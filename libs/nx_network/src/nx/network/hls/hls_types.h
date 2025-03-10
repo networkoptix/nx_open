@@ -15,7 +15,7 @@ namespace nx::network::hls {
 class NX_NETWORK_API Chunk
 {
 public:
-    double duration = 0.0;
+    std::chrono::microseconds duration{0};
     nx::utils::Url url;
     /** If true, there is discontinuity between this chunk and previous one. */
     bool discontinuity = false;

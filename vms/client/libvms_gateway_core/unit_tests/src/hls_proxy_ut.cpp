@@ -1,9 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "test_setup.h"
-
 #include <optional>
 
+#include <nx/cloud/vms_gateway/vms_gateway_process.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/hls/hls_types.h>
@@ -11,36 +10,30 @@
 #include <nx/network/http/http_content_type.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/m3u/m3u_playlist.h>
-#include <nx/network/socket_global.h>
 #include <nx/network/socket_factory.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/ssl/context.h>
 #include <nx/network/ssl/ssl_stream_socket.h>
 
-#include <nx/cloud/vms_gateway/vms_gateway_process.h>
+#include "test_setup.h"
 
-namespace nx {
-namespace cloud {
-namespace gateway {
-namespace test {
+
+namespace nx::cloud::gateway::test {
 
 namespace {
 
-const char* const kHlsPlaylistPath = "/playlist.m3u";
-const char* const kHlsChunkPath = "/hls/chunk.ts";
+using namespace std::chrono_literals;
 
-const char* const kHlsChunkContents = "This could be mpeg2/ts file.";
-const char* const kHlsChunkContentType = "video/mp2t";
+const auto kHlsPlaylistPath = "/playlist.m3u";
+const auto kHlsChunkPath = "/hls/chunk.ts";
 
-class TestCloudStreamSocket:
-    public nx::network::cloud::CloudStreamSocket
+const auto kHlsChunkContents = "This could be mpeg2/ts file.";
+const auto kHlsChunkContentType = "video/mp2t";
+
+class TestCloudStreamSocket: public nx::network::cloud::CloudStreamSocket
 {
-    using base_type = nx::network::cloud::CloudStreamSocket;
-
 public:
-    virtual std::string getForeignHostName() const override
-    {
-        return m_foreignHostFullCloudName;
-    }
+    virtual std::string getForeignHostName() const override { return m_foreignHostFullCloudName; }
 
     void setForeignHostFullCloudName(const std::string& hostName)
     {
@@ -55,14 +48,10 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class HlsProxy:
-    public BasicComponentTest
+class HlsProxy: public BasicComponentTest
 {
 public:
-    HlsProxy()
-    {
-        addArg("-http/allowTargetEndpointInUrl", "true");
-    }
+    HlsProxy() { addArg("-http/allowTargetEndpointInUrl", "true"); }
 
     ~HlsProxy()
     {
@@ -71,17 +60,17 @@ public:
     }
 
 protected:
-    void setSslEnabled(bool val)
-    {
-        m_sslEnabled = val;
-    }
+    void setSslEnabled(bool val) { m_sslEnabled = val; }
 
     void whenReceivedHlsPlaylistViaProxy()
     {
         nx::Buffer msgBody;
         std::string contentType;
-        ASSERT_TRUE(nx::network::http::HttpClient::fetchResource(
-            playlistProxyUrl(), &msgBody, &contentType, nx::network::kNoTimeout, nx::network::ssl::kAcceptAnyCertificate));
+        ASSERT_TRUE(nx::network::http::HttpClient::fetchResource(playlistProxyUrl(),
+            &msgBody,
+            &contentType,
+            nx::network::kNoTimeout,
+            nx::network::ssl::kAcceptAnyCertificate));
         ASSERT_TRUE(m_receivedPlaylist.parse(msgBody));
     }
 
@@ -103,8 +92,11 @@ protected:
 
         nx::Buffer msgBody;
         std::string contentType;
-        ASSERT_TRUE(nx::network::http::HttpClient::fetchResource(
-            chunkUrl, &msgBody, &contentType, nx::network::kNoTimeout, nx::network::ssl::kAcceptAnyCertificate));
+        ASSERT_TRUE(nx::network::http::HttpClient::fetchResource(chunkUrl,
+            &msgBody,
+            &contentType,
+            nx::network::kNoTimeout,
+            nx::network::ssl::kAcceptAnyCertificate));
 
         ASSERT_EQ(kHlsChunkContents, msgBody);
         ASSERT_EQ(kHlsChunkContentType, contentType);
@@ -147,24 +139,21 @@ private:
 
         m_cloudSystemId = nx::Uuid::createUuid().toSimpleStdString();
         m_cloudServerId = nx::Uuid::createUuid().toSimpleStdString();
-        m_hlsServerFullCloudName = nx::format("%1.%2").arg(m_cloudServerId).arg(m_cloudSystemId).toStdString();
+        m_hlsServerFullCloudName =
+            nx::format("%1.%2").arg(m_cloudServerId).arg(m_cloudSystemId).toStdString();
         nx::network::SocketGlobals::addressResolver().addFixedAddress(
-            m_hlsServerFullCloudName,
-            m_hlsServer.serverAddress());
+            m_hlsServerFullCloudName, m_hlsServer.serverAddress());
         nx::network::SocketGlobals::addressResolver().addFixedAddress(
-            m_cloudSystemId,
-            m_hlsServer.serverAddress());
+            m_cloudSystemId, m_hlsServer.serverAddress());
 
         m_socketFactoryBak = nx::network::SocketFactory::setCreateStreamSocketFunc(
             std::bind(&HlsProxy::createStreamSocket, this, _2));
 
         m_hlsServer.registerStaticProcessor(
-            kHlsChunkPath,
-            kHlsChunkContents,
-            kHlsChunkContentType);
+            kHlsChunkPath, kHlsChunkContents, kHlsChunkContentType);
 
         network::hls::Chunk hlsChunk;
-        hlsChunk.duration = 10;
+        hlsChunk.duration = 10us;
         hlsChunk.url = nx::format("%1").arg(kHlsChunkPath);
 
         network::hls::Playlist playlist;
@@ -172,16 +161,15 @@ private:
         playlist.chunks.push_back(hlsChunk);
 
         m_hlsServer.registerStaticProcessor(
-            kHlsPlaylistPath,
-            playlist.toString(),
-            nx::network::http::kAudioMpegUrlMimeType);
+            kHlsPlaylistPath, playlist.toString(), nx::network::http::kAudioMpegUrlMimeType);
     }
 
     nx::utils::Url playlistProxyUrl() const
     {
         return nx::utils::Url(nx::format("http://%1/%2%3")
-            .arg(moduleInstance()->impl()->httpEndpoints()[0])
-            .arg(m_cloudSystemId).arg(kHlsPlaylistPath));
+                .arg(moduleInstance()->impl()->httpEndpoints()[0])
+                .arg(m_cloudSystemId)
+                .arg(kHlsPlaylistPath));
     }
 
     std::unique_ptr<nx::network::AbstractStreamSocket> createStreamSocket(bool sslRequired)
@@ -222,7 +210,4 @@ TEST_F(HlsProxy, subsequent_requests_are_forwarded_to_the_same_server_when_ssl_i
     thenAllPlaylistItemsPointToTheExactServer();
 }
 
-} // namespace test
-} // namespace gateway
-} // namespace cloud
-} // namespace nx
+} // namespace nx::cloud::gateway::test

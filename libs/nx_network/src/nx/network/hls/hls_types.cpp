@@ -4,15 +4,15 @@
 
 #include <cmath>
 
-#include <QtCore/QTimeZone>
-
 #include <nx/utils/log/log.h>
 
 namespace nx::network::hls {
 
+using namespace std::chrono_literals;
+
 QString timeZoneOffsetString(QDateTime dt1)
 {
-    QDateTime dt2 = dt1.toUTC();
+    const QDateTime dt2 = dt1.toUTC();
     dt1.setTimeZone(QTimeZone::UTC);
     const int offsetSeconds = dt2.secsTo(dt1);
 
@@ -24,18 +24,18 @@ QString timeZoneOffsetString(QDateTime dt1)
 
 std::string Playlist::toString() const
 {
-    int targetDuration = 0;
+    auto targetDuration = 0us;
     for (const auto& chunk: chunks)
     {
-        if (std::ceil(chunk.duration) > targetDuration)
-            targetDuration = std::ceil(chunk.duration);
+        if (chunk.duration > targetDuration)
+            targetDuration = chunk.duration;
     }
 
     std::string playlistStr;
     playlistStr +=
         "#EXTM3U\r\n"
         "#EXT-X-VERSION:3\r\n";
-    playlistStr += "#EXT-X-TARGETDURATION:" + std::to_string(targetDuration) + "\r\n";
+    playlistStr += "#EXT-X-TARGETDURATION:" + std::to_string(targetDuration.count()) + "\r\n";
     playlistStr += "#EXT-X-MEDIA-SEQUENCE:" + std::to_string(mediaSequence) + "\r\n";
     if (allowCache)
     {
@@ -62,7 +62,7 @@ std::string Playlist::toString() const
             playlistStr += dateTime.toStdString(); //< data/time.
             playlistStr += "\r\n";
         }
-        playlistStr += "#EXTINF:" + std::to_string(chunk.duration) + ",\r\n";
+        playlistStr += "#EXTINF:" + std::to_string(chunk.duration.count()) + ",\r\n";
 
         // NOTE: Reporting only path if host not specified.
         playlistStr += chunk.url.host().isEmpty()
