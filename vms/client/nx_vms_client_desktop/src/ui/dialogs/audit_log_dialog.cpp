@@ -800,11 +800,13 @@ void QnAuditLogDialog::triggerAction(
                     tr("These cameras are removed from Site", "", count)));
                 break;
             case menu::ServerSettingsAction:
-                QnMessageBox::warning(this, tr("These servers are removed from Site",
+                // Entry cannot have more than one server, so let default string be singular.
+                QnMessageBox::warning(this, tr("This server is removed from Site",
                     "", count));
                 break;
             case menu::UserSettingsAction:
-                QnMessageBox::warning(this, tr("These users are removed from Site",
+                // Entry cannot have more than one user, so let default string be singular.
+                QnMessageBox::warning(this, tr("This user is removed from Site",
                     "", count));
                 break;
             default:
