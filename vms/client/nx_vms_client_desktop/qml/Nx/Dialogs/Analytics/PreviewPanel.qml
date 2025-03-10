@@ -370,6 +370,8 @@ Rectangle
                     textFormat: Text.PlainText
 
                     text: previewPanel.selectedItem ? previewPanel.selectedItem.objectTitle : ""
+                    GlobalToolTip.text: text
+                    GlobalToolTip.enabled: truncated
                     visible: !!text
 
                     wrapMode: Text.Wrap
