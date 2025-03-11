@@ -23,9 +23,6 @@ TableView
 
     columnWidthProvider: function(column)
     {
-        if (!isColumnLoaded(column))
-            return -1
-
         const checkableColumnWidth = Math.max(
             implicitColumnWidth(0), horizontalHeaderView.implicitColumnWidth(0))
         if (column === 0)
