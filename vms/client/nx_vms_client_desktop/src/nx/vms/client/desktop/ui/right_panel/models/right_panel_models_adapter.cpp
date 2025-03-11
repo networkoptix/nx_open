@@ -1212,10 +1212,8 @@ void RightPanelModelsAdapter::Private::initCslSupport(
         this,
         [this, setSystemContextToModels]
         {
-            const auto selectedCamera =
-                m_context->navigator()->currentResource().dynamicCast<QnVirtualCameraResource>();
-
-            setSystemContextToModels(SystemContext::fromResource(selectedCamera));
+            setSystemContextToModels(
+                SystemContext::fromResource(m_context->navigator()->currentResource()));
 
             emit q->crossSiteModeChanged();
         });
@@ -1226,21 +1224,14 @@ void RightPanelModelsAdapter::Private::initCslSupport(
         this,
         [this, setSystemContextToModels]
         {
-            const auto selectedCamera = m_context->navigator()->currentResource()
-                .dynamicCast<QnVirtualCameraResource>();
-            if (!selectedCamera)
-                return;
-
-            setSystemContextToModels(selectedCamera->systemContext()->as<SystemContext>());
+            setSystemContextToModels(
+                SystemContext::fromResource(m_context->navigator()->currentResource()));
 
             emit q->crossSiteModeChanged();
         });
 
-    if (const auto selectedCamera = m_context->navigator()->currentResource()
-        .dynamicCast<QnVirtualCameraResource>())
-    {
-        setSystemContextToModels(selectedCamera->systemContext()->as<SystemContext>());
-    }
+    setSystemContextToModels(
+        SystemContext::fromResource(m_context->navigator()->currentResource()));
 }
 
 void RightPanelModelsAdapter::Private::setHighlightedTimestamp(microseconds value)
