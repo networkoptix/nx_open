@@ -18,6 +18,7 @@ Control
     property color backgroundColor: "transparent"
     property color disabledBackgroundColor: "transparent"
     property alias icon: iconLabel.icon
+    property alias imageSource: iconImage.source
     property bool checkable: false
     property bool checked: false
 
@@ -52,12 +53,31 @@ Control
         ? checkedIconColor
         : normalIconColor
 
-    contentItem: IconLabel
+    contentItem: Item
     {
-        id: iconLabel
+        implicitWidth: iconLabel.implicitWidth
+        implicitHeight: iconLabel.implicitHeight
 
-        anchors.centerIn: parent
-        opacity: control.enabled && control.enabledMask ? 1.0 : 0.3
+        IconLabel
+        {
+            id: iconLabel
+
+            visible: !iconImage.source.toString()
+            anchors.centerIn: parent
+            opacity: control.enabled && control.enabledMask ? 1.0 : 0.3
+        }
+
+        // IconLabel does not support data images with hidpi, so use Image instead.
+        Image
+        {
+            id: iconImage
+
+            visible: source
+            anchors.centerIn: parent
+            opacity: control.enabled && control.enabledMask ? 1.0 : 0.3
+            width: iconLabel.implicitWidth
+            height: iconLabel.implicitHeight
+        }
     }
 
     background: MouseArea
