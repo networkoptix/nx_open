@@ -74,73 +74,81 @@ Page
                 width: parent.availableWidth
                 onAccepted: customConnectionScreen.connect()
             }
+        }
+    }
 
-            Item
+    Column
+    {
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.margins: 20
+
+        spacing: 16
+
+        LoginButton
+        {
+            id: connectButton
+
+            width: parent.width
+            showProgress: d.connecting
+            onClicked: customConnectionScreen.connect()
+        }
+
+        Button
+        {
+            width: parent.width
+            text: qsTr("Delete")
+            visible: saved
+            leftPadding: 0
+            rightPadding: 0
+
+            implicitHeight: 44
+
+            onClicked:
             {
-                width: 1
-                height: 8
-            }
+                var title
+                var message
 
-            LoginButton
-            {
-                id: connectButton
+                var lastCredentials = authenticationDataAccessor.count <= 1
 
-                width: parent.availableWidth
-                showProgress: d.connecting
-                onClicked: customConnectionScreen.connect()
-            }
-
-            Button
-            {
-                width: parent.availableWidth
-                text: qsTr("Delete")
-                visible: saved
-
-                onClicked:
+                if (!lastCredentials)
                 {
-                    var title
-                    var message
-
-                    var lastCredentials = authenticationDataAccessor.count <= 1
-
-                    if (!lastCredentials)
-                    {
-                        title = qsTr("Delete login \"%1\"?", "%1 is a user name").arg(credentialsEditor.login)
-                        message = qsTr(
-                            "Server addresses and other logins will remain saved. "
-                                + "To delete all connection information "
-                                + "you should delete all saved logins.")
-                    }
-                    else
-                    {
-                        title = qsTr("Delete connection?")
-                    }
-
-                    var dialog = Workflow.openStandardDialog(
-                        title, message,
-                        [
-                            { "id": "DELETE", "text": qsTr("Delete") },
-                            "CANCEL"
-                        ])
-
-                    dialog.buttonClicked.connect(
-                        function(buttonId)
-                        {
-                            if (buttonId !== "DELETE")
-                                return
-
-                            removeSavedConnection(systemId, localSystemId, credentialsEditor.login)
-
-                            if (lastCredentials)
-                            {
-                                cancelScreen()
-                                return
-                            }
-
-                            credentialsEditor.login =
-                                authenticationDataModel.defaultCredentials.user
-                        })
+                    title = qsTr("Delete login \"%1\"?", "%1 is a user name").arg(credentialsEditor.login)
+                    message = qsTr(
+                        "Server addresses and other logins will remain saved. "
+                            + "To delete all connection information "
+                            + "you should delete all saved logins.")
                 }
+                else
+                {
+                    title = qsTr("Delete connection?")
+                }
+
+                var dialog = Workflow.openStandardDialog(
+                    title, message,
+                    [
+                        { "id": "DELETE", "text": qsTr("Delete") },
+                        "CANCEL"
+                    ])
+
+                dialog.buttonClicked.connect(
+                    function(buttonId)
+                    {
+                        if (buttonId !== "DELETE")
+                            return
+
+                        removeSavedConnection(systemId, localSystemId, credentialsEditor.login)
+
+                        if (lastCredentials)
+                        {
+                            cancelScreen()
+                            return
+                        }
+
+                        credentialsEditor.login =
+                            authenticationDataModel.defaultCredentials.user
+                    })
             }
         }
     }

@@ -3,6 +3,9 @@ module Nx.Items
 SideNavigation 1.0 SideNavigation.qml
 SessionCredentialsEditor 1.0 SessionCredentialsEditor.qml
 SessionItem 1.0 SessionItem.qml
+SiteListItem 1.0 SiteListItem.qml
+Skeleton 1.0 Skeleton.qml
+Placeholder 1.0 Placeholder.qml
 SystemInformationBlock 1.0 SystemInformationBlock.qml
 ArchiveCalendar 1.0 ArchiveCalendar.qml
 LoginButton 1.0 LoginButton.qml
@@ -10,3 +13,5 @@ DummyMessage 1.0 DummyMessage.qml
 IssueLabel 1.0 IssueLabel.qml
 BookmarkList 1.0 BookmarkList.qml
 DownloadMediaButton 1.0 DownloadMediaButton.qml
+Breadcrumb 1.0 Breadcrumb.qml
+SiteList 1.0 SiteList.qml

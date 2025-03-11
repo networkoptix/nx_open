@@ -71,6 +71,25 @@ function openNewSessionScreen()
         item.focusHostField()
 }
 
+function openOrganizationScreen(model, rootIndex)
+{
+    stackView.safePush(
+        Qt.resolvedUrl("../Screens/OrganizationScreen.qml"),
+        {
+            "model": model,
+            "rootIndex": rootIndex
+        })
+}
+
+function openChannelPartnerScreen(profileWatcher)
+{
+    stackView.safePush(
+        Qt.resolvedUrl("../Screens/Cloud/ChannelPartner.qml"),
+        {
+            "profileWatcher": profileWatcher
+        })
+}
+
 function openConnectToServerScreen(host, user, password, operationId)
 {
     var item = stackView.safePush(
@@ -78,7 +97,7 @@ function openConnectToServerScreen(host, user, password, operationId)
             {
                 "address": host,
                 "login": user,
-                "passowrd": password,
+                "password": password,
                 "operationId": operationId
             }
     )

@@ -1,10 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Controls
 import Nx.Items
+import Nx.Mobile
 import Nx.Models
 import Nx.Ui
 
@@ -15,25 +19,50 @@ Page
     id: sessionsScreen
     objectName: "sessionsScreen"
 
-    leftButtonIcon.source: lp("/images/menu.png")
+    leftButtonImageSource: cloudStatusWatcher.status == CloudStatusWatcher.Online
+        ? cloudUserProfileWatcher.avatarUrl
+        : ""
+    leftButtonIcon.source: "image://skin/32x32/Outline/avatar.svg"
+    leftButtonIcon.width: 32
+    leftButtonIcon.height: 32
 
-    leftPadding: 12
-    rightPadding: 12
+    rightButtonIcon.source: "image://skin/24x24/Outline/settings.svg?primary=light10"
+    rightButtonIcon.width: 24
+    rightButtonIcon.height: 24
 
-    onLeftButtonClicked: sideNavigation.open()
+    onLeftButtonClicked:
+    {
+        var showSummary = cloudStatusWatcher.status == CloudStatusWatcher.Online
+            || cloudStatusWatcher.status == CloudStatusWatcher.Offline
+
+        if (!showSummary)
+        {
+            Workflow.openCloudLoginScreen()
+            return
+        }
+
+        Workflow.openCloudSummaryScreen(cloudUserProfileWatcher)
+    }
+    onRightButtonClicked: Workflow.openSettingsScreen()
+
+    readonly property bool searching: !!siteList.searchText
+    readonly property bool localSitesVisible:
+        sitesTabButton.checked || !cloudUserProfileWatcher.isOrgUser
+
+    StackView.onActivated: forceActiveFocus()
 
     titleControls:
     [
-        Button
+        SearchEdit
         {
-            text: qsTr("Log in to %1", "%1 is the short cloud name (like 'Cloud')").arg(applicationInfo.cloudName())
-            textColor: ColorTheme.colors.dark16
-            flat: true
-            leftPadding: 0
-            rightPadding: 0
-            labelPadding: 8
-            visible: cloudStatusWatcher.status == CloudStatusWatcher.LoggedOut
-            onClicked: Workflow.openCloudLoginScreen()
+            id: searchField
+
+            width: parent.width
+            height: 36
+            anchors.verticalCenter: parent.verticalCenter
+            placeholderText: qsTr("Search")
+
+            onDisplayTextChanged: siteList.searchText = displayText
         }
     ]
 
@@ -47,208 +76,277 @@ Page
         onPressed: (mouse) =>
         {
             mouse.accepted = false
-            searchEdit.resetFocus()
+            searchField.resetFocus()
         }
     }
 
     Rectangle
     {
-        id: searchPanel
+        id: systemTabs
 
-        color: sessionsScreen.backgroundColor
-
-        readonly property bool searching:
-            visible && (searchEdit.activeFocus || searchEdit.displayText.length)
-
-        readonly property point searchPanelPosition:
-        {
-            if (searchPanel.searching)
-                return Qt.point(0, 0)
-
-            return sessionsList.mapToItem(
-                searchPanel.parent,
-                sessionsList.originX - sessionsList.contentX,
-                sessionsList.originY - sessionsList.contentY)
-        }
-
-        x: searchPanelPosition.x
-        y: searchPanelPosition.y
-        z: 2
-
-        height: searchEdit.y + searchEdit.height + 12
-        width: sessionsList.width
-        visible: sessionsList.model.acceptedRowCount > 8
-
-        SearchEdit
-        {
-            id: searchEdit
-
-            property Item placeholder: searchPanel.searching ? null : placeholderHolder
-            property Item placeholderHolder: null
-
-            y: 4
-            height: 40
-            width: parent.width
-            onDisplayTextChanged:
-            {
-                sessionsList.model.filterWildcard = displayText
-                if (!displayText.length)
-                    sessionsList.positionViewAtBeginning()
-            }
-        }
-    }
-
-    GridView
-    {
-        id: sessionsList
-
-        clip: true
+        color: ColorTheme.colors.dark8
         width: parent.width
-        height: parent.height
+        implicitHeight: 48
+        height: visible ? implicitHeight : 0
+        z: 1
 
-        header: Item
+        visible: !sessionsScreen.searching && !organizationsModel.channelPartnerLoading
+            && cloudUserProfileWatcher.isOrgUser
+
+        ButtonGroup
         {
-            width: sessionsList.width
-            height: searchPanel.searching || searchPanel.visible ? searchPanel.height : 16
-            Component.onCompleted: searchEdit.placeholderHolder = this
+            buttons: systemTabsRow.children
         }
 
-        footer: Item
+        component TabButton: AbstractButton
         {
-            width: sessionsList.width
-            height: 12
-        }
+            id: tabButton
 
-        property real horizontalSpacing: 8
-        property real verticalSpacing: cellsInRow > 1 ? 8 : 1
-        readonly property real maxCellWidth: 488 + horizontalSpacing
-        property int cellsInRow: Math.max(1, Math.ceil(width / maxCellWidth))
+            height: 40
+            width: tabText.width + 16 * 2
+            checkable: true
+            focusPolicy: Qt.StrongFocus
 
-        cellWidth: (width - leftMargin - rightMargin) / cellsInRow
-        cellHeight: 98 + verticalSpacing
-
-        model: OrderedSystemsModel
-        {
-            id: systemsModel
-
-            // TODO: #ynikitenkov refactor to use ConnectionValidator implementation instead.
-            // minimalVersion: "3.0" //< Will be fixed soon.
-            filterCaseSensitivity: Qt.CaseInsensitive
-            filterRole: searchRoleId()
-        }
-
-        delegate: Item
-        {
-            width: sessionsList.cellWidth
-            height: sessionsList.cellHeight
-
-            SessionItem
+            background: Rectangle
             {
-                readonly property bool firstRowItem: index < sessionsList.cellsInRow
-                readonly property real verticalMargin: Math.floor(sessionsList.verticalSpacing / 2)
-                readonly property real horizontalMargin: sessionsList.horizontalSpacing / 2
+                color: tabButton.checked ? ColorTheme.colors.dark10 : "transparent"
+                radius: 8
+            }
 
-                anchors.fill: parent
-                anchors.leftMargin: horizontalMargin
-                anchors.rightMargin: horizontalMargin
-                anchors.topMargin: firstRowItem ? 0 : verticalMargin
-                anchors.bottomMargin: sessionsList.verticalSpacing - verticalMargin
-
-                systemName: model.systemName
-                systemId: model.systemId
-                localId: model.localId
-                cloudSystem: model.isCloudSystem
-                factorySystem: model.isFactorySystem
-                needDigestCloudPassword: !model.isOauthSupported && !hasDigestCloudPassword
-                ownerDescription: cloudSystem ? model.ownerDescription : ""
-                running: model.isOnline
-                reachable: model.isReachable
-                compatible: model.isCompatibleToMobileClient || model.isFactorySystem
-                wrongCustomization: model.wrongCustomization ? model.wrongCustomization : false
-                invalidVersion: model.wrongVersion ? model.wrongVersion.toString() : ""
+            Text
+            {
+                id: tabText
+                text: tabButton.text
+                color: tabButton.checked ? ColorTheme.colors.light4 : ColorTheme.colors.light10
+                font.pixelSize: 14
+                anchors.centerIn: parent
             }
         }
-        highlightMoveDuration: 0
 
-        focus: false
-
-        Keys.onPressed:
+        Row
         {
-            // TODO: #dklychkov Implement transparent navigation to the footer item.
-            if (event.key == Qt.Key_C)
+            id: systemTabsRow
+            spacing: 0
+            x: 20
+            y: 4
+
+            TabButton
             {
-                Workflow.openNewSessionScreen()
-                event.accepted = true
+                id: organizationsTabButton
+                checked: true
+                text: qsTr("Organizations")
+            }
+
+            TabButton
+            {
+                id: sitesTabButton
+                text: qsTr("Sites")
             }
         }
     }
 
-    footer: Rectangle
+    OrderedSystemsModel
     {
-        implicitHeight: customConnectionButton.implicitHeight + 16
-        color: ColorTheme.colors.windowBackground
+        id: systemsModel
+    }
 
-        Rectangle
+    OrganizationsModel
+    {
+        id: organizationsModel
+
+        statusWatcher: cloudUserProfileWatcher.statusWatcher
+        systemsModel: systemsModel
+        channelPartner: cloudUserProfileWatcher.channelPartner
+
+        signal systemOpened(var current)
+
+        onSystemOpened: (current) => sessionsScreen.openSystem(current)
+    }
+
+    ModelDataAccessor
+    {
+        id: accessor
+
+        model: organizationsModel
+    }
+
+    LinearizationListModel
+    {
+        id: linearizationListModel
+
+        sourceModel: organizationsModel
+        autoExpandAll: sessionsScreen.searching
+        onAutoExpandAllChanged:
         {
-            width: parent.width
-            height: 1
-            anchors.top: parent ? parent.top : undefined
-            color: ColorTheme.colors.dark4
+            if (!autoExpandAll)
+                collapseAll()
         }
+        sourceRoot: localSitesVisible && !sessionsScreen.searching
+            ? organizationsModel.sitesRoot
+            : NxGlobals.invalidModelIndex()
+    }
 
-        Button
+    Placeholder
+    {
+        id: searchNotFoundPlaceholder
+
+        visible: sessionsScreen.searching && siteList.count == 0
+
+        anchors.centerIn: parent
+        anchors.verticalCenterOffset: -header.height / 2
+        imageSource: "image://skin/64x64/Outline/notfound.svg?primary=light10"
+        text: qsTr("Nothing found")
+        description: qsTr("Try changing the search parameters")
+    }
+
+    Placeholder
+    {
+        id: noOrganizationPlaceholder
+
+        visible: !sessionsScreen.searching && siteList.count == 0 && organizationsTabButton.checked
+            && !organizationsModel.channelPartnerLoading && cloudUserProfileWatcher.isOrgUser
+
+        anchors.centerIn: parent
+        anchors.verticalCenterOffset: -header.height / 2
+        imageSource: "image://skin/64x64/Outline/no_organization.svg?primary=light10"
+        text: qsTr("No Organizations")
+        description: qsTr("We didn't find any organizations, try contacting support")
+    }
+
+    Placeholder
+    {
+        id: noSitesPlaceholder
+
+        visible: !sessionsScreen.searching && siteList.count == 0
+            && !organizationsModel.channelPartnerLoading && localSitesVisible
+
+        z: 1
+
+        anchors.centerIn: parent
+        anchors.verticalCenterOffset: -header.height / 2
+
+        readonly property bool isLoggedOut:
+            cloudStatusWatcher.status == CloudStatusWatcher.LoggedOut
+
+        imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10"
+        text: qsTr("No Sites Found")
+        description: isLoggedOut
+            ? qsTr("We didn't find any sites on your local network, try adding servers manually or log in to your cloud account")
+            : qsTr("We didn't find any sites on your local network, try adding servers manually")
+        buttonText: isLoggedOut ? qsTr("Log In") : ""
+        buttonIcon.source: "image://skin/24x24/Outline/cloud.svg?primary=dark1"
+        onButtonClicked: Workflow.openCloudLoginScreen()
+    }
+
+    SiteList
+    {
+        id: siteList
+
+        width: parent.width
+        height: parent.height - systemTabs.height
+        y: systemTabs.height
+
+        visible: !organizationsModel.channelPartnerLoading
+        siteModel: linearizationListModel
+        hideOrgSystemsFromSites: cloudUserProfileWatcher.isOrgUser
+
+        onItemClicked: (nodeId) =>
         {
-            id: customConnectionButton
+            let current = organizationsModel.indexFromId(nodeId)
 
-            text: dummyMessage.visible
-                ? qsTr("Connect to Server...")
-                : qsTr("Connect to Another Server...")
+            if (accessor.getData(current, "type") != OrganizationsModel.System)
+            {
+                Workflow.openOrganizationScreen(organizationsModel, current)
+                return
+            }
 
-            anchors.centerIn: parent
-            width: parent.width - 16
-
-            onClicked: Workflow.openNewSessionScreen()
+            sessionsScreen.openSystem(current)
         }
     }
 
-    DummyMessage
+    IconButton
     {
-        id: dummyMessage
+        id: customConnectionButton
 
-        readonly property string kCheckNetworkMessage:
-            qsTr("Check your network connection or press \"%1\" button to enter a known server address.",
-             "%1 is a button name").arg(customConnectionButton.text)
+        visible: localSitesVisible && !searching
 
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.bottomMargin: 20
+        anchors.rightMargin: 20
+
+        icon.source: "image://skin/24x24/Outline/plus.svg?primary=dark1"
+        icon.width: 24
+        icon.height: 24
+        padding: 16
+
+        TapHandler
+        {
+            onTapped: Workflow.openNewSessionScreen()
+        }
+
+        background: Rectangle
+        {
+            color: ColorTheme.colors.light10
+            radius: 16
+        }
+    }
+
+    Skeleton
+    {
         anchors.fill: parent
-        anchors.bottomMargin: -8
 
-        readonly property bool emptySearchMode:
-            searchPanel.searching && sessionsList.model.sourceRowsCount > 0
+        visible: organizationsModel.channelPartnerLoading
 
-        title: emptySearchMode ? qsTr("Nothing found") : qsTr("No Sites found")
-        description: emptySearchMode ? "" : kCheckNetworkMessage
-
-        visible: false
-
-        Timer
+        component MaskItem: Rectangle
         {
-            interval: 1000
-            running: true
-            onTriggered:
+            radius: 8
+            color: "white"
+            antialiasing: false
+        }
+
+        Row
+        {
+            x: 20
+            y: 4
+            spacing: 4
+
+            MaskItem
             {
-                dummyMessage.visible = Qt.binding(function() { return sessionsList.count == 0 })
+                width: 120
+                height: 40
+            }
+
+            MaskItem
+            {
+                width: 120
+                height: 40
+            }
+        }
+
+        Flow
+        {
+            anchors.fill: parent
+            topPadding: 64
+            leftPadding: 20
+            spacing: siteList.spacing
+            Repeater
+            {
+                model: 4
+
+                delegate: MaskItem
+                {
+                    width: siteList.cellWidth
+                    height: 116
+                }
             }
         }
     }
 
     function resetSearch()
     {
-        searchEdit.clear()
-        if (!sessionsList.count)
-            return
-
-        sessionsList.positionViewAtBeginning()
-        sessionsList.contentY += searchPanel.visible ? searchEdit.height : 0
+        searchField.clear()
+        siteList.positionViewAtBeginning()
     }
 
     onVisibleChanged:
@@ -258,4 +356,111 @@ Page
     }
 
     Component.onCompleted: resetSearch()
+
+    AuthenticationDataModel
+    {
+        id: authenticationDataModel
+
+        readonly property bool hasData: !!defaultCredentials.user
+        readonly property bool hasStoredPassword: defaultCredentials.isPasswordSaved
+    }
+
+    SystemHostsModel
+    {
+        id: hostsModel
+    }
+
+    function openSystem(current)
+    {
+        const isFactory = accessor.getData(current, "isFactorySystem")
+        if (isFactory)
+        {
+            Workflow.openStandardDialog("", UiMessages.factorySystemErrorText())
+            return
+        }
+
+        const systemName = accessor.getData(current, "display")
+
+        const isCompatible = accessor.getData(current, "isCompatibleToMobileClient")
+        if (!isCompatible)
+        {
+            const wrongCustomization = accessor.getData(current, "wrongCustomization")
+            if (wrongCustomization)
+            {
+                const incompatibleServerErrorText = UiMessages.incompatibleServerErrorText()
+                Workflow.openSessionsScreenWithWarning(systemName, incompatibleServerErrorText)
+            }
+            else
+            {
+                const tooOldErrorText = UiMessages.tooOldServerErrorText()
+                Workflow.openSessionsScreenWithWarning(systemName, tooOldErrorText)
+            }
+
+            return
+        }
+
+        const systemId = accessor.getData(current, "systemId")
+
+        const isCloudSystem = accessor.getData(current, "isCloudSystem")
+        if (!isCloudSystem)
+        {
+            const localId = accessor.getData(current, "localId")
+            authenticationDataModel.localSystemId = localId
+
+            hostsModel.systemId = systemId
+            hostsModel.localSystemId = localId
+            const defaultAddress = hostsModel.rowCount() > 0
+                ? NxGlobals.modelData(hostsModel.index(0, 0), "url-internal")
+                : NxGlobals.emptyUrl()
+
+            if (authenticationDataModel.hasData)
+            {
+                let connectionStarted = false
+                if (authenticationDataModel.hasStoredPassword)
+                {
+                    const callback =
+                        function(connectionStatus, errorMessage)
+                        {
+                            if (connectionStatus !== SessionManager.LocalSessionExiredStatus)
+                                return
+
+                            Workflow.openSessionsScreen() //< Resets connection state/preloader.
+                            removeSavedAuth(
+                                localId, authenticationDataModel.defaultCredentials.user)
+                            openSavedSession(
+                                systemId, localId, systemName, defaultAddress, errorMessage)
+                        }
+
+                    connectionStarted = sessionManager.startSessionWithStoredCredentials(
+                        defaultAddress,
+                        NxGlobals.uuid(localId),
+                        authenticationDataModel.defaultCredentials.user,
+                        callback)
+                }
+
+                if (!connectionStarted)
+                    openSavedSession(systemId, localId, systemName, defaultAddress)
+            }
+            else
+            {
+                Workflow.openDiscoveredSession(
+                    systemId, localId, systemName, defaultAddress.displayAddress())
+            }
+        }
+        else if (!hostsModel.isEmpty)
+        {
+            sessionManager.startCloudSession(systemId, systemName)
+        }
+    }
+
+    function openSavedSession(systemId, localId, systemName, defaultAddress, errorMessage)
+    {
+        Workflow.openSavedSession(
+            systemId,
+            localId,
+            systemName,
+            defaultAddress.displayAddress(),
+            authenticationDataModel.defaultCredentials.user,
+            errorMessage)
+    }
 }

@@ -19,9 +19,11 @@ TextInput
 
     property bool enableCustomHandles: Qt.platform.os == "android"
 
-    property color inactiveColor: showError ? ColorTheme.colors.red_d1 : ColorTheme.colors.dark10
+    property color inactiveColor: showError ? ColorTheme.colors.red_d1 : ColorTheme.colors.dark7
     property color activeColor: showError ? ColorTheme.colors.red_core : ColorTheme.colors.brand_core
-    property color placeholderColor: ColorTheme.colors.dark16
+    property color backgroundColor: ColorTheme.colors.dark7
+    property real borderWidth: 2
+    property color placeholderColor: ColorTheme.colors.light15
     property color cursorColor: activeColor
     property bool selectionAllowed: true
     scrollByMouse: CoreUtils.isMobile()
@@ -42,48 +44,11 @@ TextInput
     {
         Rectangle
         {
-            width: parent.width
-            anchors
-            {
-                bottom: parent ? parent.bottom : undefined
-                bottomMargin: 4
-                left: parent ? parent.left : undefined
-                leftMargin: 4
-                right: parent ? parent.right : undefined
-                rightMargin: 4 - control.backgroundRightOffset
-            }
-            height: 1
-            color: control.activeFocus ? activeColor : inactiveColor
-        }
-
-        Rectangle
-        {
-            anchors
-            {
-                left: parent ? parent.left : undefined
-                leftMargin: 4
-                bottom: parent ? parent.bottom : undefined
-                bottomMargin: 4
-            }
-            border.width: 0
-            height: 6
-            width: 1
-            color: control.activeFocus ? activeColor : inactiveColor
-        }
-
-        Rectangle
-        {
-            anchors
-            {
-                right: parent ? parent.right : undefined
-                rightMargin: 4 - control.backgroundRightOffset
-                bottom: parent ? parent.bottom : undefined
-                bottomMargin: 4
-            }
-            border.width: 0
-            height: 6
-            width: 1
-            color: control.activeFocus ? activeColor : inactiveColor
+            anchors.fill: parent
+            color: control.backgroundColor
+            radius: 8
+            border.color: control.activeFocus ? activeColor : inactiveColor
+            border.width: control.borderWidth
         }
     }
 

@@ -16,7 +16,7 @@ AbstractButton
     property color textColor: ColorTheme.windowText
     property color pressedTextColor: textColor
     property color highlightColor: "#30ffffff"
-    property real radius: 2
+    property real radius: 6
     property real labelPadding: text ? 24 : 0
 
     property alias mouseX: mouseTracker.mouseX

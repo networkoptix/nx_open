@@ -193,6 +193,15 @@ ApplicationWindow
         }
     }
 
+    CloudUserProfileWatcher
+    {
+        id: cloudUserProfileWatcher
+        statusWatcher: cloudStatusWatcher
+        readonly property bool isOrgUser:
+            cloudStatusWatcher.status != CloudStatusWatcher.LoggedOut
+            && channelPartnerList && channelPartnerList.length
+    }
+
     NxObject
     {
         id: d
@@ -248,7 +257,7 @@ ApplicationWindow
 
     function setupColorTheme()
     {
-        ColorTheme.colors["windowBackground"] = ColorTheme.colors.dark5
+        ColorTheme.colors["windowBackground"] = ColorTheme.colors.dark4
         ColorTheme.colors["backgroundDimColor"] = ColorTheme.transparent(ColorTheme.colors.dark5, 0.4)
         ColorTheme.windowText = ColorTheme.colors.light1
     }

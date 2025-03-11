@@ -45,7 +45,7 @@ Pane
             id: addressField
 
             width: parent.width
-            placeholderText: qsTr("Host : Port")
+            placeholderText: qsTr("Host: Port")
             showError: displayAddressError
             onTextChanged: credentialsEditor.changed()
             selectionAllowed: false
@@ -124,12 +124,13 @@ Pane
         Item
         {
             width: parent.width
-            height: passwordField.height
+            height: passwordField.height + passwordField.y
 
             TextField
             {
                 id: passwordField
 
+                y: 24
                 width: parent.width
                 enabled: !isPasswordSaved
 

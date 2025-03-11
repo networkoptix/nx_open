@@ -1,8 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.0
-import Nx.Controls 1.0
-import QtQuick.Layouts 1.3
+import QtQuick
+import QtQuick.Layouts
+
+import Nx.Core
+import Nx.Core.Controls
+import Nx.Controls
 
 Item
 {
@@ -32,15 +35,29 @@ Item
         textField.clear()
     }
 
+    ColoredImage
+    {
+        id: searchIcon
+
+        sourceSize: Qt.size(20, 20)
+        sourcePath: "image://skin/20x20/Outline/search.svg?primary=light16"
+
+        anchors.verticalCenter: parent.verticalCenter
+        x: 8
+    }
+
     TextField
     {
         id: textField
 
-        width: parent.width - backgroundRightOffset
+        width: parent.width
         height: parent.height
 
-        backgroundRightOffset: closeButton.visible ? closeButton.width : 0
+        font.pixelSize: 14
 
+        borderWidth: 1
+        backgroundColor: "transparent"
+        inactiveColor: ColorTheme.colors.dark6
         placeholderText: qsTr("Search")
         enterKeyType: TextInput.EnterKeySearch
 
@@ -49,17 +66,22 @@ Item
 
         onAccepted: Qt.inputMethod.hide()
 
-        rightPadding: closeButton.width
+        leftPadding: 32
+        rightPadding: clearButton.visible ? 32 : 4
     }
 
     IconButton
     {
-        id: closeButton
+        id: clearButton
 
-        width: 48
-        height: 48
+        width: 36
+        height: 36
+        padding: 0
 
-        icon.source: lp("/images/clear.png")
+        icon.width: 20
+        icon.height: 20
+
+        icon.source: "image://skin/20x20/Outline/close_small.svg?primary=light16"
         onClicked: textField.clear()
 
         opacity: textField.displayText && control.hasClearButton ? 1.0 : 0.0

@@ -17,8 +17,11 @@ QuickControls.Page
     property bool sideNavigationEnabled: true
     property var customBackHandler
     property string result
+    property bool titleUnderlineVisible: false
 
     property alias leftButtonIcon: toolBar.leftButtonIcon
+    property alias leftButtonImageSource: toolBar.leftButtonImageSource
+    property alias rightButtonIcon: toolBar.rightButtonIcon
     property alias titleControls: toolBar.controls
     property alias warningText: warningPanel.text
     property alias warningVisible: warningPanel.opened
@@ -29,6 +32,7 @@ QuickControls.Page
     property alias gradientToolbarBackground: toolBar.useGradientBackground
 
     signal leftButtonClicked()
+    signal rightButtonClicked()
     signal headerClicked()
 
     clip: true
@@ -48,8 +52,10 @@ QuickControls.Page
             {
                 id: toolBar
                 title: control && control.title
+                titleUnderlineVisible: control.titleUnderlineVisible
                 leftButtonIcon.source: d.kBackButtonIconSource
                 onLeftButtonClicked: control.leftButtonClicked()
+                onRightButtonClicked: control.rightButtonClicked()
                 onClicked: control.headerClicked()
             }
 

@@ -10,17 +10,19 @@ Rectangle
     property alias textColor: label.color
 
     color: ColorTheme.colors.red_core
-    radius: 2
+    radius: 4
 
-    implicitHeight: 18
-    implicitWidth: label.implicitWidth + 16
+    implicitHeight: label.implicitHeight + 4
+    implicitWidth: label.implicitWidth + 10
+
+    baselineOffset: label.y + label.baselineOffset
 
     Text
     {
         id: label
         anchors.centerIn: parent
-        color: ColorTheme.colors.dark4
-        font.pixelSize: 11
-        font.weight: Font.DemiBold
+        color: ColorTheme.colors.dark6
+        font.pixelSize: 12
+        font.weight: Font.Medium
     }
 }

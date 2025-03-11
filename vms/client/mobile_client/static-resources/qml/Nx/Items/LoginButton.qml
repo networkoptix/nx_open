@@ -23,6 +23,9 @@ FocusScope
         id: connectButton
 
         anchors.fill: parent
+        leftPadding: 0
+        rightPadding: 0
+        implicitHeight: 44
         text: qsTr("Connect")
         color: ColorTheme.colors.brand_core
         textColor: ColorTheme.colors.brand_contrast
