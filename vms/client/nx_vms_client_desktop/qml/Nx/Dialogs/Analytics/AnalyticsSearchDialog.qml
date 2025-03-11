@@ -339,7 +339,7 @@ Window
 
                     Layout.alignment: Qt.AlignVCenter
                     text: qsTr("Settings")
-                    visible: d.objectTypeSelected && !eventModel.placeholderRequired
+                    visible: d.objectTypeSelected
                     icon.source: "image://skin/20x20/Outline/settings.svg"
 
                     onClicked:
