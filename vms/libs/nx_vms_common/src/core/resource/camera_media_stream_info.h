@@ -81,7 +81,7 @@ public:
 
     int fps = -1;
     float actualFps = -1;
-    float averageGopSize;
+    float averageGopSize = 0;
     QString resolution;
     int numberOfChannels = -1;
     bool isConfigured = false;

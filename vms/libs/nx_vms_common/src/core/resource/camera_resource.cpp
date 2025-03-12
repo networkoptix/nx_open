@@ -216,7 +216,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 
 } // namespace nx::vms::api::analytics
 
-
 const QString QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty(
     "compatibleAnalyticsEngines");
 
@@ -924,10 +923,11 @@ void QnVirtualCameraResource::updateAudioRequiredOnDevice(const QString& deviceI
     auto prevDevice = nx::Uuid(deviceId);
     if (!prevDevice.isNull())
     {
-        auto resource = systemContext()->resourcePool()->getResourceById<QnVirtualCameraResource>(
-            prevDevice);
-        if (resource)
-            resource->updateAudioRequired();
+        if (const auto pool = resourcePool())
+        {
+            if (auto resource = pool->getResourceById<QnVirtualCameraResource>(prevDevice))
+                resource->updateAudioRequired();
+        }
     }
 }
 
@@ -1039,9 +1039,10 @@ Qn::LicenseType QnVirtualCameraResource::calculateLicenseType() const
     using namespace nx::vms::api;
     const auto licenseType = getProperty(ResourcePropertyKey::kForcedLicenseType);
     Qn::LicenseType result = nx::reflect::fromString(licenseType.toStdString(), Qn::LC_Professional);
+    const auto context = systemContext();
 
     if (result != Qn::LicenseType::LC_Free
-        && systemContext()->saasServiceManager()->saasState() != SaasState::uninitialized)
+        && context && context->saasServiceManager()->saasState() != SaasState::uninitialized)
     {
         return Qn::LC_SaasLocalRecording;
     }
