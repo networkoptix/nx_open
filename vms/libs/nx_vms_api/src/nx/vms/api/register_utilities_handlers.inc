@@ -21,6 +21,8 @@ void registerUtilitiesHandlers(
      * General information about VMS Server API for details). Most of the 3rd party players and
      * libraries (vlc, ffmpeg, live555, etc.) support only standard RTSP, which can be used only
      * for the Users with enabled Basic/Digest authentication.
+     * ATTENTION: VMS stores the digest in lowercase, so third-party software must pass the login
+     * in lower case.
      * %jsonrpc[unused]
      * %caption RTSP streaming
      * %ingroup Utilities
