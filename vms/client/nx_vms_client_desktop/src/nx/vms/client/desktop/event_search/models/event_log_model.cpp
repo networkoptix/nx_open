@@ -849,4 +849,12 @@ std::chrono::milliseconds EventLogModel::eventTimestamp(int row) const
     return duration_cast<milliseconds>(m_index->at(row).event(systemContext())->timestamp());
 }
 
+QString EventLogModel::actionType(int row) const
+{
+    if (!m_index->isValidRow(row))
+        return {};
+
+    return m_index->at(row).actionType();
+}
+
 } // namespace nx::vms::client::desktop

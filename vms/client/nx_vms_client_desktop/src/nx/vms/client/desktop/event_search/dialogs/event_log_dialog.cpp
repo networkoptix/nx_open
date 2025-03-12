@@ -813,13 +813,17 @@ void EventLogDialog::at_filterAction_triggered()
 {
     QModelIndex idx = ui->gridEvents->currentIndex();
 
-    auto eventType = m_model->eventType(idx.row());
-    const auto analyticsEventType = m_model->analyticsEventType(idx.row());
+    const auto recordEventType = m_model->eventType(idx.row());
+    const auto recordAnalyticsEventType = m_model->analyticsEventType(idx.row());
+    const auto recordActionType = m_model->actionType(idx.row());
+
+    const auto filterActionType =
+        actionType(m_actionTypesModel->index(ui->actionComboBox->currentIndex(), 0));
 
 /* TODO: #amalov Investigate parent stuff.
-    auto parentEventType = parentEvent(eventType);
+    auto parentEventType = parentEvent(recordEventType);
     if (parentEventType != EventType::anyEvent && parentEventType != EventType::undefinedEvent)
-        eventType = parentEventType;
+        recordEventType = parentEventType;
 */
     QSet<nx::Uuid> camList;
     const auto cameraResource =
@@ -828,13 +832,22 @@ void EventLogDialog::at_filterAction_triggered()
         camList << cameraResource->getId();
 
     disableUpdateData();
-    if (!analyticsEventType.isEmpty())
-        setAnalyticsEventType(analyticsEventType);
+    if (idx.column() == EventLogModel::ActionColumn)
+    {
+        setActionType(recordActionType);
+    }
     else
-        setEventType(eventType);
+    {
+        if (!recordAnalyticsEventType.isEmpty())
+            setAnalyticsEventType(recordAnalyticsEventType);
+        else
+            setEventType(recordEventType);
 
-    setEventDevices(camList);
-    setActionType({});
+        setEventDevices(camList);
+
+        if (filterActionType != recordActionType)
+            setActionType({});
+    }
     enableUpdateData();
 }
 

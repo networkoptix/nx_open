@@ -56,6 +56,7 @@ public:
     nx::vms::api::analytics::EventTypeId analyticsEventType(int row) const;
     QnResourcePtr eventResource(int row) const;
     std::chrono::milliseconds eventTimestamp(int row) const;
+    QString actionType(int row) const;
 
     void clear();
 
