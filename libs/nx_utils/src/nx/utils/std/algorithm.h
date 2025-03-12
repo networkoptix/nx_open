@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <map>
+#include <set>
 #include <vector>
 
 namespace nx {
@@ -318,6 +319,33 @@ template <typename T, typename Allocator>
 {
     unique_sort(items);
     return items;
+}
+
+template<typename T, typename Alloc, typename... Other>
+std::vector<T, Alloc> concat(std::vector<T, Alloc> first, const Other&... other)
+{
+    const size_t total_size = (first.size() + ... + other.size());
+    first.reserve(total_size);
+    (first.insert(first.end(), other.cbegin(), other.cend()), ...);
+    return first;
+}
+
+template<typename T, typename Alloc, typename... Other>
+std::vector<T, Alloc> concat(std::vector<T, Alloc> first, Other&&... other)
+{
+    const size_t total_size = (first.size() + ... + other.size());
+    first.reserve(total_size);
+    (first.insert(first.end(),
+         std::make_move_iterator(other.begin()),
+         std::make_move_iterator(other.end())),
+        ...);
+    return first;
+}
+
+template<typename T, typename Alloc>
+std::vector<T, Alloc> concat(std::vector<T, Alloc> first)
+{
+    return first;
 }
 
 } // namespace utils
