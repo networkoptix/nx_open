@@ -82,6 +82,7 @@ struct SaveableSettingsBase
     std::optional<QString> frameOptionsHeader;
     std::optional<bool> insecureDeprecatedApiEnabled;
     std::optional<bool> insecureDeprecatedApiInUseEnabled;
+    std::optional<bool> insecureDeprecatedAuthEnabled;
     std::optional<PersistentUpdateStorage> installedPersistentUpdateStorage;
     std::optional<QByteArray> installedUpdateInformation;
     std::optional<bool> keepIoPortStateIntactOnInitialization;
@@ -164,6 +165,7 @@ struct SaveableSettingsBase
     (frameOptionsHeader) \
     (insecureDeprecatedApiEnabled) \
     (insecureDeprecatedApiInUseEnabled) \
+    (insecureDeprecatedAuthEnabled) \
     (installedPersistentUpdateStorage) \
     (installedUpdateInformation) \
     (keepIoPortStateIntactOnInitialization) \

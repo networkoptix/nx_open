@@ -239,6 +239,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<bool>* securityForPowerUsersAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* insecureDeprecatedApiEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* insecureDeprecatedApiInUseEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* insecureDeprecatedAuthEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* exposeServerEndpointsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* showMouseTimelinePreviewAdaptor = nullptr;
     QnResourcePropertyAdaptor<std::chrono::seconds>* cloudPollingIntervalSAdaptor = nullptr;
@@ -948,6 +949,10 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
                 nx::branding::company());
         });
 
+    d->insecureDeprecatedAuthEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        Names::insecureDeprecatedAuthEnabled, true, this,
+        [] { return tr("Enable deprecated HTTP Basic and Digest Authentications (insecure)."); });
+
     d->exposeServerEndpointsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::exposeServerEndpoints, true, this,
         []() { return tr("Expose IP addresses for autodiscovery."); });
@@ -1325,6 +1330,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << d->securityForPowerUsersAdaptor
         << d->insecureDeprecatedApiEnabledAdaptor
         << d->insecureDeprecatedApiInUseEnabledAdaptor
+        << d->insecureDeprecatedAuthEnabledAdaptor
         << d->eventLogPeriodDaysAdaptor
         << d->autoDiscoveryEnabledAdaptor
         << d->autoDiscoveryResponseEnabledAdaptor
@@ -2619,6 +2625,16 @@ bool SystemSettings::isInsecureDeprecatedApiInUseEnabled() const
 void SystemSettings::enableInsecureDeprecatedApiInUse(bool value)
 {
     d->insecureDeprecatedApiInUseEnabledAdaptor->setValue(value);
+}
+
+bool SystemSettings::isInsecureDeprecatedAuthEnabled() const
+{
+    return d->insecureDeprecatedAuthEnabledAdaptor->value();
+}
+
+void SystemSettings::setInsecureDeprecatedAuthEnabled(bool value)
+{
+    d->insecureDeprecatedAuthEnabledAdaptor->setValue(value);
 }
 
 std::chrono::seconds SystemSettings::cloudPollingInterval() const

@@ -57,6 +57,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(frameOptionsHeader);
     DECLARE_SETTING_NAME(insecureDeprecatedApiEnabled);
     DECLARE_SETTING_NAME(insecureDeprecatedApiInUseEnabled);
+    DECLARE_SETTING_NAME(insecureDeprecatedAuthEnabled);
     DECLARE_SETTING_NAME(lastMergeMasterId);
     DECLARE_SETTING_NAME(lastMergeSlaveId);
     DECLARE_SETTING_NAME(ldap);
@@ -225,6 +226,9 @@ public:
 
     bool isInsecureDeprecatedApiInUseEnabled() const;
     void enableInsecureDeprecatedApiInUse(bool value = true);
+
+    bool isInsecureDeprecatedAuthEnabled() const;
+    void setInsecureDeprecatedAuthEnabled(bool value);
 
     bool isAutoDiscoveryEnabled() const;
     void setAutoDiscoveryEnabled(bool enabled);

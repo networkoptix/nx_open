@@ -142,6 +142,7 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
     .frameOptionsHeader = QString{"SAMEORIGIN"},
     .insecureDeprecatedApiEnabled = false,
     .insecureDeprecatedApiInUseEnabled = true,
+    .insecureDeprecatedAuthEnabled = true,
     .installedPersistentUpdateStorage = PersistentUpdateStorage{},
     .installedUpdateInformation = QByteArray{},
     .keepIoPortStateIntactOnInitialization = false,
