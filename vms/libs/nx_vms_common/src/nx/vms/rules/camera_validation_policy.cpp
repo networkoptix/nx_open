@@ -202,7 +202,7 @@ QString QnCameraMotionPolicy::getText(
 bool QnCameraAudioTransmitPolicy::isResourceValid(
     nx::vms::common::SystemContext* /*context*/, const QnVirtualCameraResourcePtr& camera)
 {
-    return camera->hasTwoWayAudio();
+    return camera->audioOutputDevice()->hasTwoWayAudio();
 }
 
 QString QnCameraAudioTransmitPolicy::getText(
