@@ -2132,6 +2132,8 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
 
+    NX_DEBUG(this, "Start preview search, period: %1, periods: %2", period, periods);
+
     if (period.isEmpty())
     {
         if (!isPreviewSearchLayout)
@@ -2169,8 +2171,10 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
         }
     }
 
+    NX_DEBUG(this, "Adjusted period: %1", period);
+
     /* List of possible time steps, in milliseconds. */
-    const qint64 steps[] = {
+    static const qint64 steps[] = {
         1000ll * 10,                    /* 10 seconds. */
         1000ll * 15,                    /* 15 seconds. */
         1000ll * 20,                    /* 20 seconds. */
@@ -2262,6 +2266,8 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
 
         itemCount = qMin(period.durationMs / step, maxItems);
     }
+
+    NX_DEBUG(this, "Final period: %1, step: %2 s, item count: %3", period, step / 1000.0f, itemCount);
 
     /* Calculate size of the resulting matrix. */
     qreal desiredItemAspectRatio = QnLayoutResource::kDefaultCellAspectRatio;

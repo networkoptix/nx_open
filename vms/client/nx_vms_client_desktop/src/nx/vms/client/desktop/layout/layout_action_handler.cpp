@@ -1127,9 +1127,12 @@ void LayoutActionHandler::at_openInNewTabAction_triggered()
 
     // Update state depending on how the action was called.
     auto currentState = streamSynchronizer->state();
+    bool forceStateUpdate = false;
+
     if (parameters.hasArgument(Qn::LayoutSyncStateRole))
     {
         currentState = parameters.argument<StreamSynchronizationState>(Qn::LayoutSyncStateRole);
+        forceStateUpdate = (currentState.timeUs != DATETIME_INVALID);
     }
     else if (!currentMediaWidget
         || !isCameraWithFootage(currentMediaWidget)
@@ -1161,10 +1164,7 @@ void LayoutActionHandler::at_openInNewTabAction_triggered()
     {
         NX_ASSERT(!calledFromScene, "Layouts can not be passed from the scene");
         NX_ASSERT(resources.size() == layouts.size(), "Mixed resources are not expected here");
-        openLayouts(
-            layouts,
-            currentState,
-            /*forceStateUpdate*/ parameters.hasArgument(Qn::LayoutSyncStateRole));
+        openLayouts(layouts, currentState, forceStateUpdate);
 
         // Do not return in case mixed resource set is passed somehow.
     }
