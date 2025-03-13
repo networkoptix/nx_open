@@ -19,9 +19,8 @@ void Statistics::add(const Statistics& right)
     connectionsAcceptedPerMinute += right.connectionsAcceptedPerMinute;
     requestsReceivedPerMinute += right.requestsReceivedPerMinute;
 
-    requestsAveragePerConnection =
-        thisWeight * requestsAveragePerConnection +
-        rightWeight * right.requestsAveragePerConnection;
+    requestsAveragePerConnection = static_cast<int>(thisWeight * requestsAveragePerConnection
+        + rightWeight * right.requestsAveragePerConnection);
 }
 
 //-------------------------------------------------------------------------------------------------
