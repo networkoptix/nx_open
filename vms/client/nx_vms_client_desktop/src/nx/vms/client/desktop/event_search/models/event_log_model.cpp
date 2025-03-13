@@ -358,6 +358,8 @@ public:
     {
     }
 
+    SystemContext* systemContext() const { return m_parent->systemContext(); }
+
     void setSort(Column column, Qt::SortOrder order)
     {
         if (column == m_sortCol)
@@ -409,11 +411,11 @@ public:
 
     bool lessThanEventType(Iterator l, Iterator r) const
     {
-        const QString lType = l->eventType();
-        const QString rType = r->eventType();
+        const QString& lType = l->eventTitle(systemContext());
+        const QString& rType = r->eventTitle(systemContext());
 
-        if (lType != rType)
-            return m_lexComparator->lexEventLess(lType, rType);
+        if (auto comp = QString::compare(lType, rType, Qt::CaseInsensitive); comp != 0)
+            return comp < 0;
 
         return lessThanTimestamp(l, r);
     }
@@ -431,7 +433,7 @@ public:
 
     bool lessThanLexicographically(Iterator l, Iterator r) const
     {
-        int res = l->compareString().compare(r->compareString());
+        auto res = QString::compare(l->compareString(), r->compareString(), Qt::CaseInsensitive);
         if (res != 0)
             return res < 0;
 
@@ -606,8 +608,6 @@ QVariant EventLogModel::iconData(Column column, const EventLogModelData& data) c
 
 QString EventLogModel::textData(Column column, const EventLogModelData& data) const
 {
-    const auto& eventDetails = data.details(systemContext());
-
     switch (column)
     {
         case DateTimeColumn:
@@ -617,7 +617,7 @@ QString EventLogModel::textData(Column column, const EventLogModelData& data) co
             return nx::vms::time::toString(dt);
         }
         case EventColumn:
-            return eventTitle(eventDetails);
+            return data.eventTitle(systemContext());
 
         case EventCameraColumn:
             return eventSourceText(systemContext(), data);

@@ -43,11 +43,15 @@ public:
     void setCompareString(const QString& str);
     const QString& compareString() const;
 
+    QString eventTitle(SystemContext* context) const;
+
     nx::vms::rules::ActionPtr action(SystemContext* context) const;
     const QVariantMap& actionDetails(SystemContext* context) const;
     QString actionType() const;
 
 private:
+    mutable QString m_eventTitle;
+
     mutable nx::vms::rules::ActionPtr m_action;
     mutable QVariantMap m_actionDetails;
     QString m_compareString;

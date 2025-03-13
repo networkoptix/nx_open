@@ -3,6 +3,7 @@
 #include "event_model_data.h"
 
 #include <nx/vms/api/rules/event_log.h>
+#include <nx/vms/client/desktop/event_search/utils/event_data.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/basic_action.h>
 #include <nx/vms/rules/basic_event.h>
@@ -71,6 +72,14 @@ void EventLogModelData::setCompareString(const QString& str)
 const QString& EventLogModelData::compareString() const
 {
     return m_compareString;
+}
+
+QString EventLogModelData::eventTitle(SystemContext* context) const
+{
+    if (m_eventTitle.isEmpty())
+        m_eventTitle = desktop::eventTitle(details(context));
+
+    return m_eventTitle;
 }
 
 const QVariantMap& EventLogModelData::actionDetails(SystemContext* context) const
