@@ -23,6 +23,10 @@ struct NX_NETWORK_API Ini: nx::kit::IniConfig
         "Verify SSL certificates using OS CA by default if there is no specific certificate\n"
         "verification assumed (i.e. client-server, server-server or server-cloud connections)");
 
+    NX_INI_STRING("", sslKeyLogFile,
+        "File to store TLS keys used to decrypt traffic dumps. Same as SSLKEYLOGFILE environment "
+        "variable in cURL or Chrome. Used by the function set with SSL_CTX_set_keylog_callback.");
+
     NX_INI_FLAG(false, httpClientTraffic, "Trace HTTP traffic for nx::network::http::AsyncHttpClient");
     NX_INI_STRING("", disableHosts, "Comma-separated list of forbidden IPs and domains");
 
