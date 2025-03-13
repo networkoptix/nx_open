@@ -31,8 +31,14 @@ class NX_NETWORK_API TunnelConnector:
 {
 public:
     /**
-        @param mediatorAddress This param is for test only
-    */
+     * Tune the delay before reporting connector success. Default value is 200ms.
+     * @return the previous value.
+     */
+    static std::chrono::milliseconds setConnectDelay(std::chrono::milliseconds delay);
+
+    /**
+     * @param mediatorAddress This param is for test only
+     */
     TunnelConnector(
         AddressEntry targetHostAddress,
         std::string connectSessionId,
@@ -62,6 +68,8 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
+    static std::chrono::milliseconds s_connectDelay;
+
     struct ConnectorContext
     {
         std::unique_ptr<RendezvousConnectorWithVerification> connector;

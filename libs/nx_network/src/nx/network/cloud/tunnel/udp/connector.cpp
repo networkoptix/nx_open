@@ -17,6 +17,8 @@ namespace nx::network::cloud::udp {
 
 using namespace nx::hpm;
 
+std::chrono::milliseconds TunnelConnector::s_connectDelay{200};
+
 TunnelConnector::TunnelConnector(
     AddressEntry targetHostAddress,
     std::string connectSessionId,
@@ -38,6 +40,11 @@ TunnelConnector::~TunnelConnector()
 {
     //it is OK if called after pleaseStop or within aio thread after connect handler has been called
     stopWhileInAioThread();
+}
+
+std::chrono::milliseconds TunnelConnector::setConnectDelay(std::chrono::milliseconds delay)
+{
+    return std::exchange(s_connectDelay, delay);
 }
 
 void TunnelConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
@@ -192,31 +199,41 @@ void TunnelConnector::onHandshakeComplete(SystemError::ErrorCode errorCode)
 {
     m_chosenConnectorCtx->stats.responseTime = m_chosenConnectorCtx->responseTimer.elapsed();
 
-    auto connectorCtx = std::move(m_chosenConnectorCtx);
-    m_chosenConnectorCtx.reset();
-
     if (errorCode != SystemError::noError)
     {
         NX_DEBUG(this, "cross-nat %1. Failed to notify remote side (%2) about connection choice. %3",
             m_connectSessionId,
-            connectorCtx->connector->remoteAddress(),
+            m_chosenConnectorCtx->connector->remoteAddress(),
             SystemError::toString(errorCode));
 
         return holePunchingDone(
             api::NatTraversalResultCode::udtConnectFailed,
             errorCode,
-            std::move(connectorCtx));
+            std::move(*m_chosenConnectorCtx));
     }
 
+    // Notify the caller if connection is closed before the timer below completes. The close handler
+    // and the timer handler below are mutually exclusive, only one will execute, and remove the
+    // other.
+    m_chosenConnectorCtx->connector->setConnectionClosedHandler(
+        [this](SystemError::ErrorCode closeReason)
+        {
+            holePunchingDone(
+                api::NatTraversalResultCode::udtConnectFailed,
+                closeReason,
+                std::move(*m_chosenConnectorCtx));
+        });
+
     //introducing delay to give server some time to call accept (work around udt bug)
+    NX_VERBOSE(this, "Delaying report of connect success by %1", s_connectDelay);
     m_timer->start(
-        std::chrono::milliseconds(200),
-        [this, connectorCtx = std::move(connectorCtx)]() mutable
+        s_connectDelay,
+        [this]() mutable
         {
             holePunchingDone(
                 api::NatTraversalResultCode::ok,
                 SystemError::noError,
-                std::move(connectorCtx));
+                std::move(*m_chosenConnectorCtx));
         });
 }
 

@@ -48,6 +48,7 @@ public:
     virtual void connect(
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler completionHandler);
+
     /**
      * Moves connection out of this.
      */

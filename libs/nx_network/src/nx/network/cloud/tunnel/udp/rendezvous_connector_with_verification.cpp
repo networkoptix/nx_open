@@ -86,6 +86,9 @@ void RendezvousConnectorWithVerification::notifyAboutChoosingConnection(
 std::unique_ptr<nx::network::UdtStreamSocket>
     RendezvousConnectorWithVerification::takeConnection()
 {
+    if (!m_requestPipeline)
+        return nullptr;
+
     auto udtConnection =
         nx::utils::static_unique_ptr_cast<UdtStreamSocket>(
             m_requestPipeline->takeSocket());
@@ -100,7 +103,18 @@ void RendezvousConnectorWithVerification::onConnectionClosed(
 {
     NX_VERBOSE(this, nx::format("cross-nat %1 error: %2")
         .args(connectSessionId(), SystemError::toString(closeReason)));
+
+    auto closeHandler = std::exchange(m_connectionClosedHandler, nullptr);
+
     m_requestPipeline.reset();
+
+    if (closeHandler)
+        closeHandler(closeReason);
+}
+
+void RendezvousConnectorWithVerification::setConnectionClosedHandler(ConnectCompletionHandler handler)
+{
+    m_connectionClosedHandler = std::move(handler);
 }
 
 void RendezvousConnectorWithVerification::onConnectCompleted(

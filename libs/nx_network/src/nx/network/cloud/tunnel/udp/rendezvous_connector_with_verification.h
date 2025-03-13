@@ -29,6 +29,14 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     /**
+     * If the connection established with a call to connect() is closed before a call to
+     * takeConnection(), this handler will be invoked. Must be called before connect() or in the
+     * same thread as the connect() completion handler.
+     */
+     void setConnectionClosedHandler(ConnectCompletionHandler handler);
+
+
+    /**
      * @param completionHandler Success is returned only if remote side is aware of connection id.
      */
     virtual void connect(
@@ -41,6 +49,7 @@ public:
 private:
     std::chrono::milliseconds m_timeout{0};
     ConnectCompletionHandler m_connectCompletionHandler;
+    ConnectCompletionHandler m_connectionClosedHandler;
     std::unique_ptr<stun::MessagePipeline> m_requestPipeline;
     std::unique_ptr<nx::network::UdtStreamSocket> m_udtConnection;
 
