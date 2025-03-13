@@ -585,6 +585,13 @@ void AbstractSearchWidget::Private::setupCameraSelection()
     addDeviceDependentAction(addMenuAction("<any camera>", core::EventSearch::CameraSelection::all, true),
         tr("Any device"), tr("Any camera"));
 
+    connect(ui->cameraSelectionButton, &SelectableTextButton::stateChanged, this,
+        [this](SelectableTextButton::State state)
+        {
+            if (state == SelectableTextButton::State::deactivated)
+                m_cameraSelectionActions[core::EventSearch::CameraSelection::all]->trigger();
+        });
+
     ui->cameraSelectionButton->setMenu(cameraMenu);
     updateButton();
 
