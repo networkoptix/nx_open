@@ -4,7 +4,7 @@
 
 #include <nx/utils/log/log.h>
 
-QnStoragePluginFactory::StorageFactory QnStoragePluginFactory::s_factory = nullptr;
+nx::Lockable<QnStoragePluginFactory::StorageFactory> QnStoragePluginFactory::s_factory{};
 
 QnStoragePluginFactory::QnStoragePluginFactory(QObject* parent):
     QObject(parent),
@@ -36,7 +36,7 @@ bool QnStoragePluginFactory::existsFactoryForProtocol(const QString& protocol)
 
 void QnStoragePluginFactory::setDefault(StorageFactory factory)
 {
-    s_factory = factory;
+    *s_factory.lock() = factory;
 }
 
 QnStorageResource* QnStoragePluginFactory::createStorage(
@@ -47,9 +47,11 @@ QnStorageResource* QnStoragePluginFactory::createStorage(
 
     if (url.isEmpty())
         return nullptr;
-
-    if (s_factory)
-        return s_factory(url);
+    {
+        auto staticFactory = s_factory.lock();
+        if (*staticFactory)
+            return (*staticFactory)(url);
+    }
 
     int index = url.indexOf("://");
     if (index == -1)

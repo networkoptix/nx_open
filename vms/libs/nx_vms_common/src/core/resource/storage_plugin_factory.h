@@ -6,6 +6,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
+#include <nx/utils/lockable.h>
 #include "storage_resource.h"
 
 class NX_VMS_COMMON_API QnStoragePluginFactory: public QObject
@@ -31,6 +32,6 @@ public:
 private:
     QHash<QString, StorageFactory> m_factoryByProtocol;
     StorageFactory m_defaultFactory;
-    static StorageFactory s_factory;
+    static nx::Lockable<StorageFactory> s_factory;
     nx::Mutex m_mutex; // TODO: #rvasilenko this mutex is not used, is it intentional?
 };
