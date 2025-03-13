@@ -101,7 +101,7 @@
     </message>
     <message>
       <source>Invalid login or password</source>
-      <translation>ログインIDまたはパスワードが無効です</translation>
+      <translation>ログインIDまたはパスワードが違います</translation>
     </message>
     <message>
       <source>Incorrect username or password.</source>
