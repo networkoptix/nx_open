@@ -154,7 +154,7 @@ Item
 
             text: qsTr("Offline")
 
-            visible: !tile.online
+            visible: !tile.online && !tile.isPending
         }
 
         Nx.Tag

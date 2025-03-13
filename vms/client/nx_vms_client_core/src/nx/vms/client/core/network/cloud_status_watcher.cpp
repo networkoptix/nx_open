@@ -52,9 +52,6 @@ QnCloudSystemList getCloudSystemList(const SystemDataExList& systemsList)
 
     for (const SystemDataEx& systemData: systemsList.systems)
     {
-        if (systemData.status != SystemStatus::activated)
-            continue;
-
         const bool compatibleCustomization =
             ServerCompatibilityValidator::isCompatibleCustomization(
                 QString::fromStdString(systemData.customization));
