@@ -60,9 +60,6 @@ TileBase
                 sourceSize: Qt.size(20, 20)
 
                 visible: !!sourcePath
-                    && (!controller
-                        || !controller.attributeManager
-                        || controller.attributeManager.objectTypeVisible)
                 primaryColor: caption.color
             }
 
@@ -70,9 +67,6 @@ TileBase
             {
                 id: caption
 
-                visible: !controller
-                    || !controller.attributeManager
-                    || controller.attributeManager.objectTypeVisible
                 Layout.fillWidth: true
                 Layout.topMargin: 2
                 Layout.alignment: Qt.AlignTop

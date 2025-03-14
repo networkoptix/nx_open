@@ -239,11 +239,7 @@ TEST_F(AnalyticsDialogTableModelTest, changeColumnsVisibility)
         }
     }
 
-    m_attributeManager->setVisible(analytics::taxonomy::kObjectTypeAttributeName, false);
-    ASSERT_EQ(m_testModel->columnCount({}), columnsBefore - 2);
     m_attributeManager->setVisible(analytics::taxonomy::kCameraAttributeName, true);
-    ASSERT_EQ(m_testModel->columnCount({}), columnsBefore - 1);
-    m_attributeManager->setVisible(analytics::taxonomy::kObjectTypeAttributeName, true);
     ASSERT_EQ(m_testModel->columnCount({}), columnsBefore);
 }
 

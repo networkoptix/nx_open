@@ -18,7 +18,6 @@ QStringList kBuiltInAttributes = {
     kDateTimeAttributeName,
     kTitleAttributeName,
     kCameraAttributeName,
-    kObjectTypeAttributeName,
 };
 
 class AttributeDisplayManager::Private: public QObject
@@ -256,7 +255,7 @@ void AttributeDisplayManager::setVisible(const QString& attribute, bool visible)
 
 bool AttributeDisplayManager::canBeHidden(const QString& attribute) const
 {
-    return attribute != kDateTimeAttributeName;
+    return attribute != kDateTimeAttributeName && attribute != kTitleAttributeName;
 }
 
 bool AttributeDisplayManager::canBeMoved(const QString& attribute) const
