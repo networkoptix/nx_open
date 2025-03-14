@@ -9,6 +9,7 @@
 
 #include <openssl/ssl.h>
 
+#include <nx/network/nx_network_ini.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
@@ -37,6 +38,48 @@ public:
 static constexpr int kDefaultDisabledServerVersions =
     SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1;
 
+void sslKeyLogFileCallback(const SSL* /*ssl*/, const char* line)
+{
+    // Atomic appends: it is assumed that:
+    // if the file is opened with O_APPEND/FILE_APPEND_DATA flags,
+    // and if each write is done with a single write()/WriteFile() call,
+    // writes do not interleave and do not overwrite each other
+    // even if called from different processes.
+
+    // Key log file grows indefinitely, is not rotated, nor limited in size.
+    // Unlike normal logs, this is an internal debugging feature,
+    // which must not be enabled for a long period of time.
+
+    static FILE* file = //< Static local initialization is thread-safe.
+        []()
+        {
+            const char* path = nx::network::ini().sslKeyLogFile;
+            if (strcmp(path, "") == 0)
+                return static_cast<FILE*>(nullptr);
+
+            FILE* file = std::fopen(path, "ab");
+            if (!file)
+            {
+                static const auto error = std::strerror(errno);
+                NX_ERROR(NX_SCOPE_TAG, "Unable to open %1: %2", path, error);
+                return static_cast<FILE*>(nullptr);
+            }
+
+            // Disable buffering: force OS-level write call each time.
+            std::setvbuf(file, nullptr, _IONBF, 0);
+            return file;
+        }();
+    if (!file)
+        return;
+
+    // Prepare a string with a newline at the end for a single write call.
+    char buffer[512]; //< The longest actual line length seen is 194.
+    size_t len = strnlen(line, sizeof(buffer) - 1);
+    std::memcpy(buffer, line, len);
+    buffer[len++] = '\n';
+    std::fwrite(buffer, 1, len, file);
+}
+
 } // namespace
 
 Context::Context():
@@ -54,6 +97,7 @@ Context::Context():
     auto verifyParam = nx::utils::wrapUnique(X509_VERIFY_PARAM_new(), &X509_VERIFY_PARAM_free);
     X509_VERIFY_PARAM_set_flags(verifyParam.get(), X509_V_FLAG_PARTIAL_CHAIN);
     SSL_CTX_set1_param(m_clientContext.get(), verifyParam.get());
+    SSL_CTX_set_keylog_callback(m_clientContext.get(), sslKeyLogFileCallback);
 }
 
 Context::~Context() = default;
@@ -255,6 +299,8 @@ std::shared_ptr<SSL_CTX> Context::createServerContext()
         &Context::chooseSslContextForIncomingConnectionStatic);
 
     SSL_CTX_set_tlsext_servername_arg(context.get(), this);
+
+    SSL_CTX_set_keylog_callback(context.get(), sslKeyLogFileCallback);
 
     return context;
 }
