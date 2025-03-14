@@ -181,8 +181,8 @@ foreach(sanitizer ${enabledSanitizers})
             # Copy ASan DLL to bin/ for convenience.
             nx_copy("${asan_library_path}" DESTINATION "${PROJECT_BINARY_DIR}/bin")
 
-            set(cl_link_flags /fsanitize=${sanitizer})
             add_compile_options(/fsanitize=${sanitizer})
+            add_compile_definitions(_DISABLE_STL_ANNOTATION)
             # Disable warning:
             #   C5059: runtime checks and address sanitizer is not currently supported - disabling runtime checks
             add_compile_options(/wd5059)
@@ -198,9 +198,6 @@ foreach(sanitizer ${enabledSanitizers})
             )
                 string(REGEX REPLACE "[/|-]RTC(su|[1su])" "" ${flag_var} "${${flag_var}}")
             endforeach()
-
-            string(APPEND CMAKE_SHARED_LINKER_FLAGS " ${cl_link_flags}")
-            string(APPEND CMAKE_EXE_LINKER_FLAGS " ${cl_link_flags}")
         endif()
     else()
         add_compile_options(-fsanitize=${sanitizer})
