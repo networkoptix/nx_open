@@ -247,6 +247,8 @@ protected:
 
     void replaceLayoutItemActionTriggered();
 
+    void cameraAuthenticationActionTriggered();
+
 private:
     void showSingleCameraErrorMessage(const QString& explanation = QString());
     void showMultipleCamerasErrorMessage(

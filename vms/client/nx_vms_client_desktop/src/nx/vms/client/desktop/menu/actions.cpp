@@ -224,6 +224,16 @@ void initialize(Manager* manager, Action* root)
                 MatchMode::any)
             && !condition::showreelIsRunning());
 
+    factory(CameraAuthenticationAction)
+        .mode(DesktopMode)
+        .flags(ResourceTarget | SingleTarget | MultiTarget)
+        .condition(
+            condition::hasFlags(
+                /*require*/ Qn::live_cam,
+                /*exclude*/ Qn::cross_system,
+                MatchMode::any)
+            && !condition::showreelIsRunning());
+
 //-------------------------------------------------------------------------------------------------
 // VMS Rules and Event log actions.
 

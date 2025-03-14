@@ -30,6 +30,7 @@
 #include <client/desktop_client_message_processor.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/client_camera.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/file_processor.h>
@@ -95,6 +96,7 @@
 #include <nx/vms/client/desktop/resource_dialogs/failover_priority_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
+#include <nx/vms/client/desktop/resource_properties/camera/dialogs/camera_credentials_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/layout/flux/layout_settings_dialog_state.h>
 #include <nx/vms/client/desktop/resource_properties/media_file/media_file_settings_dialog.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
@@ -489,6 +491,9 @@ ActionHandler::ActionHandler(QObject *parent) :
 
     connect(action(menu::ItemUnmuteAction), &QAction::triggered,
         this, &ActionHandler::at_itemUnmuteAction_triggered);
+
+    connect(action(menu::CameraAuthenticationAction), &QAction::triggered,
+        this, &ActionHandler::cameraAuthenticationActionTriggered);
 }
 
 ActionHandler::~ActionHandler()
@@ -1193,6 +1198,53 @@ void ActionHandler::replaceLayoutItemActionTriggered()
 
     layout->removeItem(layoutItemIndex.uuid());
     addToLayout(layout, camera, replacementParams);
+}
+
+void ActionHandler::cameraAuthenticationActionTriggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    const auto cameras = parameters.resources().filtered<QnVirtualCameraResource>(
+        [](const auto& camera)
+        {
+            return !camera->hasFlags(Qn::cross_system) && !camera->hasFlags(Qn::removed);
+        });
+
+    if (cameras.empty())
+        return;
+
+    std::optional<QString> displayedLogin = cameras.first()->getAuth().user();
+    const auto multipleLoginValues = std::any_of(cameras.begin(), cameras.end(),
+        [login = displayedLogin.value()](const auto& camera)
+        {
+            return camera->getAuth().user() != login;
+        });
+
+    if (multipleLoginValues)
+        displayedLogin.reset();
+
+    QScopedPointer<CameraCredentialsDialog> dialog(new CameraCredentialsDialog(mainWindowWidget()));
+    dialog->setLogin(displayedLogin);
+    dialog->setHasRemotePassword(true);
+
+    if (dialog->exec() != QDialog::Accepted || dialog->hasRemotePassword())
+        return;
+
+    for (const auto& camera: cameras)
+    {
+        QAuthenticator auth;
+        auth.setUser(dialog->login().value_or(camera->getAuth().user()));
+        auth.setPassword(dialog->password().value());
+
+        if (camera->isMultiSensorCamera() || camera->isNvr())
+        {
+            QnClientCameraResource::setAuthToCameraGroup(camera, auth);
+        }
+        else
+        {
+            camera->setAuth(auth);
+            camera->savePropertiesAsync();
+        }
+    }
 }
 
 void ActionHandler::at_openInCurrentLayoutAction_triggered()

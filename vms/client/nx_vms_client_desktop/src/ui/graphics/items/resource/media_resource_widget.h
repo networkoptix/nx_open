@@ -377,6 +377,7 @@ private slots:
     void processEnableLicenseRequest();
     void processMoreLicensesRequest();
     void processEncryptedArchiveUnlockRequst();
+    void processAuthorizationRequest();
     void processCloudAuthorizationRequest();
     void at_renderWatcher_widgetChanged(QnResourceWidget* widget);
     void at_zoomRectChanged();

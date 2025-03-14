@@ -898,14 +898,19 @@ enum IDType
     CustomGroupRemovedEvent,
 
     /**
-     * Connect incompatible server to current system
+     * Connect incompatible server to the current system.
      */
     ConnectToCurrentSystem,
 
     /**
-     * Merge the other system with the current system
+     * Merge the other system with the current system.
      */
     MergeSystems,
+
+    /**
+     * Input credentials for given cameras via Authentication Credentials dialog.
+     */
+    CameraAuthenticationAction,
 
     /* PTZ Actions */
 

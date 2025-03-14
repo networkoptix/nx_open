@@ -797,7 +797,7 @@ void QnMediaResourceWidget::initStatusOverlayController()
                     if (d->camera.dynamicCast<CrossSystemCameraResource>())
                         processCloudAuthorizationRequest();
                     else
-                        processSettingsRequest();
+                        processAuthorizationRequest();
                     break;
                 default:
                     NX_ASSERT("Unexpected button type");
@@ -3143,6 +3143,12 @@ void QnMediaResourceWidget::processEncryptedArchiveUnlockRequst()
             new EncryptedArchivePasswordDialog(resource(), mainWindow()));
     }
     m_encryptedArchivePasswordDialog->showForEncryptionData(m_encryptedArchiveData);
+}
+
+void QnMediaResourceWidget::processAuthorizationRequest()
+{
+    statisticsModule()->controls()->registerClick("resource_status_overlay_authorize");
+    menu()->trigger(menu::CameraAuthenticationAction, d->camera);
 }
 
 void QnMediaResourceWidget::processCloudAuthorizationRequest()
