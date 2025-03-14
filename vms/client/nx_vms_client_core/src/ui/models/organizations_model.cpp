@@ -468,11 +468,12 @@ nx::coro::FireAndForget OrganizationsModel::Private::loadOrgs(nx::Uuid cpId)
             "status",
             [](auto value) { return value == CloudStatusWatcher::Online; });
 
+        auto orgsPath = nx::network::http::rest::substituteParameters(
+            "/partners/api/v2/channel_partners/{id}/organizations/",
+            {cpId.toSimpleStdString()});
         auto orgList = co_await cloudGet<OrganizationList>(
             statusWatcher,
-            nx::network::http::rest::substituteParameters(
-                "/partners/api/v2/channel_partners/{id}/organizations/",
-                {cpId.toSimpleStdString()}));
+            orgsPath);
 
         if (!orgList)
         {
@@ -495,17 +496,20 @@ nx::coro::FireAndForget OrganizationsModel::Private::loadOrgs(nx::Uuid cpId)
             loadTasks.push_back(
                 [](auto self, auto org) -> nx::coro::Task<bool>
                 {
+                    auto groupsPath = nx::network::http::rest::substituteParameters(
+                        "/partners/api/v2/organizations/{id}/groups_structure/",
+                        {org.id.toSimpleStdString()});
+                    auto systemsPath = nx::network::http::rest::substituteParameters(
+                        "/partners/api/v2/organizations/{id}/cloud_systems/user_systems/",
+                        {org.id.toSimpleStdString()});
+
                     auto [groupStructure, systems] = co_await nx::coro::whenAll(
                         cloudGet<std::vector<GroupStructure>>(
                             self->statusWatcher,
-                            nx::network::http::rest::substituteParameters(
-                                "/partners/api/v2/organizations/{id}/groups_structure/",
-                                {org.id.toSimpleStdString()})),
+                            groupsPath),
                         cloudGet<SystemList>(
                             self->statusWatcher,
-                            nx::network::http::rest::substituteParameters(
-                                "/partners/api/v2/organizations/{id}/cloud_systems/user_systems/",
-                                {org.id.toSimpleStdString()}),
+                            systemsPath,
                             nx::utils::UrlQuery().addQueryItem("rootOnly", "false")));
 
                     if (!groupStructure || !systems)
