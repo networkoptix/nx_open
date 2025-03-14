@@ -233,12 +233,16 @@ bool FfmpegMuxer::muxPacket(const QnConstAbstractMediaDataPtr& media)
     auto packet = avPacket.get();
 
     bool allowEqualTimestamps = media->dataType == QnAbstractMediaData::GENERIC_METADATA;
-    auto timestamp = m_timestampCorrector.process(std::chrono::microseconds(media->timestamp), streamIndex, allowEqualTimestamps).count();
+    auto timestamp = m_timestampCorrector.process(
+        std::chrono::microseconds(media->timestamp),
+        streamIndex,
+        allowEqualTimestamps,
+        media->flags & QnAbstractMediaData::MediaFlags_Discontinuity).count();
 
     packet->pts = av_rescale_q(timestamp, srcRate, stream->time_base);
     packet->data = (uint8_t*)media->data();
     packet->size = static_cast<int>(media->dataSize());
-    if (media->dataType == QnAbstractMediaData::AUDIO || media->flags & AV_PKT_FLAG_KEY)
+    if (media->dataType == QnAbstractMediaData::AUDIO || media->flags & QnAbstractMediaData::MediaFlags_AVKey)
         packet->flags |= AV_PKT_FLAG_KEY;
 
     packet->stream_index = streamIndex;

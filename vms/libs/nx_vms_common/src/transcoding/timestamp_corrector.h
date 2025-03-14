@@ -18,7 +18,10 @@ public:
     void setOffset(std::chrono::microseconds value);
 
     std::chrono::microseconds process(
-        std::chrono::microseconds timestamp, int streamIndex, bool equalAllowed);
+        std::chrono::microseconds timestamp,
+        int streamIndex,
+        bool equalAllowed,
+        bool forceDiscontinuity = false);
 
     void clear();
 

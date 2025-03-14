@@ -281,6 +281,9 @@ bool QnFfmpegAudioTranscoder::receivePacket(QnAbstractMediaDataPtr* const result
         }
 
         // 2. Send data to the encoder.
+        if (!m_resampler)
+            return true;
+
         AVFrame* resampledFrame = m_resampler->nextFrame();
         if (!resampledFrame)
             return true;

@@ -24,7 +24,7 @@ void TimestampCorrector::clear()
 }
 
 std::chrono::microseconds TimestampCorrector::process(
-    std::chrono::microseconds timestamp, int streamIndex, bool equalAllowed)
+    std::chrono::microseconds timestamp, int streamIndex, bool equalAllowed, bool forceDiscontinuity)
 {
     if (!m_baseTime.has_value())
         m_baseTime = timestamp;
@@ -39,7 +39,7 @@ std::chrono::microseconds TimestampCorrector::process(
             : (timeDiff <= std::chrono::microseconds::zero());
 
         discontinuity |= timeDiff >= kMaxFrameDurationUs;
-        if (discontinuity)
+        if (discontinuity || forceDiscontinuity)
         {
             // Recalculate m_baseTime after seek by new frame timestamp. Timestamps should increase
             // monotonously.

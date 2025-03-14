@@ -105,7 +105,11 @@ public:
 
         // Flag indicates that motion sensitivity should be temporary increased in region
         // where object metadata was recently received.
-        MediaFlags_UpdateMotionSensitivity = 0x200000
+        MediaFlags_UpdateMotionSensitivity = 0x200000,
+
+        // Flag indicates to the first frame after a removed portion of the stream (e.g. when
+        // clearing the media queue due to overflow).
+        MediaFlags_Discontinuity        = 0x400000
     )
 
     Q_DECLARE_FLAGS(MediaFlags, MediaFlag)
@@ -140,7 +144,7 @@ public:
     QnAbstractStreamDataProvider* dataProvider;
     DataType dataType;
     AVCodecID compressionType;
-    MediaFlags flags;
+    mutable MediaFlags flags;
     // Video or audio channel number. Some devices might have more than one sensor.
     quint32 channelNumber;
     CodecParametersConstPtr context;

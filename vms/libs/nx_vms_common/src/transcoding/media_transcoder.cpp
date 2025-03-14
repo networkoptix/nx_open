@@ -174,7 +174,7 @@ bool finalizeTranscoder(
     do
     {
         transcodedData.reset();
-        // transcode media
+        // Transcode media.
         int errCode = transcoder->transcodePacket(QnConstAbstractMediaDataPtr(), &transcodedData);
         if (errCode != 0)
             return false;
