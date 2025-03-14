@@ -7,16 +7,15 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/system_context.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/resource/server.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
-
-#include <nx/network/http/http_types.h>
-#include <nx/network/url/url_builder.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 namespace {
@@ -283,6 +282,8 @@ void OtherServersManager::stop()
 {
     d->connections.reset();
 
+    for (const auto& serverId: std::as_const(d->otherServers))
+        emit serverRemoved(serverId);
     d->otherServers.clear();
 }
 

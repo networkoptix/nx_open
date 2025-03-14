@@ -945,7 +945,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLocalOtherSystemsEntity() con
     const GroupingRule otherSystemsGroupingRule =
         {systemNameGetter,
         systemItemCreator,
-        core::UuidRole,
+        Qt::DisplayRole,
         1, //< Dimension
         numericOrder()};
 
