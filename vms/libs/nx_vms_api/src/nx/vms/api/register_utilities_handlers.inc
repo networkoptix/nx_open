@@ -88,8 +88,10 @@ void registerUtilitiesHandlers(
      * %jsonrpc[unused]
      * %caption Audio backchannel streaming
      * %ingroup Utilities
-     * %param:uuid camera_id Device id (can be obtained from "id", "physicalId" or "logicalId" field
-     *     via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain Devices).
+     * %param:uuid camera_id Device id (can be obtained from "id", "physicalId" or "logicalId"
+     *     field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain Devices).
+     * %param[opt]:option live Is live stream or not, if not present (or false), then Server will
+     *     try to read all data and then start to parse audio data.
      * %param[opt]:enum format Audio sample format.
      *     %value u8
      *     %value s16be
@@ -106,7 +108,7 @@ void registerUtilitiesHandlers(
      *     %value 2
      * %return Audio stream in the requested format.
      */
-    registerTcpHandler<http_audio::AudioRequestProcessor>(
+    registerTcpHandler<http_audio::UploadAudioHandler>(
         mediaServerProcess,
         /*protocol*/ "HTTP",
         /*path*/ "api/http_audio",

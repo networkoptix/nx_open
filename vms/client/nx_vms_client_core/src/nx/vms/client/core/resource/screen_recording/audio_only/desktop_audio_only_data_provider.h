@@ -53,6 +53,7 @@ private:
     bool m_initialized = false;
     bool m_stopping = false;
     int m_frameSize = 0;
+    int64_t m_utcTimstampOffsetUs = 0;
     QByteArray m_internalBuffer;
     nx::media::ffmpeg::AudioEncoder m_audioEncoder;
     std::vector<AudioSourceInfoPtr> m_audioSourcesInfo;

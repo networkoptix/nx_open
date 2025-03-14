@@ -15,7 +15,7 @@ public:
     /** @param tag Human-readable tag for logging. */
     NxRtpMetadataParser() = default;
 
-    virtual void setSdpInfo(const Sdp::Media& sdp) override {}
+    virtual void setSdpInfo(const Sdp::Media& /*sdp*/) override {}
 
     virtual bool isUtcTime() const override { return true; }
 

@@ -15,6 +15,7 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_availability_watcher.h>
+#include <nx/vms/client/core/two_way_audio/two_way_audio_streamer.h>
 
 namespace nx::vms::client::core {
 
@@ -27,6 +28,7 @@ struct TwoWayAudioController::Private
     TwoWayAudioController* const q;
     OrderedRequestsHelper orderedRequestsHelper;
     QScopedPointer<TwoWayAudioAvailabilityWatcher> availabilityWatcher;
+    std::shared_ptr<TwoWayAudioStreamer> streamer;
     QString sourceId;
     bool started = false;
     bool available = false;
@@ -64,32 +66,22 @@ bool TwoWayAudioController::Private::setActive(bool active, OperationCallback&& 
     if (!NX_ASSERT(targetResource))
         return false;
 
-    nx::network::rest::Params params;
-    params.insert("clientId", sourceId);
-    params.insert("resourceId", targetResource->getId().toSimpleString());
-    params.insert("action", active ? "start" : "stop");
-
-    const auto requestCallback = nx::utils::guarded(q,
-        [this, active, callback](
-            bool success, rest::Handle /*handle*/, const nx::network::rest::JsonResult& result)
-        {
-            const bool ok = success && result.errorId == nx::network::rest::ErrorId::ok;
-            setStarted(active && ok);
-            if (callback)
-                callback(ok);
-        });
-
-    auto serverVersion = q->connection()->moduleInformation().version;
-    if (serverVersion < nx::utils::SoftwareVersion(5, 0))
+    if (active)
     {
-        return orderedRequestsHelper.getJsonResult(q->connectedServerApi(),
-            "/api/transmitAudio", params, requestCallback, QThread::currentThread());
+        streamer = std::make_shared<TwoWayAudioStreamer>();
+        const bool result = streamer->start(q->connection()->credentials(), targetResource);
+        setStarted(result);
+        if (callback)
+            callback(result);
     }
     else
     {
-        return orderedRequestsHelper.postJsonResult(q->connectedServerApi(),
-            "/api/transmitAudio", params, requestCallback, QThread::currentThread());
+        streamer.reset();
+        setStarted(false);
+        if (callback)
+            callback(true);
     }
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------

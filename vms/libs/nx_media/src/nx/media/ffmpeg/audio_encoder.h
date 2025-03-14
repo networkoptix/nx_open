@@ -31,6 +31,7 @@ private:
     void close();
 
 private:
+    int64_t m_ptsUs = 0;
     AVFrame* m_inputFrame = nullptr;
     AVPacket* m_outputPacket = nullptr;
     AVCodecContext* m_encoderContext = nullptr;

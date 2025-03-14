@@ -53,7 +53,6 @@ protected:
 protected:
     QnMediaStreamStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
     std::array<int, CL_MAX_CHANNEL_NUMBER> m_gotKeyFrame;
-    QnMediaResourcePtr m_mediaResource;
 
     virtual void setNeedKeyData();
     virtual void setNeedKeyData(int channel);

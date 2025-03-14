@@ -42,14 +42,9 @@ public:
     AVCodecParameters* getAudioCodecParameters() const;
     AVFormatContext* getFormatContext() const { return m_formatCtx; }
 
-    /*
-    * Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
-    * Destination codecs MUST be used from source data codecs. If 'direct stream copy' is false, video or audio may be empty
-    * @return Returns true if no error or false otherwise
-    */
-    bool open(std::optional<QnAviArchiveMetadata> metadata = std::nullopt);
     bool addVideo(const AVCodecParameters* codecParameters);
     bool addAudio(const AVCodecParameters* codecParameters);
+    bool open(std::optional<QnAviArchiveMetadata> metadata = std::nullopt);
 
     /*
     * Process media data and write it to specified nx::utils::ByteArray

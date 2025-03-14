@@ -56,12 +56,11 @@ QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(
     m_numberOfChannels(
         [this]
         {
-            return m_mediaResource ? m_mediaResource->getVideoLayout(this)->channelCount() : 1;
+            auto mediaResource = m_resource.dynamicCast<QnMediaResource>();
+            return mediaResource ? mediaResource->getVideoLayout(this)->channelCount() : 1;
         })
 {
     std::fill(m_gotKeyFrame.begin(), m_gotKeyFrame.end(), 0);
-    m_mediaResource = resource.dynamicCast<QnMediaResource>();
-    NX_ASSERT(m_mediaResource);
     resetTimeCheck();
     m_isCamera = (bool) resource.dynamicCast<QnVirtualCameraResource>();
     connect(resource.data(), &QnResource::propertyChanged, this,

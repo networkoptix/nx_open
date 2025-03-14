@@ -7,6 +7,8 @@
 
 namespace nx::media::ffmpeg {
 
+constexpr int64_t kTimeScale = 1'000'000;
+
 AudioEncoder::AudioEncoder():
     m_inputFrame(av_frame_alloc()),
     m_outputPacket(av_packet_alloc())
@@ -53,6 +55,7 @@ bool AudioEncoder::initialize(
     m_encoderContext->ch_layout = layout;
     m_encoderContext->sample_rate = sampleRate;
     m_encoderContext->bit_rate = bitrate;
+    m_encoderContext->time_base = {1, kTimeScale};
 
     auto status = avcodec_open2(m_encoderContext, codec, nullptr);
     if (status < 0)
@@ -73,6 +76,8 @@ bool AudioEncoder::sendFrame(uint8_t* data, int size)
     m_inputFrame->sample_rate = m_encoderContext->sample_rate;
     m_inputFrame->format = m_encoderContext->sample_fmt;
     m_inputFrame->ch_layout = m_encoderContext->ch_layout;
+    m_inputFrame->pts = m_ptsUs;
+    m_ptsUs += (kTimeScale * m_inputFrame->nb_samples) / m_inputFrame->sample_rate;
     auto status = avcodec_send_frame(m_encoderContext, m_inputFrame);
     if (status < 0)
     {
@@ -100,6 +105,7 @@ bool AudioEncoder::receivePacket(QnWritableCompressedAudioDataPtr& result)
     result = std::make_shared<QnWritableCompressedAudioData>(m_outputPacket->size, m_codecParams);
     result->m_data.write((const char*)m_outputPacket->data, m_outputPacket->size);
     result->compressionType = m_encoderContext->codec_id;
+    result->timestamp = m_outputPacket->pts;
     av_packet_unref(m_outputPacket);
     return true;
 }

@@ -118,7 +118,7 @@ void DesktopAudioOnlyDataProvider::run()
 
     AVChannelLayout layout;
     av_channel_layout_default(&layout, channels);
-    if (!m_audioEncoder.initialize(AV_CODEC_ID_MP2,
+    if (!m_audioEncoder.initialize(AV_CODEC_ID_MP3,
         sampleRate,
         fromQtAudioFormat(format),
         layout,
@@ -284,7 +284,10 @@ void DesktopAudioOnlyDataProvider::processData()
             if (!packet)
                 break;
 
-            packet->timestamp = qnSyncTime->currentUSecsSinceEpoch(); //< TODO: #lbusygin set an appropriate timestamp.
+            if (m_utcTimstampOffsetUs == 0)
+                m_utcTimstampOffsetUs = qnSyncTime->currentUSecsSinceEpoch();
+
+            packet->timestamp += m_utcTimstampOffsetUs;
             packet->flags |= QnAbstractMediaData::MediaFlags_LIVE;
             packet->dataProvider = this;
             packet->channelNumber = 1;
@@ -355,7 +358,6 @@ void DesktopAudioOnlyDataProvider::preprocessAudioBuffers(
             (qint16*)preprocessList.at(1)->frameBuffer,
             kStereoPacketSizeInBytes / kSampleSizeInBytes);
     }
-
 }
 
 bool DesktopAudioOnlyDataProvider::isInitialized() const
