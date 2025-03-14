@@ -269,10 +269,10 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
     if (!NX_ASSERT(server))
         return StartResult::failed;
 
-    NX_VERBOSE(this, "Request camera history for %1", camera);
-
     // if camera belongs to a single server not need to do API request to build detailed history information. generate it instead.
     QnMediaServerResourceList serverList = getCameraFootageData(camera->getId(), true);
+    NX_VERBOSE(this, "Request camera history for %1, servers: %2", camera, serverList.size());
+
     if (serverList.size() <= 1)
     {
         nx::vms::api::CameraHistoryItemDataList items;
