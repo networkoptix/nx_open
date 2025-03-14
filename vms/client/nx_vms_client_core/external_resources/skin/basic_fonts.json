@@ -14,5 +14,8 @@
     "editableLabel": {"size": 24, "weight": "medium"},
     "resourceTree": {"size": 13, "weight": "medium"},
     "systemTabBar": {"size": 12, "weight": "medium"},
-    "clock": {"size": 18, "weight": "medium"}
+    "clock": {"size": 18, "weight": "medium"},
+
+    "messageBoxTitle": {"size": 16, "weight": "medium"},
+    "messageBoxDescription": {"size": 14, "weight": "normal"}
 }

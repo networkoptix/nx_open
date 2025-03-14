@@ -16,6 +16,7 @@
 #include <nx/vms/client/desktop/common/widgets/message_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <ui/workaround/cancel_drag.h>
 
@@ -108,9 +109,10 @@ void QnMessageBoxPrivate::init()
     q->ui->secondaryLine->hide();
     q->ui->iconLabel->hide();
 
-    QFont font = q->ui->mainLabel->font();
-    font.setPixelSize(font.pixelSize() + 2);
-    q->ui->mainLabel->setFont(font);
+    q->ui->mainLabel->setFont(nx::vms::client::desktop::fontConfig()->font("messageBoxTitle"));
+    auto mainLabelPalette = q->ui->mainLabel->palette();
+    mainLabelPalette.setColor(QPalette::Light, nx::vms::client::core::colorTheme()->color("light10"));
+    q->ui->mainLabel->setPalette(mainLabelPalette);
     q->ui->mainLabel->setForegroundRole(QPalette::Light);
     q->ui->mainLabel->setOpenExternalLinks(true);
     q->setResizeToContentsMode(Qt::Vertical);
@@ -583,12 +585,20 @@ void QnMessageBox::setInformativeText(const QStringList &lines)
         delete label;
     d->informativeLabels.clear();
 
+    const auto font = nx::vms::client::desktop::fontConfig()->font("messageBoxDescription");
     const int layoutInfoIndex = ui->verticalLayout->indexOf(ui->mainLabel) + 1;
     int index = layoutInfoIndex;
     for (const QString& line: lines)
     {
         QLabel* label = new QLabel(this);
         label->setObjectName("infoLabel" + QString::number(index - layoutInfoIndex));
+        label->setFont(font);
+
+        auto palette = label->palette();
+        palette.setColor(QPalette::Light, nx::vms::client::core::colorTheme()->color("light16"));
+        label->setPalette(palette);
+        label->setForegroundRole(QPalette::Light);
+
         label->setWordWrap(true);
         label->setText(line);
         if (line.contains("http")) //< Make both external and internal links work.
