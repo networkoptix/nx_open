@@ -9,6 +9,8 @@
 #include <core/misc/schedule_task.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/storage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -71,6 +73,7 @@ std::pair<RecordingStatus, RecordingMetadataTypes> currentRecordingMode(
         const int dayOfWeek = dateTime.date().dayOfWeek();
         const int seconds = dateTime.time().msecsSinceStartOfDay() / 1000;
 
+        const bool recording = ResourceStatus::recording == camera->getStatus();
         const auto scheduledTasks = camera->getScheduleTasks();
         bool recordScheduled = false;
         for (const auto& task: scheduledTasks)
@@ -85,6 +88,8 @@ std::pair<RecordingStatus, RecordingMetadataTypes> currentRecordingMode(
                     status = RecordingStatus::recordingMetadataOnly;
                 else if (task.recordingType == RecordingType::metadataAndLowQuality)
                     status = RecordingStatus::recordingMetadataAndLQ;
+                if (!recording)
+                    return {RecordingStatus::recordingScheduled, task.metadataTypes};
                 return {status, task.metadataTypes};
             }
         }

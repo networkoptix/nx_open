@@ -37,6 +37,7 @@ public:
     {
         m_camera = createCamera();
         m_camera->addToSystemContext(appContext()->currentSystemContext());
+        m_camera->setStatus(api::ResourceStatus::recording);
 
         m_recordingStatusHelper.setCamera(m_camera);
     }
@@ -64,6 +65,11 @@ public:
         api::CameraAttributesData attributes;
         attributes.scheduleEnabled = true;
         m_camera->setUserAttributesAndNotify(attributes);
+    }
+
+    void whenStorageDisabled()
+    {
+        m_camera->setStatus(api::ResourceStatus::online);
     }
 
     void whenRecordingTodayIs(nx::vms::api::RecordingType recordingType)
@@ -115,6 +121,15 @@ TEST_F(RecordingStatusHelperTest, recordingIcon)
     givenRecordingIsSet(nx::vms::api::RecordingType::always);
     thenIconIs(qnSkin->icon(kRecordingIcon));
     thenIconPathIs(QString("image://skin/20x20/Solid/record_on.svg"));
+}
+
+TEST_F(RecordingStatusHelperTest, storageDisabled)
+{
+    whenRecordingEnabled();
+    givenRecordingIsSet(nx::vms::api::RecordingType::always);
+    whenStorageDisabled();
+    thenIconIs(qnSkin->icon(kNotRecordingIcon));
+    thenIconPathIs(QString("image://skin/20x20/Solid/record_part.svg"));
 }
 
 TEST_F(RecordingStatusHelperTest, recordingIconLoRes)
