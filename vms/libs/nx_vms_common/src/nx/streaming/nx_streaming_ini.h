@@ -19,7 +19,7 @@ struct NxStreamingIniConfig: public nx::kit::IniConfig
 
     NX_INI_INT(
         5'000,
-        resyncTresholdMs,
+        resyncThresholdMs,
         "If the difference between camera time and server time is bigger than the value of this\n"
         "setting an offset between the clocks of the camera and the server is recalculated");
 

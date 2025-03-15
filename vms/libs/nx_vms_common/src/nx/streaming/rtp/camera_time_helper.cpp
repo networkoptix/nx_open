@@ -20,7 +20,7 @@ constexpr auto kWaitSenderReportThreshold = 20s;
 
 CameraTimeHelper::CameraTimeHelper(const std::string& resourceId, const TimeOffsetPtr& offset):
     m_primaryOffset(offset),
-    m_resyncThreshold(milliseconds(nxStreamingIni().resyncTresholdMs)),
+    m_resyncThreshold(milliseconds(nxStreamingIni().resyncThresholdMs)),
     m_streamsSyncThreshold(milliseconds(nxStreamingIni().streamsSyncThresholdMs)),
     m_forceCameraTimeThreshold(milliseconds(nxStreamingIni().forceCameraTimeThresholdMs)),
     m_maxExpectedMetadataDelay(milliseconds(nxStreamingIni().maxExpectedMetadataDelayMs)),
