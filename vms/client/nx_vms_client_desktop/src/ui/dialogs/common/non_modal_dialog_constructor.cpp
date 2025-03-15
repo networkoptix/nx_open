@@ -3,17 +3,42 @@
 #include "non_modal_dialog_constructor.h"
 
 #include <QtCore/QEvent>
-#include <QtGui/QWindow>
 #include <QtGui/QScreen>
+#include <QtGui/QWindow>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QWidget>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 namespace {
-    const int extrah = 40;
-    const int extraw = 10;
+
+QString widgetInfo(const QObject* object)
+{
+    QStringList names;
+    if (auto name = object->objectName(); !name.isEmpty())
+        names.push_back(NX_FMT("Object name: %1", name));
+
+    if (auto widget = dynamic_cast<const QWidget*>(object))
+    {
+        if (auto title = widget->windowTitle(); !title.isEmpty())
+            names.push_back(NX_FMT("Window title: %1", title));
+    }
+
+    return names.join(", ");
 }
+
+QString widgetsInfo(const QWidgetList& widgets)
+{
+    QStringList names;
+    for (auto widget: widgets)
+        names.push_back(widgetInfo(widget));
+    names.removeAll({});
+
+    return names.join("\n");
+}
+
+} // namespace
 
 void QnShowDialogHelper::show(QWidget* dialog, const QRect &targetGeometry) {
     dialog->showNormal();
@@ -43,6 +68,9 @@ QPoint QnShowDialogHelper::calculatePosition(QWidget* dialog) {
     if (!w)
         return QPoint();
 
+    constexpr auto extrah = 40;
+    constexpr auto extraw = 10;
+
     const QRect desk = w->screen()->availableGeometry();
 
     // Use pos() if the widget is embedded into a native window
@@ -70,8 +98,8 @@ QPoint QnShowDialogHelper::calculatePosition(QWidget* dialog) {
     return p;
 }
 
-void QnShowDialogHelper::showNonModalDialog(QWidget* dialog, const QRect &targetGeometry,
-    bool focus)
+void QnShowDialogHelper::showNonModalDialog(
+    QWidget* dialog, const QRect& targetGeometry, bool focus)
 {
     QWidgetList modalWidgets;
 
@@ -82,44 +110,15 @@ void QnShowDialogHelper::showNonModalDialog(QWidget* dialog, const QRect &target
             modalWidgets << tlw;
     }
 
-    /* Setup dialog to show after all modal windows are closed. */
-    if (!modalWidgets.isEmpty())
-    {
-        auto helper = new QnDelayedShowHelper(dialog, targetGeometry, modalWidgets.size(), dialog);
-        for (auto modalWidget: modalWidgets)
-            modalWidget->installEventFilter(helper);
-        return;
-    }
+    NX_DEBUG(NX_SCOPE_TAG, "Show non-modal dialog: %1, modal widgets: %2",
+        dialog->windowTitle(), modalWidgets.size());
+
+    NX_ASSERT(modalWidgets.empty(),
+        "Non-modal dialog is shown while %1 modal dialogs are visible:\n%2",
+        modalWidgets.size(), widgetsInfo(modalWidgets));
 
     if (dialog->isVisible() && !focus)
         dialog->raise();
     else
         show(dialog, targetGeometry);
-}
-
-QnDelayedShowHelper::QnDelayedShowHelper(QWidget* targetWidget, const QRect &targetGeometry, int sourceCount, QObject *parent):
-    QObject(parent),
-    m_targetWidget(targetWidget),
-    m_targetGeometry(targetGeometry),
-    m_sourceCount(sourceCount)
-{
-
-}
-
-bool QnDelayedShowHelper::eventFilter(QObject *watched, QEvent *event)
-{
-    if (m_targetWidget && event->type() == QEvent::Hide)
-    {
-        watched->removeEventFilter(this);   //avoid double call
-        m_sourceCount--;
-
-        if (m_sourceCount <= 0)
-        {
-            show(m_targetWidget.data(), m_targetGeometry);
-            deleteLater();
-        }
-
-    }
-
-    return QObject::eventFilter(watched, event);
 }

@@ -22,32 +22,6 @@ public:
     static QPoint calculatePosition(QWidget* dialog);
 };
 
-/** Helper class to show target non-modal dialog as soon as top-level modal dialog is closed. */
-class QnDelayedShowHelper: public QObject, public QnShowDialogHelper
-{
-    Q_OBJECT
-
-public:
-    QnDelayedShowHelper(
-        QWidget* targetWidget,
-        const QRect& targetGeometry,
-        int sourceCount,
-        QObject* parent = nullptr);
-
-    virtual bool eventFilter(QObject *watched, QEvent *event) override;
-
-    /** Invalidate stored geometry so dialog will be displayed in the center of the screen. */
-    void resetGeometry()
-    {
-        m_targetGeometry = QRect();
-    }
-
-private:
-    QPointer<QWidget> m_targetWidget;
-    QRect m_targetGeometry;
-    int m_sourceCount;
-};
-
 /** Helper class to restore geometry of the persistent dialogs. */
 template<typename T>
 class QnNonModalDialogConstructor: public QnShowDialogHelper
