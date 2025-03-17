@@ -124,15 +124,16 @@ public:
         if (text() == value)
             return;
 
-        edit->setText(value);
-
         if (editing())
         {
+            // Incoming changes must not reset user input, so change only the label value.
+            label->setText(value);
             // If editing is on, emit textChanging.
-            emit q->textChanging(value);
+            emit q->textChanging(edit->text());
         }
         else
         {
+            edit->setText(value);
             // If editing is off, emit textChanged.
             label->setText(value);
             emit q->textChanged(value);
