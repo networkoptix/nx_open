@@ -249,7 +249,7 @@ QString Strings::sourceCameraString()
 
 QString Strings::devModeInfoTitle()
 {
-    return tr("Developer Mode Info");
+    return "Developer Mode Info"; //< This string is intentionally untranslatable.
 }
 
 QString Strings::isListed()
@@ -455,12 +455,12 @@ QString Strings::removed(SystemContext* context, nx::vms::rules::ResourceType ty
         case ResourceType::device:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 context->resourcePool(),
-                tr("%n removed devices", {}, count),
-                tr("%n removed cameras", {}, count));
+                tr("%n removed devices", "", count),
+                tr("%n removed cameras", "", count));
         case ResourceType::server:
-            return tr("%n removed servers", {}, count);
+            return tr("%n removed servers", "", count);
         case ResourceType::layout:
-            return tr("%n removed layouts", {}, count);
+            return tr("%n removed layouts", "", count);
         default:
             NX_ASSERT(false, "Unexpected resource type: %1", type);
             return {};
@@ -479,12 +479,12 @@ QString Strings::more(SystemContext* context, nx::vms::rules::ResourceType type,
         case ResourceType::device:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 context->resourcePool(),
-                tr("%n devices more", {}, count),
-                tr("%n cameras more", {}, count));
+                tr("%n devices more", "", count),
+                tr("%n cameras more", "", count));
         case ResourceType::server:
-            return tr("%n servers more", {}, count);
+            return tr("%n servers more", "", count);
         case ResourceType::layout:
-            return tr("%n layouts more", {}, count);
+            return tr("%n layouts more", "", count);
         default:
             NX_ASSERT(false, "Unexpected resource type: %1", type);
             return {};
@@ -503,9 +503,9 @@ QString Strings::number(nx::vms::rules::ResourceType type, const QnResourceList&
                 SystemContext::fromResource(resources.first())->resourcePool(),
                 resources.filtered<QnVirtualCameraResource>());
         case ResourceType::server:
-            return tr("%n Servers", {}, resources.size());
+            return tr("%n Servers", "", resources.size());
         case ResourceType::layout:
-            return tr("%n Layouts", {}, resources.size());
+            return tr("%n Layouts", "", resources.size());
         default:
             NX_ASSERT(false, "Unexpected resource type: %1", type);
             return {};

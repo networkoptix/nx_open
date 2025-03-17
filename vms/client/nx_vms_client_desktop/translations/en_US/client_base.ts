@@ -5,133 +5,133 @@
     <name>AbstractSearchWidget::Private</name>
     <message>
         <source>Hide information</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Show information</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Hide thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Show thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Last day</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Last 7 days</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Last 30 days</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected on Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any time</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Devices on layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cameras on layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Choose devices...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Choose cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected media</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>none</source>
         <comment>No currently selected camera</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n chosen devices</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n chosen device</numerusform>
             <numerusform>%n chosen devices</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n chosen cameras</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n chosen camera</numerusform>
             <numerusform>%n chosen cameras</numerusform>
         </translation>
     </message>
     <message>
         <source>Chosen device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Chosen camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>ActionDurationPickerWidget</name>
     <message>
         <source>For the duration of event</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Of fixed duration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Event occurs</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Event starts</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Event stops</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Duration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>For</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -194,15 +194,15 @@
     <name>CellWidget</name>
     <message>
         <source>Canceled</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Added</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Adding</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1158,87 +1158,87 @@
     </message>
     <message>
         <source>Connect to Site</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site Administration...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site Update...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Lists Management...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Open Integrations...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Merge Sites...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Open in</source>
         <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>New Tab</source>
         <comment>The &quot;Open in&quot; submenu item</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>New Window</source>
         <comment>The &quot;Open in&quot; submenu item</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Dedicated Window</source>
         <comment>The &quot;Open in&quot; submenu item</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Resolution</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>JavaScript API...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Merge to Currently Connected Site...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cell Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>New Layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Welcome Screen</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>New Welcome Screen</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Monitor in New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Monitor in New Window</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1341,7 +1341,7 @@
     </message>
     <message numerus="yes">
         <source>Delete %n groups?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Delete %n group?</numerusform>
             <numerusform>Delete %n groups?</numerusform>
         </translation>
@@ -1459,11 +1459,11 @@ License Key: %2</source>
     </message>
     <message>
         <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1593,7 +1593,7 @@ License Key: %2</source>
     <name>OauthLoginDialog</name>
     <message>
         <source>Connect to Site</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1708,7 +1708,7 @@ License Key: %2</source>
     </message>
     <message>
         <source>Enter a short Site description here.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1961,7 +1961,7 @@ License Key: %2</source>
     </message>
     <message>
         <source>Platform</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2061,7 +2061,7 @@ License Key: %2</source>
     <name>QnAttachToVideowallDialog</name>
     <message>
         <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2159,37 +2159,37 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
         <source>These devices are removed from Site</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>This device is removed from Site</numerusform>
+            <numerusform>These devices are removed from Site</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These cameras are removed from Site</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>This camera is removed from Site</numerusform>
+            <numerusform>These cameras are removed from Site</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These resources are removed from Site</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>This resource is removed from Site</numerusform>
+            <numerusform>These resources are removed from Site</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>This server is removed from Site</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>This server is removed from Site</numerusform>
+            <numerusform>These servers are removed from Site</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>This user is removed from Site</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>This user is removed from Site</numerusform>
+            <numerusform>These users are removed from Site</numerusform>
         </translation>
     </message>
 </context>
@@ -2372,53 +2372,53 @@ License Key: %2</source>
     </message>
     <message>
         <source>Site name changed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site merge</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Server proxy connection</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site has been updated to version %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 - %2, Duration: %3, Target: %4</source>
         <comment>%1 is start time of proxy connection, %2 is end time of proxy connection, %3 is proxy connection duration, %4 is proxy connection target address</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Start time: %1, Target: %2</source>
         <comment>%1 is start time of proxy connection, %2 is proxy connection target address</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>User IP</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Device IP</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Camera IP</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2714,62 +2714,62 @@ License Key: %2</source>
     <message>
         <source>Disconnect Site from %1</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Connect Site to %1...</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>There is currently no connection between your site and %1.</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enter your account password to disconnect Site from %1</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cannot disconnect the Site from %1</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site disconnected from %1</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Disconnect site from %1?</source>
         <comment>%1 is the cloud name, like Nx Cloud</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Recording will stop and all Service Subscriptions will be removed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>All %1 users will be removed from the site</source>
         <comment>%1 is the short cloud name (like Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>You will be logged out of the site. The site will be accessible only via local network</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>The site will be accessible only via local network</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Existing data (site settings and archive) will be preserved</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This action cannot be undone</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2859,12 +2859,12 @@ License Key: %2</source>
     <message>
         <source>Log in to %1</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Logged in as %1</source>
         <comment>%1 is the cloud login name (like user@domain.com</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2960,11 +2960,11 @@ License Key: %2</source>
     </message>
     <message>
         <source>Site is not compatible with two-factor authentication</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to log in to Site &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3050,11 +3050,11 @@ License Key: %2</source>
     </message>
     <message>
         <source>Site configuration will be restored from backup, Server application will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enter your account password to restore Site from backup</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3099,7 +3099,7 @@ License Key: %2</source>
     </message>
     <message>
         <source>Notifications filters are moved to the right panel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3154,11 +3154,11 @@ License Key: %2</source>
     </message>
     <message>
         <source>Integrations</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Open Integrations</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3452,7 +3452,7 @@ License Key: %2</source>
     </message>
     <message>
         <source>Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3566,18 +3566,18 @@ License Key: %2</source>
     </message>
     <message>
         <source>Mute</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Set for %n devices</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Set for %n device</numerusform>
+            <numerusform>Set for %n devices</numerusform>
         </translation>
     </message>
     <message>
         <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3627,7 +3627,7 @@ License Key: %2</source>
     </message>
     <message>
         <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3956,7 +3956,7 @@ License Key: %2</source>
     </message>
     <message>
         <source>Move to a dedicated window</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4214,7 +4214,7 @@ License Key: %2</source>
     </message>
     <message>
         <source>Failover</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4251,7 +4251,7 @@ License Key: %2</source>
     </message>
     <message>
         <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4309,78 +4309,78 @@ License Key: %2</source>
     </message>
     <message>
         <source>Set</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnStatusOverlayWidget</name>
     <message>
         <source>NOT ENOUGH LICENSES</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>OFFLINE</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>UNAUTHORIZED</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>UNSUPPORTED</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>PASSWORD REQUIRED</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>SITE SHUT DOWN</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>INFORMATION REQUIRED</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>NO DATA</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>NO ACCESS</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>NO EXPORT PERMISSION</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>TOO MANY CONNECTIONS</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>NO LIVE STREAM</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>ARCHIVE ENCRYPTED</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>CERTIFICATE ERROR</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Access to this camera requires authorization credentials.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>CONNECTION LOST</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4532,52 +4532,52 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Choose a read-write policy to define how interact with storage directories.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Exclusive</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Shared</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Isolated</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>The Site Servers have different read-write policies for the storage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>URL: %1</source>
         <comment>%1 will be substituted with storage URL, e.g &apos;192.168.1.10/media&apos;</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cloud storage cannot be enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Insufficient services</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4680,39 +4680,39 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Isolated</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Exclusive</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Shared</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Undefined</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>removable</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unknown size</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>The storage has different read-write policies across various Servers in the Site</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Click on the icon to see Servers list</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Read-Write Policy</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4825,7 +4825,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Failed to save site settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4948,60 +4948,60 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>The Site has no internet access for time synchronization</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>System partition is used for analytics data</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site suspended</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site shut down</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Email address is not set for your account</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Calling...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Missed call</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Storage is not configured on %n servers</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Storage is not configured on %n server</numerusform>
+            <numerusform>Storage is not configured on %n servers</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Backup storage is not configured on %n servers</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Backup storage is not configured on %n server</numerusform>
+            <numerusform>Backup storage is not configured on %n servers</numerusform>
         </translation>
     </message>
     <message>
         <source>Recording schedule is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Recording schedule is invalid on %n cameras</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Recording schedule is invalid on %n camera</numerusform>
+            <numerusform>Recording schedule is invalid on %n cameras</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Email address is not set for %n users</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Email address is not set for %n user</numerusform>
             <numerusform>Email address is not set for %n users</numerusform>
         </translation>
@@ -5009,95 +5009,95 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Check out %1</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Remote archive synchronization failed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Storage for analytics data is not set on %n Servers</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Storage for analytics data is not set on %n Server</numerusform>
             <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>System storage is used for analytics data on %n servers</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>System storage is used for analytics data on %n server</numerusform>
+            <numerusform>System storage is used for analytics data on %n servers</numerusform>
         </translation>
     </message>
     <message>
         <source>Connect to your Site from anywhere!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No online server in the site has internet access for time synchronization.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>You cannot receive Site notifications by email.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>They cannot receive Site notifications by email.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Some cameras are set to record in a mode they do not support.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>+ %n more</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>+ %n more</numerusform>
+            <numerusform>+ %n more</numerusform>
         </translation>
     </message>
     <message>
         <source>Site will stop functioning soon</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site has stopped functioning</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site will stop functioning today</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site will stop functioning tomorrow</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Site will stop functioning in %n days</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Site will stop functioning in %n day</numerusform>
+            <numerusform>Site will stop functioning in %n days</numerusform>
         </translation>
     </message>
     <message>
         <source>Notification and interface languages differ</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Notifications language differs from the interface language</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Recording disabled</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cloud storage backup disabled</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Paid integration services disabled</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5120,19 +5120,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Includes information about site, such as cameras models and firmware versions, number of servers, etc.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Allow optimize device settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Allow optimize camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5248,11 +5248,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Auto-refresh every %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5475,11 +5475,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Site shut down</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>To add a Video Wall, the Site should be in active state. %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5718,14 +5718,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
         <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>This layout is shared with other users, so it will be deleted for their accounts as well.</numerusform>
             <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n layout is shared with other users, so it will be deleted for their accounts as well.</numerusform>
             <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
         </translation>
@@ -5739,11 +5739,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Unable to move device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Maximum number of devices for this server is reached</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5829,181 +5829,211 @@ If you intended to move analytics data to another storage location, please conta
     <name>Strings</name>
     <message numerus="yes">
         <source>Source and %n more Cameras</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Source and %n more Camera</numerusform>
             <numerusform>Source and %n more Cameras</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Layouts</source>
-        <translation type="unfinished">%n Layout</translation>
+        <translation>
+            <numerusform>%n Layout</numerusform>
+            <numerusform>%n Layouts</numerusform>
+        </translation>
     </message>
     <message>
         <source>Source Server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Source Server and %n Servers</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Source Server and %n Server</numerusform>
             <numerusform>Source Server and %n Servers</numerusform>
         </translation>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any Device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any Camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any Server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any User</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Info</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Undefined</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Servers</source>
-        <translation type="unfinished">%n Server</translation>
+        <translation>
+            <numerusform>%n Server</numerusform>
+            <numerusform>%n Servers</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>%n additional</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n additional</numerusform>
             <numerusform>%n additional</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Users</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n User</numerusform>
             <numerusform>%n Users</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Groups</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n Group</numerusform>
             <numerusform>%n Groups</numerusform>
         </translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Source camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Developer Mode Info</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Is listed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Is not listed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>In</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n removed devices</source>
-        <translation type="unfinished"></translation>
+        <translation>
+            <numerusform>%n removed device</numerusform>
+            <numerusform>%n removed devices</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n removed cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>
+            <numerusform>%n removed camera</numerusform>
+            <numerusform>%n removed cameras</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n removed servers</source>
-        <translation type="unfinished"></translation>
+        <translation>
+            <numerusform>%n removed server</numerusform>
+            <numerusform>%n removed servers</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n removed layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>
+            <numerusform>%n removed layout</numerusform>
+            <numerusform>%n removed layouts</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>%n subjects more</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n subject more</numerusform>
+            <numerusform>%n subjects more</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices more</source>
-        <translation type="unfinished"></translation>
+        <translation>
+            <numerusform>%n device more</numerusform>
+            <numerusform>%n devices more</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras more</source>
-        <translation type="unfinished"></translation>
+        <translation>
+            <numerusform>%n camera more</numerusform>
+            <numerusform>%n cameras more</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n servers more</source>
-        <translation type="unfinished"></translation>
+        <translation>
+            <numerusform>%n server more</numerusform>
+            <numerusform>%n servers more</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n layouts more</source>
-        <translation type="unfinished"></translation>
+        <translation>
+            <numerusform>%n layout more</numerusform>
+            <numerusform>%n layouts more</numerusform>
+        </translation>
     </message>
     <message>
         <source>Removed subject</source>
         <comment>The subject is user or group</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Removed device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Removed camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Removed server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Removed layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n removed subjects</source>
         <comment>The subject is user or group</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n removed subject</numerusform>
+            <numerusform>%n removed subjects</numerusform>
         </translation>
     </message>
 </context>
@@ -6011,31 +6041,31 @@ If you intended to move analytics data to another storage location, please conta
     <name>TierUsageStrings</name>
     <message>
         <source>Number of servers per Site</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Number of devices per server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Number of items on layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Number of days of archive</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>LDAP</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cross-Site features</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6043,27 +6073,27 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Also include</source>
         <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Begin</source>
         <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Before Event</source>
         <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>End</source>
         <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>After Event</source>
         <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6337,11 +6367,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Play Audio</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6373,11 +6403,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message>
         <source>Add To List</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Create New List...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6649,19 +6679,19 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
         <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Backup will not be activated for %1 devices: </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 suitable cloud storage services are required to activate backup for them.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6706,15 +6736,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Site shut down</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6756,7 +6786,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Footage from these cameras is backed up through to %1 %2</source>
         <comment>%1 and %2 will be replaced respectively by the date and time in the site format.</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6785,23 +6815,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Missed call</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Call Request</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Call Request Missed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Source: %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6823,7 +6853,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraButtonManager</name>
     <message>
         <source>Disabled by schedule</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6910,11 +6940,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Do not change these settings unless you are absolutely sure of their potential impact on performance</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6933,7 +6963,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Open Layout in new Tab</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6960,7 +6990,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Select Target...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6979,26 +7009,26 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Target resource does not exist</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select Camera or Layout...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Target</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::CameraHotspotsSettingsWidget</name>
     <message>
         <source>Select Hotspot Target</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7025,7 +7055,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Use this link to add the camera to another site</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7145,7 +7175,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>%1 will be removed from the Site and replaced by the selected camera</source>
         <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7211,7 +7241,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Source camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7611,23 +7641,23 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Login to %1</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Are you sure you want to disconnect?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Disconnect</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Channel Partner users have access to this site</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7643,37 +7673,37 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Local Site owner is absent or disabled.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site connected to %1</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to connect Site to %1</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Connect Site to %1</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Connect Site to %1?</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enter your account password to connect Site to %1</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Connect</source>
         <comment>Connect current Site to cloud</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7697,16 +7727,16 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Merge Server to the Site</source>
         <comment>Dialog title</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enter your account password to merge Server to the Site</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Merge</source>
         <comment>Merge Server to the current Site (dialog button text)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7733,7 +7763,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>New Site</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7782,11 +7812,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>This camera requires password to be set up. Ask your site administrator to do it.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Some of selected cameras require password to be set up. Ask your site administrator to do it.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7921,11 +7951,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Site Administration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Maximum number of Devices for the Site is reached</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8006,11 +8036,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8041,15 +8071,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Open event video</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Open event device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Open event camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8091,13 +8121,13 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::EventTile</name>
     <message>
         <source>UNKNOWN</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source> + %n</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> + %n</numerusform>
+            <numerusform> + %n</numerusform>
         </translation>
     </message>
 </context>
@@ -8301,39 +8331,39 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::FailoverWidget</name>
     <message>
         <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failover</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Max devices on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Max cameras on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>At least two servers are required for this feature.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This server already has more than max devices</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This server already has more than max cameras</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>To avoid issues adjust max number of devices</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>To avoid issues adjust max number of cameras</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8433,7 +8463,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>View video without redaction</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8544,30 +8574,30 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Sites will be merged shortly</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Servers from the other Site will appear in the resource tree.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Connecting to the current Site...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Server will be connected to Site shortly</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to merge %1 to our site.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::JumpToLiveButton</name>
     <message>
         <source>Go to Live</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8585,23 +8615,23 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LayoutActionHandler</name>
     <message>
         <source>Save Layout As</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enter Layout Name:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Save Layout As Cloud</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>New Layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enter the name of the layout to create:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8647,7 +8677,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>This ID is already in use. Use Generate button to find a free ID.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8744,7 +8774,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8851,7 +8881,7 @@ The Logging Level &quot;%1&quot; will provide you with more granular information
     <message>
         <source>The selected Logging Level may degrade performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8913,11 +8943,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
         <source>Logging level degrades performance</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&lt;None&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8947,33 +8977,33 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
         <source>Debug logging is enabled on the client</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Debug logging is enabled.
 Client performance is degraded.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Debug logging is enabled</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Debug logging is enabled.
 Site performance is degraded.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Logs download canceled</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Downloading logs...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Logs download failed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8984,31 +9014,31 @@ Site performance is degraded.</source>
     </message>
     <message>
         <source>Downloading...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Download completed with errors</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Download success</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n selected:</source>
         <comment>number of selected rows</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n selected:</numerusform>
+            <numerusform>%n selected:</numerusform>
         </translation>
     </message>
     <message>
         <source>Retry (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Retry</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9019,76 +9049,76 @@ Site performance is degraded.</source>
     </message>
     <message>
         <source>Lookup List remove request failed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Could not add object to the List</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>An object doesn&apos;t have attributes that matches selected list</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Object was added to the List</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>An object has been added to the &quot;%1&quot; successfully</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::LookupListEntriesModel</name>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Present</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Absent</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::LookupListExportProcessor</name>
     <message>
         <source>Text files</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Export List</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
         <source>Import Lookup List</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Text files</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>All other text files</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9161,52 +9191,52 @@ Site performance is degraded.</source>
     </message>
     <message>
         <source>Merge Sites</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enter your account password to merge Sites</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Merge</source>
         <comment>Merge two Sites together (dialog button text)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Merging Sites...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This is the current Site URL.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Servers from the other Site will appear in the resource tree when the database synchronization is finished.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Sites will be merged shortly</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to merge Sites</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Remote</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Current (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Remote (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9241,68 +9271,68 @@ Site performance is degraded.</source>
     </message>
     <message>
         <source>New Site</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>The discovered Site %1 has an incompatible version %2.</source>
         <comment>%1 is name of Site, %2 is version information</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>You are about to merge Sites with Starter licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Only one Starter license is allowed per Site, so the second license will be deactivated.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>You are about to merge Sites with NVR licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Only one NVR license is allowed per Site, so the second license will be deactivated.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Could not configure the remote Site %1.</source>
         <comment>%1 is name of the Site</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
         <comment>%1 is the short cloud name (like Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Both Sites are connected to %1. Merge is not allowed.</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 sites have different owners. Merge is not allowed.</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site name is not configured yet.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Maximum number of Servers for the Site is reached.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9330,7 +9360,7 @@ You can force it, but it may significantly increase CPU load.</source>
 You can force motion detection, but it may lead to a substantial increase in CPU load.</source>
         <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9604,24 +9634,24 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
         <source>OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Incompatible %1 instance. To update disconnect Site from %1 first.</source>
         <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Applying updates at the end of the week is not recommended</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site updated to</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site update in process</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9635,77 +9665,77 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NewDeviceAdditionDialog</name>
     <message>
         <source>Possible formats:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Server offline</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>System Administration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Device search failed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Failed to add %n devices</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Failed to add %n device</numerusform>
             <numerusform>Failed to add %n devices</numerusform>
         </translation>
     </message>
     <message>
         <source>Initializing scan...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Scanning online hosts...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Checking host...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Aborted</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Searching...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No devices found</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>All devices are already added</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n devices are being added. You can close this dialog or start a new search</source>
-        <translation type="unfinished">
-            <numerusform>%n devices is being added. You can close this dialog or start a new search</numerusform>
+        <translation>
+            <numerusform>%n device is being added. You can close this dialog or start a new search</numerusform>
             <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
         </translation>
     </message>
     <message>
         <source>Add all Devices</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Add %n Devices</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Add Device</numerusform>
             <numerusform>Add %n Devices</numerusform>
         </translation>
@@ -9742,22 +9772,22 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
         <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>User management for organization users is available only at the organization level, not the site level</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::NotificationActionExecutor</name>
     <message>
         <source>Unable to acknowledge event on removed camera.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unable to acknowledge event on inaccessible camera.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9782,41 +9812,41 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
         <source>Current Site</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any Notification</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Event Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Choose Types...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any notification</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n notification types</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n notification type</numerusform>
+            <numerusform>%n notification types</numerusform>
         </translation>
     </message>
     <message>
         <source>Site Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::NotificationSettingsDialog</name>
     <message>
         <source>Select Notification Types</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10114,11 +10144,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
         <source>Auto-refresh integration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Auto-refresh web page</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10219,7 +10249,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::ResourceGroupingActionHandler</name>
     <message>
         <source>Maximum level of nesting is reached</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10284,7 +10314,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message numerus="yes">
         <source>%n notifications</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n notification</numerusform>
             <numerusform>%n notifications</numerusform>
         </translation>
@@ -10453,43 +10483,43 @@ You can still change quality and FPS directly on the camera.</source>
     <message>
         <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Mbps</source>
         <comment>Megabits per seconds</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ScreenRecordingActionHandler</name>
     <message>
         <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Recording in %1...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Recorded Video</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Save Recording As...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>AVI (Audio/Video Interleaved)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Failed to start recording</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10556,42 +10586,42 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
         <source>Archive encryption increases CPU usage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Additional configuration might be required on the server machine.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>The encryption password will be required to restore the archive.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::SelectAnalyticsObjectTypesButton</name>
     <message>
         <source>No objects</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n objects selected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n object selected</numerusform>
+            <numerusform>%n objects selected</numerusform>
         </translation>
     </message>
     <message>
         <source>All objects</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10692,7 +10722,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>I trust this server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10995,35 +11025,35 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Open Settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Open Services</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Recording on %n channels was stopped due to service overuse.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Recording on %n channel was stopped due to service overuse.</numerusform>
+            <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Cloud storage backup on %n channel was stopped due to service overuse.</numerusform>
+            <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Paid integration service usage on %n channel was stopped due to service overuse.</numerusform>
+            <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
         </translation>
     </message>
 </context>
@@ -11031,11 +11061,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::SystemTabBar</name>
     <message>
         <source>Open in New Window</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11048,12 +11078,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
         <source>Your access to the Site expires %1</source>
         <comment>%1 is a date</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Your access to the Site expires in %1</source>
         <comment>%1 is a duration</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11122,7 +11152,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>This action is not supported for notifications from other Sites</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11194,15 +11224,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::TwoWayAudioButton</name>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Input device is not selected</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11280,7 +11310,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11339,7 +11369,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>Site Error</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11391,7 +11421,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11537,7 +11567,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>This will instantly remove an access to the site for this user</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11567,170 +11597,170 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::VirtualCameraActionHandler</name>
     <message>
         <source>Failed to add virtual camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Open Virtual Camera Recordings...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No video files found in selected folder</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Stop uploading?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Already uploaded files will be kept.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Selected file formats are not supported</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Selected file format is not supported</numerusform>
             <numerusform>Selected file formats are not supported</numerusform>
         </translation>
     </message>
     <message>
         <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Selected files do not have timestamps</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Selected file does not have timestamp</numerusform>
             <numerusform>Selected files do not have timestamps</numerusform>
         </translation>
     </message>
     <message>
         <source>Only video files with correct timestamp are supported.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Selected files are too old</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Selected file is too old</numerusform>
             <numerusform>Selected files are too old</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Selected file was recorded on %1, but only files that were recorded in the last 24 hours can be uploaded. You can change this in camera archive settings.</numerusform>
             <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last 24 hours can be uploaded. You can change this in camera archive settings.</numerusform>
             <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Selected files cover periods for which videos are already being uploaded</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Selected file covers period for which video is already being uploaded</numerusform>
             <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>You can upload these files to a different instance of a Virtual Camera.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>You can upload this file to a different instance of a Virtual Camera.</numerusform>
             <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Selected files cover periods for which videos have already been uploaded</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Selected file covers period for which video has already been uploaded</numerusform>
             <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
         </translation>
     </message>
     <message>
         <source>Not enough space on server storage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected files will not be uploaded</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Some files will not be uploaded</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No new files to upload in selected folder</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>Some footage may be deleted after uploading these files</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Some footage may be deleted after uploading this file</numerusform>
             <numerusform>Some footage may be deleted after uploading these files</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected file happens to be the oldest on the server, it will be deleted right after being uploaded.</numerusform>
             <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
         </translation>
     </message>
     <message>
         <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Upload anyway?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Could not finish upload to %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Make sure there is enough space on server storage.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Uploading footage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 has unsupported format.</source>
         <comment>Filename will be substituted</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 does not have timestamp.</source>
         <comment>Filename will be substituted</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 is older than allowed in camera archive settings.</source>
         <comment>Filename will be substituted</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 covers period for which video has already been uploaded.</source>
         <comment>Filename will be substituted</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 covers period for which video is being uploaded.</source>
         <comment>Filename will be substituted</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11850,11 +11880,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>Unavailable in dedicated window mode</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Move this window to the Layout to use this functionality</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11880,7 +11910,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>Unable to connect to the site because it has become offline</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11971,26 +12001,26 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>Skip Version</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::analytics::taxonomy::AttributeDisplayManager</name>
     <message>
         <source>Date/Time</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Object Type</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12035,7 +12065,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
         <source>New Site</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12102,7 +12132,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>Other Sites</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12239,11 +12269,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>Resource not found</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Parameter not found</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12266,26 +12296,26 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>Cannot find a widget corresponding to the specified item</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cannot maximize the item</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::menu::ChunksFilterActionFactory</name>
     <message>
         <source>No filter</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Main storage only</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Backup storage only</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12293,84 +12323,84 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>%1 (active)</source>
         <comment>Template for active PTZ preset</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 (active)</source>
         <comment>Template for active PTZ tour</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::menu::RadassActionFactory</name>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::menu::ShowOnItemsFactory</name>
     <message>
         <source>Info</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Objects</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Regions of Interest</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Hotspots</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::menu::ShowreelSettingsFactory</name>
     <message>
         <source>Switch with Hotkeys</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Switch on Timer</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::menu::ShowreelTextFactory</name>
     <message>
         <source>Stop Tour</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Stop Showreel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Start Tour</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Start Showreel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12438,44 +12468,44 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>Add Title or Comment</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>The rule is not valid and may not work</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
         <source>Authentication</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Token</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
     <message>
         <source>No custom headers</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n custom headers</source>
         <comment>%n is a number of custom headers</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n custom header</numerusform>
+            <numerusform>%n custom headers</numerusform>
         </translation>
     </message>
 </context>
@@ -12483,11 +12513,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
         <source>Key</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Value</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12585,27 +12615,27 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>Any Device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any Camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any Server</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select at least one layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select at least one User</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12626,19 +12656,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::StatePicker</name>
     <message>
         <source>When event occurs</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>When event starts</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>When event stops</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select state</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12661,11 +12691,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>Not contains keywords</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Not contains list entries</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12694,7 +12724,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::VolumePicker</name>
     <message>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12728,15 +12758,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::saas::TierUsageModel</name>
     <message>
         <source>Limitation</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Allowed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Current</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -13040,7 +13070,7 @@ We recommend you not to open this web page. If you understand the risks, you can
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -13187,7 +13217,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
         <source>Client auto-updates</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

@@ -24,7 +24,7 @@
     <name>PtzCameraButtonController</name>
     <message>
         <source>Control PTZ</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -32,11 +32,11 @@
     <message>
         <source>Owner: %1</source>
         <comment>%1 is a user name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Your Site</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -48,11 +48,11 @@
     <message>
         <source>Cannot connect to the Site &quot;%1&quot;</source>
         <comment>%1 is a site name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -70,18 +70,18 @@
     </message>
     <message>
         <source>Session duration limit can be changed by the site administrators</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::client::mobile::MediaDownloadBackend</name>
     <message>
         <source>Can&apos;t download video</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Please check a network connection.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -96,7 +96,7 @@
     </message>
     <message>
         <source>Please check your internet connection</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 </TS>
