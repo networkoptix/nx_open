@@ -163,9 +163,17 @@ public:
 private:
     void init(const QStringList& paths);
 
-    bool initSvgRenderer(const QString& name, QSvgRenderer& renderer) const;
-    QPixmap getPixmapInternal(const QString& name);
-    QPixmap getPixmapFromSvg(const QString& name, bool correctDevicePixelRatio, const QSize& desiredSize);
+    std::pair<QPixmap, QString> pixmapInternal(
+        const QString& name,
+        bool correctDevicePixelRatio,
+        const QSize& desiredSize = QSize());
+
+    QString initSvgRenderer(const QString& name, QSvgRenderer& renderer) const;
+    std::pair<QPixmap, QString> createPixmap(const QString& name);
+    std::pair<QPixmap, QString> createPixmapFromSvg(
+        const QString& name,
+        bool correctDevicePixelRatio,
+        const QSize& desiredSize);
     QString getDpiDependedName(const QString& name) const;
 
 private:

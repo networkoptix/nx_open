@@ -324,22 +324,22 @@ bool Skin::addGeneratedPixmap(const QString& name, const QPixmap& pixmap)
     return true;
 }
 
-QPixmap Skin::pixmap(const QString& name, bool correctDevicePixelRatio, const QSize& desiredSize)
+QPixmap Skin::pixmap(
+    const QString& name,
+    bool correctDevicePixelRatio,
+    const QSize& desiredSize)
 {
-    if (name.endsWith(".svg"))
-        return getPixmapFromSvg(name, correctDevicePixelRatio, desiredSize);
+    const auto [pixmap, error] = pixmapInternal(name, correctDevicePixelRatio, desiredSize);
 
-    QPixmap result = getPixmapInternal(getDpiDependedName(name));
+    NX_ASSERT(error.isEmpty(), error);
 
-    if (correctDevicePixelRatio)
-        correctPixelRatio(result);
-
-    return result;
+    return pixmap;
 }
 
-QPixmap Skin::getPixmapInternal(const QString& name)
+std::pair<QPixmap, QString> Skin::createPixmap(const QString& name)
 {
     QPixmap pixmap;
+    QString error;
     if (!QPixmapCache::find(name, &pixmap))
     {
         if (m_externalPixmaps.contains(name))
@@ -349,38 +349,54 @@ QPixmap Skin::getPixmapInternal(const QString& name)
         else if (const auto fullPath = path(name);
             fullPath.isEmpty())
         {
-            NX_ASSERT(name.contains(kHiDpiSuffix));
+            if (!name.contains(kHiDpiSuffix))
+                error = nx::format("Name does not include \"%1\"", kHiDpiSuffix);
         }
         else
         {
             pixmap = QPixmap::fromImage(QImage(fullPath), Qt::OrderedDither | Qt::OrderedAlphaDither);
             pixmap.setDevicePixelRatio(1); // Force to use not scaled images
-            NX_ASSERT(!pixmap.isNull(), "Can't find icon %1", fullPath);
+            if (pixmap.isNull())
+                error = nx::format("Can't find icon %1", fullPath);
         }
         QPixmapCache::insert(name, pixmap);
     }
-    return pixmap;
+    return {pixmap, error};
 }
 
-bool Skin::initSvgRenderer(const QString& name, QSvgRenderer& renderer) const
+std::pair<QPixmap, QString> Skin::pixmapInternal(
+    const QString& name,
+    bool correctDevicePixelRatio,
+    const QSize& desiredSize)
+{
+    if (name.endsWith(".svg"))
+        return createPixmapFromSvg(name, correctDevicePixelRatio, desiredSize);
+
+    std::pair<QPixmap, QString> result = createPixmap(getDpiDependedName(name));
+    if (correctDevicePixelRatio)
+        correctPixelRatio(result.first);
+
+    return result;
+}
+
+QString Skin::initSvgRenderer(
+    const QString& name,
+    QSvgRenderer& renderer) const
 {
     QFile source(path(name));
     if (!source.open(QIODevice::ReadOnly))
-    {
-        NX_ASSERT(false, "Cannot load svg with name " + name);
-        return false;
-    }
+        return "Cannot open svg file: " + name;
 
     if (!renderer.load(SvgIconColorer::colorized(source.readAll())))
-    {
-        NX_ASSERT(false, "Error while loading svg");
-        return false;
-    }
+        return "Error while loading svg: " + name;
 
-    return true;
+    return {};
 }
 
-QPixmap Skin::getPixmapFromSvg(const QString& name, bool correctDevicePixelRatio, const QSize& desiredSize)
+std::pair<QPixmap, QString> Skin::createPixmapFromSvg(
+    const QString& name,
+    bool correctDevicePixelRatio,
+    const QSize& desiredSize)
 {
     QPixmap pixmap;
 
@@ -389,16 +405,14 @@ QPixmap Skin::getPixmapFromSvg(const QString& name, bool correctDevicePixelRatio
     QSize size = desiredSize;
     if (!size.isValid())
     {
-        if (!initSvgRenderer(name, renderer))
-            return pixmap;
+        QString rendererError = initSvgRenderer(name, renderer);
+        if (!rendererError.isEmpty())
+            return {pixmap, rendererError};
 
         size = renderer.defaultSize();
 
         if (!size.isValid())
-        {
-            NX_ASSERT(size.isValid(), nx::format("%1 doesn't define default size", name));
-            return pixmap;
-        }
+            return {pixmap, nx::format("%1 doesn't define default size", name)};
     }
 
     const auto key = nx::format("%1:%2:%3:%4", name, correctDevicePixelRatio,
@@ -406,8 +420,9 @@ QPixmap Skin::getPixmapFromSvg(const QString& name, bool correctDevicePixelRatio
 
     if (!QPixmapCache::find(key, &pixmap))
     {
-        if (!renderer.isValid() && !initSvgRenderer(name, renderer))
-            return pixmap;
+        QString rendererError = initSvgRenderer(name, renderer);
+        if (!renderer.isValid() && !rendererError.isEmpty())
+            return {pixmap, rendererError};
 
         const QSize& correctedSize = correctDevicePixelRatio
             ? size * qApp->devicePixelRatio()
@@ -424,7 +439,7 @@ QPixmap Skin::getPixmapFromSvg(const QString& name, bool correctDevicePixelRatio
         QPixmapCache::insert(key, pixmap);
     }
 
-    return pixmap;
+    return {pixmap, QString()};
 }
 
 QString Skin::getDpiDependedName(const QString& name) const
@@ -525,9 +540,29 @@ QPixmap Skin::colorizedPixmap(
     // Only optional primary channel is allowed for non-SVG images.
     NX_ASSERT(colorMap.empty() || (colorMap.size() == 1 && colorMap.contains(kPrimaryKey)));
 
-    auto result = pixmap(path);
-    if (!NX_ASSERT(!result.isNull()))
-        return result;
+    auto [pixmap, error] = pixmapInternal(path, /*correctDevicePixelRatio*/ true);
+
+    static const QString kIgnoreErrorsFragment = "ignoreErrors";
+    const bool ignoreErrors = url.hasFragment() && url.fragment() != kIgnoreErrorsFragment;
+
+    if (!error.isEmpty())
+    {
+        if (ignoreErrors)
+            NX_WARNING(this, error);
+        else
+            NX_ASSERT(false, error);
+    }
+    else if (pixmap.isNull())
+    {
+        const QString emptyPixmapError = nx::format("Empty pixmap: %1", pathAndParams);
+        if (ignoreErrors)
+            NX_WARNING(this, emptyPixmapError);
+        else
+            NX_ASSERT(false, emptyPixmapError);
+    }
+
+    if (pixmap.isNull())
+        return pixmap;
 
     if (colorMap.contains(kPrimaryKey))
     {
@@ -536,14 +571,14 @@ QPixmap Skin::colorizedPixmap(
 
         NX_ASSERT(targetColor.isValid(), "Invalid color \"%1\" for image \"%2\"", colorName, path);
         if (targetColor.isValid())
-            result = colorize(result, targetColor);
+            pixmap = colorize(pixmap, targetColor);
     }
 
     if (!desiredPhysicalSize.isEmpty())
-        result = result.scaled(desiredPhysicalSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        pixmap = pixmap.scaled(desiredPhysicalSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
-    result.setDevicePixelRatio(devicePixelRatio);
-    return result;
+    pixmap.setDevicePixelRatio(devicePixelRatio);
+    return pixmap;
 }
 
 } // namespace nx::vms::client::core
