@@ -209,10 +209,10 @@ struct NX_VMS_API ApiObjectMetadataPacket
     Flags flags = Flags::none;
 
     /**%apidoc[opt] */
-    std::chrono::microseconds timestampUs;
+    std::chrono::milliseconds timestampMs;
 
     /**%apidoc[opt] */
-    std::chrono::microseconds durationUs;
+    std::chrono::milliseconds durationMs;
 
     /**%apidoc[opt] */
     std::vector<ApiObjectMetadata> objects;
@@ -220,7 +220,7 @@ struct NX_VMS_API ApiObjectMetadataPacket
     bool operator==(const ApiObjectMetadataPacket& other) const = default;
 };
 #define nx_vms_api_analytics_ApiObjectMetadataPacket_Fields \
-    (id)(deviceId)(flags)(timestampUs)(durationUs)(objects)
+    (id)(deviceId)(flags)(timestampMs)(durationMs)(objects)
 QN_FUSION_DECLARE_FUNCTIONS(ApiObjectMetadataPacket, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ApiObjectMetadataPacket,
     nx_vms_api_analytics_ApiObjectMetadataPacket_Fields)
@@ -246,8 +246,8 @@ struct NX_VMS_API ApiBestShotMetadataPacket
     Flags flags = Flags::none;
 
     /**%apidoc[opt] */
-    std::chrono::microseconds timestampUs;
-    /**%apidoc:string
+    std::chrono::milliseconds timestampMs;
+    /**%apidoc[opt]:string
      * Coordinates of the bounding box on a video frame where an Object is shown; in range [0..1].
      * The format is: `{x},{y},{width}x{height}`
      */
@@ -268,7 +268,7 @@ struct NX_VMS_API ApiBestShotMetadataPacket
     bool operator==(const ApiBestShotMetadataPacket& other) const = default;
 };
 #define nx_vms_api_analytics_ApiBestShotMetadataPacket_Fields \
-    (id)(deviceId)(trackId)(flags)(timestampUs)(boundingBox) \
+    (id)(deviceId)(trackId)(flags)(timestampMs)(boundingBox) \
     (imageUrl)(imageData)(imageDataFormat)(attributes)
 QN_FUSION_DECLARE_FUNCTIONS(ApiBestShotMetadataPacket, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ApiBestShotMetadataPacket,
@@ -295,9 +295,9 @@ struct NX_VMS_API ApiObjectTitleMetadataPacket
     Flags flags = Flags::none;
 
     /**%apidoc[opt] */
-    std::chrono::microseconds timestampUs;
+    std::chrono::milliseconds timestampMs;
 
-    /**%apidoc:string
+    /**%apidoc[opt]:string
      * Coordinates of the bounding box on a video frame where an Object is shown; in range [0..1].
      * The format is: `{x},{y},{width}x{height}`
      */
@@ -318,7 +318,7 @@ struct NX_VMS_API ApiObjectTitleMetadataPacket
     bool operator==(const ApiObjectTitleMetadataPacket& other) const = default;
 };
 #define nx_vms_api_analytics_ApiObjectTitleMetadataPacket_Fields \
-    (id)(deviceId)(trackId)(flags)(timestampUs)(boundingBox) \
+    (id)(deviceId)(trackId)(flags)(timestampMs)(boundingBox) \
     (text)(imageUrl)(imageData)(imageDataFormat)
 QN_FUSION_DECLARE_FUNCTIONS(ApiObjectTitleMetadataPacket, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ApiObjectTitleMetadataPacket,
@@ -373,10 +373,10 @@ struct NX_VMS_API ApiEventMetadataPacket
     Flags flags = Flags::none;
 
     /**%apidoc[opt] */
-    std::chrono::microseconds timestampUs;
+    std::chrono::milliseconds timestampMs;
 
     /**%apidoc[opt] */
-    std::chrono::microseconds durationUs;
+    std::chrono::milliseconds durationMs;
 
     /**%apidoc[opt] */
     std::vector<ApiEventMetadata> events;
@@ -384,7 +384,7 @@ struct NX_VMS_API ApiEventMetadataPacket
     bool operator==(const ApiEventMetadataPacket& other) const = default;
 };
 #define nx_vms_api_analytics_ApiEventMetadataPacket_Fields \
-    (id)(deviceId)(flags)(timestampUs)(durationUs)(events)
+    (id)(deviceId)(flags)(timestampMs)(durationMs)(events)
 QN_FUSION_DECLARE_FUNCTIONS(ApiEventMetadataPacket, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ApiEventMetadataPacket,
     nx_vms_api_analytics_ApiEventMetadataPacket_Fields)

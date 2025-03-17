@@ -6,7 +6,7 @@ const constants = require("./constants");
 const { mergeMaps, boundingBoxToString } = require("./utils.js");
 const { randomUUID } = require("node:crypto");
 
-const makeObjectMetadataPackets = (mouseMovableObjectMetadata, objectActionMetadata, timestampUs) => {
+const makeObjectMetadataPackets = (mouseMovableObjectMetadata, objectActionMetadata, timestampMs) => {
     if (!objectActionMetadata.trackId ||
         objectActionMetadata.boundingBox.x + objectActionMetadata.boundingBox.width > 1.0)
     {
@@ -29,22 +29,22 @@ const makeObjectMetadataPackets = (mouseMovableObjectMetadata, objectActionMetad
 
     return [
         {
-            timestampUs: timestampUs,
-            durationUs: 30000,
+            timestampMs: timestampMs,
+            durationMs: 30,
             objects: [mouseMovableObjectMetadataCopy]
         },
         {
-            timestampUs: timestampUs,
-            durationUs: 30000,
+            timestampMs: timestampMs,
+            durationMs: 30,
             objects: [objectActionMetadataCopy]
         }
     ];
 };
 
-const makeEventMetadataPacket = (trackId, timestampUs) => {
+const makeEventMetadataPacket = (trackId, timestampMs) => {
     return {
-        timestampUs: timestampUs,
-        durationUs: 0,
+        timestampMs: timestampMs,
+        durationMs: 0,
         events:
         [
             {
@@ -59,9 +59,9 @@ const makeEventMetadataPacket = (trackId, timestampUs) => {
     };
 };
 
-const makeBestShotMetadataPacket = (trackId, timestampUs) => {
+const makeBestShotMetadataPacket = (trackId, timestampMs) => {
     return {
-        timestampUs: timestampUs,
+        timestampMs: timestampMs,
         trackId: trackId,
         imageUrl: "https://picsum.photos/200/300",
         boundingBox: boundingBoxToString({
@@ -73,9 +73,9 @@ const makeBestShotMetadataPacket = (trackId, timestampUs) => {
     };
 };
 
-const makeObjectTitleMetadataPacket = (trackId, timestampUs) => {
+const makeObjectTitleMetadataPacket = (trackId, timestampMs) => {
     return {
-        timestampUs: timestampUs,
+        timestampMs: timestampMs,
         trackId: trackId,
         imageUrl: "https://picsum.photos/200/300",
         text: "Analytics API Stub: Object Track title",
@@ -95,7 +95,7 @@ class DeviceAgent {
         id: "", // Engine Id
         deviceId: ""
     };
-    lastDataTimestampUs = -1;
+    lastDataTimestampMs = 1;
     mouseMovableObjectMetadata = null;
     appContext = null;
     frameCounter = 0;
@@ -132,12 +132,12 @@ class DeviceAgent {
 
         this.frameCounter = this.frameCounter + 1;
 
-        this.lastDataTimestampUs = data.timestampUs ?? this.lastDataTimestampUs;
+        this.lastDataTimestampMs = data.timestampMs ?? this.lastDataTimestampMs;
 
         // Send object metadata packets on every frame.
         let objectMetadataPackets = makeObjectMetadataPackets(this.mouseMovableObjectMetadata,
             this.objectActionMetadata,
-            this.lastDataTimestampUs);
+            this.lastDataTimestampMs);
 
         let method = constants.PUSH_DEVICE_AGENT_OBJECT_METADATA_METHOD;
 
@@ -158,7 +158,7 @@ class DeviceAgent {
             let method = constants.PUSH_DEVICE_AGENT_OBJECT_TITLE_METADATA_METHOD;
 
             let packet = makeObjectTitleMetadataPacket(this.objectActionMetadata.trackId,
-                this.lastDataTimestampUs);
+                this.lastDataTimestampMs);
             let parameters = mergeMaps(this.target, packet);
             this.appContext.rpcClient.notify(method, parameters);
         }
@@ -167,7 +167,7 @@ class DeviceAgent {
             let method = constants.PUSH_DEVICE_AGENT_EVENT_METADATA_METHOD;
 
             let packet = makeEventMetadataPacket(this.objectActionMetadata.trackId,
-                this.lastDataTimestampUs);
+                this.lastDataTimestampMs);
             let parameters = mergeMaps(this.target, packet);
             this.appContext.rpcClient.notify(method, parameters);
         }
@@ -176,7 +176,7 @@ class DeviceAgent {
             let method = constants.PUSH_DEVICE_AGENT_BESTSHOT_METADATA_METHOD;
 
             let packet = makeBestShotMetadataPacket(this.objectActionMetadata.trackId,
-                this.lastDataTimestampUs);
+                this.lastDataTimestampMs);
             let parameters = mergeMaps(this.target, packet);
             this.appContext.rpcClient.notify(method, parameters);
         }
