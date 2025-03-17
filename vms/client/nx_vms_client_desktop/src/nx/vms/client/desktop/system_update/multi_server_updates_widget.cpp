@@ -1495,6 +1495,9 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
             messageBox->addButton(tr("OK"),
                 QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
             messageBox->exec();
+            // Destroy message box as soon as possible to avoid double destruction crash if the
+            // widget is deleted during the disconnect when `shouldRestartClient` is true.
+            messageBox.reset();
 
             completeClientInstallation(shouldRestartClient);
         }
