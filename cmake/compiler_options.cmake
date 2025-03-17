@@ -182,7 +182,7 @@ foreach(sanitizer ${enabledSanitizers})
             nx_copy("${asan_library_path}" DESTINATION "${PROJECT_BINARY_DIR}/bin")
 
             add_compile_options(/fsanitize=${sanitizer})
-            add_compile_definitions(_DISABLE_STL_ANNOTATION)
+            add_compile_definitions(_DISABLE_STRING_ANNOTATION _DISABLE_VECTOR_ANNOTATION)
             # Disable warning:
             #   C5059: runtime checks and address sanitizer is not currently supported - disabling runtime checks
             add_compile_options(/wd5059)
