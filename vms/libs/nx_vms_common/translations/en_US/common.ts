@@ -1045,6 +1045,10 @@
         <source>None of selected user roles contain users</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Select at least one user</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnTimeStrings</name>
@@ -1298,17 +1302,6 @@
     </message>
 </context>
 <context>
-    <name>QnTranscoder</name>
-    <message>
-        <source>OpenCLTranscode is not implemented.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unknown transcode method</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnUserResource</name>
     <message>
         <source>Custom</source>
@@ -1465,334 +1458,6 @@
 <context>
     <name>nx::vms::common::SystemSettings</name>
     <message>
-        <source>Anonymous statistics report allowed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Anonymous statistics report last time</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Anonymous statistics report last version</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Anonymous statistics report last number</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Anonymous statistics time cycle</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Anonymous statistics report delay after update</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Anonymous Statistics Report Server URL</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Anonymous statistics report Client settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Proxy connection timeout (seconds, 1s-1h)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Time synchronization enabled</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Primary time synchronization Server ID</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Max difference between local and source time (milliseconds)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>OS time change check period</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Sync time synchronization interval for network requests</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cloud owner account</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cloud authorization key</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Disable Device vendors</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Optimize Camera settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Thumbnails auto-update</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Max scene items (0 means default)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Send plain-text emails</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Use Windows line feed in emails</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable audit trail</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Audit trail period (days, 14-730)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Event log period (days)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enforce HTTPS (data traffic encryption)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enforce RTSPS (video traffic encryption)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable auto-discovery</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable auto-update notifications</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable update notifications</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable UPNP port-mapping</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Backup settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cloud host override</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable RTSP for Arecont</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable sequential Flir ONVIF searcher</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Max P2P queue size (bytes, 32-512MB)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Max P2P all clients size (bytes, 32-512MB)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Max record queue size (bytes, 6-96MB)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Max record queue size (elements, 250-4000)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>RTP timeout (milliseconds)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Max RTSP connection duration (seconds)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable cloud-connect UDP hole-punching</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable cloud-connect relays usage</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enforce SSL for cloud-connect relays</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable recording on EDGE</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Target update information</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Installed update information</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Downloader peers for files</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Client update settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Watermark settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Session token count limit on a single Server</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Max session token count per user on single Server</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Default video codec</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Default codec for export video</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Low quality screen video codec</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>License server</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>URI for resource_data.json automatic update</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Meta data storage change policy</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Persistent Servers for update storage</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Persistent Servers where updates are stored</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>VMS Server version specific features</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Additional local FS storage types for recording</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Force analytics DB storage mount point permissions in case of failure</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Storage encryption enabled</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Current storage encryption key</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>HTTP header: Origin</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>HTTP header: X-Frame-Options</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show mouse timeline preview</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Media buffer size (KB, 10KB-4MB)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable cross-domain policy</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable WebSocket for P2P</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show Servers in the Resource Tree for non-admins</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Use only HTTPS for cameras</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Expose IP addresses for autodiscovery</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Keep IO port state on when Server connects to the device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Thread count limit for camera archive synchronization</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
         <translation></translation>
     </message>
@@ -1805,31 +1470,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Update releases.json file URL</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>LDAP settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>SMTP settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Authorization Session token lifetime (seconds)</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Allow Power User editing Security Settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable deprecated API functions (insecure)</source>
         <translation></translation>
     </message>
     <message>
@@ -1842,39 +1483,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Organization Id</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Device storage information update interval</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Site alive update interval (seconds, 1s-1h)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Proxy connection access policy</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cloud Site ID</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable 2FA for the Site</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Site name</source>
         <translation></translation>
     </message>
     <message>
@@ -1882,754 +1491,428 @@
         <translation></translation>
     </message>
     <message>
-        <source>Last master Site merge ID</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Last slave Site merge ID</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Pixelation settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Apply session limit for Cloud tokens</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Enable or disable the creation of new Integration registration requests</source>
         <translation></translation>
     </message>
     <message>
-        <source>Anonymous Crash Report Server API URL</source>
-        <translation></translation>
+        <source>SMTP settings.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Default locale for new users</source>
-        <translation></translation>
+        <source>Anonymous statistics report allowed.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check video stream permissions on VMS server period (milliseconds)</source>
-        <translation></translation>
+        <source>Anonymous statistics report last time.</source>
+        <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>nx::vms::event::StringsHelper</name>
     <message>
-        <source>Bookmark</source>
-        <translation></translation>
+        <source>Anonymous statistics report last version.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Panic recording</source>
-        <translation></translation>
+        <source>Anonymous statistics report last number.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Write to log</source>
-        <translation></translation>
+        <source>Anonymous statistics time cycle.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Repeat sound</source>
-        <translation></translation>
+        <source>Anonymous statistics report delay after update.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Play sound</source>
-        <translation></translation>
+        <source>Anonymous Statistics Report Server URL.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Speak</source>
-        <translation></translation>
+        <source>Anonymous Crash Report Server API URL.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Execute PTZ preset</source>
-        <translation></translation>
+        <source>Anonymous statistics report Client settings.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show text overlay</source>
-        <translation></translation>
+        <source>Device storage information update interval.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show on Alarm Layout</source>
-        <translation></translation>
+        <source>Site alive update interval (seconds, 1s-1h).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device output</source>
-        <translation></translation>
+        <source>Proxy connection timeout (seconds, 1s-1h).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera output</source>
-        <translation></translation>
+        <source>Proxy connection access policy.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device recording</source>
-        <translation></translation>
+        <source>Time synchronization enabled.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera recording</source>
-        <translation></translation>
+        <source>Primary time synchronization Server ID.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Generic Event</source>
-        <translation></translation>
+        <source>Max difference between local and source time (milliseconds).</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>Motion on Cameras</source>
-        <translation>
-            <numerusform>Motion on Camera</numerusform>
-            <numerusform>Motion on Cameras</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Network Issue</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server Failure</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server Conflict</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server Started</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>License Issue</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any Server Issue</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any Event</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Input Signal on Devices</source>
-        <translation>
-            <numerusform>Input Signal on Device</numerusform>
-            <numerusform>Input Signal on Devices</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Input Signal on Cameras</source>
-        <translation>
-            <numerusform>Input Signal on Camera</numerusform>
-            <numerusform>Input Signal on Cameras</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Devices Disconnected</source>
-        <translation>
-            <numerusform>Device Disconnected</numerusform>
-            <numerusform>Devices Disconnected</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Cameras Disconnected</source>
-        <translation>
-            <numerusform>Camera Disconnected</numerusform>
-            <numerusform>Cameras Disconnected</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Devices IP Conflict</source>
-        <translation>
-            <numerusform>Device IP Conflict</numerusform>
-            <numerusform>Devices IP Conflict</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Cameras IP Conflict</source>
-        <translation>
-            <numerusform>Camera IP Conflict</numerusform>
-            <numerusform>Cameras IP Conflict</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Any Device Issue</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any Camera Issue</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Undefined event has occurred on %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Device %1 was disconnected</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera %1 was disconnected</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O Module %1 was disconnected</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Input on %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Motion on %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Network Issue at %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server &quot;%1&quot; Failure</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Device IP Conflict at %1</source>
-        <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera IP Conflict at %1</source>
-        <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server &quot;%1&quot; Conflict</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server &quot;%1&quot; Started</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server &quot;%1&quot; has a license problem</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server &quot;%1&quot; has finished an archive backup</source>
-        <translation></translation>
-    </message>
     <message>
-        <source>Generic Event at %1</source>
-        <translation></translation>
+        <source>OS time change check period.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>An unknown event has occurred</source>
-        <translation></translation>
+        <source>Sync time synchronization interval for network requests.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Event: %1</source>
-        <translation></translation>
+        <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Source: %1</source>
-        <translation></translation>
+        <source>Cloud owner account.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Caption: %1</source>
-        <translation></translation>
+        <source>Organization Id.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Input Port: %1</source>
-        <translation></translation>
+        <source>Cloud Site ID.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reason: %1</source>
-        <translation></translation>
+        <source>Cloud authorization key.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Conflicting Address: %1</source>
-        <translation></translation>
+        <source>Enable 2FA for the Site.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>MAC #%1: %2</source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation></translation>
+        <source>Site name.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Conflicting Server #%1: %2</source>
-        <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-        <translation></translation>
+        <source>Last master Site merge ID.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Conflicting Server: %1</source>
-        <translation></translation>
+        <source>Last slave Site merge ID.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Trigger: %1</source>
-        <translation></translation>
+        <source>Disable Device vendors.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation></translation>
+        <source>Optimize Camera settings.</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation>
-            <numerusform>%n time on %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-            <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Time: %1 on %2</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>First occurrence: %1 on %2 (%n times total)</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation>
-            <numerusform>First Occurrence: %1 on %2 (%n time total)</numerusform>
-            <numerusform>First Occurrence: %1 on %2 (%n times total)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>No data received during last %n seconds.</source>
-        <translation>
-            <numerusform>No data received during last second.</numerusform>
-            <numerusform>No data received during last %n seconds.</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>RTP packet loss detected.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Device does not respond to network requests.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Connection to server is lost.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server stopped unexpectedly.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O error has occurred at %1.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Not enough HDD/SSD speed for recording to %1.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>System disk &quot;%1&quot; is almost full.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>start</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>stop</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>While %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>On %1 %2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Trigger Name</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n Users</source>
-        <translation>
-            <numerusform>%n User</numerusform>
-            <numerusform>%n Users</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>All Users</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select at least one user</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Soft Trigger</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Soft Trigger %1 at %2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Soft Trigger %1 has been activated multiple times</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Send email</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Acknowledge</source>
-        <translation></translation>
-    </message>
     <message>
-        <source>Analytics Event</source>
-        <translation></translation>
+        <source>Thumbnails auto-update.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 at %2</source>
-        <comment>Analytics Event at some camera</comment>
-        <translation></translation>
+        <source>Max scene items (0 means default).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storage Issue</source>
-        <translation></translation>
+        <source>Send plain-text emails.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storage Issue at %1</source>
-        <translation></translation>
+        <source>Use Windows line feed in emails.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set to fullscreen</source>
-        <translation></translation>
+        <source>Enable audit trail.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Exit fullscreen</source>
-        <translation></translation>
+        <source>Audit trail period (days, 14-730).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open layout</source>
-        <translation></translation>
+        <source>Event log period (days).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Multiple %1 events have occurred</source>
-        <translation></translation>
+        <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Analytics storage &quot;%1&quot; is offline.</source>
-        <translation></translation>
+        <source>Enforce HTTPS (data traffic encryption).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Analytics storage &quot;%1&quot; is almost full.</source>
-        <translation></translation>
+        <source>Enforce RTSPS (video traffic encryption).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Plugin Diagnostic Event</source>
-        <translation></translation>
+        <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown Plugin Diagnostic Event</source>
-        <translation></translation>
+        <source>Enable auto-discovery.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Buzzer</source>
-        <translation></translation>
+        <source>Enable auto-update notifications.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Archive Backup Finished</source>
-        <translation></translation>
+        <source>Enable update notifications.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>PoE over Budget</source>
-        <translation></translation>
+        <source>Enable UPNP port-mapping.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fan Error</source>
-        <translation></translation>
+        <source>Backup settings.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>PoE over budget at %1</source>
-        <translation></translation>
+        <source>Cloud host override.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fan error at %1</source>
-        <translation></translation>
+        <source>Enable cross-domain policy.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reason: Power limit exceeded (%1)</source>
-        <comment>%1 is consumption</comment>
-        <translation></translation>
+        <source>Enable RTSP for Arecont.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show desktop notification</source>
-        <translation></translation>
+        <source>Enable sequential Flir ONVIF searcher.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Send mobile notification</source>
-        <translation></translation>
+        <source>Max P2P queue size (bytes, 32-512MB).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Consumption</source>
-        <translation></translation>
+        <source>Max P2P all clients size (bytes, 32-512MB).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device was disconnected</source>
-        <translation></translation>
+        <source>Max record queue size (bytes, 6-96MB).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera was disconnected</source>
-        <translation></translation>
+        <source>Max record queue size (elements, 250-4000).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>I/O Module was disconnected</source>
-        <translation></translation>
+        <source>RTP timeout (milliseconds).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Analytics Object Detected</source>
-        <translation></translation>
+        <source>Max RTSP connection duration (seconds).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 at camera &apos;%2&apos;</source>
-        <comment> is detected</comment>
-        <translation></translation>
+        <source>Enable cloud-connect UDP hole-punching.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Plugin: %1</source>
-        <translation></translation>
+        <source>Enable cloud-connect relays usage.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Archive backup failed.</source>
-        <translation></translation>
+        <source>Enforce SSL for cloud-connect relays.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Object detected</source>
-        <translation></translation>
+        <source>Enable recording on EDGE.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Archive backup failed</source>
-        <translation></translation>
+        <source>Enable WebSocket for P2P.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Data is backed up to %1</source>
-        <translation></translation>
+        <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server Certificate Error</source>
-        <translation></translation>
+        <source>Update releases.json file URL.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; certificate error</source>
-        <translation></translation>
+        <source>Target update information.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>RTP error in primary stream (%1).</source>
-        <translation></translation>
+        <source>Installed update information.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>RTP error in secondary stream (%1).</source>
-        <translation></translation>
+        <source>Downloader peers for files.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera time is back to normal.</source>
-        <translation></translation>
+        <source>Client update settings.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Address %1 is already in use by %2 on primary stream.</source>
-        <comment>%1 is the address, %2 is the device name</comment>
-        <translation></translation>
+        <source>Thread count limit for camera archive synchronization.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Address %1 is already in use by %2 on secondary stream.</source>
-        <comment>%1 is the address, %2 is the device name</comment>
-        <translation></translation>
+        <source>Watermark settings.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Multicast address conflict detected.</source>
-        <translation></translation>
+        <source>Pixelation settings.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Network address %1 is not a multicast address.</source>
-        <translation></translation>
+        <source>Authorization Session token lifetime (seconds).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to backup file %1</source>
-        <translation></translation>
+        <source>Apply session limit for Cloud tokens.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do HTTP(S) request</source>
-        <translation></translation>
+        <source>Session token count limit on a single Server.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation></translation>
+        <source>Max session token count per user on single Server.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation></translation>
+        <source>Update interval for remote session token cache (other Servers and Cloud).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to device was unexpectedly closed.</source>
-        <translation></translation>
+        <source>Timeout for remote session token cache (other Servers and Cloud).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-        <translation></translation>
+        <source>Default video codec.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-        <translation></translation>
+        <source>Default codec for export video.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>RAID error: %1.</source>
-        <translation></translation>
+        <source>Low quality screen video codec.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-        <translation></translation>
+        <source>License server.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-        <translation></translation>
+        <source>URI for resource_data.json automatic update.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-        <translation></translation>
+        <source>Meta data storage change policy.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Also show source camera</source>
-        <translation></translation>
+        <source>Persistent Servers for update storage.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Source camera</source>
-        <translation></translation>
+        <source>Persistent Servers where updates are stored.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Also show on source camera</source>
-        <translation></translation>
+        <source>VMS Server version specific features.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Also set on source camera</source>
-        <translation></translation>
+        <source>Default locale for new users.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Also trigger on source camera</source>
-        <translation></translation>
+        <source>Additional local FS storage types for recording.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Also record source camera</source>
-        <translation></translation>
+        <source>Keep IO port state on when Server connects to the device.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Also play on source camera</source>
-        <translation></translation>
+        <source>Media buffer size (KB, 10KB-4MB).</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>%n Groups</source>
-        <translation>
-            <numerusform>%n Group</numerusform>
-            <numerusform>%n Groups</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>LDAP Sync Issue</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 (%n times)</source>
-        <comment>%1 is description of event. Will be replaced in runtime</comment>
-        <translation>
-            <numerusform>%1 (%n time)</numerusform>
-            <numerusform>%1 (%n times)</numerusform>
-        </translation>
-    </message>
     <message>
-        <source>Failed to connect to the LDAP server.</source>
-        <translation></translation>
+        <source>Media buffer size for audio only devices (KB, 1KB-1MB).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to complete the sync within a %1 timeout.</source>
-        <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-        <translation></translation>
+        <source>Force analytics DB storage mount point permissions in case of failure.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to complete the sync within a given timeout.</source>
-        <translation></translation>
+        <source>Check video stream permissions on VMS server period (milliseconds).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No user accounts on LDAP server match the synchronization settings.</source>
-        <translation></translation>
+        <source>Storage encryption enabled.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Some LDAP users or groups were not found in the LDAP database.</source>
-        <translation></translation>
+        <source>Current storage encryption key.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Services Issue</source>
-        <translation></translation>
+        <source>Show Servers in the Resource Tree for non-admins.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; has license migration issue</source>
-        <translation></translation>
+        <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Service overuse</source>
-        <translation></translation>
+        <source>HTTP header: Origin.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The following licenses were not migrated:</source>
-        <translation></translation>
+        <source>HTTP header: X-Frame-Options.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>License</source>
-        <translation></translation>
+        <source>Use only HTTPS for cameras.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>Recording on %n channels was stopped due to service overuse.</source>
-        <translation>
-            <numerusform>Recording on %n channel was stopped due to service overuse.</numerusform>
-            <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-        <translation>
-            <numerusform>Cloud storage backup on %n channel was stopped due to service overuse.</numerusform>
-            <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-        <translation>
-            <numerusform>Paid integration service usage on %n channel was stopped due to service overuse.</numerusform>
-            <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        </translation>
+        <source>Allow Power User editing Security Settings.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to migrate licenses.</source>
-        <translation></translation>
+        <source>Enable deprecated API functions (insecure).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-        <translation></translation>
+        <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-        <translation></translation>
+        <source>Expose IP addresses for autodiscovery.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Call Request</source>
-        <translation></translation>
+        <source>Show mouse timeline preview.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Call Request Missed</source>
-        <translation></translation>
+        <source>LDAP settings.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

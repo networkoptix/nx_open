@@ -236,6 +236,14 @@
         <source>Table Settings</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Switch to table view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to card view</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AnalyticsSettings</name>
@@ -277,13 +285,6 @@
         <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
 Select an Integration to begin configuring its parameters.</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>AnalyticsToolTipPreview</name>
-    <message>
-        <source>NO DATA</source>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -527,6 +528,10 @@ Select an Integration to begin configuring its parameters.</source>
         <source>Shut Down</source>
         <translation></translation>
     </message>
+    <message>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CloudTile</name>
@@ -631,6 +636,29 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
         <source>Show thumbnails</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>CustomHttpHeadersDialog</name>
+    <message>
+        <source>Custom HTTP headers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1107,6 +1135,26 @@ Select an Integration to begin configuring its parameters.</source>
         <source>No groups</source>
         <translation></translation>
     </message>
+    <message>
+        <source>LDAP</source>
+        <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ORGANIZATION</source>
+        <comment>Section with groups from organisation</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BUILT-IN</source>
+        <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CUSTOM</source>
+        <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>HintItem</name>
@@ -1142,10 +1190,14 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
 </context>
 <context>
-    <name>InsecureWarning</name>
+    <name>InsecureBanner</name>
     <message>
-        <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-        <translation></translation>
+        <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1799,6 +1851,11 @@ Select an Integration to begin configuring its parameters.</source>
         <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
         <translation></translation>
     </message>
+    <message>
+        <source>Organization</source>
+        <comment>Section with groups from organisation</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PasswordChangeDialog</name>
@@ -2218,15 +2275,7 @@ Press Alt + Click to follow object</source>
         <translation></translation>
     </message>
     <message>
-        <source>Nothing found</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Try searching for something else</source>
         <translation></translation>
     </message>
 </context>
@@ -2288,10 +2337,6 @@ Press Alt + Click to follow object</source>
 </context>
 <context>
     <name>ResourceSearchPane</name>
-    <message>
-        <source>Search</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Servers</source>
         <translation></translation>
@@ -2390,13 +2435,6 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
         <source>File to save the results:</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>SearchEdit</name>
-    <message>
-        <source>Search</source>
         <translation></translation>
     </message>
 </context>

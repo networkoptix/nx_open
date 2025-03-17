@@ -74,6 +74,10 @@
         <source>The session key is too old for this Site.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>No credentials provided when required by endpoint.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Result</name>

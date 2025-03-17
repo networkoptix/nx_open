@@ -17,6 +17,14 @@
     </message>
 </context>
 <context>
+    <name>RulesAuditLogStrings</name>
+    <message>
+        <source>On %1 --&gt; %2</source>
+        <comment>%1 is the event name, %2 is the action name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Strings</name>
     <message numerus="yes">
         <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -256,6 +264,10 @@
         <source>To Users</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Soft Trigger</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
@@ -292,6 +304,10 @@
         <source>%1 at %2</source>
         <comment>Analytics Event at some camera</comment>
         <translation></translation>
+    </message>
+    <message>
+        <source>And attributes</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -546,6 +562,10 @@
         <source>HTTP authentication</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Custom headers</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::HttpAuthFieldValidator</name>
@@ -559,9 +579,41 @@
     </message>
 </context>
 <context>
+    <name>nx::vms::rules::HttpHeadersFieldValidator</name>
+    <message numerus="yes">
+        <source>Some of the headers are not valid</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>All the headers are not valid</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
         <source>HTTP Method should be known</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
+    <message>
+        <source>Integration Diagnostic Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For Plugin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>And Level Is</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -770,21 +822,6 @@
     </message>
 </context>
 <context>
-    <name>nx::vms::rules::PluginDiagnosticEvent</name>
-    <message>
-        <source>Plugin Diagnostic Event</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>For Plugin</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>And Level Is</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::rules::PoeOverBudgetEvent</name>
     <message>
         <source>Consumption</source>
@@ -927,6 +964,14 @@
         <source>Services Issue</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failed to migrate licenses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::SendEmailAction</name>
@@ -1024,6 +1069,25 @@
     <message>
         <source>Force Alarm Layout Opening</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::rules::SiteHttpAction</name>
+    <message>
+        <source>Site HTTP(S) Request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Endpoint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Content</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1169,6 +1233,10 @@
         <source>List with the given id &apos;%1&apos; is not a generic list</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Invalid UUID string</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::TextOverlayAction</name>
@@ -1197,6 +1265,14 @@
     </message>
     <message>
         <source>Url should not contains user or password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Endpoint cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Endpoint mustn&apos;t contains any space</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
