@@ -24,7 +24,6 @@
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/cleanup_db_data.h>
 #include <nx/vms/api/data/discovery_data.h>
-#include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/license_data.h>
@@ -98,12 +97,6 @@ Result canModifyStorage(
 } // namespace transaction_descriptor
 
 namespace detail {
-
-Result checkActionPermission(nx::vms::common::SystemContext* systemContext,
-    const nx::network::rest::UserAccessData& accessData,
-    const nx::vms::api::EventActionData& data);
-
-struct NoneType {};
 
 template<typename ParamType>
 using CheckSavePermissionFuncType = std::function<Result(

@@ -67,7 +67,6 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/system_health/message_type.h>
-#include <nx/vms/event/actions/abstract_action.h>
 #include <nx_ec/ec_api_common.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <recording/stream_recorder.h>

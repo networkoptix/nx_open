@@ -9,9 +9,6 @@
 
 namespace nx::vms::event {
 
-class AbstractAction;
-typedef QSharedPointer<AbstractAction> AbstractActionPtr;
-
 class Rule;
 typedef QSharedPointer<Rule> RulePtr;
 typedef QList<RulePtr> RuleList;

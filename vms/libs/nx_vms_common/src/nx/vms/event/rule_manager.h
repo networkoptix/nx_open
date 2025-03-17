@@ -9,8 +9,6 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/event/event_fwd.h>
 
-Q_MOC_INCLUDE("nx/vms/event/rule.h")
-
 namespace nx {
 namespace vms {
 namespace event {

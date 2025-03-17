@@ -2,10 +2,8 @@
 
 #pragma once
 
-#include <core/resource/resource_fwd.h>
 #include <nx/vms/event/action_parameters.h>
-#include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/event_fwd.h>
+#include <nx/vms/event/event_parameters.h>
 
 namespace nx {
 namespace vms {
@@ -14,16 +12,13 @@ namespace event {
 /**
 * This class define relation between event and action
 */
-class NX_VMS_COMMON_API Rule: public QObject
+class NX_VMS_COMMON_API Rule final
 {
-    using EventReason = nx::vms::api::EventReason;
-    using EventState = nx::vms::api::EventState;
-    using EventType = nx::vms::api::EventType;
-    using ActionType = nx::vms::api::ActionType;
+    Q_DISABLE_COPY(Rule)
 
 public:
     Rule();
-    virtual ~Rule() override;
+    ~Rule();
 
     static const QByteArray kGuidPostfix;
 
@@ -89,9 +84,6 @@ public:
      */
     static QMap<nx::Uuid, nx::Uuid> remappedGuidsToFix();
     static RuleList getDisabledRulesUpd43();
-
-    Rule* clone();
-    void removeResource(const nx::Uuid& resId);
 
 private:
     Rule(int internalId, int aggregationPeriod,  bool isSystem, ActionType bActionType,

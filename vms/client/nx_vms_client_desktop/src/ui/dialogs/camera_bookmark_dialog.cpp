@@ -9,7 +9,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
-#include <nx/vms/event/actions/abstract_action.h>
 
 using namespace nx::vms::client::desktop;
 

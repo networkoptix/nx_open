@@ -43,7 +43,6 @@
 #include <nx/vms/client/desktop/utils/user_notification_settings_manager.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
-#include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/migration_utils.h>
 #include <nx/vms/rules/strings.h>
 #include <ui/common/palette.h>

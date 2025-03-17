@@ -53,4 +53,8 @@ NX_VMS_COMMON_API bool checkForKeywords(const QString& value, const QStringList&
 NX_VMS_COMMON_API QList<ActionType> userAvailableActions();
 NX_VMS_COMMON_API QList<ActionType> allActions();
 
+NX_VMS_COMMON_API bool requiresUserResource(ActionType actionType);
+NX_VMS_COMMON_API bool isActionProlonged(ActionType actionType, const ActionParameters &parameters);
+
+
 } // namespace nx::vms::event

@@ -2328,64 +2328,6 @@ Result userHasAccess(
     return Result();
 }
 
-Result checkResourceAccess(SystemContext* systemContext,
-    const nx::network::rest::UserAccessData& accessData,
-    const std::vector<nx::Uuid>& resourceIds,
-    api::AccessRight accessRight)
-{
-    for (const auto& id: resourceIds)
-    {
-        if (auto hasUserInputResult = userHasAccess(systemContext, accessData, id, accessRight);
-            !hasUserInputResult)
-        {
-            return hasUserInputResult;
-        }
-    }
-    return {};
-};
-
-Result checkActionPermission(SystemContext* systemContext,
-    const nx::network::rest::UserAccessData& accessData,
-    const nx::vms::api::EventActionData& data)
-{
-    switch (data.actionType)
-    {
-        case api::ActionType::bookmarkAction:
-        {
-            return checkResourceAccess(
-                systemContext, accessData, data.resourceIds, api::AccessRight::manageBookmarks);
-        }
-        case api::ActionType::cameraOutputAction:
-        case api::ActionType::cameraRecordingAction:
-        case api::ActionType::panicRecordingAction:
-        case api::ActionType::executePtzPresetAction:
-        {
-            return checkResourceAccess(
-                systemContext, accessData, data.resourceIds, api::AccessRight::userInput);
-        }
-
-        // Any additional permissions for these actions?
-        case api::ActionType::sendMailAction:
-        case api::ActionType::diagnosticsAction:
-        case api::ActionType::showPopupAction:
-        case api::ActionType::playSoundAction:
-        case api::ActionType::playSoundOnceAction:
-        case api::ActionType::sayTextAction:
-        case api::ActionType::showTextOverlayAction:
-        case api::ActionType::showOnAlarmLayoutAction:
-        case api::ActionType::execHttpRequestAction:
-        case api::ActionType::acknowledgeAction:
-        case api::ActionType::fullscreenCameraAction:
-        case api::ActionType::exitFullscreenAction:
-        case api::ActionType::openLayoutAction:
-        case api::ActionType::buzzerAction:
-        case api::ActionType::pushNotificationAction:
-        case api::ActionType::undefinedAction:
-        default:
-            return {};
-    };
-}
-
 class SaveServerDataAccess
 {
 public:

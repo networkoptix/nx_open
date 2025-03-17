@@ -2,11 +2,11 @@
 
 #include "rule.h"
 
-#include <core/resource/resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/vms/api/data/user_group_data.h>
+#include <utils/common/id.h>
+
+#include "helpers.h"
 
 namespace nx {
 namespace vms {
@@ -205,40 +205,6 @@ Rule::Rule(
             m_actionResources = subjectIds.toVector();
         else
             m_actionParams.additionalResources = std::vector(subjectIds.begin(), subjectIds.end());
-    }
-}
-
-Rule* Rule::clone()
-{
-    Rule* newRule = new Rule();
-    newRule->m_id = m_id;
-    newRule->m_eventType = m_eventType;
-    newRule->m_eventResources = m_eventResources;
-    newRule->m_eventParams = m_eventParams;
-    newRule->m_eventState = m_eventState;
-    newRule->m_actionType = m_actionType;
-    newRule->m_actionResources = m_actionResources;
-    newRule->m_actionParams = m_actionParams;
-    newRule->m_aggregationPeriod = m_aggregationPeriod;
-    newRule->m_disabled = m_disabled;
-    newRule->m_schedule = m_schedule;
-    newRule->m_binSchedule = m_binSchedule;
-    newRule->m_comment = m_comment;
-    newRule->m_system = m_system;
-    return newRule;
-}
-
-void Rule::removeResource(const nx::Uuid& resId)
-{
-    for (int i = m_actionResources.size() - 1; i >= 0; --i)
-    {
-        if (m_actionResources[i] == resId)
-            m_actionResources.removeAt(i);
-    }
-    for (int i = m_eventResources.size() - 1; i >= 0; --i)
-    {
-        if (m_eventResources[i] == resId)
-            m_eventResources.removeAt(i);
     }
 }
 

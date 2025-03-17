@@ -30,7 +30,6 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
-#include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/rules/actions/show_on_alarm_layout_action.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/utils/type.h>

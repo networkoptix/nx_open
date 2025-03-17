@@ -7,14 +7,11 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
-#include <nx/vms/client/core/system_context.h>
-#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
-#include <nx/vms/event/actions/abstract_action.h>
-#include <utils/common/synctime.h>
 
 using namespace nx::vms::client;
 

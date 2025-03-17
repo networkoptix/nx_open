@@ -22,8 +22,6 @@ enum class Value
 
 Value convert(nx::vms::event::Level level);
 
-Value valueOf(const nx::vms::event::AbstractActionPtr& action);
-Value valueOf(const nx::vms::event::EventParameters& params);
 Value valueOf(
     nx::vms::common::SystemContext* systemContext,
     nx::vms::common::system_health::MessageType messageType);

@@ -17,16 +17,6 @@ QnNotificationLevel::Value QnNotificationLevel::convert(nx::vms::event::Level le
     return static_cast<QnNotificationLevel::Value>(level);
 }
 
-QnNotificationLevel::Value QnNotificationLevel::valueOf(const nx::vms::event::AbstractActionPtr& action)
-{
-    return convert(nx::vms::event::levelOf(action));
-};
-
-QnNotificationLevel::Value QnNotificationLevel::valueOf(const nx::vms::event::EventParameters& params)
-{
-    return convert(nx::vms::event::levelOf(params));
-}
-
 int QnNotificationLevel::priority(nx::vms::common::SystemContext* systemContext,
     nx::vms::common::system_health::MessageType messageType)
 {

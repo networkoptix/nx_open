@@ -6,7 +6,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/string.h>
-#include <nx/vms/event/event_parameters.h>
+
+#include "action_parameters.h"
+#include "event_parameters.h"
 
 namespace nx::vms::event {
 
@@ -208,6 +210,103 @@ QList<ActionType> allActions()
         }();
 
     return result;
+}
+
+bool requiresUserResource(ActionType actionType)
+{
+    switch (actionType)
+    {
+        case ActionType::undefinedAction:
+        case ActionType::panicRecordingAction:
+        case ActionType::cameraOutputAction:
+        case ActionType::bookmarkAction:
+        case ActionType::cameraRecordingAction:
+        case ActionType::diagnosticsAction:
+        case ActionType::showPopupAction:
+        case ActionType::pushNotificationAction:
+        case ActionType::playSoundOnceAction:
+        case ActionType::playSoundAction:
+        case ActionType::sayTextAction:
+        case ActionType::executePtzPresetAction:
+        case ActionType::showTextOverlayAction:
+        case ActionType::showOnAlarmLayoutAction:
+        case ActionType::execHttpRequestAction:
+        case ActionType::openLayoutAction:
+        case ActionType::fullscreenCameraAction:
+        case ActionType::exitFullscreenAction:
+        case ActionType::buzzerAction:
+            return false;
+
+        case ActionType::acknowledgeAction:
+        case ActionType::sendMailAction:
+            return true;
+
+        default:
+            NX_ASSERT(false, "All action types must be handled.");
+            return false;
+    }
+}
+
+
+bool hasToggleState(ActionType actionType)
+{
+    switch (actionType)
+    {
+        case ActionType::undefinedAction:
+        case ActionType::sendMailAction:
+        case ActionType::diagnosticsAction:
+        case ActionType::showPopupAction:
+        case ActionType::pushNotificationAction:
+        case ActionType::playSoundOnceAction:
+        case ActionType::sayTextAction:
+        case ActionType::executePtzPresetAction:
+        case ActionType::showOnAlarmLayoutAction:
+        case ActionType::execHttpRequestAction:
+        case ActionType::acknowledgeAction:
+        case ActionType::openLayoutAction:
+        case ActionType::fullscreenCameraAction:
+        case ActionType::exitFullscreenAction:
+            return false;
+
+        case ActionType::cameraOutputAction:
+        case ActionType::cameraRecordingAction:
+        case ActionType::panicRecordingAction:
+        case ActionType::playSoundAction:
+        case ActionType::bookmarkAction:
+        case ActionType::showTextOverlayAction:
+        case ActionType::buzzerAction:
+            return true;
+
+        default:
+            NX_ASSERT(false, "Unhandled action type: %1", actionType);
+            break;
+    }
+    return false;
+}
+
+bool supportsDuration(ActionType actionType)
+{
+    switch (actionType)
+    {
+        case ActionType::bookmarkAction:
+        case ActionType::showTextOverlayAction:
+        case ActionType::cameraOutputAction:
+        case ActionType::cameraRecordingAction:
+        case ActionType::buzzerAction:
+            NX_ASSERT(hasToggleState(actionType),
+                "Action %1 should have toggle state to support duration", actionType);
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool isActionProlonged(ActionType actionType, const ActionParameters &parameters)
+{
+    if (supportsDuration(actionType))
+        return parameters.durationMs <= 0;
+
+    return hasToggleState(actionType);
 }
 
 } // namespace nx::vms::event

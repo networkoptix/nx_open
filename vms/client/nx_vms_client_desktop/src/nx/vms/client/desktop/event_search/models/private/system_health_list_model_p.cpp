@@ -39,7 +39,6 @@
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_health/system_health_data_helper.h>
-#include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/helpers.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/common/notification_levels.h>
