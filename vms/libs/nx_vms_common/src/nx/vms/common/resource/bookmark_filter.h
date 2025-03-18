@@ -19,7 +19,7 @@ public:
     bool operator()(const CameraBookmark& bookmark) const;
 
 private:
-    std::vector<std::pair<QString, QRegularExpression>> m_words;
+    QStringList m_words;
 };
 
 } // namespace nx::vms::common

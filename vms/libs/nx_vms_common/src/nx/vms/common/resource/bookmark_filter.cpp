@@ -8,13 +8,7 @@ namespace nx::vms::common {
 
 BookmarkTextFilter::BookmarkTextFilter(const QString& text)
 {
-    for (const QString& word: text.split(QRegularExpression("[\\s]"), Qt::SkipEmptyParts))
-    {
-        constexpr auto regexFlags = QRegularExpression::CaseInsensitiveOption
-            | QRegularExpression::UseUnicodePropertiesOption;
-
-        m_words.emplace_back(word, QRegularExpression(QString("\\b%1").arg(word), regexFlags));
-    }
+    m_words = text.split(QRegularExpression("[\\s]"), Qt::SkipEmptyParts);
 };
 
 bool BookmarkTextFilter::operator()(const CameraBookmark& bookmark) const
@@ -24,7 +18,7 @@ bool BookmarkTextFilter::operator()(const CameraBookmark& bookmark) const
 
 bool BookmarkTextFilter::match(const CameraBookmark& bookmark) const
 {
-    for (const auto& [word, wordRegExp]: m_words)
+    for (const auto& word: m_words)
     {
         bool tagFound = false;
 
@@ -43,8 +37,8 @@ bool BookmarkTextFilter::match(const CameraBookmark& bookmark) const
         if (!bookmark.name.isEmpty() && bookmark.name.startsWith(word, Qt::CaseInsensitive))
             continue;
 
-        if (wordRegExp.match(bookmark.name).hasMatch() ||
-            wordRegExp.match(bookmark.description).hasMatch())
+        if (bookmark.name.contains(word, Qt::CaseInsensitive)
+            || bookmark.description.contains(word, Qt::CaseInsensitive))
         {
             continue;
         }
