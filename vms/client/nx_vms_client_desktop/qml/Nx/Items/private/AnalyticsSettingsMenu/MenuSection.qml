@@ -69,6 +69,7 @@ Column
 
                 MouseArea
                 {
+                    enabled: level !== 0
                     anchors.fill: parent
 
                     onClicked:
