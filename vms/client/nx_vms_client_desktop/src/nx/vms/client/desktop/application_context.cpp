@@ -593,7 +593,10 @@ struct ApplicationContext::Private
 
     void initSkin()
     {
-        QApplication::setWindowIcon(q->skin()->icon(":/logo.png"));
+        // On MacOS the icon from the package is used by default, and it has the better size.
+        if (!nx::build_info::isMacOsX())
+            QApplication::setWindowIcon(q->skin()->icon(":/logo.png"));
+
         QApplication::setStyle([]() { return new OldStyle(new Style()); }());
 
         customCursors = std::make_unique<nx::vms::client::desktop::CustomCursors>(q->skin());
