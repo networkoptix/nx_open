@@ -221,6 +221,8 @@ void moveFieldsToParameters(DeviceModelV3Base* m)
         QJson::serialize(*m->userEnabledAnalyticsEngineIds,
             &m->parameters[kUserEnabledAnalyticsEnginesProperty]);
     }
+    if (m->streamUrls)
+        m->parameters[kStreamUrls] = *m->streamUrls;
 }
 
 void movePtzFieldsToParameters(DeviceModelV4* m)

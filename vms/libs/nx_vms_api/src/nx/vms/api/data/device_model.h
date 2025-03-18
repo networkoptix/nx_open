@@ -245,7 +245,7 @@ NX_REFLECTION_ENUM_CLASS(DeviceCapability,
     /**%apidoc The Device firmware is too old. */
     isOldFirmware = 1 << 11,
 
-    /**%apidoc The Device streams are editable. */
+    /**%apidoc The Device `streamUrls` field is editable. */
     customMediaUrl = 1 << 12,
 
     /**%apidoc The Device is an NVR which supports playback speeds 1, 2, 4, etc. natively. */
@@ -392,7 +392,10 @@ struct NX_VMS_API DeviceModelV3Base: DeviceModelV1Base
     /**%apidoc[readonly] */
     std::vector<DeviceMediaStreamInfo> mediaStreams;
 
-    /**%apidoc[readonly] */
+    /**%apidoc
+     * The Device stream urls. It can be set only if the field `capabilities`
+     * has `customMediaUrl` flag.
+     */
     std::optional<QJsonObject> streamUrls;
 
     // TODO: #skolesnik
