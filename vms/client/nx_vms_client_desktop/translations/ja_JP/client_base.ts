@@ -7248,7 +7248,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation>%1 または %2 を使用して一括編集するデバイスを複数選択します。 %3 ですべてのデバイスを選択します。</translation>
+      <translation>一括設定する場合、%1 や %2 でデバイスを複数選択できます。 %3 ですべてのデバイスを選択できます。</translation>
     </message>
     <message>
       <source>What to backup</source>
@@ -10590,7 +10590,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Recording everything</source>
-      <translation>全てを録画</translation>
+      <translation>すべてを録画</translation>
     </message>
     <message>
       <source>Recording motion only</source>
@@ -10606,7 +10606,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Motion only</source>
-      <translation>モーション録画</translation>
+      <translation>モーションのみ</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -12802,7 +12802,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
-      <translation>一部のデバイスで無効にするか、より適切なサービスを追加してください。それ以外の場合は %1 に自動的に実行されます</translation>
+      <translation>不足分のデバイス数だけ無効化、もしくは適切なサービスを追加してください。対処されない場合、%1 に自動的に実行されます。</translation>
     </message>
   </context>
   <context>

@@ -1322,11 +1322,11 @@
     <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Anonymous statistics report allowed</source>
-      <translation>匿名の統計レポートを許可</translation>
+      <translation>匿名統計レポートを許可する</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time</source>
-      <translation>前回の匿名統計レポート</translation>
+      <translation>匿名統計レポートの最終報告日時</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version</source>
@@ -1338,7 +1338,7 @@
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
-      <translation>匿名統計のタイムサイクル</translation>
+      <translation>匿名統計レポートのタイムサイクル</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update</source>
@@ -1350,7 +1350,7 @@
     </message>
     <message>
       <source>Anonymous statistics report Client settings</source>
-      <translation>匿名統計レポートのクライアント設定</translation>
+      <translation>クライアント設定の匿名統計レポート</translation>
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
@@ -1430,7 +1430,7 @@
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
-      <translation>Eメールで Windows ラインフィードを使用する</translation>
+      <translation>メールに Windows の改行を使用する</translation>
     </message>
     <message>
       <source>Enable audit trail</source>
@@ -1438,7 +1438,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
-      <translation>操作履歴保存期間 (日, 14-730)</translation>
+      <translation>操作履歴保存期間 (14-730 日)</translation>
     </message>
     <message>
       <source>Event log period (days)</source>
@@ -1526,11 +1526,11 @@
     </message>
     <message>
       <source>Target update information</source>
-      <translation>ターゲットの更新情報</translation>
+      <translation>対象の更新情報</translation>
     </message>
     <message>
       <source>Installed update information</source>
-      <translation>インストールされた更新情報</translation>
+      <translation>インストール済み更新情報</translation>
     </message>
     <message>
       <source>Downloader peers for files</source>
@@ -1622,7 +1622,7 @@
     </message>
     <message>
       <source>Show mouse timeline preview</source>
-      <translation>マウスのタイムラインプレビューを表示する</translation>
+      <translation>マウスでタイムラインプレビューを表示する</translation>
     </message>
     <message>
       <source>Language for Cloud notifications</source>
@@ -1690,7 +1690,7 @@
     </message>
     <message>
       <source>Update releases.json file URL</source>
-      <translation>releases.json ファイルの URL を更新</translation>
+      <translation>releases.json ファイルの更新 URL</translation>
     </message>
     <message>
       <source>LDAP settings</source>

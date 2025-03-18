@@ -786,7 +786,7 @@
     </message>
     <message>
       <source>Cloud storage services disabled</source>
-      <translation>クラウド ストレージ サービスが無効になっています</translation>
+      <translation>クラウドストレージサービスが無効になっています</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
