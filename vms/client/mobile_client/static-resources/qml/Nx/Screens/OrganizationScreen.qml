@@ -25,14 +25,7 @@ Page
         : ""
     titleUnderlineVisible: true
 
-    rightButtonIcon.source: searchField.visible
-        ? "image://skin/24x24/Outline/close.svg?primary=light10"
-        : "image://skin/24x24/Outline/search.svg?primary=light10"
-    rightButtonIcon.width: 24
-    rightButtonIcon.height: 24
-
     onLeftButtonClicked: goBack()
-    onRightButtonClicked: searchField.visible ? goBack() : startSearch()
 
     customBackHandler: () => goBack()
 
@@ -60,12 +53,27 @@ Page
         model: organizationScreen.model
     }
 
-    titleControls:
+    rightControl: IconButton
+    {
+        id: searchButton
+
+        anchors.centerIn: parent
+
+        icon.source: searchField.visible
+            ? "image://skin/24x24/Outline/close.svg?primary=light10"
+            : "image://skin/24x24/Outline/search.svg?primary=light10"
+        icon.width: 24
+        icon.height: 24
+
+        onClicked: searchField.visible ? goBack() : startSearch()
+        alwaysCompleteHighlightAnimation: false
+    }
+
+    centerControl:
     [
         MouseArea
         {
-            width: parent.width
-            height: 40
+            anchors.fill: parent
             visible: !searchField.visible && !breadcrumb.visible
             onClicked: breadcrumb.openWith(subtreeModel.sourceRoot)
         },

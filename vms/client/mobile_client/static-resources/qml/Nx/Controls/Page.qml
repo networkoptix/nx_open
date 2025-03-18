@@ -21,7 +21,6 @@ QuickControls.Page
 
     property alias leftButtonIcon: toolBar.leftButtonIcon
     property alias leftButtonImageSource: toolBar.leftButtonImageSource
-    property alias rightButtonIcon: toolBar.rightButtonIcon
     property alias titleControls: toolBar.controls
     property alias warningText: warningPanel.text
     property alias warningVisible: warningPanel.opened
@@ -31,8 +30,10 @@ QuickControls.Page
     property alias backgroundColor: backgroundRectangle.color
     property alias gradientToolbarBackground: toolBar.useGradientBackground
 
+    property alias centerControl: toolBar.centerControl
+    property alias rightControl: toolBar.rightControl
+
     signal leftButtonClicked()
-    signal rightButtonClicked()
     signal headerClicked()
 
     clip: true
@@ -55,7 +56,6 @@ QuickControls.Page
                 titleUnderlineVisible: control.titleUnderlineVisible
                 leftButtonIcon.source: d.kBackButtonIconSource
                 onLeftButtonClicked: control.leftButtonClicked()
-                onRightButtonClicked: control.rightButtonClicked()
                 onClicked: control.headerClicked()
             }
 

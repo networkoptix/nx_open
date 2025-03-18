@@ -25,24 +25,23 @@ Page
     sideNavigationEnabled: !searchToolBar.visible
     property alias filterIds: camerasGrid.filterIds
 
-    titleControls:
-    [
-        IconButton
-        {
-            id: searchButton
+    rightControl: IconButton
+    {
+        id: searchButton
 
-            padding: 0
-            icon.source: lp("/images/search.png")
-            enabled: camerasGrid.enabled
-            opacity: sessionManager.hasReconnectingSession ? 0.2 : 1.0
-            onClicked:
-            {
-                sideNavigation.close()
-                searchToolBar.open()
-            }
-            alwaysCompleteHighlightAnimation: false
+        anchors.centerIn: parent
+
+        padding: 0
+        icon.source: lp("/images/search.png")
+        enabled: camerasGrid.enabled
+        opacity: sessionManager.hasReconnectingSession ? 0.2 : 1.0
+        onClicked:
+        {
+            sideNavigation.close()
+            searchToolBar.open()
         }
-    ]
+        alwaysCompleteHighlightAnimation: false
+    }
 
     LayoutAccessor
     {

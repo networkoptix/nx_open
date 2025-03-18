@@ -68,18 +68,18 @@ Page
     customBackHandler: () => apply()
     onLeftButtonClicked: apply()
 
-    titleControls:
-    [
-        TextButton
-        {
-            id: clearButton
+    rightControl: TextButton
+    {
+        id: clearButton
 
-            text: qsTr("Clear")
-            visible: screen.selector && !screen.selector.isDefaultValue
+        anchors.right: parent.right
+        anchors.baseline: parent.baseline
 
-            onClicked: d.callDelegateFunction("clear")
-        }
-    ]
+        text: qsTr("Clear")
+        visible: screen.selector && !screen.selector.isDefaultValue
+
+        onClicked: d.callDelegateFunction("clear")
+    }
 
     Component.onCompleted:
     {

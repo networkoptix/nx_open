@@ -17,6 +17,8 @@ AbstractButton
     leftPadding: 8
     rightPadding: 8
 
+    baselineOffset: topPadding + textItem.baselineOffset
+
     contentItem: Text
     {
         id: textItem

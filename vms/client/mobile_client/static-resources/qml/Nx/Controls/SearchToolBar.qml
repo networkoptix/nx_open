@@ -43,7 +43,7 @@ ToolBarBase
         {
             id: searchField
 
-            height: 40
+            height: 36
             Layout.fillWidth: true
             Layout.minimumHeight: height
         }

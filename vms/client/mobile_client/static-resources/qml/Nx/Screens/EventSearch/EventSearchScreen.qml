@@ -33,22 +33,21 @@ Page
     onLeftButtonClicked: Workflow.popCurrentScreen()
     onHeaderClicked: searchButton.clicked()
 
-    titleControls:
-    [
-        IconButton
-        {
-            id: searchButton
+    rightControl: IconButton
+    {
+        id: searchButton
 
-            padding: 0
-            icon.source: lp("/images/search.png")
-            onClicked:
-            {
-                sideNavigation.close()
-                searchToolBar.open()
-            }
-            alwaysCompleteHighlightAnimation: false
+        anchors.centerIn: parent
+
+        padding: 0
+        icon.source: lp("/images/search.png")
+        onClicked:
+        {
+            sideNavigation.close()
+            searchToolBar.open()
         }
-    ]
+        alwaysCompleteHighlightAnimation: false
+    }
 
     SearchToolBar
     {

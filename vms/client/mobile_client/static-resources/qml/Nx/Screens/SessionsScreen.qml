@@ -26,10 +26,6 @@ Page
     leftButtonIcon.width: 32
     leftButtonIcon.height: 32
 
-    rightButtonIcon.source: "image://skin/24x24/Outline/settings.svg?primary=light10"
-    rightButtonIcon.width: 24
-    rightButtonIcon.height: 24
-
     onLeftButtonClicked:
     {
         var showSummary = cloudStatusWatcher.status == CloudStatusWatcher.Online
@@ -43,7 +39,6 @@ Page
 
         Workflow.openCloudSummaryScreen(cloudUserProfileWatcher)
     }
-    onRightButtonClicked: Workflow.openSettingsScreen()
 
     readonly property bool searching: !!siteList.searchText
     readonly property bool localSitesVisible:
@@ -51,7 +46,20 @@ Page
 
     StackView.onActivated: forceActiveFocus()
 
-    titleControls:
+    rightControl: IconButton
+    {
+        id: rightButton
+
+        anchors.centerIn: parent
+
+        icon.source: "image://skin/24x24/Outline/settings.svg?primary=light10"
+        icon.width: 24
+        icon.height: 24
+
+        onClicked: Workflow.openSettingsScreen()
+    }
+
+    centerControl:
     [
         SearchEdit
         {

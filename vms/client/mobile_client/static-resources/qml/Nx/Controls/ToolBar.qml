@@ -14,88 +14,120 @@ ToolBarBase
 
     property alias leftButtonIcon: leftButton.icon
     property alias leftButtonImageSource: leftButton.imageSource
-    property alias rightButtonIcon: rightButton.icon
     property alias title: label.text
     property alias controls: controlsRow.data
     property alias titleOpacity: label.opacity
     property alias titleUnderlineVisible: labelUnderline.visible
 
+    property alias centerControl: centerControlContainer.data
+    property alias rightControl: rightControlContainer.data
+
+    baselineOffset: label.y + label.baselineOffset
+
     signal leftButtonClicked()
-    signal rightButtonClicked()
 
-    IconButton
+    Item
     {
-        id: leftButton
+        id: leftControlContainer
         anchors.verticalCenter: parent.verticalCenter
-        x: 8
-        padding: 0
-        visible: icon.source != ""
-        onClicked: toolBar.leftButtonClicked()
-        alwaysCompleteHighlightAnimation: false
-    }
+        anchors.left: parent.left
+        anchors.leftMargin: 20
+        width: 32
+        height: 32
 
-    PageTitleLabel
-    {
-        id: label
-
-        readonly property real leftButtonSpace:
-            8 + (leftButton.width ? leftButton.x + leftButton.width : 0)
-        readonly property real buttonSpace:
-            leftButtonSpace + 8 + (rightButton.visible ? rightButton.width + 8 : 0)
-        readonly property real maxWidth: parent.width - buttonSpace
-
-        x: Math.max(parent.width / 2 - width / 2, leftButtonSpace)
-        width: Math.max(0, Math.min(implicitWidth, maxWidth))
-        anchors.verticalCenter: parent.verticalCenter
-    }
-
-    Canvas
-    {
-        id: labelUnderline
-
-        anchors.left: label.left
-        anchors.right: label.right
-        anchors.top: label.bottom
-        anchors.topMargin: 4
-        height: 1
-
-        visible: label.visible && label.text != ""
-
-        onPaint:
+        IconButton
         {
-            const ctx = getContext("2d")
+            id: leftButton
+            anchors.centerIn: parent
 
-            ctx.strokeStyle = ColorTheme.colors.dark16
-            ctx.lineWidth = 1
-            ctx.setLineDash([2, 2]);
+            padding: 0
+            visible: icon.source != ""
+            onClicked: toolBar.leftButtonClicked()
+            alwaysCompleteHighlightAnimation: false
+        }
+    }
 
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(width, 0);
-            ctx.stroke();
+    Item
+    {
+        id: centerControlContainer
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: leftControlContainer.right
+        anchors.leftMargin: 20
+        anchors.right: rightControlContainer.left
+        anchors.rightMargin: 20
+        height: parent.height
+
+        PageTitleLabel
+        {
+            id: label
+
+            readonly property real controlsRowWidth:
+                controlsRow.width > 0 ? controlsRow.width + 8 : 0
+
+            readonly property bool fitsInCenter:
+                parent.width / 2 + implicitWidth / 2 < parent.width - controlsRowWidth
+
+            readonly property bool hasRightControl: rightControlContainer.children.length > 0
+
+            x: fitsInCenter
+                ? Math.max((parent.width - implicitWidth) / 2, 0)
+                : Math.max((parent.width - width - controlsRowWidth) / 2, 0)
+
+            width: fitsInCenter
+                ? implicitWidth
+                : (hasRightControl
+                    ? (parent.width - controlsRowWidth)
+                    : Math.min(parent.width + 20 + 32, implicitWidth))
+
+            anchors.verticalCenter: parent.verticalCenter
+
+        }
+
+        Canvas
+        {
+            id: labelUnderline
+
+            anchors.left: label.left
+            anchors.right: label.right
+            anchors.top: label.bottom
+            anchors.topMargin: 4
+            height: 1
+
+            visible: label.visible && label.text != ""
+
+            onPaint:
+            {
+                const ctx = getContext("2d")
+
+                ctx.strokeStyle = ColorTheme.colors.dark16
+                ctx.lineWidth = 1
+                ctx.setLineDash([2, 2]);
+
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(width, 0);
+                ctx.stroke();
+            }
         }
     }
 
     Row
     {
+        // TODO: This item should probably go away
         id: controlsRow
         anchors.verticalCenter: parent.verticalCenter
-        anchors.left: leftButton.right
-        anchors.right: rightButton.left
-        anchors.leftMargin: 8
-        anchors.rightMargin: 8
+        anchors.right: centerControlContainer.right
         spacing: 8
     }
 
-    IconButton
+    Item
     {
-        id: rightButton
+        id: rightControlContainer
+        baselineOffset: toolBar.baselineOffset - y
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
-        anchors.rightMargin: 8
-        padding: 0
-        visible: icon.source != ""
-        onClicked: toolBar.rightButtonClicked()
-        alwaysCompleteHighlightAnimation: false
+        anchors.rightMargin: 20
+        width: 32
+        height: 32
     }
 }

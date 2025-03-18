@@ -157,6 +157,21 @@ Page
     sideNavigationEnabled: false
     onLeftButtonClicked: Workflow.popCurrentScreen()
 
+    rightControl: IconButton
+    {
+        id: menuButton
+
+        anchors.centerIn: parent
+
+        icon.source: lp("/images/more_vert.png")
+        onClicked:
+        {
+            menu.x = 0
+            menu.y = height
+            menu.open()
+        }
+    }
+
     title: controller.resourceHelper.resourceName
     toolBar.opacity: d.uiOpacity
     toolBar.visible: opacity > 0
@@ -172,17 +187,6 @@ Page
                 icon.source: lp("/images/close.png")
 
                 onClicked: video.motionController.clearCustomRoi()
-            },
-
-            IconButton
-            {
-                id: menuButton
-
-                icon.source: lp("/images/more_vert.png")
-                onClicked:
-                {
-                    menu.open()
-                }
             }
         ]
 

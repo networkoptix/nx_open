@@ -40,18 +40,17 @@ Page
 
     clip: false
 
-    titleControls:
-    [
-        DownloadMediaButton
-        {
-            id: downloadButton
+    rightControl: DownloadMediaButton
+    {
+        id: downloadButton
 
-            enabled: preview.player && !preview.player.cannotDecryptMediaError
-            resourceId: preview.resource && preview.resource.id
-            positionMs: preview.startTimeMs
-            durationMs: preview.durationMs
-        }
-    ]
+        anchors.centerIn: parent
+
+        enabled: preview.player && !preview.player.cannotDecryptMediaError
+        resourceId: preview.resource && preview.resource.id
+        positionMs: preview.startTimeMs
+        durationMs: preview.durationMs
+    }
 
     toolBar.contentItem.clip: false
     gradientToolbarBackground: true
