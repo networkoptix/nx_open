@@ -39,6 +39,7 @@
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/license/saas/saas_service_usage_helper.h>
 #include <nx/vms/time/formatter.h>
@@ -808,6 +809,13 @@ QnStorageConfigWidget::StorageConfigWarningFlags
                 flags.setFlag(analyticsIsOnDisabledStorage);
         }
 
+        if (storageResource->isCloudStorage()
+            && storageInfo.isUsed
+            && system()->saasServiceManager()->saasShutDown())
+        {
+            flags.setFlag(cloudBackupStopped);
+        }
+
         // Storage enabled state wasn's affected, skipping further checks.
         if (storageInfo.isUsed == storageResource->isUsedForWriting())
             continue;
@@ -912,6 +920,19 @@ void QnStorageConfigWidget::updateWarnings()
                 .isEnabledProperty = &messageBarSettings()->storageConfigCloudStorageWarning
             });
     }
+
+    if (flags.testFlag(cloudBackupStopped))
+    {
+        messages.push_back(
+            {
+                .text = tr("Cloud backup has been stopped because the system has been shutdown. "
+                    "It must be active to perform a backup to cloud storage. Contact your channel "
+                    "partner for assistance"),
+                .level = BarDescription::BarLevel::Error,
+                .isEnabledProperty = &messageBarSettings()->cloudBackupStoppedWarning
+            });
+    }
+
     ui->messageBarBlock->setMessageBars(messages);
 }
 

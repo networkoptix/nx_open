@@ -55,6 +55,7 @@ private:
         cloudBackupStorageBeingEnabled = 1 << 4,
         backupStorageBeingReplacedByCloudStorage = 1 << 5,
         notEnoughLicensesForCloudStorage = 1 << 6,
+        cloudBackupStopped = 1 << 7,
     };
     Q_DECLARE_FLAGS(StorageConfigWarningFlags, StorageConfigWarningFlag)
 
