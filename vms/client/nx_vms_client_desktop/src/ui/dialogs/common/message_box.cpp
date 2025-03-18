@@ -22,7 +22,7 @@
 
 namespace {
 
-static constexpr int kMinimumWidth = 400;
+constexpr int kFixedWidth = 400;
 
 const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kGreenTheme = {
     {QIcon::Normal, {.primary = "green_attention"}}};
@@ -862,8 +862,7 @@ void QnMessageBox::showEvent(QShowEvent* event)
 void QnMessageBox::afterLayout()
 {
     auto size = sizeHint();
-
-    size.setWidth(std::max({ kMinimumWidth, size.width(), minimumSizeHint().width() }));
+    size.setWidth(kFixedWidth);
     if (hasHeightForWidth())
         size.setHeight(heightForWidth(size.width()));
 
