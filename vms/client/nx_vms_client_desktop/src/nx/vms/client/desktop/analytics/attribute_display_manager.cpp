@@ -14,10 +14,11 @@
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
-QStringList kBuiltInAttributes = {
+const QStringList kBuiltInAttributes = {
     kDateTimeAttributeName,
     kTitleAttributeName,
     kCameraAttributeName,
+    kObjectTypeAttributeName,
 };
 
 class AttributeDisplayManager::Private: public QObject
@@ -51,9 +52,10 @@ public:
 
             if (mode == Mode::tileView)
             {
-                // In the tile mode, built-in attributes go first.
+                // In the tile mode, built-in attributes always go first.
                 orderedAttributes.removeOne(attribute);
-                orderedAttributes.prepend(attribute);
+                if (attribute != kObjectTypeAttributeName)
+                    orderedAttributes.prepend(attribute);
             }
             else
             {
@@ -86,6 +88,8 @@ public:
         QList<LocalSettings::AnalyticsAttributeSettings> attributes;
         for (const QString& attribute: orderedAttributes)
         {
+            if (mode == Mode::tileView && attribute == kObjectTypeAttributeName)
+                continue;
             attributes.push_back(LocalSettings::AnalyticsAttributeSettings{
                 .id = attribute,
                 .visible = visibleAttributes.contains(attribute)});
@@ -255,7 +259,8 @@ void AttributeDisplayManager::setVisible(const QString& attribute, bool visible)
 
 bool AttributeDisplayManager::canBeHidden(const QString& attribute) const
 {
-    return attribute != kDateTimeAttributeName && attribute != kTitleAttributeName;
+    return attribute != kDateTimeAttributeName
+        && (d->mode == Mode::tableView || attribute != kTitleAttributeName);
 }
 
 bool AttributeDisplayManager::canBeMoved(const QString& attribute) const
