@@ -273,10 +273,6 @@
       <translation>Hjälp</translation>
     </message>
     <message>
-      <source>Event Log...</source>
-      <translation>Händelselogg...</translation>
-    </message>
-    <message>
       <source>Control Video Wall</source>
       <translation>Styr videovägg</translation>
     </message>
@@ -1165,22 +1161,6 @@
       <translation>Anslut till webbplatsen</translation>
     </message>
     <message>
-      <source>Layout Tab</source>
-      <translation>Fliken Layout</translation>
-    </message>
-    <message>
-      <source>New Layout Tab</source>
-      <translation>Ny layoutflik</translation>
-    </message>
-    <message>
-      <source>Welcome Screen Tab</source>
-      <translation>Fliken Välkomstskärm</translation>
-    </message>
-    <message>
-      <source>New Welcome Screen Tab</source>
-      <translation>Ny flik på välkomstskärmen</translation>
-    </message>
-    <message>
       <source>Site Administration...</source>
       <translation>Webbplatsadministration...</translation>
     </message>
@@ -1235,6 +1215,30 @@
     <message>
       <source>Cell Aspect Ratio</source>
       <translation>Cell proportioner</translation>
+    </message>
+    <message>
+      <source>Layout</source>
+      <translation>Vyer</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>Ny Vy</translation>
+    </message>
+    <message>
+      <source>Welcome Screen</source>
+      <translation>Välkomstskärm</translation>
+    </message>
+    <message>
+      <source>New Welcome Screen</source>
+      <translation>Ny välkomstskärm</translation>
+    </message>
+    <message>
+      <source>Monitor in New Tab</source>
+      <translation>Övervaka i ny flik</translation>
+    </message>
+    <message>
+      <source>Monitor in New Window</source>
+      <translation>Övervaka i nytt fönster</translation>
     </message>
   </context>
   <context>
@@ -1307,20 +1311,6 @@
     </message>
   </context>
   <context>
-    <name>ExitFullscreenActionHelper</name>
-    <message>
-      <source>Select layout...</source>
-      <translation>Välj layout...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n layouts</source>
-      <translation>
-        <numerusform>%n vyer</numerusform>
-        <numerusform>%n vyer</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1341,37 +1331,6 @@
     <message>
       <source>Executable %1 Media File</source>
       <translation>Körbar %1 mediefil</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenActionHelper</name>
-    <message>
-      <source>Source camera</source>
-      <translation>Källkamera</translation>
-    </message>
-    <message>
-      <source>Select device...</source>
-      <translation>Välj enhet...</translation>
-    </message>
-    <message>
-      <source>Select camera...</source>
-      <translation>Välj kamera...</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Välj layout...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n layouts</source>
-      <translation>
-        <numerusform>%n layouter</numerusform>
-        <numerusform>%n layouter</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>%1 on %2</source>
-      <comment>Camera %1 on layout %2</comment>
-      <translation>%1 på %2</translation>
     </message>
   </context>
   <context>
@@ -2214,24 +2173,24 @@ Licensnyckel: %2</translation>
       </translation>
     </message>
     <message numerus="yes">
-      <source>These servers are removed from Site</source>
-      <translation>
-        <numerusform>Dessa servrar tas bort från sajten</numerusform>
-        <numerusform>Dessa servrar tas bort från System</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These users are removed from Site</source>
-      <translation>
-        <numerusform>Dessa användare tas bort från System</numerusform>
-        <numerusform>Dessa användare tas bort från System</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>These resources are removed from Site</source>
       <translation>
         <numerusform>Dessa resurser tas bort från webbplatsen</numerusform>
         <numerusform>Dessa resurser tas bort från System</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This server is removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>This server is removed from Site</numerusform>
+        <numerusform>This server is removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This user is removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>This user is removed from Site</numerusform>
+        <numerusform>This user is removed from Site</numerusform>
       </translation>
     </message>
   </context>
@@ -2373,10 +2332,6 @@ Licensnyckel: %2</translation>
       <translation>Händelsesregel har tagits bort</translation>
     </message>
     <message>
-      <source>Event rules reset to default</source>
-      <translation>Händelseregler återställs till standard</translation>
-    </message>
-    <message>
       <source>Storage added</source>
       <translation>Lagring tillagd</translation>
     </message>
@@ -2509,222 +2464,6 @@ Licensnyckel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleViewModel</name>
-    <message>
-      <source>Error: %1</source>
-      <translation>Fel: %1</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Omedelbart</translation>
-    </message>
-    <message>
-      <source>Stops</source>
-      <translation>Stoppar</translation>
-    </message>
-    <message>
-      <source>Starts</source>
-      <translation>Startar</translation>
-    </message>
-    <message>
-      <source>Occurs</source>
-      <translation>Inträffar</translation>
-    </message>
-    <message>
-      <source>N/A</source>
-      <translation>Ej tillgänglig</translation>
-    </message>
-    <message>
-      <source>Every %1</source>
-      <translation>Var %1</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Vilken server som helst</translation>
-    </message>
-    <message>
-      <source>Any Device</source>
-      <translation>Valfri enhet</translation>
-    </message>
-    <message>
-      <source>Any Camera</source>
-      <translation>Valfri kamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Servers</source>
-      <translation>
-        <numerusform>%n Servrar</numerusform>
-        <numerusform>%n Servrar</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Användare</translation>
-    </message>
-    <message>
-      <source>Source Server</source>
-      <translation>Källserver</translation>
-    </message>
-    <message>
-      <source>Source Camera</source>
-      <translation>Källkamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Källa och %n fler kameror</numerusform>
-        <numerusform>Källa och %n fler kameror</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Select at least one Device</source>
-      <translation>Välj minst en enhet</translation>
-    </message>
-    <message>
-      <source>Select at least one Camera</source>
-      <translation>Välj minst en kamera</translation>
-    </message>
-    <message>
-      <source>Select Server</source>
-      <translation>Välj server</translation>
-    </message>
-    <message>
-      <source>Source Server and %1</source>
-      <translation>Källserver och %1</translation>
-    </message>
-    <message>
-      <source>Site</source>
-      <translation>Webbplats</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRuleWidget</name>
-    <message>
-      <source>to</source>
-      <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
-      <translation>till</translation>
-    </message>
-    <message>
-      <source>at</source>
-      <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-      <translation>vid</translation>
-    </message>
-    <message>
-      <source>Select at least one device</source>
-      <translation>Välj minst en enhet</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Välj minst en kamera</translation>
-    </message>
-    <message>
-      <source>Devices</source>
-      <translation>Enheter</translation>
-    </message>
-    <message>
-      <source>Cameras</source>
-      <translation>Kameror</translation>
-    </message>
-    <message>
-      <source>Any Device</source>
-      <translation>Valfri enhet</translation>
-    </message>
-    <message>
-      <source>Any Camera</source>
-      <translation>Valfri kamera</translation>
-    </message>
-    <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation>Forcerad kvittering fungerar bara för generiska händelser om kamerans modifierare används i generiska händelse URL-er</translation>
-    </message>
-    <message>
-      <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation>Hög förinspelningstid kommer att öka RAM-utnyttjande på servern</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRulesDialog</name>
-    <message>
-      <source>&amp;New...</source>
-      <translation>&amp;Ny...</translation>
-    </message>
-    <message>
-      <source>&amp;Delete</source>
-      <translation>&amp;Radera</translation>
-    </message>
-    <message>
-      <source>&amp;Schedule...</source>
-      <translation>Schema...</translation>
-    </message>
-    <message>
-      <source>Restore All Rules to Default</source>
-      <translation>Återställ alla regler till standard</translation>
-    </message>
-    <message>
-      <source>No event rules</source>
-      <translation>Inga händelsesregler</translation>
-    </message>
-    <message>
-      <source>Filter by devices...</source>
-      <translation>Filtrera efter enheter...</translation>
-    </message>
-    <message>
-      <source>Filter by cameras...</source>
-      <translation>Filtrera efter kameror...</translation>
-    </message>
-    <message>
-      <source>Failed to retrieve rules</source>
-      <translation>Det gick inte att hämta regler</translation>
-    </message>
-    <message>
-      <source>Failed to save rule</source>
-      <translation>Misslyckades med att spara regeln</translation>
-    </message>
-    <message>
-      <source>This action cannot be undone.</source>
-      <translation>Denna åtgärd kan inte ångras.</translation>
-    </message>
-    <message>
-      <source>Restore all rules to default?</source>
-      <translation>Återställ alla regler till standard?</translation>
-    </message>
-    <message>
-      <source>Some rules are not valid and may not work</source>
-      <translation>Vissa regler är ogiltiga och kanske inte fungerar</translation>
-    </message>
-    <message>
-      <source>Apply changes before exiting?</source>
-      <translation>Vill du tillämpa ändringar innan du avslutar?</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRulesViewModel</name>
-    <message>
-      <source>On</source>
-      <translation>På</translation>
-    </message>
-    <message>
-      <source>Event</source>
-      <translation>Händelse</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>Källa</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Åtgärd</translation>
-    </message>
-    <message>
-      <source>Target</source>
-      <translation>Mål</translation>
-    </message>
-    <message>
-      <source>Interval of Action</source>
-      <translation>Åtgärdsintervall</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCamDisplay</name>
     <message>
       <source>%1 Running</source>
@@ -2801,13 +2540,6 @@ Licensnyckel: %2</translation>
     <message>
       <source>Diagnostics complete</source>
       <translation>Diagnostik komplett</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraInputBusinessEventWidget</name>
-    <message>
-      <source>automatic</source>
-      <translation>automatisk</translation>
     </message>
   </context>
   <context>
@@ -2917,13 +2649,6 @@ Licensnyckel: %2</translation>
     <message>
       <source>Logical ID</source>
       <translation>Logiskt ID</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraOutputBusinessActionWidget</name>
-    <message>
-      <source>automatic</source>
-      <translation>automatisk</translation>
     </message>
   </context>
   <context>
@@ -3244,33 +2969,6 @@ Licensnyckel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnCustomBusinessEventWidget</name>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Om fältet är tomt kommer händelsen alltid att trigga.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>Händelsen utlöses endast om det finns matchningar i källan med något av de angivna sökorden.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Händelsen utlöses endast om det finns matchningar i källan med något av de angivna sökorden.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation>Händelsen utlöses endast om det finns matchningar i beskrivningen med något av de angivna sökorden.</translation>
-    </message>
-    <message>
-      <source>Server API</source>
-      <translation>Server API</translation>
-    </message>
-    <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>För att generera generisk händelse, se %1.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCustomFileDialog</name>
     <message>
       <source>Pictures</source>
@@ -3361,159 +3059,6 @@ Licensnyckel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnEmptyBusinessActionWidget</name>
-    <message>
-      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>Panikinspelningsläge byter inspelningsinställningar för alla kameror till maximal FPS och kvalitet.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnEventLogDialog</name>
-    <message>
-      <source>Filter Similar Rows</source>
-      <translation>Filtrera liknande rader</translation>
-    </message>
-    <message>
-      <source>Copy Selection to Clipboard</source>
-      <translation>Kopiera urval till Urklipp</translation>
-    </message>
-    <message>
-      <source>Export Selection to File...</source>
-      <translation>Exportera urval till fil...</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Markera alla</translation>
-    </message>
-    <message>
-      <source>Clear Filter</source>
-      <translation>Rensa filter</translation>
-    </message>
-    <message>
-      <source>Export selected events to file</source>
-      <translation>Exportera utvalda händelser till fil</translation>
-    </message>
-    <message>
-      <source>Any Action</source>
-      <translation>Någon åtgärd</translation>
-    </message>
-    <message>
-      <source>No events</source>
-      <translation>Inga händelser</translation>
-    </message>
-    <message numerus="yes">
-      <source>Event log for period from %1 to %2 - %n events found</source>
-      <comment>Dates are substituted</comment>
-      <translation>
-        <numerusform>Händelselogg för perioden från %1 till %2 - %n händelser hittades</numerusform>
-        <numerusform>Händelselogg för perioden från %1 till %2 - %n händelser hittades</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Event log for %1 - %n events found</source>
-      <comment>Date is substituted</comment>
-      <translation>
-        <numerusform>Händelselogg för %1 - %n händelser hittades</numerusform>
-        <numerusform>Händelselogg för %1 - %n händelser hittades</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Beskrivning</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnEventLogModel</name>
-    <message>
-      <source>Motion video</source>
-      <translation>Rörelsevideo</translation>
-    </message>
-    <message>
-      <source>Date/Time</source>
-      <translation>Datum/Tid</translation>
-    </message>
-    <message>
-      <source>Event</source>
-      <translation>Händelse</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>Källa</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Åtgärd</translation>
-    </message>
-    <message>
-      <source>Target</source>
-      <translation>Mål</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Beskrivning</translation>
-    </message>
-    <message>
-      <source>All users</source>
-      <translation>Alla användare</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n times)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n gånger)</numerusform>
-        <numerusform>%1 (%n gånger)</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Open camera</source>
-      <translation>Öppna kameran</translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n users more...</source>
-      <translation>
-        <numerusform>och %n användare mer...</numerusform>
-        <numerusform>och %n användare mer...</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n more...</source>
-      <translation>
-        <numerusform>och %n mer...</numerusform>
-        <numerusform>och %n mer...</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Removed subjects</source>
-      <translation>
-        <numerusform>%n Borttagna ämnen</numerusform>
-        <numerusform>%n Borttagna ämnen</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Subject removed</source>
-      <translation>Ämne borttaget</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n cameras)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n kameror)</numerusform>
-        <numerusform>%1 (%n kameror)</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnExecHttpRequestActionWidget</name>
-    <message>
-      <source>Auto</source>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <source>Basic</source>
-      <translation>Grundläggande</translation>
-    </message>
-  </context>
-  <context>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
@@ -3522,17 +3067,6 @@ Licensnyckel: %2</translation>
     <message>
       <source>Failed to overwrite file</source>
       <translation>Misslyckades med att skriva över filen</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFullscreenCameraActionWidget</name>
-    <message>
-      <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation>Kameran är för närvarande inte på några av de valda vyerna. Åtgärd fungerar om kameran läggs till innan åtgärden triggas.</translation>
-    </message>
-    <message>
-      <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation>Kameran är för närvarande inte på några av de valda vyerna. Åtgärd fungerar om kameran läggs till innan åtgärden triggas.</translation>
     </message>
   </context>
   <context>
@@ -4015,13 +3549,6 @@ Licensnyckel: %2</translation>
       <source>Lo-Res</source>
       <translation>Låg-Upl</translation>
     </message>
-    <message numerus="yes">
-      <source>Set for all %n Cameras</source>
-      <translation>
-        <numerusform>Ange för alla %n kameror</numerusform>
-        <numerusform>Ange för alla %n kameror</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Area Zoom</source>
       <translation>Områdeszoom</translation>
@@ -4041,6 +3568,17 @@ Licensnyckel: %2</translation>
     <message>
       <source>Mute</source>
       <translation>Tysta</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set for %n devices</source>
+      <translation type="unfinished">
+        <numerusform>Set for %n devices</numerusform>
+        <numerusform>Set for %n devices</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Cloud authorization request should only be performed for cloud cross system resources</source>
+      <translation type="unfinished">Cloud authorization request should only be performed for cloud cross system resources</translation>
     </message>
   </context>
   <context>
@@ -4156,13 +3694,6 @@ Licensnyckel: %2</translation>
     <message>
       <source>Rotation</source>
       <translation>Rotation</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPopupBusinessActionWidget</name>
-    <message>
-      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation>Meddelandet visas tills en av användarna som ser det skapar bokmärke med händelsebeskrivning</translation>
     </message>
   </context>
   <context>
@@ -4615,42 +4146,6 @@ Licensnyckel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnSendEmailActionDelegate</name>
-    <message numerus="yes">
-      <source>%n additional</source>
-      <translation>
-        <numerusform>%n ytterligare</numerusform>
-        <numerusform>%n ytterligare</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has invalid email address</source>
-      <translation>Användare %1 har ogiltig e-postadress</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 users have invalid email address</source>
-      <translation>
-        <numerusform>%n av %1 användare har ogiltig e-postadress</numerusform>
-        <numerusform>%n av %1 användare har ogiltig e-postadress</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid email address %1</source>
-      <translation>Ogiltig e-postadress %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 additional email addresses are invalid</source>
-      <translation>
-        <numerusform>%n av %1 ytterligare e-postadresser är ogiltiga</numerusform>
-        <numerusform>%n av %1 ytterligare e-postadresser är ogiltiga</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Send email to %1</source>
-      <translation>Skicka e-post till %1</translation>
-    </message>
-  </context>
-  <context>
     <name>QnServerAddressesModel</name>
     <message>
       <source>Address</source>
@@ -4761,17 +4256,6 @@ Licensnyckel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnShowTextOverlayActionWidget</name>
-    <message>
-      <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-      <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
-&apos; sequence</comment>
-      <translation>Html-taggar kan användas inom anpassad text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Även olika &lt;font color=&quot;red&quot;&gt;färger&lt;/font&gt; och &lt;font size=&quot;18&quot;&gt;storlekar&lt;/font&gt; kan användas. Texten kan vara &lt;s&gt;ramad&lt;/s&gt;, &lt;u&gt;understreckad&lt;/u&gt;, &lt;b&gt;fet&lt;/b&gt; eller &lt;i&gt;kursiv&lt;/i&gt;</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSignInfo</name>
     <message>
       <source>Analyzing: %1%</source>
@@ -4825,8 +4309,8 @@ Licensnyckel: %2</translation>
       <translation>Auktorisera</translation>
     </message>
     <message>
-      <source>Setup</source>
-      <translation>Konfiguration</translation>
+      <source>Set</source>
+      <translation type="unfinished">Set</translation>
     </message>
   </context>
   <context>
@@ -4840,16 +4324,8 @@ Licensnyckel: %2</translation>
       <translation>OFFLINE</translation>
     </message>
     <message>
-      <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
-      <translation>Den här kameran kan inte nås. Utför kamerans diagnostik inom skrivbordsklienten för ytterligare information.</translation>
-    </message>
-    <message>
       <source>UNAUTHORIZED</source>
       <translation>OBEHÖRIG</translation>
-    </message>
-    <message>
-      <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
-      <translation>Denna kamera kräver att auktoriserade autentiseringsuppgifter ställs in i enhetsinställningarna i molnportalen eller skrivbordsklienten.</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
@@ -4864,16 +4340,8 @@ Licensnyckel: %2</translation>
       <translation>WEBBPLATSEN AVSTÄNGD</translation>
     </message>
     <message>
-      <source>STREAM LIMITATION</source>
-      <translation>STREAM BEGRÄNSNING</translation>
-    </message>
-    <message>
       <source>INFORMATION REQUIRED</source>
       <translation>INFORMATION KRÄVS</translation>
-    </message>
-    <message>
-      <source>AUDIO ONLY</source>
-      <translation>ENDAST LJUD</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -4902,6 +4370,18 @@ Licensnyckel: %2</translation>
     <message>
       <source>CERTIFICATE ERROR</source>
       <translation>CERTIFIKATFEL</translation>
+    </message>
+    <message>
+      <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
+      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+    </message>
+    <message>
+      <source>Access to this camera requires authorization credentials.</source>
+      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+    </message>
+    <message>
+      <source>CONNECTION LOST</source>
+      <translation type="unfinished">CONNECTION LOST</translation>
     </message>
   </context>
   <context>
@@ -5088,6 +4568,18 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
       <translation>Isolerad - servern läser och skriver uteslutande till sin egen mapp. Den tar endast bort gamla data från sin egen mapp.</translation>
+    </message>
+    <message>
+      <source>Cloud storage cannot be enabled.</source>
+      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+    </message>
+    <message>
+      <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
+      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+    </message>
+    <message>
+      <source>Insufficient services</source>
+      <translation>Otillräckliga tjänster</translation>
     </message>
   </context>
   <context>
@@ -5473,10 +4965,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Webbplatsen stängs av</translation>
     </message>
     <message>
-      <source>Reject intercom call</source>
-      <translation>Avvisa intercomsamtal</translation>
-    </message>
-    <message>
       <source>Email address is not set for your account</source>
       <translation>E-postadressen är inte inställd för ditt konto</translation>
     </message>
@@ -5600,6 +5088,18 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Notifications language differs from the interface language</source>
       <translation>Aviseringsspråk skiljer sig från gränssnittets språk</translation>
+    </message>
+    <message>
+      <source>Recording disabled</source>
+      <translation type="unfinished">Recording disabled</translation>
+    </message>
+    <message>
+      <source>Cloud storage backup disabled</source>
+      <translation type="unfinished">Cloud storage backup disabled</translation>
+    </message>
+    <message>
+      <source>Paid integration services disabled</source>
+      <translation type="unfinished">Paid integration services disabled</translation>
     </message>
   </context>
   <context>
@@ -6441,10 +5941,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>I</translation>
     </message>
     <message>
-      <source>%n removed subjects</source>
-      <translation>%n borttagna ämnen</translation>
-    </message>
-    <message>
       <source>%n removed devices</source>
       <translation>%n borttagna enheter</translation>
     </message>
@@ -6482,6 +5978,35 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>%n layouts more</source>
       <translation>%n layouter mer</translation>
+    </message>
+    <message>
+      <source>Removed subject</source>
+      <comment>The subject is user or group</comment>
+      <translation type="unfinished">Removed subject</translation>
+    </message>
+    <message>
+      <source>Removed device</source>
+      <translation type="unfinished">Removed device</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation type="unfinished">Removed camera</translation>
+    </message>
+    <message>
+      <source>Removed server</source>
+      <translation type="unfinished">Removed server</translation>
+    </message>
+    <message>
+      <source>Removed layout</source>
+      <translation type="unfinished">Removed layout</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n removed subjects</source>
+      <comment>The subject is user or group</comment>
+      <translation type="unfinished">
+        <numerusform>%n removed subjects</numerusform>
+        <numerusform>%n removed subjects</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7123,6 +6648,23 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <translation>Det finns fler kameror som säkerhetskopieras än tillgängliga tjänster. Inaktivera säkerhetskopiering för vissa kameror eller lägg till lämpligare tjänster. Annars kommer det att göras automatiskt på %1</translation>
     </message>
+    <message>
+      <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
+      <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
+      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+    </message>
+    <message>
+      <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
+      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+    </message>
+    <message>
+      <source>Backup will not be activated for %1 devices: </source>
+      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
+    </message>
+    <message>
+      <source>%1 suitable cloud storage services are required to activate backup for them.</source>
+      <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>
@@ -7250,6 +6792,18 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Missed call</source>
       <translation>Missat samtal</translation>
+    </message>
+    <message>
+      <source>Call Request</source>
+      <translation type="unfinished">Call Request</translation>
+    </message>
+    <message>
+      <source>Call Request Missed</source>
+      <translation type="unfinished">Call Request Missed</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation type="unfinished">Source: %1</translation>
     </message>
   </context>
   <context>
@@ -7444,6 +6998,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Select Hotspot Target</source>
       <translation>Välj Hotspotmål</translation>
     </message>
+    <message>
+      <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
+      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
@@ -7466,6 +7024,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Less Info</source>
       <translation>Mindre info</translation>
+    </message>
+    <message>
+      <source>Use this link to add the camera to another site</source>
+      <translation type="unfinished">Use this link to add the camera to another site</translation>
     </message>
   </context>
   <context>
@@ -7982,26 +7544,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CloudLayoutsIntroDialog</name>
-    <message>
-      <source>Introducing %1 Layouts</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Introducerar %1 layouter</translation>
-    </message>
-    <message>
-      <source>Read more on the %1</source>
-      <translation>Läs mer på %1</translation>
-    </message>
-    <message>
-      <source>help page</source>
-      <translation>hjälpsida</translation>
-    </message>
-    <message>
-      <source>%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation>%1 Layouter är &lt;b&gt;sajtöverskridande layouter&lt;/b&gt; som låter dig arbeta med enheter från olika platser. För närvarande är endast vissa funktioner i vanliga layouter tillgängliga, men vi kommer att fortsätta att utöka kapaciteten för %1 Layouter i framtida versioner</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CloudLayoutsManager</name>
     <message>
       <source>%1 (Copy)</source>
@@ -8080,6 +7622,14 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Disconnect</source>
       <translation>Koppla från</translation>
+    </message>
+    <message>
+      <source>Channel Partner users have access to this site</source>
+      <translation type="unfinished">Channel Partner users have access to this site</translation>
+    </message>
+    <message>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
+      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
@@ -8243,10 +7793,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
   </context>
   <context>
     <name>nx::vms::client::desktop::DesktopDataProvider</name>
-    <message>
-      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>Ljudupptagningsenheten stöder inga lämpliga ljudformat. Välj en annan ljudenhet eller &quot;ingen&quot; i inställningarna för skärminspelning.</translation>
-    </message>
     <message>
       <source>Could not detect capturing resolution</source>
       <translation>Det gick inte att upptäcka upplösningen</translation>
@@ -8460,6 +8006,14 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Export selected events to file</source>
       <translation>Exportera utvalda händelser till fil</translation>
     </message>
+    <message>
+      <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
+      <translation type="unfinished">Server cannot answer in reasonable time. Consider narrowing period or filter.</translation>
+    </message>
+    <message>
+      <source>All Servers are offline. Logs are not available.</source>
+      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventLogModel</name>
@@ -8533,24 +8087,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>INFORMATION REQUIRED</source>
       <translation>INFORMATION KRÄVS</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>No events</source>
-      <translation>Inga händelser</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n events</source>
-      <translation>
-        <numerusform>%n händelser</numerusform>
-        <numerusform>%n händelser</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Try changing the filters or create an Event Rule</source>
-      <translation>Försök att ändra filtren eller skapa en händelseregel</translation>
     </message>
   </context>
   <context>
@@ -9030,6 +8566,13 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::JumpToLiveButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation>Gå till realtid</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -9127,20 +8670,8 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>INGA DATA</translation>
     </message>
     <message>
-      <source>NOT A CAMERA</source>
-      <translation>INTE EN KAMERA</translation>
-    </message>
-    <message>
       <source>DISABLED</source>
       <translation>INAKTIVERAD</translation>
-    </message>
-    <message>
-      <source>OFFLINE</source>
-      <translation>FRÅNKOPPLAD</translation>
-    </message>
-    <message>
-      <source>NO EXPORT PERMISSION</source>
-      <translation>INGET EXPORTTILLSTÅND</translation>
     </message>
   </context>
   <context>
@@ -9357,10 +8888,6 @@ Kom ihåg att returnera loggnivån till dess standardinställning när du har sa
       <translation>Klient</translation>
     </message>
     <message>
-      <source>None</source>
-      <translation>Inget</translation>
-    </message>
-    <message>
       <source>Error</source>
       <translation>Fel</translation>
     </message>
@@ -9391,6 +8918,10 @@ Kom ihåg att returnera loggnivån till dess standardinställning när du har sa
     <message>
       <source>Logging level degrades performance</source>
       <translation>Loggningsnivå försämrar prestanda</translation>
+    </message>
+    <message>
+      <source>&lt;None&gt;</source>
+      <translation type="unfinished">&lt;None&gt;</translation>
     </message>
   </context>
   <context>
@@ -10239,18 +9770,7 @@ Du kan tvinga rörelsedetektering, men det kan leda till en betydande ökning av
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::NotificationActionHandler</name>
-    <message>
-      <source>Unable to acknowledge event on removed camera.</source>
-      <translation>Det går inte att bekräfta händelsen på den borttagna kameran.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
-    <message>
-      <source>Alarm: %1</source>
-      <translation>Larm: %1</translation>
-    </message>
     <message>
       <source>Acknowledge</source>
       <translation>Bekräfta</translation>
@@ -10282,10 +9802,6 @@ Du kan tvinga rörelsedetektering, men det kan leda till en betydande ökning av
       <translation>Notifications d'événements</translation>
     </message>
     <message>
-      <source>System Notifications</source>
-      <translation>Systemnotiser</translation>
-    </message>
-    <message>
       <source>Choose Types...</source>
       <translation>Välj typer...</translation>
     </message>
@@ -10299,6 +9815,10 @@ Du kan tvinga rörelsedetektering, men det kan leda till en betydande ökning av
         <numerusform>%n aviseringstyper</numerusform>
         <numerusform>%n aviseringstyper</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Site Notifications</source>
+      <translation type="unfinished">Site Notifications</translation>
     </message>
   </context>
   <context>
@@ -10324,45 +9844,10 @@ Du kan tvinga rörelsedetektering, men det kan leda till en betydande ökning av
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
-    <message>
-      <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation>Ingen av de valda användare har tillgång till den valda layouten. Åtgärden fungerar inte.</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Välj layout...</translation>
-    </message>
-    <message>
-      <source>None of selected user roles contain users. Action will not work.</source>
-      <translation>Ingen av de valda användargrupperna innehåller användare. Åtgärden fungerar inte.</translation>
-    </message>
-    <message>
-      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation>Vissa användare har inte tillgång till den valda layouten. Åtgärden fungerar inte för dem.</translation>
-    </message>
-    <message>
-      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation>Letar du efter en lokal layout? Välj endast en användare från listan &quot;Visa till&quot; för att visa deras lokala layouter som ett alternativ här.</translation>
-    </message>
-    <message>
-      <source>Local layouts can only be shown to their owners</source>
-      <translation>Lokala layouter kan bara visas för sina ägare</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
     <message>
       <source>Not supported</source>
       <translation>Stöds inte</translation>
-    </message>
-    <message>
-      <source>This tab will be available in future versions</source>
-      <translation>Den här fliken kommer att finnas tillgänglig i framtida versioner</translation>
-    </message>
-    <message>
-      <source>Learn more</source>
-      <translation>Lär dig mer</translation>
     </message>
   </context>
   <context>
@@ -10543,33 +10028,6 @@ Du kan tvinga rörelsedetektering, men det kan leda till en betydande ökning av
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>%1 Settings</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>%1 Inställningar</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n symbols over</source>
-      <translation>
-        <numerusform>%n symboler över</numerusform>
-        <numerusform>%n symboler över</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n symbols left</source>
-      <translation>
-        <numerusform>%n symboler kvar</numerusform>
-        <numerusform>%n symboler kvar</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Platsen är inte ansluten till %1. Mobilaviseringar fungerar bara när sajten är ansluten till %1.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::QnWebpageDialog</name>
     <message>
       <source>Name</source>
@@ -10725,69 +10183,6 @@ Du kan tvinga rörelsedetektering, men det kan leda till en betydande ökning av
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::RecordingStatusHelper</name>
-    <message>
-      <source>Not recording</source>
-      <translation>Spelar inte in</translation>
-    </message>
-    <message>
-      <source>Recording everything</source>
-      <translation>Spelar in allt</translation>
-    </message>
-    <message>
-      <source>Recording motion only</source>
-      <translation>Endast rörelseinspelning</translation>
-    </message>
-    <message>
-      <source>Recording motion and low quality</source>
-      <translation>Inspelningsrörelse och låg kvalitet</translation>
-    </message>
-    <message>
-      <source>Continuous</source>
-      <translation>Kontinuerlig</translation>
-    </message>
-    <message>
-      <source>Motion only</source>
-      <translation>Endast rörelse</translation>
-    </message>
-    <message>
-      <source>Motion + Lo-Res</source>
-      <translation>Rörelse + Låg uppl</translation>
-    </message>
-    <message>
-      <source>Recording motion and objects</source>
-      <translation>Inspelning av rörelse och objekt</translation>
-    </message>
-    <message>
-      <source>Recording objects only</source>
-      <translation>Endast inspelning av objekt</translation>
-    </message>
-    <message>
-      <source>Recording motion, objects and low quality</source>
-      <translation>Inspelning rörelse, objekt och låg kvalitet</translation>
-    </message>
-    <message>
-      <source>Recording objects and low quality</source>
-      <translation>Inspelning av objekt och låg kvalitet</translation>
-    </message>
-    <message>
-      <source>Motion, Objects</source>
-      <translation>Rörelse, Objekt</translation>
-    </message>
-    <message>
-      <source>Objects only</source>
-      <translation>Endast objekt</translation>
-    </message>
-    <message>
-      <source>Motion, Objects + Lo-Res</source>
-      <translation>Rörelse, Objekt + Låg-Res</translation>
-    </message>
-    <message>
-      <source>Objects + Lo-Res</source>
-      <translation>Objekt + Lågupplöst</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
     <message>
       <source>%1 layout</source>
@@ -10933,10 +10328,6 @@ Du kan tvinga rörelsedetektering, men det kan leda till en betydande ökning av
       <translation>Kvalitetsinställningen bestämmer endast kompressionshastigheten och påverkar inte upplösningen. Låg, Medium, Hög och Bäst är förinställda bithastighetsvärden.</translation>
     </message>
     <message>
-      <source>Mbit/s</source>
-      <translation>Mbit / s</translation>
-    </message>
-    <message>
       <source>Less Settings</source>
       <translation>Mindre inställningar</translation>
     </message>
@@ -11076,6 +10467,11 @@ Du kan fortfarande ändra kvalitet och FPS direkt på kameran.</translation>
 You can still change quality and FPS directly on the camera.</source>
       <translation>Kvalitets- och FPS-inställningar är inaktiverade på grund av &quot;Tillåt optimering av kamerainställningar&quot; i &quot;Site Administration&quot; dialogrutan.
 Du kan fortfarande ändra kvalitet och FPS direkt på kameran.</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <comment>Megabits per seconds</comment>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -11579,13 +10975,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
-    <message>
-      <source>Go to Live</source>
-      <translation>Gå till realtid</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>
@@ -11630,6 +11019,27 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>Open Services</source>
       <translation>Öppna tjänster</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -12868,16 +12278,20 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Det går inte att lägga till resursen i layouten</translation>
     </message>
     <message>
-      <source>Cannot find a widget corresponding to the specified item.</source>
-      <translation>Kan inte hitta en widget som motsvarar det angivna objektet.</translation>
-    </message>
-    <message>
       <source>Cannot find an item with the specified ID</source>
       <translation>Kan inte hitta ett objekt med det angivna ID</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified ID.</source>
       <translation>Kan inte hitta en resurs med angivet ID.</translation>
+    </message>
+    <message>
+      <source>Cannot find a widget corresponding to the specified item</source>
+      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+    </message>
+    <message>
+      <source>Cannot maximize the item</source>
+      <translation type="unfinished">Cannot maximize the item</translation>
     </message>
   </context>
   <context>
@@ -13069,6 +12483,32 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Token</source>
       <translation>Token</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
+    <message>
+      <source>No custom headers</source>
+      <translation type="unfinished">No custom headers</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n custom headers</source>
+      <comment>%n is a number of custom headers</comment>
+      <translation type="unfinished">
+        <numerusform>%n custom headers</numerusform>
+        <numerusform>%n custom headers</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::KeyValueModel</name>
+    <message>
+      <source>Key</source>
+      <translation type="unfinished">Key</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>Värde</translation>
     </message>
   </context>
   <context>
@@ -13321,71 +12761,10 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Analytics events can be set up on a certain cameras.</source>
-      <translation>Analys-händelser kan ställas in på vissa kameror.</translation>
-    </message>
-    <message>
-      <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Välj kameror med knappen ovan för att se listan över händelser som stöds.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Händelsen utlöses endast om det finns matchningar i källan med något av de angivna sökorden.</translation>
-    </message>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Om fältet är tomt kommer händelsen alltid att trigga.</translation>
-    </message>
-    <message>
-      <source>This field is case sensitive.</source>
-      <translation>Det här fältet är skiftlägeskänsligt.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Händelsen utlöses endast om det finns matchningar i beskrivningen med något av de angivna sökorden.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Analytics object detection can be set up on a certain cameras.</source>
-      <translation>Analys-händelser kan ställas in på vissa kameror.</translation>
-    </message>
-    <message>
-      <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Välj kameror med knappen ovan för att se listan över händelser som stöds.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation>Händelse utlöses endast om det finns matchningar av något av attributen. Du kan se namnen på attributen och deras värden på fliken Objekt.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation>Någon plugin</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Händelsen utlöses endast om det finns matchningar i rubriken med något av de angivna sökorden.</translation>
-    </message>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Om fältet är tomt kommer händelsen alltid att trigga.</translation>
-    </message>
-    <message>
-      <source>This field is case sensitive.</source>
-      <translation>Det här fältet är skiftlägeskänsligt.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Händelsen utlöses endast om det finns matchningar i beskrivningen med något av de angivna sökorden.</translation>
     </message>
   </context>
   <context>

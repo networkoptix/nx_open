@@ -994,6 +994,10 @@
       <source>None of selected user roles contain users</source>
       <translation>Tidak ada peran user yang dipilih yang berisi users</translation>
     </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>Pilih setidaknya satu pengguna</translation>
+    </message>
   </context>
   <context>
     <name>QnTimeStrings</name>
@@ -1231,17 +1235,6 @@
     </message>
   </context>
   <context>
-    <name>QnTranscoder</name>
-    <message>
-      <source>OpenCLTranscode is not implemented.</source>
-      <translation>OpenCLTranscode tidak diterapkan.</translation>
-    </message>
-    <message>
-      <source>Unknown transcode method</source>
-      <translation>Metode transkode tidak diketahui</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserResource</name>
     <message>
       <source>Custom</source>
@@ -1395,334 +1388,6 @@
   <context>
     <name>nx::vms::common::SystemSettings</name>
     <message>
-      <source>Anonymous statistics report allowed</source>
-      <translation>Laporan statistik anonim diperbolehkan</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last time</source>
-      <translation>Laporan statistik anonim terakhir kali</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last version</source>
-      <translation>Statistik anonim melaporkan versi terakhir</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last number</source>
-      <translation>Statistik anonim melaporkan nomor terakhir</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics time cycle</source>
-      <translation>Siklus waktu statistik anonim</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report delay after update</source>
-      <translation>Statistik anonim melaporkan penundaan setelah update</translation>
-    </message>
-    <message>
-      <source>Anonymous Statistics Report Server URL</source>
-      <translation>URL Server Laporan Statistik Anonim</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report Client settings</source>
-      <translation>Statistik anonim melaporkan pengaturan Klien</translation>
-    </message>
-    <message>
-      <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation>Batas waktu koneksi proxy habis (detik, 1 detik-1 jam)</translation>
-    </message>
-    <message>
-      <source>Time synchronization enabled</source>
-      <translation>Sinkronisasi waktu diaktifkan</translation>
-    </message>
-    <message>
-      <source>Primary time synchronization Server ID</source>
-      <translation>ID Server sinkronisasi waktu primer</translation>
-    </message>
-    <message>
-      <source>Max difference between local and source time (milliseconds)</source>
-      <translation>Perbedaan maksimal antara waktu lokal dan waktu sumber (milidetik)</translation>
-    </message>
-    <message>
-      <source>OS time change check period</source>
-      <translation>Periode pemeriksaan perubahan waktu OS</translation>
-    </message>
-    <message>
-      <source>Sync time synchronization interval for network requests</source>
-      <translation>Interval sinkronisasi waktu sinkronisasi untuk permintaan jaringan</translation>
-    </message>
-    <message>
-      <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation>Sinkronkan waktu epsilon. Nilai baru tidak diterapkan jika delta waktu lebih kecil dari epsilon</translation>
-    </message>
-    <message>
-      <source>Cloud owner account</source>
-      <translation>Akun pemilik cloud</translation>
-    </message>
-    <message>
-      <source>Cloud authorization key</source>
-      <translation>Kunci otorisasi cloud</translation>
-    </message>
-    <message>
-      <source>Disable Device vendors</source>
-      <translation>Nonaktifkan vendor Perangkat</translation>
-    </message>
-    <message>
-      <source>Optimize Camera settings</source>
-      <translation>Optimalkan pengaturan Kamera</translation>
-    </message>
-    <message>
-      <source>Thumbnails auto-update</source>
-      <translation>Pembaruan otomatis thumbnail</translation>
-    </message>
-    <message>
-      <source>Max scene items (0 means default)</source>
-      <translation>Item scene maksimal (0 berarti default)</translation>
-    </message>
-    <message>
-      <source>Send plain-text emails</source>
-      <translation>Kirim email teks biasa</translation>
-    </message>
-    <message>
-      <source>Use Windows line feed in emails</source>
-      <translation>Gunakan feed baris Windows dalam email</translation>
-    </message>
-    <message>
-      <source>Enable audit trail</source>
-      <translation>Enable audit trail</translation>
-    </message>
-    <message>
-      <source>Audit trail period (days, 14-730)</source>
-      <translation>Periode audit trail (hari, 14-730)</translation>
-    </message>
-    <message>
-      <source>Event log period (days)</source>
-      <translation>Periode event log (hari)</translation>
-    </message>
-    <message>
-      <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation>Menerapkan HTTPS (enkripsi trafik data)</translation>
-    </message>
-    <message>
-      <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation>Menerapkan RTSPS (enkripsi trafik video)</translation>
-    </message>
-    <message>
-      <source>Enable auto-discovery</source>
-      <translation>Aktifkan penemuan otomatis</translation>
-    </message>
-    <message>
-      <source>Enable auto-update notifications</source>
-      <translation>Aktifkan notifikasi update otomatis</translation>
-    </message>
-    <message>
-      <source>Enable update notifications</source>
-      <translation>Aktifkan notifikasi update</translation>
-    </message>
-    <message>
-      <source>Enable UPNP port-mapping</source>
-      <translation>Aktifkan pemetaan port UPNP</translation>
-    </message>
-    <message>
-      <source>Backup settings</source>
-      <translation>Pengaturan Backup</translation>
-    </message>
-    <message>
-      <source>Cloud host override</source>
-      <translation>Penggantian host cloud</translation>
-    </message>
-    <message>
-      <source>Enable RTSP for Arecont</source>
-      <translation>Aktifkan RTSP untuk Arecont</translation>
-    </message>
-    <message>
-      <source>Enable sequential Flir ONVIF searcher</source>
-      <translation>Aktifkan pencari Flir ONVIF berurutan</translation>
-    </message>
-    <message>
-      <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation>Ukuran antrean P2P maks (byte, 32-512MB)</translation>
-    </message>
-    <message>
-      <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation>Maks P2P semua ukuran klien (byte, 32-512MB)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation>Ukuran antrean rekaman maksimal (byte, 6-96MB)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (elements, 250-4000)</source>
-      <translation>Ukuran antrian rekaman maksimal (elemen, 250-4000)</translation>
-    </message>
-    <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>Batas waktu RTP (milidetik)</translation>
-    </message>
-    <message>
-      <source>Max RTSP connection duration (seconds)</source>
-      <translation>Durasi koneksi RTSP maks (detik)</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect UDP hole-punching</source>
-      <translation>Aktifkan hole-punching UDP koneksi cloud</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect relays usage</source>
-      <translation>Aktifkan penggunaan relai koneksi cloud</translation>
-    </message>
-    <message>
-      <source>Enforce SSL for cloud-connect relays</source>
-      <translation>Terapkan SSL untuk relai koneksi cloud</translation>
-    </message>
-    <message>
-      <source>Enable recording on EDGE</source>
-      <translation>Aktifkan perekaman di EDGE</translation>
-    </message>
-    <message>
-      <source>Target update information</source>
-      <translation>Informasi update target</translation>
-    </message>
-    <message>
-      <source>Installed update information</source>
-      <translation>Informasi update yang diinstal</translation>
-    </message>
-    <message>
-      <source>Downloader peers for files</source>
-      <translation>Download peers untuk file</translation>
-    </message>
-    <message>
-      <source>Client update settings</source>
-      <translation>Pengaturan update Klien</translation>
-    </message>
-    <message>
-      <source>Watermark settings</source>
-      <translation>Pengaturan watermark</translation>
-    </message>
-    <message>
-      <source>Session token count limit on a single Server</source>
-      <translation>Batas jumlah token sesi pada satu Server</translation>
-    </message>
-    <message>
-      <source>Max session token count per user on single Server</source>
-      <translation>Jumlah token sesi maksimum per pengguna di satu Server</translation>
-    </message>
-    <message>
-      <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation>Interval update untuk cache token sesi remote (Server dan Cloud lain)</translation>
-    </message>
-    <message>
-      <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation>Batas waktu untuk cache token sesi remote (Server dan Cloud lain)</translation>
-    </message>
-    <message>
-      <source>Default video codec</source>
-      <translation>Default video codec</translation>
-    </message>
-    <message>
-      <source>Default codec for export video</source>
-      <translation>Codec default untuk mengekspor video</translation>
-    </message>
-    <message>
-      <source>Low quality screen video codec</source>
-      <translation>Codec video layar berkualitas rendah</translation>
-    </message>
-    <message>
-      <source>License server</source>
-      <translation>Lisensi server</translation>
-    </message>
-    <message>
-      <source>URI for resource_data.json automatic update</source>
-      <translation>URI untuk update otomatis resource_data.json</translation>
-    </message>
-    <message>
-      <source>Meta data storage change policy</source>
-      <translation>Kebijakan perubahan penyimpanan meta data</translation>
-    </message>
-    <message>
-      <source>Persistent Servers for update storage</source>
-      <translation>Server Persisten untuk penyimpanan update</translation>
-    </message>
-    <message>
-      <source>Persistent Servers where updates are stored</source>
-      <translation>Server Persisten tempat update disimpan</translation>
-    </message>
-    <message>
-      <source>VMS Server version specific features</source>
-      <translation>Fitur khusus versi Server VMS</translation>
-    </message>
-    <message>
-      <source>Additional local FS storage types for recording</source>
-      <translation>Jenis penyimpanan FS lokal tambahan untuk perekaman</translation>
-    </message>
-    <message>
-      <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation>Paksa izin titik pemasangan penyimpanan DB analitik jika terjadi kegagalan</translation>
-    </message>
-    <message>
-      <source>Storage encryption enabled</source>
-      <translation>Enkripsi penyimpanan diaktifkan</translation>
-    </message>
-    <message>
-      <source>Current storage encryption key</source>
-      <translation>Kunci enkripsi penyimpanan saat ini</translation>
-    </message>
-    <message>
-      <source>HTTP header: Origin</source>
-      <translation>Header HTTP: Asal</translation>
-    </message>
-    <message>
-      <source>HTTP header: X-Frame-Options</source>
-      <translation>Header HTTP: Opsi X-Frame</translation>
-    </message>
-    <message>
-      <source>Show mouse timeline preview</source>
-      <translation>Tampilkan preview timeline mouse</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4MB)</source>
-      <translation>Ukuran buffer media (KB, 10KB-4MB)</translation>
-    </message>
-    <message>
-      <source>Enable cross-domain policy</source>
-      <translation>Aktifkan kebijakan lintas domain</translation>
-    </message>
-    <message>
-      <source>Enable WebSocket for P2P</source>
-      <translation>Aktifkan WebSocket untuk P2P</translation>
-    </message>
-    <message>
-      <source>Show Servers in the Resource Tree for non-admins</source>
-      <translation>Tampilkan Server di Resource Tree untuk non-admin</translation>
-    </message>
-    <message>
-      <source>Use only HTTPS for cameras</source>
-      <translation>Gunakan hanya HTTPS untuk kamera</translation>
-    </message>
-    <message>
-      <source>Expose IP addresses for autodiscovery</source>
-      <translation>Paparkan alamat IP untuk penemuan otomatis</translation>
-    </message>
-    <message>
-      <source>Keep IO port state on when Server connects to the device</source>
-      <translation>Tetap aktifkan status port IO saat Server terkoneksi ke perangkat</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation>Ukuran buffer media untuk perangkat audio saja (KB, 1KB-1MB)</translation>
-    </message>
-    <message>
-      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation>Mengekspos kata sandi perangkat yang disimpan di VMS untuk administrator (untuk halaman web)</translation>
-    </message>
-    <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation>Jumlah thread maksimum untuk sinkronisasi archive remote (&lt;=0 - otomatis, maks 32)</translation>
-    </message>
-    <message>
-      <source>Thread count limit for camera archive synchronization</source>
-      <translation>Batas jumlah thread untuk sinkronisasi archive kamera</translation>
-    </message>
-    <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
       <translation>Catatan event log maksimum untuk disimpan ke dalam database. Jumlah sebenarnya dari catatan yang tidak terhapus mungkin lebih tinggi hingga 20% dari nilai yang ditentukan.</translation>
     </message>
@@ -1735,32 +1400,8 @@
       <translation>Jumlah maksimum koneksi HTTP menggunakan transcoding untuk Server. Chrome membuka 2 koneksi sekaligus, lalu menutup koneksi pertama. Kami merekomendasikan pengaturan nilai parameter&apos;s ini ke 2 atau lebih.</translation>
     </message>
     <message>
-      <source>Update releases.json file URL</source>
-      <translation>Update URL file rilis.json</translation>
-    </message>
-    <message>
-      <source>LDAP settings</source>
-      <translation>Pengaturan LDAP</translation>
-    </message>
-    <message>
-      <source>SMTP settings</source>
-      <translation>Pengaturan SMTP</translation>
-    </message>
-    <message>
-      <source>Authorization Session token lifetime (seconds)</source>
-      <translation>Masa pakai token Sesi Otorisasi (detik)</translation>
-    </message>
-    <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
       <translation>Daftar Server yang dipisahkan titik koma yang ditujukan untuk terhubung ke Cloud. Server di urutan teratas memiliki prioritas lebih tinggi. Jika daftarnya kosong, Server untuk koneksi Cloud dipilih secara otomatis.</translation>
-    </message>
-    <message>
-      <source>Allow Power User editing Security Settings</source>
-      <translation>Izinkan Power User mengedit Pengaturan Keamanan</translation>
-    </message>
-    <message>
-      <source>Enable deprecated API functions (insecure)</source>
-      <translation>Aktifkan fungsi API yang tidak digunakan lagi (tidak aman)</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
@@ -1772,778 +1413,436 @@
       <translation>Aktifkan fungsi API yang tidak digunakan lagi yang saat ini digunakan oleh software %1 (tidak aman)</translation>
     </message>
     <message>
-      <source>Organization Id</source>
-      <translation>Id Organisasi</translation>
-    </message>
-    <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
       <translation>Interval antara HTTP requests polling Cloud untuk mensinkronkan data.</translation>
-    </message>
-    <message>
-      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
-      <translation>Header HTTP: Server, variabel yang didukung: $vmsName, $vmsVersion, $company, $compatibility</translation>
-    </message>
-    <message>
-      <source>Device storage information update interval</source>
-      <translation>Interval pembaruan informasi penyimpanan perangkat</translation>
-    </message>
-    <message>
-      <source>Site alive update interval (seconds, 1s-1h)</source>
-      <translation>Interval update site aktif (seconds, 1s-1h)</translation>
-    </message>
-    <message>
-      <source>Proxy connection access policy</source>
-      <translation>Kebijakan akses koneksi proxy</translation>
-    </message>
-    <message>
-      <source>Cloud Site ID</source>
-      <translation>ID Site Cloud</translation>
-    </message>
-    <message>
-      <source>Enable 2FA for the Site</source>
-      <translation>Aktifkan 2FA untuk Site</translation>
-    </message>
-    <message>
-      <source>Site name</source>
-      <translation>Nama Site</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
       <translation>ID Site Lokal, null berarti Site belum diset up.</translation>
     </message>
     <message>
-      <source>Last master Site merge ID</source>
-      <translation>Penggabungan ID Site Master Terakhir</translation>
-    </message>
-    <message>
-      <source>Last slave Site merge ID</source>
-      <translation>ID Penggabungan Site slave terakhir</translation>
-    </message>
-    <message>
-      <source>Pixelation settings</source>
-      <translation>Pengaturan pikselasi</translation>
-    </message>
-    <message>
-      <source>Apply session limit for Cloud tokens</source>
-      <translation>Terapkan batas sesi untuk token Cloud</translation>
-    </message>
-    <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
       <translation>Mengaktifkan atau menonaktifkan pembuatan permintaan pendaftaran Integrasi baru</translation>
     </message>
     <message>
-      <source>Anonymous Crash Report Server API URL</source>
-      <translation>Anonim Laporan Crash URL API Server</translation>
+      <source>SMTP settings.</source>
+      <translation>Pengaturan SMTP.</translation>
     </message>
     <message>
-      <source>Default locale for new users</source>
-      <translation>Lokal default untuk user baru</translation>
+      <source>Anonymous statistics report allowed.</source>
+      <translation>Laporan statistik anonim diperbolehkan.</translation>
     </message>
     <message>
-      <source>Check video stream permissions on VMS server period (milliseconds)</source>
-      <translation>Periksa izin stream video pada periode server VMS (milidetik)</translation>
+      <source>Anonymous statistics report last time.</source>
+      <translation>Laporan statistik anonim terakhir kali.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::event::StringsHelper</name>
     <message>
-      <source>Bookmark</source>
-      <translation>Bookmark</translation>
+      <source>Anonymous statistics report last version.</source>
+      <translation>Statistik anonim melaporkan versi terakhir.</translation>
     </message>
     <message>
-      <source>Panic recording</source>
-      <translation>Rekaman panik</translation>
+      <source>Anonymous statistics report last number.</source>
+      <translation>Statistik anonim melaporkan nomor terakhir.</translation>
     </message>
     <message>
-      <source>Write to log</source>
-      <translation>Tulis ke log</translation>
+      <source>Anonymous statistics time cycle.</source>
+      <translation>Siklus waktu statistik anonim.</translation>
     </message>
     <message>
-      <source>Repeat sound</source>
-      <translation>Ulangi suara</translation>
+      <source>Anonymous statistics report delay after update.</source>
+      <translation>Statistik anonim melaporkan penundaan setelah update.</translation>
     </message>
     <message>
-      <source>Play sound</source>
-      <translation>Memainkan suara</translation>
+      <source>Anonymous Statistics Report Server URL.</source>
+      <translation>URL Server Laporan Statistik Anonim.</translation>
     </message>
     <message>
-      <source>Speak</source>
-      <translation>Bicara</translation>
+      <source>Anonymous Crash Report Server API URL.</source>
+      <translation>Anonim Laporan Crash URL API Server.</translation>
     </message>
     <message>
-      <source>Execute PTZ preset</source>
-      <translation>Jalankan preset PTZ</translation>
+      <source>Anonymous statistics report Client settings.</source>
+      <translation>Statistik anonim melaporkan pengaturan Klien.</translation>
     </message>
     <message>
-      <source>Show text overlay</source>
-      <translation>Tampilkan text overlay</translation>
+      <source>Device storage information update interval.</source>
+      <translation>Interval pembaruan informasi penyimpanan perangkat.</translation>
     </message>
     <message>
-      <source>Show on Alarm Layout</source>
-      <translation>Tampilkan di Layout Alarm</translation>
+      <source>Site alive update interval (seconds, 1s-1h).</source>
+      <translation>Interval update site aktif (seconds, 1s-1h).</translation>
     </message>
     <message>
-      <source>Device output</source>
-      <translation>Output perangkat</translation>
+      <source>Proxy connection timeout (seconds, 1s-1h).</source>
+      <translation>Batas waktu koneksi proxy habis (detik, 1 detik-1 jam).</translation>
     </message>
     <message>
-      <source>Camera output</source>
-      <translation>Output kamera</translation>
+      <source>Proxy connection access policy.</source>
+      <translation>Kebijakan akses koneksi proxy.</translation>
     </message>
     <message>
-      <source>Device recording</source>
-      <translation>Rekaman perangkat</translation>
+      <source>Time synchronization enabled.</source>
+      <translation>Sinkronisasi waktu diaktifkan.</translation>
     </message>
     <message>
-      <source>Camera recording</source>
-      <translation>Rekaman kamera</translation>
+      <source>Primary time synchronization Server ID.</source>
+      <translation>ID Server sinkronisasi waktu primer.</translation>
     </message>
     <message>
-      <source>Generic Event</source>
-      <translation>Event generik</translation>
+      <source>Max difference between local and source time (milliseconds).</source>
+      <translation>Perbedaan maksimal antara waktu lokal dan waktu sumber (milidetik).</translation>
     </message>
-    <message numerus="yes">
-      <source>Motion on Cameras</source>
-      <translation>
-        <numerusform>Gerakan pada Kamera</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Network Issue</source>
-      <translation>Masalah Jaringan</translation>
-    </message>
-    <message>
-      <source>Server Failure</source>
-      <translation>Kegagalan Server</translation>
-    </message>
-    <message>
-      <source>Server Conflict</source>
-      <translation>Konflik Server</translation>
-    </message>
-    <message>
-      <source>Server Started</source>
-      <translation>Server Dimulai</translation>
-    </message>
-    <message>
-      <source>License Issue</source>
-      <translation>Isu Lisensi</translation>
-    </message>
-    <message>
-      <source>Any Server Issue</source>
-      <translation>Masalah Server Apa Pun</translation>
-    </message>
-    <message>
-      <source>Any Event</source>
-      <translation>Event apa pun</translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Devices</source>
-      <translation>
-        <numerusform>Sinyal Input pada Perangkat</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Cameras</source>
-      <translation>
-        <numerusform>Sinyal Input pada Kamera</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices Disconnected</source>
-      <translation>
-        <numerusform>Perangkat Tidak Terkoneksi</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras Disconnected</source>
-      <translation>
-        <numerusform>Kamera Tidak Terkoneksi</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices IP Conflict</source>
-      <translation>
-        <numerusform>Konflik IP Perangkat</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras IP Conflict</source>
-      <translation>
-        <numerusform>Konflik IP Kamera</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Any Device Issue</source>
-      <translation>Masalah Perangkat Apa Pun</translation>
-    </message>
-    <message>
-      <source>Any Camera Issue</source>
-      <translation>Masalah Kamera Apa Pun</translation>
-    </message>
-    <message>
-      <source>Undefined event has occurred on %1</source>
-      <translation>Event yang tidak ditentukan telah terjadi pada %1</translation>
-    </message>
-    <message>
-      <source>Device %1 was disconnected</source>
-      <translation>Perangkat %1 tidak terkoneksi</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>Kamera %1 tidak terkoneksi</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>Modul I/O %1 tidak terkoneksi</translation>
-    </message>
-    <message>
-      <source>Input on %1</source>
-      <translation>Input pada %1</translation>
-    </message>
-    <message>
-      <source>Motion on %1</source>
-      <translation>Gerakan pada %1</translation>
-    </message>
-    <message>
-      <source>Network Issue at %1</source>
-      <translation>Masalah Jaringan di %1</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation>Server &quot;%1&quot; Gagal</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict at %1</source>
-      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Konflik IP Perangkat di %1</translation>
-    </message>
-    <message>
-      <source>Camera IP Conflict at %1</source>
-      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Konflik IP Kamera pada %1</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation>Server &quot;%1&quot; Konflik</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation>Server &quot;%1&quot; Dimulai</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>Server &quot;%1&quot; mempunyai masalah lisensi</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>Server &quot;%1&quot; telah menyelesaikan backup archive</translation>
-    </message>
     <message>
-      <source>Generic Event at %1</source>
-      <translation>Event generik di %1</translation>
+      <source>OS time change check period.</source>
+      <translation>Periode pemeriksaan perubahan waktu OS.</translation>
     </message>
     <message>
-      <source>An unknown event has occurred</source>
-      <translation>Event yang tidak diketahui telah terjadi</translation>
+      <source>Sync time synchronization interval for network requests.</source>
+      <translation>Interval sinkronisasi waktu sinkronisasi untuk permintaan jaringan.</translation>
     </message>
     <message>
-      <source>Event: %1</source>
-      <translation>Event: %1</translation>
+      <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
+      <translation>Sinkronkan waktu epsilon. Nilai baru tidak diterapkan jika delta waktu lebih kecil dari epsilon.</translation>
     </message>
     <message>
-      <source>Source: %1</source>
-      <translation>Source: %1</translation>
+      <source>Cloud owner account.</source>
+      <translation>Akun pemilik Cloud.</translation>
     </message>
     <message>
-      <source>Caption: %1</source>
-      <translation>Keterangan: %1</translation>
+      <source>Organization Id.</source>
+      <translation>Id Organisasi.</translation>
     </message>
     <message>
-      <source>Input Port: %1</source>
-      <translation>Port Input: %1</translation>
+      <source>Cloud Site ID.</source>
+      <translation>ID Site Cloud.</translation>
     </message>
     <message>
-      <source>Reason: %1</source>
-      <translation>Alasan: %1</translation>
+      <source>Cloud authorization key.</source>
+      <translation>Kunci otorisasi cloud.</translation>
     </message>
     <message>
-      <source>Conflicting Address: %1</source>
-      <translation>Alamat Konflik: %1</translation>
+      <source>Enable 2FA for the Site.</source>
+      <translation>Aktifkan 2FA untuk Site.</translation>
     </message>
     <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2</translation>
+      <source>Site name.</source>
+      <translation>Nama Site.</translation>
     </message>
     <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Server Konflik #%1: %2</translation>
+      <source>Last master Site merge ID.</source>
+      <translation>Penggabungan ID Site Master Terakhir.</translation>
     </message>
     <message>
-      <source>Conflicting Server: %1</source>
-      <translation>Server Konflik: %1</translation>
+      <source>Last slave Site merge ID.</source>
+      <translation>ID Penggabungan Site slave terakhir.</translation>
     </message>
     <message>
-      <source>Trigger: %1</source>
-      <translation>Trigger: %1</translation>
+      <source>Disable Device vendors.</source>
+      <translation>Nonaktifkan vendor Perangkat.</translation>
     </message>
     <message>
-      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <source>Optimize Camera settings.</source>
+      <translation>Optimalkan pengaturan Kamera.</translation>
     </message>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n kali, pertama: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>Waktu: %1 pada %2</translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>Kemunculan pertama: %1 pada %2 (%n kali total)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>Tidak ada data yang diterima selama %n detik terakhir.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected.</source>
-      <translation>Kehilangan paket RTP terdeteksi.</translation>
-    </message>
-    <message>
-      <source>Device does not respond to network requests.</source>
-      <translation>Perangkat tidak merespon permintaan jaringan.</translation>
-    </message>
-    <message>
-      <source>Connection to server is lost.</source>
-      <translation>Koneksi ke server terputus.</translation>
-    </message>
-    <message>
-      <source>Server stopped unexpectedly.</source>
-      <translation>Server berhenti tiba-tiba.</translation>
-    </message>
-    <message>
-      <source>I/O error has occurred at %1.</source>
-      <translation>Error I/O telah terjadi di %1.</translation>
-    </message>
-    <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>Kecepatan HDD/SSD tidak cukup untuk merekam ke %1.</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>Disk HDD/SSD &quot;%1&quot; penuh. Disk berisi terlalu banyak data yang tidak dikelola oleh VMS.</translation>
-    </message>
-    <message>
-      <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>Disk sistem &quot;%1&quot; hampir penuh.</translation>
-    </message>
-    <message>
-      <source>start</source>
-      <translation>mulai</translation>
-    </message>
-    <message>
-      <source>stop</source>
-      <translation>berhenti</translation>
-    </message>
-    <message>
-      <source>While %1</source>
-      <translation>Sementara %1</translation>
-    </message>
-    <message>
-      <source>On %1 %2</source>
-      <translation>Aktif %1 %2</translation>
-    </message>
-    <message>
-      <source>Trigger Name</source>
-      <translation>Nama Trigger</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n Pengguna</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>Semua Pengguna</translation>
-    </message>
-    <message>
-      <source>Select at least one user</source>
-      <translation>Pilih setidaknya satu pengguna</translation>
-    </message>
-    <message>
-      <source>Soft Trigger</source>
-      <translation>Soft Trigger</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 at %2</source>
-      <translation>Soft Trigger %1 pada %2</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation>Soft Trigger %1 telah diaktifkan beberapa kali</translation>
-    </message>
-    <message>
-      <source>Send email</source>
-      <translation>Kirim email</translation>
-    </message>
-    <message>
-      <source>Acknowledge</source>
-      <translation>Acknowledge</translation>
-    </message>
     <message>
-      <source>Analytics Event</source>
-      <translation>Event Analitik</translation>
+      <source>Thumbnails auto-update.</source>
+      <translation>Pembaruan otomatis thumbnail.</translation>
     </message>
     <message>
-      <source>%1 at %2</source>
-      <comment>Analytics Event at some camera</comment>
-      <translation>%1 pada %2</translation>
+      <source>Max scene items (0 means default).</source>
+      <translation>Item scene maksimal (0 berarti default).</translation>
     </message>
     <message>
-      <source>Storage Issue</source>
-      <translation>Masalah Penyimpanan</translation>
+      <source>Send plain-text emails.</source>
+      <translation>Kirim email teks biasa.</translation>
     </message>
     <message>
-      <source>Storage Issue at %1</source>
-      <translation>Masalah Penyimpanan di %1</translation>
+      <source>Use Windows line feed in emails.</source>
+      <translation>Gunakan feed baris Windows dalam email.</translation>
     </message>
     <message>
-      <source>Set to fullscreen</source>
-      <translation>Setel ke layar penuh</translation>
+      <source>Enable audit trail.</source>
+      <translation>Enable audit trail.</translation>
     </message>
     <message>
-      <source>Exit fullscreen</source>
-      <translation>Keluar dari layar penuh</translation>
+      <source>Audit trail period (days, 14-730).</source>
+      <translation>Periode audit trail (hari, 14-730).</translation>
     </message>
     <message>
-      <source>Open layout</source>
-      <translation>Buka layout</translation>
+      <source>Event log period (days).</source>
+      <translation>Periode log event (hari).</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>Beberapa event %1 telah terjadi</translation>
+      <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
+      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation>Penyimpanan analitik &quot;%1&quot; sedang offline.</translation>
+      <source>Enforce HTTPS (data traffic encryption).</source>
+      <translation>Menerapkan HTTPS (enkripsi trafik data).</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation>Penyimpanan analitik &quot;%1&quot; hampir penuh.</translation>
+      <source>Enforce RTSPS (video traffic encryption).</source>
+      <translation>Menerapkan RTSPS (enkripsi trafik video).</translation>
     </message>
     <message>
-      <source>Plugin Diagnostic Event</source>
-      <translation>Event Diagnostik Plugin</translation>
+      <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
+      <translation>Mengekspos kata sandi perangkat yang disimpan di VMS untuk administrator (untuk halaman web).</translation>
     </message>
     <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>Event Diagnostik Plugin Tidak Diketahui</translation>
+      <source>Enable auto-discovery.</source>
+      <translation>Aktifkan penemuan otomatis.</translation>
     </message>
     <message>
-      <source>Buzzer</source>
-      <translation>Buzzer</translation>
+      <source>Enable auto-update notifications.</source>
+      <translation>Aktifkan notifikasi update otomatis.</translation>
     </message>
     <message>
-      <source>Archive Backup Finished</source>
-      <translation>Backup Archive Selesai</translation>
+      <source>Enable update notifications.</source>
+      <translation>Aktifkan notifikasi update.</translation>
     </message>
     <message>
-      <source>PoE over Budget</source>
-      <translation>PoE melebihi Budget</translation>
+      <source>Enable UPNP port-mapping.</source>
+      <translation>Aktifkan pemetaan port UPNP.</translation>
     </message>
     <message>
-      <source>Fan Error</source>
-      <translation>Error Kipas</translation>
+      <source>Backup settings.</source>
+      <translation>Pengaturan Backup.</translation>
     </message>
     <message>
-      <source>PoE over budget at %1</source>
-      <translation>PoE melebihi budget pada %1</translation>
+      <source>Cloud host override.</source>
+      <translation>Penggantian host cloud.</translation>
     </message>
     <message>
-      <source>Fan error at %1</source>
-      <translation>Error kipas pada %1</translation>
+      <source>Enable cross-domain policy.</source>
+      <translation>Aktifkan kebijakan lintas domain.</translation>
     </message>
     <message>
-      <source>Reason: Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation>Alasan: Batas daya terlampaui (%1)</translation>
+      <source>Enable RTSP for Arecont.</source>
+      <translation>Aktifkan RTSP untuk Arecont.</translation>
     </message>
     <message>
-      <source>Show desktop notification</source>
-      <translation>Tampilkan notifikasi desktop</translation>
+      <source>Enable sequential Flir ONVIF searcher.</source>
+      <translation>Aktifkan pencari Flir ONVIF berurutan.</translation>
     </message>
     <message>
-      <source>Send mobile notification</source>
-      <translation>Kirim notifikasi seluler</translation>
+      <source>Max P2P queue size (bytes, 32-512MB).</source>
+      <translation>Ukuran antrean P2P maks (byte, 32-512MB).</translation>
     </message>
     <message>
-      <source>Consumption</source>
-      <translation>Konsumsi</translation>
+      <source>Max P2P all clients size (bytes, 32-512MB).</source>
+      <translation>Maks P2P semua ukuran klien (byte, 32-512MB).</translation>
     </message>
     <message>
-      <source>Device was disconnected</source>
-      <translation>Perangkat tidak terkoneksi</translation>
+      <source>Max record queue size (bytes, 6-96MB).</source>
+      <translation>Ukuran antrean rekaman maksimal (byte, 6-96MB).</translation>
     </message>
     <message>
-      <source>Camera was disconnected</source>
-      <translation>Kamera tidak terkoneksi</translation>
+      <source>Max record queue size (elements, 250-4000).</source>
+      <translation>Ukuran antrian rekaman maksimal (elemen, 250-4000).</translation>
     </message>
     <message>
-      <source>I/O Module was disconnected</source>
-      <translation>Modul I/O tidak terkoneksi</translation>
+      <source>RTP timeout (milliseconds).</source>
+      <translation>Batas waktu RTP (milidetik).</translation>
     </message>
     <message>
-      <source>Analytics Object Detected</source>
-      <translation>Objek Analitik Terdeteksi</translation>
+      <source>Max RTSP connection duration (seconds).</source>
+      <translation>Durasi koneksi RTSP maks (detik).</translation>
     </message>
     <message>
-      <source>%1 at camera &apos;%2&apos;</source>
-      <comment> is detected</comment>
-      <translation>%1 pada kamera &apos;%2&apos;</translation>
+      <source>Enable cloud-connect UDP hole-punching.</source>
+      <translation>Aktifkan hole-punching UDP koneksi cloud.</translation>
     </message>
     <message>
-      <source>Plugin: %1</source>
-      <translation>Plugin: %1</translation>
+      <source>Enable cloud-connect relays usage.</source>
+      <translation>Aktifkan penggunaan relai koneksi cloud.</translation>
     </message>
     <message>
-      <source>Archive backup failed.</source>
-      <translation>Backup archive gagal.</translation>
+      <source>Enforce SSL for cloud-connect relays.</source>
+      <translation>Terapkan SSL untuk relai koneksi cloud.</translation>
     </message>
     <message>
-      <source>Object detected</source>
-      <translation>Objek terdeteksi</translation>
+      <source>Enable recording on EDGE.</source>
+      <translation>Aktifkan perekaman di EDGE.</translation>
     </message>
     <message>
-      <source>Archive backup failed</source>
-      <translation>Backup archive gagal</translation>
+      <source>Enable WebSocket for P2P.</source>
+      <translation>Aktifkan WebSocket untuk P2P.</translation>
     </message>
     <message>
-      <source>Data is backed up to %1</source>
-      <translation>Data dibackup hingga %1</translation>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>
+      <translation>Jumlah thread maksimum untuk sinkronisasi archive remote (&lt;=0 - otomatis, maks 32).</translation>
     </message>
     <message>
-      <source>Server Certificate Error</source>
-      <translation>Error Sertifikat Server</translation>
+      <source>Update releases.json file URL.</source>
+      <translation>Update URL file rilis.json.</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; certificate error</source>
-      <translation>Server &quot;%1&quot; error sertifikat</translation>
+      <source>Target update information.</source>
+      <translation>Informasi update target.</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1).</source>
-      <translation>Error RTP di stream primer (%1).</translation>
+      <source>Installed update information.</source>
+      <translation>Informasi update yang diinstal.</translation>
     </message>
     <message>
-      <source>RTP error in secondary stream (%1).</source>
-      <translation>Error RTP di stream sekunder (%1).</translation>
+      <source>Downloader peers for files.</source>
+      <translation>Download peers untuk file.</translation>
     </message>
     <message>
-      <source>Camera time is back to normal.</source>
-      <translation>Waktu kamera kembali normal.</translation>
+      <source>Client update settings.</source>
+      <translation>Pengaturan update Klien.</translation>
     </message>
     <message>
-      <source>Address %1 is already in use by %2 on primary stream.</source>
-      <comment>%1 is the address, %2 is the device name</comment>
-      <translation>Alamat %1 sudah digunakan oleh %2 pada stream primer.</translation>
+      <source>Thread count limit for camera archive synchronization.</source>
+      <translation>Batas jumlah thread untuk sinkronisasi archive kamera.</translation>
     </message>
     <message>
-      <source>Address %1 is already in use by %2 on secondary stream.</source>
-      <comment>%1 is the address, %2 is the device name</comment>
-      <translation>Alamat %1 sudah digunakan oleh %2 pada stream sekunder.</translation>
+      <source>Watermark settings.</source>
+      <translation>Pengaturan watermark.</translation>
     </message>
     <message>
-      <source>Multicast address conflict detected.</source>
-      <translation>Konflik alamat multicast terdeteksi.</translation>
+      <source>Pixelation settings.</source>
+      <translation>Pengaturan pikselasi.</translation>
     </message>
     <message>
-      <source>Network address %1 is not a multicast address.</source>
-      <translation>Alamat network %1 bukan alamat multicast.</translation>
+      <source>Authorization Session token lifetime (seconds).</source>
+      <translation>Masa pakai token Sesi Otorisasi (detik).</translation>
     </message>
     <message>
-      <source>Failed to backup file %1</source>
-      <translation>Gagal membackup file %1</translation>
+      <source>Apply session limit for Cloud tokens.</source>
+      <translation>Terapkan batas sesi untuk token Cloud.</translation>
     </message>
     <message>
-      <source>Do HTTP(S) request</source>
-      <translation>Lakukan HTTP(S) request</translation>
+      <source>Session token count limit on a single Server.</source>
+      <translation>Batas jumlah token sesi pada satu Server.</translation>
     </message>
     <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>Koneksi ke kamera (stream primer) tiba-tiba terputus.</translation>
+      <source>Max session token count per user on single Server.</source>
+      <translation>Jumlah token sesi maksimum per pengguna di satu Server.</translation>
     </message>
     <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Koneksi ke kamera (stream sekunder) tiba-tiba terputus.</translation>
+      <source>Update interval for remote session token cache (other Servers and Cloud).</source>
+      <translation>Interval update untuk cache token sesi remote (Server dan Cloud lain).</translation>
     </message>
     <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>Koneksi ke perangkat tiba-tiba terputus.</translation>
+      <source>Timeout for remote session token cache (other Servers and Cloud).</source>
+      <translation>Batas waktu untuk cache token sesi remote (Server dan Cloud lain).</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation>Penyimpanan analitik &quot;%1&quot; error database: Izin tidak mencukupi pada titik pemasangan.</translation>
+      <source>Default video codec.</source>
+      <translation>Video codec default.</translation>
     </message>
     <message>
-      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation>Tidak dapat menginisialisasi enkripsi AES saat perekaman diaktifkan pada archive media. Data ditulis tidak terenkripsi.</translation>
+      <source>Default codec for export video.</source>
+      <translation>Codec default untuk mengekspor video.</translation>
     </message>
     <message>
-      <source>RAID error: %1.</source>
-      <translation>Error RAID: %1.</translation>
+      <source>Low quality screen video codec.</source>
+      <translation>Codec video layar berkualitas rendah.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation>Lisensi tidak cukup. Perekaman telah dinonaktifkan pada perangkat berikut:</translation>
+      <source>License server.</source>
+      <translation>Lisensi server.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation>Lisensi tidak cukup. Perekaman telah dinonaktifkan pada kamera berikut:</translation>
+      <source>URI for resource_data.json automatic update.</source>
+      <translation>URI untuk update otomatis resource_data.json.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation>Lisensi tidak cukup. Perekaman telah dinonaktifkan pada modul I/O berikut:</translation>
+      <source>Meta data storage change policy.</source>
+      <translation>Kebijakan perubahan penyimpanan meta data.</translation>
     </message>
     <message>
-      <source>Also show source camera</source>
-      <translation>Also show source camera</translation>
+      <source>Persistent Servers for update storage.</source>
+      <translation>Server Persisten untuk penyimpanan update.</translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Source camera</translation>
+      <source>Persistent Servers where updates are stored.</source>
+      <translation>Server Persisten tempat update disimpan.</translation>
     </message>
     <message>
-      <source>Also show on source camera</source>
-      <translation>Also show on source camera</translation>
+      <source>VMS Server version specific features.</source>
+      <translation>Fitur khusus versi Server VMS.</translation>
     </message>
     <message>
-      <source>Also set on source camera</source>
-      <translation>Juga disetel pada source kamera</translation>
+      <source>Default locale for new users.</source>
+      <translation>Lokal default untuk user baru.</translation>
     </message>
     <message>
-      <source>Also trigger on source camera</source>
-      <translation>Juga trigger pada source kamera</translation>
+      <source>Additional local FS storage types for recording.</source>
+      <translation>Jenis penyimpanan FS lokal tambahan untuk perekaman.</translation>
     </message>
     <message>
-      <source>Also record source camera</source>
-      <translation>Juga rekam source kamera</translation>
+      <source>Keep IO port state on when Server connects to the device.</source>
+      <translation>Tetap aktifkan status port IO saat Server terkoneksi ke perangkat.</translation>
     </message>
     <message>
-      <source>Also play on source camera</source>
-      <translation>Juga mainkan di source kamera</translation>
+      <source>Media buffer size (KB, 10KB-4MB).</source>
+      <translation>Ukuran buffer media (KB, 10KB-4MB).</translation>
     </message>
-    <message numerus="yes">
-      <source>%n Groups</source>
-      <translation>
-        <numerusform>%n Grup</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>LDAP Sync Issue</source>
-      <translation>Masalah Sinkronisasi LDAP</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n times)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n times)</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Failed to connect to the LDAP server.</source>
-      <translation>Gagal terkoneksi ke server LDAP.</translation>
+      <source>Media buffer size for audio only devices (KB, 1KB-1MB).</source>
+      <translation>Ukuran buffer media untuk perangkat audio saja (KB, 1KB-1MB).</translation>
     </message>
     <message>
-      <source>Failed to complete the sync within a %1 timeout.</source>
-      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation>Gagal menyelesaikan sinkronisasi dalam batas waktu %1.</translation>
+      <source>Force analytics DB storage mount point permissions in case of failure.</source>
+      <translation>Paksa izin titik pemasangan penyimpanan DB analitik jika terjadi kegagalan.</translation>
     </message>
     <message>
-      <source>Failed to complete the sync within a given timeout.</source>
-      <translation>Gagal menyelesaikan sinkronisasi dalam batas waktu yang ditentukan.</translation>
+      <source>Check video stream permissions on VMS server period (milliseconds).</source>
+      <translation>Periksa izin stream video pada periode server VMS (milidetik).</translation>
     </message>
     <message>
-      <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation>Tidak ada akun pengguna di server LDAP yang cocok dengan pengaturan sinkronisasi.</translation>
+      <source>Storage encryption enabled.</source>
+      <translation>Enkripsi penyimpanan diaktifkan.</translation>
     </message>
     <message>
-      <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation>Beberapa pengguna atau grup LDAP tidak ditemukan di database LDAP.</translation>
+      <source>Current storage encryption key.</source>
+      <translation>Kunci enkripsi penyimpanan saat ini.</translation>
     </message>
     <message>
-      <source>Services Issue</source>
-      <translation>Masalah Layanan</translation>
+      <source>Show Servers in the Resource Tree for non-admins.</source>
+      <translation>Tampilkan Server di Resource Tree untuk non-admin.</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; has license migration issue</source>
-      <translation>Server &quot;%1&quot; memiliki masalah migrasi lisensi</translation>
+      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</source>
+      <translation>Header HTTP: Server, variabel yang didukung: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
-      <source>Service overuse</source>
-      <translation>Penggunaan layanan secara berlebihan</translation>
+      <source>HTTP header: Origin.</source>
+      <translation>Header HTTP: Asal.</translation>
     </message>
     <message>
-      <source>The following licenses were not migrated:</source>
-      <translation>Lisensi berikut tidak dimigrasikan:</translation>
+      <source>HTTP header: X-Frame-Options.</source>
+      <translation>Header HTTP: Opsi X-Frame.</translation>
     </message>
     <message>
-      <source>License</source>
-      <translation>Lisensi</translation>
+      <source>Use only HTTPS for cameras.</source>
+      <translation>Gunakan hanya HTTPS untuk kamera.</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>Perekaman pada channel %n dihentikan karena penggunaan layanan yang berlebihan.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>Backup penyimpanan cloud di channel %n dihentikan karena penggunaan layanan yang berlebihan.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>Penggunaan layanan integrasi berbayar pada channel %n dihentikan karena penggunaan layanan yang berlebihan.</numerusform>
-      </translation>
+      <source>Allow Power User editing Security Settings.</source>
+      <translation>Izinkan Power User mengedit Pengaturan Keamanan.</translation>
     </message>
     <message>
-      <source>Failed to migrate licenses.</source>
-      <translation>Gagal memigrasikan lisensi.</translation>
+      <source>Enable deprecated API functions (insecure).</source>
+      <translation>Aktifkan fungsi API yang tidak digunakan lagi (tidak aman).</translation>
     </message>
     <message>
-      <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation>Melewatkan impor lisensi. Upaya migrasi lainnya akan dijadwalkan secara otomatis nanti.</translation>
+      <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
+      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation>Gagal memaksakan penggunaan waktu kamera, karena terlalu lambat. Waktu site akan digunakan sebagai gantinya.</translation>
+      <source>Expose IP addresses for autodiscovery.</source>
+      <translation>Paparkan alamat IP untuk penemuan otomatis.</translation>
     </message>
     <message>
-      <source>Call Request</source>
-      <translation>Permintaan Panggilan</translation>
+      <source>Show mouse timeline preview.</source>
+      <translation>Tampilkan preview timeline mouse.</translation>
     </message>
     <message>
-      <source>Call Request Missed</source>
-      <translation>Permintaan Panggilan Tak Terjawab</translation>
+      <source>LDAP settings.</source>
+      <translation>Pengaturan LDAP.</translation>
     </message>
   </context>
 </TS>

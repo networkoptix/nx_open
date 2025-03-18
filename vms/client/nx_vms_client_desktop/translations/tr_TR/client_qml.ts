@@ -236,6 +236,14 @@
       <source>Table Settings</source>
       <translation type="unfinished">Table Settings</translation>
     </message>
+    <message>
+      <source>Switch to table view</source>
+      <translation type="unfinished">Switch to table view</translation>
+    </message>
+    <message>
+      <source>Switch to card view</source>
+      <translation type="unfinished">Switch to card view</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsSettings</name>
@@ -278,13 +286,6 @@
 Select an Integration to begin configuring its parameters.</source>
       <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
 Select an Integration to begin configuring its parameters.</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsToolTipPreview</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>VERİ YOK</translation>
     </message>
   </context>
   <context>
@@ -532,6 +533,10 @@ Select an Integration to begin configuring its parameters.</translation>
       <source>Shut Down</source>
       <translation>Kapat</translation>
     </message>
+    <message>
+      <source>New</source>
+      <translation type="unfinished">New</translation>
+    </message>
   </context>
   <context>
     <name>CloudTile</name>
@@ -636,6 +641,29 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Show thumbnails</source>
       <translation>Küçük resimleri göster</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomHttpHeadersDialog</name>
+    <message>
+      <source>Custom HTTP headers</source>
+      <translation type="unfinished">Custom HTTP headers</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Ekle</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Sil</translation>
+    </message>
+    <message>
+      <source>Key</source>
+      <translation type="unfinished">Key</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
     </message>
   </context>
   <context>
@@ -1112,6 +1140,26 @@ Select an Integration to begin configuring its parameters.</translation>
       <source>No groups</source>
       <translation>Grup yok</translation>
     </message>
+    <message>
+      <source>LDAP</source>
+      <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+      <translation>LDAP</translation>
+    </message>
+    <message>
+      <source>ORGANIZATION</source>
+      <comment>Section with groups from organisation</comment>
+      <translation type="unfinished">ORGANIZATION</translation>
+    </message>
+    <message>
+      <source>BUILT-IN</source>
+      <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
+      <translation type="unfinished">BUILT-IN</translation>
+    </message>
+    <message>
+      <source>CUSTOM</source>
+      <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+      <translation type="unfinished">CUSTOM</translation>
+    </message>
   </context>
   <context>
     <name>HintItem</name>
@@ -1147,10 +1195,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
   </context>
   <context>
-    <name>InsecureWarning</name>
+    <name>InsecureBanner</name>
     <message>
-      <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-      <translation>Hesap güvenliği önemlidir. Bunu yapmak için iyi bir nedeniniz olmadığı sürece bu ayarı etkinleştirmeyin.</translation>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
+      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</translation>
+    </message>
+    <message>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
+      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
     </message>
   </context>
   <context>
@@ -1804,6 +1856,11 @@ Select an Integration to begin configuring its parameters.</translation>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
       <translation>Özel Ayarlar</translation>
     </message>
+    <message>
+      <source>Organization</source>
+      <comment>Section with groups from organisation</comment>
+      <translation type="unfinished">Organization</translation>
+    </message>
   </context>
   <context>
     <name>PasswordChangeDialog</name>
@@ -2226,16 +2283,8 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
       <translation>Yerel dosya yok</translation>
     </message>
     <message>
-      <source>Nothing found</source>
-      <translation>Hiçbir şey bulunamadı</translation>
-    </message>
-    <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>Video dosyalarını veya görüntüleri istemci penceresine sürükleyin veya Yerel Ayarlar iletişim kutusundan yerel medya klasörü ekleyin</translation>
-    </message>
-    <message>
-      <source>Try searching for something else</source>
-      <translation>Başka bir şey aramayı dene</translation>
     </message>
   </context>
   <context>
@@ -2296,10 +2345,6 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
   </context>
   <context>
     <name>ResourceSearchPane</name>
-    <message>
-      <source>Search</source>
-      <translation>Arama</translation>
-    </message>
     <message>
       <source>Servers</source>
       <translation>Sunucular</translation>
@@ -2399,13 +2444,6 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     <message>
       <source>File to save the results:</source>
       <translation>Sonuçların kayıt edileceği dosya:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SearchEdit</name>
-    <message>
-      <source>Search</source>
-      <translation>Arama</translation>
     </message>
   </context>
   <context>

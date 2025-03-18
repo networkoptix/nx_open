@@ -268,10 +268,6 @@
       <translation>Bantuan</translation>
     </message>
     <message>
-      <source>Event Log...</source>
-      <translation>Log Event...</translation>
-    </message>
-    <message>
       <source>Control Video Wall</source>
       <translation>Kontrol Video Wall</translation>
     </message>
@@ -1157,22 +1153,6 @@
       <translation>Koneksikan ke Site</translation>
     </message>
     <message>
-      <source>Layout Tab</source>
-      <translation>Tab Layout</translation>
-    </message>
-    <message>
-      <source>New Layout Tab</source>
-      <translation>Tab Layout Baru</translation>
-    </message>
-    <message>
-      <source>Welcome Screen Tab</source>
-      <translation>Tab Layar Selamat Datang</translation>
-    </message>
-    <message>
-      <source>New Welcome Screen Tab</source>
-      <translation>Tab Layar Selamat Datang Baru</translation>
-    </message>
-    <message>
       <source>Site Administration...</source>
       <translation>Administrasi Site...</translation>
     </message>
@@ -1227,6 +1207,30 @@
     <message>
       <source>Cell Aspect Ratio</source>
       <translation>Rasio Aspek Sel</translation>
+    </message>
+    <message>
+      <source>Layout</source>
+      <translation>Layout</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>Layout Baru</translation>
+    </message>
+    <message>
+      <source>Welcome Screen</source>
+      <translation>Layar Selamat Datang</translation>
+    </message>
+    <message>
+      <source>New Welcome Screen</source>
+      <translation>Layar Selamat Datang Baru</translation>
+    </message>
+    <message>
+      <source>Monitor in New Tab</source>
+      <translation>Monitor di Tab Baru</translation>
+    </message>
+    <message>
+      <source>Monitor in New Window</source>
+      <translation>Monitor di Window Baru</translation>
     </message>
   </context>
   <context>
@@ -1299,19 +1303,6 @@
     </message>
   </context>
   <context>
-    <name>ExitFullscreenActionHelper</name>
-    <message>
-      <source>Select layout...</source>
-      <translation>Pilih layout...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n layouts</source>
-      <translation>
-        <numerusform>%n layout</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1332,36 +1323,6 @@
     <message>
       <source>Executable %1 Media File</source>
       <translation>File Media yang Dapat Dieksekusi %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenActionHelper</name>
-    <message>
-      <source>Source camera</source>
-      <translation>Kamera source</translation>
-    </message>
-    <message>
-      <source>Select device...</source>
-      <translation>Select device...</translation>
-    </message>
-    <message>
-      <source>Select camera...</source>
-      <translation>Select camera...</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Pilih layout...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n layouts</source>
-      <translation>
-        <numerusform>%n layout</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>%1 on %2</source>
-      <comment>Camera %1 on layout %2</comment>
-      <translation>%1 pada %2</translation>
     </message>
   </context>
   <context>
@@ -2187,21 +2148,21 @@ Kunci Lisensi: %2</translation>
       </translation>
     </message>
     <message numerus="yes">
-      <source>These servers are removed from Site</source>
-      <translation>
-        <numerusform>Server ini dihapus dari Site</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These users are removed from Site</source>
-      <translation>
-        <numerusform>User ini dihapus dari Site</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>These resources are removed from Site</source>
       <translation>
         <numerusform>Resource ini dihapus dari Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This server is removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>This server is removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This user is removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>This user is removed from Site</numerusform>
       </translation>
     </message>
   </context>
@@ -2342,10 +2303,6 @@ Kunci Lisensi: %2</translation>
       <translation>Aturan event dihapus</translation>
     </message>
     <message>
-      <source>Event rules reset to default</source>
-      <translation>Aturan event direset ke default</translation>
-    </message>
-    <message>
       <source>Storage added</source>
       <translation>Penyimpanan ditambahkan</translation>
     </message>
@@ -2477,220 +2434,6 @@ Kunci Lisensi: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleViewModel</name>
-    <message>
-      <source>Error: %1</source>
-      <translation>Error: %1</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Instan</translation>
-    </message>
-    <message>
-      <source>Stops</source>
-      <translation>Berhenti</translation>
-    </message>
-    <message>
-      <source>Starts</source>
-      <translation>Mulai</translation>
-    </message>
-    <message>
-      <source>Occurs</source>
-      <translation>Terjadi</translation>
-    </message>
-    <message>
-      <source>N/A</source>
-      <translation>N/A</translation>
-    </message>
-    <message>
-      <source>Every %1</source>
-      <translation>Setiap %1</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Server Mana pun</translation>
-    </message>
-    <message>
-      <source>Any Device</source>
-      <translation>Perangkat Apa Pun</translation>
-    </message>
-    <message>
-      <source>Any Camera</source>
-      <translation>Kamera Apa Pun</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Servers</source>
-      <translation>
-        <numerusform>%n Server</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Pengguna</translation>
-    </message>
-    <message>
-      <source>Source Server</source>
-      <translation>Server Sumber</translation>
-    </message>
-    <message>
-      <source>Source Camera</source>
-      <translation>Kamera Sumber</translation>
-    </message>
-    <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Sumber dan %n Kamera lainnya</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Select at least one Device</source>
-      <translation>Pilih setidaknya satu Perangkat</translation>
-    </message>
-    <message>
-      <source>Select at least one Camera</source>
-      <translation>Pilih setidaknya satu Kamera</translation>
-    </message>
-    <message>
-      <source>Select Server</source>
-      <translation>Pilih Server</translation>
-    </message>
-    <message>
-      <source>Source Server and %1</source>
-      <translation>Server Sumber dan %1</translation>
-    </message>
-    <message>
-      <source>Site</source>
-      <translation>Site</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRuleWidget</name>
-    <message>
-      <source>to</source>
-      <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
-      <translation>ke</translation>
-    </message>
-    <message>
-      <source>at</source>
-      <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-      <translation>pada</translation>
-    </message>
-    <message>
-      <source>Select at least one device</source>
-      <translation>Pilih setidaknya satu perangkat</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Pilih setidaknya satu kamera</translation>
-    </message>
-    <message>
-      <source>Devices</source>
-      <translation>Perangkat</translation>
-    </message>
-    <message>
-      <source>Cameras</source>
-      <translation>Kamera</translation>
-    </message>
-    <message>
-      <source>Any Device</source>
-      <translation>Perangkat Apa Pun</translation>
-    </message>
-    <message>
-      <source>Any Camera</source>
-      <translation>Kamera Apa Pun</translation>
-    </message>
-    <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation>Force Acknowledgement hanya akan berfungsi untuk Event Generik jika pengidentifikasi kamera digunakan di URL Event Generik</translation>
-    </message>
-    <message>
-      <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation>Waktu pra-perekaman yang tinggi akan meningkatkan penggunaan RAM di server</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRulesDialog</name>
-    <message>
-      <source>&amp;New...</source>
-      <translation>&amp;Baru...</translation>
-    </message>
-    <message>
-      <source>&amp;Delete</source>
-      <translation>&amp;Hapus</translation>
-    </message>
-    <message>
-      <source>&amp;Schedule...</source>
-      <translation>&amp;Jadwal...</translation>
-    </message>
-    <message>
-      <source>Restore All Rules to Default</source>
-      <translation>Kembalikan Semua Aturan ke Default</translation>
-    </message>
-    <message>
-      <source>No event rules</source>
-      <translation>Tidak ada aturan event</translation>
-    </message>
-    <message>
-      <source>Filter by devices...</source>
-      <translation>Filter menurut perangkat...</translation>
-    </message>
-    <message>
-      <source>Filter by cameras...</source>
-      <translation>Filter menurut kamera...</translation>
-    </message>
-    <message>
-      <source>Failed to retrieve rules</source>
-      <translation>Gagal mengambil aturan</translation>
-    </message>
-    <message>
-      <source>Failed to save rule</source>
-      <translation>Gagal menyimpan aturan</translation>
-    </message>
-    <message>
-      <source>This action cannot be undone.</source>
-      <translation>Aksi ini tidak bisa dibatalkan.</translation>
-    </message>
-    <message>
-      <source>Restore all rules to default?</source>
-      <translation>Kembalikan semua aturan ke default?</translation>
-    </message>
-    <message>
-      <source>Some rules are not valid and may not work</source>
-      <translation>Beberapa aturan tidak valid dan mungkin tidak berfungsi</translation>
-    </message>
-    <message>
-      <source>Apply changes before exiting?</source>
-      <translation>Terapkan perubahan sebelum keluar?</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRulesViewModel</name>
-    <message>
-      <source>On</source>
-      <translation>Pada</translation>
-    </message>
-    <message>
-      <source>Event</source>
-      <translation>Event</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>Source</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Aksi</translation>
-    </message>
-    <message>
-      <source>Target</source>
-      <translation>Target</translation>
-    </message>
-    <message>
-      <source>Interval of Action</source>
-      <translation>Interval Aksi</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCamDisplay</name>
     <message>
       <source>%1 Running</source>
@@ -2767,13 +2510,6 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>Diagnostics complete</source>
       <translation>Diagnostik selesai</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraInputBusinessEventWidget</name>
-    <message>
-      <source>automatic</source>
-      <translation>otomatis</translation>
     </message>
   </context>
   <context>
@@ -2880,13 +2616,6 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>Logical ID</source>
       <translation>ID logis</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraOutputBusinessActionWidget</name>
-    <message>
-      <source>automatic</source>
-      <translation>otomatis</translation>
     </message>
   </context>
   <context>
@@ -3207,33 +2936,6 @@ Kunci Lisensi: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnCustomBusinessEventWidget</name>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Jika bidangnya kosong, event akan selalu trigger.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>Event hanya akan trigger jika ada kecocokan dalam source dengan salah satu kata kunci yang dimasukkan.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Event hanya akan trigger jika ada kecocokan dalam caption dengan salah satu kata kunci yang dimasukkan.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation>Event hanya akan trigger jika ada kecocokan dalam description dengan salah satu kata kunci yang dimasukkan.</translation>
-    </message>
-    <message>
-      <source>Server API</source>
-      <translation>Server API</translation>
-    </message>
-    <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>To generate Generic Event, please refer to %1.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCustomFileDialog</name>
     <message>
       <source>Pictures</source>
@@ -3324,152 +3026,6 @@ Kunci Lisensi: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnEmptyBusinessActionWidget</name>
-    <message>
-      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>Mode Perekaman Panik mengalihkan pengaturan perekaman untuk semua kamera ke FPS dan kualitas maksimum.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnEventLogDialog</name>
-    <message>
-      <source>Filter Similar Rows</source>
-      <translation>Filter Baris Serupa</translation>
-    </message>
-    <message>
-      <source>Copy Selection to Clipboard</source>
-      <translation>Salin Seleksi ke Clipboard</translation>
-    </message>
-    <message>
-      <source>Export Selection to File...</source>
-      <translation>Ekspor Seleksi ke File...</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Pilih Semua</translation>
-    </message>
-    <message>
-      <source>Clear Filter</source>
-      <translation>Hapus Filter</translation>
-    </message>
-    <message>
-      <source>Export selected events to file</source>
-      <translation>Ekspor event yang dipilih ke file</translation>
-    </message>
-    <message>
-      <source>Any Action</source>
-      <translation>Aksi Apa pun</translation>
-    </message>
-    <message>
-      <source>No events</source>
-      <translation>Tidak ada event</translation>
-    </message>
-    <message numerus="yes">
-      <source>Event log for period from %1 to %2 - %n events found</source>
-      <comment>Dates are substituted</comment>
-      <translation>
-        <numerusform>Log event untuk periode dari %1 hingga %2 - %n event ditemukan</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Event log for %1 - %n events found</source>
-      <comment>Date is substituted</comment>
-      <translation>
-        <numerusform>Log event untuk %1 - %n event ditemukan</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Deskripsi</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnEventLogModel</name>
-    <message>
-      <source>Motion video</source>
-      <translation>Video bergerak</translation>
-    </message>
-    <message>
-      <source>Date/Time</source>
-      <translation>Tanggal/Waktu</translation>
-    </message>
-    <message>
-      <source>Event</source>
-      <translation>Event</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>Source</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Aksi</translation>
-    </message>
-    <message>
-      <source>Target</source>
-      <translation>Target</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Deskripsi</translation>
-    </message>
-    <message>
-      <source>All users</source>
-      <translation>Semua pengguna</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n times)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n kali)</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Open camera</source>
-      <translation>Buka kamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n users more...</source>
-      <translation>
-        <numerusform>dan %n pengguna lainnya...</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n more...</source>
-      <translation>
-        <numerusform>dan %n lebih lanjut...</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Removed subjects</source>
-      <translation>
-        <numerusform>%n Subjek dihapus</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Subject removed</source>
-      <translation>Subjek dihapus</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n cameras)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n kamera)</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnExecHttpRequestActionWidget</name>
-    <message>
-      <source>Auto</source>
-      <translation>Otomatis</translation>
-    </message>
-    <message>
-      <source>Basic</source>
-      <translation>Dasar</translation>
-    </message>
-  </context>
-  <context>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
@@ -3478,17 +3034,6 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>Failed to overwrite file</source>
       <translation>Gagal menimpa file</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFullscreenCameraActionWidget</name>
-    <message>
-      <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation>Kamera ini saat ini tidak berada pada layout yang dipilih. Aksi akan berfungsi jika kamera ditambahkan sebelum aksi ditrigger.</translation>
-    </message>
-    <message>
-      <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation>Kamera ini saat ini tidak berada pada layout yang dipilih. Aksi akan berfungsi jika kamera ditambahkan sebelum aksi ditrigger.</translation>
     </message>
   </context>
   <context>
@@ -3970,12 +3515,6 @@ Kunci Lisensi: %2</translation>
       <source>Lo-Res</source>
       <translation>Resolusi Rendah</translation>
     </message>
-    <message numerus="yes">
-      <source>Set for all %n Cameras</source>
-      <translation>
-        <numerusform>Ditetapkan untuk semua %n Kamera</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Area Zoom</source>
       <translation>Area Zoom</translation>
@@ -3995,6 +3534,16 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>Mute</source>
       <translation>Mute</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set for %n devices</source>
+      <translation type="unfinished">
+        <numerusform>Set for %n devices</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Cloud authorization request should only be performed for cloud cross system resources</source>
+      <translation type="unfinished">Cloud authorization request should only be performed for cloud cross system resources</translation>
     </message>
   </context>
   <context>
@@ -4110,13 +3659,6 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>Rotation</source>
       <translation>Rotation</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPopupBusinessActionWidget</name>
-    <message>
-      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation>Notifikasi akan ditampilkan hingga salah satu pengguna yang melihatnya membuat bookmark dengan deskripsi event</translation>
     </message>
   </context>
   <context>
@@ -4560,39 +4102,6 @@ Kunci Lisensi: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnSendEmailActionDelegate</name>
-    <message numerus="yes">
-      <source>%n additional</source>
-      <translation>
-        <numerusform>%n tambahan</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has invalid email address</source>
-      <translation>Pengguna %1 memiliki alamat email yang tidak valid</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 users have invalid email address</source>
-      <translation>
-        <numerusform>%n dari %1 pengguna memiliki alamat email yang tidak valid</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid email address %1</source>
-      <translation>Alamat email tidak valid %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 additional email addresses are invalid</source>
-      <translation>
-        <numerusform>%n dari %1 alamat email tambahan tidak valid</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Send email to %1</source>
-      <translation>Kirim email ke %1</translation>
-    </message>
-  </context>
-  <context>
     <name>QnServerAddressesModel</name>
     <message>
       <source>Address</source>
@@ -4701,17 +4210,6 @@ Kunci Lisensi: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnShowTextOverlayActionWidget</name>
-    <message>
-      <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-      <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
-&apos; sequence</comment>
-      <translation>Tag html dapat digunakan dalam teks kustom:
-&lt;h4&gt;Header (h1-h6)&lt;/h4&gt;Juga berbeda &lt;font color=&quot;red&quot;&gt;warna&lt;/font&gt; dan &lt;font size=&quot;18&quot;&gt;ukuran&lt;/font&gt; dapat diterapkan. Teks bisa &lt;s&gt;dicoret&lt;/s&gt;, &lt;u&gt;bergaris bawah&lt;/u&gt;, &lt;b&gt;tebal&lt;/b&gt; atau &lt;i&gt;miring&lt;/i&gt;</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSignInfo</name>
     <message>
       <source>Analyzing: %1%</source>
@@ -4765,8 +4263,8 @@ Kunci Lisensi: %2</translation>
       <translation>Otorisasi</translation>
     </message>
     <message>
-      <source>Setup</source>
-      <translation>Pasang</translation>
+      <source>Set</source>
+      <translation type="unfinished">Set</translation>
     </message>
   </context>
   <context>
@@ -4780,16 +4278,8 @@ Kunci Lisensi: %2</translation>
       <translation>OFFLINE</translation>
     </message>
     <message>
-      <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
-      <translation>Kamera ini tidak dapat diakses. Lakukan diagnostik kamera dalam Klien Desktop untuk mendapatkan informasi tambahan.</translation>
-    </message>
-    <message>
       <source>UNAUTHORIZED</source>
       <translation>TIDAK DIOTORISASI</translation>
-    </message>
-    <message>
-      <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
-      <translation>Kamera ini memerlukan kredensial yang diotorisasi yang akan ditetapkan dalam pengaturan perangkat di portal Cloud atau klien Desktop.</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
@@ -4804,16 +4294,8 @@ Kunci Lisensi: %2</translation>
       <translation>SITE DITUTUP</translation>
     </message>
     <message>
-      <source>STREAM LIMITATION</source>
-      <translation>LIMITASI STREAM</translation>
-    </message>
-    <message>
       <source>INFORMATION REQUIRED</source>
       <translation>INFORMASI DIPERLUKAN</translation>
-    </message>
-    <message>
-      <source>AUDIO ONLY</source>
-      <translation>HANYA AUDIO</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -4842,6 +4324,18 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>CERTIFICATE ERROR</source>
       <translation>SERTIFIKAT ERROR</translation>
+    </message>
+    <message>
+      <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
+      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+    </message>
+    <message>
+      <source>Access to this camera requires authorization credentials.</source>
+      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+    </message>
+    <message>
+      <source>CONNECTION LOST</source>
+      <translation type="unfinished">CONNECTION LOST</translation>
     </message>
   </context>
   <context>
@@ -5027,6 +4521,18 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
       <translation>Terisolasi - server membaca dan menulis secara eksklusif ke foldernya sendiri. Data lama hanya dihapus dari foldernya sendiri.</translation>
+    </message>
+    <message>
+      <source>Cloud storage cannot be enabled.</source>
+      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+    </message>
+    <message>
+      <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
+      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+    </message>
+    <message>
+      <source>Insufficient services</source>
+      <translation>Layanan tidak memadai</translation>
     </message>
   </context>
   <context>
@@ -5412,10 +4918,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <translation>Site ditutup</translation>
     </message>
     <message>
-      <source>Reject intercom call</source>
-      <translation>Tolak panggilan interkom</translation>
-    </message>
-    <message>
       <source>Email address is not set for your account</source>
       <translation>Alamat email tidak ditetapkan untuk akun Anda</translation>
     </message>
@@ -5531,6 +5033,18 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Notifications language differs from the interface language</source>
       <translation>Bahasa notifikasi berbeda dari bahasa antarmuka</translation>
+    </message>
+    <message>
+      <source>Recording disabled</source>
+      <translation type="unfinished">Recording disabled</translation>
+    </message>
+    <message>
+      <source>Cloud storage backup disabled</source>
+      <translation type="unfinished">Cloud storage backup disabled</translation>
+    </message>
+    <message>
+      <source>Paid integration services disabled</source>
+      <translation type="unfinished">Paid integration services disabled</translation>
     </message>
   </context>
   <context>
@@ -6342,10 +5856,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <translation>Dalam</translation>
     </message>
     <message>
-      <source>%n removed subjects</source>
-      <translation>%n removed subjects</translation>
-    </message>
-    <message>
       <source>%n removed devices</source>
       <translation>%n perangkat yang dihapus</translation>
     </message>
@@ -6382,6 +5892,34 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>%n layouts more</source>
       <translation>%n layout lainnya</translation>
+    </message>
+    <message>
+      <source>Removed subject</source>
+      <comment>The subject is user or group</comment>
+      <translation type="unfinished">Removed subject</translation>
+    </message>
+    <message>
+      <source>Removed device</source>
+      <translation type="unfinished">Removed device</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation type="unfinished">Removed camera</translation>
+    </message>
+    <message>
+      <source>Removed server</source>
+      <translation type="unfinished">Removed server</translation>
+    </message>
+    <message>
+      <source>Removed layout</source>
+      <translation type="unfinished">Removed layout</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n removed subjects</source>
+      <comment>The subject is user or group</comment>
+      <translation type="unfinished">
+        <numerusform>%n removed subjects</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7009,6 +6547,23 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <translation>Ada lebih banyak kamera yang dibackup daripada layanan yang tersedia. Mohon nonaktifkan backup untuk beberapa kamera atau tambahkan layanan yang lebih sesuai. Jika tidak, ini akan dilakukan secara otomatis pada %1</translation>
     </message>
+    <message>
+      <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
+      <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
+      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+    </message>
+    <message>
+      <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
+      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+    </message>
+    <message>
+      <source>Backup will not be activated for %1 devices: </source>
+      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
+    </message>
+    <message>
+      <source>%1 suitable cloud storage services are required to activate backup for them.</source>
+      <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>
@@ -7133,6 +6688,18 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Missed call</source>
       <translation>Panggilan tak terjawab</translation>
+    </message>
+    <message>
+      <source>Call Request</source>
+      <translation type="unfinished">Call Request</translation>
+    </message>
+    <message>
+      <source>Call Request Missed</source>
+      <translation type="unfinished">Call Request Missed</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation type="unfinished">Source: %1</translation>
     </message>
   </context>
   <context>
@@ -7326,6 +6893,10 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <source>Select Hotspot Target</source>
       <translation>Pilih Target Hotspot</translation>
     </message>
+    <message>
+      <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
+      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
@@ -7348,6 +6919,10 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Less Info</source>
       <translation>Informasi Lebih Sedikit</translation>
+    </message>
+    <message>
+      <source>Use this link to add the camera to another site</source>
+      <translation type="unfinished">Use this link to add the camera to another site</translation>
     </message>
   </context>
   <context>
@@ -7855,26 +7430,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CloudLayoutsIntroDialog</name>
-    <message>
-      <source>Introducing %1 Layouts</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Memperkenalkan %1 Layout</translation>
-    </message>
-    <message>
-      <source>Read more on the %1</source>
-      <translation>Baca lebih lanjut di %1</translation>
-    </message>
-    <message>
-      <source>help page</source>
-      <translation>halaman bantuan</translation>
-    </message>
-    <message>
-      <source>%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation>%1 Layout adalah &lt;b&gt;Layout lintas sistem&lt;/b&gt; yang memungkinkan Anda bekerja dengan perangkat dari Site berbeda. Saat ini, hanya beberapa fitur layout reguler yang tersedia, namun kami akan terus memperluas kemampuan %1 Layout di versi mendatang</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CloudLayoutsManager</name>
     <message>
       <source>%1 (Copy)</source>
@@ -7953,6 +7508,14 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Disconnect</source>
       <translation>Putuskan koneksi</translation>
+    </message>
+    <message>
+      <source>Channel Partner users have access to this site</source>
+      <translation type="unfinished">Channel Partner users have access to this site</translation>
+    </message>
+    <message>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
+      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
@@ -8116,10 +7679,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
   </context>
   <context>
     <name>nx::vms::client::desktop::DesktopDataProvider</name>
-    <message>
-      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>Perangkat perekam audio tidak mendukung format audio yang sesuai. Silakan pilih perangkat audio lain atau &quot;tidak ada&quot; di pengaturan Screen Recording.</translation>
-    </message>
     <message>
       <source>Could not detect capturing resolution</source>
       <translation>Tidak dapat mendeteksi resolusi pengambilan</translation>
@@ -8328,6 +7887,14 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <source>Export selected events to file</source>
       <translation>Ekspor event yang dipilih ke file</translation>
     </message>
+    <message>
+      <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
+      <translation type="unfinished">Server cannot answer in reasonable time. Consider narrowing period or filter.</translation>
+    </message>
+    <message>
+      <source>All Servers are offline. Logs are not available.</source>
+      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventLogModel</name>
@@ -8401,23 +7968,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>INFORMATION REQUIRED</source>
       <translation>INFORMASI DIPERLUKAN</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>No events</source>
-      <translation>Tidak ada event</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n events</source>
-      <translation>
-        <numerusform>%n event</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Try changing the filters or create an Event Rule</source>
-      <translation>Coba ubah filter atau buat Aturan Event</translation>
     </message>
   </context>
   <context>
@@ -8893,6 +8443,13 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::JumpToLiveButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation>Pergi ke Live</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -8990,20 +8547,8 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <translation>TIDAK ADA DATA</translation>
     </message>
     <message>
-      <source>NOT A CAMERA</source>
-      <translation>BUKAN KAMERA</translation>
-    </message>
-    <message>
       <source>DISABLED</source>
       <translation>DINONAKTIFKAN</translation>
-    </message>
-    <message>
-      <source>OFFLINE</source>
-      <translation>OFFLINE</translation>
-    </message>
-    <message>
-      <source>NO EXPORT PERMISSION</source>
-      <translation>TIDAK ADA IZIN EKSPOR</translation>
     </message>
   </context>
   <context>
@@ -9214,10 +8759,6 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
       <translation>Klien</translation>
     </message>
     <message>
-      <source>None</source>
-      <translation>Tidak ada</translation>
-    </message>
-    <message>
       <source>Error</source>
       <translation>Error</translation>
     </message>
@@ -9248,6 +8789,10 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
     <message>
       <source>Logging level degrades performance</source>
       <translation>Level Logging menurunkan performa</translation>
+    </message>
+    <message>
+      <source>&lt;None&gt;</source>
+      <translation type="unfinished">&lt;None&gt;</translation>
     </message>
   </context>
   <context>
@@ -10090,18 +9635,7 @@ Anda dapat memaksakan deteksi gerakan, tetapi hal itu dapat menyebabkan peningka
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::NotificationActionHandler</name>
-    <message>
-      <source>Unable to acknowledge event on removed camera.</source>
-      <translation>Tidak dapat mengkonfirmasi event pada kamera yang dihapus.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
-    <message>
-      <source>Alarm: %1</source>
-      <translation>Alarm: %1</translation>
-    </message>
     <message>
       <source>Acknowledge</source>
       <translation>Acknowledge</translation>
@@ -10132,10 +9666,6 @@ Anda dapat memaksakan deteksi gerakan, tetapi hal itu dapat menyebabkan peningka
       <translation>Notifikasi Event</translation>
     </message>
     <message>
-      <source>System Notifications</source>
-      <translation>Notifikasi Sistem</translation>
-    </message>
-    <message>
       <source>Choose Types...</source>
       <translation>Pilih Jenis...</translation>
     </message>
@@ -10148,6 +9678,10 @@ Anda dapat memaksakan deteksi gerakan, tetapi hal itu dapat menyebabkan peningka
       <translation>
         <numerusform>%n jenis notifikasi</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Site Notifications</source>
+      <translation type="unfinished">Site Notifications</translation>
     </message>
   </context>
   <context>
@@ -10173,45 +9707,10 @@ Anda dapat memaksakan deteksi gerakan, tetapi hal itu dapat menyebabkan peningka
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
-    <message>
-      <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation>Tidak ada pengguna terpilih yang memiliki akses ke layout yang dipilih. Aksi tidak akan bekerja.</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Pilih layout...</translation>
-    </message>
-    <message>
-      <source>None of selected user roles contain users. Action will not work.</source>
-      <translation>Tak satu pun dari peran pengguna yang dipilih berisi pengguna. Aksi tidak akan bekerja.</translation>
-    </message>
-    <message>
-      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation>Beberapa pengguna tidak memiliki akses ke layout yang dipilih. Aksi tidak akan bekerja untuk mereka.</translation>
-    </message>
-    <message>
-      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation>Mencari layout lokal? Pilih hanya satu pengguna dari daftar &quot;Tampilkan ke&quot; untuk menampilkan layout lokalnya sebagai opsi di sini.</translation>
-    </message>
-    <message>
-      <source>Local layouts can only be shown to their owners</source>
-      <translation>Layout lokal hanya dapat ditampilkan kepada pemiliknya</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
     <message>
       <source>Not supported</source>
       <translation>Tidak didukung</translation>
-    </message>
-    <message>
-      <source>This tab will be available in future versions</source>
-      <translation>Tab ini akan tersedia di versi mendatang</translation>
-    </message>
-    <message>
-      <source>Learn more</source>
-      <translation>Pelajari lebih lanjut</translation>
     </message>
   </context>
   <context>
@@ -10392,31 +9891,6 @@ Anda dapat memaksakan deteksi gerakan, tetapi hal itu dapat menyebabkan peningka
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>%1 Settings</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>%1 Pengaturan</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n symbols over</source>
-      <translation>
-        <numerusform>%n simbol berakhir</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n symbols left</source>
-      <translation>
-        <numerusform>%n simbol tersisa</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Site ini tidak terkoneksi ke %1. Notifikasi mobile hanya berfungsi saat site terkoneksi ke %1.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::QnWebpageDialog</name>
     <message>
       <source>Name</source>
@@ -10571,69 +10045,6 @@ Anda dapat memaksakan deteksi gerakan, tetapi hal itu dapat menyebabkan peningka
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::RecordingStatusHelper</name>
-    <message>
-      <source>Not recording</source>
-      <translation>Tidak merekam</translation>
-    </message>
-    <message>
-      <source>Recording everything</source>
-      <translation>Merekam semuanya</translation>
-    </message>
-    <message>
-      <source>Recording motion only</source>
-      <translation>Merekam gerakan saja</translation>
-    </message>
-    <message>
-      <source>Recording motion and low quality</source>
-      <translation>Merekam gerakan dan kualitas rendah</translation>
-    </message>
-    <message>
-      <source>Continuous</source>
-      <translation>Kontinu</translation>
-    </message>
-    <message>
-      <source>Motion only</source>
-      <translation>Hanya gerakan</translation>
-    </message>
-    <message>
-      <source>Motion + Lo-Res</source>
-      <translation>Gerakan + Resolusi Rendah</translation>
-    </message>
-    <message>
-      <source>Recording motion and objects</source>
-      <translation>Merekam gerakan dan objek</translation>
-    </message>
-    <message>
-      <source>Recording objects only</source>
-      <translation>Merekam objek saja</translation>
-    </message>
-    <message>
-      <source>Recording motion, objects and low quality</source>
-      <translation>Merekam gerakan, objek dan kualitas rendah</translation>
-    </message>
-    <message>
-      <source>Recording objects and low quality</source>
-      <translation>Merekam objek dan kualitas rendah</translation>
-    </message>
-    <message>
-      <source>Motion, Objects</source>
-      <translation>Gerakan, Objek</translation>
-    </message>
-    <message>
-      <source>Objects only</source>
-      <translation>Hanya Objek</translation>
-    </message>
-    <message>
-      <source>Motion, Objects + Lo-Res</source>
-      <translation>Gerakan, Objek + Resolusi Rendah</translation>
-    </message>
-    <message>
-      <source>Objects + Lo-Res</source>
-      <translation>Objek + Resolusi Rendah</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
     <message>
       <source>%1 layout</source>
@@ -10769,10 +10180,6 @@ Anda dapat memaksakan deteksi gerakan, tetapi hal itu dapat menyebabkan peningka
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
       <translation>Pengaturan kualitas hanya menentukan laju kompresi, dan tidak mempengaruhi resolusi. Rendah, Sedang, Tinggi, dan Terbaik adalah nilai bitrate yang telah ditetapkan sebelumnya.</translation>
-    </message>
-    <message>
-      <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -10915,6 +10322,11 @@ Anda masih dapat mengubah kualitas dan FPS langsung di kamera.</translation>
 You can still change quality and FPS directly on the camera.</source>
       <translation>Pengaturan kualitas dan FPS dinonaktifkan karena opsi &quot;Izinkan pengoptimalan pengaturan kamera&quot; dalam dialog &quot;Administrasi Site&quot;.
 Anda masih dapat mengubah kualitas dan FPS langsung di kamera.</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <comment>Megabits per seconds</comment>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -11413,13 +10825,6 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
-    <message>
-      <source>Go to Live</source>
-      <translation>Pergi ke Live</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>
@@ -11464,6 +10869,24 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     <message>
       <source>Open Services</source>
       <translation>Buka Layanan</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -12688,16 +12111,20 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
       <translation>Tidak dapat menambahkan resource ke layout</translation>
     </message>
     <message>
-      <source>Cannot find a widget corresponding to the specified item.</source>
-      <translation>Tidak dapat menemukan widget yang sesuai dengan item yang ditentukan.</translation>
-    </message>
-    <message>
       <source>Cannot find an item with the specified ID</source>
       <translation>Tidak dapat menemukan item dengan ID yang ditentukan</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified ID.</source>
       <translation>Tidak dapat menemukan resource dengan ID yang ditentukan.</translation>
+    </message>
+    <message>
+      <source>Cannot find a widget corresponding to the specified item</source>
+      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+    </message>
+    <message>
+      <source>Cannot maximize the item</source>
+      <translation type="unfinished">Cannot maximize the item</translation>
     </message>
   </context>
   <context>
@@ -12889,6 +12316,31 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>Token</source>
       <translation>Token</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
+    <message>
+      <source>No custom headers</source>
+      <translation type="unfinished">No custom headers</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n custom headers</source>
+      <comment>%n is a number of custom headers</comment>
+      <translation type="unfinished">
+        <numerusform>%n custom headers</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::KeyValueModel</name>
+    <message>
+      <source>Key</source>
+      <translation type="unfinished">Key</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>Nilai</translation>
     </message>
   </context>
   <context>
@@ -13138,71 +12590,10 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Analytics events can be set up on a certain cameras.</source>
-      <translation>Event analitik dapat diatur pada kamera tertentu.</translation>
-    </message>
-    <message>
-      <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Pilih kamera menggunakan tombol di atas untuk melihat daftar event yang didukung.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Event hanya akan trigger jika ada kecocokan dalam caption dengan salah satu kata kunci yang dimasukkan.</translation>
-    </message>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Jika bidangnya kosong, event akan selalu trigger.</translation>
-    </message>
-    <message>
-      <source>This field is case sensitive.</source>
-      <translation>Bidang ini peka huruf besar-kecil.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Event hanya akan trigger jika ada kecocokan dalam description dengan salah satu kata kunci yang dimasukkan.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Analytics object detection can be set up on a certain cameras.</source>
-      <translation>Deteksi objek analitik dapat diatur pada kamera tertentu.</translation>
-    </message>
-    <message>
-      <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Pilih kamera menggunakan tombol di atas untuk melihat daftar event yang didukung.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation>Event hanya akan triger hanya jika ada atribut yang cocok. Anda dapat melihat nama atribut dan nilainya pada tab Objek.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation>Plugin apa pun</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Event hanya akan trigger jika ada kecocokan dalam caption dengan salah satu kata kunci yang dimasukkan.</translation>
-    </message>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Jika bidangnya kosong, event akan selalu trigger.</translation>
-    </message>
-    <message>
-      <source>This field is case sensitive.</source>
-      <translation>Bidang ini peka huruf besar-kecil.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Event hanya akan trigger jika ada kecocokan dalam description dengan salah satu kata kunci yang dimasukkan.</translation>
     </message>
   </context>
   <context>

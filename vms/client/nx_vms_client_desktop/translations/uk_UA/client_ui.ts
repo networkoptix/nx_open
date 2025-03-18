@@ -129,54 +129,13 @@
       <source>Open Files Folder</source>
       <translation type="unfinished">Open Files Folder</translation>
     </message>
-  </context>
-  <context>
-    <name>AggregationWidget</name>
     <message>
-      <source>Check to set aggregation period</source>
-      <translation>Виберіть для установки періоду спрацювання</translation>
+      <source>with</source>
+      <translation type="unfinished">with</translation>
     </message>
     <message>
-      <source>Interval of action :</source>
-      <translation>Інтервал спрацьовування :</translation>
-    </message>
-    <message>
-      <source>No more than once per</source>
-      <translation>Не частіше ніж раз в</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Миттєво</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Ключові слова, розділені пробілом</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Заголовок містить:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Опис містить:</translation>
-    </message>
-    <message>
-      <source>Event Type:</source>
-      <translation>Тип Події:</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Attributes:</source>
-      <translation type="unfinished">Attributes:</translation>
-    </message>
-    <message>
-      <source>Object Type:</source>
-      <translation type="unfinished">Object Type:</translation>
+      <source>Simultaneous Streams</source>
+      <translation type="unfinished">Simultaneous Streams</translation>
     </message>
   </context>
   <context>
@@ -291,10 +250,6 @@
       <translation type="unfinished">Fix bandwidth to</translation>
     </message>
     <message>
-      <source>Mbit/s</source>
-      <translation>Мбіт / с</translation>
-    </message>
-    <message>
       <source>Unlimited</source>
       <translation type="unfinished">Unlimited</translation>
     </message>
@@ -305,6 +260,10 @@
     <message>
       <source>No backup</source>
       <translation type="unfinished">No backup</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -332,29 +291,6 @@
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
       <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
-    </message>
-  </context>
-  <context>
-    <name>BookmarkBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Тривалість за замовчуванням:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>секунд</translation>
-    </message>
-    <message>
-      <source>Tags:</source>
-      <translation>Теги:</translation>
-    </message>
-    <message>
-      <source>Pre-recording:</source>
-      <translation>Попередній запис:</translation>
-    </message>
-    <message>
-      <source>Post-recording:</source>
-      <translation>Пост запис:</translation>
     </message>
   </context>
   <context>
@@ -420,79 +356,6 @@
     <message>
       <source>Clear Filter</source>
       <translation>Очистити фільтр</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRuleWidget</name>
-    <message>
-      <source>Event</source>
-      <translation>Подія</translation>
-    </message>
-    <message>
-      <source>Schedule...</source>
-      <translation>Розклад...</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Дія</translation>
-    </message>
-    <message>
-      <source>Comments:</source>
-      <translation>Коментарі:</translation>
-    </message>
-    <message>
-      <source>When</source>
-      <translation>Коли</translation>
-    </message>
-    <message>
-      <source>Do</source>
-      <translation>Зробити</translation>
-    </message>
-    <message>
-      <source>At</source>
-      <translation>На</translation>
-    </message>
-    <message>
-      <source>Use event source server</source>
-      <translation>Використати вихідний сервер подій</translation>
-    </message>
-    <message>
-      <source>Use event source camera</source>
-      <translation type="unfinished">Use event source camera</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRulesDialog</name>
-    <message>
-      <source>Add</source>
-      <translation>Додати</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Видалити</translation>
-    </message>
-    <message>
-      <source>Event Rules</source>
-      <translation>Правила подій</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>Журнал подій...</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Перевірка</translation>
-    </message>
-  </context>
-  <context>
-    <name>BuzzerBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Тривалість за замовчуванням:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>секунд</translation>
     </message>
   </context>
   <context>
@@ -741,12 +604,9 @@
       <source>Logical ID</source>
       <translation>Логічний ID</translation>
     </message>
-  </context>
-  <context>
-    <name>CameraInputBusinessEventWidget</name>
     <message>
-      <source>Input ID</source>
-      <translation>ID Тривожного входу</translation>
+      <source>Restreaming Link</source>
+      <translation type="unfinished">Restreaming Link</translation>
     </message>
   </context>
   <context>
@@ -781,17 +641,6 @@
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
       <translation type="unfinished">in</translation>
-    </message>
-  </context>
-  <context>
-    <name>CameraOutputBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Тривалість за замовчуванням:</translation>
-    </message>
-    <message>
-      <source>Output ID:</source>
-      <translation>ID Тривожного виходу:</translation>
     </message>
   </context>
   <context>
@@ -904,57 +753,6 @@
     </message>
   </context>
   <context>
-    <name>CloudLayoutsIntroDialog</name>
-    <message>
-      <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
-    </message>
-    <message>
-      <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
-    </message>
-    <message>
-      <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
-    </message>
-    <message>
-      <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
-    </message>
-    <message>
-      <source>PTZ</source>
-      <translation>PTZ</translation>
-    </message>
-    <message>
-      <source>Showreels</source>
-      <translation>Прокрутки</translation>
-    </message>
-    <message>
-      <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
-    </message>
-    <message>
-      <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
-    </message>
-    <message>
-      <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
-    </message>
-    <message>
-      <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
-    </message>
-    <message>
-      <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
-    </message>
-    <message>
-      <source>In the Future</source>
-      <translation type="unfinished">In the Future</translation>
-    </message>
-  </context>
-  <context>
     <name>CloudManagementWidget</name>
     <message>
       <source>No connection</source>
@@ -996,29 +794,6 @@
     <message>
       <source>Select another event or action</source>
       <translation type="unfinished">Select another event or action</translation>
-    </message>
-  </context>
-  <context>
-    <name>CustomBusinessEventWidget</name>
-    <message>
-      <source>Source contains:</source>
-      <translation>Джерело містить:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Ключові слова, розділені пробілом</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Заголовок містить:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Опис містить:</translation>
-    </message>
-    <message>
-      <source>Omit Logging</source>
-      <translation>Втратити реєстрацію</translation>
     </message>
   </context>
   <context>
@@ -1172,59 +947,6 @@
     </message>
   </context>
   <context>
-    <name>ExecHttpRequestActionWidget</name>
-    <message>
-      <source>Login to authenticate (optional)</source>
-      <translation>Ім'я користувача для аутентифікації (необов'язково)</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Ім'я користувача</translation>
-    </message>
-    <message>
-      <source>Password to authenticate (optional)</source>
-      <translation>Пароль користувача для автентифікації (необов'язково)</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Пароль</translation>
-    </message>
-    <message>
-      <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
-    </message>
-    <message>
-      <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
-    </message>
-    <message>
-      <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
-    </message>
-    <message>
-      <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
-    </message>
-    <message>
-      <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExecPtzPresetBusinessActionWidget</name>
-    <message>
-      <source>PTZ preset:</source>
-      <translation>PTZ пресет:</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExitFullscreenActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>На закладку</translation>
-    </message>
-  </context>
-  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <source>Export Settings</source>
@@ -1345,17 +1067,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Нічого не знайдено</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenCameraActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>На макеті</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Камера</translation>
     </message>
   </context>
   <context>
@@ -1773,8 +1484,8 @@
       <translation>Повторити</translation>
     </message>
     <message>
-      <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
     </message>
   </context>
   <context>
@@ -2001,21 +1712,6 @@
     </message>
   </context>
   <context>
-    <name>OpenLayoutActionWidget</name>
-    <message>
-      <source>Layout</source>
-      <translation>Розкладка</translation>
-    </message>
-    <message>
-      <source>Show to</source>
-      <translation>Показати до</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Виберіть макет...</translation>
-    </message>
-  </context>
-  <context>
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
@@ -2067,75 +1763,6 @@
     <message>
       <source>Sign in to web page</source>
       <translation type="unfinished">Sign in to web page</translation>
-    </message>
-  </context>
-  <context>
-    <name>PlaySoundBusinessActionWidget</name>
-    <message>
-      <source>Manage...</source>
-      <translation>Налаштувати...</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>Гучність:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>Тестування...</translation>
-    </message>
-    <message>
-      <source>Play to users</source>
-      <translation>Грати користувачам</translation>
-    </message>
-  </context>
-  <context>
-    <name>PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Source:</source>
-      <translation>Джерело:</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Заголовок містить:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Ключові слова, розділені пробілом</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Опис містить:</translation>
-    </message>
-    <message>
-      <source>Level:</source>
-      <translation>Рівень:</translation>
-    </message>
-    <message>
-      <source>ERROR</source>
-      <translation>ПОМИЛКА</translation>
-    </message>
-    <message>
-      <source>WARNING</source>
-      <translation>ПОПЕРЕДЖЕННЯ</translation>
-    </message>
-    <message>
-      <source>INFO</source>
-      <translation>ДАНІ</translation>
-    </message>
-  </context>
-  <context>
-    <name>PopupBusinessActionWidget</name>
-    <message>
-      <source>Force Acknowledgment</source>
-      <translation>Вимагати підтвердження</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>Використовувати особливий текст:</translation>
-    </message>
-    <message>
-      <source>to</source>
-      <translation>до</translation>
     </message>
   </context>
   <context>
@@ -2209,37 +1836,6 @@
     <message>
       <source>Hotkey:</source>
       <translation>Гаряча клавіша:</translation>
-    </message>
-  </context>
-  <context>
-    <name>PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>To</source>
-      <translation>До</translation>
-    </message>
-    <message>
-      <source>Custom notification content</source>
-      <translation>Особливий вміст сповіщень</translation>
-    </message>
-    <message>
-      <source>Header</source>
-      <translation>Заголовок</translation>
-    </message>
-    <message>
-      <source>Default notification title will be used if left empty</source>
-      <translation>Заголовок сповіщення за замовчуванням буде використаний, якщо його залишити порожнім</translation>
-    </message>
-    <message>
-      <source>Body</source>
-      <translation>Тіло</translation>
-    </message>
-    <message>
-      <source>Default text will be used if this field is empty</source>
-      <translation>Текст за замовчуванням буде використаний, якщо це поле порожнє</translation>
-    </message>
-    <message>
-      <source>Add source device name in body</source>
-      <translation>Додайте назву початкового пристрою в тіло</translation>
     </message>
   </context>
   <context>
@@ -2389,33 +1985,6 @@
     </message>
   </context>
   <context>
-    <name>RecordingBusinessActionWidget</name>
-    <message>
-      <source>Quality:</source>
-      <translation>Якість:</translation>
-    </message>
-    <message>
-      <source>FPS</source>
-      <translation>FPS</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <translation>с</translation>
-    </message>
-    <message>
-      <source>Pre-Recording:</source>
-      <translation>Попередній запис:</translation>
-    </message>
-    <message>
-      <source>Post-Recording:</source>
-      <translation>Пост-запис:</translation>
-    </message>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Тривалість за замовчуванням:</translation>
-    </message>
-  </context>
-  <context>
     <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
@@ -2520,29 +2089,6 @@
     <message>
       <source>Organization&apos;s limits violation</source>
       <translation type="unfinished">Organization&apos;s limits violation</translation>
-    </message>
-  </context>
-  <context>
-    <name>SayTextBusinessActionWidget</name>
-    <message>
-      <source>Speak the following:</source>
-      <translation>Промовте наступне:</translation>
-    </message>
-    <message>
-      <source>Type any text here</source>
-      <translation>Введіть текст</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>Гучність:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>Перевірка...</translation>
-    </message>
-    <message>
-      <source>Speak to users</source>
-      <translation>Грати користувачам</translation>
     </message>
   </context>
   <context>
@@ -2688,17 +2234,6 @@
     </message>
   </context>
   <context>
-    <name>SendmailBusinessActionWidget</name>
-    <message>
-      <source>Additional Recipients:</source>
-      <translation>Додаткові одержувачі:</translation>
-    </message>
-    <message>
-      <source>Global Email Settings...</source>
-      <translation>Налаштування пошти...</translation>
-    </message>
-  </context>
-  <context>
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
@@ -2772,36 +2307,6 @@
     </message>
   </context>
   <context>
-    <name>ShowOnAlarmLayoutActionWidget</name>
-    <message>
-      <source>for</source>
-      <translation>для</translation>
-    </message>
-    <message>
-      <source>Force Alarm Layout opening</source>
-      <translation>Примусове відкриття тривожної розкладки</translation>
-    </message>
-  </context>
-  <context>
-    <name>ShowTextOverlayActionWidget</name>
-    <message>
-      <source>seconds</source>
-      <translation>секунд</translation>
-    </message>
-    <message>
-      <source>Display text for:</source>
-      <translation>Показувати текст протягом:</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>Використовувати особливий текст:</translation>
-    </message>
-    <message>
-      <source>Rule will work only for prolonged events</source>
-      <translation>Правило буде працювати тільки для тривалих подій</translation>
-    </message>
-  </context>
-  <context>
     <name>SignDialog</name>
     <message>
       <source>Watermark Check</source>
@@ -2814,21 +2319,6 @@
     <message>
       <source>Check Result:</source>
       <translation>Результат:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>Available to</source>
-      <translation>Доступно для</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Ім’я</translation>
-    </message>
-    <message>
-      <source>Icon</source>
-      <translation>Значок</translation>
     </message>
   </context>
   <context>

@@ -335,6 +335,84 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::client::core::OrganizationsModel</name>
+    <message>
+      <source>Organizations</source>
+      <translation type="unfinished">Organizations</translation>
+    </message>
+    <message>
+      <source>Folders</source>
+      <translation type="unfinished">Folders</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation type="unfinished">Sites</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::RecordingStatusHelper</name>
+    <message>
+      <source>Not recording</source>
+      <translation type="unfinished">Not recording</translation>
+    </message>
+    <message>
+      <source>Recording everything</source>
+      <translation type="unfinished">Recording everything</translation>
+    </message>
+    <message>
+      <source>Recording motion and objects</source>
+      <translation type="unfinished">Recording motion and objects</translation>
+    </message>
+    <message>
+      <source>Recording motion only</source>
+      <translation type="unfinished">Recording motion only</translation>
+    </message>
+    <message>
+      <source>Recording objects only</source>
+      <translation type="unfinished">Recording objects only</translation>
+    </message>
+    <message>
+      <source>Recording motion, objects and low quality</source>
+      <translation type="unfinished">Recording motion, objects and low quality</translation>
+    </message>
+    <message>
+      <source>Recording motion and low quality</source>
+      <translation type="unfinished">Recording motion and low quality</translation>
+    </message>
+    <message>
+      <source>Recording objects and low quality</source>
+      <translation type="unfinished">Recording objects and low quality</translation>
+    </message>
+    <message>
+      <source>Continuous</source>
+      <translation type="unfinished">Continuous</translation>
+    </message>
+    <message>
+      <source>Motion, Objects</source>
+      <translation type="unfinished">Motion, Objects</translation>
+    </message>
+    <message>
+      <source>Motion only</source>
+      <translation type="unfinished">Motion only</translation>
+    </message>
+    <message>
+      <source>Objects only</source>
+      <translation type="unfinished">Objects only</translation>
+    </message>
+    <message>
+      <source>Motion, Objects + Lo-Res</source>
+      <translation type="unfinished">Motion, Objects + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Motion + Lo-Res</source>
+      <translation type="unfinished">Motion + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Objects + Lo-Res</source>
+      <translation type="unfinished">Objects + Lo-Res</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::core::SingleSystemDescription</name>
     <message>
       <source>Unnamed Site</source>

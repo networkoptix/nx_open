@@ -237,6 +237,14 @@
       <source>Table Settings</source>
       <translation>テーブル設定</translation>
     </message>
+    <message>
+      <source>Switch to table view</source>
+      <translation type="unfinished">Switch to table view</translation>
+    </message>
+    <message>
+      <source>Switch to card view</source>
+      <translation type="unfinished">Switch to card view</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsSettings</name>
@@ -279,13 +287,6 @@
 Select an Integration to begin configuring its parameters.</source>
       <translation>インテグレーションにより、VMS 上のさまざまなデバイスで映像分析をシームレスに利用できるようになります。
 パラメーターの設定を開始するには、インテグレーションを選択してください。</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsToolTipPreview</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>データがありません</translation>
     </message>
   </context>
   <context>
@@ -529,6 +530,10 @@ Select an Integration to begin configuring its parameters.</source>
       <source>Shut Down</source>
       <translation>シャットダウン</translation>
     </message>
+    <message>
+      <source>New</source>
+      <translation type="unfinished">New</translation>
+    </message>
   </context>
   <context>
     <name>CloudTile</name>
@@ -633,6 +638,29 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
       <source>Show thumbnails</source>
       <translation>サムネイルを表示</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomHttpHeadersDialog</name>
+    <message>
+      <source>Custom HTTP headers</source>
+      <translation type="unfinished">Custom HTTP headers</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>追加</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <source>Key</source>
+      <translation type="unfinished">Key</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
     </message>
   </context>
   <context>
@@ -1108,6 +1136,26 @@ Select an Integration to begin configuring its parameters.</source>
       <source>No groups</source>
       <translation>グループなし</translation>
     </message>
+    <message>
+      <source>LDAP</source>
+      <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+      <translation>LDAP</translation>
+    </message>
+    <message>
+      <source>ORGANIZATION</source>
+      <comment>Section with groups from organisation</comment>
+      <translation type="unfinished">ORGANIZATION</translation>
+    </message>
+    <message>
+      <source>BUILT-IN</source>
+      <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
+      <translation type="unfinished">BUILT-IN</translation>
+    </message>
+    <message>
+      <source>CUSTOM</source>
+      <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+      <translation type="unfinished">CUSTOM</translation>
+    </message>
   </context>
   <context>
     <name>HintItem</name>
@@ -1143,10 +1191,14 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
   </context>
   <context>
-    <name>InsecureWarning</name>
+    <name>InsecureBanner</name>
     <message>
-      <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-      <translation>アカウントのセキュリティは重要です。正当な理由がない限り、この設定を有効にしないでください。</translation>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
+      <translation>Digest 認証は非推奨であり、次のリリースでは無効になります。デフォルトの Bearer 認証を使用できない場合にのみ使用してください。</translation>
+    </message>
+    <message>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
+      <translation>Digest 認証は非推奨であり、次のリリースでは無効になります。デフォルトの Bearer 認証を使用できない場合にのみ使用してください。ユーザーのログイン名は小文字のみで構成する必要があります。</translation>
     </message>
   </context>
   <context>
@@ -1796,6 +1848,11 @@ Select an Integration to begin configuring its parameters.</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
       <translation>カスタム</translation>
     </message>
+    <message>
+      <source>Organization</source>
+      <comment>Section with groups from organisation</comment>
+      <translation type="unfinished">Organization</translation>
+    </message>
   </context>
   <context>
     <name>PasswordChangeDialog</name>
@@ -2221,16 +2278,8 @@ Alt + クリックを使用してください。</translation>
       <translation>ローカルファイルがありません</translation>
     </message>
     <message>
-      <source>Nothing found</source>
-      <translation>見つかりません</translation>
-    </message>
-    <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>動画ファイルまたは画像をクライアントウィンドウにドラッグするか、[ローカル設定] ダイアログからローカルメディアフォルダーを追加してください</translation>
-    </message>
-    <message>
-      <source>Try searching for something else</source>
-      <translation>違うキーワードで検索してみてください。</translation>
     </message>
   </context>
   <context>
@@ -2290,10 +2339,6 @@ Alt + クリックを使用してください。</translation>
   </context>
   <context>
     <name>ResourceSearchPane</name>
-    <message>
-      <source>Search</source>
-      <translation>検索</translation>
-    </message>
     <message>
       <source>Servers</source>
       <translation>サーバー</translation>
@@ -2393,13 +2438,6 @@ Alt + クリックを使用してください。</translation>
     <message>
       <source>File to save the results:</source>
       <translation>結果を保存するファイル:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SearchEdit</name>
-    <message>
-      <source>Search</source>
-      <translation>検索</translation>
     </message>
   </context>
   <context>

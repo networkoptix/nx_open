@@ -129,54 +129,13 @@
       <source>Open Files Folder</source>
       <translation type="unfinished">Open Files Folder</translation>
     </message>
-  </context>
-  <context>
-    <name>AggregationWidget</name>
     <message>
-      <source>Check to set aggregation period</source>
-      <translation>Marqueu aquesta opció per definir el període d'agregació</translation>
+      <source>with</source>
+      <translation type="unfinished">with</translation>
     </message>
     <message>
-      <source>Interval of action :</source>
-      <translation>Interval d'acció:</translation>
-    </message>
-    <message>
-      <source>No more than once per</source>
-      <translation>No més d'una vegada per</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Instantani</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Paraules clau separades per espai</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>El títol conté:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>La descripció conté:</translation>
-    </message>
-    <message>
-      <source>Event Type:</source>
-      <translation>Tipus d'esdeveniment:</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Attributes:</source>
-      <translation type="unfinished">Attributes:</translation>
-    </message>
-    <message>
-      <source>Object Type:</source>
-      <translation type="unfinished">Object Type:</translation>
+      <source>Simultaneous Streams</source>
+      <translation type="unfinished">Simultaneous Streams</translation>
     </message>
   </context>
   <context>
@@ -291,10 +250,6 @@
       <translation type="unfinished">Fix bandwidth to</translation>
     </message>
     <message>
-      <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
-    </message>
-    <message>
       <source>Unlimited</source>
       <translation type="unfinished">Unlimited</translation>
     </message>
@@ -305,6 +260,10 @@
     <message>
       <source>No backup</source>
       <translation type="unfinished">No backup</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -332,29 +291,6 @@
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
       <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
-    </message>
-  </context>
-  <context>
-    <name>BookmarkBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Durada fixa:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>segons</translation>
-    </message>
-    <message>
-      <source>Tags:</source>
-      <translation>Etiquetes:</translation>
-    </message>
-    <message>
-      <source>Pre-recording:</source>
-      <translation>Enregistrament previ:</translation>
-    </message>
-    <message>
-      <source>Post-recording:</source>
-      <translation>Enregistrament posterior:</translation>
     </message>
   </context>
   <context>
@@ -420,79 +356,6 @@
     <message>
       <source>Clear Filter</source>
       <translation>Neteja el filtre</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRuleWidget</name>
-    <message>
-      <source>Event</source>
-      <translation>Esdeveniment</translation>
-    </message>
-    <message>
-      <source>Schedule...</source>
-      <translation>Programa...</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Acció</translation>
-    </message>
-    <message>
-      <source>Comments:</source>
-      <translation>Comentaris:</translation>
-    </message>
-    <message>
-      <source>When</source>
-      <translation>Quan</translation>
-    </message>
-    <message>
-      <source>Do</source>
-      <translation>Fes</translation>
-    </message>
-    <message>
-      <source>At</source>
-      <translation>A</translation>
-    </message>
-    <message>
-      <source>Use event source server</source>
-      <translation>Utilitza el servidor d'origen d'esdeveniment</translation>
-    </message>
-    <message>
-      <source>Use event source camera</source>
-      <translation type="unfinished">Use event source camera</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRulesDialog</name>
-    <message>
-      <source>Add</source>
-      <translation>Afegeix</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Suprimeix</translation>
-    </message>
-    <message>
-      <source>Event Rules</source>
-      <translation>Regles d'esdeveniments</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>Registre d'esdeveniments...</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Prova</translation>
-    </message>
-  </context>
-  <context>
-    <name>BuzzerBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Durada fixa:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>segons</translation>
     </message>
   </context>
   <context>
@@ -741,12 +604,9 @@
       <source>Logical ID</source>
       <translation>ID lògic</translation>
     </message>
-  </context>
-  <context>
-    <name>CameraInputBusinessEventWidget</name>
     <message>
-      <source>Input ID</source>
-      <translation>ID d'entrada</translation>
+      <source>Restreaming Link</source>
+      <translation type="unfinished">Restreaming Link</translation>
     </message>
   </context>
   <context>
@@ -781,17 +641,6 @@
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
       <translation type="unfinished">in</translation>
-    </message>
-  </context>
-  <context>
-    <name>CameraOutputBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Durada fixa:</translation>
-    </message>
-    <message>
-      <source>Output ID:</source>
-      <translation>ID de sortida:</translation>
     </message>
   </context>
   <context>
@@ -904,57 +753,6 @@
     </message>
   </context>
   <context>
-    <name>CloudLayoutsIntroDialog</name>
-    <message>
-      <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
-    </message>
-    <message>
-      <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
-    </message>
-    <message>
-      <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
-    </message>
-    <message>
-      <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
-    </message>
-    <message>
-      <source>PTZ</source>
-      <translation>PTZ</translation>
-    </message>
-    <message>
-      <source>Showreels</source>
-      <translation>Showreels</translation>
-    </message>
-    <message>
-      <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
-    </message>
-    <message>
-      <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
-    </message>
-    <message>
-      <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
-    </message>
-    <message>
-      <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
-    </message>
-    <message>
-      <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
-    </message>
-    <message>
-      <source>In the Future</source>
-      <translation type="unfinished">In the Future</translation>
-    </message>
-  </context>
-  <context>
     <name>CloudManagementWidget</name>
     <message>
       <source>No connection</source>
@@ -996,29 +794,6 @@
     <message>
       <source>Select another event or action</source>
       <translation type="unfinished">Select another event or action</translation>
-    </message>
-  </context>
-  <context>
-    <name>CustomBusinessEventWidget</name>
-    <message>
-      <source>Source contains:</source>
-      <translation>La font conté:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Paraules clau separades per espai</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>El títol conté:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>La descripció conté:</translation>
-    </message>
-    <message>
-      <source>Omit Logging</source>
-      <translation>Omet el registre</translation>
     </message>
   </context>
   <context>
@@ -1172,59 +947,6 @@
     </message>
   </context>
   <context>
-    <name>ExecHttpRequestActionWidget</name>
-    <message>
-      <source>Login to authenticate (optional)</source>
-      <translation>Usuari per a autenticació (opcional)</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Usuari</translation>
-    </message>
-    <message>
-      <source>Password to authenticate (optional)</source>
-      <translation>Contrasenya per a autenticació (opcional)</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Contrasenya</translation>
-    </message>
-    <message>
-      <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
-    </message>
-    <message>
-      <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
-    </message>
-    <message>
-      <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
-    </message>
-    <message>
-      <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
-    </message>
-    <message>
-      <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExecPtzPresetBusinessActionWidget</name>
-    <message>
-      <source>PTZ preset:</source>
-      <translation>Valor predefinit PTZ:</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExitFullscreenActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>Al disseny</translation>
-    </message>
-  </context>
-  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <source>Export Settings</source>
@@ -1345,17 +1067,6 @@
     <message>
       <source>Nothing found</source>
       <translation>No s'ha trobat res</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenCameraActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>Al disseny</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Càmera</translation>
     </message>
   </context>
   <context>
@@ -1773,8 +1484,8 @@
       <translation>Torna-ho a provar</translation>
     </message>
     <message>
-      <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
     </message>
   </context>
   <context>
@@ -2001,21 +1712,6 @@
     </message>
   </context>
   <context>
-    <name>OpenLayoutActionWidget</name>
-    <message>
-      <source>Layout</source>
-      <translation>Disseny</translation>
-    </message>
-    <message>
-      <source>Show to</source>
-      <translation>Mostra a</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Seleccioneu un disseny...</translation>
-    </message>
-  </context>
-  <context>
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
@@ -2067,75 +1763,6 @@
     <message>
       <source>Sign in to web page</source>
       <translation type="unfinished">Sign in to web page</translation>
-    </message>
-  </context>
-  <context>
-    <name>PlaySoundBusinessActionWidget</name>
-    <message>
-      <source>Manage...</source>
-      <translation>Gestiona...</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>Volum:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>Prova...</translation>
-    </message>
-    <message>
-      <source>Play to users</source>
-      <translation>Reprodueix per als usuaris</translation>
-    </message>
-  </context>
-  <context>
-    <name>PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Source:</source>
-      <translation>Origen:</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>El títol conté:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Paraules clau separades per espai</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>La descripció conté:</translation>
-    </message>
-    <message>
-      <source>Level:</source>
-      <translation>Nivell:</translation>
-    </message>
-    <message>
-      <source>ERROR</source>
-      <translation>ERROR</translation>
-    </message>
-    <message>
-      <source>WARNING</source>
-      <translation>AVÍS</translation>
-    </message>
-    <message>
-      <source>INFO</source>
-      <translation>INFORMACIÓ</translation>
-    </message>
-  </context>
-  <context>
-    <name>PopupBusinessActionWidget</name>
-    <message>
-      <source>Force Acknowledgment</source>
-      <translation>Reconeixement forçat</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>Utilitza text personalitzat:</translation>
-    </message>
-    <message>
-      <source>to</source>
-      <translation>a</translation>
     </message>
   </context>
   <context>
@@ -2209,37 +1836,6 @@
     <message>
       <source>Hotkey:</source>
       <translation>Drecera:</translation>
-    </message>
-  </context>
-  <context>
-    <name>PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>To</source>
-      <translation>Per a</translation>
-    </message>
-    <message>
-      <source>Custom notification content</source>
-      <translation>Contingut de la notificació personalitzada</translation>
-    </message>
-    <message>
-      <source>Header</source>
-      <translation>Capçalera</translation>
-    </message>
-    <message>
-      <source>Default notification title will be used if left empty</source>
-      <translation>Si es deixa buit, s'utilitzarà el títol de notificació predeterminada</translation>
-    </message>
-    <message>
-      <source>Body</source>
-      <translation>Cos</translation>
-    </message>
-    <message>
-      <source>Default text will be used if this field is empty</source>
-      <translation>Si aquest camp està buit, s'utilitzarà el text predeterminat</translation>
-    </message>
-    <message>
-      <source>Add source device name in body</source>
-      <translation>Afegiu el nom del dispositiu d'origen al cos</translation>
     </message>
   </context>
   <context>
@@ -2389,33 +1985,6 @@
     </message>
   </context>
   <context>
-    <name>RecordingBusinessActionWidget</name>
-    <message>
-      <source>Quality:</source>
-      <translation>Qualitat:</translation>
-    </message>
-    <message>
-      <source>FPS</source>
-      <translation>FPS</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>Pre-Recording:</source>
-      <translation>Enregistrament previ:</translation>
-    </message>
-    <message>
-      <source>Post-Recording:</source>
-      <translation>Enregistrament posterior:</translation>
-    </message>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Durada fixa:</translation>
-    </message>
-  </context>
-  <context>
     <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
@@ -2520,29 +2089,6 @@
     <message>
       <source>Organization&apos;s limits violation</source>
       <translation type="unfinished">Organization&apos;s limits violation</translation>
-    </message>
-  </context>
-  <context>
-    <name>SayTextBusinessActionWidget</name>
-    <message>
-      <source>Speak the following:</source>
-      <translation>Digueu el següent:</translation>
-    </message>
-    <message>
-      <source>Type any text here</source>
-      <translation>Escriviu qualsevol text aquí</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>Volum:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>Prova...</translation>
-    </message>
-    <message>
-      <source>Speak to users</source>
-      <translation>Parleu amb els usuaris</translation>
     </message>
   </context>
   <context>
@@ -2688,17 +2234,6 @@
     </message>
   </context>
   <context>
-    <name>SendmailBusinessActionWidget</name>
-    <message>
-      <source>Additional Recipients:</source>
-      <translation>Destinataris addicionals:</translation>
-    </message>
-    <message>
-      <source>Global Email Settings...</source>
-      <translation>Configuració global de l'email...</translation>
-    </message>
-  </context>
-  <context>
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
@@ -2772,36 +2307,6 @@
     </message>
   </context>
   <context>
-    <name>ShowOnAlarmLayoutActionWidget</name>
-    <message>
-      <source>for</source>
-      <translation>per a</translation>
-    </message>
-    <message>
-      <source>Force Alarm Layout opening</source>
-      <translation>Força l'obertura del disseny d'alarma</translation>
-    </message>
-  </context>
-  <context>
-    <name>ShowTextOverlayActionWidget</name>
-    <message>
-      <source>seconds</source>
-      <translation>segons</translation>
-    </message>
-    <message>
-      <source>Display text for:</source>
-      <translation>Mostra el text per a:</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>Utilitza text personalitzat:</translation>
-    </message>
-    <message>
-      <source>Rule will work only for prolonged events</source>
-      <translation>La regla només funcionarà per a esdeveniments prolongats</translation>
-    </message>
-  </context>
-  <context>
     <name>SignDialog</name>
     <message>
       <source>Watermark Check</source>
@@ -2814,21 +2319,6 @@
     <message>
       <source>Check Result:</source>
       <translation>Resultat de la comprovació:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>Available to</source>
-      <translation>Disponible per a</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Nom</translation>
-    </message>
-    <message>
-      <source>Icon</source>
-      <translation>Icona</translation>
     </message>
   </context>
   <context>

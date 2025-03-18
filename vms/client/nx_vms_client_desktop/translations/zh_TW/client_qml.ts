@@ -236,6 +236,14 @@
       <source>Table Settings</source>
       <translation>表格設定</translation>
     </message>
+    <message>
+      <source>Switch to table view</source>
+      <translation type="unfinished">Switch to table view</translation>
+    </message>
+    <message>
+      <source>Switch to card view</source>
+      <translation type="unfinished">Switch to card view</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsSettings</name>
@@ -278,13 +286,6 @@
 Select an Integration to begin configuring its parameters.</source>
       <translation>整合允許在各種裝置上無縫利用 VMS 的影像分析。
 選擇一個整合以開始設定其參數。</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsToolTipPreview</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>無資料</translation>
     </message>
   </context>
   <context>
@@ -528,6 +529,10 @@ Select an Integration to begin configuring its parameters.</source>
       <source>Shut Down</source>
       <translation>關閉</translation>
     </message>
+    <message>
+      <source>New</source>
+      <translation type="unfinished">New</translation>
+    </message>
   </context>
   <context>
     <name>CloudTile</name>
@@ -632,6 +637,29 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
       <source>Show thumbnails</source>
       <translation>顯示縮圖</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomHttpHeadersDialog</name>
+    <message>
+      <source>Custom HTTP headers</source>
+      <translation type="unfinished">Custom HTTP headers</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>新增</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>刪除</translation>
+    </message>
+    <message>
+      <source>Key</source>
+      <translation type="unfinished">Key</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
     </message>
   </context>
   <context>
@@ -1107,6 +1135,26 @@ Select an Integration to begin configuring its parameters.</source>
       <source>No groups</source>
       <translation>沒有群組</translation>
     </message>
+    <message>
+      <source>LDAP</source>
+      <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+      <translation>LDAP</translation>
+    </message>
+    <message>
+      <source>ORGANIZATION</source>
+      <comment>Section with groups from organisation</comment>
+      <translation type="unfinished">ORGANIZATION</translation>
+    </message>
+    <message>
+      <source>BUILT-IN</source>
+      <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
+      <translation type="unfinished">BUILT-IN</translation>
+    </message>
+    <message>
+      <source>CUSTOM</source>
+      <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+      <translation type="unfinished">CUSTOM</translation>
+    </message>
   </context>
   <context>
     <name>HintItem</name>
@@ -1142,10 +1190,14 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
   </context>
   <context>
-    <name>InsecureWarning</name>
+    <name>InsecureBanner</name>
     <message>
-      <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-      <translation>帳號安全很重要。除非您有充分的理由，否則請勿啟用此設定。</translation>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
+      <translation>摘要式身份認證已棄用並將在下個版本停用，僅應在無法使用預設的 Bearer 身份認證時使用。</translation>
+    </message>
+    <message>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
+      <translation>摘要式身份認證已棄用並將在下個版本停用，僅應在無法使用預設的 Bearer 身份認證時使用。使用者登入名稱只能包含小寫字母。</translation>
     </message>
   </context>
   <context>
@@ -1794,6 +1846,11 @@ Select an Integration to begin configuring its parameters.</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
       <translation>自訂</translation>
     </message>
+    <message>
+      <source>Organization</source>
+      <comment>Section with groups from organisation</comment>
+      <translation type="unfinished">Organization</translation>
+    </message>
   </context>
   <context>
     <name>PasswordChangeDialog</name>
@@ -2214,16 +2271,8 @@ Press Alt + Click to follow object</source>
       <translation>查無本機檔案</translation>
     </message>
     <message>
-      <source>Nothing found</source>
-      <translation>未找到任何內容</translation>
-    </message>
-    <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>將串流檔案、圖像拖曳至客戶端視窗，或透過“本機設定”選項來加入本機媒體資料夾</translation>
-    </message>
-    <message>
-      <source>Try searching for something else</source>
-      <translation>請嘗試搜尋其他內容</translation>
     </message>
   </context>
   <context>
@@ -2283,10 +2332,6 @@ Press Alt + Click to follow object</source>
   </context>
   <context>
     <name>ResourceSearchPane</name>
-    <message>
-      <source>Search</source>
-      <translation>搜尋</translation>
-    </message>
     <message>
       <source>Servers</source>
       <translation>伺服器</translation>
@@ -2386,13 +2431,6 @@ Press Alt + Click to follow object</source>
     <message>
       <source>File to save the results:</source>
       <translation>保存結果到文件</translation>
-    </message>
-  </context>
-  <context>
-    <name>SearchEdit</name>
-    <message>
-      <source>Search</source>
-      <translation>搜尋</translation>
     </message>
   </context>
   <context>

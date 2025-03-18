@@ -129,54 +129,13 @@
       <source>Open Files Folder</source>
       <translation>Dosya Klasörünü Aç</translation>
     </message>
-  </context>
-  <context>
-    <name>AggregationWidget</name>
     <message>
-      <source>Check to set aggregation period</source>
-      <translation>Toplama Periyodunu Ayarlamak İçin Kontrol Et</translation>
+      <source>with</source>
+      <translation type="unfinished">with</translation>
     </message>
     <message>
-      <source>Interval of action :</source>
-      <translation>Eylem Aralığı :</translation>
-    </message>
-    <message>
-      <source>No more than once per</source>
-      <translation>Defadan Daha Fazla Değil</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Derhal</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Anahtar Kelimeler Boşluk İle Ayrılır</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Başlık İçeriği:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Açıklama İçeriği:</translation>
-    </message>
-    <message>
-      <source>Event Type:</source>
-      <translation>Etkinlik Türü:</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Attributes:</source>
-      <translation>Öznitellikler:</translation>
-    </message>
-    <message>
-      <source>Object Type:</source>
-      <translation>Nesne Türü:</translation>
+      <source>Simultaneous Streams</source>
+      <translation type="unfinished">Simultaneous Streams</translation>
     </message>
   </context>
   <context>
@@ -291,10 +250,6 @@
       <translation>Bant genişliğini sabitle</translation>
     </message>
     <message>
-      <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
-    </message>
-    <message>
       <source>Unlimited</source>
       <translation>Sınırsız</translation>
     </message>
@@ -305,6 +260,10 @@
     <message>
       <source>No backup</source>
       <translation>Yedek yok</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -332,29 +291,6 @@
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
       <translation>Depolama sorunu nedeniyle yedekleme durduruldu. Depolama sorunu çözüldükten sonra yedekleme otomatik olarak devam edecek</translation>
-    </message>
-  </context>
-  <context>
-    <name>BookmarkBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Belirlenmiş Zaman:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>saniye</translation>
-    </message>
-    <message>
-      <source>Tags:</source>
-      <translation>Etiketler:</translation>
-    </message>
-    <message>
-      <source>Pre-recording:</source>
-      <translation>Kayıt Öncesi Süre:</translation>
-    </message>
-    <message>
-      <source>Post-recording:</source>
-      <translation>Kayıt Sonrası Süre:</translation>
     </message>
   </context>
   <context>
@@ -420,79 +356,6 @@
     <message>
       <source>Clear Filter</source>
       <translation>Filtreyi Temizle</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRuleWidget</name>
-    <message>
-      <source>Event</source>
-      <translation>Durum</translation>
-    </message>
-    <message>
-      <source>Schedule...</source>
-      <translation>Takvim...</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Hareket</translation>
-    </message>
-    <message>
-      <source>Comments:</source>
-      <translation>Yorumlar:</translation>
-    </message>
-    <message>
-      <source>When</source>
-      <translation>Başlama Zamanı</translation>
-    </message>
-    <message>
-      <source>Do</source>
-      <translation>Yap</translation>
-    </message>
-    <message>
-      <source>At</source>
-      <translation>da/de</translation>
-    </message>
-    <message>
-      <source>Use event source server</source>
-      <translation>Olay kaynağı sunucusunu kullan</translation>
-    </message>
-    <message>
-      <source>Use event source camera</source>
-      <translation>Olay kaynağı kamerasını kullan</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRulesDialog</name>
-    <message>
-      <source>Add</source>
-      <translation>Ekle</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Sil</translation>
-    </message>
-    <message>
-      <source>Event Rules</source>
-      <translation>Olay Kuralları</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>Olay Günlükleri...</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Test</translation>
-    </message>
-  </context>
-  <context>
-    <name>BuzzerBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Belirlenmiş Zaman:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>saniye</translation>
     </message>
   </context>
   <context>
@@ -741,12 +604,9 @@
       <source>Logical ID</source>
       <translation>Mantıksal Kimlik</translation>
     </message>
-  </context>
-  <context>
-    <name>CameraInputBusinessEventWidget</name>
     <message>
-      <source>Input ID</source>
-      <translation>Giriş kimliği</translation>
+      <source>Restreaming Link</source>
+      <translation type="unfinished">Restreaming Link</translation>
     </message>
   </context>
   <context>
@@ -781,17 +641,6 @@
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
       <translation>içinde</translation>
-    </message>
-  </context>
-  <context>
-    <name>CameraOutputBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Belirlenmiş Zaman:</translation>
-    </message>
-    <message>
-      <source>Output ID:</source>
-      <translation>Çıkış Kimliği:</translation>
     </message>
   </context>
   <context>
@@ -904,57 +753,6 @@
     </message>
   </context>
   <context>
-    <name>CloudLayoutsIntroDialog</name>
-    <message>
-      <source>BETA</source>
-      <translation>BETA</translation>
-    </message>
-    <message>
-      <source>Available Actions</source>
-      <translation>Yapılabilecek işlemler</translation>
-    </message>
-    <message>
-      <source>Video Export</source>
-      <translation>Video Dışa Aktarma</translation>
-    </message>
-    <message>
-      <source>Live Video and Archive</source>
-      <translation>Canlı Video ve Arşiv</translation>
-    </message>
-    <message>
-      <source>PTZ</source>
-      <translation>PTZ</translation>
-    </message>
-    <message>
-      <source>Showreels</source>
-      <translation>Kamera Tur</translation>
-    </message>
-    <message>
-      <source>Read more on the help page</source>
-      <translation>Yardım sayfasında daha fazlasını okuyun</translation>
-    </message>
-    <message>
-      <source>Do not show this window again</source>
-      <translation>Bu pencereyi tekrar gösterme</translation>
-    </message>
-    <message>
-      <source>Introducing Cloud Layouts</source>
-      <translation>Cloud Layouts'a Giriş</translation>
-    </message>
-    <message>
-      <source>Motion Search</source>
-      <translation>Hareket Arama</translation>
-    </message>
-    <message>
-      <source>Searching Bookmarks, Objects, Events</source>
-      <translation>Yer İmlerini, Nesneleri, Olayları Arama</translation>
-    </message>
-    <message>
-      <source>In the Future</source>
-      <translation>Gelecekte</translation>
-    </message>
-  </context>
-  <context>
     <name>CloudManagementWidget</name>
     <message>
       <source>No connection</source>
@@ -996,29 +794,6 @@
     <message>
       <source>Select another event or action</source>
       <translation>Başka bir etkinlik veya eylem seçin</translation>
-    </message>
-  </context>
-  <context>
-    <name>CustomBusinessEventWidget</name>
-    <message>
-      <source>Source contains:</source>
-      <translation>Kaynak İçeriği:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Anahtar Kelimeler Boşluk İle Ayrılır</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Başlık İçeriği:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Açıklama İçeriği:</translation>
-    </message>
-    <message>
-      <source>Omit Logging</source>
-      <translation>Günlük kaydı atlayın</translation>
     </message>
   </context>
   <context>
@@ -1172,59 +947,6 @@
     </message>
   </context>
   <context>
-    <name>ExecHttpRequestActionWidget</name>
-    <message>
-      <source>Login to authenticate (optional)</source>
-      <translation>Kimlik doğrulaması (isteğe Bağlı)</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Giriş</translation>
-    </message>
-    <message>
-      <source>Password to authenticate (optional)</source>
-      <translation>Kimlik doğrulaması (isteğe Bağlı)</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Parola</translation>
-    </message>
-    <message>
-      <source>HTTP(S) URL</source>
-      <translation>HTTP(S) Bağlantısı</translation>
-    </message>
-    <message>
-      <source>HTTP(S) Content</source>
-      <translation>HTTP(S) İçeriği</translation>
-    </message>
-    <message>
-      <source>Content Type</source>
-      <translation>İçerik Türü</translation>
-    </message>
-    <message>
-      <source>Authentication Type</source>
-      <translation>Kimlik Doğrulama Türü</translation>
-    </message>
-    <message>
-      <source>Request Method</source>
-      <translation>İstek Yöntemi</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExecPtzPresetBusinessActionWidget</name>
-    <message>
-      <source>PTZ preset:</source>
-      <translation>PTZ ön tanımlı pozisyon:</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExitFullscreenActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>Ekranda</translation>
-    </message>
-  </context>
-  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <source>Export Settings</source>
@@ -1345,17 +1067,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Hiçbir şey bulunamadı</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenCameraActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>Ekranda</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
     </message>
   </context>
   <context>
@@ -1773,8 +1484,8 @@
       <translation>Yeniden dene</translation>
     </message>
     <message>
-      <source>Open Files Folder</source>
-      <translation>Dosya Klasörünü Aç</translation>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
     </message>
   </context>
   <context>
@@ -2001,21 +1712,6 @@
     </message>
   </context>
   <context>
-    <name>OpenLayoutActionWidget</name>
-    <message>
-      <source>Layout</source>
-      <translation>Yerleşim</translation>
-    </message>
-    <message>
-      <source>Show to</source>
-      <translation>Göster</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Düzen seç...</translation>
-    </message>
-  </context>
-  <context>
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
@@ -2067,75 +1763,6 @@
     <message>
       <source>Sign in to web page</source>
       <translation>Web sayfasında oturum açın</translation>
-    </message>
-  </context>
-  <context>
-    <name>PlaySoundBusinessActionWidget</name>
-    <message>
-      <source>Manage...</source>
-      <translation>Yönet...</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>Ses:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>Test Et...</translation>
-    </message>
-    <message>
-      <source>Play to users</source>
-      <translation>Kullanıcıya oynat</translation>
-    </message>
-  </context>
-  <context>
-    <name>PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Source:</source>
-      <translation>Kaynak:</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Başlık İçeriği:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Anahtar Kelimeler Boşluk İle Ayrılır</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Açıklama İçeriği:</translation>
-    </message>
-    <message>
-      <source>Level:</source>
-      <translation>Seviye:</translation>
-    </message>
-    <message>
-      <source>ERROR</source>
-      <translation>HATA</translation>
-    </message>
-    <message>
-      <source>WARNING</source>
-      <translation>UYARI</translation>
-    </message>
-    <message>
-      <source>INFO</source>
-      <translation>BİLGİ</translation>
-    </message>
-  </context>
-  <context>
-    <name>PopupBusinessActionWidget</name>
-    <message>
-      <source>Force Acknowledgment</source>
-      <translation>İlerleme Bildirimi</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>Özel Metin Kullan:</translation>
-    </message>
-    <message>
-      <source>to</source>
-      <translation>kime</translation>
     </message>
   </context>
   <context>
@@ -2209,37 +1836,6 @@
     <message>
       <source>Hotkey:</source>
       <translation>Kısayol:</translation>
-    </message>
-  </context>
-  <context>
-    <name>PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>To</source>
-      <translation>Kime</translation>
-    </message>
-    <message>
-      <source>Custom notification content</source>
-      <translation>Bildirim içeriğini gizle</translation>
-    </message>
-    <message>
-      <source>Header</source>
-      <translation>Başlık</translation>
-    </message>
-    <message>
-      <source>Default notification title will be used if left empty</source>
-      <translation>Boş bırakılırsa varsayılan bildirim başlığı kullanılır</translation>
-    </message>
-    <message>
-      <source>Body</source>
-      <translation>Gövde</translation>
-    </message>
-    <message>
-      <source>Default text will be used if this field is empty</source>
-      <translation>Bu alan boşsa varsayılan metin kullanılır</translation>
-    </message>
-    <message>
-      <source>Add source device name in body</source>
-      <translation>Gövdeye kaynak cihaz adı ekle</translation>
     </message>
   </context>
   <context>
@@ -2389,33 +1985,6 @@
     </message>
   </context>
   <context>
-    <name>RecordingBusinessActionWidget</name>
-    <message>
-      <source>Quality:</source>
-      <translation>Kalite:</translation>
-    </message>
-    <message>
-      <source>FPS</source>
-      <translation>FPS</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>Pre-Recording:</source>
-      <translation>Ön Kayıt Süresi:</translation>
-    </message>
-    <message>
-      <source>Post-Recording:</source>
-      <translation>Son Kayıt Süresi:</translation>
-    </message>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Belirlenmiş Zaman:</translation>
-    </message>
-  </context>
-  <context>
     <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
@@ -2520,29 +2089,6 @@
     <message>
       <source>Organization&apos;s limits violation</source>
       <translation type="unfinished">Organization&apos;s limits violation</translation>
-    </message>
-  </context>
-  <context>
-    <name>SayTextBusinessActionWidget</name>
-    <message>
-      <source>Speak the following:</source>
-      <translation>Aşağıdakileri Söyleyin:</translation>
-    </message>
-    <message>
-      <source>Type any text here</source>
-      <translation>Herhangi Bir Metin Girin</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>Ses:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>Test Et...</translation>
-    </message>
-    <message>
-      <source>Speak to users</source>
-      <translation>Kullnıcıya konuş</translation>
     </message>
   </context>
   <context>
@@ -2688,17 +2234,6 @@
     </message>
   </context>
   <context>
-    <name>SendmailBusinessActionWidget</name>
-    <message>
-      <source>Additional Recipients:</source>
-      <translation>Diğer Alıcılar:</translation>
-    </message>
-    <message>
-      <source>Global Email Settings...</source>
-      <translation>Genel e-posta ayarları...</translation>
-    </message>
-  </context>
-  <context>
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
@@ -2772,36 +2307,6 @@
     </message>
   </context>
   <context>
-    <name>ShowOnAlarmLayoutActionWidget</name>
-    <message>
-      <source>for</source>
-      <translation>için</translation>
-    </message>
-    <message>
-      <source>Force Alarm Layout opening</source>
-      <translation>Alarm Ekranını Açmaya Zorla</translation>
-    </message>
-  </context>
-  <context>
-    <name>ShowTextOverlayActionWidget</name>
-    <message>
-      <source>seconds</source>
-      <translation>saniye</translation>
-    </message>
-    <message>
-      <source>Display text for:</source>
-      <translation>Ekranda Görünecek Metin:</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>Özel Metin Kullan:</translation>
-    </message>
-    <message>
-      <source>Rule will work only for prolonged events</source>
-      <translation>Kural Sadece Devam Eden Olaylarda Çalışacaktır</translation>
-    </message>
-  </context>
-  <context>
     <name>SignDialog</name>
     <message>
       <source>Watermark Check</source>
@@ -2814,21 +2319,6 @@
     <message>
       <source>Check Result:</source>
       <translation>Kontrol Et:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>Available to</source>
-      <translation>Uygun</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>İsim</translation>
-    </message>
-    <message>
-      <source>Icon</source>
-      <translation>Simge</translation>
     </message>
   </context>
   <context>

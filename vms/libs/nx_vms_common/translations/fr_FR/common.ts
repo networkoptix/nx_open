@@ -1045,6 +1045,10 @@
       <source>None of selected user roles contain users</source>
       <translation>Aucun des rôles d'utilisateur sélectionnés ne contient d'utilisateurs</translation>
     </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>Sélectionner au moins un utilisateur</translation>
+    </message>
   </context>
   <context>
     <name>QnTimeStrings</name>
@@ -1298,17 +1302,6 @@
     </message>
   </context>
   <context>
-    <name>QnTranscoder</name>
-    <message>
-      <source>OpenCLTranscode is not implemented.</source>
-      <translation>'OpenCLTranscode' n'est pas implémenté.</translation>
-    </message>
-    <message>
-      <source>Unknown transcode method</source>
-      <translation>Méthode de transcodage inconnue</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserResource</name>
     <message>
       <source>Custom</source>
@@ -1465,336 +1458,6 @@
   <context>
     <name>nx::vms::common::SystemSettings</name>
     <message>
-      <source>Anonymous statistics report allowed</source>
-      <translation>Statistique anonyme autorisée</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last time</source>
-      <translation>Statistique anonyme de la dernière fois</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last version</source>
-      <translation>Dernière version des statistiques anonymes</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last number</source>
-      <translation>Dernier numéro des statistiques anonymes</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics time cycle</source>
-      <translation>Cycle de temps des statistiques anonymes</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report delay after update</source>
-      <translation>Retard des statistiques anonymes après la mise à jour</translation>
-    </message>
-    <message>
-      <source>Anonymous Statistics Report Server URL</source>
-      <translation>URL du serveur des statistiques anonymes</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report Client settings</source>
-      <translation>Paramètres du client des statistiques anonymes</translation>
-    </message>
-    <message>
-      <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation>Délai de connexion du proxy (secondes, 1s-1h)
-</translation>
-    </message>
-    <message>
-      <source>Time synchronization enabled</source>
-      <translation>Synchronisation de l'heure activée</translation>
-    </message>
-    <message>
-      <source>Primary time synchronization Server ID</source>
-      <translation>ID serveur de synchronisation de l'heure principal</translation>
-    </message>
-    <message>
-      <source>Max difference between local and source time (milliseconds)</source>
-      <translation>Différence maximale entre l'heure locale et l'heure source (millisecondes)</translation>
-    </message>
-    <message>
-      <source>OS time change check period</source>
-      <translation>Période de vérification du changement d'heure de l'OS</translation>
-    </message>
-    <message>
-      <source>Sync time synchronization interval for network requests</source>
-      <translation>Intervalle de synchronisation de synchronisation de l'heure pour les requêtes réseau</translation>
-    </message>
-    <message>
-      <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation>Synchroniser le temps epsilon. La nouvelle valeur n'est pas appliquée si le delta temps est inférieur à epsilon</translation>
-    </message>
-    <message>
-      <source>Cloud owner account</source>
-      <translation>Compte propriétaire du cloud</translation>
-    </message>
-    <message>
-      <source>Cloud authorization key</source>
-      <translation>Clé d'autorisation Cloud</translation>
-    </message>
-    <message>
-      <source>Disable Device vendors</source>
-      <translation>Désactiver les fournisseurs d'appareils</translation>
-    </message>
-    <message>
-      <source>Optimize Camera settings</source>
-      <translation>Optimiser les paramètres de la caméra</translation>
-    </message>
-    <message>
-      <source>Thumbnails auto-update</source>
-      <translation>Mise à jour automatique des vignettes</translation>
-    </message>
-    <message>
-      <source>Max scene items (0 means default)</source>
-      <translation>Max éléments de scène (0 signifie par défaut)</translation>
-    </message>
-    <message>
-      <source>Send plain-text emails</source>
-      <translation>Envoyer des courriels en texte brut</translation>
-    </message>
-    <message>
-      <source>Use Windows line feed in emails</source>
-      <translation>Utiliser le Windows 'line feed' dans les courriels</translation>
-    </message>
-    <message>
-      <source>Enable audit trail</source>
-      <translation>Activer piste de vérification</translation>
-    </message>
-    <message>
-      <source>Audit trail period (days, 14-730)</source>
-      <translation>Période de la piste de vérification (jours, 14-730)</translation>
-    </message>
-    <message>
-      <source>Event log period (days)</source>
-      <translation>Période du journal d'événements (jours)</translation>
-    </message>
-    <message>
-      <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation>Forcer HTTPS (chiffrement du trafic de données)</translation>
-    </message>
-    <message>
-      <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation>Forcer RTSPS (cryptage du trafic vidéo)</translation>
-    </message>
-    <message>
-      <source>Enable auto-discovery</source>
-      <translation>Activer la détection automatique</translation>
-    </message>
-    <message>
-      <source>Enable auto-update notifications</source>
-      <translation>Activer les notifications de mise à jour automatique</translation>
-    </message>
-    <message>
-      <source>Enable update notifications</source>
-      <translation>Activer les notifications de mise à jour</translation>
-    </message>
-    <message>
-      <source>Enable UPNP port-mapping</source>
-      <translation>Activer le mappage de port UPNP</translation>
-    </message>
-    <message>
-      <source>Backup settings</source>
-      <translation>Paramètres de sauvegarde</translation>
-    </message>
-    <message>
-      <source>Cloud host override</source>
-      <translation>Remplacement de l'hôte cloud</translation>
-    </message>
-    <message>
-      <source>Enable RTSP for Arecont</source>
-      <translation>Activer RTSP pour Arecont</translation>
-    </message>
-    <message>
-      <source>Enable sequential Flir ONVIF searcher</source>
-      <translation>Activer la recherche séquentielle Flir ONVIF</translation>
-    </message>
-    <message>
-      <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation>Taille maximale de la file d'attente P2P (octets, 32-512 Mo)</translation>
-    </message>
-    <message>
-      <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation>Taille maximale de tous les clients P2P (octets, 32-512 Mo)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation>Taille maximale de la file d'attente d'enregistrement (octets, 6-96 Mo)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (elements, 250-4000)</source>
-      <translation>Taille maximale de la file d'attente d'enregistrements (éléments, 250-4000)</translation>
-    </message>
-    <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>Délai RTP (millisecondes)</translation>
-    </message>
-    <message>
-      <source>Max RTSP connection duration (seconds)</source>
-      <translation>Durée maximale de connexion RTSP (secondes)</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect UDP hole-punching</source>
-      <translation>Activer l'UDP hole-punching de la connexion cloud</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect relays usage</source>
-      <translation>Activer l'utilisation des relais de connexion cloud</translation>
-    </message>
-    <message>
-      <source>Enforce SSL for cloud-connect relays</source>
-      <translation>Forcer SSL pour les relais de connexion cloud</translation>
-    </message>
-    <message>
-      <source>Enable recording on EDGE</source>
-      <translation>Activer l'enregistrement de bord</translation>
-    </message>
-    <message>
-      <source>Target update information</source>
-      <translation>Informations sur la mise à jour cible</translation>
-    </message>
-    <message>
-      <source>Installed update information</source>
-      <translation>Informations sur la mise à jour installée</translation>
-    </message>
-    <message>
-      <source>Downloader peers for files</source>
-      <translation>Paires de téléchargeurs pour les fichiers</translation>
-    </message>
-    <message>
-      <source>Client update settings</source>
-      <translation>Paramètres de mise à jour du client</translation>
-    </message>
-    <message>
-      <source>Watermark settings</source>
-      <translation>Paramètres du filigrane</translation>
-    </message>
-    <message>
-      <source>Session token count limit on a single Server</source>
-      <translation>Limite du nombre de jetons de session sur un seul serveur</translation>
-    </message>
-    <message>
-      <source>Max session token count per user on single Server</source>
-      <translation>Nombre maximal de jetons de session par utilisateur sur un seul serveur</translation>
-    </message>
-    <message>
-      <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation>Intervalle de mise à jour du cache du jeton de session à distance (autres serveurs et Cloud)</translation>
-    </message>
-    <message>
-      <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation>Délai pour le cache de jeton de session à distance (autres serveurs et Cloud)
-</translation>
-    </message>
-    <message>
-      <source>Default video codec</source>
-      <translation>Codec vidéo par défaut</translation>
-    </message>
-    <message>
-      <source>Default codec for export video</source>
-      <translation>Codec par défaut pour l'exportation de vidéo</translation>
-    </message>
-    <message>
-      <source>Low quality screen video codec</source>
-      <translation>Codec vidéo d'écran faible qualité</translation>
-    </message>
-    <message>
-      <source>License server</source>
-      <translation>Serveur de licence</translation>
-    </message>
-    <message>
-      <source>URI for resource_data.json automatic update</source>
-      <translation>URI pour la mise à jour automatique de resource_data.json</translation>
-    </message>
-    <message>
-      <source>Meta data storage change policy</source>
-      <translation>Politique de modification du stockage des métadonnées</translation>
-    </message>
-    <message>
-      <source>Persistent Servers for update storage</source>
-      <translation>Serveurs persistants pour mettre à jour le stockage</translation>
-    </message>
-    <message>
-      <source>Persistent Servers where updates are stored</source>
-      <translation>Serveurs persistants où les mises à jour sont stockées</translation>
-    </message>
-    <message>
-      <source>VMS Server version specific features</source>
-      <translation>Fonctionnalités spécifiques du Serveur VMS</translation>
-    </message>
-    <message>
-      <source>Additional local FS storage types for recording</source>
-      <translation>Types de stockage FS locaux supplémentaires pour l'enregistrement</translation>
-    </message>
-    <message>
-      <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation>Forcer les permissions du point de montage de la base de données analytique en cas d'échec</translation>
-    </message>
-    <message>
-      <source>Storage encryption enabled</source>
-      <translation>Chiffrement du stockage activé</translation>
-    </message>
-    <message>
-      <source>Current storage encryption key</source>
-      <translation>Clé de cryptage du stockage actuel</translation>
-    </message>
-    <message>
-      <source>HTTP header: Origin</source>
-      <translation>En-tête HTTP: Origine</translation>
-    </message>
-    <message>
-      <source>HTTP header: X-Frame-Options</source>
-      <translation>En-tête HTTP : X-Frame-Options</translation>
-    </message>
-    <message>
-      <source>Show mouse timeline preview</source>
-      <translation>Afficher l'aperçu de la chronologie de la souris</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4MB)</source>
-      <translation>Taille du tampon multimédia (KB, 10KB-4MB)</translation>
-    </message>
-    <message>
-      <source>Enable cross-domain policy</source>
-      <translation>Activer la politique inter-domaine</translation>
-    </message>
-    <message>
-      <source>Enable WebSocket for P2P</source>
-      <translation>Activer WebSocket pour P2P</translation>
-    </message>
-    <message>
-      <source>Show Servers in the Resource Tree for non-admins</source>
-      <translation>Afficher les serveurs dans l'arborescence des ressources pour les non-administrateurs</translation>
-    </message>
-    <message>
-      <source>Use only HTTPS for cameras</source>
-      <translation>Utiliser uniquement HTTPS pour les caméras</translation>
-    </message>
-    <message>
-      <source>Expose IP addresses for autodiscovery</source>
-      <translation>Exposer les adresses IP pour la découverte automatique</translation>
-    </message>
-    <message>
-      <source>Keep IO port state on when Server connects to the device</source>
-      <translation>Garder l'état du port IO activé lorsque le serveur se connecte à l'appareil</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation>Taille du tampon multimédia pour les périphériques audio uniquement (KB, 1KB-1MB)</translation>
-    </message>
-    <message>
-      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation>Exposer les mots de passe de l'appareil stockés dans le VMS pour les administrateurs (pour les pages web)</translation>
-    </message>
-    <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation>Nombre maximum de threads pour la synchronisation d'archives distantes (&lt;=0 - auto, max 32)</translation>
-    </message>
-    <message>
-      <source>Thread count limit for camera archive synchronization</source>
-      <translation>Limite du nombre de threads pour la synchronisation des archives de la caméra</translation>
-    </message>
-    <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
       <translation>Nombre maximum d'enregistrements de journaux d'événements à conserver dans la base de données. Le nombre réel d'enregistrements non supprimés peut être jusqu'à 20% supérieur à la valeur spécifiée.</translation>
     </message>
@@ -1807,32 +1470,8 @@
       <translation>Quantité maximale de connexions HTTP utilisant le transcodage pour le serveur. Chrome ouvre 2 connexions à la fois, puis ferme la première. Nous recommandons de régler la valeur&apos;s de ce paramètre sur 2 ou plus.</translation>
     </message>
     <message>
-      <source>Update releases.json file URL</source>
-      <translation>Mettre à jour l'URL du fichier releases.json</translation>
-    </message>
-    <message>
-      <source>LDAP settings</source>
-      <translation>Paramètres LDAP</translation>
-    </message>
-    <message>
-      <source>SMTP settings</source>
-      <translation>Paramètres SMTP</translation>
-    </message>
-    <message>
-      <source>Authorization Session token lifetime (seconds)</source>
-      <translation>Durée de vie du jeton de session d'autorisation (secondes)</translation>
-    </message>
-    <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
       <translation>Liste séparée par des virgules de serveurs désignés pour se connecter au Cloud. Les serveurs en haut de la liste ont une priorité plus élevée. Si la liste est vide, un serveur pour la connexion Cloud est sélectionné automatiquement.</translation>
-    </message>
-    <message>
-      <source>Allow Power User editing Security Settings</source>
-      <translation>Autoriser les utilisateurs expérimentés à modifier les paramètres de sécurité</translation>
-    </message>
-    <message>
-      <source>Enable deprecated API functions (insecure)</source>
-      <translation>Activer les fonctions API obsolètes (non sécurisées)</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
@@ -1844,794 +1483,436 @@
       <translation>Activer les fonctions API obsolètes actuellement utilisées par le logiciel %1 (non sécurisées)</translation>
     </message>
     <message>
-      <source>Organization Id</source>
-      <translation>ID de l'Organisation</translation>
-    </message>
-    <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
       <translation>Intervalle entre les requêtes HTTP d'interrogation du Cloud pour synchroniser les données.</translation>
-    </message>
-    <message>
-      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
-      <translation>En-tête HTTP : Serveur, variables supportées : $vmsName, $vmsVersion, $company, $compatibility</translation>
-    </message>
-    <message>
-      <source>Device storage information update interval</source>
-      <translation>Intervalle de mise à jour des informations de stockage de l'appareil</translation>
-    </message>
-    <message>
-      <source>Site alive update interval (seconds, 1s-1h)</source>
-      <translation>Intervalle de mise à jour du site (secondes, 1s-1h)</translation>
-    </message>
-    <message>
-      <source>Proxy connection access policy</source>
-      <translation>Politique d'accès à la connexion proxy</translation>
-    </message>
-    <message>
-      <source>Cloud Site ID</source>
-      <translation>ID du site cloud</translation>
-    </message>
-    <message>
-      <source>Enable 2FA for the Site</source>
-      <translation>Activer 2FA pour le site</translation>
-    </message>
-    <message>
-      <source>Site name</source>
-      <translation>Nom du site</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
       <translation>ID du site local, null signifie que le site n'est pas encore configuré.</translation>
     </message>
     <message>
-      <source>Last master Site merge ID</source>
-      <translation>Dernier ID de fusion du site maître</translation>
-    </message>
-    <message>
-      <source>Last slave Site merge ID</source>
-      <translation>Dernier identifiant de fusion du site esclave</translation>
-    </message>
-    <message>
-      <source>Pixelation settings</source>
-      <translation>Paramètres de pixellisation</translation>
-    </message>
-    <message>
-      <source>Apply session limit for Cloud tokens</source>
-      <translation>Appliquer la limite de session pour les jetons Cloud</translation>
-    </message>
-    <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
       <translation>Activer ou désactiver la création de nouvelles demandes d'enregistrement d'intégration</translation>
     </message>
     <message>
-      <source>Anonymous Crash Report Server API URL</source>
-      <translation>URL de l'API du serveur de rapport d'incident anonyme</translation>
+      <source>SMTP settings.</source>
+      <translation>Paramètres SMTP.</translation>
     </message>
     <message>
-      <source>Default locale for new users</source>
-      <translation>Langue par défaut pour les nouveaux utilisateurs</translation>
+      <source>Anonymous statistics report allowed.</source>
+      <translation>Statistique anonyme autorisée.</translation>
     </message>
     <message>
-      <source>Check video stream permissions on VMS server period (milliseconds)</source>
-      <translation>Vérifier les autorisations de flux vidéo sur la période du serveur VMS (millisecondes)</translation>
+      <source>Anonymous statistics report last time.</source>
+      <translation>Statistique anonyme de la dernière fois.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::event::StringsHelper</name>
     <message>
-      <source>Bookmark</source>
-      <translation>Signet</translation>
+      <source>Anonymous statistics report last version.</source>
+      <translation>Dernière version des statistiques anonymes.</translation>
     </message>
     <message>
-      <source>Panic recording</source>
-      <translation>Enregistrement Panic</translation>
+      <source>Anonymous statistics report last number.</source>
+      <translation>Dernier numéro des statistiques anonymes.</translation>
     </message>
     <message>
-      <source>Write to log</source>
-      <translation>Écrire dans journal</translation>
+      <source>Anonymous statistics time cycle.</source>
+      <translation>Cycle de temps des statistiques anonymes.</translation>
     </message>
     <message>
-      <source>Repeat sound</source>
-      <translation>Répéter Son</translation>
+      <source>Anonymous statistics report delay after update.</source>
+      <translation>Retard des statistiques anonymes après la mise à jour.</translation>
     </message>
     <message>
-      <source>Play sound</source>
-      <translation>Jouer Son</translation>
+      <source>Anonymous Statistics Report Server URL.</source>
+      <translation>URL du serveur des statistiques anonymes.</translation>
     </message>
     <message>
-      <source>Speak</source>
-      <translation>Parler</translation>
+      <source>Anonymous Crash Report Server API URL.</source>
+      <translation>URL de l'API du serveur de rapport d'incident anonyme.</translation>
     </message>
     <message>
-      <source>Execute PTZ preset</source>
-      <translation>Exécuter préréglages PTZ</translation>
+      <source>Anonymous statistics report Client settings.</source>
+      <translation>Paramètres du client des statistiques anonymes.</translation>
     </message>
     <message>
-      <source>Show text overlay</source>
-      <translation>Afficher le texte de fond</translation>
+      <source>Device storage information update interval.</source>
+      <translation>Intervalle de mise à jour des informations de stockage de l'appareil.</translation>
     </message>
     <message>
-      <source>Show on Alarm Layout</source>
-      <translation>Afficher sur mise en page Alarme</translation>
+      <source>Site alive update interval (seconds, 1s-1h).</source>
+      <translation>Intervalle de mise à jour du site (secondes, 1s-1h).</translation>
     </message>
     <message>
-      <source>Device output</source>
-      <translation>Sortie Périphérique</translation>
+      <source>Proxy connection timeout (seconds, 1s-1h).</source>
+      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h).</translation>
     </message>
     <message>
-      <source>Camera output</source>
-      <translation>Sortie Caméra</translation>
+      <source>Proxy connection access policy.</source>
+      <translation>Politique d'accès à la connexion proxy.</translation>
     </message>
     <message>
-      <source>Device recording</source>
-      <translation>Enregistrement Périphérique</translation>
+      <source>Time synchronization enabled.</source>
+      <translation>Synchronisation de l'heure activée.</translation>
     </message>
     <message>
-      <source>Camera recording</source>
-      <translation>Enregistrement Caméra</translation>
+      <source>Primary time synchronization Server ID.</source>
+      <translation>ID serveur de synchronisation de l'heure principal.</translation>
     </message>
     <message>
-      <source>Generic Event</source>
-      <translation>Événement Générique</translation>
+      <source>Max difference between local and source time (milliseconds).</source>
+      <translation>Différence maximale entre l'heure locale et l'heure source (millisecondes).</translation>
     </message>
-    <message numerus="yes">
-      <source>Motion on Cameras</source>
-      <translation>
-        <numerusform>Mouvement sur caméras</numerusform>
-        <numerusform>Mouvement sur caméras</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Network Issue</source>
-      <translation>Problème réseau</translation>
-    </message>
-    <message>
-      <source>Server Failure</source>
-      <translation>Échec Serveur</translation>
-    </message>
-    <message>
-      <source>Server Conflict</source>
-      <translation>Conflit Serveur</translation>
-    </message>
-    <message>
-      <source>Server Started</source>
-      <translation>Serveur Démarré</translation>
-    </message>
-    <message>
-      <source>License Issue</source>
-      <translation>Problème Licence</translation>
-    </message>
-    <message>
-      <source>Any Server Issue</source>
-      <translation>Tout problème de serveur</translation>
-    </message>
-    <message>
-      <source>Any Event</source>
-      <translation>Tout Événement</translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Devices</source>
-      <translation>
-        <numerusform>Signal d’entrée sur périphériques</numerusform>
-        <numerusform>Signal d’entrée sur périphériques</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Cameras</source>
-      <translation>
-        <numerusform>Signal d’entrée sur caméras</numerusform>
-        <numerusform>Signal d’entrée sur caméras</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices Disconnected</source>
-      <translation>
-        <numerusform>Périphériques déconnectés</numerusform>
-        <numerusform>Périphériques déconnectés</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras Disconnected</source>
-      <translation>
-        <numerusform>Caméras déconnectées</numerusform>
-        <numerusform>Caméras déconnectées</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices IP Conflict</source>
-      <translation>
-        <numerusform>Conflit IP Périphériques</numerusform>
-        <numerusform>Conflit IP Périphériques</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras IP Conflict</source>
-      <translation>
-        <numerusform>Conflit IP Caméras</numerusform>
-        <numerusform>Conflit IP Caméras</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Any Device Issue</source>
-      <translation>Tout problème périphérique</translation>
-    </message>
-    <message>
-      <source>Any Camera Issue</source>
-      <translation>Tout problème caméra</translation>
-    </message>
-    <message>
-      <source>Undefined event has occurred on %1</source>
-      <translation>Évènement indéfini est survenu sur %1</translation>
-    </message>
-    <message>
-      <source>Device %1 was disconnected</source>
-      <translation>Périphérique %1 a été découvert</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>Caméra %1 a été découverte</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>Module I/O %1 à été déconnecté</translation>
-    </message>
-    <message>
-      <source>Input on %1</source>
-      <translation>Entrée sur %1</translation>
-    </message>
-    <message>
-      <source>Motion on %1</source>
-      <translation>Mouvement sur %1</translation>
-    </message>
-    <message>
-      <source>Network Issue at %1</source>
-      <translation>Problème de réseau à %1</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation>Échec Serveur &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict at %1</source>
-      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Conflit IP Périphérique sur %1</translation>
-    </message>
-    <message>
-      <source>Camera IP Conflict at %1</source>
-      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Conflit IP Caméra sur %1</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation>Conflit Serveur &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation>Serveur &quot;%1&quot; Démarré</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>Serveur &quot;%1&quot; a un problème de licence</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>Serveur &quot;%1&quot; a terminé une sauvegarde d’archive</translation>
-    </message>
     <message>
-      <source>Generic Event at %1</source>
-      <translation>Événement Générique %1</translation>
+      <source>OS time change check period.</source>
+      <translation>Période de vérification du changement d'heure de l'OS.</translation>
     </message>
     <message>
-      <source>An unknown event has occurred</source>
-      <translation>Évènement inconnu s'est produit</translation>
+      <source>Sync time synchronization interval for network requests.</source>
+      <translation>Intervalle de synchronisation de synchronisation de l'heure pour les requêtes réseau.</translation>
     </message>
     <message>
-      <source>Event: %1</source>
-      <translation>Évènement: %1</translation>
+      <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
+      <translation>Synchroniser le temps epsilon. La nouvelle valeur n'est pas appliquée si le delta temps est inférieur à epsilon.</translation>
     </message>
     <message>
-      <source>Source: %1</source>
-      <translation>Source: %1</translation>
+      <source>Cloud owner account.</source>
+      <translation>Compte propriétaire du cloud.</translation>
     </message>
     <message>
-      <source>Caption: %1</source>
-      <translation>Légende: %1</translation>
+      <source>Organization Id.</source>
+      <translation>ID de l'Organisation.</translation>
     </message>
     <message>
-      <source>Input Port: %1</source>
-      <translation>Port Entrée: %1</translation>
+      <source>Cloud Site ID.</source>
+      <translation>ID du site cloud.</translation>
     </message>
     <message>
-      <source>Reason: %1</source>
-      <translation>Raison: %1</translation>
+      <source>Cloud authorization key.</source>
+      <translation>Clé d'autorisation Cloud.</translation>
     </message>
     <message>
-      <source>Conflicting Address: %1</source>
-      <translation>Conflit avec serveur: %1</translation>
+      <source>Enable 2FA for the Site.</source>
+      <translation>Activer 2FA pour le site.</translation>
     </message>
     <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2</translation>
+      <source>Site name.</source>
+      <translation>Nom du site.</translation>
     </message>
     <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Conflit de serveur#%1: %2</translation>
+      <source>Last master Site merge ID.</source>
+      <translation>Dernier ID de fusion du site maître.</translation>
     </message>
     <message>
-      <source>Conflicting Server: %1</source>
-      <translation>Conflit de serveur: %1</translation>
+      <source>Last slave Site merge ID.</source>
+      <translation>Dernier identifiant de fusion du site esclave.</translation>
     </message>
     <message>
-      <source>Trigger: %1</source>
-      <translation>Déclenchement: %1</translation>
+      <source>Disable Device vendors.</source>
+      <translation>Désactiver les fournisseurs d'appareils.</translation>
     </message>
     <message>
-      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <source>Optimize Camera settings.</source>
+      <translation>Optimiser les paramètres de la caméra.</translation>
     </message>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n fois, premier: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n fois, premier: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>Temps: %2 à %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>Première occurrence: %2 à %1 (%n temps total)</numerusform>
-        <numerusform>Première occurrence: %2 à %1 (%n temps total)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>Aucune donnée reçu durant %n secondes.</numerusform>
-        <numerusform>Aucune donnée reçu durant %n secondes.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected.</source>
-      <translation>Perte de paquet RTP détectée.</translation>
-    </message>
-    <message>
-      <source>Device does not respond to network requests.</source>
-      <translation>Périphérique ne répond pas aux demandes réseau.</translation>
-    </message>
-    <message>
-      <source>Connection to server is lost.</source>
-      <translation>Connexion au serveur perdu.</translation>
-    </message>
-    <message>
-      <source>Server stopped unexpectedly.</source>
-      <translation>Serveur arrêté inopinément.</translation>
-    </message>
-    <message>
-      <source>I/O error has occurred at %1.</source>
-      <translation>I/O erreur est survenue à %1.</translation>
-    </message>
-    <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>Vitesse HDD/SSD insuffisante pour l'enregistrement sur %1.</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>HDD/SSD &quot;%1&quot; est plein. Le disque contient trop de données qui ne sont pas gérés par le VMS.</translation>
-    </message>
-    <message>
-      <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>Disque système &quot;%1&quot; presque plein.</translation>
-    </message>
-    <message>
-      <source>start</source>
-      <translation>démarrer</translation>
-    </message>
-    <message>
-      <source>stop</source>
-      <translation>arrêter</translation>
-    </message>
-    <message>
-      <source>While %1</source>
-      <translation>Pendant %1</translation>
-    </message>
-    <message>
-      <source>On %1 %2</source>
-      <translation>Sur %1 %2</translation>
-    </message>
-    <message>
-      <source>Trigger Name</source>
-      <translation>Nom du déclencheur</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n utilisateur</numerusform>
-        <numerusform>%n utilisateurs</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>Tous les utilisateurs</translation>
-    </message>
-    <message>
-      <source>Select at least one user</source>
-      <translation>Sélectionner au moins un utilisateur</translation>
-    </message>
-    <message>
-      <source>Soft Trigger</source>
-      <translation>Déclencheur</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 at %2</source>
-      <translation>Déclencheur %1 à %2</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation>Déclencheur %1 à été activé plusieurs fois</translation>
-    </message>
-    <message>
-      <source>Send email</source>
-      <translation>Envoyer Courriel</translation>
-    </message>
-    <message>
-      <source>Acknowledge</source>
-      <translation>Acquitter</translation>
-    </message>
     <message>
-      <source>Analytics Event</source>
-      <translation>Événement Analytique</translation>
+      <source>Thumbnails auto-update.</source>
+      <translation>Mise à jour automatique des vignettes.</translation>
     </message>
     <message>
-      <source>%1 at %2</source>
-      <comment>Analytics Event at some camera</comment>
-      <translation>%1 à %2</translation>
+      <source>Max scene items (0 means default).</source>
+      <translation>Max éléments de scène (0 signifie par défaut).</translation>
     </message>
     <message>
-      <source>Storage Issue</source>
-      <translation>Problème de stockage</translation>
+      <source>Send plain-text emails.</source>
+      <translation>Envoyer des courriels en texte brut.</translation>
     </message>
     <message>
-      <source>Storage Issue at %1</source>
-      <translation>Problème de stockage à %1</translation>
+      <source>Use Windows line feed in emails.</source>
+      <translation>Utiliser le Windows 'line feed' dans les courriels.</translation>
     </message>
     <message>
-      <source>Set to fullscreen</source>
-      <translation>Définir en plein écran</translation>
+      <source>Enable audit trail.</source>
+      <translation>Activer piste de vérification.</translation>
     </message>
     <message>
-      <source>Exit fullscreen</source>
-      <translation>Quitter le plein écran</translation>
+      <source>Audit trail period (days, 14-730).</source>
+      <translation>Période de la piste de vérification (jours, 14-730).</translation>
     </message>
     <message>
-      <source>Open layout</source>
-      <translation>Ouvrir la mise en page</translation>
+      <source>Event log period (days).</source>
+      <translation>Période du journal d'événements (jours).</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>Plusieurs %1 événements se sont produits</translation>
+      <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
+      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation>Le stockage analytique &quot;%1&quot; est hors ligne.</translation>
+      <source>Enforce HTTPS (data traffic encryption).</source>
+      <translation>Forcer HTTPS (chiffrement du trafic de données).</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation>Le stockage analytique &quot;%1&quot; est presque plein.</translation>
+      <source>Enforce RTSPS (video traffic encryption).</source>
+      <translation>Forcer RTSPS (cryptage du trafic vidéo).</translation>
     </message>
     <message>
-      <source>Plugin Diagnostic Event</source>
-      <translation>Événement de diagnostic du plugin</translation>
+      <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
+      <translation>Exposer les mots de passe de l'appareil stockés dans le VMS pour les administrateurs (pour les pages web).</translation>
     </message>
     <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>Evénement de diagnostic de plugin inconnu</translation>
+      <source>Enable auto-discovery.</source>
+      <translation>Activer la détection automatique.</translation>
     </message>
     <message>
-      <source>Buzzer</source>
-      <translation>Buzzer</translation>
+      <source>Enable auto-update notifications.</source>
+      <translation>Activer les notifications de mise à jour automatique.</translation>
     </message>
     <message>
-      <source>Archive Backup Finished</source>
-      <translation>Sauvegarde d'archive terminée</translation>
+      <source>Enable update notifications.</source>
+      <translation>Activer les notifications de mise à jour.</translation>
     </message>
     <message>
-      <source>PoE over Budget</source>
-      <translation>Budget PoE dépassé</translation>
+      <source>Enable UPNP port-mapping.</source>
+      <translation>Activer le mappage de port UPNP.</translation>
     </message>
     <message>
-      <source>Fan Error</source>
-      <translation>Erreur de ventilateur</translation>
+      <source>Backup settings.</source>
+      <translation>Paramètres de sauvegarde.</translation>
     </message>
     <message>
-      <source>PoE over budget at %1</source>
-      <translation>PoE supérieur au budget de %1</translation>
+      <source>Cloud host override.</source>
+      <translation>Remplacement de l'hôte cloud.</translation>
     </message>
     <message>
-      <source>Fan error at %1</source>
-      <translation>Erreur de ventilateur de %1</translation>
+      <source>Enable cross-domain policy.</source>
+      <translation>Activer la politique inter-domaine.</translation>
     </message>
     <message>
-      <source>Reason: Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation>Raison : Limite de puissance dépassée (%1)</translation>
+      <source>Enable RTSP for Arecont.</source>
+      <translation>Activer RTSP pour Arecont.</translation>
     </message>
     <message>
-      <source>Show desktop notification</source>
-      <translation>Afficher notification sur le bureau</translation>
+      <source>Enable sequential Flir ONVIF searcher.</source>
+      <translation>Activer la recherche séquentielle Flir ONVIF.</translation>
     </message>
     <message>
-      <source>Send mobile notification</source>
-      <translation>Envoyer une notification mobile</translation>
+      <source>Max P2P queue size (bytes, 32-512MB).</source>
+      <translation>Taille maximale de la file d'attente P2P (octets, 32-512 Mo).</translation>
     </message>
     <message>
-      <source>Consumption</source>
-      <translation>Consommation</translation>
+      <source>Max P2P all clients size (bytes, 32-512MB).</source>
+      <translation>Taille maximale de tous les clients P2P (octets, 32-512 Mo).</translation>
     </message>
     <message>
-      <source>Device was disconnected</source>
-      <translation>Périphérique a été déconnecté</translation>
+      <source>Max record queue size (bytes, 6-96MB).</source>
+      <translation>Taille maximale de la file d'attente d'enregistrement (octets, 6-96 Mo).</translation>
     </message>
     <message>
-      <source>Camera was disconnected</source>
-      <translation>Caméra a été déconnectée</translation>
+      <source>Max record queue size (elements, 250-4000).</source>
+      <translation>Taille maximale de la file d'attente d'enregistrements (éléments, 250-4000).</translation>
     </message>
     <message>
-      <source>I/O Module was disconnected</source>
-      <translation>Module E/S a été déconnecté</translation>
+      <source>RTP timeout (milliseconds).</source>
+      <translation>Délai RTP (millisecondes).</translation>
     </message>
     <message>
-      <source>Analytics Object Detected</source>
-      <translation>Objet Analytique Détecté</translation>
+      <source>Max RTSP connection duration (seconds).</source>
+      <translation>Durée maximale de connexion RTSP (secondes).</translation>
     </message>
     <message>
-      <source>%1 at camera &apos;%2&apos;</source>
-      <comment> is detected</comment>
-      <translation>%1 à la caméra &apos;%2&apos;</translation>
+      <source>Enable cloud-connect UDP hole-punching.</source>
+      <translation>Activer l'UDP hole-punching de la connexion cloud.</translation>
     </message>
     <message>
-      <source>Plugin: %1</source>
-      <translation>Plugin: %1</translation>
+      <source>Enable cloud-connect relays usage.</source>
+      <translation>Activer l'utilisation des relais de connexion cloud.</translation>
     </message>
     <message>
-      <source>Archive backup failed.</source>
-      <translation>Échec de la sauvegarde d'archive.</translation>
+      <source>Enforce SSL for cloud-connect relays.</source>
+      <translation>Forcer SSL pour les relais de connexion cloud.</translation>
     </message>
     <message>
-      <source>Object detected</source>
-      <translation>Objet détecté</translation>
+      <source>Enable recording on EDGE.</source>
+      <translation>Activer l'enregistrement de bord.</translation>
     </message>
     <message>
-      <source>Archive backup failed</source>
-      <translation>Échec de la sauvegarde d'archive</translation>
+      <source>Enable WebSocket for P2P.</source>
+      <translation>Activer WebSocket pour P2P.</translation>
     </message>
     <message>
-      <source>Data is backed up to %1</source>
-      <translation>Les données sont sauvegardées dans %1</translation>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>
+      <translation>Nombre maximum de threads pour la synchronisation d'archives distantes (&lt;=0 - auto, max 32).</translation>
     </message>
     <message>
-      <source>Server Certificate Error</source>
-      <translation>Erreur de certificat de serveur</translation>
+      <source>Update releases.json file URL.</source>
+      <translation>Mettre à jour l'URL du fichier releases.json.</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; certificate error</source>
-      <translation>Erreur serveur &quot;%1&quot; certificat</translation>
+      <source>Target update information.</source>
+      <translation>Informations sur la mise à jour cible.</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1).</source>
-      <translation>Erreur RTP dans le flux principal (%1).</translation>
+      <source>Installed update information.</source>
+      <translation>Informations sur la mise à jour installée.</translation>
     </message>
     <message>
-      <source>RTP error in secondary stream (%1).</source>
-      <translation>Erreur RTP dans le flux secondaire (%1).</translation>
+      <source>Downloader peers for files.</source>
+      <translation>Paires de téléchargeurs pour les fichiers.</translation>
     </message>
     <message>
-      <source>Camera time is back to normal.</source>
-      <translation>Le temps de la caméra est revenu à la normale.</translation>
+      <source>Client update settings.</source>
+      <translation>Paramètres de mise à jour du client.</translation>
     </message>
     <message>
-      <source>Address %1 is already in use by %2 on primary stream.</source>
-      <comment>%1 is the address, %2 is the device name</comment>
-      <translation>L'adresse %1 est déjà utilisée par %2 sur le flux principal.</translation>
+      <source>Thread count limit for camera archive synchronization.</source>
+      <translation>Limite du nombre de threads pour la synchronisation des archives de la caméra.</translation>
     </message>
     <message>
-      <source>Address %1 is already in use by %2 on secondary stream.</source>
-      <comment>%1 is the address, %2 is the device name</comment>
-      <translation>L'adresse %1 est déjà utilisée par %2 sur le flux secondaire.</translation>
+      <source>Watermark settings.</source>
+      <translation>Paramètres du filigrane.</translation>
     </message>
     <message>
-      <source>Multicast address conflict detected.</source>
-      <translation>Conflit d'adresse multicast détecté.</translation>
+      <source>Pixelation settings.</source>
+      <translation>Paramètres de pixellisation.</translation>
     </message>
     <message>
-      <source>Network address %1 is not a multicast address.</source>
-      <translation>L'adresse réseau %1 n'est pas une adresse multicast.</translation>
+      <source>Authorization Session token lifetime (seconds).</source>
+      <translation>Durée de vie du jeton de session d'autorisation (secondes).</translation>
     </message>
     <message>
-      <source>Failed to backup file %1</source>
-      <translation>Échec de la sauvegarde du fichier %1</translation>
+      <source>Apply session limit for Cloud tokens.</source>
+      <translation>Appliquer la limite de session pour les jetons Cloud.</translation>
     </message>
     <message>
-      <source>Do HTTP(S) request</source>
-      <translation>Faire une requête HTTP(S)</translation>
+      <source>Session token count limit on a single Server.</source>
+      <translation>Limite du nombre de jetons de session sur un seul serveur.</translation>
     </message>
     <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>Connexion à la caméra (flux primaire) a été fermée de façon inattendue.</translation>
+      <source>Max session token count per user on single Server.</source>
+      <translation>Nombre maximal de jetons de session par utilisateur sur un seul serveur.</translation>
     </message>
     <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Connexion à la caméra (flux secondaire) a été fermée de façon inattendue.</translation>
+      <source>Update interval for remote session token cache (other Servers and Cloud).</source>
+      <translation>Intervalle de mise à jour du cache du jeton de session à distance (autres serveurs et Cloud).</translation>
     </message>
     <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>Connexion au périphérique a été fermé de façon inattendue.</translation>
+      <source>Timeout for remote session token cache (other Servers and Cloud).</source>
+      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud).</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation>Erreur de stockage des analytiques &quot;%1&quot; base de données : permissions insuffisantes sur le point de montage.</translation>
+      <source>Default video codec.</source>
+      <translation>Codec vidéo par défaut.</translation>
     </message>
     <message>
-      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation>Impossible d'initialiser le chiffrement AES lorsque l'enregistrement est activé dans l'archive média. Les données sont écrites non chiffrées.</translation>
+      <source>Default codec for export video.</source>
+      <translation>Codec par défaut pour l'exportation de vidéo.</translation>
     </message>
     <message>
-      <source>RAID error: %1.</source>
-      <translation>Erreur RAID : %1.</translation>
+      <source>Low quality screen video codec.</source>
+      <translation>Codec vidéo d'écran faible qualité.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation>Pas assez de licences. L'enregistrement a été désactivé sur les appareils suivants :</translation>
+      <source>License server.</source>
+      <translation>Serveur de licence.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation>Pas assez de licences. L'enregistrement a été désactivé sur les caméras suivantes:</translation>
+      <source>URI for resource_data.json automatic update.</source>
+      <translation>URI pour la mise à jour automatique de resource_data.json.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation>Pas assez de licences. L'enregistrement a été désactivé sur les modules d'E/S suivants :</translation>
+      <source>Meta data storage change policy.</source>
+      <translation>Politique de modification du stockage des métadonnées.</translation>
     </message>
     <message>
-      <source>Also show source camera</source>
-      <translation>Aussi afficher la caméra source</translation>
+      <source>Persistent Servers for update storage.</source>
+      <translation>Serveurs persistants pour mettre à jour le stockage.</translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Source Caméra</translation>
+      <source>Persistent Servers where updates are stored.</source>
+      <translation>Serveurs persistants où les mises à jour sont stockées.</translation>
     </message>
     <message>
-      <source>Also show on source camera</source>
-      <translation>Aussi afficher la caméra source</translation>
+      <source>VMS Server version specific features.</source>
+      <translation>Fonctionnalités spécifiques du Serveur VMS.</translation>
     </message>
     <message>
-      <source>Also set on source camera</source>
-      <translation>Également défini sur la caméra source</translation>
+      <source>Default locale for new users.</source>
+      <translation>Langue par défaut pour les nouveaux utilisateurs.</translation>
     </message>
     <message>
-      <source>Also trigger on source camera</source>
-      <translation>Déclenche également sur la caméra source</translation>
+      <source>Additional local FS storage types for recording.</source>
+      <translation>Types de stockage FS locaux supplémentaires pour l'enregistrement.</translation>
     </message>
     <message>
-      <source>Also record source camera</source>
-      <translation>Enregistrer également la caméra source</translation>
+      <source>Keep IO port state on when Server connects to the device.</source>
+      <translation>Garder l'état du port IO activé lorsque le serveur se connecte à l'appareil.</translation>
     </message>
     <message>
-      <source>Also play on source camera</source>
-      <translation>Jouer également sur la caméra source</translation>
+      <source>Media buffer size (KB, 10KB-4MB).</source>
+      <translation>Taille du tampon multimédia (KB, 10KB-4MB).</translation>
     </message>
-    <message numerus="yes">
-      <source>%n Groups</source>
-      <translation>
-        <numerusform>%n groupe</numerusform>
-        <numerusform>%n groupes</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>LDAP Sync Issue</source>
-      <translation>Problème de synchronisation LDAP</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n times)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n fois)</numerusform>
-        <numerusform>%1 (%n fois)</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Failed to connect to the LDAP server.</source>
-      <translation>Impossible de se connecter au serveur LDAP.</translation>
+      <source>Media buffer size for audio only devices (KB, 1KB-1MB).</source>
+      <translation>Taille du tampon multimédia pour les périphériques audio uniquement (KB, 1KB-1MB).</translation>
     </message>
     <message>
-      <source>Failed to complete the sync within a %1 timeout.</source>
-      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation>Échec de la synchronisation dans un délai d'expiration de %1 .</translation>
+      <source>Force analytics DB storage mount point permissions in case of failure.</source>
+      <translation>Forcer les permissions du point de montage de la base de données analytique en cas d'échec.</translation>
     </message>
     <message>
-      <source>Failed to complete the sync within a given timeout.</source>
-      <translation>Impossible de terminer la synchronisation dans un délai donné.</translation>
+      <source>Check video stream permissions on VMS server period (milliseconds).</source>
+      <translation>Vérifier les autorisations de flux vidéo sur la période du serveur VMS (millisecondes).</translation>
     </message>
     <message>
-      <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation>Aucun compte utilisateur sur le serveur LDAP ne correspond aux paramètres de synchronisation.</translation>
+      <source>Storage encryption enabled.</source>
+      <translation>Chiffrement du stockage activé.</translation>
     </message>
     <message>
-      <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation>Certains utilisateurs LDAP ou groupes n'ont pas été trouvés dans la base de données LDAP.</translation>
+      <source>Current storage encryption key.</source>
+      <translation>Clé de cryptage du stockage actuel.</translation>
     </message>
     <message>
-      <source>Services Issue</source>
-      <translation>Problème de services</translation>
+      <source>Show Servers in the Resource Tree for non-admins.</source>
+      <translation>Afficher les serveurs dans l'arborescence des ressources pour les non-administrateurs.</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; has license migration issue</source>
-      <translation>Le serveur &quot;%1&quot; a un problème de migration de licence</translation>
+      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</source>
+      <translation>En-tête HTTP : Serveur, variables supportées : $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
-      <source>Service overuse</source>
-      <translation>Surutilisation du service</translation>
+      <source>HTTP header: Origin.</source>
+      <translation>En-tête HTTP: Origine.</translation>
     </message>
     <message>
-      <source>The following licenses were not migrated:</source>
-      <translation>Les licences suivantes n'ont pas été migrées:</translation>
+      <source>HTTP header: X-Frame-Options.</source>
+      <translation>En-tête HTTP : X-Frame-Options.</translation>
     </message>
     <message>
-      <source>License</source>
-      <translation>Licence :</translation>
+      <source>Use only HTTPS for cameras.</source>
+      <translation>Utiliser uniquement HTTPS pour les caméras.</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>Caméra</translation>
-    </message>
-    <message numerus="yes">
-      <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>L'enregistrement sur le canal %n a été arrêté en raison d'une utilisation excessive du service.</numerusform>
-        <numerusform>L'enregistrement sur les canaux %n a été arrêté en raison d'une utilisation excessive du service.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>La sauvegarde du stockage cloud sur le canal %n a été arrêtée en raison d'une utilisation excessive du service.</numerusform>
-        <numerusform>La sauvegarde du stockage cloud sur %n canaux a été arrêtée en raison d'une surutilisation du service.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>L'utilisation du service d'intégration payante sur le canal %n a été arrêtée en raison d'une utilisation excessive du service.</numerusform>
-        <numerusform>L'utilisation du service d'intégration payante sur les canaux %n a été arrêtée en raison d'une utilisation excessive du service.</numerusform>
-      </translation>
+      <source>Allow Power User editing Security Settings.</source>
+      <translation>Autoriser les utilisateurs expérimentés à modifier les paramètres de sécurité.</translation>
     </message>
     <message>
-      <source>Failed to migrate licenses.</source>
-      <translation>Échec de la migration des licences.</translation>
+      <source>Enable deprecated API functions (insecure).</source>
+      <translation>Activer les fonctions API obsolètes (non sécurisées).</translation>
     </message>
     <message>
-      <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation>Importation des licences ignorée. Une autre tentative de migration sera automatiquement planifiée pour plus tard.</translation>
+      <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
+      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation>Impossible de forcer l'utilisation de l'heure de la caméra, car il y a trop de retard. L'heure du site sera utilisée à la place.</translation>
+      <source>Expose IP addresses for autodiscovery.</source>
+      <translation>Exposer les adresses IP pour la découverte automatique.</translation>
     </message>
     <message>
-      <source>Call Request</source>
-      <translation>Demande d'appel</translation>
+      <source>Show mouse timeline preview.</source>
+      <translation>Afficher l'aperçu de la chronologie de la souris.</translation>
     </message>
     <message>
-      <source>Call Request Missed</source>
-      <translation>Demande d'appel manquée</translation>
+      <source>LDAP settings.</source>
+      <translation>Paramètres LDAP.</translation>
     </message>
   </context>
 </TS>

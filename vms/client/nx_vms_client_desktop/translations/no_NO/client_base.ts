@@ -273,10 +273,6 @@
       <translation>Hjelp</translation>
     </message>
     <message>
-      <source>Event Log...</source>
-      <translation>Hendelsesloggen...</translation>
-    </message>
-    <message>
       <source>Control Video Wall</source>
       <translation>Kontroller Videovegg</translation>
     </message>
@@ -1165,22 +1161,6 @@
       <translation type="unfinished">Connect to Site</translation>
     </message>
     <message>
-      <source>Layout Tab</source>
-      <translation type="unfinished">Layout Tab</translation>
-    </message>
-    <message>
-      <source>New Layout Tab</source>
-      <translation type="unfinished">New Layout Tab</translation>
-    </message>
-    <message>
-      <source>Welcome Screen Tab</source>
-      <translation type="unfinished">Welcome Screen Tab</translation>
-    </message>
-    <message>
-      <source>New Welcome Screen Tab</source>
-      <translation type="unfinished">New Welcome Screen Tab</translation>
-    </message>
-    <message>
       <source>Site Administration...</source>
       <translation type="unfinished">Site Administration...</translation>
     </message>
@@ -1235,6 +1215,30 @@
     <message>
       <source>Cell Aspect Ratio</source>
       <translation>Celleformat</translation>
+    </message>
+    <message>
+      <source>Layout</source>
+      <translation>Oppsett</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>Ny visning</translation>
+    </message>
+    <message>
+      <source>Welcome Screen</source>
+      <translation>Velkomstskjerm</translation>
+    </message>
+    <message>
+      <source>New Welcome Screen</source>
+      <translation>Ny velkomstskjerm</translation>
+    </message>
+    <message>
+      <source>Monitor in New Tab</source>
+      <translation>Serverstatus i ny fane</translation>
+    </message>
+    <message>
+      <source>Monitor in New Window</source>
+      <translation>Serverstatus i nytt vindu</translation>
     </message>
   </context>
   <context>
@@ -1307,20 +1311,6 @@
     </message>
   </context>
   <context>
-    <name>ExitFullscreenActionHelper</name>
-    <message>
-      <source>Select layout...</source>
-      <translation>Velg visning...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n layouts</source>
-      <translation>
-        <numerusform>%n visning</numerusform>
-        <numerusform>%n visninger</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1341,37 +1331,6 @@
     <message>
       <source>Executable %1 Media File</source>
       <translation>Kjørbar %1 mediefil</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenActionHelper</name>
-    <message>
-      <source>Source camera</source>
-      <translation>Kildekamera</translation>
-    </message>
-    <message>
-      <source>Select device...</source>
-      <translation>Velg enhet...</translation>
-    </message>
-    <message>
-      <source>Select camera...</source>
-      <translation>Velg kamera...</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Velg visning...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n layouts</source>
-      <translation>
-        <numerusform>%n visninger</numerusform>
-        <numerusform>%n visninger</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>%1 on %2</source>
-      <comment>Camera %1 on layout %2</comment>
-      <translation>%1 på %2</translation>
     </message>
   </context>
   <context>
@@ -2214,24 +2173,24 @@ Lisensnøkkel: %2</translation>
       </translation>
     </message>
     <message numerus="yes">
-      <source>These servers are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These servers are removed from Site</numerusform>
-        <numerusform>These servers are removed from Site</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These users are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These users are removed from Site</numerusform>
-        <numerusform>These users are removed from Site</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>These resources are removed from Site</source>
       <translation type="unfinished">
         <numerusform>These resources are removed from Site</numerusform>
         <numerusform>These resources are removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This server is removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>This server is removed from Site</numerusform>
+        <numerusform>This server is removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This user is removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>This user is removed from Site</numerusform>
+        <numerusform>This user is removed from Site</numerusform>
       </translation>
     </message>
   </context>
@@ -2373,10 +2332,6 @@ Lisensnøkkel: %2</translation>
       <translation>Hendelsesregel fjernet</translation>
     </message>
     <message>
-      <source>Event rules reset to default</source>
-      <translation>Hendelsesregler tilbakestilles til standard</translation>
-    </message>
-    <message>
       <source>Storage added</source>
       <translation>Lagring lagt til</translation>
     </message>
@@ -2509,222 +2464,6 @@ Lisensnøkkel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleViewModel</name>
-    <message>
-      <source>Error: %1</source>
-      <translation>Feil: %1</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Umiddelbar</translation>
-    </message>
-    <message>
-      <source>Stops</source>
-      <translation>Stopper</translation>
-    </message>
-    <message>
-      <source>Starts</source>
-      <translation>Starter</translation>
-    </message>
-    <message>
-      <source>Occurs</source>
-      <translation>Inntreffer</translation>
-    </message>
-    <message>
-      <source>N/A</source>
-      <translation>N/A</translation>
-    </message>
-    <message>
-      <source>Every %1</source>
-      <translation>Hver %1</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Enhver server</translation>
-    </message>
-    <message>
-      <source>Any Device</source>
-      <translation>Enhver enhet</translation>
-    </message>
-    <message>
-      <source>Any Camera</source>
-      <translation>Hvilket som helst kamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Servers</source>
-      <translation>
-        <numerusform>%n server</numerusform>
-        <numerusform>%n servere</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Bruker</translation>
-    </message>
-    <message>
-      <source>Source Server</source>
-      <translation>Kildeserver</translation>
-    </message>
-    <message>
-      <source>Source Camera</source>
-      <translation>Kildekamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Kilde og %n flere kameraer</numerusform>
-        <numerusform>Kilde og %n kameraer til</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Select at least one Device</source>
-      <translation>Velg minst en enhet</translation>
-    </message>
-    <message>
-      <source>Select at least one Camera</source>
-      <translation>Velg minst ett kamera</translation>
-    </message>
-    <message>
-      <source>Select Server</source>
-      <translation>Velg servere</translation>
-    </message>
-    <message>
-      <source>Source Server and %1</source>
-      <translation>Kildeserver og %1</translation>
-    </message>
-    <message>
-      <source>Site</source>
-      <translation>Nettsted</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRuleWidget</name>
-    <message>
-      <source>to</source>
-      <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
-      <translation>til</translation>
-    </message>
-    <message>
-      <source>at</source>
-      <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-      <translation>ved</translation>
-    </message>
-    <message>
-      <source>Select at least one device</source>
-      <translation>Velg minst en enhet</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Velg minst ett kamera</translation>
-    </message>
-    <message>
-      <source>Devices</source>
-      <translation>Enheter</translation>
-    </message>
-    <message>
-      <source>Cameras</source>
-      <translation>Kameraer</translation>
-    </message>
-    <message>
-      <source>Any Device</source>
-      <translation>Hvilket som helst enhet</translation>
-    </message>
-    <message>
-      <source>Any Camera</source>
-      <translation>Hvilket som helst kamera</translation>
-    </message>
-    <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation>Krev godkjenning fungerer bare for generiske hendelser hvis kameraidentifikatorer brukes i URLen for generisk hendelse</translation>
-    </message>
-    <message>
-      <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation>Høy forhåndsopptakstid vil øke RAM-utnyttelsen på serveren</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRulesDialog</name>
-    <message>
-      <source>&amp;New...</source>
-      <translation>&amp;Ny...</translation>
-    </message>
-    <message>
-      <source>&amp;Delete</source>
-      <translation>&amp;Slett</translation>
-    </message>
-    <message>
-      <source>&amp;Schedule...</source>
-      <translation>&amp;Tidsplan...</translation>
-    </message>
-    <message>
-      <source>Restore All Rules to Default</source>
-      <translation>Gjenopprett alle regler til standard</translation>
-    </message>
-    <message>
-      <source>No event rules</source>
-      <translation>Ingen hendelsesregler</translation>
-    </message>
-    <message>
-      <source>Filter by devices...</source>
-      <translation>Filtrer etter enheter...</translation>
-    </message>
-    <message>
-      <source>Filter by cameras...</source>
-      <translation>Filtrer etter kameraer...</translation>
-    </message>
-    <message>
-      <source>Failed to retrieve rules</source>
-      <translation>Kunne ikke hente regler</translation>
-    </message>
-    <message>
-      <source>Failed to save rule</source>
-      <translation>Kunne ikke lagre regel</translation>
-    </message>
-    <message>
-      <source>This action cannot be undone.</source>
-      <translation>Denne handlingen kan ikke angres.</translation>
-    </message>
-    <message>
-      <source>Restore all rules to default?</source>
-      <translation>Gjenopprett alle regler til standard?</translation>
-    </message>
-    <message>
-      <source>Some rules are not valid and may not work</source>
-      <translation>Noen regler er ikke gyldige og fungerer kanskje ikke</translation>
-    </message>
-    <message>
-      <source>Apply changes before exiting?</source>
-      <translation>Lagre endringer før du går videre?</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRulesViewModel</name>
-    <message>
-      <source>On</source>
-      <translation>På</translation>
-    </message>
-    <message>
-      <source>Event</source>
-      <translation>Hendelse</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>Kilde</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Handling</translation>
-    </message>
-    <message>
-      <source>Target</source>
-      <translation>Mål</translation>
-    </message>
-    <message>
-      <source>Interval of Action</source>
-      <translation>Handlingsintervall</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCamDisplay</name>
     <message>
       <source>%1 Running</source>
@@ -2801,13 +2540,6 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>Diagnostics complete</source>
       <translation>Diagnostikk fullført</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraInputBusinessEventWidget</name>
-    <message>
-      <source>automatic</source>
-      <translation>automatisk</translation>
     </message>
   </context>
   <context>
@@ -2917,13 +2649,6 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>Logical ID</source>
       <translation>Logisk ID</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraOutputBusinessActionWidget</name>
-    <message>
-      <source>automatic</source>
-      <translation>automatisk</translation>
     </message>
   </context>
   <context>
@@ -3244,33 +2969,6 @@ Lisensnøkkel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnCustomBusinessEventWidget</name>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Hvis feltet er tomt, vil hendelsen alltid utløse.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>Hendelse utløses bare hvis det er treff i kilden med noen av de angitte nøkkelordene.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Hendelse utløses bare hvis det er treff i kilden med noen av de angitte nøkkelordene.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation>Hendelse utløses bare hvis det er treff i beskrivelsen med noen av de angitte nøkkelordene.</translation>
-    </message>
-    <message>
-      <source>Server API</source>
-      <translation>Server API</translation>
-    </message>
-    <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>For å generere generisk hendelse, se %1.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCustomFileDialog</name>
     <message>
       <source>Pictures</source>
@@ -3361,159 +3059,6 @@ Lisensnøkkel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnEmptyBusinessActionWidget</name>
-    <message>
-      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>Panic Recording Mode bytter innspillingsinnstillinger for alle kameraer til maksimal FPS og kvalitet.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnEventLogDialog</name>
-    <message>
-      <source>Filter Similar Rows</source>
-      <translation>Filtrer lignende rader</translation>
-    </message>
-    <message>
-      <source>Copy Selection to Clipboard</source>
-      <translation>Kopier utvalg til utklippstavle</translation>
-    </message>
-    <message>
-      <source>Export Selection to File...</source>
-      <translation>Eksporter utvalg til fil...</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Velg alle</translation>
-    </message>
-    <message>
-      <source>Clear Filter</source>
-      <translation>Tøm filter</translation>
-    </message>
-    <message>
-      <source>Export selected events to file</source>
-      <translation>Eksporter valgte hendelser til fil</translation>
-    </message>
-    <message>
-      <source>Any Action</source>
-      <translation>Enhver handling</translation>
-    </message>
-    <message>
-      <source>No events</source>
-      <translation>Ingen hendelser</translation>
-    </message>
-    <message numerus="yes">
-      <source>Event log for period from %1 to %2 - %n events found</source>
-      <comment>Dates are substituted</comment>
-      <translation>
-        <numerusform>Hendelseslogg for periode fra %1 til %2 - %n hendelser funnet</numerusform>
-        <numerusform>Hendelseslogg for periode fra %1 til %2 - %n hendelser funnet</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Event log for %1 - %n events found</source>
-      <comment>Date is substituted</comment>
-      <translation>
-        <numerusform>Hendelseslogg for %1 - %n hendelser funnet</numerusform>
-        <numerusform>Hendelseslogg for %1 - %n hendelser funnet</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Beskrivelse</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnEventLogModel</name>
-    <message>
-      <source>Motion video</source>
-      <translation>Bevegelsesvideo</translation>
-    </message>
-    <message>
-      <source>Date/Time</source>
-      <translation>Dato/klokkeslett</translation>
-    </message>
-    <message>
-      <source>Event</source>
-      <translation>Hendelse</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>Kilde</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Handling</translation>
-    </message>
-    <message>
-      <source>Target</source>
-      <translation>Mål</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Beskrivelse</translation>
-    </message>
-    <message>
-      <source>All users</source>
-      <translation>Alle brukere</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n times)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n gang)</numerusform>
-        <numerusform>%1 (%n ganger)</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Open camera</source>
-      <translation>Åpne kamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n users more...</source>
-      <translation>
-        <numerusform>og %n brukere mer...</numerusform>
-        <numerusform>og %n brukere mer...</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n more...</source>
-      <translation>
-        <numerusform>og %n mer...</numerusform>
-        <numerusform>og %n mer...</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Removed subjects</source>
-      <translation>
-        <numerusform>%n Fjernede emner</numerusform>
-        <numerusform>%n Fjernede emner</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Subject removed</source>
-      <translation>Emne fjernet</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n cameras)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n kamera)</numerusform>
-        <numerusform>%1 (%n kameraer)</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnExecHttpRequestActionWidget</name>
-    <message>
-      <source>Auto</source>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <source>Basic</source>
-      <translation>Enkel</translation>
-    </message>
-  </context>
-  <context>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
@@ -3522,17 +3067,6 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>Failed to overwrite file</source>
       <translation>Kunne ikke overskrive filen</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFullscreenCameraActionWidget</name>
-    <message>
-      <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation>Dette kameraet er for øyeblikket ikke på valgt layout. Handling vil fungere hvis kameraet blir lagt til før handling utløses.</translation>
-    </message>
-    <message>
-      <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation>Dette kameraet er for øyeblikket ikke på noen av de valgte layoutene. Handling vil fungere hvis kameraet blir lagt til før handling utløses.</translation>
     </message>
   </context>
   <context>
@@ -4015,13 +3549,6 @@ Lisensnøkkel: %2</translation>
       <source>Lo-Res</source>
       <translation>Lo-Res</translation>
     </message>
-    <message numerus="yes">
-      <source>Set for all %n Cameras</source>
-      <translation>
-        <numerusform>Sett for alle %n kameraer</numerusform>
-        <numerusform>Sett for alle %n kameraer</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Area Zoom</source>
       <translation>Områdeszoom</translation>
@@ -4041,6 +3568,17 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>Mute</source>
       <translation>Mute</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set for %n devices</source>
+      <translation type="unfinished">
+        <numerusform>Set for %n devices</numerusform>
+        <numerusform>Set for %n devices</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Cloud authorization request should only be performed for cloud cross system resources</source>
+      <translation type="unfinished">Cloud authorization request should only be performed for cloud cross system resources</translation>
     </message>
   </context>
   <context>
@@ -4156,13 +3694,6 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>Rotation</source>
       <translation>Rotasjon</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPopupBusinessActionWidget</name>
-    <message>
-      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation>Varsel vises frem til en av brukerne som ser det oppretter et bokmerke med hendelsesbeskrivelse</translation>
     </message>
   </context>
   <context>
@@ -4615,42 +4146,6 @@ Lisensnøkkel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnSendEmailActionDelegate</name>
-    <message numerus="yes">
-      <source>%n additional</source>
-      <translation>
-        <numerusform>%n tillegg</numerusform>
-        <numerusform>%n tillegg</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has invalid email address</source>
-      <translation>Bruker %1 har ugyldig e-postadresse</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 users have invalid email address</source>
-      <translation>
-        <numerusform>%n av %1 brukere har ugyldig e-postadresse</numerusform>
-        <numerusform>%n av %1 brukere har ugyldig e-postadresse</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid email address %1</source>
-      <translation>Ugyldig e-postadresse %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 additional email addresses are invalid</source>
-      <translation>
-        <numerusform>%n av %1 ekstra e-postadresser er ugyldige</numerusform>
-        <numerusform>%n av %1 ekstra e-postadresser er ugyldige</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Send email to %1</source>
-      <translation>Send e-post til %1</translation>
-    </message>
-  </context>
-  <context>
     <name>QnServerAddressesModel</name>
     <message>
       <source>Address</source>
@@ -4761,17 +4256,6 @@ Lisensnøkkel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnShowTextOverlayActionWidget</name>
-    <message>
-      <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-      <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
-&apos; sequence</comment>
-      <translation>Html-tagger kan brukes i tilpasset tekst:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Også forskjellige &lt;font color=&quot;red&quot;&gt;farger&lt;/font&gt; og &lt;font size=&quot;18&quot;&gt;størrelser&lt;/font&gt; kan brukes. Teksten kan være &lt;s&gt;rammet&lt;/s&gt;, &lt;u&gt;understreket&lt;/u&gt;, &lt;b&gt;fet&lt;/b&gt; eller &lt;i&gt;kursiv&lt;/i&gt;</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSignInfo</name>
     <message>
       <source>Analyzing: %1%</source>
@@ -4825,8 +4309,8 @@ Lisensnøkkel: %2</translation>
       <translation>Autorisere</translation>
     </message>
     <message>
-      <source>Setup</source>
-      <translation>Oppsett</translation>
+      <source>Set</source>
+      <translation type="unfinished">Set</translation>
     </message>
   </context>
   <context>
@@ -4840,16 +4324,8 @@ Lisensnøkkel: %2</translation>
       <translation>FRAKOBLET</translation>
     </message>
     <message>
-      <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
-      <translation type="unfinished">This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</translation>
-    </message>
-    <message>
       <source>UNAUTHORIZED</source>
       <translation>UAUTORISERT</translation>
-    </message>
-    <message>
-      <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
-      <translation type="unfinished">This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
@@ -4864,16 +4340,8 @@ Lisensnøkkel: %2</translation>
       <translation type="unfinished">SITE SHUT DOWN</translation>
     </message>
     <message>
-      <source>STREAM LIMITATION</source>
-      <translation type="unfinished">STREAM LIMITATION</translation>
-    </message>
-    <message>
       <source>INFORMATION REQUIRED</source>
       <translation>INFORMASJON PÅKREVET</translation>
-    </message>
-    <message>
-      <source>AUDIO ONLY</source>
-      <translation type="unfinished">AUDIO ONLY</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -4902,6 +4370,18 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>CERTIFICATE ERROR</source>
       <translation type="unfinished">CERTIFICATE ERROR</translation>
+    </message>
+    <message>
+      <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
+      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+    </message>
+    <message>
+      <source>Access to this camera requires authorization credentials.</source>
+      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+    </message>
+    <message>
+      <source>CONNECTION LOST</source>
+      <translation type="unfinished">CONNECTION LOST</translation>
     </message>
   </context>
   <context>
@@ -5088,6 +4568,18 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
       <translation type="unfinished">Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</translation>
+    </message>
+    <message>
+      <source>Cloud storage cannot be enabled.</source>
+      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+    </message>
+    <message>
+      <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
+      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+    </message>
+    <message>
+      <source>Insufficient services</source>
+      <translation>Utilstrekkelige tjenester</translation>
     </message>
   </context>
   <context>
@@ -5473,10 +4965,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation type="unfinished">Site shut down</translation>
     </message>
     <message>
-      <source>Reject intercom call</source>
-      <translation type="unfinished">Reject intercom call</translation>
-    </message>
-    <message>
       <source>Email address is not set for your account</source>
       <translation type="unfinished">Email address is not set for your account</translation>
     </message>
@@ -5600,6 +5088,18 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Notifications language differs from the interface language</source>
       <translation type="unfinished">Notifications language differs from the interface language</translation>
+    </message>
+    <message>
+      <source>Recording disabled</source>
+      <translation type="unfinished">Recording disabled</translation>
+    </message>
+    <message>
+      <source>Cloud storage backup disabled</source>
+      <translation type="unfinished">Cloud storage backup disabled</translation>
+    </message>
+    <message>
+      <source>Paid integration services disabled</source>
+      <translation type="unfinished">Paid integration services disabled</translation>
     </message>
   </context>
   <context>
@@ -6441,10 +5941,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>I</translation>
     </message>
     <message>
-      <source>%n removed subjects</source>
-      <translation>%n fjernede emner</translation>
-    </message>
-    <message>
       <source>%n removed devices</source>
       <translation type="unfinished">%n removed devices</translation>
     </message>
@@ -6482,6 +5978,35 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>%n layouts more</source>
       <translation type="unfinished">%n layouts more</translation>
+    </message>
+    <message>
+      <source>Removed subject</source>
+      <comment>The subject is user or group</comment>
+      <translation type="unfinished">Removed subject</translation>
+    </message>
+    <message>
+      <source>Removed device</source>
+      <translation type="unfinished">Removed device</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation type="unfinished">Removed camera</translation>
+    </message>
+    <message>
+      <source>Removed server</source>
+      <translation type="unfinished">Removed server</translation>
+    </message>
+    <message>
+      <source>Removed layout</source>
+      <translation type="unfinished">Removed layout</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n removed subjects</source>
+      <comment>The subject is user or group</comment>
+      <translation type="unfinished">
+        <numerusform>%n removed subjects</numerusform>
+        <numerusform>%n removed subjects</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7123,6 +6648,23 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <translation>Det er flere kamera som er sikkerhetskopiert enn tilgjengelige tjenester. Deaktiver sikkerhetskopi av noen kameraer eller legg til flere egnede tjenester. Ellers vil det gjøres automatisk på %1</translation>
     </message>
+    <message>
+      <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
+      <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
+      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+    </message>
+    <message>
+      <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
+      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+    </message>
+    <message>
+      <source>Backup will not be activated for %1 devices: </source>
+      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
+    </message>
+    <message>
+      <source>%1 suitable cloud storage services are required to activate backup for them.</source>
+      <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>
@@ -7250,6 +6792,18 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Missed call</source>
       <translation type="unfinished">Missed call</translation>
+    </message>
+    <message>
+      <source>Call Request</source>
+      <translation type="unfinished">Call Request</translation>
+    </message>
+    <message>
+      <source>Call Request Missed</source>
+      <translation type="unfinished">Call Request Missed</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation type="unfinished">Source: %1</translation>
     </message>
   </context>
   <context>
@@ -7444,6 +6998,10 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <source>Select Hotspot Target</source>
       <translation type="unfinished">Select Hotspot Target</translation>
     </message>
+    <message>
+      <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
+      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
@@ -7466,6 +7024,10 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Less Info</source>
       <translation>Mindre info</translation>
+    </message>
+    <message>
+      <source>Use this link to add the camera to another site</source>
+      <translation type="unfinished">Use this link to add the camera to another site</translation>
     </message>
   </context>
   <context>
@@ -7982,26 +7544,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CloudLayoutsIntroDialog</name>
-    <message>
-      <source>Introducing %1 Layouts</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Introduserer %1 oppsett</translation>
-    </message>
-    <message>
-      <source>Read more on the %1</source>
-      <translation>Les mer på %1</translation>
-    </message>
-    <message>
-      <source>help page</source>
-      <translation>hjelpeside</translation>
-    </message>
-    <message>
-      <source>%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CloudLayoutsManager</name>
     <message>
       <source>%1 (Copy)</source>
@@ -8080,6 +7622,14 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Disconnect</source>
       <translation>Koble fra</translation>
+    </message>
+    <message>
+      <source>Channel Partner users have access to this site</source>
+      <translation type="unfinished">Channel Partner users have access to this site</translation>
+    </message>
+    <message>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
+      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
@@ -8243,10 +7793,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
   </context>
   <context>
     <name>nx::vms::client::desktop::DesktopDataProvider</name>
-    <message>
-      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>Lydopptaksenheten støtter ingen passende lydformater. Velg en annen lydenhet eller &quot;ingen&quot; i skjermopptaksinnstillingene.</translation>
-    </message>
     <message>
       <source>Could not detect capturing resolution</source>
       <translation>Kunne ikke oppdage opptaks-oppløsningen</translation>
@@ -8460,6 +8006,14 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <source>Export selected events to file</source>
       <translation>Eksporter valgte hendelser til fil</translation>
     </message>
+    <message>
+      <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
+      <translation type="unfinished">Server cannot answer in reasonable time. Consider narrowing period or filter.</translation>
+    </message>
+    <message>
+      <source>All Servers are offline. Logs are not available.</source>
+      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventLogModel</name>
@@ -8533,24 +8087,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>INFORMATION REQUIRED</source>
       <translation>INFORMASJON PÅKREVET</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>No events</source>
-      <translation>Ingen hendelser</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n events</source>
-      <translation>
-        <numerusform>%n hendelse</numerusform>
-        <numerusform>%n hendelser</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Try changing the filters or create an Event Rule</source>
-      <translation>Prøv å endre filtrene eller opprett en hendelsesregel</translation>
     </message>
   </context>
   <context>
@@ -9030,6 +8566,13 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::JumpToLiveButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation>Gå til Live</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -9127,20 +8670,8 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>TIDSPUNKTET HAR INGEN OPPAK</translation>
     </message>
     <message>
-      <source>NOT A CAMERA</source>
-      <translation>IKKE ET KAMERA</translation>
-    </message>
-    <message>
       <source>DISABLED</source>
       <translation>DEAKTIVERT</translation>
-    </message>
-    <message>
-      <source>OFFLINE</source>
-      <translation>FRAKOBLET</translation>
-    </message>
-    <message>
-      <source>NO EXPORT PERMISSION</source>
-      <translation>INGEN EKSPORT TILLATELSE</translation>
     </message>
   </context>
   <context>
@@ -9357,10 +8888,6 @@ Remember to return the Logging Level to its default setting after you have colle
       <translation>Klient</translation>
     </message>
     <message>
-      <source>None</source>
-      <translation>Ingen</translation>
-    </message>
-    <message>
       <source>Error</source>
       <translation>Feil</translation>
     </message>
@@ -9391,6 +8918,10 @@ Remember to return the Logging Level to its default setting after you have colle
     <message>
       <source>Logging level degrades performance</source>
       <translation type="unfinished">Logging level degrades performance</translation>
+    </message>
+    <message>
+      <source>&lt;None&gt;</source>
+      <translation type="unfinished">&lt;None&gt;</translation>
     </message>
   </context>
   <context>
@@ -10239,18 +9770,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::NotificationActionHandler</name>
-    <message>
-      <source>Unable to acknowledge event on removed camera.</source>
-      <translation>Kan ikke behandle hendelsen på fjernet kamera.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
-    <message>
-      <source>Alarm: %1</source>
-      <translation>Alarm: %1</translation>
-    </message>
     <message>
       <source>Acknowledge</source>
       <translation>Behandle</translation>
@@ -10282,10 +9802,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <translation type="unfinished">Event Notifications</translation>
     </message>
     <message>
-      <source>System Notifications</source>
-      <translation>Systemvarsler</translation>
-    </message>
-    <message>
       <source>Choose Types...</source>
       <translation type="unfinished">Choose Types...</translation>
     </message>
@@ -10299,6 +9815,10 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <numerusform>%n notification types</numerusform>
         <numerusform>%n notification types</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Site Notifications</source>
+      <translation type="unfinished">Site Notifications</translation>
     </message>
   </context>
   <context>
@@ -10324,45 +9844,10 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
-    <message>
-      <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation>Ingen av utvalgte brukere har tilgang til valgt layout. Handling vil ikke fungere.</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Velg visning...</translation>
-    </message>
-    <message>
-      <source>None of selected user roles contain users. Action will not work.</source>
-      <translation>Ingen av de valgte brukerrollene inneholder brukere. Handling vil ikke fungere.</translation>
-    </message>
-    <message>
-      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation>Noen brukere har ikke tilgang til valgt visning. Handling vil ikke fungere for dem.</translation>
-    </message>
-    <message>
-      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation>Leter du etter en lokal layout? Velg bare én bruker fra &quot;Vis til&quot; -listen for å vise deres lokale oppsett som et alternativ her.</translation>
-    </message>
-    <message>
-      <source>Local layouts can only be shown to their owners</source>
-      <translation>Lokale oppsett kan bare vises for eierne deres</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
     <message>
       <source>Not supported</source>
       <translation>Støttes ikke</translation>
-    </message>
-    <message>
-      <source>This tab will be available in future versions</source>
-      <translation>Denne fanen vil være tilgjengelig i fremtidige versjoner</translation>
-    </message>
-    <message>
-      <source>Learn more</source>
-      <translation>Finn ut mer</translation>
     </message>
   </context>
   <context>
@@ -10543,33 +10028,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>%1 Settings</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>%1 Innstillinger</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n symbols over</source>
-      <translation>
-        <numerusform>%n symboler over</numerusform>
-        <numerusform>%n symboler over</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n symbols left</source>
-      <translation>
-        <numerusform>%n symboler igjen</numerusform>
-        <numerusform>%n symboler igjen</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::QnWebpageDialog</name>
     <message>
       <source>Name</source>
@@ -10725,69 +10183,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::RecordingStatusHelper</name>
-    <message>
-      <source>Not recording</source>
-      <translation>Tar ikke opp</translation>
-    </message>
-    <message>
-      <source>Recording everything</source>
-      <translation>Tar opp kontinuerlig</translation>
-    </message>
-    <message>
-      <source>Recording motion only</source>
-      <translation>Tar opp ved bevegelse</translation>
-    </message>
-    <message>
-      <source>Recording motion and low quality</source>
-      <translation>Tar opp ved bevegelse + lav oppløsning kontinuerlig</translation>
-    </message>
-    <message>
-      <source>Continuous</source>
-      <translation>Kontinuerlig</translation>
-    </message>
-    <message>
-      <source>Motion only</source>
-      <translation>Bare bevegelse</translation>
-    </message>
-    <message>
-      <source>Motion + Lo-Res</source>
-      <translation>Bevegelse + Lavoppløselig</translation>
-    </message>
-    <message>
-      <source>Recording motion and objects</source>
-      <translation>Registrerer bevegelser og objekter</translation>
-    </message>
-    <message>
-      <source>Recording objects only</source>
-      <translation>Kun opptak av objekter</translation>
-    </message>
-    <message>
-      <source>Recording motion, objects and low quality</source>
-      <translation>Registrerer bevegelse, objekter og lav kvalitet</translation>
-    </message>
-    <message>
-      <source>Recording objects and low quality</source>
-      <translation>Opptak av objekter og lav kvalitet</translation>
-    </message>
-    <message>
-      <source>Motion, Objects</source>
-      <translation>Bevegelse, objekter</translation>
-    </message>
-    <message>
-      <source>Objects only</source>
-      <translation>Kun objekter</translation>
-    </message>
-    <message>
-      <source>Motion, Objects + Lo-Res</source>
-      <translation>Bevegelse og objekter + Lo-Res</translation>
-    </message>
-    <message>
-      <source>Objects + Lo-Res</source>
-      <translation>Objekter + Lo-Res</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
     <message>
       <source>%1 layout</source>
@@ -10933,10 +10328,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <translation>Kvalitetsinnstilling bestemmer bare komprimeringsfrekvensen og påvirker ikke oppløsningen. Lav, medium, høy og best er forhåndsinnstilte bitrateverdier.</translation>
     </message>
     <message>
-      <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
-    </message>
-    <message>
       <source>Less Settings</source>
       <translation>Mindre innstillinger</translation>
     </message>
@@ -11074,6 +10465,11 @@ Du kan fortsatt endre kvalitet og FPS direkte på kameraet.</translation>
 You can still change quality and FPS directly on the camera.</source>
       <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <comment>Megabits per seconds</comment>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -11577,13 +10973,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
-    <message>
-      <source>Go to Live</source>
-      <translation>Gå til Live</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>
@@ -11628,6 +11017,27 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>Open Services</source>
       <translation type="unfinished">Open Services</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -12865,16 +12275,20 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Kan ikke legge til ressursen i oppsettet</translation>
     </message>
     <message>
-      <source>Cannot find a widget corresponding to the specified item.</source>
-      <translation>Kan ikke finne en widget som tilsvarer det angitte elementet.</translation>
-    </message>
-    <message>
       <source>Cannot find an item with the specified ID</source>
       <translation>Kan ikke finne en enhet med den angitte IDen</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified ID.</source>
       <translation>Kan ikke finne en ressurs med den angitte IDen.</translation>
+    </message>
+    <message>
+      <source>Cannot find a widget corresponding to the specified item</source>
+      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+    </message>
+    <message>
+      <source>Cannot maximize the item</source>
+      <translation type="unfinished">Cannot maximize the item</translation>
     </message>
   </context>
   <context>
@@ -13066,6 +12480,32 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>Token</source>
       <translation type="unfinished">Token</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
+    <message>
+      <source>No custom headers</source>
+      <translation type="unfinished">No custom headers</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n custom headers</source>
+      <comment>%n is a number of custom headers</comment>
+      <translation type="unfinished">
+        <numerusform>%n custom headers</numerusform>
+        <numerusform>%n custom headers</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::KeyValueModel</name>
+    <message>
+      <source>Key</source>
+      <translation type="unfinished">Key</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>Verdi</translation>
     </message>
   </context>
   <context>
@@ -13318,71 +12758,10 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Analytics events can be set up on a certain cameras.</source>
-      <translation>Analytics-hendelser kan settes opp på et bestemt kamera.</translation>
-    </message>
-    <message>
-      <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Velg kameraer ved å bruke knappen over for å se listen over støttede hendelser.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Hendelse utløses bare hvis det er treff i kilden med noen av de angitte nøkkelordene.</translation>
-    </message>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Hvis feltet er tomt, vil hendelsen alltid utløse.</translation>
-    </message>
-    <message>
-      <source>This field is case sensitive.</source>
-      <translation>Dette feltet skiller store og små bokstaver.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Hendelse utløses bare hvis det er treff i beskrivelsen med noen av de angitte nøkkelordene.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Analytics object detection can be set up on a certain cameras.</source>
-      <translation>Analytics-objektdeteksjon kan settes opp på enkelte kameraer.</translation>
-    </message>
-    <message>
-      <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Velg kameraer ved å bruke knappen over for å se listen over støttede hendelser.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation>Hendelsen utløses bare hvis det er samsvar med noen av attributtene. Du kan se navnene på attributtene og deres verdier på fanen Objekter.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation>Enhver plugin</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Hendelse utløses bare hvis det er treff i kilden med noen av de angitte nøkkelordene.</translation>
-    </message>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Hvis feltet er tomt, vil hendelsen alltid utløse.</translation>
-    </message>
-    <message>
-      <source>This field is case sensitive.</source>
-      <translation>Dette feltet skiller mellom store og små bokstaver.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Hendelse utløses bare hvis det er treff i beskrivelsen med noen av de angitte nøkkelordene.</translation>
     </message>
   </context>
   <context>

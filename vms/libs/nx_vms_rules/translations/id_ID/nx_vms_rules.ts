@@ -17,6 +17,14 @@
     </message>
   </context>
   <context>
+    <name>RulesAuditLogStrings</name>
+    <message>
+      <source>On %1 --&gt; %2</source>
+      <comment>%1 is the event name, %2 is the action name</comment>
+      <translation type="unfinished">On %1 --&gt; %2</translation>
+    </message>
+  </context>
+  <context>
     <name>Strings</name>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -250,6 +258,10 @@
       <source>To Users</source>
       <translation>Kepada Pengguna</translation>
     </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation>Soft Trigger</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
@@ -285,6 +297,10 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 at %2</translation>
+    </message>
+    <message>
+      <source>And attributes</source>
+      <translation type="unfinished">And attributes</translation>
     </message>
   </context>
   <context>
@@ -539,6 +555,10 @@
       <source>HTTP authentication</source>
       <translation>Otentikasi HTTP</translation>
     </message>
+    <message>
+      <source>Custom headers</source>
+      <translation type="unfinished">Custom headers</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAuthFieldValidator</name>
@@ -552,10 +572,40 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::rules::HttpHeadersFieldValidator</name>
+    <message numerus="yes">
+      <source>Some of the headers are not valid</source>
+      <translation type="unfinished">
+        <numerusform>Some of the headers are not valid</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>All the headers are not valid</source>
+      <translation type="unfinished">
+        <numerusform>All the headers are not valid</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
       <source>HTTP Method should be known</source>
       <translation>Metode HTTP harus diketahui</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
+    <message>
+      <source>Integration Diagnostic Event</source>
+      <translation type="unfinished">Integration Diagnostic Event</translation>
+    </message>
+    <message>
+      <source>For Plugin</source>
+      <translation>Untuk Plugin</translation>
+    </message>
+    <message>
+      <source>And Level Is</source>
+      <translation>Dan Level Adalah</translation>
     </message>
   </context>
   <context>
@@ -761,21 +811,6 @@
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::PluginDiagnosticEvent</name>
-    <message>
-      <source>Plugin Diagnostic Event</source>
-      <translation>Event Diagnostik Plugin</translation>
-    </message>
-    <message>
-      <source>For Plugin</source>
-      <translation>Untuk Plugin</translation>
-    </message>
-    <message>
-      <source>And Level Is</source>
-      <translation>Dan Level Adalah</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::rules::PoeOverBudgetEvent</name>
     <message>
       <source>Consumption</source>
@@ -915,6 +950,14 @@
       <source>Services Issue</source>
       <translation>Masalah Layanan</translation>
     </message>
+    <message>
+      <source>Failed to migrate licenses.</source>
+      <translation>Gagal memigrasikan lisensi.</translation>
+    </message>
+    <message>
+      <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
+      <translation>Melewatkan impor lisensi. Upaya migrasi lainnya akan dijadwalkan secara otomatis nanti.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::SendEmailAction</name>
@@ -1012,6 +1055,25 @@
     <message>
       <source>Force Alarm Layout Opening</source>
       <translation>Paksa Pembukaan Layout Alarm</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::SiteHttpAction</name>
+    <message>
+      <source>Site HTTP(S) Request</source>
+      <translation type="unfinished">Site HTTP(S) Request</translation>
+    </message>
+    <message>
+      <source>Endpoint</source>
+      <translation type="unfinished">Endpoint</translation>
+    </message>
+    <message>
+      <source>Method</source>
+      <translation>Metode</translation>
+    </message>
+    <message>
+      <source>Content</source>
+      <translation>Konten</translation>
     </message>
   </context>
   <context>
@@ -1157,6 +1219,10 @@
       <source>List with the given id &apos;%1&apos; is not a generic list</source>
       <translation>Daftar dengan id yang diberikan &apos;%1&apos; bukan daftar generik</translation>
     </message>
+    <message>
+      <source>Invalid UUID string</source>
+      <translation type="unfinished">Invalid UUID string</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
@@ -1186,6 +1252,14 @@
     <message>
       <source>Url should not contains user or password</source>
       <translation>Url tidak boleh berisi user atau kata sandi</translation>
+    </message>
+    <message>
+      <source>Endpoint cannot be empty</source>
+      <translation type="unfinished">Endpoint cannot be empty</translation>
+    </message>
+    <message>
+      <source>Endpoint mustn&apos;t contains any space</source>
+      <translation type="unfinished">Endpoint mustn&apos;t contains any space</translation>
     </message>
   </context>
   <context>

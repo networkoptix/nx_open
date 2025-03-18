@@ -236,6 +236,14 @@
       <source>Table Settings</source>
       <translation type="unfinished">Table Settings</translation>
     </message>
+    <message>
+      <source>Switch to table view</source>
+      <translation type="unfinished">Switch to table view</translation>
+    </message>
+    <message>
+      <source>Switch to card view</source>
+      <translation type="unfinished">Switch to card view</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsSettings</name>
@@ -278,13 +286,6 @@
 Select an Integration to begin configuring its parameters.</source>
       <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
 Select an Integration to begin configuring its parameters.</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsToolTipPreview</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>TIDSPUNKTET HAR INGEN OPPAK</translation>
     </message>
   </context>
   <context>
@@ -532,6 +533,10 @@ Select an Integration to begin configuring its parameters.</translation>
       <source>Shut Down</source>
       <translation>Slå av</translation>
     </message>
+    <message>
+      <source>New</source>
+      <translation type="unfinished">New</translation>
+    </message>
   </context>
   <context>
     <name>CloudTile</name>
@@ -636,6 +641,29 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Show thumbnails</source>
       <translation>Vis miniatyrbilder</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomHttpHeadersDialog</name>
+    <message>
+      <source>Custom HTTP headers</source>
+      <translation type="unfinished">Custom HTTP headers</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Legg til</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Slett</translation>
+    </message>
+    <message>
+      <source>Key</source>
+      <translation type="unfinished">Key</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
     </message>
   </context>
   <context>
@@ -1112,6 +1140,26 @@ Select an Integration to begin configuring its parameters.</translation>
       <source>No groups</source>
       <translation>Ingen grupper</translation>
     </message>
+    <message>
+      <source>LDAP</source>
+      <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+      <translation>LDAP</translation>
+    </message>
+    <message>
+      <source>ORGANIZATION</source>
+      <comment>Section with groups from organisation</comment>
+      <translation type="unfinished">ORGANIZATION</translation>
+    </message>
+    <message>
+      <source>BUILT-IN</source>
+      <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
+      <translation type="unfinished">BUILT-IN</translation>
+    </message>
+    <message>
+      <source>CUSTOM</source>
+      <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+      <translation type="unfinished">CUSTOM</translation>
+    </message>
   </context>
   <context>
     <name>HintItem</name>
@@ -1147,10 +1195,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
   </context>
   <context>
-    <name>InsecureWarning</name>
+    <name>InsecureBanner</name>
     <message>
-      <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-      <translation>Kontosikkerhet er viktig. Ikke aktiver denne innstillingen med mindre du har gode grunner til å gjøre det.</translation>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
+      <translation>Digest-autentisering er utdatert og vil bli deaktivert i neste utgivelse, og bør bare brukes når standard bærerautentisering ikke kan brukes.</translation>
+    </message>
+    <message>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
+      <translation>Digest-autentisering er utdatert og vil bli deaktivert i neste utgivelse, og bør bare brukes når standard bærerautentisering ikke kan brukes. Brukerpålogginger må kun bestå av små bokstaver.</translation>
     </message>
   </context>
   <context>
@@ -1804,6 +1856,11 @@ Select an Integration to begin configuring its parameters.</translation>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
       <translation>Egendefinert</translation>
     </message>
+    <message>
+      <source>Organization</source>
+      <comment>Section with groups from organisation</comment>
+      <translation type="unfinished">Organization</translation>
+    </message>
   </context>
   <context>
     <name>PasswordChangeDialog</name>
@@ -2229,16 +2286,8 @@ Trykk Alt + Klikk for å følge objektet</translation>
       <translation>Ingen lokale filer</translation>
     </message>
     <message>
-      <source>Nothing found</source>
-      <translation>Ingenting funnet</translation>
-    </message>
-    <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>Dra videofiler eller bilder til klientvinduet, eller legg til lokal mediemappe via dialogboksen Lokale innstillinger</translation>
-    </message>
-    <message>
-      <source>Try searching for something else</source>
-      <translation>Prøv å søke etter noe annet</translation>
     </message>
   </context>
   <context>
@@ -2299,10 +2348,6 @@ Trykk Alt + Klikk for å følge objektet</translation>
   </context>
   <context>
     <name>ResourceSearchPane</name>
-    <message>
-      <source>Search</source>
-      <translation>Søk</translation>
-    </message>
     <message>
       <source>Servers</source>
       <translation>Servere</translation>
@@ -2402,13 +2447,6 @@ Trykk Alt + Klikk for å følge objektet</translation>
     <message>
       <source>File to save the results:</source>
       <translation>Fil for å lagre resultatene:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SearchEdit</name>
-    <message>
-      <source>Search</source>
-      <translation>Søk</translation>
     </message>
   </context>
   <context>

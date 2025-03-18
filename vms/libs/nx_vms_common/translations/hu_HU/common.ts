@@ -1045,6 +1045,10 @@
       <source>None of selected user roles contain users</source>
       <translation type="unfinished">None of selected user roles contain users</translation>
     </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>Válasszon legalább egy felhasználót</translation>
+    </message>
   </context>
   <context>
     <name>QnTimeStrings</name>
@@ -1298,17 +1302,6 @@
     </message>
   </context>
   <context>
-    <name>QnTranscoder</name>
-    <message>
-      <source>OpenCLTranscode is not implemented.</source>
-      <translation>OpenCL átkódolás nincs megvalósítva.</translation>
-    </message>
-    <message>
-      <source>Unknown transcode method</source>
-      <translation>Ismeretlen átkódolási metódus</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserResource</name>
     <message>
       <source>Custom</source>
@@ -1465,334 +1458,6 @@
   <context>
     <name>nx::vms::common::SystemSettings</name>
     <message>
-      <source>Anonymous statistics report allowed</source>
-      <translation type="unfinished">Anonymous statistics report allowed</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last time</source>
-      <translation type="unfinished">Anonymous statistics report last time</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last version</source>
-      <translation type="unfinished">Anonymous statistics report last version</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last number</source>
-      <translation type="unfinished">Anonymous statistics report last number</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics time cycle</source>
-      <translation type="unfinished">Anonymous statistics time cycle</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report delay after update</source>
-      <translation type="unfinished">Anonymous statistics report delay after update</translation>
-    </message>
-    <message>
-      <source>Anonymous Statistics Report Server URL</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report Client settings</source>
-      <translation type="unfinished">Anonymous statistics report Client settings</translation>
-    </message>
-    <message>
-      <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h)</translation>
-    </message>
-    <message>
-      <source>Time synchronization enabled</source>
-      <translation>Időszinkronizálás engedélyezve</translation>
-    </message>
-    <message>
-      <source>Primary time synchronization Server ID</source>
-      <translation type="unfinished">Primary time synchronization Server ID</translation>
-    </message>
-    <message>
-      <source>Max difference between local and source time (milliseconds)</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds)</translation>
-    </message>
-    <message>
-      <source>OS time change check period</source>
-      <translation>OS időváltozási ellenőrzési időszak</translation>
-    </message>
-    <message>
-      <source>Sync time synchronization interval for network requests</source>
-      <translation>A hálózati kérések szinkronizálási időszaka</translation>
-    </message>
-    <message>
-      <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation>Epsilon szinkronizálása. Az új érték nem kerül alkalmazásra, ha a delta idő kevesebb, mint epsilon</translation>
-    </message>
-    <message>
-      <source>Cloud owner account</source>
-      <translation>Felhő-tulajdonos fiókja</translation>
-    </message>
-    <message>
-      <source>Cloud authorization key</source>
-      <translation type="unfinished">Cloud authorization key</translation>
-    </message>
-    <message>
-      <source>Disable Device vendors</source>
-      <translation type="unfinished">Disable Device vendors</translation>
-    </message>
-    <message>
-      <source>Optimize Camera settings</source>
-      <translation type="unfinished">Optimize Camera settings</translation>
-    </message>
-    <message>
-      <source>Thumbnails auto-update</source>
-      <translation type="unfinished">Thumbnails auto-update</translation>
-    </message>
-    <message>
-      <source>Max scene items (0 means default)</source>
-      <translation>Max. elemszám (0 alapértelmezett)</translation>
-    </message>
-    <message>
-      <source>Send plain-text emails</source>
-      <translation>Egyszerű szöveges e-mailek küldése</translation>
-    </message>
-    <message>
-      <source>Use Windows line feed in emails</source>
-      <translation>Használja a Windows feed-et e-mailben</translation>
-    </message>
-    <message>
-      <source>Enable audit trail</source>
-      <translation>Audit napló engedélyezése</translation>
-    </message>
-    <message>
-      <source>Audit trail period (days, 14-730)</source>
-      <translation type="unfinished">Audit trail period (days, 14-730)</translation>
-    </message>
-    <message>
-      <source>Event log period (days)</source>
-      <translation>Eseménynapló időszak (nap)</translation>
-    </message>
-    <message>
-      <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption)</translation>
-    </message>
-    <message>
-      <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption)</translation>
-    </message>
-    <message>
-      <source>Enable auto-discovery</source>
-      <translation type="unfinished">Enable auto-discovery</translation>
-    </message>
-    <message>
-      <source>Enable auto-update notifications</source>
-      <translation type="unfinished">Enable auto-update notifications</translation>
-    </message>
-    <message>
-      <source>Enable update notifications</source>
-      <translation type="unfinished">Enable update notifications</translation>
-    </message>
-    <message>
-      <source>Enable UPNP port-mapping</source>
-      <translation type="unfinished">Enable UPNP port-mapping</translation>
-    </message>
-    <message>
-      <source>Backup settings</source>
-      <translation type="unfinished">Backup settings</translation>
-    </message>
-    <message>
-      <source>Cloud host override</source>
-      <translation type="unfinished">Cloud host override</translation>
-    </message>
-    <message>
-      <source>Enable RTSP for Arecont</source>
-      <translation type="unfinished">Enable RTSP for Arecont</translation>
-    </message>
-    <message>
-      <source>Enable sequential Flir ONVIF searcher</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher</translation>
-    </message>
-    <message>
-      <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB)</translation>
-    </message>
-    <message>
-      <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation type="unfinished">Max record queue size (bytes, 6-96MB)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (elements, 250-4000)</source>
-      <translation type="unfinished">Max record queue size (elements, 250-4000)</translation>
-    </message>
-    <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>RTP időtúllépés (millisec)</translation>
-    </message>
-    <message>
-      <source>Max RTSP connection duration (seconds)</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect UDP hole-punching</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect relays usage</source>
-      <translation type="unfinished">Enable cloud-connect relays usage</translation>
-    </message>
-    <message>
-      <source>Enforce SSL for cloud-connect relays</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays</translation>
-    </message>
-    <message>
-      <source>Enable recording on EDGE</source>
-      <translation type="unfinished">Enable recording on EDGE</translation>
-    </message>
-    <message>
-      <source>Target update information</source>
-      <translation type="unfinished">Target update information</translation>
-    </message>
-    <message>
-      <source>Installed update information</source>
-      <translation type="unfinished">Installed update information</translation>
-    </message>
-    <message>
-      <source>Downloader peers for files</source>
-      <translation type="unfinished">Downloader peers for files</translation>
-    </message>
-    <message>
-      <source>Client update settings</source>
-      <translation type="unfinished">Client update settings</translation>
-    </message>
-    <message>
-      <source>Watermark settings</source>
-      <translation>Vízjel beállítások</translation>
-    </message>
-    <message>
-      <source>Session token count limit on a single Server</source>
-      <translation type="unfinished">Session token count limit on a single Server</translation>
-    </message>
-    <message>
-      <source>Max session token count per user on single Server</source>
-      <translation type="unfinished">Max session token count per user on single Server</translation>
-    </message>
-    <message>
-      <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud)</translation>
-    </message>
-    <message>
-      <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud)</translation>
-    </message>
-    <message>
-      <source>Default video codec</source>
-      <translation>Alapértelmezett video tömörítés</translation>
-    </message>
-    <message>
-      <source>Default codec for export video</source>
-      <translation type="unfinished">Default codec for export video</translation>
-    </message>
-    <message>
-      <source>Low quality screen video codec</source>
-      <translation>Alacsony minőségű képernyő-videó kodek</translation>
-    </message>
-    <message>
-      <source>License server</source>
-      <translation>Licenc szerver</translation>
-    </message>
-    <message>
-      <source>URI for resource_data.json automatic update</source>
-      <translation type="unfinished">URI for resource_data.json automatic update</translation>
-    </message>
-    <message>
-      <source>Meta data storage change policy</source>
-      <translation>Metaadat-tárolási változási politika</translation>
-    </message>
-    <message>
-      <source>Persistent Servers for update storage</source>
-      <translation type="unfinished">Persistent Servers for update storage</translation>
-    </message>
-    <message>
-      <source>Persistent Servers where updates are stored</source>
-      <translation type="unfinished">Persistent Servers where updates are stored</translation>
-    </message>
-    <message>
-      <source>VMS Server version specific features</source>
-      <translation type="unfinished">VMS Server version specific features</translation>
-    </message>
-    <message>
-      <source>Additional local FS storage types for recording</source>
-      <translation type="unfinished">Additional local FS storage types for recording</translation>
-    </message>
-    <message>
-      <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure</translation>
-    </message>
-    <message>
-      <source>Storage encryption enabled</source>
-      <translation type="unfinished">Storage encryption enabled</translation>
-    </message>
-    <message>
-      <source>Current storage encryption key</source>
-      <translation type="unfinished">Current storage encryption key</translation>
-    </message>
-    <message>
-      <source>HTTP header: Origin</source>
-      <translation type="unfinished">HTTP header: Origin</translation>
-    </message>
-    <message>
-      <source>HTTP header: X-Frame-Options</source>
-      <translation type="unfinished">HTTP header: X-Frame-Options</translation>
-    </message>
-    <message>
-      <source>Show mouse timeline preview</source>
-      <translation type="unfinished">Show mouse timeline preview</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4MB)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4MB)</translation>
-    </message>
-    <message>
-      <source>Enable cross-domain policy</source>
-      <translation type="unfinished">Enable cross-domain policy</translation>
-    </message>
-    <message>
-      <source>Enable WebSocket for P2P</source>
-      <translation type="unfinished">Enable WebSocket for P2P</translation>
-    </message>
-    <message>
-      <source>Show Servers in the Resource Tree for non-admins</source>
-      <translation type="unfinished">Show Servers in the Resource Tree for non-admins</translation>
-    </message>
-    <message>
-      <source>Use only HTTPS for cameras</source>
-      <translation type="unfinished">Use only HTTPS for cameras</translation>
-    </message>
-    <message>
-      <source>Expose IP addresses for autodiscovery</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
-    </message>
-    <message>
-      <source>Keep IO port state on when Server connects to the device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
-    </message>
-    <message>
-      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages)</translation>
-    </message>
-    <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</translation>
-    </message>
-    <message>
-      <source>Thread count limit for camera archive synchronization</source>
-      <translation type="unfinished">Thread count limit for camera archive synchronization</translation>
-    </message>
-    <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
       <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
     </message>
@@ -1805,32 +1470,8 @@
       <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
     </message>
     <message>
-      <source>Update releases.json file URL</source>
-      <translation type="unfinished">Update releases.json file URL</translation>
-    </message>
-    <message>
-      <source>LDAP settings</source>
-      <translation type="unfinished">LDAP settings</translation>
-    </message>
-    <message>
-      <source>SMTP settings</source>
-      <translation type="unfinished">SMTP settings</translation>
-    </message>
-    <message>
-      <source>Authorization Session token lifetime (seconds)</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
-    </message>
-    <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
       <translation type="unfinished">Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</translation>
-    </message>
-    <message>
-      <source>Allow Power User editing Security Settings</source>
-      <translation type="unfinished">Allow Power User editing Security Settings</translation>
-    </message>
-    <message>
-      <source>Enable deprecated API functions (insecure)</source>
-      <translation type="unfinished">Enable deprecated API functions (insecure)</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
@@ -1842,794 +1483,436 @@
       <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
     </message>
     <message>
-      <source>Organization Id</source>
-      <translation type="unfinished">Organization Id</translation>
-    </message>
-    <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
       <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
-    </message>
-    <message>
-      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
-      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</translation>
-    </message>
-    <message>
-      <source>Device storage information update interval</source>
-      <translation type="unfinished">Device storage information update interval</translation>
-    </message>
-    <message>
-      <source>Site alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h)</translation>
-    </message>
-    <message>
-      <source>Proxy connection access policy</source>
-      <translation type="unfinished">Proxy connection access policy</translation>
-    </message>
-    <message>
-      <source>Cloud Site ID</source>
-      <translation type="unfinished">Cloud Site ID</translation>
-    </message>
-    <message>
-      <source>Enable 2FA for the Site</source>
-      <translation type="unfinished">Enable 2FA for the Site</translation>
-    </message>
-    <message>
-      <source>Site name</source>
-      <translation type="unfinished">Site name</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
       <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
     </message>
     <message>
-      <source>Last master Site merge ID</source>
-      <translation type="unfinished">Last master Site merge ID</translation>
-    </message>
-    <message>
-      <source>Last slave Site merge ID</source>
-      <translation type="unfinished">Last slave Site merge ID</translation>
-    </message>
-    <message>
-      <source>Pixelation settings</source>
-      <translation type="unfinished">Pixelation settings</translation>
-    </message>
-    <message>
-      <source>Apply session limit for Cloud tokens</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens</translation>
-    </message>
-    <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
       <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
     </message>
     <message>
-      <source>Anonymous Crash Report Server API URL</source>
-      <translation type="unfinished">Anonymous Crash Report Server API URL</translation>
+      <source>SMTP settings.</source>
+      <translation type="unfinished">SMTP settings.</translation>
     </message>
     <message>
-      <source>Default locale for new users</source>
-      <translation type="unfinished">Default locale for new users</translation>
+      <source>Anonymous statistics report allowed.</source>
+      <translation type="unfinished">Anonymous statistics report allowed.</translation>
     </message>
     <message>
-      <source>Check video stream permissions on VMS server period (milliseconds)</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
+      <source>Anonymous statistics report last time.</source>
+      <translation type="unfinished">Anonymous statistics report last time.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::event::StringsHelper</name>
     <message>
-      <source>Bookmark</source>
-      <translation>Könyvjeltő</translation>
+      <source>Anonymous statistics report last version.</source>
+      <translation type="unfinished">Anonymous statistics report last version.</translation>
     </message>
     <message>
-      <source>Panic recording</source>
-      <translation>Pánik rögzítés</translation>
+      <source>Anonymous statistics report last number.</source>
+      <translation type="unfinished">Anonymous statistics report last number.</translation>
     </message>
     <message>
-      <source>Write to log</source>
-      <translation>Írás naplóba</translation>
+      <source>Anonymous statistics time cycle.</source>
+      <translation type="unfinished">Anonymous statistics time cycle.</translation>
     </message>
     <message>
-      <source>Repeat sound</source>
-      <translation>Hang ismétlése</translation>
+      <source>Anonymous statistics report delay after update.</source>
+      <translation type="unfinished">Anonymous statistics report delay after update.</translation>
     </message>
     <message>
-      <source>Play sound</source>
-      <translation>Hang lejátszása</translation>
+      <source>Anonymous Statistics Report Server URL.</source>
+      <translation type="unfinished">Anonymous Statistics Report Server URL.</translation>
     </message>
     <message>
-      <source>Speak</source>
-      <translation>Beszéd</translation>
+      <source>Anonymous Crash Report Server API URL.</source>
+      <translation type="unfinished">Anonymous Crash Report Server API URL.</translation>
     </message>
     <message>
-      <source>Execute PTZ preset</source>
-      <translation>PTZ preset indítás</translation>
+      <source>Anonymous statistics report Client settings.</source>
+      <translation type="unfinished">Anonymous statistics report Client settings.</translation>
     </message>
     <message>
-      <source>Show text overlay</source>
-      <translation>Felirat fólia megjelenítése</translation>
+      <source>Device storage information update interval.</source>
+      <translation type="unfinished">Device storage information update interval.</translation>
     </message>
     <message>
-      <source>Show on Alarm Layout</source>
-      <translation>Megjelenítés a riasztás elrendezésen</translation>
+      <source>Site alive update interval (seconds, 1s-1h).</source>
+      <translation type="unfinished">Site alive update interval (seconds, 1s-1h).</translation>
     </message>
     <message>
-      <source>Device output</source>
-      <translation>Eszköz kimenet</translation>
+      <source>Proxy connection timeout (seconds, 1s-1h).</source>
+      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h).</translation>
     </message>
     <message>
-      <source>Camera output</source>
-      <translation>Kamera kimenet</translation>
+      <source>Proxy connection access policy.</source>
+      <translation type="unfinished">Proxy connection access policy.</translation>
     </message>
     <message>
-      <source>Device recording</source>
-      <translation>Eszköz rögzítés</translation>
+      <source>Time synchronization enabled.</source>
+      <translation>Időszinkronizálás engedélyezve.</translation>
     </message>
     <message>
-      <source>Camera recording</source>
-      <translation>Kamera rögzítés</translation>
+      <source>Primary time synchronization Server ID.</source>
+      <translation type="unfinished">Primary time synchronization Server ID.</translation>
     </message>
     <message>
-      <source>Generic Event</source>
-      <translation>Általános esemény</translation>
+      <source>Max difference between local and source time (milliseconds).</source>
+      <translation type="unfinished">Max difference between local and source time (milliseconds).</translation>
     </message>
-    <message numerus="yes">
-      <source>Motion on Cameras</source>
-      <translation>
-        <numerusform>Mozgás a kamerákon</numerusform>
-        <numerusform>Mozgás a kamerákon</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Network Issue</source>
-      <translation>Hálózati probléma</translation>
-    </message>
-    <message>
-      <source>Server Failure</source>
-      <translation>Szerver hiba</translation>
-    </message>
-    <message>
-      <source>Server Conflict</source>
-      <translation>Szerver ütközés</translation>
-    </message>
-    <message>
-      <source>Server Started</source>
-      <translation>Szerver elindult</translation>
-    </message>
-    <message>
-      <source>License Issue</source>
-      <translation>Licence probléma</translation>
-    </message>
-    <message>
-      <source>Any Server Issue</source>
-      <translation>Bármilyen szerver hiba</translation>
-    </message>
-    <message>
-      <source>Any Event</source>
-      <translation>Bármilyen esemény</translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Devices</source>
-      <translation>
-        <numerusform>Bemeneti jel az eszközökön</numerusform>
-        <numerusform>Bemeneti jel az eszközökön</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Cameras</source>
-      <translation>
-        <numerusform>Bemeneti jel a kamerákon</numerusform>
-        <numerusform>Bemeneti jel a kamerákon</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices Disconnected</source>
-      <translation>
-        <numerusform>Eszközök lekapcsolódva</numerusform>
-        <numerusform>Eszközök lekapcsolódva</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras Disconnected</source>
-      <translation>
-        <numerusform>Kamerák lekapcsolódva</numerusform>
-        <numerusform>Kamerák lekapcsolódva</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices IP Conflict</source>
-      <translation>
-        <numerusform>IP ütközés az eszközöknél</numerusform>
-        <numerusform>IP ütközés az eszközöknél</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras IP Conflict</source>
-      <translation>
-        <numerusform>IP ütközés a kameráknál</numerusform>
-        <numerusform>IP ütközés a kameráknál</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Any Device Issue</source>
-      <translation>Bármilyen eszköz hiba</translation>
-    </message>
-    <message>
-      <source>Any Camera Issue</source>
-      <translation>Bármilyen kamera hiba</translation>
-    </message>
-    <message>
-      <source>Undefined event has occurred on %1</source>
-      <translation>Nem definiált esemény történ itt: %1</translation>
-    </message>
-    <message>
-      <source>Device %1 was disconnected</source>
-      <translation>%1 eszköz szétkapcsolt</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>%1 kamera szétkapcsolt</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>%1 I/O modul szétkapcsolt</translation>
-    </message>
-    <message>
-      <source>Input on %1</source>
-      <translation>Bemenet: %1</translation>
-    </message>
-    <message>
-      <source>Motion on %1</source>
-      <translation>Mozgás: %1</translation>
-    </message>
-    <message>
-      <source>Network Issue at %1</source>
-      <translation>Hálózati probléma: %1</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation>&quot;%1&quot; szerver hiba</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict at %1</source>
-      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Eszköz IP ütközés %1 szerveren</translation>
-    </message>
-    <message>
-      <source>Camera IP Conflict at %1</source>
-      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Kamera IP ütközés %1 szerveren</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation>&quot;%1&quot; szerver ütközés</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation>&quot;%1&quot; szerver elindult</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>&quot;%1&quot; szervernek licencproblémája van</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>&quot;%1&quot; szerver befejezte az archív biztonsági másolatot</translation>
-    </message>
     <message>
-      <source>Generic Event at %1</source>
-      <translation>%1 - általános esemény</translation>
+      <source>OS time change check period.</source>
+      <translation>OS időváltozási ellenőrzési időszak.</translation>
     </message>
     <message>
-      <source>An unknown event has occurred</source>
-      <translation>Ismeretlen esemény történt</translation>
+      <source>Sync time synchronization interval for network requests.</source>
+      <translation>A hálózati kérések szinkronizálási időszaka.</translation>
     </message>
     <message>
-      <source>Event: %1</source>
-      <translation>Esemény %1</translation>
+      <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
+      <translation>Epsilon szinkronizálása. Az új érték nem kerül alkalmazásra, ha a delta idő kevesebb, mint epsilon.</translation>
     </message>
     <message>
-      <source>Source: %1</source>
-      <translation>Forrás: %1</translation>
+      <source>Cloud owner account.</source>
+      <translation>Felhő-tulajdonos fiókja.</translation>
     </message>
     <message>
-      <source>Caption: %1</source>
-      <translation>Felirat: %1</translation>
+      <source>Organization Id.</source>
+      <translation type="unfinished">Organization Id.</translation>
     </message>
     <message>
-      <source>Input Port: %1</source>
-      <translation>Bemeneti port: %1</translation>
+      <source>Cloud Site ID.</source>
+      <translation type="unfinished">Cloud Site ID.</translation>
     </message>
     <message>
-      <source>Reason: %1</source>
-      <translation>Ok: %1</translation>
+      <source>Cloud authorization key.</source>
+      <translation type="unfinished">Cloud authorization key.</translation>
     </message>
     <message>
-      <source>Conflicting Address: %1</source>
-      <translation>Címütközés: %1</translation>
+      <source>Enable 2FA for the Site.</source>
+      <translation type="unfinished">Enable 2FA for the Site.</translation>
     </message>
     <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2</translation>
+      <source>Site name.</source>
+      <translation type="unfinished">Site name.</translation>
     </message>
     <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Ütköző szerver: #%1: %2</translation>
+      <source>Last master Site merge ID.</source>
+      <translation type="unfinished">Last master Site merge ID.</translation>
     </message>
     <message>
-      <source>Conflicting Server: %1</source>
-      <translation>Ütköző szerver: %1</translation>
+      <source>Last slave Site merge ID.</source>
+      <translation type="unfinished">Last slave Site merge ID.</translation>
     </message>
     <message>
-      <source>Trigger: %1</source>
-      <translation>Eseményindító: %1</translation>
+      <source>Disable Device vendors.</source>
+      <translation type="unfinished">Disable Device vendors.</translation>
     </message>
     <message>
-      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <source>Optimize Camera settings.</source>
+      <translation type="unfinished">Optimize Camera settings.</translation>
     </message>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>Alkalom: %1/%2</translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>Első előfordulás: %1/%2(%n alkalomból)</numerusform>
-        <numerusform>Első előfordulás: %1/%2(%n alkalomból)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>Nincs fogadott adat az elmúlt %n másodpercben.</numerusform>
-        <numerusform>Nincs fogadott adat az elmúlt %n másodpercben.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected.</source>
-      <translation>RTP csomag vesztés észlelve.</translation>
-    </message>
-    <message>
-      <source>Device does not respond to network requests.</source>
-      <translation>A berendezés nem válaszol a hálózati kérésre.</translation>
-    </message>
-    <message>
-      <source>Connection to server is lost.</source>
-      <translation>A kapcsolat a szerverrrel megszakadt.</translation>
-    </message>
-    <message>
-      <source>Server stopped unexpectedly.</source>
-      <translation>A szerver váratlanul leállt.</translation>
-    </message>
-    <message>
-      <source>I/O error has occurred at %1.</source>
-      <translation>I/O hiba történt: %1.</translation>
-    </message>
-    <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>Nincs elegendő HDD/SDD sebesség a rögzítéshez: %1.</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>&quot;%1&quot; HDD/SDD lemez megtelt. A lemez túl sok adatot tartalmaz amit a VMS nem menedzsel.</translation>
-    </message>
-    <message>
-      <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>&quot;%1&quot; rendszerlemez majdnem megtelt.</translation>
-    </message>
-    <message>
-      <source>start</source>
-      <translation>indítás</translation>
-    </message>
-    <message>
-      <source>stop</source>
-      <translation>megállítás</translation>
-    </message>
-    <message>
-      <source>While %1</source>
-      <translation>%1 alatt</translation>
-    </message>
-    <message>
-      <source>On %1 %2</source>
-      <translation>Itt: %1 %2</translation>
-    </message>
-    <message>
-      <source>Trigger Name</source>
-      <translation>Eseményindító neve</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n felhasználó</numerusform>
-        <numerusform>%n felhasználó</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>Minden felhasználó</translation>
-    </message>
-    <message>
-      <source>Select at least one user</source>
-      <translation>Válasszon legalább egy felhasználót</translation>
-    </message>
-    <message>
-      <source>Soft Trigger</source>
-      <translation>Szoft eseményindítás</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 at %2</source>
-      <translation>Soft Trigger %1:%2</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation>%1 soft eseményindító többször is aktiválódott</translation>
-    </message>
-    <message>
-      <source>Send email</source>
-      <translation>E-mail küldése</translation>
-    </message>
-    <message>
-      <source>Acknowledge</source>
-      <translation>Nyugtázás</translation>
-    </message>
     <message>
-      <source>Analytics Event</source>
-      <translation>Analitikai esemény</translation>
+      <source>Thumbnails auto-update.</source>
+      <translation type="unfinished">Thumbnails auto-update.</translation>
     </message>
     <message>
-      <source>%1 at %2</source>
-      <comment>Analytics Event at some camera</comment>
-      <translation>%1 ezen %2</translation>
+      <source>Max scene items (0 means default).</source>
+      <translation>Max. elemszám (0 alapértelmezett).</translation>
     </message>
     <message>
-      <source>Storage Issue</source>
-      <translation>Tároló hiba</translation>
+      <source>Send plain-text emails.</source>
+      <translation>Egyszerű szöveges e-mailek küldése.</translation>
     </message>
     <message>
-      <source>Storage Issue at %1</source>
-      <translation>Tárhely hiba: %1</translation>
+      <source>Use Windows line feed in emails.</source>
+      <translation>Használja a Windows feed-et e-mailben.</translation>
     </message>
     <message>
-      <source>Set to fullscreen</source>
-      <translation>Váltás teljesképernyőre</translation>
+      <source>Enable audit trail.</source>
+      <translation>Audit napló engedélyezése.</translation>
     </message>
     <message>
-      <source>Exit fullscreen</source>
-      <translation>Kilépés teljesképernyős módból</translation>
+      <source>Audit trail period (days, 14-730).</source>
+      <translation type="unfinished">Audit trail period (days, 14-730).</translation>
     </message>
     <message>
-      <source>Open layout</source>
-      <translation>Elrendezés megnyitása</translation>
+      <source>Event log period (days).</source>
+      <translation>Eseménynapló időszak (nap).</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>Több %1 esemény történt</translation>
+      <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
+      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation>Az Analytics tárhely &quot;%1&quot; offline állapotban van.</translation>
+      <source>Enforce HTTPS (data traffic encryption).</source>
+      <translation type="unfinished">Enforce HTTPS (data traffic encryption).</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation>Az Analytics &quot;%1&quot; tárhelye majdnem tele van.</translation>
+      <source>Enforce RTSPS (video traffic encryption).</source>
+      <translation type="unfinished">Enforce RTSPS (video traffic encryption).</translation>
     </message>
     <message>
-      <source>Plugin Diagnostic Event</source>
-      <translation>Plugin diagnosztikai esemény</translation>
+      <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
+      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages).</translation>
     </message>
     <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>Ismeretlen plugin diagnosztikai esemény</translation>
+      <source>Enable auto-discovery.</source>
+      <translation type="unfinished">Enable auto-discovery.</translation>
     </message>
     <message>
-      <source>Buzzer</source>
-      <translation>Berregő</translation>
+      <source>Enable auto-update notifications.</source>
+      <translation type="unfinished">Enable auto-update notifications.</translation>
     </message>
     <message>
-      <source>Archive Backup Finished</source>
-      <translation>Az archívum biztonsági mentése kész</translation>
+      <source>Enable update notifications.</source>
+      <translation type="unfinished">Enable update notifications.</translation>
     </message>
     <message>
-      <source>PoE over Budget</source>
-      <translation>PoE a "Budget" felett</translation>
+      <source>Enable UPNP port-mapping.</source>
+      <translation type="unfinished">Enable UPNP port-mapping.</translation>
     </message>
     <message>
-      <source>Fan Error</source>
-      <translation>Ventilátor hiba</translation>
+      <source>Backup settings.</source>
+      <translation type="unfinished">Backup settings.</translation>
     </message>
     <message>
-      <source>PoE over budget at %1</source>
-      <translation>PoE a "Budget" felett %1</translation>
+      <source>Cloud host override.</source>
+      <translation type="unfinished">Cloud host override.</translation>
     </message>
     <message>
-      <source>Fan error at %1</source>
-      <translation>Ventilátor hiba %1</translation>
+      <source>Enable cross-domain policy.</source>
+      <translation type="unfinished">Enable cross-domain policy.</translation>
     </message>
     <message>
-      <source>Reason: Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation>Ok: Túllépte a teljesítménykorlátot (%1)</translation>
+      <source>Enable RTSP for Arecont.</source>
+      <translation type="unfinished">Enable RTSP for Arecont.</translation>
     </message>
     <message>
-      <source>Show desktop notification</source>
-      <translation>Az asztali értesítés megjelenítése</translation>
+      <source>Enable sequential Flir ONVIF searcher.</source>
+      <translation type="unfinished">Enable sequential Flir ONVIF searcher.</translation>
     </message>
     <message>
-      <source>Send mobile notification</source>
-      <translation>Küldjön mobil értesítést</translation>
+      <source>Max P2P queue size (bytes, 32-512MB).</source>
+      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB).</translation>
     </message>
     <message>
-      <source>Consumption</source>
-      <translation>Fogyasztás</translation>
+      <source>Max P2P all clients size (bytes, 32-512MB).</source>
+      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB).</translation>
     </message>
     <message>
-      <source>Device was disconnected</source>
-      <translation>Az eszköz lecsatlakozott</translation>
+      <source>Max record queue size (bytes, 6-96MB).</source>
+      <translation type="unfinished">Max record queue size (bytes, 6-96MB).</translation>
     </message>
     <message>
-      <source>Camera was disconnected</source>
-      <translation>A kamera lecsatlakozott</translation>
+      <source>Max record queue size (elements, 250-4000).</source>
+      <translation type="unfinished">Max record queue size (elements, 250-4000).</translation>
     </message>
     <message>
-      <source>I/O Module was disconnected</source>
-      <translation>I/O modul szétkapcsolt</translation>
+      <source>RTP timeout (milliseconds).</source>
+      <translation>RTP időtúllépés (millisec).</translation>
     </message>
     <message>
-      <source>Analytics Object Detected</source>
-      <translation type="unfinished">Analytics Object Detected</translation>
+      <source>Max RTSP connection duration (seconds).</source>
+      <translation type="unfinished">Max RTSP connection duration (seconds).</translation>
     </message>
     <message>
-      <source>%1 at camera &apos;%2&apos;</source>
-      <comment> is detected</comment>
-      <translation type="unfinished">%1 at camera &apos;%2&apos;</translation>
+      <source>Enable cloud-connect UDP hole-punching.</source>
+      <translation type="unfinished">Enable cloud-connect UDP hole-punching.</translation>
     </message>
     <message>
-      <source>Plugin: %1</source>
-      <translation type="unfinished">Plugin: %1</translation>
+      <source>Enable cloud-connect relays usage.</source>
+      <translation type="unfinished">Enable cloud-connect relays usage.</translation>
     </message>
     <message>
-      <source>Archive backup failed.</source>
-      <translation>Az archívum biztonsági mentése nem sikerült.</translation>
+      <source>Enforce SSL for cloud-connect relays.</source>
+      <translation type="unfinished">Enforce SSL for cloud-connect relays.</translation>
     </message>
     <message>
-      <source>Object detected</source>
-      <translation type="unfinished">Object detected</translation>
+      <source>Enable recording on EDGE.</source>
+      <translation type="unfinished">Enable recording on EDGE.</translation>
     </message>
     <message>
-      <source>Archive backup failed</source>
-      <translation>Az archívum biztonsági mentése nem sikerült</translation>
+      <source>Enable WebSocket for P2P.</source>
+      <translation type="unfinished">Enable WebSocket for P2P.</translation>
     </message>
     <message>
-      <source>Data is backed up to %1</source>
-      <translation type="unfinished">Data is backed up to %1</translation>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>
+      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</translation>
     </message>
     <message>
-      <source>Server Certificate Error</source>
-      <translation type="unfinished">Server Certificate Error</translation>
+      <source>Update releases.json file URL.</source>
+      <translation type="unfinished">Update releases.json file URL.</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; certificate error</source>
-      <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
+      <source>Target update information.</source>
+      <translation type="unfinished">Target update information.</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1).</source>
-      <translation>RTP hiba az elsődleges adatfolyamban (%1).</translation>
+      <source>Installed update information.</source>
+      <translation type="unfinished">Installed update information.</translation>
     </message>
     <message>
-      <source>RTP error in secondary stream (%1).</source>
-      <translation>RTP hiba a másodlagos adatfolyamban (%1).</translation>
+      <source>Downloader peers for files.</source>
+      <translation type="unfinished">Downloader peers for files.</translation>
     </message>
     <message>
-      <source>Camera time is back to normal.</source>
-      <translation>A kameraidő visszaállt alaphelyzetbe.</translation>
+      <source>Client update settings.</source>
+      <translation type="unfinished">Client update settings.</translation>
     </message>
     <message>
-      <source>Address %1 is already in use by %2 on primary stream.</source>
-      <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+      <source>Thread count limit for camera archive synchronization.</source>
+      <translation type="unfinished">Thread count limit for camera archive synchronization.</translation>
     </message>
     <message>
-      <source>Address %1 is already in use by %2 on secondary stream.</source>
-      <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+      <source>Watermark settings.</source>
+      <translation>Vízjel beállítások.</translation>
     </message>
     <message>
-      <source>Multicast address conflict detected.</source>
-      <translation type="unfinished">Multicast address conflict detected.</translation>
+      <source>Pixelation settings.</source>
+      <translation type="unfinished">Pixelation settings.</translation>
     </message>
     <message>
-      <source>Network address %1 is not a multicast address.</source>
-      <translation>A %1 hálózati cím nem multicast-cím.</translation>
+      <source>Authorization Session token lifetime (seconds).</source>
+      <translation type="unfinished">Authorization Session token lifetime (seconds).</translation>
     </message>
     <message>
-      <source>Failed to backup file %1</source>
-      <translation type="unfinished">Failed to backup file %1</translation>
+      <source>Apply session limit for Cloud tokens.</source>
+      <translation type="unfinished">Apply session limit for Cloud tokens.</translation>
     </message>
     <message>
-      <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <source>Session token count limit on a single Server.</source>
+      <translation type="unfinished">Session token count limit on a single Server.</translation>
     </message>
     <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>A kapcsolat a kamerával (elsődleges adatfolyam) váratlanul bezárult.</translation>
+      <source>Max session token count per user on single Server.</source>
+      <translation type="unfinished">Max session token count per user on single Server.</translation>
     </message>
     <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>A kapcsolat a kamerával (másodlagos adatfolyam) váratlanul bezárult.</translation>
+      <source>Update interval for remote session token cache (other Servers and Cloud).</source>
+      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud).</translation>
     </message>
     <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>A kapcsolat az eszközzel váratlanul bezárult.</translation>
+      <source>Timeout for remote session token cache (other Servers and Cloud).</source>
+      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud).</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <source>Default video codec.</source>
+      <translation>Alapértelmezett video tömörítés.</translation>
     </message>
     <message>
-      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <source>Default codec for export video.</source>
+      <translation type="unfinished">Default codec for export video.</translation>
     </message>
     <message>
-      <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <source>Low quality screen video codec.</source>
+      <translation>Alacsony minőségű képernyő-videó kodek.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <source>License server.</source>
+      <translation>Licenc szerver.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <source>URI for resource_data.json automatic update.</source>
+      <translation type="unfinished">URI for resource_data.json automatic update.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <source>Meta data storage change policy.</source>
+      <translation>Metaadat-tárolási változási politika.</translation>
     </message>
     <message>
-      <source>Also show source camera</source>
-      <translation>Forrás kamera megjelenítésével együtt</translation>
+      <source>Persistent Servers for update storage.</source>
+      <translation type="unfinished">Persistent Servers for update storage.</translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Forrás kamera</translation>
+      <source>Persistent Servers where updates are stored.</source>
+      <translation type="unfinished">Persistent Servers where updates are stored.</translation>
     </message>
     <message>
-      <source>Also show on source camera</source>
-      <translation>Forrás kamera megjelenítésével együtt</translation>
+      <source>VMS Server version specific features.</source>
+      <translation type="unfinished">VMS Server version specific features.</translation>
     </message>
     <message>
-      <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <source>Default locale for new users.</source>
+      <translation type="unfinished">Default locale for new users.</translation>
     </message>
     <message>
-      <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <source>Additional local FS storage types for recording.</source>
+      <translation type="unfinished">Additional local FS storage types for recording.</translation>
     </message>
     <message>
-      <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <source>Keep IO port state on when Server connects to the device.</source>
+      <translation type="unfinished">Keep IO port state on when Server connects to the device.</translation>
     </message>
     <message>
-      <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <source>Media buffer size (KB, 10KB-4MB).</source>
+      <translation type="unfinished">Media buffer size (KB, 10KB-4MB).</translation>
     </message>
-    <message numerus="yes">
-      <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>LDAP Sync Issue</source>
-      <translation type="unfinished">LDAP Sync Issue</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n times)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n alkalom)</numerusform>
-        <numerusform>%1 (%n alkalom)</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Failed to connect to the LDAP server.</source>
-      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+      <source>Media buffer size for audio only devices (KB, 1KB-1MB).</source>
+      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB).</translation>
     </message>
     <message>
-      <source>Failed to complete the sync within a %1 timeout.</source>
-      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+      <source>Force analytics DB storage mount point permissions in case of failure.</source>
+      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure.</translation>
     </message>
     <message>
-      <source>Failed to complete the sync within a given timeout.</source>
-      <translation type="unfinished">Failed to complete the sync within a given timeout.</translation>
+      <source>Check video stream permissions on VMS server period (milliseconds).</source>
+      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds).</translation>
     </message>
     <message>
-      <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+      <source>Storage encryption enabled.</source>
+      <translation type="unfinished">Storage encryption enabled.</translation>
     </message>
     <message>
-      <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
+      <source>Current storage encryption key.</source>
+      <translation type="unfinished">Current storage encryption key.</translation>
     </message>
     <message>
-      <source>Services Issue</source>
-      <translation type="unfinished">Services Issue</translation>
+      <source>Show Servers in the Resource Tree for non-admins.</source>
+      <translation type="unfinished">Show Servers in the Resource Tree for non-admins.</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; has license migration issue</source>
-      <translation type="unfinished">Server &quot;%1&quot; has license migration issue</translation>
+      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</source>
+      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
-      <source>Service overuse</source>
-      <translation type="unfinished">Service overuse</translation>
+      <source>HTTP header: Origin.</source>
+      <translation type="unfinished">HTTP header: Origin.</translation>
     </message>
     <message>
-      <source>The following licenses were not migrated:</source>
-      <translation type="unfinished">The following licenses were not migrated:</translation>
+      <source>HTTP header: X-Frame-Options.</source>
+      <translation type="unfinished">HTTP header: X-Frame-Options.</translation>
     </message>
     <message>
-      <source>License</source>
-      <translation type="unfinished">License</translation>
+      <source>Use only HTTPS for cameras.</source>
+      <translation type="unfinished">Use only HTTPS for cameras.</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-      </translation>
+      <source>Allow Power User editing Security Settings.</source>
+      <translation type="unfinished">Allow Power User editing Security Settings.</translation>
     </message>
     <message>
-      <source>Failed to migrate licenses.</source>
-      <translation type="unfinished">Failed to migrate licenses.</translation>
+      <source>Enable deprecated API functions (insecure).</source>
+      <translation type="unfinished">Enable deprecated API functions (insecure).</translation>
     </message>
     <message>
-      <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation type="unfinished">Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</translation>
+      <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
+      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <source>Expose IP addresses for autodiscovery.</source>
+      <translation type="unfinished">Expose IP addresses for autodiscovery.</translation>
     </message>
     <message>
-      <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <source>Show mouse timeline preview.</source>
+      <translation type="unfinished">Show mouse timeline preview.</translation>
     </message>
     <message>
-      <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <source>LDAP settings.</source>
+      <translation type="unfinished">LDAP settings.</translation>
     </message>
   </context>
 </TS>

@@ -273,10 +273,6 @@
       <translation>Yardım</translation>
     </message>
     <message>
-      <source>Event Log...</source>
-      <translation>Olay Günlükleri...</translation>
-    </message>
-    <message>
       <source>Control Video Wall</source>
       <translation>Video Duvarını Kontrol Et</translation>
     </message>
@@ -1165,22 +1161,6 @@
       <translation type="unfinished">Connect to Site</translation>
     </message>
     <message>
-      <source>Layout Tab</source>
-      <translation type="unfinished">Layout Tab</translation>
-    </message>
-    <message>
-      <source>New Layout Tab</source>
-      <translation type="unfinished">New Layout Tab</translation>
-    </message>
-    <message>
-      <source>Welcome Screen Tab</source>
-      <translation type="unfinished">Welcome Screen Tab</translation>
-    </message>
-    <message>
-      <source>New Welcome Screen Tab</source>
-      <translation type="unfinished">New Welcome Screen Tab</translation>
-    </message>
-    <message>
       <source>Site Administration...</source>
       <translation type="unfinished">Site Administration...</translation>
     </message>
@@ -1235,6 +1215,30 @@
     <message>
       <source>Cell Aspect Ratio</source>
       <translation>En boy oranı</translation>
+    </message>
+    <message>
+      <source>Layout</source>
+      <translation>Yerleşim</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>Yeni Ekran</translation>
+    </message>
+    <message>
+      <source>Welcome Screen</source>
+      <translation>Açılış Ekranı</translation>
+    </message>
+    <message>
+      <source>New Welcome Screen</source>
+      <translation>Yeni Karşılama Ekranı</translation>
+    </message>
+    <message>
+      <source>Monitor in New Tab</source>
+      <translation>Yeni Sekmede İzle</translation>
+    </message>
+    <message>
+      <source>Monitor in New Window</source>
+      <translation>Yeni Pencerede İzle</translation>
     </message>
   </context>
   <context>
@@ -1307,20 +1311,6 @@
     </message>
   </context>
   <context>
-    <name>ExitFullscreenActionHelper</name>
-    <message>
-      <source>Select layout...</source>
-      <translation>Düzen seç...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n layouts</source>
-      <translation>
-        <numerusform>%n düzen</numerusform>
-        <numerusform>%n düzenleri</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1341,37 +1331,6 @@
     <message>
       <source>Executable %1 Media File</source>
       <translation>Yürütülebilir %1 Medya Dosyası</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenActionHelper</name>
-    <message>
-      <source>Source camera</source>
-      <translation>Kaynak Kamera</translation>
-    </message>
-    <message>
-      <source>Select device...</source>
-      <translation>Cihaz seçin...</translation>
-    </message>
-    <message>
-      <source>Select camera...</source>
-      <translation>Kamera seçin...</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Düzen seç...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n layouts</source>
-      <translation>
-        <numerusform>%n düzen</numerusform>
-        <numerusform>%n düzenleri</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>%1 on %2</source>
-      <comment>Camera %1 on layout %2</comment>
-      <translation>%2 de %1</translation>
     </message>
   </context>
   <context>
@@ -2213,24 +2172,24 @@ License Key: %2</source>
       </translation>
     </message>
     <message numerus="yes">
-      <source>These servers are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These servers are removed from Site</numerusform>
-        <numerusform>These servers are removed from Site</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These users are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These users are removed from Site</numerusform>
-        <numerusform>These users are removed from Site</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>These resources are removed from Site</source>
       <translation type="unfinished">
         <numerusform>These resources are removed from Site</numerusform>
         <numerusform>These resources are removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This server is removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>This server is removed from Site</numerusform>
+        <numerusform>This server is removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This user is removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>This user is removed from Site</numerusform>
+        <numerusform>This user is removed from Site</numerusform>
       </translation>
     </message>
   </context>
@@ -2372,10 +2331,6 @@ License Key: %2</source>
       <translation>Etkinlik kuralı kaldırıldı</translation>
     </message>
     <message>
-      <source>Event rules reset to default</source>
-      <translation>Etkinlik kuralları varsayılana sıfırlandı</translation>
-    </message>
-    <message>
       <source>Storage added</source>
       <translation>Depolama eklendi</translation>
     </message>
@@ -2508,222 +2463,6 @@ License Key: %2</source>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleViewModel</name>
-    <message>
-      <source>Error: %1</source>
-      <translation>Hata: %1</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Derhal</translation>
-    </message>
-    <message>
-      <source>Stops</source>
-      <translation>Bitir</translation>
-    </message>
-    <message>
-      <source>Starts</source>
-      <translation>Başlat</translation>
-    </message>
-    <message>
-      <source>Occurs</source>
-      <translation>Oluştur</translation>
-    </message>
-    <message>
-      <source>N/A</source>
-      <translation>N/A</translation>
-    </message>
-    <message>
-      <source>Every %1</source>
-      <translation>Her %1</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Herhangi bir sunucu</translation>
-    </message>
-    <message>
-      <source>Any Device</source>
-      <translation>Herhangi bir cihaz</translation>
-    </message>
-    <message>
-      <source>Any Camera</source>
-      <translation>Herhangi bir kamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Servers</source>
-      <translation>
-        <numerusform>%n sunucu</numerusform>
-        <numerusform>%n sunucular</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Kullanıcı</translation>
-    </message>
-    <message>
-      <source>Source Server</source>
-      <translation>Kaynak Sunucu</translation>
-    </message>
-    <message>
-      <source>Source Camera</source>
-      <translation>Kaynak Kamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Kaynak ve %n Kamera Daha</numerusform>
-        <numerusform>Kaynak ve %n Kamera Daha</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Select at least one Device</source>
-      <translation>En Az Bir Aygıt Seçin</translation>
-    </message>
-    <message>
-      <source>Select at least one Camera</source>
-      <translation>En Az Bir Kamera Seçin</translation>
-    </message>
-    <message>
-      <source>Select Server</source>
-      <translation>Sunucuları seçin</translation>
-    </message>
-    <message>
-      <source>Source Server and %1</source>
-      <translation>Kaynak Sunucu ve %1</translation>
-    </message>
-    <message>
-      <source>Site</source>
-      <translation>Site</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRuleWidget</name>
-    <message>
-      <source>to</source>
-      <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
-      <translation>kime</translation>
-    </message>
-    <message>
-      <source>at</source>
-      <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-      <translation>da</translation>
-    </message>
-    <message>
-      <source>Select at least one device</source>
-      <translation>En Az Bir Aygıt Seçin</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>En Az Bir Kamera Seçin</translation>
-    </message>
-    <message>
-      <source>Devices</source>
-      <translation>Aygıtlar</translation>
-    </message>
-    <message>
-      <source>Cameras</source>
-      <translation>Kameralar</translation>
-    </message>
-    <message>
-      <source>Any Device</source>
-      <translation>Herhangi bir cihaz</translation>
-    </message>
-    <message>
-      <source>Any Camera</source>
-      <translation>Herhangi bir kamera</translation>
-    </message>
-    <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation>Zorla Onaylama, yalnızca Genel Olay URL'sinde kamera tanımlayıcıları kullanılıyorsa çalışır</translation>
-    </message>
-    <message>
-      <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation>Yüksek ön kayıt süresi, sunucuda RAM kullanımını artıracaktır</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRulesDialog</name>
-    <message>
-      <source>&amp;New...</source>
-      <translation>&amp;Yeni...</translation>
-    </message>
-    <message>
-      <source>&amp;Delete</source>
-      <translation>&amp;Sil</translation>
-    </message>
-    <message>
-      <source>&amp;Schedule...</source>
-      <translation>&amp;Takvim...</translation>
-    </message>
-    <message>
-      <source>Restore All Rules to Default</source>
-      <translation>Tüm Ayarları Varsayılan Ayarlara Döndür</translation>
-    </message>
-    <message>
-      <source>No event rules</source>
-      <translation>Olay kuralı yok</translation>
-    </message>
-    <message>
-      <source>Filter by devices...</source>
-      <translation>Cihazları filtrele...</translation>
-    </message>
-    <message>
-      <source>Filter by cameras...</source>
-      <translation>Kameraları filtrele...</translation>
-    </message>
-    <message>
-      <source>Failed to retrieve rules</source>
-      <translation>Kurallar getirilemedi</translation>
-    </message>
-    <message>
-      <source>Failed to save rule</source>
-      <translation>Kural kaydedilirken hata oluştu</translation>
-    </message>
-    <message>
-      <source>This action cannot be undone.</source>
-      <translation>Bu işlem geri alınamaz.</translation>
-    </message>
-    <message>
-      <source>Restore all rules to default?</source>
-      <translation>Tüm Ayarları Varsayılan Ayarlara Döndür?</translation>
-    </message>
-    <message>
-      <source>Some rules are not valid and may not work</source>
-      <translation>Bazı kurallar geçerli değil ve çalışmayabilir</translation>
-    </message>
-    <message>
-      <source>Apply changes before exiting?</source>
-      <translation>Çıkmadan önce değişiklikler uygulansın mı?</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRulesViewModel</name>
-    <message>
-      <source>On</source>
-      <translation>Açık</translation>
-    </message>
-    <message>
-      <source>Event</source>
-      <translation>Durum</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>Kaynak</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Hareket</translation>
-    </message>
-    <message>
-      <source>Target</source>
-      <translation>Hedef</translation>
-    </message>
-    <message>
-      <source>Interval of Action</source>
-      <translation>Hareket Aralığı</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCamDisplay</name>
     <message>
       <source>%1 Running</source>
@@ -2800,13 +2539,6 @@ License Key: %2</source>
     <message>
       <source>Diagnostics complete</source>
       <translation>Tanılama tamamlandı</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraInputBusinessEventWidget</name>
-    <message>
-      <source>automatic</source>
-      <translation>otomatik</translation>
     </message>
   </context>
   <context>
@@ -2916,13 +2648,6 @@ License Key: %2</source>
     <message>
       <source>Logical ID</source>
       <translation>Mantıksal Kimlik</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraOutputBusinessActionWidget</name>
-    <message>
-      <source>automatic</source>
-      <translation>otomatik</translation>
     </message>
   </context>
   <context>
@@ -3243,33 +2968,6 @@ License Key: %2</source>
     </message>
   </context>
   <context>
-    <name>QnCustomBusinessEventWidget</name>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Alan boşsa, etkinlik her zaman tetiklenir.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama alanında eşleşme varsa tetiklenecektir.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama başlığında eşleşme varsa tetiklenecektir.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama başlığında eşleşme varsa tetiklenecektir.</translation>
-    </message>
-    <message>
-      <source>Server API</source>
-      <translation>Sunucu API</translation>
-    </message>
-    <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>Kapsamlı Olay Oluşturmak İçin, Lütfen %1'e Bakın.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCustomFileDialog</name>
     <message>
       <source>Pictures</source>
@@ -3360,159 +3058,6 @@ License Key: %2</source>
     </message>
   </context>
   <context>
-    <name>QnEmptyBusinessActionWidget</name>
-    <message>
-      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>Panik Kayıt modu, tüm kameraların kayıt ayarlarını maksimum FPS ve kaliteye dönüştürür.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnEventLogDialog</name>
-    <message>
-      <source>Filter Similar Rows</source>
-      <translation>Benzer Dizinleri nFiltrele</translation>
-    </message>
-    <message>
-      <source>Copy Selection to Clipboard</source>
-      <translation>Seçileni Panoya Kopyala</translation>
-    </message>
-    <message>
-      <source>Export Selection to File...</source>
-      <translation>Seçileni Dosyaya Çıkart...</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Tümünü Seç</translation>
-    </message>
-    <message>
-      <source>Clear Filter</source>
-      <translation>Filtreyi Temizle</translation>
-    </message>
-    <message>
-      <source>Export selected events to file</source>
-      <translation>Seçilen Olayları Dosyaya Çıkar</translation>
-    </message>
-    <message>
-      <source>Any Action</source>
-      <translation>Tüm Hareketler</translation>
-    </message>
-    <message>
-      <source>No events</source>
-      <translation>Olay yok</translation>
-    </message>
-    <message numerus="yes">
-      <source>Event log for period from %1 to %2 - %n events found</source>
-      <comment>Dates are substituted</comment>
-      <translation>
-        <numerusform>%1'den %2'ye Kadar Olan Durum Günlüğü - %n olaylar bulundu</numerusform>
-        <numerusform>%1'den %2'ye Kadar Olan Durum Günlüğü - %n olaylar bulundu</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Event log for %1 - %n events found</source>
-      <comment>Date is substituted</comment>
-      <translation>
-        <numerusform>%1 için olay günlüğü - %n olay bulundu</numerusform>
-        <numerusform>%1 için olay günlüğü - %n olay bulundu</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Açıklama</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnEventLogModel</name>
-    <message>
-      <source>Motion video</source>
-      <translation>Hareketli Video</translation>
-    </message>
-    <message>
-      <source>Date/Time</source>
-      <translation>Tarih/Zaman</translation>
-    </message>
-    <message>
-      <source>Event</source>
-      <translation>Durum</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>Kaynak</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Hareket</translation>
-    </message>
-    <message>
-      <source>Target</source>
-      <translation>Hedef</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Açıklama</translation>
-    </message>
-    <message>
-      <source>All users</source>
-      <translation>Tüm Kullanıcılar</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n times)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n defa)</numerusform>
-        <numerusform>%1 (%n defa)</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Open camera</source>
-      <translation>Kamerayı aç</translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n users more...</source>
-      <translation>
-        <numerusform>ve %n kullanıcısı...</numerusform>
-        <numerusform>ve %n kullanıcıları...</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n more...</source>
-      <translation>
-        <numerusform>ve %n den fazlası...</numerusform>
-        <numerusform>ve %n den fazlası...</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Removed subjects</source>
-      <translation>
-        <numerusform>%n Kaldırılan konular</numerusform>
-        <numerusform>%n Kaldırılan konular</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Subject removed</source>
-      <translation>Konu kaldırıldı</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n cameras)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n kameralar)</numerusform>
-        <numerusform>%1 (%n kameralar)</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnExecHttpRequestActionWidget</name>
-    <message>
-      <source>Auto</source>
-      <translation>Oto</translation>
-    </message>
-    <message>
-      <source>Basic</source>
-      <translation>Temel</translation>
-    </message>
-  </context>
-  <context>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
@@ -3521,17 +3066,6 @@ License Key: %2</source>
     <message>
       <source>Failed to overwrite file</source>
       <translation>Dosyanın üzerine yazmak başarısız oldu</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFullscreenCameraActionWidget</name>
-    <message>
-      <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation>Bu kamera seçili ekran düzeninde yok. İşlem yapılmadan önce kamera eklenirse işlem çalışacaktır.</translation>
-    </message>
-    <message>
-      <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation>Bu kamera seçili ekran düzenlerinin bazılarında yok. İşlem yapılmadan önce kamera eklenirse işlem çalışacaktır.</translation>
     </message>
   </context>
   <context>
@@ -4014,13 +3548,6 @@ License Key: %2</source>
       <source>Lo-Res</source>
       <translation>Düşük-Çözünürlük</translation>
     </message>
-    <message numerus="yes">
-      <source>Set for all %n Cameras</source>
-      <translation>
-        <numerusform>Tüm %n kameralar için ayarla</numerusform>
-        <numerusform>Tüm %n kameralar için ayarla</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Area Zoom</source>
       <translation>Alan Yakınlaştırma</translation>
@@ -4040,6 +3567,17 @@ License Key: %2</source>
     <message>
       <source>Mute</source>
       <translation>Sessiz</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set for %n devices</source>
+      <translation type="unfinished">
+        <numerusform>Set for %n devices</numerusform>
+        <numerusform>Set for %n devices</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Cloud authorization request should only be performed for cloud cross system resources</source>
+      <translation type="unfinished">Cloud authorization request should only be performed for cloud cross system resources</translation>
     </message>
   </context>
   <context>
@@ -4155,13 +3693,6 @@ License Key: %2</source>
     <message>
       <source>Rotation</source>
       <translation>Döndür</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPopupBusinessActionWidget</name>
-    <message>
-      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation>Bildirimi gören kullanıcılardan biri etkinlik açıklamasıyla yer imi oluşturana kadar gösterilir.</translation>
     </message>
   </context>
   <context>
@@ -4614,42 +4145,6 @@ License Key: %2</source>
     </message>
   </context>
   <context>
-    <name>QnSendEmailActionDelegate</name>
-    <message numerus="yes">
-      <source>%n additional</source>
-      <translation>
-        <numerusform>Ek olarak %n</numerusform>
-        <numerusform>Ek olarak %n</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has invalid email address</source>
-      <translation>%1 kullanıcısı için e-posta adresi geçersiz</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 users have invalid email address</source>
-      <translation>
-        <numerusform>%n kullanıcının %1 i geçersiz e-psotaya sahip</numerusform>
-        <numerusform>%n kullanıcının %1 i geçersiz e-psotaya sahip</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid email address %1</source>
-      <translation>Geçersiz e-posta adresi %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 additional email addresses are invalid</source>
-      <translation>
-        <numerusform>%n kullanıcının %1 i geçersiz ikincil e-psotaya sahip</numerusform>
-        <numerusform>%n kullanıcının %1 i geçersiz ikincil e-psotaya sahip</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Send email to %1</source>
-      <translation>%1 e Email gönder</translation>
-    </message>
-  </context>
-  <context>
     <name>QnServerAddressesModel</name>
     <message>
       <source>Address</source>
@@ -4760,16 +4255,6 @@ License Key: %2</source>
     </message>
   </context>
   <context>
-    <name>QnShowTextOverlayActionWidget</name>
-    <message>
-      <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-      <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
-&apos; sequence</comment>
-      <translation>Html etiketleri özel metin içinde kullanılabilir: &lt;h4&gt;Header'lar (h1-h6) &lt;/h4&gt; Ayrıca farklı &lt;font color=&quot;red&quot;&gt; renkler&lt;/font&gt; ve &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; uygulanabilir. Metin &lt;s&gt; eğik&lt;/s&gt;, &lt;u&gt; açık altı&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; veya &lt;i&gt;italic&lt;/i&gt; olabilir;</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSignInfo</name>
     <message>
       <source>Analyzing: %1%</source>
@@ -4823,8 +4308,8 @@ License Key: %2</source>
       <translation>Yetkilendir</translation>
     </message>
     <message>
-      <source>Setup</source>
-      <translation>Kurulum</translation>
+      <source>Set</source>
+      <translation type="unfinished">Set</translation>
     </message>
   </context>
   <context>
@@ -4838,16 +4323,8 @@ License Key: %2</source>
       <translation>ÇEVRİMDIŞI</translation>
     </message>
     <message>
-      <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
-      <translation type="unfinished">This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</translation>
-    </message>
-    <message>
       <source>UNAUTHORIZED</source>
       <translation>YETKİSİZ</translation>
-    </message>
-    <message>
-      <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
-      <translation type="unfinished">This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
@@ -4862,16 +4339,8 @@ License Key: %2</source>
       <translation type="unfinished">SITE SHUT DOWN</translation>
     </message>
     <message>
-      <source>STREAM LIMITATION</source>
-      <translation type="unfinished">STREAM LIMITATION</translation>
-    </message>
-    <message>
       <source>INFORMATION REQUIRED</source>
       <translation>BİLGİ GEREKİYOR</translation>
-    </message>
-    <message>
-      <source>AUDIO ONLY</source>
-      <translation type="unfinished">AUDIO ONLY</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -4900,6 +4369,18 @@ License Key: %2</source>
     <message>
       <source>CERTIFICATE ERROR</source>
       <translation type="unfinished">CERTIFICATE ERROR</translation>
+    </message>
+    <message>
+      <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
+      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+    </message>
+    <message>
+      <source>Access to this camera requires authorization credentials.</source>
+      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+    </message>
+    <message>
+      <source>CONNECTION LOST</source>
+      <translation type="unfinished">CONNECTION LOST</translation>
     </message>
   </context>
   <context>
@@ -5086,6 +4567,18 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
       <translation type="unfinished">Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</translation>
+    </message>
+    <message>
+      <source>Cloud storage cannot be enabled.</source>
+      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+    </message>
+    <message>
+      <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
+      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+    </message>
+    <message>
+      <source>Insufficient services</source>
+      <translation>Yetersiz hizmetler</translation>
     </message>
   </context>
   <context>
@@ -5471,10 +4964,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation type="unfinished">Site shut down</translation>
     </message>
     <message>
-      <source>Reject intercom call</source>
-      <translation type="unfinished">Reject intercom call</translation>
-    </message>
-    <message>
       <source>Email address is not set for your account</source>
       <translation type="unfinished">Email address is not set for your account</translation>
     </message>
@@ -5598,6 +5087,18 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Notifications language differs from the interface language</source>
       <translation type="unfinished">Notifications language differs from the interface language</translation>
+    </message>
+    <message>
+      <source>Recording disabled</source>
+      <translation type="unfinished">Recording disabled</translation>
+    </message>
+    <message>
+      <source>Cloud storage backup disabled</source>
+      <translation type="unfinished">Cloud storage backup disabled</translation>
+    </message>
+    <message>
+      <source>Paid integration services disabled</source>
+      <translation type="unfinished">Paid integration services disabled</translation>
     </message>
   </context>
   <context>
@@ -6439,10 +5940,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>İçinde</translation>
     </message>
     <message>
-      <source>%n removed subjects</source>
-      <translation>%n kaldırılan konular</translation>
-    </message>
-    <message>
       <source>%n removed devices</source>
       <translation type="unfinished">%n removed devices</translation>
     </message>
@@ -6480,6 +5977,35 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>%n layouts more</source>
       <translation type="unfinished">%n layouts more</translation>
+    </message>
+    <message>
+      <source>Removed subject</source>
+      <comment>The subject is user or group</comment>
+      <translation type="unfinished">Removed subject</translation>
+    </message>
+    <message>
+      <source>Removed device</source>
+      <translation type="unfinished">Removed device</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation type="unfinished">Removed camera</translation>
+    </message>
+    <message>
+      <source>Removed server</source>
+      <translation type="unfinished">Removed server</translation>
+    </message>
+    <message>
+      <source>Removed layout</source>
+      <translation type="unfinished">Removed layout</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n removed subjects</source>
+      <comment>The subject is user or group</comment>
+      <translation type="unfinished">
+        <numerusform>%n removed subjects</numerusform>
+        <numerusform>%n removed subjects</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7121,6 +6647,23 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <translation>Mevcut hizmetlerden daha fazla kamera yedekleniyor. Lütfen bazı kameralar için yedeklemeyi devre dışı bırakın veya daha fazla uygun hizmet ekleyin. Aksi halde %1 tarihinde otomatik olarak yapılacaktır</translation>
     </message>
+    <message>
+      <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
+      <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
+      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+    </message>
+    <message>
+      <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
+      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+    </message>
+    <message>
+      <source>Backup will not be activated for %1 devices: </source>
+      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
+    </message>
+    <message>
+      <source>%1 suitable cloud storage services are required to activate backup for them.</source>
+      <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>
@@ -7248,6 +6791,18 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Missed call</source>
       <translation type="unfinished">Missed call</translation>
+    </message>
+    <message>
+      <source>Call Request</source>
+      <translation type="unfinished">Call Request</translation>
+    </message>
+    <message>
+      <source>Call Request Missed</source>
+      <translation type="unfinished">Call Request Missed</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation type="unfinished">Source: %1</translation>
     </message>
   </context>
   <context>
@@ -7442,6 +6997,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Select Hotspot Target</source>
       <translation type="unfinished">Select Hotspot Target</translation>
     </message>
+    <message>
+      <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
+      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
@@ -7464,6 +7023,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Less Info</source>
       <translation>Daha az bilgi</translation>
+    </message>
+    <message>
+      <source>Use this link to add the camera to another site</source>
+      <translation type="unfinished">Use this link to add the camera to another site</translation>
     </message>
   </context>
   <context>
@@ -7980,26 +7543,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CloudLayoutsIntroDialog</name>
-    <message>
-      <source>Introducing %1 Layouts</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 Ekran Düzeni Tanıtımı</translation>
-    </message>
-    <message>
-      <source>Read more on the %1</source>
-      <translation>%1 hakkında daha fazlasını okuyun</translation>
-    </message>
-    <message>
-      <source>help page</source>
-      <translation>yardım sayfası</translation>
-    </message>
-    <message>
-      <source>%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CloudLayoutsManager</name>
     <message>
       <source>%1 (Copy)</source>
@@ -8078,6 +7621,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Disconnect</source>
       <translation>Bağlantıyı kes</translation>
+    </message>
+    <message>
+      <source>Channel Partner users have access to this site</source>
+      <translation type="unfinished">Channel Partner users have access to this site</translation>
+    </message>
+    <message>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
+      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
@@ -8241,10 +7792,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
   </context>
   <context>
     <name>nx::vms::client::desktop::DesktopDataProvider</name>
-    <message>
-      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>Ses yakalama aygıtı destekler Uygun bir ses formats.Please başka ses cihazı veya seçmek &quot;hiçbiri&quot; Ekran Kayıt ayarlarında.</translation>
-    </message>
     <message>
       <source>Could not detect capturing resolution</source>
       <translation>Yakalama çözünürlüğü tespit edilemedi</translation>
@@ -8458,6 +8005,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Export selected events to file</source>
       <translation>Seçilen Olayları Dosyaya Çıkar</translation>
     </message>
+    <message>
+      <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
+      <translation type="unfinished">Server cannot answer in reasonable time. Consider narrowing period or filter.</translation>
+    </message>
+    <message>
+      <source>All Servers are offline. Logs are not available.</source>
+      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventLogModel</name>
@@ -8531,24 +8086,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>INFORMATION REQUIRED</source>
       <translation>BİLGİ GEREKİYOR</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>No events</source>
-      <translation>Olay yok</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n events</source>
-      <translation>
-        <numerusform>%n etkinlik</numerusform>
-        <numerusform>%n etkinlik</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Try changing the filters or create an Event Rule</source>
-      <translation>Filtreleri değiştirmeyi deneyin veya bir Olay Kuralı oluşturun</translation>
     </message>
   </context>
   <context>
@@ -9028,6 +8565,13 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::JumpToLiveButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation>Canlıya Git</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -9125,20 +8669,8 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>VERİ YOK</translation>
     </message>
     <message>
-      <source>NOT A CAMERA</source>
-      <translation>KAMERA DEĞİL</translation>
-    </message>
-    <message>
       <source>DISABLED</source>
       <translation>Devre dışı</translation>
-    </message>
-    <message>
-      <source>OFFLINE</source>
-      <translation>ÇEVRİMDIŞI</translation>
-    </message>
-    <message>
-      <source>NO EXPORT PERMISSION</source>
-      <translation>DIŞA AKTARIM İZNİ YOK</translation>
     </message>
   </context>
   <context>
@@ -9355,10 +8887,6 @@ Remember to return the Logging Level to its default setting after you have colle
       <translation>İstemci</translation>
     </message>
     <message>
-      <source>None</source>
-      <translation>Yok</translation>
-    </message>
-    <message>
       <source>Error</source>
       <translation>Hata</translation>
     </message>
@@ -9389,6 +8917,10 @@ Remember to return the Logging Level to its default setting after you have colle
     <message>
       <source>Logging level degrades performance</source>
       <translation type="unfinished">Logging level degrades performance</translation>
+    </message>
+    <message>
+      <source>&lt;None&gt;</source>
+      <translation type="unfinished">&lt;None&gt;</translation>
     </message>
   </context>
   <context>
@@ -10237,18 +9769,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::NotificationActionHandler</name>
-    <message>
-      <source>Unable to acknowledge event on removed camera.</source>
-      <translation>Kaldırılan kameradaki olay onaylanamıyor.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
-    <message>
-      <source>Alarm: %1</source>
-      <translation>Alarm:%1</translation>
-    </message>
     <message>
       <source>Acknowledge</source>
       <translation>Kabul edilen</translation>
@@ -10280,10 +9801,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <translation type="unfinished">Event Notifications</translation>
     </message>
     <message>
-      <source>System Notifications</source>
-      <translation>Sistem Bildirimleri</translation>
-    </message>
-    <message>
       <source>Choose Types...</source>
       <translation type="unfinished">Choose Types...</translation>
     </message>
@@ -10297,6 +9814,10 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <numerusform>%n notification types</numerusform>
         <numerusform>%n notification types</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Site Notifications</source>
+      <translation type="unfinished">Site Notifications</translation>
     </message>
   </context>
   <context>
@@ -10322,45 +9843,10 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
-    <message>
-      <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation>Seçilen kullanıcıların hiçbiri seçilen yerleşime erişemez. Eylem çalışmayacak.</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Düzen seç...</translation>
-    </message>
-    <message>
-      <source>None of selected user roles contain users. Action will not work.</source>
-      <translation>Seçilen kullanıcı rollerinden hiçbiri kullanıcı içermiyor. Eylem işe yaramayacak.</translation>
-    </message>
-    <message>
-      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation>Seçilen kullanıcıların hiçbiri seçilen yerleşime erişemez. Eylem çalışmayacak.</translation>
-    </message>
-    <message>
-      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation>Yerel bir düzen mi arıyorsunuz? Burada bir seçenek olarak yerel düzenlerini görüntülemek için &quot;Göster&quot; listesinden yalnızca bir kullanıcı seçin.</translation>
-    </message>
-    <message>
-      <source>Local layouts can only be shown to their owners</source>
-      <translation>Yerel düzenler yalnızca sahiplerine gösterilebilir</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
     <message>
       <source>Not supported</source>
       <translation>Desteklenmiyor</translation>
-    </message>
-    <message>
-      <source>This tab will be available in future versions</source>
-      <translation>Bu sekme gelecekteki sürümlerde kullanılabilecektir</translation>
-    </message>
-    <message>
-      <source>Learn more</source>
-      <translation>Dahası için</translation>
     </message>
   </context>
   <context>
@@ -10541,33 +10027,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>%1 Settings</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>%1 Ayarlar</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n symbols over</source>
-      <translation>
-        <numerusform>%n sembol bitti</numerusform>
-        <numerusform>%n sembol bitti</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n symbols left</source>
-      <translation>
-        <numerusform>%n sembol kaldı</numerusform>
-        <numerusform>%n sembol kaldı</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::QnWebpageDialog</name>
     <message>
       <source>Name</source>
@@ -10723,69 +10182,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::RecordingStatusHelper</name>
-    <message>
-      <source>Not recording</source>
-      <translation>Kaydetmiyor</translation>
-    </message>
-    <message>
-      <source>Recording everything</source>
-      <translation>Her Şeyi Kaydet</translation>
-    </message>
-    <message>
-      <source>Recording motion only</source>
-      <translation>Sadece Hareket Olduğunda Kaydediliyor</translation>
-    </message>
-    <message>
-      <source>Recording motion and low quality</source>
-      <translation>Hareket Olduğunda Düşük Kalitede Kaydediliyor</translation>
-    </message>
-    <message>
-      <source>Continuous</source>
-      <translation>Sürekli</translation>
-    </message>
-    <message>
-      <source>Motion only</source>
-      <translation>Sadece Hareket</translation>
-    </message>
-    <message>
-      <source>Motion + Lo-Res</source>
-      <translation>Hareket + Düşük Kalite</translation>
-    </message>
-    <message>
-      <source>Recording motion and objects</source>
-      <translation>Hareket ve nesneleri kaydetme</translation>
-    </message>
-    <message>
-      <source>Recording objects only</source>
-      <translation>Yalnızca nesneleri kaydetme</translation>
-    </message>
-    <message>
-      <source>Recording motion, objects and low quality</source>
-      <translation>Hareket ve nesneleri düşük kalite kaydetme</translation>
-    </message>
-    <message>
-      <source>Recording objects and low quality</source>
-      <translation>Nesneleri düşük kalite kaydetme</translation>
-    </message>
-    <message>
-      <source>Motion, Objects</source>
-      <translation>Hareket, Nesne</translation>
-    </message>
-    <message>
-      <source>Objects only</source>
-      <translation>Yalnızca nesneler</translation>
-    </message>
-    <message>
-      <source>Motion, Objects + Lo-Res</source>
-      <translation>Hareket, Nesne + Düşük Çözünürlük</translation>
-    </message>
-    <message>
-      <source>Objects + Lo-Res</source>
-      <translation>Nesne + Düşük Çözünürlük</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
     <message>
       <source>%1 layout</source>
@@ -10931,10 +10327,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <translation>Kalite ayarı sadece sıkıştırma oranını belirler ve çözünürlüğü etkilemez. Düşük, Orta, Yüksek ve En İyi, önceden belirlenmiş bit hızı değerleridir.</translation>
     </message>
     <message>
-      <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
-    </message>
-    <message>
       <source>Less Settings</source>
       <translation>Basit ayarlar</translation>
     </message>
@@ -11072,6 +10464,11 @@ Kaliteyi ve FPS'yi doğrudan kameradan değiştirmeye devam edebilirsiniz.</tran
 You can still change quality and FPS directly on the camera.</source>
       <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <comment>Megabits per seconds</comment>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -11575,13 +10972,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
-    <message>
-      <source>Go to Live</source>
-      <translation>Canlıya Git</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>
@@ -11626,6 +11016,27 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Open Services</source>
       <translation type="unfinished">Open Services</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -12862,16 +12273,20 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
       <translation>Kaynak düzene eklenemiyor</translation>
     </message>
     <message>
-      <source>Cannot find a widget corresponding to the specified item.</source>
-      <translation>Belirtilen öğeye karşılık gelen bir widget bulunamıyor.</translation>
-    </message>
-    <message>
       <source>Cannot find an item with the specified ID</source>
       <translation>Belirtilen kimliğe sahip bir öğe bulunamıyor</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified ID.</source>
       <translation>Belirtilen kimliğe sahip bir kaynak bulunamıyor.</translation>
+    </message>
+    <message>
+      <source>Cannot find a widget corresponding to the specified item</source>
+      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+    </message>
+    <message>
+      <source>Cannot maximize the item</source>
+      <translation type="unfinished">Cannot maximize the item</translation>
     </message>
   </context>
   <context>
@@ -13063,6 +12478,32 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <message>
       <source>Token</source>
       <translation type="unfinished">Token</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
+    <message>
+      <source>No custom headers</source>
+      <translation type="unfinished">No custom headers</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n custom headers</source>
+      <comment>%n is a number of custom headers</comment>
+      <translation type="unfinished">
+        <numerusform>%n custom headers</numerusform>
+        <numerusform>%n custom headers</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::KeyValueModel</name>
+    <message>
+      <source>Key</source>
+      <translation type="unfinished">Key</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>Değer</translation>
     </message>
   </context>
   <context>
@@ -13315,71 +12756,10 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Analytics events can be set up on a certain cameras.</source>
-      <translation>Analytics etkinlikleri belirli kameralarda kurulabilir.</translation>
-    </message>
-    <message>
-      <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Desteklenen etkinliklerin listesini görmek için yukarıdaki düğmeyi kullanarak kameraları seçin.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama başlığında eşleşme varsa tetiklenecektir.</translation>
-    </message>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Alan boşsa, etkinlik her zaman tetiklenir.</translation>
-    </message>
-    <message>
-      <source>This field is case sensitive.</source>
-      <translation>Arama büyük/küçük harfe duyarlı.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama alanında eşleşme varsa tetiklenecektir.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Analytics object detection can be set up on a certain cameras.</source>
-      <translation>Analitik nesne algılama belirli kameralarda aktif edilebilir.</translation>
-    </message>
-    <message>
-      <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Desteklenen etkinliklerin listesini görmek için yukarıdaki düğmeyi kullanarak kameraları seçin.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation>Etkinlik yalnızca özelliklerden herhangi biriyle eşleşme olması durumunda tetiklenecektir. Niteliklerin adlarını ve değerlerini Nesneler sekmesinde görebilirsiniz.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation>Herhangi bir eklenti</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama başlığında eşleşme varsa tetiklenecektir.</translation>
-    </message>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Alan boşsa, etkinlik her zaman tetiklenir.</translation>
-    </message>
-    <message>
-      <source>This field is case sensitive.</source>
-      <translation>Arama büyük/küçük harfe duyarlı.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama alanında eşleşme varsa tetiklenecektir.</translation>
     </message>
   </context>
   <context>

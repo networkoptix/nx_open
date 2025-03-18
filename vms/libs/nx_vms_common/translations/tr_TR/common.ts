@@ -1045,6 +1045,10 @@
       <source>None of selected user roles contain users</source>
       <translation type="unfinished">None of selected user roles contain users</translation>
     </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>En az bir kullanıcı seçin</translation>
+    </message>
   </context>
   <context>
     <name>QnTimeStrings</name>
@@ -1298,17 +1302,6 @@
     </message>
   </context>
   <context>
-    <name>QnTranscoder</name>
-    <message>
-      <source>OpenCLTranscode is not implemented.</source>
-      <translation>OpenCL Yeniden Kodlama Uygulanamadı.</translation>
-    </message>
-    <message>
-      <source>Unknown transcode method</source>
-      <translation>Bilinmeyen Yeniden Kodlama Yöntemi</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserResource</name>
     <message>
       <source>Custom</source>
@@ -1465,334 +1458,6 @@
   <context>
     <name>nx::vms::common::SystemSettings</name>
     <message>
-      <source>Anonymous statistics report allowed</source>
-      <translation>Anonim istatistik raporuna izin verilir</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last time</source>
-      <translation>Anonim istatistik raporu son</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last version</source>
-      <translation>Anonim istatistik raporunun son versiyonu</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last number</source>
-      <translation>Anonim istatistik raporu son sayısı</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics time cycle</source>
-      <translation>Anonim istatistik zaman döngüsü</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report delay after update</source>
-      <translation>Anonim istatistik raporu güncellemeden sonra gecikme</translation>
-    </message>
-    <message>
-      <source>Anonymous Statistics Report Server URL</source>
-      <translation>Anonim İstatistik Rapor Sunucu URL'si</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report Client settings</source>
-      <translation>İstemci ayarları anonim istatistik raporu</translation>
-    </message>
-    <message>
-      <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation>Proxy bağlantı zaman aşımı (saniye, 1saniye-1saat)</translation>
-    </message>
-    <message>
-      <source>Time synchronization enabled</source>
-      <translation>Zaman senkronizasyonu etkin</translation>
-    </message>
-    <message>
-      <source>Primary time synchronization Server ID</source>
-      <translation>Birincil zaman senkronizasyon sunucusu</translation>
-    </message>
-    <message>
-      <source>Max difference between local and source time (milliseconds)</source>
-      <translation>Yerel ve kaynak zaman arasındaki maksimum fark (milisaniye)</translation>
-    </message>
-    <message>
-      <source>OS time change check period</source>
-      <translation>İşletim sistemi zaman değişikliği kontrol süresi</translation>
-    </message>
-    <message>
-      <source>Sync time synchronization interval for network requests</source>
-      <translation>Ağ istekleri için zaman eşitleme aralığını eşitle</translation>
-    </message>
-    <message>
-      <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation>Zaman epsilonunu senkronize et. Zaman deltası epsilondan küçükse yeni değer uygulanmaz</translation>
-    </message>
-    <message>
-      <source>Cloud owner account</source>
-      <translation>Cloud hesabı sahibi</translation>
-    </message>
-    <message>
-      <source>Cloud authorization key</source>
-      <translation>Bulut yetkilendirme anahtarı</translation>
-    </message>
-    <message>
-      <source>Disable Device vendors</source>
-      <translation>Cihaz sağlayıcılarını devre dışı bırakın</translation>
-    </message>
-    <message>
-      <source>Optimize Camera settings</source>
-      <translation>Kamera ayarlarını optimize edin</translation>
-    </message>
-    <message>
-      <source>Thumbnails auto-update</source>
-      <translation>Küçük resimler otomatik güncelleme</translation>
-    </message>
-    <message>
-      <source>Max scene items (0 means default)</source>
-      <translation>Maksimum sahne öğeleri (0 varsayılan değerdir)</translation>
-    </message>
-    <message>
-      <source>Send plain-text emails</source>
-      <translation>Düz metin e-postaları gönder</translation>
-    </message>
-    <message>
-      <source>Use Windows line feed in emails</source>
-      <translation>E-postalarda windows satır beslemesini kulllan</translation>
-    </message>
-    <message>
-      <source>Enable audit trail</source>
-      <translation>Denetim Merkezini Etkinleştir</translation>
-    </message>
-    <message>
-      <source>Audit trail period (days, 14-730)</source>
-      <translation>Denetim izi takip süresi (gün, 14-730)</translation>
-    </message>
-    <message>
-      <source>Event log period (days)</source>
-      <translation>Olay günlük periyodu (gün)</translation>
-    </message>
-    <message>
-      <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation>HTTPS'yi zorunlu kılın (veri trafiği şifrelemesi)</translation>
-    </message>
-    <message>
-      <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation>RTSPS'yi zorunlu kılın (video trafik şifrelemesi)</translation>
-    </message>
-    <message>
-      <source>Enable auto-discovery</source>
-      <translation>Otomatik cihaz bulmayı etkinleştir</translation>
-    </message>
-    <message>
-      <source>Enable auto-update notifications</source>
-      <translation>Otomatik güncelleme bildirimlerini etkinleştir</translation>
-    </message>
-    <message>
-      <source>Enable update notifications</source>
-      <translation>Güncelleme bildirimlerini etkinleştir</translation>
-    </message>
-    <message>
-      <source>Enable UPNP port-mapping</source>
-      <translation>UPNP bağlantı noktası eşlemeyi etkinleştir</translation>
-    </message>
-    <message>
-      <source>Backup settings</source>
-      <translation>Yedekleme ayarları</translation>
-    </message>
-    <message>
-      <source>Cloud host override</source>
-      <translation>Bulut barındırıcı etkisizleştirme</translation>
-    </message>
-    <message>
-      <source>Enable RTSP for Arecont</source>
-      <translation>Arecont için RTSP'yi etkinleştirin</translation>
-    </message>
-    <message>
-      <source>Enable sequential Flir ONVIF searcher</source>
-      <translation>Sıralı Flir ONVIF arama aracını etkinleştir</translation>
-    </message>
-    <message>
-      <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation>Maks. P2P kuyruğu boyutu (bayt, 32-512MB)</translation>
-    </message>
-    <message>
-      <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation>Maks P2P tüm istemci boyutu (bayt, 32-512MB)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation>Maksimum kayıt kuyruğu boyutu (bayt, 6-96MB)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (elements, 250-4000)</source>
-      <translation>Maksimum kayıt kuyruğu boyutu (öğeler, 250-4000)</translation>
-    </message>
-    <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>RTP zaman aşımı (milisaniye)</translation>
-    </message>
-    <message>
-      <source>Max RTSP connection duration (seconds)</source>
-      <translation>Maks. RTSP bağlantı süresi (saniye)</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect UDP hole-punching</source>
-      <translation>Cloud-bağlantısı UDP boşluk açmayı etkinleştirin</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect relays usage</source>
-      <translation>Bulut bağlantılı geçiş kullanımını etkinleştir</translation>
-    </message>
-    <message>
-      <source>Enforce SSL for cloud-connect relays</source>
-      <translation>Bulut bağlantı geçişleri için SSL'yi zorunlu kılın</translation>
-    </message>
-    <message>
-      <source>Enable recording on EDGE</source>
-      <translation>UÇ'ta kaydı etkinleştir</translation>
-    </message>
-    <message>
-      <source>Target update information</source>
-      <translation>Hedef güncelleme bilgileri</translation>
-    </message>
-    <message>
-      <source>Installed update information</source>
-      <translation>Yüklü güncelleme bilgileri</translation>
-    </message>
-    <message>
-      <source>Downloader peers for files</source>
-      <translation>Dosyalar için eşleri indir</translation>
-    </message>
-    <message>
-      <source>Client update settings</source>
-      <translation>İstemci güncelleme ayarları</translation>
-    </message>
-    <message>
-      <source>Watermark settings</source>
-      <translation>Filigran ayarları</translation>
-    </message>
-    <message>
-      <source>Session token count limit on a single Server</source>
-      <translation>Tek Sunucuda oturum belirteci sayısı sınırı</translation>
-    </message>
-    <message>
-      <source>Max session token count per user on single Server</source>
-      <translation>Tek Sunucuda kullanıcı başına maksimum oturum belirteci sayısı</translation>
-    </message>
-    <message>
-      <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation>Uzak oturum belirteci önbelleği için güncelleme aralığı (diğer Sunucular ve Bulut)</translation>
-    </message>
-    <message>
-      <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation>Uzak oturum belirteç önbelleği için zaman aşımı (diğer Sunucular ve Bulut)</translation>
-    </message>
-    <message>
-      <source>Default video codec</source>
-      <translation>Varsayılan video codec bileşeni</translation>
-    </message>
-    <message>
-      <source>Default codec for export video</source>
-      <translation>Dışa aktarılan video için varsayılan kod çözücü</translation>
-    </message>
-    <message>
-      <source>Low quality screen video codec</source>
-      <translation>Düşük kaliteli ekran video codec bileşeni</translation>
-    </message>
-    <message>
-      <source>License server</source>
-      <translation>Lisans sunucusu</translation>
-    </message>
-    <message>
-      <source>URI for resource_data.json automatic update</source>
-      <translation>Resource_data.json otomatik güncellemesi için URI</translation>
-    </message>
-    <message>
-      <source>Meta data storage change policy</source>
-      <translation>Meta veri depolama değişikliği politikası</translation>
-    </message>
-    <message>
-      <source>Persistent Servers for update storage</source>
-      <translation>Güncellemelerin saklandığı Kalıcı Sunucular</translation>
-    </message>
-    <message>
-      <source>Persistent Servers where updates are stored</source>
-      <translation>Güncellemelerin saklandığı Kalıcı Sunucular</translation>
-    </message>
-    <message>
-      <source>VMS Server version specific features</source>
-      <translation>VMS Server sürümüne özgü özellikler</translation>
-    </message>
-    <message>
-      <source>Additional local FS storage types for recording</source>
-      <translation>Kayıt için ilave yerel FS depolama türleri</translation>
-    </message>
-    <message>
-      <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation>Hata durumunda analitik DB depolama bağlama noktası izinlerini zorunlu kıl</translation>
-    </message>
-    <message>
-      <source>Storage encryption enabled</source>
-      <translation>Depolama şifrelemesi etkin</translation>
-    </message>
-    <message>
-      <source>Current storage encryption key</source>
-      <translation>Mevcut depolama şifreleme anahtarı</translation>
-    </message>
-    <message>
-      <source>HTTP header: Origin</source>
-      <translation>HTTP başlığı: Kaynak</translation>
-    </message>
-    <message>
-      <source>HTTP header: X-Frame-Options</source>
-      <translation>HTTP başlığı: X-Frame-Seçenekleri</translation>
-    </message>
-    <message>
-      <source>Show mouse timeline preview</source>
-      <translation>Fare zaman çizelgesi önizlemesini göster</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4MB)</source>
-      <translation>Medya arabellek boyutu (KB, 10KB-4MB)</translation>
-    </message>
-    <message>
-      <source>Enable cross-domain policy</source>
-      <translation>Etki alanları arası politikayı etkinleştir</translation>
-    </message>
-    <message>
-      <source>Enable WebSocket for P2P</source>
-      <translation>P2P için WebSocket'ı etkinleştirin</translation>
-    </message>
-    <message>
-      <source>Show Servers in the Resource Tree for non-admins</source>
-      <translation>Yönetici olmayanlar için Kaynak Ağacında Sunucuları Göster</translation>
-    </message>
-    <message>
-      <source>Use only HTTPS for cameras</source>
-      <translation>Kameralar için yalnızca HTTPS kullanın</translation>
-    </message>
-    <message>
-      <source>Expose IP addresses for autodiscovery</source>
-      <translation>Otomatik bulma için IP adreslerini açığa çıkarın</translation>
-    </message>
-    <message>
-      <source>Keep IO port state on when Server connects to the device</source>
-      <translation>Sunucu cihaza bağlandığında GÇ bağlantı noktası durumunu koruyun</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation>Yalnızca ses aygıtları için ortam arabelleği boyutu (KB, 1KB-1MB)</translation>
-    </message>
-    <message>
-      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation>VMS'de saklanan cihaz şifrelerini Yöneticiler için açığa çıkarın (web sayfaları için)</translation>
-    </message>
-    <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation>Uzak arşiv senkronizasyonu için maks. iş parçacığı sayısı (&lt;=0 - otomatik, maks. 32)</translation>
-    </message>
-    <message>
-      <source>Thread count limit for camera archive synchronization</source>
-      <translation>Kamera arşivi senkronizasyonu için iş parçacığı sayısı sınırı</translation>
-    </message>
-    <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
       <translation>Veritabanında tutulacak maksimum olay günlüğü kaydı. Silinmemiş kayıtların gerçek miktarı, belirtilen değerden %20 kadar daha yüksek olabilir.</translation>
     </message>
@@ -1805,32 +1470,8 @@
       <translation>Sunucud kod çevrimi kullanan maksimum HTTP bağlantısı miktarı. Chrome aynı anda 2 bağlantı açar, ardından ilkini kapatır. Bu parametreyi &apos; olarak veya 2 ve daha fazla olarak ayarlamanızı öneririz.</translation>
     </message>
     <message>
-      <source>Update releases.json file URL</source>
-      <translation>Releases.json dosya URL'sini güncelleyin</translation>
-    </message>
-    <message>
-      <source>LDAP settings</source>
-      <translation>LDAP ayarları</translation>
-    </message>
-    <message>
-      <source>SMTP settings</source>
-      <translation>SMTP ayarları</translation>
-    </message>
-    <message>
-      <source>Authorization Session token lifetime (seconds)</source>
-      <translation>Yetkilendirme Oturumu jetonunun ömrü (saniye)</translation>
-    </message>
-    <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
       <translation>Buluta bağlanmak üzere belirlenmiş Sunucuların noktalı virgülle ayrılmış listesi. Listenin en üstündeki sunucular daha yüksek önceliğe sahiptir. Liste boşsa Bulut bağlantısı için bir Sunucu otomatik olarak seçilir.</translation>
-    </message>
-    <message>
-      <source>Allow Power User editing Security Settings</source>
-      <translation>Uzman Kullanıcının Güvenlik Ayarlarını düzenlemesine izin ver</translation>
-    </message>
-    <message>
-      <source>Enable deprecated API functions (insecure)</source>
-      <translation>Kullanımdan kaldırılan API fonksiyonlarını etkinleştir (güvenli değil)</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
@@ -1842,794 +1483,436 @@
       <translation>Şu anda %1 yazılımı tarafından kullanılan, kullanımdan kaldırılmış API işlevlerini etkinleştirin (güvenli değil)</translation>
     </message>
     <message>
-      <source>Organization Id</source>
-      <translation>Kuruluş Kimliği</translation>
-    </message>
-    <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
       <translation>Verileri senkronize etmek için Bulut yoklama HTTP istekleri arasındaki aralık.</translation>
-    </message>
-    <message>
-      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
-      <translation>HTTP başlığı: Sunucu, desteklenen değişkenler: $vmsName, $vmsVersion, $company, $compatibility</translation>
-    </message>
-    <message>
-      <source>Device storage information update interval</source>
-      <translation>Cihaz depolama bilgisi güncelleme aralığı</translation>
-    </message>
-    <message>
-      <source>Site alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h)</translation>
-    </message>
-    <message>
-      <source>Proxy connection access policy</source>
-      <translation type="unfinished">Proxy connection access policy</translation>
-    </message>
-    <message>
-      <source>Cloud Site ID</source>
-      <translation type="unfinished">Cloud Site ID</translation>
-    </message>
-    <message>
-      <source>Enable 2FA for the Site</source>
-      <translation type="unfinished">Enable 2FA for the Site</translation>
-    </message>
-    <message>
-      <source>Site name</source>
-      <translation type="unfinished">Site name</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
       <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
     </message>
     <message>
-      <source>Last master Site merge ID</source>
-      <translation type="unfinished">Last master Site merge ID</translation>
-    </message>
-    <message>
-      <source>Last slave Site merge ID</source>
-      <translation type="unfinished">Last slave Site merge ID</translation>
-    </message>
-    <message>
-      <source>Pixelation settings</source>
-      <translation type="unfinished">Pixelation settings</translation>
-    </message>
-    <message>
-      <source>Apply session limit for Cloud tokens</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens</translation>
-    </message>
-    <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
       <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
     </message>
     <message>
-      <source>Anonymous Crash Report Server API URL</source>
-      <translation>Anonim Çökme Raporu Sunucusu API URL'si</translation>
+      <source>SMTP settings.</source>
+      <translation>SMTP ayarları.</translation>
     </message>
     <message>
-      <source>Default locale for new users</source>
-      <translation type="unfinished">Default locale for new users</translation>
+      <source>Anonymous statistics report allowed.</source>
+      <translation>Anonim istatistik raporuna izin verilir.</translation>
     </message>
     <message>
-      <source>Check video stream permissions on VMS server period (milliseconds)</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
+      <source>Anonymous statistics report last time.</source>
+      <translation>Anonim istatistik raporu son.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::event::StringsHelper</name>
     <message>
-      <source>Bookmark</source>
-      <translation>Yer İmi</translation>
+      <source>Anonymous statistics report last version.</source>
+      <translation>Anonim istatistik raporunun son versiyonu.</translation>
     </message>
     <message>
-      <source>Panic recording</source>
-      <translation>Panik Kaydı</translation>
+      <source>Anonymous statistics report last number.</source>
+      <translation>Anonim istatistik raporu son sayısı.</translation>
     </message>
     <message>
-      <source>Write to log</source>
-      <translation>Günlüğe Yaz</translation>
+      <source>Anonymous statistics time cycle.</source>
+      <translation>Anonim istatistik zaman döngüsü.</translation>
     </message>
     <message>
-      <source>Repeat sound</source>
-      <translation>Sesi Tekrarla</translation>
+      <source>Anonymous statistics report delay after update.</source>
+      <translation>Anonim istatistik raporu güncellemeden sonra gecikme.</translation>
     </message>
     <message>
-      <source>Play sound</source>
-      <translation>Sesi Oynat</translation>
+      <source>Anonymous Statistics Report Server URL.</source>
+      <translation>Anonim İstatistik Rapor Sunucu URL'si.</translation>
     </message>
     <message>
-      <source>Speak</source>
-      <translation>Konuş</translation>
+      <source>Anonymous Crash Report Server API URL.</source>
+      <translation>Anonim Çökme Raporu Sunucusu API URL'si.</translation>
     </message>
     <message>
-      <source>Execute PTZ preset</source>
-      <translation>PTZ Ön Ayarını Uygula</translation>
+      <source>Anonymous statistics report Client settings.</source>
+      <translation>İstemci ayarları anonim istatistik raporu.</translation>
     </message>
     <message>
-      <source>Show text overlay</source>
-      <translation>Metin Şablonunu Göster</translation>
+      <source>Device storage information update interval.</source>
+      <translation>Cihaz depolama bilgisi güncelleme aralığı.</translation>
     </message>
     <message>
-      <source>Show on Alarm Layout</source>
-      <translation>Alarm Düzenini Göster</translation>
+      <source>Site alive update interval (seconds, 1s-1h).</source>
+      <translation type="unfinished">Site alive update interval (seconds, 1s-1h).</translation>
     </message>
     <message>
-      <source>Device output</source>
-      <translation>Aygıt Çıkışı</translation>
+      <source>Proxy connection timeout (seconds, 1s-1h).</source>
+      <translation>Proxy bağlantı zaman aşımı (saniye, 1saniye-1saat).</translation>
     </message>
     <message>
-      <source>Camera output</source>
-      <translation>Kamera Çıkışı</translation>
+      <source>Proxy connection access policy.</source>
+      <translation type="unfinished">Proxy connection access policy.</translation>
     </message>
     <message>
-      <source>Device recording</source>
-      <translation>Aygıt Kaydı</translation>
+      <source>Time synchronization enabled.</source>
+      <translation>Zaman senkronizasyonu etkin.</translation>
     </message>
     <message>
-      <source>Camera recording</source>
-      <translation>Kamera Kaydı</translation>
+      <source>Primary time synchronization Server ID.</source>
+      <translation>Birincil zaman senkronizasyon sunucusu.</translation>
     </message>
     <message>
-      <source>Generic Event</source>
-      <translation>Genel olay</translation>
+      <source>Max difference between local and source time (milliseconds).</source>
+      <translation>Yerel ve kaynak zaman arasındaki maksimum fark (milisaniye).</translation>
     </message>
-    <message numerus="yes">
-      <source>Motion on Cameras</source>
-      <translation>
-        <numerusform>Haraket olan kamera</numerusform>
-        <numerusform>Haraket olan kamera</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Network Issue</source>
-      <translation>Ağ Sorunu</translation>
-    </message>
-    <message>
-      <source>Server Failure</source>
-      <translation>Sunucu Hatası</translation>
-    </message>
-    <message>
-      <source>Server Conflict</source>
-      <translation>Sunucu Uyuşmazlığı</translation>
-    </message>
-    <message>
-      <source>Server Started</source>
-      <translation>Sunucu Başlatıldı</translation>
-    </message>
-    <message>
-      <source>License Issue</source>
-      <translation>Lisans Sorunu</translation>
-    </message>
-    <message>
-      <source>Any Server Issue</source>
-      <translation>Herhangi Bir Sunucu Sorunu</translation>
-    </message>
-    <message>
-      <source>Any Event</source>
-      <translation>Herhangi Bir Durum</translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Devices</source>
-      <translation>
-        <numerusform>Cihazlarda giriş sinyali</numerusform>
-        <numerusform>Cihazlarda giriş sinyali</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Cameras</source>
-      <translation>
-        <numerusform>Kameralarda giriş sinyali</numerusform>
-        <numerusform>Kameralarda giriş sinyali</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices Disconnected</source>
-      <translation>
-        <numerusform>Aygıt bağlantısı kesildi</numerusform>
-        <numerusform>Aygıt bağlantısı kesildi</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras Disconnected</source>
-      <translation>
-        <numerusform>Kameraların bağlantısı kesildi</numerusform>
-        <numerusform>Kameraların bağlantısı kesildi</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices IP Conflict</source>
-      <translation>
-        <numerusform>Cihazlarda IP çakışması</numerusform>
-        <numerusform>Cihazlarda IP çakışması</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras IP Conflict</source>
-      <translation>
-        <numerusform>Kameralarda IP çakışması</numerusform>
-        <numerusform>Kameralarda IP çakışması</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Any Device Issue</source>
-      <translation>Herhangi Bir Aygıt Sorunu</translation>
-    </message>
-    <message>
-      <source>Any Camera Issue</source>
-      <translation>Herhangi Bir Kamera Sorunu</translation>
-    </message>
-    <message>
-      <source>Undefined event has occurred on %1</source>
-      <translation>%1 Üzerinde Tanımlanamayan Bir Durum Oluştu</translation>
-    </message>
-    <message>
-      <source>Device %1 was disconnected</source>
-      <translation>%1 Aygıt Bağlantısı Kesildi</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>%1 Kamera Bağlantısı Kesildi</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>%1 I/O Modül Bağlantısı Kesildi</translation>
-    </message>
-    <message>
-      <source>Input on %1</source>
-      <translation>%1 Giriş Üzerinde</translation>
-    </message>
-    <message>
-      <source>Motion on %1</source>
-      <translation>%1 Hareket Üzerinde</translation>
-    </message>
-    <message>
-      <source>Network Issue at %1</source>
-      <translation>%1 Ağ Sorunu</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation>Sunucu &quot;%1&quot; Hata</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict at %1</source>
-      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>%1 Aygıt IP Uyuşmazlığı</translation>
-    </message>
-    <message>
-      <source>Camera IP Conflict at %1</source>
-      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>%1 Kamera IP Uyuşmazlığı</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation>Sunucu &quot;%1&quot; Çakışması</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation>Sunucu &quot;%1&quot; Başladı</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>Sunucu &quot;%1&quot; bir lisans sorunu yaşıyor</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>Sunucu &quot;%1&quot; bir arşiv yedekleme işlemini tamamladı</translation>
-    </message>
     <message>
-      <source>Generic Event at %1</source>
-      <translation>%1 Genel Durum</translation>
+      <source>OS time change check period.</source>
+      <translation>İşletim sistemi zaman değişikliği kontrol süresi.</translation>
     </message>
     <message>
-      <source>An unknown event has occurred</source>
-      <translation>Bilinmeyen Bir Durum Oluştu</translation>
+      <source>Sync time synchronization interval for network requests.</source>
+      <translation>Ağ istekleri için zaman eşitleme aralığını eşitle.</translation>
     </message>
     <message>
-      <source>Event: %1</source>
-      <translation>Durum: %1</translation>
+      <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
+      <translation>Zaman epsilonunu senkronize et. Zaman deltası epsilondan küçükse yeni değer uygulanmaz.</translation>
     </message>
     <message>
-      <source>Source: %1</source>
-      <translation>Kaynak: %1</translation>
+      <source>Cloud owner account.</source>
+      <translation>Cloud hesabı sahibi.</translation>
     </message>
     <message>
-      <source>Caption: %1</source>
-      <translation>Başlık: %1</translation>
+      <source>Organization Id.</source>
+      <translation>Kuruluş Kimliği.</translation>
     </message>
     <message>
-      <source>Input Port: %1</source>
-      <translation>Port Girişi: %1</translation>
+      <source>Cloud Site ID.</source>
+      <translation type="unfinished">Cloud Site ID.</translation>
     </message>
     <message>
-      <source>Reason: %1</source>
-      <translation>Gerekçe: %1</translation>
+      <source>Cloud authorization key.</source>
+      <translation>Bulut yetkilendirme anahtarı.</translation>
     </message>
     <message>
-      <source>Conflicting Address: %1</source>
-      <translation>Çakışan Adres: %1</translation>
+      <source>Enable 2FA for the Site.</source>
+      <translation type="unfinished">Enable 2FA for the Site.</translation>
     </message>
     <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2</translation>
+      <source>Site name.</source>
+      <translation type="unfinished">Site name.</translation>
     </message>
     <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Conflicting Server#%1: %2</translation>
+      <source>Last master Site merge ID.</source>
+      <translation type="unfinished">Last master Site merge ID.</translation>
     </message>
     <message>
-      <source>Conflicting Server: %1</source>
-      <translation>Çakışan Sunucu: %1</translation>
+      <source>Last slave Site merge ID.</source>
+      <translation type="unfinished">Last slave Site merge ID.</translation>
     </message>
     <message>
-      <source>Trigger: %1</source>
-      <translation>Tetikleyici: %1</translation>
+      <source>Disable Device vendors.</source>
+      <translation>Cihaz sağlayıcılarını devre dışı bırakın.</translation>
     </message>
     <message>
-      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <source>Optimize Camera settings.</source>
+      <translation>Kamera ayarlarını optimize edin.</translation>
     </message>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n defa, önce: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n defa, önce: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>Zaman: %2 üzerinde %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>İlk Ortaya Çıkış: %2 üzerinde %1 (toplamda %n kere)</numerusform>
-        <numerusform>İlk Ortaya Çıkış: %2 üzerinde %1 (toplamda %n kere)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>Geçen %n Saniye Süresince Hiç Veri Alınmadı.</numerusform>
-        <numerusform>Geçen %n Saniye Süresince Hiç Veri Alınmadı.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected.</source>
-      <translation>RTP Veri Kaybı Algılandı.</translation>
-    </message>
-    <message>
-      <source>Device does not respond to network requests.</source>
-      <translation>Aygıt ağ isteklerine yanıt vermiyor.</translation>
-    </message>
-    <message>
-      <source>Connection to server is lost.</source>
-      <translation>Sunucuyla Bağlantı Kayboldu.</translation>
-    </message>
-    <message>
-      <source>Server stopped unexpectedly.</source>
-      <translation>Sunucu beklenmedik biçimde durdu.</translation>
-    </message>
-    <message>
-      <source>I/O error has occurred at %1.</source>
-      <translation>%1 Üzerinde I/O Hatası Meydana Geldi.</translation>
-    </message>
-    <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>%1 'i Kaydetmek İçin Yeterli HDD/SSD Hızı Yok.</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>HDD / SSD disk &quot;%1&quot; dolu. Disk, VMS tarafından yönetilmeyen çok fazla veri içeriyor.</translation>
-    </message>
-    <message>
-      <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>Sistem diski &quot;%1&quot; neredeyse doluydu.</translation>
-    </message>
-    <message>
-      <source>start</source>
-      <translation>başlat</translation>
-    </message>
-    <message>
-      <source>stop</source>
-      <translation>durdur</translation>
-    </message>
-    <message>
-      <source>While %1</source>
-      <translation>%1 Sürdürülüyor</translation>
-    </message>
-    <message>
-      <source>On %1 %2</source>
-      <translation>%1 Üzerinde %2</translation>
-    </message>
-    <message>
-      <source>Trigger Name</source>
-      <translation>Tetikleyici Adı</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n kullanıcı</numerusform>
-        <numerusform>%n kullanıcı</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>Tüm Kullanıcılar</translation>
-    </message>
-    <message>
-      <source>Select at least one user</source>
-      <translation>En az bir kullanıcı seçin</translation>
-    </message>
-    <message>
-      <source>Soft Trigger</source>
-      <translation>Yazılımsal Tetikleyici</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 at %2</source>
-      <translation>%2'de Yazılımsal Tetikleme %1</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation>Yazılımsal Tetikleyici %1 birden çok kez etkinleştirildi</translation>
-    </message>
-    <message>
-      <source>Send email</source>
-      <translation>E-posta gönder</translation>
-    </message>
-    <message>
-      <source>Acknowledge</source>
-      <translation>Kabul edilen</translation>
-    </message>
     <message>
-      <source>Analytics Event</source>
-      <translation>Analiz Etkinliği</translation>
+      <source>Thumbnails auto-update.</source>
+      <translation>Küçük resimler otomatik güncelleme.</translation>
     </message>
     <message>
-      <source>%1 at %2</source>
-      <comment>Analytics Event at some camera</comment>
-      <translation>%2 de %1</translation>
+      <source>Max scene items (0 means default).</source>
+      <translation>Maksimum sahne öğeleri (0 varsayılan değerdir).</translation>
     </message>
     <message>
-      <source>Storage Issue</source>
-      <translation>Depolama sorunu</translation>
+      <source>Send plain-text emails.</source>
+      <translation>Düz metin e-postaları gönder.</translation>
     </message>
     <message>
-      <source>Storage Issue at %1</source>
-      <translation>Depolama Sorunu %1</translation>
+      <source>Use Windows line feed in emails.</source>
+      <translation>E-postalarda windows satır beslemesini kulllan.</translation>
     </message>
     <message>
-      <source>Set to fullscreen</source>
-      <translation>Tam Ekran Moduna Geç</translation>
+      <source>Enable audit trail.</source>
+      <translation>Denetim Merkezini Etkinleştir.</translation>
     </message>
     <message>
-      <source>Exit fullscreen</source>
-      <translation>Tam Ekrandan Çık</translation>
+      <source>Audit trail period (days, 14-730).</source>
+      <translation>Denetim izi takip süresi (gün, 14-730).</translation>
     </message>
     <message>
-      <source>Open layout</source>
-      <translation>Ekranı Aç</translation>
+      <source>Event log period (days).</source>
+      <translation>Olay günlük periyodu (gün).</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>Birden fazla %1 etkinliği gerçekleşti</translation>
+      <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
+      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation>Analytics depolama &quot;%1&quot; çevrimdışı.</translation>
+      <source>Enforce HTTPS (data traffic encryption).</source>
+      <translation>HTTPS'yi zorunlu kılın (veri trafiği şifrelemesi).</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation>Analytics depolama &quot;%1&quot; çevrimdışı.</translation>
+      <source>Enforce RTSPS (video traffic encryption).</source>
+      <translation>RTSPS'yi zorunlu kılın (video trafik şifrelemesi).</translation>
     </message>
     <message>
-      <source>Plugin Diagnostic Event</source>
-      <translation>Bilinmeyen Eklenti Teşhis Olayı</translation>
+      <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
+      <translation>VMS'de saklanan cihaz şifrelerini Yöneticiler için açığa çıkarın (web sayfaları için).</translation>
     </message>
     <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>Bilinmeyen Eklenti Teşhis Olayı</translation>
+      <source>Enable auto-discovery.</source>
+      <translation>Otomatik cihaz bulmayı etkinleştir.</translation>
     </message>
     <message>
-      <source>Buzzer</source>
-      <translation>Buzzer</translation>
+      <source>Enable auto-update notifications.</source>
+      <translation>Otomatik güncelleme bildirimlerini etkinleştir.</translation>
     </message>
     <message>
-      <source>Archive Backup Finished</source>
-      <translation>Arşiv Yedeklemesi Bitti</translation>
+      <source>Enable update notifications.</source>
+      <translation>Güncelleme bildirimlerini etkinleştir.</translation>
     </message>
     <message>
-      <source>PoE over Budget</source>
-      <translation>PoE kapasitesi</translation>
+      <source>Enable UPNP port-mapping.</source>
+      <translation>UPNP bağlantı noktası eşlemeyi etkinleştir.</translation>
     </message>
     <message>
-      <source>Fan Error</source>
-      <translation>Fan hatası</translation>
+      <source>Backup settings.</source>
+      <translation>Yedekleme ayarları.</translation>
     </message>
     <message>
-      <source>PoE over budget at %1</source>
-      <translation>Poe güç yetersizliği %1</translation>
+      <source>Cloud host override.</source>
+      <translation>Bulut barındırıcı etkisizleştirme.</translation>
     </message>
     <message>
-      <source>Fan error at %1</source>
-      <translation>%1 fan hatası</translation>
+      <source>Enable cross-domain policy.</source>
+      <translation>Etki alanları arası politikayı etkinleştir.</translation>
     </message>
     <message>
-      <source>Reason: Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation>Sebep: Güç sınırı aşıldı (%1)</translation>
+      <source>Enable RTSP for Arecont.</source>
+      <translation>Arecont için RTSP'yi etkinleştirin.</translation>
     </message>
     <message>
-      <source>Show desktop notification</source>
-      <translation>Masaüstü bildirimlerini kullan</translation>
+      <source>Enable sequential Flir ONVIF searcher.</source>
+      <translation>Sıralı Flir ONVIF arama aracını etkinleştir.</translation>
     </message>
     <message>
-      <source>Send mobile notification</source>
-      <translation>Mobil bildirim gönder</translation>
+      <source>Max P2P queue size (bytes, 32-512MB).</source>
+      <translation>Maks. P2P kuyruğu boyutu (bayt, 32-512MB).</translation>
     </message>
     <message>
-      <source>Consumption</source>
-      <translation>Tüketim</translation>
+      <source>Max P2P all clients size (bytes, 32-512MB).</source>
+      <translation>Maks P2P tüm istemci boyutu (bayt, 32-512MB).</translation>
     </message>
     <message>
-      <source>Device was disconnected</source>
-      <translation>Aygıt Bağlantısı Kesildi</translation>
+      <source>Max record queue size (bytes, 6-96MB).</source>
+      <translation>Maksimum kayıt kuyruğu boyutu (bayt, 6-96MB).</translation>
     </message>
     <message>
-      <source>Camera was disconnected</source>
-      <translation>Kamera Bağlantısı Kesildi</translation>
+      <source>Max record queue size (elements, 250-4000).</source>
+      <translation>Maksimum kayıt kuyruğu boyutu (öğeler, 250-4000).</translation>
     </message>
     <message>
-      <source>I/O Module was disconnected</source>
-      <translation>I/O Modül Bağlantısı Kesildi</translation>
+      <source>RTP timeout (milliseconds).</source>
+      <translation>RTP zaman aşımı (milisaniye).</translation>
     </message>
     <message>
-      <source>Analytics Object Detected</source>
-      <translation>Analiz Nesnesi Algılandı</translation>
+      <source>Max RTSP connection duration (seconds).</source>
+      <translation>Maks. RTSP bağlantı süresi (saniye).</translation>
     </message>
     <message>
-      <source>%1 at camera &apos;%2&apos;</source>
-      <comment> is detected</comment>
-      <translation>%1 kamerada &apos;%2&apos;</translation>
+      <source>Enable cloud-connect UDP hole-punching.</source>
+      <translation>Cloud-bağlantısı UDP boşluk açmayı etkinleştirin.</translation>
     </message>
     <message>
-      <source>Plugin: %1</source>
-      <translation>Eklenti: %1</translation>
+      <source>Enable cloud-connect relays usage.</source>
+      <translation>Bulut bağlantılı geçiş kullanımını etkinleştir.</translation>
     </message>
     <message>
-      <source>Archive backup failed.</source>
-      <translation>Arşiv yedeklemesi başarısız oldu.</translation>
+      <source>Enforce SSL for cloud-connect relays.</source>
+      <translation>Bulut bağlantı geçişleri için SSL'yi zorunlu kılın.</translation>
     </message>
     <message>
-      <source>Object detected</source>
-      <translation>Nesne tespit edildi</translation>
+      <source>Enable recording on EDGE.</source>
+      <translation>UÇ'ta kaydı etkinleştir.</translation>
     </message>
     <message>
-      <source>Archive backup failed</source>
-      <translation>Arşiv yedeklemesi başarısız oldu</translation>
+      <source>Enable WebSocket for P2P.</source>
+      <translation>P2P için WebSocket'ı etkinleştirin.</translation>
     </message>
     <message>
-      <source>Data is backed up to %1</source>
-      <translation>Veritabanı %1 üzerinde yedeklendi</translation>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>
+      <translation>Uzak arşiv senkronizasyonu için maks. iş parçacığı sayısı (&lt;=0 - otomatik, maks. 32).</translation>
     </message>
     <message>
-      <source>Server Certificate Error</source>
-      <translation>Sunucu Sertifikası Hatası</translation>
+      <source>Update releases.json file URL.</source>
+      <translation>Releases.json dosya URL'sini güncelleyin.</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; certificate error</source>
-      <translation>Sunucu &quot;%1&quot; sertifika hatası</translation>
+      <source>Target update information.</source>
+      <translation>Hedef güncelleme bilgileri.</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1).</source>
-      <translation>Birincil akışta RTP hatası (%1).</translation>
+      <source>Installed update information.</source>
+      <translation>Yüklü güncelleme bilgileri.</translation>
     </message>
     <message>
-      <source>RTP error in secondary stream (%1).</source>
-      <translation>İkincil akışta RTP hatası (%1).</translation>
+      <source>Downloader peers for files.</source>
+      <translation>Dosyalar için eşleri indir.</translation>
     </message>
     <message>
-      <source>Camera time is back to normal.</source>
-      <translation>Kamera saati normale döndü.</translation>
+      <source>Client update settings.</source>
+      <translation>İstemci güncelleme ayarları.</translation>
     </message>
     <message>
-      <source>Address %1 is already in use by %2 on primary stream.</source>
-      <comment>%1 is the address, %2 is the device name</comment>
-      <translation>Adres %1, birincil akışta %2 tarafından zaten kullanılıyor.</translation>
+      <source>Thread count limit for camera archive synchronization.</source>
+      <translation>Kamera arşivi senkronizasyonu için iş parçacığı sayısı sınırı.</translation>
     </message>
     <message>
-      <source>Address %1 is already in use by %2 on secondary stream.</source>
-      <comment>%1 is the address, %2 is the device name</comment>
-      <translation>Adres %1, ikincil akışta %2 tarafından zaten kullanılıyor.</translation>
+      <source>Watermark settings.</source>
+      <translation>Filigran ayarları.</translation>
     </message>
     <message>
-      <source>Multicast address conflict detected.</source>
-      <translation>Çoklu yayın adres çakışması algılandı.</translation>
+      <source>Pixelation settings.</source>
+      <translation type="unfinished">Pixelation settings.</translation>
     </message>
     <message>
-      <source>Network address %1 is not a multicast address.</source>
-      <translation>Ağ adresi %1 çok noktaya yayın adresi değil.</translation>
+      <source>Authorization Session token lifetime (seconds).</source>
+      <translation>Yetkilendirme Oturumu jetonunun ömrü (saniye).</translation>
     </message>
     <message>
-      <source>Failed to backup file %1</source>
-      <translation>%1 dosyası yedeklenemedi</translation>
+      <source>Apply session limit for Cloud tokens.</source>
+      <translation type="unfinished">Apply session limit for Cloud tokens.</translation>
     </message>
     <message>
-      <source>Do HTTP(S) request</source>
-      <translation>HTTP(S) isteği yap</translation>
+      <source>Session token count limit on a single Server.</source>
+      <translation>Tek Sunucuda oturum belirteci sayısı sınırı.</translation>
     </message>
     <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>Kamerayla Bağlantı (birincil akış) Beklenmedik Bir Şekilde Kapandı.</translation>
+      <source>Max session token count per user on single Server.</source>
+      <translation>Tek Sunucuda kullanıcı başına maksimum oturum belirteci sayısı.</translation>
     </message>
     <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Kamerayla Bağlantı (ikincil akış) Beklenmedik Bir Şekilde Kapandı.</translation>
+      <source>Update interval for remote session token cache (other Servers and Cloud).</source>
+      <translation>Uzak oturum belirteci önbelleği için güncelleme aralığı (diğer Sunucular ve Bulut).</translation>
     </message>
     <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>Aygıtla Bağlantı Beklenmedik Bir Şekilde Kapandı.</translation>
+      <source>Timeout for remote session token cache (other Servers and Cloud).</source>
+      <translation>Uzak oturum belirteç önbelleği için zaman aşımı (diğer Sunucular ve Bulut).</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation>Analitik depolama &quot;%1&quot; veritabanı hatası: Bağlama noktasında izinler yetersiz.</translation>
+      <source>Default video codec.</source>
+      <translation>Varsayılan video codec bileşeni.</translation>
     </message>
     <message>
-      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation>Medya arşivinde kayıt etkinken AES şifrelemesi başlatılamıyor. Veriler şifrelenmeden yazılır.</translation>
+      <source>Default codec for export video.</source>
+      <translation>Dışa aktarılan video için varsayılan kod çözücü.</translation>
     </message>
     <message>
-      <source>RAID error: %1.</source>
-      <translation>RAID hatası: %1.</translation>
+      <source>Low quality screen video codec.</source>
+      <translation>Düşük kaliteli ekran video codec bileşeni.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation>Yeterli lisans yok. Kayıt aşağıdaki cihazlar için devre dışı bırakılacaktır:</translation>
+      <source>License server.</source>
+      <translation>Lisans sunucusu.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation>Yeterli lisans yok. Kayıt aşağıdaki cihazlar için devre dışı bırakılacaktır:</translation>
+      <source>URI for resource_data.json automatic update.</source>
+      <translation>Resource_data.json otomatik güncellemesi için URI.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation>Yeterli lisans yok. Aşağıdaki G/Ç modülleri devre dışı bırakıldı:</translation>
+      <source>Meta data storage change policy.</source>
+      <translation>Meta veri depolama değişikliği politikası.</translation>
     </message>
     <message>
-      <source>Also show source camera</source>
-      <translation>Ayrıca Kaynak Kamerayı Göster</translation>
+      <source>Persistent Servers for update storage.</source>
+      <translation>Güncellemelerin saklandığı Kalıcı Sunucular.</translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Kaynak Kamera</translation>
+      <source>Persistent Servers where updates are stored.</source>
+      <translation>Güncellemelerin saklandığı Kalıcı Sunucular.</translation>
     </message>
     <message>
-      <source>Also show on source camera</source>
-      <translation>Kaynak Kamerada Göster</translation>
+      <source>VMS Server version specific features.</source>
+      <translation>VMS Server sürümüne özgü özellikler.</translation>
     </message>
     <message>
-      <source>Also set on source camera</source>
-      <translation>Kaynak kamerada da ayarla</translation>
+      <source>Default locale for new users.</source>
+      <translation type="unfinished">Default locale for new users.</translation>
     </message>
     <message>
-      <source>Also trigger on source camera</source>
-      <translation>Ayrıca kaynak kamerada tetikle</translation>
+      <source>Additional local FS storage types for recording.</source>
+      <translation>Kayıt için ilave yerel FS depolama türleri.</translation>
     </message>
     <message>
-      <source>Also record source camera</source>
-      <translation>Kaynak kamerayı da kaydedin</translation>
+      <source>Keep IO port state on when Server connects to the device.</source>
+      <translation>Sunucu cihaza bağlandığında GÇ bağlantı noktası durumunu koruyun.</translation>
     </message>
     <message>
-      <source>Also play on source camera</source>
-      <translation>Kaynak kamerada da oynat</translation>
+      <source>Media buffer size (KB, 10KB-4MB).</source>
+      <translation>Medya arabellek boyutu (KB, 10KB-4MB).</translation>
     </message>
-    <message numerus="yes">
-      <source>%n Groups</source>
-      <translation>
-        <numerusform>%n Gruplar</numerusform>
-        <numerusform>%n Gruplar</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>LDAP Sync Issue</source>
-      <translation>LDAP Senkronizasyon Sorunu</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n times)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n defa)</numerusform>
-        <numerusform>%1 (%n defa)</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Failed to connect to the LDAP server.</source>
-      <translation>LDAP sunucusuna bağlanılamadı.</translation>
+      <source>Media buffer size for audio only devices (KB, 1KB-1MB).</source>
+      <translation>Yalnızca ses aygıtları için ortam arabelleği boyutu (KB, 1KB-1MB).</translation>
     </message>
     <message>
-      <source>Failed to complete the sync within a %1 timeout.</source>
-      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation>Senkronizasyon %1 zaman aşımı süresi içinde tamamlanamadı.</translation>
+      <source>Force analytics DB storage mount point permissions in case of failure.</source>
+      <translation>Hata durumunda analitik DB depolama bağlama noktası izinlerini zorunlu kıl.</translation>
     </message>
     <message>
-      <source>Failed to complete the sync within a given timeout.</source>
-      <translation>Belirli bir zaman aşımı süresinde senkronizasyon tamamlanamadı.</translation>
+      <source>Check video stream permissions on VMS server period (milliseconds).</source>
+      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds).</translation>
     </message>
     <message>
-      <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation>LDAP sunucusundaki hiçbir kullanıcı hesabı senkronizasyon ayarlarıyla eşleşmiyor.</translation>
+      <source>Storage encryption enabled.</source>
+      <translation>Depolama şifrelemesi etkin.</translation>
     </message>
     <message>
-      <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation>Bazı LDAP kullanıcıları veya grupları LDAP veritabanında bulunamadı.</translation>
+      <source>Current storage encryption key.</source>
+      <translation>Mevcut depolama şifreleme anahtarı.</translation>
     </message>
     <message>
-      <source>Services Issue</source>
-      <translation>Hizmet Sorunu</translation>
+      <source>Show Servers in the Resource Tree for non-admins.</source>
+      <translation>Yönetici olmayanlar için Kaynak Ağacında Sunucuları Göster.</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; has license migration issue</source>
-      <translation>&quot;%1&quot; Sunucusu için lisans taşıma sorunu var</translation>
+      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</source>
+      <translation>HTTP başlığı: Sunucu, desteklenen değişkenler: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
-      <source>Service overuse</source>
-      <translation>Hizmetin aşırı kullanımı</translation>
+      <source>HTTP header: Origin.</source>
+      <translation>HTTP başlığı: Kaynak.</translation>
     </message>
     <message>
-      <source>The following licenses were not migrated:</source>
-      <translation>Aşağıdaki lisanslar taşınmadı:</translation>
+      <source>HTTP header: X-Frame-Options.</source>
+      <translation>HTTP başlığı: X-Frame-Seçenekleri.</translation>
     </message>
     <message>
-      <source>License</source>
-      <translation>Lisans</translation>
+      <source>Use only HTTPS for cameras.</source>
+      <translation>Kameralar için yalnızca HTTPS kullanın.</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanallarındaki kayıt durduruldu.</numerusform>
-        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanallarındaki kayıt durduruldu.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanalında bulut depolama yedeklemesi durduruldu.</numerusform>
-        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanallarındaki bulut depolama yedeklemesi durduruldu.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanalda ücretli entegrasyon hizmeti kullanımı durduruldu.</numerusform>
-        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanalda ücretli entegrasyon hizmeti kullanımı durduruldu.</numerusform>
-      </translation>
+      <source>Allow Power User editing Security Settings.</source>
+      <translation>Uzman Kullanıcının Güvenlik Ayarlarını düzenlemesine izin ver.</translation>
     </message>
     <message>
-      <source>Failed to migrate licenses.</source>
-      <translation>Lisanslar taşınamadı.</translation>
+      <source>Enable deprecated API functions (insecure).</source>
+      <translation>Kullanımdan kaldırılan API fonksiyonlarını etkinleştir (güvenli değil).</translation>
     </message>
     <message>
-      <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation>Lisansların içe aktarımı atlandı. Başka bir aktarım denemesi daha sonra otomatik olarak planlanacak.</translation>
+      <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
+      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <source>Expose IP addresses for autodiscovery.</source>
+      <translation>Otomatik bulma için IP adreslerini açığa çıkarın.</translation>
     </message>
     <message>
-      <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <source>Show mouse timeline preview.</source>
+      <translation>Fare zaman çizelgesi önizlemesini göster.</translation>
     </message>
     <message>
-      <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <source>LDAP settings.</source>
+      <translation>LDAP ayarları.</translation>
     </message>
   </context>
 </TS>

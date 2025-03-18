@@ -236,6 +236,14 @@
       <source>Table Settings</source>
       <translation>Paramètres du tableau</translation>
     </message>
+    <message>
+      <source>Switch to table view</source>
+      <translation type="unfinished">Switch to table view</translation>
+    </message>
+    <message>
+      <source>Switch to card view</source>
+      <translation type="unfinished">Switch to card view</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsSettings</name>
@@ -278,13 +286,6 @@
 Select an Integration to begin configuring its parameters.</source>
       <translation>Les intégrations permettent une utilisation transparente des analyses vidéo sur divers appareils à partir du VMS.
 Sélectionnez une intégration pour commencer à configurer ses paramètres.</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsToolTipPreview</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>AUCUNE DONNÉE</translation>
     </message>
   </context>
   <context>
@@ -532,6 +533,10 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
       <source>Shut Down</source>
       <translation>Arrêt</translation>
     </message>
+    <message>
+      <source>New</source>
+      <translation type="unfinished">New</translation>
+    </message>
   </context>
   <context>
     <name>CloudTile</name>
@@ -636,6 +641,29 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     <message>
       <source>Show thumbnails</source>
       <translation>Afficher les miniatures</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomHttpHeadersDialog</name>
+    <message>
+      <source>Custom HTTP headers</source>
+      <translation type="unfinished">Custom HTTP headers</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Ajouter</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Supprimer</translation>
+    </message>
+    <message>
+      <source>Key</source>
+      <translation type="unfinished">Key</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
     </message>
   </context>
   <context>
@@ -1112,6 +1140,26 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
       <source>No groups</source>
       <translation>Aucun groupe</translation>
     </message>
+    <message>
+      <source>LDAP</source>
+      <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+      <translation>LDAP</translation>
+    </message>
+    <message>
+      <source>ORGANIZATION</source>
+      <comment>Section with groups from organisation</comment>
+      <translation type="unfinished">ORGANIZATION</translation>
+    </message>
+    <message>
+      <source>BUILT-IN</source>
+      <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
+      <translation type="unfinished">BUILT-IN</translation>
+    </message>
+    <message>
+      <source>CUSTOM</source>
+      <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+      <translation type="unfinished">CUSTOM</translation>
+    </message>
   </context>
   <context>
     <name>HintItem</name>
@@ -1147,10 +1195,14 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     </message>
   </context>
   <context>
-    <name>InsecureWarning</name>
+    <name>InsecureBanner</name>
     <message>
-      <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-      <translation>La sécurité du compte est importante. N'activez pas ce paramètre à moins que vous n'ayez de bonnes raisons de le faire.</translation>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
+      <translation>L'authentification Digest est obsolète et sera désactivée dans la prochaine version. Elle ne doit être utilisée que lorsque l'authentification Bearer par défaut ne peut pas être utilisée.</translation>
+    </message>
+    <message>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
+      <translation>L'authentification Digest est obsolète et sera désactivée dans la prochaine version. Elle ne doit être utilisée que si l'authentification Bearer par défaut ne peut pas être utilisée. Les identifiants des utilisateurs doivent uniquement comporter des lettres minuscules.</translation>
     </message>
   </context>
   <context>
@@ -1804,6 +1856,11 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
       <translation>Personnalisé</translation>
     </message>
+    <message>
+      <source>Organization</source>
+      <comment>Section with groups from organisation</comment>
+      <translation type="unfinished">Organization</translation>
+    </message>
   </context>
   <context>
     <name>PasswordChangeDialog</name>
@@ -2229,16 +2286,8 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
       <translation>Aucun fichier local</translation>
     </message>
     <message>
-      <source>Nothing found</source>
-      <translation>Rien trouvé</translation>
-    </message>
-    <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>Faites glisser des fichiers vidéo ou des images dans la fenêtre du client, ou ajoutez le dossier média local dans la boîte de dialogue Paramètres locaux</translation>
-    </message>
-    <message>
-      <source>Try searching for something else</source>
-      <translation>Essayez de chercher autre chose</translation>
     </message>
   </context>
   <context>
@@ -2299,10 +2348,6 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
   </context>
   <context>
     <name>ResourceSearchPane</name>
-    <message>
-      <source>Search</source>
-      <translation>Recherche</translation>
-    </message>
     <message>
       <source>Servers</source>
       <translation>Serveurs</translation>
@@ -2402,13 +2447,6 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     <message>
       <source>File to save the results:</source>
       <translation>Fichier pour enregistrer les résultats :</translation>
-    </message>
-  </context>
-  <context>
-    <name>SearchEdit</name>
-    <message>
-      <source>Search</source>
-      <translation>Recherche</translation>
     </message>
   </context>
   <context>

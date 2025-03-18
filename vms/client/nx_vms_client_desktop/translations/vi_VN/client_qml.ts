@@ -236,6 +236,14 @@
       <source>Table Settings</source>
       <translation>Cài đặt bảng</translation>
     </message>
+    <message>
+      <source>Switch to table view</source>
+      <translation type="unfinished">Switch to table view</translation>
+    </message>
+    <message>
+      <source>Switch to card view</source>
+      <translation type="unfinished">Switch to card view</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsSettings</name>
@@ -278,13 +286,6 @@
 Select an Integration to begin configuring its parameters.</source>
       <translation>Tích hợp cho phép sử dụng liền mạch chức năng phân tích video trên nhiều thiết bị khác nhau từ VMS.
 Chọn Tích hợp để bắt đầu cấu hình các tham số của tích hợp đó.</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsToolTipPreview</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>KHÔNG CÓ DỮ LIỆU</translation>
     </message>
   </context>
   <context>
@@ -528,6 +529,10 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
       <source>Shut Down</source>
       <translation>Tắt nguồn</translation>
     </message>
+    <message>
+      <source>New</source>
+      <translation type="unfinished">New</translation>
+    </message>
   </context>
   <context>
     <name>CloudTile</name>
@@ -632,6 +637,29 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     <message>
       <source>Show thumbnails</source>
       <translation>Hiển thị hình thu nhỏ</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomHttpHeadersDialog</name>
+    <message>
+      <source>Custom HTTP headers</source>
+      <translation type="unfinished">Custom HTTP headers</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Thêm vào</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Xoá</translation>
+    </message>
+    <message>
+      <source>Key</source>
+      <translation type="unfinished">Key</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
     </message>
   </context>
   <context>
@@ -1107,6 +1135,26 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
       <source>No groups</source>
       <translation>Không có nhóm</translation>
     </message>
+    <message>
+      <source>LDAP</source>
+      <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+      <translation>LDAP</translation>
+    </message>
+    <message>
+      <source>ORGANIZATION</source>
+      <comment>Section with groups from organisation</comment>
+      <translation type="unfinished">ORGANIZATION</translation>
+    </message>
+    <message>
+      <source>BUILT-IN</source>
+      <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
+      <translation type="unfinished">BUILT-IN</translation>
+    </message>
+    <message>
+      <source>CUSTOM</source>
+      <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+      <translation type="unfinished">CUSTOM</translation>
+    </message>
   </context>
   <context>
     <name>HintItem</name>
@@ -1142,10 +1190,14 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     </message>
   </context>
   <context>
-    <name>InsecureWarning</name>
+    <name>InsecureBanner</name>
     <message>
-      <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-      <translation>Bảo mật tài khoản là quan trọng. Không bật cài đặt này trừ khi bạn có lý do chính đáng để làm như vậy.</translation>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
+      <translation>Xác thực Digest đã lỗi thời và sẽ bị vô hiệu hóa trong bản phát hành tiếp theo và chỉ nên sử dụng khi không thể sử dụng Xác thực người mang mặc định.</translation>
+    </message>
+    <message>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
+      <translation>Xác thực Digest đã lỗi thời và sẽ bị vô hiệu hóa trong bản phát hành tiếp theo và chỉ nên sử dụng khi không thể sử dụng Xác thực Bearer mặc định. Thông tin đăng nhập của người dùng chỉ được bao gồm các chữ cái thường.</translation>
     </message>
   </context>
   <context>
@@ -1794,6 +1846,11 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
       <translation>Tùy chỉnh</translation>
     </message>
+    <message>
+      <source>Organization</source>
+      <comment>Section with groups from organisation</comment>
+      <translation type="unfinished">Organization</translation>
+    </message>
   </context>
   <context>
     <name>PasswordChangeDialog</name>
@@ -2217,16 +2274,8 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
       <translation>Không có tập tin trên thiết bị</translation>
     </message>
     <message>
-      <source>Nothing found</source>
-      <translation>Không tìm thấy kết quả nào</translation>
-    </message>
-    <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>Kéo tệp video hoặc hình ảnh vào cửa sổ ứng dụng khách hoặc thêm thư mục đa phương tiện cục bộ thông qua hộp thoại Cài đặt cục bộ</translation>
-    </message>
-    <message>
-      <source>Try searching for something else</source>
-      <translation>Thử tìm kiếm những thứ khác</translation>
     </message>
   </context>
   <context>
@@ -2286,10 +2335,6 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
   </context>
   <context>
     <name>ResourceSearchPane</name>
-    <message>
-      <source>Search</source>
-      <translation>Tìm kiếm</translation>
-    </message>
     <message>
       <source>Servers</source>
       <translation>Máy chủ</translation>
@@ -2389,13 +2434,6 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     <message>
       <source>File to save the results:</source>
       <translation>File lưu kết quả:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SearchEdit</name>
-    <message>
-      <source>Search</source>
-      <translation>Tìm kiếm</translation>
     </message>
   </context>
   <context>

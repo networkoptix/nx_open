@@ -994,6 +994,10 @@
       <source>None of selected user roles contain users</source>
       <translation type="unfinished">None of selected user roles contain users</translation>
     </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>최소 하나의 사용자를 선택하세요</translation>
+    </message>
   </context>
   <context>
     <name>QnTimeStrings</name>
@@ -1231,17 +1235,6 @@
     </message>
   </context>
   <context>
-    <name>QnTranscoder</name>
-    <message>
-      <source>OpenCLTranscode is not implemented.</source>
-      <translation>OpenCLTranscode가 구현되어있지 않음.</translation>
-    </message>
-    <message>
-      <source>Unknown transcode method</source>
-      <translation>알수없는 변환 방법</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserResource</name>
     <message>
       <source>Custom</source>
@@ -1395,334 +1388,6 @@
   <context>
     <name>nx::vms::common::SystemSettings</name>
     <message>
-      <source>Anonymous statistics report allowed</source>
-      <translation>익명의 통계 보고서 허용</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last time</source>
-      <translation>지난번 익명 통계 보고서</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last version</source>
-      <translation>익명 통계 보고서 마지막 버전</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last number</source>
-      <translation>익명 통계 보고서 마지막 번호</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics time cycle</source>
-      <translation>익명 통계 시간주기</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report delay after update</source>
-      <translation>익명 통계 보고서 업데이트 후 지연</translation>
-    </message>
-    <message>
-      <source>Anonymous Statistics Report Server URL</source>
-      <translation>익명 통계 보고서 서버 URL</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report Client settings</source>
-      <translation>익명 통계 보고서 클라이언트 설정</translation>
-    </message>
-    <message>
-      <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation>프록시 연결 시간 초과 (초, 1초~1시간)</translation>
-    </message>
-    <message>
-      <source>Time synchronization enabled</source>
-      <translation>시간 동기화 활성화</translation>
-    </message>
-    <message>
-      <source>Primary time synchronization Server ID</source>
-      <translation>1차 시간 동기화 서버 ID</translation>
-    </message>
-    <message>
-      <source>Max difference between local and source time (milliseconds)</source>
-      <translation>로컬 시간과 소스 시간의 최대 차이 (밀리초)</translation>
-    </message>
-    <message>
-      <source>OS time change check period</source>
-      <translation>OS 시간 변경 확인 기간</translation>
-    </message>
-    <message>
-      <source>Sync time synchronization interval for network requests</source>
-      <translation>네트워크 요청에 대한 시간 동기화 간격 동기화</translation>
-    </message>
-    <message>
-      <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation>엡실론 시간 동기화. 시간 델타가 엡실론보다 작 으면 새로운 값이 적용되지 않습니다</translation>
-    </message>
-    <message>
-      <source>Cloud owner account</source>
-      <translation>클라우드 소유자 계정</translation>
-    </message>
-    <message>
-      <source>Cloud authorization key</source>
-      <translation>클라우드 인증 키</translation>
-    </message>
-    <message>
-      <source>Disable Device vendors</source>
-      <translation>장치 공급업체 비활성화</translation>
-    </message>
-    <message>
-      <source>Optimize Camera settings</source>
-      <translation>카메라 설정 최적화</translation>
-    </message>
-    <message>
-      <source>Thumbnails auto-update</source>
-      <translation>썸네일 자동 업데이트</translation>
-    </message>
-    <message>
-      <source>Max scene items (0 means default)</source>
-      <translation>최대 장면수(기본값 0)</translation>
-    </message>
-    <message>
-      <source>Send plain-text emails</source>
-      <translation>일반 텍스트로 이메일 보내기</translation>
-    </message>
-    <message>
-      <source>Use Windows line feed in emails</source>
-      <translation>이메일에 Windows 줄넘김 사용</translation>
-    </message>
-    <message>
-      <source>Enable audit trail</source>
-      <translation>검사 보고 설정</translation>
-    </message>
-    <message>
-      <source>Audit trail period (days, 14-730)</source>
-      <translation>감사 추적 기간 (일, 14-730)</translation>
-    </message>
-    <message>
-      <source>Event log period (days)</source>
-      <translation>이벤트 로그 기간(일)</translation>
-    </message>
-    <message>
-      <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation>HTTPS (데이터 트래픽 암호화) 적용</translation>
-    </message>
-    <message>
-      <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation>RTSPS (비디오 트래픽 암호화) 적용</translation>
-    </message>
-    <message>
-      <source>Enable auto-discovery</source>
-      <translation>자동 검색 활성화</translation>
-    </message>
-    <message>
-      <source>Enable auto-update notifications</source>
-      <translation>자동 업데이트 알림 활성화</translation>
-    </message>
-    <message>
-      <source>Enable update notifications</source>
-      <translation>업데이트 알림 활성화</translation>
-    </message>
-    <message>
-      <source>Enable UPNP port-mapping</source>
-      <translation>UPNP 포트 매핑 활성화</translation>
-    </message>
-    <message>
-      <source>Backup settings</source>
-      <translation>백업 설정</translation>
-    </message>
-    <message>
-      <source>Cloud host override</source>
-      <translation>클라우드 호스트 오버라이드</translation>
-    </message>
-    <message>
-      <source>Enable RTSP for Arecont</source>
-      <translation>Arecont에 RTSP 활성화</translation>
-    </message>
-    <message>
-      <source>Enable sequential Flir ONVIF searcher</source>
-      <translation>순차적 Flir ONVIF 검색기 활성화</translation>
-    </message>
-    <message>
-      <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation>최대 P2P 대기열 크기 (바이트, 32-512MB)</translation>
-    </message>
-    <message>
-      <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation>최대 P2P 모든 클라이언트 크기(바이트, 32-512MB)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation>최대 레코드 대기열 크기 (바이트, 6-96MB)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (elements, 250-4000)</source>
-      <translation>최대 레코드 대기열 크기 (요소, 250-4000)</translation>
-    </message>
-    <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>RTP 휴식시간 (1/1000초)</translation>
-    </message>
-    <message>
-      <source>Max RTSP connection duration (seconds)</source>
-      <translation>최대 RTSP 연결 기간 (초)</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect UDP hole-punching</source>
-      <translation>클라우드 연결 UDP 홀 펀칭 활성화</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect relays usage</source>
-      <translation>클라우드 연결 릴레이 사용 활성화</translation>
-    </message>
-    <message>
-      <source>Enforce SSL for cloud-connect relays</source>
-      <translation>클라우드 연결 릴레이에 SSL 적용</translation>
-    </message>
-    <message>
-      <source>Enable recording on EDGE</source>
-      <translation>EDGE에서 녹화 활성화</translation>
-    </message>
-    <message>
-      <source>Target update information</source>
-      <translation>타겟 업데이트 정보</translation>
-    </message>
-    <message>
-      <source>Installed update information</source>
-      <translation>설치된 업데이트 정보</translation>
-    </message>
-    <message>
-      <source>Downloader peers for files</source>
-      <translation>파일을 위한 다운로더 피어</translation>
-    </message>
-    <message>
-      <source>Client update settings</source>
-      <translation>클라이언트 업데이트 설정</translation>
-    </message>
-    <message>
-      <source>Watermark settings</source>
-      <translation>카메라 설정</translation>
-    </message>
-    <message>
-      <source>Session token count limit on a single Server</source>
-      <translation>단일 서버의 세션 토큰 수</translation>
-    </message>
-    <message>
-      <source>Max session token count per user on single Server</source>
-      <translation>단일 서버에서 사용자당 최대 세션 토큰 수</translation>
-    </message>
-    <message>
-      <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation>원격 세션 토큰 캐시에 대한 업데이트 간격 (다른 서버 및 클라우드)</translation>
-    </message>
-    <message>
-      <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation>원격 세션 토큰 캐시에 대한 시간 초과 (다른 서버 및 클라우드)</translation>
-    </message>
-    <message>
-      <source>Default video codec</source>
-      <translation>기본 내보내기 비디오 코덱</translation>
-    </message>
-    <message>
-      <source>Default codec for export video</source>
-      <translation>비디오 내보내기용 기본 코덱</translation>
-    </message>
-    <message>
-      <source>Low quality screen video codec</source>
-      <translation>저품질 스크린 비디오 코덱</translation>
-    </message>
-    <message>
-      <source>License server</source>
-      <translation>라이선스 서버</translation>
-    </message>
-    <message>
-      <source>URI for resource_data.json automatic update</source>
-      <translation>resource_data.json 자동 업데이트를 위한 URI</translation>
-    </message>
-    <message>
-      <source>Meta data storage change policy</source>
-      <translation>메타 데이터 스토리지 변경 정책</translation>
-    </message>
-    <message>
-      <source>Persistent Servers for update storage</source>
-      <translation>업데이트 저장소를 위한 영구 서버</translation>
-    </message>
-    <message>
-      <source>Persistent Servers where updates are stored</source>
-      <translation>업데이트가 저장되는 영구 서버</translation>
-    </message>
-    <message>
-      <source>VMS Server version specific features</source>
-      <translation>VMS 서버 버전별 기능</translation>
-    </message>
-    <message>
-      <source>Additional local FS storage types for recording</source>
-      <translation>기록을 위한 추가 로컬 FS 스토리지 유형</translation>
-    </message>
-    <message>
-      <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation>장애 발생 시 강제 분석 DB 스토리지 마운트 지점 권한 부여</translation>
-    </message>
-    <message>
-      <source>Storage encryption enabled</source>
-      <translation>저장소 암호화가 활성화됨</translation>
-    </message>
-    <message>
-      <source>Current storage encryption key</source>
-      <translation>현재 저장소 암호화 키</translation>
-    </message>
-    <message>
-      <source>HTTP header: Origin</source>
-      <translation>HTTP 헤더: 출처</translation>
-    </message>
-    <message>
-      <source>HTTP header: X-Frame-Options</source>
-      <translation>HTTP 헤더: X-Frame-Options</translation>
-    </message>
-    <message>
-      <source>Show mouse timeline preview</source>
-      <translation>마우스 타임라인 미리보기 표시</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4MB)</source>
-      <translation>미디어 버퍼 크기 (KB, 10KB-4MB)</translation>
-    </message>
-    <message>
-      <source>Enable cross-domain policy</source>
-      <translation>크로스 도메인 정책 활성화</translation>
-    </message>
-    <message>
-      <source>Enable WebSocket for P2P</source>
-      <translation>P2P를 위해 WebSocket 활성화</translation>
-    </message>
-    <message>
-      <source>Show Servers in the Resource Tree for non-admins</source>
-      <translation>관리자가 아닌 사용자를 위한 리소스 트리에 서버 표시</translation>
-    </message>
-    <message>
-      <source>Use only HTTPS for cameras</source>
-      <translation>카메라에는 HTTPS만 사용하세요</translation>
-    </message>
-    <message>
-      <source>Expose IP addresses for autodiscovery</source>
-      <translation>자동 검색을 위해 IP 주소 노출</translation>
-    </message>
-    <message>
-      <source>Keep IO port state on when Server connects to the device</source>
-      <translation>서버가 장치에 연결되면 IO 포트 상태를 유지합니다.</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation>오디오 전용 장치의 미디어 버퍼 크기 (KB, 1KB-1MB)</translation>
-    </message>
-    <message>
-      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation>VMS에 저장된 장치 암호를 관리자에게 공개 (웹 페이지용)</translation>
-    </message>
-    <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation>원격 아카이브 동기화를 위한 최대 스레드 수 (&lt;=0 - 자동, 최대 32)</translation>
-    </message>
-    <message>
-      <source>Thread count limit for camera archive synchronization</source>
-      <translation>카메라 아카이브 동기화를 위한 스레드 수 제한</translation>
-    </message>
-    <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
       <translation>데이터베이스에 보관할 최대 이벤트 로그 레코드. 삭제되지 않은 레코드의 실제 양은 지정된 값보다 최대 20% 더 높을 수 있습니다.</translation>
     </message>
@@ -1735,32 +1400,8 @@
       <translation>서버에 대한 트랜스코딩을 사용하는 최대 HTTP 연결 수. Chrome은 한 번에 2개의 연결을 연 다음 첫 번째 연결을 닫습니다. 이 매개변수&apos;s 값을 2 이상으로 설정하는 것이 좋습니다.</translation>
     </message>
     <message>
-      <source>Update releases.json file URL</source>
-      <translation>releases.json 파일 URL 업데이트</translation>
-    </message>
-    <message>
-      <source>LDAP settings</source>
-      <translation>LDAP 설정</translation>
-    </message>
-    <message>
-      <source>SMTP settings</source>
-      <translation>SMTP 설정</translation>
-    </message>
-    <message>
-      <source>Authorization Session token lifetime (seconds)</source>
-      <translation>인증 세션 토큰 수명 (초)</translation>
-    </message>
-    <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
       <translation>클라우드에 연결하도록 지정된 서버의 세미콜론으로 구분된 목록입니다. 목록 맨 위에 있는 서버는 우선순위가 더 높습니다. 목록이 비어 있으면 클라우드 연결을 위한 서버가 자동으로 선택됩니다.</translation>
-    </message>
-    <message>
-      <source>Allow Power User editing Security Settings</source>
-      <translation>전문 사용자가 보안 설정을 편집하도록 허용</translation>
-    </message>
-    <message>
-      <source>Enable deprecated API functions (insecure)</source>
-      <translation>더 이상 사용되지 않는 API 함수 활성화 (보안되지 않음)</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
@@ -1772,778 +1413,436 @@
       <translation>현재 %1 소프트웨어에서 사용되는 더 이상 사용되지 않는 API 함수 활성화 (보안되지 않음)</translation>
     </message>
     <message>
-      <source>Organization Id</source>
-      <translation>조직 Id</translation>
-    </message>
-    <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
       <translation>데이터를 동기화하기 위한 클라우드 폴링 HTTP 요청 사이의 간격입니다.</translation>
-    </message>
-    <message>
-      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
-      <translation>HTTP 헤더: 서버, 지원 변수: $vmsName, $vmsVersion, $company, $compatibility</translation>
-    </message>
-    <message>
-      <source>Device storage information update interval</source>
-      <translation>장치 저장 정보 업데이트 간격</translation>
-    </message>
-    <message>
-      <source>Site alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h)</translation>
-    </message>
-    <message>
-      <source>Proxy connection access policy</source>
-      <translation type="unfinished">Proxy connection access policy</translation>
-    </message>
-    <message>
-      <source>Cloud Site ID</source>
-      <translation type="unfinished">Cloud Site ID</translation>
-    </message>
-    <message>
-      <source>Enable 2FA for the Site</source>
-      <translation type="unfinished">Enable 2FA for the Site</translation>
-    </message>
-    <message>
-      <source>Site name</source>
-      <translation type="unfinished">Site name</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
       <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
     </message>
     <message>
-      <source>Last master Site merge ID</source>
-      <translation type="unfinished">Last master Site merge ID</translation>
-    </message>
-    <message>
-      <source>Last slave Site merge ID</source>
-      <translation type="unfinished">Last slave Site merge ID</translation>
-    </message>
-    <message>
-      <source>Pixelation settings</source>
-      <translation type="unfinished">Pixelation settings</translation>
-    </message>
-    <message>
-      <source>Apply session limit for Cloud tokens</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens</translation>
-    </message>
-    <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
       <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
     </message>
     <message>
-      <source>Anonymous Crash Report Server API URL</source>
-      <translation>익명 충돌 보고 서버 API URL</translation>
+      <source>SMTP settings.</source>
+      <translation>SMTP 설정.</translation>
     </message>
     <message>
-      <source>Default locale for new users</source>
-      <translation type="unfinished">Default locale for new users</translation>
+      <source>Anonymous statistics report allowed.</source>
+      <translation>익명의 통계 보고서 허용.</translation>
     </message>
     <message>
-      <source>Check video stream permissions on VMS server period (milliseconds)</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
+      <source>Anonymous statistics report last time.</source>
+      <translation>지난번 익명 통계 보고서.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::event::StringsHelper</name>
     <message>
-      <source>Bookmark</source>
-      <translation>즐겨찾기</translation>
+      <source>Anonymous statistics report last version.</source>
+      <translation>익명 통계 보고서 마지막 버전.</translation>
     </message>
     <message>
-      <source>Panic recording</source>
-      <translation>패닉 저장</translation>
+      <source>Anonymous statistics report last number.</source>
+      <translation>익명 통계 보고서 마지막 번호.</translation>
     </message>
     <message>
-      <source>Write to log</source>
-      <translation>로그 기록</translation>
+      <source>Anonymous statistics time cycle.</source>
+      <translation>익명 통계 시간주기.</translation>
     </message>
     <message>
-      <source>Repeat sound</source>
-      <translation>음원 반복</translation>
+      <source>Anonymous statistics report delay after update.</source>
+      <translation>익명 통계 보고서 업데이트 후 지연.</translation>
     </message>
     <message>
-      <source>Play sound</source>
-      <translation>음원 재생</translation>
+      <source>Anonymous Statistics Report Server URL.</source>
+      <translation>익명 통계 보고서 서버 URL.</translation>
     </message>
     <message>
-      <source>Speak</source>
-      <translation>음성출력</translation>
+      <source>Anonymous Crash Report Server API URL.</source>
+      <translation>익명 충돌 보고 서버 API URL.</translation>
     </message>
     <message>
-      <source>Execute PTZ preset</source>
-      <translation>PTZ 프리셋 실행</translation>
+      <source>Anonymous statistics report Client settings.</source>
+      <translation>익명 통계 보고서 클라이언트 설정.</translation>
     </message>
     <message>
-      <source>Show text overlay</source>
-      <translation>텍스트 오버레이 표시</translation>
+      <source>Device storage information update interval.</source>
+      <translation>장치 저장 정보 업데이트 간격.</translation>
     </message>
     <message>
-      <source>Show on Alarm Layout</source>
-      <translation>알람 레이아웃에 표시</translation>
+      <source>Site alive update interval (seconds, 1s-1h).</source>
+      <translation type="unfinished">Site alive update interval (seconds, 1s-1h).</translation>
     </message>
     <message>
-      <source>Device output</source>
-      <translation>장치 출력</translation>
+      <source>Proxy connection timeout (seconds, 1s-1h).</source>
+      <translation>프록시 연결 시간 초과 (초, 1초~1시간).</translation>
     </message>
     <message>
-      <source>Camera output</source>
-      <translation>카메라 출력</translation>
+      <source>Proxy connection access policy.</source>
+      <translation type="unfinished">Proxy connection access policy.</translation>
     </message>
     <message>
-      <source>Device recording</source>
-      <translation>장치 녹화</translation>
+      <source>Time synchronization enabled.</source>
+      <translation>시간 동기화 활성화.</translation>
     </message>
     <message>
-      <source>Camera recording</source>
-      <translation>카메라 녹화</translation>
+      <source>Primary time synchronization Server ID.</source>
+      <translation>1차 시간 동기화 서버 ID.</translation>
     </message>
     <message>
-      <source>Generic Event</source>
-      <translation>일반 이벤트</translation>
+      <source>Max difference between local and source time (milliseconds).</source>
+      <translation>로컬 시간과 소스 시간의 최대 차이 (밀리초).</translation>
     </message>
-    <message numerus="yes">
-      <source>Motion on Cameras</source>
-      <translation>
-        <numerusform>카메라에 모션</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Network Issue</source>
-      <translation>네트워크 이슈</translation>
-    </message>
-    <message>
-      <source>Server Failure</source>
-      <translation>서버 오류</translation>
-    </message>
-    <message>
-      <source>Server Conflict</source>
-      <translation>서버 충돌</translation>
-    </message>
-    <message>
-      <source>Server Started</source>
-      <translation>서버 시작</translation>
-    </message>
-    <message>
-      <source>License Issue</source>
-      <translation>인증키 이슈</translation>
-    </message>
-    <message>
-      <source>Any Server Issue</source>
-      <translation>서버 이슈</translation>
-    </message>
-    <message>
-      <source>Any Event</source>
-      <translation>모든 이벤트</translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Devices</source>
-      <translation>
-        <numerusform>장치에 입력된 신호</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Cameras</source>
-      <translation>
-        <numerusform>카메라에 입력된 신호</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices Disconnected</source>
-      <translation>
-        <numerusform>장치 연결이 끊어졌습니다</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras Disconnected</source>
-      <translation>
-        <numerusform>카메라 연결 해제</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices IP Conflict</source>
-      <translation>
-        <numerusform>장치 IP 충돌</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras IP Conflict</source>
-      <translation>
-        <numerusform>카메라 IP 충돌</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Any Device Issue</source>
-      <translation>모든 장치 문제</translation>
-    </message>
-    <message>
-      <source>Any Camera Issue</source>
-      <translation>카메라 이슈</translation>
-    </message>
-    <message>
-      <source>Undefined event has occurred on %1</source>
-      <translation>%1에 정의되지 않은 이벤트 발생</translation>
-    </message>
-    <message>
-      <source>Device %1 was disconnected</source>
-      <translation>장치%1 연결 끊김</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>카메라 %1연결끊김</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>I/O 모듈 %1이 끊어졌습니다.</translation>
-    </message>
-    <message>
-      <source>Input on %1</source>
-      <translation>%1의 입력</translation>
-    </message>
-    <message>
-      <source>Motion on %1</source>
-      <translation>%1의 모션</translation>
-    </message>
-    <message>
-      <source>Network Issue at %1</source>
-      <translation>%1 내 네트워크 오류</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation>서버 &quot;%1&quot; 오류</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict at %1</source>
-      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>%1에서 장치 IP 충돌</translation>
-    </message>
-    <message>
-      <source>Camera IP Conflict at %1</source>
-      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>%1에서 카메라 IP 충돌</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation>서버 &quot;%1&quot; 충돌</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation>서버 &quot;%1&quot; 시작됨</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>서버 &quot;%1&quot; 에 라이선스 문제가 있습니다.</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>서버 &quot;%1&quot; 가 아카이브 백업을 완료했습니다.</translation>
-    </message>
     <message>
-      <source>Generic Event at %1</source>
-      <translation>%1에서 일반 이벤트</translation>
+      <source>OS time change check period.</source>
+      <translation>OS 시간 변경 확인 기간.</translation>
     </message>
     <message>
-      <source>An unknown event has occurred</source>
-      <translation>알지 못하는 이벤트 발생</translation>
+      <source>Sync time synchronization interval for network requests.</source>
+      <translation>네트워크 요청에 대한 시간 동기화 간격 동기화.</translation>
     </message>
     <message>
-      <source>Event: %1</source>
-      <translation>이벤트: %1</translation>
+      <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
+      <translation>엡실론 시간 동기화. 시간 델타가 엡실론보다 작 으면 새로운 값이 적용되지 않습니다.</translation>
     </message>
     <message>
-      <source>Source: %1</source>
-      <translation>소스: %1</translation>
+      <source>Cloud owner account.</source>
+      <translation>클라우드 소유자 계정.</translation>
     </message>
     <message>
-      <source>Caption: %1</source>
-      <translation>캡션: %1</translation>
+      <source>Organization Id.</source>
+      <translation>조직 Id.</translation>
     </message>
     <message>
-      <source>Input Port: %1</source>
-      <translation>%1의 입력</translation>
+      <source>Cloud Site ID.</source>
+      <translation type="unfinished">Cloud Site ID.</translation>
     </message>
     <message>
-      <source>Reason: %1</source>
-      <translation>원인: %1</translation>
+      <source>Cloud authorization key.</source>
+      <translation>클라우드 인증 키.</translation>
     </message>
     <message>
-      <source>Conflicting Address: %1</source>
-      <translation>충돌 주소: %1</translation>
+      <source>Enable 2FA for the Site.</source>
+      <translation type="unfinished">Enable 2FA for the Site.</translation>
     </message>
     <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>맥 #%1: %2</translation>
+      <source>Site name.</source>
+      <translation type="unfinished">Site name.</translation>
     </message>
     <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>%1 서버 충돌 중: %2</translation>
+      <source>Last master Site merge ID.</source>
+      <translation type="unfinished">Last master Site merge ID.</translation>
     </message>
     <message>
-      <source>Conflicting Server: %1</source>
-      <translation>서버 충돌: %1</translation>
+      <source>Last slave Site merge ID.</source>
+      <translation type="unfinished">Last slave Site merge ID.</translation>
     </message>
     <message>
-      <source>Trigger: %1</source>
-      <translation>Trigger: %1</translation>
+      <source>Disable Device vendors.</source>
+      <translation>장치 공급업체 비활성화.</translation>
     </message>
     <message>
-      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <source>Optimize Camera settings.</source>
+      <translation>카메라 설정 최적화.</translation>
     </message>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n 번, 첫 번째: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>시간: %2 의 %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>첫번째 발생: %2의 %1 (%n 전체 시간)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>%n 초간 데이터 받기 실패.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected.</source>
-      <translation>RTP 패킷 손실이 발생함.</translation>
-    </message>
-    <message>
-      <source>Device does not respond to network requests.</source>
-      <translation>장치는 네트워크 요청에 응답 하지 않습니다.</translation>
-    </message>
-    <message>
-      <source>Connection to server is lost.</source>
-      <translation>서버 접속 연결 실패.</translation>
-    </message>
-    <message>
-      <source>Server stopped unexpectedly.</source>
-      <translation>서버는 예기치 않게 중단 되었습니다.</translation>
-    </message>
-    <message>
-      <source>I/O error has occurred at %1.</source>
-      <translation>%1에 I/O 오류 발생.</translation>
-    </message>
-    <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>%1. 에 저장을 위한 HDD/SSD 속도 정보.</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>HDD/SSD 디스크 "%1" 꽉 찼습니다. 디스크에 VM에 의해 관리 되지 않는 너무 많은 데이터를 포함 합니다.</translation>
-    </message>
-    <message>
-      <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>시스템 디스크 &quot;%1&quot; 가 거의 찼습니다.</translation>
-    </message>
-    <message>
-      <source>start</source>
-      <translation>시작</translation>
-    </message>
-    <message>
-      <source>stop</source>
-      <translation>멈춤</translation>
-    </message>
-    <message>
-      <source>While %1</source>
-      <translation>%1 동안</translation>
-    </message>
-    <message>
-      <source>On %1 %2</source>
-      <translation>%1 %2</translation>
-    </message>
-    <message>
-      <source>Trigger Name</source>
-      <translation>트리거 이름</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n 사용자</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>모든 사용자</translation>
-    </message>
-    <message>
-      <source>Select at least one user</source>
-      <translation>최소 하나의 사용자를 선택하세요</translation>
-    </message>
-    <message>
-      <source>Soft Trigger</source>
-      <translation>Soft Trigger</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 at %2</source>
-      <translation>Soft Trigger %1 at %2</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation>Soft trigger %1이 (가) 여러 번 활성화되었습니다.</translation>
-    </message>
-    <message>
-      <source>Send email</source>
-      <translation>이메일 보내기</translation>
-    </message>
-    <message>
-      <source>Acknowledge</source>
-      <translation>확인함</translation>
-    </message>
     <message>
-      <source>Analytics Event</source>
-      <translation>분석 이벤트</translation>
+      <source>Thumbnails auto-update.</source>
+      <translation>썸네일 자동 업데이트.</translation>
     </message>
     <message>
-      <source>%1 at %2</source>
-      <comment>Analytics Event at some camera</comment>
-      <translation>%2 에서 %1</translation>
+      <source>Max scene items (0 means default).</source>
+      <translation>최대 장면수(기본값 0).</translation>
     </message>
     <message>
-      <source>Storage Issue</source>
-      <translation>저장공간 문제</translation>
+      <source>Send plain-text emails.</source>
+      <translation>일반 텍스트로 이메일 보내기.</translation>
     </message>
     <message>
-      <source>Storage Issue at %1</source>
-      <translation>%1 의 저장공간 오류</translation>
+      <source>Use Windows line feed in emails.</source>
+      <translation>이메일에 Windows 줄넘김 사용.</translation>
     </message>
     <message>
-      <source>Set to fullscreen</source>
-      <translation>전체화면으로 설정</translation>
+      <source>Enable audit trail.</source>
+      <translation>검사 보고 설정.</translation>
     </message>
     <message>
-      <source>Exit fullscreen</source>
-      <translation>전체 화면 종료</translation>
+      <source>Audit trail period (days, 14-730).</source>
+      <translation>감사 추적 기간 (일, 14-730).</translation>
     </message>
     <message>
-      <source>Open layout</source>
-      <translation>레이아웃 열기</translation>
+      <source>Event log period (days).</source>
+      <translation>이벤트 로그 기간(일).</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>여러 개의 %1 이벤트가 발생했습니다.</translation>
+      <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
+      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation>웹 로그 분석 저장 공간 &quot;%1&quot; 은 오프라인입니다.</translation>
+      <source>Enforce HTTPS (data traffic encryption).</source>
+      <translation type="unfinished">Enforce HTTPS (data traffic encryption).</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation>에널리틱 저장소 &quot;%1&quot; 가 거의 찼습니다.</translation>
+      <source>Enforce RTSPS (video traffic encryption).</source>
+      <translation type="unfinished">Enforce RTSPS (video traffic encryption).</translation>
     </message>
     <message>
-      <source>Plugin Diagnostic Event</source>
-      <translation>플러그인 진단 이벤트</translation>
+      <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
+      <translation>VMS에 저장된 장치 암호를 관리자에게 공개 (웹 페이지용).</translation>
     </message>
     <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>알 수없는 플러그인 진단 이벤트</translation>
+      <source>Enable auto-discovery.</source>
+      <translation>자동 검색 활성화.</translation>
     </message>
     <message>
-      <source>Buzzer</source>
-      <translation>부저</translation>
+      <source>Enable auto-update notifications.</source>
+      <translation>자동 업데이트 알림 활성화.</translation>
     </message>
     <message>
-      <source>Archive Backup Finished</source>
-      <translation>아카이브 백업 완료</translation>
+      <source>Enable update notifications.</source>
+      <translation>업데이트 알림 활성화.</translation>
     </message>
     <message>
-      <source>PoE over Budget</source>
-      <translation>PoE 용량 초과</translation>
+      <source>Enable UPNP port-mapping.</source>
+      <translation>UPNP 포트 매핑 활성화.</translation>
     </message>
     <message>
-      <source>Fan Error</source>
-      <translation>팬 오류</translation>
+      <source>Backup settings.</source>
+      <translation>백업 설정.</translation>
     </message>
     <message>
-      <source>PoE over budget at %1</source>
-      <translation>%1 PoE 용량 초과</translation>
+      <source>Cloud host override.</source>
+      <translation>클라우드 호스트 오버라이드.</translation>
     </message>
     <message>
-      <source>Fan error at %1</source>
-      <translation>%1에 팬 오류</translation>
+      <source>Enable cross-domain policy.</source>
+      <translation>크로스 도메인 정책 활성화.</translation>
     </message>
     <message>
-      <source>Reason: Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation>이유: 전력 제한 초과 (%1)</translation>
+      <source>Enable RTSP for Arecont.</source>
+      <translation>Arecont에 RTSP 활성화.</translation>
     </message>
     <message>
-      <source>Show desktop notification</source>
-      <translation>데스크톱 알림 보이기</translation>
+      <source>Enable sequential Flir ONVIF searcher.</source>
+      <translation>순차적 Flir ONVIF 검색기 활성화.</translation>
     </message>
     <message>
-      <source>Send mobile notification</source>
-      <translation>모바일 알림 보내기</translation>
+      <source>Max P2P queue size (bytes, 32-512MB).</source>
+      <translation>최대 P2P 대기열 크기 (바이트, 32-512MB).</translation>
     </message>
     <message>
-      <source>Consumption</source>
-      <translation>소비량</translation>
+      <source>Max P2P all clients size (bytes, 32-512MB).</source>
+      <translation>최대 P2P 모든 클라이언트 크기(바이트, 32-512MB).</translation>
     </message>
     <message>
-      <source>Device was disconnected</source>
-      <translation>기기 연결이 끊어졌었습니다</translation>
+      <source>Max record queue size (bytes, 6-96MB).</source>
+      <translation>최대 레코드 대기열 크기 (바이트, 6-96MB).</translation>
     </message>
     <message>
-      <source>Camera was disconnected</source>
-      <translation>카메라 연결이 끊어졌었습니다</translation>
+      <source>Max record queue size (elements, 250-4000).</source>
+      <translation>최대 레코드 대기열 크기 (요소, 250-4000).</translation>
     </message>
     <message>
-      <source>I/O Module was disconnected</source>
-      <translation>I/O 모듈 연결이 끊어졌었습니다</translation>
+      <source>RTP timeout (milliseconds).</source>
+      <translation>RTP 휴식시간 (1/1000초).</translation>
     </message>
     <message>
-      <source>Analytics Object Detected</source>
-      <translation>분석 개체 감지됨</translation>
+      <source>Max RTSP connection duration (seconds).</source>
+      <translation>최대 RTSP 연결 기간 (초).</translation>
     </message>
     <message>
-      <source>%1 at camera &apos;%2&apos;</source>
-      <comment> is detected</comment>
-      <translation>%1 카메라 &apos;%2&apos;</translation>
+      <source>Enable cloud-connect UDP hole-punching.</source>
+      <translation>클라우드 연결 UDP 홀 펀칭 활성화.</translation>
     </message>
     <message>
-      <source>Plugin: %1</source>
-      <translation>플러그인: %1</translation>
+      <source>Enable cloud-connect relays usage.</source>
+      <translation>클라우드 연결 릴레이 사용 활성화.</translation>
     </message>
     <message>
-      <source>Archive backup failed.</source>
-      <translation>아카이브 백업이 실패되었습니다.</translation>
+      <source>Enforce SSL for cloud-connect relays.</source>
+      <translation>클라우드 연결 릴레이에 SSL 적용.</translation>
     </message>
     <message>
-      <source>Object detected</source>
-      <translation>감지된 객체</translation>
+      <source>Enable recording on EDGE.</source>
+      <translation>EDGE에서 녹화 활성화.</translation>
     </message>
     <message>
-      <source>Archive backup failed</source>
-      <translation>아카이브 백업이 실패되었습니다</translation>
+      <source>Enable WebSocket for P2P.</source>
+      <translation>P2P를 위해 WebSocket 활성화.</translation>
     </message>
     <message>
-      <source>Data is backed up to %1</source>
-      <translation>데이터가 %1로 백업됨</translation>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>
+      <translation>원격 아카이브 동기화를 위한 최대 스레드 수 (&lt;=0 - 자동, 최대 32).</translation>
     </message>
     <message>
-      <source>Server Certificate Error</source>
-      <translation>서버 인증서 오류</translation>
+      <source>Update releases.json file URL.</source>
+      <translation>releases.json 파일 URL 업데이트.</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; certificate error</source>
-      <translation>서버 &quot;%1&quot; 인증서 오류</translation>
+      <source>Target update information.</source>
+      <translation>타겟 업데이트 정보.</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1).</source>
-      <translation>기본 스트림의 RTP 오류 (%1).</translation>
+      <source>Installed update information.</source>
+      <translation>설치된 업데이트 정보.</translation>
     </message>
     <message>
-      <source>RTP error in secondary stream (%1).</source>
-      <translation>보조 스트림의 RTP 오류 (%1).</translation>
+      <source>Downloader peers for files.</source>
+      <translation>파일을 위한 다운로더 피어.</translation>
     </message>
     <message>
-      <source>Camera time is back to normal.</source>
-      <translation>카메라 시간이 정상으로 돌아왔습니다.</translation>
+      <source>Client update settings.</source>
+      <translation>클라이언트 업데이트 설정.</translation>
     </message>
     <message>
-      <source>Address %1 is already in use by %2 on primary stream.</source>
-      <comment>%1 is the address, %2 is the device name</comment>
-      <translation>주소 %1 은 이미 기본 스트림의 %2 에 의해 사용 중입니다.</translation>
+      <source>Thread count limit for camera archive synchronization.</source>
+      <translation>카메라 아카이브 동기화를 위한 스레드 수 제한.</translation>
     </message>
     <message>
-      <source>Address %1 is already in use by %2 on secondary stream.</source>
-      <comment>%1 is the address, %2 is the device name</comment>
-      <translation>주소 %1 은 이미 보조 스트림의 %2 에 의해 사용 중입니다.</translation>
+      <source>Watermark settings.</source>
+      <translation>카메라 설정.</translation>
     </message>
     <message>
-      <source>Multicast address conflict detected.</source>
-      <translation>멀티캐스트 주소 충돌이 감지되었습니다.</translation>
+      <source>Pixelation settings.</source>
+      <translation type="unfinished">Pixelation settings.</translation>
     </message>
     <message>
-      <source>Network address %1 is not a multicast address.</source>
-      <translation>네트워크 주소 %1 은 멀티캐스트 주소가 아닙니다.</translation>
+      <source>Authorization Session token lifetime (seconds).</source>
+      <translation>인증 세션 토큰 수명 (초).</translation>
     </message>
     <message>
-      <source>Failed to backup file %1</source>
-      <translation>파일 %1을 백업하는 데 실패했습니다.</translation>
+      <source>Apply session limit for Cloud tokens.</source>
+      <translation type="unfinished">Apply session limit for Cloud tokens.</translation>
     </message>
     <message>
-      <source>Do HTTP(S) request</source>
-      <translation>HTTP(S) 요청을 하세요</translation>
+      <source>Session token count limit on a single Server.</source>
+      <translation>단일 서버의 세션 토큰 수.</translation>
     </message>
     <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>카메라 메인스트림 연결이 예상치 못하게 끊겼습니다.</translation>
+      <source>Max session token count per user on single Server.</source>
+      <translation>단일 서버에서 사용자당 최대 세션 토큰 수.</translation>
     </message>
     <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>카메라 2nd 스트림이 에상치 못하게 끊겼습니다.</translation>
+      <source>Update interval for remote session token cache (other Servers and Cloud).</source>
+      <translation>원격 세션 토큰 캐시에 대한 업데이트 간격 (다른 서버 및 클라우드).</translation>
     </message>
     <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>장치 연결이 예상치 못하게 끊김.</translation>
+      <source>Timeout for remote session token cache (other Servers and Cloud).</source>
+      <translation>원격 세션 토큰 캐시에 대한 시간 초과 (다른 서버 및 클라우드).</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation>분석 저장소 &quot;%1&quot; 데이터베이스 오류: 마운트 지점에 대한 권한이 부족합니다.</translation>
+      <source>Default video codec.</source>
+      <translation>기본 내보내기 비디오 코덱.</translation>
     </message>
     <message>
-      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation>미디어 아카이브에서 녹화가 활성화되어 있는 동안 AES 암호화를 초기화할 수 없습니다. 데이터는 암호화되지 않은 상태로 기록됩니다.</translation>
+      <source>Default codec for export video.</source>
+      <translation>비디오 내보내기용 기본 코덱.</translation>
     </message>
     <message>
-      <source>RAID error: %1.</source>
-      <translation>RAID 오류: %1.</translation>
+      <source>Low quality screen video codec.</source>
+      <translation>저품질 스크린 비디오 코덱.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation>라이센스가 충분하지 않습니다. 다음 기기에서 녹화가 비활성화되었습니다.</translation>
+      <source>License server.</source>
+      <translation>라이선스 서버.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation>라이센스가 충분하지 않습니다. 다음 카메라에서 녹화가 비활성화되었습니다.</translation>
+      <source>URI for resource_data.json automatic update.</source>
+      <translation>resource_data.json 자동 업데이트를 위한 URI.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation>라이센스가 충분하지 않습니다. 다음 I/O 모듈에서 레코딩이 비활성화되었습니다.</translation>
+      <source>Meta data storage change policy.</source>
+      <translation>메타 데이터 스토리지 변경 정책.</translation>
     </message>
     <message>
-      <source>Also show source camera</source>
-      <translation>이벤트 발생 카메라 보여주기</translation>
+      <source>Persistent Servers for update storage.</source>
+      <translation>업데이트 저장소를 위한 영구 서버.</translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>선택된 카메라</translation>
+      <source>Persistent Servers where updates are stored.</source>
+      <translation>업데이트가 저장되는 영구 서버.</translation>
     </message>
     <message>
-      <source>Also show on source camera</source>
-      <translation>이벤트 발생카메라 보이기</translation>
+      <source>VMS Server version specific features.</source>
+      <translation>VMS 서버 버전별 기능.</translation>
     </message>
     <message>
-      <source>Also set on source camera</source>
-      <translation>소스 카메라에도 설정됨</translation>
+      <source>Default locale for new users.</source>
+      <translation type="unfinished">Default locale for new users.</translation>
     </message>
     <message>
-      <source>Also trigger on source camera</source>
-      <translation>소스 카메라에서도 트리거</translation>
+      <source>Additional local FS storage types for recording.</source>
+      <translation>기록을 위한 추가 로컬 FS 스토리지 유형.</translation>
     </message>
     <message>
-      <source>Also record source camera</source>
-      <translation>소스 카메라를 기록합니다</translation>
+      <source>Keep IO port state on when Server connects to the device.</source>
+      <translation type="unfinished">Keep IO port state on when Server connects to the device.</translation>
     </message>
     <message>
-      <source>Also play on source camera</source>
-      <translation>이벤트 발생카메라 재생</translation>
+      <source>Media buffer size (KB, 10KB-4MB).</source>
+      <translation>미디어 버퍼 크기 (KB, 10KB-4MB).</translation>
     </message>
-    <message numerus="yes">
-      <source>%n Groups</source>
-      <translation>
-        <numerusform>%n 그룹</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>LDAP Sync Issue</source>
-      <translation>LDAP 동기화 문제</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n times)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n 번)</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Failed to connect to the LDAP server.</source>
-      <translation>LDAP 서버에 연결하지 못했습니다.</translation>
+      <source>Media buffer size for audio only devices (KB, 1KB-1MB).</source>
+      <translation>오디오 전용 장치의 미디어 버퍼 크기 (KB, 1KB-1MB).</translation>
     </message>
     <message>
-      <source>Failed to complete the sync within a %1 timeout.</source>
-      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation>%1 시간 초과 내에 동기화를 완료하지 못했습니다.</translation>
+      <source>Force analytics DB storage mount point permissions in case of failure.</source>
+      <translation>장애 발생 시 강제 분석 DB 스토리지 마운트 지점 권한 부여.</translation>
     </message>
     <message>
-      <source>Failed to complete the sync within a given timeout.</source>
-      <translation>주어진 시간 내에 동기화를 완료하지 못했습니다.</translation>
+      <source>Check video stream permissions on VMS server period (milliseconds).</source>
+      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds).</translation>
     </message>
     <message>
-      <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation>LDAP 서버의 사용자 계정이 동기화 설정과 일치하지 않습니다.</translation>
+      <source>Storage encryption enabled.</source>
+      <translation>저장소 암호화가 활성화됨.</translation>
     </message>
     <message>
-      <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation>LDAP 데이터베이스에서 일부 LDAP 사용자 또는 그룹을 찾을 수 없습니다.</translation>
+      <source>Current storage encryption key.</source>
+      <translation>현재 저장소 암호화 키.</translation>
     </message>
     <message>
-      <source>Services Issue</source>
-      <translation>서비스 문제</translation>
+      <source>Show Servers in the Resource Tree for non-admins.</source>
+      <translation>관리자가 아닌 사용자를 위한 리소스 트리에 서버 표시.</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; has license migration issue</source>
-      <translation>서버 &quot;%1&quot; 에 라이센스 마이그레이션 문제가 있습니다.</translation>
+      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</source>
+      <translation>HTTP 헤더: 서버, 지원 변수: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
-      <source>Service overuse</source>
-      <translation>서비스 과다 사용</translation>
+      <source>HTTP header: Origin.</source>
+      <translation>HTTP 헤더: 출처.</translation>
     </message>
     <message>
-      <source>The following licenses were not migrated:</source>
-      <translation>다음 라이센스는 마이그레이션되지 않았습니다.</translation>
+      <source>HTTP header: X-Frame-Options.</source>
+      <translation>HTTP 헤더: X-Frame-Options.</translation>
     </message>
     <message>
-      <source>License</source>
-      <translation>라이선스</translation>
+      <source>Use only HTTPS for cameras.</source>
+      <translation>카메라에는 HTTPS만 사용하세요.</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>카메라</translation>
-    </message>
-    <message numerus="yes">
-      <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>서비스 과부하로 인해 %n 채널의 녹화가 중단되었습니다.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>서비스 초과 사용으로 인해 %n 채널의 클라우드 스토리지 백업이 중단되었습니다.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>서비스 과도한 사용으로 인해 %n 채널의 유료 통합 서비스 사용이 중단되었습니다.</numerusform>
-      </translation>
+      <source>Allow Power User editing Security Settings.</source>
+      <translation>전문 사용자가 보안 설정을 편집하도록 허용.</translation>
     </message>
     <message>
-      <source>Failed to migrate licenses.</source>
-      <translation>라이센스를 마이그레이션하지 못했습니다.</translation>
+      <source>Enable deprecated API functions (insecure).</source>
+      <translation>더 이상 사용되지 않는 API 함수 활성화 (보안되지 않음).</translation>
     </message>
     <message>
-      <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation>라이센스 가져오기 건너뛰기. 다른 마이그레이션 시도가 나중에 자동으로 예약됩니다.</translation>
+      <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
+      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <source>Expose IP addresses for autodiscovery.</source>
+      <translation>자동 검색을 위해 IP 주소 노출.</translation>
     </message>
     <message>
-      <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <source>Show mouse timeline preview.</source>
+      <translation>마우스 타임라인 미리보기 표시.</translation>
     </message>
     <message>
-      <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <source>LDAP settings.</source>
+      <translation>LDAP 설정.</translation>
     </message>
   </context>
 </TS>

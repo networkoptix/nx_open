@@ -74,6 +74,10 @@
       <source>The session key is too old for this Site.</source>
       <translation>このサイトに対してセッションキーが古すぎます。</translation>
     </message>
+    <message>
+      <source>No credentials provided when required by endpoint.</source>
+      <translation>エンドポイントで認証情報が要求されましたが、提供されませんでした。</translation>
+    </message>
   </context>
   <context>
     <name>Result</name>

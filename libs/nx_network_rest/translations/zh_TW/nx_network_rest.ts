@@ -74,6 +74,10 @@
       <source>The session key is too old for this Site.</source>
       <translation>連線金鑰對於此站點而言太舊。</translation>
     </message>
+    <message>
+      <source>No credentials provided when required by endpoint.</source>
+      <translation>端點需要時沒有提供登入資訊。</translation>
+    </message>
   </context>
   <context>
     <name>Result</name>

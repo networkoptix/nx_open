@@ -273,10 +273,6 @@
       <translation>Hilfe</translation>
     </message>
     <message>
-      <source>Event Log...</source>
-      <translation>Ereignisprotokoll...</translation>
-    </message>
-    <message>
       <source>Control Video Wall</source>
       <translation>Videowand steuern</translation>
     </message>
@@ -1165,22 +1161,6 @@
       <translation type="unfinished">Connect to Site</translation>
     </message>
     <message>
-      <source>Layout Tab</source>
-      <translation type="unfinished">Layout Tab</translation>
-    </message>
-    <message>
-      <source>New Layout Tab</source>
-      <translation type="unfinished">New Layout Tab</translation>
-    </message>
-    <message>
-      <source>Welcome Screen Tab</source>
-      <translation type="unfinished">Welcome Screen Tab</translation>
-    </message>
-    <message>
-      <source>New Welcome Screen Tab</source>
-      <translation type="unfinished">New Welcome Screen Tab</translation>
-    </message>
-    <message>
       <source>Site Administration...</source>
       <translation type="unfinished">Site Administration...</translation>
     </message>
@@ -1235,6 +1215,30 @@
     <message>
       <source>Cell Aspect Ratio</source>
       <translation>Zelle Seitenverhältnis</translation>
+    </message>
+    <message>
+      <source>Layout</source>
+      <translation>Layout</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>Neues Layout</translation>
+    </message>
+    <message>
+      <source>Welcome Screen</source>
+      <translation>Startbildschirm</translation>
+    </message>
+    <message>
+      <source>New Welcome Screen</source>
+      <translation type="unfinished">New Welcome Screen</translation>
+    </message>
+    <message>
+      <source>Monitor in New Tab</source>
+      <translation>In neuem Tab anzeigen</translation>
+    </message>
+    <message>
+      <source>Monitor in New Window</source>
+      <translation>In neuem Fenster anzeigen</translation>
     </message>
   </context>
   <context>
@@ -1307,20 +1311,6 @@
     </message>
   </context>
   <context>
-    <name>ExitFullscreenActionHelper</name>
-    <message>
-      <source>Select layout...</source>
-      <translation>Layout auswählen...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n layouts</source>
-      <translation>
-        <numerusform>%n Layout</numerusform>
-        <numerusform>%n Layouts</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1341,37 +1331,6 @@
     <message>
       <source>Executable %1 Media File</source>
       <translation>Ausführbare %1 Mediendatei</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenActionHelper</name>
-    <message>
-      <source>Source camera</source>
-      <translation>Quell-Kamera</translation>
-    </message>
-    <message>
-      <source>Select device...</source>
-      <translation>Gerät auswählen...</translation>
-    </message>
-    <message>
-      <source>Select camera...</source>
-      <translation>Kamera auswählen...</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Layout auswählen...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n layouts</source>
-      <translation>
-        <numerusform>%n Layout</numerusform>
-        <numerusform>%n Layouts</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>%1 on %2</source>
-      <comment>Camera %1 on layout %2</comment>
-      <translation>%1 auf %2</translation>
     </message>
   </context>
   <context>
@@ -2214,24 +2173,24 @@ Lizenzschlüssel: %2</translation>
       </translation>
     </message>
     <message numerus="yes">
-      <source>These servers are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These servers are removed from Site</numerusform>
-        <numerusform>These servers are removed from Site</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These users are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These users are removed from Site</numerusform>
-        <numerusform>These users are removed from Site</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>These resources are removed from Site</source>
       <translation type="unfinished">
         <numerusform>These resources are removed from Site</numerusform>
         <numerusform>These resources are removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This server is removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>This server is removed from Site</numerusform>
+        <numerusform>This server is removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This user is removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>This user is removed from Site</numerusform>
+        <numerusform>This user is removed from Site</numerusform>
       </translation>
     </message>
   </context>
@@ -2373,10 +2332,6 @@ Lizenzschlüssel: %2</translation>
       <translation>Ereignisregel entfernt</translation>
     </message>
     <message>
-      <source>Event rules reset to default</source>
-      <translation>Ereignisregeln auf Standard zurückgesetzt</translation>
-    </message>
-    <message>
       <source>Storage added</source>
       <translation>Speicher hinzugefügt</translation>
     </message>
@@ -2509,222 +2464,6 @@ Lizenzschlüssel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleViewModel</name>
-    <message>
-      <source>Error: %1</source>
-      <translation>Fehler: %1</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Sofort</translation>
-    </message>
-    <message>
-      <source>Stops</source>
-      <translation>Stoppen</translation>
-    </message>
-    <message>
-      <source>Starts</source>
-      <translation>Starten</translation>
-    </message>
-    <message>
-      <source>Occurs</source>
-      <translation>Erscheinen</translation>
-    </message>
-    <message>
-      <source>N/A</source>
-      <translation>N/A</translation>
-    </message>
-    <message>
-      <source>Every %1</source>
-      <translation>Alle %1</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Jeder Server</translation>
-    </message>
-    <message>
-      <source>Any Device</source>
-      <translation>Jedes Gerät</translation>
-    </message>
-    <message>
-      <source>Any Camera</source>
-      <translation>Jede Kamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Servers</source>
-      <translation>
-        <numerusform>%n Server</numerusform>
-        <numerusform>%n Server</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Benutzer</translation>
-    </message>
-    <message>
-      <source>Source Server</source>
-      <translation>Quellserver</translation>
-    </message>
-    <message>
-      <source>Source Camera</source>
-      <translation>Quellkamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Quell und %n weitere Kamera</numerusform>
-        <numerusform>Quell und %n weitere Kameras</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Select at least one Device</source>
-      <translation>Wählen Sie mindestens ein Gerät</translation>
-    </message>
-    <message>
-      <source>Select at least one Camera</source>
-      <translation>Wählen Sie mindestens eine Kamera</translation>
-    </message>
-    <message>
-      <source>Select Server</source>
-      <translation>Server wählen</translation>
-    </message>
-    <message>
-      <source>Source Server and %1</source>
-      <translation>Quellserver und %1</translation>
-    </message>
-    <message>
-      <source>Site</source>
-      <translation type="unfinished">Site</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRuleWidget</name>
-    <message>
-      <source>to</source>
-      <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
-      <translation>an</translation>
-    </message>
-    <message>
-      <source>at</source>
-      <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-      <translation>an</translation>
-    </message>
-    <message>
-      <source>Select at least one device</source>
-      <translation>Wählen Sie mindestens ein Gerät</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Wählen Sie mindestens eine Kamera</translation>
-    </message>
-    <message>
-      <source>Devices</source>
-      <translation>Geräte</translation>
-    </message>
-    <message>
-      <source>Cameras</source>
-      <translation>Kameras</translation>
-    </message>
-    <message>
-      <source>Any Device</source>
-      <translation>Jedes Gerät</translation>
-    </message>
-    <message>
-      <source>Any Camera</source>
-      <translation>Jede Kamera</translation>
-    </message>
-    <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation>Bestätigung erzwingen funktioniert nur für generische Ereignisse, wenn Kamerakennungen in der URL für generische Ereignisse verwendet werden</translation>
-    </message>
-    <message>
-      <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation>Eine hohe Voraufzeichnungszeit erhöht die RAM-Auslastung auf dem Server</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRulesDialog</name>
-    <message>
-      <source>&amp;New...</source>
-      <translation>&amp;Neu...</translation>
-    </message>
-    <message>
-      <source>&amp;Delete</source>
-      <translation>&amp;Löschen</translation>
-    </message>
-    <message>
-      <source>&amp;Schedule...</source>
-      <translation>&amp;Planen...</translation>
-    </message>
-    <message>
-      <source>Restore All Rules to Default</source>
-      <translation>Alle Regeln auf Standardwerte zurücksetzen</translation>
-    </message>
-    <message>
-      <source>No event rules</source>
-      <translation>Keine Ereignisregeln</translation>
-    </message>
-    <message>
-      <source>Filter by devices...</source>
-      <translation>Filtern nach Geräten...</translation>
-    </message>
-    <message>
-      <source>Filter by cameras...</source>
-      <translation>Filtern nach Kameras...</translation>
-    </message>
-    <message>
-      <source>Failed to retrieve rules</source>
-      <translation>Fehler beim Abrufen der Regeln</translation>
-    </message>
-    <message>
-      <source>Failed to save rule</source>
-      <translation>Fehler beim Speichern der Regel</translation>
-    </message>
-    <message>
-      <source>This action cannot be undone.</source>
-      <translation>Diese Aktion kann nicht rückgängig gemacht werden.</translation>
-    </message>
-    <message>
-      <source>Restore all rules to default?</source>
-      <translation>Alle Regeln auf Standardwerte zurücksetzen?</translation>
-    </message>
-    <message>
-      <source>Some rules are not valid and may not work</source>
-      <translation>Einige Regeln sind ungültig und funktionieren möglicherweise nicht</translation>
-    </message>
-    <message>
-      <source>Apply changes before exiting?</source>
-      <translation>Änderungen vor dem Verlassen anwenden?</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRulesViewModel</name>
-    <message>
-      <source>On</source>
-      <translation>An</translation>
-    </message>
-    <message>
-      <source>Event</source>
-      <translation>Ereignis</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>Quelle</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Aktion</translation>
-    </message>
-    <message>
-      <source>Target</source>
-      <translation>Ziel</translation>
-    </message>
-    <message>
-      <source>Interval of Action</source>
-      <translation>Aktionsintervall</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCamDisplay</name>
     <message>
       <source>%1 Running</source>
@@ -2801,13 +2540,6 @@ Lizenzschlüssel: %2</translation>
     <message>
       <source>Diagnostics complete</source>
       <translation>Komplette Diagnose</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraInputBusinessEventWidget</name>
-    <message>
-      <source>automatic</source>
-      <translation>automatisch</translation>
     </message>
   </context>
   <context>
@@ -2917,13 +2649,6 @@ Lizenzschlüssel: %2</translation>
     <message>
       <source>Logical ID</source>
       <translation>Logical-ID</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraOutputBusinessActionWidget</name>
-    <message>
-      <source>automatic</source>
-      <translation>automatisch</translation>
     </message>
   </context>
   <context>
@@ -3244,33 +2969,6 @@ Lizenzschlüssel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnCustomBusinessEventWidget</name>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Wenn das Feld leer ist, wird immer ein Ereignis ausgelöst.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>Das Ereignis wird nur ausgelöst, wenn in der Quelle Übereinstimmungen mit einem der eingegebenen Schlüsselwörter vorhanden sind.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Das Ereignis wird nur ausgelöst, wenn es Übereinstimmungen mit einem der eingegebenen Schlüsselwörter gibt.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation>Das Ereignis wird nur ausgelöst, wenn die Beschreibung mit einem der eingegebenen Schlüsselwörter übereinstimmt.</translation>
-    </message>
-    <message>
-      <source>Server API</source>
-      <translation>Server-API</translation>
-    </message>
-    <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>Um ein Event zu generien, befolgen Sie bitte %1.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCustomFileDialog</name>
     <message>
       <source>Pictures</source>
@@ -3361,159 +3059,6 @@ Lizenzschlüssel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnEmptyBusinessActionWidget</name>
-    <message>
-      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>Die Panikaufnahme schaltet die Aufnahmeeinstellungen für alle Kameras auf maximale FPS und Qualität um.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnEventLogDialog</name>
-    <message>
-      <source>Filter Similar Rows</source>
-      <translation>Identische Zeilen ausfiltern</translation>
-    </message>
-    <message>
-      <source>Copy Selection to Clipboard</source>
-      <translation>Auswahl in Zwischenablage kopieren</translation>
-    </message>
-    <message>
-      <source>Export Selection to File...</source>
-      <translation>Auswahl in Datei exportieren...</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Alles auswählen</translation>
-    </message>
-    <message>
-      <source>Clear Filter</source>
-      <translation>Filter zurücksetzen</translation>
-    </message>
-    <message>
-      <source>Export selected events to file</source>
-      <translation>Ausgewählte Ereignisse in Datei exportieren</translation>
-    </message>
-    <message>
-      <source>Any Action</source>
-      <translation>Jede Aktion</translation>
-    </message>
-    <message>
-      <source>No events</source>
-      <translation>Keine Ereignisse</translation>
-    </message>
-    <message numerus="yes">
-      <source>Event log for period from %1 to %2 - %n events found</source>
-      <comment>Dates are substituted</comment>
-      <translation>
-        <numerusform>Ereignisprotokoll für den Zeitraum von %1 bis %2 - %n gefundenes Ereignis</numerusform>
-        <numerusform>Ereignisprotokoll für den Zeitraum von %1 bis %2 - %n gefundene Ereignisse</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Event log for %1 - %n events found</source>
-      <comment>Date is substituted</comment>
-      <translation>
-        <numerusform>Ereignisprotokoll für %1 - %n Ereignis gefunden</numerusform>
-        <numerusform>Ereignisprotokoll für %1 - %n Ereignisse gefunden</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Beschreibung</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnEventLogModel</name>
-    <message>
-      <source>Motion video</source>
-      <translation>Motion-Video</translation>
-    </message>
-    <message>
-      <source>Date/Time</source>
-      <translation>Datum/Zeit</translation>
-    </message>
-    <message>
-      <source>Event</source>
-      <translation>Ereignis</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>Quelle</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Aktion</translation>
-    </message>
-    <message>
-      <source>Target</source>
-      <translation>Ziel</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Beschreibung</translation>
-    </message>
-    <message>
-      <source>All users</source>
-      <translation>Alle Benutzer</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n times)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n mal)</numerusform>
-        <numerusform>%1 (%n mal)</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Open camera</source>
-      <translation>Kamera öffnen</translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n users more...</source>
-      <translation>
-        <numerusform>und %n Benutzer mehr...</numerusform>
-        <numerusform>und %n Benutzer mehr...</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n more...</source>
-      <translation>
-        <numerusform>und %n mehr...</numerusform>
-        <numerusform>und %n mehr...</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Removed subjects</source>
-      <translation>
-        <numerusform>%n entfernter Betreff</numerusform>
-        <numerusform>%n entfernte Betreffe</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Subject removed</source>
-      <translation>Thema entfernt</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n cameras)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n Kamera)</numerusform>
-        <numerusform>%1 (%n Kameras)</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnExecHttpRequestActionWidget</name>
-    <message>
-      <source>Auto</source>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <source>Basic</source>
-      <translation>Basic</translation>
-    </message>
-  </context>
-  <context>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
@@ -3522,17 +3067,6 @@ Lizenzschlüssel: %2</translation>
     <message>
       <source>Failed to overwrite file</source>
       <translation>Fehler beim Überschreiben der Datei</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFullscreenCameraActionWidget</name>
-    <message>
-      <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation>Diese Kamera befindet sich derzeit nicht im ausgewählten Layout. Die Aktion funktioniert, wenn die Kamera hinzugefügt wird, bevor die Aktion ausgelöst wird.</translation>
-    </message>
-    <message>
-      <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation>Diese Kamera befindet sich derzeit nicht in einigen der ausgewählten Layouts. Die Aktion funktioniert, wenn die Kamera hinzugefügt wird, bevor die Aktion ausgelöst wird.</translation>
     </message>
   </context>
   <context>
@@ -4015,13 +3549,6 @@ Lizenzschlüssel: %2</translation>
       <source>Lo-Res</source>
       <translation>Lo-Res</translation>
     </message>
-    <message numerus="yes">
-      <source>Set for all %n Cameras</source>
-      <translation>
-        <numerusform>Für %n Kamera festlegen</numerusform>
-        <numerusform>Für alle %n Kameras festlegen</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Area Zoom</source>
       <translation>Bereichszoom</translation>
@@ -4041,6 +3568,17 @@ Lizenzschlüssel: %2</translation>
     <message>
       <source>Mute</source>
       <translation>Stumm</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set for %n devices</source>
+      <translation type="unfinished">
+        <numerusform>Set for %n devices</numerusform>
+        <numerusform>Set for %n devices</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Cloud authorization request should only be performed for cloud cross system resources</source>
+      <translation type="unfinished">Cloud authorization request should only be performed for cloud cross system resources</translation>
     </message>
   </context>
   <context>
@@ -4156,13 +3694,6 @@ Lizenzschlüssel: %2</translation>
     <message>
       <source>Rotation</source>
       <translation>Rotation</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPopupBusinessActionWidget</name>
-    <message>
-      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation>Die Benachrichtigung wird angezeigt, bis einer der Benutzer ein Lesezeichen mit Ereignisbeschreibung erstellt</translation>
     </message>
   </context>
   <context>
@@ -4615,42 +4146,6 @@ Lizenzschlüssel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnSendEmailActionDelegate</name>
-    <message numerus="yes">
-      <source>%n additional</source>
-      <translation>
-        <numerusform>%n zusätzlich</numerusform>
-        <numerusform>%n zusätzlich</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has invalid email address</source>
-      <translation>Benutzer %1 hat eine ungültige Emailadresse</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 users have invalid email address</source>
-      <translation>
-        <numerusform>%n von %1 Benutzer hat eine ungültige Emailadresse</numerusform>
-        <numerusform>%n von %1 Benutzern haben eine ungültige Emailadresse</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid email address %1</source>
-      <translation>Ungültige Emailadresse %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 additional email addresses are invalid</source>
-      <translation>
-        <numerusform>%n von %1 zusätzliche Emailadresse ist ungültig</numerusform>
-        <numerusform>%n von %1 zusätzliche Emailadressen sind ungültig</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Send email to %1</source>
-      <translation>Email an %1 senden</translation>
-    </message>
-  </context>
-  <context>
     <name>QnServerAddressesModel</name>
     <message>
       <source>Address</source>
@@ -4761,17 +4256,6 @@ Lizenzschlüssel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnShowTextOverlayActionWidget</name>
-    <message>
-      <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-      <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
-&apos; sequence</comment>
-      <translation>HTML-Tags können innerhalb von benutzerdefinierten Texten verwendet werden:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Auch verschiedene &lt;font color=&quot;red&quot;&gt;Farben&lt;/font&gt; und &lt;font size=&quot;18&quot;&gt;Größen&lt;/font&gt; können angewandt werden. Der Text kann &lt;s&gt;durchgestrichen&lt;/s&gt;, &lt;u&gt;unterstrichen&lt;/u&gt;, &lt;b&gt;fett&lt;/b&gt; oder &lt;i&gt;kursiv&lt;/i&gt; sein</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSignInfo</name>
     <message>
       <source>Analyzing: %1%</source>
@@ -4825,8 +4309,8 @@ Lizenzschlüssel: %2</translation>
       <translation type="unfinished">Authorize</translation>
     </message>
     <message>
-      <source>Setup</source>
-      <translation>Setup</translation>
+      <source>Set</source>
+      <translation type="unfinished">Set</translation>
     </message>
   </context>
   <context>
@@ -4840,16 +4324,8 @@ Lizenzschlüssel: %2</translation>
       <translation>OFFLINE</translation>
     </message>
     <message>
-      <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
-      <translation type="unfinished">This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</translation>
-    </message>
-    <message>
       <source>UNAUTHORIZED</source>
       <translation>NICHT AUTORISIERT</translation>
-    </message>
-    <message>
-      <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
-      <translation type="unfinished">This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
@@ -4864,16 +4340,8 @@ Lizenzschlüssel: %2</translation>
       <translation type="unfinished">SITE SHUT DOWN</translation>
     </message>
     <message>
-      <source>STREAM LIMITATION</source>
-      <translation type="unfinished">STREAM LIMITATION</translation>
-    </message>
-    <message>
       <source>INFORMATION REQUIRED</source>
       <translation>ERFORDERLICHE INFORMATIONEN</translation>
-    </message>
-    <message>
-      <source>AUDIO ONLY</source>
-      <translation type="unfinished">AUDIO ONLY</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -4902,6 +4370,18 @@ Lizenzschlüssel: %2</translation>
     <message>
       <source>CERTIFICATE ERROR</source>
       <translation>ZERTIFIKATSFEHLER</translation>
+    </message>
+    <message>
+      <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
+      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+    </message>
+    <message>
+      <source>Access to this camera requires authorization credentials.</source>
+      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+    </message>
+    <message>
+      <source>CONNECTION LOST</source>
+      <translation type="unfinished">CONNECTION LOST</translation>
     </message>
   </context>
   <context>
@@ -5088,6 +4568,18 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
       <translation type="unfinished">Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</translation>
+    </message>
+    <message>
+      <source>Cloud storage cannot be enabled.</source>
+      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+    </message>
+    <message>
+      <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
+      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+    </message>
+    <message>
+      <source>Insufficient services</source>
+      <translation type="unfinished">Insufficient services</translation>
     </message>
   </context>
   <context>
@@ -5473,10 +4965,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation type="unfinished">Site shut down</translation>
     </message>
     <message>
-      <source>Reject intercom call</source>
-      <translation type="unfinished">Reject intercom call</translation>
-    </message>
-    <message>
       <source>Email address is not set for your account</source>
       <translation type="unfinished">Email address is not set for your account</translation>
     </message>
@@ -5600,6 +5088,18 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Notifications language differs from the interface language</source>
       <translation type="unfinished">Notifications language differs from the interface language</translation>
+    </message>
+    <message>
+      <source>Recording disabled</source>
+      <translation type="unfinished">Recording disabled</translation>
+    </message>
+    <message>
+      <source>Cloud storage backup disabled</source>
+      <translation type="unfinished">Cloud storage backup disabled</translation>
+    </message>
+    <message>
+      <source>Paid integration services disabled</source>
+      <translation type="unfinished">Paid integration services disabled</translation>
     </message>
   </context>
   <context>
@@ -6441,10 +5941,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation type="unfinished">In</translation>
     </message>
     <message>
-      <source>%n removed subjects</source>
-      <translation>%n entfernter Betreff</translation>
-    </message>
-    <message>
       <source>%n removed devices</source>
       <translation type="unfinished">%n removed devices</translation>
     </message>
@@ -6482,6 +5978,35 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>%n layouts more</source>
       <translation type="unfinished">%n layouts more</translation>
+    </message>
+    <message>
+      <source>Removed subject</source>
+      <comment>The subject is user or group</comment>
+      <translation type="unfinished">Removed subject</translation>
+    </message>
+    <message>
+      <source>Removed device</source>
+      <translation type="unfinished">Removed device</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation type="unfinished">Removed camera</translation>
+    </message>
+    <message>
+      <source>Removed server</source>
+      <translation type="unfinished">Removed server</translation>
+    </message>
+    <message>
+      <source>Removed layout</source>
+      <translation type="unfinished">Removed layout</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n removed subjects</source>
+      <comment>The subject is user or group</comment>
+      <translation type="unfinished">
+        <numerusform>%n removed subjects</numerusform>
+        <numerusform>%n removed subjects</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7123,6 +6648,23 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <translation type="unfinished">There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
     </message>
+    <message>
+      <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
+      <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
+      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+    </message>
+    <message>
+      <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
+      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+    </message>
+    <message>
+      <source>Backup will not be activated for %1 devices: </source>
+      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
+    </message>
+    <message>
+      <source>%1 suitable cloud storage services are required to activate backup for them.</source>
+      <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>
@@ -7250,6 +6792,18 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Missed call</source>
       <translation type="unfinished">Missed call</translation>
+    </message>
+    <message>
+      <source>Call Request</source>
+      <translation type="unfinished">Call Request</translation>
+    </message>
+    <message>
+      <source>Call Request Missed</source>
+      <translation type="unfinished">Call Request Missed</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation type="unfinished">Source: %1</translation>
     </message>
   </context>
   <context>
@@ -7444,6 +6998,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>Select Hotspot Target</source>
       <translation type="unfinished">Select Hotspot Target</translation>
     </message>
+    <message>
+      <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
+      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
@@ -7466,6 +7024,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Less Info</source>
       <translation>Weniger Info</translation>
+    </message>
+    <message>
+      <source>Use this link to add the camera to another site</source>
+      <translation type="unfinished">Use this link to add the camera to another site</translation>
     </message>
   </context>
   <context>
@@ -7982,26 +7544,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CloudLayoutsIntroDialog</name>
-    <message>
-      <source>Introducing %1 Layouts</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Einführung von %1 Layouts</translation>
-    </message>
-    <message>
-      <source>Read more on the %1</source>
-      <translation>Lesen Sie mehr auf %1</translation>
-    </message>
-    <message>
-      <source>help page</source>
-      <translation>Hilfeseite</translation>
-    </message>
-    <message>
-      <source>%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CloudLayoutsManager</name>
     <message>
       <source>%1 (Copy)</source>
@@ -8080,6 +7622,14 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Disconnect</source>
       <translation>Trennen</translation>
+    </message>
+    <message>
+      <source>Channel Partner users have access to this site</source>
+      <translation type="unfinished">Channel Partner users have access to this site</translation>
+    </message>
+    <message>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
+      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
@@ -8243,10 +7793,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
   </context>
   <context>
     <name>nx::vms::client::desktop::DesktopDataProvider</name>
-    <message>
-      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>Das Audioaufnahmegerät unterstützt keine geeigneten Audioformate. Bitte wählen Sie in den Bildschirmaufnahmeeinstellungen ein anderes Audiogerät oder &quot;keines&quot;.</translation>
-    </message>
     <message>
       <source>Could not detect capturing resolution</source>
       <translation>Die Erfassungsauflösung konnte nicht erkannt werden</translation>
@@ -8460,6 +8006,14 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>Export selected events to file</source>
       <translation>Ausgewählte Ereignisse in Datei exportieren</translation>
     </message>
+    <message>
+      <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
+      <translation type="unfinished">Server cannot answer in reasonable time. Consider narrowing period or filter.</translation>
+    </message>
+    <message>
+      <source>All Servers are offline. Logs are not available.</source>
+      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventLogModel</name>
@@ -8533,24 +8087,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>INFORMATION REQUIRED</source>
       <translation>ERFORDERLICHE INFORMATIONEN</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>No events</source>
-      <translation>Keine Ereignisse</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n events</source>
-      <translation>
-        <numerusform>%n Ereignis</numerusform>
-        <numerusform>%n Ereignisse</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Try changing the filters or create an Event Rule</source>
-      <translation>Versuchen Sie, die Filter zu ändern oder eine Ereignisregel zu erstellen</translation>
     </message>
   </context>
   <context>
@@ -9030,6 +8566,13 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::JumpToLiveButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation>Live gehen</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -9127,20 +8670,8 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>KEINE DATEN</translation>
     </message>
     <message>
-      <source>NOT A CAMERA</source>
-      <translation>KEINE KAMERA</translation>
-    </message>
-    <message>
       <source>DISABLED</source>
       <translation>DEAKTIVIERT</translation>
-    </message>
-    <message>
-      <source>OFFLINE</source>
-      <translation>OFFLINE</translation>
-    </message>
-    <message>
-      <source>NO EXPORT PERMISSION</source>
-      <translation type="unfinished">NO EXPORT PERMISSION</translation>
     </message>
   </context>
   <context>
@@ -9357,10 +8888,6 @@ Remember to return the Logging Level to its default setting after you have colle
       <translation>Client</translation>
     </message>
     <message>
-      <source>None</source>
-      <translation>Keine</translation>
-    </message>
-    <message>
       <source>Error</source>
       <translation>Fehler</translation>
     </message>
@@ -9391,6 +8918,10 @@ Remember to return the Logging Level to its default setting after you have colle
     <message>
       <source>Logging level degrades performance</source>
       <translation type="unfinished">Logging level degrades performance</translation>
+    </message>
+    <message>
+      <source>&lt;None&gt;</source>
+      <translation type="unfinished">&lt;None&gt;</translation>
     </message>
   </context>
   <context>
@@ -10239,18 +9770,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::NotificationActionHandler</name>
-    <message>
-      <source>Unable to acknowledge event on removed camera.</source>
-      <translation>Das Ereignis kann bei entfernter Kamera nicht bestätigt werden.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
-    <message>
-      <source>Alarm: %1</source>
-      <translation>Alarm: %1</translation>
-    </message>
     <message>
       <source>Acknowledge</source>
       <translation>Bestätigen</translation>
@@ -10282,10 +9802,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <translation type="unfinished">Event Notifications</translation>
     </message>
     <message>
-      <source>System Notifications</source>
-      <translation>Systembenachrichtigungen</translation>
-    </message>
-    <message>
       <source>Choose Types...</source>
       <translation type="unfinished">Choose Types...</translation>
     </message>
@@ -10299,6 +9815,10 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <numerusform>%n notification types</numerusform>
         <numerusform>%n notification types</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Site Notifications</source>
+      <translation type="unfinished">Site Notifications</translation>
     </message>
   </context>
   <context>
@@ -10324,45 +9844,10 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
-    <message>
-      <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation>Keiner der ausgewählten Benutzer hat Zugriff auf das ausgewählte Layout. Aktion wird nicht funktionieren.</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Layout auswählen...</translation>
-    </message>
-    <message>
-      <source>None of selected user roles contain users. Action will not work.</source>
-      <translation>Keine der ausgewählten Benutzerrollen enthält Benutzer. Aktion wird nicht funktionieren.</translation>
-    </message>
-    <message>
-      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation>Einige Benutzer haben keinen Zugriff auf das ausgewählte Layout. Aktion wird für sie nicht funktionieren.</translation>
-    </message>
-    <message>
-      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation>Suchen Sie nach einem lokalen Layout? Wählen Sie nur einen Benutzer aus der Liste &quot;Anzeigen an&quot; aus, um dessen lokale Layouts hier als Option anzuzeigen.</translation>
-    </message>
-    <message>
-      <source>Local layouts can only be shown to their owners</source>
-      <translation>Lokale Layouts können nur ihren Besitzern angezeigt werden</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
     <message>
       <source>Not supported</source>
       <translation>Nicht unterstützt</translation>
-    </message>
-    <message>
-      <source>This tab will be available in future versions</source>
-      <translation>Diese Registerkarte wird in zukünftigen Versionen verfügbar sein</translation>
-    </message>
-    <message>
-      <source>Learn more</source>
-      <translation>Weitere Informationen</translation>
     </message>
   </context>
   <context>
@@ -10543,33 +10028,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>%1 Settings</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>%1 Einstellungen</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n symbols over</source>
-      <translation>
-        <numerusform>%n Symbol über</numerusform>
-        <numerusform>%n Symbole über</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n symbols left</source>
-      <translation>
-        <numerusform>%n Symbol übrig</numerusform>
-        <numerusform>%n Symbole übrig</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::QnWebpageDialog</name>
     <message>
       <source>Name</source>
@@ -10725,69 +10183,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::RecordingStatusHelper</name>
-    <message>
-      <source>Not recording</source>
-      <translation>Nehme nicht auf</translation>
-    </message>
-    <message>
-      <source>Recording everything</source>
-      <translation>Nehme alles auf</translation>
-    </message>
-    <message>
-      <source>Recording motion only</source>
-      <translation>Nehme nur Bewegung auf</translation>
-    </message>
-    <message>
-      <source>Recording motion and low quality</source>
-      <translation>Nehme Bewegung auf und den Rest mit niedriger Qualität</translation>
-    </message>
-    <message>
-      <source>Continuous</source>
-      <translation>Laufend</translation>
-    </message>
-    <message>
-      <source>Motion only</source>
-      <translation>Nur bei Bewegung</translation>
-    </message>
-    <message>
-      <source>Motion + Lo-Res</source>
-      <translation>Bewegung + Lo-Res</translation>
-    </message>
-    <message>
-      <source>Recording motion and objects</source>
-      <translation>Aufzeichnung von Bewegungen und Objekten</translation>
-    </message>
-    <message>
-      <source>Recording objects only</source>
-      <translation>Nur Objekte aufnehmen</translation>
-    </message>
-    <message>
-      <source>Recording motion, objects and low quality</source>
-      <translation>Aufzeichnung von Bewegungen, Objekten und niedriger Qualität</translation>
-    </message>
-    <message>
-      <source>Recording objects and low quality</source>
-      <translation>Aufzeichnung von Objekten und niedriger Qualität</translation>
-    </message>
-    <message>
-      <source>Motion, Objects</source>
-      <translation>Bewegung, Objekte</translation>
-    </message>
-    <message>
-      <source>Objects only</source>
-      <translation>Nur Objekte</translation>
-    </message>
-    <message>
-      <source>Motion, Objects + Lo-Res</source>
-      <translation>Bewegung, Objekte + Lo-Res</translation>
-    </message>
-    <message>
-      <source>Objects + Lo-Res</source>
-      <translation>Objekte + Lo-Res</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
     <message>
       <source>%1 layout</source>
@@ -10933,10 +10328,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
       <translation>Die Qualitätseinstellung bestimmt nur die Kompressionsrate und hat keinen Einfluss auf die Auflösung. Low, Medium, High und Best sind voreingestellte Bitratenwerte.</translation>
     </message>
     <message>
-      <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
-    </message>
-    <message>
       <source>Less Settings</source>
       <translation>Weniger Einstellungen</translation>
     </message>
@@ -11077,6 +10468,11 @@ Sie können Qualität und FPS weiterhin direkt an der Kamera ändern.</translati
 You can still change quality and FPS directly on the camera.</source>
       <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <comment>Megabits per seconds</comment>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -11580,13 +10976,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
-    <message>
-      <source>Go to Live</source>
-      <translation>Live gehen</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>
@@ -11631,6 +11020,27 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Open Services</source>
       <translation type="unfinished">Open Services</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -12869,16 +12279,20 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
       <translation>Die Ressource kann dem Layout nicht hinzugefügt werden</translation>
     </message>
     <message>
-      <source>Cannot find a widget corresponding to the specified item.</source>
-      <translation>Es konnte kein Widget gefunden werden, das dem angegebenen Element entspricht.</translation>
-    </message>
-    <message>
       <source>Cannot find an item with the specified ID</source>
       <translation>Ein Element mit der angegebenen ID kann nicht gefunden werden</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified ID.</source>
       <translation>Es konnte keine Ressource mit der angegebenen ID gefunden werden.</translation>
+    </message>
+    <message>
+      <source>Cannot find a widget corresponding to the specified item</source>
+      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+    </message>
+    <message>
+      <source>Cannot maximize the item</source>
+      <translation type="unfinished">Cannot maximize the item</translation>
     </message>
   </context>
   <context>
@@ -13070,6 +12484,32 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <message>
       <source>Token</source>
       <translation type="unfinished">Token</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
+    <message>
+      <source>No custom headers</source>
+      <translation type="unfinished">No custom headers</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n custom headers</source>
+      <comment>%n is a number of custom headers</comment>
+      <translation type="unfinished">
+        <numerusform>%n custom headers</numerusform>
+        <numerusform>%n custom headers</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::KeyValueModel</name>
+    <message>
+      <source>Key</source>
+      <translation type="unfinished">Key</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>Wert</translation>
     </message>
   </context>
   <context>
@@ -13322,71 +12762,10 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Analytics events can be set up on a certain cameras.</source>
-      <translation>Analytik-Ereignisse können auf einer bestimmten Kamera eingerichtet werden.</translation>
-    </message>
-    <message>
-      <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Wählen Sie Kameras über die Schaltfläche oben aus, um die Liste der unterstützten Ereignisse anzuzeigen.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Das Ereignis wird nur ausgelöst, wenn es Übereinstimmungen mit einem der eingegebenen Schlüsselwörter gibt.</translation>
-    </message>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Wenn das Feld leer ist, wird immer ein Ereignis ausgelöst.</translation>
-    </message>
-    <message>
-      <source>This field is case sensitive.</source>
-      <translation>In diesem Feld wird zwischen Groß- und Kleinschreibung unterschieden.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Das Ereignis wird nur ausgelöst, wenn im Beschreibungsfeld Übereinstimmungen mit einem der eingegebenen Schlüsselwörter vorhanden sind.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Analytics object detection can be set up on a certain cameras.</source>
-      <translation>Die Analyticsobjekterkennung kann für bestimmte Kameras eingerichtet werden.</translation>
-    </message>
-    <message>
-      <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Wählen Sie Kameras über die Schaltfläche oben aus, um die Liste der unterstützten Ereignisse anzuzeigen.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation>Das Ereignis wird nur ausgelöst, wenn eines der Attribute übereinstimmt. Sie können die Namen der Attribute und ihre Werte auf der Registerkarte Objekte sehen.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation>Jedes Plugin</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Das Ereignis wird nur ausgelöst, wenn es Übereinstimmungen mit einem der eingegebenen Schlüsselwörter gibt.</translation>
-    </message>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Wenn das Feld leer ist, wird immer ein Ereignis ausgelöst.</translation>
-    </message>
-    <message>
-      <source>This field is case sensitive.</source>
-      <translation>In diesem Feld wird zwischen Groß- und Kleinschreibung unterschieden.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Das Ereignis wird nur ausgelöst, wenn im Beschreibungsfeld Übereinstimmungen mit einem der eingegebenen Schlüsselwörter vorhanden sind.</translation>
     </message>
   </context>
   <context>

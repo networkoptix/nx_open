@@ -994,6 +994,10 @@
       <source>None of selected user roles contain users</source>
       <translation>選択したユーザーロールにユーザーが含まれていません</translation>
     </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>ユーザーを1人以上選択してください</translation>
+    </message>
   </context>
   <context>
     <name>QnTimeStrings</name>
@@ -1231,17 +1235,6 @@
     </message>
   </context>
   <context>
-    <name>QnTranscoder</name>
-    <message>
-      <source>OpenCLTranscode is not implemented.</source>
-      <translation>OpenCL トランスコードが実装されていません。</translation>
-    </message>
-    <message>
-      <source>Unknown transcode method</source>
-      <translation>不明なトランスコード方法</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserResource</name>
     <message>
       <source>Custom</source>
@@ -1395,334 +1388,6 @@
   <context>
     <name>nx::vms::common::SystemSettings</name>
     <message>
-      <source>Anonymous statistics report allowed</source>
-      <translation>匿名の統計レポートを許可</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last time</source>
-      <translation>前回の匿名統計レポート</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last version</source>
-      <translation>匿名統計レポートの最新バージョン</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last number</source>
-      <translation>匿名統計レポートの最終番号</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics time cycle</source>
-      <translation>匿名統計のタイムサイクル</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report delay after update</source>
-      <translation>匿名統計レポートの更新後の遅延</translation>
-    </message>
-    <message>
-      <source>Anonymous Statistics Report Server URL</source>
-      <translation>匿名統計レポートのサーバーURL</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report Client settings</source>
-      <translation>匿名統計レポートのクライアント設定</translation>
-    </message>
-    <message>
-      <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation>プロキシ接続タイムアウト (秒, 1秒-1時間)</translation>
-    </message>
-    <message>
-      <source>Time synchronization enabled</source>
-      <translation>時刻同期有効</translation>
-    </message>
-    <message>
-      <source>Primary time synchronization Server ID</source>
-      <translation>プライマリ時刻同期サーバーID</translation>
-    </message>
-    <message>
-      <source>Max difference between local and source time (milliseconds)</source>
-      <translation>ローカル時刻とソース時刻の最大差 (ミリ秒)</translation>
-    </message>
-    <message>
-      <source>OS time change check period</source>
-      <translation>OS時刻変更の確認間隔</translation>
-    </message>
-    <message>
-      <source>Sync time synchronization interval for network requests</source>
-      <translation>ネットワークリクエストの時刻同期間隔を同期する</translation>
-    </message>
-    <message>
-      <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation>同期時刻イプシロン。時間デルタがイプシロンより小さい場合、新しい値は適用されません。</translation>
-    </message>
-    <message>
-      <source>Cloud owner account</source>
-      <translation>クラウドオーナーアカウント</translation>
-    </message>
-    <message>
-      <source>Cloud authorization key</source>
-      <translation>クラウド認証キー</translation>
-    </message>
-    <message>
-      <source>Disable Device vendors</source>
-      <translation>デバイスベンダーを無効にする</translation>
-    </message>
-    <message>
-      <source>Optimize Camera settings</source>
-      <translation>カメラ設定の最適化</translation>
-    </message>
-    <message>
-      <source>Thumbnails auto-update</source>
-      <translation>サムネイルの自動更新</translation>
-    </message>
-    <message>
-      <source>Max scene items (0 means default)</source>
-      <translation>シーン内最大アイテム数 (0でデフォルト値を使用)</translation>
-    </message>
-    <message>
-      <source>Send plain-text emails</source>
-      <translation>プレーンテキストのメールを送信する</translation>
-    </message>
-    <message>
-      <source>Use Windows line feed in emails</source>
-      <translation>Eメールで Windows ラインフィードを使用する</translation>
-    </message>
-    <message>
-      <source>Enable audit trail</source>
-      <translation>操作履歴を有効にする</translation>
-    </message>
-    <message>
-      <source>Audit trail period (days, 14-730)</source>
-      <translation>操作履歴保存期間 (日, 14-730)</translation>
-    </message>
-    <message>
-      <source>Event log period (days)</source>
-      <translation>イベントログ保存期間 (日)</translation>
-    </message>
-    <message>
-      <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation>HTTPS (データ通信の暗号化) を強制する</translation>
-    </message>
-    <message>
-      <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation>RTSPS (映像通信の暗号化) を強制する</translation>
-    </message>
-    <message>
-      <source>Enable auto-discovery</source>
-      <translation>自動検出を有効にする</translation>
-    </message>
-    <message>
-      <source>Enable auto-update notifications</source>
-      <translation>自動更新通知を有効にする</translation>
-    </message>
-    <message>
-      <source>Enable update notifications</source>
-      <translation>更新通知を有効にする</translation>
-    </message>
-    <message>
-      <source>Enable UPNP port-mapping</source>
-      <translation>UPNPポートマッピングを有効にする</translation>
-    </message>
-    <message>
-      <source>Backup settings</source>
-      <translation>バックアップ設定</translation>
-    </message>
-    <message>
-      <source>Cloud host override</source>
-      <translation>クラウドホストのオーバーライド</translation>
-    </message>
-    <message>
-      <source>Enable RTSP for Arecont</source>
-      <translation>Arecont の RTSP を有効にする</translation>
-    </message>
-    <message>
-      <source>Enable sequential Flir ONVIF searcher</source>
-      <translation>シーケンシャル Flir ONVIF 検索を有効にする</translation>
-    </message>
-    <message>
-      <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation>P2P キューの最大サイズ (バイト, 32-512MB)</translation>
-    </message>
-    <message>
-      <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation>P2P 全クライアントの最大サイズ (バイト, 32-512MB)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation>レコードキューの最大サイズ (バイト, 6-96MB)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (elements, 250-4000)</source>
-      <translation>レコードキューの最大サイズ (要素数, 250-4000)</translation>
-    </message>
-    <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>RTPタイムアウト (ミリ秒)</translation>
-    </message>
-    <message>
-      <source>Max RTSP connection duration (seconds)</source>
-      <translation>RTSP 接続最大時間 (秒)</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect UDP hole-punching</source>
-      <translation>クラウド接続の UDP ホールパンチングを有効にする</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect relays usage</source>
-      <translation>クラウド接続リレーの使用を有効にする</translation>
-    </message>
-    <message>
-      <source>Enforce SSL for cloud-connect relays</source>
-      <translation>クラウド接続リレーにSSLを強制する</translation>
-    </message>
-    <message>
-      <source>Enable recording on EDGE</source>
-      <translation>エッジでの録画を有効にする</translation>
-    </message>
-    <message>
-      <source>Target update information</source>
-      <translation>ターゲットの更新情報</translation>
-    </message>
-    <message>
-      <source>Installed update information</source>
-      <translation>インストールされた更新情報</translation>
-    </message>
-    <message>
-      <source>Downloader peers for files</source>
-      <translation>ファイルのダウンローダーピア</translation>
-    </message>
-    <message>
-      <source>Client update settings</source>
-      <translation>クライアントの更新設定</translation>
-    </message>
-    <message>
-      <source>Watermark settings</source>
-      <translation>ウォーターマーク設定</translation>
-    </message>
-    <message>
-      <source>Session token count limit on a single Server</source>
-      <translation>単一サーバー上のセッショントークン数上限</translation>
-    </message>
-    <message>
-      <source>Max session token count per user on single Server</source>
-      <translation>単一サーバー上のユーザーあたりの最大セッショントークン数</translation>
-    </message>
-    <message>
-      <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation>リモートセッショントークンキャッシュの更新間隔 (他のサーバーおよびクラウド)</translation>
-    </message>
-    <message>
-      <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation>リモートセッショントークンキャッシュのタイムアウト (他のサーバーおよびクラウド)</translation>
-    </message>
-    <message>
-      <source>Default video codec</source>
-      <translation>デフォルトの映像コーデック</translation>
-    </message>
-    <message>
-      <source>Default codec for export video</source>
-      <translation>エクスポート映像のデフォルトコーデック</translation>
-    </message>
-    <message>
-      <source>Low quality screen video codec</source>
-      <translation>低画質スクリーンの映像コーデック</translation>
-    </message>
-    <message>
-      <source>License server</source>
-      <translation>ライセンスサーバー</translation>
-    </message>
-    <message>
-      <source>URI for resource_data.json automatic update</source>
-      <translation>resource_data.json 自動更新用 URI</translation>
-    </message>
-    <message>
-      <source>Meta data storage change policy</source>
-      <translation>メタデータストレージ変更ポリシー</translation>
-    </message>
-    <message>
-      <source>Persistent Servers for update storage</source>
-      <translation>更新ストレージ用の永続サーバー</translation>
-    </message>
-    <message>
-      <source>Persistent Servers where updates are stored</source>
-      <translation>更新が保存される永続サーバー</translation>
-    </message>
-    <message>
-      <source>VMS Server version specific features</source>
-      <translation>VMSサーバーのバージョン固有の機能</translation>
-    </message>
-    <message>
-      <source>Additional local FS storage types for recording</source>
-      <translation>録画用の追加のローカルFSストレージタイプ</translation>
-    </message>
-    <message>
-      <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation>障害が発生した場合に、分析DBストレージのマウントポイントの権限取得を強制する</translation>
-    </message>
-    <message>
-      <source>Storage encryption enabled</source>
-      <translation>ストレージ暗号化有効</translation>
-    </message>
-    <message>
-      <source>Current storage encryption key</source>
-      <translation>現在のストレージ暗号化キー</translation>
-    </message>
-    <message>
-      <source>HTTP header: Origin</source>
-      <translation>HTTP ヘッダー: Origin</translation>
-    </message>
-    <message>
-      <source>HTTP header: X-Frame-Options</source>
-      <translation>HTTP ヘッダー: X-Frame-Options</translation>
-    </message>
-    <message>
-      <source>Show mouse timeline preview</source>
-      <translation>マウスのタイムラインプレビューを表示する</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4MB)</source>
-      <translation>メディアバッファーサイズ (KB, 10KB-4MB)</translation>
-    </message>
-    <message>
-      <source>Enable cross-domain policy</source>
-      <translation>クロスドメインポリシーを有効にする</translation>
-    </message>
-    <message>
-      <source>Enable WebSocket for P2P</source>
-      <translation>P2P用 WebSocket を有効にする</translation>
-    </message>
-    <message>
-      <source>Show Servers in the Resource Tree for non-admins</source>
-      <translation>管理者以外のリソースツリーにもサーバーを表示する</translation>
-    </message>
-    <message>
-      <source>Use only HTTPS for cameras</source>
-      <translation>カメラへの接続にHTTPSのみを使用</translation>
-    </message>
-    <message>
-      <source>Expose IP addresses for autodiscovery</source>
-      <translation>自動検出用に IP アドレスを公開する</translation>
-    </message>
-    <message>
-      <source>Keep IO port state on when Server connects to the device</source>
-      <translation>サーバーがデバイスに接続する際、I/O ポートの状態を維持する</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation>音声のみのデバイスに対するメディアバッファーサイズ (KB, 1KB-1MB)</translation>
-    </message>
-    <message>
-      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation>VMSに保存されているデバイスパスワードを管理者に公開 (Webページ用)</translation>
-    </message>
-    <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation>リモートアーカイブ同期の最大スレッド数 (&lt;=0 - 自動、最大32)</translation>
-    </message>
-    <message>
-      <source>Thread count limit for camera archive synchronization</source>
-      <translation>カメラアーカイブ同期のスレッド数制限</translation>
-    </message>
-    <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
       <translation>データベースに保存する最大イベントログレコード数。削除されていないレコードの実際の量は、指定された値よりも最大20％大きくなる可能性があります。</translation>
     </message>
@@ -1735,32 +1400,8 @@
       <translation>このサーバーに対する、トランスコーディングを使用したHTTP接続の最大数。Chromeは一度に2つの接続を開き、その後最初の接続を閉じます。したがって、このパラメーターには2以上の値を設定することをお勧めします。</translation>
     </message>
     <message>
-      <source>Update releases.json file URL</source>
-      <translation>releases.json ファイルの URL を更新</translation>
-    </message>
-    <message>
-      <source>LDAP settings</source>
-      <translation>LDAP 設定</translation>
-    </message>
-    <message>
-      <source>SMTP settings</source>
-      <translation>SMTP 設定</translation>
-    </message>
-    <message>
-      <source>Authorization Session token lifetime (seconds)</source>
-      <translation>認証セッショントークンの有効期間 (秒)</translation>
-    </message>
-    <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
       <translation>クラウドに接続するように指定されたサーバーのセミコロン区切りのリスト。リストの先頭にあるサーバーの優先度が高くなります。リストが空の場合、クラウド接続用のサーバーが自動的に選択されます。</translation>
-    </message>
-    <message>
-      <source>Allow Power User editing Security Settings</source>
-      <translation>パワーユーザーによるセキュリティ設定の編集を許可する</translation>
-    </message>
-    <message>
-      <source>Enable deprecated API functions (insecure)</source>
-      <translation>非推奨の API 関数を有効にする (非セキュア)</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
@@ -1772,778 +1413,436 @@
       <translation>現在 %1 ソフトウェアで使用されている、非推奨のAPI関数を有効にする (非セキュア)</translation>
     </message>
     <message>
-      <source>Organization Id</source>
-      <translation>組織 ID</translation>
-    </message>
-    <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
       <translation>データ同期のためのクラウドポーリングHTTPリクエストの間隔。</translation>
-    </message>
-    <message>
-      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
-      <translation>HTTPヘッダー: サーバー、サポートされている変数: $vmsName, $vmsVersion, $company, $compatibility</translation>
-    </message>
-    <message>
-      <source>Device storage information update interval</source>
-      <translation>デバイスのストレージ情報の更新間隔</translation>
-    </message>
-    <message>
-      <source>Site alive update interval (seconds, 1s-1h)</source>
-      <translation>サイト死活監視間隔 (秒, 1秒-1時間)</translation>
-    </message>
-    <message>
-      <source>Proxy connection access policy</source>
-      <translation>プロキシ接続アクセスポリシー</translation>
-    </message>
-    <message>
-      <source>Cloud Site ID</source>
-      <translation>クラウドサイトID</translation>
-    </message>
-    <message>
-      <source>Enable 2FA for the Site</source>
-      <translation>サイトの二要素認証を有効化</translation>
-    </message>
-    <message>
-      <source>Site name</source>
-      <translation>サイト名</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
       <translation>ローカルサイトID。null の場合、サイトがまだセットアップされていないことを意味します。</translation>
     </message>
     <message>
-      <source>Last master Site merge ID</source>
-      <translation>最終マスターサイト統合ID</translation>
-    </message>
-    <message>
-      <source>Last slave Site merge ID</source>
-      <translation>最終スレーブサイト統合ID</translation>
-    </message>
-    <message>
-      <source>Pixelation settings</source>
-      <translation>ピクセル化設定</translation>
-    </message>
-    <message>
-      <source>Apply session limit for Cloud tokens</source>
-      <translation>クラウドトークンにセッション制限を適用する</translation>
-    </message>
-    <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
       <translation>新しいインテグレーション登録リクエストの作成を有効または無効にする</translation>
     </message>
     <message>
-      <source>Anonymous Crash Report Server API URL</source>
-      <translation>匿名クラッシュレポートのサーバーAPI URL</translation>
+      <source>SMTP settings.</source>
+      <translation>SMTP 設定.</translation>
     </message>
     <message>
-      <source>Default locale for new users</source>
-      <translation>新規ユーザーのデフォルトロケール</translation>
+      <source>Anonymous statistics report allowed.</source>
+      <translation>匿名の統計レポートを許可.</translation>
     </message>
     <message>
-      <source>Check video stream permissions on VMS server period (milliseconds)</source>
-      <translation>VMS サーバーでの映像ストリーム権限の確認間隔 (ミリ秒)</translation>
+      <source>Anonymous statistics report last time.</source>
+      <translation>前回の匿名統計レポート.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::event::StringsHelper</name>
     <message>
-      <source>Bookmark</source>
-      <translation>ブックマーク</translation>
+      <source>Anonymous statistics report last version.</source>
+      <translation>匿名統計レポートの最新バージョン.</translation>
     </message>
     <message>
-      <source>Panic recording</source>
-      <translation>パニック録画</translation>
+      <source>Anonymous statistics report last number.</source>
+      <translation>匿名統計レポートの最終番号.</translation>
     </message>
     <message>
-      <source>Write to log</source>
-      <translation>ログ書込み</translation>
+      <source>Anonymous statistics time cycle.</source>
+      <translation>匿名統計のタイムサイクル.</translation>
     </message>
     <message>
-      <source>Repeat sound</source>
-      <translation>サウンド繰返し</translation>
+      <source>Anonymous statistics report delay after update.</source>
+      <translation>匿名統計レポートの更新後の遅延.</translation>
     </message>
     <message>
-      <source>Play sound</source>
-      <translation>サウンド再生</translation>
+      <source>Anonymous Statistics Report Server URL.</source>
+      <translation>匿名統計レポートのサーバーURL.</translation>
     </message>
     <message>
-      <source>Speak</source>
-      <translation>テキスト読み上げ</translation>
+      <source>Anonymous Crash Report Server API URL.</source>
+      <translation>匿名クラッシュレポートのサーバーAPI URL.</translation>
     </message>
     <message>
-      <source>Execute PTZ preset</source>
-      <translation>PTZプリセットを実行</translation>
+      <source>Anonymous statistics report Client settings.</source>
+      <translation>匿名統計レポートのクライアント設定.</translation>
     </message>
     <message>
-      <source>Show text overlay</source>
-      <translation>テキストオーバーレイを表示</translation>
+      <source>Device storage information update interval.</source>
+      <translation>デバイスのストレージ情報の更新間隔.</translation>
     </message>
     <message>
-      <source>Show on Alarm Layout</source>
-      <translation>アラームレイアウト表示</translation>
+      <source>Site alive update interval (seconds, 1s-1h).</source>
+      <translation>サイト死活監視間隔 (秒, 1秒-1時間).</translation>
     </message>
     <message>
-      <source>Device output</source>
-      <translation>デバイスI/O出力</translation>
+      <source>Proxy connection timeout (seconds, 1s-1h).</source>
+      <translation>プロキシ接続タイムアウト (秒, 1秒-1時間).</translation>
     </message>
     <message>
-      <source>Camera output</source>
-      <translation>カメラI/O出力</translation>
+      <source>Proxy connection access policy.</source>
+      <translation>プロキシ接続アクセスポリシー.</translation>
     </message>
     <message>
-      <source>Device recording</source>
-      <translation>デバイス録画</translation>
+      <source>Time synchronization enabled.</source>
+      <translation>時刻同期有効.</translation>
     </message>
     <message>
-      <source>Camera recording</source>
-      <translation>カメラ録画</translation>
+      <source>Primary time synchronization Server ID.</source>
+      <translation>プライマリ時刻同期サーバーID.</translation>
     </message>
     <message>
-      <source>Generic Event</source>
-      <translation>汎用イベント</translation>
+      <source>Max difference between local and source time (milliseconds).</source>
+      <translation>ローカル時刻とソース時刻の最大差 (ミリ秒).</translation>
     </message>
-    <message numerus="yes">
-      <source>Motion on Cameras</source>
-      <translation>
-        <numerusform>カメラのモーション</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Network Issue</source>
-      <translation>ネットワーク障害</translation>
-    </message>
-    <message>
-      <source>Server Failure</source>
-      <translation>サーバー障害</translation>
-    </message>
-    <message>
-      <source>Server Conflict</source>
-      <translation>サーバー競合</translation>
-    </message>
-    <message>
-      <source>Server Started</source>
-      <translation>サーバー起動</translation>
-    </message>
-    <message>
-      <source>License Issue</source>
-      <translation>ライセンス障害</translation>
-    </message>
-    <message>
-      <source>Any Server Issue</source>
-      <translation>全サーバー障害</translation>
-    </message>
-    <message>
-      <source>Any Event</source>
-      <translation>全イベント</translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Devices</source>
-      <translation>
-        <numerusform>デバイスのI/O入力</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Cameras</source>
-      <translation>
-        <numerusform>カメラのI/O入力</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices Disconnected</source>
-      <translation>
-        <numerusform>デバイス切断</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras Disconnected</source>
-      <translation>
-        <numerusform>カメラ切断</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices IP Conflict</source>
-      <translation>
-        <numerusform>デバイスの IP競合</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras IP Conflict</source>
-      <translation>
-        <numerusform>カメラのIP競合</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Any Device Issue</source>
-      <translation>全デバイス障害</translation>
-    </message>
-    <message>
-      <source>Any Camera Issue</source>
-      <translation>全カメラ障害</translation>
-    </message>
-    <message>
-      <source>Undefined event has occurred on %1</source>
-      <translation>定義されていないイベントが %1 で発生しました</translation>
-    </message>
-    <message>
-      <source>Device %1 was disconnected</source>
-      <translation>デバイス %1 が切断されました</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>カメラ %1 が切断されました</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>I/Oモジュール %1 が切断されました</translation>
-    </message>
-    <message>
-      <source>Input on %1</source>
-      <translation>%1 I/O入力</translation>
-    </message>
-    <message>
-      <source>Motion on %1</source>
-      <translation>%1 モーション検知</translation>
-    </message>
-    <message>
-      <source>Network Issue at %1</source>
-      <translation>%1 ネットワーク障害</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation>サーバー &quot;%1&quot; 障害</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict at %1</source>
-      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>%1 でデバイスのIPが競合しています</translation>
-    </message>
-    <message>
-      <source>Camera IP Conflict at %1</source>
-      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>%1 でカメラのIPが競合しています</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation>サーバー &quot;%1&quot; 競合</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation>サーバー &quot;%1&quot; が起動しました</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>サーバー &quot;%1&quot; のライセンスに問題があります</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>サーバー &quot;%1&quot; のアーカイブのバックアップが完了しました</translation>
-    </message>
     <message>
-      <source>Generic Event at %1</source>
-      <translation>%1 の汎用イベント</translation>
+      <source>OS time change check period.</source>
+      <translation>OS時刻変更の確認間隔.</translation>
     </message>
     <message>
-      <source>An unknown event has occurred</source>
-      <translation>不明なイベントが発生しました</translation>
+      <source>Sync time synchronization interval for network requests.</source>
+      <translation>ネットワークリクエストの時刻同期間隔を同期する.</translation>
     </message>
     <message>
-      <source>Event: %1</source>
-      <translation>イベント: %1</translation>
+      <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
+      <translation>同期時間イプシロン。時間デルタがイプシロンより小さい場合、新しい値は適用されません.</translation>
     </message>
     <message>
-      <source>Source: %1</source>
-      <translation>ソース: %1</translation>
+      <source>Cloud owner account.</source>
+      <translation>クラウドオーナーアカウント.</translation>
     </message>
     <message>
-      <source>Caption: %1</source>
-      <translation>キャプション: %1</translation>
+      <source>Organization Id.</source>
+      <translation>組織 ID.</translation>
     </message>
     <message>
-      <source>Input Port: %1</source>
-      <translation>I/O入力ポート: %1</translation>
+      <source>Cloud Site ID.</source>
+      <translation>クラウドサイトID.</translation>
     </message>
     <message>
-      <source>Reason: %1</source>
-      <translation>理由: %1</translation>
+      <source>Cloud authorization key.</source>
+      <translation>クラウド認証キー.</translation>
     </message>
     <message>
-      <source>Conflicting Address: %1</source>
-      <translation>競合アドレス: %1</translation>
+      <source>Enable 2FA for the Site.</source>
+      <translation>サイトの二要素認証を有効化.</translation>
     </message>
     <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2</translation>
+      <source>Site name.</source>
+      <translation>サイト名.</translation>
     </message>
     <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>競合サーバー #%1: %2</translation>
+      <source>Last master Site merge ID.</source>
+      <translation>最終マスターサイト統合ID.</translation>
     </message>
     <message>
-      <source>Conflicting Server: %1</source>
-      <translation>競合サーバー: %1</translation>
+      <source>Last slave Site merge ID.</source>
+      <translation>最終スレーブサイト統合ID.</translation>
     </message>
     <message>
-      <source>Trigger: %1</source>
-      <translation>トリガー: %1</translation>
+      <source>Disable Device vendors.</source>
+      <translation>デバイスベンダーを無効にする.</translation>
     </message>
     <message>
-      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <source>Optimize Camera settings.</source>
+      <translation>カメラ設定の最適化.</translation>
     </message>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n 回、初回: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>日時: %2 %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>最初の発生: %2 %1 (合計 %n 回)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>%n 秒間データを受信していません。</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected.</source>
-      <translation>RTPパケットロスが検知されました。</translation>
-    </message>
-    <message>
-      <source>Device does not respond to network requests.</source>
-      <translation>デバイスがネットワークリクエストに応答しません。</translation>
-    </message>
-    <message>
-      <source>Connection to server is lost.</source>
-      <translation>サーバーへの接続が失われました。</translation>
-    </message>
-    <message>
-      <source>Server stopped unexpectedly.</source>
-      <translation>サーバーが予期せず停止しました。</translation>
-    </message>
-    <message>
-      <source>I/O error has occurred at %1.</source>
-      <translation>%1 でI/Oエラーが発生しました。</translation>
-    </message>
-    <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>%1 に録画するためのHDD/SSD速度が不足しています。</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>HDD / SSDディスク &quot;%1&quot; がいっぱいです。VMS管理外のデータが多すぎます。</translation>
-    </message>
-    <message>
-      <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>システムディスク &quot;%1&quot; の空き領域が少なくなっています。</translation>
-    </message>
-    <message>
-      <source>start</source>
-      <translation>開始</translation>
-    </message>
-    <message>
-      <source>stop</source>
-      <translation>停止</translation>
-    </message>
-    <message>
-      <source>While %1</source>
-      <translation>%1の間</translation>
-    </message>
-    <message>
-      <source>On %1 %2</source>
-      <translation>%1 %2</translation>
-    </message>
-    <message>
-      <source>Trigger Name</source>
-      <translation>トリガー名</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n ユーザー</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>すべてのユーザー</translation>
-    </message>
-    <message>
-      <source>Select at least one user</source>
-      <translation>ユーザーを1人以上選択してください</translation>
-    </message>
-    <message>
-      <source>Soft Trigger</source>
-      <translation>ソフトトリガー</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 at %2</source>
-      <translation>%2 のソフトトリガー %1</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation>ソフトトリガー %1 が複数回起動されました</translation>
-    </message>
-    <message>
-      <source>Send email</source>
-      <translation>メールを送信</translation>
-    </message>
-    <message>
-      <source>Acknowledge</source>
-      <translation>確認</translation>
-    </message>
     <message>
-      <source>Analytics Event</source>
-      <translation>分析イベント</translation>
+      <source>Thumbnails auto-update.</source>
+      <translation>サムネイルの自動更新.</translation>
     </message>
     <message>
-      <source>%1 at %2</source>
-      <comment>Analytics Event at some camera</comment>
-      <translation>%2 の %1</translation>
+      <source>Max scene items (0 means default).</source>
+      <translation>シーン内最大アイテム数 (0でデフォルト値を使用).</translation>
     </message>
     <message>
-      <source>Storage Issue</source>
-      <translation>ストレージ障害</translation>
+      <source>Send plain-text emails.</source>
+      <translation>プレーンテキストのメールを送信する.</translation>
     </message>
     <message>
-      <source>Storage Issue at %1</source>
-      <translation>%1 のストレージ障害</translation>
+      <source>Use Windows line feed in emails.</source>
+      <translation>Eメールで Windows ラインフィードを使用する.</translation>
     </message>
     <message>
-      <source>Set to fullscreen</source>
-      <translation>フルスクリーン表示</translation>
+      <source>Enable audit trail.</source>
+      <translation>操作履歴有効.</translation>
     </message>
     <message>
-      <source>Exit fullscreen</source>
-      <translation>フルスクリーン表示終了</translation>
+      <source>Audit trail period (days, 14-730).</source>
+      <translation>操作履歴保存期間 (日, 14-730).</translation>
     </message>
     <message>
-      <source>Open layout</source>
-      <translation>レイアウトを開く</translation>
+      <source>Event log period (days).</source>
+      <translation>イベントログ保存期間 (日).</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>複数の %1 イベントが発生しました</translation>
+      <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
+      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation>分析ストレージ &quot;%1&quot; がオフラインです。</translation>
+      <source>Enforce HTTPS (data traffic encryption).</source>
+      <translation type="unfinished">Enforce HTTPS (data traffic encryption).</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation>分析ストレージ &quot;%1&quot; の空き領域が少なくなっています。</translation>
+      <source>Enforce RTSPS (video traffic encryption).</source>
+      <translation type="unfinished">Enforce RTSPS (video traffic encryption).</translation>
     </message>
     <message>
-      <source>Plugin Diagnostic Event</source>
-      <translation>プラグイン診断イベント</translation>
+      <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
+      <translation>VMSに保存されているデバイスパスワードを管理者に公開 (Webページ用).</translation>
     </message>
     <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>不明なプラグイン診断イベント</translation>
+      <source>Enable auto-discovery.</source>
+      <translation>自動検出を有効にする.</translation>
     </message>
     <message>
-      <source>Buzzer</source>
-      <translation>ブザー</translation>
+      <source>Enable auto-update notifications.</source>
+      <translation>自動更新通知を有効にする.</translation>
     </message>
     <message>
-      <source>Archive Backup Finished</source>
-      <translation>アーカイブのバックアップ完了</translation>
+      <source>Enable update notifications.</source>
+      <translation>更新通知を有効にする.</translation>
     </message>
     <message>
-      <source>PoE over Budget</source>
-      <translation>PoE給電容量超過</translation>
+      <source>Enable UPNP port-mapping.</source>
+      <translation>UPNPポートマッピングを有効にする.</translation>
     </message>
     <message>
-      <source>Fan Error</source>
-      <translation>ファンエラー</translation>
+      <source>Backup settings.</source>
+      <translation>バックアップ設定.</translation>
     </message>
     <message>
-      <source>PoE over budget at %1</source>
-      <translation>%1のPoE給電量が給電能力を超えています</translation>
+      <source>Cloud host override.</source>
+      <translation>クラウドホストのオーバーライド.</translation>
     </message>
     <message>
-      <source>Fan error at %1</source>
-      <translation>%1ファンエラー</translation>
+      <source>Enable cross-domain policy.</source>
+      <translation>クロスドメインポリシーを有効にする.</translation>
     </message>
     <message>
-      <source>Reason: Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation>理由: 電力上限を超過しました (%1)</translation>
+      <source>Enable RTSP for Arecont.</source>
+      <translation>Arecont の RTSP を有効にする.</translation>
     </message>
     <message>
-      <source>Show desktop notification</source>
-      <translation>デスクトップ通知を表示</translation>
+      <source>Enable sequential Flir ONVIF searcher.</source>
+      <translation>シーケンシャル Flir ONVIF 検索を有効にする.</translation>
     </message>
     <message>
-      <source>Send mobile notification</source>
-      <translation>モバイル通知を送信</translation>
+      <source>Max P2P queue size (bytes, 32-512MB).</source>
+      <translation>P2P キューの最大サイズ (バイト, 32-512MB).</translation>
     </message>
     <message>
-      <source>Consumption</source>
-      <translation>消費量</translation>
+      <source>Max P2P all clients size (bytes, 32-512MB).</source>
+      <translation>P2P 全クライアントの最大サイズ (バイト, 32-512MB).</translation>
     </message>
     <message>
-      <source>Device was disconnected</source>
-      <translation>デバイスが切断されました</translation>
+      <source>Max record queue size (bytes, 6-96MB).</source>
+      <translation>レコードキューの最大サイズ (バイト, 6-96MB).</translation>
     </message>
     <message>
-      <source>Camera was disconnected</source>
-      <translation>カメラが切断されました</translation>
+      <source>Max record queue size (elements, 250-4000).</source>
+      <translation>レコードキューの最大サイズ (要素数, 250-4000).</translation>
     </message>
     <message>
-      <source>I/O Module was disconnected</source>
-      <translation>I/Oモジュールが切断されました</translation>
+      <source>RTP timeout (milliseconds).</source>
+      <translation>RTPタイムアウト (ミリ秒).</translation>
     </message>
     <message>
-      <source>Analytics Object Detected</source>
-      <translation>分析オブジェクト検出</translation>
+      <source>Max RTSP connection duration (seconds).</source>
+      <translation>RTSP 接続最大時間 (秒).</translation>
     </message>
     <message>
-      <source>%1 at camera &apos;%2&apos;</source>
-      <comment> is detected</comment>
-      <translation>カメラ &apos;%2&apos; の %1</translation>
+      <source>Enable cloud-connect UDP hole-punching.</source>
+      <translation>クラウド接続の UDP ホールパンチングを有効にする.</translation>
     </message>
     <message>
-      <source>Plugin: %1</source>
-      <translation>プラグイン: %1</translation>
+      <source>Enable cloud-connect relays usage.</source>
+      <translation>クラウド接続リレーの使用を有効にする.</translation>
     </message>
     <message>
-      <source>Archive backup failed.</source>
-      <translation>アーカイブのバックアップに失敗しました。</translation>
+      <source>Enforce SSL for cloud-connect relays.</source>
+      <translation>クラウド接続リレーにSSLを強制する.</translation>
     </message>
     <message>
-      <source>Object detected</source>
-      <translation>オブジェクト検出</translation>
+      <source>Enable recording on EDGE.</source>
+      <translation>エッジでの録画を有効にする.</translation>
     </message>
     <message>
-      <source>Archive backup failed</source>
-      <translation>アーカイブのバックアップに失敗しました</translation>
+      <source>Enable WebSocket for P2P.</source>
+      <translation>P2P用 WebSocket を有効にする.</translation>
     </message>
     <message>
-      <source>Data is backed up to %1</source>
-      <translation>データを %1 にバックアップしました</translation>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>
+      <translation>リモートアーカイブ同期の最大スレッド数 (&lt;=0 - 自動、最大32).</translation>
     </message>
     <message>
-      <source>Server Certificate Error</source>
-      <translation>サーバー証明書エラー</translation>
+      <source>Update releases.json file URL.</source>
+      <translation>releases.json ファイルの URL を更新.</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; certificate error</source>
-      <translation>サーバー &quot;%1&quot; 証明書エラー</translation>
+      <source>Target update information.</source>
+      <translation>ターゲットの更新情報.</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1).</source>
-      <translation>プライマリストリームのRTPエラー (%1)。</translation>
+      <source>Installed update information.</source>
+      <translation>インストールされた更新情報.</translation>
     </message>
     <message>
-      <source>RTP error in secondary stream (%1).</source>
-      <translation>セカンダリストリームのRTPエラー (%1)。</translation>
+      <source>Downloader peers for files.</source>
+      <translation>ファイルのダウンローダーピア.</translation>
     </message>
     <message>
-      <source>Camera time is back to normal.</source>
-      <translation>カメラ時刻が正常な状態に戻りました。</translation>
+      <source>Client update settings.</source>
+      <translation>クライアントの更新設定.</translation>
     </message>
     <message>
-      <source>Address %1 is already in use by %2 on primary stream.</source>
-      <comment>%1 is the address, %2 is the device name</comment>
-      <translation>アドレス %1 は、すでに %2 のプライマリストリームとして使用されています。</translation>
+      <source>Thread count limit for camera archive synchronization.</source>
+      <translation>カメラアーカイブ同期のスレッド数制限.</translation>
     </message>
     <message>
-      <source>Address %1 is already in use by %2 on secondary stream.</source>
-      <comment>%1 is the address, %2 is the device name</comment>
-      <translation>アドレス %1 は、すでに %2 のセカンダリストリームとして使用されています。</translation>
+      <source>Watermark settings.</source>
+      <translation>透かし設定.</translation>
     </message>
     <message>
-      <source>Multicast address conflict detected.</source>
-      <translation>マルチキャストアドレスの競合が検出されました。</translation>
+      <source>Pixelation settings.</source>
+      <translation>ピクセル化設定.</translation>
     </message>
     <message>
-      <source>Network address %1 is not a multicast address.</source>
-      <translation>ネットワークアドレス %1 はマルチキャストアドレスではありません。</translation>
+      <source>Authorization Session token lifetime (seconds).</source>
+      <translation>認証セッショントークンの有効期間 (秒).</translation>
     </message>
     <message>
-      <source>Failed to backup file %1</source>
-      <translation>ファイル %1 のバックアップに失敗しました</translation>
+      <source>Apply session limit for Cloud tokens.</source>
+      <translation>クラウドトークンにセッション制限を適用する.</translation>
     </message>
     <message>
-      <source>Do HTTP(S) request</source>
-      <translation>HTTP(S) リクエストを実行</translation>
+      <source>Session token count limit on a single Server.</source>
+      <translation>単一サーバー上のセッショントークン数上限.</translation>
     </message>
     <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>カメラ (プライマリストリーム) への接続が予期せず終了しました。</translation>
+      <source>Max session token count per user on single Server.</source>
+      <translation>単一サーバー上のユーザーあたりの最大セッショントークン数.</translation>
     </message>
     <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>カメラ (セカンダリストリーム) への接続が予期せず終了しました。</translation>
+      <source>Update interval for remote session token cache (other Servers and Cloud).</source>
+      <translation>リモートセッショントークンキャッシュの更新間隔 (他のサーバーおよびクラウド).</translation>
     </message>
     <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>デバイスとの通信が予期せず終了しました。</translation>
+      <source>Timeout for remote session token cache (other Servers and Cloud).</source>
+      <translation>リモートセッショントークンキャッシュのタイムアウト (他のサーバーおよびクラウド).</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation>分析ストレージ &quot;%1&quot; データベースエラー: マウントポイントの権限が不足しています。</translation>
+      <source>Default video codec.</source>
+      <translation>デフォルトの映像コーデック.</translation>
     </message>
     <message>
-      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation>メディアアーカイブの録画が有効になっている間は、AES 暗号化を初期化できません。データは暗号化されずに書き込まれます。</translation>
+      <source>Default codec for export video.</source>
+      <translation>エクスポート映像のデフォルトコーデック.</translation>
     </message>
     <message>
-      <source>RAID error: %1.</source>
-      <translation>RAID エラー: %1。</translation>
+      <source>Low quality screen video codec.</source>
+      <translation>低画質スクリーンの映像コーデック.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation>ライセンスが不足しています。以下のデバイスで録画が無効になっています:</translation>
+      <source>License server.</source>
+      <translation>ライセンスサーバー.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation>ライセンスが不足しています。以下のカメラで録画が無効になっています:</translation>
+      <source>URI for resource_data.json automatic update.</source>
+      <translation>resource_data.json 自動更新用 URI.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation>ライセンスが不足しています。以下のI/Oモジュールで録音が無効になっています:</translation>
+      <source>Meta data storage change policy.</source>
+      <translation>メタデータストレージ変更ポリシー.</translation>
     </message>
     <message>
-      <source>Also show source camera</source>
-      <translation>ソースカメラも表示</translation>
+      <source>Persistent Servers for update storage.</source>
+      <translation>更新ストレージ用の永続サーバー.</translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>ソースカメラ</translation>
+      <source>Persistent Servers where updates are stored.</source>
+      <translation>更新が保存される永続サーバー.</translation>
     </message>
     <message>
-      <source>Also show on source camera</source>
-      <translation>ソースカメラにも表示</translation>
+      <source>VMS Server version specific features.</source>
+      <translation>VMSサーバーのバージョン固有の機能.</translation>
     </message>
     <message>
-      <source>Also set on source camera</source>
-      <translation>ソースカメラにも設定</translation>
+      <source>Default locale for new users.</source>
+      <translation>新規ユーザーのデフォルトロケール.</translation>
     </message>
     <message>
-      <source>Also trigger on source camera</source>
-      <translation>ソースカメラでもトリガー</translation>
+      <source>Additional local FS storage types for recording.</source>
+      <translation>録画用の追加のローカルFSストレージタイプ.</translation>
     </message>
     <message>
-      <source>Also record source camera</source>
-      <translation>ソースカメラも録画</translation>
+      <source>Keep IO port state on when Server connects to the device.</source>
+      <translation>サーバーがデバイスに接続する際、I/O ポートの状態を維持する.</translation>
     </message>
     <message>
-      <source>Also play on source camera</source>
-      <translation>ソースカメラでも再生</translation>
+      <source>Media buffer size (KB, 10KB-4MB).</source>
+      <translation>メディアバッファーサイズ (KB, 10KB-4MB).</translation>
     </message>
-    <message numerus="yes">
-      <source>%n Groups</source>
-      <translation>
-        <numerusform>%n グループ</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>LDAP Sync Issue</source>
-      <translation>LDAP 同期障害</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n times)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n 回)</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Failed to connect to the LDAP server.</source>
-      <translation>LDAP サーバーへの接続に失敗しました。</translation>
+      <source>Media buffer size for audio only devices (KB, 1KB-1MB).</source>
+      <translation>音声のみのデバイスに対するメディアバッファーサイズ (KB, 1KB-1MB).</translation>
     </message>
     <message>
-      <source>Failed to complete the sync within a %1 timeout.</source>
-      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation>%1 のタイムアウト以内に同期を完了できませんでした。</translation>
+      <source>Force analytics DB storage mount point permissions in case of failure.</source>
+      <translation>障害が発生した場合に、分析DBストレージのマウントポイントの権限取得を強制する.</translation>
     </message>
     <message>
-      <source>Failed to complete the sync within a given timeout.</source>
-      <translation>指定されたタイムアウト以内に同期を完了できませんでした。</translation>
+      <source>Check video stream permissions on VMS server period (milliseconds).</source>
+      <translation>VMS サーバーでの映像ストリーム権限の確認間隔 (ミリ秒).</translation>
     </message>
     <message>
-      <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation>同期設定に一致するユーザーアカウントが LDAP サーバー上に存在しません。</translation>
+      <source>Storage encryption enabled.</source>
+      <translation>ストレージ暗号化有効.</translation>
     </message>
     <message>
-      <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation>一部の LDAP ユーザーまたはグループが LDAP データベースで見つかりませんでした。</translation>
+      <source>Current storage encryption key.</source>
+      <translation>現在のストレージ暗号化キー.</translation>
     </message>
     <message>
-      <source>Services Issue</source>
-      <translation>サービス障害</translation>
+      <source>Show Servers in the Resource Tree for non-admins.</source>
+      <translation>管理者以外のリソースツリーにもサーバーを表示する.</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; has license migration issue</source>
-      <translation>サーバー &quot;%1&quot; にライセンス移行の問題が発生しています</translation>
+      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</source>
+      <translation>HTTPヘッダー: サーバー、サポートされている変数: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
-      <source>Service overuse</source>
-      <translation>サービスの過剰使用</translation>
+      <source>HTTP header: Origin.</source>
+      <translation>HTTP ヘッダー: Origin.</translation>
     </message>
     <message>
-      <source>The following licenses were not migrated:</source>
-      <translation>次のライセンスは移行されませんでした:</translation>
+      <source>HTTP header: X-Frame-Options.</source>
+      <translation>HTTP ヘッダー: X-Frame-Options.</translation>
     </message>
     <message>
-      <source>License</source>
-      <translation>ライセンス</translation>
+      <source>Use only HTTPS for cameras.</source>
+      <translation>カメラへの接続にHTTPSのみを使用.</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>カメラ</translation>
-    </message>
-    <message numerus="yes">
-      <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>サービスの過剰使用のため、 %n チャンネルの録画が停止されました。</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>サービスの過剰使用のため、 %n チャンネルのクラウドストレージバックアップが停止されました。</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>サービスの過剰使用のため、 %n チャンネルでの有料インテグレーションサービスの使用が停止されました。</numerusform>
-      </translation>
+      <source>Allow Power User editing Security Settings.</source>
+      <translation>パワーユーザーによるセキュリティ設定の編集を許可する.</translation>
     </message>
     <message>
-      <source>Failed to migrate licenses.</source>
-      <translation>ライセンスの移行に失敗しました。</translation>
+      <source>Enable deprecated API functions (insecure).</source>
+      <translation>非推奨の API 関数を有効にする (非セキュア).</translation>
     </message>
     <message>
-      <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation>ライセンスのインポートをスキップしました。後ほど別の移行試行が自動的にスケジュールされます。</translation>
+      <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
+      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation>時刻ずれが大きすぎるため、カメラ時刻は使用できませんでした。代わりにサイト時刻が使用されます。</translation>
+      <source>Expose IP addresses for autodiscovery.</source>
+      <translation>自動検出用に IP アドレスを公開する.</translation>
     </message>
     <message>
-      <source>Call Request</source>
-      <translation>通話リクエスト</translation>
+      <source>Show mouse timeline preview.</source>
+      <translation>マウスのタイムラインプレビューを表示する.</translation>
     </message>
     <message>
-      <source>Call Request Missed</source>
-      <translation>通話リクエストを逃しました</translation>
+      <source>LDAP settings.</source>
+      <translation>LDAP 設定.</translation>
     </message>
   </context>
 </TS>

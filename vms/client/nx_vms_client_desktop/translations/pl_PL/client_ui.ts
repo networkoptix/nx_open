@@ -129,54 +129,13 @@
       <source>Open Files Folder</source>
       <translation>Otwórz folder plików</translation>
     </message>
-  </context>
-  <context>
-    <name>AggregationWidget</name>
     <message>
-      <source>Check to set aggregation period</source>
-      <translation>Zaznacz, aby ustawić okres agregacji</translation>
+      <source>with</source>
+      <translation type="unfinished">with</translation>
     </message>
     <message>
-      <source>Interval of action :</source>
-      <translation>Interwał działania :</translation>
-    </message>
-    <message>
-      <source>No more than once per</source>
-      <translation>Nie częściej niż co</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Szybko</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Słowa kluczowe oddzielone spacją</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Nagłówek zawiera:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Opis zawiera:</translation>
-    </message>
-    <message>
-      <source>Event Type:</source>
-      <translation>Typ zdarzenia:</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Attributes:</source>
-      <translation>Atrybuty:</translation>
-    </message>
-    <message>
-      <source>Object Type:</source>
-      <translation>Typ obiektu:</translation>
+      <source>Simultaneous Streams</source>
+      <translation type="unfinished">Simultaneous Streams</translation>
     </message>
   </context>
   <context>
@@ -291,10 +250,6 @@
       <translation>Ograniczaj pasmo do</translation>
     </message>
     <message>
-      <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
-    </message>
-    <message>
       <source>Unlimited</source>
       <translation>Bez limitu</translation>
     </message>
@@ -305,6 +260,10 @@
     <message>
       <source>No backup</source>
       <translation>Brak kopii zapasowej</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -332,29 +291,6 @@
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
       <translation>Kopia zapasowa została zatrzymana z powodu problemu z pamięcią. Kopia zapasowa zostanie wznowiona automatycznie po rozwiązaniu problemu z pamięcią</translation>
-    </message>
-  </context>
-  <context>
-    <name>BookmarkBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Ustalony czas trwania:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>sek.</translation>
-    </message>
-    <message>
-      <source>Tags:</source>
-      <translation>Tagi:</translation>
-    </message>
-    <message>
-      <source>Pre-recording:</source>
-      <translation>Nagrywanie przedalarmowe:</translation>
-    </message>
-    <message>
-      <source>Post-recording:</source>
-      <translation>Nagrywanie poalarmowe:</translation>
     </message>
   </context>
   <context>
@@ -420,79 +356,6 @@
     <message>
       <source>Clear Filter</source>
       <translation>Wyczyść filtr</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRuleWidget</name>
-    <message>
-      <source>Event</source>
-      <translation>Zdarzenie</translation>
-    </message>
-    <message>
-      <source>Schedule...</source>
-      <translation>Harmonogram...</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Akcja</translation>
-    </message>
-    <message>
-      <source>Comments:</source>
-      <translation>Komentarze:</translation>
-    </message>
-    <message>
-      <source>When</source>
-      <translation>Jeśli</translation>
-    </message>
-    <message>
-      <source>Do</source>
-      <translation>Wykonaj</translation>
-    </message>
-    <message>
-      <source>At</source>
-      <translation>Na</translation>
-    </message>
-    <message>
-      <source>Use event source server</source>
-      <translation>Użyj serwera źródłowego dla zdarzenia</translation>
-    </message>
-    <message>
-      <source>Use event source camera</source>
-      <translation>Użyj źródła zdarzenia</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRulesDialog</name>
-    <message>
-      <source>Add</source>
-      <translation>Dodaj</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Usuń</translation>
-    </message>
-    <message>
-      <source>Event Rules</source>
-      <translation>Reguły zdarzeń</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>Dziennik zdarzeń...</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Test</translation>
-    </message>
-  </context>
-  <context>
-    <name>BuzzerBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Ustalony czas trwania:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>sek.</translation>
     </message>
   </context>
   <context>
@@ -741,12 +604,9 @@
       <source>Logical ID</source>
       <translation>ID logiczny</translation>
     </message>
-  </context>
-  <context>
-    <name>CameraInputBusinessEventWidget</name>
     <message>
-      <source>Input ID</source>
-      <translation>ID wejścia</translation>
+      <source>Restreaming Link</source>
+      <translation type="unfinished">Restreaming Link</translation>
     </message>
   </context>
   <context>
@@ -781,17 +641,6 @@
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
       <translation>w</translation>
-    </message>
-  </context>
-  <context>
-    <name>CameraOutputBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Ustalony czas trwania:</translation>
-    </message>
-    <message>
-      <source>Output ID:</source>
-      <translation>ID wyjściowe:</translation>
     </message>
   </context>
   <context>
@@ -904,57 +753,6 @@
     </message>
   </context>
   <context>
-    <name>CloudLayoutsIntroDialog</name>
-    <message>
-      <source>BETA</source>
-      <translation>BETA</translation>
-    </message>
-    <message>
-      <source>Available Actions</source>
-      <translation>Dostępne akcje</translation>
-    </message>
-    <message>
-      <source>Video Export</source>
-      <translation>Eksport wideo</translation>
-    </message>
-    <message>
-      <source>Live Video and Archive</source>
-      <translation>Wideo i archiwizacja na żywo</translation>
-    </message>
-    <message>
-      <source>PTZ</source>
-      <translation>PTZ</translation>
-    </message>
-    <message>
-      <source>Showreels</source>
-      <translation>Sekwencje</translation>
-    </message>
-    <message>
-      <source>Read more on the help page</source>
-      <translation>Przeczytaj więcej na stronie pomocy</translation>
-    </message>
-    <message>
-      <source>Do not show this window again</source>
-      <translation>Nie pokazuj ponownie tego okna</translation>
-    </message>
-    <message>
-      <source>Introducing Cloud Layouts</source>
-      <translation>Ujawnienie układu w chmurze</translation>
-    </message>
-    <message>
-      <source>Motion Search</source>
-      <translation>Wyszukiwanie ruchu</translation>
-    </message>
-    <message>
-      <source>Searching Bookmarks, Objects, Events</source>
-      <translation>Wyszukiwanie zakładek, obiektów, zdarzeń</translation>
-    </message>
-    <message>
-      <source>In the Future</source>
-      <translation>W przyszłości</translation>
-    </message>
-  </context>
-  <context>
     <name>CloudManagementWidget</name>
     <message>
       <source>No connection</source>
@@ -996,29 +794,6 @@
     <message>
       <source>Select another event or action</source>
       <translation>Wybierz inne zdarzenie lub akcję</translation>
-    </message>
-  </context>
-  <context>
-    <name>CustomBusinessEventWidget</name>
-    <message>
-      <source>Source contains:</source>
-      <translation>Źródło zawiera:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Słowa kluczowe oddzielone spacją</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Nagłówek zawiera:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Opis zawiera:</translation>
-    </message>
-    <message>
-      <source>Omit Logging</source>
-      <translation>Pomiń logowanie w dzienniku</translation>
     </message>
   </context>
   <context>
@@ -1172,59 +947,6 @@
     </message>
   </context>
   <context>
-    <name>ExecHttpRequestActionWidget</name>
-    <message>
-      <source>Login to authenticate (optional)</source>
-      <translation>Zaloguj, aby uwierzytelnić (opcjonalne)</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Login</translation>
-    </message>
-    <message>
-      <source>Password to authenticate (optional)</source>
-      <translation>Hasło do uwierzytelnienia (opcjonalne)</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Hasło</translation>
-    </message>
-    <message>
-      <source>HTTP(S) URL</source>
-      <translation>Adres URL http(s)</translation>
-    </message>
-    <message>
-      <source>HTTP(S) Content</source>
-      <translation>Zawartość Http(s)</translation>
-    </message>
-    <message>
-      <source>Content Type</source>
-      <translation>Typ zawartości</translation>
-    </message>
-    <message>
-      <source>Authentication Type</source>
-      <translation>Rodzaj uwierzytelniania</translation>
-    </message>
-    <message>
-      <source>Request Method</source>
-      <translation>Metoda żądania</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExecPtzPresetBusinessActionWidget</name>
-    <message>
-      <source>PTZ preset:</source>
-      <translation>Preset PTZ:</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExitFullscreenActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>Na układzie</translation>
-    </message>
-  </context>
-  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <source>Export Settings</source>
@@ -1345,17 +1067,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Nic nie znaleziono</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenCameraActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>Na układzie</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
     </message>
   </context>
   <context>
@@ -1773,8 +1484,8 @@
       <translation>Ponów</translation>
     </message>
     <message>
-      <source>Open Files Folder</source>
-      <translation>Otwórz folder plików</translation>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
     </message>
   </context>
   <context>
@@ -2001,21 +1712,6 @@
     </message>
   </context>
   <context>
-    <name>OpenLayoutActionWidget</name>
-    <message>
-      <source>Layout</source>
-      <translation>Układ</translation>
-    </message>
-    <message>
-      <source>Show to</source>
-      <translation>Pokaż na</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Wybierz układ...</translation>
-    </message>
-  </context>
-  <context>
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
@@ -2067,75 +1763,6 @@
     <message>
       <source>Sign in to web page</source>
       <translation>Zaloguj się do strony internetowej</translation>
-    </message>
-  </context>
-  <context>
-    <name>PlaySoundBusinessActionWidget</name>
-    <message>
-      <source>Manage...</source>
-      <translation>Zarządzaj...</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>Głośność:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>Test...</translation>
-    </message>
-    <message>
-      <source>Play to users</source>
-      <translation>Odtwarzaj użytkownikom</translation>
-    </message>
-  </context>
-  <context>
-    <name>PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Source:</source>
-      <translation>Źródło:</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Nagłówek zawiera:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Słowa kluczowe oddzielone spacją</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Opis zawiera:</translation>
-    </message>
-    <message>
-      <source>Level:</source>
-      <translation>Poziom:</translation>
-    </message>
-    <message>
-      <source>ERROR</source>
-      <translation>BŁĄD</translation>
-    </message>
-    <message>
-      <source>WARNING</source>
-      <translation>OSTRZEŻENIE</translation>
-    </message>
-    <message>
-      <source>INFO</source>
-      <translation>INFO</translation>
-    </message>
-  </context>
-  <context>
-    <name>PopupBusinessActionWidget</name>
-    <message>
-      <source>Force Acknowledgment</source>
-      <translation>Wymuszaj potwierdzenie</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>Użyj niestandardowego tekstu:</translation>
-    </message>
-    <message>
-      <source>to</source>
-      <translation>do</translation>
     </message>
   </context>
   <context>
@@ -2209,37 +1836,6 @@
     <message>
       <source>Hotkey:</source>
       <translation>Klawisz skrótu:</translation>
-    </message>
-  </context>
-  <context>
-    <name>PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>To</source>
-      <translation>Do</translation>
-    </message>
-    <message>
-      <source>Custom notification content</source>
-      <translation>Niestandardowa treść powiadomienia</translation>
-    </message>
-    <message>
-      <source>Header</source>
-      <translation>Nagłówek</translation>
-    </message>
-    <message>
-      <source>Default notification title will be used if left empty</source>
-      <translation>Jeśli pozostanie pusty, zostanie użyty domyślny tytuł powiadomienia</translation>
-    </message>
-    <message>
-      <source>Body</source>
-      <translation>Treść</translation>
-    </message>
-    <message>
-      <source>Default text will be used if this field is empty</source>
-      <translation>Jeśli to pole pozostanie puste, zostanie użyty tekst domyślny</translation>
-    </message>
-    <message>
-      <source>Add source device name in body</source>
-      <translation>Dodaj w treści nazwę urządzenia źródłowego</translation>
     </message>
   </context>
   <context>
@@ -2389,33 +1985,6 @@
     </message>
   </context>
   <context>
-    <name>RecordingBusinessActionWidget</name>
-    <message>
-      <source>Quality:</source>
-      <translation>Jakość:</translation>
-    </message>
-    <message>
-      <source>FPS</source>
-      <translation>kl./s</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>Pre-Recording:</source>
-      <translation>Nagrywanie przedalarmowe:</translation>
-    </message>
-    <message>
-      <source>Post-Recording:</source>
-      <translation>Nagrywanie poalarmowe:</translation>
-    </message>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Ustalony czas trwania:</translation>
-    </message>
-  </context>
-  <context>
     <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
@@ -2520,29 +2089,6 @@
     <message>
       <source>Organization&apos;s limits violation</source>
       <translation>Naruszenie limitów organizacji</translation>
-    </message>
-  </context>
-  <context>
-    <name>SayTextBusinessActionWidget</name>
-    <message>
-      <source>Speak the following:</source>
-      <translation>Powiedz to:</translation>
-    </message>
-    <message>
-      <source>Type any text here</source>
-      <translation>Wpisz tutaj dowolny tekst</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>Głośność:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>Test...</translation>
-    </message>
-    <message>
-      <source>Speak to users</source>
-      <translation>Rozmowa z użytkownikami</translation>
     </message>
   </context>
   <context>
@@ -2688,17 +2234,6 @@
     </message>
   </context>
   <context>
-    <name>SendmailBusinessActionWidget</name>
-    <message>
-      <source>Additional Recipients:</source>
-      <translation>Dodatkowi odbiorcy:</translation>
-    </message>
-    <message>
-      <source>Global Email Settings...</source>
-      <translation>Ustawienia globalne e-mail...</translation>
-    </message>
-  </context>
-  <context>
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
@@ -2772,36 +2307,6 @@
     </message>
   </context>
   <context>
-    <name>ShowOnAlarmLayoutActionWidget</name>
-    <message>
-      <source>for</source>
-      <translation>dla</translation>
-    </message>
-    <message>
-      <source>Force Alarm Layout opening</source>
-      <translation>Wymuszaj otwarcie układu alarmowego</translation>
-    </message>
-  </context>
-  <context>
-    <name>ShowTextOverlayActionWidget</name>
-    <message>
-      <source>seconds</source>
-      <translation>sek.</translation>
-    </message>
-    <message>
-      <source>Display text for:</source>
-      <translation>Wyświetl tekst przez:</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>Użyj niestandardowego tekstu:</translation>
-    </message>
-    <message>
-      <source>Rule will work only for prolonged events</source>
-      <translation>Reguła będzie działać tylko w przypadku długotrwałych zdarzeń</translation>
-    </message>
-  </context>
-  <context>
     <name>SignDialog</name>
     <message>
       <source>Watermark Check</source>
@@ -2814,21 +2319,6 @@
     <message>
       <source>Check Result:</source>
       <translation>Rezultat sprawdzenia:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>Available to</source>
-      <translation>Dostępne dla</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Nazwa</translation>
-    </message>
-    <message>
-      <source>Icon</source>
-      <translation>Ikona</translation>
     </message>
   </context>
   <context>

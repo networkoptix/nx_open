@@ -129,54 +129,13 @@
       <source>Open Files Folder</source>
       <translation>ファイルフォルダーを開く</translation>
     </message>
-  </context>
-  <context>
-    <name>AggregationWidget</name>
     <message>
-      <source>Check to set aggregation period</source>
-      <translation>集計期間を設定する場合はチェックを入れてください</translation>
+      <source>with</source>
+      <translation type="unfinished">with</translation>
     </message>
     <message>
-      <source>Interval of action :</source>
-      <translation>実行間隔:</translation>
-    </message>
-    <message>
-      <source>No more than once per</source>
-      <translation>前回実行から</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>即時</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>キーワード (スペース区切り)</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>キャプションに次の内容を含む:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>説明に次の内容を含む:</translation>
-    </message>
-    <message>
-      <source>Event Type:</source>
-      <translation>イベントタイプ:</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Attributes:</source>
-      <translation>属性:</translation>
-    </message>
-    <message>
-      <source>Object Type:</source>
-      <translation>オブジェクトタイプ:</translation>
+      <source>Simultaneous Streams</source>
+      <translation type="unfinished">Simultaneous Streams</translation>
     </message>
   </context>
   <context>
@@ -291,10 +250,6 @@
       <translation>帯域幅を固定:</translation>
     </message>
     <message>
-      <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
-    </message>
-    <message>
       <source>Unlimited</source>
       <translation>無制限</translation>
     </message>
@@ -305,6 +260,10 @@
     <message>
       <source>No backup</source>
       <translation>バックアップなし</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -332,29 +291,6 @@
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
       <translation>ストレージの問題が発生したため、バックアップは停止しています。ストレージの問題が解決された後、バックアップは自動的に再開されます。</translation>
-    </message>
-  </context>
-  <context>
-    <name>BookmarkBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>固定期間:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>秒</translation>
-    </message>
-    <message>
-      <source>Tags:</source>
-      <translation>タグ:</translation>
-    </message>
-    <message>
-      <source>Pre-recording:</source>
-      <translation>プレ録画:</translation>
-    </message>
-    <message>
-      <source>Post-recording:</source>
-      <translation>ポスト録画:</translation>
     </message>
   </context>
   <context>
@@ -420,79 +356,6 @@
     <message>
       <source>Clear Filter</source>
       <translation>フィルターを解除</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRuleWidget</name>
-    <message>
-      <source>Event</source>
-      <translation>イベント</translation>
-    </message>
-    <message>
-      <source>Schedule...</source>
-      <translation>スケジュール...</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>アクション</translation>
-    </message>
-    <message>
-      <source>Comments:</source>
-      <translation>コメント:</translation>
-    </message>
-    <message>
-      <source>When</source>
-      <translation>トリガー</translation>
-    </message>
-    <message>
-      <source>Do</source>
-      <translation>動作</translation>
-    </message>
-    <message>
-      <source>At</source>
-      <translation>デバイス</translation>
-    </message>
-    <message>
-      <source>Use event source server</source>
-      <translation>イベントソースサーバーを使用する</translation>
-    </message>
-    <message>
-      <source>Use event source camera</source>
-      <translation>イベントソースのカメラを使用</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRulesDialog</name>
-    <message>
-      <source>Add</source>
-      <translation>追加</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>削除</translation>
-    </message>
-    <message>
-      <source>Event Rules</source>
-      <translation>イベントルール</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>イベントログ...</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>テスト</translation>
-    </message>
-  </context>
-  <context>
-    <name>BuzzerBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>固定期間:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>秒</translation>
     </message>
   </context>
   <context>
@@ -741,12 +604,9 @@
       <source>Logical ID</source>
       <translation>自定義ID</translation>
     </message>
-  </context>
-  <context>
-    <name>CameraInputBusinessEventWidget</name>
     <message>
-      <source>Input ID</source>
-      <translation>入力ID</translation>
+      <source>Restreaming Link</source>
+      <translation type="unfinished">Restreaming Link</translation>
     </message>
   </context>
   <context>
@@ -781,17 +641,6 @@
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
       <translation>使用:</translation>
-    </message>
-  </context>
-  <context>
-    <name>CameraOutputBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>固定期間:</translation>
-    </message>
-    <message>
-      <source>Output ID:</source>
-      <translation>出力ID:</translation>
     </message>
   </context>
   <context>
@@ -904,57 +753,6 @@
     </message>
   </context>
   <context>
-    <name>CloudLayoutsIntroDialog</name>
-    <message>
-      <source>BETA</source>
-      <translation>ベータ</translation>
-    </message>
-    <message>
-      <source>Available Actions</source>
-      <translation>利用可能なアクション</translation>
-    </message>
-    <message>
-      <source>Video Export</source>
-      <translation>映像のエクスポート</translation>
-    </message>
-    <message>
-      <source>Live Video and Archive</source>
-      <translation>ライブ映像とアーカイブ</translation>
-    </message>
-    <message>
-      <source>PTZ</source>
-      <translation>PTZ</translation>
-    </message>
-    <message>
-      <source>Showreels</source>
-      <translation>シーケンシャル表示</translation>
-    </message>
-    <message>
-      <source>Read more on the help page</source>
-      <translation>詳しくはヘルプページをご覧ください</translation>
-    </message>
-    <message>
-      <source>Do not show this window again</source>
-      <translation>今後このウィンドウを表示しない</translation>
-    </message>
-    <message>
-      <source>Introducing Cloud Layouts</source>
-      <translation>クラウドレイアウトのご紹介</translation>
-    </message>
-    <message>
-      <source>Motion Search</source>
-      <translation>モーション検索</translation>
-    </message>
-    <message>
-      <source>Searching Bookmarks, Objects, Events</source>
-      <translation>ブックマーク、オブジェクト、イベントの検索</translation>
-    </message>
-    <message>
-      <source>In the Future</source>
-      <translation>将来</translation>
-    </message>
-  </context>
-  <context>
     <name>CloudManagementWidget</name>
     <message>
       <source>No connection</source>
@@ -996,29 +794,6 @@
     <message>
       <source>Select another event or action</source>
       <translation>別のイベントまたはアクションを選択してください</translation>
-    </message>
-  </context>
-  <context>
-    <name>CustomBusinessEventWidget</name>
-    <message>
-      <source>Source contains:</source>
-      <translation>ソースに次の内容を含む:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>キーワード (スペース区切り)</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>キャプションに次の内容を含む:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>説明に次の内容を含む:</translation>
-    </message>
-    <message>
-      <source>Omit Logging</source>
-      <translation>ログ書込みを省略</translation>
     </message>
   </context>
   <context>
@@ -1172,59 +947,6 @@
     </message>
   </context>
   <context>
-    <name>ExecHttpRequestActionWidget</name>
-    <message>
-      <source>Login to authenticate (optional)</source>
-      <translation>認証用ログイン名 (オプション)</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>ログイン名</translation>
-    </message>
-    <message>
-      <source>Password to authenticate (optional)</source>
-      <translation>認証用パスワード (オプション)</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>パスワード</translation>
-    </message>
-    <message>
-      <source>HTTP(S) URL</source>
-      <translation>HTTP(S) URL</translation>
-    </message>
-    <message>
-      <source>HTTP(S) Content</source>
-      <translation>HTTP(S) コンテンツ</translation>
-    </message>
-    <message>
-      <source>Content Type</source>
-      <translation>コンテンツタイプ</translation>
-    </message>
-    <message>
-      <source>Authentication Type</source>
-      <translation>認証タイプ</translation>
-    </message>
-    <message>
-      <source>Request Method</source>
-      <translation>リクエストメソッド</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExecPtzPresetBusinessActionWidget</name>
-    <message>
-      <source>PTZ preset:</source>
-      <translation>PTZ プリセット:</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExitFullscreenActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>レイアウト</translation>
-    </message>
-  </context>
-  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <source>Export Settings</source>
@@ -1345,17 +1067,6 @@
     <message>
       <source>Nothing found</source>
       <translation>見つかりません</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenCameraActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>レイアウト</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>カメラ</translation>
     </message>
   </context>
   <context>
@@ -1773,8 +1484,8 @@
       <translation>再試行</translation>
     </message>
     <message>
-      <source>Open Files Folder</source>
-      <translation>ファイルフォルダーを開く</translation>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
     </message>
   </context>
   <context>
@@ -2001,21 +1712,6 @@
     </message>
   </context>
   <context>
-    <name>OpenLayoutActionWidget</name>
-    <message>
-      <source>Layout</source>
-      <translation>レイアウト</translation>
-    </message>
-    <message>
-      <source>Show to</source>
-      <translation>対象ユーザー</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>レイアウトを選択してください...</translation>
-    </message>
-  </context>
-  <context>
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
@@ -2067,75 +1763,6 @@
     <message>
       <source>Sign in to web page</source>
       <translation>Web ページにサインイン</translation>
-    </message>
-  </context>
-  <context>
-    <name>PlaySoundBusinessActionWidget</name>
-    <message>
-      <source>Manage...</source>
-      <translation>管理...</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>ボリューム:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>テスト...</translation>
-    </message>
-    <message>
-      <source>Play to users</source>
-      <translation>対象ユーザー</translation>
-    </message>
-  </context>
-  <context>
-    <name>PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Source:</source>
-      <translation>ソース:</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>キャプションに次の内容を含む:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>キーワード (スペース区切り)</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>説明に次の内容を含む:</translation>
-    </message>
-    <message>
-      <source>Level:</source>
-      <translation>レベル:</translation>
-    </message>
-    <message>
-      <source>ERROR</source>
-      <translation>エラー</translation>
-    </message>
-    <message>
-      <source>WARNING</source>
-      <translation>警告</translation>
-    </message>
-    <message>
-      <source>INFO</source>
-      <translation>情報</translation>
-    </message>
-  </context>
-  <context>
-    <name>PopupBusinessActionWidget</name>
-    <message>
-      <source>Force Acknowledgment</source>
-      <translation>要確認</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>カスタムテキストを使用:</translation>
-    </message>
-    <message>
-      <source>to</source>
-      <translation>対象ユーザー</translation>
     </message>
   </context>
   <context>
@@ -2209,37 +1836,6 @@
     <message>
       <source>Hotkey:</source>
       <translation>ホットキー:</translation>
-    </message>
-  </context>
-  <context>
-    <name>PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>To</source>
-      <translation>対象ユーザー</translation>
-    </message>
-    <message>
-      <source>Custom notification content</source>
-      <translation>通知内容を変更</translation>
-    </message>
-    <message>
-      <source>Header</source>
-      <translation>ヘッダー</translation>
-    </message>
-    <message>
-      <source>Default notification title will be used if left empty</source>
-      <translation>このフィールドが空の場合、デフォルトの通知タイトルが使用されます</translation>
-    </message>
-    <message>
-      <source>Body</source>
-      <translation>本文</translation>
-    </message>
-    <message>
-      <source>Default text will be used if this field is empty</source>
-      <translation>このフィールドが空の場合、デフォルトのテキストが使用されます</translation>
-    </message>
-    <message>
-      <source>Add source device name in body</source>
-      <translation>本文にソースデバイス名を追加</translation>
     </message>
   </context>
   <context>
@@ -2389,33 +1985,6 @@
     </message>
   </context>
   <context>
-    <name>RecordingBusinessActionWidget</name>
-    <message>
-      <source>Quality:</source>
-      <translation>映像品質:</translation>
-    </message>
-    <message>
-      <source>FPS</source>
-      <translation>FPS</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <translation>秒</translation>
-    </message>
-    <message>
-      <source>Pre-Recording:</source>
-      <translation>プレ録画:</translation>
-    </message>
-    <message>
-      <source>Post-Recording:</source>
-      <translation>ポスト録画:</translation>
-    </message>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>固定期間:</translation>
-    </message>
-  </context>
-  <context>
     <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
@@ -2520,29 +2089,6 @@
     <message>
       <source>Organization&apos;s limits violation</source>
       <translation>組織制限を超過</translation>
-    </message>
-  </context>
-  <context>
-    <name>SayTextBusinessActionWidget</name>
-    <message>
-      <source>Speak the following:</source>
-      <translation>読み上げる内容:</translation>
-    </message>
-    <message>
-      <source>Type any text here</source>
-      <translation>テキストを入力してください (英数字)</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>ボリューム:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>テスト...</translation>
-    </message>
-    <message>
-      <source>Speak to users</source>
-      <translation>対象ユーザー</translation>
     </message>
   </context>
   <context>
@@ -2688,17 +2234,6 @@
     </message>
   </context>
   <context>
-    <name>SendmailBusinessActionWidget</name>
-    <message>
-      <source>Additional Recipients:</source>
-      <translation>追加の受信者:</translation>
-    </message>
-    <message>
-      <source>Global Email Settings...</source>
-      <translation>メールサーバー設定...</translation>
-    </message>
-  </context>
-  <context>
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
@@ -2772,36 +2307,6 @@
     </message>
   </context>
   <context>
-    <name>ShowOnAlarmLayoutActionWidget</name>
-    <message>
-      <source>for</source>
-      <translation>ユーザー</translation>
-    </message>
-    <message>
-      <source>Force Alarm Layout opening</source>
-      <translation>強制的にアラームレイアウトを開く</translation>
-    </message>
-  </context>
-  <context>
-    <name>ShowTextOverlayActionWidget</name>
-    <message>
-      <source>seconds</source>
-      <translation>秒</translation>
-    </message>
-    <message>
-      <source>Display text for:</source>
-      <translation>テキスト表示期間:</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>カスタムテキストを使用:</translation>
-    </message>
-    <message>
-      <source>Rule will work only for prolonged events</source>
-      <translation>ルールは期間が定義されるイベントでのみ機能します</translation>
-    </message>
-  </context>
-  <context>
     <name>SignDialog</name>
     <message>
       <source>Watermark Check</source>
@@ -2814,21 +2319,6 @@
     <message>
       <source>Check Result:</source>
       <translation>チェック結果:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>Available to</source>
-      <translation>ユーザー</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>名前</translation>
-    </message>
-    <message>
-      <source>Icon</source>
-      <translation>アイコン</translation>
     </message>
   </context>
   <context>

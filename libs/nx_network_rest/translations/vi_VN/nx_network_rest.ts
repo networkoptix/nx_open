@@ -74,6 +74,10 @@
       <source>The session key is too old for this Site.</source>
       <translation>Khóa phiên đã quá cũ đối với Chi nhánh này.</translation>
     </message>
+    <message>
+      <source>No credentials provided when required by endpoint.</source>
+      <translation>Không cung cấp thông tin xác thực khi điểm cuối yêu cầu.</translation>
+    </message>
   </context>
   <context>
     <name>Result</name>

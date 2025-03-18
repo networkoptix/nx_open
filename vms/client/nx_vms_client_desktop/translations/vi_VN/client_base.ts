@@ -268,10 +268,6 @@
       <translation>Sự trông cậy</translation>
     </message>
     <message>
-      <source>Event Log...</source>
-      <translation>Ghi sự kiện...</translation>
-    </message>
-    <message>
       <source>Control Video Wall</source>
       <translation>Điều khiển Tường video</translation>
     </message>
@@ -1157,22 +1153,6 @@
       <translation>Kết nối với Chi nhánh</translation>
     </message>
     <message>
-      <source>Layout Tab</source>
-      <translation>Thẻ Bố cục</translation>
-    </message>
-    <message>
-      <source>New Layout Tab</source>
-      <translation>Thẻ Bố cục mới</translation>
-    </message>
-    <message>
-      <source>Welcome Screen Tab</source>
-      <translation>Thẻ Màn hình chào mừng</translation>
-    </message>
-    <message>
-      <source>New Welcome Screen Tab</source>
-      <translation>Thẻ Màn hình chào mừng mới</translation>
-    </message>
-    <message>
       <source>Site Administration...</source>
       <translation>Quản trị Chi nhánh...</translation>
     </message>
@@ -1227,6 +1207,30 @@
     <message>
       <source>Cell Aspect Ratio</source>
       <translation>Tỷ lệ ô khung hình</translation>
+    </message>
+    <message>
+      <source>Layout</source>
+      <translation>Bố cục</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>Bố cục mới</translation>
+    </message>
+    <message>
+      <source>Welcome Screen</source>
+      <translation>Màn hình chào mừng</translation>
+    </message>
+    <message>
+      <source>New Welcome Screen</source>
+      <translation>Màn hình chào mừng mới</translation>
+    </message>
+    <message>
+      <source>Monitor in New Tab</source>
+      <translation>Màn hình trong tab mới</translation>
+    </message>
+    <message>
+      <source>Monitor in New Window</source>
+      <translation>Giám sát trong cửa sổ mới</translation>
     </message>
   </context>
   <context>
@@ -1299,19 +1303,6 @@
     </message>
   </context>
   <context>
-    <name>ExitFullscreenActionHelper</name>
-    <message>
-      <source>Select layout...</source>
-      <translation>Chọn bố cục...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n layouts</source>
-      <translation>
-        <numerusform>Bố cục %n</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -1332,36 +1323,6 @@
     <message>
       <source>Executable %1 Media File</source>
       <translation>Tệp đa phương tiện có thể thực thi %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenActionHelper</name>
-    <message>
-      <source>Source camera</source>
-      <translation>Máy ảnh nguồn</translation>
-    </message>
-    <message>
-      <source>Select device...</source>
-      <translation>Chọn thiết bị...</translation>
-    </message>
-    <message>
-      <source>Select camera...</source>
-      <translation>Chọn camera...</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Chọn bố cục...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n layouts</source>
-      <translation>
-        <numerusform>Bố cục %n</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>%1 on %2</source>
-      <comment>Camera %1 on layout %2</comment>
-      <translation>%1 trên %2</translation>
     </message>
   </context>
   <context>
@@ -2187,21 +2148,21 @@ Khóa giấy phép: %2</translation>
       </translation>
     </message>
     <message numerus="yes">
-      <source>These servers are removed from Site</source>
-      <translation>
-        <numerusform>Các máy chủ này đã được xóa khỏi Chi nhánh</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These users are removed from Site</source>
-      <translation>
-        <numerusform>Những người dùng này đã được xóa khỏi Chi nhánh</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>These resources are removed from Site</source>
       <translation>
         <numerusform>Những tài nguyên này đã bị xóa khỏi Chi nhánh</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This server is removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>This server is removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>This user is removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>This user is removed from Site</numerusform>
       </translation>
     </message>
   </context>
@@ -2342,10 +2303,6 @@ Khóa giấy phép: %2</translation>
       <translation>Quy tắc sự kiện được loại bỏ</translation>
     </message>
     <message>
-      <source>Event rules reset to default</source>
-      <translation>Đặt lại quy tắc sự kiện về mặc định</translation>
-    </message>
-    <message>
       <source>Storage added</source>
       <translation>Đã thêm bộ lưu trữ</translation>
     </message>
@@ -2477,220 +2434,6 @@ Khóa giấy phép: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleViewModel</name>
-    <message>
-      <source>Error: %1</source>
-      <translation>Lỗi: %1</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Ngay</translation>
-    </message>
-    <message>
-      <source>Stops</source>
-      <translation>Dừng lại</translation>
-    </message>
-    <message>
-      <source>Starts</source>
-      <translation>Bắt đầu</translation>
-    </message>
-    <message>
-      <source>Occurs</source>
-      <translation>Xảy ra</translation>
-    </message>
-    <message>
-      <source>N/A</source>
-      <translation>N/A</translation>
-    </message>
-    <message>
-      <source>Every %1</source>
-      <translation>Mỗi %1</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Bất kỳ máy chủ nào</translation>
-    </message>
-    <message>
-      <source>Any Device</source>
-      <translation>Bất kỳ thiết bị nào</translation>
-    </message>
-    <message>
-      <source>Any Camera</source>
-      <translation>Tất cả camera</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Servers</source>
-      <translation>
-        <numerusform>%n Máy chủ</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Người dùng</translation>
-    </message>
-    <message>
-      <source>Source Server</source>
-      <translation>Máy chủ nguồn</translation>
-    </message>
-    <message>
-      <source>Source Camera</source>
-      <translation>Camera nguồn</translation>
-    </message>
-    <message numerus="yes">
-      <source>Source and %n more Cameras</source>
-      <translation>
-        <numerusform>Nguồn và %n camera khác</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Select at least one Device</source>
-      <translation>Chọn ít nhất một thiết bị</translation>
-    </message>
-    <message>
-      <source>Select at least one Camera</source>
-      <translation>Chọn ít nhất một Camera</translation>
-    </message>
-    <message>
-      <source>Select Server</source>
-      <translation>Chọn máy chủ</translation>
-    </message>
-    <message>
-      <source>Source Server and %1</source>
-      <translation>Máy chủ nguồn và %1</translation>
-    </message>
-    <message>
-      <source>Site</source>
-      <translation>Chi nhánh</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRuleWidget</name>
-    <message>
-      <source>to</source>
-      <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
-      <translation>đến</translation>
-    </message>
-    <message>
-      <source>at</source>
-      <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-      <translation>đến</translation>
-    </message>
-    <message>
-      <source>Select at least one device</source>
-      <translation>Chọn ít nhất một thiết bị</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Chọn ít nhất một máy ảnh</translation>
-    </message>
-    <message>
-      <source>Devices</source>
-      <translation>Thiết bị</translation>
-    </message>
-    <message>
-      <source>Cameras</source>
-      <translation>Máy ảnh</translation>
-    </message>
-    <message>
-      <source>Any Device</source>
-      <translation>Bất kỳ thiết bị nào</translation>
-    </message>
-    <message>
-      <source>Any Camera</source>
-      <translation>Tất cả camera</translation>
-    </message>
-    <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation>Buộc công nhận sẽ chỉ hoạt động cho Sự kiện chung nếu mã xác nhận camera được sử dụng trong URL Sự kiện chung</translation>
-    </message>
-    <message>
-      <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation>Thời gian ghi trước dài sẽ tăng mức sử dụng RAM trên máy chủ</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRulesDialog</name>
-    <message>
-      <source>&amp;New...</source>
-      <translation>&amp;thêm...</translation>
-    </message>
-    <message>
-      <source>&amp;Delete</source>
-      <translation>&amp;xóa bỏ</translation>
-    </message>
-    <message>
-      <source>&amp;Schedule...</source>
-      <translation>&amp;lịch trình...</translation>
-    </message>
-    <message>
-      <source>Restore All Rules to Default</source>
-      <translation>Khôi phục lại tất cả các quy tắc về mặc định</translation>
-    </message>
-    <message>
-      <source>No event rules</source>
-      <translation>Không có quy tắc sự kiện</translation>
-    </message>
-    <message>
-      <source>Filter by devices...</source>
-      <translation>Lọc theo thiết bị...</translation>
-    </message>
-    <message>
-      <source>Filter by cameras...</source>
-      <translation>Lọc theo camera...</translation>
-    </message>
-    <message>
-      <source>Failed to retrieve rules</source>
-      <translation>Không tìm được rules nào</translation>
-    </message>
-    <message>
-      <source>Failed to save rule</source>
-      <translation>Không thể lưu rule</translation>
-    </message>
-    <message>
-      <source>This action cannot be undone.</source>
-      <translation>Không thể hoàn tác thao tác này.</translation>
-    </message>
-    <message>
-      <source>Restore all rules to default?</source>
-      <translation>Khôi phục tất cả các quy tắc về mặc định?</translation>
-    </message>
-    <message>
-      <source>Some rules are not valid and may not work</source>
-      <translation>Một số quy tắc không hợp lệ và có thể không hoạt động</translation>
-    </message>
-    <message>
-      <source>Apply changes before exiting?</source>
-      <translation>Áp dụng các thay đổi trước khi thoát?</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRulesViewModel</name>
-    <message>
-      <source>On</source>
-      <translation>Mở</translation>
-    </message>
-    <message>
-      <source>Event</source>
-      <translation>Sự kiện</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>Nguồn</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Hoạt động</translation>
-    </message>
-    <message>
-      <source>Target</source>
-      <translation>Đích đến</translation>
-    </message>
-    <message>
-      <source>Interval of Action</source>
-      <translation>Khoảng thời gian hành động</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCamDisplay</name>
     <message>
       <source>%1 Running</source>
@@ -2767,13 +2510,6 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Diagnostics complete</source>
       <translation>Hoàn tất chuẩn đoán</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraInputBusinessEventWidget</name>
-    <message>
-      <source>automatic</source>
-      <translation>tự động</translation>
     </message>
   </context>
   <context>
@@ -2880,13 +2616,6 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Logical ID</source>
       <translation>ID logic</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraOutputBusinessActionWidget</name>
-    <message>
-      <source>automatic</source>
-      <translation>tự động</translation>
     </message>
   </context>
   <context>
@@ -3207,33 +2936,6 @@ Khóa giấy phép: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnCustomBusinessEventWidget</name>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Nếu trường trống, sẽ luôn kích hoạt sự kiện.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>Sự kiện sẽ chỉ kích hoạt nếu có các kết quả khớp với các từ khóa nào đã nhập.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Sự kiện sẽ chỉ kích hoạt nếu có kết quả khớp với chú thích của từ khóa đã nhập.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation>Sự kiện sẽ chỉ kích hoạt nếu có kết quả khớp với phần mô tả của từ khóa nào đã nhập.</translation>
-    </message>
-    <message>
-      <source>Server API</source>
-      <translation>API Máy chủ</translation>
-    </message>
-    <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>Để tạo Sự kiện chung, vui lòng tham khảo %1.</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCustomFileDialog</name>
     <message>
       <source>Pictures</source>
@@ -3324,152 +3026,6 @@ Khóa giấy phép: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnEmptyBusinessActionWidget</name>
-    <message>
-      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>Chế độ Ghi hoảng loạn sẽ chuyển cài đặt ghi cho tất cả các camera thành FPS và chất lượng tối đa.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnEventLogDialog</name>
-    <message>
-      <source>Filter Similar Rows</source>
-      <translation>Lọc Rows tương tự</translation>
-    </message>
-    <message>
-      <source>Copy Selection to Clipboard</source>
-      <translation>Sao chép lựa chọn vào Clipboard</translation>
-    </message>
-    <message>
-      <source>Export Selection to File...</source>
-      <translation>Lựa chọn Export to File...</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Chọn tất cả</translation>
-    </message>
-    <message>
-      <source>Clear Filter</source>
-      <translation>Xóa bộ lọc</translation>
-    </message>
-    <message>
-      <source>Export selected events to file</source>
-      <translation>Xuất khẩu chọn lọc sự kiện để nộp</translation>
-    </message>
-    <message>
-      <source>Any Action</source>
-      <translation>Tất cả hành động</translation>
-    </message>
-    <message>
-      <source>No events</source>
-      <translation>Không có sự kiện</translation>
-    </message>
-    <message numerus="yes">
-      <source>Event log for period from %1 to %2 - %n events found</source>
-      <comment>Dates are substituted</comment>
-      <translation>
-        <numerusform>Nhật ký sự kiện trong khoảng thời gian từ %1 đến %2 - %n sự kiện được tìm thấy</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Event log for %1 - %n events found</source>
-      <comment>Date is substituted</comment>
-      <translation>
-        <numerusform>Nhật ký sự kiện cho %1 - %n sự kiện được tìm thấy</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Mô tả</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnEventLogModel</name>
-    <message>
-      <source>Motion video</source>
-      <translation>Chuyển động video</translation>
-    </message>
-    <message>
-      <source>Date/Time</source>
-      <translation>Ngày / thời gian</translation>
-    </message>
-    <message>
-      <source>Event</source>
-      <translation>Sự kiện</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>Nguồn</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Hoạt động</translation>
-    </message>
-    <message>
-      <source>Target</source>
-      <translation>Đích đến</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Mô tả</translation>
-    </message>
-    <message>
-      <source>All users</source>
-      <translation>Tất cả người dùng</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n times)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n thời gian)</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Open camera</source>
-      <translation>Mở camera</translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n users more...</source>
-      <translation>
-        <numerusform>và %n nhiều người dùng hơn...</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n more...</source>
-      <translation>
-        <numerusform>và %n nhiều hơn nữa...</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Removed subjects</source>
-      <translation>
-        <numerusform>%n Chủ đề đã bị xóa</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Subject removed</source>
-      <translation>Chủ đề đã xóa</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n cameras)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n camera)</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnExecHttpRequestActionWidget</name>
-    <message>
-      <source>Auto</source>
-      <translation>Tự động</translation>
-    </message>
-    <message>
-      <source>Basic</source>
-      <translation>Cơ bản</translation>
-    </message>
-  </context>
-  <context>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
@@ -3478,17 +3034,6 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Failed to overwrite file</source>
       <translation>Không thể ghi đè tệp</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFullscreenCameraActionWidget</name>
-    <message>
-      <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation>Camera này hiện không có trên bố cục đã chọn. Hành động sẽ được thực hiện nếu camera được thêm vào trước khi kích hoạt.</translation>
-    </message>
-    <message>
-      <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation>Camera này hiện không có trên một số bố cục đã chọn. Hành động sẽ được thực hiện nếu camera được thêm vào trước khi kích hoạt.</translation>
     </message>
   </context>
   <context>
@@ -3970,12 +3515,6 @@ Khóa giấy phép: %2</translation>
       <source>Lo-Res</source>
       <translation>Lo-Res</translation>
     </message>
-    <message numerus="yes">
-      <source>Set for all %n Cameras</source>
-      <translation>
-        <numerusform>Đặt cho tất cả %n Camera</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Area Zoom</source>
       <translation>Thu phóng khu vực</translation>
@@ -3995,6 +3534,16 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Mute</source>
       <translation>Tắt tiếng</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set for %n devices</source>
+      <translation type="unfinished">
+        <numerusform>Set for %n devices</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Cloud authorization request should only be performed for cloud cross system resources</source>
+      <translation type="unfinished">Cloud authorization request should only be performed for cloud cross system resources</translation>
     </message>
   </context>
   <context>
@@ -4110,13 +3659,6 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Rotation</source>
       <translation>Quay</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPopupBusinessActionWidget</name>
-    <message>
-      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation>Thông báo sẽ được hiển thị cho đến khi người dùng tạo bookmark để mô tả sự kiện</translation>
     </message>
   </context>
   <context>
@@ -4560,39 +4102,6 @@ Khóa giấy phép: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnSendEmailActionDelegate</name>
-    <message numerus="yes">
-      <source>%n additional</source>
-      <translation>
-        <numerusform>%n bổ sung</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has invalid email address</source>
-      <translation>Người dùng %1 có địa chỉ email không hợp lệ</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 users have invalid email address</source>
-      <translation>
-        <numerusform>%n trong số %1 người dùng có địa chỉ email không hợp lệ</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid email address %1</source>
-      <translation>Địa chỉ email không hợp lệ %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 additional email addresses are invalid</source>
-      <translation>
-        <numerusform>%n trong tổng số %1 địa chỉ email bổ sung không hợp lệ</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Send email to %1</source>
-      <translation>Gửi email đến %1</translation>
-    </message>
-  </context>
-  <context>
     <name>QnServerAddressesModel</name>
     <message>
       <source>Address</source>
@@ -4701,16 +4210,6 @@ Khóa giấy phép: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnShowTextOverlayActionWidget</name>
-    <message>
-      <source>Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
-      <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
-&apos; sequence</comment>
-      <translation>Thẻ Html có thể được sử dụng trong văn bản: &lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSignInfo</name>
     <message>
       <source>Analyzing: %1%</source>
@@ -4764,8 +4263,8 @@ Khóa giấy phép: %2</translation>
       <translation>Ủy quyền</translation>
     </message>
     <message>
-      <source>Setup</source>
-      <translation>Thiết lập</translation>
+      <source>Set</source>
+      <translation type="unfinished">Set</translation>
     </message>
   </context>
   <context>
@@ -4779,16 +4278,8 @@ Khóa giấy phép: %2</translation>
       <translation>NGOẠI TUYẾN</translation>
     </message>
     <message>
-      <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
-      <translation>Không thể truy cập vào camera này. Thực hiện chẩn đoán camera trong ứng dụng khách để biết thêm thông tin.</translation>
-    </message>
-    <message>
       <source>UNAUTHORIZED</source>
       <translation>KHÔNG ĐƯỢC PHÉP</translation>
-    </message>
-    <message>
-      <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
-      <translation>Camera này yêu cầu phải có thông tin xác thực được thiết lập trong phần cài đặt thiết bị trên cổng thông tin đám mây hoặc máy khách trên máy tính.</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
@@ -4803,16 +4294,8 @@ Khóa giấy phép: %2</translation>
       <translation>CHI NHÁNH ĐÃ ĐÓNG</translation>
     </message>
     <message>
-      <source>STREAM LIMITATION</source>
-      <translation>GIỚI HẠN LUỒNG</translation>
-    </message>
-    <message>
       <source>INFORMATION REQUIRED</source>
       <translation>THÔNG TIN BẮT BUỘC</translation>
-    </message>
-    <message>
-      <source>AUDIO ONLY</source>
-      <translation>CHỈ ÂM THANH</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -4841,6 +4324,18 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>CERTIFICATE ERROR</source>
       <translation>LỖI CHỨNG NHẬN</translation>
+    </message>
+    <message>
+      <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
+      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+    </message>
+    <message>
+      <source>Access to this camera requires authorization credentials.</source>
+      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+    </message>
+    <message>
+      <source>CONNECTION LOST</source>
+      <translation type="unfinished">CONNECTION LOST</translation>
     </message>
   </context>
   <context>
@@ -5026,6 +4521,18 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
       <translation>Tách biệt - máy chủ chỉ đọc và ghi vào thư mục riêng của nó. Nó chỉ xóa dữ liệu cũ khỏi thư mục riêng của nó.</translation>
+    </message>
+    <message>
+      <source>Cloud storage cannot be enabled.</source>
+      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+    </message>
+    <message>
+      <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
+      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+    </message>
+    <message>
+      <source>Insufficient services</source>
+      <translation>Dịch vụ không đầy đủ</translation>
     </message>
   </context>
   <context>
@@ -5411,10 +4918,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Chi nhánh đã đóng</translation>
     </message>
     <message>
-      <source>Reject intercom call</source>
-      <translation>Từ chối cuộc gọi liên lạc nội bộ</translation>
-    </message>
-    <message>
       <source>Email address is not set for your account</source>
       <translation>Địa chỉ email chưa được thiết lập cho tài khoản của bạn</translation>
     </message>
@@ -5530,6 +5033,18 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Notifications language differs from the interface language</source>
       <translation>Ngôn ngữ thông báo khác với ngôn ngữ giao diện</translation>
+    </message>
+    <message>
+      <source>Recording disabled</source>
+      <translation type="unfinished">Recording disabled</translation>
+    </message>
+    <message>
+      <source>Cloud storage backup disabled</source>
+      <translation type="unfinished">Cloud storage backup disabled</translation>
+    </message>
+    <message>
+      <source>Paid integration services disabled</source>
+      <translation type="unfinished">Paid integration services disabled</translation>
     </message>
   </context>
   <context>
@@ -6341,10 +5856,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Trong</translation>
     </message>
     <message>
-      <source>%n removed subjects</source>
-      <translation>%n chủ đề đã bị xóa</translation>
-    </message>
-    <message>
       <source>%n removed devices</source>
       <translation>%n thiết bị đã xóa</translation>
     </message>
@@ -6381,6 +5892,34 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>%n layouts more</source>
       <translation>%n bố cục nhiều hơn</translation>
+    </message>
+    <message>
+      <source>Removed subject</source>
+      <comment>The subject is user or group</comment>
+      <translation type="unfinished">Removed subject</translation>
+    </message>
+    <message>
+      <source>Removed device</source>
+      <translation type="unfinished">Removed device</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation type="unfinished">Removed camera</translation>
+    </message>
+    <message>
+      <source>Removed server</source>
+      <translation type="unfinished">Removed server</translation>
+    </message>
+    <message>
+      <source>Removed layout</source>
+      <translation type="unfinished">Removed layout</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n removed subjects</source>
+      <comment>The subject is user or group</comment>
+      <translation type="unfinished">
+        <numerusform>%n removed subjects</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -7008,6 +6547,23 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <translation>Có nhiều camera được sao lưu hơn các dịch vụ có sẵn. Vui lòng tắt sao lưu cho một số camera hoặc thêm các dịch vụ phù hợp hơn. Nếu không, nó sẽ được thực hiện tự động vào %1</translation>
     </message>
+    <message>
+      <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
+      <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
+      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+    </message>
+    <message>
+      <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
+      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+    </message>
+    <message>
+      <source>Backup will not be activated for %1 devices: </source>
+      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
+    </message>
+    <message>
+      <source>%1 suitable cloud storage services are required to activate backup for them.</source>
+      <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>
@@ -7132,6 +6688,18 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Missed call</source>
       <translation>Cuộc gọi nhỡ</translation>
+    </message>
+    <message>
+      <source>Call Request</source>
+      <translation type="unfinished">Call Request</translation>
+    </message>
+    <message>
+      <source>Call Request Missed</source>
+      <translation type="unfinished">Call Request Missed</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation type="unfinished">Source: %1</translation>
     </message>
   </context>
   <context>
@@ -7325,6 +6893,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Select Hotspot Target</source>
       <translation>Chọn mục tiêu điểm phát sóng</translation>
     </message>
+    <message>
+      <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
+      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
@@ -7347,6 +6919,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Less Info</source>
       <translation>Thông tin ít hơn</translation>
+    </message>
+    <message>
+      <source>Use this link to add the camera to another site</source>
+      <translation type="unfinished">Use this link to add the camera to another site</translation>
     </message>
   </context>
   <context>
@@ -7854,26 +7430,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CloudLayoutsIntroDialog</name>
-    <message>
-      <source>Introducing %1 Layouts</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Giới thiệu Bố cục %1</translation>
-    </message>
-    <message>
-      <source>Read more on the %1</source>
-      <translation>Đọc thêm trên %1</translation>
-    </message>
-    <message>
-      <source>help page</source>
-      <translation>trang trợ giúp</translation>
-    </message>
-    <message>
-      <source>%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation>%1 Bố cục là &lt;b&gt;bố cục liên chi nhánh&lt;/b&gt; cho phép bạn làm việc với các thiết bị từ các Chi nhánh khác nhau. Hiện tại, chỉ có một số tính năng của bố cục thông thường khả dụng, nhưng chúng tôi sẽ tiếp tục mở rộng khả năng của %1 Bố cục trong các phiên bản tương lai</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CloudLayoutsManager</name>
     <message>
       <source>%1 (Copy)</source>
@@ -7952,6 +7508,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Disconnect</source>
       <translation>Ngắt kết nối</translation>
+    </message>
+    <message>
+      <source>Channel Partner users have access to this site</source>
+      <translation type="unfinished">Channel Partner users have access to this site</translation>
+    </message>
+    <message>
+      <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
+      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
@@ -8115,10 +7679,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
   </context>
   <context>
     <name>nx::vms::client::desktop::DesktopDataProvider</name>
-    <message>
-      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>Thiết bị ghi âm không hỗ trợ các định dạng âm thanh phù hợp. Vui lòng chọn thiết bị âm thanh khác hoặc &quot;không có&quot; trong cài đặt Ghi màn hình.</translation>
-    </message>
     <message>
       <source>Could not detect capturing resolution</source>
       <translation>Không thể phát hiện độ phân giải chụp</translation>
@@ -8327,6 +7887,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Export selected events to file</source>
       <translation>Xuất khẩu chọn lọc sự kiện để nộp</translation>
     </message>
+    <message>
+      <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
+      <translation type="unfinished">Server cannot answer in reasonable time. Consider narrowing period or filter.</translation>
+    </message>
+    <message>
+      <source>All Servers are offline. Logs are not available.</source>
+      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventLogModel</name>
@@ -8400,23 +7968,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>INFORMATION REQUIRED</source>
       <translation>THÔNG TIN BẮT BUỘC</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>No events</source>
-      <translation>Không có sự kiện</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n events</source>
-      <translation>
-        <numerusform>%n sự kiện</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Try changing the filters or create an Event Rule</source>
-      <translation>Thử thay đổi bộ lọc hoặc tạo Quy tắc sự kiện</translation>
     </message>
   </context>
   <context>
@@ -8892,6 +8443,13 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::JumpToLiveButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation>Đi tới Live</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
@@ -8989,20 +8547,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Không có sẵn</translation>
     </message>
     <message>
-      <source>NOT A CAMERA</source>
-      <translation>KHÔNG PHẢI LÀ CAMERA</translation>
-    </message>
-    <message>
       <source>DISABLED</source>
       <translation>VÔ HIỆU HÓA</translation>
-    </message>
-    <message>
-      <source>OFFLINE</source>
-      <translation>NGOẠI TUYẾN</translation>
-    </message>
-    <message>
-      <source>NO EXPORT PERMISSION</source>
-      <translation>KHÔNG CÓ QUYỀN XUẤT VIDEO</translation>
     </message>
   </context>
   <context>
@@ -9213,10 +8759,6 @@ Hãy nhớ khôi phục Mức ghi nhật ký về cài đặt mặc định sau 
       <translation>Khách hàng</translation>
     </message>
     <message>
-      <source>None</source>
-      <translation>Không</translation>
-    </message>
-    <message>
       <source>Error</source>
       <translation>Lỗi</translation>
     </message>
@@ -9247,6 +8789,10 @@ Hãy nhớ khôi phục Mức ghi nhật ký về cài đặt mặc định sau 
     <message>
       <source>Logging level degrades performance</source>
       <translation>Mức độ ghi nhật ký làm giảm hiệu suất</translation>
+    </message>
+    <message>
+      <source>&lt;None&gt;</source>
+      <translation type="unfinished">&lt;None&gt;</translation>
     </message>
   </context>
   <context>
@@ -10089,18 +9635,7 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::NotificationActionHandler</name>
-    <message>
-      <source>Unable to acknowledge event on removed camera.</source>
-      <translation>Không thể xác nhận sự kiện trên máy ảnh bị xóa.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
-    <message>
-      <source>Alarm: %1</source>
-      <translation>Báo động: %1</translation>
-    </message>
     <message>
       <source>Acknowledge</source>
       <translation>Công nhận</translation>
@@ -10131,10 +9666,6 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
       <translation>Thông báo sự kiện</translation>
     </message>
     <message>
-      <source>System Notifications</source>
-      <translation>Hệ thống Thông báo</translation>
-    </message>
-    <message>
       <source>Choose Types...</source>
       <translation>Chọn loại...</translation>
     </message>
@@ -10147,6 +9678,10 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
       <translation>
         <numerusform>%n loại thông báo</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Site Notifications</source>
+      <translation type="unfinished">Site Notifications</translation>
     </message>
   </context>
   <context>
@@ -10172,45 +9707,10 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
-    <message>
-      <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation>Không người dùng được chọn nào có quyền truy cập vào bố cục đã chọn. Hành động sẽ không thực hiện được.</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Chọn bố cục...</translation>
-    </message>
-    <message>
-      <source>None of selected user roles contain users. Action will not work.</source>
-      <translation>Không có vai trò người dùng được chọn nào chứa người dùng. Hành động sẽ không hoạt động.</translation>
-    </message>
-    <message>
-      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation>Một số người dùng không có quyền truy cập vào bố cục đã chọn. Hành động sẽ không thực hiện được.</translation>
-    </message>
-    <message>
-      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation>Tìm kiếm một bố cục cục bộ? Chỉ chọn một người dùng từ danh sách &quot;Hiển thị tới&quot; để hiển thị bố cục cục bộ dưới dạng tùy chọn tại đây.</translation>
-    </message>
-    <message>
-      <source>Local layouts can only be shown to their owners</source>
-      <translation>Bố cục cục bộ chỉ có thể được hiển thị cho chủ sở hữu bố cục</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
     <message>
       <source>Not supported</source>
       <translation>Không được hỗ trợ</translation>
-    </message>
-    <message>
-      <source>This tab will be available in future versions</source>
-      <translation>Tab này sẽ có sẵn trong các phiên bản tương lai</translation>
-    </message>
-    <message>
-      <source>Learn more</source>
-      <translation>Tìm hiểu thêm</translation>
     </message>
   </context>
   <context>
@@ -10391,31 +9891,6 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>%1 Settings</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>%1 Cài đặt</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n symbols over</source>
-      <translation>
-        <numerusform>%n biểu tượng trên</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n symbols left</source>
-      <translation>
-        <numerusform>%n biểu tượng còn lại</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Chi nhánh không được kết nối với %1. Thông báo trên thiết bị di động chỉ hoạt động khi Chi nhánh được kết nối với %1.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::QnWebpageDialog</name>
     <message>
       <source>Name</source>
@@ -10570,69 +10045,6 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::RecordingStatusHelper</name>
-    <message>
-      <source>Not recording</source>
-      <translation>Không có video</translation>
-    </message>
-    <message>
-      <source>Recording everything</source>
-      <translation>Video liên tục</translation>
-    </message>
-    <message>
-      <source>Recording motion only</source>
-      <translation>Ghi âm phát hiện Displacement chỉ</translation>
-    </message>
-    <message>
-      <source>Recording motion and low quality</source>
-      <translation>Phát hiện chuyển động + chất lượng thấp video liên tục</translation>
-    </message>
-    <message>
-      <source>Continuous</source>
-      <translation>Video liên tục</translation>
-    </message>
-    <message>
-      <source>Motion only</source>
-      <translation>Chỉ phát hiện di dời</translation>
-    </message>
-    <message>
-      <source>Motion + Lo-Res</source>
-      <translation>Chuyển động + Lo-Res</translation>
-    </message>
-    <message>
-      <source>Recording motion and objects</source>
-      <translation>Ghi chuyển động và đối tượng</translation>
-    </message>
-    <message>
-      <source>Recording objects only</source>
-      <translation>Chỉ ghi đối tượng</translation>
-    </message>
-    <message>
-      <source>Recording motion, objects and low quality</source>
-      <translation>Ghi chuyển động, đối tượng và chất lượng thấp</translation>
-    </message>
-    <message>
-      <source>Recording objects and low quality</source>
-      <translation>Ghi đối tượng và chất lượng thấp</translation>
-    </message>
-    <message>
-      <source>Motion, Objects</source>
-      <translation>Chuyển động, Đối tượng</translation>
-    </message>
-    <message>
-      <source>Objects only</source>
-      <translation>Đối tượng chỉ</translation>
-    </message>
-    <message>
-      <source>Motion, Objects + Lo-Res</source>
-      <translation>Chuyển động, Đối tượng + Độ phân giải thấp</translation>
-    </message>
-    <message>
-      <source>Objects + Lo-Res</source>
-      <translation>Đối tượng + Độ phân giải thấp</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
     <message>
       <source>%1 layout</source>
@@ -10768,10 +10180,6 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
       <translation>Thiết đặt chất lượng xác định tỷ lệ nén chỉ, và không ảnh hưởng đến độ phân giải. Thấp, Trung bình, cao và tốt nhất là giá trị đặt trước bitrate.</translation>
-    </message>
-    <message>
-      <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
@@ -10914,6 +10322,11 @@ Bạn vẫn có thể thay đổi chất lượng và FPS trực tiếp trên ca
 You can still change quality and FPS directly on the camera.</source>
       <translation>Cài đặt chất lượng và FPS bị vô hiệu hóa do tùy chọn &quot;Cho phép tối ưu hóa cài đặt camera&quot; trong hộp thoại &quot;Quản trị Chi nhánh&quot;.
 Bạn vẫn có thể thay đổi chất lượng và FPS trực tiếp trên camera.</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <comment>Megabits per seconds</comment>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -11412,13 +10825,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
-    <message>
-      <source>Go to Live</source>
-      <translation>Đi tới Live</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>
@@ -11463,6 +10869,24 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>Open Services</source>
       <translation>Dịch vụ mở</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -12687,16 +12111,20 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Không thể thêm tài nguyên vào bố cục</translation>
     </message>
     <message>
-      <source>Cannot find a widget corresponding to the specified item.</source>
-      <translation>Không thể tìm thấy tiện ích tương ứng với khoản mục chỉ định.</translation>
-    </message>
-    <message>
       <source>Cannot find an item with the specified ID</source>
       <translation>Không thể tìm thấy mục có ID chỉ định</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified ID.</source>
       <translation>Không thể tìm thấy tài nguyên có ID chỉ định.</translation>
+    </message>
+    <message>
+      <source>Cannot find a widget corresponding to the specified item</source>
+      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+    </message>
+    <message>
+      <source>Cannot maximize the item</source>
+      <translation type="unfinished">Cannot maximize the item</translation>
     </message>
   </context>
   <context>
@@ -12888,6 +12316,31 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Token</source>
       <translation>Mã thông báo</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
+    <message>
+      <source>No custom headers</source>
+      <translation type="unfinished">No custom headers</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n custom headers</source>
+      <comment>%n is a number of custom headers</comment>
+      <translation type="unfinished">
+        <numerusform>%n custom headers</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::KeyValueModel</name>
+    <message>
+      <source>Key</source>
+      <translation type="unfinished">Key</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>Giá trí</translation>
     </message>
   </context>
   <context>
@@ -13137,71 +12590,10 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Analytics events can be set up on a certain cameras.</source>
-      <translation>Phân tích sự kiện có thể được thiết lập trên một camera nhất định.</translation>
-    </message>
-    <message>
-      <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Chọn camera bằng cách sử dụng nút ở trên để xem danh sách các sự kiện được hỗ trợ.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Sự kiện sẽ kích hoạt chỉ khi có những trận đấu trong chú thích với bất kỳ từ khóa đã nhập.</translation>
-    </message>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Nếu lĩnh vực này là trống rỗng, sự kiện sẽ luôn luôn kích hoạt.</translation>
-    </message>
-    <message>
-      <source>This field is case sensitive.</source>
-      <translation>Lĩnh vực này là trường hợp nhạy cảm.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Sự kiện sẽ kích hoạt chỉ khi có những trận đấu trong trường mô tả với bất kỳ từ khóa đã nhập.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Analytics object detection can be set up on a certain cameras.</source>
-      <translation>Tính năng phát hiện đối tượng phân tích có thể được thiết lập trên một số camera nhất định.</translation>
-    </message>
-    <message>
-      <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Chọn camera bằng cách sử dụng nút ở trên để xem danh sách các sự kiện được hỗ trợ.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation>Sự kiện sẽ chỉ kích hoạt nếu có bất kỳ đặc tính nào phù hợp. Bạn có thể thấy tên của các đặc tính và giá trị của chúng trên tab Đối tượng.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation>Tất cả Plugin</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Sự kiện sẽ kích hoạt chỉ khi có những trận đấu trong chú thích với bất kỳ từ khóa đã nhập.</translation>
-    </message>
-    <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation>Nếu lĩnh vực này là trống rỗng, sự kiện sẽ luôn luôn kích hoạt.</translation>
-    </message>
-    <message>
-      <source>This field is case sensitive.</source>
-      <translation>Lĩnh vực này là trường hợp nhạy cảm.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>Sự kiện sẽ kích hoạt chỉ khi có những trận đấu trong trường mô tả với bất kỳ từ khóa đã nhập.</translation>
     </message>
   </context>
   <context>

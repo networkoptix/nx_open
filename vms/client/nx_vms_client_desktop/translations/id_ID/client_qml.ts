@@ -236,6 +236,14 @@
       <source>Table Settings</source>
       <translation>Pengaturan Tabel</translation>
     </message>
+    <message>
+      <source>Switch to table view</source>
+      <translation type="unfinished">Switch to table view</translation>
+    </message>
+    <message>
+      <source>Switch to card view</source>
+      <translation type="unfinished">Switch to card view</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsSettings</name>
@@ -278,13 +286,6 @@
 Select an Integration to begin configuring its parameters.</source>
       <translation>Integrasi memungkinkan pemanfaatan analitik video yang lancar pada berbagai perangkat dari VMS.
 Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsToolTipPreview</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>NO DATA</translation>
     </message>
   </context>
   <context>
@@ -528,6 +529,10 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
       <source>Shut Down</source>
       <translation>Matikan</translation>
     </message>
+    <message>
+      <source>New</source>
+      <translation type="unfinished">New</translation>
+    </message>
   </context>
   <context>
     <name>CloudTile</name>
@@ -632,6 +637,29 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     <message>
       <source>Show thumbnails</source>
       <translation>Tampilkan thumbnail</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomHttpHeadersDialog</name>
+    <message>
+      <source>Custom HTTP headers</source>
+      <translation type="unfinished">Custom HTTP headers</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Tambah</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Hapus</translation>
+    </message>
+    <message>
+      <source>Key</source>
+      <translation type="unfinished">Key</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
     </message>
   </context>
   <context>
@@ -1107,6 +1135,26 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
       <source>No groups</source>
       <translation>Tidak ada grup</translation>
     </message>
+    <message>
+      <source>LDAP</source>
+      <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+      <translation>LDAP</translation>
+    </message>
+    <message>
+      <source>ORGANIZATION</source>
+      <comment>Section with groups from organisation</comment>
+      <translation type="unfinished">ORGANIZATION</translation>
+    </message>
+    <message>
+      <source>BUILT-IN</source>
+      <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
+      <translation type="unfinished">BUILT-IN</translation>
+    </message>
+    <message>
+      <source>CUSTOM</source>
+      <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+      <translation type="unfinished">CUSTOM</translation>
+    </message>
   </context>
   <context>
     <name>HintItem</name>
@@ -1142,10 +1190,14 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     </message>
   </context>
   <context>
-    <name>InsecureWarning</name>
+    <name>InsecureBanner</name>
     <message>
-      <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-      <translation>Keamanan akun itu penting. Jangan aktifkan pengaturan ini kecuali Anda mempunyai alasan kuat untuk melakukannya.</translation>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
+      <translation>Otentikasi digest sudah tidak digunakan lagi dan akan dinonaktifkan pada rilis berikutnya, dan hanya boleh digunakan bila Otentikasi Bearer default tidak dapat digunakan.</translation>
+    </message>
+    <message>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
+      <translation>Otentikasi digest sudah tidak berlaku lagi dan akan dinonaktifkan pada rilis berikutnya, dan hanya boleh digunakan jika Otentikasi Bearer default tidak dapat digunakan. Login pengguna hanya boleh terdiri dari huruf kecil.</translation>
     </message>
   </context>
   <context>
@@ -1794,6 +1846,11 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
       <translation>Kustom</translation>
     </message>
+    <message>
+      <source>Organization</source>
+      <comment>Section with groups from organisation</comment>
+      <translation type="unfinished">Organization</translation>
+    </message>
   </context>
   <context>
     <name>PasswordChangeDialog</name>
@@ -2217,16 +2274,8 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
       <translation>Tidak ada file lokal</translation>
     </message>
     <message>
-      <source>Nothing found</source>
-      <translation>Tidak ada yang ditemukan</translation>
-    </message>
-    <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
       <translation>Geser file video atau gambar ke jendela klien, atau tambahkan folder media lokal melalui dialog Pengaturan Lokal</translation>
-    </message>
-    <message>
-      <source>Try searching for something else</source>
-      <translation>Mencoba cari yang lain</translation>
     </message>
   </context>
   <context>
@@ -2286,10 +2335,6 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
   </context>
   <context>
     <name>ResourceSearchPane</name>
-    <message>
-      <source>Search</source>
-      <translation>Cari</translation>
-    </message>
     <message>
       <source>Servers</source>
       <translation>Servers</translation>
@@ -2389,13 +2434,6 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     <message>
       <source>File to save the results:</source>
       <translation>File untuk menyimpan hasilnya:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SearchEdit</name>
-    <message>
-      <source>Search</source>
-      <translation>Cari</translation>
     </message>
   </context>
   <context>

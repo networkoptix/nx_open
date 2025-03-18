@@ -74,6 +74,10 @@
       <source>The session key is too old for this Site.</source>
       <translation>Kunci sesi terlalu lama untuk Site ini.</translation>
     </message>
+    <message>
+      <source>No credentials provided when required by endpoint.</source>
+      <translation>Tidak ada kredensial yang diberikan saat diminta oleh endpoint.</translation>
+    </message>
   </context>
   <context>
     <name>Result</name>

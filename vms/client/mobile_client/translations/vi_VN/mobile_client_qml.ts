@@ -115,6 +115,13 @@
     </message>
   </context>
   <context>
+    <name>ChannelPartner</name>
+    <message>
+      <source>Channel Partner</source>
+      <translation type="unfinished">Channel Partner</translation>
+    </message>
+  </context>
+  <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
@@ -249,6 +256,48 @@
     </message>
   </context>
   <context>
+    <name>EventSearchMenuScreen</name>
+    <message>
+      <source>Looking for</source>
+      <translation type="unfinished">Looking for</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>Dấu trang</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Đối tượng</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation>Đối tượng</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>Dấu trang</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation>Không có đối tượng</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation>Không có dấu trang</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation>Thử thay đổi bộ lọc hoặc định cấu hình phát hiện đối tượng trong cài đặt plugin camera</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation>Thử thay đổi bộ lọc để hiển thị kết quả</translation>
+    </message>
+  </context>
+  <context>
     <name>FiltersPanel</name>
     <message>
       <source>No filters</source>
@@ -318,6 +367,17 @@
     </message>
   </context>
   <context>
+    <name>MenuScreen</name>
+    <message>
+      <source>App Settings</source>
+      <translation type="unfinished">App Settings</translation>
+    </message>
+    <message>
+      <source>Disconnect</source>
+      <translation type="unfinished">Disconnect</translation>
+    </message>
+  </context>
+  <context>
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
@@ -347,6 +407,37 @@
     <message>
       <source>Clear</source>
       <translation>Tẩy</translation>
+    </message>
+  </context>
+  <context>
+    <name>OrganizationScreen</name>
+    <message>
+      <source>Search</source>
+      <translation>Tìm kiếm</translation>
+    </message>
+    <message>
+      <source>No Sites</source>
+      <translation type="unfinished">No Sites</translation>
+    </message>
+    <message>
+      <source>We did not find any sites in this organization</source>
+      <translation type="unfinished">We did not find any sites in this organization</translation>
+    </message>
+    <message>
+      <source>We did not find any sites in this folder</source>
+      <translation type="unfinished">We did not find any sites in this folder</translation>
+    </message>
+    <message>
+      <source>How to connect sites?</source>
+      <translation type="unfinished">How to connect sites?</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Không tìm thấy kết quả nào</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
     </message>
   </context>
   <context>
@@ -508,33 +599,6 @@
     </message>
   </context>
   <context>
-    <name>SearchScreen</name>
-    <message>
-      <source>Objects</source>
-      <translation>Đối tượng</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>Dấu trang</translation>
-    </message>
-    <message>
-      <source>No objects</source>
-      <translation>Không có đối tượng</translation>
-    </message>
-    <message>
-      <source>No bookmarks</source>
-      <translation>Không có dấu trang</translation>
-    </message>
-    <message>
-      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation>Thử thay đổi bộ lọc hoặc định cấu hình phát hiện đối tượng trong cài đặt plugin camera</translation>
-    </message>
-    <message>
-      <source>Try changing the filters to display the results</source>
-      <translation>Thử thay đổi bộ lọc để hiển thị kết quả</translation>
-    </message>
-  </context>
-  <context>
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
@@ -560,10 +624,6 @@
   <context>
     <name>SessionCredentialsEditor</name>
     <message>
-      <source>Host : Port</source>
-      <translation>Máy chủ: Port</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Đăng nhập</translation>
     </message>
@@ -579,49 +639,56 @@
       <source>Users</source>
       <translation>Người sử dụng</translation>
     </message>
-  </context>
-  <context>
-    <name>SessionItem</name>
     <message>
-      <source>INCOMPATIBLE</source>
-      <translation>KHÔNG TƯƠNG THÍCH</translation>
-    </message>
-    <message>
-      <source>OFFLINE</source>
-      <translation>NGOẠI TUYẾN</translation>
-    </message>
-    <message>
-      <source>UNREACHABLE</source>
-      <translation>Không thể truy cập được</translation>
+      <source>Host: Port</source>
+      <translation type="unfinished">Host: Port</translation>
     </message>
   </context>
   <context>
     <name>SessionsScreen</name>
     <message>
-      <source>Connect to Server...</source>
-      <translation>Kết nối đến máy chủ...</translation>
-    </message>
-    <message>
-      <source>Connect to Another Server...</source>
-      <translation>Kết nối đến các máy chủ khác...</translation>
-    </message>
-    <message>
-      <source>Log in to %1</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Đăng nhập vào %1</translation>
-    </message>
-    <message>
-      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <comment>%1 is a button name</comment>
-      <translation>Kiểm tra kết nối mạng hoặc nhấn nút &quot;%1&quot; để nhập địa chỉ máy chủ đã biết.</translation>
-    </message>
-    <message>
       <source>Nothing found</source>
       <translation>Không tìm thấy kết quả nào</translation>
     </message>
     <message>
-      <source>No Sites found</source>
-      <translation>Không tìm thấy Chi nhánh nào</translation>
+      <source>Search</source>
+      <translation>Tìm kiếm</translation>
+    </message>
+    <message>
+      <source>Organizations</source>
+      <translation type="unfinished">Organizations</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation>Các chi nhánh</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
+    </message>
+    <message>
+      <source>No Organizations</source>
+      <translation type="unfinished">No Organizations</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any organizations, try contacting support</source>
+      <translation type="unfinished">We didn&apos;t find any organizations, try contacting support</translation>
+    </message>
+    <message>
+      <source>No Sites Found</source>
+      <translation type="unfinished">No Sites Found</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
+      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
+      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
     </message>
   </context>
   <context>
@@ -706,6 +773,14 @@
       <source>Early access to new features</source>
       <translation>Quyền truy cập sớm vào các tính năng mới</translation>
     </message>
+    <message>
+      <source>Enable software decoder fallback</source>
+      <translation>Bật chế độ dự phòng giải mã phần mềm</translation>
+    </message>
+    <message>
+      <source>Decode some rare video formats using software decoder</source>
+      <translation>Giải mã một số định dạng video hiếm bằng phần mềm giải mã</translation>
+    </message>
   </context>
   <context>
     <name>SideNavigation</name>
@@ -713,13 +788,35 @@
       <source>New connection</source>
       <translation>Kết nối mới</translation>
     </message>
+  </context>
+  <context>
+    <name>SiteList</name>
     <message>
-      <source>Disconnect from Server</source>
-      <translation>Ngắt kết nối với máy chủ</translation>
+      <source>Organizations</source>
+      <translation type="unfinished">Organizations</translation>
     </message>
     <message>
-      <source>Settings</source>
-      <translation>Cài đặt</translation>
+      <source>Folders</source>
+      <translation type="unfinished">Folders</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation>Các chi nhánh</translation>
+    </message>
+  </context>
+  <context>
+    <name>SiteListItem</name>
+    <message>
+      <source>INCOMPATIBLE</source>
+      <translation>KHÔNG TƯƠNG THÍCH</translation>
+    </message>
+    <message>
+      <source>OFFLINE</source>
+      <translation>NGOẠI TUYẾN</translation>
+    </message>
+    <message>
+      <source>UNREACHABLE</source>
+      <translation>Không thể truy cập được</translation>
     </message>
   </context>
   <context>
@@ -753,9 +850,13 @@
       <translation>Đăng xuất</translation>
     </message>
     <message>
-      <source>Go to %1</source>
+      <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Đi tới %1</translation>
+      <translation type="unfinished">Open %1</translation>
+    </message>
+    <message>
+      <source>Channel Partner</source>
+      <translation type="unfinished">Channel Partner</translation>
     </message>
   </context>
   <context>

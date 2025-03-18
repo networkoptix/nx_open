@@ -129,54 +129,13 @@
       <source>Open Files Folder</source>
       <translation type="unfinished">Open Files Folder</translation>
     </message>
-  </context>
-  <context>
-    <name>AggregationWidget</name>
     <message>
-      <source>Check to set aggregation period</source>
-      <translation>Check to set aggregation period</translation>
+      <source>with</source>
+      <translation type="unfinished">with</translation>
     </message>
     <message>
-      <source>Interval of action :</source>
-      <translation>Interval voor actie:</translation>
-    </message>
-    <message>
-      <source>No more than once per</source>
-      <translation>Niet meer dan een keer per</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Instant</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Trefwoorden scheiden met een spatie</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Onderschrift bevat:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Beschrijving bevat:</translation>
-    </message>
-    <message>
-      <source>Event Type:</source>
-      <translation>Gebeurtenistype:</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Attributes:</source>
-      <translation>Attributen:</translation>
-    </message>
-    <message>
-      <source>Object Type:</source>
-      <translation>Object type:</translation>
+      <source>Simultaneous Streams</source>
+      <translation type="unfinished">Simultaneous Streams</translation>
     </message>
   </context>
   <context>
@@ -291,10 +250,6 @@
       <translation>Beperk bandbreedte tot</translation>
     </message>
     <message>
-      <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
-    </message>
-    <message>
       <source>Unlimited</source>
       <translation>Onbeperkt</translation>
     </message>
@@ -305,6 +260,10 @@
     <message>
       <source>No backup</source>
       <translation>Geen back-up</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -332,29 +291,6 @@
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
       <translation>De back-up is gestopt vanwege een opslagprobleem. Back-up wordt automatisch hervat nadat het opslagprobleem is opgelost</translation>
-    </message>
-  </context>
-  <context>
-    <name>BookmarkBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Vaste duur:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>seconden</translation>
-    </message>
-    <message>
-      <source>Tags:</source>
-      <translation>Tags:</translation>
-    </message>
-    <message>
-      <source>Pre-recording:</source>
-      <translation>Voor-opname:</translation>
-    </message>
-    <message>
-      <source>Post-recording:</source>
-      <translation>Na-opname:</translation>
     </message>
   </context>
   <context>
@@ -420,79 +356,6 @@
     <message>
       <source>Clear Filter</source>
       <translation>Filter wissen</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRuleWidget</name>
-    <message>
-      <source>Event</source>
-      <translation>Event</translation>
-    </message>
-    <message>
-      <source>Schedule...</source>
-      <translation>Schema...</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Actie</translation>
-    </message>
-    <message>
-      <source>Comments:</source>
-      <translation>Reacties:</translation>
-    </message>
-    <message>
-      <source>When</source>
-      <translation>Wanneer</translation>
-    </message>
-    <message>
-      <source>Do</source>
-      <translation>Actie</translation>
-    </message>
-    <message>
-      <source>At</source>
-      <translation>Bron</translation>
-    </message>
-    <message>
-      <source>Use event source server</source>
-      <translation>Gebruik event bron server</translation>
-    </message>
-    <message>
-      <source>Use event source camera</source>
-      <translation type="unfinished">Use event source camera</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRulesDialog</name>
-    <message>
-      <source>Add</source>
-      <translation>Toevoegen</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Verwijder</translation>
-    </message>
-    <message>
-      <source>Event Rules</source>
-      <translation>Event regels</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>Logboek...</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Test</translation>
-    </message>
-  </context>
-  <context>
-    <name>BuzzerBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Vaste duur:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>seconden</translation>
     </message>
   </context>
   <context>
@@ -741,12 +604,9 @@
       <source>Logical ID</source>
       <translation>Logische ID</translation>
     </message>
-  </context>
-  <context>
-    <name>CameraInputBusinessEventWidget</name>
     <message>
-      <source>Input ID</source>
-      <translation>Ingang ID</translation>
+      <source>Restreaming Link</source>
+      <translation type="unfinished">Restreaming Link</translation>
     </message>
   </context>
   <context>
@@ -781,17 +641,6 @@
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
       <translation>in</translation>
-    </message>
-  </context>
-  <context>
-    <name>CameraOutputBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Vaste duur:</translation>
-    </message>
-    <message>
-      <source>Output ID:</source>
-      <translation>Uitgang ID:</translation>
     </message>
   </context>
   <context>
@@ -904,57 +753,6 @@
     </message>
   </context>
   <context>
-    <name>CloudLayoutsIntroDialog</name>
-    <message>
-      <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
-    </message>
-    <message>
-      <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
-    </message>
-    <message>
-      <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
-    </message>
-    <message>
-      <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
-    </message>
-    <message>
-      <source>PTZ</source>
-      <translation>PTZ</translation>
-    </message>
-    <message>
-      <source>Showreels</source>
-      <translation>Showreels</translation>
-    </message>
-    <message>
-      <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
-    </message>
-    <message>
-      <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
-    </message>
-    <message>
-      <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
-    </message>
-    <message>
-      <source>Motion Search</source>
-      <translation>Zoeken op beweging</translation>
-    </message>
-    <message>
-      <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
-    </message>
-    <message>
-      <source>In the Future</source>
-      <translation type="unfinished">In the Future</translation>
-    </message>
-  </context>
-  <context>
     <name>CloudManagementWidget</name>
     <message>
       <source>No connection</source>
@@ -996,29 +794,6 @@
     <message>
       <source>Select another event or action</source>
       <translation type="unfinished">Select another event or action</translation>
-    </message>
-  </context>
-  <context>
-    <name>CustomBusinessEventWidget</name>
-    <message>
-      <source>Source contains:</source>
-      <translation>Bron bevat:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Trefwoorden scheiden met een spatie</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Onderschrift bevat:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Beschrijving bevat:</translation>
-    </message>
-    <message>
-      <source>Omit Logging</source>
-      <translation>Logging weglaten</translation>
     </message>
   </context>
   <context>
@@ -1172,59 +947,6 @@
     </message>
   </context>
   <context>
-    <name>ExecHttpRequestActionWidget</name>
-    <message>
-      <source>Login to authenticate (optional)</source>
-      <translation>Log in om te verifiëren (optioneel)</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Login</translation>
-    </message>
-    <message>
-      <source>Password to authenticate (optional)</source>
-      <translation>Wachtwoord voor verificatie (optioneel)</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Wachtwoord</translation>
-    </message>
-    <message>
-      <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
-    </message>
-    <message>
-      <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
-    </message>
-    <message>
-      <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
-    </message>
-    <message>
-      <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
-    </message>
-    <message>
-      <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExecPtzPresetBusinessActionWidget</name>
-    <message>
-      <source>PTZ preset:</source>
-      <translation>PTZ preset:</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExitFullscreenActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>Op schermindeling</translation>
-    </message>
-  </context>
-  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <source>Export Settings</source>
@@ -1345,17 +1067,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Niets gevonden</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenCameraActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>Op schermindeling</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Camera</translation>
     </message>
   </context>
   <context>
@@ -1773,8 +1484,8 @@
       <translation>Opnieuw proberen</translation>
     </message>
     <message>
-      <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
     </message>
   </context>
   <context>
@@ -2001,21 +1712,6 @@
     </message>
   </context>
   <context>
-    <name>OpenLayoutActionWidget</name>
-    <message>
-      <source>Layout</source>
-      <translation>Layout</translation>
-    </message>
-    <message>
-      <source>Show to</source>
-      <translation>Laten zien aan</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Selecteer schermindeling...</translation>
-    </message>
-  </context>
-  <context>
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
@@ -2067,75 +1763,6 @@
     <message>
       <source>Sign in to web page</source>
       <translation type="unfinished">Sign in to web page</translation>
-    </message>
-  </context>
-  <context>
-    <name>PlaySoundBusinessActionWidget</name>
-    <message>
-      <source>Manage...</source>
-      <translation>Beheren...</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>Volume:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>Test...</translation>
-    </message>
-    <message>
-      <source>Play to users</source>
-      <translation>Speel af naar gebruikers</translation>
-    </message>
-  </context>
-  <context>
-    <name>PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Source:</source>
-      <translation>Bron:</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Onderschrift bevat:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Trefwoorden scheiden met een spatie</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Beschrijving bevat:</translation>
-    </message>
-    <message>
-      <source>Level:</source>
-      <translation>Niveau:</translation>
-    </message>
-    <message>
-      <source>ERROR</source>
-      <translation>FOUT</translation>
-    </message>
-    <message>
-      <source>WARNING</source>
-      <translation>WAARSCHUWING</translation>
-    </message>
-    <message>
-      <source>INFO</source>
-      <translation>INFO</translation>
-    </message>
-  </context>
-  <context>
-    <name>PopupBusinessActionWidget</name>
-    <message>
-      <source>Force Acknowledgment</source>
-      <translation>Forceer bevestiging</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>Gebruik aangepaste tekst:</translation>
-    </message>
-    <message>
-      <source>to</source>
-      <translation>aan</translation>
     </message>
   </context>
   <context>
@@ -2209,37 +1836,6 @@
     <message>
       <source>Hotkey:</source>
       <translation>Sneltoets:</translation>
-    </message>
-  </context>
-  <context>
-    <name>PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>To</source>
-      <translation>Aan</translation>
-    </message>
-    <message>
-      <source>Custom notification content</source>
-      <translation>Aangepaste inhoud van meldingen</translation>
-    </message>
-    <message>
-      <source>Header</source>
-      <translation>Koptekst</translation>
-    </message>
-    <message>
-      <source>Default notification title will be used if left empty</source>
-      <translation>Standaard notificatie titel zal gebruikt worden als het leeg gelaten wordt</translation>
-    </message>
-    <message>
-      <source>Body</source>
-      <translation>Berichttekst</translation>
-    </message>
-    <message>
-      <source>Default text will be used if this field is empty</source>
-      <translation>Standaardtekst wordt gebruikt als dit veld leeg is</translation>
-    </message>
-    <message>
-      <source>Add source device name in body</source>
-      <translation>Voeg de naam van het bronapparaat toe aan de berichttekst</translation>
     </message>
   </context>
   <context>
@@ -2389,33 +1985,6 @@
     </message>
   </context>
   <context>
-    <name>RecordingBusinessActionWidget</name>
-    <message>
-      <source>Quality:</source>
-      <translation>Kwaliteit:</translation>
-    </message>
-    <message>
-      <source>FPS</source>
-      <translation>FPS</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>Pre-Recording:</source>
-      <translation>Voor-opname:</translation>
-    </message>
-    <message>
-      <source>Post-Recording:</source>
-      <translation>Na-opname:</translation>
-    </message>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Vaste duur:</translation>
-    </message>
-  </context>
-  <context>
     <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
@@ -2520,29 +2089,6 @@
     <message>
       <source>Organization&apos;s limits violation</source>
       <translation type="unfinished">Organization&apos;s limits violation</translation>
-    </message>
-  </context>
-  <context>
-    <name>SayTextBusinessActionWidget</name>
-    <message>
-      <source>Speak the following:</source>
-      <translation>Spreek het volgende uit:</translation>
-    </message>
-    <message>
-      <source>Type any text here</source>
-      <translation>Typ de gewenste tekst hier</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>Volume:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>Test...</translation>
-    </message>
-    <message>
-      <source>Speak to users</source>
-      <translation>Spreek met gebruikers</translation>
     </message>
   </context>
   <context>
@@ -2688,17 +2234,6 @@
     </message>
   </context>
   <context>
-    <name>SendmailBusinessActionWidget</name>
-    <message>
-      <source>Additional Recipients:</source>
-      <translation>Aanvullende Ontvangers:</translation>
-    </message>
-    <message>
-      <source>Global Email Settings...</source>
-      <translation>Algemene e-mailinstellingen...</translation>
-    </message>
-  </context>
-  <context>
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
@@ -2772,36 +2307,6 @@
     </message>
   </context>
   <context>
-    <name>ShowOnAlarmLayoutActionWidget</name>
-    <message>
-      <source>for</source>
-      <translation>voor</translation>
-    </message>
-    <message>
-      <source>Force Alarm Layout opening</source>
-      <translation>Forceer het openen van een alarmlayout</translation>
-    </message>
-  </context>
-  <context>
-    <name>ShowTextOverlayActionWidget</name>
-    <message>
-      <source>seconds</source>
-      <translation>seconden</translation>
-    </message>
-    <message>
-      <source>Display text for:</source>
-      <translation>Toon tekst voor:</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>Gebruik aangepaste tekst:</translation>
-    </message>
-    <message>
-      <source>Rule will work only for prolonged events</source>
-      <translation>Regel werkt alleen voor langdurige evenementen</translation>
-    </message>
-  </context>
-  <context>
     <name>SignDialog</name>
     <message>
       <source>Watermark Check</source>
@@ -2814,21 +2319,6 @@
     <message>
       <source>Check Result:</source>
       <translation>Controle resultaat:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>Available to</source>
-      <translation>Beschikbaar voor</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Naam</translation>
-    </message>
-    <message>
-      <source>Icon</source>
-      <translation>Icoon</translation>
     </message>
   </context>
   <context>

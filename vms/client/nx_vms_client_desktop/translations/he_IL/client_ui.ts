@@ -129,54 +129,13 @@
       <source>Open Files Folder</source>
       <translation type="unfinished">Open Files Folder</translation>
     </message>
-  </context>
-  <context>
-    <name>AggregationWidget</name>
     <message>
-      <source>Check to set aggregation period</source>
-      <translation>סמן להגדרת תקופת השמירה</translation>
+      <source>with</source>
+      <translation type="unfinished">with</translation>
     </message>
     <message>
-      <source>Interval of action :</source>
-      <translation>מרווח פעולה:</translation>
-    </message>
-    <message>
-      <source>No more than once per</source>
-      <translation>לא יותר מאחת ל</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>מיידי</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>מילות מפתח מופרדות ע"י רווח</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>הכתובית מכילה:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>התיאור מכיל:</translation>
-    </message>
-    <message>
-      <source>Event Type:</source>
-      <translation>סוג אירוע:</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Attributes:</source>
-      <translation type="unfinished">Attributes:</translation>
-    </message>
-    <message>
-      <source>Object Type:</source>
-      <translation type="unfinished">Object Type:</translation>
+      <source>Simultaneous Streams</source>
+      <translation type="unfinished">Simultaneous Streams</translation>
     </message>
   </context>
   <context>
@@ -291,10 +250,6 @@
       <translation type="unfinished">Fix bandwidth to</translation>
     </message>
     <message>
-      <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
-    </message>
-    <message>
       <source>Unlimited</source>
       <translation type="unfinished">Unlimited</translation>
     </message>
@@ -305,6 +260,10 @@
     <message>
       <source>No backup</source>
       <translation type="unfinished">No backup</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -332,29 +291,6 @@
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
       <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
-    </message>
-  </context>
-  <context>
-    <name>BookmarkBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>משך זמן קבוע:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>שניות</translation>
-    </message>
-    <message>
-      <source>Tags:</source>
-      <translation>תגים:</translation>
-    </message>
-    <message>
-      <source>Pre-recording:</source>
-      <translation>לפני הקלטה:</translation>
-    </message>
-    <message>
-      <source>Post-recording:</source>
-      <translation>אחרי הקלטה:</translation>
     </message>
   </context>
   <context>
@@ -420,79 +356,6 @@
     <message>
       <source>Clear Filter</source>
       <translation>מחק פילטר</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRuleWidget</name>
-    <message>
-      <source>Event</source>
-      <translation>אירוע</translation>
-    </message>
-    <message>
-      <source>Schedule...</source>
-      <translation>לוח זמנים...</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>פעולה</translation>
-    </message>
-    <message>
-      <source>Comments:</source>
-      <translation>הערות:</translation>
-    </message>
-    <message>
-      <source>When</source>
-      <translation>כאשר</translation>
-    </message>
-    <message>
-      <source>Do</source>
-      <translation>בצע</translation>
-    </message>
-    <message>
-      <source>At</source>
-      <translation>ב</translation>
-    </message>
-    <message>
-      <source>Use event source server</source>
-      <translation>השתמש בשרת מקור האירוע</translation>
-    </message>
-    <message>
-      <source>Use event source camera</source>
-      <translation type="unfinished">Use event source camera</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRulesDialog</name>
-    <message>
-      <source>Add</source>
-      <translation>הוסף</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>מחק</translation>
-    </message>
-    <message>
-      <source>Event Rules</source>
-      <translation>חוקים</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>יומן אירועים...</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>בדיקה</translation>
-    </message>
-  </context>
-  <context>
-    <name>BuzzerBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>משך זמן קבוע:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>שניות</translation>
     </message>
   </context>
   <context>
@@ -741,12 +604,9 @@
       <source>Logical ID</source>
       <translation>זיהוי ID לוגי</translation>
     </message>
-  </context>
-  <context>
-    <name>CameraInputBusinessEventWidget</name>
     <message>
-      <source>Input ID</source>
-      <translation>מזהה קלט</translation>
+      <source>Restreaming Link</source>
+      <translation type="unfinished">Restreaming Link</translation>
     </message>
   </context>
   <context>
@@ -781,17 +641,6 @@
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
       <translation type="unfinished">in</translation>
-    </message>
-  </context>
-  <context>
-    <name>CameraOutputBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>משך זמן קבוע:</translation>
-    </message>
-    <message>
-      <source>Output ID:</source>
-      <translation>מזהה פלט:</translation>
     </message>
   </context>
   <context>
@@ -904,57 +753,6 @@
     </message>
   </context>
   <context>
-    <name>CloudLayoutsIntroDialog</name>
-    <message>
-      <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
-    </message>
-    <message>
-      <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
-    </message>
-    <message>
-      <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
-    </message>
-    <message>
-      <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
-    </message>
-    <message>
-      <source>PTZ</source>
-      <translation>מצלמה ממונעת</translation>
-    </message>
-    <message>
-      <source>Showreels</source>
-      <translation>סיורי פריסות</translation>
-    </message>
-    <message>
-      <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
-    </message>
-    <message>
-      <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
-    </message>
-    <message>
-      <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
-    </message>
-    <message>
-      <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
-    </message>
-    <message>
-      <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
-    </message>
-    <message>
-      <source>In the Future</source>
-      <translation type="unfinished">In the Future</translation>
-    </message>
-  </context>
-  <context>
     <name>CloudManagementWidget</name>
     <message>
       <source>No connection</source>
@@ -996,29 +794,6 @@
     <message>
       <source>Select another event or action</source>
       <translation type="unfinished">Select another event or action</translation>
-    </message>
-  </context>
-  <context>
-    <name>CustomBusinessEventWidget</name>
-    <message>
-      <source>Source contains:</source>
-      <translation>המקור מכיל:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>מילות מפתח מופרדות ע"י רווח</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>הכתובית מכילה:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>התיאור מכיל:</translation>
-    </message>
-    <message>
-      <source>Omit Logging</source>
-      <translation>בטל רישום</translation>
     </message>
   </context>
   <context>
@@ -1172,59 +947,6 @@
     </message>
   </context>
   <context>
-    <name>ExecHttpRequestActionWidget</name>
-    <message>
-      <source>Login to authenticate (optional)</source>
-      <translation>היכנס לארכיטקטורה (אופציונאלי)</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>שם משתמש</translation>
-    </message>
-    <message>
-      <source>Password to authenticate (optional)</source>
-      <translation>סיסמה לאימות (אופציונאלי)</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>סיסמה</translation>
-    </message>
-    <message>
-      <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
-    </message>
-    <message>
-      <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
-    </message>
-    <message>
-      <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
-    </message>
-    <message>
-      <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
-    </message>
-    <message>
-      <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExecPtzPresetBusinessActionWidget</name>
-    <message>
-      <source>PTZ preset:</source>
-      <translation>פריסט &amp;PTZ:</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExitFullscreenActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>בפריסה</translation>
-    </message>
-  </context>
-  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <source>Export Settings</source>
@@ -1345,17 +1067,6 @@
     <message>
       <source>Nothing found</source>
       <translation>לא נמצא דבר</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenCameraActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>בפריסה</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>מצלמה</translation>
     </message>
   </context>
   <context>
@@ -1773,8 +1484,8 @@
       <translation>נסה שוב</translation>
     </message>
     <message>
-      <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
     </message>
   </context>
   <context>
@@ -2001,21 +1712,6 @@
     </message>
   </context>
   <context>
-    <name>OpenLayoutActionWidget</name>
-    <message>
-      <source>Layout</source>
-      <translation>פריסה</translation>
-    </message>
-    <message>
-      <source>Show to</source>
-      <translation>הצג ל</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>בחר פריסה...</translation>
-    </message>
-  </context>
-  <context>
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
@@ -2067,75 +1763,6 @@
     <message>
       <source>Sign in to web page</source>
       <translation type="unfinished">Sign in to web page</translation>
-    </message>
-  </context>
-  <context>
-    <name>PlaySoundBusinessActionWidget</name>
-    <message>
-      <source>Manage...</source>
-      <translation>נהל...</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>ווליום:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>בדוק...</translation>
-    </message>
-    <message>
-      <source>Play to users</source>
-      <translation>נגן למתשתמשים</translation>
-    </message>
-  </context>
-  <context>
-    <name>PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Source:</source>
-      <translation>מקור:</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>הכתובית מכילה:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>מילות מפתח מופרדות ע"י רווח</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>התיאור מכיל:</translation>
-    </message>
-    <message>
-      <source>Level:</source>
-      <translation>רמה:</translation>
-    </message>
-    <message>
-      <source>ERROR</source>
-      <translation>שגיאה</translation>
-    </message>
-    <message>
-      <source>WARNING</source>
-      <translation>אזהרה</translation>
-    </message>
-    <message>
-      <source>INFO</source>
-      <translation>מידע</translation>
-    </message>
-  </context>
-  <context>
-    <name>PopupBusinessActionWidget</name>
-    <message>
-      <source>Force Acknowledgment</source>
-      <translation>כפה אישור</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>השתמש בטקסט:</translation>
-    </message>
-    <message>
-      <source>to</source>
-      <translation>ל</translation>
     </message>
   </context>
   <context>
@@ -2209,37 +1836,6 @@
     <message>
       <source>Hotkey:</source>
       <translation>מקש קיצור:</translation>
-    </message>
-  </context>
-  <context>
-    <name>PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>To</source>
-      <translation>אל</translation>
-    </message>
-    <message>
-      <source>Custom notification content</source>
-      <translation>תוכן התראה מותאם אישית</translation>
-    </message>
-    <message>
-      <source>Header</source>
-      <translation>כותרת</translation>
-    </message>
-    <message>
-      <source>Default notification title will be used if left empty</source>
-      <translation>אם ריק, כותרת ברירת מחדל תהיה בשימוש</translation>
-    </message>
-    <message>
-      <source>Body</source>
-      <translation>גוף ההודעה</translation>
-    </message>
-    <message>
-      <source>Default text will be used if this field is empty</source>
-      <translation>טקסט ברירת מחדל ישמש אם שדה זה ריק</translation>
-    </message>
-    <message>
-      <source>Add source device name in body</source>
-      <translation>הוסף את שם ההתקן בגוף ההודעה</translation>
     </message>
   </context>
   <context>
@@ -2389,33 +1985,6 @@
     </message>
   </context>
   <context>
-    <name>RecordingBusinessActionWidget</name>
-    <message>
-      <source>Quality:</source>
-      <translation>איכות:</translation>
-    </message>
-    <message>
-      <source>FPS</source>
-      <translation>פריימים לשניה</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <translation>ש</translation>
-    </message>
-    <message>
-      <source>Pre-Recording:</source>
-      <translation>קודם התנועה:</translation>
-    </message>
-    <message>
-      <source>Post-Recording:</source>
-      <translation>לאחר התנועה:</translation>
-    </message>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>משך זמן קבוע:</translation>
-    </message>
-  </context>
-  <context>
     <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
@@ -2520,29 +2089,6 @@
     <message>
       <source>Organization&apos;s limits violation</source>
       <translation type="unfinished">Organization&apos;s limits violation</translation>
-    </message>
-  </context>
-  <context>
-    <name>SayTextBusinessActionWidget</name>
-    <message>
-      <source>Speak the following:</source>
-      <translation>אמור את הטקסט הבא:</translation>
-    </message>
-    <message>
-      <source>Type any text here</source>
-      <translation>כתוב כאן טקסט כל שהוא</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>ווליום:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>בדיקה...</translation>
-    </message>
-    <message>
-      <source>Speak to users</source>
-      <translation>דבר למשתמשים</translation>
     </message>
   </context>
   <context>
@@ -2688,17 +2234,6 @@
     </message>
   </context>
   <context>
-    <name>SendmailBusinessActionWidget</name>
-    <message>
-      <source>Additional Recipients:</source>
-      <translation>&amp;נמענים נוספים:</translation>
-    </message>
-    <message>
-      <source>Global Email Settings...</source>
-      <translation>&amp;הגדרות אימייל גלובליות...</translation>
-    </message>
-  </context>
-  <context>
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
@@ -2772,36 +2307,6 @@
     </message>
   </context>
   <context>
-    <name>ShowOnAlarmLayoutActionWidget</name>
-    <message>
-      <source>for</source>
-      <translation>ל</translation>
-    </message>
-    <message>
-      <source>Force Alarm Layout opening</source>
-      <translation>כפה פתיחת פריסת אזעקה</translation>
-    </message>
-  </context>
-  <context>
-    <name>ShowTextOverlayActionWidget</name>
-    <message>
-      <source>seconds</source>
-      <translation>שניות</translation>
-    </message>
-    <message>
-      <source>Display text for:</source>
-      <translation>הצג טקסט עבור:</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>השתמש בטקסט:</translation>
-    </message>
-    <message>
-      <source>Rule will work only for prolonged events</source>
-      <translation>החוק יעבוד רק עבור חוקים מתמשכים</translation>
-    </message>
-  </context>
-  <context>
     <name>SignDialog</name>
     <message>
       <source>Watermark Check</source>
@@ -2814,21 +2319,6 @@
     <message>
       <source>Check Result:</source>
       <translation>בדוק תוצאה:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>Available to</source>
-      <translation>זמין ל</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>שם</translation>
-    </message>
-    <message>
-      <source>Icon</source>
-      <translation>סמל</translation>
     </message>
   </context>
   <context>

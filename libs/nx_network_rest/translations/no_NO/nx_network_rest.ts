@@ -74,6 +74,10 @@
       <source>The session key is too old for this Site.</source>
       <translation>Sesjonsnøkkelen er for gammel for dette nettstedet.</translation>
     </message>
+    <message>
+      <source>No credentials provided when required by endpoint.</source>
+      <translation>Ingen legitimasjon oppgitt når endepunktet krever det.</translation>
+    </message>
   </context>
   <context>
     <name>Result</name>

@@ -129,54 +129,13 @@
       <source>Open Files Folder</source>
       <translation>開啟檔案資料夾</translation>
     </message>
-  </context>
-  <context>
-    <name>AggregationWidget</name>
     <message>
-      <source>Check to set aggregation period</source>
-      <translation>點選以設定動作期間</translation>
+      <source>with</source>
+      <translation type="unfinished">with</translation>
     </message>
     <message>
-      <source>Interval of action :</source>
-      <translation>動作間隔:</translation>
-    </message>
-    <message>
-      <source>No more than once per</source>
-      <translation>一次以上</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>立即</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>關鍵字以空白鍵分隔</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>說明包含:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>敘述包含:</translation>
-    </message>
-    <message>
-      <source>Event Type:</source>
-      <translation>事件類型:</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Attributes:</source>
-      <translation>屬性:</translation>
-    </message>
-    <message>
-      <source>Object Type:</source>
-      <translation>物件類型:</translation>
+      <source>Simultaneous Streams</source>
+      <translation type="unfinished">Simultaneous Streams</translation>
     </message>
   </context>
   <context>
@@ -291,10 +250,6 @@
       <translation>限制頻寬上限為</translation>
     </message>
     <message>
-      <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
-    </message>
-    <message>
       <source>Unlimited</source>
       <translation>不限制頻寬</translation>
     </message>
@@ -305,6 +260,10 @@
     <message>
       <source>No backup</source>
       <translation>不啟用備份</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -332,29 +291,6 @@
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
       <translation>因儲存裝置問題而導致備份暫時停止，待問題修復後，備份將會自動重啟。</translation>
-    </message>
-  </context>
-  <context>
-    <name>BookmarkBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>固定長度:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>秒</translation>
-    </message>
-    <message>
-      <source>Tags:</source>
-      <translation>標籤:</translation>
-    </message>
-    <message>
-      <source>Pre-recording:</source>
-      <translation>事前錄影:</translation>
-    </message>
-    <message>
-      <source>Post-recording:</source>
-      <translation>事後錄影:</translation>
     </message>
   </context>
   <context>
@@ -420,79 +356,6 @@
     <message>
       <source>Clear Filter</source>
       <translation>清除篩選器</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRuleWidget</name>
-    <message>
-      <source>Event</source>
-      <translation>事件</translation>
-    </message>
-    <message>
-      <source>Schedule...</source>
-      <translation>排程...</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>動作</translation>
-    </message>
-    <message>
-      <source>Comments:</source>
-      <translation>註解:</translation>
-    </message>
-    <message>
-      <source>When</source>
-      <translation>當</translation>
-    </message>
-    <message>
-      <source>Do</source>
-      <translation>進行</translation>
-    </message>
-    <message>
-      <source>At</source>
-      <translation>於</translation>
-    </message>
-    <message>
-      <source>Use event source server</source>
-      <translation>使用事件來源伺服器</translation>
-    </message>
-    <message>
-      <source>Use event source camera</source>
-      <translation>使用事件來源攝影機</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRulesDialog</name>
-    <message>
-      <source>Add</source>
-      <translation>新增</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>刪除</translation>
-    </message>
-    <message>
-      <source>Event Rules</source>
-      <translation>事件規則</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>事件日誌...</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>測試</translation>
-    </message>
-  </context>
-  <context>
-    <name>BuzzerBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>固定長度:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>秒</translation>
     </message>
   </context>
   <context>
@@ -741,12 +604,9 @@
       <source>Logical ID</source>
       <translation>自定義 ID</translation>
     </message>
-  </context>
-  <context>
-    <name>CameraInputBusinessEventWidget</name>
     <message>
-      <source>Input ID</source>
-      <translation>輸入ID</translation>
+      <source>Restreaming Link</source>
+      <translation type="unfinished">Restreaming Link</translation>
     </message>
   </context>
   <context>
@@ -781,17 +641,6 @@
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
       <translation>使用</translation>
-    </message>
-  </context>
-  <context>
-    <name>CameraOutputBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>固定長度:</translation>
-    </message>
-    <message>
-      <source>Output ID:</source>
-      <translation>輸出 ID:</translation>
     </message>
   </context>
   <context>
@@ -904,57 +753,6 @@
     </message>
   </context>
   <context>
-    <name>CloudLayoutsIntroDialog</name>
-    <message>
-      <source>BETA</source>
-      <translation>測試版</translation>
-    </message>
-    <message>
-      <source>Available Actions</source>
-      <translation>可使用的操作</translation>
-    </message>
-    <message>
-      <source>Video Export</source>
-      <translation>影像匯出</translation>
-    </message>
-    <message>
-      <source>Live Video and Archive</source>
-      <translation>即時串流與錄影資料</translation>
-    </message>
-    <message>
-      <source>PTZ</source>
-      <translation>PTZ</translation>
-    </message>
-    <message>
-      <source>Showreels</source>
-      <translation>幻燈片</translation>
-    </message>
-    <message>
-      <source>Read more on the help page</source>
-      <translation>在幫助頁面上了解更多詳細資訊</translation>
-    </message>
-    <message>
-      <source>Do not show this window again</source>
-      <translation>不要再顯示此視窗</translation>
-    </message>
-    <message>
-      <source>Introducing Cloud Layouts</source>
-      <translation>Cloud佈局功能介紹</translation>
-    </message>
-    <message>
-      <source>Motion Search</source>
-      <translation>智慧位移偵測</translation>
-    </message>
-    <message>
-      <source>Searching Bookmarks, Objects, Events</source>
-      <translation>搜索書籤、物件、事件</translation>
-    </message>
-    <message>
-      <source>In the Future</source>
-      <translation>未來</translation>
-    </message>
-  </context>
-  <context>
     <name>CloudManagementWidget</name>
     <message>
       <source>No connection</source>
@@ -996,29 +794,6 @@
     <message>
       <source>Select another event or action</source>
       <translation>選擇另一個事件或動作</translation>
-    </message>
-  </context>
-  <context>
-    <name>CustomBusinessEventWidget</name>
-    <message>
-      <source>Source contains:</source>
-      <translation>來源包含:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>關鍵字以空白鍵分隔</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>說明包含:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>敘述包含:</translation>
-    </message>
-    <message>
-      <source>Omit Logging</source>
-      <translation>省略日誌記錄</translation>
     </message>
   </context>
   <context>
@@ -1172,59 +947,6 @@
     </message>
   </context>
   <context>
-    <name>ExecHttpRequestActionWidget</name>
-    <message>
-      <source>Login to authenticate (optional)</source>
-      <translation>認証帳號 (非必要)</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>登入</translation>
-    </message>
-    <message>
-      <source>Password to authenticate (optional)</source>
-      <translation>認証密碼 (非必要)</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>密碼</translation>
-    </message>
-    <message>
-      <source>HTTP(S) URL</source>
-      <translation>HTTP(S) 網址</translation>
-    </message>
-    <message>
-      <source>HTTP(S) Content</source>
-      <translation>HTTP(S) 內容</translation>
-    </message>
-    <message>
-      <source>Content Type</source>
-      <translation>內容類型</translation>
-    </message>
-    <message>
-      <source>Authentication Type</source>
-      <translation>驗證類型</translation>
-    </message>
-    <message>
-      <source>Request Method</source>
-      <translation>請求方法</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExecPtzPresetBusinessActionWidget</name>
-    <message>
-      <source>PTZ preset:</source>
-      <translation>&amp;PTZ預設點:</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExitFullscreenActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>在佈局上</translation>
-    </message>
-  </context>
-  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <source>Export Settings</source>
@@ -1345,17 +1067,6 @@
     <message>
       <source>Nothing found</source>
       <translation>未找到任何內容</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenCameraActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>在佈局上</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>攝影機</translation>
     </message>
   </context>
   <context>
@@ -1773,8 +1484,8 @@
       <translation>重試</translation>
     </message>
     <message>
-      <source>Open Files Folder</source>
-      <translation>開啟檔案資料夾</translation>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
     </message>
   </context>
   <context>
@@ -2001,21 +1712,6 @@
     </message>
   </context>
   <context>
-    <name>OpenLayoutActionWidget</name>
-    <message>
-      <source>Layout</source>
-      <translation>佈局</translation>
-    </message>
-    <message>
-      <source>Show to</source>
-      <translation>顯示給使用者</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>選擇佈局</translation>
-    </message>
-  </context>
-  <context>
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
@@ -2067,75 +1763,6 @@
     <message>
       <source>Sign in to web page</source>
       <translation>登入Web頁面</translation>
-    </message>
-  </context>
-  <context>
-    <name>PlaySoundBusinessActionWidget</name>
-    <message>
-      <source>Manage...</source>
-      <translation>管理…</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>音量:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>測試…</translation>
-    </message>
-    <message>
-      <source>Play to users</source>
-      <translation>播放至客戶端</translation>
-    </message>
-  </context>
-  <context>
-    <name>PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Source:</source>
-      <translation>來源:</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>說明包含:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>關鍵字以空白鍵分隔</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>敘述包含:</translation>
-    </message>
-    <message>
-      <source>Level:</source>
-      <translation>級別:</translation>
-    </message>
-    <message>
-      <source>ERROR</source>
-      <translation>錯誤</translation>
-    </message>
-    <message>
-      <source>WARNING</source>
-      <translation>警告</translation>
-    </message>
-    <message>
-      <source>INFO</source>
-      <translation>信息</translation>
-    </message>
-  </context>
-  <context>
-    <name>PopupBusinessActionWidget</name>
-    <message>
-      <source>Force Acknowledgment</source>
-      <translation>強制確認</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>使用客制字幕:</translation>
-    </message>
-    <message>
-      <source>to</source>
-      <translation>到</translation>
     </message>
   </context>
   <context>
@@ -2209,37 +1836,6 @@
     <message>
       <source>Hotkey:</source>
       <translation>快速鍵:</translation>
-    </message>
-  </context>
-  <context>
-    <name>PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>To</source>
-      <translation>發送到</translation>
-    </message>
-    <message>
-      <source>Custom notification content</source>
-      <translation>自訂通知內容</translation>
-    </message>
-    <message>
-      <source>Header</source>
-      <translation>標題</translation>
-    </message>
-    <message>
-      <source>Default notification title will be used if left empty</source>
-      <translation>如不填寫, 將使用預設通知標題</translation>
-    </message>
-    <message>
-      <source>Body</source>
-      <translation>內容</translation>
-    </message>
-    <message>
-      <source>Default text will be used if this field is empty</source>
-      <translation>如不填寫, 將使用預設內容</translation>
-    </message>
-    <message>
-      <source>Add source device name in body</source>
-      <translation>在內容中加入來源設備名稱</translation>
     </message>
   </context>
   <context>
@@ -2389,33 +1985,6 @@
     </message>
   </context>
   <context>
-    <name>RecordingBusinessActionWidget</name>
-    <message>
-      <source>Quality:</source>
-      <translation>畫質:</translation>
-    </message>
-    <message>
-      <source>FPS</source>
-      <translation>FPS</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <translation>秒</translation>
-    </message>
-    <message>
-      <source>Pre-Recording:</source>
-      <translation>事前錄影:</translation>
-    </message>
-    <message>
-      <source>Post-Recording:</source>
-      <translation>事後錄影:</translation>
-    </message>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>固定長度:</translation>
-    </message>
-  </context>
-  <context>
     <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
@@ -2520,29 +2089,6 @@
     <message>
       <source>Organization&apos;s limits violation</source>
       <translation>違反組織限制</translation>
-    </message>
-  </context>
-  <context>
-    <name>SayTextBusinessActionWidget</name>
-    <message>
-      <source>Speak the following:</source>
-      <translation>說以下內容:</translation>
-    </message>
-    <message>
-      <source>Type any text here</source>
-      <translation>在此輸入任意文字 (限英文)</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>音量:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>測試...</translation>
-    </message>
-    <message>
-      <source>Speak to users</source>
-      <translation>發話至客戶端</translation>
     </message>
   </context>
   <context>
@@ -2688,17 +2234,6 @@
     </message>
   </context>
   <context>
-    <name>SendmailBusinessActionWidget</name>
-    <message>
-      <source>Additional Recipients:</source>
-      <translation>&amp;額外收件者:</translation>
-    </message>
-    <message>
-      <source>Global Email Settings...</source>
-      <translation>&amp;全域 Email 設定…</translation>
-    </message>
-  </context>
-  <context>
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
@@ -2772,36 +2307,6 @@
     </message>
   </context>
   <context>
-    <name>ShowOnAlarmLayoutActionWidget</name>
-    <message>
-      <source>for</source>
-      <translation>給</translation>
-    </message>
-    <message>
-      <source>Force Alarm Layout opening</source>
-      <translation>強制彈跳影像</translation>
-    </message>
-  </context>
-  <context>
-    <name>ShowTextOverlayActionWidget</name>
-    <message>
-      <source>seconds</source>
-      <translation>秒</translation>
-    </message>
-    <message>
-      <source>Display text for:</source>
-      <translation>顯示字幕:</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>使用客制字幕:</translation>
-    </message>
-    <message>
-      <source>Rule will work only for prolonged events</source>
-      <translation>規則只運作於延長事件</translation>
-    </message>
-  </context>
-  <context>
     <name>SignDialog</name>
     <message>
       <source>Watermark Check</source>
@@ -2814,21 +2319,6 @@
     <message>
       <source>Check Result:</source>
       <translation>檢查結果:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>Available to</source>
-      <translation>適用於</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>名稱</translation>
-    </message>
-    <message>
-      <source>Icon</source>
-      <translation>圖示</translation>
     </message>
   </context>
   <context>

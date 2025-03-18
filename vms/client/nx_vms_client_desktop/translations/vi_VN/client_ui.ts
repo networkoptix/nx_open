@@ -129,54 +129,13 @@
       <source>Open Files Folder</source>
       <translation>Mở thư mục</translation>
     </message>
-  </context>
-  <context>
-    <name>AggregationWidget</name>
     <message>
-      <source>Check to set aggregation period</source>
-      <translation>Nhấn vào đây để thiết lập các hành động trong thời gian</translation>
+      <source>with</source>
+      <translation type="unfinished">with</translation>
     </message>
     <message>
-      <source>Interval of action :</source>
-      <translation>Hành động Interval:</translation>
-    </message>
-    <message>
-      <source>No more than once per</source>
-      <translation>Hơn một lần</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Ngay</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Từ khóa ngăn cách bởi không gian</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Chú thích có chứa:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Mô tả chứa:</translation>
-    </message>
-    <message>
-      <source>Event Type:</source>
-      <translation>Loại sự kiện:</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Attributes:</source>
-      <translation>Các đặc tính:</translation>
-    </message>
-    <message>
-      <source>Object Type:</source>
-      <translation>Loại đối tượng:</translation>
+      <source>Simultaneous Streams</source>
+      <translation type="unfinished">Simultaneous Streams</translation>
     </message>
   </context>
   <context>
@@ -291,10 +250,6 @@
       <translation>Cố định băng thông thành</translation>
     </message>
     <message>
-      <source>Mbit/s</source>
-      <translation>Mbit / s</translation>
-    </message>
-    <message>
       <source>Unlimited</source>
       <translation>Không giới hạn</translation>
     </message>
@@ -305,6 +260,10 @@
     <message>
       <source>No backup</source>
       <translation>Không sao lưu</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -332,29 +291,6 @@
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
       <translation>Quá trình sao lưu bị dừng do sự cố bộ nhớ. Quá trình sao lưu sẽ tự động tiếp tục sau khi sự cố bộ nhớ được giải quyết</translation>
-    </message>
-  </context>
-  <context>
-    <name>BookmarkBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Thời gian cố định:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>giây</translation>
-    </message>
-    <message>
-      <source>Tags:</source>
-      <translation>Thẻ:</translation>
-    </message>
-    <message>
-      <source>Pre-recording:</source>
-      <translation>Pre-ghi:</translation>
-    </message>
-    <message>
-      <source>Post-recording:</source>
-      <translation>Post-ghi:</translation>
     </message>
   </context>
   <context>
@@ -420,79 +356,6 @@
     <message>
       <source>Clear Filter</source>
       <translation>Xóa bộ lọc</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRuleWidget</name>
-    <message>
-      <source>Event</source>
-      <translation>Sự kiện</translation>
-    </message>
-    <message>
-      <source>Schedule...</source>
-      <translation>Lịch trình...</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Hoạt động</translation>
-    </message>
-    <message>
-      <source>Comments:</source>
-      <translation>Lời nói:</translation>
-    </message>
-    <message>
-      <source>When</source>
-      <translation>Khi nào</translation>
-    </message>
-    <message>
-      <source>Do</source>
-      <translation>Làm</translation>
-    </message>
-    <message>
-      <source>At</source>
-      <translation>Tại camera</translation>
-    </message>
-    <message>
-      <source>Use event source server</source>
-      <translation>Sử dụng máy chủ nguồn sự kiện</translation>
-    </message>
-    <message>
-      <source>Use event source camera</source>
-      <translation>Sử dụng camera nguồn sự kiện</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRulesDialog</name>
-    <message>
-      <source>Add</source>
-      <translation>Thêm</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Xóa bỏ</translation>
-    </message>
-    <message>
-      <source>Event Rules</source>
-      <translation>Quy tắc sự kiện</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>Ghi sự kiện...</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Kiểm tra</translation>
-    </message>
-  </context>
-  <context>
-    <name>BuzzerBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Thời gian cố định:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>giây</translation>
     </message>
   </context>
   <context>
@@ -741,12 +604,9 @@
       <source>Logical ID</source>
       <translation>ID hợp lý</translation>
     </message>
-  </context>
-  <context>
-    <name>CameraInputBusinessEventWidget</name>
     <message>
-      <source>Input ID</source>
-      <translation>ID đầu vào</translation>
+      <source>Restreaming Link</source>
+      <translation type="unfinished">Restreaming Link</translation>
     </message>
   </context>
   <context>
@@ -781,17 +641,6 @@
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
       <translation>trong</translation>
-    </message>
-  </context>
-  <context>
-    <name>CameraOutputBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Thời gian cố định:</translation>
-    </message>
-    <message>
-      <source>Output ID:</source>
-      <translation>ID đầu ra:</translation>
     </message>
   </context>
   <context>
@@ -904,57 +753,6 @@
     </message>
   </context>
   <context>
-    <name>CloudLayoutsIntroDialog</name>
-    <message>
-      <source>BETA</source>
-      <translation>BETA</translation>
-    </message>
-    <message>
-      <source>Available Actions</source>
-      <translation>Hoạt động có sẵn</translation>
-    </message>
-    <message>
-      <source>Video Export</source>
-      <translation>Xuất video</translation>
-    </message>
-    <message>
-      <source>Live Video and Archive</source>
-      <translation>Video trực tiếp và lưu trữ</translation>
-    </message>
-    <message>
-      <source>PTZ</source>
-      <translation>PTZ</translation>
-    </message>
-    <message>
-      <source>Showreels</source>
-      <translation>Showreels</translation>
-    </message>
-    <message>
-      <source>Read more on the help page</source>
-      <translation>Đọc thêm trên trang trợ giúp</translation>
-    </message>
-    <message>
-      <source>Do not show this window again</source>
-      <translation>Không hiển thị lại cửa sổ này</translation>
-    </message>
-    <message>
-      <source>Introducing Cloud Layouts</source>
-      <translation>Giới thiệu Bố cục đám mây</translation>
-    </message>
-    <message>
-      <source>Motion Search</source>
-      <translation>Tìm kiếm chuyển động</translation>
-    </message>
-    <message>
-      <source>Searching Bookmarks, Objects, Events</source>
-      <translation>Tìm kiếm Dấu trang, Đối tượng, Sự kiện</translation>
-    </message>
-    <message>
-      <source>In the Future</source>
-      <translation>Trong tương lai</translation>
-    </message>
-  </context>
-  <context>
     <name>CloudManagementWidget</name>
     <message>
       <source>No connection</source>
@@ -996,29 +794,6 @@
     <message>
       <source>Select another event or action</source>
       <translation>Chọn một sự kiện hoặc hành động khác</translation>
-    </message>
-  </context>
-  <context>
-    <name>CustomBusinessEventWidget</name>
-    <message>
-      <source>Source contains:</source>
-      <translation>Nguồn chứa:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Từ khóa ngăn cách bởi không gian</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Chú thích có chứa:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Mô tả chứa:</translation>
-    </message>
-    <message>
-      <source>Omit Logging</source>
-      <translation>Bỏ qua ghi nhật ký</translation>
     </message>
   </context>
   <context>
@@ -1172,59 +947,6 @@
     </message>
   </context>
   <context>
-    <name>ExecHttpRequestActionWidget</name>
-    <message>
-      <source>Login to authenticate (optional)</source>
-      <translation>Đăng nhập vào xác thực (tùy chọn)</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Đăng nhập</translation>
-    </message>
-    <message>
-      <source>Password to authenticate (optional)</source>
-      <translation>Mật khẩu để xác thực (tùy chọn)</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Mật khẩu</translation>
-    </message>
-    <message>
-      <source>HTTP(S) URL</source>
-      <translation>URL HTTP(S)</translation>
-    </message>
-    <message>
-      <source>HTTP(S) Content</source>
-      <translation>Nội dung HTTP(S)</translation>
-    </message>
-    <message>
-      <source>Content Type</source>
-      <translation>Loại nội dung</translation>
-    </message>
-    <message>
-      <source>Authentication Type</source>
-      <translation>Loại Xác Thực,</translation>
-    </message>
-    <message>
-      <source>Request Method</source>
-      <translation>Phương thức yêu cầu</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExecPtzPresetBusinessActionWidget</name>
-    <message>
-      <source>PTZ preset:</source>
-      <translation>&amp;PTZ cài sẵn:</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExitFullscreenActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>Trong bố cục</translation>
-    </message>
-  </context>
-  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <source>Export Settings</source>
@@ -1345,17 +1067,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Không tìm thấy kết quả nào</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenCameraActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>Trong bố cục</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Máy chụp hình</translation>
     </message>
   </context>
   <context>
@@ -1773,8 +1484,8 @@
       <translation>thử lại</translation>
     </message>
     <message>
-      <source>Open Files Folder</source>
-      <translation>Mở thư mục</translation>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
     </message>
   </context>
   <context>
@@ -2001,21 +1712,6 @@
     </message>
   </context>
   <context>
-    <name>OpenLayoutActionWidget</name>
-    <message>
-      <source>Layout</source>
-      <translation>Bố cục</translation>
-    </message>
-    <message>
-      <source>Show to</source>
-      <translation>Cho Đến</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Chọn bố cục...</translation>
-    </message>
-  </context>
-  <context>
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
@@ -2067,75 +1763,6 @@
     <message>
       <source>Sign in to web page</source>
       <translation>Đăng nhập vào trang web</translation>
-    </message>
-  </context>
-  <context>
-    <name>PlaySoundBusinessActionWidget</name>
-    <message>
-      <source>Manage...</source>
-      <translation>Quản lý...</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>Thể tích:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>Thử...</translation>
-    </message>
-    <message>
-      <source>Play to users</source>
-      <translation>Người dùng xem</translation>
-    </message>
-  </context>
-  <context>
-    <name>PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Source:</source>
-      <translation>Nguồn:</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Chú thích có chứa:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Từ khóa ngăn cách bởi không gian</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Mô tả chứa:</translation>
-    </message>
-    <message>
-      <source>Level:</source>
-      <translation>Mức độ:</translation>
-    </message>
-    <message>
-      <source>ERROR</source>
-      <translation>LỖI</translation>
-    </message>
-    <message>
-      <source>WARNING</source>
-      <translation>CẢNH BÁO</translation>
-    </message>
-    <message>
-      <source>INFO</source>
-      <translation>THÔNG TIN</translation>
-    </message>
-  </context>
-  <context>
-    <name>PopupBusinessActionWidget</name>
-    <message>
-      <source>Force Acknowledgment</source>
-      <translation>Bắt buộc</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>Sử dụng văn bản tùy chỉnh:</translation>
-    </message>
-    <message>
-      <source>to</source>
-      <translation>đến</translation>
     </message>
   </context>
   <context>
@@ -2209,37 +1836,6 @@
     <message>
       <source>Hotkey:</source>
       <translation>Phím nóng:</translation>
-    </message>
-  </context>
-  <context>
-    <name>PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>To</source>
-      <translation>Đến</translation>
-    </message>
-    <message>
-      <source>Custom notification content</source>
-      <translation>Nội dung thông báo tùy chỉnh</translation>
-    </message>
-    <message>
-      <source>Header</source>
-      <translation>Tiêu đề</translation>
-    </message>
-    <message>
-      <source>Default notification title will be used if left empty</source>
-      <translation>Tiêu đề thông báo mặc định sẽ được sử dụng nếu để trống</translation>
-    </message>
-    <message>
-      <source>Body</source>
-      <translation>Nội dung</translation>
-    </message>
-    <message>
-      <source>Default text will be used if this field is empty</source>
-      <translation>Văn bản mặc định sẽ được sử dụng nếu trường này trống</translation>
-    </message>
-    <message>
-      <source>Add source device name in body</source>
-      <translation>Thêm tên thiết bị nguồn trong nội dung</translation>
     </message>
   </context>
   <context>
@@ -2389,33 +1985,6 @@
     </message>
   </context>
   <context>
-    <name>RecordingBusinessActionWidget</name>
-    <message>
-      <source>Quality:</source>
-      <translation>Hình ảnh:</translation>
-    </message>
-    <message>
-      <source>FPS</source>
-      <translation>FPS</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>Pre-Recording:</source>
-      <translation>Pre-recording:</translation>
-    </message>
-    <message>
-      <source>Post-Recording:</source>
-      <translation>Bài-ghi âm:</translation>
-    </message>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Thời gian cố định:</translation>
-    </message>
-  </context>
-  <context>
     <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
@@ -2520,29 +2089,6 @@
     <message>
       <source>Organization&apos;s limits violation</source>
       <translation>Vi phạm giới hạn của Tổ chức</translation>
-    </message>
-  </context>
-  <context>
-    <name>SayTextBusinessActionWidget</name>
-    <message>
-      <source>Speak the following:</source>
-      <translation>Cho biết sau:</translation>
-    </message>
-    <message>
-      <source>Type any text here</source>
-      <translation>Nhập bất kỳ văn bản (bằng tiếng Anh)</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>Thể tích:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>Thử...</translation>
-    </message>
-    <message>
-      <source>Speak to users</source>
-      <translation>Nói với người dùng</translation>
     </message>
   </context>
   <context>
@@ -2688,17 +2234,6 @@
     </message>
   </context>
   <context>
-    <name>SendmailBusinessActionWidget</name>
-    <message>
-      <source>Additional Recipients:</source>
-      <translation>&amp;Nhận thêm:</translation>
-    </message>
-    <message>
-      <source>Global Email Settings...</source>
-      <translation>Cài đặt Email trên toàn cầu...</translation>
-    </message>
-  </context>
-  <context>
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
@@ -2772,36 +2307,6 @@
     </message>
   </context>
   <context>
-    <name>ShowOnAlarmLayoutActionWidget</name>
-    <message>
-      <source>for</source>
-      <translation>vì</translation>
-    </message>
-    <message>
-      <source>Force Alarm Layout opening</source>
-      <translation>Lực lượng báo động Giao diện mở</translation>
-    </message>
-  </context>
-  <context>
-    <name>ShowTextOverlayActionWidget</name>
-    <message>
-      <source>seconds</source>
-      <translation>giây</translation>
-    </message>
-    <message>
-      <source>Display text for:</source>
-      <translation>Hiển thị văn bản cho:</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>Sử dụng văn bản tùy chỉnh:</translation>
-    </message>
-    <message>
-      <source>Rule will work only for prolonged events</source>
-      <translation>Quy tắc này sẽ chỉ làm việc cho các sự kiện kéo dài</translation>
-    </message>
-  </context>
-  <context>
     <name>SignDialog</name>
     <message>
       <source>Watermark Check</source>
@@ -2814,21 +2319,6 @@
     <message>
       <source>Check Result:</source>
       <translation>Kết quả thử nghiệm:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>Available to</source>
-      <translation>Khả dụng cho</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Tên</translation>
-    </message>
-    <message>
-      <source>Icon</source>
-      <translation>Biểu tượng</translation>
     </message>
   </context>
   <context>

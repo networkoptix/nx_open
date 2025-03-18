@@ -994,6 +994,10 @@
       <source>None of selected user roles contain users</source>
       <translation>Không có nhóm quyền được chọn nào chứa người dùng</translation>
     </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>Chọn ít nhất một người dùng</translation>
+    </message>
   </context>
   <context>
     <name>QnTimeStrings</name>
@@ -1231,17 +1235,6 @@
     </message>
   </context>
   <context>
-    <name>QnTranscoder</name>
-    <message>
-      <source>OpenCLTranscode is not implemented.</source>
-      <translation>Chuyển mã OpenCL không được triển khai.</translation>
-    </message>
-    <message>
-      <source>Unknown transcode method</source>
-      <translation>Phương pháp chuyển mã không xác định</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserResource</name>
     <message>
       <source>Custom</source>
@@ -1395,334 +1388,6 @@
   <context>
     <name>nx::vms::common::SystemSettings</name>
     <message>
-      <source>Anonymous statistics report allowed</source>
-      <translation>Cho phép báo cáo thống kê ẩn danh</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last time</source>
-      <translation>Báo cáo thống kê ẩn danh của lần trước</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last version</source>
-      <translation>Báo cáo thống kê ẩn danh của bản trước</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last number</source>
-      <translation>Báo cáo thống kê ẩn danh gần nhất</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics time cycle</source>
-      <translation>Chu kỳ thời gian thống kê ẩn danh</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report delay after update</source>
-      <translation>Báo cáo thống kê ẩn danh trì hoãn sau khi cập nhật</translation>
-    </message>
-    <message>
-      <source>Anonymous Statistics Report Server URL</source>
-      <translation>URL máy chủ báo cáo thống kê ẩn danh</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report Client settings</source>
-      <translation>Báo cáo thống kê ẩn danh Cài đặt ứng dụng khách</translation>
-    </message>
-    <message>
-      <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation>Thời gian chờ kết nối proxy (giây, 1 giây-1 giờ)</translation>
-    </message>
-    <message>
-      <source>Time synchronization enabled</source>
-      <translation>Đã bật đồng bộ hóa thời gian</translation>
-    </message>
-    <message>
-      <source>Primary time synchronization Server ID</source>
-      <translation>ID máy chủ đồng bộ hóa thời gian chính</translation>
-    </message>
-    <message>
-      <source>Max difference between local and source time (milliseconds)</source>
-      <translation>Chênh lệch tối đa giữa thời gian cục bộ và thời gian nguồn (mili giây)</translation>
-    </message>
-    <message>
-      <source>OS time change check period</source>
-      <translation>Chu kỳ kiểm tra thay đổi thời gian của hệ điều hành</translation>
-    </message>
-    <message>
-      <source>Sync time synchronization interval for network requests</source>
-      <translation>Đồng bộ khoảng thời gian đồng bộ hóa cho các yêu cầu mạng</translation>
-    </message>
-    <message>
-      <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation>Đồng bộ hóa thời gian epsilon. Giá trị mới không được áp dụng nếu thời gian delta nhỏ hơn epsilon</translation>
-    </message>
-    <message>
-      <source>Cloud owner account</source>
-      <translation>Tài khoản chủ sở hữu đám mây</translation>
-    </message>
-    <message>
-      <source>Cloud authorization key</source>
-      <translation>Khóa ủy quyền đám mây</translation>
-    </message>
-    <message>
-      <source>Disable Device vendors</source>
-      <translation>Vô hiệu hóa nhà cung cấp Thiết bị</translation>
-    </message>
-    <message>
-      <source>Optimize Camera settings</source>
-      <translation>Tối ưu hóa Cài đặt Camera</translation>
-    </message>
-    <message>
-      <source>Thumbnails auto-update</source>
-      <translation>Tự động cập nhật hình thu nhỏ</translation>
-    </message>
-    <message>
-      <source>Max scene items (0 means default)</source>
-      <translation>Số lượng mục cảnh tối đa (0 nghĩa là mặc định)</translation>
-    </message>
-    <message>
-      <source>Send plain-text emails</source>
-      <translation>Gửi email văn bản thuần túy</translation>
-    </message>
-    <message>
-      <source>Use Windows line feed in emails</source>
-      <translation>Sử dụng nguồn cấp dữ liệu Windows trong email</translation>
-    </message>
-    <message>
-      <source>Enable audit trail</source>
-      <translation>Kích hoạt báo cáo hành vi người dùng</translation>
-    </message>
-    <message>
-      <source>Audit trail period (days, 14-730)</source>
-      <translation>Khoảng thời gian báo cáo hành vi người dùng (ngày, 14-730)</translation>
-    </message>
-    <message>
-      <source>Event log period (days)</source>
-      <translation>Khoảng thời gian nhật ký sự kiện (ngày)</translation>
-    </message>
-    <message>
-      <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation>Thực thi HTTPS (mã hóa lưu lượng dữ liệu)</translation>
-    </message>
-    <message>
-      <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation>Thực thi RTSPS (mã hóa lưu lượng video)</translation>
-    </message>
-    <message>
-      <source>Enable auto-discovery</source>
-      <translation>Cho phép tự động phát hiện thiết bị</translation>
-    </message>
-    <message>
-      <source>Enable auto-update notifications</source>
-      <translation>Bật thông báo tự động cập nhật</translation>
-    </message>
-    <message>
-      <source>Enable update notifications</source>
-      <translation>Bật thông báo cập nhật</translation>
-    </message>
-    <message>
-      <source>Enable UPNP port-mapping</source>
-      <translation>Bật ánh xạ cổng UPNP</translation>
-    </message>
-    <message>
-      <source>Backup settings</source>
-      <translation>Cài đặt sao lưu</translation>
-    </message>
-    <message>
-      <source>Cloud host override</source>
-      <translation>Ghi đè máy chủ đám mây</translation>
-    </message>
-    <message>
-      <source>Enable RTSP for Arecont</source>
-      <translation>Bật RTSP cho Arecont</translation>
-    </message>
-    <message>
-      <source>Enable sequential Flir ONVIF searcher</source>
-      <translation>Bật trình tìm kiếm Flir ONVIF tuần tự</translation>
-    </message>
-    <message>
-      <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation>Kích thước hàng đợi P2P tối đa (byte, 32-512MB)</translation>
-    </message>
-    <message>
-      <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation>Kích thước tối đa cho tất cả máy khách P2P (byte, 32-512MB)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation>Kích thước hàng đợi ghi tối đa (byte, 6-96MB)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (elements, 250-4000)</source>
-      <translation>Kích thước hàng đợi ghi tối đa (phần tử, 250-4000)</translation>
-    </message>
-    <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>Hết thời gian chờ RTP (mili giây)</translation>
-    </message>
-    <message>
-      <source>Max RTSP connection duration (seconds)</source>
-      <translation>Thời lượng kết nối RTSP tối đa (giây)</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect UDP hole-punching</source>
-      <translation>Bật kết nối đám mây UDP hole-punching</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect relays usage</source>
-      <translation>Bật sử dụng relay kết nối đám mây</translation>
-    </message>
-    <message>
-      <source>Enforce SSL for cloud-connect relays</source>
-      <translation>Thực thi SSL cho các relay kết nối đám mây</translation>
-    </message>
-    <message>
-      <source>Enable recording on EDGE</source>
-      <translation>Bật ghi tại biên</translation>
-    </message>
-    <message>
-      <source>Target update information</source>
-      <translation>Thông tin cập nhật mục tiêu</translation>
-    </message>
-    <message>
-      <source>Installed update information</source>
-      <translation>Thông tin cập nhật đã cài đặt</translation>
-    </message>
-    <message>
-      <source>Downloader peers for files</source>
-      <translation>Trình tải xuống ngang hàng cho các tệp</translation>
-    </message>
-    <message>
-      <source>Client update settings</source>
-      <translation>Cài đặt cập nhật ứng dụng khách</translation>
-    </message>
-    <message>
-      <source>Watermark settings</source>
-      <translation>Cài đặt hình mờ</translation>
-    </message>
-    <message>
-      <source>Session token count limit on a single Server</source>
-      <translation>Giới hạn số lượng mã token theo phiên trên một Máy chủ</translation>
-    </message>
-    <message>
-      <source>Max session token count per user on single Server</source>
-      <translation>Số lượng mã token theo phiên tối đa cho mỗi người dùng trên một Máy chủ</translation>
-    </message>
-    <message>
-      <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation>Khoảng thời gian cập nhật cho bộ đệm mã token theo phiên từ xa (Các máy chủ khác và Đám mây)</translation>
-    </message>
-    <message>
-      <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation>Hết thời gian chờ cho bộ đệm ẩn mã token theo phiên từ xa (Máy chủ khác và Đám mây)</translation>
-    </message>
-    <message>
-      <source>Default video codec</source>
-      <translation>Bộ giải mã video mặc định</translation>
-    </message>
-    <message>
-      <source>Default codec for export video</source>
-      <translation>Codec mặc định cho xuất video</translation>
-    </message>
-    <message>
-      <source>Low quality screen video codec</source>
-      <translation>Giải mã video màn hình chất lượng thấp</translation>
-    </message>
-    <message>
-      <source>License server</source>
-      <translation>Máy chủ cấp giấy phép</translation>
-    </message>
-    <message>
-      <source>URI for resource_data.json automatic update</source>
-      <translation>URL cho cập nhật tự động resource_data.json</translation>
-    </message>
-    <message>
-      <source>Meta data storage change policy</source>
-      <translation>Chính sách thay đổi lưu trữ dữ liệu meta</translation>
-    </message>
-    <message>
-      <source>Persistent Servers for update storage</source>
-      <translation>Máy chủ cố định để lưu trữ cập nhật</translation>
-    </message>
-    <message>
-      <source>Persistent Servers where updates are stored</source>
-      <translation>Máy chủ cố định nơi lưu trữ cập nhật</translation>
-    </message>
-    <message>
-      <source>VMS Server version specific features</source>
-      <translation>Các tính năng cụ thể của phiên bản máy chủ VMS</translation>
-    </message>
-    <message>
-      <source>Additional local FS storage types for recording</source>
-      <translation>Các loại lưu trữ FS cục bộ bổ sung dành cho việc ghi</translation>
-    </message>
-    <message>
-      <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation>Buộc cấp quyền điểm gắn lưu trữ DB phân tích trong trường hợp lỗi</translation>
-    </message>
-    <message>
-      <source>Storage encryption enabled</source>
-      <translation>Đã bật mã hóa lưu trữ</translation>
-    </message>
-    <message>
-      <source>Current storage encryption key</source>
-      <translation>Khóa mã hóa bộ nhớ hiện tại</translation>
-    </message>
-    <message>
-      <source>HTTP header: Origin</source>
-      <translation>Tiêu đề HTTP: Nguồn gốc</translation>
-    </message>
-    <message>
-      <source>HTTP header: X-Frame-Options</source>
-      <translation>Tiêu đề HTTP: X-Frame-Options</translation>
-    </message>
-    <message>
-      <source>Show mouse timeline preview</source>
-      <translation>Hiển thị bản xem trước dòng thời gian từ chuột</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4MB)</source>
-      <translation>Kích thước bộ đệm đa phương tiện (KB, 10KB-4MB)</translation>
-    </message>
-    <message>
-      <source>Enable cross-domain policy</source>
-      <translation>Bật chính sách tên miền chéo</translation>
-    </message>
-    <message>
-      <source>Enable WebSocket for P2P</source>
-      <translation>Bật WebSocket cho P2P</translation>
-    </message>
-    <message>
-      <source>Show Servers in the Resource Tree for non-admins</source>
-      <translation>Hiển thị Máy chủ trong Danh sách tài nguyên cho những người không phải là quản trị viên</translation>
-    </message>
-    <message>
-      <source>Use only HTTPS for cameras</source>
-      <translation>Chỉ sử dụng HTTPS cho camera</translation>
-    </message>
-    <message>
-      <source>Expose IP addresses for autodiscovery</source>
-      <translation>Hiển thị địa chỉ IP để tự động phát hiện</translation>
-    </message>
-    <message>
-      <source>Keep IO port state on when Server connects to the device</source>
-      <translation>Giữ trạng thái cổng IO khi Máy chủ kết nối với thiết bị</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation>Kích thước bộ đệm đa phương tiện chỉ dành cho thiết bị âm thanh (KB, 1KB-1MB)</translation>
-    </message>
-    <message>
-      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation>Hiển thị mật khẩu thiết bị được lưu trữ trong VMS cho quản trị viên (đối với trang web)</translation>
-    </message>
-    <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation>Số luồng tối đa để đồng bộ hóa lưu trữ từ xa (&lt;= 0 - tự động, tối đa 32)</translation>
-    </message>
-    <message>
-      <source>Thread count limit for camera archive synchronization</source>
-      <translation>Giới hạn số luồng đối với đồng bộ hóa lưu trữ camera</translation>
-    </message>
-    <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
       <translation>Bản ghi nhật ký sự kiện tối đa cần lưu trong cơ sở dữ liệu. Số lượng bản ghi thực tế chưa xóa có thể cao hơn tới 20% so với giá trị đã chỉ định.</translation>
     </message>
@@ -1735,32 +1400,8 @@
       <translation>Số lượng kết nối HTTP tối đa sử dụng chuyển mã cho Máy chủ. Chrome mở 2 kết nối cùng một lúc, sau đó đóng kết nối đầu tiên. Chúng tôi khuyến nghị nên đặt giá trị tham số này là 2 hoặc nhiều hơn.</translation>
     </message>
     <message>
-      <source>Update releases.json file URL</source>
-      <translation>Cập nhật URL tệp releases.json</translation>
-    </message>
-    <message>
-      <source>LDAP settings</source>
-      <translation>Cài đặt LDAP</translation>
-    </message>
-    <message>
-      <source>SMTP settings</source>
-      <translation>Cài đặt SMTP</translation>
-    </message>
-    <message>
-      <source>Authorization Session token lifetime (seconds)</source>
-      <translation>Thời gian khả dụng của mã phiên xác thực (giây)</translation>
-    </message>
-    <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
       <translation>Danh sách Máy chủ được phân tách bằng dấu chấm phẩy được chỉ định để kết nối với Đám mây. Máy chủ ở đầu danh sách có mức độ ưu tiên cao hơn. Nếu danh sách trống, Máy chủ dành cho kết nối Đám mây sẽ tự động được chọn.</translation>
-    </message>
-    <message>
-      <source>Allow Power User editing Security Settings</source>
-      <translation>Cho phép Người dùng cấp cao chỉnh sửa Cài đặt bảo mật</translation>
-    </message>
-    <message>
-      <source>Enable deprecated API functions (insecure)</source>
-      <translation>Bật các hàm API deprecated (không an toàn)</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
@@ -1772,778 +1413,436 @@
       <translation>Bật các hàm API deprecated đang được phần mềm %1 sử dụng (không an toàn)</translation>
     </message>
     <message>
-      <source>Organization Id</source>
-      <translation>ID tổ chức</translation>
-    </message>
-    <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
       <translation>Khoảng thời gian giữa yêu cầu HTTP thăm dò đám mây để đồng bộ hóa dữ liệu.</translation>
-    </message>
-    <message>
-      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
-      <translation>Tiêu đề HTTP: Máy chủ, các biến được hỗ trợ: $vmsName, $vmsVersion, $company, $compatibility</translation>
-    </message>
-    <message>
-      <source>Device storage information update interval</source>
-      <translation>Khoảng thời gian cập nhật thông tin lưu trữ thiết bị</translation>
-    </message>
-    <message>
-      <source>Site alive update interval (seconds, 1s-1h)</source>
-      <translation>Khoảng thời gian cập nhật Chi nhánh đang hoạt động (giây, 1 giây-1 giờ)</translation>
-    </message>
-    <message>
-      <source>Proxy connection access policy</source>
-      <translation>Chính sách truy cập kết nối proxy</translation>
-    </message>
-    <message>
-      <source>Cloud Site ID</source>
-      <translation>ID Chi nhánh đám mây</translation>
-    </message>
-    <message>
-      <source>Enable 2FA for the Site</source>
-      <translation>Bật 2FA cho Chi nhánh</translation>
-    </message>
-    <message>
-      <source>Site name</source>
-      <translation>Tên Chi Nhánh</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
       <translation>ID Chi nhánh cục bộ, null có nghĩa là Chi nhánh chưa được thiết lập.</translation>
     </message>
     <message>
-      <source>Last master Site merge ID</source>
-      <translation>ID Chi nhánh chính hợp nhất gần đây</translation>
-    </message>
-    <message>
-      <source>Last slave Site merge ID</source>
-      <translation>ID Chi nhánh cấp dưới hợp nhất gần đây</translation>
-    </message>
-    <message>
-      <source>Pixelation settings</source>
-      <translation>Cài đặt Điểm ảnh</translation>
-    </message>
-    <message>
-      <source>Apply session limit for Cloud tokens</source>
-      <translation>Áp dụng giới hạn phiên cho Token Đám mây</translation>
-    </message>
-    <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
       <translation>Bật hoặc tắt việc tạo yêu cầu đăng ký tích hợp mới</translation>
     </message>
     <message>
-      <source>Anonymous Crash Report Server API URL</source>
-      <translation>URL API máy chủ báo cáo sự cố ẩn danh</translation>
+      <source>SMTP settings.</source>
+      <translation>Cài đặt SMTP.</translation>
     </message>
     <message>
-      <source>Default locale for new users</source>
-      <translation>Ngôn ngữ mặc định cho người dùng mới</translation>
+      <source>Anonymous statistics report allowed.</source>
+      <translation>Cho phép báo cáo thống kê ẩn danh.</translation>
     </message>
     <message>
-      <source>Check video stream permissions on VMS server period (milliseconds)</source>
-      <translation>Kiểm tra quyền phát video trên máy chủ VMS theo chu kỳ (mili giây)</translation>
+      <source>Anonymous statistics report last time.</source>
+      <translation>Báo cáo thống kê ẩn danh của lần trước.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::event::StringsHelper</name>
     <message>
-      <source>Bookmark</source>
-      <translation>Dấu trang</translation>
+      <source>Anonymous statistics report last version.</source>
+      <translation>Báo cáo thống kê ẩn danh của bản trước.</translation>
     </message>
     <message>
-      <source>Panic recording</source>
-      <translation>Video khẩn cấp</translation>
+      <source>Anonymous statistics report last number.</source>
+      <translation>Báo cáo thống kê ẩn danh gần nhất.</translation>
     </message>
     <message>
-      <source>Write to log</source>
-      <translation>Ghi vào nhật ký</translation>
+      <source>Anonymous statistics time cycle.</source>
+      <translation>Chu kỳ thời gian thống kê ẩn danh.</translation>
     </message>
     <message>
-      <source>Repeat sound</source>
-      <translation>Lặp lại âm thanh</translation>
+      <source>Anonymous statistics report delay after update.</source>
+      <translation>Báo cáo thống kê ẩn danh trì hoãn sau khi cập nhật.</translation>
     </message>
     <message>
-      <source>Play sound</source>
-      <translation>Phát âm thanh</translation>
+      <source>Anonymous Statistics Report Server URL.</source>
+      <translation>URL máy chủ báo cáo thống kê ẩn danh.</translation>
     </message>
     <message>
-      <source>Speak</source>
-      <translation>Nói</translation>
+      <source>Anonymous Crash Report Server API URL.</source>
+      <translation>URL API máy chủ báo cáo sự cố ẩn danh.</translation>
     </message>
     <message>
-      <source>Execute PTZ preset</source>
-      <translation>Thực thi cài đặt trước PTZ</translation>
+      <source>Anonymous statistics report Client settings.</source>
+      <translation>Báo cáo thống kê ẩn danh Cài đặt ứng dụng khách.</translation>
     </message>
     <message>
-      <source>Show text overlay</source>
-      <translation>Hiện lớp phủ văn bản</translation>
+      <source>Device storage information update interval.</source>
+      <translation>Khoảng thời gian cập nhật thông tin lưu trữ thiết bị.</translation>
     </message>
     <message>
-      <source>Show on Alarm Layout</source>
-      <translation>Hiển thị trên Bố cục cảnh báo</translation>
+      <source>Site alive update interval (seconds, 1s-1h).</source>
+      <translation>Khoảng thời gian cập nhật Chi nhánh đang hoạt động (giây, 1 giây-1 giờ).</translation>
     </message>
     <message>
-      <source>Device output</source>
-      <translation>Đầu ra thiết bị</translation>
+      <source>Proxy connection timeout (seconds, 1s-1h).</source>
+      <translation>Thời gian chờ kết nối proxy (giây, 1 giây-1 giờ).</translation>
     </message>
     <message>
-      <source>Camera output</source>
-      <translation>Đầu ra camera</translation>
+      <source>Proxy connection access policy.</source>
+      <translation>Chính sách truy cập kết nối proxy.</translation>
     </message>
     <message>
-      <source>Device recording</source>
-      <translation>Thiết bị ghi âm</translation>
+      <source>Time synchronization enabled.</source>
+      <translation>Đã bật đồng bộ hóa thời gian.</translation>
     </message>
     <message>
-      <source>Camera recording</source>
-      <translation>Camera ghi âm</translation>
+      <source>Primary time synchronization Server ID.</source>
+      <translation>ID máy chủ đồng bộ hóa thời gian chính.</translation>
     </message>
     <message>
-      <source>Generic Event</source>
-      <translation>Sự kiện chung</translation>
+      <source>Max difference between local and source time (milliseconds).</source>
+      <translation>Chênh lệch tối đa giữa thời gian cục bộ và thời gian nguồn (mili giây).</translation>
     </message>
-    <message numerus="yes">
-      <source>Motion on Cameras</source>
-      <translation>
-        <numerusform>Chuyển động trên camera</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Network Issue</source>
-      <translation>Vấn đề về mạng</translation>
-    </message>
-    <message>
-      <source>Server Failure</source>
-      <translation>Máy chủ thất bại</translation>
-    </message>
-    <message>
-      <source>Server Conflict</source>
-      <translation>Xung đột máy chủ</translation>
-    </message>
-    <message>
-      <source>Server Started</source>
-      <translation>Máy chủ bắt đầu</translation>
-    </message>
-    <message>
-      <source>License Issue</source>
-      <translation>Vấn đề giấy phép</translation>
-    </message>
-    <message>
-      <source>Any Server Issue</source>
-      <translation>Mọi vấn đề về máy chủ</translation>
-    </message>
-    <message>
-      <source>Any Event</source>
-      <translation>Tất cả sự kiện</translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Devices</source>
-      <translation>
-        <numerusform>Tín hiệu đầu vào trên thiết bị</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Cameras</source>
-      <translation>
-        <numerusform>Tín hiệu đầu vào trên camera</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices Disconnected</source>
-      <translation>
-        <numerusform>Thiết bị ngắt kết nối</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras Disconnected</source>
-      <translation>
-        <numerusform>Camera Ngắt kết nối</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices IP Conflict</source>
-      <translation>
-        <numerusform>Xung đột IP của thiết bị</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras IP Conflict</source>
-      <translation>
-        <numerusform>Xung đột IP của camera</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Any Device Issue</source>
-      <translation>Mọi vấn đề về thiết bị</translation>
-    </message>
-    <message>
-      <source>Any Camera Issue</source>
-      <translation>Mọi vấn đề về camera</translation>
-    </message>
-    <message>
-      <source>Undefined event has occurred on %1</source>
-      <translation>Sự kiện không xác định đã xảy ra vào %1</translation>
-    </message>
-    <message>
-      <source>Device %1 was disconnected</source>
-      <translation>Thiết bị %1 đã được ngắt kết nối</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>Camera %1 đã bị ngắt kết nối</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>Mô-đun I/O %1 đã bị ngắt kết nối</translation>
-    </message>
-    <message>
-      <source>Input on %1</source>
-      <translation>Nhập vào %1</translation>
-    </message>
-    <message>
-      <source>Motion on %1</source>
-      <translation>Chuyển động trên %1</translation>
-    </message>
-    <message>
-      <source>Network Issue at %1</source>
-      <translation>%1 lỗi mạng</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation>Máy chủ &quot;%1&quot; Lỗi</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict at %1</source>
-      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Thiết bị IP xung đột tại %1</translation>
-    </message>
-    <message>
-      <source>Camera IP Conflict at %1</source>
-      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Camera IP xung đột tại %1</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation>Máy chủ &quot;%1&quot; Xung đột</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation>Máy chủ &quot;%1&quot; đã bắt đầu</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>Máy chủ &quot;%1&quot; có vấn đề về giấy phép</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>Máy chủ &quot;%1&quot; đã hoàn tất sao lưu dữ liệu</translation>
-    </message>
     <message>
-      <source>Generic Event at %1</source>
-      <translation>Sự kiện chung tại %1</translation>
+      <source>OS time change check period.</source>
+      <translation>Khoảng thời gian kiểm tra thay đổi thời gian của hệ điều hành.</translation>
     </message>
     <message>
-      <source>An unknown event has occurred</source>
-      <translation>Đã xảy ra lỗi chưa xác định</translation>
+      <source>Sync time synchronization interval for network requests.</source>
+      <translation>Đồng bộ khoảng thời gian đồng bộ hóa cho các yêu cầu mạng.</translation>
     </message>
     <message>
-      <source>Event: %1</source>
-      <translation>Sự kiện: %1</translation>
+      <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
+      <translation>Đồng bộ hóa thời gian epsilon. Giá trị mới không được áp dụng nếu thời gian delta nhỏ hơn epsilon.</translation>
     </message>
     <message>
-      <source>Source: %1</source>
-      <translation>Nguồn：%1</translation>
+      <source>Cloud owner account.</source>
+      <translation>Tài khoản chủ sở hữu đám mây.</translation>
     </message>
     <message>
-      <source>Caption: %1</source>
-      <translation>Chú thích: %1</translation>
+      <source>Organization Id.</source>
+      <translation>ID tổ chức.</translation>
     </message>
     <message>
-      <source>Input Port: %1</source>
-      <translation>Cổng đầu vào: %1</translation>
+      <source>Cloud Site ID.</source>
+      <translation>ID Chi nhánh đám mây.</translation>
     </message>
     <message>
-      <source>Reason: %1</source>
-      <translation>Lý do：%1</translation>
+      <source>Cloud authorization key.</source>
+      <translation>Khóa ủy quyền đám mây.</translation>
     </message>
     <message>
-      <source>Conflicting Address: %1</source>
-      <translation>Địa chỉ xung đột: %1</translation>
+      <source>Enable 2FA for the Site.</source>
+      <translation>Bật 2FA cho Chi nhánh.</translation>
     </message>
     <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2 {1:?} {2?}</translation>
+      <source>Site name.</source>
+      <translation>Tên Chi Nhánh.</translation>
     </message>
     <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Máy chủ xung đột #%1: %2</translation>
+      <source>Last master Site merge ID.</source>
+      <translation>ID Chi nhánh chính hợp nhất gần đây.</translation>
     </message>
     <message>
-      <source>Conflicting Server: %1</source>
-      <translation>Máy chủ xung đột: %1</translation>
+      <source>Last slave Site merge ID.</source>
+      <translation>ID Chi nhánh cấp dưới hợp nhất gần đây.</translation>
     </message>
     <message>
-      <source>Trigger: %1</source>
-      <translation>Kích hoạt: %1</translation>
+      <source>Disable Device vendors.</source>
+      <translation>Vô hiệu hóa nhà cung cấp Thiết bị.</translation>
     </message>
     <message>
-      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <source>Optimize Camera settings.</source>
+      <translation>Tối ưu hóa Cài đặt Camera.</translation>
     </message>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n lần, lần đầu tiên: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>Thời gian：%1 trong %2</translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>Lần xuất hiện đầu tiên: %1 trên %2 ( tổng cộng%n lần)</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>Không nhận được dữ liệu nào trong %n giây qua.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected.</source>
-      <translation>Phát hiện mất gói tin RTP.</translation>
-    </message>
-    <message>
-      <source>Device does not respond to network requests.</source>
-      <translation>Thiết bị không phản hồi yêu cầu mạng.</translation>
-    </message>
-    <message>
-      <source>Connection to server is lost.</source>
-      <translation>Kết nối với máy chủ bị mất.</translation>
-    </message>
-    <message>
-      <source>Server stopped unexpectedly.</source>
-      <translation>Máy chủ dừng đột ngột.</translation>
-    </message>
-    <message>
-      <source>I/O error has occurred at %1.</source>
-      <translation>I/O lỗi trong %1.</translation>
-    </message>
-    <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>Không đủ tốc độ HDD/SSD để ghi tới %1.</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>Ổ đĩa HDD/SSD &quot;%1&quot; đã đầy. Đĩa chứa quá nhiều dữ liệu không được quản lý bởi VMS.</translation>
-    </message>
-    <message>
-      <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>Đĩa hệ thống &quot;%1&quot; gần đầy.</translation>
-    </message>
-    <message>
-      <source>start</source>
-      <translation>bắt đầu</translation>
-    </message>
-    <message>
-      <source>stop</source>
-      <translation>kết thúc</translation>
-    </message>
-    <message>
-      <source>While %1</source>
-      <translation>Trong khi %1</translation>
-    </message>
-    <message>
-      <source>On %1 %2</source>
-      <translation>Trên %1 %2</translation>
-    </message>
-    <message>
-      <source>Trigger Name</source>
-      <translation>Tên kích hoạt</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n Người dùng</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>Tất cả người dùng</translation>
-    </message>
-    <message>
-      <source>Select at least one user</source>
-      <translation>Chọn ít nhất một người dùng</translation>
-    </message>
-    <message>
-      <source>Soft Trigger</source>
-      <translation>Kích hoạt mềm</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 at %2</source>
-      <translation>Trình kích hoạt mềm %1 tại %2</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation>Trình kích hoạt mềm %1 đã được kích hoạt nhiều lần</translation>
-    </message>
-    <message>
-      <source>Send email</source>
-      <translation>Gửi email</translation>
-    </message>
-    <message>
-      <source>Acknowledge</source>
-      <translation>Công nhận</translation>
-    </message>
     <message>
-      <source>Analytics Event</source>
-      <translation>Sự kiện phân tích</translation>
+      <source>Thumbnails auto-update.</source>
+      <translation>Tự động cập nhật hình thu nhỏ.</translation>
     </message>
     <message>
-      <source>%1 at %2</source>
-      <comment>Analytics Event at some camera</comment>
-      <translation>%1 tại %2</translation>
+      <source>Max scene items (0 means default).</source>
+      <translation>Số lượng mục cảnh tối đa (0 nghĩa là mặc định).</translation>
     </message>
     <message>
-      <source>Storage Issue</source>
-      <translation>Vấn đề lưu trữ</translation>
+      <source>Send plain-text emails.</source>
+      <translation>Gửi email văn bản thuần túy.</translation>
     </message>
     <message>
-      <source>Storage Issue at %1</source>
-      <translation>Vấn đề lưu trữ tại %1</translation>
+      <source>Use Windows line feed in emails.</source>
+      <translation>Sử dụng nguồn cấp dữ liệu Windows trong email.</translation>
     </message>
     <message>
-      <source>Set to fullscreen</source>
-      <translation>Đặt thành toàn màn hình</translation>
+      <source>Enable audit trail.</source>
+      <translation>Kích hoạt tính năng dấu vết kiểm toán.</translation>
     </message>
     <message>
-      <source>Exit fullscreen</source>
-      <translation>Thoát toàn màn hình</translation>
+      <source>Audit trail period (days, 14-730).</source>
+      <translation>Khoảng thời gian báo cáo hành vi người dùng (ngày, 14-730).</translation>
     </message>
     <message>
-      <source>Open layout</source>
-      <translation>Mở bố cục</translation>
+      <source>Event log period (days).</source>
+      <translation>Khoảng thời gian nhật ký sự kiện (ngày).</translation>
     </message>
     <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>Nhiều sự kiện %1 đã xảy ra</translation>
+      <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
+      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation>Lưu trữ phân tích &quot;%1&quot; đang ngoại tuyến.</translation>
+      <source>Enforce HTTPS (data traffic encryption).</source>
+      <translation>Thực thi HTTPS (mã hóa lưu lượng dữ liệu).</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation>Lưu trữ phân tích &quot;%1&quot; gần đầy.</translation>
+      <source>Enforce RTSPS (video traffic encryption).</source>
+      <translation>Thực thi RTSPS (mã hóa lưu lượng video).</translation>
     </message>
     <message>
-      <source>Plugin Diagnostic Event</source>
-      <translation>Sự kiện chẩn đoán plugin</translation>
+      <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
+      <translation>Hiển thị mật khẩu thiết bị được lưu trữ trong VMS cho quản trị viên (đối với trang web).</translation>
     </message>
     <message>
-      <source>Unknown Plugin Diagnostic Event</source>
-      <translation>Sự kiện chẩn đoán plugin không xác định</translation>
+      <source>Enable auto-discovery.</source>
+      <translation>Cho phép tự động phát hiện thiết bị.</translation>
     </message>
     <message>
-      <source>Buzzer</source>
-      <translation>Buzzer</translation>
+      <source>Enable auto-update notifications.</source>
+      <translation>Bật thông báo tự động cập nhật.</translation>
     </message>
     <message>
-      <source>Archive Backup Finished</source>
-      <translation>Hoàn thành sao lưu bộ lưu trữ</translation>
+      <source>Enable update notifications.</source>
+      <translation>Bật thông báo cập nhật.</translation>
     </message>
     <message>
-      <source>PoE over Budget</source>
-      <translation>Quá tải PoE</translation>
+      <source>Enable UPNP port-mapping.</source>
+      <translation>Bật ánh xạ cổng UPNP.</translation>
     </message>
     <message>
-      <source>Fan Error</source>
-      <translation>Quạt bị lỗi</translation>
+      <source>Backup settings.</source>
+      <translation>Cài đặt sao lưu.</translation>
     </message>
     <message>
-      <source>PoE over budget at %1</source>
-      <translation>Quá tải PoE tại %1</translation>
+      <source>Cloud host override.</source>
+      <translation>Ghi đè máy chủ đám mây.</translation>
     </message>
     <message>
-      <source>Fan error at %1</source>
-      <translation>Lỗi quạt tại %1</translation>
+      <source>Enable cross-domain policy.</source>
+      <translation>Bật chính sách tên miền chéo.</translation>
     </message>
     <message>
-      <source>Reason: Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation>Lý do: Vượt quá giới hạn công suất (%1)</translation>
+      <source>Enable RTSP for Arecont.</source>
+      <translation>Bật RTSP cho Arecont.</translation>
     </message>
     <message>
-      <source>Show desktop notification</source>
-      <translation>Hiển thị thông báo trên màn hình</translation>
+      <source>Enable sequential Flir ONVIF searcher.</source>
+      <translation>Bật trình tìm kiếm Flir ONVIF tuần tự.</translation>
     </message>
     <message>
-      <source>Send mobile notification</source>
-      <translation>Gửi thông báo di động</translation>
+      <source>Max P2P queue size (bytes, 32-512MB).</source>
+      <translation>Kích thước hàng đợi P2P tối đa (byte, 32-512MB).</translation>
     </message>
     <message>
-      <source>Consumption</source>
-      <translation>Mức tiêu thụ</translation>
+      <source>Max P2P all clients size (bytes, 32-512MB).</source>
+      <translation>Kích thước tối đa cho tất cả máy khách P2P (byte, 32-512MB).</translation>
     </message>
     <message>
-      <source>Device was disconnected</source>
-      <translation>Thiết bị đã bị ngắt kết nối</translation>
+      <source>Max record queue size (bytes, 6-96MB).</source>
+      <translation>Kích thước hàng đợi ghi tối đa (byte, 6-96MB).</translation>
     </message>
     <message>
-      <source>Camera was disconnected</source>
-      <translation>Camera bị ngắt kết nối</translation>
+      <source>Max record queue size (elements, 250-4000).</source>
+      <translation>Kích thước hàng đợi ghi tối đa (phần tử, 250-4000).</translation>
     </message>
     <message>
-      <source>I/O Module was disconnected</source>
-      <translation>Mô-đun I/O bị ngắt kết nối</translation>
+      <source>RTP timeout (milliseconds).</source>
+      <translation>Hết thời gian chờ RTP (mili giây).</translation>
     </message>
     <message>
-      <source>Analytics Object Detected</source>
-      <translation>Phát hiện phân tích Đối tượng</translation>
+      <source>Max RTSP connection duration (seconds).</source>
+      <translation>Thời lượng kết nối RTSP tối đa (giây).</translation>
     </message>
     <message>
-      <source>%1 at camera &apos;%2&apos;</source>
-      <comment> is detected</comment>
-      <translation>%1 tại camera &apos;%2&apos;</translation>
+      <source>Enable cloud-connect UDP hole-punching.</source>
+      <translation>Bật kết nối đám mây UDP hole-punching.</translation>
     </message>
     <message>
-      <source>Plugin: %1</source>
-      <translation>Plugin: %1</translation>
+      <source>Enable cloud-connect relays usage.</source>
+      <translation>Bật sử dụng relay kết nối đám mây.</translation>
     </message>
     <message>
-      <source>Archive backup failed.</source>
-      <translation>Sao lưu video không thành công.</translation>
+      <source>Enforce SSL for cloud-connect relays.</source>
+      <translation>Thực thi SSL cho các relay kết nối đám mây.</translation>
     </message>
     <message>
-      <source>Object detected</source>
-      <translation>Phát hiện đối tượng</translation>
+      <source>Enable recording on EDGE.</source>
+      <translation>Bật ghi tại biên.</translation>
     </message>
     <message>
-      <source>Archive backup failed</source>
-      <translation>Sao lưu lưu trữ không thành công</translation>
+      <source>Enable WebSocket for P2P.</source>
+      <translation>Bật WebSocket cho P2P.</translation>
     </message>
     <message>
-      <source>Data is backed up to %1</source>
-      <translation>Dữ liệu được sao lưu về %1</translation>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>
+      <translation>Số luồng tối đa để đồng bộ hóa lưu trữ từ xa (&lt;= 0 - tự động, tối đa 32).</translation>
     </message>
     <message>
-      <source>Server Certificate Error</source>
-      <translation>Lỗi chứng chỉ máy chủ</translation>
+      <source>Update releases.json file URL.</source>
+      <translation>Cập nhật URL tệp releases.json.</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; certificate error</source>
-      <translation>Lỗi chứng chỉ máy chủ &quot;%1&quot;</translation>
+      <source>Target update information.</source>
+      <translation>Thông tin cập nhật mục tiêu.</translation>
     </message>
     <message>
-      <source>RTP error in primary stream (%1).</source>
-      <translation>Lỗi RTP trong luồng chính (%1).</translation>
+      <source>Installed update information.</source>
+      <translation>Thông tin cập nhật đã cài đặt.</translation>
     </message>
     <message>
-      <source>RTP error in secondary stream (%1).</source>
-      <translation>Lỗi RTP trong luồng phụ (%1).</translation>
+      <source>Downloader peers for files.</source>
+      <translation>Trình tải xuống ngang hàng cho các tệp.</translation>
     </message>
     <message>
-      <source>Camera time is back to normal.</source>
-      <translation>Thời gian camera trở lại bình thường.</translation>
+      <source>Client update settings.</source>
+      <translation>Cài đặt cập nhật ứng dụng khách.</translation>
     </message>
     <message>
-      <source>Address %1 is already in use by %2 on primary stream.</source>
-      <comment>%1 is the address, %2 is the device name</comment>
-      <translation>Địa chỉ %1 đã được sử dụng bởi %2 trên luồng chính.</translation>
+      <source>Thread count limit for camera archive synchronization.</source>
+      <translation>Giới hạn số luồng đối với đồng bộ hóa lưu trữ camera.</translation>
     </message>
     <message>
-      <source>Address %1 is already in use by %2 on secondary stream.</source>
-      <comment>%1 is the address, %2 is the device name</comment>
-      <translation>Địa chỉ %1 đã được sử dụng bởi %2 trên luồng phụ.</translation>
+      <source>Watermark settings.</source>
+      <translation>Cài đặt hình mờ.</translation>
     </message>
     <message>
-      <source>Multicast address conflict detected.</source>
-      <translation>Đã phát hiện xung đột địa chỉ multicast.</translation>
+      <source>Pixelation settings.</source>
+      <translation>Cài đặt Điểm ảnh.</translation>
     </message>
     <message>
-      <source>Network address %1 is not a multicast address.</source>
-      <translation>Địa chỉ mạng %1 không phải là địa chỉ multicast.</translation>
+      <source>Authorization Session token lifetime (seconds).</source>
+      <translation>Thời gian khả dụng của mã phiên xác thực (giây).</translation>
     </message>
     <message>
-      <source>Failed to backup file %1</source>
-      <translation>Không thể sao lưu tệp %1</translation>
+      <source>Apply session limit for Cloud tokens.</source>
+      <translation>Áp dụng giới hạn phiên cho Token Đám mây.</translation>
     </message>
     <message>
-      <source>Do HTTP(S) request</source>
-      <translation>Thực hiện yêu cầu HTTP(S)</translation>
+      <source>Session token count limit on a single Server.</source>
+      <translation>Giới hạn số lượng mã token theo phiên trên một Máy chủ.</translation>
     </message>
     <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>Kết nối với camera (luồng chính) đã bị đóng đột ngột.</translation>
+      <source>Max session token count per user on single Server.</source>
+      <translation>Số lượng mã token theo phiên tối đa cho mỗi người dùng trên một Máy chủ.</translation>
     </message>
     <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Kết nối với camera (luồng phụ) đã bị đóng đột ngột.</translation>
+      <source>Update interval for remote session token cache (other Servers and Cloud).</source>
+      <translation>Khoảng thời gian cập nhật cho bộ đệm mã token theo phiên từ xa (Các máy chủ khác và Đám mây).</translation>
     </message>
     <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>Kết nối với thiết bị đã bị đóng đột ngột.</translation>
+      <source>Timeout for remote session token cache (other Servers and Cloud).</source>
+      <translation>Hết thời gian chờ cho bộ đệm ẩn mã token theo phiên từ xa (Máy chủ khác và Đám mây).</translation>
     </message>
     <message>
-      <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation>Bộ nhớ Phân tích &quot;%1&quot; lỗi cơ sở dữ liệu: Không đủ quyền tại điểm gắn kết.</translation>
+      <source>Default video codec.</source>
+      <translation>Bộ giải mã video mặc định.</translation>
     </message>
     <message>
-      <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation>Không thể khởi tạo mã hóa AES khi trình ghi được bật trên kho lưu trữ phương tiện. Dữ liệu ghi không được mã hóa.</translation>
+      <source>Default codec for export video.</source>
+      <translation>Codec mặc định cho xuất video.</translation>
     </message>
     <message>
-      <source>RAID error: %1.</source>
-      <translation>Lỗi RAID. %1.</translation>
+      <source>Low quality screen video codec.</source>
+      <translation>Giải mã video màn hình chất lượng thấp.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation>Không đủ giấy phép. Trình ghi đã bị tắt trên các thiết bị sau:</translation>
+      <source>License server.</source>
+      <translation>Máy chủ cấp phép.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation>Không đủ giấy phép. Tính năng ghi đã bị tắt trên các camera sau:</translation>
+      <source>URI for resource_data.json automatic update.</source>
+      <translation>URL cho cập nhật tự động resource_data.json.</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation>Không đủ giấy phép. Tính năng ghi đã bị tắt trên các mô-đun I/O sau:</translation>
+      <source>Meta data storage change policy.</source>
+      <translation>Chính sách thay đổi lưu trữ dữ liệu meta.</translation>
     </message>
     <message>
-      <source>Also show source camera</source>
-      <translation>Đồng thời hiển thị camera nguồn</translation>
+      <source>Persistent Servers for update storage.</source>
+      <translation>Máy chủ cố định để lưu trữ cập nhật.</translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Camera nguồn</translation>
+      <source>Persistent Servers where updates are stored.</source>
+      <translation>Máy chủ cố định nơi lưu trữ cập nhật.</translation>
     </message>
     <message>
-      <source>Also show on source camera</source>
-      <translation>Đồng thời hiển thị trên camera nguồn</translation>
+      <source>VMS Server version specific features.</source>
+      <translation>Các tính năng cụ thể của phiên bản máy chủ VMS.</translation>
     </message>
     <message>
-      <source>Also set on source camera</source>
-      <translation>Cũng cài đặt trên camera nguồn</translation>
+      <source>Default locale for new users.</source>
+      <translation>Ngôn ngữ mặc định cho người dùng mới.</translation>
     </message>
     <message>
-      <source>Also trigger on source camera</source>
-      <translation>Cũng kích hoạt trên camera nguồn</translation>
+      <source>Additional local FS storage types for recording.</source>
+      <translation>Các loại lưu trữ FS cục bộ bổ sung dành cho việc ghi.</translation>
     </message>
     <message>
-      <source>Also record source camera</source>
-      <translation>Cũng ghi camera nguồn</translation>
+      <source>Keep IO port state on when Server connects to the device.</source>
+      <translation>Giữ trạng thái cổng IO khi Máy chủ kết nối với thiết bị.</translation>
     </message>
     <message>
-      <source>Also play on source camera</source>
-      <translation>Cũng hiển thị trên camera nguồn</translation>
+      <source>Media buffer size (KB, 10KB-4MB).</source>
+      <translation>Kích thước bộ đệm đa phương tiện (KB, 10KB-4MB).</translation>
     </message>
-    <message numerus="yes">
-      <source>%n Groups</source>
-      <translation>
-        <numerusform>%n nhóm</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>LDAP Sync Issue</source>
-      <translation>Sự cố đồng bộ hóa LDAP</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 (%n times)</source>
-      <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation>
-        <numerusform>%1 (%n lần)</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Failed to connect to the LDAP server.</source>
-      <translation>Không thể kết nối với máy chủ LDAP.</translation>
+      <source>Media buffer size for audio only devices (KB, 1KB-1MB).</source>
+      <translation>Kích thước bộ đệm đa phương tiện chỉ dành cho thiết bị âm thanh (KB, 1KB-1MB).</translation>
     </message>
     <message>
-      <source>Failed to complete the sync within a %1 timeout.</source>
-      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation>Không thể hoàn tất đồng bộ hóa trong khoảng thời gian chờ %1.</translation>
+      <source>Force analytics DB storage mount point permissions in case of failure.</source>
+      <translation>Buộc cấp quyền điểm gắn lưu trữ DB phân tích trong trường hợp lỗi.</translation>
     </message>
     <message>
-      <source>Failed to complete the sync within a given timeout.</source>
-      <translation>Không thể hoàn tất đồng bộ hóa trong khoảng thời gian chờ nhất định.</translation>
+      <source>Check video stream permissions on VMS server period (milliseconds).</source>
+      <translation>Kiểm tra quyền phát video trên máy chủ VMS theo chu kỳ (mili giây).</translation>
     </message>
     <message>
-      <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation>Không có tài khoản người dùng nào trên máy chủ LDAP khớp với cài đặt đồng bộ hóa.</translation>
+      <source>Storage encryption enabled.</source>
+      <translation>Đã bật mã hóa lưu trữ.</translation>
     </message>
     <message>
-      <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation>Không tìm thấy người dùng hoặc nhóm LDAP trong cơ sở dữ liệu LDAP.</translation>
+      <source>Current storage encryption key.</source>
+      <translation>Khóa mã hóa bộ nhớ hiện tại.</translation>
     </message>
     <message>
-      <source>Services Issue</source>
-      <translation>Sự cố dịch vụ</translation>
+      <source>Show Servers in the Resource Tree for non-admins.</source>
+      <translation>Hiển thị Máy chủ trong Danh sách tài nguyên cho những người không phải là quản trị viên.</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; has license migration issue</source>
-      <translation>Máy chủ &quot;%1&quot; có vấn đề di chuyển giấy phép</translation>
+      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</source>
+      <translation>Tiêu đề HTTP: Máy chủ, các biến được hỗ trợ: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
-      <source>Service overuse</source>
-      <translation>Lạm dụng dịch vụ</translation>
+      <source>HTTP header: Origin.</source>
+      <translation>Tiêu đề HTTP: Nguồn gốc.</translation>
     </message>
     <message>
-      <source>The following licenses were not migrated:</source>
-      <translation>Các giấy phép sau chưa được di chuyển:</translation>
+      <source>HTTP header: X-Frame-Options.</source>
+      <translation>Tiêu đề HTTP: X-Frame-Options.</translation>
     </message>
     <message>
-      <source>License</source>
-      <translation>Giấy phép</translation>
+      <source>Use only HTTPS for cameras.</source>
+      <translation>Chỉ sử dụng HTTPS cho camera.</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>Máy chụp hình</translation>
-    </message>
-    <message numerus="yes">
-      <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>Quá trình ghi trên %n kênh đã bị dừng do sử dụng dịch vụ quá mức.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>Sao lưu bộ nhớ đám mây trên %n kênh đã bị dừng do sử dụng dịch vụ quá mức.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>Việc sử dụng dịch vụ tích hợp trả phí trên %n kênh đã bị ngừng do sử dụng dịch vụ quá mức.</numerusform>
-      </translation>
+      <source>Allow Power User editing Security Settings.</source>
+      <translation>Cho phép Người dùng cấp cao chỉnh sửa Cài đặt bảo mật.</translation>
     </message>
     <message>
-      <source>Failed to migrate licenses.</source>
-      <translation>Không thể di chuyển giấy phép.</translation>
+      <source>Enable deprecated API functions (insecure).</source>
+      <translation>Bật các hàm API deprecated (không an toàn).</translation>
     </message>
     <message>
-      <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation>Bỏ qua việc nhập giấy phép. Việc di chuyển tiếp theo sẽ được tự động lên lịch sau.</translation>
+      <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
+      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation>Không thể buộc sử dụng thời gian camera vì nó bị trễ quá nhiều. Thay vào đó, thời gian Chi nhánh sẽ được sử dụng.</translation>
+      <source>Expose IP addresses for autodiscovery.</source>
+      <translation>Hiển thị địa chỉ IP để tự động phát hiện.</translation>
     </message>
     <message>
-      <source>Call Request</source>
-      <translation>Yêu cầu Gọi</translation>
+      <source>Show mouse timeline preview.</source>
+      <translation>Hiển thị bản xem trước dòng thời gian từ chuột.</translation>
     </message>
     <message>
-      <source>Call Request Missed</source>
-      <translation>Yêu cầu Gọi bị nhỡ</translation>
+      <source>LDAP settings.</source>
+      <translation>Cài đặt LDAP.</translation>
     </message>
   </context>
 </TS>

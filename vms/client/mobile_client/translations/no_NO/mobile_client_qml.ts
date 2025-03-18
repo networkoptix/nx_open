@@ -115,6 +115,13 @@
     </message>
   </context>
   <context>
+    <name>ChannelPartner</name>
+    <message>
+      <source>Channel Partner</source>
+      <translation type="unfinished">Channel Partner</translation>
+    </message>
+  </context>
+  <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
@@ -250,6 +257,48 @@
     </message>
   </context>
   <context>
+    <name>EventSearchMenuScreen</name>
+    <message>
+      <source>Looking for</source>
+      <translation type="unfinished">Looking for</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>Bokmerker</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Objekter</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation>Objekter</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>Bokmerker</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation>Ingen gjenstander</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation>Ingen bokmerker</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation>Prøv å endre filtrene eller konfigurer objektdeteksjon i innstillingene for kameraplugin</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation>Prøv å endre filtrene for å vise resultatene</translation>
+    </message>
+  </context>
+  <context>
     <name>FiltersPanel</name>
     <message>
       <source>No filters</source>
@@ -319,6 +368,17 @@
     </message>
   </context>
   <context>
+    <name>MenuScreen</name>
+    <message>
+      <source>App Settings</source>
+      <translation type="unfinished">App Settings</translation>
+    </message>
+    <message>
+      <source>Disconnect</source>
+      <translation type="unfinished">Disconnect</translation>
+    </message>
+  </context>
+  <context>
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
@@ -348,6 +408,37 @@
     <message>
       <source>Clear</source>
       <translation>Tøm</translation>
+    </message>
+  </context>
+  <context>
+    <name>OrganizationScreen</name>
+    <message>
+      <source>Search</source>
+      <translation>Søk</translation>
+    </message>
+    <message>
+      <source>No Sites</source>
+      <translation type="unfinished">No Sites</translation>
+    </message>
+    <message>
+      <source>We did not find any sites in this organization</source>
+      <translation type="unfinished">We did not find any sites in this organization</translation>
+    </message>
+    <message>
+      <source>We did not find any sites in this folder</source>
+      <translation type="unfinished">We did not find any sites in this folder</translation>
+    </message>
+    <message>
+      <source>How to connect sites?</source>
+      <translation type="unfinished">How to connect sites?</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Ingenting funnet</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
     </message>
   </context>
   <context>
@@ -509,33 +600,6 @@
     </message>
   </context>
   <context>
-    <name>SearchScreen</name>
-    <message>
-      <source>Objects</source>
-      <translation>Objekter</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>Bokmerker</translation>
-    </message>
-    <message>
-      <source>No objects</source>
-      <translation>Ingen gjenstander</translation>
-    </message>
-    <message>
-      <source>No bookmarks</source>
-      <translation>Ingen bokmerker</translation>
-    </message>
-    <message>
-      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation>Prøv å endre filtrene eller konfigurer objektdeteksjon i innstillingene for kameraplugin</translation>
-    </message>
-    <message>
-      <source>Try changing the filters to display the results</source>
-      <translation>Prøv å endre filtrene for å vise resultatene</translation>
-    </message>
-  </context>
-  <context>
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
@@ -561,10 +625,6 @@
   <context>
     <name>SessionCredentialsEditor</name>
     <message>
-      <source>Host : Port</source>
-      <translation>Tjener: Port</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Logg Inn</translation>
     </message>
@@ -580,49 +640,56 @@
       <source>Users</source>
       <translation>Brukere</translation>
     </message>
-  </context>
-  <context>
-    <name>SessionItem</name>
     <message>
-      <source>INCOMPATIBLE</source>
-      <translation>INKOMPATIBEL</translation>
-    </message>
-    <message>
-      <source>OFFLINE</source>
-      <translation>OFFLINE</translation>
-    </message>
-    <message>
-      <source>UNREACHABLE</source>
-      <translation>UTILGJENGELIG</translation>
+      <source>Host: Port</source>
+      <translation type="unfinished">Host: Port</translation>
     </message>
   </context>
   <context>
     <name>SessionsScreen</name>
     <message>
-      <source>Connect to Server...</source>
-      <translation>Koble til server...</translation>
-    </message>
-    <message>
-      <source>Connect to Another Server...</source>
-      <translation>Koble til en annen server...</translation>
-    </message>
-    <message>
-      <source>Log in to %1</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Logg inn på %1</translation>
-    </message>
-    <message>
-      <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <comment>%1 is a button name</comment>
-      <translation>Kontroller nettverksforbindelsen eller trykk &quot;%1&quot; knappen for å angi en kjent serveradresse.</translation>
-    </message>
-    <message>
       <source>Nothing found</source>
       <translation>Ingenting funnet</translation>
     </message>
     <message>
-      <source>No Sites found</source>
-      <translation>Ingen nettsteder funnet</translation>
+      <source>Search</source>
+      <translation>Søk</translation>
+    </message>
+    <message>
+      <source>Organizations</source>
+      <translation type="unfinished">Organizations</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation>Nettsteder</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
+    </message>
+    <message>
+      <source>No Organizations</source>
+      <translation type="unfinished">No Organizations</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any organizations, try contacting support</source>
+      <translation type="unfinished">We didn&apos;t find any organizations, try contacting support</translation>
+    </message>
+    <message>
+      <source>No Sites Found</source>
+      <translation type="unfinished">No Sites Found</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
+      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
+      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
     </message>
   </context>
   <context>
@@ -707,6 +774,14 @@
       <source>Early access to new features</source>
       <translation>Tidlig tilgang til nye funksjoner</translation>
     </message>
+    <message>
+      <source>Enable software decoder fallback</source>
+      <translation>Aktiver reserveprogramvaredekoder</translation>
+    </message>
+    <message>
+      <source>Decode some rare video formats using software decoder</source>
+      <translation>Dekod noen sjeldne videoformater ved hjelp av programvaredekoder</translation>
+    </message>
   </context>
   <context>
     <name>SideNavigation</name>
@@ -714,13 +789,35 @@
       <source>New connection</source>
       <translation>Ny tilkobling</translation>
     </message>
+  </context>
+  <context>
+    <name>SiteList</name>
     <message>
-      <source>Disconnect from Server</source>
-      <translation>Koble fra serveren</translation>
+      <source>Organizations</source>
+      <translation type="unfinished">Organizations</translation>
     </message>
     <message>
-      <source>Settings</source>
-      <translation>Innstillinger</translation>
+      <source>Folders</source>
+      <translation type="unfinished">Folders</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation>Nettsteder</translation>
+    </message>
+  </context>
+  <context>
+    <name>SiteListItem</name>
+    <message>
+      <source>INCOMPATIBLE</source>
+      <translation>INKOMPATIBEL</translation>
+    </message>
+    <message>
+      <source>OFFLINE</source>
+      <translation>OFFLINE</translation>
+    </message>
+    <message>
+      <source>UNREACHABLE</source>
+      <translation>UTILGJENGELIG</translation>
     </message>
   </context>
   <context>
@@ -754,9 +851,13 @@
       <translation>Logg ut</translation>
     </message>
     <message>
-      <source>Go to %1</source>
+      <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Gå til %1</translation>
+      <translation type="unfinished">Open %1</translation>
+    </message>
+    <message>
+      <source>Channel Partner</source>
+      <translation type="unfinished">Channel Partner</translation>
     </message>
   </context>
   <context>

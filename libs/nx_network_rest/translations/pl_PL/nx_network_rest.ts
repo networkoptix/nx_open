@@ -74,6 +74,10 @@
       <source>The session key is too old for this Site.</source>
       <translation>Klucz sesji jest za stary dla tej witryny.</translation>
     </message>
+    <message>
+      <source>No credentials provided when required by endpoint.</source>
+      <translation>Nie podano danych uwierzytelniających, mimo że są wymagane przez punkt końcowy.</translation>
+    </message>
   </context>
   <context>
     <name>Result</name>

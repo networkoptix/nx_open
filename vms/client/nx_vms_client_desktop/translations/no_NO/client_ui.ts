@@ -129,54 +129,13 @@
       <source>Open Files Folder</source>
       <translation>Åpne mappen Filer</translation>
     </message>
-  </context>
-  <context>
-    <name>AggregationWidget</name>
     <message>
-      <source>Check to set aggregation period</source>
-      <translation>Kryss av for å angi interval</translation>
+      <source>with</source>
+      <translation type="unfinished">with</translation>
     </message>
     <message>
-      <source>Interval of action :</source>
-      <translation>Handlingsintervall:</translation>
-    </message>
-    <message>
-      <source>No more than once per</source>
-      <translation>Ikke mer enn en gang per</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Umiddelbar</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkEventWidget</name>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Søkeord skilt av plass</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Tittel inneholder:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Beskrivelse inneholder:</translation>
-    </message>
-    <message>
-      <source>Event Type:</source>
-      <translation>Hendelsestype:</translation>
-    </message>
-  </context>
-  <context>
-    <name>AnalyticsSdkObjectDetectedWidget</name>
-    <message>
-      <source>Attributes:</source>
-      <translation>Egenskaper:</translation>
-    </message>
-    <message>
-      <source>Object Type:</source>
-      <translation>Objekttype:</translation>
+      <source>Simultaneous Streams</source>
+      <translation type="unfinished">Simultaneous Streams</translation>
     </message>
   </context>
   <context>
@@ -291,10 +250,6 @@
       <translation>Lås båndbredde til</translation>
     </message>
     <message>
-      <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
-    </message>
-    <message>
       <source>Unlimited</source>
       <translation>Ubegrenset</translation>
     </message>
@@ -305,6 +260,10 @@
     <message>
       <source>No backup</source>
       <translation>Ingen backup</translation>
+    </message>
+    <message>
+      <source>Mbps</source>
+      <translation type="unfinished">Mbps</translation>
     </message>
   </context>
   <context>
@@ -332,29 +291,6 @@
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
       <translation>Sikkerhetskopiering er stoppet på grunn av lagringsproblem. Sikkerhetskopieringen gjenopptas automatisk etter at lagringsproblemet er løst</translation>
-    </message>
-  </context>
-  <context>
-    <name>BookmarkBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Fast varighet:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>sekunder</translation>
-    </message>
-    <message>
-      <source>Tags:</source>
-      <translation>Merker:</translation>
-    </message>
-    <message>
-      <source>Pre-recording:</source>
-      <translation>Pre-opptak:</translation>
-    </message>
-    <message>
-      <source>Post-recording:</source>
-      <translation>Post-opptak:</translation>
     </message>
   </context>
   <context>
@@ -420,79 +356,6 @@
     <message>
       <source>Clear Filter</source>
       <translation>Tøm filter</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRuleWidget</name>
-    <message>
-      <source>Event</source>
-      <translation>Hendelse</translation>
-    </message>
-    <message>
-      <source>Schedule...</source>
-      <translation>Tidsplan...</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Handling</translation>
-    </message>
-    <message>
-      <source>Comments:</source>
-      <translation>Kommentarer:</translation>
-    </message>
-    <message>
-      <source>When</source>
-      <translation>Når</translation>
-    </message>
-    <message>
-      <source>Do</source>
-      <translation>Gjør</translation>
-    </message>
-    <message>
-      <source>At</source>
-      <translation>Ved</translation>
-    </message>
-    <message>
-      <source>Use event source server</source>
-      <translation>Bruk hendelseskildeserver</translation>
-    </message>
-    <message>
-      <source>Use event source camera</source>
-      <translation>Bruk hendelseskildekamera</translation>
-    </message>
-  </context>
-  <context>
-    <name>BusinessRulesDialog</name>
-    <message>
-      <source>Add</source>
-      <translation>Legg til</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Slett</translation>
-    </message>
-    <message>
-      <source>Event Rules</source>
-      <translation>Hendelseregler</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>Hendelsesloggen...</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Test</translation>
-    </message>
-  </context>
-  <context>
-    <name>BuzzerBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Fast varighet:</translation>
-    </message>
-    <message>
-      <source>seconds</source>
-      <translation>sekunder</translation>
     </message>
   </context>
   <context>
@@ -741,12 +604,9 @@
       <source>Logical ID</source>
       <translation>Logisk ID</translation>
     </message>
-  </context>
-  <context>
-    <name>CameraInputBusinessEventWidget</name>
     <message>
-      <source>Input ID</source>
-      <translation>Inngangs-ID</translation>
+      <source>Restreaming Link</source>
+      <translation type="unfinished">Restreaming Link</translation>
     </message>
   </context>
   <context>
@@ -781,17 +641,6 @@
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
       <translation>i</translation>
-    </message>
-  </context>
-  <context>
-    <name>CameraOutputBusinessActionWidget</name>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Fast varighet:</translation>
-    </message>
-    <message>
-      <source>Output ID:</source>
-      <translation>Utgangs-ID:</translation>
     </message>
   </context>
   <context>
@@ -904,57 +753,6 @@
     </message>
   </context>
   <context>
-    <name>CloudLayoutsIntroDialog</name>
-    <message>
-      <source>BETA</source>
-      <translation>BETA</translation>
-    </message>
-    <message>
-      <source>Available Actions</source>
-      <translation>Tilgjengelige handlinger</translation>
-    </message>
-    <message>
-      <source>Video Export</source>
-      <translation>Videoeksport</translation>
-    </message>
-    <message>
-      <source>Live Video and Archive</source>
-      <translation>Live video og arkiv</translation>
-    </message>
-    <message>
-      <source>PTZ</source>
-      <translation>PTZ</translation>
-    </message>
-    <message>
-      <source>Showreels</source>
-      <translation>Bildesyklus</translation>
-    </message>
-    <message>
-      <source>Read more on the help page</source>
-      <translation>Les mer på hjelpesiden</translation>
-    </message>
-    <message>
-      <source>Do not show this window again</source>
-      <translation>Ikke vis dette vinduet igjen</translation>
-    </message>
-    <message>
-      <source>Introducing Cloud Layouts</source>
-      <translation>Vi introduserer skyoppsett</translation>
-    </message>
-    <message>
-      <source>Motion Search</source>
-      <translation>Bevegelsessøk</translation>
-    </message>
-    <message>
-      <source>Searching Bookmarks, Objects, Events</source>
-      <translation>Søker i bokmerker, objekter, hendelser</translation>
-    </message>
-    <message>
-      <source>In the Future</source>
-      <translation>I fremtiden</translation>
-    </message>
-  </context>
-  <context>
     <name>CloudManagementWidget</name>
     <message>
       <source>No connection</source>
@@ -996,29 +794,6 @@
     <message>
       <source>Select another event or action</source>
       <translation>Velg en annen hendelse eller handling</translation>
-    </message>
-  </context>
-  <context>
-    <name>CustomBusinessEventWidget</name>
-    <message>
-      <source>Source contains:</source>
-      <translation>Kilde inneholder:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Søkeord skilt av plass</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Tittel inneholder:</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Beskrivelse inneholder:</translation>
-    </message>
-    <message>
-      <source>Omit Logging</source>
-      <translation>Utelat logging</translation>
     </message>
   </context>
   <context>
@@ -1172,59 +947,6 @@
     </message>
   </context>
   <context>
-    <name>ExecHttpRequestActionWidget</name>
-    <message>
-      <source>Login to authenticate (optional)</source>
-      <translation>Logg inn for å autentisere (valgfritt)</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Logg Inn</translation>
-    </message>
-    <message>
-      <source>Password to authenticate (optional)</source>
-      <translation>Passord for å autentisere (valgfritt)</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Passord</translation>
-    </message>
-    <message>
-      <source>HTTP(S) URL</source>
-      <translation>HTTP(S) URL</translation>
-    </message>
-    <message>
-      <source>HTTP(S) Content</source>
-      <translation>HTTP(S)-innhold</translation>
-    </message>
-    <message>
-      <source>Content Type</source>
-      <translation>Innholdstype</translation>
-    </message>
-    <message>
-      <source>Authentication Type</source>
-      <translation>Autentiseringstype</translation>
-    </message>
-    <message>
-      <source>Request Method</source>
-      <translation>Forespørselsmetode</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExecPtzPresetBusinessActionWidget</name>
-    <message>
-      <source>PTZ preset:</source>
-      <translation>PTZ-posisjoner:</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExitFullscreenActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>På visning</translation>
-    </message>
-  </context>
-  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <source>Export Settings</source>
@@ -1345,17 +1067,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Ingenting funnet</translation>
-    </message>
-  </context>
-  <context>
-    <name>FullscreenCameraActionWidget</name>
-    <message>
-      <source>On layout</source>
-      <translation>På visning</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
     </message>
   </context>
   <context>
@@ -1773,8 +1484,8 @@
       <translation>Prøv på nytt</translation>
     </message>
     <message>
-      <source>Open Files Folder</source>
-      <translation>Åpne filmappe</translation>
+      <source>Open files folder</source>
+      <translation type="unfinished">Open files folder</translation>
     </message>
   </context>
   <context>
@@ -2001,21 +1712,6 @@
     </message>
   </context>
   <context>
-    <name>OpenLayoutActionWidget</name>
-    <message>
-      <source>Layout</source>
-      <translation>Visning</translation>
-    </message>
-    <message>
-      <source>Show to</source>
-      <translation>Vis til</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Velg visning...</translation>
-    </message>
-  </context>
-  <context>
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
@@ -2067,75 +1763,6 @@
     <message>
       <source>Sign in to web page</source>
       <translation>Logg på nettsiden</translation>
-    </message>
-  </context>
-  <context>
-    <name>PlaySoundBusinessActionWidget</name>
-    <message>
-      <source>Manage...</source>
-      <translation>Behandle...</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>Volum:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>Test...</translation>
-    </message>
-    <message>
-      <source>Play to users</source>
-      <translation>Spill til brukere</translation>
-    </message>
-  </context>
-  <context>
-    <name>PluginDiagnosticEventWidget</name>
-    <message>
-      <source>Source:</source>
-      <translation>Kilde:</translation>
-    </message>
-    <message>
-      <source>Caption contains:</source>
-      <translation>Tittel inneholder:</translation>
-    </message>
-    <message>
-      <source>Keywords separated by space</source>
-      <translation>Søkeord skilt av plass</translation>
-    </message>
-    <message>
-      <source>Description contains:</source>
-      <translation>Beskrivelse inneholder:</translation>
-    </message>
-    <message>
-      <source>Level:</source>
-      <translation>Nivå:</translation>
-    </message>
-    <message>
-      <source>ERROR</source>
-      <translation>FEIL</translation>
-    </message>
-    <message>
-      <source>WARNING</source>
-      <translation>ADVARSEL</translation>
-    </message>
-    <message>
-      <source>INFO</source>
-      <translation>INFO</translation>
-    </message>
-  </context>
-  <context>
-    <name>PopupBusinessActionWidget</name>
-    <message>
-      <source>Force Acknowledgment</source>
-      <translation>Krev godkjenning</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>Bruk tilpasset tekst:</translation>
-    </message>
-    <message>
-      <source>to</source>
-      <translation>til</translation>
     </message>
   </context>
   <context>
@@ -2209,37 +1836,6 @@
     <message>
       <source>Hotkey:</source>
       <translation>Hurtigtast:</translation>
-    </message>
-  </context>
-  <context>
-    <name>PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>To</source>
-      <translation>Til</translation>
-    </message>
-    <message>
-      <source>Custom notification content</source>
-      <translation>Egendefinert meldingsinnhold</translation>
-    </message>
-    <message>
-      <source>Header</source>
-      <translation>Topptekst</translation>
-    </message>
-    <message>
-      <source>Default notification title will be used if left empty</source>
-      <translation>Standardtittel for varsel vil bli brukt hvis feltet er tomt</translation>
-    </message>
-    <message>
-      <source>Body</source>
-      <translation>Kropp</translation>
-    </message>
-    <message>
-      <source>Default text will be used if this field is empty</source>
-      <translation>Standardtekst vil bli brukt hvis dette feltet er tomt</translation>
-    </message>
-    <message>
-      <source>Add source device name in body</source>
-      <translation>Legg til kildeenhetens navn i body</translation>
     </message>
   </context>
   <context>
@@ -2389,33 +1985,6 @@
     </message>
   </context>
   <context>
-    <name>RecordingBusinessActionWidget</name>
-    <message>
-      <source>Quality:</source>
-      <translation>Kvalitet:</translation>
-    </message>
-    <message>
-      <source>FPS</source>
-      <translation>BPS</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>Pre-Recording:</source>
-      <translation>Pre-opptak:</translation>
-    </message>
-    <message>
-      <source>Post-Recording:</source>
-      <translation>Post-opptak:</translation>
-    </message>
-    <message>
-      <source>Fixed duration:</source>
-      <translation>Fast varighet:</translation>
-    </message>
-  </context>
-  <context>
     <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
@@ -2520,29 +2089,6 @@
     <message>
       <source>Organization&apos;s limits violation</source>
       <translation type="unfinished">Organization&apos;s limits violation</translation>
-    </message>
-  </context>
-  <context>
-    <name>SayTextBusinessActionWidget</name>
-    <message>
-      <source>Speak the following:</source>
-      <translation>Les opp følgende:</translation>
-    </message>
-    <message>
-      <source>Type any text here</source>
-      <translation>Skriv inn hvilken som helst tekst her</translation>
-    </message>
-    <message>
-      <source>Volume:</source>
-      <translation>Volum:</translation>
-    </message>
-    <message>
-      <source>Test...</source>
-      <translation>Test...</translation>
-    </message>
-    <message>
-      <source>Speak to users</source>
-      <translation>Spill til brukere</translation>
     </message>
   </context>
   <context>
@@ -2688,17 +2234,6 @@
     </message>
   </context>
   <context>
-    <name>SendmailBusinessActionWidget</name>
-    <message>
-      <source>Additional Recipients:</source>
-      <translation>Tilleggsmottakere:</translation>
-    </message>
-    <message>
-      <source>Global Email Settings...</source>
-      <translation>Globale e-postinnstillinger...</translation>
-    </message>
-  </context>
-  <context>
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
@@ -2772,36 +2307,6 @@
     </message>
   </context>
   <context>
-    <name>ShowOnAlarmLayoutActionWidget</name>
-    <message>
-      <source>for</source>
-      <translation>for</translation>
-    </message>
-    <message>
-      <source>Force Alarm Layout opening</source>
-      <translation>Tving åpning av alarmvisning</translation>
-    </message>
-  </context>
-  <context>
-    <name>ShowTextOverlayActionWidget</name>
-    <message>
-      <source>seconds</source>
-      <translation>sekunder</translation>
-    </message>
-    <message>
-      <source>Display text for:</source>
-      <translation>Vis tekst for:</translation>
-    </message>
-    <message>
-      <source>Use custom text:</source>
-      <translation>Bruk tilpasset tekst:</translation>
-    </message>
-    <message>
-      <source>Rule will work only for prolonged events</source>
-      <translation>Regel vil bare fungere for langvarige hendelser</translation>
-    </message>
-  </context>
-  <context>
     <name>SignDialog</name>
     <message>
       <source>Watermark Check</source>
@@ -2814,21 +2319,6 @@
     <message>
       <source>Check Result:</source>
       <translation>Sjekk resultat:</translation>
-    </message>
-  </context>
-  <context>
-    <name>SoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>Available to</source>
-      <translation>Tilgjengelig for</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Navn</translation>
-    </message>
-    <message>
-      <source>Icon</source>
-      <translation>Ikon</translation>
     </message>
   </context>
   <context>
