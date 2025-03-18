@@ -155,6 +155,8 @@ void moveFieldsToParameters(DeviceModelV3* m)
         QJson::serialize(*m->userEnabledAnalyticsEngineIds,
             &m->parameters[kUserEnabledAnalyticsEnginesProperty]);
     }
+    if (m->streamUrls)
+        m->parameters[kStreamUrls] = *m->streamUrls;
 }
 
 struct LessById
