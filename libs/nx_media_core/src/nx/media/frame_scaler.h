@@ -4,7 +4,11 @@
 
 #include <nx/media/ffmpeg/frame_info.h>
 
-class QnFrameScaler
+/*
+ * This class is alternative to sws_scale. It is limited to scale frames on 2,4 or 8 times without
+ * changing pixel format. It works several times faster than ffmpeg sws_scale.
+ */
+class NX_MEDIA_CORE_API QnFrameScaler
 {
 public:
     enum DownscaleFactor {
@@ -21,7 +25,13 @@ public:
         factor_unknown = 512
     };
 
-    static void downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, DownscaleFactor factor);
+    static void downscale(const AVFrame* src, CLVideoDecoderOutput* dst, DownscaleFactor factor);
+
+    /*
+     * Downscale avFrame if scaler supports it. If function returns false sws_scale should be
+     * used as fallback.
+     */
+    static bool downscale(const AVFrame* src, CLVideoDecoderOutput* dst, bool useIntrinsicsOnly = true);
 
 private:
     static void downscalePlate_factor2(

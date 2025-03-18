@@ -10,11 +10,11 @@
 
 #include <nx/media/abstract_metadata_consumer.h>
 #include <nx/media/ffmpeg/abstract_video_decoder.h>
+#include <nx/media/frame_scaler.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/stoppable.h>
 #include <transcoding/filters/filter_helper.h>
 
-#include "frame_scaler.h"
 
 extern "C" {
 struct SwsContext;

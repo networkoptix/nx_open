@@ -19,6 +19,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/kit/debug.h>
+#include <nx/media/avframe_memory_buffer.h>
 #include <nx/media/ini.h>
 #include <nx/media/supported_decoders.h>
 #include <nx/media/video_frame.h>
@@ -539,6 +540,21 @@ void Player::Private::presentNextFrameDelayed()
     }
 }
 
+AVPixelFormat toFfmpegPixelFormat(QVideoFrameFormat::PixelFormat format)
+{
+    switch (format)
+    {
+        case QVideoFrameFormat::Format_YUV420P:
+            return AV_PIX_FMT_YUV420P;
+        case QVideoFrameFormat::Format_YUV422P:
+            return AV_PIX_FMT_YUV420P;
+        case QVideoFrameFormat::Format_NV12:
+            return AV_PIX_FMT_NV12;
+        default:
+            return AV_PIX_FMT_NONE;
+    }
+}
+
 VideoFramePtr Player::Private::scaleFrame(const VideoFramePtr& videoFrame)
 {
     if (videoFrame->handleType() != QVideoFrame::NoHandle)
@@ -547,15 +563,48 @@ VideoFramePtr Player::Private::scaleFrame(const VideoFramePtr& videoFrame)
     if (videoFrame->width() <= maxTextureSize && videoFrame->height() <= maxTextureSize)
         return videoFrame; //< Scale is not required.
 
-    const QImage image = videoFrame->toImage().scaled(
-        maxTextureSize, maxTextureSize, Qt::KeepAspectRatio);
+    const int maxSize = std::max(videoFrame->width(), videoFrame->height());
+    int scaleFactor = (int) std::ceil(maxSize / (float) maxTextureSize);
+    // Try to use optimized scaled factor
+    if (scaleFactor > 4 && scaleFactor < 8)
+        scaleFactor = 8;
+    else if (scaleFactor == 3)
+        scaleFactor = 4;
 
-    NX_ASSERT(!image.isNull());
+    QSize newSize(videoFrame->width() / scaleFactor, videoFrame->height() / scaleFactor);
 
-    if (auto scaledFrame = std::make_shared<VideoFrame>(image))
-        return scaledFrame;
+    auto format = toFfmpegPixelFormat(videoFrame->pixelFormat());
+    if (format == AV_PIX_FMT_NONE)
+    {
+        NX_DEBUG(this, "Pixel format %1 is not supported to downscale frame", format);
+        return videoFrame;
+    }
 
-    return videoFrame;
+    CLVideoDecoderOutput src;
+    src.setUseExternalData(true);
+    src.width = videoFrame->width();
+    src.height = videoFrame->height();
+    src.format = format;
+
+    if (!videoFrame->map(QVideoFrame::ReadOnly))
+    {
+        NX_WARNING(this, "Can't map frame data to scale it");
+        return videoFrame;
+    }
+    for (int i = 0; i < videoFrame->planeCount(); ++i)
+    {
+        src.data[i] = videoFrame->bits(i);
+        src.linesize[i] = videoFrame->bytesPerLine(i);
+    }
+    auto buffer = std::make_unique<CLVideoDecoderOutputMemBuffer>(src.scaled(newSize, format));
+    videoFrame->unmap();
+
+    VideoFramePtr scaledFrame(new VideoFrame(std::move(buffer)));
+
+    scaledFrame->setStartTime(videoFrame->startTime());
+    scaledFrame->metaData = videoFrame->metaData;
+
+    return scaledFrame;
 }
 
 void Player::Private::presentNextFrame()

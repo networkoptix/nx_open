@@ -187,15 +187,15 @@ void downscalePlate_factor8_sse41_intr(
 #else // !defined(__arm__) && !defined(__aarch64__)
 
 void downscalePlate_factor4_ssse3_intr(
-    unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
-    const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
+    unsigned char * /*dst*/, const unsigned int /*dst_stride*/, const unsigned char* /*src*/,
+    const unsigned int /*width*/, const unsigned int /*src_stride*/, unsigned int /*height*/, int /*filler*/)
 {
     NX_CRITICAL(false);
 }
 
 void downscalePlate_factor8_sse41_intr(
-    unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
-    const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
+    unsigned char* /*dst*/, const unsigned int /*dst_stride*/, const unsigned char* /*src*/,
+    const unsigned int /*width*/, const unsigned int /*src_stride*/, unsigned int /*height*/, int /*filler*/)
 {
     NX_CRITICAL(false);
 }
@@ -205,7 +205,7 @@ void downscalePlate_factor8_sse41_intr(
 template <auto scalerFunc>
 void downscalePlanes(
     const AVPixFmtDescriptor* descriptor,
-    const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst,
+    const AVFrame* src, AVFrame* dst,
     const int croppedWidth)
 {
     for (int i = 0; i < QnFfmpegHelper::planeCount(descriptor) && src->data[i] && dst->data[i]; ++i)
@@ -225,7 +225,31 @@ void downscalePlanes(
 
 } // namespace
 
-void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, DownscaleFactor factor)
+bool QnFrameScaler::downscale(const AVFrame* src, CLVideoDecoderOutput* dst, bool useIntrinsicsOnly)
+{
+    if (src->format != dst->format)
+        return false;
+    if (src->format != AV_PIX_FMT_YUV420P
+        && src->format != AV_PIX_FMT_YUV422P
+        && src->format != AV_PIX_FMT_YUV444P)
+    {
+        return false;
+    }
+
+    DownscaleFactor factor;
+    if (src->width / 2 == dst->width && src->height / 2 == dst->height && (!useIntrinsicsOnly || useSSE2()))
+        factor = DownscaleFactor::factor_2;
+    else if (src->width / 4 == dst->width && src->height / 4 == dst->height && (!useIntrinsicsOnly || useSSSE3()))
+        factor = DownscaleFactor::factor_4;
+    else if (src->width / 8 == dst->width && src->height / 8 == dst->height && (!useIntrinsicsOnly || useSSE41()))
+        factor = DownscaleFactor::factor_8;
+    else
+        return false;
+    downscale(src, dst, factor);
+    return true;
+}
+
+void QnFrameScaler::downscale(const AVFrame* src, CLVideoDecoderOutput* dst, DownscaleFactor factor)
 {
     const AVPixFmtDescriptor* descriptor = av_pix_fmt_desc_get((AVPixelFormat)src->format);
     if (!descriptor)

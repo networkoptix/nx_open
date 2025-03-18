@@ -18,6 +18,7 @@ extern "C" {
 #include <nx/utils/thread/mutex.h>
 
 #include "aligned_mem_video_buffer.h"
+#include "avframe_memory_buffer.h"
 #include "ini.h"
 
 namespace nx {
@@ -28,86 +29,8 @@ namespace {
 static const nx::log::Tag kLogTag(QString("FfmpegVideoDecoder"));
 static const int kHeavyVideoThreshold = 1'000'000 * 2;
 
-QVideoFrameFormat::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
-{
-    switch (pixFormat)
-    {
-        case AV_PIX_FMT_YUV420P:
-        case AV_PIX_FMT_YUVJ420P:
-            return QVideoFrameFormat::Format_YUV420P;
-        case AV_PIX_FMT_BGRA:
-            return QVideoFrameFormat::Format_BGRA8888;
-        case AV_PIX_FMT_NV12:
-            return QVideoFrameFormat::Format_NV12;
-        default:
-            return QVideoFrameFormat::Format_Invalid;
-    }
-}
-
 } // namespace
 
-
-class AvFrameMemoryBuffer: public QAbstractVideoBuffer
-{
-public:
-    AvFrameMemoryBuffer(AVFrame* frame, bool ownsFrame):
-        m_frame(frame),
-        m_ownsFrame(ownsFrame)
-    {
-    }
-
-    virtual ~AvFrameMemoryBuffer()
-    {
-        if (m_ownsFrame)
-            av_frame_free(&m_frame);
-    }
-
-    virtual MapData map(QVideoFrame::MapMode mode) override
-    {
-        MapData data;
-
-        if (mode != QVideoFrame::ReadOnly)
-            return data;
-
-        const auto pixelFormat = toQtPixelFormat((AVPixelFormat) m_frame->format);
-
-        int planes = 0;
-
-        for (int i = 0; i < 4 && m_frame->data[i]; ++i)
-        {
-            ++planes;
-            data.data[i] = m_frame->data[i];
-            data.bytesPerLine[i] = m_frame->linesize[i];
-            int bytesPerPlane = data.bytesPerLine[i] * m_frame->height;
-
-            if (i > 0 && pixelFormat == QVideoFrameFormat::Format_YUV420P)
-                bytesPerPlane /= 2;
-
-            data.dataSize[i] = bytesPerPlane;
-        }
-        data.planeCount = planes;
-
-        return data;
-    }
-
-    virtual void unmap() override
-    {
-    }
-
-    virtual QVideoFrameFormat format() const override
-    {
-        if (!m_frame)
-            return QVideoFrameFormat();
-
-        return QVideoFrameFormat(
-            QSize(m_frame->width, m_frame->height),
-            toQtPixelFormat((AVPixelFormat) m_frame->format));
-    }
-
-private:
-    AVFrame* m_frame = nullptr;
-    bool m_ownsFrame = true;
-};
 
 //-------------------------------------------------------------------------------------------------
 // FfmpegDecoderPrivate
@@ -284,7 +207,7 @@ VideoFrame* FfmpegVideoDecoderPrivate::fromAVFrame(
 {
     qint64 startTimeMs = (*pFrame)->pkt_dts / 1000;
 
-    const auto qtPixelFormat = toQtPixelFormat((AVPixelFormat) (*pFrame)->format);
+    const auto qtPixelFormat = AvFrameMemoryBuffer::toQtPixelFormat((AVPixelFormat) (*pFrame)->format);
 
     // Frame moved to the buffer. Buffer keeps reference to a frame.
     std::unique_ptr<QAbstractVideoBuffer> buffer;

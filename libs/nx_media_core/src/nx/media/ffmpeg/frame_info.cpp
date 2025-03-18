@@ -13,6 +13,7 @@
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/ffmpeg/nx_image_ini.h>
 #include <nx/media/ffmpeg_helper.h>
+#include <nx/media/frame_scaler.h>
 #include <nx/media/yuvconvert.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
@@ -542,22 +543,22 @@ CLVideoDecoderOutputPtr CLVideoDecoderOutput::scaled(
             && scaleSize.height() != 0 && scaleSize.height() <= newSize.height());
     }
 
-    // Absolute robustness for the case, when operator 'new' throws an exception.
-    std::unique_ptr<SwsContext, decltype(&sws_freeContext)> scaleContext(
-        sws_getContext(width, height, (AVPixelFormat)format,
-            scaleSize.width(), scaleSize.height(), newFormat,
-            scaleFlags, NULL, NULL, NULL), sws_freeContext);
+    CLVideoDecoderOutputPtr dst(new CLVideoDecoderOutput);
+    dst->reallocate(newSize.width(), newSize.height(), newFormat);
+    dst->assignMiscData(this);
+    dst->sample_aspect_ratio = 1.0;
+    if (keepAspectRatio)
+        dst->memZero();
 
-    if (scaleContext)
+    if (QnFrameScaler::downscale(this, dst.data()))
+        return dst;
+
+    if (auto scaleContext = sws_getContext(width, height, (AVPixelFormat)format,
+        scaleSize.width(), scaleSize.height(), newFormat,
+        scaleFlags, NULL, NULL, NULL))
     {
-        CLVideoDecoderOutputPtr dst(new CLVideoDecoderOutput);
-        dst->reallocate(newSize.width(), newSize.height(), newFormat);
-        dst->assignMiscData(this);
-        dst->sample_aspect_ratio = 1.0;
-        if (keepAspectRatio)
-            dst->memZero();
-
-        sws_scale(scaleContext.get(), data, linesize, 0, height, dst->data, dst->linesize);
+        sws_scale(scaleContext, data, linesize, 0, height, dst->data, dst->linesize);
+        sws_freeContext(scaleContext);
         return dst;
     }
 
