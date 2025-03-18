@@ -5990,7 +5990,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Poistettu kamera</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -6003,9 +6003,9 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n poistetut aiheet</numerusform>
+        <numerusform>%n poistetut aiheet</numerusform>
       </translation>
     </message>
   </context>
@@ -6803,7 +6803,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Lähde: %1</translation>
     </message>
   </context>
   <context>
@@ -8012,7 +8012,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Kaikki palvelimet ovat offline-tilassa. Tarkastustiedot eivät ole käytettävissä.</translation>
     </message>
   </context>
   <context>

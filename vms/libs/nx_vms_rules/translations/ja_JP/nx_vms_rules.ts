@@ -21,7 +21,7 @@
     <message>
       <source>On %1 --&gt; %2</source>
       <comment>%1 is the event name, %2 is the action name</comment>
-      <translation type="unfinished">On %1 --&gt; %2</translation>
+      <translation>%1 --&gt; %2</translation>
     </message>
   </context>
   <context>
@@ -300,7 +300,7 @@
     </message>
     <message>
       <source>And attributes</source>
-      <translation type="unfinished">And attributes</translation>
+      <translation>属性</translation>
     </message>
   </context>
   <context>
@@ -557,7 +557,7 @@
     </message>
     <message>
       <source>Custom headers</source>
-      <translation type="unfinished">Custom headers</translation>
+      <translation>カスタムヘッダー</translation>
     </message>
   </context>
   <context>
@@ -575,14 +575,14 @@
     <name>nx::vms::rules::HttpHeadersFieldValidator</name>
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
-      <translation type="unfinished">
-        <numerusform>Some of the headers are not valid</numerusform>
+      <translation>
+        <numerusform>一部のヘッダーが不正です。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
-      <translation type="unfinished">
-        <numerusform>All the headers are not valid</numerusform>
+      <translation>
+        <numerusform>すべてのヘッダーが不正です。</numerusform>
       </translation>
     </message>
   </context>
@@ -597,7 +597,7 @@
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
       <source>Integration Diagnostic Event</source>
-      <translation type="unfinished">Integration Diagnostic Event</translation>
+      <translation>インテグレーション診断イベント</translation>
     </message>
     <message>
       <source>For Plugin</source>
@@ -922,7 +922,7 @@
     </message>
     <message>
       <source>Cloud storage services disabled</source>
-      <translation>クラウド ストレージ サービスが無効になっています</translation>
+      <translation>クラウドストレージサービスが無効になっています</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
@@ -1061,11 +1061,11 @@
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
       <source>Site HTTP(S) Request</source>
-      <translation type="unfinished">Site HTTP(S) Request</translation>
+      <translation>サイト HTTP(S) リクエスト</translation>
     </message>
     <message>
       <source>Endpoint</source>
-      <translation type="unfinished">Endpoint</translation>
+      <translation>エンドポイント</translation>
     </message>
     <message>
       <source>Method</source>
@@ -1221,7 +1221,7 @@
     </message>
     <message>
       <source>Invalid UUID string</source>
-      <translation type="unfinished">Invalid UUID string</translation>
+      <translation>無効な UUID 文字列です。</translation>
     </message>
   </context>
   <context>
@@ -1255,11 +1255,11 @@
     </message>
     <message>
       <source>Endpoint cannot be empty</source>
-      <translation type="unfinished">Endpoint cannot be empty</translation>
+      <translation>エンドポイントを入力してください。</translation>
     </message>
     <message>
       <source>Endpoint mustn&apos;t contains any space</source>
-      <translation type="unfinished">Endpoint mustn&apos;t contains any space</translation>
+      <translation>エンドポイントにスペースを含めることはできません。</translation>
     </message>
   </context>
   <context>

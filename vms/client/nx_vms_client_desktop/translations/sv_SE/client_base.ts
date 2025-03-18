@@ -4310,7 +4310,7 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>Ställ in</translation>
     </message>
   </context>
   <context>
@@ -5099,7 +5099,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Betalda integrationstjänster inaktiverade</translation>
     </message>
   </context>
   <context>
@@ -5990,7 +5990,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Borttagen kamera</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -6003,9 +6003,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n borttagna ämnen</numerusform>
+        <numerusform>%n borttagna ämnen</numerusform>
       </translation>
     </message>
   </context>
@@ -6795,15 +6795,15 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>Samtalsförfrågan</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>Samtalsbegäran missad</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Källa: %1</translation>
     </message>
   </context>
   <context>
@@ -8012,7 +8012,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Alla servrar är offline. Loggarna är inte tillgängliga.</translation>
     </message>
   </context>
   <context>
@@ -9818,7 +9818,7 @@ Du kan tvinga rörelsedetektering, men det kan leda till en betydande ökning av
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Webbplatsmeddelanden</translation>
     </message>
   </context>
   <context>
@@ -11022,23 +11022,23 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Inspelning på %n kanaler stoppades på grund av överanvändning av tjänsten.</numerusform>
+        <numerusform>Inspelning på %n kanaler stoppades på grund av överanvändning av tjänsten.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Säkerhetskopiering av molnlagring på %n kanaler stoppades på grund av överanvändning av tjänster.</numerusform>
+        <numerusform>Säkerhetskopiering av molnlagring på %n kanaler stoppades på grund av överanvändning av tjänster.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Användningen av betalda integrationstjänster på %n kanaler stoppades på grund av överanvändning av tjänster.</numerusform>
+        <numerusform>Användningen av betalda integrationstjänster på %n kanaler stoppades på grund av överanvändning av tjänster.</numerusform>
       </translation>
     </message>
   </context>
@@ -12287,7 +12287,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>Kan inte hitta en widget som motsvarar det angivna objektet</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
@@ -12504,7 +12504,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Nyckel</translation>
     </message>
     <message>
       <source>Value</source>

@@ -531,7 +531,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>ใหม่</translation>
     </message>
   </context>
   <context>

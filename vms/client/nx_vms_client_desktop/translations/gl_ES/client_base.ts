@@ -4310,7 +4310,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>Configurar</translation>
     </message>
   </context>
   <context>
@@ -6003,9 +6003,9 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n temas eliminados</numerusform>
+        <numerusform>%n temas eliminados</numerusform>
       </translation>
     </message>
   </context>
@@ -12505,7 +12505,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Chave</translation>
     </message>
     <message>
       <source>Value</source>

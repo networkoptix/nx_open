@@ -1485,7 +1485,7 @@
     </message>
     <message>
       <source>Open files folder</source>
-      <translation type="unfinished">Open files folder</translation>
+      <translation>Abra a pasta de arquivos</translation>
     </message>
   </context>
   <context>

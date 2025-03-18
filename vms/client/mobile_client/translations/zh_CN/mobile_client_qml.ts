@@ -374,7 +374,7 @@
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>断开连接</translation>
     </message>
   </context>
   <context>
@@ -688,7 +688,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>登录</translation>
     </message>
   </context>
   <context>

@@ -5990,7 +5990,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Fjernet kamera</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -12286,7 +12286,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>Kan ikke finde en widget, der svarer til det angivne element</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
@@ -12503,7 +12503,7 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Nøgle</translation>
     </message>
     <message>
       <source>Value</source>

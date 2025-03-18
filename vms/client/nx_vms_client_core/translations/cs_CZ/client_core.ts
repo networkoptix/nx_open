@@ -359,11 +359,11 @@
     <name>nx::vms::client::core::RecordingStatusHelper</name>
     <message>
       <source>Not recording</source>
-      <translation type="unfinished">Not recording</translation>
+      <translation>Bez záznamu</translation>
     </message>
     <message>
       <source>Recording everything</source>
-      <translation type="unfinished">Recording everything</translation>
+      <translation>Nahrát vše</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
@@ -371,7 +371,7 @@
     </message>
     <message>
       <source>Recording motion only</source>
-      <translation type="unfinished">Recording motion only</translation>
+      <translation>Nahrát pouze pohyb</translation>
     </message>
     <message>
       <source>Recording objects only</source>
@@ -383,7 +383,7 @@
     </message>
     <message>
       <source>Recording motion and low quality</source>
-      <translation type="unfinished">Recording motion and low quality</translation>
+      <translation>Nahrát pohyb nízkou kvalitou</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
@@ -391,7 +391,7 @@
     </message>
     <message>
       <source>Continuous</source>
-      <translation type="unfinished">Continuous</translation>
+      <translation>Kontinuální</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -399,7 +399,7 @@
     </message>
     <message>
       <source>Motion only</source>
-      <translation type="unfinished">Motion only</translation>
+      <translation>Pouze pohyb</translation>
     </message>
     <message>
       <source>Objects only</source>
@@ -411,7 +411,7 @@
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Pohyb + nízké rozlišení</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>

@@ -118,7 +118,7 @@
     <name>ChannelPartner</name>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>채널 파트너</translation>
     </message>
   </context>
   <context>
@@ -374,7 +374,7 @@
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>연결 끊기</translation>
     </message>
   </context>
   <context>
@@ -437,7 +437,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>검색 매개변수를 변경해보세요</translation>
     </message>
   </context>
   <context>
@@ -656,7 +656,7 @@
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>조직</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -664,11 +664,11 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>검색 매개변수를 변경해보세요</translation>
     </message>
     <message>
       <source>No Organizations</source>
-      <translation type="unfinished">No Organizations</translation>
+      <translation>조직 없음</translation>
     </message>
     <message>
       <source>We didn&apos;t find any organizations, try contacting support</source>
@@ -688,7 +688,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>로그인</translation>
     </message>
   </context>
   <context>
@@ -793,7 +793,7 @@
     <name>SiteList</name>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>조직</translation>
     </message>
     <message>
       <source>Folders</source>
@@ -856,7 +856,7 @@
     </message>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>채널 파트너</translation>
     </message>
   </context>
   <context>

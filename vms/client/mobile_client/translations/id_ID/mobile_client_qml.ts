@@ -118,7 +118,7 @@
     <name>ChannelPartner</name>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>Channel Partner</translation>
     </message>
   </context>
   <context>
@@ -259,7 +259,7 @@
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
-      <translation type="unfinished">Looking for</translation>
+      <translation>Mencari</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -370,11 +370,11 @@
     <name>MenuScreen</name>
     <message>
       <source>App Settings</source>
-      <translation type="unfinished">App Settings</translation>
+      <translation>Pengaturan App</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Disconnect</translation>
     </message>
   </context>
   <context>
@@ -417,19 +417,19 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Tidak Ada Site</translation>
     </message>
     <message>
       <source>We did not find any sites in this organization</source>
-      <translation type="unfinished">We did not find any sites in this organization</translation>
+      <translation>Kami tidak menemukan site apa pun di organisasi ini</translation>
     </message>
     <message>
       <source>We did not find any sites in this folder</source>
-      <translation type="unfinished">We did not find any sites in this folder</translation>
+      <translation>Kami tidak menemukan site apa pun di folder ini</translation>
     </message>
     <message>
       <source>How to connect sites?</source>
-      <translation type="unfinished">How to connect sites?</translation>
+      <translation>Bagaimana cara mengkoneksikan site?</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -437,7 +437,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Coba ubah parameter pencarian</translation>
     </message>
   </context>
   <context>
@@ -641,7 +641,7 @@
     </message>
     <message>
       <source>Host: Port</source>
-      <translation type="unfinished">Host: Port</translation>
+      <translation>Host: Port</translation>
     </message>
   </context>
   <context>
@@ -656,7 +656,7 @@
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Organisasi</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -664,31 +664,31 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Coba ubah parameter pencarian</translation>
     </message>
     <message>
       <source>No Organizations</source>
-      <translation type="unfinished">No Organizations</translation>
+      <translation>Tidak Ada Organisasi</translation>
     </message>
     <message>
       <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation type="unfinished">We didn&apos;t find any organizations, try contacting support</translation>
+      <translation>Kami tidak&apos; menemukan organisasi apa pun, coba hubungi support</translation>
     </message>
     <message>
       <source>No Sites Found</source>
-      <translation type="unfinished">No Sites Found</translation>
+      <translation>Tidak Ada Site Ditemukan</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</translation>
+      <translation>Kami tidak&apos; menemukan site apa pun di jaringan lokal Anda, coba tambahkan server secara manual atau masuk ke akun cloud Anda</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually</translation>
+      <translation>Kami tidak&apos; menemukan site apa pun di jaringan lokal Anda, coba tambahkan server secara manual</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Masuk</translation>
     </message>
   </context>
   <context>
@@ -793,11 +793,11 @@
     <name>SiteList</name>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Organisasi</translation>
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>Folder</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -852,11 +852,11 @@
     <message>
       <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Open %1</translation>
+      <translation>Buka %1</translation>
     </message>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>Channel Partner</translation>
     </message>
   </context>
   <context>

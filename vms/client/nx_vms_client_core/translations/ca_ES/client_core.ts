@@ -355,11 +355,11 @@
     <name>nx::vms::client::core::RecordingStatusHelper</name>
     <message>
       <source>Not recording</source>
-      <translation type="unfinished">Not recording</translation>
+      <translation>No enregistrant</translation>
     </message>
     <message>
       <source>Recording everything</source>
-      <translation type="unfinished">Recording everything</translation>
+      <translation>Enregistrant-ho tot</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
@@ -367,7 +367,7 @@
     </message>
     <message>
       <source>Recording motion only</source>
-      <translation type="unfinished">Recording motion only</translation>
+      <translation>Enregistrant només moviment</translation>
     </message>
     <message>
       <source>Recording objects only</source>
@@ -379,7 +379,7 @@
     </message>
     <message>
       <source>Recording motion and low quality</source>
-      <translation type="unfinished">Recording motion and low quality</translation>
+      <translation>Enregistrant moviment i baixa qualitat</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
@@ -387,7 +387,7 @@
     </message>
     <message>
       <source>Continuous</source>
-      <translation type="unfinished">Continuous</translation>
+      <translation>Continu</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -395,7 +395,7 @@
     </message>
     <message>
       <source>Motion only</source>
-      <translation type="unfinished">Motion only</translation>
+      <translation>Només moviment</translation>
     </message>
     <message>
       <source>Objects only</source>
@@ -407,7 +407,7 @@
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Moviment + Baixa resolució</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>

@@ -118,7 +118,7 @@
     <name>ChannelPartner</name>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>Kanal Ortağı</translation>
     </message>
   </context>
   <context>
@@ -375,7 +375,7 @@
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Bağlantıyı kes</translation>
     </message>
   </context>
   <context>
@@ -438,7 +438,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Arama parametrelerini değiştirmeyi deneyin</translation>
     </message>
   </context>
   <context>
@@ -657,7 +657,7 @@
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Organizasyonlar</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -665,11 +665,11 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Arama parametrelerini değiştirmeyi deneyin</translation>
     </message>
     <message>
       <source>No Organizations</source>
-      <translation type="unfinished">No Organizations</translation>
+      <translation>Organizasyon yok</translation>
     </message>
     <message>
       <source>We didn&apos;t find any organizations, try contacting support</source>
@@ -689,7 +689,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Oturum Aç</translation>
     </message>
   </context>
   <context>
@@ -794,7 +794,7 @@
     <name>SiteList</name>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Organizasyonlar</translation>
     </message>
     <message>
       <source>Folders</source>
@@ -857,7 +857,7 @@
     </message>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>Kanal Ortağı</translation>
     </message>
   </context>
   <context>

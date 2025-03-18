@@ -355,11 +355,11 @@
     <name>nx::vms::client::core::RecordingStatusHelper</name>
     <message>
       <source>Not recording</source>
-      <translation type="unfinished">Not recording</translation>
+      <translation>Ei tallennusta</translation>
     </message>
     <message>
       <source>Recording everything</source>
-      <translation type="unfinished">Recording everything</translation>
+      <translation>Kaikki tallennetaan</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
@@ -367,7 +367,7 @@
     </message>
     <message>
       <source>Recording motion only</source>
-      <translation type="unfinished">Recording motion only</translation>
+      <translation>Tallennus vain liikkeeestä</translation>
     </message>
     <message>
       <source>Recording objects only</source>
@@ -379,7 +379,7 @@
     </message>
     <message>
       <source>Recording motion and low quality</source>
-      <translation type="unfinished">Recording motion and low quality</translation>
+      <translation>Tallennus liikkeestä ja alhaisella laadulla</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
@@ -387,7 +387,7 @@
     </message>
     <message>
       <source>Continuous</source>
-      <translation type="unfinished">Continuous</translation>
+      <translation>Jatkuva</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -395,7 +395,7 @@
     </message>
     <message>
       <source>Motion only</source>
-      <translation type="unfinished">Motion only</translation>
+      <translation>Vain liike</translation>
     </message>
     <message>
       <source>Objects only</source>
@@ -407,7 +407,7 @@
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Liike + Matala resoluutio</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>

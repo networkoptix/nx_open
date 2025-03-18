@@ -6162,7 +6162,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Odstraněna kamera</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -6175,11 +6175,11 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n odstraněné objekty</numerusform>
+        <numerusform>%n odstraněné objekty</numerusform>
+        <numerusform>%n odstraněné objekty</numerusform>
+        <numerusform>%n odstraněné objekty</numerusform>
       </translation>
     </message>
   </context>
@@ -7011,7 +7011,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Zdroj: %1</translation>
     </message>
   </context>
   <context>
@@ -8250,7 +8250,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Všechny servery jsou offline. Záznamy nejsou k dispozici.</translation>
     </message>
   </context>
   <context>

@@ -4264,7 +4264,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>세트</translation>
     </message>
   </context>
   <context>
@@ -5904,7 +5904,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>제거된 카메라</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -5917,8 +5917,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n 제목삭제</numerusform>
       </translation>
     </message>
   </context>
@@ -6699,7 +6699,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>소스: %1</translation>
     </message>
   </context>
   <context>
@@ -7893,7 +7893,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>모든 서버가 오프라인 상태입니다. 로그를 사용할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -10326,7 +10326,7 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -10872,20 +10872,20 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>서비스 과부하로 인해 %n 채널의 녹화가 중단되었습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>서비스 초과 사용으로 인해 %n 채널의 클라우드 스토리지 백업이 중단되었습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>서비스 과도한 사용으로 인해 %n 채널의 유료 통합 서비스 사용이 중단되었습니다.</numerusform>
       </translation>
     </message>
   </context>
@@ -12118,7 +12118,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>지정된 항목에 해당하는 위젯을 찾을 수 없습니다</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
@@ -12334,7 +12334,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>키</translation>
     </message>
     <message>
       <source>Value</source>

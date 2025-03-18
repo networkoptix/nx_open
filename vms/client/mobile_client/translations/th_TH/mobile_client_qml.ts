@@ -374,7 +374,7 @@
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>ตัดการเชื่อมต่อ</translation>
     </message>
   </context>
   <context>
@@ -437,7 +437,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>ลองเปลี่ยนพารามิเตอร์การค้นหา</translation>
     </message>
   </context>
   <context>
@@ -664,11 +664,11 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>ลองเปลี่ยนพารามิเตอร์การค้นหา</translation>
     </message>
     <message>
       <source>No Organizations</source>
-      <translation type="unfinished">No Organizations</translation>
+      <translation>ไม่มีองค์กร</translation>
     </message>
     <message>
       <source>We didn&apos;t find any organizations, try contacting support</source>
@@ -688,7 +688,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>เข้าสู่ระบบ</translation>
     </message>
   </context>
   <context>

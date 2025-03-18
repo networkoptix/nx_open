@@ -4310,7 +4310,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>Übernehmen</translation>
     </message>
   </context>
   <context>
@@ -5990,7 +5990,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Entfernte Kamera</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -6003,9 +6003,9 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n entfernter Betreff</numerusform>
+        <numerusform>%n entfernter Betreff</numerusform>
       </translation>
     </message>
   </context>
@@ -6803,7 +6803,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Quelle: %1</translation>
     </message>
   </context>
   <context>
@@ -8012,7 +8012,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Alle Server sind offline. Protokolle sind nicht verfügbar.</translation>
     </message>
   </context>
   <context>
@@ -10472,7 +10472,7 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -12288,7 +12288,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>Es konnte kein Widget gefunden werden, das dem angegebenen Element entspricht</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
@@ -12505,7 +12505,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Schlüssel</translation>
     </message>
     <message>
       <source>Value</source>

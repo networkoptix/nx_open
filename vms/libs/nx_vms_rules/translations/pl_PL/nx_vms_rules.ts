@@ -21,7 +21,7 @@
     <message>
       <source>On %1 --&gt; %2</source>
       <comment>%1 is the event name, %2 is the action name</comment>
-      <translation type="unfinished">On %1 --&gt; %2</translation>
+      <translation>Na %1 --&gt; %2</translation>
     </message>
   </context>
   <context>
@@ -321,7 +321,7 @@
     </message>
     <message>
       <source>And attributes</source>
-      <translation type="unfinished">And attributes</translation>
+      <translation>I atrybuty</translation>
     </message>
   </context>
   <context>
@@ -578,7 +578,7 @@
     </message>
     <message>
       <source>Custom headers</source>
-      <translation type="unfinished">Custom headers</translation>
+      <translation>Niestandardowe nagłówki</translation>
     </message>
   </context>
   <context>
@@ -597,7 +597,7 @@
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
       <translation type="unfinished">
-        <numerusform>Some of the headers are not valid</numerusform>
+        <numerusform>Niektóre nagłówki są nieprawidłowe</numerusform>
         <numerusform>Some of the headers are not valid</numerusform>
         <numerusform>Some of the headers are not valid</numerusform>
         <numerusform>Some of the headers are not valid</numerusform>
@@ -606,7 +606,7 @@
     <message numerus="yes">
       <source>All the headers are not valid</source>
       <translation type="unfinished">
-        <numerusform>All the headers are not valid</numerusform>
+        <numerusform>Wszystkie nagłówki są nieprawidłowe</numerusform>
         <numerusform>All the headers are not valid</numerusform>
         <numerusform>All the headers are not valid</numerusform>
         <numerusform>All the headers are not valid</numerusform>
@@ -624,7 +624,7 @@
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
       <source>Integration Diagnostic Event</source>
-      <translation type="unfinished">Integration Diagnostic Event</translation>
+      <translation>Zdarzenie diagnostyczne integracji</translation>
     </message>
     <message>
       <source>For Plugin</source>
@@ -1103,11 +1103,11 @@
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
       <source>Site HTTP(S) Request</source>
-      <translation type="unfinished">Site HTTP(S) Request</translation>
+      <translation>Żądanie HTTP(S) witryny</translation>
     </message>
     <message>
       <source>Endpoint</source>
-      <translation type="unfinished">Endpoint</translation>
+      <translation>Punkt końcowy</translation>
     </message>
     <message>
       <source>Method</source>
@@ -1263,7 +1263,7 @@
     </message>
     <message>
       <source>Invalid UUID string</source>
-      <translation type="unfinished">Invalid UUID string</translation>
+      <translation>Nieprawidłowy ciąg UUID</translation>
     </message>
   </context>
   <context>
@@ -1297,11 +1297,11 @@
     </message>
     <message>
       <source>Endpoint cannot be empty</source>
-      <translation type="unfinished">Endpoint cannot be empty</translation>
+      <translation>Punkt końcowy nie może być pusty</translation>
     </message>
     <message>
       <source>Endpoint mustn&apos;t contains any space</source>
-      <translation type="unfinished">Endpoint mustn&apos;t contains any space</translation>
+      <translation>Punkt końcowy nie może zawierać żadnego wolnego miejsca</translation>
     </message>
   </context>
   <context>

@@ -4310,7 +4310,7 @@ Chave de licença: %2</translation>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>Definir</translation>
     </message>
   </context>
   <context>
@@ -5990,7 +5990,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Câmara removida</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -6003,9 +6003,9 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n assuntos removidos</numerusform>
+        <numerusform>%n assuntos removidos</numerusform>
       </translation>
     </message>
   </context>
@@ -6803,7 +6803,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Fonte: %1</translation>
     </message>
   </context>
   <context>
@@ -8012,7 +8012,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Todos os Servidores estão Offline. Os Logs não estão disponíveis.</translation>
     </message>
   </context>
   <context>
@@ -12287,7 +12287,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>Não é possível encontrar um widget correspondente ao item especificado</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
@@ -12504,7 +12504,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Chave</translation>
     </message>
     <message>
       <source>Value</source>

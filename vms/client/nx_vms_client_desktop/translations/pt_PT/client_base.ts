@@ -5990,7 +5990,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Câmara removida</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -6003,9 +6003,9 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n assuntos removidos</numerusform>
+        <numerusform>%n assuntos removidos</numerusform>
       </translation>
     </message>
   </context>
@@ -6803,7 +6803,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Fonte: %1</translation>
     </message>
   </context>
   <context>
@@ -8012,7 +8012,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Todos os Servidores estão Offline. Os Logs não estão disponíveis.</translation>
     </message>
   </context>
   <context>

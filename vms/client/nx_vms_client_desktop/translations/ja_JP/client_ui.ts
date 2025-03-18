@@ -131,11 +131,11 @@
     </message>
     <message>
       <source>with</source>
-      <translation type="unfinished">with</translation>
+      <translation>使用:</translation>
     </message>
     <message>
       <source>Simultaneous Streams</source>
-      <translation type="unfinished">Simultaneous Streams</translation>
+      <translation>同時配信</translation>
     </message>
   </context>
   <context>
@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>Mbps</source>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -606,7 +606,7 @@
     </message>
     <message>
       <source>Restreaming Link</source>
-      <translation type="unfinished">Restreaming Link</translation>
+      <translation>再ストリーミング用リンク</translation>
     </message>
   </context>
   <context>
@@ -1485,7 +1485,7 @@
     </message>
     <message>
       <source>Open files folder</source>
-      <translation type="unfinished">Open files folder</translation>
+      <translation>ファイルフォルダーを開く</translation>
     </message>
   </context>
   <context>

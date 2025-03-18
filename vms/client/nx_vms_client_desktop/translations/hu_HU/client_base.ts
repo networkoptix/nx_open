@@ -5990,7 +5990,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Eltávolított kamera</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -6003,9 +6003,9 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n eltávolított tárgy</numerusform>
+        <numerusform>%n eltávolított tárgy</numerusform>
       </translation>
     </message>
   </context>
@@ -6803,7 +6803,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Forrás: %1</translation>
     </message>
   </context>
   <context>
@@ -8012,7 +8012,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Minden szerver offline. Nincs elérhető eseménylista.</translation>
     </message>
   </context>
   <context>
@@ -10472,7 +10472,7 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>

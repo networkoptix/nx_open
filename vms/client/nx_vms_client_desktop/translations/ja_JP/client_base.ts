@@ -2155,14 +2155,14 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>This server is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This server is removed from Site</numerusform>
+      <translation>
+        <numerusform>このサーバーはサイトから削除されています。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>This user is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This user is removed from Site</numerusform>
+      <translation>
+        <numerusform>このユーザーはサイトから削除されています。</numerusform>
       </translation>
     </message>
   </context>
@@ -3537,13 +3537,13 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>Set for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n devices</numerusform>
+      <translation>
+        <numerusform>%n デバイスに設定</numerusform>
       </translation>
     </message>
     <message>
       <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation type="unfinished">Cloud authorization request should only be performed for cloud cross system resources</translation>
+      <translation>クラウド認証リクエストは、クラウドのクロスシステムリソースに対してのみ実行する必要があります。</translation>
     </message>
   </context>
   <context>
@@ -4264,7 +4264,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>設定</translation>
     </message>
   </context>
   <context>
@@ -4327,15 +4327,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
-      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+      <translation>このカメラにアクセスできません。詳細については、デスクトップクライアント内でカメラ診断を実行してください。</translation>
     </message>
     <message>
       <source>Access to this camera requires authorization credentials.</source>
-      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+      <translation>このカメラへのアクセスには認証情報が必要です。</translation>
     </message>
     <message>
       <source>CONNECTION LOST</source>
-      <translation type="unfinished">CONNECTION LOST</translation>
+      <translation>接続が失われました</translation>
     </message>
   </context>
   <context>
@@ -4524,11 +4524,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud storage cannot be enabled.</source>
-      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+      <translation>クラウドストレージを有効化できません。</translation>
     </message>
     <message>
       <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
-      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+      <translation>有効化するには、%1 式の適切なサービスを追加するか、バックアップが有効なカメラの数を減らしてください。</translation>
     </message>
     <message>
       <source>Insufficient services</source>
@@ -5036,15 +5036,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording disabled</source>
-      <translation type="unfinished">Recording disabled</translation>
+      <translation>録画無効</translation>
     </message>
     <message>
       <source>Cloud storage backup disabled</source>
-      <translation type="unfinished">Cloud storage backup disabled</translation>
+      <translation>クラウドストレージのバックアップ無効</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>有料インテグレーションサービスが無効になっています</translation>
     </message>
   </context>
   <context>
@@ -5896,29 +5896,29 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Removed subject</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">Removed subject</translation>
+      <translation>削除されたサブジェクト</translation>
     </message>
     <message>
       <source>Removed device</source>
-      <translation type="unfinished">Removed device</translation>
+      <translation>削除されたデバイス</translation>
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>削除されたカメラ</translation>
     </message>
     <message>
       <source>Removed server</source>
-      <translation type="unfinished">Removed server</translation>
+      <translation>削除されたサーバー</translation>
     </message>
     <message>
       <source>Removed layout</source>
-      <translation type="unfinished">Removed layout</translation>
+      <translation>削除された  レイアウト</translation>
     </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>削除された %n サブジェクト</numerusform>
       </translation>
     </message>
   </context>
@@ -6525,7 +6525,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation>%1 または %2 を使用して一括編集するデバイスを複数選択します。 %3 ですべてのデバイスを選択します。</translation>
+      <translation>一括設定する場合、%1 や %2 でデバイスを複数選択できます。 %3 ですべてのデバイスを選択できます。</translation>
     </message>
     <message>
       <source>What to backup</source>
@@ -6551,19 +6551,19 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
       <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
-      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+      <translation>選択したすべてのデバイスのバックアップを有効化するには、追加で %1 式の適切なクラウドストレージサービスが必要です。</translation>
     </message>
     <message>
       <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
-      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+      <translation>ただし共通スイッチを使用することで、バックアップが可能なカメラについては有効化できます。</translation>
     </message>
     <message>
       <source>Backup will not be activated for %1 devices: </source>
-      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
+      <translation>%1 デバイスのバックアップは有効化されません: </translation>
     </message>
     <message>
       <source>%1 suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
+      <translation>バックアップを有効化するには、%1 式の適切なクラウドストレージサービスが必要です。</translation>
     </message>
   </context>
   <context>
@@ -6692,15 +6692,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>通話リクエスト</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>通話リクエストを逃しました</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>ソース: %1</translation>
     </message>
   </context>
   <context>
@@ -6896,7 +6896,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
-      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+      <translation>パン、チルト、ズーム機能を備えたデバイスが検出されました。プリセットの使用や移動によって視野が変更されると、ホットスポットが映像上の位置と関連しなくなる可能性があります。</translation>
     </message>
   </context>
   <context>
@@ -6923,7 +6923,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use this link to add the camera to another site</source>
-      <translation type="unfinished">Use this link to add the camera to another site</translation>
+      <translation>このリンクでカメラを別のサイトに追加できます。</translation>
     </message>
   </context>
   <context>
@@ -7512,11 +7512,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Channel Partner users have access to this site</source>
-      <translation type="unfinished">Channel Partner users have access to this site</translation>
+      <translation>チャネルパートナーのユーザーはこのサイトにアクセスできます。</translation>
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</translation>
+      <translation>チャネルパートナーユーザーのアクセス権限は組織レベルで管理されており、サイトのユーザー管理では表示されません。&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;詳細はこちら&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
@@ -7890,11 +7890,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
-      <translation type="unfinished">Server cannot answer in reasonable time. Consider narrowing period or filter.</translation>
+      <translation>サーバーは妥当な時間内に応答できません。期間やフィルターでのさらなる絞り込みを検討してください。</translation>
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>すべてのサーバーがオフラインです。ログは利用できません。</translation>
     </message>
   </context>
   <context>
@@ -8793,7 +8793,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>&lt;None&gt;</source>
-      <translation type="unfinished">&lt;None&gt;</translation>
+      <translation>&lt;なし&gt;</translation>
     </message>
   </context>
   <context>
@@ -9682,7 +9682,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>サイト通知</translation>
     </message>
   </context>
   <context>
@@ -10327,7 +10327,7 @@ You can still change quality and FPS directly on the camera.</source>
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -10873,20 +10873,20 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>サービスの過剰使用のため、 %n チャンネルの録画が停止されました。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>サービスの過剰使用のため、 %n チャンネルのクラウドストレージバックアップが停止されました。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>サービスの過剰使用のため、 %n チャンネルでの有料インテグレーションサービスの使用が停止されました。</numerusform>
       </translation>
     </message>
   </context>
@@ -12119,11 +12119,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>指定されたアイテムに対応するウィジェットが見つかりません。</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
-      <translation type="unfinished">Cannot maximize the item</translation>
+      <translation>アイテムを最大化できません</translation>
     </message>
   </context>
   <context>
@@ -12321,13 +12321,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
     <message>
       <source>No custom headers</source>
-      <translation type="unfinished">No custom headers</translation>
+      <translation>カスタムヘッダーなし</translation>
     </message>
     <message numerus="yes">
       <source>%n custom headers</source>
       <comment>%n is a number of custom headers</comment>
-      <translation type="unfinished">
-        <numerusform>%n custom headers</numerusform>
+      <translation>
+        <numerusform>%n カスタムヘッダー</numerusform>
       </translation>
     </message>
   </context>
@@ -12335,7 +12335,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>キー</translation>
     </message>
     <message>
       <source>Value</source>
@@ -12570,7 +12570,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
-      <translation>一部のデバイスで無効にするか、より適切なサービスを追加してください。それ以外の場合は %1 に自動的に実行されます</translation>
+      <translation>不足分のデバイス数だけ無効化、もしくは適切なサービスを追加してください。対処されない場合、%1 に自動的に実行されます。</translation>
     </message>
   </context>
   <context>

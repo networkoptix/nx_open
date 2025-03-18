@@ -2155,14 +2155,14 @@ Kunci Lisensi: %2</translation>
     </message>
     <message numerus="yes">
       <source>This server is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This server is removed from Site</numerusform>
+      <translation>
+        <numerusform>Server ini dihapus dari Site</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>This user is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This user is removed from Site</numerusform>
+      <translation>
+        <numerusform>User ini dihapus dari Site</numerusform>
       </translation>
     </message>
   </context>
@@ -3537,13 +3537,13 @@ Kunci Lisensi: %2</translation>
     </message>
     <message numerus="yes">
       <source>Set for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n devices</numerusform>
+      <translation>
+        <numerusform>Ditetapkan untuk %n perangkat</numerusform>
       </translation>
     </message>
     <message>
       <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation type="unfinished">Cloud authorization request should only be performed for cloud cross system resources</translation>
+      <translation>Permintaan otorisasi cloud hanya boleh dilakukan untuk resources lintas sistem cloud</translation>
     </message>
   </context>
   <context>
@@ -4264,7 +4264,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>Setel</translation>
     </message>
   </context>
   <context>
@@ -4327,15 +4327,15 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
-      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+      <translation>Kamera ini tidak dapat diakses. Jalankan diagnostik kamera di Klien Desktop untuk informasi lebih lanjut.</translation>
     </message>
     <message>
       <source>Access to this camera requires authorization credentials.</source>
-      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+      <translation>Akses ke kamera ini memerlukan kredensial otorisasi.</translation>
     </message>
     <message>
       <source>CONNECTION LOST</source>
-      <translation type="unfinished">CONNECTION LOST</translation>
+      <translation>KONEKSI TERPUTUS</translation>
     </message>
   </context>
   <context>
@@ -4524,11 +4524,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Cloud storage cannot be enabled.</source>
-      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+      <translation>Penyimpanan cloud tidak dapat diaktifkan.</translation>
     </message>
     <message>
       <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
-      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+      <translation>Untuk mengaktifkannya tambahkan %1 layanan yang lebih sesuai atau kurangi jumlah kamera dengan backup diaktifkan.</translation>
     </message>
     <message>
       <source>Insufficient services</source>
@@ -5036,15 +5036,15 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Recording disabled</source>
-      <translation type="unfinished">Recording disabled</translation>
+      <translation>Rekaman dinonaktifkan</translation>
     </message>
     <message>
       <source>Cloud storage backup disabled</source>
-      <translation type="unfinished">Cloud storage backup disabled</translation>
+      <translation>Backup penyimpanan cloud dinonaktifkan</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Layanan integrasi berbayar dinonaktifkan</translation>
     </message>
   </context>
   <context>
@@ -5896,29 +5896,29 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Removed subject</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">Removed subject</translation>
+      <translation>Subjek dihapus</translation>
     </message>
     <message>
       <source>Removed device</source>
-      <translation type="unfinished">Removed device</translation>
+      <translation>Perangkat dihapus</translation>
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Kamera yang dihapus</translation>
     </message>
     <message>
       <source>Removed server</source>
-      <translation type="unfinished">Removed server</translation>
+      <translation>Server dihapus</translation>
     </message>
     <message>
       <source>Removed layout</source>
-      <translation type="unfinished">Removed layout</translation>
+      <translation>Layout dihapus</translation>
     </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n subjek dihapus</numerusform>
       </translation>
     </message>
   </context>
@@ -6550,19 +6550,19 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
       <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
-      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+      <translation>%1 layanan penyimpanan cloud yang lebih sesuai diperlukan untuk mengaktifkan backup untuk semua perangkat yang dipilih</translation>
     </message>
     <message>
       <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
-      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+      <translation>Namun Anda masih dapat menggunakan switch umum untuk mengaktifkan backup untuk kamera yang memungkinkan hal ini</translation>
     </message>
     <message>
       <source>Backup will not be activated for %1 devices: </source>
-      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
+      <translation>Backup tidak akan diaktifkan untuk perangkat %1: </translation>
     </message>
     <message>
       <source>%1 suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
+      <translation>%1 diperlukan layanan penyimpanan cloud yang sesuai untuk mengaktifkan backup untuk layanan tersebut.</translation>
     </message>
   </context>
   <context>
@@ -6691,15 +6691,15 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>Permintaan Panggilan</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>Permintaan Panggilan Tak Terjawab</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Source: %1</translation>
     </message>
   </context>
   <context>
@@ -6895,7 +6895,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
-      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+      <translation>Perangkat terdeteksi dengan kemampuan Pan, Tilt, dan/atau Zoom. Setiap perubahan pada bidang pandang melalui penggunaan preset atau gerakan dapat menyebabkan hotspot tidak lagi relevan.</translation>
     </message>
   </context>
   <context>
@@ -6922,7 +6922,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Use this link to add the camera to another site</source>
-      <translation type="unfinished">Use this link to add the camera to another site</translation>
+      <translation>Gunakan link ini untuk menambahkan kamera ke site lain</translation>
     </message>
   </context>
   <context>
@@ -7511,11 +7511,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Channel Partner users have access to this site</source>
-      <translation type="unfinished">Channel Partner users have access to this site</translation>
+      <translation>Pengguna Channel Partner memiliki akses ke site ini</translation>
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</translation>
+      <translation>Pengguna Channel Partner&apos; akses dikelola di tingkat Organisasi, dan mereka tidak terlihat dalam manajemen pengguna site.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Pelajari lebih lanjut&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
@@ -7889,11 +7889,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
-      <translation type="unfinished">Server cannot answer in reasonable time. Consider narrowing period or filter.</translation>
+      <translation>Server tidak dapat menjawab dalam waktu yang wajar. Pertimbangkan untuk mempersempit periode atau filter.</translation>
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Semua Server sedang offline. Log tidak tersedia.</translation>
     </message>
   </context>
   <context>
@@ -8792,7 +8792,7 @@ Ingatlah untuk mengembalikan Level Logging ke pengaturan default setelah Anda me
     </message>
     <message>
       <source>&lt;None&gt;</source>
-      <translation type="unfinished">&lt;None&gt;</translation>
+      <translation>&lt;None&gt;</translation>
     </message>
   </context>
   <context>
@@ -9681,7 +9681,7 @@ Anda dapat memaksakan deteksi gerakan, tetapi hal itu dapat menyebabkan peningka
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Notifikasi Site</translation>
     </message>
   </context>
   <context>
@@ -10326,7 +10326,7 @@ Anda masih dapat mengubah kualitas dan FPS langsung di kamera.</translation>
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -10872,20 +10872,20 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Perekaman pada channel %n dihentikan karena penggunaan layanan yang berlebihan.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Backup penyimpanan cloud di channel %n dihentikan karena penggunaan layanan yang berlebihan.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Penggunaan layanan integrasi berbayar pada channel %n dihentikan karena penggunaan layanan yang berlebihan.</numerusform>
       </translation>
     </message>
   </context>
@@ -12120,11 +12120,11 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>Tidak dapat menemukan widget yang sesuai dengan item yang ditentukan</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
-      <translation type="unfinished">Cannot maximize the item</translation>
+      <translation>Tidak dapat memaksimalkan item</translation>
     </message>
   </context>
   <context>
@@ -12322,13 +12322,13 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
     <message>
       <source>No custom headers</source>
-      <translation type="unfinished">No custom headers</translation>
+      <translation>Tidak ada header kustom</translation>
     </message>
     <message numerus="yes">
       <source>%n custom headers</source>
       <comment>%n is a number of custom headers</comment>
-      <translation type="unfinished">
-        <numerusform>%n custom headers</numerusform>
+      <translation>
+        <numerusform>%n header kustom</numerusform>
       </translation>
     </message>
   </context>
@@ -12336,7 +12336,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Kunci</translation>
     </message>
     <message>
       <source>Value</source>

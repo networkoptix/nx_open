@@ -531,7 +531,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>새로운</translation>
     </message>
   </context>
   <context>
@@ -655,11 +655,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>키</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>값</translation>
     </message>
   </context>
   <context>
@@ -1849,7 +1849,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Organization</source>
       <comment>Section with groups from organisation</comment>
-      <translation type="unfinished">Organization</translation>
+      <translation>조직</translation>
     </message>
   </context>
   <context>

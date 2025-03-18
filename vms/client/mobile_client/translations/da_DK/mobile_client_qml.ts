@@ -118,7 +118,7 @@
     <name>ChannelPartner</name>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>Channel Partner</translation>
     </message>
   </context>
   <context>
@@ -375,7 +375,7 @@
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Afbryd</translation>
     </message>
   </context>
   <context>
@@ -657,7 +657,7 @@
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Organisationer</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -689,7 +689,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Log ind</translation>
     </message>
   </context>
   <context>
@@ -794,7 +794,7 @@
     <name>SiteList</name>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Organisationer</translation>
     </message>
     <message>
       <source>Folders</source>
@@ -857,7 +857,7 @@
     </message>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>Channel Partner</translation>
     </message>
   </context>
   <context>

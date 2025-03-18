@@ -375,7 +375,7 @@
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Desconnecta</translation>
     </message>
   </context>
   <context>
@@ -689,7 +689,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Inicia la sessió</translation>
     </message>
   </context>
   <context>

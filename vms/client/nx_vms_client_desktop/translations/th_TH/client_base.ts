@@ -5904,7 +5904,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>ลบกล้องออก</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -5917,8 +5917,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n ลบหัวข้อ</numerusform>
       </translation>
     </message>
   </context>
@@ -6699,7 +6699,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>แหล่งที่มา: %1</translation>
     </message>
   </context>
   <context>
@@ -7893,7 +7893,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>เซิร์ฟเวอร์ทั้งหมดออฟไลน์ บันทึกจะไม่สามารถใช้ได้.</translation>
     </message>
   </context>
   <context>
@@ -10326,7 +10326,7 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>

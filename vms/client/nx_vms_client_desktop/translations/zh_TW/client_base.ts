@@ -4264,7 +4264,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>設定</translation>
     </message>
   </context>
   <context>
@@ -5044,7 +5044,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>付費整合服務已停用</translation>
     </message>
   </context>
   <context>
@@ -5904,7 +5904,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>移除攝影機</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -5917,8 +5917,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n 個已移除之項目</numerusform>
       </translation>
     </message>
   </context>
@@ -6691,15 +6691,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>呼叫請求</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>未接呼叫請求</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>來源：%1</translation>
     </message>
   </context>
   <context>
@@ -7893,7 +7893,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>所有攝影機皆已離線. 無法取得記錄.</translation>
     </message>
   </context>
   <context>
@@ -9681,7 +9681,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>站點通知</translation>
     </message>
   </context>
   <context>
@@ -10323,7 +10323,7 @@ You can still change quality and FPS directly on the camera.</source>
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -10869,20 +10869,20 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>由於服務過度使用， %n 授權數的錄影已停止。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>由於服務過度使用， %n 授權數的雲端備份已停止使用。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>由於服務過度使用， %n 授權數上的付費整合服務已停止使用。</numerusform>
       </translation>
     </message>
   </context>
@@ -12331,7 +12331,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>序號</translation>
     </message>
     <message>
       <source>Value</source>

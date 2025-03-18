@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>Mbps</source>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Мб/с</translation>
     </message>
   </context>
   <context>

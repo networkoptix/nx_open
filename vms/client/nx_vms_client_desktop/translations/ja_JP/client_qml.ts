@@ -239,11 +239,11 @@
     </message>
     <message>
       <source>Switch to table view</source>
-      <translation type="unfinished">Switch to table view</translation>
+      <translation>テーブル表示に切り替える</translation>
     </message>
     <message>
       <source>Switch to card view</source>
-      <translation type="unfinished">Switch to card view</translation>
+      <translation>カード表示に切り替える</translation>
     </message>
   </context>
   <context>
@@ -532,7 +532,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>新規作成</translation>
     </message>
   </context>
   <context>
@@ -644,7 +644,7 @@ Select an Integration to begin configuring its parameters.</source>
     <name>CustomHttpHeadersDialog</name>
     <message>
       <source>Custom HTTP headers</source>
-      <translation type="unfinished">Custom HTTP headers</translation>
+      <translation>カスタム HTTP ヘッダー</translation>
     </message>
     <message>
       <source>Add</source>
@@ -656,11 +656,11 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>キー</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>値</translation>
     </message>
   </context>
   <context>
@@ -1144,17 +1144,17 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
       <source>ORGANIZATION</source>
       <comment>Section with groups from organisation</comment>
-      <translation type="unfinished">ORGANIZATION</translation>
+      <translation>組織</translation>
     </message>
     <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">BUILT-IN</translation>
+      <translation>ビルトイン</translation>
     </message>
     <message>
       <source>CUSTOM</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">CUSTOM</translation>
+      <translation>カスタム</translation>
     </message>
   </context>
   <context>
@@ -1851,7 +1851,7 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
       <source>Organization</source>
       <comment>Section with groups from organisation</comment>
-      <translation type="unfinished">Organization</translation>
+      <translation>組織</translation>
     </message>
   </context>
   <context>

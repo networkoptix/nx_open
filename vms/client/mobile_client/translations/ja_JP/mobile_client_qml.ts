@@ -118,7 +118,7 @@
     <name>ChannelPartner</name>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>チャネルパートナー</translation>
     </message>
   </context>
   <context>
@@ -259,7 +259,7 @@
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
-      <translation type="unfinished">Looking for</translation>
+      <translation>検索</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -370,11 +370,11 @@
     <name>MenuScreen</name>
     <message>
       <source>App Settings</source>
-      <translation type="unfinished">App Settings</translation>
+      <translation>アプリ設定</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>切断</translation>
     </message>
   </context>
   <context>
@@ -417,19 +417,19 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>サイトがありません</translation>
     </message>
     <message>
       <source>We did not find any sites in this organization</source>
-      <translation type="unfinished">We did not find any sites in this organization</translation>
+      <translation>この組織内にサイトは見つかりませんでした。</translation>
     </message>
     <message>
       <source>We did not find any sites in this folder</source>
-      <translation type="unfinished">We did not find any sites in this folder</translation>
+      <translation>このフォルダー内にサイトは見つかりませんでした。</translation>
     </message>
     <message>
       <source>How to connect sites?</source>
-      <translation type="unfinished">How to connect sites?</translation>
+      <translation>サイトの接続方法</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -437,7 +437,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>異なる検索条件でお試しください。</translation>
     </message>
   </context>
   <context>
@@ -641,7 +641,7 @@
     </message>
     <message>
       <source>Host: Port</source>
-      <translation type="unfinished">Host: Port</translation>
+      <translation>ホスト: ポート</translation>
     </message>
   </context>
   <context>
@@ -656,7 +656,7 @@
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>組織</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -664,31 +664,31 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>異なる検索条件でお試しください。</translation>
     </message>
     <message>
       <source>No Organizations</source>
-      <translation type="unfinished">No Organizations</translation>
+      <translation>組織がありません</translation>
     </message>
     <message>
       <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation type="unfinished">We didn&apos;t find any organizations, try contacting support</translation>
+      <translation>組織が見つかりませんでした。サポートにお問い合わせください。</translation>
     </message>
     <message>
       <source>No Sites Found</source>
-      <translation type="unfinished">No Sites Found</translation>
+      <translation>サイトが見つかりません</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</translation>
+      <translation>ローカルネットワーク上にサイトが見つかりませんでした。手動でのサーバー追加、またはクラウドアカウントへのログインをお試しください。</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually</translation>
+      <translation>ローカルネットワーク上にサイトが見つかりませんでした。手動でサーバーを追加してください。</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>ログイン</translation>
     </message>
   </context>
   <context>
@@ -793,11 +793,11 @@
     <name>SiteList</name>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>組織</translation>
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>フォルダー</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -852,11 +852,11 @@
     <message>
       <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Open %1</translation>
+      <translation>%1 を開く</translation>
     </message>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>チャネルパートナー</translation>
     </message>
   </context>
   <context>

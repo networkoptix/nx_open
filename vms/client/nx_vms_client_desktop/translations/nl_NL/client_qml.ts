@@ -535,7 +535,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Nieuw</translation>
     </message>
   </context>
   <context>
@@ -659,7 +659,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Sleutel</translation>
     </message>
     <message>
       <source>Value</source>

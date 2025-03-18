@@ -543,7 +543,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Создать</translation>
     </message>
   </context>
   <context>
@@ -667,7 +667,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Ключ</translation>
     </message>
     <message>
       <source>Value</source>
@@ -1879,7 +1879,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Organization</source>
       <comment>Section with groups from organisation</comment>
-      <translation type="unfinished">Organization</translation>
+      <translation>Организация</translation>
     </message>
   </context>
   <context>

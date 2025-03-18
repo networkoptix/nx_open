@@ -131,11 +131,11 @@
     </message>
     <message>
       <source>with</source>
-      <translation type="unfinished">with</translation>
+      <translation>dengan</translation>
     </message>
     <message>
       <source>Simultaneous Streams</source>
-      <translation type="unfinished">Simultaneous Streams</translation>
+      <translation>Stream Bersamaan</translation>
     </message>
   </context>
   <context>
@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>Mbps</source>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -606,7 +606,7 @@
     </message>
     <message>
       <source>Restreaming Link</source>
-      <translation type="unfinished">Restreaming Link</translation>
+      <translation>Link Restreaming</translation>
     </message>
   </context>
   <context>
@@ -1485,7 +1485,7 @@
     </message>
     <message>
       <source>Open files folder</source>
-      <translation type="unfinished">Open files folder</translation>
+      <translation>Buka folder file</translation>
     </message>
   </context>
   <context>

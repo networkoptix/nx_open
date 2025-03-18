@@ -539,7 +539,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Nou</translation>
     </message>
   </context>
   <context>

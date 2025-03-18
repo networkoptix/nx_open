@@ -4309,7 +4309,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>Ayarla</translation>
     </message>
   </context>
   <context>
@@ -5098,7 +5098,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Ücretli entegrasyon hizmetleri devre dışı bırakıldı</translation>
     </message>
   </context>
   <context>
@@ -5989,7 +5989,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Kaldırılmış Kamera</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -6002,9 +6002,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n kaldırılan konular</numerusform>
+        <numerusform>%n kaldırılan konular</numerusform>
       </translation>
     </message>
   </context>
@@ -6802,7 +6802,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Kaynak: %1</translation>
     </message>
   </context>
   <context>
@@ -8011,7 +8011,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Tüm Sunucular Çevrimdışı. Günlükler Mevcut Değil.</translation>
     </message>
   </context>
   <context>
@@ -10468,7 +10468,7 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -11019,23 +11019,23 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanallarındaki kayıt durduruldu.</numerusform>
+        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanallarındaki kayıt durduruldu.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanalında bulut depolama yedeklemesi durduruldu.</numerusform>
+        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanalında bulut depolama yedeklemesi durduruldu.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanalda ücretli entegrasyon hizmeti kullanımı durduruldu.</numerusform>
+        <numerusform>Hizmetin aşırı kullanımı nedeniyle %n kanalda ücretli entegrasyon hizmeti kullanımı durduruldu.</numerusform>
       </translation>
     </message>
   </context>
@@ -12282,7 +12282,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>Belirtilen öğeye karşılık gelen bir widget bulunamıyor</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
@@ -12499,7 +12499,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Anahtar</translation>
     </message>
     <message>
       <source>Value</source>

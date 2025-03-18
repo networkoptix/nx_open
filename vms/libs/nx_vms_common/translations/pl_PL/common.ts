@@ -1684,7 +1684,7 @@
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h).</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h).</translation>
+      <translation>Limit czasu połączenia proxy (sekundy, 1s-1godz.).</translation>
     </message>
     <message>
       <source>Proxy connection access policy.</source>
@@ -1740,11 +1740,11 @@
     </message>
     <message>
       <source>Last master Site merge ID.</source>
-      <translation type="unfinished">Last master Site merge ID.</translation>
+      <translation>Ostatni główny identyfikator scalania witryny.</translation>
     </message>
     <message>
       <source>Last slave Site merge ID.</source>
-      <translation type="unfinished">Last slave Site merge ID.</translation>
+      <translation>Ostatni identyfikator scalenia witryny podrzędnej.</translation>
     </message>
     <message>
       <source>Disable Device vendors.</source>
@@ -1784,7 +1784,7 @@
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
-      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
+      <translation>Maksymalna liczba zakładek. Wartość mniejsza lub równa 0 jest nieskończona.</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption).</source>
@@ -1860,11 +1860,11 @@
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching.</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching.</translation>
+      <translation>Włącz dziurkowanie UDP w połączeniu z chmurą.</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage.</source>
-      <translation type="unfinished">Enable cloud-connect relays usage.</translation>
+      <translation>Włącz użycie przekaźników w chmurze.</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays.</source>
@@ -2040,7 +2040,7 @@
     </message>
     <message>
       <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
-      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
+      <translation>Włącz przestarzałe uwierzytelnianie HTTP Basic i Digest (niezabezpieczone).</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery.</source>

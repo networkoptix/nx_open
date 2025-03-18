@@ -4264,7 +4264,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>Đặt</translation>
     </message>
   </context>
   <context>
@@ -5044,7 +5044,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Dịch vụ tích hợp trả phí đã bị vô hiệu hóa</translation>
     </message>
   </context>
   <context>
@@ -5904,7 +5904,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Camera bị xóa</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -5917,8 +5917,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n chủ đề đã bị xóa</numerusform>
       </translation>
     </message>
   </context>
@@ -6691,15 +6691,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>Yêu cầu Gọi</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>Yêu cầu Gọi bị nhỡ</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>nguồn：%1</translation>
     </message>
   </context>
   <context>
@@ -7893,7 +7893,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Tất cả máy chủ đang offline. Logs là không có sẵn.</translation>
     </message>
   </context>
   <context>
@@ -9681,7 +9681,7 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Thông báo Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -10326,7 +10326,7 @@ Bạn vẫn có thể thay đổi chất lượng và FPS trực tiếp trên ca
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -10872,20 +10872,20 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Quá trình ghi trên %n kênh đã bị dừng do sử dụng dịch vụ quá mức.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Sao lưu bộ nhớ đám mây trên %n kênh đã bị dừng do sử dụng dịch vụ quá mức.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Việc sử dụng dịch vụ tích hợp trả phí trên %n kênh đã bị ngừng do sử dụng dịch vụ quá mức.</numerusform>
       </translation>
     </message>
   </context>
@@ -12120,7 +12120,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>Không thể tìm thấy tiện ích tương ứng với khoản mục chỉ định</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
@@ -12336,7 +12336,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Khóa</translation>
     </message>
     <message>
       <source>Value</source>

@@ -346,18 +346,18 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>ไซต์</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::RecordingStatusHelper</name>
     <message>
       <source>Not recording</source>
-      <translation type="unfinished">Not recording</translation>
+      <translation>ไม่ได้ทำการบันทึก</translation>
     </message>
     <message>
       <source>Recording everything</source>
-      <translation type="unfinished">Recording everything</translation>
+      <translation>บันทึกทุกอย่าง</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
@@ -365,7 +365,7 @@
     </message>
     <message>
       <source>Recording motion only</source>
-      <translation type="unfinished">Recording motion only</translation>
+      <translation>บันทึกการเคลื่อนไหวเท่านั้น</translation>
     </message>
     <message>
       <source>Recording objects only</source>
@@ -377,7 +377,7 @@
     </message>
     <message>
       <source>Recording motion and low quality</source>
-      <translation type="unfinished">Recording motion and low quality</translation>
+      <translation>การเคลื่อนไหวและการบันทึกที่มีคุณภาพต่ำ</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
@@ -385,7 +385,7 @@
     </message>
     <message>
       <source>Continuous</source>
-      <translation type="unfinished">Continuous</translation>
+      <translation>ต่อเนื่อง</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -393,7 +393,7 @@
     </message>
     <message>
       <source>Motion only</source>
-      <translation type="unfinished">Motion only</translation>
+      <translation>การเคลื่อนไหวเท่านั้น</translation>
     </message>
     <message>
       <source>Objects only</source>
@@ -405,7 +405,7 @@
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>การเคลื่อนไหว + Lo-Res</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>

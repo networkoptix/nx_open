@@ -4402,7 +4402,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>Ustaw</translation>
     </message>
   </context>
   <context>
@@ -4473,7 +4473,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>CONNECTION LOST</source>
-      <translation type="unfinished">CONNECTION LOST</translation>
+      <translation>UTRACONO POŁĄCZENIE</translation>
     </message>
   </context>
   <context>
@@ -4664,7 +4664,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud storage cannot be enabled.</source>
-      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+      <translation>Nie można włączyć przechowywania w chmurze.</translation>
     </message>
     <message>
       <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
@@ -5200,11 +5200,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording disabled</source>
-      <translation type="unfinished">Recording disabled</translation>
+      <translation>Nagrywanie wyłączone</translation>
     </message>
     <message>
       <source>Cloud storage backup disabled</source>
-      <translation type="unfinished">Cloud storage backup disabled</translation>
+      <translation>Kopia zapasowa w chmurze wyłączona</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
@@ -6153,32 +6153,32 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Removed subject</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">Removed subject</translation>
+      <translation>Usunięto temat</translation>
     </message>
     <message>
       <source>Removed device</source>
-      <translation type="unfinished">Removed device</translation>
+      <translation>Usunięto urządzenie</translation>
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Usunięta kamera</translation>
     </message>
     <message>
       <source>Removed server</source>
-      <translation type="unfinished">Removed server</translation>
+      <translation>Usunięto serwer</translation>
     </message>
     <message>
       <source>Removed layout</source>
-      <translation type="unfinished">Removed layout</translation>
+      <translation>Usunięto układ</translation>
     </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n usunięty obiekt</numerusform>
+        <numerusform>%n usunięty obiekt</numerusform>
+        <numerusform>%n usunięty obiekt</numerusform>
+        <numerusform>%n usunięty obiekt</numerusform>
       </translation>
     </message>
   </context>
@@ -7002,15 +7002,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>Prośba o połączenie</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>Prośba o połączenie nieodebrana</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Źródło: %1</translation>
     </message>
   </context>
   <context>
@@ -8249,7 +8249,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Wszystkie serwery są odłączone. Logi nie są dostępne.</translation>
     </message>
   </context>
   <context>
@@ -10091,7 +10091,7 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Powiadomienia witryny</translation>
     </message>
   </context>
   <context>
@@ -10762,7 +10762,7 @@ Nadal możesz zmienić jakość i FPS bezpośrednio w kamerze.</translation>
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mb/s</translation>
     </message>
   </context>
   <context>
@@ -11323,29 +11323,29 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Nagrywanie na kanałach %n zostało zatrzymane z powodu przeciążenia usługi.</numerusform>
+        <numerusform>Nagrywanie na kanałach %n zostało zatrzymane z powodu przeciążenia usługi.</numerusform>
+        <numerusform>Nagrywanie na kanałach %n zostało zatrzymane z powodu przeciążenia usługi.</numerusform>
+        <numerusform>Nagrywanie na kanałach %n zostało zatrzymane z powodu przeciążenia usługi.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Kopia zapasowa w chmurze na kanałach %n została zatrzymana ze względu na nadużywanie usługi.</numerusform>
+        <numerusform>Kopia zapasowa w chmurze na kanałach %n została zatrzymana ze względu na nadużywanie usługi.</numerusform>
+        <numerusform>Kopia zapasowa w chmurze na kanałach %n została zatrzymana ze względu na nadużywanie usługi.</numerusform>
+        <numerusform>Kopia zapasowa w chmurze na kanałach %n została zatrzymana ze względu na nadużywanie usługi.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Płatna usługa integracji na %n kanałach została wstrzymana z powodu nadmiernego wykorzystania usługi.</numerusform>
+        <numerusform>Płatna usługa integracji na %n kanałach została wstrzymana z powodu nadmiernego wykorzystania usługi.</numerusform>
+        <numerusform>Płatna usługa integracji na %n kanałach została wstrzymana z powodu nadmiernego wykorzystania usługi.</numerusform>
+        <numerusform>Płatna usługa integracji na %n kanałach została wstrzymana z powodu nadmiernego wykorzystania usługi.</numerusform>
       </translation>
     </message>
   </context>
@@ -12620,7 +12620,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>Nie można znaleźć widżetu odpowiadającego określonemu elementowi</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
@@ -12839,7 +12839,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Klucz</translation>
     </message>
     <message>
       <source>Value</source>

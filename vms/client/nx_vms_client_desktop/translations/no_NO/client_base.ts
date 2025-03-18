@@ -4310,7 +4310,7 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>Bruk</translation>
     </message>
   </context>
   <context>
@@ -5099,7 +5099,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Betalte integreringstjenester er deaktivert</translation>
     </message>
   </context>
   <context>
@@ -5990,7 +5990,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Fjernet kamera</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -6003,9 +6003,9 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n fjernede emner</numerusform>
+        <numerusform>%n fjernede emner</numerusform>
       </translation>
     </message>
   </context>
@@ -6795,15 +6795,15 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>Anropsforespørsel</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>Anropsforespørsel tapt</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Kilde: %1</translation>
     </message>
   </context>
   <context>
@@ -8012,7 +8012,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Alle tjenere er offline. Logger er ikke tilgjengelige.</translation>
     </message>
   </context>
   <context>
@@ -11020,23 +11020,23 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Opptak på %n kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
+        <numerusform>Opptak på %n kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Sikkerhetskopiering av skylagring på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
+        <numerusform>Sikkerhetskopiering av skylagring på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Bruk av betalte integreringstjenester på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
+        <numerusform>Bruk av betalte integreringstjenester på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
       </translation>
     </message>
   </context>
@@ -12284,7 +12284,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>Kan ikke finne en widget som tilsvarer det angitte elementet</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
@@ -12501,7 +12501,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Nøkkel</translation>
     </message>
     <message>
       <source>Value</source>

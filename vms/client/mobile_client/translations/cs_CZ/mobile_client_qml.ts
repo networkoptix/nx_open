@@ -377,7 +377,7 @@
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Odpojit</translation>
     </message>
   </context>
   <context>
@@ -691,7 +691,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Přihlásit se</translation>
     </message>
   </context>
   <context>

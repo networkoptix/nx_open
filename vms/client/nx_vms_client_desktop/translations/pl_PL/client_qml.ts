@@ -543,7 +543,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Nowy</translation>
     </message>
   </context>
   <context>
@@ -667,11 +667,11 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Klucz</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Wartość</translation>
     </message>
   </context>
   <context>
@@ -1879,7 +1879,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <message>
       <source>Organization</source>
       <comment>Section with groups from organisation</comment>
-      <translation type="unfinished">Organization</translation>
+      <translation>Organizacja</translation>
     </message>
   </context>
   <context>

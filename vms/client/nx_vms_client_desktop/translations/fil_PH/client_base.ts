@@ -6003,7 +6003,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n removed subjects</numerusform>
         <numerusform>%n removed subjects</numerusform>
       </translation>
@@ -8012,7 +8012,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>All Servers are offline. Logs are not available.</translation>
     </message>
   </context>
   <context>

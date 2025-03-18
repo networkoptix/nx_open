@@ -238,11 +238,11 @@
     </message>
     <message>
       <source>Switch to table view</source>
-      <translation type="unfinished">Switch to table view</translation>
+      <translation>Beralih ke tampilan tabel</translation>
     </message>
     <message>
       <source>Switch to card view</source>
-      <translation type="unfinished">Switch to card view</translation>
+      <translation>Beralih ke tampilan kartu</translation>
     </message>
   </context>
   <context>
@@ -531,7 +531,7 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Baru</translation>
     </message>
   </context>
   <context>
@@ -643,7 +643,7 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     <name>CustomHttpHeadersDialog</name>
     <message>
       <source>Custom HTTP headers</source>
-      <translation type="unfinished">Custom HTTP headers</translation>
+      <translation>Kustom HTTP header</translation>
     </message>
     <message>
       <source>Add</source>
@@ -655,11 +655,11 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     </message>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Kunci</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Nilai</translation>
     </message>
   </context>
   <context>
@@ -1143,17 +1143,17 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     <message>
       <source>ORGANIZATION</source>
       <comment>Section with groups from organisation</comment>
-      <translation type="unfinished">ORGANIZATION</translation>
+      <translation>ORGANISASI</translation>
     </message>
     <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">BUILT-IN</translation>
+      <translation>BAWAAN</translation>
     </message>
     <message>
       <source>CUSTOM</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">CUSTOM</translation>
+      <translation>KUSTOM</translation>
     </message>
   </context>
   <context>
@@ -1849,7 +1849,7 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     <message>
       <source>Organization</source>
       <comment>Section with groups from organisation</comment>
-      <translation type="unfinished">Organization</translation>
+      <translation>Organisasi</translation>
     </message>
   </context>
   <context>

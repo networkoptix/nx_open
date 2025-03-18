@@ -6162,7 +6162,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Віддалена камера</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -6175,11 +6175,11 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n видалениї об’єктів</numerusform>
+        <numerusform>%n видалениї об’єктів</numerusform>
+        <numerusform>%n видалениї об’єктів</numerusform>
+        <numerusform>%n видалениї об’єктів</numerusform>
       </translation>
     </message>
   </context>
@@ -7011,7 +7011,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Джерело: %1</translation>
     </message>
   </context>
   <context>
@@ -8250,7 +8250,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Всі сервери офлайн. Логи недоступні.</translation>
     </message>
   </context>
   <context>

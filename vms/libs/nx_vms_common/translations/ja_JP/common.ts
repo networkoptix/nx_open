@@ -1426,423 +1426,423 @@
     </message>
     <message>
       <source>SMTP settings.</source>
-      <translation>SMTP 設定.</translation>
+      <translation>SMTP 設定。</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed.</source>
-      <translation>匿名の統計レポートを許可.</translation>
+      <translation>匿名統計レポートを許可する。</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time.</source>
-      <translation>前回の匿名統計レポート.</translation>
+      <translation>匿名統計レポートの最終報告日時。</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version.</source>
-      <translation>匿名統計レポートの最新バージョン.</translation>
+      <translation>匿名統計レポートの最新バージョン。</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number.</source>
-      <translation>匿名統計レポートの最終番号.</translation>
+      <translation>匿名統計レポートの最終番号。</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle.</source>
-      <translation>匿名統計のタイムサイクル.</translation>
+      <translation>匿名統計レポートのタイムサイクル。</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update.</source>
-      <translation>匿名統計レポートの更新後の遅延.</translation>
+      <translation>匿名統計レポートの更新後の遅延。</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL.</source>
-      <translation>匿名統計レポートのサーバーURL.</translation>
+      <translation>匿名統計レポートのサーバーURL。</translation>
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL.</source>
-      <translation>匿名クラッシュレポートのサーバーAPI URL.</translation>
+      <translation>匿名クラッシュレポートのサーバーAPI URL。</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings.</source>
-      <translation>匿名統計レポートのクライアント設定.</translation>
+      <translation>クライアント設定の匿名統計レポート。</translation>
     </message>
     <message>
       <source>Device storage information update interval.</source>
-      <translation>デバイスのストレージ情報の更新間隔.</translation>
+      <translation>デバイスのストレージ情報の更新間隔。</translation>
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h).</source>
-      <translation>サイト死活監視間隔 (秒, 1秒-1時間).</translation>
+      <translation>サイト死活監視間隔 (秒, 1秒-1時間)。</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h).</source>
-      <translation>プロキシ接続タイムアウト (秒, 1秒-1時間).</translation>
+      <translation>プロキシ接続タイムアウト (秒, 1秒-1時間)。</translation>
     </message>
     <message>
       <source>Proxy connection access policy.</source>
-      <translation>プロキシ接続アクセスポリシー.</translation>
+      <translation>プロキシ接続アクセスポリシー。</translation>
     </message>
     <message>
       <source>Time synchronization enabled.</source>
-      <translation>時刻同期有効.</translation>
+      <translation>時刻同期を有効にする。</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID.</source>
-      <translation>プライマリ時刻同期サーバーID.</translation>
+      <translation>プライマリ時刻同期サーバーID。</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds).</source>
-      <translation>ローカル時刻とソース時刻の最大差 (ミリ秒).</translation>
+      <translation>ローカル時刻とソース時刻の最大差 (ミリ秒)。</translation>
     </message>
     <message>
       <source>OS time change check period.</source>
-      <translation>OS時刻変更の確認間隔.</translation>
+      <translation>OS時刻変更の確認間隔。</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests.</source>
-      <translation>ネットワークリクエストの時刻同期間隔を同期する.</translation>
+      <translation>ネットワークリクエストの時刻同期間隔を同期する。</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
-      <translation>同期時間イプシロン。時間デルタがイプシロンより小さい場合、新しい値は適用されません.</translation>
+      <translation>同期時刻イプシロン。時間デルタがイプシロンより小さい場合、新しい値は適用されません。</translation>
     </message>
     <message>
       <source>Cloud owner account.</source>
-      <translation>クラウドオーナーアカウント.</translation>
+      <translation>クラウドオーナーアカウント。</translation>
     </message>
     <message>
       <source>Organization Id.</source>
-      <translation>組織 ID.</translation>
+      <translation>組織 ID。</translation>
     </message>
     <message>
       <source>Cloud Site ID.</source>
-      <translation>クラウドサイトID.</translation>
+      <translation>クラウドサイトID。</translation>
     </message>
     <message>
       <source>Cloud authorization key.</source>
-      <translation>クラウド認証キー.</translation>
+      <translation>クラウド認証キー。</translation>
     </message>
     <message>
       <source>Enable 2FA for the Site.</source>
-      <translation>サイトの二要素認証を有効化.</translation>
+      <translation>サイトの二要素認証を有効にする。</translation>
     </message>
     <message>
       <source>Site name.</source>
-      <translation>サイト名.</translation>
+      <translation>サイト名。</translation>
     </message>
     <message>
       <source>Last master Site merge ID.</source>
-      <translation>最終マスターサイト統合ID.</translation>
+      <translation>最終マスターサイト統合ID。</translation>
     </message>
     <message>
       <source>Last slave Site merge ID.</source>
-      <translation>最終スレーブサイト統合ID.</translation>
+      <translation>最終スレーブサイト統合ID。</translation>
     </message>
     <message>
       <source>Disable Device vendors.</source>
-      <translation>デバイスベンダーを無効にする.</translation>
+      <translation>デバイスベンダーを無効にする。</translation>
     </message>
     <message>
       <source>Optimize Camera settings.</source>
-      <translation>カメラ設定の最適化.</translation>
+      <translation>カメラ設定の最適化。</translation>
     </message>
     <message>
       <source>Thumbnails auto-update.</source>
-      <translation>サムネイルの自動更新.</translation>
+      <translation>サムネイルの自動更新を有効にする。</translation>
     </message>
     <message>
       <source>Max scene items (0 means default).</source>
-      <translation>シーン内最大アイテム数 (0でデフォルト値を使用).</translation>
+      <translation>シーン内最大アイテム数 (0でデフォルト値を使用)。</translation>
     </message>
     <message>
       <source>Send plain-text emails.</source>
-      <translation>プレーンテキストのメールを送信する.</translation>
+      <translation>プレーンテキストのメールを送信する。</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails.</source>
-      <translation>Eメールで Windows ラインフィードを使用する.</translation>
+      <translation>メールに Windows の改行を使用する。</translation>
     </message>
     <message>
       <source>Enable audit trail.</source>
-      <translation>操作履歴有効.</translation>
+      <translation>操作履歴を有効にする。</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730).</source>
-      <translation>操作履歴保存期間 (日, 14-730).</translation>
+      <translation>操作履歴保存期間 (14-730 日)。</translation>
     </message>
     <message>
       <source>Event log period (days).</source>
-      <translation>イベントログ保存期間 (日).</translation>
+      <translation>イベントログ保存期間 (日)。</translation>
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
-      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
+      <translation>ブックマークの最大数。0 以下の値の場合は無制限です。</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption).</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption).</translation>
+      <translation>HTTPS (データ通信の暗号化) を強制する。</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption).</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption).</translation>
+      <translation>RTSPS (映像通信の暗号化) を強制する。</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
-      <translation>VMSに保存されているデバイスパスワードを管理者に公開 (Webページ用).</translation>
+      <translation>VMSに保存されているデバイスパスワードを管理者に公開する (Webページ用)。</translation>
     </message>
     <message>
       <source>Enable auto-discovery.</source>
-      <translation>自動検出を有効にする.</translation>
+      <translation>自動検出を有効にする。</translation>
     </message>
     <message>
       <source>Enable auto-update notifications.</source>
-      <translation>自動更新通知を有効にする.</translation>
+      <translation>自動更新通知を有効にする。</translation>
     </message>
     <message>
       <source>Enable update notifications.</source>
-      <translation>更新通知を有効にする.</translation>
+      <translation>更新通知を有効にする。</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping.</source>
-      <translation>UPNPポートマッピングを有効にする.</translation>
+      <translation>UPnP ポートマッピングを有効にする。</translation>
     </message>
     <message>
       <source>Backup settings.</source>
-      <translation>バックアップ設定.</translation>
+      <translation>バックアップ設定。</translation>
     </message>
     <message>
       <source>Cloud host override.</source>
-      <translation>クラウドホストのオーバーライド.</translation>
+      <translation>クラウドホストのオーバーライド。</translation>
     </message>
     <message>
       <source>Enable cross-domain policy.</source>
-      <translation>クロスドメインポリシーを有効にする.</translation>
+      <translation>クロスドメインポリシーを有効にする。</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont.</source>
-      <translation>Arecont の RTSP を有効にする.</translation>
+      <translation>Arecont の RTSP を有効にする。</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher.</source>
-      <translation>シーケンシャル Flir ONVIF 検索を有効にする.</translation>
+      <translation>シーケンシャル Flir ONVIF 検索有効にする。</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB).</source>
-      <translation>P2P キューの最大サイズ (バイト, 32-512MB).</translation>
+      <translation>P2P キューの最大サイズ (バイト, 32-512MB)。</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB).</source>
-      <translation>P2P 全クライアントの最大サイズ (バイト, 32-512MB).</translation>
+      <translation>P2P 全クライアントの最大サイズ (バイト, 32-512MB)。</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB).</source>
-      <translation>レコードキューの最大サイズ (バイト, 6-96MB).</translation>
+      <translation>レコードキューの最大サイズ (バイト, 6-96MB)。</translation>
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000).</source>
-      <translation>レコードキューの最大サイズ (要素数, 250-4000).</translation>
+      <translation>レコードキューの最大サイズ (要素数, 250-4000)。</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds).</source>
-      <translation>RTPタイムアウト (ミリ秒).</translation>
+      <translation>RTPタイムアウト (ミリ秒)。</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds).</source>
-      <translation>RTSP 接続最大時間 (秒).</translation>
+      <translation>RTSP 接続最大時間 (秒)。</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching.</source>
-      <translation>クラウド接続の UDP ホールパンチングを有効にする.</translation>
+      <translation>クラウド接続の UDP ホールパンチングを有効にする。</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage.</source>
-      <translation>クラウド接続リレーの使用を有効にする.</translation>
+      <translation>クラウド接続リレーの使用を有効にする。</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays.</source>
-      <translation>クラウド接続リレーにSSLを強制する.</translation>
+      <translation>クラウド接続リレーにSSLを強制する。</translation>
     </message>
     <message>
       <source>Enable recording on EDGE.</source>
-      <translation>エッジでの録画を有効にする.</translation>
+      <translation>エッジでの録画を有効にする。</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P.</source>
-      <translation>P2P用 WebSocket を有効にする.</translation>
+      <translation>P2P用 WebSocket を有効にする。</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>
-      <translation>リモートアーカイブ同期の最大スレッド数 (&lt;=0 - 自動、最大32).</translation>
+      <translation>リモートアーカイブ同期の最大スレッド数 (&lt;=0 - 自動、最大32)。</translation>
     </message>
     <message>
       <source>Update releases.json file URL.</source>
-      <translation>releases.json ファイルの URL を更新.</translation>
+      <translation>releases.json ファイルの更新 URL。</translation>
     </message>
     <message>
       <source>Target update information.</source>
-      <translation>ターゲットの更新情報.</translation>
+      <translation>対象の更新情報。</translation>
     </message>
     <message>
       <source>Installed update information.</source>
-      <translation>インストールされた更新情報.</translation>
+      <translation>インストール済み更新情報。</translation>
     </message>
     <message>
       <source>Downloader peers for files.</source>
-      <translation>ファイルのダウンローダーピア.</translation>
+      <translation>ファイルのダウンローダーピア。</translation>
     </message>
     <message>
       <source>Client update settings.</source>
-      <translation>クライアントの更新設定.</translation>
+      <translation>クライアントの更新設定。</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization.</source>
-      <translation>カメラアーカイブ同期のスレッド数制限.</translation>
+      <translation>カメラアーカイブ同期のスレッド数制限。</translation>
     </message>
     <message>
       <source>Watermark settings.</source>
-      <translation>透かし設定.</translation>
+      <translation>ウォーターマーク設定。</translation>
     </message>
     <message>
       <source>Pixelation settings.</source>
-      <translation>ピクセル化設定.</translation>
+      <translation>ピクセル化設定。</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds).</source>
-      <translation>認証セッショントークンの有効期間 (秒).</translation>
+      <translation>認証セッショントークンの有効期間 (秒)。</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens.</source>
-      <translation>クラウドトークンにセッション制限を適用する.</translation>
+      <translation>クラウドトークンにセッション制限を適用する。</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server.</source>
-      <translation>単一サーバー上のセッショントークン数上限.</translation>
+      <translation>単一サーバー上のセッショントークン数上限。</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server.</source>
-      <translation>単一サーバー上のユーザーあたりの最大セッショントークン数.</translation>
+      <translation>単一サーバー上のユーザーあたりの最大セッショントークン数。</translation>
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud).</source>
-      <translation>リモートセッショントークンキャッシュの更新間隔 (他のサーバーおよびクラウド).</translation>
+      <translation>リモートセッショントークンキャッシュの更新間隔 (他のサーバーおよびクラウド)。</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud).</source>
-      <translation>リモートセッショントークンキャッシュのタイムアウト (他のサーバーおよびクラウド).</translation>
+      <translation>リモートセッショントークンキャッシュのタイムアウト (他のサーバーおよびクラウド)。</translation>
     </message>
     <message>
       <source>Default video codec.</source>
-      <translation>デフォルトの映像コーデック.</translation>
+      <translation>デフォルトの映像コーデック。</translation>
     </message>
     <message>
       <source>Default codec for export video.</source>
-      <translation>エクスポート映像のデフォルトコーデック.</translation>
+      <translation>エクスポート映像のデフォルトコーデック。</translation>
     </message>
     <message>
       <source>Low quality screen video codec.</source>
-      <translation>低画質スクリーンの映像コーデック.</translation>
+      <translation>低画質スクリーンの映像コーデック。</translation>
     </message>
     <message>
       <source>License server.</source>
-      <translation>ライセンスサーバー.</translation>
+      <translation>ライセンスサーバー。</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update.</source>
-      <translation>resource_data.json 自動更新用 URI.</translation>
+      <translation>resource_data.json 自動更新用 URI。</translation>
     </message>
     <message>
       <source>Meta data storage change policy.</source>
-      <translation>メタデータストレージ変更ポリシー.</translation>
+      <translation>メタデータストレージ変更ポリシー。</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage.</source>
-      <translation>更新ストレージ用の永続サーバー.</translation>
+      <translation>更新ストレージ用の永続サーバー。</translation>
     </message>
     <message>
       <source>Persistent Servers where updates are stored.</source>
-      <translation>更新が保存される永続サーバー.</translation>
+      <translation>更新が保存される永続サーバー。</translation>
     </message>
     <message>
       <source>VMS Server version specific features.</source>
-      <translation>VMSサーバーのバージョン固有の機能.</translation>
+      <translation>VMSサーバーのバージョン固有の機能。</translation>
     </message>
     <message>
       <source>Default locale for new users.</source>
-      <translation>新規ユーザーのデフォルトロケール.</translation>
+      <translation>新規ユーザーのデフォルトロケール。</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording.</source>
-      <translation>録画用の追加のローカルFSストレージタイプ.</translation>
+      <translation>録画用の追加のローカルFSストレージタイプ。</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device.</source>
-      <translation>サーバーがデバイスに接続する際、I/O ポートの状態を維持する.</translation>
+      <translation>サーバーがデバイスに接続する際、I/O ポートの状態を維持する。</translation>
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4MB).</source>
-      <translation>メディアバッファーサイズ (KB, 10KB-4MB).</translation>
+      <translation>メディアバッファーサイズ (KB, 10KB-4MB)。</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB).</source>
-      <translation>音声のみのデバイスに対するメディアバッファーサイズ (KB, 1KB-1MB).</translation>
+      <translation>音声のみのデバイスに対するメディアバッファーサイズ (KB, 1KB-1MB)。</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure.</source>
-      <translation>障害が発生した場合に、分析DBストレージのマウントポイントの権限取得を強制する.</translation>
+      <translation>障害が発生した場合に、分析DBストレージのマウントポイントの権限取得を強制する。</translation>
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds).</source>
-      <translation>VMS サーバーでの映像ストリーム権限の確認間隔 (ミリ秒).</translation>
+      <translation>VMS サーバーでの映像ストリーム権限の確認間隔 (ミリ秒)。</translation>
     </message>
     <message>
       <source>Storage encryption enabled.</source>
-      <translation>ストレージ暗号化有効.</translation>
+      <translation>ストレージ暗号化を有効にする。</translation>
     </message>
     <message>
       <source>Current storage encryption key.</source>
-      <translation>現在のストレージ暗号化キー.</translation>
+      <translation>現在のストレージ暗号化キー。</translation>
     </message>
     <message>
       <source>Show Servers in the Resource Tree for non-admins.</source>
-      <translation>管理者以外のリソースツリーにもサーバーを表示する.</translation>
+      <translation>管理者以外のリソースツリーにもサーバーを表示する。</translation>
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</source>
-      <translation>HTTPヘッダー: サーバー、サポートされている変数: $vmsName, $vmsVersion, $company, $compatibility.</translation>
+      <translation>HTTPヘッダー: サーバー、サポートされている変数: $vmsName, $vmsVersion, $company, $compatibility。</translation>
     </message>
     <message>
       <source>HTTP header: Origin.</source>
-      <translation>HTTP ヘッダー: Origin.</translation>
+      <translation>HTTP ヘッダー: Origin。</translation>
     </message>
     <message>
       <source>HTTP header: X-Frame-Options.</source>
-      <translation>HTTP ヘッダー: X-Frame-Options.</translation>
+      <translation>HTTP ヘッダー: X-Frame-Options。</translation>
     </message>
     <message>
       <source>Use only HTTPS for cameras.</source>
-      <translation>カメラへの接続にHTTPSのみを使用.</translation>
+      <translation>カメラへの接続にHTTPSのみを使用する。</translation>
     </message>
     <message>
       <source>Allow Power User editing Security Settings.</source>
-      <translation>パワーユーザーによるセキュリティ設定の編集を許可する.</translation>
+      <translation>パワーユーザーによるセキュリティ設定の編集を許可する。</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (insecure).</source>
-      <translation>非推奨の API 関数を有効にする (非セキュア).</translation>
+      <translation>非推奨の API 関数を有効にする (非セキュア)。</translation>
     </message>
     <message>
       <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
-      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
+      <translation>非推奨の HTTP Basic 認証と Digest 認証を有効にする (非セキュア)。</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery.</source>
-      <translation>自動検出用に IP アドレスを公開する.</translation>
+      <translation>自動検出用に IP アドレスを公開する。</translation>
     </message>
     <message>
       <source>Show mouse timeline preview.</source>
-      <translation>マウスのタイムラインプレビューを表示する.</translation>
+      <translation>マウスでタイムラインプレビューを表示する。</translation>
     </message>
     <message>
       <source>LDAP settings.</source>
-      <translation>LDAP 設定.</translation>
+      <translation>LDAP 設定。</translation>
     </message>
   </context>
 </TS>

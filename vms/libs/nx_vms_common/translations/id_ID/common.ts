@@ -1574,7 +1574,7 @@
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
-      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
+      <translation>Jumlah maksimum bookmark. Nilai kurang dari atau sama dengan 0 tidak terbatas.</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption).</source>
@@ -1830,7 +1830,7 @@
     </message>
     <message>
       <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
-      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
+      <translation>Aktifkan Otentikasi HTTP Basic dan Digest yang telah usang (tidak aman).</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery.</source>

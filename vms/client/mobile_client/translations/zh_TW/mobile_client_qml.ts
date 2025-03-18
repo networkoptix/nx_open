@@ -118,7 +118,7 @@
     <name>ChannelPartner</name>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>通路夥伴</translation>
     </message>
   </context>
   <context>
@@ -374,7 +374,7 @@
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>斷線</translation>
     </message>
   </context>
   <context>
@@ -437,7 +437,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>嘗試更改搜尋參數</translation>
     </message>
   </context>
   <context>
@@ -656,7 +656,7 @@
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>組織</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -664,11 +664,11 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>嘗試更改搜尋參數</translation>
     </message>
     <message>
       <source>No Organizations</source>
-      <translation type="unfinished">No Organizations</translation>
+      <translation>沒有組織</translation>
     </message>
     <message>
       <source>We didn&apos;t find any organizations, try contacting support</source>
@@ -688,7 +688,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>登入</translation>
     </message>
   </context>
   <context>
@@ -793,7 +793,7 @@
     <name>SiteList</name>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>組織</translation>
     </message>
     <message>
       <source>Folders</source>
@@ -856,7 +856,7 @@
     </message>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>通路夥伴</translation>
     </message>
   </context>
   <context>

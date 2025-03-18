@@ -379,7 +379,7 @@
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Disconnect</translation>
     </message>
   </context>
   <context>

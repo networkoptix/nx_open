@@ -535,7 +535,7 @@ Välj en integration för att börja konfigurera dess parametrar.</translation>
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Ny</translation>
     </message>
   </context>
   <context>
@@ -659,11 +659,11 @@ Välj en integration för att börja konfigurera dess parametrar.</translation>
     </message>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Nyckel</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Värde</translation>
     </message>
   </context>
   <context>
@@ -1859,7 +1859,7 @@ Välj en integration för att börja konfigurera dess parametrar.</translation>
     <message>
       <source>Organization</source>
       <comment>Section with groups from organisation</comment>
-      <translation type="unfinished">Organization</translation>
+      <translation>Organisation</translation>
     </message>
   </context>
   <context>

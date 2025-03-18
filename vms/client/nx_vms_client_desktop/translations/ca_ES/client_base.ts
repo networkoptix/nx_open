@@ -5990,7 +5990,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>S'ha suprimit la càmera</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -6003,9 +6003,9 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n subjectes eliminats</numerusform>
+        <numerusform>%n subjectes eliminats</numerusform>
       </translation>
     </message>
   </context>
@@ -6803,7 +6803,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Font: %1</translation>
     </message>
   </context>
   <context>
@@ -8012,7 +8012,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Tots els servidors estan desconnectats. Els registres no estan disponibles.</translation>
     </message>
   </context>
   <context>

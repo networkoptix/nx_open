@@ -531,7 +531,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>新增</translation>
     </message>
   </context>
   <context>
@@ -655,11 +655,11 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>序號</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>數值</translation>
     </message>
   </context>
   <context>
@@ -1849,7 +1849,7 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
       <source>Organization</source>
       <comment>Section with groups from organisation</comment>
-      <translation type="unfinished">Organization</translation>
+      <translation>組織</translation>
     </message>
   </context>
   <context>

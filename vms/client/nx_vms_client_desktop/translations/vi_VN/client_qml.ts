@@ -531,7 +531,7 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Tạo</translation>
     </message>
   </context>
   <context>
@@ -655,11 +655,11 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     </message>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Khóa</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Giá trị</translation>
     </message>
   </context>
   <context>
@@ -1849,7 +1849,7 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     <message>
       <source>Organization</source>
       <comment>Section with groups from organisation</comment>
-      <translation type="unfinished">Organization</translation>
+      <translation>Tổ chức</translation>
     </message>
   </context>
   <context>

@@ -4310,7 +4310,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>Régler</translation>
     </message>
   </context>
   <context>
@@ -5099,7 +5099,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Services d'intégration payants désactivés</translation>
     </message>
   </context>
   <context>
@@ -5990,7 +5990,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Caméra retirée</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -6003,9 +6003,9 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n sujets supprimés</numerusform>
+        <numerusform>%n sujets supprimés</numerusform>
       </translation>
     </message>
   </context>
@@ -6795,15 +6795,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>Demande d'appel</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>Demande d'appel manquée</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Source: %1</translation>
     </message>
   </context>
   <context>
@@ -8012,7 +8012,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Tous les serveurs sont hors ligne, Journal non disponibles.</translation>
     </message>
   </context>
   <context>
@@ -9818,7 +9818,7 @@ Vous pouvez forcer la détection de mouvement, mais cela peut entraîner une aug
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Notifications du site</translation>
     </message>
   </context>
   <context>
@@ -10472,7 +10472,7 @@ Vous pouvez toujours modifier la qualité et le FPS directement sur la caméra.<
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -11023,23 +11023,23 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>L'enregistrement sur le canal %n a été arrêté en raison d'une utilisation excessive du service.</numerusform>
+        <numerusform>L'enregistrement sur les canaux %n a été arrêté en raison d'une utilisation excessive du service.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>La sauvegarde du stockage cloud sur %n canaux a été arrêtée en raison d'une surutilisation du service.</numerusform>
+        <numerusform>La sauvegarde du stockage cloud sur %n canaux a été arrêtée en raison d'une surutilisation du service.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>L'utilisation du service d'intégration payante sur les canaux %n a été arrêtée en raison d'une utilisation excessive du service.</numerusform>
+        <numerusform>L'utilisation du service d'intégration payante sur les canaux %n a été arrêtée en raison d'une utilisation excessive du service.</numerusform>
       </translation>
     </message>
   </context>
@@ -12289,7 +12289,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>Impossible de trouver un widget correspondant à l'élément spécifié</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
@@ -12506,7 +12506,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Clé</translation>
     </message>
     <message>
       <source>Value</source>

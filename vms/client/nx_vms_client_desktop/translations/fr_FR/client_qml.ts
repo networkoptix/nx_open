@@ -535,7 +535,7 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Nouveau</translation>
     </message>
   </context>
   <context>
@@ -659,11 +659,11 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     </message>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Clé</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Valeur</translation>
     </message>
   </context>
   <context>
@@ -1859,7 +1859,7 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     <message>
       <source>Organization</source>
       <comment>Section with groups from organisation</comment>
-      <translation type="unfinished">Organization</translation>
+      <translation>Organisation</translation>
     </message>
   </context>
   <context>

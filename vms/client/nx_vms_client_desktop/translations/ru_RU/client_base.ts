@@ -6162,7 +6162,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Удаленная камера</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -6175,11 +6175,11 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n удаленных объекта</numerusform>
+        <numerusform>%n удаленных объекта</numerusform>
+        <numerusform>%n удаленных объекта</numerusform>
+        <numerusform>%n удаленных объекта</numerusform>
       </translation>
     </message>
   </context>
@@ -7011,7 +7011,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Источник: %1</translation>
     </message>
   </context>
   <context>
@@ -8250,7 +8250,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Все серверы отключены. Журналы недоступны.</translation>
     </message>
   </context>
   <context>
@@ -10763,7 +10763,7 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Мб/с</translation>
     </message>
   </context>
   <context>
@@ -12623,7 +12623,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>Не удается найти виджет, соответствующий указанному элементу</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
@@ -12842,7 +12842,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Ключ</translation>
     </message>
     <message>
       <source>Value</source>

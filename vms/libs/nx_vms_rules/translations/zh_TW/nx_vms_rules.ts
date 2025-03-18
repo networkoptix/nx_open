@@ -952,11 +952,11 @@
     </message>
     <message>
       <source>Failed to migrate licenses.</source>
-      <translation type="unfinished">Failed to migrate licenses.</translation>
+      <translation>轉移授權失敗。</translation>
     </message>
     <message>
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation type="unfinished">Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</translation>
+      <translation>跳過授權匯入。稍後將自動安排另一次轉移嘗試。</translation>
     </message>
   </context>
   <context>

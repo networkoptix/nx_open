@@ -4310,7 +4310,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>Instellen</translation>
     </message>
   </context>
   <context>
@@ -5990,7 +5990,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Verwijderde camera</translation>
     </message>
     <message>
       <source>Removed server</source>
@@ -6003,9 +6003,9 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n verwijderde onderwerpen</numerusform>
+        <numerusform>%n verwijderde onderwerpen</numerusform>
       </translation>
     </message>
   </context>
@@ -6803,7 +6803,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Bron: %1</translation>
     </message>
   </context>
   <context>
@@ -8012,7 +8012,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Alle servers zijn offline. Logboeken zijn niet beschikbaar.</translation>
     </message>
   </context>
   <context>
@@ -10471,7 +10471,7 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -12287,7 +12287,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>Kan geen widget vinden die overeenkomt met het opgegeven item</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
@@ -12504,7 +12504,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Sleutel</translation>
     </message>
     <message>
       <source>Value</source>
