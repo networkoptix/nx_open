@@ -776,7 +776,11 @@ bool MessageBus::handlePushImpersistentBroadcastTransaction(
 bool MessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data)
 {
     bool success = false;
-    QVector<PeerNumberType> request = deserializeCompressedPeers(data, &success);
+    QVector<PeerNumberType> request;
+    if (connection->localPeer().dataFormat == Qn::SerializationFormat::ubjson)
+        request = deserializeCompressedPeers(data, &success);
+    else
+        success = nx::reflect::json::deserialize({data.data(), (size_t) data.size()}, &request);
     if (!success)
         return false;
 
@@ -789,16 +793,28 @@ bool MessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connecti
         response.push_back(PeerNumberResponseRecord(peer, fullPeerId));
     }
 
-    auto responseData = serializeResolvePeerNumberResponse(response, 1);
-    responseData.data()[0] = (quint8) MessageType::resolvePeerNumberResponse;
-    connection->sendMessage(std::move(responseData));
+    if (connection->remotePeer().dataFormat == Qn::SerializationFormat::ubjson)
+    {
+        auto responseData = serializeResolvePeerNumberResponse(response, 1);
+        responseData.data()[0] = (quint8) MessageType::resolvePeerNumberResponse;
+        connection->sendMessage(std::move(responseData));
+    }
+    else
+    {
+        connection->sendMessage(
+            MessageType::resolvePeerNumberResponse, nx::reflect::json::serialize(response));
+    }
     return true;
 }
 
 bool MessageBus::handleResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data)
 {
     bool success = false;
-    auto records = deserializeResolvePeerNumberResponse(data, &success);
+    QVector<PeerNumberResponseRecord> records;
+    if (connection->remotePeer().dataFormat == Qn::SerializationFormat::ubjson)
+        records = deserializeResolvePeerNumberResponse(data, &success);
+    else
+        success = nx::reflect::json::deserialize({data.data(), (size_t) data.size()}, &records);
     if (!success)
         return false;
 
@@ -826,7 +842,11 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
     NX_ASSERT(!data.isEmpty());
 
     bool success = false;
-    auto peers = deserializePeersMessage(data, &success);
+    std::vector<PeerDistanceRecord> peers;
+    if (connection->remotePeer().dataFormat == Qn::SerializationFormat::ubjson)
+        peers = deserializePeersMessage(data, &success);
+    else
+        success = nx::reflect::json::deserialize({data.data(), (size_t) data.size()}, &peers);
     if (!success)
         return false;
 
@@ -910,9 +930,17 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
         connectionContext->awaitingNumbersToResolve.push_back(number);
     std::sort(connectionContext->awaitingNumbersToResolve.begin(), connectionContext->awaitingNumbersToResolve.end());
 
-    auto serializedData = serializeCompressedPeers(moreNumbersToResolve, 1);
-    serializedData.data()[0] = (quint8) MessageType::resolvePeerNumberRequest;
-    connection->sendMessage(std::move(serializedData));
+    if (connection->remotePeer().dataFormat == Qn::SerializationFormat::ubjson)
+    {
+        auto serializedData = serializeCompressedPeers(moreNumbersToResolve, 1);
+        serializedData.data()[0] = (quint8) MessageType::resolvePeerNumberRequest;
+        connection->sendMessage(std::move(serializedData));
+    }
+    else
+    {
+        connection->sendMessage(
+            MessageType::resolvePeerNumberRequest, nx::reflect::json::serialize(moreNumbersToResolve));
+    }
     return true;
 }
 
@@ -1040,15 +1068,13 @@ void MessageBus::sendTransactionImpl(
     switch (connection->remotePeer().dataFormat)
     {
     case Qn::SerializationFormat::json:
-        connection->sendTransaction(
-            tran,
+        connection->sendTransaction(tran, MessageType::pushTransactionData,
             m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
         break;
     case Qn::SerializationFormat::ubjson:
         if (connection->remotePeer().isClient())
         {
-            connection->sendTransaction(
-                tran,
+            connection->sendTransaction(tran, MessageType::pushTransactionData,
                 m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
         }
         else if (descriptor->isPersistent)
@@ -1094,7 +1120,11 @@ void MessageBus::sendRuntimeData(
 bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data)
 {
     bool success = false;
-    QVector<SubscribeRecord> request = deserializeSubscribeRequest(data, &success);
+    QVector<SubscribeRecord> request;
+    if (connection->remotePeer().dataFormat == Qn::SerializationFormat::ubjson)
+        request = deserializeSubscribeRequest(data, &success);
+    else
+        success = nx::reflect::json::deserialize({data.data(), (size_t) data.size()}, &request);
     if (!success)
         return false;
     vms::api::TranState newSubscription;
@@ -1730,14 +1760,12 @@ bool MessageBus::sendUnicastTransactionImpl(
             switch (connection->remotePeer().dataFormat)
             {
                 case Qn::SerializationFormat::json:
-                    connection->sendTransaction(
-                        tran,
+                    connection->sendTransaction(tran, MessageType::pushTransactionData,
                         m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
                     result = true;
                     break;
                 case Qn::SerializationFormat::ubjson:
-                    connection->sendTransaction(
-                        tran,
+                    connection->sendTransaction(tran, MessageType::pushTransactionData,
                         m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
                     result = true;
                     break;

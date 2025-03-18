@@ -50,6 +50,7 @@ struct SubscribeRecord
     PeerNumberType peer = 0;
     qint32 sequence = 0;
 };
+NX_REFLECTION_INSTRUMENT(SubscribeRecord, (peer)(sequence))
 
 struct PeerDistanceRecord
 {
@@ -59,6 +60,7 @@ struct PeerDistanceRecord
     qint32 distance = 0; //< Distance to the peer.
     PeerNumberType firstVia = kUnknownPeerNumnber; //< First via peer in route if distance > 1.
 };
+NX_REFLECTION_INSTRUMENT(PeerDistanceRecord, (peerNumber)(distance)(firstVia))
 
 struct PeerNumberResponseRecord: vms::api::PersistentIdData
 {
@@ -73,6 +75,7 @@ struct PeerNumberResponseRecord: vms::api::PersistentIdData
 
     PeerNumberType peerNumber = 0;
 };
+NX_REFLECTION_INSTRUMENT(PeerNumberResponseRecord, PersistentIdData_Fields(peerNumber))
 
 struct BidirectionRoutingInfo;
 

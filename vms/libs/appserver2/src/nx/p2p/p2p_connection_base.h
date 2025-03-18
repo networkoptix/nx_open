@@ -25,6 +25,8 @@ namespace ec2 {
 struct QnAbstractTransaction;
 }
 
+namespace nx::vms::api { struct PeerData; }
+
 namespace nx {
 namespace p2p {
 
@@ -107,7 +109,8 @@ public:
      * true if transaction has been sent or MUST never be sent.
      */
     template<typename... Args>
-    bool sendTransaction(const QnAbstractTransaction& tran, Args&&... args)
+    bool sendTransaction(
+        const QnAbstractTransaction& tran, MessageType messageType, Args&&... args)
     {
         switch (shouldTransactionBeSentToPeer(tran))
         {
@@ -123,15 +126,15 @@ public:
                 return false; //< The deserialized transaction is required to decide firmly.
         }
 
-        sendMessage(std::forward<Args>(args)...);
+        sendMessage(messageType, std::forward<Args>(args)...);
         return true;
     }
 
     template<typename T, typename... Args>
-    void sendTransaction(const QnTransaction<T>& tran, Args&&... args)
+    void sendTransaction(const QnTransaction<T>& tran, MessageType messageType, Args&&... args)
     {
         if (shouldTransactionBeSentToPeer(tran) != nx::p2p::FilterResult::deny)
-            sendMessage(std::forward<Args>(args)...);
+            sendMessage(messageType, std::forward<Args>(args)...);
         else
             m_timer.post([this]() { transactionSkipped(); });
     }
@@ -231,8 +234,7 @@ private:
     void onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead);
 
     void handleMessage(const nx::Buffer& message);
-    int messageHeaderSize(bool isClient) const;
-    MessageType getMessageType(const nx::Buffer& buffer, bool isClient) const;
+    MessageType getMessageType(const nx::Buffer& buffer, const nx::vms::api::PeerData& peer) const;
     void transactionSkipped();
     bool skipTransactionForMobileClient(ApiCommand::Value command);
 

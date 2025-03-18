@@ -456,10 +456,15 @@ void ConnectionBase::setState(State state, const QString& reason)
     emit stateChanged(weakPointer(), state);
 }
 
+static constexpr std::string_view kJsonMessagePattern = "[00]";
+
 void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data)
 {
     if (remotePeer().isClient())
+    {
         NX_ASSERT(messageType == MessageType::pushTransactionData);
+        return sendMessage(data);
+    }
 
     if (remotePeer().isCloudServer())
     {
@@ -468,9 +473,25 @@ void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data
     }
 
     nx::Buffer buffer;
-    buffer.reserve(data.size() + 1);
-    buffer.append((char) messageType);
-    buffer.append(data);
+    if (remotePeer().dataFormat == Qn::SerializationFormat::ubjson)
+    {
+        buffer.reserve(data.size() + 1);
+        buffer.append((char) messageType);
+        buffer.append(data);
+    }
+    else
+    {
+        buffer.reserve((data.empty() ? 0 : data.size() + 1) + kJsonMessagePattern.size());
+        buffer.append(kJsonMessagePattern.front());
+        buffer.append('0' + (int) messageType / 10);
+        buffer.append('0' + (int) messageType % 10);
+        if (!data.empty())
+        {
+            buffer.append(',');
+            buffer.append(data);
+        }
+        buffer.append(kJsonMessagePattern.back());
+    }
     sendMessage(buffer);
 }
 
@@ -479,12 +500,26 @@ void ConnectionBase::sendMessage(MessageType messageType, const QByteArray& data
     sendMessage(messageType, nx::Buffer(data));
 }
 
-MessageType ConnectionBase::getMessageType(const nx::Buffer& buffer, bool isClient) const
+MessageType ConnectionBase::getMessageType(
+    const nx::Buffer& buffer, const nx::vms::api::PeerData& peer) const
 {
-    if (isClient)
+    if (peer.isClient())
         return MessageType::pushTransactionData;
 
-    auto messageType = buffer.at(kMessageOffset);
+    auto messageType = (qint8) MessageType::unknown;
+    if (peer.dataFormat == Qn::SerializationFormat::json)
+    {
+        if (buffer.size() >= kJsonMessagePattern.size()
+            && buffer.front() == kJsonMessagePattern.front()
+            && buffer.back() == kJsonMessagePattern.back())
+        {
+            messageType = (buffer[1] - '0') * 10 + buffer[2] - '0';
+        }
+    }
+    else
+    {
+        messageType = buffer.at(kMessageOffset);
+    }
     return messageType < (qint8) MessageType::counter
         ? (MessageType) messageType
         : MessageType::unknown;
@@ -510,10 +545,11 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
         auto localPeerName = context->moduleDisplayName(localPeer().id);
         auto remotePeerName = context->moduleDisplayName(remotePeer().id);
 
-        MessageType messageType = (MessageType)data[0];
+        MessageType messageType = getMessageType(data, remotePeer());
         if (messageType != MessageType::pushTransactionData &&
             messageType != MessageType::pushTransactionList)
         {
+            NX_ASSERT(messageType != MessageType::unknown);
             NX_VERBOSE(this, "Send message: %1 ---> %2. Type: %3. Size=%4",
                 localPeerName, remotePeerName, messageType, data.size());
         }
@@ -544,7 +580,7 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
 
             if (m_dataToSend.size() == 1)
             {
-                auto messageType = getMessageType(m_dataToSend.front(), remotePeer().isClient());
+                auto messageType = getMessageType(m_dataToSend.front(), remotePeer());
                 m_sendCounters[(quint8)messageType] += m_dataToSend.front().size();
 
                 using namespace std::placeholders;
@@ -578,7 +614,7 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
     m_dataToSend.pop_front();
     if (!m_dataToSend.empty())
     {
-        quint8 messageType = (quint8) getMessageType(m_dataToSend.front(), remotePeer().isClient());
+        quint8 messageType = (quint8) getMessageType(m_dataToSend.front(), remotePeer());
         m_sendCounters[messageType] += m_dataToSend.front().size();
 
         m_p2pTransport->sendAsync(
@@ -635,12 +671,6 @@ void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t b
         std::bind(&ConnectionBase::onNewMessageRead, this, _1, _2));
 }
 
-int ConnectionBase::messageHeaderSize(bool isClient) const
-{
-    // kMessageOffset is an addition optional header for debug purpose. Usual header has 1 byte for server.
-    return isClient ? 0 : kMessageOffset + 1;
-}
-
 void ConnectionBase::handleMessage(const nx::Buffer& message)
 {
     NX_ASSERT(!message.empty());
@@ -654,9 +684,29 @@ void ConnectionBase::handleMessage(const nx::Buffer& message)
     NX_CRITICAL(dataSize == message.size() - kMessageOffset);
 #endif
 
-    const bool isClient = localPeer().isClient();
-    MessageType messageType = getMessageType(message, isClient);
-    emit gotMessage(weakPointer(), messageType, message.substr(messageHeaderSize(isClient)));
+    const auto messageType = getMessageType(message, localPeer());
+    if (messageType == MessageType::unknown || localPeer().isClient())
+    {
+        emit gotMessage(weakPointer(), messageType, message);
+        return;
+    }
+
+    if (localPeer().dataFormat == Qn::SerializationFormat::ubjson)
+    {
+        // kMessageOffset is an addition optional header for debug purpose. Usual header has 1 byte
+        // for server.
+        emit gotMessage(weakPointer(), messageType, message.substr(kMessageOffset + 1));
+        return;
+    }
+
+    if (message.size() == kJsonMessagePattern.size())
+    {
+        emit gotMessage(weakPointer(), messageType, /*payload*/ {});
+        return;
+    }
+
+    emit gotMessage(weakPointer(), messageType, message.substr(
+        kJsonMessagePattern.size(), message.size() - kJsonMessagePattern.size() - 1));
 }
 
 QObject* ConnectionBase::opaqueObject()

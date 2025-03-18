@@ -531,13 +531,13 @@ typename BasicBuffer<CharType>::value_type& BasicBuffer<CharType>::front()
 template<typename CharType>
 typename BasicBuffer<CharType>::value_type BasicBuffer<CharType>::back() const
 {
-    return *(m_data + m_size);
+    return *(m_data + m_size - 1);
 }
 
 template<typename CharType>
 typename BasicBuffer<CharType>::value_type& BasicBuffer<CharType>::back()
 {
-    return *(m_data + m_size);
+    return *(m_data + m_size - 1);
 }
 
 template<typename CharType>
