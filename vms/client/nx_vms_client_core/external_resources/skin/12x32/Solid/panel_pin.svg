@@ -7,7 +7,7 @@
   </g>
   <defs>
     <clipPath id="a" class="a">
-      <path fill="#fff" d="M0 0h12v32H0z"/>
+      <path fill="#ffffff" d="M0 0h12v32H0z"/>
     </clipPath>
     <filter id="b" width="20" height="40" x="-2" y="-4" class="b" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
       <feFlood flood-opacity="0" result="BackgroundImageFix"/>

@@ -7,20 +7,20 @@
   </g>
   <defs>
     <linearGradient id="a" x1="7.051" x2="14.47" y1="7.344" y2="6.035" class="a" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#fff" stop-opacity="0"/>
-      <stop offset="1" stop-color="#fff"/>
+      <stop stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#ffffff"/>
     </linearGradient>
     <linearGradient id="b" x1="17.294" x2="9.71" y1="17.489" y2="17.489" class="b" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#fff" stop-opacity="0"/>
-      <stop offset="1" stop-color="#fff"/>
+      <stop stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#ffffff"/>
     </linearGradient>
     <linearGradient id="c" x1="16.576" x2="17.965" y1="6.596" y2="14.47" class="c" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#fff" stop-opacity="0"/>
-      <stop offset="1" stop-color="#fff"/>
+      <stop stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#ffffff"/>
     </linearGradient>
     <linearGradient id="d" x1="7.344" x2="5.955" y1="16.949" y2="9.075" class="d" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#fff" stop-opacity="0"/>
-      <stop offset="1" stop-color="#fff"/>
+      <stop stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#ffffff"/>
     </linearGradient>
   </defs>
 </svg>
