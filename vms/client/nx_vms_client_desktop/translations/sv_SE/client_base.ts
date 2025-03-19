@@ -2181,16 +2181,16 @@ Licensnyckel: %2</translation>
     </message>
     <message numerus="yes">
       <source>This server is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This server is removed from Site</numerusform>
-        <numerusform>This server is removed from Site</numerusform>
+      <translation>
+        <numerusform>Denna server tas bort från sajten</numerusform>
+        <numerusform>Denna server tas bort från sajten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>This user is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This user is removed from Site</numerusform>
-        <numerusform>This user is removed from Site</numerusform>
+      <translation>
+        <numerusform>Den här användaren tas bort från sajten</numerusform>
+        <numerusform>Den här användaren tas bort från sajten</numerusform>
       </translation>
     </message>
   </context>
@@ -3571,14 +3571,14 @@ Licensnyckel: %2</translation>
     </message>
     <message numerus="yes">
       <source>Set for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n devices</numerusform>
-        <numerusform>Set for %n devices</numerusform>
+      <translation>
+        <numerusform>Ställ in för %n enheter</numerusform>
+        <numerusform>Ställ in för %n enheter</numerusform>
       </translation>
     </message>
     <message>
       <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation type="unfinished">Cloud authorization request should only be performed for cloud cross system resources</translation>
+      <translation>Begäran om molnbehörighet ska endast utföras för molnöverskridande systemresurser</translation>
     </message>
   </context>
   <context>
@@ -4373,15 +4373,15 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
-      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+      <translation>Den här kameran kan inte nås. Utför kamerans diagnostik inom skrivbordsklienten för ytterligare information.</translation>
     </message>
     <message>
       <source>Access to this camera requires authorization credentials.</source>
-      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+      <translation>Åtkomst till den här kameran kräver autentiseringsuppgifter.</translation>
     </message>
     <message>
       <source>CONNECTION LOST</source>
-      <translation type="unfinished">CONNECTION LOST</translation>
+      <translation>ANSLUTNING FÖRLORAD</translation>
     </message>
   </context>
   <context>
@@ -4525,14 +4525,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Inspelningen aktiverades på USB-minnet</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>Om molnlagring är aktiverat för säkerhetskopiering, andra säkerhetskopieringslagringar kommer att inaktiveras och &quot;Alla arkiv&quot; alternativ för redan konfigurerade enheter kommer att ändras till &quot;Motion, Objekt, bokmärken&quot;</translation>
-    </message>
-    <message>
-      <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>Om molnlagring är aktiverat för säkerhetskopiering, &quot;Alla arkiv&quot; alternativ för redan konfigurerade enheter kommer att ändras till &quot;Rörelse, objekt, bokmärken&quot;</translation>
-    </message>
-    <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
       <translation>Välj en läs- och skrivpolicy för att definiera hur man interagerar med lagringskataloger.</translation>
     </message>
@@ -4571,15 +4563,23 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Cloud storage cannot be enabled.</source>
-      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+      <translation>Molnlagring kan inte aktiveras.</translation>
     </message>
     <message>
       <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
-      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+      <translation>För att aktivera den lägg till %1 mer lämpliga tjänster eller minska antalet kameror med backup aktiverad.</translation>
     </message>
     <message>
       <source>Insufficient services</source>
       <translation>Otillräckliga tjänster</translation>
+    </message>
+    <message>
+      <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
+      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+    </message>
+    <message>
+      <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
+      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
     </message>
   </context>
   <context>
@@ -5091,11 +5091,11 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Recording disabled</source>
-      <translation type="unfinished">Recording disabled</translation>
+      <translation>Inspelning inaktiverad</translation>
     </message>
     <message>
       <source>Cloud storage backup disabled</source>
-      <translation type="unfinished">Cloud storage backup disabled</translation>
+      <translation>Säkerhetskopiering av molnlagring inaktiverad</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
@@ -5836,9 +5836,12 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
         <numerusform>Källa och %n fler kameror</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Layouts</source>
-      <translation>%n Vyer</translation>
+      <translation>
+        <numerusform>%n Vyer</numerusform>
+        <numerusform>%n Vyer</numerusform>
+      </translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -5891,9 +5894,12 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Auto</source>
       <translation>Auto</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Servers</source>
-      <translation>%n Servrar</translation>
+      <translation>
+        <numerusform>%n Servrar</numerusform>
+        <numerusform>%n Servrar</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -5925,10 +5931,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Källkamera</translation>
     </message>
     <message>
-      <source>Developer Mode Info</source>
-      <translation>Information om utvecklarläge</translation>
-    </message>
-    <message>
       <source>Is listed</source>
       <translation>Är listad</translation>
     </message>
@@ -5940,21 +5942,33 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>In</source>
       <translation>I</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed devices</source>
-      <translation>%n borttagna enheter</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed devices</numerusform>
+        <numerusform>%n removed devices</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation>%n borttagna kameror</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed cameras</numerusform>
+        <numerusform>%n removed cameras</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed servers</source>
-      <translation>%n borttagna servrar</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed servers</numerusform>
+        <numerusform>%n removed servers</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation>%n borttagna layouter</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed layouts</numerusform>
+        <numerusform>%n removed layouts</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
@@ -5963,30 +5977,42 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
         <numerusform>%n ämnen mer</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n devices more</source>
-      <translation>%n enheter mer</translation>
+      <translation type="unfinished">
+        <numerusform>%n devices more</numerusform>
+        <numerusform>%n devices more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n cameras more</source>
-      <translation>%n kameror mer</translation>
+      <translation type="unfinished">
+        <numerusform>%n cameras more</numerusform>
+        <numerusform>%n cameras more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n servers more</source>
-      <translation>%n servrar fler</translation>
+      <translation type="unfinished">
+        <numerusform>%n servers more</numerusform>
+        <numerusform>%n servers more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n layouts more</source>
-      <translation>%n layouter mer</translation>
+      <translation type="unfinished">
+        <numerusform>%n layouts more</numerusform>
+        <numerusform>%n layouts more</numerusform>
+      </translation>
     </message>
     <message>
       <source>Removed subject</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">Removed subject</translation>
+      <translation>Tog bort ämne</translation>
     </message>
     <message>
       <source>Removed device</source>
-      <translation type="unfinished">Removed device</translation>
+      <translation>Borttagen enhet</translation>
     </message>
     <message>
       <source>Removed camera</source>
@@ -5994,11 +6020,11 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Removed server</source>
-      <translation type="unfinished">Removed server</translation>
+      <translation>Borttagen server</translation>
     </message>
     <message>
       <source>Removed layout</source>
-      <translation type="unfinished">Removed layout</translation>
+      <translation>Borttagen layout</translation>
     </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
@@ -6651,19 +6677,19 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
       <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
-      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+      <translation>%1 mer lämpliga molnlagringstjänster krävs för att aktivera säkerhetskopiering för alla utvalda enheter</translation>
     </message>
     <message>
       <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
-      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+      <translation>Men du kan fortfarande använda en vanlig switch för att aktivera säkerhetskopiering för de kameror för vilka detta är möjligt</translation>
     </message>
     <message>
       <source>Backup will not be activated for %1 devices: </source>
-      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
+      <translation>Säkerhetskopiering kommer inte att aktiveras för %1 enheter: </translation>
     </message>
     <message>
       <source>%1 suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
+      <translation>%1 lämpliga molnlagringstjänster krävs för att aktivera säkerhetskopiering för dem.</translation>
     </message>
   </context>
   <context>
@@ -7000,7 +7026,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
-      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+      <translation>Enheten har upptäckts med funktioner för Pan, Tilt och/eller Zoom. Eventuella förändringar i synfältet genom användning av förinställningar eller rörelser kan orsaka att hotspot inte längre är relevant.</translation>
     </message>
   </context>
   <context>
@@ -7027,7 +7053,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Use this link to add the camera to another site</source>
-      <translation type="unfinished">Use this link to add the camera to another site</translation>
+      <translation>Använd den här länken för att lägga till kameran på en annan webbplats</translation>
     </message>
   </context>
   <context>
@@ -7625,11 +7651,11 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Channel Partner users have access to this site</source>
-      <translation type="unfinished">Channel Partner users have access to this site</translation>
+      <translation>Channel Partner-användare har tillgång till denna webbplats</translation>
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</translation>
+      <translation>Kanalpartner-användare&apos; -åtkomst hanteras på organisationsnivå och de är inte synliga i webbplatsens användarhantering.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Läs mer&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
@@ -8008,7 +8034,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
-      <translation type="unfinished">Server cannot answer in reasonable time. Consider narrowing period or filter.</translation>
+      <translation>Servern kan inte svara i rimlig tid. Överväg att begränsa period eller filter.</translation>
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
@@ -8921,7 +8947,7 @@ Kom ihåg att returnera loggnivån till dess standardinställning när du har sa
     </message>
     <message>
       <source>&lt;None&gt;</source>
-      <translation type="unfinished">&lt;None&gt;</translation>
+      <translation>&lt;Ingen&gt;</translation>
     </message>
   </context>
   <context>
@@ -10471,7 +10497,7 @@ Du kan fortfarande ändra kvalitet och FPS direkt på kameran.</translation>
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -12291,7 +12317,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Cannot maximize the item</source>
-      <translation type="unfinished">Cannot maximize the item</translation>
+      <translation>Kan inte maximera objektet</translation>
     </message>
   </context>
   <context>
@@ -12489,14 +12515,14 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
     <message>
       <source>No custom headers</source>
-      <translation type="unfinished">No custom headers</translation>
+      <translation>Inga anpassade sidhuvuden</translation>
     </message>
     <message numerus="yes">
       <source>%n custom headers</source>
       <comment>%n is a number of custom headers</comment>
-      <translation type="unfinished">
-        <numerusform>%n custom headers</numerusform>
-        <numerusform>%n custom headers</numerusform>
+      <translation>
+        <numerusform>%n anpassade rubriker</numerusform>
+        <numerusform>%n anpassade rubriker</numerusform>
       </translation>
     </message>
   </context>

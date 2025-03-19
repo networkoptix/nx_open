@@ -2229,8 +2229,8 @@
       <translation>Disponible à</translation>
     </message>
     <message>
-      <source>Power users</source>
-      <translation>Utilisateurs expérimentés</translation>
+      <source>Power Users</source>
+      <translation type="unfinished">Power Users</translation>
     </message>
   </context>
   <context>

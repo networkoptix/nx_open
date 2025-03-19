@@ -4478,14 +4478,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Ghi âm được kích hoạt trên USB lưu trữ</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>Nếu bộ lưu trữ đám mây được kích hoạt để sao lưu, các bộ lưu trữ sao lưu khác sẽ bị vô hiệu hóa và tùy chọn &quot;Tất cả lưu trữ&quot; cho các thiết bị đã được định cấu hình sẽ được thay đổi thành &quot;Chuyển động, Đối tượng, Dấu trang&quot;</translation>
-    </message>
-    <message>
-      <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>Nếu bộ lưu trữ đám mây được kích hoạt để sao lưu, tùy chọn &quot;Tất cả lưu trữ&quot; cho các thiết bị đã được cấu hình sẽ được thay đổi thành &quot;Chuyển động, Đối tượng, Dấu trang&quot;</translation>
-    </message>
-    <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
       <translation>Chọn chính sách đọc-ghi để xác định cách tương tác với các thư mục lưu trữ.</translation>
     </message>
@@ -4533,6 +4525,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Insufficient services</source>
       <translation>Dịch vụ không đầy đủ</translation>
+    </message>
+    <message>
+      <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
+      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+    </message>
+    <message>
+      <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
+      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
     </message>
   </context>
   <context>
@@ -5755,9 +5755,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
         <numerusform>Nguồn và %n camera khác</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Layouts</source>
-      <translation>Bố cục %n</translation>
+      <translation>
+        <numerusform>Bố cục %n</numerusform>
+      </translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -5809,9 +5811,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Auto</source>
       <translation>Tự động</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Servers</source>
-      <translation>%n Máy chủ</translation>
+      <translation>
+        <numerusform>%n Máy chủ</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -5840,10 +5844,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Máy ảnh nguồn</translation>
     </message>
     <message>
-      <source>Developer Mode Info</source>
-      <translation>Thông tin chế độ nhà phát triển</translation>
-    </message>
-    <message>
       <source>Is listed</source>
       <translation>Được liệt kê</translation>
     </message>
@@ -5855,21 +5855,29 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>In</source>
       <translation>Trong</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed devices</source>
-      <translation>%n thiết bị đã xóa</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed devices</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation>%n camera đã bị xóa</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed cameras</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed servers</source>
-      <translation>%n máy chủ đã bị xóa</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed servers</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation>%n các bố cục đã xóa</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed layouts</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
@@ -5877,21 +5885,29 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
         <numerusform>%n chủ đề nhiều hơn</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n devices more</source>
-      <translation>%n thiết bị nhiều hơn</translation>
+      <translation type="unfinished">
+        <numerusform>%n devices more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n cameras more</source>
-      <translation>%n camera nhiều hơn</translation>
+      <translation type="unfinished">
+        <numerusform>%n cameras more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n servers more</source>
-      <translation>%n máy chủ nhiều hơn</translation>
+      <translation type="unfinished">
+        <numerusform>%n servers more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n layouts more</source>
-      <translation>%n bố cục nhiều hơn</translation>
+      <translation type="unfinished">
+        <numerusform>%n layouts more</numerusform>
+      </translation>
     </message>
     <message>
       <source>Removed subject</source>

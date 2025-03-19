@@ -238,11 +238,11 @@
     </message>
     <message>
       <source>Switch to table view</source>
-      <translation type="unfinished">Switch to table view</translation>
+      <translation>Växla till tabellvy</translation>
     </message>
     <message>
       <source>Switch to card view</source>
-      <translation type="unfinished">Switch to card view</translation>
+      <translation>Växla till kortvy</translation>
     </message>
   </context>
   <context>
@@ -647,7 +647,7 @@ Välj en integration för att börja konfigurera dess parametrar.</translation>
     <name>CustomHttpHeadersDialog</name>
     <message>
       <source>Custom HTTP headers</source>
-      <translation type="unfinished">Custom HTTP headers</translation>
+      <translation>Anpassade HTTP-huvuden</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1148,17 +1148,17 @@ Välj en integration för att börja konfigurera dess parametrar.</translation>
     <message>
       <source>ORGANIZATION</source>
       <comment>Section with groups from organisation</comment>
-      <translation type="unfinished">ORGANIZATION</translation>
+      <translation>ORGANISATION</translation>
     </message>
     <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">BUILT-IN</translation>
+      <translation>INBYGGT</translation>
     </message>
     <message>
       <source>CUSTOM</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">CUSTOM</translation>
+      <translation>SPECIAL</translation>
     </message>
   </context>
   <context>

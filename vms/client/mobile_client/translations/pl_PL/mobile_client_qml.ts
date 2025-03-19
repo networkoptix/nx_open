@@ -800,7 +800,7 @@
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>Foldery</translation>
     </message>
     <message>
       <source>Sites</source>

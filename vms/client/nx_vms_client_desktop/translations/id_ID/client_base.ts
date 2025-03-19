@@ -4478,14 +4478,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <translation>Perekaman diaktifkan pada penyimpanan USB</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>Jika penyimpanan cloud diaktifkan untuk backup, penyimpanan backup lainnya akan dinonaktifkan dan &quot;Semua archive&quot; opsi untuk perangkat yang sudah dikonfigurasi akan diubah menjadi &quot;Gerakan, Objek, Bookmark&quot;</translation>
-    </message>
-    <message>
-      <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>Jika penyimpanan cloud diaktifkan untuk backup, opsi &quot;Semua archive&quot; untuk perangkat yang sudah dikonfigurasi akan diubah menjadi &quot;Gerakan, Objek, Bookmark&quot;</translation>
-    </message>
-    <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
       <translation>Pilih kebijakan read-write untuk menentukan cara berinteraksi dengan direktori penyimpanan.</translation>
     </message>
@@ -4533,6 +4525,14 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Insufficient services</source>
       <translation>Layanan tidak memadai</translation>
+    </message>
+    <message>
+      <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
+      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+    </message>
+    <message>
+      <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
+      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
     </message>
   </context>
   <context>
@@ -5755,9 +5755,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
         <numerusform>Sumber dan %n Kamera lainnya</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Layouts</source>
-      <translation>%n Layout</translation>
+      <translation>
+        <numerusform>%n Layout</numerusform>
+      </translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -5809,9 +5811,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <source>Auto</source>
       <translation>Otomatis</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Servers</source>
-      <translation>%n Servers</translation>
+      <translation>
+        <numerusform>%n Server</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -5840,10 +5844,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <translation>Kamera source</translation>
     </message>
     <message>
-      <source>Developer Mode Info</source>
-      <translation>Info Mode Developer</translation>
-    </message>
-    <message>
       <source>Is listed</source>
       <translation>Terdaftar</translation>
     </message>
@@ -5855,21 +5855,29 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <source>In</source>
       <translation>Dalam</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed devices</source>
-      <translation>%n perangkat yang dihapus</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed devices</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation>%n kamera dihapus</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed cameras</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed servers</source>
-      <translation>%n server dihapus</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed servers</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation>%n layout dihapus</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed layouts</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
@@ -5877,21 +5885,29 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
         <numerusform>%n subyek lainnya</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n devices more</source>
-      <translation>%n perangkat lainnya</translation>
+      <translation type="unfinished">
+        <numerusform>%n devices more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n cameras more</source>
-      <translation>%n kamera lainnya</translation>
+      <translation type="unfinished">
+        <numerusform>%n cameras more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n servers more</source>
-      <translation>%n server lainnya</translation>
+      <translation type="unfinished">
+        <numerusform>%n servers more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n layouts more</source>
-      <translation>%n layout lainnya</translation>
+      <translation type="unfinished">
+        <numerusform>%n layouts more</numerusform>
+      </translation>
     </message>
     <message>
       <source>Removed subject</source>

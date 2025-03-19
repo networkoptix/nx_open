@@ -260,7 +260,7 @@
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
-      <translation type="unfinished">Looking for</translation>
+      <translation>Letar efter</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -371,7 +371,7 @@
     <name>MenuScreen</name>
     <message>
       <source>App Settings</source>
-      <translation type="unfinished">App Settings</translation>
+      <translation>Appinställningar</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -418,19 +418,19 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Inga sajter</translation>
     </message>
     <message>
       <source>We did not find any sites in this organization</source>
-      <translation type="unfinished">We did not find any sites in this organization</translation>
+      <translation>Vi hittade inga sajter i denna organisation</translation>
     </message>
     <message>
       <source>We did not find any sites in this folder</source>
-      <translation type="unfinished">We did not find any sites in this folder</translation>
+      <translation>Vi hittade inga sajter i den här mappen</translation>
     </message>
     <message>
       <source>How to connect sites?</source>
-      <translation type="unfinished">How to connect sites?</translation>
+      <translation>Hur ansluter man sajter?</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -642,7 +642,7 @@
     </message>
     <message>
       <source>Host: Port</source>
-      <translation type="unfinished">Host: Port</translation>
+      <translation>Värd: Port</translation>
     </message>
   </context>
   <context>
@@ -673,19 +673,19 @@
     </message>
     <message>
       <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation type="unfinished">We didn&apos;t find any organizations, try contacting support</translation>
+      <translation>Vi hittade&apos;inga organisationer, försök kontakta supporten</translation>
     </message>
     <message>
       <source>No Sites Found</source>
-      <translation type="unfinished">No Sites Found</translation>
+      <translation>Inga platser hittades</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</translation>
+      <translation>Vi hittade inga webbplatser på ditt lokala nätverk, försök lägga till servrar manuellt eller logga in på ditt molnkonto</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually</translation>
+      <translation>Vi hittade inga webbplatser på ditt lokala nätverk, försök lägga till servrar manuellt eller logga in på ditt molnkonto</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -798,7 +798,7 @@
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>Mappar</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -853,7 +853,7 @@
     <message>
       <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Open %1</translation>
+      <translation>Öppna %1</translation>
     </message>
     <message>
       <source>Channel Partner</source>

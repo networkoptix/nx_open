@@ -4525,14 +4525,6 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>A gravação foi activada no armazenamento USB</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation type="unfinished">If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
-    </message>
-    <message>
-      <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation type="unfinished">If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
-    </message>
-    <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
       <translation type="unfinished">Choose a read-write policy to define how interact with storage directories.</translation>
     </message>
@@ -4580,6 +4572,14 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>Insufficient services</source>
       <translation type="unfinished">Insufficient services</translation>
+    </message>
+    <message>
+      <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
+      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+    </message>
+    <message>
+      <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
+      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
     </message>
   </context>
   <context>
@@ -5836,9 +5836,12 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
         <numerusform>Fonte e mais %n câmeras</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Layouts</source>
-      <translation>%n Layout</translation>
+      <translation>
+        <numerusform>%n Layout</numerusform>
+        <numerusform>%n Layout</numerusform>
+      </translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -5891,9 +5894,12 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <source>Auto</source>
       <translation>Auto</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Servers</source>
-      <translation>%n Servidores</translation>
+      <translation>
+        <numerusform>%n Servidores</numerusform>
+        <numerusform>%n Servidores</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -5925,10 +5931,6 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>Câmera de origem</translation>
     </message>
     <message>
-      <source>Developer Mode Info</source>
-      <translation type="unfinished">Developer Mode Info</translation>
-    </message>
-    <message>
       <source>Is listed</source>
       <translation type="unfinished">Is listed</translation>
     </message>
@@ -5940,21 +5942,33 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <source>In</source>
       <translation type="unfinished">In</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed devices</source>
-      <translation type="unfinished">%n removed devices</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed devices</numerusform>
+        <numerusform>%n removed devices</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation type="unfinished">%n removed cameras</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed cameras</numerusform>
+        <numerusform>%n removed cameras</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed servers</source>
-      <translation type="unfinished">%n removed servers</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed servers</numerusform>
+        <numerusform>%n removed servers</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation type="unfinished">%n removed layouts</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed layouts</numerusform>
+        <numerusform>%n removed layouts</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
@@ -5963,21 +5977,33 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
         <numerusform>%n subjects more</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n devices more</source>
-      <translation type="unfinished">%n devices more</translation>
+      <translation type="unfinished">
+        <numerusform>%n devices more</numerusform>
+        <numerusform>%n devices more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n cameras more</source>
-      <translation type="unfinished">%n cameras more</translation>
+      <translation type="unfinished">
+        <numerusform>%n cameras more</numerusform>
+        <numerusform>%n cameras more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n servers more</source>
-      <translation type="unfinished">%n servers more</translation>
+      <translation type="unfinished">
+        <numerusform>%n servers more</numerusform>
+        <numerusform>%n servers more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n layouts more</source>
-      <translation type="unfinished">%n layouts more</translation>
+      <translation type="unfinished">
+        <numerusform>%n layouts more</numerusform>
+        <numerusform>%n layouts more</numerusform>
+      </translation>
     </message>
     <message>
       <source>Removed subject</source>

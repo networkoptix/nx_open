@@ -2229,8 +2229,8 @@
       <translation>Khả dụng cho</translation>
     </message>
     <message>
-      <source>Power users</source>
-      <translation>Người dùng cấp cao</translation>
+      <source>Power Users</source>
+      <translation type="unfinished">Power Users</translation>
     </message>
   </context>
   <context>

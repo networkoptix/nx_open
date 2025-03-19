@@ -4478,14 +4478,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>มีการเปิดใช้การบันทึกในที่จัดเก็บข้อมูล USB</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>หากเปิดใช้งานที่เก็บข้อมูลบนคลาวด์สำหรับการสำรองข้อมูล ที่เก็บข้อมูลสำรองอื่น ๆ จะถูกปิดใช้งานและตัวเลือก &quot;เก็บถาวรทั้งหมด&quot; สำหรับอุปกรณ์ที่กำหนดค่าไว้แล้วจะเปลี่ยนเป็น &quot;การเคลื่อนไหว วัตถุ บุ๊กมาร์ก&quot;</translation>
-    </message>
-    <message>
-      <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>หากเปิดใช้งานที่เก็บข้อมูลบนคลาวด์สำหรับการสำรองข้อมูล ตัวเลือก &quot;เก็บถาวรทั้งหมด&quot; สำหรับอุปกรณ์ที่กำหนดค่าไว้แล้วจะถูกเปลี่ยนเป็น &quot;การเคลื่อนไหว วัตถุ บุ๊กมาร์ก&quot;</translation>
-    </message>
-    <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
       <translation type="unfinished">Choose a read-write policy to define how interact with storage directories.</translation>
     </message>
@@ -4533,6 +4525,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Insufficient services</source>
       <translation type="unfinished">Insufficient services</translation>
+    </message>
+    <message>
+      <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
+      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+    </message>
+    <message>
+      <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
+      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
     </message>
   </context>
   <context>
@@ -5755,9 +5755,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>แหล่งที่มาและ%n เพิ่มกล้องมากขึ้น</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Layouts</source>
-      <translation>%n เค้าโครง</translation>
+      <translation>
+        <numerusform>%n เค้าโครง</numerusform>
+      </translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -5809,9 +5811,11 @@ If you intended to move analytics data to another storage location, please conta
       <source>Auto</source>
       <translation>อัตโนมัติ</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Servers</source>
-      <translation>%n เซิร์ฟเวอร์</translation>
+      <translation>
+        <numerusform>%n เซิร์ฟเวอร์</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -5840,10 +5844,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>กล้องที่มา</translation>
     </message>
     <message>
-      <source>Developer Mode Info</source>
-      <translation type="unfinished">Developer Mode Info</translation>
-    </message>
-    <message>
       <source>Is listed</source>
       <translation type="unfinished">Is listed</translation>
     </message>
@@ -5855,21 +5855,29 @@ If you intended to move analytics data to another storage location, please conta
       <source>In</source>
       <translation type="unfinished">In</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed devices</source>
-      <translation type="unfinished">%n removed devices</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed devices</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation type="unfinished">%n removed cameras</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed cameras</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed servers</source>
-      <translation type="unfinished">%n removed servers</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed servers</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation type="unfinished">%n removed layouts</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed layouts</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
@@ -5877,21 +5885,29 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n subjects more</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n devices more</source>
-      <translation type="unfinished">%n devices more</translation>
+      <translation type="unfinished">
+        <numerusform>%n devices more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n cameras more</source>
-      <translation type="unfinished">%n cameras more</translation>
+      <translation type="unfinished">
+        <numerusform>%n cameras more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n servers more</source>
-      <translation type="unfinished">%n servers more</translation>
+      <translation type="unfinished">
+        <numerusform>%n servers more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n layouts more</source>
-      <translation type="unfinished">%n layouts more</translation>
+      <translation type="unfinished">
+        <numerusform>%n layouts more</numerusform>
+      </translation>
     </message>
     <message>
       <source>Removed subject</source>

@@ -4478,14 +4478,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>將 USB 外接儲存裝置作為錄影使用。</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>如果啟動雲端儲存進行備份，其他備份裝置將會被停用，已設定 &quot;所有存檔&quot; 的裝置將變更為 &quot;位移、物件、書籤&quot;</translation>
-    </message>
-    <message>
-      <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>如果啟動雲端儲存進行備份，已設定 &quot;所有存檔&quot; 的裝置將變更為 &quot;位移、物件、書籤&quot;</translation>
-    </message>
-    <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
       <translation>選擇一個讀寫政策來定義如何與儲存目錄互動。</translation>
     </message>
@@ -4533,6 +4525,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Insufficient services</source>
       <translation>服務不足</translation>
+    </message>
+    <message>
+      <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
+      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+    </message>
+    <message>
+      <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
+      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
     </message>
   </context>
   <context>
@@ -5755,9 +5755,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>來源與 %n 個以上的攝影機</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Layouts</source>
-      <translation>%n 佈局</translation>
+      <translation>
+        <numerusform>%n 佈局</numerusform>
+      </translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -5809,9 +5811,11 @@ If you intended to move analytics data to another storage location, please conta
       <source>Auto</source>
       <translation>自動</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Servers</source>
-      <translation>%n 伺服器</translation>
+      <translation>
+        <numerusform>%n 伺服器</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -5840,10 +5844,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>來源攝影機</translation>
     </message>
     <message>
-      <source>Developer Mode Info</source>
-      <translation>開發者模式訊息</translation>
-    </message>
-    <message>
       <source>Is listed</source>
       <translation>包含</translation>
     </message>
@@ -5855,21 +5855,29 @@ If you intended to move analytics data to another storage location, please conta
       <source>In</source>
       <translation>於登入後</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed devices</source>
-      <translation>%n 台已移除的裝置</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed devices</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation>%n 台已移除的攝影機</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed cameras</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed servers</source>
-      <translation>%n 台已移除的伺服器</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed servers</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation>%n 個已移除的佈局</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed layouts</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
@@ -5877,21 +5885,29 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>再%n 個科目</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n devices more</source>
-      <translation>再%n個裝置</translation>
+      <translation type="unfinished">
+        <numerusform>%n devices more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n cameras more</source>
-      <translation>再%n 個攝影機</translation>
+      <translation type="unfinished">
+        <numerusform>%n cameras more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n servers more</source>
-      <translation>再%n 個伺服器</translation>
+      <translation type="unfinished">
+        <numerusform>%n servers more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n layouts more</source>
-      <translation>再%n個佈局</translation>
+      <translation type="unfinished">
+        <numerusform>%n layouts more</numerusform>
+      </translation>
     </message>
     <message>
       <source>Removed subject</source>

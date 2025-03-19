@@ -131,11 +131,11 @@
     </message>
     <message>
       <source>with</source>
-      <translation type="unfinished">with</translation>
+      <translation>med</translation>
     </message>
     <message>
       <source>Simultaneous Streams</source>
-      <translation type="unfinished">Simultaneous Streams</translation>
+      <translation>Samtidiga strömmar</translation>
     </message>
   </context>
   <context>
@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>Mbps</source>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -606,7 +606,7 @@
     </message>
     <message>
       <source>Restreaming Link</source>
-      <translation type="unfinished">Restreaming Link</translation>
+      <translation>Återupptar länk</translation>
     </message>
   </context>
   <context>
@@ -2229,8 +2229,8 @@
       <translation>Tillgänglig till</translation>
     </message>
     <message>
-      <source>Power users</source>
-      <translation>Superanvändare</translation>
+      <source>Power Users</source>
+      <translation type="unfinished">Power Users</translation>
     </message>
   </context>
   <context>

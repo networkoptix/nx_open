@@ -4525,14 +4525,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Enregistrement a été activé sur le stockage USB</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>Si le stockage cloud est activé pour la sauvegarde, les autres sauvegardes seront désactivées et l'option &quot;Toutes les archives&quot; pour les appareils déjà configurés seront changées en &quot;Motion, Objet, signets&quot;</translation>
-    </message>
-    <message>
-      <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>Si le stockage cloud est activé pour la sauvegarde, l'option &quot;Toutes les archives&quot; pour les appareils déjà configurés seront changées en &quot;Motion, objet, signets&quot;</translation>
-    </message>
-    <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
       <translation>Choisissez une politique de lecture-écriture pour définir comment interagir avec les répertoires de stockage.</translation>
     </message>
@@ -4580,6 +4572,14 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Insufficient services</source>
       <translation>Services insuffisants</translation>
+    </message>
+    <message>
+      <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
+      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+    </message>
+    <message>
+      <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
+      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
     </message>
   </context>
   <context>
@@ -5836,9 +5836,12 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
         <numerusform>Source et %n autres caméras</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Layouts</source>
-      <translation>%n Mises en page</translation>
+      <translation>
+        <numerusform>%n Mise en page</numerusform>
+        <numerusform>%n Mise en page</numerusform>
+      </translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -5891,9 +5894,12 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>Auto</source>
       <translation>Auto</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Servers</source>
-      <translation>%n Serveurs</translation>
+      <translation>
+        <numerusform>%n Serveur</numerusform>
+        <numerusform>%n Serveurs</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -5925,10 +5931,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Source Caméra</translation>
     </message>
     <message>
-      <source>Developer Mode Info</source>
-      <translation>Infos sur le mode développeur</translation>
-    </message>
-    <message>
       <source>Is listed</source>
       <translation>Est listé</translation>
     </message>
@@ -5940,21 +5942,33 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>In</source>
       <translation>Dans</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed devices</source>
-      <translation>%n appareils supprimés</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed devices</numerusform>
+        <numerusform>%n removed devices</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation>%n caméras supprimées</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed cameras</numerusform>
+        <numerusform>%n removed cameras</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed servers</source>
-      <translation>%n serveurs supprimés</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed servers</numerusform>
+        <numerusform>%n removed servers</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation>%n mises en page supprimées</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed layouts</numerusform>
+        <numerusform>%n removed layouts</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
@@ -5963,21 +5977,33 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
         <numerusform>%n sujets supplémentaires</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n devices more</source>
-      <translation>%n appareils en plus</translation>
+      <translation type="unfinished">
+        <numerusform>%n devices more</numerusform>
+        <numerusform>%n devices more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n cameras more</source>
-      <translation>%n caméras plus</translation>
+      <translation type="unfinished">
+        <numerusform>%n cameras more</numerusform>
+        <numerusform>%n cameras more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n servers more</source>
-      <translation>%n serveurs supplémentaires</translation>
+      <translation type="unfinished">
+        <numerusform>%n servers more</numerusform>
+        <numerusform>%n servers more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n layouts more</source>
-      <translation>%n mises en page supplémentaires</translation>
+      <translation type="unfinished">
+        <numerusform>%n layouts more</numerusform>
+        <numerusform>%n layouts more</numerusform>
+      </translation>
     </message>
     <message>
       <source>Removed subject</source>

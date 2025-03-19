@@ -4478,14 +4478,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>USBストレージで録画が有効になりました</translation>
     </message>
     <message>
-      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>クラウドストレージがバックアップ用に有効化されている場合、 他のバックアップストレージは無効になり、既に設定されているデバイスの「すべてのアーカイブ」オプションは「モーション、オブジェクト、ブックマーク」に変更されます。</translation>
-    </message>
-    <message>
-      <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>クラウドストレージがバックアップ用に有効化されている場合、 既に設定されているデバイスの「すべてのアーカイブ」オプションは「モーション、オブジェクト、ブックマーク」に変更されます。</translation>
-    </message>
-    <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
       <translation>読み取り/書き込みポリシーを選択して、ストレージディレクトリへの操作内容を定義してください。</translation>
     </message>
@@ -4533,6 +4525,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Insufficient services</source>
       <translation>不十分なサービス</translation>
+    </message>
+    <message>
+      <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
+      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+    </message>
+    <message>
+      <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
+      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
     </message>
   </context>
   <context>
@@ -5755,9 +5755,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>ソースおよびその他 %n 台のカメラ</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Layouts</source>
-      <translation>%n レイアウト</translation>
+      <translation>
+        <numerusform>%n レイアウト</numerusform>
+      </translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -5809,9 +5811,11 @@ If you intended to move analytics data to another storage location, please conta
       <source>Auto</source>
       <translation>自動</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n Servers</source>
-      <translation>%n サーバー</translation>
+      <translation>
+        <numerusform>%n サーバー</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -5840,10 +5844,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ソースカメラ</translation>
     </message>
     <message>
-      <source>Developer Mode Info</source>
-      <translation>開発者モード情報</translation>
-    </message>
-    <message>
       <source>Is listed</source>
       <translation>リストに存在する</translation>
     </message>
@@ -5855,21 +5855,29 @@ If you intended to move analytics data to another storage location, please conta
       <source>In</source>
       <translation>検索対象リスト</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed devices</source>
-      <translation>削除された %n デバイス</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed devices</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation>削除された %n カメラ</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed cameras</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed servers</source>
-      <translation>削除された %n サーバー</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed servers</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation>削除された %n レイアウト</translation>
+      <translation type="unfinished">
+        <numerusform>%n removed layouts</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
@@ -5877,21 +5885,29 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>ほか %n サブジェクト</numerusform>
       </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n devices more</source>
-      <translation>ほか %n デバイス</translation>
+      <translation type="unfinished">
+        <numerusform>%n devices more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n cameras more</source>
-      <translation>ほか %n カメラ</translation>
+      <translation type="unfinished">
+        <numerusform>%n cameras more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n servers more</source>
-      <translation>ほか %n サーバー</translation>
+      <translation type="unfinished">
+        <numerusform>%n servers more</numerusform>
+      </translation>
     </message>
-    <message>
+    <message numerus="yes">
       <source>%n layouts more</source>
-      <translation>ほか %n レイアウト</translation>
+      <translation type="unfinished">
+        <numerusform>%n layouts more</numerusform>
+      </translation>
     </message>
     <message>
       <source>Removed subject</source>

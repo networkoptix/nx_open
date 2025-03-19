@@ -2229,8 +2229,8 @@
       <translation>Dostępne dla</translation>
     </message>
     <message>
-      <source>Power users</source>
-      <translation>Użytkownicy zaawansowani</translation>
+      <source>Power Users</source>
+      <translation type="unfinished">Power Users</translation>
     </message>
   </context>
   <context>

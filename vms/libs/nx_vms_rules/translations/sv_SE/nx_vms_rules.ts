@@ -21,7 +21,7 @@
     <message>
       <source>On %1 --&gt; %2</source>
       <comment>%1 is the event name, %2 is the action name</comment>
-      <translation type="unfinished">On %1 --&gt; %2</translation>
+      <translation>På %1 --&gt; %2</translation>
     </message>
   </context>
   <context>
@@ -307,7 +307,7 @@
     </message>
     <message>
       <source>And attributes</source>
-      <translation type="unfinished">And attributes</translation>
+      <translation>Och attribut</translation>
     </message>
   </context>
   <context>
@@ -564,7 +564,7 @@
     </message>
     <message>
       <source>Custom headers</source>
-      <translation type="unfinished">Custom headers</translation>
+      <translation>Anpassat sidhuvud</translation>
     </message>
   </context>
   <context>
@@ -582,16 +582,16 @@
     <name>nx::vms::rules::HttpHeadersFieldValidator</name>
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
-      <translation type="unfinished">
-        <numerusform>Some of the headers are not valid</numerusform>
-        <numerusform>Some of the headers are not valid</numerusform>
+      <translation>
+        <numerusform>Vissa av rubrikerna är inte giltiga</numerusform>
+        <numerusform>Vissa av rubrikerna är inte giltiga</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
-      <translation type="unfinished">
-        <numerusform>All the headers are not valid</numerusform>
-        <numerusform>All the headers are not valid</numerusform>
+      <translation>
+        <numerusform>Alla rubriker är inte giltiga</numerusform>
+        <numerusform>Alla rubriker är inte giltiga</numerusform>
       </translation>
     </message>
   </context>
@@ -606,7 +606,7 @@
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
       <source>Integration Diagnostic Event</source>
-      <translation type="unfinished">Integration Diagnostic Event</translation>
+      <translation>Integreringsdiagnostikhändelse</translation>
     </message>
     <message>
       <source>For Plugin</source>
@@ -1075,11 +1075,11 @@
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
       <source>Site HTTP(S) Request</source>
-      <translation type="unfinished">Site HTTP(S) Request</translation>
+      <translation>Webbplats HTTP(S)-förfrågan</translation>
     </message>
     <message>
       <source>Endpoint</source>
-      <translation type="unfinished">Endpoint</translation>
+      <translation>Ändpunkt</translation>
     </message>
     <message>
       <source>Method</source>
@@ -1235,7 +1235,7 @@
     </message>
     <message>
       <source>Invalid UUID string</source>
-      <translation type="unfinished">Invalid UUID string</translation>
+      <translation>Ogiltig UUID-sträng</translation>
     </message>
   </context>
   <context>
@@ -1269,11 +1269,11 @@
     </message>
     <message>
       <source>Endpoint cannot be empty</source>
-      <translation type="unfinished">Endpoint cannot be empty</translation>
+      <translation>Endpoint kan inte vara tom</translation>
     </message>
     <message>
       <source>Endpoint mustn&apos;t contains any space</source>
-      <translation type="unfinished">Endpoint mustn&apos;t contains any space</translation>
+      <translation>Endpoint får inte&apos;innehålla något blanksteg</translation>
     </message>
   </context>
   <context>

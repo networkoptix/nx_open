@@ -2229,8 +2229,8 @@
       <translation>適用於</translation>
     </message>
     <message>
-      <source>Power users</source>
-      <translation>進階使用者</translation>
+      <source>Power Users</source>
+      <translation type="unfinished">Power Users</translation>
     </message>
   </context>
   <context>

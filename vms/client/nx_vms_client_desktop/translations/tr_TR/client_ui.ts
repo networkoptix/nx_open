@@ -2229,8 +2229,8 @@
       <translation>Uygun</translation>
     </message>
     <message>
-      <source>Power users</source>
-      <translation type="unfinished">Power users</translation>
+      <source>Power Users</source>
+      <translation type="unfinished">Power Users</translation>
     </message>
   </context>
   <context>

@@ -1644,7 +1644,7 @@
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
-      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
+      <translation>Maximalt antal bokmärken. Värde mindre än eller lika med 0 är oändligt.</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption).</source>
@@ -1900,7 +1900,7 @@
     </message>
     <message>
       <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
-      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
+      <translation>Aktivera föråldrade HTTP Basic och Digest-autentiseringar (osäker).</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery.</source>
