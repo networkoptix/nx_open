@@ -345,8 +345,9 @@ void CameraButtonManager::Private::handleButtonAdded(const CameraButtonData& dat
             if (!button->isLive())
                 return;
 
+            // The button may be released on removal.
             const auto data = controller->buttonData(id);
-            if (!data->prolonged())
+            if (!data || !data->prolonged())
                 return;
 
             const nx::utils::ScopeGuard guard(

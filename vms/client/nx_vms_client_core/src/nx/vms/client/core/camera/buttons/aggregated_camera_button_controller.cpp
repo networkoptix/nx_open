@@ -104,11 +104,10 @@ OptionalCameraButtonData AggregatedCameraButtonController::buttonData(const nx::
 {
     for (const auto& controller: d->controllers)
     {
-        if (const auto& result = controller->buttonData(id))
+        if (auto result = controller->buttonData(id))
             return result;
     }
 
-    NX_ASSERT(false, "Can't find camera button");
     return {};
 }
 
