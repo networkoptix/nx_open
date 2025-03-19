@@ -4,7 +4,6 @@
 
 #include <QtWidgets/QCheckBox>
 
-#include <client_core/client_core_module.h>
 #include <core/misc/schedule_task.h>
 #include <core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
@@ -20,10 +19,12 @@ namespace nx::vms::client::desktop {
 namespace {
 
 CameraSelectionDialog::AlertTextProvider initAlertTextProvider(
+    SystemContext* context,
     const CameraSettingsDialogState& settings)
 {
     return
-        [&settings](const QSet<QnResourcePtr>& resources, bool /*pinnedItemSelected*/) -> QString
+        [&settings, context]
+            (const QSet<QnResourcePtr>& resources, bool /*pinnedItemSelected*/) -> QString
         {
             QStringList alertRows;
 
@@ -42,10 +43,7 @@ CameraSelectionDialog::AlertTextProvider initAlertTextProvider(
                 && settings.recording.enabled())
             {
                 using namespace nx::vms::license;
-                CamLicenseUsageHelper helper(
-                    cameras,
-                    /*enableRecording*/ true,
-                    qnClientCoreModule->systemContext());
+                CamLicenseUsageHelper helper(cameras, /*enableRecording*/ true, context);
 
                 if (!helper.isValid())
                 {
@@ -155,7 +153,7 @@ CopyScheduleCameraSelectionDialog::CopyScheduleCameraSelectionDialog(
     base_type(
         /*resourceFilter*/ supportsSchedule(settings),
         /*resourceValidator*/ canApplySchedule(settings),
-        /*alertTextProvider*/ initAlertTextProvider(settings),
+        /*alertTextProvider*/ initAlertTextProvider(systemContext(), settings),
         /*permissionsHandledByFilter*/ false,
         /*pinnedItemDescription*/ {},
         parent)

@@ -97,7 +97,7 @@ QuickControls.Page
                 else if (sessionManager.hasConnectingSession
                     || sessionManager.hasAwaitingResourcesSession)
                 {
-                    sessionManager.stopSession();
+                    sessionManager.stopSessionByUser();
                 }
                 else if (stackView.depth > 1)
                 {

@@ -528,9 +528,7 @@ Item
 
                     enabled: !controller.mediaPlayer.liveMode && hasArchive
                         && !controller.cannotDecryptMedia
-                    resourceId: controller.mediaPlayer.resource
-                        ? controller.mediaPlayer.resource.id
-                        : NxGlobals.uuid("");
+                    resource: controller.mediaPlayer.resource
                     positionMs: controller.mediaPlayer.position
 
                     anchors.left:  motionSearchModeButton.right
@@ -648,7 +646,9 @@ Item
 
                     Binding
                     {
-                        target: twoWayAudioController
+                        target: controller.systemContext
+                            ? controller.systemContext.twoWayAudioController
+                            : null
                         property: "resourceId"
                         value: controller.resourceId
                     }

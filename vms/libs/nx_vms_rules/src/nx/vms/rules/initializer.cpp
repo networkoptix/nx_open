@@ -104,14 +104,14 @@ void Initializer::registerFields() const
         fieldMetatype<AnalyticsEventTypeField>(),
         [this](const FieldDescriptor* descriptor)
         {
-            return new AnalyticsEventTypeField(this->m_context, descriptor);
+            return new AnalyticsEventTypeField(systemContext(), descriptor);
         });
     registerEventField<AnalyticsAttributesField>();
     m_engine->registerEventField(
         fieldMetatype<AnalyticsObjectTypeField>(),
         [this](const FieldDescriptor* descriptor)
         {
-            return new AnalyticsObjectTypeField(this->m_context, descriptor);
+            return new AnalyticsObjectTypeField(systemContext(), descriptor);
         });
     registerEventField<CustomizableFlagField>();
     registerEventField<CustomizableIconField>();
@@ -125,7 +125,7 @@ void Initializer::registerFields() const
         fieldMetatype<ObjectLookupField>(),
         [this](const FieldDescriptor* descriptor)
         {
-            return new ObjectLookupField(this->m_context, descriptor);
+            return new ObjectLookupField(systemContext(), descriptor);
         });
     registerEventField<SourceCameraField>();
     registerEventField<SourceServerField>();
@@ -140,7 +140,7 @@ void Initializer::registerFields() const
         fieldMetatype<TextLookupField>(),
         [this](const FieldDescriptor* descriptor)
         {
-            return new TextLookupField(this->m_context, descriptor);
+            return new TextLookupField(systemContext(), descriptor);
         });
     registerEventField<UniqueIdField>();
 
@@ -150,8 +150,8 @@ void Initializer::registerFields() const
     registerActionField<ActionFlagField>();
     registerActionField<FpsField>();
     registerActionField<ContentTypeField>();
-    registerActionField<EmailMessageField>(this->m_context);
-    registerActionField<ExtractDetailField>(this->m_context);
+    registerActionField<EmailMessageField>(systemContext());
+    registerActionField<ExtractDetailField>(systemContext());
     registerActionField<EventDevicesField>();
     registerActionField<HttpAuthTypeField>();
     registerActionField<HttpHeadersField>();
@@ -165,8 +165,8 @@ void Initializer::registerFields() const
     registerActionField<StreamQualityField>();
     registerActionField<TargetDevicesField>();
     registerActionField<TargetServersField>();
-    registerActionField<TargetUsersField>(this->m_context);
-    registerActionField<TextWithFields>(this->m_context);
+    registerActionField<TargetUsersField>(systemContext());
+    registerActionField<TextWithFields>(systemContext());
     registerActionField<TargetLayoutsField>();
     registerActionField<TargetDeviceField>();
     registerActionField<TimeField>();

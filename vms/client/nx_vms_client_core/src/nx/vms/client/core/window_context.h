@@ -6,15 +6,16 @@
 
 #include <nx/utils/log/assert.h>
 
-#include "window_context_aware.h"
-
 namespace nx::vms::client::core {
+
+class SystemContext;
+class WindowContextQmlInitializer;
 
 /**
  * Context of the application window. Created once per each window in scope of the application
  * process. Each Window Context has access to all System Contexts, but only one System Context is
- * considered as "current" - which is used to display Resource Tree and other system-dependent UI
- * elements.
+ * considered as "current" - which is used to display currently connected site resources and
+ * other site-dependent UI elements.
  */
 class NX_VMS_CLIENT_CORE_API WindowContext: public QObject
 {
@@ -27,6 +28,8 @@ public:
      */
     WindowContext(QObject* parent = nullptr);
     virtual ~WindowContext() override;
+
+    static std::unique_ptr<WindowContextQmlInitializer> fromQmlContext(QObject* owner);
 
     template<typename Target>
     Target* as()

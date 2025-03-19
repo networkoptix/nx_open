@@ -3,7 +3,7 @@
 #include "mobile_client_ui_controller.h"
 
 #include <context/context.h>
-#include <core/resource/resource.h>
+#include <core/resource/layout_resource.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/application_context.h>
@@ -13,10 +13,11 @@
 #include <nx/vms/client/mobile/session/ui_messages.h>
 #include <nx/vms/common/system_settings.h>
 
+
 class QnMobileClientUiControllerPrivate
 {
 public:
-    QString layoutId;
+    QnLayoutResourcePtr layout;
     QnMobileClientUiController::Screen currentScreen =
         QnMobileClientUiController::Screen::UnknownScreen;
 };
@@ -27,8 +28,8 @@ QnMobileClientUiController::QnMobileClientUiController(QObject* parent):
 {
     NX_DEBUG(this, "QnMobileClientUiController(): created mobile client UI controller");
 
-    connect(globalSettings(), &nx::vms::common::SystemSettings::systemNameChanged,
-        this, &QnMobileClientUiController::currentSystemNameChanged);
+//    connect(globalSettings(), &nx::vms::common::SystemSettings::systemNameChanged,
+//        this, &QnMobileClientUiController::currentSystemNameChanged);
 }
 
 QnMobileClientUiController::~QnMobileClientUiController()
@@ -57,7 +58,7 @@ void QnMobileClientUiController::initialize(
             }
             else
             {
-                setLayoutId(QString());
+                setRawLayout({});
                 if (screen != Screen::DigestLoginToCloudScreen)
                     openSessionsScreen();
             }
@@ -83,7 +84,7 @@ void QnMobileClientUiController::initialize(
     using RemoteConnectionErrorCode = nx::vms::client::core::RemoteConnectionErrorCode;
     const auto handleSessionError =
         [this, context](
-            const Session::Holder& session,
+            const QString& systemName,
             RemoteConnectionErrorCode status)
         {
             NX_DEBUG(this, "initialize(): sessionFinishedWithError: current screen is <%1>",
@@ -97,7 +98,7 @@ void QnMobileClientUiController::initialize(
 
             using UiMessages = nx::vms::client::mobile::UiMessages;
             const auto errorText = UiMessages::getConnectionErrorText(status);
-            context->showConnectionErrorMessage(session->systemName(), errorText);
+            context->showConnectionErrorMessage(systemName, errorText);
         };
     connect(sessionManager, &SessionManager::sessionFinishedWithError,
         context, handleSessionError);
@@ -119,26 +120,31 @@ void QnMobileClientUiController::setCurrentScreen(Screen value)
     emit currentScreenChanged();
 }
 
-QString QnMobileClientUiController::layoutId() const
+
+QnLayoutResource* QnMobileClientUiController::rawLayout() const
 {
     Q_D(const QnMobileClientUiController);
-    return d->layoutId;
+    return d->layout.get();
 }
 
-void QnMobileClientUiController::setLayoutId(const QString& layoutId)
+void QnMobileClientUiController::setRawLayout(QnLayoutResource* value)
 {
     Q_D(QnMobileClientUiController);
-    if (d->layoutId == layoutId)
+    const auto layout = value
+        ? value->toSharedPointer().dynamicCast<QnLayoutResource>()
+        : QnLayoutResourcePtr{};
+
+    if (d->layout == layout)
         return;
 
-    d->layoutId = layoutId;
-    emit layoutIdChanged();
+    d->layout = layout;
+    emit layoutChanged();
 }
 
-QString QnMobileClientUiController::currentSystemName() const
-{
-    return globalSettings()->systemName();
-}
+//QString QnMobileClientUiController::currentSystemName() const
+//{
+//    return globalSettings()->systemName();
+//}
 
 void QnMobileClientUiController::openConnectToServerScreen(
     const nx::utils::Url& url,

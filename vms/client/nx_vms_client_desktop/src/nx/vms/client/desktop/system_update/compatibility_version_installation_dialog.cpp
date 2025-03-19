@@ -8,7 +8,6 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QPushButton>
 
-#include <client_core/client_core_module.h>
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
@@ -113,7 +112,8 @@ void CompatibilityVersionInstallationDialog::reject()
 int CompatibilityVersionInstallationDialog::exec()
 {
     NX_VERBOSE(this, "Connecting to the Site %1...", m_private->logonData.address);
-    const auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
+    const auto remoteConnectionFactory =
+        appContext()->currentSystemContext()->networkModule()->connectionFactory();
     m_private->connectionProcess = remoteConnectionFactory->connect(
         m_private->logonData,
         nx::utils::AsyncHandlerExecutor(this).bind(

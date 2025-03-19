@@ -6,7 +6,6 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 
 #include "virtual_camera_fwd.h"
 
@@ -15,9 +14,7 @@ class QnTimePeriodList;
 
 namespace nx::vms::client::desktop {
 
-class VirtualCameraPreparer:
-    public QObject,
-    public core::RemoteConnectionAware
+class VirtualCameraPreparer: public QObject
 {
     Q_OBJECT
     using base_type = QObject;

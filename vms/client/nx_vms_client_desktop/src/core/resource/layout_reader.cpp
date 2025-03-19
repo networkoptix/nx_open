@@ -6,7 +6,6 @@
 #include <QtCore/QThread>
 
 #include <client/client_globals.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
@@ -15,6 +14,7 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/export/data/nov_metadata.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
@@ -214,7 +214,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
             aviResource->setTimeZone(calculateTimeZone(itemProperties));
         }
 
-        auto resourcePool = qnClientCoreModule->resourcePool();
+        auto resourcePool = appContext()->currentSystemContext()->resourcePool();
         resourcePool->addResource(aviResource, QnResourcePool::SkipAddingTransaction);
 
         // Check if we have updated an existing resource.

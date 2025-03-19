@@ -4,7 +4,6 @@
 
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>

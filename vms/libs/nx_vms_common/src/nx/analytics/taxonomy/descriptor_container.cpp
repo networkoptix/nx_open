@@ -105,7 +105,7 @@ Descriptors DescriptorContainer::descriptors(const nx::Uuid& serverId)
 void DescriptorContainer::updateDescriptors(const Descriptors& descriptors)
 {
     QnMediaServerResourcePtr ownServer = resourcePool()->getResourceById<QnMediaServerResource>(
-        m_context->peerId());
+        peerId());
 
     if (!NX_ASSERT(ownServer, "Unable to find own mediaserver"))
         return;

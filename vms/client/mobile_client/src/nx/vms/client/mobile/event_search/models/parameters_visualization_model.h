@@ -9,12 +9,12 @@
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/core/event_search/utils/common_object_search_setup.h>
-#include <nx/vms/client/core/system_context_aware.h>
+#include <nx/vms/client/mobile/window_context_aware.h>
 
 namespace nx::vms::client::mobile {
 
 class ParametersVisualizationModel: public ScopedModelOperations<QAbstractListModel>,
-    public core::SystemContextAware
+    public WindowContextAware
 {
     Q_OBJECT
     using base_type = ScopedModelOperations<QAbstractListModel>;

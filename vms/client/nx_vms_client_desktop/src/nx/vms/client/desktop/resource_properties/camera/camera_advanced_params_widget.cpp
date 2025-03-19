@@ -82,10 +82,12 @@ struct CameraAdvancedParamsWidget::Private
 };
 
 CameraAdvancedParamsWidget::CameraAdvancedParamsWidget(
+    SystemContext* context,
     CameraSettingsDialogStore* store,
     QWidget* parent)
     :
     base_type(parent),
+    SystemContextAware(context),
     d(new Private()),
     ui(new Ui::CameraAdvancedParamsWidget)
 {

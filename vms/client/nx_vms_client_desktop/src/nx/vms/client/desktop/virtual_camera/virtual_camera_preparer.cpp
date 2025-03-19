@@ -11,6 +11,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/server_request_storage.h>
 #include <recording/time_period_list.h>
 #include <utils/common/synctime.h>
@@ -48,10 +49,12 @@ QnTimePeriod shrinkPeriod(const QnTimePeriod& local, const QnTimePeriodList& rem
 } // namespace
 
 
-struct VirtualCameraPreparer::Private
+struct VirtualCameraPreparer::Private: public SystemContextAware
 {
     Private(const QnVirtualCameraResourcePtr& camera):
-        camera(camera)
+        SystemContextAware(SystemContext::fromResource(camera)),
+        camera(camera),
+        requests(systemContext())
     {
     }
 
@@ -80,7 +83,7 @@ void VirtualCameraPreparer::prepareUploads(const QStringList& filePaths, const Q
 {
     NX_ASSERT(d->upload.elements.isEmpty());
     NX_ASSERT(!filePaths.isEmpty());
-    if (!NX_ASSERT(connection()))
+    if (!NX_ASSERT(d->connection()))
         return;
 
     for (const QString& path : filePaths)
@@ -121,7 +124,7 @@ void VirtualCameraPreparer::prepareUploads(const QStringList& filePaths, const Q
             handlePrepareFinished(success, reply);
         });
 
-    d->requests.storeHandle(connectedServerApi()->prepareVirtualCameraUploads(
+    d->requests.storeHandle(d->connectedServerApi()->prepareVirtualCameraUploads(
         d->camera,
         request,
         callback,

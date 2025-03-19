@@ -5,6 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/system_context_accessor.h>
 
 namespace nx {
 namespace client {
@@ -48,19 +49,18 @@ void LayoutCamerasWatcher::setLayout(const QnLayoutResourcePtr& layout)
 
     for (const auto& item: layout->getItems())
     {
-        const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(item.resource.id);
-        if (camera)
+        const auto pool = layout->resourcePool();
+        if (const auto camera = pool->getResourceById<QnVirtualCameraResource>(item.resource.id))
             addCamera(camera);
     }
 
     connect(layout.get(), &QnLayoutResource::itemAdded, this,
-        [this](const QnLayoutResourcePtr&, const nx::vms::common::LayoutItemData& item)
+        [this](const QnLayoutResourcePtr& layout, const nx::vms::common::LayoutItemData& item)
         {
-            if (const auto camera =
-                resourcePool()->getResourceById<QnVirtualCameraResource>(item.resource.id))
-            {
+            const auto pool = vms::client::core::SystemContextAccessor(layout).resourcePool();
+            const auto resourceId = item.resource.id;
+            if (const auto camera = pool->getResourceById<QnVirtualCameraResource>(resourceId))
                 addCamera(camera);
-            }
         });
     connect(layout.get(), &QnLayoutResource::itemRemoved, this,
         [this](const QnLayoutResourcePtr&, const nx::vms::common::LayoutItemData& item)

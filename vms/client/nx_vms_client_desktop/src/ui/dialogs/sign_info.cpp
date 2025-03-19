@@ -6,7 +6,6 @@
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlEngine>
 
-#include <client_core/client_core_module.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/skin/color_theme.h>

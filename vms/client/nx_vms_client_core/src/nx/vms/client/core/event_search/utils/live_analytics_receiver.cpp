@@ -9,6 +9,7 @@
 #include <core/resource/camera_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/common/application_context.h>
 #include <utils/common/long_runable_cleanup.h>
 #include <utils/common/threadqueue.h>
@@ -66,7 +67,7 @@ void LiveAnalyticsReceiver::Private::setCamera(const QnVirtualCameraResourcePtr&
     m_reader.reset(new QnArchiveStreamReader(m_camera));
     m_reader->setArchiveDelegate(new QnRtspClientArchiveDelegate(
         m_reader.get(),
-        q->connectionCredentials(),
+        SystemContext::fromResource(m_camera)->connectionCredentials(),
         "AnalyticsPanel"));
     m_reader->setStreamDataFilter(vms::api::StreamDataFilter::objects);
     m_reader->addDataProcessor(this);

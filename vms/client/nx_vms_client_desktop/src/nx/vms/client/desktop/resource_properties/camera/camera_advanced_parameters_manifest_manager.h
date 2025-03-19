@@ -10,7 +10,6 @@
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 
 namespace nx::vms::client::desktop {
 

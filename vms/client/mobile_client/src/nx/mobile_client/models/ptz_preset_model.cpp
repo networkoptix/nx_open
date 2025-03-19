@@ -2,8 +2,9 @@
 
 #include "ptz_preset_model.h"
 
-#include <client_core/client_core_module.h>
 #include <core/ptz/abstract_ptz_controller.h>
+#include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/ptz/client_ptz_controller_pool.h>
 #include <nx/vms/client/core/ptz/helpers.h>
@@ -23,7 +24,7 @@ namespace mobile {
 
 struct PtzPresetModel::Private
 {
-    nx::Uuid uniqueResourceId;
+    QnVirtualCameraResourcePtr camera;
     QnPtzPresetList presets;
 };
 
@@ -31,13 +32,14 @@ PtzPresetModel::PtzPresetModel(QObject* parent):
     base_type(parent),
     d(new Private())
 {
-    connect(this, &PtzPresetModel::resourceIdChanged, this,
+    connect(this, &PtzPresetModel::resourceChanged, this,
         [this]()
         {
-            const auto resource = qnClientCoreModule->resourcePool()->getResourceById(
-                d->uniqueResourceId);
-            auto systemContext = nx::vms::client::core::SystemContext::fromResource(resource);
-            const auto controller = systemContext->ptzControllerPool()->controller(resource);
+            if (!d->camera)
+                return;
+
+            auto systemContext = nx::vms::client::core::SystemContext::fromResource(d->camera);
+            const auto controller = systemContext->ptzControllerPool()->controller(d->camera);
             if (!NX_ASSERT(controller))
                 return;
 
@@ -107,18 +109,22 @@ QHash<int, QByteArray> PtzPresetModel::roleNames() const
     return names;
 }
 
-nx::Uuid PtzPresetModel::resourceId() const
+QnResource* PtzPresetModel::rawResource() const
 {
-    return d->uniqueResourceId;
+    return d->camera.get();
 }
 
-void PtzPresetModel::setResourceId(const nx::Uuid& value)
+void PtzPresetModel::setRawResource(QnResource* value)
 {
-    if (d->uniqueResourceId == value)
+    const auto camera = value
+        ? value->toSharedPointer().dynamicCast<QnVirtualCameraResource>()
+        : QnVirtualCameraResourcePtr{};
+
+    if (camera == d->camera)
         return;
 
-    d->uniqueResourceId = value;
-    emit resourceIdChanged();
+    d->camera = camera;
+    emit resourceChanged();
 }
 
 } // namespace mobile

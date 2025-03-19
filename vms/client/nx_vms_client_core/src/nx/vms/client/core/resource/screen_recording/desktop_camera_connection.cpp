@@ -4,7 +4,6 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <client_core/client_core_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/tcp_connection_priv.h>

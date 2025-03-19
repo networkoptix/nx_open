@@ -90,6 +90,7 @@ Control
             Watermark
             {
                 anchors.fill: parent
+                resource: intervalPreview.resource
                 sourceSize: image.sourceSize
             }
 

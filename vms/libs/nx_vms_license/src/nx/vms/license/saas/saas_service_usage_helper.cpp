@@ -89,9 +89,9 @@ void IntegrationServiceUsageHelper::updateCacheUnsafe() const
     m_cache = std::map<QString, LicenseSummaryDataEx>();
 
     // Update integration info
-    const auto saasData = m_context->saasServiceManager()->data();
+    const auto saasData = saasServiceManager()->data();
 
-    for (const auto& [serviceId, integration]: m_context->saasServiceManager()->analyticsIntegrations())
+    for (const auto& [serviceId, integration]: saasServiceManager()->analyticsIntegrations())
     {
         auto& cacheData = (*m_cache)[integration.integrationId];
         cacheData.serviceId = serviceId;
@@ -201,7 +201,7 @@ std::map<nx::Uuid, std::set<QString>> IntegrationServiceUsageHelper::camerasBySe
 
     // Update integration info
     QMap<QString, nx::Uuid> serviceByIntegration;
-    for (const auto& [serviceId, integration]: m_context->saasServiceManager()->analyticsIntegrations())
+    for (const auto& [serviceId, integration]: saasServiceManager()->analyticsIntegrations())
         serviceByIntegration[integration.integrationId] = serviceId;
 
     for (const auto& camera: getAllCameras())
@@ -281,7 +281,7 @@ int CloudStorageServiceUsageHelper::licenseDeficit() const
 void CloudStorageServiceUsageHelper::calculateAvailableUnsafe() const
 {
     auto& cache = *m_cache;
-    const auto saasData = m_context->saasServiceManager()->data();
+    const auto saasData = saasServiceManager()->data();
     auto cloudStorageData = systemContext()->saasServiceManager()->cloudStorageData();
     for (const auto& [id, parameters]: cloudStorageData)
     {
@@ -476,7 +476,7 @@ std::map<QString, nx::Uuid> CloudStorageServiceUsageHelper::servicesByCameras() 
 
     std::map<QString, nx::Uuid> result;
     using Data = std::pair<nx::Uuid, int>; //< ServiceId and channels.
-    const auto saasData = m_context->saasServiceManager()->data();
+    const auto saasData = saasServiceManager()->data();
     std::multimap<int, Data> availableChannels;
     if (saasData.state == SaasState::active)
     {
@@ -540,7 +540,7 @@ std::map<nx::Uuid, std::set<QString>> LocalRecordingUsageHelper::cameraGroupsByS
     // Update integration info
     std::map<nx::Uuid, int> channelsByService; // key - serviceId, value - channel count.
     nx::Uuid defaultServiceId;
-    for (const auto& [serviceId, params]: m_context->saasServiceManager()->localRecording())
+    for (const auto& [serviceId, params]: saasServiceManager()->localRecording())
     {
         channelsByService[serviceId] = params.totalChannelNumber;
         if (defaultServiceId.isNull() && params.totalChannelNumber > 0)

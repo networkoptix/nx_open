@@ -3,7 +3,6 @@
 #include "cloud_url_validator.h"
 
 #include <api/network_proxy_factory.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>

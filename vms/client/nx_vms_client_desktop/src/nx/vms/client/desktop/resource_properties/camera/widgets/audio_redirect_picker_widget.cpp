@@ -5,13 +5,14 @@
 
 #include <QtWidgets/QMenu>
 
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
@@ -101,11 +102,11 @@ void AudioRedirectPickerWidget::loadState(const CameraSettingsDialogState& state
     m_deviceId = state.singleCameraId();
     m_audioRedirectDeviceId = getRedirectDeviceId(state);
 
-    const auto resourcePool = qnClientCoreModule->resourcePool();
+    const auto pool = resourcePool();
 
-    const auto device = resourcePool->getResourceById<QnVirtualCameraResource>(m_deviceId);
+    const auto device = pool->getResourceById<QnVirtualCameraResource>(m_deviceId);
     const auto redirectDevice =
-        resourcePool->getResourceById<QnVirtualCameraResource>(m_audioRedirectDeviceId);
+        pool->getResourceById<QnVirtualCameraResource>(m_audioRedirectDeviceId);
 
     ui->redirectOptionDropdownWidget->setVisible(capabilityCheck(device));
     ui->redirectOptionLabel->setVisible(!capabilityCheck(device));
@@ -154,7 +155,7 @@ void AudioRedirectPickerWidget::showEvent(QShowEvent* event)
 
 QnResourcePool* AudioRedirectPickerWidget::resourcePool() const
 {
-    return qnClientCoreModule->resourcePool();
+    return appContext()->currentSystemContext()->resourcePool();
 }
 
 void AudioRedirectPickerWidget::selectAudioRedirectDevice()

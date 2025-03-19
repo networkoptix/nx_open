@@ -18,7 +18,6 @@
 #include <analytics/db/analytics_db_types.h>
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>

@@ -2,10 +2,11 @@
 
 #include "mobile_client_message_processor.h"
 
-#include <client_core/client_core_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/mobile_client_resource_factory.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 
 void QnMobileClientMessageProcessor::updateResource(
@@ -14,7 +15,8 @@ void QnMobileClientMessageProcessor::updateResource(
 {
     base_type::updateResource(resource, source);
 
-    if (resource->getId() == qnClientCoreModule->networkModule()->currentServerId())
+    const auto context = systemContext()->as<nx::vms::client::core::SystemContext>();
+    if (context && resource->getId() == context->currentServerId())
         updateMainServerApiUrl(resource.dynamicCast<QnMediaServerResource>());
 }
 

@@ -59,7 +59,7 @@ QnLicenseList remoteLicenses(
 bool hasUniqueLicenses(QnLicensePool* localLicensesPool)
 {
     const auto localLicenses = ListHelper(localLicensesPool->getLicenses());
-    Validator validator(localLicensesPool->context());
+    Validator validator(localLicensesPool->systemContext());
 
     for (const auto& [licenseType, errorCode]: kUniqueLicenseTypes)
     {
@@ -75,7 +75,7 @@ MergeSystemsStatus remoteLicensesConflict(
 {
     const auto localLicenses = ListHelper(localLicensesPool->getLicenses());
     const auto remoteLicenses = ListHelper(remoteLicenseList);
-    Validator validator(localLicensesPool->context());
+    Validator validator(localLicensesPool->systemContext());
 
     for (const auto& [licenseType, errorCode]: kUniqueLicenseTypes)
     {
@@ -98,7 +98,7 @@ MergeSystemsStatus remoteLicensesConflict(
 {
     const auto localLicenses = ListHelper(localLicensesPool->getLicenses());
     std::optional<ListHelper> remoteLicensesList;
-    Validator validator(localLicensesPool->context());
+    Validator validator(localLicensesPool->systemContext());
     for (const auto& [licenseType, errorCode]: kUniqueLicenseTypes)
     {
         const bool localSystemHasLicenses =

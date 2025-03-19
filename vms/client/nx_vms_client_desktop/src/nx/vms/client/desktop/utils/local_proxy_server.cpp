@@ -12,7 +12,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/utils/url.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
@@ -32,8 +32,7 @@ using namespace nx::network::http;
  */
 class VmsServerConnector:
     public nx::network::socks5::AbstractTunnelConnector,
-    public SystemContextAware,
-    public core::RemoteConnectionAware
+    public SystemContextAware
 {
     using base_type = nx::network::socks5::AbstractTunnelConnector;
 
@@ -93,7 +92,7 @@ bool VmsServerConnector::auth(const std::string& user, const std::string& passwo
     }
     else if (resource.dynamicCast<nx::vms::common::AnalyticsEngineResource>())
     {
-        m_exitNodeId = serverId();
+        m_exitNodeId = connection()->moduleInformation().id;
         m_resourceId = resourceId;
     }
 
@@ -113,7 +112,7 @@ void VmsServerConnector::connectTo(const SocketAddress& address, DoneCallback on
     const auto url = url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
         .setPath(nx::format("/proxy/socks5/%1:%2", address.address.toString(), address.port))
-        .setEndpoint(connectionAddress())
+        .setEndpoint(connection()->address())
         .toUrl();
 
     // Set credentials from current server connection.

@@ -6,7 +6,6 @@
 #include <QtWidgets/QButtonGroup>
 
 #include <api/server_rest_connection.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
@@ -14,6 +13,7 @@
 #include <network/system_helpers.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
@@ -62,7 +62,7 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
     m_delegate(std::move(delegate)),
     m_mergeTool(new MergeSystemsTool(
         this,
-        qnClientCoreModule->networkModule()->certificateVerifier(),
+        certificateVerifier<core::CertificateVerifier>(),
         m_delegate.get(),
         appContext()->coreSettings()->locale().toStdString()))
 {

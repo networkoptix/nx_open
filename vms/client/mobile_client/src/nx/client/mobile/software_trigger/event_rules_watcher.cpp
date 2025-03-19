@@ -3,7 +3,7 @@
 #include "event_rules_watcher.h"
 
 #include <managers/event_rules_manager.h>
-#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -14,8 +14,11 @@ namespace mobile {
 
 using namespace nx::vms::event;
 
-EventRulesWatcher::EventRulesWatcher(QObject* parent):
-    base_type(parent)
+EventRulesWatcher::EventRulesWatcher(nx::vms::client::mobile::SystemContext* context,
+    QObject* parent)
+    :
+    base_type(parent),
+    SystemContextAware(context)
 {
     const auto rulesManager = systemContext()->eventRuleManager();
 

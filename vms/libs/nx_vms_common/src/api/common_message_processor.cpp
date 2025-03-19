@@ -497,19 +497,19 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(
         showreelNotificationManager,
         &ec2::AbstractShowreelNotificationManager::removed,
-        m_context->showreelManager(),
+        showreelManager(),
         &ShowreelManager::removeShowreel,
         connectionType);
 
     const auto lookupListNotificationManager = connection->lookupListNotificationManager().get();
     connect(lookupListNotificationManager,
         &ec2::AbstractLookupListNotificationManager::addedOrUpdated,
-        m_context->lookupListManager(),
+        lookupListManager(),
         &LookupListManager::addOrUpdate,
         connectionType);
     connect(lookupListNotificationManager,
         &ec2::AbstractLookupListNotificationManager::removed,
-        m_context->lookupListManager(),
+        lookupListManager(),
         &LookupListManager::remove,
         connectionType);
 
@@ -570,19 +570,18 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(
     auto server = resourcePool()->getResourceById<QnMediaServerResource>(data.id);
     if (!server)
     {
+        const auto dictionary = serverAdditionalAddressesDictionary();
         if (!data.ignore)
         {
-            QList<nx::utils::Url> urls =
-                m_context->serverAdditionalAddressesDictionary()->additionalUrls(data.id);
+            QList<nx::utils::Url> urls = dictionary->additionalUrls(data.id);
             urls.append(url);
-            m_context->serverAdditionalAddressesDictionary()->setAdditionalUrls(data.id, urls);
+            dictionary->setAdditionalUrls(data.id, urls);
         }
         else
         {
-            QList<nx::utils::Url> urls =
-                m_context->serverAdditionalAddressesDictionary()->ignoredUrls(data.id);
+            QList<nx::utils::Url> urls = dictionary->ignoredUrls(data.id);
             urls.append(url);
-            m_context->serverAdditionalAddressesDictionary()->setIgnoredUrls(data.id, urls);
+            dictionary->setIgnoredUrls(data.id, urls);
         }
         return;
     }
@@ -634,7 +633,7 @@ void QnCommonMessageProcessor::on_resourceStatusChanged(
     if (resource)
         onResourceStatusChanged(resource, localStatus, source);
     else
-        m_context->resourceStatusDictionary()->setValue(resourceId, localStatus);
+        resourceStatusDictionary()->setValue(resourceId, localStatus);
 }
 
 void QnCommonMessageProcessor::on_resourceParamChanged(
@@ -661,7 +660,7 @@ void QnCommonMessageProcessor::on_resourceParamChanged(
     if (param.name == Qn::kResourceDataParamName)
     {
         const bool loaded = param.value.isEmpty()
-            || m_context->resourceDataPool()->loadData(param.value.toUtf8());
+            || systemContext()->resourceDataPool()->loadData(param.value.toUtf8());
         NX_ASSERT(loaded, "Invalid json received");
     }
 }
@@ -695,7 +694,7 @@ void QnCommonMessageProcessor::on_resourceRemoved(
     {
         if (QnResourcePtr ownResource = resourcePool()->getResourceById(resourceId))
             resourcePool()->removeResource(ownResource);
-        m_context->resourceStatusDictionary()->remove(resourceId);
+        resourceStatusDictionary()->remove(resourceId);
     }
     else
         removeResourceIgnored(resourceId);
@@ -730,14 +729,14 @@ void QnCommonMessageProcessor::on_accessRightsChanged(
     std::map<nx::Uuid, AccessRights> resourceAccessRights;
     std::optional<UserGroupData> group;
     auto user =
-        m_context->resourcePool()->getResourceById<QnUserResource>(accessRightsDeprecated.userId);
+        resourcePool()->getResourceById<QnUserResource>(accessRightsDeprecated.userId);
     if (user)
     {
         resourceAccessRights = user->ownResourceAccessRights();
     }
     else
     {
-        group = m_context->userGroupManager()->find(accessRightsDeprecated.userId);
+        group = userGroupManager()->find(accessRightsDeprecated.userId);
         if (!group)
         {
             NX_DEBUG(this, "No user or group %1 found", accessRightsDeprecated.userId);
@@ -775,14 +774,14 @@ void QnCommonMessageProcessor::on_accessRightsChanged(
 
 void QnCommonMessageProcessor::on_userGroupChanged(const UserGroupData& userGroup)
 {
-    m_context->userGroupManager()->addOrUpdate(userGroup);
-    m_context->accessRightsManager()->setOwnResourceAccessMap(userGroup.id,
+    userGroupManager()->addOrUpdate(userGroup);
+    accessRightsManager()->setOwnResourceAccessMap(userGroup.id,
         {userGroup.resourceAccessRights.begin(), userGroup.resourceAccessRights.end()});
 }
 
 void QnCommonMessageProcessor::on_userGroupRemoved(const nx::Uuid& userGroupId)
 {
-    m_context->userGroupManager()->remove(userGroupId);
+    userGroupManager()->remove(userGroupId);
 
     for (const auto& user: resourcePool()->getResources<QnUserResource>())
     {
@@ -849,35 +848,35 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const nx::Uui
 void QnCommonMessageProcessor::on_cameraHistoryChanged(
     const ServerFootageData& serverFootageData)
 {
-    m_context->cameraHistoryPool()->setServerFootageData(serverFootageData);
+    cameraHistoryPool()->setServerFootageData(serverFootageData);
 }
 
 void QnCommonMessageProcessor::updateLicense(const QnLicensePtr& license)
 {
-    m_context->licensePool()->addLicense(license);
+    systemContext()->licensePool()->addLicense(license);
 }
 
 void QnCommonMessageProcessor::on_licenseRemoved(const QnLicensePtr& license)
 {
-    m_context->licensePool()->removeLicense(license);
+    licensePool()->removeLicense(license);
 }
 
 void QnCommonMessageProcessor::on_eventRuleAddedOrUpdated(const nx::vms::api::EventRuleData& data)
 {
     nx::vms::event::RulePtr eventRule(new nx::vms::event::Rule());
     ec2::fromApiToResource(data, eventRule);
-    m_context->eventRuleManager()->addOrUpdateRule(eventRule);
+    eventRuleManager()->addOrUpdateRule(eventRule);
 }
 
 void QnCommonMessageProcessor::on_businessEventRemoved(const nx::Uuid& id)
 {
-    m_context->eventRuleManager()->removeRule(id);
+    eventRuleManager()->removeRule(id);
 }
 
 void QnCommonMessageProcessor::handleTourAddedOrUpdated(
     const nx::vms::api::ShowreelData& showreel)
 {
-    m_context->showreelManager()->addOrUpdateShowreel(showreel);
+    showreelManager()->addOrUpdateShowreel(showreel);
 }
 
 void QnCommonMessageProcessor::resetResourceTypes(const ResourceTypeDataList& resTypes)
@@ -927,36 +926,36 @@ void QnCommonMessageProcessor::resetResources(const FullInfoData& fullData)
 
 void QnCommonMessageProcessor::resetLicenses(const LicenseDataList& licenses)
 {
-    m_context->licensePool()->replaceLicenses(licenses);
-    m_context->saasServiceManager()->updateLocalRecordingLicenseV1();
+    licensePool()->replaceLicenses(licenses);
+    saasServiceManager()->updateLocalRecordingLicenseV1();
 }
 
 void QnCommonMessageProcessor::resetCamerasWithArchiveList(
     const ServerFootageDataList& cameraHistoryList)
 {
-    m_context->cameraHistoryPool()->resetServerFootageData(cameraHistoryList);
+    cameraHistoryPool()->resetServerFootageData(cameraHistoryList);
 }
 
 void QnCommonMessageProcessor::resetEventRules(const nx::vms::api::EventRuleDataList& eventRules)
 {
     vms::event::RuleList ruleList;
     ec2::fromApiToResourceList(eventRules, ruleList);
-    m_context->eventRuleManager()->resetRules(ruleList);
+    eventRuleManager()->resetRules(ruleList);
 }
 
 void QnCommonMessageProcessor::resetVmsRules(const nx::vms::api::rules::RuleList& vmsRules)
 {
-    emit vmsRulesReset(m_context->peerId(), vmsRules);
+    emit vmsRulesReset(peerId(), vmsRules);
 }
 
 void QnCommonMessageProcessor::resetUserGroups(const UserGroupDataList& userGroups)
 {
-    m_context->userGroupManager()->resetAll(userGroups);
+    userGroupManager()->resetAll(userGroups);
 
     // Ensure group permissions cached
     for (const auto& group: userGroups)
     {
-        m_context->accessRightsManager()->setOwnResourceAccessMap(
+        accessRightsManager()->setOwnResourceAccessMap(
             group.id, {group.resourceAccessRights.begin(), group.resourceAccessRights.end()});
     }
 }
@@ -1046,8 +1045,9 @@ void QnCommonMessageProcessor::resetPropertyList(const ResourceParamWithRefDataL
 
 void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& params)
 {
-    auto keys = m_context->resourceStatusDictionary()->values().keys();
-    m_context->resourceStatusDictionary()->clear();
+    const auto dictionary = resourceStatusDictionary();
+    auto keys = dictionary->values().keys();
+    dictionary->clear();
     for(const nx::Uuid& id: keys)
     {
         if (QnResourcePtr resource = resourcePool()->getResourceById(id))
@@ -1083,9 +1083,9 @@ void QnCommonMessageProcessor::on_initNotification(const FullInfoData& fullData)
 
 void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& fullData)
 {
-    m_context->resourceAccessManager()->beginUpdate();
+    resourceAccessManager()->beginUpdate();
 
-    m_context->serverAdditionalAddressesDictionary()->clear();
+    serverAdditionalAddressesDictionary()->clear();
 
     resetResourceTypes(fullData.resourceTypes);
     resetServerUserAttributesList(fullData.serversUserAttributesList);
@@ -1101,9 +1101,9 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
     resetEventRules(fullData.rules);
     resetVmsRules(fullData.vmsRules);
 
-    m_context->showreelManager()->resetShowreels(fullData.showreels);
+    showreelManager()->resetShowreels(fullData.showreels);
 
-    m_context->resourceAccessManager()->endUpdate();
+    resourceAccessManager()->endUpdate();
 }
 
 void QnCommonMessageProcessor::updateResource(

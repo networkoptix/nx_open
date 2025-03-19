@@ -6,6 +6,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/network/abstract_certificate_verifier.h>
 
 using namespace nx::vms::common;
 

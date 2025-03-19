@@ -7,8 +7,10 @@
 #include <QtCore/QStandardPaths>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/system_context.h>
 
@@ -43,9 +45,9 @@ struct NetworkModule::Private
 
 NetworkModule::NetworkModule(
     SystemContext* systemContext,
-    nx::vms::api::PeerType peerType,
-    Qn::SerializationFormat serializationFormat)
+    QObject* parent)
     :
+    base_type(parent),
     SystemContextAware(systemContext),
     d(new Private)
 {
@@ -83,8 +85,8 @@ NetworkModule::NetworkModule(
         std::move(cloudCredentialsProvider),
         std::move(requestsManager),
         d->certificateVerifier.get(),
-        peerType,
-        serializationFormat);
+        appContext()->localPeerType(),
+        appContext()->serializationFormat());
 
     d->serverCertificateWatcher = std::make_unique<ServerCertificateWatcher>(
         systemContext,
@@ -99,11 +101,6 @@ NetworkModule::~NetworkModule()
     // Stop running session before network module is completely destroyed.
     NX_MUTEX_LOCKER lock(&d->mutex);
     d->session.reset();
-}
-
-CertificateVerifier* NetworkModule::certificateVerifier() const
-{
-    return d->certificateVerifier.get();
 }
 
 std::shared_ptr<RemoteSession> NetworkModule::session() const

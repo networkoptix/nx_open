@@ -12,6 +12,7 @@
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/vms/client/core/system_logon/remote_connection_user_interaction_delegate.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
@@ -69,12 +70,12 @@ void IncompatibleServersActionHandler::connectToCurrentSystem(const nx::Uuid& se
     if (!NX_ASSERT(!serverId.isNull()) || !NX_ASSERT(!m_connectTool))
         return;
 
-    const auto otherServersManager = context()->systemContext()->otherServersManager();
+    const auto otherServersManager = context()->system()->otherServersManager();
     const auto moduleInformation =
         otherServersManager->getModuleInformationWithAddresses(serverId);
 
     auto delegate = createConnectionUserInteractionDelegate(
-        [this]() { return mainWindowWidget(); });
+        systemContext(), [this]() { return mainWindowWidget(); });
     m_connectTool = new ConnectToCurrentSystemTool(this, std::move(delegate));
 
     auto progressDialog = new ProgressDialog(mainWindowWidget());
@@ -125,7 +126,7 @@ void IncompatibleServersActionHandler::at_mergeSystemsAction_triggered()
             QnCertificateStatisticsModule::Scenario::mergeFromDialog);
 
     auto delegate = createConnectionUserInteractionDelegate(
-        [this]() { return mainWindowWidget(); });
+        systemContext(), [this]() { return mainWindowWidget(); });
     m_mergeDialog = new MergeSystemsDialog(mainWindowWidget(), std::move(delegate));
 
     connect(m_mergeDialog.data(), &QDialog::finished, this,

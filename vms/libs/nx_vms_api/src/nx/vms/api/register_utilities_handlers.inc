@@ -145,7 +145,7 @@ void registerUtilitiesHandlers(
         /*protocol*/ "*",
         /*path*/ "proxy",
         /*ProxyConnectionProcessor/reverseConnectionManager*/ serverConnector,
-        serverModule->certificateVerifier(),
+        serverModule->systemContext()->certificateVerifier(),
         [authenticator = mediaServerProcess->universalTcpListener()->authenticator()](
             auto&&... args)
         {

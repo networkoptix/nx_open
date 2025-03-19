@@ -8,7 +8,6 @@
 #include <camera/resource_display.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
-#include <client_core/client_core_module.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/resource/camera_bookmark.h>
@@ -1700,7 +1699,7 @@ ActionVisibility ReachableServerCondition::check(
     if (!server)
         return InvisibleAction;
 
-    const auto currentSession = qnClientCoreModule->networkModule()->session();
+    const auto currentSession = appContext()->currentSystemContext()->networkModule()->session();
 
     if (!currentSession || server->getId() == currentSession->connection()->moduleInformation().id)
         return InvisibleAction;
@@ -1714,7 +1713,7 @@ ActionVisibility ReachableServerCondition::check(
 ActionVisibility HideServersInTreeCondition::check(
     const Parameters& parameters, WindowContext* context)
 {
-    const bool isLoggedIn = !context->workbenchContext()->accessController()->user().isNull();
+    const bool isLoggedIn = !context->system()->accessController()->user().isNull();
     if (!isLoggedIn)
         return InvisibleAction;
 
@@ -1743,7 +1742,7 @@ ActionVisibility ToggleProxiedResourcesCondition::check(
     const Parameters& parameters,
     WindowContext* context)
 {
-    const bool isLoggedIn = !context->workbenchContext()->accessController()->user().isNull();
+    const bool isLoggedIn = !context->system()->accessController()->user().isNull();
     if (!isLoggedIn)
         return InvisibleAction;
 
@@ -1982,7 +1981,7 @@ ConditionWrapper hasGlobalPermission(GlobalPermission permission)
     return new CustomBoolCondition(
         [permission](const Parameters& /*parameters*/, WindowContext* context)
         {
-            return context->workbenchContext()->accessController()->hasGlobalPermissions(permission);
+            return context->system()->accessController()->hasGlobalPermissions(permission);
         });
 }
 
@@ -2253,7 +2252,7 @@ ConditionWrapper isDeviceAccessRelevant(nx::vms::api::AccessRights requiredAcces
     return new CustomBoolCondition(
         [requiredAccessRights](const Parameters& /*parameters*/, WindowContext* context)
         {
-            return context->workbenchContext()->accessController()->isDeviceAccessRelevant(
+            return context->system()->accessController()->isDeviceAccessRelevant(
                 requiredAccessRights);
         });
 }
@@ -2368,8 +2367,8 @@ ConditionWrapper allowedToShowServersInResourceTree()
     return new CustomBoolCondition(
         [](const Parameters&, WindowContext* context)
         {
-            return context->workbenchContext()->accessController()->hasPowerUserPermissions()
-                || context->workbenchContext()->systemSettings()->showServersInTreeForNonAdmins();
+            return context->system()->accessController()->hasPowerUserPermissions()
+                || context->system()->globalSettings()->showServersInTreeForNonAdmins();
         });
 }
 
@@ -2558,11 +2557,11 @@ ConditionWrapper screenRecordingSupported()
                     return InvisibleAction;
 
                 const auto desktopCameraId = core::DesktopResource::calculateUniqueId(
-                    context->workbenchContext()->peerId(), user->getId());
+                    context->system()->peerId(), user->getId());
 
                 /* Do not check real pointer type to speed up check. */
                 const auto desktopCamera =
-                    context->workbenchContext()->resourcePool()->getCameraByPhysicalId(desktopCameraId);
+                    context->system()->resourcePool()->getCameraByPhysicalId(desktopCameraId);
                 if (desktopCamera && desktopCamera->hasFlags(Qn::desktop_camera))
                     return EnabledAction;
 

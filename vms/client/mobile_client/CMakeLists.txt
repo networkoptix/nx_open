@@ -106,7 +106,6 @@ if(IOS)
     set(ios_sources
         src/ui/window_utils_ios.mm
         src/utils/app_delegate.mm
-        src/nx/vms/client/mobile/controllers/web_view_controller_ios.mm
         src/nx/vms/client/mobile/push_notification/details/ios/push_platform_helpers.mm
         src/nx/vms/client/mobile/push_notification/details/ios/push_permission_manager.mm
         src/nx/vms/client/mobile/push_notification/details/ios/token_data_provider.mm

@@ -24,7 +24,6 @@
     #include <QtGui/private/qvulkandefaultinstance_p.h>
 #endif
 
-#include <client_core/client_core_module.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/qt_helpers.h>

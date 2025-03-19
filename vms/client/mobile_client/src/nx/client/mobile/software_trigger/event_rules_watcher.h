@@ -4,7 +4,7 @@
 
 #include <QtCore/QObject>
 
-#include <nx/vms/client/mobile/current_system_context_aware.h>
+#include <nx/vms/client/mobile/system_context_aware.h>
 #include <nx/vms/event/event_fwd.h>
 
 namespace nx {
@@ -14,13 +14,13 @@ namespace mobile {
 // Tries to manually gather event rules for mobile client from old servers
 class EventRulesWatcher:
     public QObject,
-    public nx::vms::client::mobile::CurrentSystemContextAware
+    public nx::vms::client::mobile::SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    EventRulesWatcher(QObject* parent = nullptr);
+    EventRulesWatcher(nx::vms::client::mobile::SystemContext* context, QObject* parent = nullptr);
 
     void handleConnectionChanged();
 

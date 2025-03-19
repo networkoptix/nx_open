@@ -11,7 +11,6 @@
 
 #include <camera/fps_calculator.h>
 #include <client/client_module.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/client_camera.h>
@@ -28,8 +27,9 @@
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/rtp_types.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/core/analytics/analytics_settings_manager.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/utils/camera_hotspots_support.h>
 #include <utils/camera/camera_bitrate_calculator.h>
@@ -439,7 +439,7 @@ State updateDuplicateLogicalIdInfo(State state)
 
     if (currentLogicalId > 0)
     {
-        const auto duplicateCameras = qnClientCoreModule->resourcePool()->
+        const auto duplicateCameras = appContext()->currentSystemContext()->resourcePool()->
             getAllCameras().filtered(isSameLogicalId);
 
         for (const auto& camera: duplicateCameras)
@@ -1069,7 +1069,7 @@ State CameraSettingsDialogStateReducer::setSingleVirtualCameraState(
 
     if (state.singleVirtualCameraState.status == VirtualCameraState::LockedByOtherClient)
     {
-        if (const auto user = qnClientCoreModule->resourcePool()->getResourceById(
+        if (const auto user = appContext()->currentSystemContext()->resourcePool()->getResourceById(
             state.singleVirtualCameraState.lockUserId))
         {
             state.virtualCameraUploaderName = user->getName();
@@ -2671,7 +2671,7 @@ State CameraSettingsDialogStateReducer::generateLogicalId(State state)
     if (!state.isSingleCamera())
         return state;
 
-    auto cameras = qnClientCoreModule->resourcePool()->getAllCameras();
+    auto cameras = appContext()->currentSystemContext()->resourcePool()->getAllCameras();
     std::set<int> usedValues;
 
     for (const auto& camera: cameras)

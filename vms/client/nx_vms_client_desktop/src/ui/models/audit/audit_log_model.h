@@ -78,7 +78,8 @@ public:
 
     static bool hasDetail(const QnLegacyAuditRecord* record);
     static void setDetail(QnLegacyAuditRecord* record, bool showDetail);
-    static QString eventTypeToString(Qn::LegacyAuditRecordType recordType);
+    static QString eventTypeToString(QnResourcePool* pool,
+        Qn::LegacyAuditRecordType recordType);
 
     static QnVirtualCameraResourceList getCameras(const QnLegacyAuditRecord* record);
 
@@ -91,7 +92,7 @@ protected:
 private:
     class DataIndex;
 
-    static QString getResourceNameById(const nx::Uuid& id);
+    QString getResourceNameById(const nx::Uuid& id) const;
     QString htmlData(const Column& column,const QnLegacyAuditRecord* data, int row, bool hovered) const;
     QString formatDateTime(int timestampSecs, bool showDate = true, bool showTime = true) const;
     static QString formatDateTime(const QDateTime& dateTime, bool showDate = true, bool showTime = true);
@@ -100,7 +101,7 @@ private:
     QVariant colorForType(Qn::LegacyAuditRecordType actionType) const;
     QString textData(const Column& column,const QnLegacyAuditRecord* action) const;
     bool skipDate(const QnLegacyAuditRecord *record, int row) const;
-    static QString getResourcesString(const std::vector<nx::Uuid>& resources);
+    QString getResourcesString(const std::vector<nx::Uuid>& resources) const;
     static QnVirtualCameraResourceList getCameras(const std::vector<nx::Uuid>& resources);
     bool matches(const Column& column, const QnLegacyAuditRecord* data, const QString& keyword) const;
     QString descriptionTooltip(const QnLegacyAuditRecord *record) const;

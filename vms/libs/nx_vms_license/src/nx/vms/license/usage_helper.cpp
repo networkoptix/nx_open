@@ -262,7 +262,7 @@ void UsageHelper::updateCache() const
     m_invalidateTimer.restart();
     m_cache.reset();
 
-    m_cache.licenses.update(m_context->licensePool()->getLicenses());
+    m_cache.licenses.update(licensePool()->getLicenses());
 
     /* How many licenses of each type are borrowed. */
     LicensesArray borrowedLicenses;

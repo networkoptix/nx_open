@@ -32,7 +32,7 @@ Page
                 "iconSource": "image://skin/24x24/Outline/disconnect.svg",
                 "text": sessionManager.systemName,
                 "initialize": (item) => item.customAreaComponent = disconnectButtonCustomArea,
-                "action": () => sessionManager.stopSession()
+                "action": () => sessionManager.stopSessionByUser()
             },
             {
                 "iconSource": "image://skin/24x24/Outline/settings.svg",

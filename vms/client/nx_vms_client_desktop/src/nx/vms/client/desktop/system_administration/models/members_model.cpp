@@ -6,13 +6,13 @@
 #include <QtQml/QtQml>
 
 #include <client/client_globals.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/subject_hierarchy.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/types/access_rights_types.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/system_administration/models/user_list_model.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
@@ -54,7 +54,7 @@ MembersModel::MembersModel(SystemContext* systemContext):
 }
 
 MembersModel::MembersModel():
-    SystemContextAware(SystemContext::fromQmlContext(this))
+    SystemContextAware(appContext()->currentSystemContext())
 {
 }
 

@@ -42,14 +42,12 @@ using namespace nx::vms::client::desktop;
 
 QnWorkbenchContext::QnWorkbenchContext(
     WindowContext* windowContext,
-    SystemContext* systemContext,
     QObject* parent)
     :
     QObject(parent),
-    WindowContextAware(windowContext),
-    SystemContextAware(systemContext)
+    WindowContextAware(windowContext)
 {
-    m_userWatcher = systemContext->userWatcher();
+    m_userWatcher = system()->userWatcher();
 
     connect(m_userWatcher, &nx::vms::client::core::UserWatcher::userChanged, this,
         [this](const QnUserResourcePtr& user)
@@ -78,11 +76,11 @@ void QnWorkbenchContext::initialize()
     const auto durationStatModule = instance<QnDurationStatisticsModule>();
     statisticsManager->registerStatisticsModule(lit("durations"), durationStatModule);
 
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionClosed,
+    connect(system()->messageProcessor(), &QnClientMessageProcessor::connectionClosed,
         statisticsManager, &QnStatisticsManager::resetStatistics);
 
     instance<QnGLCheckerInstrument>();
-    store(new ServerUpdateTool(systemContext()));
+    store(new ServerUpdateTool(system()));
     store(new WorkbenchUpdateWatcher(windowContext()));
     instance<ClientUpdateManager>();
     m_resourceTreeSettings.reset(new ResourceTreeSettings());
@@ -123,7 +121,7 @@ QWidget* QnWorkbenchContext::mainWindowWidget() const
 void QnWorkbenchContext::setMainWindow(MainWindow* mainWindow)
 {
     m_mainWindow = mainWindow;
-    systemContext()->restApiHelper()->setParent(mainWindow);
+    system()->restApiHelper()->setParent(mainWindow);
 }
 
 ResourceTreeSettings* QnWorkbenchContext::resourceTreeSettings() const
@@ -133,12 +131,14 @@ ResourceTreeSettings* QnWorkbenchContext::resourceTreeSettings() const
 
 nx::core::Watermark QnWorkbenchContext::watermark() const
 {
-    if (systemSettings()->watermarkSettings().useWatermark
-        && user()
-        && !accessController()->hasPowerUserPermissions()
-        && !user()->getName().isEmpty())
+    const auto& watermarkSettings = system()->globalSettings()->watermarkSettings();
+    const auto& user = system()->user();
+    if (watermarkSettings.useWatermark
+        && user
+        && !system()->accessController()->hasPowerUserPermissions()
+        && !user->getName().isEmpty())
     {
-        return {systemSettings()->watermarkSettings(), user()->getName()};
+        return {watermarkSettings, user->getName()};
     }
     return {};
 }

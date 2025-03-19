@@ -122,7 +122,8 @@ struct CameraSettingsDialog::Private: public QObject
             appContext()->currentSystemContext()->serverRuntimeEventConnector(),
             store));
 
-        advancedSettingsWidget = new CameraAdvancedParamsWidget(store, q->ui->tabWidget);
+        advancedSettingsWidget = new CameraAdvancedParamsWidget(
+            q->systemContext(), store, q->ui->tabWidget);
     }
 
     bool hasChanges() const
@@ -325,7 +326,7 @@ CameraSettingsDialog::CameraSettingsDialog(SystemContext* systemContext, QWidget
 
     d->fisheyePreviewController = new FisheyePreviewController(this);
 
-    new CameraSettingsGlobalSettingsWatcher(d->store, this);
+    new CameraSettingsGlobalSettingsWatcher(d->store, systemContext, this);
     new CameraSettingsGlobalPermissionsWatcher(d->store, this);
     new CameraSettingsSaasStateWatcher(d->store, systemContext, this);
     new CameraSettingsEngineLicenseWatcher(d->store, systemContext, this);

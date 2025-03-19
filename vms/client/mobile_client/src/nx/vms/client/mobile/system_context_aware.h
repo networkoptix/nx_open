@@ -4,10 +4,14 @@
 
 #include <nx/vms/client/core/system_context_aware.h>
 
+class QnAvailableCamerasWatcher;
+class QnCameraThumbnailCache;
+class QnResourceDiscoveryManager;
+
 namespace nx::vms::client::mobile {
 
-class SessionManager;
 class SystemContext;
+class WindowContext;
 
 class SystemContextAware: public core::SystemContextAware
 {
@@ -18,7 +22,13 @@ public:
 
     SystemContext* systemContext() const;
 
-    SessionManager* sessionManager() const;
+    WindowContext* windowContext() const;
+
+    QnAvailableCamerasWatcher* availableCamerasWatcher() const;
+
+    QnResourceDiscoveryManager* resourceDiscoveryManager() const;
+
+    QnCameraThumbnailCache* cameraThumbnailCache() const;
 };
 
 } // namespace nx::vms::client::mobile

@@ -168,12 +168,6 @@ public:
     nx::Uuid videoWallInstanceId() const;
 
     /**
-     * Temporary accessor until QnClientCoreModule contents is moved to the corresponding
-     * contexts.
-     */
-    QnClientCoreModule* clientCoreModule() const;
-
-    /**
      * Central place for the initialization, storage and access to various statistics modules.
      */
     ContextStatisticsModule* statisticsModule() const;

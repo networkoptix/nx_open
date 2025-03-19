@@ -116,7 +116,7 @@ void SystemContext::enableNetworking(AbstractCertificateVerifier* certificateVer
     //}
 }
 
-AbstractCertificateVerifier* SystemContext::certificateVerifier() const
+AbstractCertificateVerifier* SystemContext::verifier() const
 {
     return d->certificateVerifier;
 }

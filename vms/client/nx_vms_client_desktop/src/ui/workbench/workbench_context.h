@@ -7,7 +7,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/core/watermark/watermark.h>
-#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
 #include <utils/common/instance_storage.h>
 
@@ -32,8 +31,7 @@ class Workbench;
 class QnWorkbenchContext:
     public QObject,
     public QnInstanceStorage,
-    public nx::vms::client::desktop::WindowContextAware,
-    public nx::vms::client::desktop::SystemContextAware //< TODO: #sivanov Remove this dependency.
+    public nx::vms::client::desktop::WindowContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -41,7 +39,6 @@ class QnWorkbenchContext:
 public:
     QnWorkbenchContext(
         nx::vms::client::desktop::WindowContext* windowContext,
-        nx::vms::client::desktop::SystemContext* systemContext,
         QObject* parent = nullptr);
     virtual ~QnWorkbenchContext();
 

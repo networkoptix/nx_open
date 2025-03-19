@@ -8,7 +8,6 @@
 #include <api/server_rest_connection.h>
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/motion_window.h>

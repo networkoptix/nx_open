@@ -59,4 +59,19 @@ QnCameraBookmarksManager* SystemContextAware::cameraBookmarksManager() const
     return systemContext()->cameraBookmarksManager();
 }
 
+NetworkModule* SystemContextAware::networkModule() const
+{
+    return systemContext()->networkModule();
+}
+
+nx::network::http::Credentials SystemContextAware::connectionCredentials() const
+{
+    return systemContext()->connectionCredentials();
+}
+
+std::shared_ptr<RemoteSession> SystemContextAware::session() const
+{
+    return systemContext()->session();
+}
+
 } // namespace nx::vms::client::desktop

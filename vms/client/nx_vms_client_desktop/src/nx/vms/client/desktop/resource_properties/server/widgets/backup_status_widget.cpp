@@ -5,7 +5,6 @@
 
 #include <api/runtime_info_manager.h>
 #include <api/server_rest_connection.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
@@ -70,7 +69,8 @@ bool hasBackupStorageIssue(const QnMediaServerResourcePtr& server)
     if (!server)
         return false;
 
-    const auto runtimeInfoManager = qnClientCoreModule->runtimeInfoManager();
+    const auto runtimeInfoManager =
+        nx::vms::client::desktop::SystemContext::fromResource(server)->runtimeInfoManager();
     if (runtimeInfoManager->hasItem(server->getId()))
     {
         const auto runtimeFlags = runtimeInfoManager->item(server->getId()).data.flags;
@@ -109,23 +109,6 @@ BackupStatusWidget::BackupStatusWidget(QWidget* parent):
 
     ui->skipQueueHintButton->addHintLine(tr(
         "Applies only to the cameras connected to current server."));
-
-    const auto runtimeInfoManager = qnClientCoreModule->runtimeInfoManager();
-    connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged, this,
-        [this](const QnPeerRuntimeInfo& runtimeInfo)
-        {
-            if (!m_server || runtimeInfo.uuid != m_server->getId())
-                return;
-
-            const auto hasStorageIssue =
-                runtimeInfo.data.flags.testFlag(nx::vms::api::RuntimeFlag::noBackupStorages);
-
-            if (m_hasBackupStorageIssue == hasStorageIssue)
-                return;
-
-            m_hasBackupStorageIssue = hasStorageIssue;
-            updateBackupStatus();
-        });
 }
 
 BackupStatusWidget::~BackupStatusWidget()
@@ -137,7 +120,34 @@ void BackupStatusWidget::setServer(const QnMediaServerResourcePtr& server)
     if (m_server == server)
         return;
 
+    if (m_server)
+    {
+        const auto manager = SystemContext::fromResource(m_server)->runtimeInfoManager();
+        manager->disconnect(this);
+    }
+
     m_server = server;
+
+    if (m_server)
+    {
+        const auto manager = SystemContext::fromResource(m_server)->runtimeInfoManager();
+        connect(manager, &QnRuntimeInfoManager::runtimeInfoChanged, this,
+            [this](const QnPeerRuntimeInfo& runtimeInfo)
+            {
+                if (!m_server || runtimeInfo.uuid != m_server->getId())
+                    return;
+
+                const auto hasStorageIssue =
+                    runtimeInfo.data.flags.testFlag(nx::vms::api::RuntimeFlag::noBackupStorages);
+
+                if (m_hasBackupStorageIssue == hasStorageIssue)
+                    return;
+
+                m_hasBackupStorageIssue = hasStorageIssue;
+                updateBackupStatus();
+            });
+    }
+
     m_hasBackupStorageIssue = hasBackupStorageIssue(m_server);
     updateBackupStatus();
 }
@@ -189,11 +199,12 @@ void BackupStatusWidget::setupSkipBackupButton()
                     }
                 };
 
-            if (!NX_ASSERT(connection()))
+            const auto context = SystemContext::fromResource(m_server);
+            if (!NX_ASSERT(context->connection()))
                 return;
 
             NX_MUTEX_LOCKER lock(mutex.get());
-            requestHandles->insert(connectedServerApi()->setBackupPositionsAsyncV1(
+            requestHandles->insert(context->connectedServerApi()->setBackupPositionsAsyncV1(
                 m_server->getId(), userBackupPosition, callback));
         });
 }
@@ -202,7 +213,7 @@ void BackupStatusWidget::updateBackupStatus()
 {
     m_interruptBackupQueueSizeCalculation = true;
 
-    if (m_server.isNull() || !NX_ASSERT(connection()))
+    if (m_server.isNull() || !NX_ASSERT(SystemContext::fromResource(m_server)->connection()))
     {
         ui->stackedWidget->setCurrentWidget(ui->backupNotConfiguredPage);
         return;

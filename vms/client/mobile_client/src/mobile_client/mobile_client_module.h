@@ -12,11 +12,10 @@
 
 class QQuickWindow;
 
-class QnContext;
 class QnClientCoreModule;
-struct QnMobileClientStartupParameters;
-class QnAvailableCamerasWatcher;
 class QnResourceDiscoveryManager;
+struct QnMobileClientStartupParameters;
+
 
 namespace nx::vms::client::core { class SystemContext; }
 namespace nx::vms::client::mobile {
@@ -30,51 +29,28 @@ class WebViewController;
 // inherited from nx::vms::client::core::ApplicationContext.
 class QnMobileClientModule:
     public QObject,
-    public Singleton<QnMobileClientModule>,
-    public nx::vms::client::mobile::SystemContextAware
+    public Singleton<QnMobileClientModule>
 {
     Q_OBJECT
 
-    using base_type = nx::vms::client::mobile::SystemContextAware;
 public:
     QnMobileClientModule(
-        nx::vms::client::mobile::SystemContext* context,
         const QnMobileClientStartupParameters& startupParameters,
         QObject* parent = nullptr);
     virtual ~QnMobileClientModule() override;
 
-    QnContext* context() const;
-
-    void initDesktopCamera();
-
-    void startLocalSearches();
-
     nx::vms::client::mobile::PushNotificationManager* pushManager();
-
-    QQuickWindow* mainWindow() const;
-    void setMainWindow(QQuickWindow* window);
 
     nx::network::maintenance::log::UploaderManager* remoteLogsUploader();
 
-    QnAvailableCamerasWatcher* availableCamerasWatcher() const;
-
-    nx::vms::client::mobile::WebViewController* webViewController() const;
-
-    QnResourceDiscoveryManager* resourceDiscoveryManager() const;
-
 private:
-    void initializeSessionTimeoutWatcher();
     void initializePushNotifications();
-    void initializeConnectionUserInteractionDelegate();
 
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 
-    std::unique_ptr<QnClientCoreModule> m_clientCoreModule;
     QScopedPointer<nx::vms::client::mobile::PushNotificationManager> m_pushManager;
-    QScopedPointer<QnContext> m_context;
-    QQuickWindow* m_mainWindow = nullptr;
     std::unique_ptr<nx::network::maintenance::log::UploaderManager> m_logUploader;
     std::unique_ptr<nx::vms::client::mobile::RemoteLogManager> m_remoteLogManager;
 };

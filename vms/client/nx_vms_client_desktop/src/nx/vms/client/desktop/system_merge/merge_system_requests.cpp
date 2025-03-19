@@ -16,7 +16,8 @@
 #include <nx/utils/serialization/format.h>
 #include <nx/vms/client/core/network/network_manager.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/api/helpers/parser_helper.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -117,8 +118,7 @@ std::unique_ptr<nx::network::http::AsyncClient> makeConnectClient(
     auto httpConnectClient =
         std::make_unique<nx::network::http::AsyncClient>(std::move(proxyAdapterFunc));
 
-    nx::vms::client::core::RemoteConnectionAware connectionHelper;
-    auto connection = connectionHelper.connection();
+    auto connection = nx::vms::client::desktop::appContext()->currentSystemContext()->connection();
     if (NX_ASSERT(connection))
         httpConnectClient->setProxyCredentials(connection->credentials());
     NetworkManager::setDefaultTimeouts(httpConnectClient.get());

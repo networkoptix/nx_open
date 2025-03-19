@@ -5,7 +5,6 @@
 #include <QtGui/QPalette>
 
 #include <api/common_message_processor.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
@@ -42,33 +41,29 @@ const QByteArray QnAuditLogModel::kSourceServerParamName("srcSrv");
 
 namespace {
 
-QString firstResourceName(const QnLegacyAuditRecord *d1)
+QString firstResourceName(const QnResourcePool* pool, const QnLegacyAuditRecord *d1)
 {
-    auto resourcePool = qnClientCoreModule->resourcePool();
-
     if (d1->resources.empty())
         return QString();
-    if (QnResourcePtr res = resourcePool->getResourceById(d1->resources[0]))
+    if (QnResourcePtr res = pool->getResourceById(d1->resources[0]))
         return res->getName();
     else
-        return QString();
+        return QString{};
 }
 
-QString firstResourceIp(const QnLegacyAuditRecord *d1)
+QString firstResourceIp(const QnResourcePool* pool, const QnLegacyAuditRecord *d1)
 {
-    auto resourcePool = qnClientCoreModule->resourcePool();
-
     if (d1->resources.empty())
-        return QString();
-    if (QnVirtualCameraResourcePtr res = resourcePool->getResourceById<QnVirtualCameraResource>(d1->resources[0]))
+        return QString{};
+    if (QnVirtualCameraResourcePtr res = pool->getResourceById<QnVirtualCameraResource>(d1->resources[0]))
         return res->getHostAddress();
     else
-        return QString();
+        return QString{};
 }
 
-QString displayName(const QString& name)
+QString displayName(const QnResourcePool* pool, const QString& name)
 {
-    const auto user = qnClientCoreModule->resourcePool()->userByName(name).first;
+    const auto user = pool->userByName(name).first;
     return user ? user->displayName() : name;
 }
 
@@ -183,16 +178,6 @@ public:
         return d1->eventType < d2->eventType;
     }
 
-    static bool lessThanCameraName(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2)
-    {
-        return firstResourceName(d1) < firstResourceName(d2);
-    }
-
-    static bool lessThanCameraIp(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2)
-    {
-        return firstResourceIp(d1) < firstResourceIp(d2);
-    }
-
     static bool lessThanActivity(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2)
     {
         return d1->extractParam(ChildCntParamName).toUInt()
@@ -229,10 +214,18 @@ public:
                 lessThan = &lessThanEventType;
                 break;
             case CameraNameColumn:
-                lessThan = &lessThanCameraName;
+                lessThan =
+                    [pool = m_resourcePool](const auto& d1, const auto& d2)
+                    {
+                        return firstResourceName(pool, d1) < firstResourceName(pool, d2);
+                    };
                 break;
             case CameraIpColumn:
-                lessThan = &lessThanCameraIp;
+                lessThan =
+                    [pool = m_resourcePool](const auto& d1, const auto& d2)
+                    {
+                        return firstResourceIp(pool, d1) < firstResourceIp(pool, d2);
+                    };
                 break;
 
             case UserActivityColumn:
@@ -298,10 +291,9 @@ void QnAuditLogModel::clear() {
     endResetModel();
 }
 
-QString QnAuditLogModel::getResourceNameById(const nx::Uuid &id)
+QString QnAuditLogModel::getResourceNameById(const nx::Uuid &id) const
 {
-    auto resourcePool = qnClientCoreModule->resourcePool();
-    return QnResourceDisplayInfo(resourcePool->getResourceById(id)).toString(
+    return QnResourceDisplayInfo(resourcePool()->getResourceById(id)).toString(
         appContext()->localSettings()->resourceInfoLevel());
 }
 
@@ -343,9 +335,9 @@ QString QnAuditLogModel::formatDuration(int durationSecs)
         HumanReadable::kNoSuppressSecondUnit);
 }
 
-QString QnAuditLogModel::eventTypeToString(Qn::LegacyAuditRecordType eventType)
+QString QnAuditLogModel::eventTypeToString(QnResourcePool* pool,
+    Qn::LegacyAuditRecordType eventType)
 {
-    auto resourcePool = qnClientCoreModule->resourcePool();
     switch (eventType)
     {
         case Qn::AR_NotDefined:
@@ -364,13 +356,13 @@ QString QnAuditLogModel::eventTypeToString(Qn::LegacyAuditRecordType eventType)
             return tr("Exporting video");
         case Qn::AR_CameraUpdate:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool,
+                pool,
                 tr("Device updated"),
                 tr("Camera updated")
                 );
         case Qn::AR_CameraInsert:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool,
+                pool,
                 tr("Device added"),
                 tr("Camera added")
                 );
@@ -392,7 +384,7 @@ QString QnAuditLogModel::eventTypeToString(Qn::LegacyAuditRecordType eventType)
             return tr("Email settings changed");
         case Qn::AR_CameraRemove:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool,
+                pool,
                 tr("Device removed"),
                 tr("Camera removed")
                 );
@@ -419,7 +411,7 @@ QString QnAuditLogModel::eventTypeToString(Qn::LegacyAuditRecordType eventType)
         case Qn::AR_ProxySession:
             return tr("Server proxy connection");
     }
-    return QString();
+    return QString{};
 }
 
 QnVirtualCameraResourceList QnAuditLogModel::getCameras(const QnLegacyAuditRecord* record)
@@ -429,15 +421,17 @@ QnVirtualCameraResourceList QnAuditLogModel::getCameras(const QnLegacyAuditRecor
 
 QnVirtualCameraResourceList QnAuditLogModel::getCameras(const std::vector<nx::Uuid>& resources)
 {
-    auto resourcePool = qnClientCoreModule->resourcePool();
+    const auto pool = appContext()->currentSystemContext()->resourcePool();
     QnVirtualCameraResourceList result;
     for (const auto& id : resources)
-        if (QnVirtualCameraResourcePtr camera = resourcePool->getResourceById<QnVirtualCameraResource>(id))
+    {
+        if (const auto camera = pool->getResourceById<QnVirtualCameraResource>(id))
             result << camera;
+    }
     return result;
 }
 
-QString QnAuditLogModel::getResourcesString(const std::vector<nx::Uuid>& resources)
+QString QnAuditLogModel::getResourcesString(const std::vector<nx::Uuid>& resources) const
 {
     QString result;
     for (const auto& res : resources)
@@ -673,29 +667,29 @@ QString QnAuditLogModel::textData(const Column& column, const QnLegacyAuditRecor
             if (data->eventType == Qn::AR_Login)
                 return data->rangeEndSec ? formatDateTime(data->rangeEndSec, true, true) : QString();
             else if (data->eventType == Qn::AR_UnauthorizedLogin)
-                return eventTypeToString(data->eventType);
+                return eventTypeToString(resourcePool(), data->eventType);
             break;
 
         case DurationColumn:
             if (data->rangeEndSec)
                 return formatDuration(data->rangeEndSec - data->rangeStartSec);
             else
-                return QString();
+                return QString{};
 
         case UserNameColumn:
-            return displayName(data->authSession.userName);
+            return displayName(resourcePool(), data->authSession.userName);
 
         case UserHostColumn:
             return data->authSession.userHost;
 
         case EventTypeColumn:
-            return eventTypeToString(data->eventType);
+            return eventTypeToString(resourcePool(), data->eventType);
 
         case CameraNameColumn:
-            return firstResourceName(data);
+            return firstResourceName(resourcePool(), data);
 
         case CameraIpColumn:
-            return firstResourceIp(data);
+            return firstResourceIp(resourcePool(), data);
 
         case DescriptionColumn:
             return eventDescriptionText(data);

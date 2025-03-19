@@ -5,12 +5,13 @@
 #include <QtCore/QDir>
 #include <QtCore/QSet>
 
-#include <client_core/client_core_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/avi/filetypesupport.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/common/system_context.h>
 
 using namespace std::literals::chrono_literals;
@@ -53,7 +54,7 @@ LocalResourcesDirectoryModel::LocalResourcesDirectoryModel(QObject* parent):
     connect(&m_deferredFileChangeHandlerTimer, &QTimer::timeout,
         this, &LocalResourcesDirectoryModel::processPendingFileChanges);
 
-    auto resourcePool = qnClientCoreModule->resourcePool();
+    auto resourcePool = core::appContext()->currentSystemContext()->resourcePool();
 
     connect(resourcePool, &QnResourcePool::resourcesAdded, this,
         [this](const QnResourceList& resources)

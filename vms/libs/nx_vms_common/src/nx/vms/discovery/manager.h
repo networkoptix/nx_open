@@ -76,7 +76,7 @@ public:
      * Start Servers search and listen for the urls changes for all servers in the provided Resource
      * Pool.
      */
-    void start(QnResourcePool* resourcePool);
+    void start(QnResourcePool* resourcePool = nullptr);
 
     /**
      * Start checking provided urls only.

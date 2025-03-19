@@ -2,7 +2,6 @@
 
 #include "client_video_camera.h"
 
-#include <client_core/client_core_module.h>
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/avi/thumbnails_stream_reader.h>
 #include <core/resource/camera_resource.h>

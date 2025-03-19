@@ -7,17 +7,33 @@
 namespace nx::vms::client::mobile {
 
 class SystemContext;
+class WindowContext;
 
 class ApplicationContext: public core::ApplicationContext
 {
     Q_OBJECT
     using base_type = core::ApplicationContext;
 
+    Q_PROPERTY(bool serverTimeMode
+        READ isServerTimeMode
+        WRITE setServerTimeMode
+        NOTIFY serverTimeModeChanged)
+
 public:
     ApplicationContext(QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
 
     SystemContext* currentSystemContext() const;
+
+    WindowContext* mainWindowContext() const;
+
+    Q_INVOKABLE void closeWindow();
+
+    bool isServerTimeMode() const;
+    void setServerTimeMode(bool value);
+
+signals:
+    void serverTimeModeChanged();
 
 private:
     struct Private;

@@ -7,6 +7,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/common/p2p/downloader/result_code.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 #include "upload_state.h"
 
@@ -14,7 +15,7 @@ namespace nx::network::rest { struct JsonResult; }
 
 namespace nx::vms::client::desktop {
 
-class UploadWorker: public QObject
+class UploadWorker: public QObject, public SystemContextAware
 {
     Q_OBJECT
 

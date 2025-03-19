@@ -4,9 +4,9 @@
 
 #include <QtGui/QAction>
 
-#include <client_core/client_core_module.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/text/time_strings.h>
 #include <ui/workbench/workbench_context.h>
@@ -14,12 +14,15 @@
 namespace nx::vms::client::desktop {
 
 LocalSessionTokenExpirationWatcher::LocalSessionTokenExpirationWatcher(
+    SystemContext* context,
     QPointer<workbench::LocalNotificationsManager> notificationManager,
     QObject* parent)
     :
+    QObject(parent),
+    SystemContextAware(context),
     m_notificationManager(notificationManager)
 {
-    auto sessionTimeoutWatcher = qnClientCoreModule->networkModule()->sessionTimeoutWatcher();
+    auto sessionTimeoutWatcher = systemContext()->networkModule()->sessionTimeoutWatcher();
 
     connect(
         sessionTimeoutWatcher,
@@ -70,10 +73,7 @@ void LocalSessionTokenExpirationWatcher::notify(std::chrono::minutes timeLeft)
         [this](nx::Uuid notificationId)
         {
             if (notificationId == m_notification)
-            {
-                qnClientCoreModule->networkModule()
-                    ->sessionTimeoutWatcher()->notificationHiddenByUser();
-            }
+                systemContext()->networkModule()->sessionTimeoutWatcher()->notificationHiddenByUser();
         });
 
     connect(

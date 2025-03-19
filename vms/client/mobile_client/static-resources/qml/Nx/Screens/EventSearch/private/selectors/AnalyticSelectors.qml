@@ -64,7 +64,7 @@ Column
 
         readonly property AnalyticsFilterModel model:
         {
-            const result = systemContext.taxonomyManager.createFilterModel()
+            const result = windowContext.mainSystemContext.taxonomyManager.createFilterModel()
             result.selectedDevices = Qt.binding(() => searchSetup.selectedCameras)
             result.selectedEngine = Qt.binding(() => getCurrentEngine(result))
             result.selectedAttributeValues = Qt.binding(() => objectAttributes.value ?? {})

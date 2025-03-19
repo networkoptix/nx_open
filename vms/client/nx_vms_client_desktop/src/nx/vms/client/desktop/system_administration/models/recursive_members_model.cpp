@@ -5,6 +5,7 @@
 #include <QtQml/QtQml>
 
 #include <core/resource_access/subject_hierarchy.h>
+#include <nx/vms/client/desktop/application_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -14,7 +15,7 @@ RecursiveMembersModel::RecursiveMembersModel(SystemContext* systemContext):
 }
 
 RecursiveMembersModel::RecursiveMembersModel():
-    SystemContextAware(SystemContext::fromQmlContext(this))
+    SystemContextAware(appContext()->currentSystemContext())
 {
 }
 

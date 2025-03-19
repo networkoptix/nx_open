@@ -249,7 +249,7 @@ Item
                 padding: 0
                 height: parent.height
 
-                resourceId: controller && controller.resource && controller.resource.id
+                resource: controller && controller.resource
                 popupParent: videoScreen
                 onPresetChoosen:
                     (id) =>

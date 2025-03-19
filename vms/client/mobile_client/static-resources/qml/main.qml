@@ -2,7 +2,7 @@
 
 import QtQuick
 import QtQuick.Window
-import QtQuick.Controls
+import QtQuick.Controls as Controls
 
 import Nx.Core
 import Nx.Controls
@@ -13,7 +13,7 @@ import Nx.Ui
 import nx.vms.client.core
 import nx.vms.client.mobile
 
-ApplicationWindow
+Controls.ApplicationWindow
 {
     id: mainWindow
 
@@ -261,6 +261,15 @@ ApplicationWindow
         ColorTheme.colors["backgroundDimColor"] = ColorTheme.transparent(ColorTheme.colors.dark5, 0.4)
         ColorTheme.windowText = ColorTheme.colors.light1
     }
+
+    onClosing:
+        (close) =>
+        {
+            // To make sure that we have the correct order of deinitialization we
+            // handle window closing manually.
+            close.accepted = false
+            applicationContext.closeWindow()
+        }
 
     Component.onCompleted:
     {

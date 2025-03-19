@@ -200,12 +200,12 @@ StartupActionsHandler::StartupActionsHandler(QObject* parent):
     // Connect to the established session.
     if (!qnRuntime->isVideoWallMode())
     {
-        connect(context()->systemContext(), &core::SystemContext::remoteIdChanged, this,
+        connect(context()->system(), &core::SystemContext::remoteIdChanged, this,
             [this]()
             {
                 d->sessionConnection.reset();
 
-                auto session = context()->systemContext()->session();
+                auto session = context()->system()->session();
                 if (!session)
                     return;
 

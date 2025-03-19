@@ -370,7 +370,7 @@ AbstractECConnectionPtr RemoteConnection::messageBusConnection() const
     return d->messageBusConnection;
 }
 
-common::AbstractTimeSyncManagerPtr RemoteConnection::timeSynchronizationManager() const
+nx::vms::common::AbstractTimeSyncManagerPtr RemoteConnection::timeSynchronizationManager() const
 {
     return d->timeSynchronizationManager;
 }

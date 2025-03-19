@@ -5,7 +5,6 @@
 #include <QtCore/QTimer>
 #include <QtGui/QGuiApplication>
 
-#include <client_core/client_core_module.h>
 #include <nx/cloud/db/api/connection.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>

@@ -31,7 +31,9 @@ Pane
         bottomPadding: 0
         systemName: sessionManager.systemName
         address: sessionManager.sessionHost
-        user: currentUserWatcher.userName
+        user: windowContext.systemContext
+            ? windowContext.systemContext.userWatcher.userName
+            : ""
         ownerDescription: cloudInformationWatcher.ownerDescription
         cloud: sessionManager.isCloudSession
     }

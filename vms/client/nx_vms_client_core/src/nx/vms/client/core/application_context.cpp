@@ -21,18 +21,22 @@
 #include <nx/vms/client/core/media/voice_spectrum_analyzer.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
+#include <nx/vms/client/core/network/session_token_terminator.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/font_config.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/skin/skin_image_provider.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
+
+#include "application_context_qml_initializer.h"
 
 extern "C" {
 
@@ -170,6 +174,7 @@ struct ApplicationContext::Private
 
     ApplicationContext* const q;
     const ApplicationContext::Mode mode;
+    const Qn::SerializationFormat format;
     const Features features;
 
     std::unique_ptr<ThreadPool::Manager> threadPoolManager{new ThreadPool::Manager()};
@@ -186,11 +191,14 @@ struct ApplicationContext::Private
     std::unique_ptr<FontConfig> fontConfig;
     std::unique_ptr<LocalNetworkInterfacesManager> localNetworkInterfacesManager;
     std::unique_ptr<watchers::KnownServerConnections> knownServerConnectionsWatcher;
+    std::unique_ptr<SessionTokenTerminator> sessionTokenTerminator;
+
     QString customExternalResourceFile;
 };
 
 ApplicationContext::ApplicationContext(
     Mode mode,
+    Qn::SerializationFormat serializationFormat,
     PeerType peerType,
     const QString& customCloudHost,
     const QString& customExternalResourceFile,
@@ -205,6 +213,7 @@ ApplicationContext::ApplicationContext(
     d(new Private{
         .q = this,
         .mode = mode,
+        .format = serializationFormat,
         .features = features,
         .skin = std::make_unique<nx::vms::client::core::Skin>(QStringList{":/skin"}),
         .customExternalResourceFile = customExternalResourceFile
@@ -244,15 +253,31 @@ ApplicationContext::ApplicationContext(
 
     if (features.base.flags.testFlag(CommonFeatureFlag::translations))
         translationManager()->startLoadingTranslations();
+
+    if (const auto engine = appContext()->qmlEngine())
+        engine->addImageProvider("skin", new nx::vms::client::core::SkinImageProvider());
+
+    if (features.base.flags.testFlag(CommonFeatureFlag::networking))
+        d->sessionTokenTerminator = std::make_unique<SessionTokenTerminator>();
+
+    ApplicationContextQmlInitializer::storeToQmlContext(this);
 }
 
 ApplicationContext::~ApplicationContext()
 {
+    if (const auto engine = qmlEngine())
+        engine->removeImageProvider("skin");
+
     if (d->features.base.flags.testFlag(CommonFeatureFlag::translations))
         translationManager()->stopLoadingTranslations();
     d->uninitializeExternalResources();
 
     nx::setOnAssertHandler(nullptr);
+}
+
+Qn::SerializationFormat ApplicationContext::serializationFormat() const
+{
+    return d->format;
 }
 
 void ApplicationContext::initializeNetworkModules()
@@ -414,6 +439,11 @@ bool ApplicationContext::isCertificateValidationLevelStrict() const
 {
     return coreSettings()->certificateValidationLevel()
         == network::server_certificate::ValidationLevel::strict;
+}
+
+SessionTokenTerminator* ApplicationContext::sessionTokenTerminator() const
+{
+    return d->sessionTokenTerminator.get();
 }
 
 } // namespace nx::vms::client::core

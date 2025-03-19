@@ -13,7 +13,6 @@
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
 #include <client/desktop_client_message_processor.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_resource.h>
@@ -294,7 +293,7 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
     // ACS clients display only fixed part of the archive, so they look quite safe.
     if (qnRuntime->isDesktopMode())
     {
-        auto sessionTimeoutWatcher = qnClientCoreModule->networkModule()->sessionTimeoutWatcher();
+        auto sessionTimeoutWatcher = system()->networkModule()->sessionTimeoutWatcher();
         connect(sessionTimeoutWatcher, &RemoteSessionTimeoutWatcher::sessionExpired, this,
             [this](RemoteSessionTimeoutWatcher::SessionExpirationReason reason)
             {
@@ -357,6 +356,7 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
 
     auto sessionTokenExpirationWatcher =
         new LocalSessionTokenExpirationWatcher(
+            system(),
             windowContext->localNotificationsManager(),
             this);
 
@@ -546,9 +546,6 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
 
     connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
         [resourceModeAction]() { resourceModeAction->setChecked(true); });
-
-    qnClientCoreModule->networkModule()->connectionFactory()->setUserInteractionDelegate(
-        createConnectionUserInteractionDelegate([this]() { return mainWindowWidget(); }));
 
     // The only instance of UserAuthDebugInfoWatcher is created to be owned by the context.
     workbenchContext()->instance<UserAuthDebugInfoWatcher>();
@@ -907,7 +904,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                 session->sessionId(), serverModuleInformation, logonData));
     }
     system()->setSession(session);
-    qnClientCoreModule->networkModule()->setSession(session);
+    system()->networkModule()->setSession(session);
     const auto welcomeScreen = mainWindow()->welcomeScreen();
     if (welcomeScreen) // Welcome Screen exists in the desktop mode only.
         welcomeScreen->connectionToSystemEstablished(systemId);
@@ -1111,7 +1108,7 @@ void ConnectActionsHandler::connectToServerInNonDesktopMode(const LogonData& log
         });
 
     NX_VERBOSE(this, "Connecting in non-desktop mode to the %1", logonData.address);
-    auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
+    auto remoteConnectionFactory = system()->networkModule()->connectionFactory();
     d->currentConnectionProcess =
         remoteConnectionFactory->connect(logonData, callback, system());
 }
@@ -1206,7 +1203,7 @@ void ConnectActionsHandler::connectToCloudSystem(
         });
 
     NX_VERBOSE(this, "Connecting to cloud site: %1", connectionInfo->address);
-    auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
+    auto remoteConnectionFactory = system()->networkModule()->connectionFactory();
 
     d->currentConnectionProcess =
         remoteConnectionFactory->connect(*connectionInfo, callback, system());
@@ -1392,7 +1389,7 @@ void ConnectActionsHandler::at_reconnectAction_triggered()
             }
         });
 
-    auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
+    auto remoteConnectionFactory = system()->networkModule()->connectionFactory();
     d->currentConnectionProcess = remoteConnectionFactory->connect(logonData, callback, system());
 }
 
@@ -1464,7 +1461,7 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
         logonData.address.address = helpers::serverCloudHost(systemId, serverId);
     }
 
-    auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
+    auto remoteConnectionFactory = system()->networkModule()->connectionFactory();
 
     if (d->switchServerDialog)
         delete d->switchServerDialog.data();
@@ -1589,7 +1586,7 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
 
     d->currentConnectionProcess.reset();
     statisticsModule()->certificates()->resetScenario();
-    qnClientCoreModule->networkModule()->setSession({});
+    system()->networkModule()->setSession({});
     system()->setSession({});
 
     // Get ready for the next connection.
@@ -1698,7 +1695,7 @@ void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptio
             }
         });
 
-    auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
+    auto remoteConnectionFactory = system()->networkModule()->connectionFactory();
     d->currentConnectionProcess = remoteConnectionFactory->connect(logonData, callback, system());
 }
 

@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/vms/common/application_context.h>
 
 class QQmlEngine;
@@ -26,6 +27,7 @@ class SystemFinder;
 class ThreadPool;
 class UnifiedResourcePool;
 class VoiceSpectrumAnalyzer;
+class SessionTokenTerminator;
 
 namespace watchers { class KnownServerConnections; }
 
@@ -89,12 +91,15 @@ public:
 
     ApplicationContext(
         Mode mode,
+        Qn::SerializationFormat serializationFormat,
         PeerType peerType = PeerType::notDefined,
         const QString& customCloudHost = {},
         const QString& customExternalResourceFile = {},
         Features features = Features::all(),
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
+
+    Qn::SerializationFormat serializationFormat() const;
 
     /**
      * Initialize network-related modules.
@@ -156,6 +161,8 @@ public:
      * a safe moment (before QCoreApplication destruction).
      */
     ThreadPool* threadPool(const QString& id) const;
+
+    SessionTokenTerminator* sessionTokenTerminator() const;
 
     virtual bool isCertificateValidationLevelStrict() const override;
 

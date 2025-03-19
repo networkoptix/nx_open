@@ -2,17 +2,13 @@
 
 #pragma once
 
-#include <nx/vms/client/core/network/remote_connection_aware.h>
-
 #include "click_instrument.h"
 
 /**
  * This instrument listens to click events and sends "start object tracking" command to the server,
  * when it's needed.
  */
-class ObjectTrackingInstrument:
-    public ClickInstrument,
-    public nx::vms::client::core::RemoteConnectionAware
+class ObjectTrackingInstrument: public ClickInstrument
 {
     Q_OBJECT
     using base_type = ClickInstrument;

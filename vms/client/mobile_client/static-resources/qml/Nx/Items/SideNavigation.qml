@@ -81,15 +81,15 @@ Drawer
                 delegate: LayoutItem
                 {
                     text: resourceName
-                    resourceId: uuid
+                    layoutResource: model.resource
                     shared: shared
-                    active: uiController.layoutId === resourceId
+                    active: uiController.layout === layoutResource
                     type: itemType
                     count: itemsCount
                     onClicked:
                     {
                         Workflow.openResourcesScreen()
-                        uiController.layoutId = resourceId
+                        uiController.layout = layoutResource
                     }
                 }
 

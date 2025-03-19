@@ -3,11 +3,13 @@
 #pragma once
 
 #include <camera/camera_bookmarks_manager.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/core/io_ports/io_ports_compatibility_interface.h>
+#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/network/server_primary_interface_watcher.h>
@@ -24,9 +26,15 @@
 
 namespace nx::vms::client::core {
 
+class RemoteAsyncImageProvider;
+
 struct SystemContext::Private
 {
     void initializeIoPortsInterface();
+
+    void initializeQml();
+
+    void initializeNetworkModule();
 
     SystemContext* const q;
 
@@ -44,6 +52,7 @@ struct SystemContext::Private
     std::unique_ptr<analytics::TaxonomyManager> taxonomyManager;
     std::unique_ptr<VideoCache> videoCache;
     std::unique_ptr<AnalyticsEventsSearchTreeBuilder> analyticsEventsSearchTreeBuilder;
+    std::unique_ptr<NetworkModule> networkModule;
 
     mutable nx::Mutex sessionMutex;
 
@@ -55,6 +64,9 @@ struct SystemContext::Private
 
     // Should be destroyed before session/connection.
     std::unique_ptr<IoPortsCompatibilityInterface> ioPortsInterface;
+
+    using RemoveGuard = nx::utils::ScopeGuard<std::function<void ()>>;
+    std::unique_ptr<RemoveGuard> imageProviderRemoveGuard;
 };
 
 } // namespace nx::vms::client::core

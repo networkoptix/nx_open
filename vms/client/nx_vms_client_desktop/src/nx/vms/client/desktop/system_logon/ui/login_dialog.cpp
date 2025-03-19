@@ -13,7 +13,6 @@
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QApplication>
 
-#include <client_core/client_core_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <network/system_helpers.h>
 #include <nx/build_info.h>
@@ -340,7 +339,7 @@ void LoginDialog::sendTestConnectionRequest()
             updateUsability();
         });
 
-    auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
+    auto remoteConnectionFactory = networkModule()->connectionFactory();
 
     // User type will be verified during the connection.
     const core::LogonData logonData{

@@ -18,10 +18,10 @@
 #include <nx/vms/client/core/network/oauth_client.h>
 #include <nx/vms/client/core/network/oauth_client_constants.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
-#include <nx/vms/client/core/system_context.h>
-#include <nx/vms/client/mobile/controllers/web_view_controller.h>
-#include <nx/vms/client/mobile/current_system_context_aware.h>
+#include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
+#include <nx/vms/client/mobile/system_context.h>
+#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/client/mobile/ui/qml_wrapper_helper.h>
 #include <nx/vms/client/mobile/utils/operation_manager.h>
 #include <nx/vms/utils/system_uri.h>
@@ -33,7 +33,6 @@
 
 using nx::vms::utils::SystemUri;
 using nx::vms::client::core::CloudStatusWatcher;
-using nx::vms::client::mobile::WebViewController;
 
 namespace {
 
@@ -78,8 +77,7 @@ std::string decodeUsername(const QString& authCode)
 
 } // namespace
 
-class QnMobileClientUriHandler::Private: public QObject,
-    public nx::vms::client::mobile::CurrentSystemContextAware
+class QnMobileClientUriHandler::Private: public QObject
 {
 public:
     Private(QnContext* context);
@@ -94,8 +92,6 @@ public:
     const QPointer<nx::vms::client::mobile::OperationManager> operationManager;
     const QPointer<QnMobileClientUiController> uiController;
     const QPointer<CloudStatusWatcher> cloudStatusWatcher;
-    const QPointer<nx::vms::client::mobile::SessionManager> sessionManager;
-    const QPointer<nx::vms::client::mobile::WebViewController> webViewController;
     std::atomic<bool> m_isHandlingClientCommand = false;
 
 private:
@@ -115,9 +111,7 @@ private:
 QnMobileClientUriHandler::Private::Private(QnContext* context):
     operationManager(context->operationManager()),
     uiController(context->uiController()),
-    cloudStatusWatcher(context->cloudStatusWatcher()),
-    sessionManager(context->sessionManager()),
-    webViewController(qnMobileClientModule->webViewController())
+    cloudStatusWatcher(context->cloudStatusWatcher())
 {
 }
 
@@ -223,7 +217,7 @@ bool QnMobileClientUriHandler::Private::loginToCloud(const SystemUri& uri)
         return true;
     }
     cloudStatusWatcher->resetAuthData();
-    sessionManager->stopSession();
+    nx::vms::client::mobile::appContext()->mainWindowContext()->sessionManager()->stopSessionByUser();
 
     QVariantMap properties;
     properties["user"] = QString::fromStdString(username);
@@ -255,7 +249,8 @@ void QnMobileClientUriHandler::Private::connectedCallback(const SystemUri& uri)
             "connectedCallback(): end: opening video screen for resource %1 with timestamp <%2>",
             resourceIds.first(), timestamp);
 
-        const auto camera = systemContext()->resourcePool()->getResourceById(resourceIds.first());
+        const auto camera = nx::vms::client::mobile::appContext()->currentSystemContext()
+            ->resourcePool()->getResourceById(resourceIds.first());
         uiController->openVideoScreen(nx::vms::client::core::withCppOwnership(camera), timestamp);
     }
     else
@@ -308,10 +303,9 @@ void QnMobileClientUriHandler::Private::switchToSessionsScreen()
 void QnMobileClientUriHandler::Private::connectToServerDirectly(const SystemUri& uri)
 {
     NX_DEBUG(this, "connectToServerDirectly(): start");
-    if (!NX_ASSERT(sessionManager, "Session manager is not ready"))
-        return;
-
-    sessionManager->stopSession();
+    const auto sessionManager =
+        nx::vms::client::mobile::appContext()->mainWindowContext()->sessionManager();
+    sessionManager->stopSessionByUser();
 
     // Switch to sessions screen and wait for the change to avoid side effects with a login process.
     switchToSessionsScreen();
@@ -480,8 +474,6 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& nativeUrl)
         NX_ASSERT(false, "handleUrl(): end: UI controller is not ready, should not get here");
         return;
     }
-
-    d->webViewController->closeWindow();
 
     switch (uri.clientCommand)
     {

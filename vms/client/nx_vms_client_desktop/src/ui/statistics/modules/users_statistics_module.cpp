@@ -9,6 +9,7 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -65,7 +66,7 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
     if (!currentUser)
         return result;
 
-    const auto accessController = context()->accessController();
+    const auto accessController = context()->system()->accessController();
     const auto currentUserPermissions = accessController
         ? accessController->globalPermissions()
         : resourceAccessManager()->globalPermissions(currentUser);

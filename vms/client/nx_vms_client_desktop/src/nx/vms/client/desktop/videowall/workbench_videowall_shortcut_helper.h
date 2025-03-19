@@ -5,11 +5,11 @@
 #include <QtCore/QString>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/utils/url.h>
 
 namespace nx::vms::client::desktop {
 
-class VideoWallShortcutHelper: public core::RemoteConnectionAware
+class VideoWallShortcutHelper
 {
 public:
     bool shortcutExists(const QnVideoWallResourcePtr& videowall) const;

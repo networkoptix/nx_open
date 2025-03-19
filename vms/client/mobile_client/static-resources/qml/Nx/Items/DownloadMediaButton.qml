@@ -11,7 +11,7 @@ IconButton
 {
     id: control
 
-    property alias resourceId: mediaDownloadBackend.cameraId
+    property alias resource: mediaDownloadBackend.resource
     property real positionMs: 0
     property real durationMs: 0
     property alias menuOpened: durationOptionsMenu.opened

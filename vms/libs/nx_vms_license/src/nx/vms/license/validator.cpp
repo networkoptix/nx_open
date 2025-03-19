@@ -48,7 +48,7 @@ QnLicenseErrorCode Validator::validate(const QnLicensePtr& license, ValidationMo
     if (connection)
         currentServerId = connection->moduleInformation().id;
 
-    const auto& manager = m_context->runtimeInfoManager();
+    const auto& manager = runtimeInfoManager();
     QnPeerRuntimeInfo info;
 
     if (license->type() == Qn::LC_SaasLocalRecording)
@@ -141,7 +141,7 @@ QString Validator::errorMessage(QnLicenseErrorCode errCode, Qn::LicenseType lice
 
 nx::Uuid Validator::serverId(const QnLicensePtr& license) const
 {
-    const auto items = m_context->runtimeInfoManager()->items()->getItems();
+    const auto items = runtimeInfoManager()->items()->getItems();
     for (const QnPeerRuntimeInfo& info: items)
     {
         if (info.data.peer.peerType != vms::api::PeerType::server)
@@ -159,7 +159,7 @@ QnLicenseErrorCode Validator::isValidUniqueLicense(const QnLicensePtr& license,
     ValidationMode mode) const
 {
     // Only single license of this type per system is allowed.
-    for (const QnLicensePtr& otherLicense: m_context->licensePool()->getLicenses())
+    for (const QnLicensePtr& otherLicense: licensePool()->getLicenses())
     {
         // Skip other license types and current license itself.
         if (otherLicense->type() != license->type() || otherLicense->key() == license->key())

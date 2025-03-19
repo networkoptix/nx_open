@@ -11,18 +11,20 @@
 #include <nx/utils/software_version.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/network/remote_connection_error.h>
-#include <nx/vms/client/core/system_context_aware.h>
+#include <nx/vms/client/mobile/system_context_aware.h>
 
 #include "session_types.h"
 
 namespace nx::vms::client::mobile {
+
+class WindowContext;
 
 /**
  * Represents single connection session to some system. Automatically tries to restore connection
  * in case of loss. If first connection fails, it is supposed that session failed and should be
  * reset by session manager. Only one connection is supposed to exist at each moment of time.
  */
-class Session: public QObject, public nx::vms::client::core::SystemContextAware
+class Session: public QObject, public nx::vms::client::mobile::SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -121,7 +123,7 @@ public:
      * @param parent Object parent. Used to initialize common module aware stuff.
      */
     static Holder create(
-        core::SystemContext* systemContext,
+        SystemContext* context,
         const ConnectionData& connectionData,
         const QString& supposedSystemName,
         session::ConnectionCallback&& callback);

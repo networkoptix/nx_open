@@ -5,7 +5,10 @@
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QUuid>
 
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
+
+Q_MOC_INCLUDE("core/resource/resource.h")
 
 namespace nx {
 namespace client {
@@ -16,22 +19,22 @@ class PtzPresetModel: public QAbstractListModel
     Q_OBJECT
     using base_type = QAbstractListModel;
 
-    Q_PROPERTY(nx::Uuid resourceId READ resourceId
-        WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(QnResource* resource READ rawResource
+        WRITE setRawResource NOTIFY resourceChanged)
 
 public:
     PtzPresetModel(QObject* parent = nullptr);
     virtual ~PtzPresetModel();
 
-    nx::Uuid resourceId() const;
-    void setResourceId(const nx::Uuid& value);
+    QnResource* rawResource() const;
+    void setRawResource(QnResource* value);
 
     virtual QVariant data(const QModelIndex& index, int role) const override;
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
 
 signals:
-    void resourceIdChanged();
+    void resourceChanged();
 
 private:
     struct Private;

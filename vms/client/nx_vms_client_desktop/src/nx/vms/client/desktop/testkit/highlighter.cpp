@@ -10,7 +10,6 @@
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
 
-#include <client_core/client_core_module.h>
 #include <nx/vms/client/core/testkit/utils.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>

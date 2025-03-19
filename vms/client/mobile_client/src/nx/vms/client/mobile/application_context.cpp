@@ -2,14 +2,25 @@
 
 #include "application_context.h"
 
-#include <mobile_client/mobile_client_message_processor.h>
+#include <QtCore/QFileSelector>
+#include <QtQml/QQmlFileSelector>
+#include <QtQuick/QQuickWindow>
+
 #include <mobile_client/mobile_client_settings.h>
+#include <nx/build_info.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/mobile/mobile_client_meta_types.h>
 #include <nx/vms/client/mobile/system_context.h>
+#include <nx/vms/client/mobile/window_context.h>
+#include <nx/vms/client/mobile/session/session_manager.h>
+#include <nx/vms/discovery/manager.h>
 
 namespace nx::vms::client::mobile {
 
 namespace {
+
+static const QString kQmlRoot = "qrc:///qml/";
 
 core::ApplicationContext::Features makeFeatures()
 {
@@ -22,11 +33,12 @@ core::ApplicationContext::Features makeFeatures()
 
 struct ApplicationContext::Private
 {
-    std::unique_ptr<SystemContext> systemContext;
+    std::unique_ptr<WindowContext> windowContext;
 };
 
 ApplicationContext::ApplicationContext(QObject* parent):
     base_type(Mode::mobileClient,
+        Qn::SerializationFormat::json,
         nx::vms::api::PeerType::mobileClient,
         qnSettings->customCloudHost(),
         /*customExternalResourceFile*/ {},
@@ -34,18 +46,35 @@ ApplicationContext::ApplicationContext(QObject* parent):
         parent),
     d(new Private{})
 {
+    initializeMetaTypes();
+
     initializeNetworkModules();
     const auto selectedLocale = coreSettings()->locale();
     initializeTranslations(selectedLocale.isEmpty()
         ? QLocale::system().name()
         : selectedLocale);
 
-    d->systemContext = std::make_unique<SystemContext>(
-        core::SystemContext::Mode::client,
-        /*peerId*/ nx::Uuid::createUuid());
-    addSystemContext(d->systemContext.get());
-    d->systemContext->createMessageProcessor<QnMobileClientMessageProcessor>(
-        d->systemContext.get());
+    const auto engine = qmlEngine();
+
+    QStringList selectors;
+    QFileSelector fileSelector;
+    fileSelector.setExtraSelectors(selectors);
+    QQmlFileSelector qmlFileSelector(engine);
+    qmlFileSelector.setSelector(&fileSelector);
+
+    engine->setBaseUrl(QUrl(kQmlRoot));
+    engine->addImportPath(kQmlRoot);
+
+    if (build_info::isIos())
+        engine->addImportPath("qt_qml");
+
+    d->windowContext = std::make_unique<WindowContext>();
+    d->windowContext->initializeWindow();
+    const auto notifier = qnSettings->notifier(QnMobileClientSettings::ServerTimeMode);
+    connect(notifier, &QnPropertyNotifier::valueChanged,
+        this, &ApplicationContext::serverTimeModeChanged);
+
+    moduleDiscoveryManager()->start();
 }
 
 ApplicationContext::~ApplicationContext()
@@ -55,16 +84,37 @@ ApplicationContext::~ApplicationContext()
     // DesktopCameraConnection is a SystemContextAware object, so it should be deleted before the
     // SystemContext.
     common::ApplicationContext::stopAll();
-
-    d->systemContext->setSession({});
-    if (d->systemContext->messageProcessor())
-        d->systemContext->deleteMessageProcessor();
-    d->systemContext.reset();
 }
 
 SystemContext* ApplicationContext::currentSystemContext() const
 {
-    return base_type::currentSystemContext()->as<SystemContext>();
+    return mainWindowContext()->system()->as<SystemContext>();
+}
+
+WindowContext* ApplicationContext::mainWindowContext() const
+{
+    return d->windowContext.get();
+}
+
+void ApplicationContext::closeWindow()
+{
+    if (!NX_ASSERT(d->windowContext))
+        return;
+
+    // Make sure all QML instances are destroyed before window contexts is dissapeared.
+    const auto window = d->windowContext->mainWindow();
+    window->deleteLater();
+    QObject::connect(window, &QObject::destroyed, qApp, &QGuiApplication::quit);
+}
+
+bool ApplicationContext::isServerTimeMode() const
+{
+    return qnSettings->serverTimeMode();
+}
+
+void ApplicationContext::setServerTimeMode(bool value)
+{
+    qnSettings->setServerTimeMode(value);
 }
 
 } // namespace nx::vms::client::mobile

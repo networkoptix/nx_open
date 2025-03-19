@@ -12,7 +12,7 @@
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/random.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
 #include <nx/vms/common/p2p/downloader/result_code.h>
 #include <utils/common/delayed.h>
@@ -23,13 +23,14 @@ namespace nx::vms::client::desktop {
 
 using nx::vms::common::p2p::downloader::FileInformation;
 
-struct UploadWorker::Private: public nx::vms::client::core::RemoteConnectionAware
+struct UploadWorker::Private
 {
     UploadWorker* const q;
 
     Private(UploadWorker* parent, const QnMediaServerResourcePtr& server):
         q(parent),
-        server(server)
+        server(server),
+        requests(q->systemContext())
     {
     }
 
@@ -60,7 +61,7 @@ public:
 
 void UploadWorker::Private::getAvailableChunks()
 {
-    if (!connection())
+    if (!q->connection())
         return;
 
     NX_ASSERT(!upload.uploadAllChunks);
@@ -87,7 +88,7 @@ void UploadWorker::Private::getAvailableChunks()
             }
         });
 
-    requests.storeHandle(connectedServerApi()->fileDownloadStatus(
+    requests.storeHandle(q->connectedServerApi()->fileDownloadStatus(
         server->getId(),
         upload.destination,
         callback,
@@ -167,6 +168,7 @@ UploadWorker::UploadWorker(
     QObject* parent)
     :
     QObject(parent),
+    SystemContextAware(SystemContext::fromResource(server)),
     d(new Private(this, server))
 {
     NX_ASSERT(server);
@@ -259,7 +261,7 @@ void UploadWorker::emitProgress()
 
 void UploadWorker::createUpload()
 {
-    if (!d->connection())
+    if (!connection())
         return;
 
     d->upload.status = UploadState::CreatingUpload;
@@ -287,7 +289,7 @@ void UploadWorker::createUpload()
             //handleFileUploadCreated(success, code, result.errorString);
         });
 
-    auto handle = d->connectedServerApi()->addFileUpload(
+    auto handle = connectedServerApi()->addFileUpload(
         d->server->getId(),
         d->upload.destination,
         d->upload.size,
@@ -379,7 +381,7 @@ void UploadWorker::handleWaitForFileOnServer(
 void UploadWorker::checkRemoteFile()
 {
     // Client can be disconnected while the event is queued.
-    if (!d->connection())
+    if (!connection())
         return;
 
     d->upload.status = UploadState::WaitingFileOnServer;
@@ -388,7 +390,7 @@ void UploadWorker::checkRemoteFile()
         {
             handleWaitForFileOnServer(success, handle, result);
         });
-    auto handle = d->connectedServerApi()->fileDownloadStatus(
+    auto handle = connectedServerApi()->fileDownloadStatus(
         d->server->getId(),
         d->upload.destination,
         callback,
@@ -403,7 +405,7 @@ void UploadWorker::handleStop()
     d->md5FutureWatcher.disconnect(this);
     d->requests.cancelAllRequests();
 
-    if (!d->connection())
+    if (!connection())
         return;
 
     UploadState::Status status = d->upload.status;
@@ -411,7 +413,7 @@ void UploadWorker::handleStop()
         || status == UploadState::Uploading
         || status == UploadState::Checking)
     {
-        d->connectedServerApi()->removeFileDownload(
+        connectedServerApi()->removeFileDownload(
             d->server->getId(),
             d->upload.id,
             /*deleteData*/ true);
@@ -497,7 +499,7 @@ void UploadWorker::handleUpload()
         return;
     }
 
-    if (!d->connection())
+    if (!connection())
         return;
 
     emitProgress();
@@ -527,7 +529,7 @@ void UploadWorker::handleUpload()
             handleChunkUploaded(success, chunk);
         });
 
-    d->requests.storeHandle(d->connectedServerApi()->uploadFileChunk(
+    d->requests.storeHandle(connectedServerApi()->uploadFileChunk(
         d->server->getId(),
         d->upload.destination,
         chunk,
@@ -558,7 +560,7 @@ void UploadWorker::handleAllUploaded()
 {
     NX_INFO(this, "Upload for %1 is done. Checking...", d->upload.destination);
 
-    if (!d->connection())
+    if (!connection())
         return;
 
     d->upload.status = UploadState::Checking;
@@ -578,7 +580,7 @@ void UploadWorker::handleAllUploaded()
             handleCheckFinished(success, fileStatusOk);
         });
 
-    d->requests.storeHandle(d->connectedServerApi()->fileDownloadStatus(
+    d->requests.storeHandle(connectedServerApi()->fileDownloadStatus(
         d->server->getId(),
         d->upload.destination,
         callback,

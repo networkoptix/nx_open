@@ -41,7 +41,6 @@
 #include <QtGui/private/qvulkandefaultinstance_p.h>
 #endif
 
-#include <client_core/client_core_module.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>

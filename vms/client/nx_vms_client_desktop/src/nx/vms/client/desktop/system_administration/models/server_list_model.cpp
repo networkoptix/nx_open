@@ -5,6 +5,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/manual_device_addition/dialog/private/current_system_servers.h>
 
 namespace nx::vms::client::desktop {
@@ -30,8 +31,53 @@ struct ServerListModel::Private
 };
 
 ServerListModel::ServerListModel():
-    SystemContextAware(SystemContext::fromQmlContext(this)), d(new Private(this))
+    SystemContextAware(appContext()->currentSystemContext()), d(new Private(this))
 {
+    d->servers.reset(new CurrentSystemServers(systemContext()));
+    d->clear();
+    for (const auto& server: d->servers->servers())
+        d->serverIds.append(server->getId());
+
+    connect(d->servers.get(), &CurrentSystemServers::serverAdded,
+        [this](const QnMediaServerResourcePtr& server)
+        {
+            const auto serverId = server->getId();
+            nx::utils::ScopedConnections serverConnections;
+            serverConnections << connect(server.get(), &QnMediaServerResource::statusChanged,
+                [this, serverId]
+                {
+                    const int row = indexOf(serverId);
+                    if (row != 0)
+                        emit dataChanged(index(row), index(row));
+                });
+
+            serverConnections << connect(server.get(), &QnMediaServerResource::nameChanged,
+                [this, serverId]
+                {
+                    const int row = indexOf(serverId);
+                    if (row != 0)
+                        emit dataChanged(index(row), index(row));
+                });
+
+            d->connections[serverId] = std::move(serverConnections);
+            beginInsertRows({}, d->serverIds.count(), d->serverIds.count());
+            d->serverIds.append(serverId);
+            endInsertRows();
+        });
+
+    connect(d->servers.get(), &CurrentSystemServers::serverRemoved,
+        [this](const nx::Uuid& serverId)
+        {
+            d->connections.erase(serverId);
+            const int serverIndex = d->serverIds.indexOf(serverId);
+            if (serverIndex <= 0)
+                return;
+
+            beginRemoveRows({}, serverIndex, serverIndex);
+            d->serverIds.removeAt(serverIndex);
+            endRemoveRows();
+            emit serverRemoved();
+        });
 }
 
 ServerListModel::~ServerListModel()
@@ -112,55 +158,6 @@ QString ServerListModel::serverName(int row) const
 int ServerListModel::rowCount(const QModelIndex& /*parent*/) const
 {
     return d->serverIds.count();
-}
-
-void ServerListModel::classBegin()
-{
-    d->servers.reset(new CurrentSystemServers(systemContext()));
-    d->clear();
-    for (const auto& server: d->servers->servers())
-        d->serverIds.append(server->getId());
-
-    connect(d->servers.get(), &CurrentSystemServers::serverAdded,
-        [this](const QnMediaServerResourcePtr& server)
-        {
-            const auto serverId = server->getId();
-            nx::utils::ScopedConnections serverConnections;
-            serverConnections << connect(server.get(), &QnMediaServerResource::statusChanged,
-                [this, serverId]
-                {
-                    const int row = indexOf(serverId);
-                    if (row != 0)
-                        emit dataChanged(index(row), index(row));
-                });
-
-            serverConnections << connect(server.get(), &QnMediaServerResource::nameChanged,
-                [this, serverId]
-                {
-                    const int row = indexOf(serverId);
-                    if (row != 0)
-                        emit dataChanged(index(row), index(row));
-                });
-
-            d->connections[serverId] = std::move(serverConnections);
-            beginInsertRows({}, d->serverIds.count(), d->serverIds.count());
-            d->serverIds.append(serverId);
-            endInsertRows();
-        });
-
-    connect(d->servers.get(), &CurrentSystemServers::serverRemoved,
-        [this](const nx::Uuid& serverId)
-        {
-            d->connections.erase(serverId);
-            const int serverIndex = d->serverIds.indexOf(serverId);
-            if (serverIndex <= 0)
-                return;
-
-            beginRemoveRows({}, serverIndex, serverIndex);
-            d->serverIds.removeAt(serverIndex);
-            endRemoveRows();
-            emit serverRemoved();
-        });
 }
 
 } // namespace nx::vms::client::desktop

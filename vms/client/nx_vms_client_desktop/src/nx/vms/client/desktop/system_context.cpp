@@ -14,10 +14,11 @@
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/access/cloud_cross_system_access_controller.h>
-#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/resource/local_resources_initializer.h>
@@ -70,7 +71,7 @@ nx::vms::api::RuntimeData createLocalRuntimeInfo(SystemContext* q)
 
 SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     base_type(mode, peerId, parent),
-    d(new Private)
+    d(new Private{.q = this})
 {
     if (mode == Mode::crossSystem)
     {
@@ -124,12 +125,14 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->serverRemoteAccessWatcher = std::make_unique<ServerRemoteAccessWatcher>(this);
             d->userNotificationSettingsManager =
                 std::make_unique<UserNotificationSettingsManager>(this);
+            d->initializeNetworkModules();
             break;
 
         case Mode::crossSystem:
             d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
             d->mediaServerStatisticsManager = std::make_unique<QnMediaServerStatisticsManager>(
                 this);
+            d->initializeNetworkModules();
             break;
 
         case Mode::cloudLayouts:

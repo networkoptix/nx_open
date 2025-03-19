@@ -118,7 +118,11 @@ public:
     /**
      * Interface to create SSL certificate validation functors.
      */
-    AbstractCertificateVerifier* certificateVerifier() const;
+    template<typename CertificateVerifierType = AbstractCertificateVerifier>
+    CertificateVerifierType* certificateVerifier() const
+    {
+        return dynamic_cast<CertificateVerifierType*>(verifier());
+    }
 
     /**
      * Start checking what VMS Server network interfaces are accessible.
@@ -267,6 +271,9 @@ protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
 
     Mode mode() const;
+
+private:
+    AbstractCertificateVerifier* verifier() const;
 
 private:
     struct Private;

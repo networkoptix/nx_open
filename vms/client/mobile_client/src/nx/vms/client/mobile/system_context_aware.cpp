@@ -12,9 +12,24 @@ SystemContext* SystemContextAware::systemContext() const
     return base_type::systemContext()->as<SystemContext>();
 }
 
-SessionManager* SystemContextAware::sessionManager() const
+WindowContext* SystemContextAware::windowContext() const
 {
-    return systemContext()->sessionManager();
+    return systemContext()->windowContext();
+}
+
+QnAvailableCamerasWatcher* SystemContextAware::availableCamerasWatcher() const
+{
+    return systemContext()->availableCamerasWatcher();
+}
+
+QnResourceDiscoveryManager* SystemContextAware::resourceDiscoveryManager() const
+{
+    return systemContext()->resourceDiscoveryManager();
+}
+
+QnCameraThumbnailCache* SystemContextAware::cameraThumbnailCache() const
+{
+    return systemContext()->cameraThumbnailCache();
 }
 
 } // namespace nx::vms::client::mobile

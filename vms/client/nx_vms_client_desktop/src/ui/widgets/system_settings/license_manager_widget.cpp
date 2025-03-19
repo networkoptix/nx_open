@@ -11,7 +11,6 @@
 #include <api/runtime_info_manager.h>
 #include <api/server_rest_connection.h>
 #include <client/client_runtime_settings.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/user_resource.h>
 #include <licensing/license.h>
 #include <nx/branding.h>

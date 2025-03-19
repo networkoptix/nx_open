@@ -10,7 +10,6 @@
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <utils/common/synctime.h>
 
 #include "../flux/time_synchronization_widget_store.h"
@@ -19,9 +18,7 @@ namespace nx::vms::client::desktop {
 
 static constexpr int kDelayTickCount = 15;
 
-class TimeSynchronizationServerTimeWatcher::Private:
-    public QObject,
-    public core::RemoteConnectionAware
+class TimeSynchronizationServerTimeWatcher::Private: public QObject
 {
     TimeSynchronizationServerTimeWatcher* q = nullptr;
 
@@ -48,7 +45,7 @@ public:
         if (m_currentRequest != 0)
             return;
 
-        if (!connection())
+        if (!q->connection())
             return;
 
         const auto callback = nx::utils::guarded(this,
@@ -83,7 +80,7 @@ public:
         m_tickCount = 0;
         m_elapsedTimer.restart();
 
-        m_currentRequest = connectedServerApi()->getTimeOfServersAsync(callback, thread());
+        m_currentRequest = q->connectedServerApi()->getTimeOfServersAsync(callback, thread());
         m_store->setBaseTime(m_store->state().baseTime + m_store->state().elapsedTime);
     }
 

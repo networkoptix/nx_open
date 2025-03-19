@@ -8,7 +8,8 @@
 #include <QtQuick/QQuickWindow>
 
 #include <mobile_client/mobile_client_module.h>
-#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/mobile/application_context.h>
+#include <nx/vms/client/mobile/window_context.h>
 
 #include "detail/qml_result_wait.h"
 
@@ -21,7 +22,7 @@ QString QmlWrapperHelper::showPopup(
     const auto engine = core::appContext()->qmlEngine();
     QQmlComponent component(engine, source);
 
-    const auto parentItem = qnMobileClientModule->mainWindow()->contentItem();
+    const auto parentItem = appContext()->mainWindowContext()->mainWindow()->contentItem();
     properties.insert("parent", QVariant::fromValue(parentItem));
 
     const auto popup = component.createWithInitialProperties(properties);
@@ -51,7 +52,8 @@ QString QmlWrapperHelper::showScreen(
     const QUrl& source,
     const QVariantMap& properties)
 {
-    auto stackView = qnMobileClientModule->mainWindow()->findChild<QObject*>("mainStackView");
+    auto stackView = appContext()->mainWindowContext()->mainWindow()->findChild<QObject*>(
+        "mainStackView");
     QObject* screen = nullptr;
     QMetaObject::invokeMethod(stackView, "safePush", Qt::DirectConnection,
         Q_RETURN_ARG(QObject*, screen),

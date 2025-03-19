@@ -10,8 +10,6 @@
 #include <nx/vms/client/desktop/radass/radass_fwd.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
-class QnClientCoreModule;
-
 namespace nx::vms::api { enum class PeerType; }
 namespace nx::vms::license { class VideoWallLicenseUsageHelper; }
 
@@ -46,8 +44,6 @@ public:
     static QnClientModule* instance();
 
     void startLocalSearchers();
-
-    QnClientCoreModule* clientCoreModule() const;
 
     QnStartupParameters startupParameters() const;
 

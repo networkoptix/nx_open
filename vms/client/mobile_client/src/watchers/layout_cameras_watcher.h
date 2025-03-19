@@ -6,7 +6,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/mobile/current_system_context_aware.h>
 #include <utils/common/counter_hash.h>
 
 namespace nx {
@@ -14,9 +13,7 @@ namespace client {
 namespace mobile {
 
 
-class LayoutCamerasWatcher:
-    public QObject,
-    public nx::vms::client::mobile::CurrentSystemContextAware
+class LayoutCamerasWatcher: public QObject
 {
     Q_OBJECT
 

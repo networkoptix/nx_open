@@ -6,7 +6,6 @@
 
 #include <QtCore/QTimer>
 
-#include <client_core/client_core_module.h>
 #include <network/system_helpers.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/log/log.h>

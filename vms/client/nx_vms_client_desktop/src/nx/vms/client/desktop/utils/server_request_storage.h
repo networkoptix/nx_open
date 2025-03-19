@@ -5,7 +5,7 @@
 #include <QtCore/QSet>
 
 #include <api/server_rest_connection_fwd.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
@@ -17,10 +17,10 @@ namespace nx::vms::client::desktop {
  *
  * See example usage in `VirtualCameraWorker` implementation.
  */
-class ServerRequestStorage: public core::RemoteConnectionAware
+class ServerRequestStorage: public SystemContextAware
 {
 public:
-    ServerRequestStorage();
+    ServerRequestStorage(SystemContext* context);
     ~ServerRequestStorage();
 
     void storeHandle(rest::Handle handle);

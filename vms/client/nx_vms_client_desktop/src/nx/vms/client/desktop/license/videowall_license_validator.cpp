@@ -3,12 +3,12 @@
 #include "videowall_license_validator.h"
 
 #include <api/runtime_info_manager.h>
-#include <client_core/client_core_module.h>
 #include <licensing/license.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
-#include <nx/vms/common/system_context.h>
 #include <utils/common/synctime.h>
 
 using namespace nx::vms::client::desktop::license;
@@ -19,11 +19,12 @@ bool VideoWallLicenseValidator::overrideMissingRuntimeInfo(
     if (license->type() != Qn::LC_VideoWall)
         return false;
 
-    const auto currentSession = qnClientCoreModule->networkModule()->session();
+    const auto context = systemContext()->as<nx::vms::client::core::SystemContext>();
+    const auto currentSession = context->networkModule()->session();
     if (!currentSession)
         return false;
 
-    const auto& manager = qnClientCoreModule->runtimeInfoManager();
+    const auto& manager = currentSession->runtimeInfoManager();
     auto commonInfo =
         manager->items()->getItem(currentSession->connection()->moduleInformation().id);
 

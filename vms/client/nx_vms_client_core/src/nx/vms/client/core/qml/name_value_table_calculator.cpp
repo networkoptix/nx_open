@@ -172,7 +172,7 @@ void NameValueTableCalculator::updateColumnWidths()
     d->setWidths(preferredLabelWidth, preferredValueWidth);
 }
 
-void NameValueTableCalculator::componentComplete()
+void NameValueTableCalculator::onContextReady()
 {
     if (auto grid = qobject_cast<QQuickItem*>(parent()))
     {

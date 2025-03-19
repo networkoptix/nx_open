@@ -276,6 +276,7 @@ Control
             Watermark
             {
                 anchors.fill: parent
+                resource: cameraItem.resource
                 sourceSize: Qt.size(parent.width, parent.height)
             }
 
@@ -351,6 +352,7 @@ Control
                 parent: video.videoOutput
                 anchors.fill: parent
 
+                resource: cameraItem.resource
                 sourceSize: Qt.size(parent.width, parent.height)
             }
 

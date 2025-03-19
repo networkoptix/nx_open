@@ -8,11 +8,15 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
-#include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/network/certificate_verifier.h>
+#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/rules/client_router.h>
+#include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
+#include <nx/vms/client/core/utils/video_cache.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/core/watchers/watermark_watcher.h>
@@ -29,34 +33,6 @@ static const QString kSystemContextPropertyName("systemContext");
 
 } // namespace
 
-class SystemContextFromQmlInitializer: public nx::vms::common::SystemContextInitializer
-{
-public:
-    SystemContextFromQmlInitializer(QObject* owner):
-        m_owner(owner)
-    {
-    }
-
-    virtual SystemContext* systemContext() const override
-    {
-        auto qmlContext = QQmlEngine::contextForObject(m_owner);
-
-        while (NX_ASSERT(qmlContext))
-        {
-            auto systemContext = qmlContext->contextProperty(kSystemContextPropertyName);
-            if (systemContext.isValid())
-                return systemContext.value<SystemContext*>();
-
-            qmlContext = qmlContext->parentContext();
-        }
-
-        return nullptr;
-    }
-
-private:
-    QObject* const m_owner;
-};
-
 SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     base_type(mode, peerId, parent),
     d(new Private{.q=this})
@@ -65,7 +41,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     std::unique_ptr<QnServerStorageManager> serverStorageManager;
 
     d->analyticsAttributeHelper = std::make_unique<
-        nx::vms::client::core::analytics::AttributeHelper>(analyticsTaxonomyStateWatcher());
+        analytics::AttributeHelper>(analyticsTaxonomyStateWatcher());
 
     switch (mode)
     {
@@ -79,11 +55,13 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->serverStorageManager = std::make_unique<QnServerStorageManager>(this);
             d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(
                 this,
-                std::make_unique<nx::vms::client::core::rules::ClientRouter>(this),
+                std::make_unique<core::rules::ClientRouter>(this),
                 std::make_unique<nx::vms::rules::Initializer>(this),
                 /*separateThread*/ false);
             d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             d->videoCache = std::make_unique<VideoCache>(this);
+            d->initializeQml();
+            d->initializeNetworkModule();
             break;
         }
         case Mode::crossSystem:
@@ -95,13 +73,20 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
             if (ini().allowCslObjectSearch)
                 d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
+            d->initializeNetworkModule();
             break;
         }
 
         case Mode::cloudLayouts:
         case Mode::unitTests:
+            d->initializeQml();
+            d->initializeNetworkModule();
+            break;
+        case Mode::server:
+            NX_CRITICAL(mode != Mode::server, "Client context cannot be of server type");
             break;
     }
+
     resetAccessController(new AccessController(this));
 
     if (d->userWatcher)
@@ -126,17 +111,6 @@ SystemContext* SystemContext::fromResource(const QnResourcePtr& resource)
         return {};
 
     return dynamic_cast<SystemContext*>(resource->systemContext());
-}
-
-std::unique_ptr<nx::vms::common::SystemContextInitializer> SystemContext::fromQmlContext(
-    QObject* source)
-{
-    return std::make_unique<SystemContextFromQmlInitializer>(source);
-}
-
-void SystemContext::storeToQmlContext(QQmlContext* qmlContext)
-{
-    qmlContext->setContextProperty(kSystemContextPropertyName, this);
 }
 
 nx::vms::api::ModuleInformation SystemContext::moduleInformation() const
@@ -338,6 +312,11 @@ IoPortsCompatibilityInterface* SystemContext::ioPortsInterface() const
     return d->ioPortsInterface.get();
 }
 
+NetworkModule* SystemContext::networkModule() const
+{
+    return d->networkModule.get();
+}
+
 void SystemContext::resetAccessController(AccessController* accessController)
 {
     d->accessController.reset(accessController);
@@ -350,4 +329,4 @@ void SystemContext::startModuleDiscovery(
     d->serverPrimaryInterfaceWatcher = std::make_unique<ServerPrimaryInterfaceWatcher>(this);
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

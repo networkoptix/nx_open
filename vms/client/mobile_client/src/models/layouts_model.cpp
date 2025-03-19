@@ -15,15 +15,19 @@
 #include <mobile_client/mobile_client_module.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/client_core_globals.h>
-#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
-#include <nx/vms/client/mobile/current_system_context_aware.h>
+#include <nx/vms/client/mobile/system_context.h>
+#include <nx/vms/client/mobile/system_context_aware.h>
+#include <nx/vms/client/mobile/window_context.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/layout_cameras_watcher.h>
 
 using namespace nx;
 using namespace nx::core::access;
 using namespace nx::vms::client::core;
+using namespace nx::vms::client::mobile;
+
 using nx::client::mobile::LayoutCamerasWatcher;
 
 namespace {
@@ -68,7 +72,7 @@ struct ModelItem
 
 class QnLayoutsModelUnsorted:
     public QAbstractListModel,
-    public nx::vms::client::mobile::CurrentSystemContextAware
+    public nx::vms::client::mobile::SystemContextAware
 {
     Q_DECLARE_TR_FUNCTIONS(QnLayoutsModelUnsorted)
 
@@ -83,7 +87,8 @@ public:
         SectionRole
     };
 
-    QnLayoutsModelUnsorted(QObject* parent = nullptr);
+    QnLayoutsModelUnsorted(nx::vms::client::mobile::SystemContext* context,
+        QObject* parent = nullptr);
 
     virtual QHash<int, QByteArray> roleNames() const override;
     virtual int rowCount(const QModelIndex& parent) const override;
@@ -109,15 +114,18 @@ private:
     int m_allCamerasCount = 0;
 };
 
-QnLayoutsModelUnsorted::QnLayoutsModelUnsorted(QObject* parent):
-    base_type(parent)
+QnLayoutsModelUnsorted::QnLayoutsModelUnsorted(nx::vms::client::mobile::SystemContext* context,
+    QObject* parent)
+    :
+    base_type(parent),
+    SystemContextAware(context)
 {
     const auto userWatcher = systemContext()->userWatcher();
     connect(userWatcher, &nx::vms::client::core::UserWatcher::userChanged,
         this, &QnLayoutsModelUnsorted::at_userChanged);
     at_userChanged(userWatcher->user());
 
-    const auto camerasWatcher = qnMobileClientModule->availableCamerasWatcher();
+    const auto camerasWatcher = availableCamerasWatcher();
     auto updateCamerasCount = [this, camerasWatcher]()
     {
         m_allCamerasCount = camerasWatcher->availableCameras().size();
@@ -125,22 +133,22 @@ QnLayoutsModelUnsorted::QnLayoutsModelUnsorted(QObject* parent):
         emit dataChanged(idx, idx, QVector<int>{ItemsCountRole});
     };
     connect(camerasWatcher, &QnAvailableCamerasWatcher::cameraAdded,
-            this, updateCamerasCount);
+        this, updateCamerasCount);
     connect(camerasWatcher, &QnAvailableCamerasWatcher::cameraRemoved,
-            this, updateCamerasCount);
+        this, updateCamerasCount);
 
     connect(resourcePool(), &QnResourcePool::resourceAdded,
-            this, &QnLayoutsModelUnsorted::at_resourceAdded);
+        this, &QnLayoutsModelUnsorted::at_resourceAdded);
     connect(resourcePool(), &QnResourcePool::resourceRemoved,
-            this, &QnLayoutsModelUnsorted::at_resourceRemoved);
+        this, &QnLayoutsModelUnsorted::at_resourceRemoved);
 
     const auto handleAccessChanged =
         [this]()
-        {
-            const auto layouts = resourcePool()->getResources<QnLayoutResource>();
-            for (const auto& layout: layouts)
-                handleResourceAccessibilityChanged(layout);
-        };
+    {
+        const auto layouts = resourcePool()->getResources<QnLayoutResource>();
+        for (const auto& layout: layouts)
+            handleResourceAccessibilityChanged(layout);
+    };
 
     connect(resourceAccessManager(), &QnResourceAccessManager::resourceAccessReset,
         this, handleAccessChanged);
@@ -192,8 +200,8 @@ QVariant QnLayoutsModelUnsorted::data(const QModelIndex& index, int role) const
                     return item.name();
             }
 
-        case UuidRole:
-            return item.id.isNull() ? QString() : item.id.toSimpleString();
+        case RawResourceRole:
+            return QVariant::fromValue(withCppOwnership(item.layout));
 
         case ItemTypeRole:
             return static_cast<int>(item.type());
@@ -374,11 +382,10 @@ void QnLayoutsModelUnsorted::removeLayout(const QnLayoutResourcePtr& layout)
 }
 
 QnLayoutsModel::QnLayoutsModel(QObject* parent) :
-    base_type(parent)
+    base_type(parent),
+    nx::vms::client::mobile::WindowContextAware(
+        nx::vms::client::mobile::WindowContext::fromQmlContext(this))
 {
-    setSourceModel(new QnLayoutsModelUnsorted(this));
-    setDynamicSortFilter(true);
-    sort(0);
 }
 
 bool QnLayoutsModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
@@ -417,4 +424,27 @@ bool QnLayoutsModel::lessThan(const QModelIndex& left, const QModelIndex& right)
         return cmp < 0;
 
     return leftResource->getId() < rightResource->getId();
+}
+
+void QnLayoutsModel::onContextReady()
+{
+    setDynamicSortFilter(true);
+
+    const auto updateModel =
+        [this]()
+        {
+            if (const auto systemContext = windowContext()->mainSystemContext())
+            {
+                setSourceModel(new QnLayoutsModelUnsorted(systemContext));
+                sort(0);
+            }
+            else
+            {
+                setSourceModel(nullptr);
+            }
+        };
+
+    updateModel();
+    connect(windowContext(), &nx::vms::client::mobile::WindowContext::mainSystemContextChanged,
+        this, updateModel);
 }

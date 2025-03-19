@@ -6,6 +6,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/common/network/abstract_certificate_verifier.h>
 
 #include "system_context.h"
 
@@ -14,12 +15,10 @@ namespace nx::vms::common {
 struct SystemContextAware::Private
 {
     mutable QPointer<SystemContext> systemContext;
-    mutable std::unique_ptr<SystemContextInitializer> delayedInitializer;
 };
 
 SystemContextAware::SystemContextAware(SystemContext* systemContext):
-    m_context(systemContext),
-    d(new Private())
+    d(new Private{.systemContext = systemContext})
 {
     NX_CRITICAL(systemContext);
     d->systemContext = systemContext;
@@ -35,41 +34,15 @@ SystemContextAware::SystemContextAware(SystemContext* systemContext):
     }
 }
 
-SystemContextAware::SystemContextAware(std::unique_ptr<SystemContextInitializer> initializer):
-    d(new Private())
-{
-    d->delayedInitializer = std::move(initializer);
-}
-
 SystemContextAware::~SystemContextAware()
 {
     // Make sure context was not ever initialized or still exists.
-    NX_ASSERT(d->delayedInitializer || d->systemContext,
+    NX_ASSERT(d->systemContext,
         "Context-aware object must be destroyed before the corresponding context is.");
 }
 
 SystemContext* SystemContextAware::systemContext() const
 {
-    if (!d->systemContext)
-    {
-        if (NX_ASSERT(d->delayedInitializer))
-        {
-            d->systemContext = d->delayedInitializer->systemContext();
-            d->delayedInitializer.reset();
-            NX_ASSERT(d->systemContext, "Initialization failed");
-
-            if (auto qobject = dynamic_cast<const QObject*>(this))
-            {
-                QObject::connect(d->systemContext.get(), &QObject::destroyed, qobject,
-                    [this]()
-                    {
-                        NX_ASSERT(false,
-                            "Context-aware object must be destroyed before the corresponding "
-                            "context is.");
-                    });
-            }
-        }
-    }
     return d->systemContext.data();
 }
 
@@ -131,6 +104,48 @@ QnRuntimeInfoManager* SystemContextAware::runtimeInfoManager() const
 UserGroupManager* SystemContextAware::userGroupManager() const
 {
     return systemContext()->userGroupManager();
+}
+
+nx::core::access::AccessRightsManager* SystemContextAware::accessRightsManager() const
+{
+    return systemContext()->accessRightsManager();
+}
+
+QnLicensePool* SystemContextAware::licensePool() const
+{
+    return systemContext()->licensePool();
+}
+
+nx::vms::event::RuleManager* SystemContextAware::eventRuleManager() const
+{
+    return systemContext()->eventRuleManager();
+}
+
+QnResourceStatusDictionary* SystemContextAware::resourceStatusDictionary() const
+{
+    return systemContext()->resourceStatusDictionary();
+}
+
+QnServerAdditionalAddressesDictionary*
+    SystemContextAware::serverAdditionalAddressesDictionary() const
+{
+    return systemContext()->serverAdditionalAddressesDictionary();
+}
+
+saas::ServiceManager* SystemContextAware::saasServiceManager() const
+{
+    return systemContext()->saasServiceManager();
+}
+
+std::shared_ptr<nx::analytics::taxonomy::AbstractState>
+    SystemContextAware::analyticsTaxonomyState() const
+{
+    return systemContext()->analyticsTaxonomyState();
+}
+
+AbstractCertificateVerifier* SystemContextAware::verifier() const
+{
+    return systemContext()->certificateVerifier();
 }
 
 } // namespace nx::vms::common

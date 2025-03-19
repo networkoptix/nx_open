@@ -9,9 +9,7 @@
 #include <QtGui/QTextDocumentFragment>
 
 #include <camera/camera_thumbnail_cache.h>
-#include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
 #include <mobile_client/mobile_client_module.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_ui_controller.h>
@@ -23,12 +21,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/std/algorithm.h>
-#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
-#include <nx/vms/client/core/event_search/models/analytics_search_list_model.h>
-#include <nx/vms/client/core/event_search/models/bookmark_search_list_model.h>
-#include <nx/vms/client/core/event_search/models/event_search_model_adapter.h>
-#include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
@@ -37,12 +30,7 @@
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
-#include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
-#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/mobile/application_context.h>
-#include <nx/vms/client/mobile/controllers/web_view_controller.h>
-#include <nx/vms/client/mobile/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/mobile/push_notification/details/push_systems_selection_model.h>
 #include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
 #include <nx/vms/client/mobile/session/session.h>
@@ -51,6 +39,7 @@
 #include <nx/vms/client/mobile/ui/qml_wrapper_helper.h>
 #include <nx/vms/client/mobile/utils/navigation_bar_utils.h>
 #include <nx/vms/client/mobile/utils/operation_manager.h>
+#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/time/formatter.h>
 #include <settings/qml_settings_adaptor.h>
@@ -66,8 +55,6 @@ using namespace nx::vms::client::mobile;
 
 namespace {
 
-static const nx::utils::SoftwareVersion kUserRightsRefactoredVersion(3, 0);
-
 bool isCloudUrl(const nx::utils::Url& url)
 {
     return url.scheme() == Session::kCloudUrlScheme
@@ -81,9 +68,10 @@ Settings* coreSettings()
 
 } // namespace
 
-QnContext::QnContext(nx::vms::client::mobile::SystemContext* systemContext, QObject* parent):
+QnContext::QnContext(SessionManager* sessionManager,
+    QObject* parent)
+    :
     base_type(parent),
-    SystemContextAware(systemContext),
     m_audioController(new AudioController(this)),
     m_settings(new QmlSettingsAdaptor(this)),
     m_appInfo(new QnMobileAppInfo(this)),
@@ -92,14 +80,11 @@ QnContext::QnContext(nx::vms::client::mobile::SystemContext* systemContext, QObj
         SystemUri::ReferralSource::MobileClient,
         SystemUri::ReferralContext::WelcomePage,
         this)),
-    m_timeWatcher(systemContext->serverTimeWatcher()),
     m_localPrefix(lit("qrc:///")),
     m_customMargins(),
-    m_pushNotificationManager(qnMobileClientModule->pushManager()),
-    m_operationManager(new OperationManager(this)),
-    m_twoWayAudioController(new TwoWayAudioController(systemContext, this))
+    m_operationManager(new OperationManager(this))
 {
-    m_uiController->initialize(sessionManager(), this);
+    m_uiController->initialize(sessionManager, this);
 
     const auto screen = qApp->primaryScreen();
     // TODO: Qt6 Removed: https://bugreports.qt.io/browse/QTBUG-83055
@@ -113,29 +98,6 @@ QnContext::QnContext(nx::vms::client::mobile::SystemContext* systemContext, QObj
             const auto kAnimationDelayMs = std::chrono::milliseconds(300);
             executeDelayedParented(emitDeviceStatusBarHeightChanged, kAnimationDelayMs, this);
         });
-
-    connect(sessionManager(), &SessionManager::stateChanged, this,
-        [this]()
-        {
-            auto thumbnailCache = QnCameraThumbnailCache::instance();
-            if (!thumbnailCache)
-                return;
-
-            if (sessionManager()->hasConnectedSession())
-                thumbnailCache->start();
-            else
-                thumbnailCache->stop();
-        });
-
-    connect(sessionManager(), &SessionManager::connectedServerVersionChanged, this,
-        [this]()
-        {
-            const bool compatibilityMode =
-                sessionManager()->connectedServerVersion() < kUserRightsRefactoredVersion;
-            const auto camerasWatcher = qnMobileClientModule->availableCamerasWatcher();
-            camerasWatcher->setCompatiblityMode(compatibilityMode);
-        });
-
 
     const auto updateTrafficLogging =
         []()
@@ -171,30 +133,6 @@ QnContext::QnContext(nx::vms::client::mobile::SystemContext* systemContext, QObj
         };
 
     connect(qApp->screens().first(), &QScreen::geometryChanged, this, updateMarginsCallback);
-
-    const auto userWatcher = systemContext->userWatcher();
-    connect(userWatcher, &UserWatcher::userNameChanged, this,
-        [this, userWatcher]()
-        {
-            if (userWatcher->userName().isEmpty())
-            {
-                NX_DEBUG(this, "User name changed to empty, stopping session");
-                sessionManager()->stopSession();
-            }
-        });
-
-    const auto updateTimeMode =
-        [this]()
-        {
-            m_timeWatcher->setTimeMode(qnSettings->serverTimeMode()
-                ? ServerTimeWatcher::serverTimeMode
-                : ServerTimeWatcher::clientTimeMode);
-        };
-    const auto notifier = qnSettings->notifier(QnMobileClientSettings::ServerTimeMode);
-    connect(notifier, &QnPropertyNotifier::valueChanged, this, updateTimeMode);
-    connect(m_timeWatcher, &ServerTimeWatcher::timeZoneChanged,
-        this, &QnContext::serverTimeModeChanged);
-    updateTimeMode();
 
     using SecureProperty = nx::utils::property_storage::SecureProperty<std::string>;
     connect(&coreSettings()->digestCloudPassword, &SecureProperty::changed,
@@ -251,7 +189,7 @@ void QnContext::initCloudStatusHandling()
 
             const auto& connectionData = coreSettings()->lastConnection();
             if (isCloudUrl(connectionData.url))
-                sessionManager()->stopSession();
+                sessionManager()->stopSessionByUser();
         });
 
     connect(watcher, &CloudStatusWatcher::forcedLogout, this,
@@ -268,19 +206,9 @@ CloudStatusWatcher* QnContext::cloudStatusWatcher() const
     return nx::vms::client::core::appContext()->cloudStatusWatcher();
 }
 
-TwoWayAudioController* QnContext::twoWayAudioController() const
-{
-    return m_twoWayAudioController;
-}
-
 OperationManager* QnContext::operationManager() const
 {
     return m_operationManager;
-}
-
-UserWatcher* QnContext::currentUserWatcher() const
-{
-    return systemContext()->userWatcher();
 }
 
 QmlSettingsAdaptor* QnContext::settings() const
@@ -345,10 +273,8 @@ void QnContext::setScreenOrientation(Qt::ScreenOrientation orientation)
 
 int QnContext::getMaxTextureSize() const
 {
-    if (const auto textureSizeHelper = QnTextureSizeHelper::instance())
-        return textureSizeHelper->maxTextureSize();
-
-    return -1;
+    const auto context = nx::vms::client::mobile::appContext()->mainWindowContext();
+    return context->textureSizeHelper()->maxTextureSize();
 }
 
 bool QnContext::showCameraInfo() const
@@ -442,12 +368,17 @@ void QnContext::makeShortVibration()
     ::makeShortVibration();
 }
 
+nx::vms::client::mobile::PushNotificationManager* QnContext::pushManager() const
+{
+    return qnMobileClientModule->pushManager();
+}
+
 details::PushSystemsSelectionModel* QnContext::createPushSelectionModel() const
 {
     // No parent means Qml will take care of it.
     return new details::PushSystemsSelectionModel(
         cloudStatusWatcher()->recentCloudSystems(),
-        m_pushNotificationManager->selectedSystems());
+        pushManager()->selectedSystems());
 }
 
 void QnContext::showConnectionErrorMessage(
@@ -462,10 +393,7 @@ void QnContext::showConnectionErrorMessage(
 
 void QnContext::openExternalLink(const QUrl& url)
 {
-    if (const auto webView = qnMobileClientModule->webViewController())
-        webView->openUrl(url);
-    else
-        QDesktopServices::openUrl(url);
+    QDesktopServices::openUrl(url);
 }
 
 int QnContext::leftCustomMargin() const
@@ -488,19 +416,9 @@ int QnContext::bottomCustomMargin() const
     return m_customMargins.bottom();
 }
 
-bool QnContext::serverTimeMode() const
-{
-    return m_timeWatcher->timeMode() == ServerTimeWatcher::serverTimeMode;
-}
-
-void QnContext::setServerTimeMode(bool value)
-{
-    qnSettings->setServerTimeMode(value);
-}
-
 SessionManager* QnContext::sessionManager() const
 {
-    return systemContext()->sessionManager();
+    return nx::vms::client::mobile::appContext()->mainWindowContext()->sessionManager();
 }
 
 OauthClient* QnContext::createOauthClient(
@@ -594,58 +512,9 @@ void QnContext::requestRecordAudioPermissionIfNeeded()
     ::requestRecordAudioPermissionIfNeeded();
 }
 
-EventSearchModelAdapter* QnContext::createSearchModel(
-    bool analyticsMode)
-{
-    const auto context = systemContext();
-    const auto adapter = new EventSearchModelAdapter();
-    adapter->setSearchModel(analyticsMode
-        ? static_cast<AbstractAsyncSearchListModel*>(new AnalyticsSearchListModel(context, adapter))
-        : static_cast<AbstractAsyncSearchListModel*>(new BookmarkSearchListModel(context, adapter)));
-    return adapter;
-}
-
-nx::vms::client::core::CommonObjectSearchSetup* QnContext::createSearchSetup(
-    EventSearchModelAdapter* model)
-{
-    const auto result = new nx::vms::client::mobile::CommonObjectSearchSetup(systemContext());
-    if (model)
-        result->setModel(model->searchModel());
-    return result;
-}
-
-AnalyticsSearchSetup* QnContext::createAnalyticsSearchSetup(
-    EventSearchModelAdapter* model)
-{
-    if (!model)
-        return nullptr;
-
-    if (const auto analyticsModel = qobject_cast<AnalyticsSearchListModel*>(model->searchModel()))
-        return new AnalyticsSearchSetup(analyticsModel);
-
-    return nullptr;
-}
-
 QString QnContext::plainText(const QString& value)
 {
     return QTextDocumentFragment::fromHtml(value).toPlainText();
-}
-
-bool QnContext::hasViewBookmarksPermission()
-{
-    return accessController()->isDeviceAccessRelevant(
-        nx::vms::api::AccessRight::viewBookmarks);
-}
-
-bool QnContext::hasSearchObjectsPermission()
-{
-    static const nx::utils::SoftwareVersion kObjectSearchMinimalSupportVersion(5, 0);
-
-    const auto context = systemContext();
-    const auto server = context->currentServer();
-    return server
-        && server->getVersion() >= kObjectSearchMinimalSupportVersion
-        && context->accessController()->isDeviceAccessRelevant(nx::vms::api::AccessRight::viewArchive);
 }
 
 QString QnContext::qualityText(const QSize& resolution, int quality)

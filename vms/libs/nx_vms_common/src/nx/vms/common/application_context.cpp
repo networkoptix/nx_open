@@ -139,6 +139,11 @@ ApplicationContext::~ApplicationContext()
         s_instance = nullptr;
 }
 
+const ApplicationContext::Features& ApplicationContext::commonFeatures() const
+{
+    return d->features;
+}
+
 ApplicationContext* ApplicationContext::instance()
 {
     return s_instance;

@@ -2,8 +2,8 @@
 
 #include "remote_connection_user_interaction_delegate.h"
 
-#include <client_core/client_core_module.h>
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
@@ -25,6 +25,7 @@ using CertificateValidationLevel = network::server_certificate::ValidationLevel;
 
 struct RemoteConnectionUserInteractionDelegate::Private
 {
+    RemoteConnectionUserInteractionDelegate* const q;
     const TokenValidator validateToken;
     const AskUserToAcceptCertificates askToAcceptCertificates;
     const ShowCertificateError showCertificateError;
@@ -35,6 +36,7 @@ struct RemoteConnectionUserInteractionDelegate::Private
     }
 
     Private(
+        RemoteConnectionUserInteractionDelegate* q,
         TokenValidator validateToken,
         AskUserToAcceptCertificates askToAcceptCertificates,
         ShowCertificateError showCertificateError);
@@ -44,10 +46,12 @@ struct RemoteConnectionUserInteractionDelegate::Private
 };
 
 RemoteConnectionUserInteractionDelegate::Private::Private(
+    RemoteConnectionUserInteractionDelegate* q,
     TokenValidator validateToken,
     AskUserToAcceptCertificates askToAcceptCertificates,
     ShowCertificateError showCertificateError)
     :
+    q(q),
     validateToken(validateToken),
     askToAcceptCertificates(askToAcceptCertificates),
     showCertificateError(showCertificateError)
@@ -57,7 +61,7 @@ RemoteConnectionUserInteractionDelegate::Private::Private(
 void RemoteConnectionUserInteractionDelegate::Private::tryShowCertificateError(
     const TargetCertificateInfo& certificateInfo)
 {
-    const auto session = qnClientCoreModule->networkModule()->session();
+    const auto session = q->session();
     if (session && session->state() == nx::vms::client::core::RemoteSession::State::reconnecting)
         return;
 
@@ -68,13 +72,15 @@ void RemoteConnectionUserInteractionDelegate::Private::tryShowCertificateError(
 // RemoteConnectionUserInteractionDelegate
 
 RemoteConnectionUserInteractionDelegate::RemoteConnectionUserInteractionDelegate(
+    SystemContext* context,
     TokenValidator validateToken,
     AskUserToAcceptCertificates askToAcceptCertificates,
     ShowCertificateError showCertificateError,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(validateToken, askToAcceptCertificates, showCertificateError))
+    SystemContextAware(context),
+    d(new Private(this, validateToken, askToAcceptCertificates, showCertificateError))
 {
     NX_ASSERT(validateToken, "Validate token handler should be specified!");
     NX_ASSERT(askToAcceptCertificates, "Ask to accept certificates handler should be specified!");

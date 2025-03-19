@@ -169,6 +169,7 @@ ScalableContentHolder
         parent: videoContent.videoOutput
         anchors.fill: parent
 
+        resource: control.resourceHelper.resource
         sourceSize: videoContent.videoOutput.channelSize
     }
 

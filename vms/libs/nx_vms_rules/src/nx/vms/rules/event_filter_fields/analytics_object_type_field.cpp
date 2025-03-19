@@ -23,7 +23,7 @@ bool AnalyticsObjectTypeField::match(const QVariant& eventValue) const
         return true;
 
     return nx::analytics::taxonomy::isBaseType(
-        m_context->analyticsTaxonomyState().get(),
+        analyticsTaxonomyState().get(),
         value(),
         typeId);
 }

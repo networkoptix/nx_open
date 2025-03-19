@@ -772,7 +772,7 @@ bool QnLicensePool::isEmpty() const
 
 QVector<QString> QnLicensePool::hardwareIds(const nx::Uuid& serverId) const
 {
-    return remoteInfo(m_context->runtimeInfoManager(), serverId).data.hardwareIds;
+    return remoteInfo(systemContext()->runtimeInfoManager(), serverId).data.hardwareIds;
 }
 
 QString QnLicensePool::currentHardwareId(const nx::Uuid& serverId) const

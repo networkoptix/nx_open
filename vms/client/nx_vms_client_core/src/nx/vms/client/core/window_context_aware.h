@@ -4,6 +4,8 @@
 
 #include <QtCore/QPointer>
 
+#include "window_context_qml_initializer.h"
+
 namespace nx::vms::client::core {
 
 namespace menu { class Manager; }
@@ -16,6 +18,7 @@ class NX_VMS_CLIENT_CORE_API WindowContextAware
 public:
     WindowContextAware(WindowContext* windowContext);
     WindowContextAware(WindowContextAware* windowContextAware);
+    WindowContextAware(std::unique_ptr<WindowContextQmlInitializer>&& initializer);
 
     virtual ~WindowContextAware();
 
@@ -25,7 +28,11 @@ public:
     SystemContext* system() const;
 
 private:
-    QPointer<WindowContext> m_windowContext;
+    void initializeSafetyChecks(WindowContext* context) const;
+
+private:
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::core

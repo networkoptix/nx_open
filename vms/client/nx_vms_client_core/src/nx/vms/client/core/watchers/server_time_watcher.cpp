@@ -6,7 +6,6 @@
 
 #include <api/model/time_reply.h>
 #include <api/server_rest_connection.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>

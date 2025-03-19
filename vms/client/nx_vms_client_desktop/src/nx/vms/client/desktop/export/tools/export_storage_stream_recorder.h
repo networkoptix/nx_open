@@ -8,7 +8,6 @@
 
 #include <export/signer.h>
 #include <nx/core/transcoding/filters/filter_chain.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <recording/helpers/timestamp_stitcher.h>
 #include <recording/storage_recording_context.h>
 #include <recording/stream_recorder.h>
@@ -19,8 +18,7 @@ namespace nx::vms::client::desktop {
 
 class ExportStorageStreamRecorder:
     public QnStreamRecorder,
-    public nx::StorageRecordingContext,
-    public nx::vms::client::core::RemoteConnectionAware
+    public nx::StorageRecordingContext
 {
 public:
     ExportStorageStreamRecorder(

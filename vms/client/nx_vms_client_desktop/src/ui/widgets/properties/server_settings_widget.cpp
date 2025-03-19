@@ -567,7 +567,7 @@ void QnServerSettingsWidget::showServerCertificate(const QString& id)
     if (!NX_ASSERT(m_server))
         return;
 
-    if (!context()->globalSettings()->isAuditTrailEnabled())
+    if (!context()->system()->globalSettings()->isAuditTrailEnabled())
     {
         QnMessageBox::warning(this,
             tr("Certificate details are not available"),

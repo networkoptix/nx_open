@@ -42,7 +42,11 @@ ListView
             12 + Math.ceil(textMetrics.height) + (siteList.cellsInRow == 1 ? 10 : 12)
         width: parent.width
         height: 16 + (!!currentSearchRegExp ? (systemTabs.implicitHeight - sectionHeight) : 0)
-        onHeightChanged: siteList.positionViewAtBeginning()
+        onHeightChanged:
+        {
+            // Avoids delegates re-creation during component construction.
+            Qt.callLater(() => siteList.positionViewAtBeginning())
+        }
     }
 
     footer: Item

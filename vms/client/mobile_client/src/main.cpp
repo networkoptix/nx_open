@@ -14,13 +14,11 @@ extern "C" {
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtQml/QQmlEngine>
-#include <QtQml/QQmlFileSelector>
 #include <QtQml/QtQml>
 #include <QtQuick/QQuickWindow>
 #include <QtQuickControls2/QQuickStyle>
 #include <QtWebView/QtWebView>
 
-#include <camera/camera_thumbnail_cache.h>
 #include <context/context.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management/resource_pool.h>
@@ -55,8 +53,6 @@ extern "C" {
 #include <nx/vms/client/core/utils/font_loader.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
-#include <ui/camera_thumbnail_provider.h>
-#include <ui/texture_size_helper.h>
 #include <ui/window_utils.h>
 #include <utils/intent_listener_android.h>
 
@@ -121,12 +117,6 @@ QString getTargetFontFamiliy(const QString& defaultFontName, const QString& appl
 
 int runUi(QGuiApplication* application)
 {
-    QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
-    QnCameraThumbnailProvider *thumbnailProvider = new QnCameraThumbnailProvider();
-    thumbnailProvider->setThumbnailCache(thumbnailsCache.data());
-
-    QnCameraThumbnailProvider *activeCameraThumbnailProvider = new QnCameraThumbnailProvider();
-
     QString fontsDir = QDir(qApp->applicationDirPath()).absoluteFilePath("fonts");
     if (nx::build_info::isAndroid())
         fontsDir = "assets:/fonts";
@@ -136,48 +126,11 @@ int runUi(QGuiApplication* application)
         nx::vms::client::core::appContext()->coreSettings()->locale()));
     QGuiApplication::setFont(targetFont);
 
-    const auto context = qnMobileClientModule->context();
+    const auto applicationContext = mobile::appContext();
+    const auto engine = applicationContext->qmlEngine();
 
-    QScopedPointer<QnMobileClientUriHandler> uriHandler(new QnMobileClientUriHandler(context));
-
-    QStringList selectors;
-    QFileSelector fileSelector;
-    fileSelector.setExtraSelectors(selectors);
-
-    const auto engine = core::appContext()->qmlEngine();
-    QQmlFileSelector qmlFileSelector(engine);
-    qmlFileSelector.setSelector(&fileSelector);
-
-    engine->addImageProvider("thumbnail", thumbnailProvider);
-    engine->addImageProvider("active", activeCameraThumbnailProvider);
     engine->addImageProvider(nx::vms::client::core::WatermarkImageProvider::name(),
         new nx::vms::client::core::WatermarkImageProvider());
-
-    engine->rootContext()->setContextObject(context);
-    engine->setObjectOwnership(context, QQmlEngine::CppOwnership);
-
-    QQmlComponent mainComponent(engine, QUrl("main.qml"));
-    const QScopedPointer<QQuickWindow, QScopedPointerDeleteLater> mainWindow(
-        qobject_cast<QQuickWindow*>(mainComponent.create()));
-    engine->setParent(mainWindow.data());
-
-    QScopedPointer<QnTextureSizeHelper> textureSizeHelper(
-        new QnTextureSizeHelper(mainWindow.data()));
-
-    if (!nx::build_info::isMobile() && mainWindow)
-    {
-        mainWindow->setWidth(380);
-        mainWindow->setHeight(650);
-    }
-
-    if (!mainComponent.errors().isEmpty())
-    {
-        qWarning() << mainComponent.errorString();
-        return 1;
-    }
-
-    qnMobileClientModule->setMainWindow(mainWindow.data());
-    QObject::connect(engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
 
     prepareWindow();
 
@@ -407,9 +360,7 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
 
     QnMobileClientSettings settings;
     const auto applicationContext = std::make_unique<mobile::ApplicationContext>();
-    const auto mobileClient = std::make_unique<QnMobileClientModule>(
-        applicationContext->currentSystemContext(),
-        startupParams);
+    const auto mobileClient = std::make_unique<QnMobileClientModule>(startupParams);
 
     if (!loggingIsInitialized)
     {
@@ -417,9 +368,6 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
         if (level != nx::log::mainLogger()->defaultLevel())
             nx::log::mainLogger()->setDefaultLevel(level);
     }
-
-    mobileClient->initDesktopCamera();
-    mobileClient->startLocalSearches();
 
     qnSettings->setStartupParameters(startupParams);
     processStartupParams(startupParams);

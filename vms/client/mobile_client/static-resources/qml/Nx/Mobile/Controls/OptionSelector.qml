@@ -142,7 +142,7 @@ BaseOption
 
     onClicked:
     {
-        control.openedScreen = stackView.safePush(
+        control.openedScreen = stackView.pushScreen(
             Qt.resolvedUrl("private/OptionSelectorScreen.qml"),
             {
                 'title': control.screenTitle,

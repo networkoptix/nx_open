@@ -11,6 +11,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/device_model.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "debug_custom_actions.h"
@@ -23,7 +24,7 @@ void CamerasActions::registerAction()
         "Cameras - Toggle default password",
         [](QnWorkbenchContext* context)
         {
-            const auto cameras = context->resourcePool()->getAllCameras(
+            const auto cameras = context->system()->resourcePool()->getAllCameras(
                 QnResourcePtr(),
                 true);
             if (cameras.empty())
@@ -60,7 +61,7 @@ void CamerasActions::registerAction()
             presets.push_back(Ptz::Capability::continuousPanTiltZoom | Ptz::Capability::continuousFocus
                 | Ptz::Capability::auxiliary | Ptz::Capability::presets);
 
-            for (const auto& camera: context->resourcePool()->getAllCameras(
+            for (const auto& camera: context->system()->resourcePool()->getAllCameras(
                 QnResourcePtr(),
                 true))
             {

@@ -4,13 +4,13 @@
 
 #include <chrono>
 
-#include <client_core/client_core_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -184,7 +184,7 @@ void ConnectToCurrentSystemTool::mergeServer(const QString& adminPassword)
 
     m_mergeTool = new MergeSystemsTool(
         this,
-        qnClientCoreModule->networkModule()->certificateVerifier(),
+        system()->certificateVerifier<core::CertificateVerifier>(),
         m_delegate.get(),
         appContext()->coreSettings()->locale().toStdString());
 

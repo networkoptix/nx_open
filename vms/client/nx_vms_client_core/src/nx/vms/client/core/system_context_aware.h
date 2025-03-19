@@ -19,6 +19,8 @@ using ServerConnectionPtr = std::shared_ptr<ServerConnection>;
 
 } // namespace rest
 
+namespace nx::network::http { class Credentials; }
+
 namespace nx::vms::client::core {
 
 class AccessController;
@@ -26,6 +28,8 @@ class RemoteSession;
 class ServerTimeWatcher;
 class SystemContext;
 class UserWatcher;
+class RemoteSessionTimeoutWatcher;
+class NetworkModule;
 
 class NX_VMS_CLIENT_CORE_API SystemContextAware: public nx::vms::common::SystemContextAware
 {
@@ -58,6 +62,12 @@ public:
     ServerTimeWatcher* serverTimeWatcher() const;
 
     QnCameraBookmarksManager* cameraBookmarksManager() const;
+
+    NetworkModule* networkModule() const;
+
+    nx::network::http::Credentials connectionCredentials() const;
+
+    std::shared_ptr<RemoteSession> session() const;
 };
 
 } // namespace nx::vms::client::desktop

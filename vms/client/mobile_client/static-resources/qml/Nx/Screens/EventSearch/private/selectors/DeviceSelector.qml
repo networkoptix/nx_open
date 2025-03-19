@@ -32,7 +32,8 @@ OptionSelector
 
         function onValueChanged()
         {
-            control.textValue = EventSearchUtils.cameraSelectionText(value.selection, value.cameras)
+            control.textValue = EventSearchUtils.cameraSelectionText(
+                value.selection, value.cameras, windowContext.mainSystemContext)
             control.isDefaultValue = !value || value.selection === EventSearch.CameraSelection.all
         }
 

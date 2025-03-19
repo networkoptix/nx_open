@@ -5,13 +5,10 @@
 #include <QtCore/QAbstractListModel>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/mobile/current_system_context_aware.h>
 #include <utils/common/id.h>
 
 class QnAvailableCameraListModelPrivate;
-class QnAvailableCameraListModel:
-    public QAbstractListModel,
-    public nx::vms::client::mobile::CurrentSystemContextAware
+class QnAvailableCameraListModel: public QAbstractListModel
 {
     Q_OBJECT
 

@@ -9,7 +9,6 @@
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
 #include <client_core/client_core_meta_types.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/client_camera.h>
 #include <core/resource/file_processor.h>
@@ -131,7 +130,7 @@ QnResourcePtr stringToResource(const QString& s)
 {
     const QStringList files{s};
     const auto acceptedFiles = QnFileProcessor::findAcceptedFiles(files);
-    const auto resourcePool = qnClientCoreModule->resourcePool();
+    const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
     if (acceptedFiles.empty())
     {
         return resourcePool->getResourceById(nx::Uuid::fromStringSafe(s));
@@ -146,7 +145,7 @@ QnResourceList stringToResourceList(const QString& s)
 {
     const QStringList files{s};
     const auto acceptedFiles = QnFileProcessor::findAcceptedFiles(files);
-    const auto resourcePool = qnClientCoreModule->resourcePool();
+    const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
     if (acceptedFiles.empty())
     {
         const auto resource = resourcePool->getResourceById(nx::Uuid::fromStringSafe(s));

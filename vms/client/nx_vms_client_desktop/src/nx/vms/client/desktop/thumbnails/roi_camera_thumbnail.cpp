@@ -4,7 +4,6 @@
 
 #include <QtQml/QtQml>
 
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 

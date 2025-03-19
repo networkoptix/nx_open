@@ -11,6 +11,7 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -178,9 +179,10 @@ void ExportStorageStreamRecorder::updateSignatureAttr(StorageContext* context)
     }
 
     QByteArray placeholder = QnSignHelper::addSignatureFiller(QnSignHelper::getSignMagic());
+    const auto systemContext = SystemContext::fromResource(m_resource);
     QByteArray signature =
         QnSignHelper::addSignatureFiller(m_signer.buildSignature(
-            m_resource->systemContext()->licensePool(), serverId()));
+            systemContext->licensePool(), systemContext->connection()->moduleInformation().id));
 
     //New metadata is stored as json, so signature is written base64 - encoded.
     const bool metadataUpdated = updateInFile(file.data(),

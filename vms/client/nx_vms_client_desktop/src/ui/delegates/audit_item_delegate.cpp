@@ -174,7 +174,7 @@ QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QM
             result.setWidth(qMax(cachedTextWidth(option.font, dateStrWithSpace)
                                + cachedTextWidth(option.font, timeStr, true),
                 cachedTextWidth(option.font, QnAuditLogModel::eventTypeToString(
-                    Qn::AR_UnauthorizedLogin))));
+                    resourcePool(), Qn::AR_UnauthorizedLogin))));
             break;
 
         case QnAuditLogModel::TimeColumn:

@@ -11,13 +11,13 @@
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/network/remote_connection_error.h>
-#include <nx/vms/client/mobile/system_context_aware.h>
+#include <nx/vms/client/mobile/window_context_aware.h>
 
 #include "session.h"
 
 namespace nx::vms::client::mobile {
 
-class SystemContext;
+class WindowContext;
 
 /**
  * Responsible for connection sessions management. Only one session should exist at each moment of
@@ -25,7 +25,7 @@ class SystemContext;
  */
 class SessionManager:
     public QObject,
-    public SystemContextAware
+    public WindowContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -99,7 +99,7 @@ public:
 
     static void registerQmlType();
 
-    SessionManager(SystemContext* context, QObject* parent = nullptr);
+    SessionManager(WindowContext* context, QObject* parent = nullptr);
     virtual ~SessionManager() override;
 
     /**
@@ -190,7 +190,9 @@ public:
         session::ConnectionCallback&& callback = session::ConnectionCallback());
 
     /** Stop currently running session (if any). */
-    Q_INVOKABLE void stopSession();
+    Q_INVOKABLE void stopSessionByUser();
+
+    void resetSession();
 
 public:
     // Properties section.
@@ -232,7 +234,7 @@ signals:
      * or due to unavailability to restore.
      */
     void sessionFinishedWithError(
-        const Session::Holder& session,
+        const QString& systemName,
         nx::vms::client::core::RemoteConnectionErrorCode status);
 
     /** Signalizes that session parameters changed. */

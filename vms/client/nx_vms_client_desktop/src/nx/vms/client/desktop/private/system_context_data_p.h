@@ -37,6 +37,7 @@ namespace nx::vms::client::desktop {
 
 struct SystemContext::Private
 {
+    SystemContext* const q;
     std::unique_ptr<VideoWallOnlineScreensWatcher> videoWallOnlineScreensWatcher;
     std::unique_ptr<LdapStatusWatcher> ldapStatusWatcher;
     std::unique_ptr<OtherServersManager> otherServersManager;
@@ -64,6 +65,8 @@ struct SystemContext::Private
     std::unique_ptr<ServerNotificationCache> serverNotificationCache;
     std::unique_ptr<ServerRemoteAccessWatcher> serverRemoteAccessWatcher;
     std::unique_ptr<UserNotificationSettingsManager> userNotificationSettingsManager;
+
+    void initializeNetworkModules();
 };
 
 } // namespace nx::vms::client::desktop

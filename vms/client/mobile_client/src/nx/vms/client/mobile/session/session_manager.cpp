@@ -15,6 +15,7 @@
 #include <nx/vms/client/core/network/connection_info.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/mobile/system_context.h>
+#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/delayed.h>
 
@@ -71,8 +72,7 @@ void SessionManager::Private::startSession(
     resetSession();
 
     // TODO: #sivanov Make this class SystemContextAware.
-    session = Session::create(
-        q->systemContext(),
+    session = Session::create(q->windowContext()->createSystemContext(),
         data,
         supposedSystemName,
         std::move(connectionCallback));
@@ -112,9 +112,9 @@ void SessionManager::Private::startSession(
                         return;
                     }
 
-                    const auto lastSession = session;
+                    const auto systemName = session->systemName();
                     resetSession();
-                    emit q->sessionFinishedWithError(lastSession, errorCode);
+                    emit q->sessionFinishedWithError(systemName, errorCode);
                 };
 
             executeLater(resetSessionAction, this);
@@ -126,14 +126,19 @@ void SessionManager::Private::startSession(
 void SessionManager::Private::resetSession()
 {
     nextResetActionId = nx::Uuid();
-    session.reset();
 
+    if (!session)
+        return;
+
+    session.reset();
+    q->windowContext()->deleteSystemContext(q->windowContext()->mainSystemContext());
     handleSessionChanged();
 }
 
 void SessionManager::Private::handleSessionChanged()
 {
-    q->systemContext()->globalSettings()->synchronizeNow();
+    if (const auto context = q->mainSystemContext())
+        context->globalSettings()->synchronizeNow();
 
     updateRestoringState();
 
@@ -274,9 +279,9 @@ void SessionManager::registerQmlType()
         "Cannot create an instance of SessionManager");
 }
 
-SessionManager::SessionManager(SystemContext* context, QObject* parent):
+SessionManager::SessionManager(WindowContext* context, QObject* parent):
     base_type(parent),
-    SystemContextAware(context),
+    WindowContextAware(context),
     d(new Private(this))
 {
     NX_DEBUG(this, "SessionManager(): created");
@@ -284,7 +289,8 @@ SessionManager::SessionManager(SystemContext* context, QObject* parent):
 
 SessionManager::~SessionManager()
 {
-    d->resetSession();
+    if (hasSession())
+        d->resetSession();
 }
 
 void SessionManager::startSessionWithCredentials(
@@ -405,12 +411,17 @@ void SessionManager::startSessionByUrl(
     NX_DEBUG(this, "startSessionByUrl(): end");
 }
 
-void SessionManager::stopSession()
+void SessionManager::stopSessionByUser()
 {
-    NX_DEBUG(this, "stopSession(): called, session is <%1>", d->session);
+    NX_DEBUG(this, "stopSessionByUser(): called, session is <%1>", d->session);
 
     d->resetSession();
     emit sessionStoppedManually();
+}
+
+void SessionManager::resetSession()
+{
+    d->resetSession();
 }
 
 bool SessionManager::hasSession() const

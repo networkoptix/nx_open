@@ -209,7 +209,7 @@ bool JoystickSettingsDialog::Private::initModel(bool initWithDefaults)
                 = stick[Device::zIndex] != 0;
         }));
 
-    const auto currentServer = q->workbenchContext()->currentServer();
+    const auto currentServer = q->system()->currentServer();
     const bool openLayoutChoiceEnabled = !currentServer.isNull();
     const bool openLayoutChoiceVisible =
         !currentServer.isNull() || buttonSettingsModel->openLayoutActionIsSet();

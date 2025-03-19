@@ -3,12 +3,13 @@
 #include <QtQml/QQmlParserStatus>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/core/context_from_qml_handler.h>
 
 class QQuickItem;
 
 namespace nx::vms::client::core {
 
-class NameValueTableCalculator: public QObject, public QQmlParserStatus
+class NameValueTableCalculator: public QObject, public ContextFromQmlHandler
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
@@ -21,10 +22,10 @@ public:
 
     Q_INVOKABLE void updateColumnWidths();
 
-    virtual void classBegin() override {}
-    virtual void componentComplete() override;
-
     static void registerQmlType();
+
+private:
+    virtual void onContextReady() override;
 
 private:
     struct Private;

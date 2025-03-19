@@ -38,7 +38,7 @@ class LocalNotificationsManager;
  * considered as "current" - which is used to display Resource Tree and other system-dependent UI
  * elements.
  */
-class WindowContext: public nx::vms::client::core::WindowContext
+class NX_VMS_CLIENT_DESKTOP_API WindowContext: public nx::vms::client::core::WindowContext
 {
     using base_type = nx::vms::client::core::WindowContext;
 

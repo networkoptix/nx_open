@@ -38,7 +38,8 @@ const qint64 kConsumePollPeriodMSec = 1000;
 struct VirtualCameraWorker::Private
 {
     Private(const QnVirtualCameraResourcePtr& camera):
-        camera(camera)
+        camera(camera),
+        requests(SystemContext::fromResource(camera))
     {
         state.cameraId = camera->getId();
     }

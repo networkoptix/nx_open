@@ -8,15 +8,13 @@
 #include <camera/thumbnail_cache_base.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/api/mediaserver/image_request.h>
-#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/client/mobile/current_system_context_aware.h>
+#include <nx/vms/client/mobile/system_context_aware.h>
 #include <utils/common/id.h>
 
 class QnCameraThumbnailCache: public QObject,
     public QnThumbnailCacheBase,
-    public Singleton<QnCameraThumbnailCache>,
-    public nx::vms::client::mobile::CurrentSystemContextAware
+    public nx::vms::client::mobile::SystemContextAware
 {
     Q_OBJECT
 
@@ -33,7 +31,8 @@ public:
         {}
     };
 
-    explicit QnCameraThumbnailCache(QObject *parent = 0);
+    explicit QnCameraThumbnailCache(nx::vms::client::mobile::SystemContext* context,
+        QObject *parent = 0);
     ~QnCameraThumbnailCache();
 
     void start();

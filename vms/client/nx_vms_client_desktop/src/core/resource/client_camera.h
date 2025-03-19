@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/core/resource/camera.h>
 #include <nx/vms/client/core/resource/resource_fwd.h>
 

@@ -413,7 +413,7 @@ void QnGridBackgroundItem::updateConnectedState()
 {
     Q_D(QnGridBackgroundItem);
 
-    d->connected = !context()->currentServer().isNull();
+    d->connected = !context()->system()->currentServer().isNull();
     updateDisplay();
 }
 

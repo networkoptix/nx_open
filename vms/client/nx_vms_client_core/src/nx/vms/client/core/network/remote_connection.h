@@ -101,7 +101,7 @@ public:
     rest::ServerConnectionPtr serverApi() const;
 
     ec2::AbstractECConnectionPtr messageBusConnection() const;
-    common::AbstractTimeSyncManagerPtr timeSynchronizationManager() const;
+    nx::vms::common::AbstractTimeSyncManagerPtr timeSynchronizationManager() const;
 
     std::shared_ptr<CertificateCache> certificateCache() const;
 

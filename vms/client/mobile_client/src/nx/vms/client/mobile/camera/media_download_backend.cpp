@@ -18,8 +18,9 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
-#include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/system_context.h>
+#include <nx/vms/client/mobile/session/session_manager.h>
+#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -32,7 +33,7 @@ struct VideoDownloadContext
 {
     std::chrono::milliseconds startTime;
     std::chrono::milliseconds duration;
-    nx::Uuid cameraId;
+    QnVirtualCameraResourcePtr camera;
     QString cloudSystemId;
     nx::Uuid serverId;
 };
@@ -66,7 +67,6 @@ struct MediaDownloadBackend::Private
 {
     MediaDownloadBackend* const q;
     bool downloadAvailable = false;
-    nx::Uuid deviceId;
     QnVirtualCameraResourcePtr camera;
 
     std::unique_ptr<ClientPool> clientPool = std::make_unique<ClientPool>();
@@ -75,11 +75,16 @@ struct MediaDownloadBackend::Private
     void updateDownloadAvailability();
     void gatherProxyServerId(VideoDownloadContext&& context, VideoDownloadCallback&& callback);
     void runDownloadForContext(const VideoDownloadContext& context, const QString& ticket);
+    void showDownloadProcessError();
 };
 
 QString MediaDownloadBackend::Private::currentCloudSystemId() const
 {
-    const auto server = q->currentServer();
+    const auto context = SystemContext::fromResource(camera);
+    const auto server = context
+        ? context->currentServer()
+        : QnMediaServerResourcePtr{};
+
     return server
         ? server->getModuleInformation().cloudSystemId
         : QString{};
@@ -87,25 +92,33 @@ QString MediaDownloadBackend::Private::currentCloudSystemId() const
 
 void MediaDownloadBackend::Private::updateDownloadAvailability()
 {
-    const auto manager = q->sessionManager();
-    const auto currentUser = q->userWatcher()->user();
-    const bool hasExportArchivePermission = camera
-        && q->resourceAccessManager()->hasAccessRights(
-            currentUser, camera, api::AccessRight::exportArchive);
-    const bool hasWatermark = q->systemSettings()->watermarkSettings().useWatermark
-        && !q->resourceAccessManager()->hasPowerUserPermissions(currentUser);
-    const bool value = manager
-        && manager->hasConnectedSession()
-        && manager->isCloudSession()
-        && manager->connectedServerVersion() >= utils::SoftwareVersion(6, 0)
-        && hasExportArchivePermission
-        && !hasWatermark
-        && qnSettings->useDownloadVideoFeature();
+    const auto isAvailable =
+        [this]()
+        {
+            const auto context = SystemContext::fromResource(camera);
+            if (!context)
+                return false;
 
-    if (value == downloadAvailable)
+            const auto manager = q->sessionManager();
+            const auto currentUser = context->userWatcher()->user();
+            const bool hasExportArchivePermission =
+                context->resourceAccessManager()->hasAccessRights(
+                    currentUser, camera, api::AccessRight::exportArchive);
+            const bool hasWatermark = context->globalSettings()->watermarkSettings().useWatermark
+                && !context->resourceAccessManager()->hasPowerUserPermissions(currentUser);
+            return manager
+                && manager->hasConnectedSession()
+                && manager->isCloudSession()
+                && manager->connectedServerVersion() >= utils::SoftwareVersion(6, 0)
+                && hasExportArchivePermission
+                && !hasWatermark
+                && qnSettings->useDownloadVideoFeature();
+        }();
+
+    if (downloadAvailable == isAvailable)
         return;
 
-    downloadAvailable = value;
+    downloadAvailable = isAvailable;
     emit q->downloadAvailabilityChanged();
 }
 
@@ -132,7 +145,7 @@ void MediaDownloadBackend::Private::gatherProxyServerId(VideoDownloadContext&& c
                 || !QJson::deserialize(requestContext->response.messageBody, &jsonReply)
                 || !QJson::deserialize(jsonReply.reply, &moduleInformation))
             {
-                q->showDownloadProcessError();
+                showDownloadProcessError();
                 return;
             }
 
@@ -148,7 +161,7 @@ void MediaDownloadBackend::Private::runDownloadForContext(const VideoDownloadCon
     const QString& ticket)
 {
     const auto path = QString("/rest/v3/devices/%1/media.mp4")
-        .arg(context.cameraId.toSimpleString());
+        .arg(context.camera->getId().toSimpleString());
     const auto url = relayUrlBuilder(context.cloudSystemId, path)
         .addQueryItem("positionMs", QString::number(context.startTime.count()))
         .addQueryItem("durationMs", QString::number(context.duration.count()))
@@ -165,6 +178,12 @@ void MediaDownloadBackend::Private::runDownloadForContext(const VideoDownloadCon
     QDesktopServices::openUrl(url);
 }
 
+void MediaDownloadBackend::Private::showDownloadProcessError()
+{
+    emit q->errorOccured(tr("Can't download video"),
+        tr("Please check a network connection."));
+}
+
 //-------------------------------------------------------------------------------------------------
 
 void MediaDownloadBackend::registerQmlType()
@@ -174,29 +193,9 @@ void MediaDownloadBackend::registerQmlType()
 
 MediaDownloadBackend::MediaDownloadBackend(QObject* parent):
     QObject(parent),
-    base_type(SystemContext::fromQmlContext(this)),
+    base_type(WindowContext::fromQmlContext(this)),
     d(new Private{.q = this})
 {
-    const auto initializeDelayed =
-        [this]()
-        {
-            const auto manager = sessionManager();
-            const auto update = [this]() { d->updateDownloadAvailability(); };
-            connect(manager, &SessionManager::sessionHostChanged, this, update);
-            connect(manager, &SessionManager::hasConnectedSessionChanged, this, update);
-            connect(manager, &SessionManager::connectedServerVersionChanged, this, update);
-            connect(systemSettings(), &common::SystemSettings::watermarkChanged, this, update);
-            connect(userWatcher(), &core::UserWatcher::userChanged, this, update);
-            connect(qnSettings, &QnMobileClientSettings::valueChanged, this,
-                [update](int propertyId)
-                {
-                    if (propertyId == QnMobileClientSettings::UseDownloadVideoFeature)
-                        update();
-                });
-            update();
-        };
-
-    executeLater(initializeDelayed, this);
 }
 
 MediaDownloadBackend::~MediaDownloadBackend()
@@ -223,23 +222,23 @@ void MediaDownloadBackend::downloadVideo(qint64 startTimeMs,
     VideoDownloadContext context = {
         .startTime = std::chrono::milliseconds(startTimeMs),
         .duration = std::chrono::milliseconds(durationMs),
-        .cameraId = d->camera->getId(),
+        .camera = d->camera,
         .cloudSystemId = d->currentCloudSystemId()
     };
 
     if (!NX_ASSERT(!context.cloudSystemId.isEmpty() && isDownloadAvailable()))
     {
-        showDownloadProcessError();
+        d->showDownloadProcessError();
         return;
     }
 
     const auto requestTicketHandler =
         [this](VideoDownloadContext&& context)
         {
-            const auto api = connectedServerApi();
+            const auto api = SystemContext::fromResource(context.camera)->connectedServerApi();
             if (!NX_ASSERT(api))
             {
-                showDownloadProcessError();
+                d->showDownloadProcessError();
                 return;
             }
 
@@ -257,7 +256,7 @@ void MediaDownloadBackend::downloadVideo(qint64 startTimeMs,
                     NX_DEBUG(this, "Can't get authorization ticket, error %1",
                         session.error().errorId);
 
-                    showDownloadProcessError();
+                    d->showDownloadProcessError();
                 });
 
             api->createTicket(context.serverId, std::move(tryOpenDownload), thread());
@@ -266,31 +265,57 @@ void MediaDownloadBackend::downloadVideo(qint64 startTimeMs,
     d->gatherProxyServerId(std::move(context), requestTicketHandler);
 }
 
-nx::Uuid MediaDownloadBackend::cameraId() const
+QnResource* MediaDownloadBackend::rawResource() const
 {
-    return d->deviceId;
+    return d->camera.get();
 }
 
-void MediaDownloadBackend::setCameraId(const nx::Uuid& value)
+void MediaDownloadBackend::setRawResource(QnResource* value)
 {
-    if (d->deviceId == value)
+    const auto camera = value
+        ? value->toSharedPointer().dynamicCast<QnVirtualCameraResource>()
+        : QnVirtualCameraResourcePtr{};
+
+    if (camera)
+    {
+        const auto systemContext = SystemContext::fromResource(camera);
+        systemContext->globalSettings()->disconnect(this);
+        systemContext->userWatcher()->disconnect(this);
+    }
+
+    if (camera == d->camera)
         return;
 
-    d->deviceId = value;
-    emit cameraIdChanged();
+    d->camera = camera;
 
-    const auto newCamera = resourcePool()->getResourceById<QnVirtualCameraResource>(value);
-    if (sameCameras(d->camera, newCamera))
-        return;
+    if (camera)
+    {
+        const auto systemContext = SystemContext::fromResource(camera);
+        const auto update = [this]() { d->updateDownloadAvailability(); };
+        connect(systemContext->globalSettings(), &common::SystemSettings::watermarkChanged,
+            this, update);
+        connect(systemContext->userWatcher(), &core::UserWatcher::userChanged, this, update);
+    }
 
-    d->camera = newCamera;
     d->updateDownloadAvailability();
+    emit resourceChanged();
 }
 
-void MediaDownloadBackend::showDownloadProcessError()
+void MediaDownloadBackend::onContextReady()
 {
-    emit errorOccured(tr("Can't download video"),
-        tr("Please check a network connection."));
+    const auto manager = windowContext()->sessionManager();
+    const auto update = [this]() { d->updateDownloadAvailability(); };
+    connect(manager, &SessionManager::sessionHostChanged, this, update);
+    connect(manager, &SessionManager::hasConnectedSessionChanged, this, update);
+    connect(manager, &SessionManager::connectedServerVersionChanged, this, update);
+    connect(qnSettings, &QnMobileClientSettings::valueChanged, this,
+        [update](int propertyId)
+        {
+            if (propertyId == QnMobileClientSettings::UseDownloadVideoFeature)
+                update();
+        });
+
+    update();
 }
 
 } // namespace nx::vms::client::mobile

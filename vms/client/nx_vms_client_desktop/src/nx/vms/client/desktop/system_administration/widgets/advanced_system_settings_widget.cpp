@@ -107,7 +107,7 @@ bool AdvancedSystemSettingsWidget::Private::backupAndRestoreIsVisible() const
         accessController->hasGlobalPermissions(GlobalPermission::administrator);
     const auto isPowerUser = accessController->hasGlobalPermissions(GlobalPermission::powerUser);
 
-    const auto hasOwnerApiForAdmins = q->context()->currentServer()->getServerFlags().testFlag(
+    const auto hasOwnerApiForAdmins = q->context()->system()->currentServer()->getServerFlags().testFlag(
         nx::vms::api::SF_AdminApiForPowerUsers);
 
     return isAdministrator || (isPowerUser && hasOwnerApiForAdmins);

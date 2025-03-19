@@ -835,7 +835,7 @@ void RightPanelModelsAdapter::Private::setContext(WindowContext* value)
         TileInteractionHandler::install(q);
 
         m_contextConnections << connect(
-            m_context->workbenchContext()->accessController(),
+            m_context->system()->accessController(),
             &core::AccessController::permissionsMaybeChanged,
             q,
             &RightPanelModelsAdapter::allowanceChanged);
@@ -865,7 +865,7 @@ bool RightPanelModelsAdapter::Private::isAllowed() const
     if (!m_context)
         return false;
 
-    const auto accessController = m_context->workbenchContext()->accessController();
+    const auto accessController = m_context->system()->accessController();
     switch (m_type)
     {
         case core::EventSearch::SearchType::motion:

@@ -11,6 +11,7 @@
 
 #include "system_context_aware.h" //< Forward declarations.
 
+Q_MOC_INCLUDE("nx/vms/client/core/watchers/user_watcher.h")
 Q_MOC_INCLUDE("nx/vms/client/core/watchers/watermark_watcher.h")
 
 class QnPtzControllerPool;
@@ -37,7 +38,9 @@ class IoPortsCompatibilityInterface;
 class ServerRuntimeEventConnector;
 class UserWatcher;
 class VideoCache;
+class RemoteSessionTimeoutWatcher;
 class WatermarkWatcher;
+class NetworkModule;
 
 namespace analytics {
 class AttributeHelper;
@@ -56,6 +59,10 @@ class NX_VMS_CLIENT_CORE_API SystemContext: public common::SystemContext
         READ watermarkWatcher
         CONSTANT)
 
+    Q_PROPERTY(UserWatcher userWatcher
+        READ userWatcher
+        CONSTANT)
+
 public:
     /**
      * Initialize client-core-level System Context based on existing common-level System Context.
@@ -69,10 +76,6 @@ public:
     virtual ~SystemContext() override;
 
     static SystemContext* fromResource(const QnResourcePtr& resource);
-
-    static std::unique_ptr<nx::vms::common::SystemContextInitializer> fromQmlContext(
-        QObject* source);
-    void storeToQmlContext(QQmlContext* qmlContext);
 
     /**
      * Information about the Server we are connected to.
@@ -174,6 +177,8 @@ public:
     AnalyticsEventsSearchTreeBuilder* analyticsEventsSearchTreeBuilder() const;
 
     IoPortsCompatibilityInterface* ioPortsInterface() const;
+
+    NetworkModule* networkModule() const;
 
 signals:
     void remoteIdChanged(const nx::Uuid& id);

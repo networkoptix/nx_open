@@ -300,7 +300,7 @@ State MainWindowTitleBarStateReducer::updateFromWorkbench(
     if (connectionState != ConnectActionsHandler::LogicalState::disconnected)
     {
         const std::shared_ptr<RemoteSession> session =
-            workbenchContext->systemContext()->session();
+            workbenchContext->system()->session();
 
         if (session)
             sessionId = session->sessionId();

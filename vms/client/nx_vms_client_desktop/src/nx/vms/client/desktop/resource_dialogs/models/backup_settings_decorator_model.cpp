@@ -8,7 +8,6 @@
 
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/utils.h>

@@ -10,7 +10,7 @@ Flickable
 {
     id: control
 
-    property alias layoutId: camerasModel.layoutId
+    property alias layout: camerasModel.layout
     property bool keepStatuses: false
     property bool active: false
     property alias filterIds: camerasModel.filterIds

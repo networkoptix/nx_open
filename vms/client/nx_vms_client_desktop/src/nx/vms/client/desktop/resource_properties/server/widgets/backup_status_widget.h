@@ -8,15 +8,14 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 
 namespace Ui { class BackupStatusWidget; }
 
 namespace nx::vms::client::desktop {
 
-class BackupStatusWidget:
-    public QWidget,
-    public core::RemoteConnectionAware
+class SystemContext;
+
+class BackupStatusWidget: public QWidget
 {
     Q_OBJECT
     using base_type = QWidget;

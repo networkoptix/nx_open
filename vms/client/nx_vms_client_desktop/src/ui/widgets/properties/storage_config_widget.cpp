@@ -20,7 +20,6 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/api/data/storage_scan_info.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/core/resource/client_storage_resource.h>
 #include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/core/skin/color_theme.h>

@@ -5,7 +5,6 @@
 
 #include <QtWidgets/QPushButton>
 
-#include <client_core/client_core_module.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
@@ -18,6 +17,7 @@
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -123,8 +123,11 @@ struct ConnectionTestingDialog::Private
     public:
         ConnectionUserInteractionDelegate(ConnectionTestingDialog* owner):
             m_owner(owner),
-            m_baseDelegate(createConnectionUserInteractionDelegate([this]() {return m_owner;}))
+            m_baseDelegate(createConnectionUserInteractionDelegate(
+                appContext()->currentSystemContext(),
+                [this]() {return m_owner;}))
         {
+
         }
 
         virtual bool acceptNewCertificate(
@@ -255,7 +258,8 @@ void ConnectionTestingDialog::testConnection(
             d->connectionProcess.reset();
         });
 
-    auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
+    auto remoteConnectionFactory =
+        appContext()->currentSystemContext()->networkModule()->connectionFactory();
     const core::LogonData info{address, credentials, nx::vms::api::UserType::local};
     d->connectionProcess = remoteConnectionFactory->connect(info,
         callback,

@@ -10,7 +10,8 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/core/event_search/utils/event_search_utils.h>
-#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/mobile/system_context.h>
+#include <nx/vms/client/mobile/window_context.h>
 
 #include <nx/utils/scoped_model_operations.h>
 
@@ -127,7 +128,11 @@ void ParametersVisualizationModel::Private::addPluginFilterValue(Items& result)
             if (selectedEngineId.isEmpty())
                 return {};
 
-            const auto taxonomy = q->systemContext()->taxonomyManager()->currentTaxonomy();
+            const auto currentContext = q->mainSystemContext();
+            if (!currentContext)
+                return {};
+
+            const auto taxonomy = currentContext->taxonomyManager()->currentTaxonomy();
             const auto engine = taxonomy->engineById(selectedEngineId);
             return engine
                 ? engine->name()
@@ -153,7 +158,11 @@ void ParametersVisualizationModel::Private::addObjectTypeFilterValue(Items& resu
                     return {};
                 case 1:
                 {
-                    const auto taxonomy = q->systemContext()->taxonomyManager()->currentTaxonomy();
+                    const auto currentContext = q->mainSystemContext();
+                    if (!currentContext)
+                        return {};
+
+                    const auto taxonomy = currentContext->taxonomyManager()->currentTaxonomy();
                     const auto objectType = taxonomy->objectTypeById(types.first());
                     return objectType
                         ? Item{objectType->name(), objectType->icon()}
@@ -203,7 +212,7 @@ void ParametersVisualizationModel::registerQmlType()
 
 ParametersVisualizationModel::ParametersVisualizationModel(QObject* parent):
     base_type(parent),
-    core::SystemContextAware(core::SystemContext::fromQmlContext(this)),
+    WindowContextAware(WindowContext::fromQmlContext(this)),
     d(new Private(this))
 {
 }

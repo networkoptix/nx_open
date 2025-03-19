@@ -6,7 +6,6 @@
 
 #include <api/server_rest_connection.h>
 #include <camera/camera_data_manager.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_history.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_management/resource_data_pool.h>
@@ -362,7 +361,7 @@ struct CloudCrossSystemContext::Private
 
         NX_VERBOSE(this, "Initialize new connection");
 
-        connectionProcess = qnClientCoreModule->networkModule()->connectionFactory()->connect(
+        connectionProcess = systemContext->networkModule()->connectionFactory()->connect(
             *logonData, handleConnection, systemContext.get());
 
         return true;

@@ -7,6 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/media/jpeg.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/mobile/system_context.h>
 
 namespace {
 
@@ -20,11 +21,12 @@ namespace {
 
 } // anonymous namespace
 
-template<> QnCameraThumbnailCache* Singleton<QnCameraThumbnailCache>::s_instance = nullptr;
-
-QnCameraThumbnailCache::QnCameraThumbnailCache(QObject *parent)
-    : QObject(parent)
-    , m_decompressThread(new QThread(this))
+QnCameraThumbnailCache::QnCameraThumbnailCache(nx::vms::client::mobile::SystemContext* context,
+    QObject *parent)
+    :
+    QObject(parent),
+    SystemContextAware(context),
+    m_decompressThread(new QThread(this))
 {
     m_request.size = defaultSize;
 

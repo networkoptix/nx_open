@@ -4,7 +4,6 @@
 
 #include <QtQml/QtQml>
 
-#include <client_core/client_core_module.h>
 #include <nx/cloud/db/api/connection.h>
 #include <nx/cloud/db/api/oauth_data.h>
 #include <nx/cloud/db/client/oauth_manager.h>
@@ -13,6 +12,8 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/reflect/to_string.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -168,18 +169,20 @@ void OauthClient::Private::issueTokensWithoutScope()
 
 std::string OauthClient::Private::email() const
 {
-    auto email = authData.credentials.username;
+    if (!authData.credentials.username.empty())
+        return authData.credentials.username;
 
-    if (email.empty())
+    // We can use Oauth client both when there is connection to the system and when it is absent.
+    if (appContext()->systemContexts().empty())
+        return {};
+
+    if (const auto connection = appContext()->currentSystemContext()->connection())
     {
-        RemoteConnectionAware connectionHelper;
-        auto remoteConnection = connectionHelper.connection();
-
-        if (remoteConnection && remoteConnection->connectionInfo().isCloud())
-            email = remoteConnection->credentials().username;
+        if (connection->connectionInfo().isCloud())
+            return connection->credentials().username;
     }
 
-    return email;
+    return {};
 }
 
 //-------------------------------------------------------------------------------------------------

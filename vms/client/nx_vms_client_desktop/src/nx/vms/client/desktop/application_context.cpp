@@ -19,7 +19,6 @@
 #include <client/client_startup_parameters.h>
 #include <client/desktop_client_message_processor.h>
 #include <client/forgotten_systems_manager.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/local_resource_status_watcher.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_directory_browser.h>
@@ -167,7 +166,7 @@ QString actualCloudHost()
         : ini().cloudHost;
 }
 
-Qn::SerializationFormat serializationFormat()
+Qn::SerializationFormat appSerializationFormat()
 {
     return ini().forceJsonConnection ? Qn::SerializationFormat::json : Qn::SerializationFormat::ubjson;
 }
@@ -327,7 +326,6 @@ struct ApplicationContext::Private
     std::vector<QPointer<SystemContext>> systemContexts;
     std::vector<QPointer<WindowContext>> windowContexts;
     std::unique_ptr<SystemContext> mainSystemContext; //< Main System Context;
-    std::unique_ptr<QnClientCoreModule> clientCoreModule;
     std::unique_ptr<core::UnifiedResourcePool> unifiedResourcePool;
 
     // Settings modules.
@@ -570,16 +568,8 @@ struct ApplicationContext::Private
 
     // This is a temporary step until QnClientCoreModule contents is moved to the corresponding
     // contexts.
-    void initializeClientCoreModule()
+    void updateVersionIfNeeded()
     {
-        clientCoreModule = std::make_unique<QnClientCoreModule>(mainSystemContext.get());
-        if (mode == Mode::desktopClient)
-        {
-            clientCoreModule->initializeNetworking(
-                q->localPeerType(),
-                serializationFormat());
-        }
-
         if (!startupParameters.engineVersion.isEmpty())
         {
             nx::utils::SoftwareVersion version(startupParameters.engineVersion);
@@ -678,6 +668,7 @@ ApplicationContext::ApplicationContext(
     :
     core::ApplicationContext(
         toCoreMode(mode),
+        appSerializationFormat(),
         peerType(startupParameters),
         actualCloudHost(),
         /*customExternalResourceFile*/ "client_external.dat",
@@ -711,7 +702,7 @@ ApplicationContext::ApplicationContext(
             d->initializeSystemContext();
             if (features.flags.testFlag(FeatureFlag::cross_site))
                 d->initializeCrossSystemModules(); //< For the resources tree tests.
-            d->initializeClientCoreModule();
+            d->updateVersionIfNeeded();
             if (features.core.flags.testFlag(CoreFeatureFlag::qml))
                 d->initializeQml();
             d->resourcesChangesManager = std::make_unique<ResourcesChangesManager>();
@@ -740,7 +731,7 @@ ApplicationContext::ApplicationContext(
             d->initializeSystemContext();
             d->initializeCrossSystemModules();
             d->mainSystemContext->startModuleDiscovery(moduleDiscoveryManager());
-            d->initializeClientCoreModule();
+            d->updateVersionIfNeeded();
             d->initializeQml();
             d->initializeLocalResourcesSearch();
             d->applauncherGuard = std::make_unique<ApplauncherGuard>();
@@ -788,9 +779,6 @@ ApplicationContext::~ApplicationContext()
         if (d->mainSystemContext->messageProcessor())
             d->mainSystemContext->deleteMessageProcessor();
     }
-
-    // Shared pointer to remote session must be freed as it's destructor depends on app context.
-    d->clientCoreModule.reset();
 
     // Local resources context temporary implementation depends on main system context.
     d->localResourcesContext.reset();
@@ -862,11 +850,6 @@ nx::Uuid ApplicationContext::peerId() const
 nx::Uuid ApplicationContext::videoWallInstanceId() const
 {
     return d->startupParameters.videoWallItemGuid;
-}
-
-QnClientCoreModule* ApplicationContext::clientCoreModule() const
-{
-    return d->clientCoreModule.get();
 }
 
 SystemContext* ApplicationContext::currentSystemContext() const

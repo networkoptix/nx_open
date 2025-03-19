@@ -22,10 +22,12 @@ NxObject
     property alias refreshWatcher: refreshWatcher
     property Item refreshPreloader: null
 
-    property EventSearchModel searchModel: createSearchModel(controller.analyticsSearchMode)
-    property CommonObjectSearchSetup searchSetup: createSearchSetup(searchModel)
+    property EventSearchModel searchModel:
+        windowContext.mainSystemContext.createSearchModel(controller.analyticsSearchMode)
+    property CommonObjectSearchSetup searchSetup:
+        windowContext.mainSystemContext.createSearchSetup(searchModel)
     property AnalyticsSearchSetup analyticsSearchSetup: controller.analyticsSearchMode
-        ? createAnalyticsSearchSetup(searchModel)
+        ? windowContext.mainSystemContext.createAnalyticsSearchSetup(searchModel)
         : null
 
     function requestUpdate(direction)

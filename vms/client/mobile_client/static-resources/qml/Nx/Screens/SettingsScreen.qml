@@ -115,11 +115,11 @@ Page
             {
                 width: parent.width
                 text: qsTr("Use server time")
-                checkState: serverTimeMode ? Qt.Checked : Qt.Unchecked
+                checkState: applicationContext.serverTimeMode ? Qt.Checked : Qt.Unchecked
                 icon: lp("/images/server_time_settings_option.svg")
                 onCheckStateChanged:
                 {
-                    serverTimeMode = checkState != Qt.Unchecked
+                    applicationContext.serverTimeMode = checkState != Qt.Unchecked
                 }
             }
 

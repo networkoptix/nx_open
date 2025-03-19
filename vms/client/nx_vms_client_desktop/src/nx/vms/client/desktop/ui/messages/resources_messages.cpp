@@ -6,7 +6,6 @@
 
 #include <QtWidgets/QLabel>
 
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/resource.h>
@@ -20,6 +19,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
@@ -295,9 +295,10 @@ bool Resources::deleteResources(
                     && !camera->isManuallyAdded();
             });
 
+        const auto pool = SystemContext::fromResource(resources.first())->resourcePool();
         text = (cameras.size() == resources.size()
             ? QnDeviceDependentStrings::getNameFromSet(
-                qnClientCoreModule->resourcePool(),
+                pool,
                 QnCameraDeviceStringSet(
                     tr("Delete %n devices?", "", cameras.size()),
                     tr("Delete %n cameras?", "", cameras.size()),
@@ -308,7 +309,7 @@ bool Resources::deleteResources(
         extras = (onlineAutoDiscoveredCameras.isEmpty()
             ? QString()
             : QnDeviceDependentStrings::getNameFromSet(
-                qnClientCoreModule->resourcePool(),
+                pool,
                 QnCameraDeviceStringSet(
                     tr("%n of them are auto-discovered.",
                         "", onlineAutoDiscoveredCameras.size()),

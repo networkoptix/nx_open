@@ -46,7 +46,7 @@ TreeView
     {
         id: resourceSelectionModel
 
-        context: systemContext
+        context: windowContext.systemContext
         resourceTypes: resourceSelectionTree.resourceTypes
         selectionMode: resourceSelectionTree.selectionMode
         topLevelNodesPolicy: resourceSelectionTree.topLevelNodesPolicy

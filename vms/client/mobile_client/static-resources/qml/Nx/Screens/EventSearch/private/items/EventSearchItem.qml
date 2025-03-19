@@ -117,7 +117,8 @@ MouseArea
 
                 text:
                 {
-                    return EventSearchUtils.timestampText(control.timestampMs)
+                    return EventSearchUtils.timestampText(
+                        control.timestampMs, windowContext.mainSystemContext)
                 }
             }
         }

@@ -6,14 +6,12 @@
 
 #include <QtCore/QAbstractTableModel>
 
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <core/resource/resource_fwd.h>
 #include <nx/vms/rules/rules_fwd.h>
 
 namespace nx::vms::client::desktop::rules {
 
-class NX_VMS_CLIENT_DESKTOP_API RulesTableModel:
-    public QAbstractTableModel,
-    public nx::vms::client::core::RemoteConnectionAware
+class NX_VMS_CLIENT_DESKTOP_API RulesTableModel: public QAbstractTableModel
 {
     Q_OBJECT
 

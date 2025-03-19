@@ -172,12 +172,12 @@ void ResourceGroupingActionHandler::renameCustomResourceTreeGroup() const
     if (std::any_of(resources.begin(), resources.end(), isCamera))
     {
         const bool serversShownInTree = context()->resourceTreeSettings()->showServersInTree();
-        resourcesWithinTopLevelNode = context()->resourcePool()->getAllCameras(
+        resourcesWithinTopLevelNode = context()->system()->resourcePool()->getAllCameras(
             serversShownInTree ? resources[0]->getParentResource() : QnResourcePtr());
     }
     else if (std::any_of(resources.begin(), resources.end(), isLayout))
     {
-        resourcesWithinTopLevelNode = context()->resourcePool()->getResources<LayoutResource>();
+        resourcesWithinTopLevelNode = context()->system()->resourcePool()->getResources<LayoutResource>();
     }
 
     const auto it =

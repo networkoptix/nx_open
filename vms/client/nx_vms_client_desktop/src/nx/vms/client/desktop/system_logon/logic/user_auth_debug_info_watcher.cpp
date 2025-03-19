@@ -7,12 +7,12 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QString>
 
-#include <client_core/client_core_module.h>
 #include <core/resource/user_resource.h>
 #include <nx/cloud/db/api/oauth_data.h>
 #include <nx/cloud/db/api/oauth_manager.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/jose/jws.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
@@ -111,7 +111,7 @@ public:
         const auto updateTokenInfoForDebugInfo =
             [this]()
             {
-                const auto session = qnClientCoreModule->networkModule()->session();
+                const auto session = q->networkModule()->session();
                 const auto token = session->connection()->credentials().authToken;
                 if (token.isBearerToken())
                 {
@@ -142,7 +142,7 @@ public:
             };
 
         // When a new session appears, this old connection will be destroyed.
-        connect(qnClientCoreModule->networkModule()->session().get(),
+        connect(q->networkModule()->session().get(),
             &RemoteSession::credentialsChanged,
             q,
             updateTokenInfoForDebugInfo);

@@ -92,7 +92,7 @@ public:
      * index and data parameters for Qt::EditRole.
      */
     using EditDelegate = std::function<bool(const QModelIndex&, const QVariant&)>;
-    void setEditDelegate(EditDelegate editDelegate);
+    void setEditDelegate(EditDelegate&& editDelegate);
 
     virtual bool setData(const QModelIndex&, const QVariant&, int = Qt::EditRole) override final;
     virtual bool setItemData(const QModelIndex&, const QMap<int, QVariant>&) override final;

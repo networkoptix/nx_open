@@ -223,9 +223,9 @@ bool EntityItemModel::setHeaderData(int, Qt::Orientation, const QVariant&, int)
     return false;
 }
 
-void EntityItemModel::setEditDelegate(EditDelegate delegate)
+void EntityItemModel::setEditDelegate(EditDelegate&& delegate)
 {
-    m_editDelegate = delegate;
+    m_editDelegate = std::move(delegate);
 }
 
 bool EntityItemModel::setData(const QModelIndex& index, const QVariant& value, int role)

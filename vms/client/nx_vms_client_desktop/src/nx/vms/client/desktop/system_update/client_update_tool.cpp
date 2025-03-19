@@ -6,7 +6,6 @@
 
 #include <api/server_rest_connection.h>
 #include <client/client_startup_parameters.h>
-#include <client_core/client_core_module.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>

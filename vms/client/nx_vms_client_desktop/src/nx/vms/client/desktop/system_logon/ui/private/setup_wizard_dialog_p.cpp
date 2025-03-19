@@ -5,7 +5,6 @@
 #include <QtGui/QDesktopServices>
 #include <QtQuick/QQuickItem>
 
-#include <client_core/client_core_module.h>
 #include <network/system_helpers.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>

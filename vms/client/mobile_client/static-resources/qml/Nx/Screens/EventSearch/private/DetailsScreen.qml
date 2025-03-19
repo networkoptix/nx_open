@@ -47,7 +47,7 @@ Page
         anchors.centerIn: parent
 
         enabled: preview.player && !preview.player.cannotDecryptMediaError
-        resourceId: preview.resource && preview.resource.id
+        resource: preview.resource
         positionMs: preview.startTimeMs
         durationMs: preview.durationMs
     }
@@ -361,7 +361,7 @@ Page
         font.weight: Font.Medium
         color: ColorTheme.colors.light4
 
-        text: EventSearchUtils.timestampText(slider.value)
+        text: EventSearchUtils.timestampText(slider.value, windowContext.mainSystemContext)
     }
 
     IconButton

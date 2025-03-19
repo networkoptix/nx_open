@@ -9,7 +9,6 @@
 #include <QtGui/QGuiApplication>
 
 #include <client/client_message_processor.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <mobile_client/mobile_client_message_processor.h>
@@ -32,10 +31,11 @@
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
-#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/utils/reconnect_helper.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
+#include <nx/vms/client/mobile/system_context.h>
+#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/client/mobile/push_notification/details/push_ipc_data.h>
 #include <nx/vms/client/mobile/ui/qml_wrapper_helper.h>
 #include <nx/vms/common/system_settings.h>
@@ -337,7 +337,7 @@ void Session::Private::connectToServer(bool ignoreCachedData)
             }
         });
 
-    const auto factory = qnClientCoreModule->networkModule()->connectionFactory();
+    const auto factory = q->networkModule()->connectionFactory();
     m_connectionProcess = factory->connect(
         m_logonData.value(), callback, q->systemContext(), {}, ignoreCachedData);
 
@@ -385,7 +385,7 @@ void Session::Private::connectToKnownServer(nx::vms::client::core::RemoteConnect
             executeLater([this](){ connectToServer(/* ignoreCachedData */ true); }, this);
         });
 
-    qnClientCoreModule->networkModule()->setSession(session);
+    q->networkModule()->setSession(session);
     q->systemContext()->setSession(session);
 
     const auto userName = QString::fromStdString(connection->credentials().username);
@@ -419,7 +419,7 @@ void Session::Private::resetCurrentConnection()
 {
     m_connectionProcess.reset();
     q->systemContext()->setSession({});
-    qnClientCoreModule->networkModule()->setSession({});
+    q->networkModule()->setSession({});
 
     updateConnectionState();
 }
@@ -825,42 +825,38 @@ void Session::Private::setConnectionVersion(const nx::utils::SoftwareVersion& va
 //-------------------------------------------------------------------------------------------------
 
 Session::Holder Session::create(
-    core::SystemContext* systemContext,
+    SystemContext* context,
     const ConnectionData& connectionData,
     const QString& supposedSystemName,
     session::ConnectionCallback&& callback)
 {
-    return Session::Holder(
-        new Session(systemContext, connectionData, supposedSystemName, std::move(callback)));
+    return Session::Holder(new Session(
+        context,
+        connectionData,
+        supposedSystemName,
+        std::move(callback)));
 }
 
 Session::~Session()
 {
     NX_DEBUG(this, "~Session(): start: destroying session");
 
-    // When called in ApplicationContext destructor the QnClientCoreModule is already destroyed.
-    if (qnClientCoreModule)
+    if (const auto remoteSession = networkModule()->session())
     {
-        if (const auto session = qnClientCoreModule->networkModule()->session())
+        const auto& localSystemId = d->localSystemId();
+        const auto& userName = d->logonData().credentials.username;
+        if (!hasBearerToken(localSystemId, userName))
         {
-            const auto& localSystemId = d->localSystemId();
-            const auto& userName = d->logonData().credentials.username;
-            if (!hasBearerToken(localSystemId, userName))
-            {
-                // Absent credentials means that we don't want to preserve the remote session.
-                session->setAutoTerminate(true);
-            }
-
-            if (!isCloudSession() && !hasStoredToken(localSystemId, userName))
-                core::appContext()->coreSettings()->lastConnection = {};
+            // Absent credentials means that we don't want to preserve the remote session.
+            remoteSession->setAutoTerminate(true);
         }
+
+        if (!isCloudSession() && !hasStoredToken(localSystemId, userName))
+            core::appContext()->coreSettings()->lastConnection = {};
     }
+
     d->resetAddress();
     d->setSuspended(true); //< Disconnects from current server and prevents reconnecting.
-
-    const auto pool = resourcePool();
-    const auto remoteResources = pool->getResourcesWithFlag(Qn::remote);
-    pool->removeResources(remoteResources);
 
     NX_DEBUG(this, "~Session(): end");
 }

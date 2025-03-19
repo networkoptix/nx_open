@@ -6,7 +6,8 @@
 
 namespace nx::vms::client::desktop {
 
-ServerRequestStorage::ServerRequestStorage()
+ServerRequestStorage::ServerRequestStorage(SystemContext* context):
+    SystemContextAware(context)
 {
 }
 

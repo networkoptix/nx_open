@@ -9,8 +9,10 @@
 #include <core/resource/videowall_resource.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/app_icons.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/videowall/utils.h>
 #include <nx/vms/utils/platform/autorun.h>
@@ -71,7 +73,8 @@ bool VideoWallShortcutHelper::createShortcut(const QnVideoWallResourcePtr& video
     if (appPath.isEmpty())
         return false;
 
-    if (!NX_ASSERT(connection(), "Client must be connected"))
+    const auto connection = SystemContext::fromResource(videowall)->connection();
+    if (!NX_ASSERT(connection, "Client must be connected"))
         return false;
 
     QStringList arguments;
@@ -80,7 +83,7 @@ bool VideoWallShortcutHelper::createShortcut(const QnVideoWallResourcePtr& video
 
     const nx::utils::Url serverUrl = nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
-        .setEndpoint(connectionAddress())
+        .setEndpoint(connection->address())
         .toUrl();
 
     arguments << "--auth";

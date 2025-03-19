@@ -1600,11 +1600,11 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts(const QnVideoWallResource
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 {
-    if (nx::vms::common::saas::saasInitialized(context()->systemContext()))
+    if (nx::vms::common::saas::saasInitialized(systemContext()))
     {
-        if (context()->systemContext()->saasServiceManager()->saasShutDown())
+        if (systemContext()->saasServiceManager()->saasShutDown())
         {
-            const auto saasState = context()->systemContext()->saasServiceManager()->saasState();
+            const auto saasState = systemContext()->saasServiceManager()->saasState();
 
             const auto caption = tr("Site shut down");
             const auto text = tr("To add a Video Wall, the Site should be in active state. %1")

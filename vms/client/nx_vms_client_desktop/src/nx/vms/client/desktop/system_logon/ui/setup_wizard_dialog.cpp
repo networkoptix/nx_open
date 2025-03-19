@@ -7,11 +7,12 @@
 #include <QtWidgets/QLineEdit>
 
 #include <client/client_runtime_settings.h>
-#include <client_core/client_core_module.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/ssl/certificate.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
@@ -56,7 +57,9 @@ SetupWizardDialog::SetupWizardDialog(
         [serverId](const QString& certificateChain, const QUrl& /*url*/)
         {
             // We accept expired certificate on the first connection to a system.
-            return qnClientCoreModule->networkModule()->certificateVerifier()->verifyCertificate(
+            const auto context = core::appContext()->currentSystemContext();
+            const auto verifier = context->certificateVerifier<core::CertificateVerifier>();
+            return verifier->verifyCertificate(
                 serverId,
                 nx::network::ssl::Certificate::parse(certificateChain.toStdString()),
                 /*acceptExpired*/ true

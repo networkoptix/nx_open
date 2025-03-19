@@ -4,10 +4,10 @@
 
 #include <QtCore/QPointer>
 
-#include <client_core/client_core_module.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 #include "../flux/camera_settings_dialog_store.h"
 
@@ -15,19 +15,9 @@ using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
 
-namespace {
-
-SystemSettings* globalSettings()
-{
-    auto settings = qnClientCoreModule->globalSettings();
-    NX_ASSERT(settings);
-    return settings;
-}
-
-} // namespace
-
 CameraSettingsGlobalSettingsWatcher::CameraSettingsGlobalSettingsWatcher(
     CameraSettingsDialogStore* store,
+    SystemContext* context,
     QObject* parent)
     :
     base_type(parent)
@@ -35,18 +25,18 @@ CameraSettingsGlobalSettingsWatcher::CameraSettingsGlobalSettingsWatcher(
     NX_ASSERT(store);
 
     const auto updateCameraSettingsOptimizationEnabled =
-        [store = QPointer<CameraSettingsDialogStore>(store)]()
+        [context, store = QPointer<CameraSettingsDialogStore>(store)]()
         {
             if (!store)
                 return;
 
             store->setSettingsOptimizationEnabled(
-                globalSettings()->isCameraSettingsOptimizationEnabled());
+                context->globalSettings()->isCameraSettingsOptimizationEnabled());
         };
 
     updateCameraSettingsOptimizationEnabled();
 
-    connect(globalSettings(), &SystemSettings::cameraSettingsOptimizationChanged,
+    connect(context->globalSettings(), &SystemSettings::cameraSettingsOptimizationChanged,
         this, updateCameraSettingsOptimizationEnabled);
 }
 

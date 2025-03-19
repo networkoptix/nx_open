@@ -28,7 +28,7 @@ void ResourcePoolDialog::registerAction()
         [](QnWorkbenchContext* context)
         {
             auto dialog = std::make_unique<ResourcePoolDialog>(
-                context->resourcePool(),
+                context->system()->resourcePool(),
                 context->mainWindowWidget());
             dialog->exec();
         });

@@ -2,8 +2,14 @@
 
 #pragma once
 
-#include <nx/vms/client/mobile/system_context_aware.h>
+#include <QtCore/QObject>
+
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/core/context_from_qml_handler.h>
+#include <nx/vms/client/core/resource/resource_fwd.h>
+#include <nx/vms/client/mobile/window_context_aware.h>
+
+Q_MOC_INCLUDE("core/resource/resource.h")
 
 namespace nx::vms::client::mobile {
 
@@ -11,20 +17,23 @@ namespace nx::vms::client::mobile {
  * Class generates the media download link and requests OS to open it in the default browser.
  * Functionality is available for the cloud connections and systems 6.0 and higher.
  */
-class MediaDownloadBackend: public QObject, public SystemContextAware
+class MediaDownloadBackend:
+    public QObject,
+    public WindowContextAware,
+    public core::ContextFromQmlHandler
 {
     Q_OBJECT
 
-    using base_type = SystemContextAware;
+    using base_type = WindowContextAware;
 
     Q_PROPERTY(bool isDownloadAvailable
         READ isDownloadAvailable
         NOTIFY downloadAvailabilityChanged)
 
-    Q_PROPERTY(nx::Uuid cameraId
-        READ cameraId
-        WRITE setCameraId
-        NOTIFY cameraIdChanged)
+    Q_PROPERTY(QnResource* resource
+        READ rawResource
+        WRITE setRawResource
+        NOTIFY resourceChanged)
 
 public:
     static void registerQmlType();
@@ -37,16 +46,16 @@ public:
     Q_INVOKABLE void downloadVideo(qint64 startTimeMs,
         qint64 durationMs);
 
-    nx::Uuid cameraId() const;
-    void setCameraId(const nx::Uuid& value);
+    QnResource* rawResource() const;
+    void setRawResource(QnResource* value);
 
 signals:
     void downloadAvailabilityChanged();
-    void cameraIdChanged();
+    void resourceChanged();
     void errorOccured(const QString& title, const QString& description);
 
 private:
-    void showDownloadProcessError();
+    void onContextReady();
 
 private:
     struct Private;

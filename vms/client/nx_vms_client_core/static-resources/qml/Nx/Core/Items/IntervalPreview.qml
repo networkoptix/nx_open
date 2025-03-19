@@ -140,6 +140,7 @@ Item
                         parent: cameraDisplay.videoOutput
                         anchors.fill: parent
 
+                        resource: control.resource
                         sourceSize: cameraDisplay.videoOutput.channelSize
                     }
 

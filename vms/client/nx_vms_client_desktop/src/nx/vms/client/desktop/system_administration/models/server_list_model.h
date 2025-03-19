@@ -4,7 +4,6 @@
 
 #include <QtCore/QAbstractListModel>
 #include <QtQml/QQmlEngine>
-#include <QtQml/QQmlParserStatus>
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -16,11 +15,9 @@ namespace nx::vms::client::desktop {
  */
 class NX_VMS_CLIENT_DESKTOP_API ServerListModel:
     public QAbstractListModel,
-    public SystemContextAware,
-    public QQmlParserStatus
+    public SystemContextAware
 {
     Q_OBJECT
-    Q_INTERFACES(QQmlParserStatus)
     QML_ELEMENT
 
     using base_type = QAbstractListModel;
@@ -41,8 +38,6 @@ public:
     virtual QHash<int, QByteArray> roleNames() const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-    virtual void classBegin() override;
-    virtual void componentComplete() override {}
 
     Q_INVOKABLE nx::Uuid serverIdAt(int row) const;
     Q_INVOKABLE int indexOf(const nx::Uuid& serverId);

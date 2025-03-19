@@ -244,8 +244,8 @@ Page
 
         onAboutToShow:
         {
-            bookmarksMenuItem.visible = hasViewBookmarksPermission()
-            objectsMenuItem.visible = hasSearchObjectsPermission()
+            bookmarksMenuItem.visible = controller.systemContext.hasViewBookmarksPermission()
+            objectsMenuItem.visible = controller.systemContext.hasSearchObjectsPermission()
         }
     }
 

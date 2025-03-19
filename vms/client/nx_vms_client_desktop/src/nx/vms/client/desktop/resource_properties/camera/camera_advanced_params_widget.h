@@ -9,7 +9,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace Ui { class CameraAdvancedParamsWidget; }
 
@@ -22,13 +22,15 @@ class CameraSettingsDialogStore;
 struct CameraSettingsDialogState;
 
 class CameraAdvancedParamsWidget: public QWidget,
-    public core::RemoteConnectionAware
+    public SystemContextAware
 {
     Q_OBJECT
     using base_type = QWidget;
 
 public:
-    CameraAdvancedParamsWidget(CameraSettingsDialogStore* store, QWidget* parent = nullptr);
+    CameraAdvancedParamsWidget(SystemContext* context,
+        CameraSettingsDialogStore* store,
+        QWidget* parent = nullptr);
     virtual ~CameraAdvancedParamsWidget();
 
     void loadState(const CameraSettingsDialogState& state);

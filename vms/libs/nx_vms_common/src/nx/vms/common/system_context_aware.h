@@ -13,24 +13,27 @@ class QnGlobalPermissionsManager;
 class QnResourceAccessManager;
 class QnResourcePool;
 class QnResourcePropertyDictionary;
+class QnResourceStatusDictionary;
 class QnRuntimeInfoManager;
+class QnLicensePool;
+class QnServerAdditionalAddressesDictionary;
 
 namespace ec2 { class AbstractECConnection; }
 
+namespace nx::analytics::taxonomy { class AbstractState; }
+namespace nx::core::access { class AccessRightsManager; }
+namespace nx::vms::event { class RuleManager; }
+
 namespace nx::vms::common {
+
+namespace saas { class ServiceManager; }
 
 class LookupListManager;
 class ShowreelManager;
 class SystemContext;
 class SystemSettings;
 class UserGroupManager;
-
-class NX_VMS_COMMON_API SystemContextInitializer
-{
-public:
-    virtual ~SystemContextInitializer() = default;
-    virtual SystemContext* systemContext() const = 0;
-};
+class AbstractCertificateVerifier;
 
 /**
  * Helper class for the SystemContext-dependent classes. Must be destroyed before the Context is.
@@ -39,7 +42,6 @@ class NX_VMS_COMMON_API SystemContextAware
 {
 public:
     SystemContextAware(SystemContext* context);
-    SystemContextAware(std::unique_ptr<SystemContextInitializer> initializer);
 
     /**
      * Virtual destructor.
@@ -119,8 +121,28 @@ public:
      */
     UserGroupManager* userGroupManager() const;
 
-    // TODO: #GDM Remove field.
-    SystemContext* m_context = nullptr;
+    template<typename CertificateVerifierType = AbstractCertificateVerifier>
+    CertificateVerifierType* certificateVerifier() const
+    {
+        return dynamic_cast<CertificateVerifierType*>(verifier());
+    }
+
+    nx::core::access::AccessRightsManager* accessRightsManager() const;
+
+    QnLicensePool* licensePool() const;
+
+    nx::vms::event::RuleManager* eventRuleManager() const;
+
+    QnResourceStatusDictionary* resourceStatusDictionary() const;
+
+    QnServerAdditionalAddressesDictionary* serverAdditionalAddressesDictionary() const;
+
+    saas::ServiceManager* saasServiceManager() const;
+
+    std::shared_ptr<nx::analytics::taxonomy::AbstractState> analyticsTaxonomyState() const;
+
+private:
+    AbstractCertificateVerifier* verifier() const;
 
 private:
     struct Private;

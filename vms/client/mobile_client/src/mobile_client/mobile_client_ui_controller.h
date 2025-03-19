@@ -4,17 +4,17 @@
 
 #include <QtCore/QObject>
 
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/mobile/current_system_context_aware.h>
+
+Q_MOC_INCLUDE("core/resource/layout_resource.h")
 
 class QnContext;
 namespace nx::vms::client::mobile { class SessionManager; }
 
 class QnMobileClientUiControllerPrivate;
-class QnMobileClientUiController:
-    public QObject,
-    public nx::vms::client::mobile::CurrentSystemContextAware
+class QnMobileClientUiController: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
@@ -47,14 +47,14 @@ private:
         WRITE setCurrentScreen
         NOTIFY currentScreenChanged)
 
-    Q_PROPERTY(QString layoutId
-        READ layoutId
-        WRITE setLayoutId
-        NOTIFY layoutIdChanged)
+    Q_PROPERTY(QnLayoutResource* layout
+        READ rawLayout
+        WRITE setRawLayout
+        NOTIFY layoutChanged)
 
-    Q_PROPERTY(QString currentSystemName
-        READ currentSystemName
-        NOTIFY currentSystemNameChanged)
+//    Q_PROPERTY(QString currentSystemName
+//        READ currentSystemName
+//        NOTIFY currentSystemNameChanged)
 
     using ResourceIdList = QList<nx::Uuid>;
     using SessionManager = nx::vms::client::mobile::SessionManager;
@@ -73,10 +73,10 @@ public:
     Screen currentScreen() const;
     void setCurrentScreen(Screen value);
 
-    QString layoutId() const;
-    void setLayoutId(const QString& layoutId);
+    QnLayoutResource* rawLayout() const;
+    void setRawLayout(QnLayoutResource* value);
 
-    QString currentSystemName() const;
+//    QString currentSystemName() const;
 
 public:
     Q_INVOKABLE void openConnectToServerScreen(
@@ -87,7 +87,7 @@ public:
     Q_INVOKABLE void openSessionsScreen();
 
 signals:
-    void layoutIdChanged();
+    void layoutChanged();
     void resourcesScreenRequested(const QVariant& filterIds);
     void videoScreenRequested(QnResource* cameraResource, qint64 timestamp);
     void sessionsScreenRequested();
@@ -98,7 +98,7 @@ signals:
         const QString& password,
         const QString& operationId);
 
-    void currentSystemNameChanged();
+//    void currentSystemNameChanged();
 
     void currentScreenChanged();
 

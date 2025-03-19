@@ -3,7 +3,6 @@
 #include "abstract_search_list_model.h"
 
 #include <client/client_message_processor.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>

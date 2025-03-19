@@ -1,6 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+
+import Nx.Common
 import Nx.Core
 import Nx.Mobile
 
@@ -9,7 +11,7 @@ SideNavigationItem
     id: sideNavigationItem
 
     property string text
-    property string resourceId
+    property Resource layoutResource
     property bool shared: false
     property int count: 0
     property int type: QnLayoutsModel.Layout

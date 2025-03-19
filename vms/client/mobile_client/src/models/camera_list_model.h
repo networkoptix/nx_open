@@ -5,28 +5,37 @@
 #include <QtCore/QSortFilterProxyModel>
 
 #include <common/common_globals.h>
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/resource_types.h>
-#include <nx/vms/client/mobile/current_system_context_aware.h>
+#include <nx/vms/client/core/context_from_qml_handler.h>
+#include <nx/vms/client/mobile/window_context_aware.h>
 
+
+Q_MOC_INCLUDE("core/resource/layout_resource.h")
+
+class QnResource;
+class QnLayoutResource;
 class QnCameraListModelPrivate;
 
-class QnCameraListModel:
-    public QSortFilterProxyModel,
-    public nx::vms::client::mobile::CurrentSystemContextAware
+class QnCameraListModel: public QSortFilterProxyModel,
+    public nx::vms::client::mobile::WindowContextAware,
+    public nx::vms::client::core::ContextFromQmlHandler
 {
     Q_OBJECT
+    using base_type = QSortFilterProxyModel;
 
     Q_PROPERTY(QVariant filterIds READ filterIds WRITE setFilterIds
         NOTIFY filterIdsChanged)
-    Q_PROPERTY(QString layoutId READ layoutId WRITE setLayoutId NOTIFY layoutIdChanged)
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    Q_PROPERTY(QnLayoutResource* layout
+        READ rawLayout
+        WRITE setRawLayout
+        NOTIFY layoutChanged)    Q_PROPERTY(int count READ count NOTIFY countChanged)
     Q_PROPERTY(UuidList selectedIds
         READ selectedIds
         WRITE setSelectedIds
         NOTIFY selectedIdsChagned)
 
-    using base_type = QSortFilterProxyModel;
 
 public:
     QnCameraListModel(QObject* parent = nullptr);
@@ -35,8 +44,8 @@ public:
     virtual QHash<int, QByteArray> roleNames() const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;
 
-    QString layoutId() const;
-    void setLayoutId(const QString& layoutId);
+    QnLayoutResource* rawLayout() const;
+    void setRawLayout(QnLayoutResource* value);
 
     QVariant filterIds() const;
     void setFilterIds(const QVariant& ids);
@@ -47,7 +56,7 @@ public:
     int count() const;
 
     Q_INVOKABLE void setSelected(int row, bool selected);
-    Q_INVOKABLE int rowByResourceId(const nx::Uuid& resourceId) const;
+    Q_INVOKABLE int rowByResource(QnResource* resource) const;
     Q_INVOKABLE nx::Uuid resourceIdByRow(int row) const;
 
     Q_INVOKABLE QnResource* nextResource(QnResource* resource) const;
@@ -58,7 +67,7 @@ public slots:
     void refreshThumbnails(int from, int to);
 
 signals:
-    void layoutIdChanged();
+    void layoutChanged();
     void countChanged();
     void filterIdsChanged();
     void selectedIdsChagned();
@@ -68,6 +77,9 @@ protected:
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 
 private:
-    QScopedPointer<QnCameraListModelPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(QnCameraListModel)
+    virtual void onContextReady() override;
+
+private:
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };

@@ -5,7 +5,6 @@
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
 
-#include <client_core/client_core_module.h>
 #include <core/resource/layout_item_data.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>

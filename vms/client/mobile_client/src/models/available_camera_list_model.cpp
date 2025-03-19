@@ -8,13 +8,16 @@
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <mobile_client/mobile_client_module.h>
+#include <nx/vms/client/mobile/application_context.h>
+#include <nx/vms/client/mobile/system_context.h>
+#include <nx/vms/client/mobile/system_context_accessor.h>
 #include <watchers/available_cameras_watcher.h>
 
 using namespace nx::vms::client::core;
 
-class QnAvailableCameraListModelPrivate:
-    public QObject,
-    public nx::vms::client::mobile::CurrentSystemContextAware
+using MobileContextAccessor = nx::vms::client::mobile::SystemContextAccessor;
+
+class QnAvailableCameraListModelPrivate: public QObject
 {
     QnAvailableCameraListModel* q_ptr;
     Q_DECLARE_PUBLIC(QnAvailableCameraListModel)
@@ -38,7 +41,7 @@ public:
         const QnLayoutResourcePtr& resource, const nx::vms::common::LayoutItemData& item);
     void at_layout_itemRemoved(
         const QnLayoutResourcePtr& resource, const nx::vms::common::LayoutItemData& item);
-    void at_resourceChanged(const QnResourcePtr& resource);
+    void handleResourceChanged(const QnResourcePtr& resource);
 };
 
 QnAvailableCameraListModel::QnAvailableCameraListModel(QObject* parent) :
@@ -121,15 +124,15 @@ QModelIndex QnAvailableCameraListModel::indexByResourceId(const nx::Uuid& resour
 {
     Q_D(const QnAvailableCameraListModel);
 
-    const auto resource = resourcePool()->getResourceById(resourceId);
-    if (!resource)
-        return QModelIndex();
+    const auto it = std::find_if(d->resources.cbegin(), d->resources.cend(),
+        [resourceId](const auto resource)
+        {
+            return resource->getId() == resourceId;
+        });
 
-    const auto row = d->resources.indexOf(resource);
-    if (row < 0)
-        return QModelIndex();
-
-    return index(row);
+    return it == d->resources.cend()
+        ? QModelIndex{}
+        : index(std::distance(d->resources.cbegin(), it));
 }
 
 bool QnAvailableCameraListModel::filterAcceptsResource(const QnResourcePtr& resource) const
@@ -143,13 +146,9 @@ bool QnAvailableCameraListModel::filterAcceptsResource(const QnResourcePtr& reso
     return true;
 }
 
-
 QnAvailableCameraListModelPrivate::QnAvailableCameraListModelPrivate(QnAvailableCameraListModel* parent) :
     q_ptr(parent)
 {
-    connect(resourcePool(), &QnResourcePool::resourceChanged,
-            this, &QnAvailableCameraListModelPrivate::at_resourceChanged);
-
     resetResources();
 }
 
@@ -168,7 +167,11 @@ void QnAvailableCameraListModelPrivate::setLayout(const QnLayoutResourcePtr& new
 
 void QnAvailableCameraListModelPrivate::resetResources()
 {
-    const auto* camerasWatcher = qnMobileClientModule->availableCamerasWatcher();
+    const auto systemContext = nx::vms::client::mobile::appContext()->currentSystemContext();
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    const auto camerasWatcher = systemContext->availableCamerasWatcher();
 
     Q_Q(QnAvailableCameraListModel);
 
@@ -180,11 +183,14 @@ void QnAvailableCameraListModelPrivate::resetResources()
 
     if (layout)
     {
+        const auto layoutPool = MobileContextAccessor(layout).resourcePool();
         for (const auto& item: layout->getItems())
         {
-            const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(item.resource.id);
-            if (camera)
+            if (const auto camera =
+                layoutPool->getResourceById<QnVirtualCameraResource>(item.resource.id))
+            {
                 addCamera(camera, true);
+            }
         }
     }
     else
@@ -224,10 +230,15 @@ void QnAvailableCameraListModelPrivate::addCamera(const QnResourcePtr& resource,
     if (!q->filterAcceptsResource(resource))
         return;
 
+
+    connect(resource.get(), &QnResource::resourceChanged,
+        this, &QnAvailableCameraListModelPrivate::handleResourceChanged);
+    connect(resource.get(), &QnResource::propertyChanged,
+        this, &QnAvailableCameraListModelPrivate::handleResourceChanged);
     connect(resource.get(), &QnResource::nameChanged,
-            this, &QnAvailableCameraListModelPrivate::at_resourceChanged);
+            this, &QnAvailableCameraListModelPrivate::handleResourceChanged);
     connect(resource.get(), &QnResource::statusChanged,
-            this, &QnAvailableCameraListModelPrivate::at_resourceChanged);
+            this, &QnAvailableCameraListModelPrivate::handleResourceChanged);
 
     const auto row = resources.size();
 
@@ -272,9 +283,14 @@ void QnAvailableCameraListModelPrivate::at_watcher_cameraRemoved(const QnResourc
 void QnAvailableCameraListModelPrivate::at_layout_itemAdded(
         const QnLayoutResourcePtr& resource, const nx::vms::common::LayoutItemData& item)
 {
-    NX_ASSERT(resource == layout);
+    if (!NX_ASSERT(resource == layout && layout))
+        return;
 
-    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(item.resource.id);
+    const auto pool = MobileContextAccessor(layout).resourcePool();
+    const auto camera = pool
+        ? pool->getResourceById<QnVirtualCameraResource>(item.resource.id)
+        : QnVirtualCameraResourcePtr{};
+
     if (camera)
         addCamera(camera);
 }
@@ -282,14 +298,19 @@ void QnAvailableCameraListModelPrivate::at_layout_itemAdded(
 void QnAvailableCameraListModelPrivate::at_layout_itemRemoved(
         const QnLayoutResourcePtr& resource, const nx::vms::common::LayoutItemData& item)
 {
-    NX_ASSERT(resource == layout);
+    if (!NX_ASSERT(resource == layout && layout))
+        return;
 
-    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(item.resource.id);
+    const auto pool = MobileContextAccessor(layout).resourcePool();
+    const auto camera = pool
+        ? pool->getResourceById<QnVirtualCameraResource>(item.resource.id)
+        : QnVirtualCameraResourcePtr{};
+
     if (camera)
-        removeCamera(camera);
+        addCamera(camera);
 }
 
-void QnAvailableCameraListModelPrivate::at_resourceChanged(const QnResourcePtr& resource)
+void QnAvailableCameraListModelPrivate::handleResourceChanged(const QnResourcePtr& resource)
 {
     Q_Q(QnAvailableCameraListModel);
     q->refreshResource(resource);

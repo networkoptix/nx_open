@@ -6,6 +6,8 @@
 
 namespace nx::vms::client::desktop {
 
+class SystemContext;
+
 class CameraSettingsDialogStore;
 
 class CameraSettingsGlobalSettingsWatcher: public QObject
@@ -15,7 +17,9 @@ class CameraSettingsGlobalSettingsWatcher: public QObject
 
 public:
     explicit CameraSettingsGlobalSettingsWatcher(
-        CameraSettingsDialogStore* store, QObject* parent = nullptr);
+        CameraSettingsDialogStore* store,
+        SystemContext* context,
+        QObject* parent = nullptr);
 };
 
 } // namespace nx::vms::client::desktop

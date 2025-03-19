@@ -201,8 +201,6 @@ class NX_VMS_COMMON_API QnLicensePool:
 public:
     QnLicensePool(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
 
-    nx::vms::common::SystemContext* context() const { return m_context; }
-
     static int hardwareIdVersion(const QString& hwId);
 
     /** Number of cameras per analog encoder that require 1 license. */

@@ -12,20 +12,9 @@ StackView
     property int transitionDuration: 200
 
 
-    function safePush(url: url, properties: variant) : QtObject
+    function pushScreen(url: url, properties: variant) : QtObject
     {
-        var item = d.safeCreatePageComponent(url, properties)
-        return item
-            ? push(item, properties, StackView.Immediate)
-            : undefined
-    }
-
-    function safeReplace(target, url, properties)
-    {
-        var item = d.safeCreatePageComponent(url, properties)
-        return item
-            ? replace(target, item, properties)
-            : undefined
+        push(url, properties, StackView.Immediate)
     }
 
     onBusyChanged:
@@ -69,27 +58,6 @@ StackView
             var dy = scaleInYHint - stackView.height / 2
             var normalized = Math.max(Math.abs(dy), maxShift)
             return dy > 0 ? normalized : -normalized
-        }
-
-        function safeCreatePageComponent(url, properties)
-        {
-            var component = Qt.createComponent(url)
-            var item = properties
-                ? component.createObject(null, properties)
-                : component.createObject(null)
-
-            var error = component.errorString();
-            if (error.length)
-            {
-                console.log(error);
-            }
-
-            if (currentItem && currentItem.objectName == item.objectName)
-            {
-                item.destroy()
-                return undefined
-            }
-            return item
         }
     }
 

@@ -8,7 +8,7 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/analytics_data.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 #include "../flux/server_settings_dialog_store.h"
 
@@ -17,9 +17,7 @@ namespace nx::vms::client::desktop {
 // ------------------------------------------------------------------------------------------------
 // ServerPluginDataWatcher::Private
 
-class ServerPluginDataWatcher::Private:
-    public QObject,
-    public core::RemoteConnectionAware
+class ServerPluginDataWatcher::Private: public QObject
 {
 public:
     explicit Private(ServerPluginDataWatcher* /*q*/, ServerSettingsDialogStore* store) :
@@ -62,7 +60,11 @@ private:
 
     void requestData()
     {
-        if (!NX_ASSERT(m_server) || !NX_ASSERT(connection()))
+        if (!NX_ASSERT(m_server))
+            return;
+
+        const auto context = SystemContext::fromResource(m_server);
+        if (!NX_ASSERT(context->connection()))
             return;
 
         const auto handleResponse = nx::utils::guarded(this,
@@ -74,7 +76,7 @@ private:
                 clearActiveRequest();
             });
 
-        m_requestId = connectedServerApi()->getPluginInformation(
+        m_requestId = context->connectedServerApi()->getPluginInformation(
             m_server->getId(),
             handleResponse,
             thread());

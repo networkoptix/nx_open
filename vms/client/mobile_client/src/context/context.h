@@ -7,15 +7,11 @@
 #include <QtCore/QScopedPointer>
 
 #include <nx/utils/url.h>
-#include <nx/vms/client/mobile/system_context_aware.h>
 
 Q_MOC_INCLUDE("mobile_client/mobile_client_ui_controller.h")
 Q_MOC_INCLUDE("nx/mobile_client/controllers/audio_controller.h")
 Q_MOC_INCLUDE("nx/vms/client/core/common/utils/cloud_url_helper.h")
-Q_MOC_INCLUDE("nx/vms/client/core/event_search/models/event_search_model_adapter.h")
 Q_MOC_INCLUDE("nx/vms/client/core/network/cloud_status_watcher.h")
-Q_MOC_INCLUDE("nx/vms/client/core/two_way_audio/two_way_audio_controller.h")
-Q_MOC_INCLUDE("nx/vms/client/core/two_way_audio/two_way_audio_controller.h")
 Q_MOC_INCLUDE("nx/vms/client/core/watchers/user_watcher.h")
 Q_MOC_INCLUDE("nx/vms/client/mobile/push_notification/push_notification_manager.h")
 Q_MOC_INCLUDE("nx/vms/client/mobile/session/session_manager.h")
@@ -33,16 +29,9 @@ namespace nx::vms::client::core {
 class CloudStatusWatcher;
 class CloudUrlHelper;
 class OauthClient;
-class ServerTimeWatcher;
-class TwoWayAudioController;
-class UserWatcher;
-class CommonObjectSearchSetup;
-class AnalyticsSearchSetup;
-class EventSearchModelAdapter;
 
 } // namespace nx::vms::client::core
 
-using nx::vms::client::core::ServerTimeWatcher;
 
 namespace nx::client::mobile {
 class QmlSettingsAdaptor;
@@ -64,7 +53,7 @@ class PushSystemsSelectionModel;
 using nx::client::mobile::QmlSettingsAdaptor;
 using nx::vms::client::mobile::AudioController;
 
-class QnContext: public QObject, public nx::vms::client::mobile::SystemContextAware
+class QnContext: public QObject
 {
     Q_OBJECT
     typedef QObject base_type;
@@ -79,9 +68,6 @@ class QnContext: public QObject, public nx::vms::client::mobile::SystemContextAw
     Q_PROPERTY(nx::vms::client::core::CloudStatusWatcher* cloudStatusWatcher
         READ cloudStatusWatcher CONSTANT)
     Q_PROPERTY(QnMobileClientUiController* uiController READ uiController CONSTANT)
-    Q_PROPERTY(nx::vms::client::core::UserWatcher* currentUserWatcher READ currentUserWatcher CONSTANT)
-    Q_PROPERTY(nx::vms::client::core::TwoWayAudioController* twoWayAudioController
-        READ twoWayAudioController CONSTANT)
     Q_PROPERTY(nx::vms::client::core::CloudUrlHelper* cloudUrlHelper
         MEMBER m_cloudUrlHelper
         CONSTANT)
@@ -93,16 +79,14 @@ class QnContext: public QObject, public nx::vms::client::mobile::SystemContextAw
     Q_PROPERTY(nx::vms::client::mobile::OperationManager* operationManager
         READ operationManager CONSTANT)
 
+
     Q_PROPERTY(int leftCustomMargin READ leftCustomMargin NOTIFY customMarginsChanged)
     Q_PROPERTY(int rightCustomMargin READ rightCustomMargin NOTIFY customMarginsChanged)
     Q_PROPERTY(int topCustomMargin READ topCustomMargin NOTIFY customMarginsChanged)
     Q_PROPERTY(int bottomCustomMargin READ bottomCustomMargin NOTIFY customMarginsChanged)
 
-    Q_PROPERTY(bool serverTimeMode READ serverTimeMode WRITE setServerTimeMode
-        NOTIFY serverTimeModeChanged)
-
     Q_PROPERTY(nx::vms::client::mobile::PushNotificationManager* pushManager
-        MEMBER m_pushNotificationManager CONSTANT)
+        READ pushManager CONSTANT)
 
     Q_PROPERTY(bool hasDigestCloudPassword
         READ hasDigestCloudPassword
@@ -118,7 +102,8 @@ class QnContext: public QObject, public nx::vms::client::mobile::SystemContextAw
         NOTIFY androidKeyboardHeightChanged)
 
 public:
-    QnContext(nx::vms::client::mobile::SystemContext* systemContext, QObject* parent = nullptr);
+    QnContext(nx::vms::client::mobile::SessionManager* sessionManager,
+        QObject* parent = nullptr);
     virtual ~QnContext();
 
     void initCloudStatusHandling();
@@ -126,8 +111,6 @@ public:
     QnMobileClientUiController* uiController() const { return m_uiController; }
     nx::vms::client::core::CloudStatusWatcher* cloudStatusWatcher() const;
 
-    nx::vms::client::core::UserWatcher* currentUserWatcher() const;
-    nx::vms::client::core::TwoWayAudioController* twoWayAudioController() const;
     nx::vms::client::mobile::OperationManager* operationManager() const;
     QmlSettingsAdaptor* settings() const;
 
@@ -192,9 +175,6 @@ public:
     int topCustomMargin() const;
     int bottomCustomMargin() const;
 
-    bool serverTimeMode() const;
-    void setServerTimeMode(bool value);
-
     nx::vms::client::mobile::SessionManager* sessionManager() const;
 
     /** Create Oauth client with the specfied token and optional user. */
@@ -214,29 +194,18 @@ public:
 
     Q_INVOKABLE void requestRecordAudioPermissionIfNeeded();
 
-    Q_INVOKABLE nx::vms::client::core::EventSearchModelAdapter* createSearchModel(bool analyticsMode);
-
-    Q_INVOKABLE nx::vms::client::core::CommonObjectSearchSetup* createSearchSetup(
-        nx::vms::client::core::EventSearchModelAdapter* model);
-
-    Q_INVOKABLE nx::vms::client::core::AnalyticsSearchSetup* createAnalyticsSearchSetup(
-        nx::vms::client::core::EventSearchModelAdapter* model);
-
     Q_INVOKABLE QString plainText(const QString& value);
-
-    Q_INVOKABLE bool hasViewBookmarksPermission();
-
-    Q_INVOKABLE bool hasSearchObjectsPermission();
 
     Q_INVOKABLE QString qualityText(const QSize& resolution, int quality);
 
     Q_INVOKABLE void setGestureExclusionArea(int y, int height);
 
+    nx::vms::client::mobile::PushNotificationManager* pushManager() const;
+
 signals:
     void showMessage(
         const QString& caption,
         const QString& description);
-    void serverTimeModeChanged();
     void showCameraInfoChanged();
     void deviceStatusBarHeightChanged();
 
@@ -251,14 +220,11 @@ private:
     QnMobileAppInfo* const m_appInfo;
     QnMobileClientUiController* const m_uiController;
     nx::vms::client::core::CloudUrlHelper* const m_cloudUrlHelper;
-    ServerTimeWatcher* const m_timeWatcher;
     QString m_localPrefix;
     QMargins m_customMargins;
 
-    nx::vms::client::mobile::PushNotificationManager* const m_pushNotificationManager;
     int m_androidKeyboardHeight = 0;
     nx::vms::client::mobile::OperationManager* const m_operationManager;
-    nx::vms::client::core::TwoWayAudioController* const m_twoWayAudioController;
 };
 
 Q_DECLARE_METATYPE(QnContext*)

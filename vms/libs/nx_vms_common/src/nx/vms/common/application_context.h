@@ -59,10 +59,12 @@ public:
 
     ApplicationContext(
         PeerType localPeerType = PeerType::notDefined,
-        const QString& customCloudHost = QString(),
+        const QString& customCloudHost = QString{},
         Features features = Features::all(),
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
+
+    const Features& commonFeatures() const;
 
     /**
      * Main context of the VMS applications. Exists through all application lifetime.

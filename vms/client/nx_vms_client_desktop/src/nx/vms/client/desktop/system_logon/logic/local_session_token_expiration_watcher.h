@@ -9,17 +9,21 @@
 #include <QtCore/QPointer>
 
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop::workbench { class LocalNotificationsManager; }
 
 namespace nx::vms::client::desktop {
 
-class LocalSessionTokenExpirationWatcher: public QObject
+class SystemContext;
+
+class LocalSessionTokenExpirationWatcher: public QObject, public SystemContextAware
 {
     Q_OBJECT
 
 public:
     LocalSessionTokenExpirationWatcher(
+        SystemContext* context,
         QPointer<workbench::LocalNotificationsManager> notificationManager,
         QObject* parent);
 

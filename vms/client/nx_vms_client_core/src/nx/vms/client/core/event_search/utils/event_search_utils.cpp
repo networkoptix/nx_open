@@ -15,8 +15,7 @@
 namespace nx::vms::client::core {
 
 EventSearchUtils::EventSearchUtils(QObject* parent):
-    base_type(parent),
-    SystemContextAware(core::SystemContext::fromQmlContext(this))
+    base_type(parent)
 {
 }
 
@@ -54,10 +53,11 @@ QString EventSearchUtils::cameraSelectionText(
 
 QString EventSearchUtils::cameraSelectionText(
     EventSearch::CameraSelection selection,
-    const UuidList& cameraIds)
+    const UuidList& cameraIds,
+    SystemContext* context)
 {
     QnVirtualCameraResourceSet cameras;
-    const auto pool = systemContext()->resourcePool();
+    const auto pool = context->resourcePool();
     for (const auto& id: cameraIds)
     {
         if (const auto& camera = pool->getResourceById<QnVirtualCameraResource>(id))
@@ -76,9 +76,11 @@ FetchRequest EventSearchUtils::fetchRequest(
         .centralPointUs = std::chrono::microseconds(centralPointUs)};
 }
 
-QString EventSearchUtils::timestampText(qint64 timestampMs) const
+QString EventSearchUtils::timestampText(
+    qint64 timestampMs,
+    SystemContext* context) const
 {
-    return timestampText(std::chrono::milliseconds(timestampMs), systemContext());
+    return timestampText(std::chrono::milliseconds(timestampMs), context);
 }
 
 QString EventSearchUtils::timeFromNowText(

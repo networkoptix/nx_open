@@ -7,7 +7,6 @@
 
 #include <nx/network/http/auth_tools.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
 
 namespace nx::vms::client::desktop {
@@ -18,8 +17,7 @@ namespace nx::vms::client::desktop {
 * Intended to use with server owner API calls
 */
 class FreshSessionTokenHelper:
-    public common::AbstractSessionTokenHelper,
-    public nx::vms::client::core::RemoteConnectionAware
+    public common::AbstractSessionTokenHelper
 {
 public:
     enum class ActionType

@@ -5,7 +5,6 @@
 #include <QtQml/QQmlEngine>
 
 #include <client/client_module.h>
-#include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/application_context.h>

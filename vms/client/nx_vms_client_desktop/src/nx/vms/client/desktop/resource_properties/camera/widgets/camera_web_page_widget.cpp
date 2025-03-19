@@ -11,7 +11,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLabel>
 
-#include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/access/access_controller.h>
@@ -174,7 +173,7 @@ void CameraWebPageWidget::Private::resetPage()
 
 void CameraWebPageWidget::Private::loadPage()
 {
-    const auto resourcePool = qnClientCoreModule->resourcePool();
+    const auto resourcePool = parent->resourcePool();
 
     // Cannot load resource url directly because camera settings url can contain a path from
     // resource_data.json and it is resolved in loadState().

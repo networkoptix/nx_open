@@ -13,7 +13,6 @@
 #include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/api/data/storage_space_reply.h>
 #include <nx/vms/api/types/event_rule_types.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 #include <nx/vms/client/core/system_context_aware.h>
 #include <storage/server_storage_manager_fwd.h>
 

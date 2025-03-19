@@ -16,7 +16,7 @@ function popCurrentScreen()
 function popScreens(count)
 {
     while (stackView.depth > 1 && count-- > 0)
-        stackView.pop().destroy()
+        stackView.pop()
 
     stackView.currentItem.forceActiveFocus()
 }
@@ -41,13 +41,13 @@ function openSessionsScreen()
     }
     else
     {
-        stackView.safeReplace(null, Qt.resolvedUrl("../Screens/SessionsScreen.qml"))
+        stackView.replace(null, Qt.resolvedUrl("../Screens/SessionsScreen.qml"))
     }
 }
 
 function openDigestCloudConnectScreen(cloudSystemId, systemName)
 {
-    stackView.safePush(Qt.resolvedUrl("../Screens/Cloud/DigestLogin.qml"),
+    stackView.pushScreen(Qt.resolvedUrl("../Screens/Cloud/DigestLogin.qml"),
         {
             "cloudSystemId": cloudSystemId,
             "systemName": systemName,
@@ -59,14 +59,14 @@ function openSessionsScreenWithWarning(systemName, errorText)
 {
     var item = stackView.currentItem && stackView.currentItem.objectName == "sessionsScreen"
         ? stackView.currentItem
-        : stackView.safeReplace(null, Qt.resolvedUrl("../Screens/SessionsScreen.qml"))
+        : stackView.replace(null, Qt.resolvedUrl("../Screens/SessionsScreen.qml"))
     if (item)
         showConnectionErrorMessage(systemName, errorText)
 }
 
 function openNewSessionScreen()
 {
-    var item = stackView.safePush(Qt.resolvedUrl("../Screens/CustomConnectionScreen.qml"))
+    var item = stackView.pushScreen(Qt.resolvedUrl("../Screens/CustomConnectionScreen.qml"))
     if (item)
         item.focusHostField()
 }
@@ -92,22 +92,22 @@ function openChannelPartnerScreen(profileWatcher)
 
 function openConnectToServerScreen(host, user, password, operationId)
 {
-    var item = stackView.safePush(
-            Qt.resolvedUrl("../Screens/CustomConnectionScreen.qml"),
-            {
-                "address": host,
-                "login": user,
-                "password": password,
-                "operationId": operationId
-            }
-    )
+    var item = stackView.pushScreen(
+        Qt.resolvedUrl("../Screens/CustomConnectionScreen.qml"),
+        {
+            "address": host,
+            "login": user,
+            "passowrd": password,
+            "operationId": operationId
+        })
+
     if (item)
         item.focusCredentialsField()
 }
 
 function openDiscoveredSession(systemId, localSystemId, systemName, address)
 {
-    var item = stackView.safePush(
+    var item = stackView.pushScreen(
             Qt.resolvedUrl("../Screens/CustomConnectionScreen.qml"),
             {
                 "systemId": systemId,
@@ -129,7 +129,7 @@ function openSavedSession(
     passwordErrorText)
 {
 
-    var item = stackView.safePush(
+    var item = stackView.pushScreen(
         Qt.resolvedUrl("../Screens/CustomConnectionScreen.qml"),
         {
             "systemId": systemId,
@@ -157,7 +157,7 @@ function openResourcesScreen(systemName, filterIds)
     }
     else
     {
-        stackView.safeReplace(
+        stackView.replace(
             null,
             Qt.resolvedUrl("../Screens/ResourcesScreen.qml"),
             {
@@ -178,44 +178,44 @@ function openVideoScreen(resource, screenshotUrl, xHint, yHint, timestamp, camer
             "targetTimestamp": targetTimestamp
         }
     stackView.setScaleTransitionHint(xHint, yHint)
-    const screen = stackView.safePush(Qt.resolvedUrl("../Screens/VideoScreen.qml"), properties)
+    const screen = stackView.pushScreen(Qt.resolvedUrl("../Screens/VideoScreen.qml"), properties)
     if (screen && camerasModel)
         screen.camerasModel = camerasModel
 }
 
 function openSettingsScreen()
 {
-    stackView.safePush(Qt.resolvedUrl("../Screens/SettingsScreen.qml"))
+    stackView.pushScreen(Qt.resolvedUrl("../Screens/SettingsScreen.qml"))
 }
 
 function openPushExpertModeScreen()
 {
-    stackView.safePush(Qt.resolvedUrl("../Screens/PushExpertModeScreen.qml"))
+    stackView.pushScreen(Qt.resolvedUrl("../Screens/PushExpertModeScreen.qml"))
 }
 
 function openDeveloperSettingsScreen()
 {
-    stackView.safePush(Qt.resolvedUrl("../Screens/DeveloperSettingsScreen.qml"))
+    stackView.pushScreen(Qt.resolvedUrl("../Screens/DeveloperSettingsScreen.qml"))
 }
 
 function openCloudSummaryScreen()
 {
-    stackView.safePush(Qt.resolvedUrl("../Screens/Cloud/Summary.qml"))
+    stackView.pushScreen(Qt.resolvedUrl("../Screens/Cloud/Summary.qml"))
 }
 
 function openCloudLoginScreen()
 {
-    stackView.safePush(Qt.resolvedUrl("../Screens/Cloud/Login.qml"))
+    stackView.pushScreen(Qt.resolvedUrl("../Screens/Cloud/Login.qml"))
 }
 
 function openSecuritySettingsScreen()
 {
-    stackView.safePush(Qt.resolvedUrl("../Screens/SecuritySettingsScreen.qml"))
+    stackView.pushScreen(Qt.resolvedUrl("../Screens/SecuritySettingsScreen.qml"))
 }
 
 function openCameraSettingsScreen(mediaPlayer, audioSupported, audioController)
 {
-    stackView.safePush(
+    stackView.pushScreen(
         Qt.resolvedUrl("../Screens/CameraSettingsScreen.qml"),
         {
             "player": mediaPlayer,
@@ -229,7 +229,7 @@ function openEventSearchScreen(selectedResourceId, camerasModel, analyticsSearch
     if (hasScreenInStack("eventSearchScreen"))
         popScreens(3) //< Pop video, event details, screen.
 
-    stackView.safePush(Qt.resolvedUrl("../Screens/EventSearch/EventSearchScreen.qml"),
+    stackView.pushScreen(Qt.resolvedUrl("../Screens/EventSearch/EventSearchScreen.qml"),
         {
             'camerasModel': camerasModel,
             'customResourceId': selectedResourceId,
@@ -239,7 +239,7 @@ function openEventSearchScreen(selectedResourceId, camerasModel, analyticsSearch
 
 function openEventFiltersScreen(controller)
 {
-    stackView.safePush(
+    stackView.pushScreen(
         Qt.resolvedUrl("../Screens/EventSearch/private/FiltersScreen.qml"),
         {
             "controller": controller,
@@ -248,7 +248,7 @@ function openEventFiltersScreen(controller)
 
 function openEventDetailsScreen(camerasModel, bookmarksModel, currentIndex, isAnalyticsDetails)
 {
-    stackView.safePush(Qt.resolvedUrl("../Screens/EventSearch/private/DetailsScreen.qml"),
+    stackView.pushScreen(Qt.resolvedUrl("../Screens/EventSearch/private/DetailsScreen.qml"),
         {
             "isAnalyticsDetails": isAnalyticsDetails,
             "camerasModel": camerasModel,
@@ -259,17 +259,17 @@ function openEventDetailsScreen(camerasModel, bookmarksModel, currentIndex, isAn
 
 function openBetaFeaturesScreen()
 {
-    stackView.safePush(Qt.resolvedUrl("../Screens/BetaFeaturesScreen.qml"))
+    stackView.pushScreen(Qt.resolvedUrl("../Screens/BetaFeaturesScreen.qml"))
 }
 
 function openEventSearchMenuScreen()
 {
-    stackView.safeReplace(null, Qt.resolvedUrl("../Screens/EventSearchMenuScreen.qml"))
+    stackView.replace(null, Qt.resolvedUrl("../Screens/EventSearchMenuScreen.qml"))
 }
 
 function openMenuScreen()
 {
-    stackView.safeReplace(null, Qt.resolvedUrl("../Screens/MenuScreen.qml"))
+    stackView.replace(null, Qt.resolvedUrl("../Screens/MenuScreen.qml"))
 }
 
 function openDialog(path, properties)

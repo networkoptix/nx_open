@@ -15,7 +15,6 @@
 
 #include <api/network_proxy_factory.h>
 #include <client/client_runtime_settings.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/client_camera.h>
 #include <core/resource_management/resource_discovery_manager.h>
@@ -207,11 +206,6 @@ void QnClientModule::initWebEngine()
         else
             qunsetenv(libraryPathVariable);
     }
-}
-
-QnClientCoreModule* QnClientModule::clientCoreModule() const
-{
-    return appContext()->clientCoreModule();
 }
 
 QnStartupParameters QnClientModule::startupParameters() const

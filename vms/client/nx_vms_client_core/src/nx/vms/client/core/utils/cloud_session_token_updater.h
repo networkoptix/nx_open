@@ -10,7 +10,6 @@
 #include <nx/cloud/db/api/connection.h>
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/deadline_timer.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 
 namespace nx::vms::client::core {
 

@@ -7,7 +7,6 @@
 
 #include <client/client_meta_types.h>
 #include <client/client_runtime_settings.h>
-#include <client_core/client_core_module.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>

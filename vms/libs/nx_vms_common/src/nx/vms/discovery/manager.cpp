@@ -259,6 +259,10 @@ void Manager::start(QnResourcePool* resourcePool)
             d->legacyMulticastFinder->start();
         });
 
+
+    if (!resourcePool)
+        return;
+
     auto handleServerAdded =
         [this](const QnMediaServerResourcePtr& server)
         {

@@ -214,7 +214,7 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     connect(ui->logsSettingsButton, &QPushButton::clicked, this,
         [this]
         {
-            auto watcher = context()->systemContext()->logsManagementWatcher();
+            auto watcher = context()->system()->logsManagementWatcher();
             if (!NX_ASSERT(watcher))
                 return;
 

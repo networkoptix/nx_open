@@ -6,8 +6,6 @@
 
 #include <QtQml/QtQml>
 
-#include <camera/active_camera_thumbnail_loader.h>
-#include <camera/thumbnail_cache_accessor.h>
 #include <client_core/client_core_meta_types.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_ui_controller.h>
@@ -39,7 +37,6 @@
 #include <nx/vms/client/mobile/workaround/back_gesture_workaround.h>
 #include <private/qqmlvaluetype_p.h>
 #include <resources/camera_access_rights_helper.h>
-#include <resources/layout_accessor.h>
 #include <settings/qml_settings_adaptor.h>
 #include <ui/models/ordered_systems_model.h>
 #include <ui/models/systems_model.h>
@@ -70,7 +67,6 @@ void registerQmlTypes()
 
     qmlRegisterType<QnCameraListModel>("Nx.Mobile", 1, 0, "QnCameraListModel");
     qmlRegisterType<QnLayoutsModel>("Nx.Mobile", 1, 0, "QnLayoutsModel");
-    qmlRegisterType<resource::LayoutAccessor>("Nx.Core", 1, 0, "LayoutAccessor");
     qmlRegisterType<core::animation::KineticAnimation>("Nx.Core", 1, 0, "KineticAnimation");
     qmlRegisterType<QnCameraAccessRightsHelper>("Nx.Mobile", 1, 0, "QnCameraAccessRightsHelper");
     qmlRegisterType<QnTimeline>("Nx.Mobile", 1, 0, "QnTimelineView");
@@ -83,9 +79,6 @@ void registerQmlTypes()
         "Use UserWatcher instance from the System Context");
 
     qmlRegisterType<QnOrderedSystemsModel>("Nx.Models", 1, 0, "OrderedSystemsModel");
-    qmlRegisterType<QnActiveCameraThumbnailLoader>("Nx.Mobile", 1, 0,
-        "QnActiveCameraThumbnailLoader");
-    qmlRegisterType<QnThumbnailCacheAccessor>("Nx.Mobile", 1, 0, "QnThumbnailCacheAccessor");
     qmlRegisterType<QnQuickTextInput>("Nx.Controls", 1, 0, "TextInput");
     qmlRegisterType<QnMobileClientUiController>("Nx.Mobile", 1, 0, "Controller");
     qmlRegisterType<nx::client::mobile::utils::DeveloperSettingsHelper>(

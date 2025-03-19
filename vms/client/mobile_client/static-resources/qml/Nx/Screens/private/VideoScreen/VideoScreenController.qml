@@ -18,7 +18,7 @@ NxObject
 
     readonly property alias audioController: audioController
     readonly property alias resource: resourceHelper.resource
-
+    readonly property alias systemContext: systemContextAccessor.systemContext
     readonly property bool serverOffline: sessionManager.hasReconnectingSession
     readonly property bool cameraOffline:
         mediaPlayer.liveMode
@@ -191,6 +191,13 @@ NxObject
     MediaResourceHelper
     {
         id: resourceHelper
+    }
+
+    SystemContextAccessor
+    {
+        id: systemContextAccessor
+
+        resource: resourceHelper.resource
     }
 
     QnCameraAccessRightsHelper

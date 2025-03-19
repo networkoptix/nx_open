@@ -10,7 +10,6 @@
 
 #include <api/server_rest_connection.h>
 #include <client/client_message_processor.h>
-#include <client_core/client_core_module.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
@@ -73,7 +72,7 @@ struct RemoteSession::Private
 void RemoteSession::Private::terminateServerSessionIfNeeded()
 {
     if (autoTerminate)
-        qnClientCoreModule->sessionTokenTerminator()->terminateToken(connection);
+        appContext()->sessionTokenTerminator()->terminateToken(connection);
 }
 
 void RemoteSession::Private::updateTokenExpirationTime()
@@ -128,7 +127,7 @@ RemoteSession::RemoteSession(
     SystemContextAware(systemContext),
     d(new Private{.q = this})
 {
-    d->remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
+    d->remoteConnectionFactory = networkModule()->connectionFactory();
 
     d->messageProcessor = systemContext->clientMessageProcessor();
     connect(d->messageProcessor.data(), &QnCommonMessageProcessor::connectionOpened, this,

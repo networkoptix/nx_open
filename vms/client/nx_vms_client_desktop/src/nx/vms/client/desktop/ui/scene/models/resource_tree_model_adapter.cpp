@@ -340,7 +340,7 @@ void ResourceTreeModelAdapter::setContext(WindowContext* context)
 
         d->resourceTreeComposer->attachModel(d->resourceTreeModel.get());
 
-        d->resourceTreeModel->setEditDelegate(ResourceTreeEditDelegate(context));
+        d->resourceTreeModel->setEditDelegate(createResourceTreeEditDelegate(context));
 
         connect(d->context->workbenchContext(), &QnWorkbenchContext::userChanged, this,
             [this]() { d->updateLocalFilesMode(); });
@@ -472,8 +472,8 @@ bool ResourceTreeModelAdapter::isFilterRelevant(ResourceTree::FilterType type) c
     switch (type)
     {
         case ResourceTree::FilterType::servers:
-            return d->context->workbenchContext()->accessController()->hasPowerUserPermissions()
-                || d->context->workbenchContext()->systemSettings()->showServersInTreeForNonAdmins();
+            return d->context->system()->accessController()->hasPowerUserPermissions()
+                || d->context->system()->globalSettings()->showServersInTreeForNonAdmins();
 
         default:
             return true;

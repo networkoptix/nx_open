@@ -783,7 +783,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                     const auto owner = resourcePool()->getResourceById<QnUserResource>(ownerId);
                     if (!owner)
                     {
-                        const auto showreel = m_context->showreelManager()->showreel(ownerId);
+                        const auto showreel = showreelManager()->showreel(ownerId);
                         if (showreel.isValid())
                         {
                             return showreel.parentId == user->getId()
@@ -949,7 +949,7 @@ bool QnResourceAccessManager::canCreateLayout(
         return hasAccessRights(subject, videoWall, AccessRight::edit);
 
     // Showreel owner can create layouts in it.
-    const auto showreel = m_context->showreelManager()->showreel(data.parentId);
+    const auto showreel = showreelManager()->showreel(data.parentId);
     if (showreel.isValid())
         return showreel.parentId == subject.id();
 

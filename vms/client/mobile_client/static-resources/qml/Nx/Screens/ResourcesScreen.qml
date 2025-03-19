@@ -43,17 +43,17 @@ Page
         alwaysCompleteHighlightAnimation: false
     }
 
-    LayoutAccessor
+    ResourceHelper
     {
-        id: layout
-        layoutId: uiController.layoutId
+        id: layoutHelper
+        resource: uiController.layout
     }
 
     Binding
     {
         target: resourcesScreen
         property: "title"
-        value: layout.name || sessionManager.systemName
+        value: layoutHelper.resourceName || sessionManager.systemName
         when: sessionManager.hasActiveSession
         restoreMode: Binding.RestoreBinding
     }
@@ -80,7 +80,7 @@ Page
 
         enabled: !sessionManager.hasReconnectingSession && !loadingDummy.visible
 
-        layoutId: uiController.layoutId
+        layout: uiController.layout
 
         keepStatuses: !sessionManager.hasReconnectingSession && !sessionManager.hasConnectedSession
 
@@ -96,9 +96,9 @@ Page
         anchors.fill: parent
         title: qsTr("No cameras available on this layout")
         buttonText: qsTr("Show all cameras")
-        onButtonClicked: uiController.layoutId = ""
+        onButtonClicked: uiController.layout = null
         visible: camerasGrid.count == 0
-                 && uiController.layoutId != ""
+                 && uiController.layout
                  && sessionManager.hasActiveSession
     }
 
