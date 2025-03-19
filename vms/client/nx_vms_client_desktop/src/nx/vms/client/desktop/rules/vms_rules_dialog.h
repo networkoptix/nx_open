@@ -4,14 +4,13 @@
 
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_wrapper.h>
 #include <nx/vms/rules/rules_fwd.h>
-#include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop::rules {
 
 class RulesTableModel;
 
-class VmsRulesDialog: public QmlDialogWrapper, public QnSessionAwareDelegate
+class VmsRulesDialog: public QmlDialogWrapper, public CurrentSystemContextAware
 {
     Q_OBJECT
 
@@ -31,8 +30,6 @@ public:
     Q_INVOKABLE void resetToDefaults();
     Q_INVOKABLE void openEventLogDialog();
 
-    bool tryClose(bool force) override;
-
 private:
     QWidget* m_parentWidget{nullptr};
     RulesTableModel* m_rulesTableModel{nullptr};
@@ -40,6 +37,7 @@ private:
     void deleteRulesImpl(const UuidList& ids);
     void saveRuleImpl(const std::shared_ptr<vms::rules::Rule>& rule);
     void resetToDefaultsImpl();
+    void showEditRuleDialog(const std::shared_ptr<vms::rules::Rule>& rule, bool isNew);
 };
 
 } // namespace nx::vms::client::desktop::rules

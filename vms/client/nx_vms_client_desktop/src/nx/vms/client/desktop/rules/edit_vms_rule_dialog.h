@@ -24,13 +24,12 @@ class EditableTitleWidget;
 class EventParametersWidget;
 class EventTypePickerWidget;
 
-class EditVmsRuleDialog:
-    public QnSessionAwareButtonBoxDialog
+class EditVmsRuleDialog: public QnButtonBoxDialog, public CurrentSystemContextAware
 {
     Q_OBJECT
 
 public:
-    explicit EditVmsRuleDialog(QWidget* parent = nullptr);
+    explicit EditVmsRuleDialog(WindowContext* context, QWidget* parent = nullptr);
 
     void setRule(std::shared_ptr<vms::rules::Rule> rule, bool isNewRule);
 

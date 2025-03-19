@@ -66,8 +66,9 @@ QString indentedJson(const QByteArray& json)
 
 } // namespace
 
-EditVmsRuleDialog::EditVmsRuleDialog(QWidget* parent):
-    QnSessionAwareButtonBoxDialog{parent}
+EditVmsRuleDialog::EditVmsRuleDialog(WindowContext* context, QWidget* parent):
+    QnButtonBoxDialog{parent},
+    CurrentSystemContextAware{context}
 {
     resize(985, 704);
     setMinimumSize(QSize(800, 600));
@@ -385,7 +386,7 @@ void EditVmsRuleDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button
         }
     }
 
-    QnSessionAwareButtonBoxDialog::buttonBoxClicked(button);
+    QnButtonBoxDialog::buttonBoxClicked(button);
 }
 
 void EditVmsRuleDialog::displayComment()

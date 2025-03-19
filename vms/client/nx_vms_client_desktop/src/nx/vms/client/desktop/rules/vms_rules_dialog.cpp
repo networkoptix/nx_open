@@ -6,6 +6,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/dialogs/week_time_schedule_dialog.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/engine.h>
@@ -29,7 +30,7 @@ VmsRulesDialog::VmsRulesDialog(QWidget* parent):
         QUrl("Nx/VmsRules/VmsRulesDialog.qml"),
         /*initialProperties*/ {},
         parent),
-    QnSessionAwareDelegate(parent),
+    nx::vms::client::desktop::CurrentSystemContextAware{parent},
     m_parentWidget{parent},
     m_rulesTableModel{QmlProperty<RulesTableModel*>(rootObjectHolder(), "rulesTableModel")}
 {
@@ -53,18 +54,9 @@ void VmsRulesDialog::setFilter(const QString& filter)
 
 void VmsRulesDialog::addRule()
 {
-    auto engine = systemContext()->vmsRulesEngine();
-
-    auto newRule = std::make_shared<vms::rules::Rule>(nx::Uuid::createUuid(), engine);
-    EditVmsRuleDialog editVmsRuleDialog{m_parentWidget};
-
-    editVmsRuleDialog.setRule(newRule, /*isNewRule*/ true);
-    connect(&editVmsRuleDialog, &EditVmsRuleDialog::accepted, [&]() { saveRuleImpl(newRule); });
-
-    if (editVmsRuleDialog.exec() == QDialogButtonBox::Cancel)
-        return;
-
-    saveRuleImpl(newRule);
+    showEditRuleDialog(
+        std::make_shared<vms::rules::Rule>(nx::Uuid::createUuid(), systemContext()->vmsRulesEngine()),
+        /*isNew*/ true);
 }
 
 void VmsRulesDialog::editSchedule(const UuidList& ids)
@@ -108,15 +100,7 @@ void VmsRulesDialog::duplicateRule(nx::Uuid id)
     if (auto uniqueIdField = clone->eventFilters().at(0)->fieldByType<vms::rules::UniqueIdField>())
         uniqueIdField->setId(nx::Uuid::createUuid()); //< Fix field uniqueness after cloning. TODO: #mmalofeev fix this workaround.
 
-    EditVmsRuleDialog editVmsRuleDialog(m_parentWidget);
-
-    editVmsRuleDialog.setRule(clone, /*isNewRule*/ false);
-    connect(&editVmsRuleDialog, &EditVmsRuleDialog::accepted, [&]() { saveRuleImpl(clone); });
-
-    if (editVmsRuleDialog.exec() == QDialogButtonBox::Cancel)
-        return;
-
-    saveRuleImpl(clone);
+    showEditRuleDialog(clone, /*isNew*/ false);
 }
 
 void VmsRulesDialog::editRule(nx::Uuid id)
@@ -127,23 +111,7 @@ void VmsRulesDialog::editRule(nx::Uuid id)
     if (!NX_ASSERT(clone))
         return;
 
-    EditVmsRuleDialog editVmsRuleDialog(m_parentWidget);
-
-    editVmsRuleDialog.setRule(clone, /*isNewRule*/ false);
-    connect(&editVmsRuleDialog, &EditVmsRuleDialog::accepted, [&]() { saveRuleImpl(clone); });
-
-    const auto result = editVmsRuleDialog.exec();
-    if (result == QDialogButtonBox::Cancel)
-        return;
-
-    if (result == QDialogButtonBox::Reset)
-    {
-        // QDialogButtonBox::Reset means user requested to delete the rule.
-        deleteRulesImpl({id});
-        return;
-    }
-
-    saveRuleImpl(clone);
+    showEditRuleDialog(clone, /*isNew*/ false);
 }
 
 void VmsRulesDialog::deleteRules(const UuidList& ids)
@@ -177,13 +145,6 @@ void VmsRulesDialog::resetToDefaults()
 void VmsRulesDialog::openEventLogDialog()
 {
     action(menu::OpenEventLogAction)->trigger();
-}
-
-bool VmsRulesDialog::tryClose(bool /*force*/)
-{
-    reject();
-
-    return true;
 }
 
 void VmsRulesDialog::deleteRulesImpl(const UuidList& ids)
@@ -238,6 +199,44 @@ void VmsRulesDialog::resetToDefaultsImpl()
                 setError(tr("Reset to defaults error:") + " " + ec2::toString(errorCode));
         },
         this);
+}
+
+void VmsRulesDialog::showEditRuleDialog(const std::shared_ptr<vms::rules::Rule>& rule, bool isNew)
+{
+    auto editVmsRuleDialog = new EditVmsRuleDialog{windowContext()};
+
+    // It is unable to set the VmsRulesDialog as the EditVmsRuleDialog's parent, so we need to
+    // manually delete this window along with the VmsRulesDialog.
+    connect(
+        this,
+        &QObject::destroyed,
+        this,
+        [editVmsRuleDialog = QPointer{editVmsRuleDialog}]
+        {
+            if (editVmsRuleDialog)
+                editVmsRuleDialog->deleteLater();
+        });
+
+    connect(
+        editVmsRuleDialog, &EditVmsRuleDialog::accepted, this, [this, rule]() { saveRuleImpl(rule); });
+
+    connect(
+        editVmsRuleDialog,
+        &EditVmsRuleDialog::finished,
+        this,
+        [this, editVmsRuleDialog, rule](int result)
+        {
+            if (result == QDialogButtonBox::Ok || result == QDialogButtonBox::Apply)
+                saveRuleImpl(rule);
+            else if (result == QDialogButtonBox::Reset)
+                deleteRulesImpl({rule->id()}); //< Reset means user requested to delete the rule.
+
+            editVmsRuleDialog->deleteLater();
+        });
+
+    editVmsRuleDialog->setRule(rule, isNew);
+    editVmsRuleDialog->setWindowModality(Qt::ApplicationModal);
+    editVmsRuleDialog->show();
 }
 
 } // namespace nx::vms::client::desktop::rules
