@@ -2226,8 +2226,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Power users</source>
-        <translation></translation>
+        <source>Power Users</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

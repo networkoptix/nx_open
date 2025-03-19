@@ -4523,14 +4523,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Choose a read-write policy to define how interact with storage directories.</source>
         <translation></translation>
     </message>
@@ -4578,6 +4570,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Insufficient services</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5926,10 +5926,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Source camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Developer Mode Info</source>
         <translation></translation>
     </message>
     <message>
