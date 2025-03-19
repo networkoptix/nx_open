@@ -12,6 +12,7 @@ namespace nx::vms::client::desktop {
 class DeviceAgentSettingsAdapter;
 class CameraSettingsAnalyticsEnginesWatcherInterface;
 class CameraAdvancedParametersManifestManager;
+class CameraSettingsResourceAccessWatcher;
 
 class NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogStateReducer
 {
@@ -24,7 +25,8 @@ public:
         const QnVirtualCameraResourceList& cameras,
         DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter = nullptr,
         CameraSettingsAnalyticsEnginesWatcherInterface* analyticsEnginesWatcher = nullptr,
-        CameraAdvancedParametersManifestManager* advancedParametersManifestManager = nullptr);
+        CameraAdvancedParametersManifestManager* advancedParametersManifestManager = nullptr,
+        CameraSettingsResourceAccessWatcher* accessWatcher = nullptr);
 
     /** Motion detection support was changed on one of the cameras. */
     static State handleMotionTypeChanged(State state, const QnVirtualCameraResourceList& cameras);
@@ -83,8 +85,8 @@ public:
     static State setSettingsOptimizationEnabled(State state, bool value);
     static std::pair<bool, State> setHasPowerUserPermissions(State state, bool value);
     static std::pair<bool, State> setHasEventLogPermission(State state, bool value);
-    static std::pair<bool, State> setPermissions(State state, Qn::Permissions value);
-    static std::pair<bool, State> setAllCamerasEditable(State state, bool value);
+    static std::pair<bool, State> setPermissions(
+        State state, Qn::Permissions singleCameraPermissions, bool allCamerasEditable);
     static std::pair<bool, State> setSaasInitialized(State state, bool value);
     static State setSingleVirtualCameraState(State state, const VirtualCameraState& value);
 

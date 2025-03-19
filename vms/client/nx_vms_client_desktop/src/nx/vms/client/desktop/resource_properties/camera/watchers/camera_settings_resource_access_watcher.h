@@ -6,6 +6,7 @@
 
 #include <QtCore/QObject>
 
+#include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 
 namespace nx::vms::client::desktop {
@@ -30,6 +31,9 @@ public:
     virtual ~CameraSettingsResourceAccessWatcher() override;
 
     void setCameras(const QnVirtualCameraResourceList& cameras);
+
+    Qn::Permissions singleCameraPermissions() const;
+    bool allCamerasEditable() const;
 
 private:
     class Private;

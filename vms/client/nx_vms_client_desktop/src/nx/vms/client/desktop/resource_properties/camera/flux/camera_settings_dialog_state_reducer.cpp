@@ -37,6 +37,7 @@
 #include "../camera_advanced_parameters_manifest_manager.h"
 #include "../utils/device_agent_settings_adapter.h"
 #include "../watchers/camera_settings_analytics_engines_watcher.h"
+#include "../watchers/camera_settings_resource_access_watcher.h"
 
 namespace nx::vms::client::desktop {
 
@@ -589,6 +590,11 @@ State fixupRecordingBrush(State state)
     return state;
 }
 
+CameraSettingsTab fixupSelectedTab(const State& state)
+{
+    return state.isPageVisible(state.selectedTab) ? state.selectedTab : CameraSettingsTab::general;
+}
+
 /**
  * Utility function to filter only those entities, which are supported by the provided engines.
  */
@@ -1009,36 +1015,35 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setHasEventLogPermissio
 }
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::setPermissions(
-    State state,
-    Qn::Permissions value)
+    State state, Qn::Permissions singleCameraPermissions, bool allCamerasEditable)
 {
-    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2, %3", __func__, singleCameraPermissions, allCamerasEditable);
 
-    if (state.singleCameraProperties.permissions == value)
-        return {false, std::move(state)};
+    bool changed = false;
 
-    state.singleCameraProperties.permissions = value;
-    return {true, std::move(state)};
-}
-
-std::pair<bool, State> CameraSettingsDialogStateReducer::setAllCamerasEditable(
-    State state,
-    bool value)
-{
-    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
-
-    if (state.allCamerasEditable == value)
-        return {false, std::move(state)};
-
-    state.allCamerasEditable = value;
-
-    if (!state.allCamerasEditable)
+    if (state.singleCameraProperties.permissions != singleCameraPermissions)
     {
-        state.singleCameraSettings.cameraHotspotsEnabled.resetUser();
-        state.singleCameraSettings.cameraHotspots.resetUser();
+        state.singleCameraProperties.permissions = singleCameraPermissions;
+        changed = true;
     }
 
-    return {true, std::move(state)};
+    if (state.allCamerasEditable != allCamerasEditable)
+    {
+        state.allCamerasEditable = allCamerasEditable;
+
+        if (!state.allCamerasEditable)
+        {
+            state.singleCameraSettings.cameraHotspotsEnabled.resetUser();
+            state.singleCameraSettings.cameraHotspots.resetUser();
+        }
+
+        changed = true;
+    }
+
+    if (changed)
+        state.selectedTab = fixupSelectedTab(state); // Webpage tab can become hidden.
+
+    return {changed, std::move(state)};
 }
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::setSaasInitialized(
@@ -1178,7 +1183,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
     const Cameras& cameras,
     DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter,
     CameraSettingsAnalyticsEnginesWatcherInterface* analyticsEnginesWatcher,
-    CameraAdvancedParametersManifestManager* advancedParametersManifestManager)
+    CameraAdvancedParametersManifestManager* advancedParametersManifestManager,
+    CameraSettingsResourceAccessWatcher* accessWatcher)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "Reset state, loading cameras %1", cameras);
 
@@ -1445,6 +1451,12 @@ State CameraSettingsDialogStateReducer::loadCameras(
             });
     }
 
+    if (accessWatcher)
+    {
+        state.singleCameraProperties.permissions = accessWatcher->singleCameraPermissions();
+        state.allCamerasEditable = accessWatcher->allCamerasEditable();
+    }
+
     if (singleCamera)
     {
         NX_VERBOSE(NX_SCOPE_TAG, "Single camera %1 is selected", singleCamera);
@@ -1529,8 +1541,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.recording.minPeriod = RecordingPeriod::minPeriod(cameras);
     state.recording.maxPeriod = RecordingPeriod::maxPeriod(cameras);
 
-    if (!state.isPageVisible(state.selectedTab))
-        state.selectedTab = CameraSettingsTab::general;
+    state.selectedTab = fixupSelectedTab(state);
 
     return state;
 }
@@ -1693,8 +1704,7 @@ State CameraSettingsDialogStateReducer::handleStatusChanged(
     NX_VERBOSE(NX_SCOPE_TAG, "%1 for cameras %2", __func__, cameras);
 
     state.devicesDescription.hasMotion = combinedValue(cameras, &hasMotion);
-    if (!state.isPageVisible(state.selectedTab)) //< Motion tab can become hidden.
-        state.selectedTab = CameraSettingsTab::general;
+    state.selectedTab = fixupSelectedTab(state); //< Motion tab can become hidden.
 
     fetchFromCameras<ScheduleTasks>(state.recording.schedule, cameras,
         [](const auto& camera)
@@ -2739,8 +2749,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setAnalyticsEngines(
             state.analytics.currentEngineId);
     }
 
-    if (!state.isPageVisible(state.selectedTab)) //< Analytics tab can become hidden.
-        state.selectedTab = CameraSettingsTab::general;
+    state.selectedTab = fixupSelectedTab(state); //< Analytics tab can become hidden.
 
     return {true, std::move(state)};
 }
@@ -2979,6 +2988,9 @@ State CameraSettingsDialogStateReducer::setAdvancedSettingsManifest(
 {
     NX_ASSERT(state.isSingleCamera());
     state.singleCameraProperties.advancedSettingsManifest = manifest;
+
+    state.selectedTab = fixupSelectedTab(state); //< Advanced tab can become hidden.
+
     return state;
 }
 

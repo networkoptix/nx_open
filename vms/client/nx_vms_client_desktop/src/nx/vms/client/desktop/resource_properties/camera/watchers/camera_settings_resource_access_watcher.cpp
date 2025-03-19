@@ -2,6 +2,8 @@
 
 #include "camera_settings_resource_access_watcher.h"
 
+#include <ranges>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
@@ -22,34 +24,19 @@ class CameraSettingsResourceAccessWatcher::Private
 {
 public:
     CameraSettingsDialogStore* const store;
-    const QPointer<nx::vms::client::core::SystemContext> systemContext;
     QSet<QnVirtualCameraResourcePtr> cameras;
 
 public:
-    void updatePermissions()
+    Qn::Permissions getPermissions(const QnVirtualCameraResourcePtr& camera)
     {
-        if (!systemContext)
-            return;
+        if (const auto system = SystemContext::fromResource(camera))
+        {
+            if (const auto accessController = system->accessController())
+                return accessController->permissions(camera);
+        }
 
-        const auto getPermissions =
-            [this](const QnVirtualCameraResourcePtr& camera) -> Qn::Permissions
-            {
-                return camera && camera->systemContext() == systemContext
-                    ? systemContext->accessController()->permissions(camera)
-                    : Qn::NoPermissions;
-            };
-
-        store->setPermissions(cameras.size() == 1
-            ? getPermissions(*cameras.cbegin())
-            : Qn::NoPermissions);
-
-        store->setAllCamerasEditable(std::all_of(cameras.cbegin(), cameras.cend(),
-            [=](const QnVirtualCameraResourcePtr& camera)
-            {
-                return getPermissions(camera).testFlags(
-                    Qn::ReadWriteSavePermission | Qn::WriteNamePermission);
-            }));
-    };
+        return Qn::NoPermissions;
+    }
 };
 
 CameraSettingsResourceAccessWatcher::CameraSettingsResourceAccessWatcher(
@@ -59,7 +46,7 @@ CameraSettingsResourceAccessWatcher::CameraSettingsResourceAccessWatcher(
     QObject* parent)
     :
     base_type(parent),
-    d(new Private{.store = store, .systemContext = systemContext})
+    d(new Private{.store = store})
 {
     if (!NX_ASSERT(store && systemContext))
         return;
@@ -76,7 +63,7 @@ CameraSettingsResourceAccessWatcher::CameraSettingsResourceAccessWatcher(
                     return camera && d->cameras.contains(camera);
                 }))
             {
-                d->updatePermissions();
+                d->store->setPermissions(singleCameraPermissions(), allCamerasEditable());
             }
         });
 
@@ -94,16 +81,23 @@ CameraSettingsResourceAccessWatcher::~CameraSettingsResourceAccessWatcher()
 void CameraSettingsResourceAccessWatcher::setCameras(
     const QnVirtualCameraResourceList& cameras)
 {
-    const auto cameraSet = nx::utils::toQSet(cameras);
-    if (d->cameras == cameraSet)
-    {
-        // We need to update the store even if cameras were not changed.
-        d->updatePermissions();
-        return;
-    }
+    d->cameras = nx::utils::toQSet(cameras);
+}
 
-    d->cameras = cameraSet;
-    d->updatePermissions();
+Qn::Permissions CameraSettingsResourceAccessWatcher::singleCameraPermissions() const
+{
+    return d->cameras.size() == 1 ? d->getPermissions(*d->cameras.begin()) : Qn::NoPermissions;
+}
+
+bool CameraSettingsResourceAccessWatcher::allCamerasEditable() const
+{
+    return std::ranges::all_of(
+        d->cameras,
+        [this](const QnVirtualCameraResourcePtr& camera)
+        {
+            return d->getPermissions(camera).testFlags(
+                Qn::ReadWriteSavePermission | Qn::WriteNamePermission);
+        });
 }
 
 } // namespace nx::vms::client::desktop

@@ -197,9 +197,8 @@ struct CameraSettingsDialog::Private: public QObject
             cameras,
             deviceAgentSettingsAdapter,
             analyticsEnginesWatcher,
-            advancedParametersManifestManager.get());
-
-        cameraResourceAccessWatcher->setCameras(cameras);
+            advancedParametersManifestManager.get(),
+            cameraResourceAccessWatcher);
     }
 
     void handleAction(menu::IDType action)
@@ -512,6 +511,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->analyticsEnginesWatcher->setCamera(singleCamera);
     d->deviceAgentSettingsAdapter->setCamera(singleCamera);
     d->advancedParametersManifestWatcher->selectCamera(singleCamera);
+    d->cameraResourceAccessWatcher->setCameras(cameras);
 
     d->advancedSettingsWidget->setSelectedServer({});
     d->advancedSettingsWidget->setPtzInterface({});
@@ -671,6 +671,9 @@ void CameraSettingsDialog::updateScheduleAlert(const CameraSettingsDialogState& 
 
 void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
 {
+    if (isHidden())
+        return; //< loadDataToUi will be called by base class on show event.
+
     NX_VERBOSE(this, "Loading state:\n%1", nx::reflect::json::serialize(state));
 
     static const QString kWindowTitlePattern = lit("%1 - %2");

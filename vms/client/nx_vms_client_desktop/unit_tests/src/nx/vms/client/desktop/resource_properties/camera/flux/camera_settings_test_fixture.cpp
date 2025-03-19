@@ -82,7 +82,8 @@ CameraResourceStubPtr CameraSettingsTestFixture::givenCamera(CameraFeatures feat
         d->cameras,
         /*deviceAgentSettingsAdapter*/ nullptr,
         d->analyticsEnginesWatcher.get(),
-        /*advancedParametersManifestManager*/ nullptr);
+        /*advancedParametersManifestManager*/ nullptr,
+        /*accessWatcher*/ nullptr);
 
     return camera;
 }
@@ -105,7 +106,8 @@ void CameraSettingsTestFixture::whenCameraRemoved(CameraResourceStubPtr camera)
         d->cameras,
         /*deviceAgentSettingsAdapter*/ nullptr,
         d->analyticsEnginesWatcher.get(),
-        /*advancedParametersManifestManager*/ nullptr);
+        /*advancedParametersManifestManager*/ nullptr,
+        /*accessWatcher*/ nullptr);
 }
 
 void CameraSettingsTestFixture::whenCameraStatusChangedTo(CameraResourceStubPtr camera,
@@ -179,7 +181,8 @@ void CameraSettingsTestFixture::whenCamerasAreLoaded()
         d->cameras,
         /*deviceAgentSettingsAdapter*/ nullptr,
         d->analyticsEnginesWatcher.get(),
-        /*advancedParametersManifestManager*/ nullptr);
+        /*advancedParametersManifestManager*/ nullptr,
+        /*accessWatcher*/ nullptr);
 }
 
 //-------------------------------------------------------------------------------------------------

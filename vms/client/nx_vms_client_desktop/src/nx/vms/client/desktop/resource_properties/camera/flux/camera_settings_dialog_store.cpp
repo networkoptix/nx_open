@@ -60,7 +60,8 @@ void CameraSettingsDialogStore::loadCameras(
     const QnVirtualCameraResourceList& cameras,
     DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter,
     CameraSettingsAnalyticsEnginesWatcherInterface* analyticsEnginesWatcher,
-    CameraAdvancedParametersManifestManager* advancedParametersManifestManager)
+    CameraAdvancedParametersManifestManager* advancedParametersManifestManager,
+    CameraSettingsResourceAccessWatcher* accessWatcher)
 {
     d->executeAction(
         [&](State state)
@@ -75,7 +76,8 @@ void CameraSettingsDialogStore::loadCameras(
                 cameras,
                 deviceAgentSettingsAdapter,
                 analyticsEnginesWatcher,
-                advancedParametersManifestManager);
+                advancedParametersManifestManager,
+                accessWatcher);
         });
 }
 
@@ -218,21 +220,14 @@ void CameraSettingsDialogStore::setHasEventLogPermission(bool value)
         [&](State state) { return Reducer::setHasEventLogPermission(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setPermissions(Qn::Permissions value)
+void CameraSettingsDialogStore::setPermissions(
+    Qn::Permissions singleCameraPermissions, bool allCamerasEditable)
 {
     d->executeAction(
         [&](State state)
         {
-            return Reducer::setPermissions(std::move(state), value);
-        });
-}
-
-void CameraSettingsDialogStore::setAllCamerasEditable(bool value)
-{
-    d->executeAction(
-        [&](State state)
-        {
-            return Reducer::setAllCamerasEditable(std::move(state), value);
+            return Reducer::setPermissions(
+                std::move(state), singleCameraPermissions, allCamerasEditable);
         });
 }
 

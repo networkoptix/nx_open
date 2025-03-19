@@ -36,6 +36,7 @@ struct DeviceAgentData;
 class DeviceAgentSettingsAdapter;
 class CameraSettingsAnalyticsEnginesWatcherInterface;
 class CameraAdvancedParametersManifestManager;
+class CameraSettingsResourceAccessWatcher;
 
 class NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogStore: public QObject
 {
@@ -53,7 +54,8 @@ public:
         const QnVirtualCameraResourceList& cameras,
         DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter = nullptr,
         CameraSettingsAnalyticsEnginesWatcherInterface* analyticsEnginesWatcher = nullptr,
-        CameraAdvancedParametersManifestManager* advancedParametersManifestManager = nullptr);
+        CameraAdvancedParametersManifestManager* advancedParametersManifestManager = nullptr,
+        CameraSettingsResourceAccessWatcher* accessWatcher = nullptr);
 
     /** Motion detection support was changed on one of the cameras. */
     void handleMotionTypeChanged(const QnVirtualCameraResourceList& cameras);
@@ -94,8 +96,7 @@ public:
     void setSettingsOptimizationEnabled(bool value);
     void setHasPowerUserPermissions(bool value);
     void setHasEventLogPermission(bool value);
-    void setPermissions(Qn::Permissions value);
-    void setAllCamerasEditable(bool value);
+    void setPermissions(Qn::Permissions singleCameraPermissions, bool allCamerasEditable);
     void setSaasInitialized(bool value);
     void setSingleVirtualCameraState(const VirtualCameraState& value);
     void setSingleCameraUserName(const QString& text);
