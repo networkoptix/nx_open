@@ -844,7 +844,7 @@ public:
         const nx::String& body,
         Callback<ResultType>&& callback,
         nx::utils::AsyncHandlerExecutor executor = {},
-        std::optional<nx::Uuid> proxyToServer = {});
+        const nx::network::http::HttpHeaders& customHeaders = {});
 
     Handle getUbJsonResult(
         const QString& action,

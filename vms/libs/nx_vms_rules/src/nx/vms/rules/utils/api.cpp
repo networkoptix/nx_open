@@ -2,6 +2,8 @@
 
 #include "api.h"
 
+#include <QtCore/QJsonArray>
+
 #include <nx/utils/qobject.h>
 #include <nx/vms/api/rules/action_info.h>
 #include <nx/vms/api/rules/event_info.h>
@@ -12,12 +14,188 @@
 #include "../action_builder_field.h"
 #include "../basic_action.h"
 #include "../basic_event.h"
+#include "../engine.h"
 #include "../event_filter.h"
 #include "../event_filter_field.h"
 #include "../rule.h"
+#include "../strings.h"
+#include "api_renamer.h"
 #include "serialization.h"
 
 namespace nx::vms::rules {
+
+namespace {
+
+const IdRenamer kIdRenamer;
+const auto kPropertyOffset =
+    QObject::staticMetaObject.propertyOffset() + QObject::staticMetaObject.propertyCount();
+
+std::pair<QString, QJsonValue> toApi(QString name, const QJsonValue& value, int type)
+{
+    const auto converter = unitConverter(type);
+    return {converter->nameToApi(std::move(name)), converter->valueToApi(value)};
+}
+
+int propertyType(const QMetaObject* meta, const QString& name)
+{
+    const auto index = meta->indexOfProperty(name.toUtf8().constData());
+    NX_ASSERT(index, "Unregistered property type: %1", name);
+
+    return meta->property(index).userType();
+}
+
+// Skip empty strings, arrays, and objects in the API output.
+bool isRequiredInApi(const QJsonValue& value)
+{
+    if (value.isArray() && value.toArray().isEmpty())
+        return false;
+
+    if (value.isString() && value.toString().isEmpty())
+        return false;
+
+    if (value.isObject() && value.toObject().isEmpty())
+        return false;
+
+    return true;
+}
+
+std::pair<QString, QJsonValue> toApi(const QString& fieldName, const Field* field)
+{
+    auto propMap = serializeProperties(field, nx::utils::propertyNames(field));
+    if (propMap.isEmpty())
+        return {};
+
+    if (propMap.size() == 1) // The field has single property.
+    {
+        const auto& propValue = propMap.first();
+
+        if (!isRequiredInApi(propValue))
+            return {};
+
+        return toApi(fieldName, propValue, propertyType(field->metaObject(), propMap.firstKey()));
+    }
+
+    QJsonObject asObject;
+    for (const auto& [name, value]: propMap.asKeyValueRange())
+    {
+        const auto converted = toApi(name, value, propertyType(field->metaObject(), name));
+        if (isRequiredInApi(converted.second))
+            asObject[converted.first] = converted.second;
+    }
+
+    return {kIdRenamer.toApi(fieldName), asObject};
+}
+
+nx::vms::api::rules::RuleV4 toApi(const Rule* rule)
+{
+    nx::vms::api::rules::RuleV4 result;
+
+    NX_ASSERT(!rule->isInternal());
+
+    result.id = rule->id();
+    result.enabled = rule->enabled();
+    result.comment = rule->comment();
+    result.schedule = nx::vms::common::scheduleFromByteArray(rule->schedule());
+
+    const auto filter = rule->eventFilters().front();
+    result.event["type"] = filter->eventType();
+
+    for (const auto& [name, field]: filter->fields().asKeyValueRange())
+    {
+        if (!field->properties().visible)
+            continue;
+
+        if (auto eventField = toApi(name, field); !eventField.first.isEmpty())
+            result.event.insert(std::move(eventField));
+    }
+
+    const auto builder = rule->actionBuilders().front();
+    result.action["type"] = builder->actionType();
+
+    for (const auto& [name, field]: builder->fields().asKeyValueRange())
+    {
+        if (!field->properties().visible)
+            continue;
+
+        if (auto actionField = toApi(name, field); !actionField.first.isEmpty())
+            result.action.insert(std::move(actionField));
+    }
+
+    return result;
+}
+
+template <class T>
+bool fromApi(std::map<QString, QJsonValue>&& fieldMap, T* target, QString* error)
+{
+    for (auto [fieldName, field]: target->fields().asKeyValueRange())
+    {
+        if (!field->properties().visible)
+            continue;
+
+        const auto fieldMeta = field->metaObject();
+        const auto propCount = fieldMeta->propertyCount();
+
+        QMap<QString, QJsonValue> propMap;
+
+        if (propCount - kPropertyOffset == 1) // The field has single property.
+        {
+            const auto propMeta = fieldMeta->property(kPropertyOffset);
+            const auto converter = unitConverter(propMeta.userType());
+            const auto apiFieldName = converter->nameToApi(fieldName);
+
+            if (!fieldMap.contains(apiFieldName))
+                continue;
+
+            propMap[propMeta.name()] = converter->valueFromApi(fieldMap[apiFieldName]);
+        }
+        else
+        {
+            const auto apiFieldName = kIdRenamer.toApi(fieldName);
+
+            if (!fieldMap.contains(apiFieldName))
+                continue;
+
+            const auto fieldValue = fieldMap[apiFieldName];
+
+            if (!fieldValue.isObject())
+            {
+                if (error)
+                    *error = format(Strings::tr("Field \"%1\" should be an object"), apiFieldName);
+
+                return false;
+            }
+
+            const auto fieldObject = fieldValue.toObject();
+
+            for (int i = kPropertyOffset; i < propCount; ++i)
+            {
+                const auto propMeta = fieldMeta->property(i);
+                const auto converter = unitConverter(propMeta.userType());
+                const auto apiPropName = converter->nameToApi(propMeta.name());
+
+                if (!fieldObject.contains(apiPropName))
+                    continue;
+
+                propMap[propMeta.name()] = converter->valueFromApi(fieldObject[apiPropName]);
+            }
+        }
+
+        if (!deserializeProperties(propMap, field))
+        {
+            if (error)
+            {
+                *error = format(Strings::tr(
+                    "Unable to deserialize properties for field: %1"), fieldName);
+            }
+
+            return false;
+        }
+    }
+
+    return true;
+}
+
+} // namespace
 
 api::Rule serialize(const Rule* rule)
 {
@@ -26,6 +204,7 @@ api::Rule serialize(const Rule* rule)
     api::Rule result;
 
     result.id = rule->id();
+    result.author = rule->author();
 
     for (auto filter: rule->eventFilters())
     {
@@ -110,6 +289,65 @@ api::EventInfo serialize(const BasicEvent* event, UuidList ruleIds)
         result.triggeredRules.push_back(id);
 
     return result;
+}
+
+nx::vms::api::rules::RuleV4 toApi(
+    const nx::vms::rules::Engine* engine, const nx::vms::api::rules::Rule& rule)
+{
+    return toApi(engine->buildRule(rule).get());
+}
+
+std::optional<nx::vms::api::rules::Rule> fromApi(
+    const nx::vms::rules::Engine* engine,
+    nx::vms::api::rules::RuleV4&& simple,
+    QString author,
+    QString* error)
+{
+    const auto eventType = simple.event["type"].toString();
+    std::unique_ptr<EventFilter> filter;
+    if (!engine->eventDescriptor(eventType) || !((filter = engine->buildEventFilter(eventType))))
+    {
+        if (error)
+            *error = format(Strings::tr("Event: %1 is not registered"), eventType);
+
+        return {};
+    }
+
+    const auto actionType = simple.action["type"].toString();
+    std::unique_ptr<ActionBuilder> builder;
+    if (!engine->actionDescriptor(actionType) || !((builder = engine->buildActionBuilder(actionType))))
+    {
+        if (error)
+            *error = format(Strings::tr("Action: %1 is not registered"), actionType);
+
+        return {};
+    }
+
+    if (!fromApi(std::move(simple.event), filter.get(), error) ||
+        !fromApi(std::move(simple.action), builder.get(), error))
+    {
+        return {};
+    }
+
+    const auto rule = std::make_unique<Rule>(simple.id, engine);
+    rule->setAuthor(std::move(author));
+    rule->setEnabled(simple.enabled);
+    rule->setComment(simple.comment);
+    rule->setSchedule(nx::vms::common::scheduleToByteArray(simple.schedule));
+
+    rule->addEventFilter(std::move(filter));
+    rule->addActionBuilder(std::move(builder));
+
+    if (const auto validationResult = rule->validity(engine->systemContext());
+        validationResult.validity == QValidator::State::Invalid)
+    {
+        if (error)
+            *error = format(Strings::tr("Rule validation failed: %1"), validationResult.description);
+
+        return {};
+    }
+
+    return serialize(rule.get());
 }
 
 } // namespace nx::vms::rules

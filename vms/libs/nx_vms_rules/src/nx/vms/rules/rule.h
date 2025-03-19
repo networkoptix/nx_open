@@ -33,6 +33,9 @@ public:
     nx::Uuid id() const;
     void setId(nx::Uuid id);
 
+    QString author() const;
+    void setAuthor(QString author);
+
     const Engine* engine() const;
 
     // Takes ownership.
@@ -83,6 +86,7 @@ public:
 
 private:
     nx::Uuid m_id;
+    QString m_author; //< Name of the user who created or edited the rule.
     const Engine* m_engine;
 
     // TODO: #spanasenko and-or logic

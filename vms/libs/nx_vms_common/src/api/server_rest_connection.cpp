@@ -1782,7 +1782,7 @@ Handle ServerConnection::sendRequest(
     const nx::String& body,
     Callback<ResultType>&& callback,
     nx::utils::AsyncHandlerExecutor executor,
-    std::optional<nx::Uuid> proxyToServer)
+    const nx::network::http::HttpHeaders& customHeaders)
 {
     auto request = prepareRequest(
         method,
@@ -1790,8 +1790,8 @@ Handle ServerConnection::sendRequest(
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         body);
 
-    if (proxyToServer)
-        proxyRequestUsingServer(request, *proxyToServer);
+    for (const auto& header: customHeaders)
+        nx::network::http::insertOrReplaceHeader(&request.headers, header);
 
     using Context = ResultContext<ResultType>;
 
@@ -1812,7 +1812,7 @@ Handle NX_VMS_COMMON_API ServerConnection::sendRequest(
     const nx::String& body,
     Callback<ErrorOrEmpty>&& callback,
     nx::utils::AsyncHandlerExecutor executor,
-    std::optional<nx::Uuid> proxyToServer);
+    const nx::network::http::HttpHeaders& customHeaders);
 
 template
 Handle NX_VMS_COMMON_API ServerConnection::sendRequest(
@@ -1823,7 +1823,7 @@ Handle NX_VMS_COMMON_API ServerConnection::sendRequest(
     const nx::String& body,
     Callback<ErrorOrData<QByteArray>>&& callback,
     nx::utils::AsyncHandlerExecutor executor,
-    std::optional<nx::Uuid> proxyToServer);
+    const nx::network::http::HttpHeaders& customHeaders);
 
 Handle ServerConnection::getPluginInformation(
     const nx::Uuid& serverId,

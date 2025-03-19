@@ -26,10 +26,13 @@ struct NX_VMS_API Rule: IdData
 
     /**%apidoc[opt] String comment explaining the rule. */
     QString comment;
+
+    /**%apidoc[unused] User who created or updated the given rule. */
+    QString author;
 };
 
 #define nx_vms_api_rules_Rule_Fields \
-    IdData_Fields(eventList)(actionList)(enabled)(internal)(schedule)(comment)
+    IdData_Fields(eventList)(actionList)(enabled)(internal)(schedule)(comment)(author)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(Rule, (json)(ubjson))
 NX_REFLECTION_INSTRUMENT(Rule, nx_vms_api_rules_Rule_Fields)
 
@@ -61,6 +64,9 @@ struct NX_VMS_API ResetRules
 {
     /**%apidoc[opt] Reset to default rule set if true, clear rules if false. */
     bool useDefault = true;
+
+    /**%apidoc[unused] User who triggered given transaction. */
+    QString author;
 };
 
 #define nx_vms_api_rules_ResetRules_Fields (useDefault)

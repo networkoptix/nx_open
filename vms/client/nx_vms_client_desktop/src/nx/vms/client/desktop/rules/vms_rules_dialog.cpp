@@ -2,21 +2,16 @@
 
 #include "vms_rules_dialog.h"
 
+#include <api/server_rest_connection.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/dialogs/week_time_schedule_dialog.h>
 #include <nx/vms/client/desktop/window_context.h>
-#include <nx/vms/rules/action_builder.h>
-#include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/unique_id_field.h>
-#include <nx/vms/rules/events/generic_event.h>
-#include <nx/vms/rules/events/server_started_event.h>
 #include <nx/vms/rules/utils/api.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_vms_rules_manager.h>
 
 #include "edit_vms_rule_dialog.h"
 #include "model_view/rules_table_model.h"
@@ -149,54 +144,90 @@ void VmsRulesDialog::openEventLogDialog()
 
 void VmsRulesDialog::deleteRulesImpl(const UuidList& ids)
 {
-    auto connection = messageBusConnection();
-    if (!connection)
+    const auto api = systemContext()->connectedServerApi();
+    if (!api)
         return;
 
-    const auto rulesManager = connection->getVmsRulesManager(nx::network::rest::kSystemSession);
-    for (const auto& id: ids)
+    for (const auto id: ids)
     {
-        rulesManager->deleteRule(
-        id,
-        [this](int /*requestId*/, ec2::ErrorCode errorCode)
-        {
-            if (errorCode != ec2::ErrorCode::ok) // TODO: #mmalofeev add error to some list.
-                setError(tr("Delete rule error:") + " " + ec2::toString(errorCode));
-        },
-        this);
+        api->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
+            /*helper*/ nullptr,
+            nx::network::http::Method::delete_,
+            nx::format("/rest/v4/events/rules/%1", id.toSimpleString()),
+            /*params*/ {},
+            /*body*/ {},
+            [this](
+                bool success,
+                rest::Handle requestId,
+                const rest::ServerConnection::ErrorOrEmpty& response)
+            {
+                if (success)
+                    return;
+
+                const auto& errorString = response.error().errorString;
+                NX_WARNING(this, "Delete rule request %1 failed: %2", requestId, errorString);
+
+                setError(tr("Delete rule error: %1").arg(errorString));
+            },
+            this);
     }
 }
 
 void VmsRulesDialog::saveRuleImpl(const std::shared_ptr<vms::rules::Rule>& rule)
 {
-    auto connection = messageBusConnection();
-    if (!connection)
+    const auto api = systemContext()->connectedServerApi();
+    if (!api)
         return;
 
-    const auto serializedRule = serialize(rule.get());
-    const auto rulesManager = connection->getVmsRulesManager(nx::network::rest::kSystemSession);
-    rulesManager->save(
-        serializedRule,
-        [this](int /*requestId*/, ec2::ErrorCode errorCode)
+    const auto apiRule = vms::rules::toApi(
+        systemContext()->vmsRulesEngine(), serialize(rule.get()));
+
+    api->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
+        /*helper*/ nullptr,
+        nx::network::http::Method::put,
+        nx::format("/rest/v4/events/rules/%1", rule->id().toSimpleString()),
+        /*params*/ {},
+        QJson::serialized(apiRule),
+        [this](
+            bool success,
+            rest::Handle requestId,
+            const rest::ServerConnection::ErrorOrEmpty& response)
         {
-            if (errorCode != ec2::ErrorCode::ok)
-                setError(tr("Save rule error:") + " " + ec2::toString(errorCode));
+            if (success)
+                return;
+
+            const auto& errorString = response.error().errorString;
+            NX_WARNING(this, "Create rule request %1 failed: %2", requestId, errorString);
+
+            setError(tr("Save rule error: %1").arg(errorString));
         },
         this);
 }
 
 void VmsRulesDialog::resetToDefaultsImpl()
 {
-    auto connection = messageBusConnection();
-    if (!connection)
+    const auto api = systemContext()->connectedServerApi();
+    if (!api)
         return;
 
-    connection->getVmsRulesManager(nx::network::rest::kSystemSession)->resetVmsRules(
-        /*useDefault*/ true,
-        [this](int /*requestId*/, ec2::ErrorCode errorCode)
+    api->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
+        /*helper*/ nullptr,
+        nx::network::http::Method::post,
+        "/rest/v4/events/rules/*/reset",
+        /*params*/ {},
+        /*body*/ {},
+        [this](
+            bool success,
+            rest::Handle requestId,
+            const rest::ServerConnection::ErrorOrEmpty& response)
         {
-            if (errorCode != ec2::ErrorCode::ok)
-                setError(tr("Reset to defaults error:") + " " + ec2::toString(errorCode));
+            if (success)
+                return;
+
+            const auto& errorString = response.error().errorString;
+            NX_WARNING(this, "Reset rules request %1 failed: %2", requestId, errorString);
+
+            setError(tr("Reset rules error: %1").arg(errorString));
         },
         this);
 }

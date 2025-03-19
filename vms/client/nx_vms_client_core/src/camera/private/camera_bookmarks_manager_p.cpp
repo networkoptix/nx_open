@@ -11,10 +11,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization/ubjson.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/network/rest/params.h>
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/datetime.h>
-#include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/bookmark_models.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
@@ -166,6 +166,18 @@ CheckResultData checkFetchedData(
     return CheckResultData{CheckResult::tryMore, newBodyStartTime};
 }
 
+nx::network::http::HttpHeaders makeProxyToServerHeaders(const std::optional<nx::Uuid>& serverId)
+{
+    if (!serverId)
+        return {};
+
+    nx::network::http::HttpHeaders result;
+    nx::network::http::insertHeader(
+        &result, {Qn::SERVER_GUID_HEADER_NAME, serverId.value().toSimpleStdString()});
+
+    return result;
+}
+
 } // namespace
 
 /************************************************************************/
@@ -300,14 +312,13 @@ int QnCameraBookmarksManagerPrivate::sendPostRequest(
 
     request.format = Qn::SerializationFormat::ubjson;
 
-    auto callback = nx::utils::guarded(this,
-        [this](
+    auto callback = [this](
             bool success,
             rest::Handle handle,
             const rest::ServerConnection::ErrorOrEmpty& /*response*/)
         {
             handleBookmarkOperation(success, handle);
-        });
+        };
 
     return serverApi->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
         /*helper*/ nullptr,
@@ -316,8 +327,8 @@ int QnCameraBookmarksManagerPrivate::sendPostRequest(
         request.toParams(),
         /*body*/ {},
         std::move(callback),
-        thread(),
-        serverId);
+        this,
+        makeProxyToServerHeaders(serverId));
 }
 
 rest::Handle QnCameraBookmarksManagerPrivate::sendPatchRequest(
@@ -328,14 +339,13 @@ rest::Handle QnCameraBookmarksManagerPrivate::sendPatchRequest(
     if (!serverApi)
         return kInvalidRequestId;
 
-    auto callback = nx::utils::guarded(this,
-        [this](
+    auto callback = [this](
             bool success,
             rest::Handle handle,
             rest::ErrorOrData<QByteArray> /*response*/)
         {
             handleBookmarkOperation(success, handle);
-        });
+        };
 
     return serverApi->sendRequest<rest::ErrorOrData<QByteArray>>(
         systemContext()->getSessionTokenHelper(),
@@ -343,7 +353,7 @@ rest::Handle QnCameraBookmarksManagerPrivate::sendPatchRequest(
         path,
         nx::network::rest::Params{},
         nx::reflect::json::serialize(bookmark),
-        callback,
+        std::move(callback),
         this);
 }
 

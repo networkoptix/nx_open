@@ -44,7 +44,8 @@ QList<const typename V::value_type::element_type*> extractPointers(const V& v)
 
 } // namespace
 
-Rule::Rule(nx::Uuid id, const Engine* engine): m_id(id), m_engine(engine)
+Rule::Rule(nx::Uuid id, const Engine* engine):
+    m_id(id), m_engine(engine)
 {
 }
 
@@ -60,6 +61,16 @@ nx::Uuid Rule::id() const
 void Rule::setId(nx::Uuid id)
 {
     m_id = id;
+}
+
+QString Rule::author() const
+{
+    return m_author;
+}
+
+void Rule::setAuthor(QString author)
+{
+    m_author = std::move(author);
 }
 
 const Engine* Rule::engine() const

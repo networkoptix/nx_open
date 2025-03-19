@@ -479,6 +479,7 @@ std::unique_ptr<Rule> Engine::buildRule(const api::Rule& serialized) const
         rule->addActionBuilder(std::move(builder));
     }
 
+    rule->setAuthor(serialized.author);
     rule->setComment(serialized.comment);
     rule->setEnabled(serialized.enabled);
     rule->setInternal(serialized.internal);

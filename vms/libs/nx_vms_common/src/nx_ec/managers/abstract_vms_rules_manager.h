@@ -69,11 +69,11 @@ public:
     Result transmitActionSync(const nx::vms::api::rules::ActionInfo& info);
 
     virtual int resetVmsRules(
-        bool useDefault,
+        const nx::vms::api::rules::ResetRules& resetRulesData,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode resetVmsRulesSync(bool useDefault);
+    ErrorCode resetVmsRulesSync(const nx::vms::api::rules::ResetRules& resetRulesData);
 };
 
 } // namespace ec2

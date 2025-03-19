@@ -42,7 +42,7 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int resetVmsRules(
-        bool useDefault,
+        const nx::vms::api::rules::ResetRules& resetRulesData,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -149,14 +149,14 @@ int VmsRulesManager<T>::transmitAction(
 
 template<class T>
 int VmsRulesManager<T>::resetVmsRules(
-    bool useDefault,
+    const nx::vms::api::rules::ResetRules& resetRulesData,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::resetVmsRules,
-        nx::vms::api::rules::ResetRules{.useDefault = useDefault},
+        resetRulesData,
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);

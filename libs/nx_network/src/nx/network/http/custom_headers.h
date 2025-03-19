@@ -71,4 +71,7 @@ static constexpr char kTicketUrlQueryName[] = "_ticket";
 static constexpr char VIDEOWALL_INSTANCE_HEADER_NAME[] = "videoWallInstanceGuid";
 
 static constexpr char MERGE_ID_HEADER_NAME[] = "Nx-Merge-Id";
+
+/** Header is added to all requests produced by the VMS Rules Engine. Contains ID of the source Rule. */
+static constexpr char CREATED_BY_RULE_HEADER_NAME[] = "Nx-Created-By-Rule";
 } // namespace Qn
