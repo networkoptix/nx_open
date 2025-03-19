@@ -152,9 +152,27 @@ public:
     static bool showAllCamerasSwitch() { return true; }
 };
 
-class NX_VMS_COMMON_API QnCameraAnalyticsPolicy
+class NX_VMS_COMMON_API QnCameraAnalyticsEventsPolicy
 {
-    Q_DECLARE_TR_FUNCTIONS(QnCameraAnalyticsPolicy)
+    Q_DECLARE_TR_FUNCTIONS(QnCameraAnalyticsEventsPolicy)
+
+public:
+    using resource_type = QnVirtualCameraResource;
+    static bool isResourceValid(
+        nx::vms::common::SystemContext* context, const QnVirtualCameraResourcePtr& camera);
+    static QString getText(
+        nx::vms::common::SystemContext* context,
+        const QnResourceList& resources,
+        const bool detailed = true);
+    static bool emptyListIsValid() { return false; }
+    static bool multiChoiceListIsValid() { return true; }
+    static bool showRecordingIndicator() { return false; }
+    static bool showAllCamerasSwitch() { return true; }
+};
+
+class NX_VMS_COMMON_API QnCameraAnalyticsObjectsPolicy
+{
+    Q_DECLARE_TR_FUNCTIONS(QnCameraAnalyticsObjectsPolicy)
 
 public:
     using resource_type = QnVirtualCameraResource;

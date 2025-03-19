@@ -6,7 +6,8 @@
 
 namespace nx::vms::rules {
 
-constexpr auto kCameraAnalyticsValidationPolicy = "cameraAnalytics";
+constexpr auto kCameraAnalyticsEventsValidationPolicy = "cameraAnalyticsEvents";
+constexpr auto kCameraAnalyticsObjectsValidationPolicy = "cameraAnalyticsObjects";
 constexpr auto kCameraInputValidationPolicy = "cameraInput";
 constexpr auto kCameraMotionValidationPolicy = "cameraMotion";
 

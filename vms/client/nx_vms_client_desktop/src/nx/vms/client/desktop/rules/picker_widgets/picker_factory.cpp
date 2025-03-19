@@ -74,8 +74,11 @@ PickerWidget* createSourceCameraPicker(
 
     const auto validationPolicy = sourceCameraField->properties().validationPolicy;
 
-    if (validationPolicy == vms::rules::kCameraAnalyticsValidationPolicy)
-        return createPickerImpl<SourceCameraPicker<QnCameraAnalyticsPolicy>>(field, context, parent);
+    if (validationPolicy == vms::rules::kCameraAnalyticsEventsValidationPolicy)
+        return createPickerImpl<SourceCameraPicker<QnCameraAnalyticsEventsPolicy>>(field, context, parent);
+
+    if (validationPolicy == vms::rules::kCameraAnalyticsObjectsValidationPolicy)
+        return createPickerImpl<SourceCameraPicker<QnCameraAnalyticsObjectsPolicy>>(field, context, parent);
 
     if (validationPolicy == vms::rules::kCameraInputValidationPolicy)
         return createPickerImpl<SourceCameraPicker<QnCameraInputPolicy>>(field ,context, parent);

@@ -120,7 +120,7 @@ const ItemDescriptor& AnalyticsEvent::manifest()
                 {},
                 ResourceFilterFieldProperties{
                     .base = FieldProperties{.optional = false},
-                    .validationPolicy = kCameraAnalyticsValidationPolicy
+                    .validationPolicy = kCameraAnalyticsEventsValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<AnalyticsEventTypeField>(
                 utils::kEventTypeIdFieldName,

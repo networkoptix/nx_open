@@ -123,7 +123,7 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
                 {},
                 ResourceFilterFieldProperties{
                     .base = FieldProperties{.optional = false},
-                    .validationPolicy = kCameraAnalyticsValidationPolicy
+                    .validationPolicy = kCameraAnalyticsObjectsValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<AnalyticsObjectTypeField>(
                 utils::kObjectTypeIdFieldName,

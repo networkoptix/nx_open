@@ -241,22 +241,40 @@ QString QnCameraRecordingPolicy::getText(
         context, cameras, detailed, tr("Recording is disabled for %1"), invalid);
 }
 
-bool QnCameraAnalyticsPolicy::isResourceValid(
+bool QnCameraAnalyticsEventsPolicy::isResourceValid(
     nx::vms::common::SystemContext* /*context*/, const QnVirtualCameraResourcePtr& camera)
 {
-    return !camera->compatibleAnalyticsEngines().empty();
+    return !camera->supportedEventTypes().empty();
 }
 
-QString QnCameraAnalyticsPolicy::getText(
+QString QnCameraAnalyticsEventsPolicy::getText(
     nx::vms::common::SystemContext* context,
     const QnResourceList& resources,
     const bool detailed)
 {
     const auto cameras = resources.filtered<QnVirtualCameraResource>();
 
-    int invalid = invalidResourcesCount<QnCameraAnalyticsPolicy>(context, cameras);
-    return genericCameraText<QnCameraAnalyticsPolicy>(
-        context, cameras, detailed, tr("Analytics is not available for %1"), invalid);
+    int invalid = invalidResourcesCount<QnCameraAnalyticsEventsPolicy>(context, cameras);
+    return genericCameraText<QnCameraAnalyticsEventsPolicy>(
+        context, cameras, detailed, tr("Analytics events are not available for %1"), invalid);
+}
+
+bool QnCameraAnalyticsObjectsPolicy::isResourceValid(
+    nx::vms::common::SystemContext* /*context*/, const QnVirtualCameraResourcePtr& camera)
+{
+    return !camera->supportedObjectTypes().empty();
+}
+
+QString QnCameraAnalyticsObjectsPolicy::getText(
+    nx::vms::common::SystemContext* context,
+    const QnResourceList& resources,
+    const bool detailed)
+{
+    const auto cameras = resources.filtered<QnVirtualCameraResource>();
+
+    int invalid = invalidResourcesCount<QnCameraAnalyticsObjectsPolicy>(context, cameras);
+    return genericCameraText<QnCameraAnalyticsObjectsPolicy>(
+        context, cameras, detailed, tr("Analytics objects are not available for %1"), invalid);
 }
 
 void QnFullscreenCameraPolicy::setLayouts(QnLayoutResourceList layouts)

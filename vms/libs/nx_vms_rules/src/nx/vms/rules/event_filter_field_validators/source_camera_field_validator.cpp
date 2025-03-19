@@ -37,8 +37,11 @@ ValidationResult SourceCameraFieldValidator::validity(
     if (!sourceCameraFieldProperties.validationPolicy.isEmpty())
     {
         ValidationResult validationResult;
-        if (sourceCameraFieldProperties.validationPolicy == kCameraAnalyticsValidationPolicy)
-            return utils::camerasValidity<QnCameraAnalyticsPolicy>(context, cameras);
+        if (sourceCameraFieldProperties.validationPolicy == kCameraAnalyticsEventsValidationPolicy)
+            return utils::camerasValidity<QnCameraAnalyticsEventsPolicy>(context, cameras);
+
+        if (sourceCameraFieldProperties.validationPolicy == kCameraAnalyticsObjectsValidationPolicy)
+            return utils::camerasValidity<QnCameraAnalyticsObjectsPolicy>(context, cameras);
 
         if (sourceCameraFieldProperties.validationPolicy == kCameraInputValidationPolicy)
             return utils::camerasValidity<QnCameraInputPolicy>(context, cameras);
