@@ -58,9 +58,14 @@ AbstractButton
 
             width: defaultArea.width
 
-            height: button.horizontal
-                ? defaultArea.height
-                : (iconImage.height + button.spacing + buttonText.implicitHeight)
+            // Explicit binding helps avoid QML binding loop warnings, as changing the height of
+            // the Text triggers the implicitHeight property, which is likely a Qt bug.
+            Binding on height
+            {
+                value: button.horizontal
+                    ? defaultArea.height
+                    : (iconImage.height + button.spacing + buttonText.implicitHeight)
+            }
 
             anchors.verticalCenter: defaultArea.verticalCenter
 
