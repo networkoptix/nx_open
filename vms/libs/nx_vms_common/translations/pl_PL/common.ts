@@ -1687,11 +1687,11 @@
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching</translation>
+      <translation>Włącz dziurkowanie UDP w połączeniu z chmurą</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage</source>
-      <translation type="unfinished">Enable cloud-connect relays usage</translation>
+      <translation>Włącz użycie przekaźników w chmurze</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays</source>
