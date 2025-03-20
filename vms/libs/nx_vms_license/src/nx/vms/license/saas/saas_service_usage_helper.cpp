@@ -478,7 +478,7 @@ std::map<QString, nx::Uuid> CloudStorageServiceUsageHelper::servicesByCameras() 
     using Data = std::pair<nx::Uuid, int>; //< ServiceId and channels.
     const auto saasData = saasServiceManager()->data();
     std::multimap<int, Data> availableChannels;
-    if (saasData.state == SaasState::active)
+    if (saasData.state == SaasState::active || saasData.state == SaasState::suspended)
     {
         auto cloudStorageData = systemContext()->saasServiceManager()->cloudStorageData();
         for (const auto& [id, parameters]: cloudStorageData)

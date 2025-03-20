@@ -129,6 +129,7 @@ public:
      * @return Information about cameras which consumes SAAS services.
      * key - camera physicalId, value - serviceId. If there is not enough services for some camera
      * then the service value is an empty UUID.
+     * Services are not allocated for camera in Shutdown/autoShutdown mode.
      */
     std::map<QString, nx::Uuid> servicesByCameras() const;
 

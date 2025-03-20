@@ -406,6 +406,28 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasMapping)
     ASSERT_EQ(100, serviceUsages[nx::Uuid("60a18a70-452b-46a1-9bfd-e66af6fbd0de")]);
     ASSERT_EQ(100, serviceUsages[nx::Uuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dd")]);
     ASSERT_EQ(150, serviceUsages[nx::Uuid("60a18a70-452b-46a1-9bfd-e66af6fbd0dc")]);
+
+    const std::map<SaasState, int> testData = {
+        {SaasState::suspended, 350},
+        {SaasState::shutdown, 0},
+        {SaasState::autoShutdown, 0},
+        {SaasState::active, 350},
+    };
+    for (const auto& [state, expected]: testData)
+    {
+        auto manager = systemContext()->saasServiceManager();
+        auto saasData = manager->data();
+        saasData.state = state;
+        manager->loadSaasData(nx::reflect::json::serialize(saasData));
+        auto services = m_cloudeStorageHelper->servicesByCameras();
+        int usedServices = 0;
+        for (const auto& [cameraId, serviceId]: services)
+        {
+            if (!serviceId.isNull())
+                ++usedServices;
+        }
+        ASSERT_EQ(expected, usedServices);
+    }
 }
 
 TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasProposeChanges)
