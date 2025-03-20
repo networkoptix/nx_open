@@ -73,7 +73,7 @@ function openNewSessionScreen()
 
 function openOrganizationScreen(model, rootIndex)
 {
-    stackView.safePush(
+    stackView.pushScreen(
         Qt.resolvedUrl("../Screens/OrganizationScreen.qml"),
         {
             "model": model,
@@ -83,7 +83,7 @@ function openOrganizationScreen(model, rootIndex)
 
 function openChannelPartnerScreen(profileWatcher)
 {
-    stackView.safePush(
+    stackView.pushScreen(
         Qt.resolvedUrl("../Screens/Cloud/ChannelPartner.qml"),
         {
             "profileWatcher": profileWatcher

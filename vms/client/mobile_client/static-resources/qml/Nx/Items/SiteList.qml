@@ -41,7 +41,8 @@ ListView
         property real sectionHeight:
             12 + Math.ceil(textMetrics.height) + (siteList.cellsInRow == 1 ? 10 : 12)
         width: parent.width
-        height: 16 + (!!currentSearchRegExp ? (systemTabs.implicitHeight - sectionHeight) : 0)
+        readonly property real systemTabsHeight: 48
+        height: 16 + (!!currentSearchRegExp ? (systemTabsHeight - sectionHeight) : 0)
         onHeightChanged:
         {
             // Avoids delegates re-creation during component construction.

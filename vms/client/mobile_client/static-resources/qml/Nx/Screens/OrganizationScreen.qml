@@ -30,7 +30,7 @@ Page
     customBackHandler: () => goBack()
 
     property var model
-    property alias rootIndex: subtreeModel.sourceRoot
+    property var rootIndex
 
     property bool searching: !!siteList.searchText
 
@@ -39,6 +39,7 @@ Page
         id: subtreeModel
 
         sourceModel: model
+        sourceRoot: organizationScreen.rootIndex
         autoExpandAll: searching
         onAutoExpandAllChanged:
         {
@@ -245,13 +246,13 @@ Page
 
         anchors.fill: parent
 
-        visible: accessor.getData(rootIndex, "isLoading")
+        visible: accessor.getData(rootIndex, "isLoading") || false
         Connections
         {
             target: accessor
             function updateVisibility()
             {
-                loadingIndicator.visible = accessor.getData(rootIndex, "isLoading")
+                loadingIndicator.visible = accessor.getData(rootIndex, "isLoading") || false
             }
             function onDataChanged() { updateVisibility() }
             function onRowsInserted() { updateVisibility() }
