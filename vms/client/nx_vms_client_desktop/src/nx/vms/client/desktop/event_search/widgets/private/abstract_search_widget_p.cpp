@@ -767,7 +767,7 @@ void AbstractSearchWidget::Private::setRelevantControls(Controls value)
 
 void AbstractSearchWidget::Private::updateControlsVisibility()
 {
-    if (workbench()->currentLayout()->resource()->isCrossSystem())
+    if (workbench()->currentLayoutResource()->isCrossSystem())
         q->commonSetup()->setCameraSelection(nx::vms::client::core::EventSearch::CameraSelection::current);
 
     if (m_relevantControls.testFlags(Control::cameraSelector | Control::cameraSelectionDisplay))

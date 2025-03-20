@@ -24,6 +24,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/user_specific_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -157,6 +158,11 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
             updateWorkbench();
             updateAllMediaResourceWidgetsAnalyticsMode();
             updateAction();
+
+            // It is reasonable even for not active state in case of Advanced Search Dialog
+            // is opened.
+            if (workbench()->currentLayoutResource()->isCrossSystem())
+                this->commonSetup()->setCameraSelection(core::EventSearch::CameraSelection::current);
         });
 
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::areaEnabledChanged,

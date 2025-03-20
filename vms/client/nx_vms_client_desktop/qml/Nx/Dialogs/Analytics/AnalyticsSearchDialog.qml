@@ -158,6 +158,7 @@ Window
 
                     model: eventModel
                     searchDelay: LocalSettings.iniConfigValue("analyticsSearchRequestDelayMs")
+                    limitToCurrentCamera: model.crossSiteMode
 
                     y: 12
                     width: filtersContainer.width
