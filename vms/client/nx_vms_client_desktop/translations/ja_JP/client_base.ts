@@ -5170,11 +5170,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>クラウドストレージがバックアップ用に有効化されている場合、 他のバックアップストレージは無効になり、既に設定されているデバイスの「すべてのアーカイブ」オプションは「モーション、オブジェクト、ブックマーク」に変更されます。</translation>
+      <translation>クラウドストレージがバックアップ用に有効化されている場合、 他のバックアップストレージは無効になり、既に設定されているデバイスの&quot;すべての録画データ&quot; オプションは &quot;モーション, オブジェクト, ブックマーク&quot; に変更されます。</translation>
     </message>
     <message>
       <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
-      <translation>クラウドストレージがバックアップ用に有効化されている場合、 既に設定されているデバイスの「すべてのアーカイブ」オプションは「モーション、オブジェクト、ブックマーク」に変更されます。</translation>
+      <translation>クラウドストレージがバックアップ用に有効化されている場合、すでに設定されているデバイスの&quot;すべての録画データ&quot; オプションは &quot;モーション, オブジェクト, ブックマーク&quot; に変更されます。</translation>
     </message>
   </context>
   <context>
@@ -7241,7 +7241,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
-      <translation>クラウドストレージが有効化されたため、「すべてのアーカイブ」オプションは「モーション、オブジェクト、ブックマーク」に変更されました。</translation>
+      <translation>クラウドストレージが有効化されたため、&quot;すべての録画データ&quot; オプションは &quot;モーション, オブジェクト, ブックマーク&quot; に変更されました。</translation>
     </message>
   </context>
   <context>
