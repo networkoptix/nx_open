@@ -4528,11 +4528,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
-      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+      <translation>Semua penyimpanan backup non-cloud akan dinonaktifkan saat backup cloud diaktifkan. Perangkat yang dikonfigurasi dengan pengaturan &quot;Semua archive&quot; akan diubah ke &quot;Gerakan, Objek, dan Bookmark&quot;</translation>
     </message>
     <message>
       <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
-      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
+      <translation>Perangkat yang dikonfigurasi dengan pengaturan &quot;Semua archive&quot; akan diubah menjadi &quot;Gerakan, Objek, dan Bookmark&quot; saat backup cloud diaktifkan</translation>
     </message>
   </context>
   <context>
@@ -5857,26 +5857,26 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message numerus="yes">
       <source>%n removed devices</source>
-      <translation type="unfinished">
-        <numerusform>%n removed devices</numerusform>
+      <translation>
+        <numerusform>%n perangkat yang dihapus</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n removed cameras</numerusform>
+      <translation>
+        <numerusform>%n kamera dihapus</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed servers</source>
-      <translation type="unfinished">
-        <numerusform>%n removed servers</numerusform>
+      <translation>
+        <numerusform>%n server dihapus</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n removed layouts</numerusform>
+      <translation>
+        <numerusform>%n layout dihapus</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5887,26 +5887,26 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message numerus="yes">
       <source>%n devices more</source>
-      <translation type="unfinished">
-        <numerusform>%n devices more</numerusform>
+      <translation>
+        <numerusform>%n perangkat lainnya</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras more</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras more</numerusform>
+      <translation>
+        <numerusform>%n kamera lainnya</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers more</source>
-      <translation type="unfinished">
-        <numerusform>%n servers more</numerusform>
+      <translation>
+        <numerusform>%n server lainnya</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts more</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts more</numerusform>
+      <translation>
+        <numerusform>%n layout lainnya</numerusform>
       </translation>
     </message>
     <message>

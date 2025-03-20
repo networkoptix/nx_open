@@ -2230,7 +2230,7 @@
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>고급 사용자</translation>
     </message>
   </context>
   <context>

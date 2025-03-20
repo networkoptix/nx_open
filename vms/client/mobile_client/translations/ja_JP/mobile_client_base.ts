@@ -61,17 +61,6 @@
     </message>
   </context>
   <context>
-    <name>QnMobileClientModule</name>
-    <message>
-      <source>Your session has expired</source>
-      <translation>セッションの期限が切れました</translation>
-    </message>
-    <message>
-      <source>Session duration limit can be changed by the site administrators</source>
-      <translation>セッションの有効期限は、サイト管理者が変更できます。</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::mobile::MediaDownloadBackend</name>
     <message>
       <source>Can&apos;t download video</source>

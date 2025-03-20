@@ -235,10 +235,17 @@
     </message>
   </context>
   <context>
-    <name>QnCameraAnalyticsPolicy</name>
+    <name>QnCameraAnalyticsEventsPolicy</name>
     <message>
-      <source>Analytics is not available for %1</source>
-      <translation>%1에 대하여 분석할 수 없습니다.</translation>
+      <source>Analytics events are not available for %1</source>
+      <translation type="unfinished">Analytics events are not available for %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraAnalyticsObjectsPolicy</name>
+    <message>
+      <source>Analytics objects are not available for %1</source>
+      <translation type="unfinished">Analytics objects are not available for %1</translation>
     </message>
   </context>
   <context>

@@ -61,17 +61,6 @@
     </message>
   </context>
   <context>
-    <name>QnMobileClientModule</name>
-    <message>
-      <source>Your session has expired</source>
-      <translation>Kết nối của bạn đã hết hạn</translation>
-    </message>
-    <message>
-      <source>Session duration limit can be changed by the site administrators</source>
-      <translation>Giới hạn thời lượng phiên có thể được thay đổi bởi người quản trị Chi nhánh</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::mobile::MediaDownloadBackend</name>
     <message>
       <source>Can&apos;t download video</source>

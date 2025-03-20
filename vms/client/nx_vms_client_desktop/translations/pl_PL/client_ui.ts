@@ -135,7 +135,7 @@
     </message>
     <message>
       <source>Simultaneous Streams</source>
-      <translation type="unfinished">Simultaneous Streams</translation>
+      <translation>Jednoczesnych strumieni</translation>
     </message>
   </context>
   <context>
@@ -606,7 +606,7 @@
     </message>
     <message>
       <source>Restreaming Link</source>
-      <translation type="unfinished">Restreaming Link</translation>
+      <translation>Link do ponownego przesyłania strumieniowego</translation>
     </message>
   </context>
   <context>
@@ -2230,7 +2230,7 @@
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Użytkownicy zaawansowani</translation>
     </message>
   </context>
   <context>

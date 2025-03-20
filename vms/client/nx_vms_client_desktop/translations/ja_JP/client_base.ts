@@ -4528,11 +4528,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
-      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+      <translation>クラウドバックアップを有効化すると、クラウド以外のバックアップストレージはすべて無効になります。&quot;すべての録画データ&quot; で構成されたデバイスの設定は &quot;モーション, オブジェクト, ブックマーク&quot; に変更されます。</translation>
     </message>
     <message>
       <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
-      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
+      <translation>クラウドバックアップを有効化する際、&quot;すべての録画データ&quot; で構成されたデバイスの設定は &quot;モーション, オブジェクト, ブックマーク&quot; に変更されます。</translation>
     </message>
   </context>
   <context>
@@ -5857,26 +5857,26 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n removed devices</source>
-      <translation type="unfinished">
-        <numerusform>%n removed devices</numerusform>
+      <translation>
+        <numerusform>削除された %n デバイス</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n removed cameras</numerusform>
+      <translation>
+        <numerusform>削除された %n カメラ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed servers</source>
-      <translation type="unfinished">
-        <numerusform>%n removed servers</numerusform>
+      <translation>
+        <numerusform>削除された %n サーバー</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n removed layouts</numerusform>
+      <translation>
+        <numerusform>削除された %n レイアウト</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5887,26 +5887,26 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n devices more</source>
-      <translation type="unfinished">
-        <numerusform>%n devices more</numerusform>
+      <translation>
+        <numerusform>ほか %n デバイス</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras more</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras more</numerusform>
+      <translation>
+        <numerusform>ほか %n カメラ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers more</source>
-      <translation type="unfinished">
-        <numerusform>%n servers more</numerusform>
+      <translation>
+        <numerusform>ほか %n サーバー</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts more</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts more</numerusform>
+      <translation>
+        <numerusform>ほか %n レイアウト</numerusform>
       </translation>
     </message>
     <message>
@@ -6534,7 +6534,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
-      <translation>クラウドストレージが有効化されたため、「すべてのアーカイブ」オプションは「モーション、オブジェクト、ブックマーク」に変更されました。</translation>
+      <translation>クラウドストレージが有効化されたため、&quot;すべての録画データ&quot; オプションは &quot;モーション, オブジェクト, ブックマーク&quot; に変更されました。</translation>
     </message>
   </context>
   <context>

@@ -238,11 +238,11 @@
     </message>
     <message>
       <source>Switch to table view</source>
-      <translation type="unfinished">Switch to table view</translation>
+      <translation>Przełącz do widoku tabeli</translation>
     </message>
     <message>
       <source>Switch to card view</source>
-      <translation type="unfinished">Switch to card view</translation>
+      <translation>Przełącz na widok kart</translation>
     </message>
   </context>
   <context>
@@ -655,7 +655,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <name>CustomHttpHeadersDialog</name>
     <message>
       <source>Custom HTTP headers</source>
-      <translation type="unfinished">Custom HTTP headers</translation>
+      <translation>Niestandardowe nagłówki HTTP</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1158,17 +1158,17 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <message>
       <source>ORGANIZATION</source>
       <comment>Section with groups from organisation</comment>
-      <translation type="unfinished">ORGANIZATION</translation>
+      <translation>ORGANIZACJA</translation>
     </message>
     <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">BUILT-IN</translation>
+      <translation>WBUDOWANE</translation>
     </message>
     <message>
       <source>CUSTOM</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">CUSTOM</translation>
+      <translation>NIESTANDARDOWY</translation>
     </message>
   </context>
   <context>

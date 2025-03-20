@@ -2234,7 +2234,7 @@ Klucz licencyjny: %2</translation>
     <message numerus="yes">
       <source>This server is removed from Site</source>
       <translation type="unfinished">
-        <numerusform>This server is removed from Site</numerusform>
+        <numerusform>Ten serwer usunięto z witryny</numerusform>
         <numerusform>This server is removed from Site</numerusform>
         <numerusform>This server is removed from Site</numerusform>
         <numerusform>This server is removed from Site</numerusform>
@@ -4465,7 +4465,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
-      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+      <translation>Ta kamera jest niedostępna. Wykonaj diagnostykę kamery w kliencie Nx Witness Desktop, aby uzyskać dodatkowe informacje.</translation>
     </message>
     <message>
       <source>Access to this camera requires authorization credentials.</source>
@@ -4668,11 +4668,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
-      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+      <translation>Po włączeniu kopii zapasowej w chmurze wszystkie magazyny kopii zapasowych poza chmurą zostaną wyłączone. Urządzenia skonfigurowane z ustawieniem &quot;Wszystkie archiwum&quot; zostaną zmienione na &quot;Ruch, Obiekt i Zakładki&quot;</translation>
     </message>
     <message>
       <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
-      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
+      <translation>Urządzenia z ustawieniem &quot;Wszystkie archiwum&quot; zostaną zmienione na &quot;Ruch, Obiekt i Zakładki&quot; po włączeniu kopii zapasowej w chmurze</translation>
     </message>
   </context>
   <context>
@@ -6906,7 +6906,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup will not be activated for %1 devices: </source>
-      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
+      <translation>Kopia zapasowa nie zostanie aktywowana dla %1 urządzeń: </translation>
     </message>
     <message>
       <source>%1 suitable cloud storage services are required to activate backup for them.</source>
@@ -7898,7 +7898,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Channel Partner users have access to this site</source>
-      <translation type="unfinished">Channel Partner users have access to this site</translation>
+      <translation>Użytkownicy Channel Partner mają dostęp do tej witryny</translation>
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
@@ -8291,7 +8291,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
-      <translation type="unfinished">Server cannot answer in reasonable time. Consider narrowing period or filter.</translation>
+      <translation>Serwer nie może odpowiedzieć w rozsądnym czasie. Rozważ zawężenie okresu lub filtr.</translation>
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
@@ -12670,7 +12670,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Cannot maximize the item</source>
-      <translation type="unfinished">Cannot maximize the item</translation>
+      <translation>Nie można zmaksymalizować elementu</translation>
     </message>
   </context>
   <context>
@@ -12868,13 +12868,13 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
     <message>
       <source>No custom headers</source>
-      <translation type="unfinished">No custom headers</translation>
+      <translation>Brak niestandardowych nagłówków</translation>
     </message>
     <message numerus="yes">
       <source>%n custom headers</source>
       <comment>%n is a number of custom headers</comment>
       <translation type="unfinished">
-        <numerusform>%n custom headers</numerusform>
+        <numerusform>%n niestandardowych nagłówków</numerusform>
         <numerusform>%n custom headers</numerusform>
         <numerusform>%n custom headers</numerusform>
         <numerusform>%n custom headers</numerusform>
