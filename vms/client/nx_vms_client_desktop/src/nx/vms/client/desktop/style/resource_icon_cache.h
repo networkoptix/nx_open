@@ -58,6 +58,7 @@ public:
         CloudUser,
         LdapUser,
         TemporaryUser,
+        OrganizationUser,
         Users,
         VideoWall,
         VideoWallItem,

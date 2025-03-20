@@ -222,6 +222,8 @@ NX_DECLARE_COLORIZED_ICON(kUserLdapIcon, "20x20/Solid/user_ldap.svg",\
     kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kUserTempIcon, "20x20/Solid/user_temp.svg",\
     kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kUserOrganizationIcon, "20x20/Solid/user_organization.svg",\
+    kTreeThemeSubstitutions)
 
 NX_DECLARE_COLORIZED_ICON(kWebpagesIcon, "20x20/Solid/webpages.svg",\
     kTreeThemeSubstitutions)
@@ -401,6 +403,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(LdapUser, IconWithDescription(kUserLdapIcon));
     m_cache.insert(LocalUser, IconWithDescription(kUserIcon));
     m_cache.insert(TemporaryUser, IconWithDescription(kUserTempIcon));
+    m_cache.insert(OrganizationUser, IconWithDescription(kUserOrganizationIcon));
 
     // Videowalls.
     m_cache.insert(VideoWall, IconWithDescription(kVideowallIcon));
@@ -626,6 +629,9 @@ QnResourceIconCache::Key QnResourceIconCache::userKey(const QnUserResourcePtr& u
 {
     if (!NX_ASSERT(user))
         return User;
+
+    if (user->isOrg())
+        return OrganizationUser;
 
     if (user->isCloud())
         return CloudUser;
