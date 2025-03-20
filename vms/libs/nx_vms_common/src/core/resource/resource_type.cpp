@@ -12,6 +12,7 @@ const QString QnResourceTypePool::kC2pCameraTypeId("C2pCamera");
 
 QnResourceType::~QnResourceType()
 {
+    NX_DEBUG(this, "Destructed");
 }
 
 void QnResourceType::setParentId(const nx::Uuid &value)
@@ -149,6 +150,8 @@ QnResourceTypePool *QnResourceTypePool::instance()
 
 QnResourceTypePool::QnResourceTypePool()
 {
+    NX_DEBUG(this, "Created");
+
     // Add static data for predefined types.
     // It needs for UT only. Media server load it from the database as well.
     QnResourceTypePtr resType(new QnResourceType());
@@ -177,6 +180,8 @@ QnResourceTypePtr QnResourceTypePool::getResourceType(nx::Uuid id) const
 
 void QnResourceTypePool::replaceResourceTypeList(const QnResourceTypeList &resourceTypeList)
 {
+    NX_DEBUG(this, "%1(%2 types)", __func__, resourceTypeList.size());
+
     NX_MUTEX_LOCKER lock(&m_mutex);
 
     m_resourceTypeMap.clear();
