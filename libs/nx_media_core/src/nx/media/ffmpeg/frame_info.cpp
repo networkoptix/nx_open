@@ -357,19 +357,26 @@ bool CLVideoDecoderOutput::isPixelFormatSupported(AVPixelFormat format)
     return format == AV_PIX_FMT_YUV422P || format == AV_PIX_FMT_YUV420P || format == AV_PIX_FMT_YUV444P;
 }
 
-CLVideoDecoderOutput::CLVideoDecoderOutput(const QImage& image):
+CLVideoDecoderOutput::CLVideoDecoderOutput(const QImage& srcImage):
     AVFrame()
 {
-    reallocate(image.width(), image.height(), AV_PIX_FMT_YUV420P);
-    CLVideoDecoderOutput src;
+    const auto imageFormat = srcImage.format();
+    const QImage* image = &srcImage;
+    QImage rgbaImage;
+    if (imageFormat != QImage::Format_RGB32
+        && imageFormat != QImage::Format_ARGB32
+        && imageFormat != QImage::Format_ARGB32_Premultiplied)
+    {
+        rgbaImage = srcImage.convertToFormat(QImage::Format_RGB32);
+        image = &rgbaImage;
+    }
 
-    src.reallocate(width, height, AV_PIX_FMT_BGRA);
-    for (int y = 0; y < height; ++y)
-        memcpy(src.data[0] + src.linesize[0]*y, image.scanLine(y), width * 4);
-
+    reallocate(image->width(), image->height(), AV_PIX_FMT_YUV420P);
+    const uint8_t* srcData[AV_NUM_DATA_POINTERS] = { (const uint8_t*)image->bits() };
+    int srcLinesize[4] = { (int) image->bytesPerLine() };
     // Ignore the potential error (already logged) - no clear way to handle it here.
     convertImageFormat(width, height,
-        src.data, src.linesize, AV_PIX_FMT_BGRA,
+        srcData, srcLinesize, AV_PIX_FMT_BGRA,
         data, linesize, AV_PIX_FMT_YUV420P, /*logTag*/ this);
 }
 
