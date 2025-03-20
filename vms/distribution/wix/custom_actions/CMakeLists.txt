@@ -17,6 +17,12 @@ include_directories("${CONAN_WIX_ROOT}/sdk/inc")
 link_directories("${CONAN_WIX_ROOT}/sdk/${vsPath}/lib/${arch}")
 add_compile_options(/MT)
 
+foreach(sanitizer ${enabledSanitizers})
+    foreach(flagList CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+        string(REPLACE " /fsanitize=${sanitizer}" "" ${flagList} "${${flagList}}")
+    endforeach()
+endforeach()
+
 nx_add_target(wix_custom_actions LIBRARY
     NO_MOC
     ADDITIONAL_SOURCES

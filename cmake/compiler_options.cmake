@@ -181,7 +181,10 @@ foreach(sanitizer ${enabledSanitizers})
             # Copy ASan DLL to bin/ for convenience.
             nx_copy("${asan_library_path}" DESTINATION "${PROJECT_BINARY_DIR}/bin")
 
-            add_compile_options(/fsanitize=${sanitizer})
+            # Not using of add_compile_options for fsanitize allows to erase flags later if needed.
+            string(APPEND CMAKE_C_FLAGS " /fsanitize=${sanitizer}")
+            string(APPEND CMAKE_CXX_FLAGS " /fsanitize=${sanitizer}")
+
             add_compile_definitions(_DISABLE_STRING_ANNOTATION _DISABLE_VECTOR_ANNOTATION)
             # Disable warning:
             #   C5059: runtime checks and address sanitizer is not currently supported - disabling runtime checks
