@@ -75,6 +75,7 @@
 #include <ui/graphics/gpu/gpu_devices.h>
 #include <ui/graphics/instruments/gl_checker_instrument.h>
 #include <ui/statistics/modules/session_restore_statistics_module.h>
+#include <ui/utils/user_action_logger.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workaround/combobox_wheel_filter.h>
 #include <utils/common/command_line_parser.h>
@@ -379,6 +380,8 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     auto windowContext = std::make_unique<WindowContext>();
     applicationContext->addWindowContext(windowContext.get());
+
+    qApp->installEventFilter(UserActionsLogger::instance());
 
     #if defined(Q_OS_LINUX)
         qputenv("RESOURCE_NAME", nx::branding::brand().toUtf8());

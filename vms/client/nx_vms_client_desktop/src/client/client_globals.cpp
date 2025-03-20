@@ -222,6 +222,7 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         IDR_ITEM(OnlyResourceTreeSiblingsRole),
 
         IDR_ITEM(RemoteConnectionRole),
+        IDR_ITEM(ResourceLogInfoRole),
 
         IDR_ITEM(ItemDataRoleCount)
 

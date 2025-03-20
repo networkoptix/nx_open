@@ -112,6 +112,7 @@
 #include <recording/time_period.h>
 #include <ui/common/notification_levels.h>
 #include <ui/common/weak_graphics_item_pointer.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/graphics/view/rhi_rendering_item.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
@@ -215,6 +216,7 @@ void initializeMetatypesInternal()
     QMetaType::registerConverter<QnCameraBookmarkList, QVariantList>(bookmarkListToVariantList);
     QMetaType::registerConverter<QVariantList, QnCameraBookmarkList>(variantListToBookmarkList);
     QMetaType::registerConverter<QnCameraBookmark, QString>(bookmarkToString);
+    QnMessageBox::registerLogInfoHandler();
 
     WebViewController::registerMetaType();
 

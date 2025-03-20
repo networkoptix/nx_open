@@ -65,7 +65,7 @@ public:
     Property<int> maxHardwareDecodingStreams{ this, "maxHardwareDecodingStreams", 16,
         "Maximum number of hardware decoders." };
 
-    Property<QString> logLevel{this, "logLevel", "none"};
+    Property<QString> logLevel{this, "logLevel", "info"};
     Property<qint64> maxLogFileSizeB{this, nx::log::kMaxLogFileSizeSymbolicName,
         nx::log::kDefaultMaxLogFileSizeB};
     Property<qint64> maxLogVolumeSizeB{this, nx::log::kMaxLogVolumeSizeSymbolicName,

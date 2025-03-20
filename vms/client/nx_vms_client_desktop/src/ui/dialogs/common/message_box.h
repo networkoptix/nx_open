@@ -46,15 +46,14 @@ public:
         ButtonBox,
     };
 
-    enum class Icon
-    {
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Icon,
         NoIcon,
         Information,
         Warning,
         Critical,
         Question,
         Success
-    };
+    );
     Q_ENUM(Icon)
 
 public:
@@ -182,6 +181,7 @@ public:
     void setAlert(const QString& text);
 
     virtual int exec() override;
+    static void registerLogInfoHandler();
 
 signals:
     void linkActivated(const QString& link);

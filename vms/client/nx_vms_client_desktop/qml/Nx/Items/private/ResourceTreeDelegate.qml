@@ -28,6 +28,7 @@ FocusScope
     property real availableWidth: width
     property bool isEditing: false
     property bool isDisabledResource: resource && resource.status == API.ResourceStatus.offline
+    property string logText: (model && model.logInfo) || ""
 
     focus: isEditing
 

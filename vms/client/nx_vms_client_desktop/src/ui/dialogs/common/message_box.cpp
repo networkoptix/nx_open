@@ -18,6 +18,7 @@
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
+#include <ui/utils/user_action_logger.h>
 #include <ui/workaround/cancel_drag.h>
 
 namespace {
@@ -241,6 +242,31 @@ void QnMessageBox::initialize()
 
     ui->setupUi(this);
     d->init();
+}
+
+void QnMessageBox::registerLogInfoHandler()
+{
+    using namespace nx::vms::client::desktop;
+    UserActionsLogger::LogHandler handler =
+        [](QObject* object, QEvent* event) -> QStringList
+        {
+            QStringList log;
+            if (event->type() == QEvent::Show)
+            {
+                auto* messageBox = qobject_cast<QnMessageBox*>(object);
+                if (!NX_ASSERT(messageBox, "Couldn't convert object related to metatype"))
+                    return {};
+
+                log << "Show messageBox with level: "
+                    << QString::fromStdString(nx::reflect::toString(messageBox->icon()))
+                    << "Title: " << messageBox->text()
+                    << "Description: " << messageBox->informativeText();
+            }
+            return log;
+        };
+
+    UserActionsLogger::instance()->registerLogHandlerForClass(
+        QString(QMetaType::fromType<QnMessageBox>().name()), std::move(handler));
 }
 
 QDialogButtonBox::StandardButton QnMessageBox::execute(

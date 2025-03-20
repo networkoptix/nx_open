@@ -398,6 +398,19 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
             return extraInfo;
         }
 
+        case Qn::ResourceLogInfoRole:
+        {
+            const auto name = data(index, Qt::DisplayRole).toString();
+            const auto nodeType = QString::fromStdString(
+                reflect::toString(data(index, Qn::NodeTypeRole).value<ResourceTree::NodeType>()));
+            if (const auto resource = data(index, core::ResourceRole).value<QnResourcePtr>())
+            {
+                return nx::format("Resource of type '%1', with name '%2'", nodeType, name)
+                    .toQString();
+            }
+            return nx::format("Node %1 with name %2", nodeType, name).toQString();
+        }
+
         case Qn::ResourceExtraStatusRole:
             return int(base_type::data(index, Qn::ResourceExtraStatusRole).value<ResourceExtraStatus>());
 

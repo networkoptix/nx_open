@@ -410,6 +410,8 @@ namespace Qn
         FlattenedRole,
         WorkbenchStateRole,
 
+        ResourceLogInfoRole, /**< Role for extended string description of resource from resource tree. (QString) */
+
         ItemDataRoleCount,
     };
 
