@@ -244,10 +244,17 @@
     </message>
 </context>
 <context>
-    <name>QnCameraAnalyticsPolicy</name>
+    <name>QnCameraAnalyticsEventsPolicy</name>
     <message>
-        <source>Analytics is not available for %1</source>
-        <translation></translation>
+        <source>Analytics events are not available for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAnalyticsObjectsPolicy</name>
+    <message>
+        <source>Analytics objects are not available for %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
