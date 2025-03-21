@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
   <g class="20x20/Solid/cloud">
-    <path fill="#0B2F41" fill-rule="evenodd" d="M7.256 8a4.502 4.502 0 0 1 8.571.26A3.501 3.501 0 0 1 14.5 15h-8a3.5 3.5 0 1 1 0-7h.756Z" class="Primary" clip-rule="evenodd"/>
+    <path fill="#0B2F41" fill-rule="evenodd" d="M7.256 8a4.502 4.502 0 0 1 8.571.26A3.501 3.501 0 0 1 14.5 15h-8a3.5 3.5 0 1 1 0-7h.756Z" class="Secondary" clip-rule="evenodd"/>
     <path fill="#2FA2DB" fill-rule="evenodd" d="M6.6 7a5.501 5.501 0 0 1 10.04.541A4.5 4.5 0 0 1 14.5 16h-8a4.5 4.5 0 1 1 0-9h.1Zm4.9-1c-1.522 0-2.82.973-3.301 2.333L7.963 9H6.5a2.5 2.5 0 0 0 0 5h8a2.5 2.5 0 0 0 .948-4.814l-.449-.184-.133-.467A3.502 3.502 0 0 0 11.5 6Z" class="Primary" clip-rule="evenodd"/>
   </g>
 </svg>

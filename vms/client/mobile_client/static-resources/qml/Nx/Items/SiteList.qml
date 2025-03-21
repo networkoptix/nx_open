@@ -126,8 +126,10 @@ ListView
                 systemId: modelData.systemId
                 localId: modelData.localId || ""
                 cloudSystem: modelData.isCloudSystem || false
-                factorySystem: model.isFactorySystem || false
-                needDigestCloudPassword: !model.isOauthSupported && !hasDigestCloudPassword
+                factorySystem: modelData.isFactorySystem || false
+                isSaas: !modelData.isSaasUninitialized
+                    && (siteList.siteModel.channelPartner != NxGlobals.uuid(""))
+                needDigestCloudPassword: !modelData.isOauthSupported && !hasDigestCloudPassword
                 ownerDescription: cloudSystem ? modelData.ownerDescription : ""
                 running: modelData.isOnline || false
                 reachable: modelData.isReachable || false

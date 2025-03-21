@@ -17,6 +17,7 @@ Item
     property var localId
     property bool cloudSystem: false
     property bool factorySystem: false
+    property bool isSaas: false
     property bool needDigestCloudPassword: false
     property bool running: false
     property string ownerDescription
@@ -142,6 +143,8 @@ Item
                 anchors.left: parent.left
                 anchors.right: parent.right
 
+                spacing: 4
+
                 Text
                 {
                     id: secondaryText
@@ -183,6 +186,21 @@ Item
                     font.pixelSize: 14
                     color: ColorTheme.colors.light16
                     text: control.counter >= 0 ? `${control.counter}` : ""
+                }
+
+                ColoredImage
+                {
+                    id: cloudIcon
+
+                    visible: control.cloudSystem && !control.isSaas
+
+                    width: 20
+                    height: 20
+
+                    sourceSize: Qt.size(width, height)
+                    sourcePath: "image://skin/20x20/Solid/cloud.svg"
+                    primaryColor: ColorTheme.colors.brand_core
+                    secondaryColor: ColorTheme.colors.brand_bg
                 }
 
                 IssueLabel
