@@ -255,6 +255,12 @@ struct SystemSettings::Private
         [this] { return makeServerHeaderValue(serverHeaderAdaptor->value()); }};
 };
 
+const std::set<QString> SystemSettingNames::kPowerUsersOnlyNames = {
+    #define VALUE(R, DATA, ITEM) SystemSettingNames::ITEM,
+    BOOST_PP_SEQ_FOR_EACH(VALUE, _, PowerUsersOnlySystemSettings_Fields)
+    #undef VALUE
+};
+
 SystemSettings::SystemSettings(SystemContext* context, QObject* parent):
     base_type(parent),
     SystemContextAware(context),
@@ -341,7 +347,7 @@ SystemSettings::AdaptorList SystemSettings::initEmailAdaptors()
             [this]() { return organizationId(); },
             isValid,
             this,
-            [] { return tr("SMTP settings."); });
+            [] { return tr("SMTP settings. These settings are visible for Power Users only."); });
 
     connect(
         d->emailSettingsAdaptor,

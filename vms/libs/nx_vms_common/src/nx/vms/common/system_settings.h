@@ -40,7 +40,9 @@ enum class SystemSettingName;
 
 namespace nx::vms::common {
 
-struct SystemSettingNames
+#define PowerUsersOnlySystemSettings_Fields (emailSettings)
+
+struct NX_VMS_COMMON_API SystemSettingNames
 {
     #define DECLARE_SETTING_NAME(NAME) static const inline QString NAME = NX_FMT( #NAME )
 
@@ -52,6 +54,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(cloudPollingIntervalS);
     DECLARE_SETTING_NAME(cloudSystemID); //< TODO: rename it to cloudSystemId
     DECLARE_SETTING_NAME(disabledVendors);
+    DECLARE_SETTING_NAME(emailSettings);
     DECLARE_SETTING_NAME(exposeDeviceCredentials);
     DECLARE_SETTING_NAME(exposeServerEndpoints);
     DECLARE_SETTING_NAME(frameOptionsHeader);
@@ -131,6 +134,8 @@ struct SystemSettingNames
     static const inline std::set<QString> kHiddenNames = {
         ldap,
     };
+
+    static const std::set<QString> kPowerUsersOnlyNames;
 };
 
 using FileToPeerList = QMap<QString, QList<nx::Uuid>>;
