@@ -168,8 +168,6 @@ struct OrganizationsModel::Private
     nx::utils::ScopedConnections connections;
 
     nx::Uuid channelPartner;
-    std::vector<SystemInOrganization> cpSystems;
-    std::vector<GroupStructure> cpGroups;
 
     TreeNode::Registry nodes; //< Should be destroyed after root.
     std::unique_ptr<TreeNode> root;
@@ -332,11 +330,6 @@ struct OrganizationsModel::Private
     // Set group (folder) structure under organization node.
     void setOrgStructure(nx::Uuid orgId, const std::vector<GroupStructure>& data)
     {
-        if (cpGroups == data)
-            return;
-
-        cpGroups = data;
-
         auto orgNode = nodes.find(orgId);
 
         if (!orgNode)
@@ -351,16 +344,28 @@ struct OrganizationsModel::Private
         setNodeGroups(orgNode, data);
     }
 
+    void gatherSystems(TreeNode* parent, std::unordered_set<nx::Uuid>& systems)
+    {
+        for (const auto& child: parent->allChildren())
+        {
+            if (child->type == OrganizationsModel::System)
+                systems.insert(child->id);
+            else
+                gatherSystems(child.get(), systems);
+        }
+    }
+
     void setOrgSystems(nx::Uuid orgId, const std::vector<SystemInOrganization>& data)
     {
         // Updating group structure (e.g. folder move) may have deleted some systems.
 
+        auto orgNode = nodes.find(orgId);
+        if (!orgNode)
+            return;
+
         // Remove old systems
         std::unordered_set<nx::Uuid> oldIds;
-        for (const auto& system: cpSystems)
-            oldIds.insert(system.systemId);
-
-        cpSystems = data;
+        gatherSystems(orgNode, oldIds);
 
         for (const auto& system: data)
         {
