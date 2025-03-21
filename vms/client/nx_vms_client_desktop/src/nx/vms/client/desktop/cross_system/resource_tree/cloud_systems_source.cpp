@@ -5,7 +5,9 @@
 #include <QtCore/QVector>
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 
@@ -29,7 +31,10 @@ QVector<QString> getOtherCloudSystemsIds(const QString& thisCloudSystemId)
 
     for (const auto& systemId: cloudSystemsManager->cloudSystems())
     {
-        if (systemId != thisCloudSystemId)
+        const auto systemContext = cloudSystemsManager->systemContext(systemId);
+        const auto systemDescription = systemContext->systemDescription();
+
+        if (systemId != thisCloudSystemId && !systemDescription->isPending())
             result.append(systemId);
     }
 
@@ -50,9 +55,12 @@ CloudSystemsSource::CloudSystemsSource()
 
             m_connectionsGuard.add(QObject::connect(
                 cloudSystemsManager, &CloudCrossSystemManager::systemFound,
-                    [this](const QString& systemId)
+                    [this, cloudSystemsManager](const QString& systemId)
                     {
-                        if (systemId != connectedCloudSystemId())
+                        const auto systemContext = cloudSystemsManager->systemContext(systemId);
+                        const auto systemDescription = systemContext->systemDescription();
+
+                        if (systemId != connectedCloudSystemId() && !systemDescription->isPending())
                         {
                             NX_VERBOSE(this, "New cloud system added: %1", systemId);
                             (*addKeyHandler)(systemId);
