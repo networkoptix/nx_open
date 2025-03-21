@@ -69,10 +69,11 @@ public:
 
     static QnResourceTypePool *instance();
 
-    QnResourceTypePool();
     QnResourceTypePtr getResourceTypeByName(const QString& name) const;
     QnResourceTypePtr getResourceType(nx::Uuid id) const;
-    void addResourceType(QnResourceTypePtr resourceType);
+
+    // TODO: Mutable methods should not be publicly accessible while this class is a
+    // singleton, because it may cause data races in multi-server Unit Tests.
     void replaceResourceTypeList(const QnResourceTypeList& resourceType);
 
     /* exact match name */
@@ -86,6 +87,10 @@ public:
     bool isEmpty() const;
 
 private:
+    // As long as this class is a singleton, mutability must be reduced as much as possible.
+    QnResourceTypePool();
+    ~QnResourceTypePool();
+
     mutable nx::Mutex m_mutex;
     QnResourceTypeMap m_resourceTypeMap;
     mutable QnResourceTypePtr m_desktopCamResourceType;

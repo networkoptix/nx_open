@@ -148,16 +148,28 @@ QnResourceTypePool *QnResourceTypePool::instance()
     return &staticInstance;
 }
 
-QnResourceTypePool::QnResourceTypePool()
+QnResourceTypePool::QnResourceTypePool():
+    m_resourceTypeMap(
+        []
+        {
+            QnResourceTypeMap map;
+
+            // Add static data for predefined types.
+            // It needs for UT only. Media server load it from the database as well.
+            QnResourceTypePtr resType(new QnResourceType());
+            resType->setName(nx::vms::api::UserData::kResourceTypeName);
+            resType->setId(nx::vms::api::UserData::kResourceTypeId);
+            map.insert(resType->getId(), resType);
+
+            return map;
+        }())
 {
     NX_DEBUG(this, "Created");
+}
 
-    // Add static data for predefined types.
-    // It needs for UT only. Media server load it from the database as well.
-    QnResourceTypePtr resType(new QnResourceType());
-    resType->setName(nx::vms::api::UserData::kResourceTypeName);
-    resType->setId(nx::vms::api::UserData::kResourceTypeId);
-    addResourceType(resType);
+QnResourceTypePool::~QnResourceTypePool()
+{
+    NX_DEBUG(this, "Destructed");
 }
 
 QnResourceTypePtr QnResourceTypePool::getResourceTypeByName(const QString& name) const
@@ -190,12 +202,6 @@ void QnResourceTypePool::replaceResourceTypeList(const QnResourceTypeList &resou
         m_resourceTypeMap.insert(resourceType->getId(), resourceType);
 }
 
-void QnResourceTypePool::addResourceType(QnResourceTypePtr resourceType)
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    m_resourceTypeMap.insert(resourceType->getId(), resourceType);
-}
-
 nx::Uuid QnResourceTypePool::getResourceTypeId(const QString& manufacturer, const QString& name, bool showWarning) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -211,7 +217,7 @@ nx::Uuid QnResourceTypePool::getResourceTypeId(const QString& manufacturer, cons
             manufacturer, name);
     }
 
-    return nx::Uuid();
+    return {};
 }
 
 nx::Uuid QnResourceTypePool::getLikeResourceTypeId(
