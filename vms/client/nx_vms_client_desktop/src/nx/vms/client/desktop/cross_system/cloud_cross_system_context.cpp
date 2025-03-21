@@ -525,7 +525,7 @@ struct CloudCrossSystemContext::Private
             serverResource->setStatus(nx::vms::api::ResourceStatus::online);
     }
 
-    void addServerTaxonomyDescriptions(const nx::vms::api::ServerModelV4List& serversData)
+    void addServerTaxonomyDescriptions(const nx::vms::api::ServerModelV1List& serversData)
     {
         if (!NX_ASSERT(systemContext))
             return;

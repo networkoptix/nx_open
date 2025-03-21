@@ -40,7 +40,7 @@ struct CloudCrossSystemContextDataLoader::Private
     std::optional<UserModel> user;
     std::optional<UserGroupDataList> userGroups;
     std::optional<ServerInformationV1List> servers;
-    std::optional<ServerModelV4List> serversTaxonomyDescriptors;
+    std::optional<ServerModelV1List> serversTaxonomyDescriptors;
     std::optional<ServerFootageDataList> serverFootageData;
     std::optional<SystemSettings> systemSettings;
     std::optional<LicenseDataList> licenses;
@@ -161,7 +161,7 @@ struct CloudCrossSystemContextDataLoader::Private
     rest::Handle requestServersTaxonomyDescriptors()
     {
         NX_VERBOSE(this, "Updating servers taxonomy descriptors data");
-        auto callback = nx::utils::guarded(q,
+        auto callback =
             [this](
                 bool success,
                 ::rest::Handle requestId,
@@ -178,7 +178,7 @@ struct CloudCrossSystemContextDataLoader::Private
                 }
 
                 auto [result, deserializationResult] =
-                    reflect::json::deserialize<ServerModelV4List>(data.data());
+                    reflect::json::deserialize<ServerModelV1List>(nx::toBufferView(data));
                 if (!deserializationResult.success)
                 {
                     NX_WARNING(
@@ -192,15 +192,14 @@ struct CloudCrossSystemContextDataLoader::Private
 
                 serversTaxonomyDescriptors = result;
                 requestData();
-            }
-        );
+            };
 
         return connection->getRawResult(
-            QString("/rest/v4/servers?_with=id,parameters.%1")
+            QString("/rest/v3/servers?_with=id,parameters.%1")
                 .arg(nx::analytics::kDescriptorsProperty),
             {},
             callback,
-            q->thread());
+            q);
     }
 
     rest::Handle requestServerFootageData()
@@ -467,9 +466,9 @@ ServerInformationV1List CloudCrossSystemContextDataLoader::servers() const
     return d->servers.value_or(ServerInformationV1List());
 }
 
-ServerModelV4List CloudCrossSystemContextDataLoader::serverTaxonomyDescriptions() const
+ServerModelV1List CloudCrossSystemContextDataLoader::serverTaxonomyDescriptions() const
 {
-    return d->serversTaxonomyDescriptors.value_or(ServerModelV4List());
+    return d->serversTaxonomyDescriptors.value_or(ServerModelV1List());
 }
 
 ServerFootageDataList CloudCrossSystemContextDataLoader::serverFootageData() const

@@ -2274,7 +2274,7 @@ Handle ServerConnection::getCurrentSession(
     nx::utils::AsyncHandlerExecutor executor)
 {
     return executeGet(
-        "/rest/v4/login/sessions/current",
+        "/rest/v1/login/sessions/current",
         {},
         std::move(callback),
         executor);

@@ -77,40 +77,32 @@ void RemoteSession::Private::terminateServerSessionIfNeeded()
 
 void RemoteSession::Private::updateTokenExpirationTime()
 {
-    connection->serverApi()->getRawResult(
-        "/rest/v4/login/sessions/current",
-        nx::network::rest::Params(),
-        nx::utils::guarded(q,
-            [this, currentConnection = QPointer(connection.get())](
-                bool success,
-                rest::Handle /*requestId*/,
-                QByteArray data,
-                nx::network::http::HttpHeaders)
+    connection->serverApi()->getCurrentSession(
+        [this, currentConnection = QPointer(connection.get())](
+            bool success,
+            rest::Handle /*requestId*/,
+            rest::ErrorOrData<nx::vms::api::LoginSession> session)
+        {
+            if (session)
             {
-                if (!success)
-                {
-                    NX_WARNING(typeid(RemoteSession), "Can not update token expiration time");
-                    return;
-                }
+                const auto now = qnSyncTime->currentTimePoint();
 
-                const auto [session, result] =
-                    nx::reflect::json::deserialize<nx::vms::api::LoginSession>(data.toStdString());
-
-                if (!NX_ASSERT(result,
-                        nx::format("Can not deserialize token expiration time: %1", data)))
-                {
-                    return;
-                }
-
-                sessionStartTime = qnSyncTime->currentTimePoint() - session.ageS;
+                sessionStartTime = now - session->ageS;
                 if (currentConnection)
                 {
                     currentConnection->setSessionTokenExpirationTime(
-                        qnSyncTime->currentTimePoint() + session.expiresInS);
+                        now + session->expiresInS);
                 }
                 emit q->tokenExpirationTimeChanged();
-            }),
-        QThread::currentThread());
+            }
+            else
+            {
+                NX_WARNING(typeid(RemoteSession),
+                    "Cannot update token expiration time, code: %1, error: %2",
+                    session.error().errorId, session.error().errorString);
+            }
+        },
+        q);
 }
 
 std::chrono::microseconds RemoteSession::Private::age() const

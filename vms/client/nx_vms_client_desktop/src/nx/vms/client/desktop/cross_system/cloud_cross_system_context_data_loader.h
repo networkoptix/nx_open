@@ -46,7 +46,7 @@ public:
     nx::vms::api::UserModel user() const;
     std::optional<nx::vms::api::UserGroupDataList> userGroups() const;
     nx::vms::api::ServerInformationV1List servers() const;
-    nx::vms::api::ServerModelV4List serverTaxonomyDescriptions() const;
+    nx::vms::api::ServerModelV1List serverTaxonomyDescriptions() const;
     nx::vms::api::ServerFootageDataList serverFootageData() const;
     nx::vms::api::CameraDataExList cameras() const;
     nx::vms::api::SystemSettings systemSettings() const;

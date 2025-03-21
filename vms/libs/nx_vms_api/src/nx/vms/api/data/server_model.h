@@ -139,7 +139,7 @@ struct NX_VMS_API ServerModelV1: ServerModelBase
 #define ServerModelV1_Fields \
     ServerModelBase_Fields \
     (flags)(endpoints)(isFailoverEnabled)(locationId)(maxCameras)
-QN_FUSION_DECLARE_FUNCTIONS(ServerModelV1, (json), NX_VMS_API)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerModelV1, (json))
 NX_REFLECTION_INSTRUMENT(ServerModelV1, ServerModelV1_Fields);
 
 struct NX_VMS_API ServerNetwork
