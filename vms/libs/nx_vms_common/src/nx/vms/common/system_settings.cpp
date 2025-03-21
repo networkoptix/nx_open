@@ -296,7 +296,7 @@ SystemSettings::AdaptorList SystemSettings::initEmailAdaptors()
             nx::vms::api::EmailSettings{},
             isValid,
             this,
-            [] { return tr("SMTP settings"); });
+            [] { return tr("SMTP settings. These settings are visible for Power Users only"); });
 
     connect(
         d->emailSettingsAdaptor,

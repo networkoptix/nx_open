@@ -47,6 +47,7 @@ struct SystemSettingNames
     DECLARE_SETTING_NAME(cloudPollingIntervalS);
     DECLARE_SETTING_NAME(cloudSystemID); //< TODO: rename it to cloudSystemId
     DECLARE_SETTING_NAME(disabledVendors);
+    DECLARE_SETTING_NAME(emailSettings);
     DECLARE_SETTING_NAME(exposeDeviceCredentials);
     DECLARE_SETTING_NAME(exposeServerEndpoints);
     DECLARE_SETTING_NAME(frameOptionsHeader);
@@ -120,6 +121,10 @@ struct SystemSettingNames
 
     static const inline std::set<QString> kHiddenNames = {
         ldap,
+    };
+
+    static const inline std::set<QString> kPowerUsersOnlyNames = {
+        emailSettings,
     };
 };
 
