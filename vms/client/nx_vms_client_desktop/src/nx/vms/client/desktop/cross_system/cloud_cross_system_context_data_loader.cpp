@@ -47,6 +47,11 @@ struct CloudCrossSystemContextDataLoader::Private
     std::optional<CameraDataExList> cameras;
     QElapsedTimer camerasRefreshTimer;
 
+    /**
+    * IMPORTANT! Minimum supported cross-system version is 5.1. Do not use REST API calls with
+    * version higher than v2 unless you are implementing versioning.
+    */
+
     rest::Handle requestUser()
     {
         NX_VERBOSE(this, "Requesting user");
@@ -195,7 +200,7 @@ struct CloudCrossSystemContextDataLoader::Private
             };
 
         return connection->getRawResult(
-            QString("/rest/v3/servers?_with=id,parameters.%1")
+            QString("/rest/v2/servers?_with=id,parameters.%1")
                 .arg(nx::analytics::kDescriptorsProperty),
             {},
             callback,
@@ -278,7 +283,7 @@ struct CloudCrossSystemContextDataLoader::Private
         );
 
         return connection->getRawResult(
-            "/rest/v3/system/settings",
+            "/rest/v2/system/settings",
             {},
             callback,
             q->thread());
