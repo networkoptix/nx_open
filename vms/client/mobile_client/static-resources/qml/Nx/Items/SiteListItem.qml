@@ -160,8 +160,9 @@ Item
                     {
                         if (control.type == OrganizationsModel.System)
                         {
-                            return control.ownerDescription
-                                || hostsModelAccessor.defaultAddress.displayAddress()
+                            return control.cloudSystem
+                                ? control.ownerDescription
+                                : hostsModelAccessor.defaultAddress.displayAddress()
                         }
                         return control.text
                     }
