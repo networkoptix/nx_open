@@ -298,6 +298,8 @@ QStringList AttributeDisplayManager::attributesForObjectType(
     if (!objectType)
         return {};
 
+    while (objectType->baseObjectType())
+        objectType = objectType->baseObjectType();
     return d->attributesForObjectType(objectType);
 }
 
