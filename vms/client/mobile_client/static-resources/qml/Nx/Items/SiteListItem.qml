@@ -213,6 +213,9 @@ Item
 
                     color:
                     {
+                        if (control.factorySystem)
+                            return ColorTheme.colors.green_attention
+
                         if (control.compatible)
                             return ColorTheme.colors.dark16
 
@@ -227,6 +230,9 @@ Item
                     {
                         if (control.type != OrganizationsModel.System)
                             return ""
+
+                        if (factorySystem)
+                            return qsTr("NEW")
 
                         if (!compatible)
                             return wrongCustomization ?  qsTr("INCOMPATIBLE") : invalidVersion
