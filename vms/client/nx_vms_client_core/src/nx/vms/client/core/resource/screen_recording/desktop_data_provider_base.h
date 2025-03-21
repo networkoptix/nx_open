@@ -35,7 +35,7 @@ public:
 
 protected:
     bool initAudioDecoder(int sampleRate, AVSampleFormat format, int channels);
-    bool encodeAndPutAudioData(uint8_t* buffer, int size);
+    bool encodeAndPutAudioData(uint8_t* buffer, int size, int channelNumber);
     int getAudioFrameSize();
     AVSampleFormat fromQtAudioFormat(const QAudioFormat& format) const;
 

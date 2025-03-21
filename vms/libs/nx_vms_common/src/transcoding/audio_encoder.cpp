@@ -22,17 +22,19 @@ int getMaxAudioChannels(const AVCodec* avCodec)
 int getDefaultDstSampleRate(int srcSampleRate, const AVCodec* avCodec)
 {
     int result = srcSampleRate;
-    bool isPcmCodec = avCodec->id == AV_CODEC_ID_ADPCM_G726
-        || avCodec->id == AV_CODEC_ID_PCM_MULAW
-        || avCodec->id == AV_CODEC_ID_PCM_ALAW;
-
-    if (isPcmCodec)
-        result = 8000;
-    else
-        result = std::max(result, 16000);
-
-    if (avCodec->id == AV_CODEC_ID_VORBIS) // supported_samplerates is empty for this codec type
-        result = std::min(result, 44100);
+    switch(avCodec->id)
+    {
+        case AV_CODEC_ID_VORBIS: //< Supported_samplerates is empty for this codec type.
+            result = std::min(result, 44100);
+            break;
+        case AV_CODEC_ID_ADPCM_G726:
+        case AV_CODEC_ID_PCM_MULAW:
+        case AV_CODEC_ID_PCM_ALAW:
+            result = 8000;
+            break;
+        default:
+            result = std::max(result, 16000);
+    }
 
     if (avCodec->supported_samplerates) // select closest supported sample rate
     {

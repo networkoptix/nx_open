@@ -117,7 +117,7 @@ bool DesktopDataProviderBase::initAudioDecoder(int sampleRate, AVSampleFormat fo
     return m_audioEncoder.open(AV_CODEC_ID_MP3, sampleRate, format, layout, /*bitrate*/0);
 }
 
-bool DesktopDataProviderBase::encodeAndPutAudioData(uint8_t* buffer, int size)
+bool DesktopDataProviderBase::encodeAndPutAudioData(uint8_t* buffer, int size, int channelNumber)
 {
      if (!m_audioEncoder.sendFrame(buffer, size))
         return false;
@@ -137,7 +137,7 @@ bool DesktopDataProviderBase::encodeAndPutAudioData(uint8_t* buffer, int size)
         packet->timestamp += m_utcTimstampOffsetUs;
         packet->flags |= QnAbstractMediaData::MediaFlags_LIVE;
         packet->dataProvider = this;
-        packet->channelNumber = 1;
+        packet->channelNumber = channelNumber;
         if (dataCanBeAccepted())
             putData(packet);
     }

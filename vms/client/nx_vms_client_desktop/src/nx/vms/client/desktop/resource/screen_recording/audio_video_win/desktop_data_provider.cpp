@@ -19,7 +19,7 @@ extern "C" {
 #include <decoders/audio/ffmpeg_audio_decoder.h>
 #include <nx/media/codec_parameters.h>
 #include <nx/media/config.h>
-#include <nx/media/ffmpeg/audio_encoder.h>
+#include <transcoding/audio_encoder.h>
 #include <nx/media/ffmpeg/av_options.h>
 #include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/old_api.h>
@@ -729,7 +729,8 @@ void DesktopDataProvider::putAudioData()
         }
         d->soundAnalyzer->processData(buffer1, d->frameSize);
 
-        if (!encodeAndPutAudioData((uint8_t*)buffer1, d->frameSize))
+        int audioChannelNumber = needVideoData() ? 1 : 0;
+        if (!encodeAndPutAudioData((uint8_t*)buffer1, d->frameSize, audioChannelNumber))
             return;
     }
 }

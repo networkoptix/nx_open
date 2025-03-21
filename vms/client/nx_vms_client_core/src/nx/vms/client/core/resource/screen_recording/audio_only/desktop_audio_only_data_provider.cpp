@@ -259,7 +259,7 @@ void DesktopAudioOnlyDataProvider::processData()
         auto firstBuffer = m_audioSourcesInfo.at(0)->frameBuffer;
 
         m_soundAnalyzer->processData((qint16*)firstBuffer, m_frameSize);
-        if (!encodeAndPutAudioData((uint8_t*)firstBuffer, m_frameSize))
+        if (!encodeAndPutAudioData((uint8_t*)firstBuffer, m_frameSize, /*channelNumber*/ 0))
             return;
     }
 }
