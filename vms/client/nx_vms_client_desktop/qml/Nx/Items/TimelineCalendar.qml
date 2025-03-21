@@ -219,8 +219,8 @@ Control
                 locale: control.regionLocale
                 currentDate: control.currentDate
 
-                visibleYear: selection.start.getFullYear()
-                visibleMonth: selection.start.getMonth()
+                visibleYear: selection.end.getFullYear()
+                visibleMonth: selection.end.getMonth()
             }
 
             Spacer {}
