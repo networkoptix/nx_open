@@ -37,6 +37,10 @@ bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData
 
 bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
+    nx::vms::api::UserGroupData* userGroupData);
+
+bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,
+    QnResourceAccessManager* accessManager,
     nx::vms::api::ResourceParamData* paramData);
 
 bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,

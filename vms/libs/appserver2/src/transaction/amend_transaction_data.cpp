@@ -196,6 +196,20 @@ bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData
     return true;
 }
 
+bool amendOutputDataIfNeeded(const nx::network::rest::UserAccessData& accessData,
+    QnResourceAccessManager* accessManager,
+    nx::vms::api::UserGroupData* userGroupData)
+{
+    if (accessData == nx::network::rest::kSystemAccess
+        || userGroupData->externalId.dn.isEmpty()
+        || accessManager->hasPowerUserPermissions(accessData))
+    {
+        return false;
+    }
+    userGroupData->externalId.dn.clear();
+    return true;
+}
+
 bool amendOutputDataIfNeeded(
     const nx::network::rest::UserAccessData& accessData,
     QnResourceAccessManager* /*accessManager*/,
