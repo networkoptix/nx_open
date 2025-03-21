@@ -14,6 +14,7 @@ ListView
     property alias hideOrgSystemsFromSites: filterModel.hideOrgSystemsFromSites
 
     signal itemClicked(var nodeId)
+    signal itemEditClicked(var nodeId)
 
     spacing: cellsInRow == 1 ? 8 : 12
 
@@ -133,8 +134,10 @@ ListView
                 compatible: (modelData.isCompatibleToMobileClient || modelData.isFactorySystem) || false
                 wrongCustomization: modelData.wrongCustomization ? modelData.wrongCustomization : false
                 invalidVersion: modelData.wrongVersion ? modelData.wrongVersion.toString() : ""
+                editEnabled: modelData.type == OrganizationsModel.System && !cloudSystem
 
                 onClicked: siteList.itemClicked(modelData.nodeId)
+                onEditClicked: siteList.itemEditClicked(modelData.nodeId)
             }
         }
     }

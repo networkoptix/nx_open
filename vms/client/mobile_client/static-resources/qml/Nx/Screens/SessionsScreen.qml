@@ -270,6 +270,12 @@ Page
 
             sessionsScreen.openSystem(current)
         }
+
+        onItemEditClicked: (nodeId) =>
+        {
+            let current = organizationsModel.indexFromId(nodeId)
+            sessionsScreen.editSystem(current)
+        }
     }
 
     IconButton
@@ -458,6 +464,28 @@ Page
         else if (!hostsModel.isEmpty)
         {
             sessionManager.startCloudSession(systemId, systemName)
+        }
+    }
+
+    function editSystem(current)
+    {
+        const systemId = accessor.getData(current, "systemId")
+        const localId = accessor.getData(current, "localId")
+        authenticationDataModel.localSystemId = localId
+        hostsModel.systemId = systemId
+        hostsModel.localSystemId = localId
+        const defaultAddress = hostsModel.rowCount() > 0
+            ? NxGlobals.modelData(hostsModel.index(0, 0), "url-internal")
+            : NxGlobals.emptyUrl()
+        const systemName = accessor.getData(current, "display")
+        if (authenticationDataModel.hasData)
+        {
+            openSavedSession(systemId, localId, systemName, defaultAddress)
+        }
+        else
+        {
+            Workflow.openDiscoveredSession(
+                systemId, localId, systemName, defaultAddress.displayAddress())
         }
     }
 
