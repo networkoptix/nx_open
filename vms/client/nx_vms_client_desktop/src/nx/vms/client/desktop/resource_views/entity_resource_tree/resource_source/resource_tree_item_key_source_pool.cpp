@@ -84,6 +84,17 @@ UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::serversSource(
     return std::make_shared<ResourceSourceAdapter>(std::move(compositeServersSource));
 }
 
+UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::healthMonitorsSource(
+    const QnResourceAccessSubject& subject)
+{
+    auto accessibleServersSource = std::make_unique<AccessibleResourceProxySource>(
+        systemContext(),
+        subject,
+        std::make_unique<ServerResourceSource>(resourcePool()));
+
+    return std::make_shared<ResourceSourceAdapter>(std::move(accessibleServersSource));
+}
+
 UniqueResourceSourcePtr ResourceTreeItemKeySourcePool::allDevicesSource(
     const QnResourceAccessSubject& accessSubject,
     const ResourceFilter& resourceFilter)

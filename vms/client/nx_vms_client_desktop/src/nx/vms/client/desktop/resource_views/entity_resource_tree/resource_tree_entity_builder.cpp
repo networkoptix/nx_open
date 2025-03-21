@@ -373,7 +373,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createHealthMonitorsGroupEntity() c
         serversOrder());
 
     healthMonitorsList->installItemSource(
-        m_itemKeySourcePool->serversSource(user(), /*reduceEdgeServers*/ false));
+        m_itemKeySourcePool->healthMonitorsSource(user()));
 
     return makeFlatteningGroup(
         m_itemFactory->createHealthMonitorsItem(),

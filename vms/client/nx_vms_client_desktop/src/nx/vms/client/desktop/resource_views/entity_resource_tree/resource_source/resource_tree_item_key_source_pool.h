@@ -29,10 +29,19 @@ public:
     ~ResourceTreeItemKeySourcePool();
 
     /**
-     * Provides all non-fake servers in the system.
+     * Provides non-fake servers in the system that the given access subject has access to, as
+     * well as parent servers for resources the given access subjects has access to.
+     * @param reduceEdgeServers If true, EDGE servers will be substituted by corresponding
+     *     camera resources.
      */
-    UniqueResourceSourcePtr serversSource(const QnResourceAccessSubject& accessSubject,
+    UniqueResourceSourcePtr serversSource(
+        const QnResourceAccessSubject& accessSubject,
         bool reduceEdgeServers);
+
+    /**
+     * Provides non-fake servers in the system that the given access subject has access to.
+     */
+    UniqueResourceSourcePtr healthMonitorsSource(const QnResourceAccessSubject& accessSubject);
 
     using ResourceFilter = std::function<bool(const QnResourcePtr&)>;
 
