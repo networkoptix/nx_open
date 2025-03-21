@@ -661,6 +661,18 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
                 return QVariant::fromValue(OrganizationsModel::System);
             case IsFromSitesRole:
                 return true;
+            case QnSystemsModel::IsSaasUninitialized:
+            {
+                auto id = d->proxyModel->data(
+                    d->mapToProxyModel(index),
+                    QnSystemsModel::SystemIdRoleId).toString();
+                // If offline system belongs to another channel partner we cannot detect SaaS state.
+                // But at least we can detect that SaaS was initialized if the system belongs to
+                // an organization in current channel partner.
+                if (auto node = d->nodes.find(nx::Uuid::fromStringSafe(id)))
+                    return false;
+                break;
+            }
         }
         return d->proxyModel->data(d->mapToProxyModel(index), role);
     }
@@ -689,6 +701,8 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
             return node->loading;
         case IsFromSitesRole:
             return false;
+        case QnSystemsModel::IsSaasUninitialized:
+            return node->type == SitesNode;
         default:
             if (node->type == OrganizationsModel::System && d->proxyModel)
             {
