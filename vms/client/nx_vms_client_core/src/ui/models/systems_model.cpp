@@ -443,8 +443,13 @@ void QnSystemsModelPrivate::addSystem(const SystemDescriptionPtr& systemDescript
         << connect(systemDescription.get(), &SystemDescription::saasStateChanged, this,
             [this, systemDescription]()
             {
-                emitDataChanged(systemDescription,
-                {QnSystemsModel::IsSaasSuspended, QnSystemsModel::IsSaasShutDown});
+                emitDataChanged(
+                    systemDescription,
+                    {
+                        QnSystemsModel::IsSaasSuspended,
+                        QnSystemsModel::IsSaasShutDown,
+                        QnSystemsModel::IsSaasUninitialized
+                    });
             });
 
     const auto systemId = nx::Uuid::fromStringSafe(systemDescription->id());
