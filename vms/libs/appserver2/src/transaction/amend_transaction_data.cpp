@@ -191,6 +191,20 @@ bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
     return true;
 }
 
+bool amendOutputDataIfNeeded(const Qn::UserAccessData& accessData,
+    QnResourceAccessManager* accessManager,
+    nx::vms::api::UserGroupData* userGroupData)
+{
+    if (accessData == Qn::kSystemAccess
+        || userGroupData->externalId.dn.isEmpty()
+        || accessManager->hasPowerUserPermissions(accessData))
+    {
+        return false;
+    }
+    userGroupData->externalId.dn.clear();
+    return true;
+}
+
 bool amendOutputDataIfNeeded(
     const Qn::UserAccessData& accessData,
     QnResourceAccessManager* accessManager,
