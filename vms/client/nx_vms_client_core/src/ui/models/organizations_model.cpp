@@ -58,6 +58,7 @@ struct TreeNode
             QString::fromStdString(group.name),
             OrganizationsModel::Folder)
     {
+        systemCount = group.systemCount;
     }
 
     TreeNode(Map& idToNode, SystemInOrganization system)
