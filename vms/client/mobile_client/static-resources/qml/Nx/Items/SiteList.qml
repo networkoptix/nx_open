@@ -128,7 +128,7 @@ ListView
                 factorySystem: model.isFactorySystem || false
                 needDigestCloudPassword: !model.isOauthSupported && !hasDigestCloudPassword
                 ownerDescription: cloudSystem ? modelData.ownerDescription : ""
-                running: modelData.isOnline || true
+                running: modelData.isOnline || false
                 reachable: modelData.isReachable || false
                 compatible: (modelData.isCompatibleToMobileClient || modelData.isFactorySystem) || false
                 wrongCustomization: modelData.wrongCustomization ? modelData.wrongCustomization : false
