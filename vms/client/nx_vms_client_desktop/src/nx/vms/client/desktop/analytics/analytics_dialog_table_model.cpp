@@ -6,10 +6,10 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
-#include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 
 namespace nx::vms::client::desktop::analytics::taxonomy {

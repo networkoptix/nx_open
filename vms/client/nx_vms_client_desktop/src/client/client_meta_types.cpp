@@ -25,6 +25,7 @@
 #include <nx/vms/client/desktop/analytics/analytics_dialog_table_model.h>
 #include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
 #include <nx/vms/client/desktop/analytics/attribute_visibility_settings_model.h>
+#include <nx/vms/client/desktop/analytics/tableview_columns_calculator.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/index_list_model.h>
 #include <nx/vms/client/desktop/common/models/row_check_model.h>
@@ -278,6 +279,7 @@ void registerQmlTypesInternal()
     analytics::taxonomy::AttributeVisibilitySettingsModel::registerQmlType();
     analytics::taxonomy::AttributeDisplayManager::registerQmlType();
     analytics::taxonomy::AnalyticsDialogTableModel::registerQmlType();
+    TableViewColumnsCalculator::registerQmlType();
 
     qmlRegisterType<FisheyeCalibrator>("nx.vms.client.desktop", 1, 0, "FisheyeCalibrator");
     qmlRegisterType<ConnectTilesProxyModel>("nx.vms.client.desktop", 1, 0, "ConnectTilesModel");

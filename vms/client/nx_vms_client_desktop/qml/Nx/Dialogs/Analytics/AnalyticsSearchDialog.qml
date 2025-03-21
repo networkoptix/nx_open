@@ -663,6 +663,16 @@ Window
                             objectTypeIds: analyticsFilters.selectedObjectTypeIds
                         }
 
+                        columnWidthProvider: function(index)
+                        {
+                            return tableViewColumnsCalculator.columnWidth(index)
+                        }
+
+                        TableViewColumnsCalculator
+                        {
+                            id: tableViewColumnsCalculator
+                        }
+
                         Connections
                         {
                             target: selection
@@ -699,6 +709,7 @@ Window
                             readonly property bool isCurrentRow: tableView.currentRow === row
                             readonly property bool isHoveredRow: tableView.hoveredRow === row
                             readonly property var modelData: model
+                            property int cellHeight: tableView.cellHeight
 
                             function getData(name)
                             {
@@ -712,9 +723,12 @@ Window
                             color: isCurrentRow && showPreview
                                 ? ColorTheme.colors.dark9
                                 : isHoveredRow ? ColorTheme.colors.dark4 : ColorTheme.colors.dark2
-                            implicitWidth: Math.max(contentRowLayout.implicitWidth, 28)
-                            implicitHeight: Math.max(
-                                contentRowLayout.implicitHeight, tableView.cellHeight)
+                            implicitWidth: Math.max(
+                                contentRowLayout.implicitWidth +
+                                contentRowLayout.anchors.leftMargin +
+                                contentRowLayout.anchors.rightMargin,
+                                28)
+                            implicitHeight: Math.max(contentRowLayout.implicitHeight, cellHeight)
 
                             HoverHandler
                             {
@@ -744,8 +758,8 @@ Window
                                 ColoredImage
                                 {
                                     sourceSize: Qt.size(20, 20)
-                                    sourcePath: model.iconKey
-                                        ? "image://skin/" + model.iconKey
+                                    sourcePath: modelData.iconKey
+                                        ? "image://skin/" + modelData.iconKey
                                         : ""
                                     primaryColor: isHoveredRow
                                         ? ColorTheme.colors.light7
@@ -778,7 +792,7 @@ Window
                                     color: isHoveredRow
                                         ? ColorTheme.colors.light7
                                         : ColorTheme.colors.light10
-                                    text: model.display || ""
+                                    text: modelData.display || ""
                                 }
 
                                 Item

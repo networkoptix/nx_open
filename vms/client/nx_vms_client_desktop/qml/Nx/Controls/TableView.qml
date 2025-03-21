@@ -25,7 +25,7 @@ TableView
     property bool horizontalHeaderVisible: false
     property alias headerBackgroundColor: columnsHeader.color
     property bool horizontalHeaderEnabled: true
-    property alias horizontalHeaderView: headerRow
+    property alias horizontalHeaderView: headerView
     property bool sortEnabled: true
 
     property alias deleteShortcut: deleteShortcut
@@ -101,24 +101,35 @@ TableView
 
         HorizontalHeaderView
         {
-            id: headerRow
+            id: headerView
 
+            objectName: "headerView"
             syncView: control
-            delegate: HeaderButton
+
+            delegate: Rectangle
             {
-                width: control.columnWidthProvider(index)
-                height: columnsHeader.buttonHeight
+                id: headerDelegate
+
+                implicitWidth: control.columnWidthProvider(index)
+                implicitHeight: columnsHeader.buttonHeight
+                color: headerBackgroundColor
                 visible: width > 0
-                text: model.display
 
-                sortOrder: control.sortEnabled && control.model.sortColumn === index
-                    ? control.model.sortOrder
-                    : undefined
-
-                onClicked:
+                HeaderButton
                 {
-                    if (control.sortEnabled)
-                        control.model.sort(index, nextSortOrder())
+                    objectName: "headerButton"
+                    anchors.fill: parent
+                    text: model.display
+
+                    sortOrder: (control?.sortEnabled ?? false) && control.model.sortColumn === index
+                        ? control.model.sortOrder
+                        : undefined
+
+                    onClicked:
+                    {
+                        if (control.sortEnabled)
+                            control.model.sort(index, nextSortOrder())
+                    }
                 }
             }
             boundsBehavior: control.boundsBehavior
