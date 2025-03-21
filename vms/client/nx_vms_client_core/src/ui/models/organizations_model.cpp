@@ -2,15 +2,15 @@
 
 #include "organizations_model.h"
 
-#include <QtCore/QMetaObject>
 #include <QtCore/QCoreApplication>
+#include <QtCore/QMetaObject>
 
+#include <nx/network/http/rest/http_rest_client.h>
 #include <nx/utils/coro/task_utils.h>
 #include <nx/utils/coro/when_all.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/network/cloud_api.h>
-#include <nx/network/http/rest/http_rest_client.h>
 
 namespace nx::vms::client::core {
 
@@ -350,7 +350,7 @@ struct OrganizationsModel::Private
         setNodeGroups(orgNode, data);
     }
 
-    void setOrgSystems(const std::vector<SystemInOrganization>& data)
+    void setOrgSystems(nx::Uuid orgId, const std::vector<SystemInOrganization>& data)
     {
         // Updating group structure (e.g. folder move) may have deleted some systems.
 
@@ -376,20 +376,20 @@ struct OrganizationsModel::Private
         // Add new systems
         for (const auto& system: data)
         {
-            auto groupNode = nodes.find(system.groupId);
-            if (!groupNode)
+            auto parentNode = nodes.find(system.groupId.isNull() ? orgId : system.groupId);
+            if (!parentNode)
                 continue;
 
-            int row = groupNode->allChildren().size();
+            int row = parentNode->allChildren().size();
 
             if (auto systemNode = nodes.find(system.systemId)) //< Replace existing system.
             {
                 const int oldRow = systemNode->row();
-                row = systemNode->parentNode() == groupNode ? oldRow : std::max(row - 1, 0);
+                row = systemNode->parentNode() == parentNode ? oldRow : std::max(row - 1, 0);
                 remove(oldRow, systemNode->parentNode());
             }
 
-            insert(row, nodes.create(system), groupNode);
+            insert(row, nodes.create(system), parentNode);
         }
     }
 
@@ -532,7 +532,7 @@ nx::coro::FireAndForget OrganizationsModel::Private::loadOrgs(nx::Uuid cpId)
                     }
 
                     self->setOrgStructure(org.id, *groupStructure);
-                    self->setOrgSystems(systems->results);
+                    self->setOrgSystems(org.id, systems->results);
 
                     if (auto node = self->nodes.find(org.id); node->loading)
                     {
