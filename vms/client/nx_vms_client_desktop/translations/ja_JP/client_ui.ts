@@ -131,11 +131,11 @@
     </message>
     <message>
       <source>with</source>
-      <translation>使用:</translation>
+      <translation>同時処理上限:</translation>
     </message>
     <message>
       <source>Simultaneous Streams</source>
-      <translation>同時配信</translation>
+      <translation>ストリーム</translation>
     </message>
   </context>
   <context>

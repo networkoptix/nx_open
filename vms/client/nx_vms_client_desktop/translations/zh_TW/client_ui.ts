@@ -131,11 +131,11 @@
     </message>
     <message>
       <source>with</source>
-      <translation type="unfinished">with</translation>
+      <translation>支援</translation>
     </message>
     <message>
       <source>Simultaneous Streams</source>
-      <translation type="unfinished">Simultaneous Streams</translation>
+      <translation>個串流同時</translation>
     </message>
   </context>
   <context>
@@ -606,7 +606,7 @@
     </message>
     <message>
       <source>Restreaming Link</source>
-      <translation type="unfinished">Restreaming Link</translation>
+      <translation>重播連結</translation>
     </message>
   </context>
   <context>
@@ -1485,7 +1485,7 @@
     </message>
     <message>
       <source>Open files folder</source>
-      <translation type="unfinished">Open files folder</translation>
+      <translation>開啟檔案資料夾</translation>
     </message>
   </context>
   <context>

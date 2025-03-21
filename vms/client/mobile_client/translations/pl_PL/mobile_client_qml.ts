@@ -373,7 +373,7 @@
     <name>MenuScreen</name>
     <message>
       <source>App Settings</source>
-      <translation type="unfinished">App Settings</translation>
+      <translation>Ustawienia aplikacji</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -420,19 +420,19 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Brak witryn</translation>
     </message>
     <message>
       <source>We did not find any sites in this organization</source>
-      <translation type="unfinished">We did not find any sites in this organization</translation>
+      <translation>Nie znaleźliśmy żadnych witryn w tej organizacji</translation>
     </message>
     <message>
       <source>We did not find any sites in this folder</source>
-      <translation type="unfinished">We did not find any sites in this folder</translation>
+      <translation>Nie znaleźliśmy żadnych witryn w tym folderze</translation>
     </message>
     <message>
       <source>How to connect sites?</source>
-      <translation type="unfinished">How to connect sites?</translation>
+      <translation>Jak połączyć witryny?</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -440,7 +440,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Spróbuj zmienić parametry wyszukiwania</translation>
     </message>
   </context>
   <context>
@@ -644,7 +644,7 @@
     </message>
     <message>
       <source>Host: Port</source>
-      <translation type="unfinished">Host: Port</translation>
+      <translation>Host: Port</translation>
     </message>
   </context>
   <context>
@@ -667,7 +667,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Spróbuj zmienić parametry wyszukiwania</translation>
     </message>
     <message>
       <source>No Organizations</source>
@@ -675,19 +675,19 @@
     </message>
     <message>
       <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation type="unfinished">We didn&apos;t find any organizations, try contacting support</translation>
+      <translation>Nie znaleźliśmy żadnych organizacji. Spróbuj skontaktować się z działem wsparcia</translation>
     </message>
     <message>
       <source>No Sites Found</source>
-      <translation type="unfinished">No Sites Found</translation>
+      <translation>Nie znaleziono żadnych witryn</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</translation>
+      <translation>Nie znaleźliśmy żadnych witryn w Twojej sieci lokalnej. Spróbuj dodać serwery ręcznie lub zaloguj się konto w chmurze</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually</translation>
+      <translation>Nie znaleźliśmy żadnych witryn w Twojej sieci lokalnej. Spróbuj dodać serwery ręcznie</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -855,7 +855,7 @@
     <message>
       <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Open %1</translation>
+      <translation>Otwórz %1</translation>
     </message>
     <message>
       <source>Channel Partner</source>

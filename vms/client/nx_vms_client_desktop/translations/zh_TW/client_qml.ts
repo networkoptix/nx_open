@@ -238,11 +238,11 @@
     </message>
     <message>
       <source>Switch to table view</source>
-      <translation type="unfinished">Switch to table view</translation>
+      <translation>切換至表格瀏覽</translation>
     </message>
     <message>
       <source>Switch to card view</source>
-      <translation type="unfinished">Switch to card view</translation>
+      <translation>切換至卡片瀏覽</translation>
     </message>
   </context>
   <context>
@@ -643,7 +643,7 @@ Select an Integration to begin configuring its parameters.</source>
     <name>CustomHttpHeadersDialog</name>
     <message>
       <source>Custom HTTP headers</source>
-      <translation type="unfinished">Custom HTTP headers</translation>
+      <translation>自訂 HTTP 標頭</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1143,17 +1143,17 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
       <source>ORGANIZATION</source>
       <comment>Section with groups from organisation</comment>
-      <translation type="unfinished">ORGANIZATION</translation>
+      <translation>組織</translation>
     </message>
     <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">BUILT-IN</translation>
+      <translation>內建</translation>
     </message>
     <message>
       <source>CUSTOM</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">CUSTOM</translation>
+      <translation>自訂</translation>
     </message>
   </context>
   <context>
