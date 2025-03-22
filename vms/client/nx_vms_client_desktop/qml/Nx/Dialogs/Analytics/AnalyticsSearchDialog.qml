@@ -61,9 +61,10 @@ Window
         //  - switch tabs
         //  - enable new tab's controller
 
-        layout.children[layout.currentIndex].controller.enabled = false
-        layout.currentIndex = tileView ? 0 : 1
-        layout.children[layout.currentIndex].controller.enabled = true
+        layout.children[tileView ? 1 : 0].controller.enabled = false
+        if (!eventModel.placeholderRequired)
+            layout.currentIndex = tileView ? 0 : 1
+        layout.children[tileView ? 0 : 1].controller.enabled = true
     }
 
     signal accepted()
@@ -400,16 +401,7 @@ Window
                     keyNavigationEnabled: false //< We implement our own.
                     focus: true
                     controller.allowToFetchNewer: counterBlock.availableNewTracks <= 0
-
                     currentIndex: selection.index.row
-
-                    placeholder
-                    {
-                        icon: "image://skin/64x64/Outline/noobjects.svg?primary=dark17"
-                        title: qsTr("No objects")
-                        description: qsTr("Try changing the filters or configure object detection "
-                            + "in the camera plugin settings")
-                    }
 
                     tileController
                     {
@@ -853,24 +845,25 @@ Window
                     }
                 }
 
-                RightPanelModel
+                Rectangle
                 {
-                    id: eventModel
+                    id: placeholder
 
-                    context: windowContext
-                    type: { return EventSearch.SearchType.analytics }
-                    active: true
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    color: dialog.color
 
-                    onAnalyticsSetupChanged:
+                    ResultsPlaceholder
                     {
-                        const engineId = analyticsSetup.engine
-                        tabBar.selectEngine(engineId)
+                        id: placeholderItem
 
-                        analyticsFilters.setSelectedObjectTypeIds(
-                            analyticsSetup.objectTypes)
+                        anchors.fill: parent
+                        shown: true
 
-                        analyticsFilters.setSelectedAttributeFilters(
-                            analyticsSetup.attributeFilters)
+                        icon: "image://skin/64x64/Outline/noobjects.svg?primary=dark17"
+                        title: qsTr("No objects")
+                        description: qsTr("Try changing the filters or configure object detection "
+                            + "in the camera plugin settings")
                     }
                 }
             }
@@ -1123,6 +1116,34 @@ Window
 
                 d.isModelEmpty = !hasItems
             }
+        }
+    }
+
+    RightPanelModel
+    {
+        id: eventModel
+
+        context: windowContext
+        type: { return EventSearch.SearchType.analytics }
+        active: true
+
+        onAnalyticsSetupChanged:
+        {
+            const engineId = analyticsSetup.engine
+            tabBar.selectEngine(engineId)
+
+            analyticsFilters.setSelectedObjectTypeIds(
+                analyticsSetup.objectTypes)
+
+            analyticsFilters.setSelectedAttributeFilters(
+                analyticsSetup.attributeFilters)
+        }
+
+        onPlaceholderRequiredChanged:
+        {
+            layout.currentIndex = eventModel.placeholderRequired
+                ? 2
+                : tileView ? 0 : 1
         }
     }
 

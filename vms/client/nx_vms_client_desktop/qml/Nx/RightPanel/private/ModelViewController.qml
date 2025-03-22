@@ -218,7 +218,7 @@ NxObject
 
         function updateData()
         {
-            if (!controller.enabled || !view.visible)
+            if (!controller.enabled || (!view.visible && !model.placeholderRequired))
                 return
 
             function whereAt()
