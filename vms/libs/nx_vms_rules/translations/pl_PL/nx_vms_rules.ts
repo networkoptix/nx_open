@@ -280,6 +280,26 @@
       <source>Soft Trigger</source>
       <translation>Wyzwalacz programowy</translation>
     </message>
+    <message>
+      <source>Field &quot;%1&quot; should be an object</source>
+      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+    </message>
+    <message>
+      <source>Unable to deserialize properties for field: %1</source>
+      <translation type="unfinished">Unable to deserialize properties for field: %1</translation>
+    </message>
+    <message>
+      <source>Event: %1 is not registered</source>
+      <translation>Zdarzenie: %1 nie jest zarejestrowane</translation>
+    </message>
+    <message>
+      <source>Action: %1 is not registered</source>
+      <translation>Akcja: %1 nie jest zarejestrowana</translation>
+    </message>
+    <message>
+      <source>Rule validation failed: %1</source>
+      <translation>Sprawdzanie poprawności reguły nie powiodło się: %1</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>

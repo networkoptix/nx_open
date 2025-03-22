@@ -262,6 +262,26 @@
       <source>Soft Trigger</source>
       <translation>觸發按鈕</translation>
     </message>
+    <message>
+      <source>Field &quot;%1&quot; should be an object</source>
+      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+    </message>
+    <message>
+      <source>Unable to deserialize properties for field: %1</source>
+      <translation>無法反序列化以下欄位的屬性： %1</translation>
+    </message>
+    <message>
+      <source>Event: %1 is not registered</source>
+      <translation>事件%1 尚未註冊</translation>
+    </message>
+    <message>
+      <source>Action: %1 is not registered</source>
+      <translation>動作%1 尚未註冊</translation>
+    </message>
+    <message>
+      <source>Rule validation failed: %1</source>
+      <translation>規則驗證失敗： %1</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>

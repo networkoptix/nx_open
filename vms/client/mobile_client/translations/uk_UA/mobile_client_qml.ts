@@ -821,6 +821,10 @@
       <source>UNREACHABLE</source>
       <translation>НЕДОСТУПНА</translation>
     </message>
+    <message>
+      <source>NEW</source>
+      <translation type="unfinished">NEW</translation>
+    </message>
   </context>
   <context>
     <name>SslCertificateDialog</name>

@@ -268,6 +268,26 @@
       <source>Soft Trigger</source>
       <translation>Utlösare</translation>
     </message>
+    <message>
+      <source>Field &quot;%1&quot; should be an object</source>
+      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+    </message>
+    <message>
+      <source>Unable to deserialize properties for field: %1</source>
+      <translation>Det går inte att deserialisera egenskaper för fält: %1</translation>
+    </message>
+    <message>
+      <source>Event: %1 is not registered</source>
+      <translation>Händelse: %1 är inte registrerad</translation>
+    </message>
+    <message>
+      <source>Action: %1 is not registered</source>
+      <translation>Åtgärd: %1 är inte registrerad</translation>
+    </message>
+    <message>
+      <source>Rule validation failed: %1</source>
+      <translation>Regelvalidering misslyckades: %1</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>

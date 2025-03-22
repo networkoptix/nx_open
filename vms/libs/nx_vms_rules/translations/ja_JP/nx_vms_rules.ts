@@ -262,6 +262,26 @@
       <source>Soft Trigger</source>
       <translation>ソフトトリガー</translation>
     </message>
+    <message>
+      <source>Field &quot;%1&quot; should be an object</source>
+      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+    </message>
+    <message>
+      <source>Unable to deserialize properties for field: %1</source>
+      <translation>フィールドのプロパティをデシリアライズできません: %1</translation>
+    </message>
+    <message>
+      <source>Event: %1 is not registered</source>
+      <translation>イベント: %1 は登録されていません</translation>
+    </message>
+    <message>
+      <source>Action: %1 is not registered</source>
+      <translation>アクション: %1 は登録されていません</translation>
+    </message>
+    <message>
+      <source>Rule validation failed: %1</source>
+      <translation>ルールの検証に失敗しました: %1</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>

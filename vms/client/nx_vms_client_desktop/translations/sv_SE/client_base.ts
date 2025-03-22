@@ -4581,6 +4581,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
       <translation>Enheter konfigurerade med &quot;Inställningen för alla arkiv&quot; kommer att ändras till &quot;Rörelse, Objekt och Bokmärken&quot; när molnsäkerhetskopiering är aktiverat</translation>
     </message>
+    <message>
+      <source>Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
+      <translation type="unfinished">Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -12725,16 +12729,16 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
-      <source>Delete rule error:</source>
-      <translation>Radera regelfel:</translation>
+      <source>Delete rule error: %1</source>
+      <translation type="unfinished">Delete rule error: %1</translation>
     </message>
     <message>
-      <source>Save rule error:</source>
-      <translation>Spara regelfel:</translation>
+      <source>Save rule error: %1</source>
+      <translation type="unfinished">Save rule error: %1</translation>
     </message>
     <message>
-      <source>Reset to defaults error:</source>
-      <translation>Återställ till standardvärden med fel:</translation>
+      <source>Reset rules error: %1</source>
+      <translation type="unfinished">Reset rules error: %1</translation>
     </message>
   </context>
   <context>

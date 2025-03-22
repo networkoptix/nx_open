@@ -818,6 +818,10 @@
       <source>UNREACHABLE</source>
       <translation>Không thể truy cập được</translation>
     </message>
+    <message>
+      <source>NEW</source>
+      <translation type="unfinished">NEW</translation>
+    </message>
   </context>
   <context>
     <name>SslCertificateDialog</name>

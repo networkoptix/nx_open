@@ -262,6 +262,26 @@
       <source>Soft Trigger</source>
       <translation>Kích hoạt mềm</translation>
     </message>
+    <message>
+      <source>Field &quot;%1&quot; should be an object</source>
+      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+    </message>
+    <message>
+      <source>Unable to deserialize properties for field: %1</source>
+      <translation>Không thể hủy tuần tự hóa các thuộc tính cho trường: %1</translation>
+    </message>
+    <message>
+      <source>Event: %1 is not registered</source>
+      <translation>Sự kiện: %1 chưa được đăng ký</translation>
+    </message>
+    <message>
+      <source>Action: %1 is not registered</source>
+      <translation>Hành động: %1 không được đăng ký</translation>
+    </message>
+    <message>
+      <source>Rule validation failed: %1</source>
+      <translation>Xác thực quy tắc không thành công: %1</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>

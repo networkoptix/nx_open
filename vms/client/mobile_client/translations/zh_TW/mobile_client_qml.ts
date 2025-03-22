@@ -797,7 +797,7 @@
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>資料夾</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -817,6 +817,10 @@
     <message>
       <source>UNREACHABLE</source>
       <translation>無法連接</translation>
+    </message>
+    <message>
+      <source>NEW</source>
+      <translation type="unfinished">NEW</translation>
     </message>
   </context>
   <context>

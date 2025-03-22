@@ -4580,6 +4580,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
       <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
     </message>
+    <message>
+      <source>Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
+      <translation type="unfinished">Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -12720,16 +12724,16 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
-      <source>Delete rule error:</source>
-      <translation>Kural silme hatası:</translation>
+      <source>Delete rule error: %1</source>
+      <translation type="unfinished">Delete rule error: %1</translation>
     </message>
     <message>
-      <source>Save rule error:</source>
-      <translation>Kural kaydetme hatası:</translation>
+      <source>Save rule error: %1</source>
+      <translation type="unfinished">Save rule error: %1</translation>
     </message>
     <message>
-      <source>Reset to defaults error:</source>
-      <translation>Varsayılanlara sıfırlama hatası:</translation>
+      <source>Reset rules error: %1</source>
+      <translation type="unfinished">Reset rules error: %1</translation>
     </message>
   </context>
   <context>
