@@ -341,6 +341,7 @@ void EditVmsRuleDialog::setRule(std::shared_ptr<vms::rules::Rule> rule, bool isN
     displayRule();
     displayState();
     displayControls();
+    setHasChanges(isNewRule);
 }
 
 void EditVmsRuleDialog::accept()
@@ -355,6 +356,11 @@ void EditVmsRuleDialog::accept()
 void EditVmsRuleDialog::reject()
 {
     done(QDialogButtonBox::Cancel);
+}
+
+bool EditVmsRuleDialog::hasChanges() const
+{
+    return m_hasChanges;
 }
 
 void EditVmsRuleDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
@@ -391,6 +397,7 @@ void EditVmsRuleDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button
 
 void EditVmsRuleDialog::displayComment()
 {
+    QSignalBlocker signalBlocker{m_editableLabel};
     m_editableLabel->setText(m_rule->comment());
 }
 

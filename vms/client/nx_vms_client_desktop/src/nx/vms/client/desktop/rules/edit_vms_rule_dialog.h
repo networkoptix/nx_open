@@ -36,6 +36,8 @@ public:
     void accept() override;
     void reject() override;
 
+    bool hasChanges() const;
+
 protected:
     void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
 

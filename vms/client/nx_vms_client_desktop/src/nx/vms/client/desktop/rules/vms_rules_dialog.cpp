@@ -257,7 +257,7 @@ void VmsRulesDialog::showEditRuleDialog(const std::shared_ptr<vms::rules::Rule>&
         this,
         [this, editVmsRuleDialog, rule](int result)
         {
-            if (result == QDialogButtonBox::Ok || result == QDialogButtonBox::Apply)
+            if (result == QDialogButtonBox::Ok && editVmsRuleDialog->hasChanges())
                 saveRuleImpl(rule);
             else if (result == QDialogButtonBox::Reset)
                 deleteRulesImpl({rule->id()}); //< Reset means user requested to delete the rule.
