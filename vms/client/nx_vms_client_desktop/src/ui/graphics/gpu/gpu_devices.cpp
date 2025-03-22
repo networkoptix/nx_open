@@ -120,7 +120,7 @@ bool isVulkanVideoSupported()
     #endif
 }
 
-void selectDevice(QSGRendererInterface::GraphicsApi api, const QString& name)
+DeviceInfo selectDevice(QSGRendererInterface::GraphicsApi api, const QString& name)
 {
     QList<DeviceInfo> devices;
     const char* envName = nullptr;
@@ -144,7 +144,7 @@ void selectDevice(QSGRendererInterface::GraphicsApi api, const QString& name)
             #endif
             break;
         default:
-            return;
+            return {};
     }
 
     for (int i = 0; i < devices.size(); ++i)
@@ -172,14 +172,17 @@ void selectDevice(QSGRendererInterface::GraphicsApi api, const QString& name)
             [lowerName](auto dev) { return dev.name.toLower().contains(lowerName); });
     }
 
-    if (foundIt == devices.cend())
-        return;
-
-    const int adapterIndex = std::distance(devices.cbegin(), foundIt);
+    const int adapterIndex = foundIt == devices.cend()
+        ? 0
+        : std::distance(devices.cbegin(), foundIt);
 
     NX_DEBUG(NX_SCOPE_TAG, "Selected GPU #%1", adapterIndex);
 
     qputenv(envName, QByteArray::number(adapterIndex));
+    if (!devices.empty())
+        return devices.at(adapterIndex);
+
+    return {};
 }
 
 } // nx::vms::client::desktop::gpu

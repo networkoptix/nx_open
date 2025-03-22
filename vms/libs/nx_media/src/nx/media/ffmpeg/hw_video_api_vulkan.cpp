@@ -241,7 +241,7 @@ public:
                     {
                         auto rhi = static_cast<QRhi*>(ctx->user_opaque);
                         auto native = (QRhiVulkanNativeHandles*) rhi->nativeHandles();
-                        native->gfxQueueMutex.lock();
+                        native->gfxQueueMutex->lock();
                     };
 
                 ctx->unlock_queue =
@@ -249,7 +249,7 @@ public:
                     {
                         auto rhi = static_cast<QRhi*>(ctx->user_opaque);
                         auto native = (QRhiVulkanNativeHandles*) rhi->nativeHandles();
-                        native->gfxQueueMutex.unlock();
+                        native->gfxQueueMutex->unlock();
                     };
 
                 return true;

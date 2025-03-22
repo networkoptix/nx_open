@@ -23,7 +23,7 @@ NX_VMS_CLIENT_DESKTOP_API bool isVulkanVideoSupported();
  * Set env variable for Qt to use the selected GPU. When name is not empty a GPU is selected by
  * name. Otherwise first GPU capable of HW video decoding is selected.
  */
-NX_VMS_CLIENT_DESKTOP_API void selectDevice(
+NX_VMS_CLIENT_DESKTOP_API DeviceInfo selectDevice(
     QSGRendererInterface::GraphicsApi api,
     const QString& name = {});
 

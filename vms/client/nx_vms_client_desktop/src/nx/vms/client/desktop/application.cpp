@@ -255,7 +255,8 @@ void setGraphicsSettingsEarly(const QnStartupParameters& startupParams)
 
     if (nx::build_info::isLinux())
     {
-        if (graphicsApi != GraphicsApi::legacyopengl)
+        // EGL on arm64 causes issues with OpenGL on Nvidia - QML windows are rendered empty.
+        if (graphicsApi != GraphicsApi::legacyopengl && !nx::build_info::isArm())
         {
             // HW decoding through VAAPI requires EGL.
             static const char* kXcbGlIntegration = "QT_XCB_GL_INTEGRATION";
@@ -319,7 +320,25 @@ void setGraphicsSettings()
     }
 
     const auto selectedApi = nameToApi.value(graphicsApi, QSGRendererInterface::OpenGL);
-    gpu::selectDevice(selectedApi, ini().gpuName);
+    const auto gpuInfo = gpu::selectDevice(selectedApi, ini().gpuName);
+
+    if (gpuInfo.name.toLower().contains("nvidia") && selectedApi == QSGRendererInterface::Vulkan)
+    {
+        // Nvidia drivers cannot create more than 5 VK devices, so enable device sharing.
+        static const char* kVkDeviceShared = "QT_VK_DEVICE_SHARED";
+
+        if (qgetenv(kVkDeviceShared).isEmpty())
+            qputenv(kVkDeviceShared, "1");
+
+        // Chromium blocks WebGL on mobile tegra when using ANGLE vulkan backend.
+        if (nx::build_info::isArm())
+        {
+            static const char* kChromiumFlags = "QTWEBENGINE_CHROMIUM_FLAGS";
+            auto value = qgetenv(kChromiumFlags);
+            qputenv(kChromiumFlags, value + " --ignore-gpu-blocklist");
+        }
+    }
+
     QQuickWindow::setGraphicsApi(selectedApi);
     appContext()->runtimeSettings()->setGraphicsApi(graphicsApi);
 
