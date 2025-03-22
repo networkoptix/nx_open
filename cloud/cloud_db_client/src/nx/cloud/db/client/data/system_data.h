@@ -119,7 +119,7 @@ NX_REFLECTION_INSTRUMENT_ENUM(SystemAccessRole,
 NX_REFLECTION_INSTRUMENT(ShareSystemRequestV1, ShareSystemRequestV1_Fields)
 
 #define SystemSharingV1_Fields ShareSystemRequestV1_Fields(accountId)(accountFullName) \
-    (usageFrequency)(lastLoginTime)
+    (accountFirstName)(accountLastName)(usageFrequency)(lastLoginTime)
 
 NX_REFLECTION_INSTRUMENT(SystemSharingV1, SystemSharingV1_Fields)
 

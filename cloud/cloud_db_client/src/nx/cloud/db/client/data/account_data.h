@@ -37,8 +37,8 @@ NX_REFLECTION_INSTRUMENT(AccountRegistrationSecuritySettings, AccountRegistratio
 NX_REFLECTION_INSTRUMENT(AccountRegistrationSettings, AccountRegistrationSettings_Fields)
 
 #define AccountRegistrationData_Fields \
-    (email)(passwordHa1)(password)\
-    (fullName)(customization)(settings)
+    (email)(passwordHa1)(password)(fullName)\
+    (firstName)(lastName)(customization)(settings)
 
 NX_REFLECTION_INSTRUMENT(AccountRegistrationData, AccountRegistrationData_Fields)
 
@@ -46,9 +46,9 @@ NX_REFLECTION_INSTRUMENT(AccountRegistrationData, AccountRegistrationData_Fields
 // class AccountData
 
 #define AccountData_Fields \
-    (id)(email)(fullName)(customization)(statusCode)(registrationTime)(activationTime)\
-    (httpDigestAuthEnabled)(account2faEnabled)(authSessionLifetime)(accountBelongsToOrganization)\
-    (securitySequence)(accountLocation)(locale)(mfaKeyGenerated)
+    (id)(email)(fullName)(firstName)(lastName)(customization)(statusCode)(registrationTime)\
+    (activationTime)(httpDigestAuthEnabled)(account2faEnabled)(authSessionLifetime)\
+    (accountBelongsToOrganization)(securitySequence)(accountLocation)(locale)(mfaKeyGenerated)
 
 NX_REFLECTION_INSTRUMENT(AccountData, AccountData_Fields)
 
@@ -71,7 +71,8 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountUpdateData* const data);
 void serializeToUrlQuery(const AccountUpdateData&, QUrlQuery* const urlQuery);
 
 #define AccountUpdateData_Fields \
-    (passwordHa1)(password)(fullName)(customization)(currentPassword)(totp)(mfaCode)(locale)
+    (passwordHa1)(password)(fullName)(firstName)(lastName)(customization)(currentPassword)(totp)\
+    (mfaCode)(locale)
 
 NX_REFLECTION_INSTRUMENT(AccountUpdateData, AccountUpdateData_Fields)
 
@@ -142,7 +143,9 @@ NX_REFLECTION_INSTRUMENT(AccountForSharingRequest, AccountForSharingRequest_Fiel
 //-------------------------------------------------------------------------------------------------
 // struct AccountForSharing
 
-#define AccountForSharing_Fields (id)(email)(fullName)(statusCode)(account2faEnabled)(intermediateResponse)(remote)
+#define AccountForSharing_Fields \
+    (id)(email)(fullName)(firstName)(lastName)(statusCode)(account2faEnabled)\
+    (intermediateResponse)(remote)
 
 NX_REFLECTION_INSTRUMENT(AccountForSharing, AccountForSharing_Fields)
 

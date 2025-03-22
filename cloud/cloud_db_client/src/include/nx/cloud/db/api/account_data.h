@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <nx/utils/std_string_utils.h>
+
 namespace nx::cloud::db::api {
 
 enum class AccountStatus
@@ -47,8 +49,14 @@ struct AccountRegistrationData
     /**%apidoc Account password (plain text). */
     std::string password;
 
-    /**%apidoc Account owner full name. */
+    /**%apidoc Account owner's full name. Deprecated. Use `firstName` and `lastName` instead. */
     std::string fullName;
+
+    /**%apidoc Account owner's first name. */
+    std::string firstName;
+
+    /**%apidoc Account owner's last name. */
+    std::string lastName;
 
     std::string customization;
 
@@ -78,7 +86,18 @@ struct AccountData
     std::string email;
 
     std::unordered_map<PasswordHashType, PasswordHash> passwordHashes;
+
+    /**%apidoc[readonly] Account owner's full name. Deprecated.
+     * Use `firstName` and `lastName` instead.
+     */
     std::string fullName;
+
+    /**%apidoc[readonly] Account owner's first name. */
+    std::string firstName;
+
+    /**%apidoc[readonly] Account owner's last name. */
+    std::string lastName;
+
     std::string customization;
 
     /**%apidoc[readonly] Account status. */
@@ -145,8 +164,14 @@ struct AccountUpdateData
     /**%apidoc Current account password. */
     std::optional<std::string> currentPassword;
 
-    /**%apidoc Account owner's full name. */
+    /**%apidoc Account owner's full name. Deprecated. Use `firstName` and `lastName` instead. */
     std::optional<std::string> fullName;
+
+    /**%apidoc Account owner's first name. */
+    std::optional<std::string> firstName;
+
+    /**%apidoc Account owner's last name. */
+    std::optional<std::string> lastName;
 
     std::optional<std::string> customization;
 
@@ -286,6 +311,8 @@ struct AccountForSharing
     std::string id;
     std::string email;
     std::string fullName;
+    std::string firstName;
+    std::string lastName;
     AccountStatus statusCode = AccountStatus::invalid;
     bool account2faEnabled = false;
     std::string intermediateResponse;
@@ -301,5 +328,24 @@ struct AccountNotificationFilterSettings
     /**%apidoc List of disabled messages. */
     std::set<std::string> messageFilter;
 };
+
+inline std::string makeFullName(std::string_view firstName, std::string_view lastName)
+{
+    if (firstName.empty() && lastName.empty())
+        return "";
+    if (firstName.empty())
+        return std::string(lastName);
+    if (lastName.empty())
+        return std::string(firstName);
+    return std::string(firstName) + ' ' + std::string(lastName);
+}
+
+inline std::pair<std::string, std::string> splitFullName(std::string_view fullName)
+{
+    auto [nameParts, count] = nx::utils::split_n<2>(fullName, ' ');
+    if (count <= 1)
+        return std::pair<std::string, std::string>(fullName, "");
+    return std::pair<std::string, std::string>(nameParts[0], nameParts[1]);
+}
 
 } // namespace nx::cloud::db::api

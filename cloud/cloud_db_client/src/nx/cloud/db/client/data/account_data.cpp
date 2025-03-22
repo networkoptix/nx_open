@@ -18,6 +18,8 @@ MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, email)
 MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, passwordHa1)
 MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, password)
 MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, fullName)
+MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, firstName)
+MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, lastName)
 MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, customization)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountRegistrationData* const accountData)
@@ -30,6 +32,10 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountRegistrationData* const 
         urlQuery.queryItemValue(AccountRegistrationData_password_field).toStdString();
     accountData->fullName =
         urlQuery.queryItemValue(AccountRegistrationData_fullName_field).toStdString();
+    accountData->firstName =
+        urlQuery.queryItemValue(AccountRegistrationData_firstName_field).toStdString();
+    accountData->lastName =
+        urlQuery.queryItemValue(AccountRegistrationData_lastName_field).toStdString();
     accountData->customization =
         urlQuery.queryItemValue(AccountRegistrationData_customization_field).toStdString();
 
@@ -50,6 +56,12 @@ void serializeToUrlQuery(const AccountRegistrationData& data, QUrlQuery* const u
     urlQuery->addQueryItem(
         AccountRegistrationData_fullName_field,
         QString::fromStdString(data.fullName));
+    urlQuery->addQueryItem(
+        AccountRegistrationData_firstName_field,
+        QString::fromStdString(data.firstName));
+    urlQuery->addQueryItem(
+        AccountRegistrationData_lastName_field,
+        QString::fromStdString(data.lastName));
     urlQuery->addQueryItem(
         AccountRegistrationData_customization_field,
         QString::fromStdString(data.customization));
@@ -83,6 +95,8 @@ MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, passwordHa1)
 MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, password)
 MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, currentPassword)
 MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, fullName)
+MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, firstName)
+MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, lastName)
 MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, customization)
 MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, totp)
 MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, mfaCode)
@@ -97,6 +111,10 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountUpdateData* const data)
         urlQuery, AccountUpdateData_currentPassword_field, &data->currentPassword);
     url::deserializeField(
         urlQuery, AccountUpdateData_fullName_field, &data->fullName);
+    url::deserializeField(
+        urlQuery, AccountUpdateData_firstName_field, &data->firstName);
+    url::deserializeField(
+        urlQuery, AccountUpdateData_lastName_field, &data->lastName);
     url::deserializeField(
         urlQuery, AccountUpdateData_customization_field, &data->customization);
     url::deserializeField(
@@ -116,6 +134,10 @@ void serializeToUrlQuery(const AccountUpdateData& data, QUrlQuery* const urlQuer
         urlQuery, AccountUpdateData_currentPassword_field, data.currentPassword);
     url::serializeField(
         urlQuery, AccountUpdateData_fullName_field, data.fullName);
+    url::serializeField(
+        urlQuery, AccountUpdateData_firstName_field, data.firstName);
+    url::serializeField(
+        urlQuery, AccountUpdateData_lastName_field, data.lastName);
     url::serializeField(
         urlQuery, AccountUpdateData_customization_field, data.customization);
     url::serializeField(

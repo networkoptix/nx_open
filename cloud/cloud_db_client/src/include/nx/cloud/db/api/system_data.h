@@ -284,6 +284,8 @@ struct SystemSharingV1: ShareSystemRequestV1
     std::string accountId;
 
     std::string accountFullName;
+    std::string accountFirstName;
+    std::string accountLastName;
 
     /**%apidoc Shows how often user accesses given system in comparison to other user's systems. */
     float usageFrequency = 0.0;
@@ -295,7 +297,8 @@ struct SystemSharingV1: ShareSystemRequestV1
     {
         return static_cast<const ShareSystemRequestV1&>(*this) == static_cast<const ShareSystemRequestV1&>(rhs)
             && accountId == rhs.accountId
-            && accountFullName == rhs.accountFullName;
+            && accountFirstName == rhs.accountFirstName
+            && accountLastName == rhs.accountLastName;
     }
 
     bool operator<(const SystemSharingV1& rhs) const
@@ -392,8 +395,14 @@ struct SystemSharing: ShareSystemRequest
     /**%apidoc Globally unique account id. */
     std::string accountId;
 
-    /**%apidoc Account full name. */
+    /**%apidoc Account full name. Deprecated. Use accountFirstName and accountLastName. */
     std::string accountFullName;
+
+    /**%apidoc Account first name. */
+    std::string accountFirstName;
+
+    /**%apidoc Account last name. */
+    std::string accountLastName;
 
     /**%apidoc Account locale. */
     std::string locale;
@@ -431,11 +440,12 @@ struct SystemSharing: ShareSystemRequest
     }
 };
 
-#define SystemSharing_Fields (systemId)(accountId)(accountFullName)(locale)(usageFrequency)(lastLoginTime) \
+#define SystemSharing_Fields (systemId)(accountId)(accountFullName)(accountFirstName)\
+    (accountLastName)(locale)(usageFrequency)(lastLoginTime)\
     (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId)(type)(readonly)(hidden)
 
-NX_REFLECTION_INSTRUMENT(SystemSharing, (systemId)(accountId)(accountFullName)(locale)(usageFrequency) \
-    (lastLoginTime)(type)(readonly)(hidden))
+NX_REFLECTION_INSTRUMENT(SystemSharing, (systemId)(accountId)(accountFullName)(accountFirstName)\
+    (accountLastName)(locale)(usageFrequency)(lastLoginTime)(type)(readonly)(hidden))
 
 using SystemSharingList = std::vector<SystemSharing>;
 
