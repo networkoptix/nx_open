@@ -323,7 +323,7 @@ struct UserSettingsDialog::Private
     {
         nx::vms::api::UserModel userData;
 
-        userData.type = (nx::vms::api::UserType) state.userType;
+        userData.type = UserSettingsGlobal::getApiUserType(state.userType);
 
         const bool createCloudUser = dialogType == CreateUser
             && userData.type == nx::vms::api::UserType::cloud;
@@ -355,22 +355,23 @@ struct UserSettingsDialog::Private
         if (userData.type != nx::vms::api::UserType::cloud)
             userData.isHttpDigestEnabled = state.allowInsecure;
 
-        const auto mappedOrgGroupIds =
-            user ? user->mappedOrgGroupIds() : std::map<nx::Uuid, nx::Uuid>();
-
-        std::map<nx::Uuid, nx::Uuid> reverseMappedOrgGroupIds;
-        for (const auto& [orgId, groupId] : mappedOrgGroupIds)
-            reverseMappedOrgGroupIds[groupId] = orgId;
+        std::vector<nx::Uuid> orgGroupIds, siteGroupIds;
+        if (user)
+        {
+            orgGroupIds = user->orgGroupIds();
+            siteGroupIds = user->siteGroupIds();
+        }
 
         for (const auto& group: state.parentGroups)
         {
-            if (const auto it = reverseMappedOrgGroupIds.find(group.id);
-                it != reverseMappedOrgGroupIds.end())
+            if(std::find(orgGroupIds.begin(), orgGroupIds.end(), group.id) != orgGroupIds.end())
             {
                 if (!userData.orgGroupIds)
                     userData.orgGroupIds.emplace();
 
-                userData.orgGroupIds->push_back(it->second);
+                userData.orgGroupIds->push_back(group.id);
+                if (std::find(siteGroupIds.begin(), siteGroupIds.end(), group.id) != siteGroupIds.end())
+                    userData.groupIds.emplace_back(group.id);
             }
             else
             {
@@ -1141,7 +1142,7 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     if (user->userType() == nx::vms::api::UserType::temporaryLocal && isSelf)
         permissions &= ~(Qn::FullUserPermissions | Qn::SavePermission);
 
-    state.userType = (UserSettingsGlobal::UserType) user->userType();
+    state.userType = UserSettingsGlobal::getUserType(user);
     state.isSelf = isSelf;
     state.isOrgUser = user->isOrg();
     state.userId = user->getId();
@@ -1171,17 +1172,8 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
         && user->fullName().isEmpty();
 
     // List of groups.
-    for (const nx::Uuid& groupId: user->siteGroupIds())
+    for (const nx::Uuid& groupId: user->allGroupIds())
         state.parentGroups.insert(MembersModelGroup::fromId(systemContext(), groupId));
-
-    for (const auto& [orgGroupId, localOrgGroupId]: user->mappedOrgGroupIds())
-    {
-        auto memberModel = MembersModelGroup::fromId(systemContext(), orgGroupId);
-        memberModel.id = localOrgGroupId;
-        memberModel.isPredefined = false;
-        memberModel.isLdap = false;
-        state.parentGroups.insert(memberModel);
-    }
 
     state.sharedResources = systemContext()->accessRightsManager()->ownResourceAccessMap(
         user->getId());

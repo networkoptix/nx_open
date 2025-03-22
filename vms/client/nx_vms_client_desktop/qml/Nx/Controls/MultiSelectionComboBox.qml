@@ -249,6 +249,8 @@ Control
                         width: listView.width
                             - (listView.scrollBar.visible ? listView.scrollBar.width : 0)
 
+                        GlobalToolTip.text: model.toolTip
+
                         onClicked:
                         {
                             if (closePopupWhenClicked)

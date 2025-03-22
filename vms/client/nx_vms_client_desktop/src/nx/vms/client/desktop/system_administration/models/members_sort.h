@@ -4,6 +4,7 @@
 
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/user_data.h>
+#include <nx/vms/client/desktop/system_administration/globals/user_settings_global.h>
 #include <nx/vms/common/user_management/predefined_user_groups.h>
 
 namespace nx::vms::client::desktop {
@@ -20,6 +21,26 @@ static inline int userTypeSortOrder(nx::vms::api::UserType userType)
             return 2;
         case nx::vms::api::UserType::ldap:
             return 3;
+    }
+
+    NX_ASSERT(false, "Invalid user type %1", userType);
+    return -1;
+}
+
+static inline int userTypeSortOrder(UserSettingsGlobal::UserType userType)
+{
+    switch (userType)
+    {
+        case UserSettingsGlobal::LocalUser:
+            return 0;
+        case UserSettingsGlobal::TemporaryUser:
+            return 1;
+        case UserSettingsGlobal::OrganizationUser:
+            return 2;
+        case UserSettingsGlobal::CloudUser:
+            return 3;
+        case UserSettingsGlobal::LdapUser:
+            return 4;
     }
 
     NX_ASSERT(false, "Invalid user type %1", userType);

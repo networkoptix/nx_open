@@ -34,21 +34,11 @@ public:
 
     virtual bool shouldMaskUser() const override;
 
-    virtual std::map<nx::Uuid, nx::Uuid> mappedOrgGroupIds() const override;
-    virtual std::vector<nx::Uuid> siteAndMappedOrgGroupIds() const override;
-
 protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
 
 private:
     std::optional<nx::vms::api::UserModelV1> m_overwrittenData;
-    /**
-     * In VMS, organization groups are just user properties and don't appear in the group list. On
-     * the client side, they must be listed as read-only. Since their IDs match predefined groups,
-     * they need to be mapped to temporary values for distinction.
-     */
-    std::map<nx::Uuid, nx::Uuid> m_externalToLocalOrgGroupIds;
-    std::vector<nx::Uuid> m_localOrgGroupIds;
 };
 
 using UserResourcePtr = QnSharedResourcePointer<UserResource>;

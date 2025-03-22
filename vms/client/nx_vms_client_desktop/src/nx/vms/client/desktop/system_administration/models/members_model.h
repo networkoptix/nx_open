@@ -117,7 +117,6 @@ public:
         CanEditParents,
         CanEditMembers,
         IsPredefined,
-        IsOrganization,
         UserType
     };
 
@@ -165,6 +164,7 @@ public:
 
     MembersCache* membersCache() const { return m_cache.get(); }
 
+    bool canModifyRelation(const nx::Uuid& id) const;
     bool canEditMembers(const nx::Uuid& id) const;
 
     Q_INVOKABLE void removeParent(const nx::Uuid& groupId);

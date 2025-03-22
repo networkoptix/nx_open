@@ -28,7 +28,6 @@ const QString UserSettingsGlobal::kGroupsSection = "G";
 const QString UserSettingsGlobal::kBuiltInGroupsSection = "B";
 const QString UserSettingsGlobal::kCustomGroupsSection = "C";
 const QString UserSettingsGlobal::kLdapGroupsSection = "L";
-const QString UserSettingsGlobal::kOrgGroupsSection = "O";
 
 UserSettingsGlobal::UserSettingsGlobal()
 {
@@ -98,13 +97,23 @@ PasswordStrengthData UserSettingsGlobal::passwordStrength(const QString& passwor
 
 UserSettingsGlobal::UserType UserSettingsGlobal::getUserType(const QnUserResourcePtr& user)
 {
-    if (user->isCloud())
-        return UserSettingsGlobal::CloudUser;
+    if (user->isOrg())
+        return UserSettingsGlobal::OrganizationUser;
 
-    if (user->isLdap())
-        return UserSettingsGlobal::LdapUser;
+    return getUserType(user->userType());
+}
 
-    return UserSettingsGlobal::LocalUser;
+UserSettingsGlobal::UserType UserSettingsGlobal::getUserType(const nx::vms::api::UserType& userType)
+{
+    return (UserSettingsGlobal::UserType) userType;
+}
+
+nx::vms::api::UserType UserSettingsGlobal::getApiUserType(const UserType& userType)
+{
+    if (userType == UserSettingsGlobal::OrganizationUser)
+        return nx::vms::api::UserType::cloud;
+
+    return (nx::vms::api::UserType) userType;
 }
 
 QString UserSettingsGlobal::humanReadableSeconds(int seconds)

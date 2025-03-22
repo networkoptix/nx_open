@@ -62,16 +62,15 @@ Item
                     return "image://skin/20x20/Solid/user_cloud.svg"
                 case UserSettingsGlobal.LdapUser:
                     return "image://skin/20x20/Solid/user_ldap.svg"
+                case UserSettingsGlobal.OrganizationUser:
+                    return "image://skin/20x20/Solid/user_organization.svg"
                 default:
                     return ""
             }
         }
-	
+
         if (model.isPredefined)
             return "image://skin/20x20/Solid/group_default.svg"
-
-        if (model.isOrganization)
-            return "image://skin/20x20/Solid/group_organization.svg"
 
         return model.isLdap
             ? "image://skin/20x20/Solid/group_ldap.svg"

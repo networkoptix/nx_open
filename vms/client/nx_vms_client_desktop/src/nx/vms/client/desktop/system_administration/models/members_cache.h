@@ -32,8 +32,7 @@ public:
         QString name;
         QString description;
         bool isGroup = false;
-        bool isOrgGroup = false;
-        api::UserType userType = api::UserType::local;
+        UserSettingsGlobal::UserType userType = UserSettingsGlobal::UserType::LocalUser;
     };
 
     struct Stats

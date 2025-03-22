@@ -73,6 +73,12 @@ Item
     signal auditTrailRequested()
     signal moreGroupsClicked()
 
+    function isCloudUser()
+    {
+        return control.userType == UserSettingsGlobal.CloudUser
+            || control.userType == UserSettingsGlobal.OrganizationUser
+    }
+
     function validate()
     {
         let result = true
@@ -80,7 +86,7 @@ Item
         if (userLoginText.enabled)
             result = userLoginText.validate()
 
-        if (control.userType != UserSettingsGlobal.CloudUser)
+        if (!isCloudUser())
             return userEmailTextField.validate() && result
 
         return result
@@ -121,9 +127,9 @@ Item
                         case UserSettingsGlobal.TemporaryUser:
                             return "image://skin/64x64/Solid/user_temp.svg"
                         case UserSettingsGlobal.CloudUser:
-                            return control.isOrgUser
-                                ? "image://skin/64x64/Solid/user_organization.svg"
-                                : "image://skin/64x64/Solid/user_cloud.svg"
+                            return "image://skin/64x64/Solid/user_cloud.svg"
+                        case UserSettingsGlobal.OrganizationUser:
+                            return "image://skin/64x64/Solid/user_organization.svg"
                         case UserSettingsGlobal.LdapUser:
                             return "image://skin/64x64/Solid/user_ldap.svg"
                     }
@@ -149,7 +155,7 @@ Item
                 anchors.rightMargin: 16
 
                 validateFunc: control.self
-                    ? (text) => (control.userType == UserSettingsGlobal.CloudUser
+                    ? (text) => (isCloudUser()
                         ? control.self.validateEmail(text) : control.self.validateLogin(text))
                     : null
 
@@ -250,13 +256,13 @@ Item
                             width: parent.width
                             readOnly: !control.fullNameEditable
                                 || !control.enabled
-                                || control.userType == UserSettingsGlobal.CloudUser
+                                || isCloudUser()
                         }
                     }
 
                     CenteredField
                     {
-                        visible: control.userType == UserSettingsGlobal.CloudUser && control.isSelf
+                        visible: isCloudUser() && control.isSelf
 
                         Item
                         {
@@ -316,7 +322,7 @@ Item
                     CenteredField
                     {
                         text: qsTr("Email")
-                        visible: control.userType != UserSettingsGlobal.CloudUser
+                        visible: !isCloudUser()
 
                         TextFieldWithValidator
                         {
@@ -333,8 +339,7 @@ Item
                             validateFunc: (text) =>
                             {
                                 return control.self && enabled
-                                    ? control.self.validateEmail(
-                                        text, control.userType == UserSettingsGlobal.CloudUser)
+                                    ? control.self.validateEmail(text, isCloudUser())
                                     : ""
                             }
                         }
@@ -400,7 +405,7 @@ Item
                     {
                         // Allow digest authentication.
 
-                        visible: control.userType != UserSettingsGlobal.CloudUser
+                        visible: !isCloudUser()
                             && control.userType != UserSettingsGlobal.TemporaryUser
 
                         Component

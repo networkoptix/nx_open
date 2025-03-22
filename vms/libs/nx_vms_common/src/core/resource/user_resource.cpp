@@ -523,16 +523,6 @@ std::vector<nx::Uuid> QnUserResource::orgGroupIds() const
     return m_orgGroupIds;
 }
 
-std::map<nx::Uuid, nx::Uuid> QnUserResource::mappedOrgGroupIds() const
-{
-    return {};
-}
-
-std::vector<nx::Uuid> QnUserResource::siteAndMappedOrgGroupIds() const
-{
-    return allGroupIds();
-}
-
 void QnUserResource::setOrgGroupIds(const std::vector<nx::Uuid>& value)
 {
     std::vector<nx::Uuid> previousValue;

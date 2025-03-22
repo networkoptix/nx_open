@@ -29,7 +29,7 @@ public:
 
     nx::Uuid id() const { return infoId; }
     bool isGroup() const { return info.isGroup; }
-    nx::vms::api::UserType userType() const { return info.userType; }
+    UserSettingsGlobal::UserType userType() const { return info.userType; }
     QString name() const { return info.name; }
 };
 
@@ -60,7 +60,7 @@ MembersCache::Info MembersCache::infoFromContext(
             .name = group->name,
             .description = group->description,
             .isGroup = true,
-            .userType = group->type};
+            .userType = UserSettingsGlobal::getUserType(group->type)};
     }
 
     if (const auto user = systemContext->resourcePool()->getResourceById<QnUserResource>(id))
@@ -71,7 +71,7 @@ MembersCache::Info MembersCache::infoFromContext(
             .name = user->getName(),
             .description = user->fullName(),
             .isGroup = false,
-            .userType = user->userType()};
+            .userType =  UserSettingsGlobal::getUserType(user)};
     }
 
     return {};
@@ -111,25 +111,12 @@ void MembersCache::loadInfo(nx::vms::common::SystemContext* systemContext)
         m_info.insert(id, infoFromContext(systemContext, id));
         members.users << id;
 
-        if (m_info[id].userType == api::UserType::temporaryLocal)
+        if (m_info[id].userType ==  UserSettingsGlobal::TemporaryUser)
         {
             for (const auto& groupId: m_subjectContext->subjectHierarchy()->directParents(id))
                 addTmpUser(groupId, id);
 
             addTmpUser({}, id);
-        }
-
-        for (const auto& [orgGroupId, localOrgGroupId]: user->mappedOrgGroupIds())
-        {
-            if (m_info.contains(localOrgGroupId))
-                continue;
-
-            auto info = infoFromContext(systemContext, orgGroupId);
-            info.isOrgGroup = true;
-            info.isGroup = true;
-            info.userType = api::UserType::cloud;
-            m_info.insert(localOrgGroupId, info);
-            members.groups << localOrgGroupId;
         }
     }
 
@@ -209,7 +196,7 @@ void MembersCache::modify(
                 idList.removeAt(i);
                 emit endRemove(i, id, groupId);
 
-                if (!idInfo.isGroup && idInfo.userType == api::UserType::temporaryLocal)
+                if (!idInfo.isGroup && idInfo.userType == UserSettingsGlobal::TemporaryUser)
                     addTmpUser(groupId, id);
             }
         };
@@ -228,7 +215,7 @@ void MembersCache::modify(
                 idList.insert(i, id);
                 emit endInsert(i, id, groupId);
 
-                if (!idInfo.isGroup && idInfo.userType == api::UserType::temporaryLocal)
+                if (!idInfo.isGroup && idInfo.userType == UserSettingsGlobal::TemporaryUser)
                     removeTmpUser(groupId, id);
             }
         };
@@ -249,12 +236,7 @@ void MembersCache::modify(
 
     for (const auto& id: added)
     {
-        Info idInfo;
-        // Information about organizational groups is not stored in the group manager.
-        if (m_info.contains(id) && m_info[id].isOrgGroup)
-            idInfo = m_info[id];
-        else
-            idInfo = (m_info[id] = infoFromContext(m_systemContext, id));
+        const auto idInfo = (m_info[id] = infoFromContext(m_systemContext, id));
 
         addTo({}, id, idInfo);
         const auto parents = m_subjectContext->subjectHierarchy()->directParents(id);

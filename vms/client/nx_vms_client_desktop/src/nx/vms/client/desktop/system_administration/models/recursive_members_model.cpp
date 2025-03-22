@@ -50,13 +50,13 @@ QVariant RecursiveMembersModel::getMemberData(int offset, const nx::Uuid& id, in
         case IdRole:
             return QVariant::fromValue(id);
         case IsLdap:
-            return m_cache->info(id).userType == api::UserType::ldap;
+            return m_cache->info(id).userType == UserSettingsGlobal::LdapUser;
         case IsTemporary:
-            return m_cache->info(id).userType == api::UserType::temporaryLocal;
+            return m_cache->info(id).userType == UserSettingsGlobal::TemporaryUser;
         case CanEditParents:
             return false;
         case UserType:
-            return (UserSettingsGlobal::UserType)m_cache->info(id).userType;
+            return m_cache->info(id).userType;
     }
     return {};
 }

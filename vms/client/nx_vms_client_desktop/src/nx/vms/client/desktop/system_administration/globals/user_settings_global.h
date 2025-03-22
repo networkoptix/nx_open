@@ -35,7 +35,6 @@ class UserSettingsGlobal: public QObject
     Q_PROPERTY(QString kBuiltInGroupsSection MEMBER kBuiltInGroupsSection CONSTANT)
     Q_PROPERTY(QString kCustomGroupsSection MEMBER kCustomGroupsSection CONSTANT)
     Q_PROPERTY(QString kLdapGroupsSection MEMBER kLdapGroupsSection CONSTANT)
-    Q_PROPERTY(QString kOrgGroupsSection MEMBER kOrgGroupsSection CONSTANT)
 
 public:
     UserSettingsGlobal();
@@ -46,7 +45,6 @@ public:
     static const QString kBuiltInGroupsSection;
     static const QString kCustomGroupsSection;
     static const QString kLdapGroupsSection;
-    static const QString kOrgGroupsSection;
 
     enum UserType
     {
@@ -54,6 +52,10 @@ public:
         CloudUser = (int) nx::vms::api::UserType::cloud,
         LdapUser = (int) nx::vms::api::UserType::ldap,
         TemporaryUser = (int) nx::vms::api::UserType::temporaryLocal,
+        // Organization users are regular cloud users from server's perspective, so API does not
+        // provide a separate type for such users. However, on client side it is necessary to
+        // distinguish between cloud user and organization user.
+        OrganizationUser,
     };
     Q_ENUM(UserType)
 
@@ -68,6 +70,10 @@ public:
     static void registerQmlTypes();
 
     static UserType getUserType(const QnUserResourcePtr& user);
+
+    static UserType getUserType(const nx::vms::api::UserType& userType);
+
+    static nx::vms::api::UserType getApiUserType(const UserType& userType);
 };
 
 } // namespace nx::vms::client::desktop

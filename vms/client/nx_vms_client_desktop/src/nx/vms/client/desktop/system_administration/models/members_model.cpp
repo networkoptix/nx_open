@@ -634,7 +634,6 @@ QHash<int, QByteArray> MembersModel::roleNames() const
     roles[CanEditParents] = "canEditParents";
     roles[CanEditMembers] = "canEditMembers";
     roles[IsPredefined] = "isPredefined";
-    roles[IsOrganization] = "isOrganization";
     roles[UserType] = "userType";
     return roles;
 }
@@ -657,7 +656,7 @@ bool MembersModel::isAllowed(const nx::Uuid& parentId, const nx::Uuid& childId) 
     {
         parentInfo.isGroup = !m_subjectIsUser;
         if (m_temporary)
-            parentInfo.userType = api::UserType::temporaryLocal;
+            parentInfo.userType = UserSettingsGlobal::TemporaryUser;
     }
 
     // Unable to add users to users.
@@ -665,7 +664,7 @@ bool MembersModel::isAllowed(const nx::Uuid& parentId, const nx::Uuid& childId) 
         return false;
 
     // LDAP group membership should be managed via LDAP.
-    if (parentInfo.userType == api::UserType::ldap)
+    if (parentInfo.userType == UserSettingsGlobal::LdapUser)
         return false;
 
     auto childInfo = m_cache->info(childId);
@@ -676,7 +675,7 @@ bool MembersModel::isAllowed(const nx::Uuid& parentId, const nx::Uuid& childId) 
     {
         childInfo.isGroup = !m_subjectIsUser;
         if (m_temporary)
-            childInfo.userType = api::UserType::temporaryLocal;
+            childInfo.userType = UserSettingsGlobal::TemporaryUser;
     }
 
     // Temporary users can not get PowerUsers (or higher) permissions.
@@ -684,7 +683,7 @@ bool MembersModel::isAllowed(const nx::Uuid& parentId, const nx::Uuid& childId) 
         || m_subjectContext->subjectHierarchy()->isRecursiveMember(parentId, kRestrictedForTemp))
     {
         // Deny if child is a temporary user.
-        if (childInfo.userType == api::UserType::temporaryLocal)
+        if (childInfo.userType == UserSettingsGlobal::TemporaryUser)
             return false;
 
         // Deny if any child subgroup contains a temporary user.
@@ -804,34 +803,30 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
                 : UserSettingsGlobal::kUsersSection;
 
         case GroupSectionRole:
-            if (m_cache->info(id).userType == api::UserType::ldap)
+            if (m_cache->info(id).userType == UserSettingsGlobal::LdapUser)
                 return UserSettingsGlobal::kLdapGroupsSection;
-            if (m_cache->info(id).isOrgGroup)
-                return UserSettingsGlobal::kOrgGroupsSection;
+
             return PredefinedUserGroups::contains(id)
                 ? UserSettingsGlobal::kBuiltInGroupsSection
                 : UserSettingsGlobal::kCustomGroupsSection;
 
         case IsLdap:
-            return m_cache->info(id).userType == api::UserType::ldap;
+            return m_cache->info(id).userType == UserSettingsGlobal::LdapUser;
 
         case IsTemporary:
-            return m_cache->info(id).userType == api::UserType::temporaryLocal;
-
-        case IsOrganization:
-             return m_cache->info(id).isOrgGroup;
+            return m_cache->info(id).userType == UserSettingsGlobal::TemporaryUser;
 
         case Cycle:
             return m_groupsWithCycles.contains(id);
 
         case CanEditParents:
         {
-            const bool bothAreLdap = m_cache->info(m_subjectId).userType == api::UserType::ldap
-                && m_cache->info(id).userType == api::UserType::ldap;
-            return !bothAreLdap
+            const bool bothAreLdap =
+                m_cache->info(m_subjectId).userType == UserSettingsGlobal::LdapUser
+                && m_cache->info(id).userType == UserSettingsGlobal::LdapUser;
+            return canModifyRelation(id) && !bothAreLdap
                 && systemContext()->accessController()->hasPermissions(
-                    id,
-                    Qn::WriteAccessRightsPermission)
+                    id, Qn::WriteAccessRightsPermission)
                 && systemContext()->nonEditableUsersAndGroups()->canEditParents(id);
         }
 
@@ -839,20 +834,29 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
             return canEditMembers(id);
 
         case UserType:
-            return (UserSettingsGlobal::UserType) m_cache->info(id).userType;
+            return m_cache->info(id).userType;
 
         case Qt::ToolTipRole:
+        {
             if (!systemContext()->nonEditableUsersAndGroups()->canEditParents(id))
                 return systemContext()->nonEditableUsersAndGroups()->tooltip(id);
+
+            if (!canModifyRelation(id))
+            {
+                return m_subjectIsUser
+                    ? tr("This group has been assigned at organization level and can be managed "
+                         "only at organization level")
+                    : tr("The user has been assigned to this group at organization level and can "
+                        "be unassigned only at organization level");
+            }
+
             return {};
+        }
 
         case core::DecorationPathRole:
         {
             if (index.data(MembersModel::IsPredefined).toBool())
                 return "20x20/Solid/group_default.svg";
-
-            if (m_cache->info(id).isOrgGroup)
-                return "20x20/Solid/group_organization.svg";
 
             return index.data(MembersModel::IsLdap).toBool()
                 ? "20x20/Solid/group_ldap.svg"
@@ -864,13 +868,27 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
     }
 }
 
+bool MembersModel::canModifyRelation(const nx::Uuid& id) const
+{
+    const auto resourcePool = systemContext()->resourcePool();
+    const auto userId = m_subjectIsUser ? m_subjectId : id;
+    const auto groupId = m_subjectIsUser ? id : m_subjectId;
+    if (const auto user = resourcePool->getResourceById<QnUserResource>(userId))
+    {
+        const auto orgGroupIds = user->orgGroupIds();
+        return std::find(orgGroupIds.begin(), orgGroupIds.end(), groupId) == orgGroupIds.end();
+    }
+
+    return true;
+}
+
 bool MembersModel::canEditMembers(const nx::Uuid& id) const
 {
     const auto accessController = qobject_cast<AccessController*>(
         systemContext()->accessController());
 
-    return m_cache
-        && m_cache->info(id).userType != api::UserType::ldap
+    return canModifyRelation(id) && m_cache
+        && m_cache->info(id).userType != UserSettingsGlobal::LdapUser
         && NX_ASSERT(accessController)
         && accessController->canCreateUser(
             /*targetPermissions*/ {},
@@ -946,22 +964,7 @@ QList<MembersModelGroup> MembersModel::parentGroups() const
 
     QList<MembersModelGroup> result;
     for (const auto& groupId: directParents)
-    {
-        MembersModelGroup memberModel;
-        if (const auto info = m_cache->info(groupId); info.isOrgGroup)
-        {
-            memberModel.id = groupId;
-            memberModel.description = info.description;
-            memberModel.text = info.name;
-            memberModel.isPredefined = false;
-            memberModel.isLdap = false;
-        }
-        else
-        {
-            memberModel = MembersModelGroup::fromId(systemContext(), groupId);
-        }
-        result << memberModel;
-    }
+        result << MembersModelGroup::fromId(systemContext(), groupId);
 
     return result;
 }
@@ -1086,8 +1089,6 @@ public:
             case Qt::ToolTipRole:
                 if (mapToSource(index).data(MembersModel::IsLdap).toBool())
                     return tr("LDAP group membership is managed on LDAP server");
-
-                break;
 
             default:
                 return mapToSource(index).data(role);

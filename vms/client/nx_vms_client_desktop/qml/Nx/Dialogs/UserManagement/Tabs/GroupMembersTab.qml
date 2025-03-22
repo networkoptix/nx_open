@@ -81,6 +81,8 @@ MembershipSettings
         property var currentView: ListView.view
         property var groupId: model.isUser ? NxGlobals.uuid("") : model.id
 
+        GlobalToolTip.text: model.toolTip
+
         Item
         {
             id: subTree

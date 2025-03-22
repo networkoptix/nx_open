@@ -60,10 +60,7 @@ MultiSelectionComboBox
             {
                 if (section == UserSettingsGlobal.kLdapGroupsSection)
                     return qsTr("LDAP", "Acronym for The Lightweight Directory Access Protocol")
-
-                if (section == UserSettingsGlobal.kOrgGroupsSection)
-                    return qsTr("ORGANIZATION", "Section with groups from organisation")
-
+                    
                 return section === UserSettingsGlobal.kBuiltInGroupsSection
                     ? qsTr("BUILT-IN", "Section name in a list of items: 'Built-in groups'")
                     : qsTr("CUSTOM", "Section name in a list of items: 'Custom groups'")
