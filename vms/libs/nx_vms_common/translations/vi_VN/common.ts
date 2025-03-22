@@ -1697,10 +1697,6 @@
       <translation>Cài đặt LDAP</translation>
     </message>
     <message>
-      <source>SMTP settings</source>
-      <translation>Cài đặt SMTP</translation>
-    </message>
-    <message>
       <source>Authorization Session token lifetime (seconds)</source>
       <translation>Thời gian khả dụng của mã phiên xác thực (giây)</translation>
     </message>
@@ -1752,6 +1748,10 @@
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>
       <translation>Kiểm tra quyền phát video trên máy chủ VMS theo chu kỳ (mili giây)</translation>
+    </message>
+    <message>
+      <source>SMTP settings. These settings are visible for Power Users only</source>
+      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only</translation>
     </message>
   </context>
   <context>

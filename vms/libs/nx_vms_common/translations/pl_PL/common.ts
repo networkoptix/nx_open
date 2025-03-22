@@ -1874,10 +1874,6 @@
       <translation>Ustawienia LDAP</translation>
     </message>
     <message>
-      <source>SMTP settings</source>
-      <translation>Ustawienia SMTP</translation>
-    </message>
-    <message>
       <source>Authorization Session token lifetime (seconds)</source>
       <translation>Aktywność tokena sesji autoryzacyjnej (w sekundach)</translation>
     </message>
@@ -1929,6 +1925,10 @@
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>
       <translation>Sprawdź uprawnienia strumienia wideo na serwerze VMS (milisekundy)</translation>
+    </message>
+    <message>
+      <source>SMTP settings. These settings are visible for Power Users only</source>
+      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only</translation>
     </message>
   </context>
   <context>

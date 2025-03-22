@@ -1697,10 +1697,6 @@
       <translation>LDAP 設定</translation>
     </message>
     <message>
-      <source>SMTP settings</source>
-      <translation>SMTP 設定</translation>
-    </message>
-    <message>
       <source>Authorization Session token lifetime (seconds)</source>
       <translation>認証セッショントークンの有効期間 (秒)</translation>
     </message>
@@ -1752,6 +1748,10 @@
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>
       <translation>VMS サーバーでの映像ストリーム権限の確認間隔 (ミリ秒)</translation>
+    </message>
+    <message>
+      <source>SMTP settings. These settings are visible for Power Users only</source>
+      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only</translation>
     </message>
   </context>
   <context>

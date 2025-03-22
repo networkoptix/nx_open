@@ -1697,10 +1697,6 @@
       <translation>LDAP 설정</translation>
     </message>
     <message>
-      <source>SMTP settings</source>
-      <translation>SMTP 설정</translation>
-    </message>
-    <message>
       <source>Authorization Session token lifetime (seconds)</source>
       <translation>인증 세션 토큰 수명 (초)</translation>
     </message>
@@ -1752,6 +1748,10 @@
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>
       <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
+    </message>
+    <message>
+      <source>SMTP settings. These settings are visible for Power Users only</source>
+      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only</translation>
     </message>
   </context>
   <context>
