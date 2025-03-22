@@ -819,6 +819,10 @@
         <source>UNREACHABLE</source>
         <translation></translation>
     </message>
+    <message>
+        <source>NEW</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SslCertificateDialog</name>
