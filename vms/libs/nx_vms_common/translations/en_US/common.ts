@@ -1756,10 +1756,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>SMTP settings</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Authorization Session token lifetime (seconds)</source>
         <translation></translation>
     </message>
@@ -1810,6 +1806,10 @@
     </message>
     <message>
         <source>Check video stream permissions on VMS server period (milliseconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SMTP settings. These settings are visible for Power Users only</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
