@@ -1141,11 +1141,6 @@ Select an Integration to begin configuring its parameters.</source>
         <translation></translation>
     </message>
     <message>
-        <source>ORGANIZATION</source>
-        <comment>Section with groups from organisation</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>BUILT-IN</source>
         <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
         <translation></translation>
@@ -1849,11 +1844,6 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
         <source>Custom</source>
         <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Organization</source>
-        <comment>Section with groups from organisation</comment>
         <translation></translation>
     </message>
 </context>
