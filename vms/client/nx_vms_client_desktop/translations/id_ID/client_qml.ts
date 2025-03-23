@@ -1141,11 +1141,6 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
       <translation>LDAP</translation>
     </message>
     <message>
-      <source>ORGANIZATION</source>
-      <comment>Section with groups from organisation</comment>
-      <translation>ORGANISASI</translation>
-    </message>
-    <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
       <translation>BAWAAN</translation>
@@ -1845,11 +1840,6 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
       <source>Custom</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
       <translation>Kustom</translation>
-    </message>
-    <message>
-      <source>Organization</source>
-      <comment>Section with groups from organisation</comment>
-      <translation>Organisasi</translation>
     </message>
   </context>
   <context>

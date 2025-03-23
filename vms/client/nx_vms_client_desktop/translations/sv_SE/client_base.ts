@@ -4583,7 +4583,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
-      <translation type="unfinished">Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
+      <translation>Molnsäkerhetskopiering har stoppats eftersom systemet har stängts. Det måste vara aktivt för att utföra en säkerhetskopia till molnlagring. Kontakta din kanalpartner för hjälp</translation>
     </message>
   </context>
   <context>
@@ -9162,6 +9162,17 @@ Platsens prestanda är försämrad.</translation>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::MembersModel</name>
+    <message>
+      <source>This group has been assigned at organization level and can be managed only at organization level</source>
+      <translation type="unfinished">This group has been assigned at organization level and can be managed only at organization level</translation>
+    </message>
+    <message>
+      <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
+      <translation type="unfinished">The user has been assigned to this group at organization level and can be unassigned only at organization level</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
       <source>URL is invalid.</source>
@@ -12730,15 +12741,15 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error: %1</source>
-      <translation type="unfinished">Delete rule error: %1</translation>
+      <translation>Radera regelfel: %1</translation>
     </message>
     <message>
       <source>Save rule error: %1</source>
-      <translation type="unfinished">Save rule error: %1</translation>
+      <translation>Spara regelfel: %1</translation>
     </message>
     <message>
       <source>Reset rules error: %1</source>
-      <translation type="unfinished">Reset rules error: %1</translation>
+      <translation>Återställ regelfel: %1</translation>
     </message>
   </context>
   <context>

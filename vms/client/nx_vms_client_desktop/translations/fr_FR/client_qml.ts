@@ -1146,11 +1146,6 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
       <translation>LDAP</translation>
     </message>
     <message>
-      <source>ORGANIZATION</source>
-      <comment>Section with groups from organisation</comment>
-      <translation type="unfinished">ORGANIZATION</translation>
-    </message>
-    <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
       <translation type="unfinished">BUILT-IN</translation>
@@ -1855,11 +1850,6 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
       <source>Custom</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
       <translation>Personnalisé</translation>
-    </message>
-    <message>
-      <source>Organization</source>
-      <comment>Section with groups from organisation</comment>
-      <translation>Organisation</translation>
     </message>
   </context>
   <context>

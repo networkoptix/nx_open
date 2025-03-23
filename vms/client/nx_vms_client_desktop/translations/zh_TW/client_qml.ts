@@ -1141,11 +1141,6 @@ Select an Integration to begin configuring its parameters.</source>
       <translation>LDAP</translation>
     </message>
     <message>
-      <source>ORGANIZATION</source>
-      <comment>Section with groups from organisation</comment>
-      <translation>組織</translation>
-    </message>
-    <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
       <translation>內建</translation>
@@ -1845,11 +1840,6 @@ Select an Integration to begin configuring its parameters.</source>
       <source>Custom</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
       <translation>自訂</translation>
-    </message>
-    <message>
-      <source>Organization</source>
-      <comment>Section with groups from organisation</comment>
-      <translation>組織</translation>
     </message>
   </context>
   <context>

@@ -9162,6 +9162,17 @@ O rendemento do sitio web está degradado.</translation>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::MembersModel</name>
+    <message>
+      <source>This group has been assigned at organization level and can be managed only at organization level</source>
+      <translation type="unfinished">This group has been assigned at organization level and can be managed only at organization level</translation>
+    </message>
+    <message>
+      <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
+      <translation type="unfinished">The user has been assigned to this group at organization level and can be unassigned only at organization level</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
       <source>URL is invalid.</source>

@@ -1146,11 +1146,6 @@ Välj en integration för att börja konfigurera dess parametrar.</translation>
       <translation>LDAP</translation>
     </message>
     <message>
-      <source>ORGANIZATION</source>
-      <comment>Section with groups from organisation</comment>
-      <translation>ORGANISATION</translation>
-    </message>
-    <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
       <translation>INBYGGT</translation>
@@ -1855,11 +1850,6 @@ Välj en integration för att börja konfigurera dess parametrar.</translation>
       <source>Custom</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
       <translation>Anpassad</translation>
-    </message>
-    <message>
-      <source>Organization</source>
-      <comment>Section with groups from organisation</comment>
-      <translation>Organisation</translation>
     </message>
   </context>
   <context>

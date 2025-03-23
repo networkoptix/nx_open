@@ -270,7 +270,7 @@
     </message>
     <message>
       <source>Field &quot;%1&quot; should be an object</source>
-      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+      <translation>Fält &quot;%1&quot; ska vara ett objekt</translation>
     </message>
     <message>
       <source>Unable to deserialize properties for field: %1</source>
