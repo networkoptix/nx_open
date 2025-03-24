@@ -487,9 +487,6 @@ Window
 
                         readonly property Item hoveredItem:
                         {
-                            if (showPreview)
-                                return null
-
                             return dialog.tileView
                                 ? (eventGrid.hoveredItem?.item ?? null)
                                 : (tableView.hoveredItem ?? null)
