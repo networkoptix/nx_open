@@ -182,8 +182,7 @@ EventPanel::Private::Private(EventPanel* q):
         [this](int index)
         {
             if (workbench()->currentLayout()->resource()->isCrossSystem()
-                && (index == static_cast<int>(Tab::analytics)
-                    || index == static_cast<int>(Tab::bookmarks)
+                && (index == static_cast<int>(Tab::bookmarks)
                     || index == static_cast<int>(Tab::vmsEvents)))
             {
                 return false;
