@@ -1751,7 +1751,7 @@
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only</source>
-      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only</translation>
+      <translation>SMTP設定。これらの設定はパワーユーザーにのみ表示されます。</translation>
     </message>
   </context>
   <context>
