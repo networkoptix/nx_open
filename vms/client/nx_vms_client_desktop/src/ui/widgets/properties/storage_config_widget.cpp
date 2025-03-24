@@ -925,7 +925,7 @@ void QnStorageConfigWidget::updateWarnings()
     {
         messages.push_back(
             {
-                .text = tr("Cloud backup has been stopped because the system has been shutdown. "
+                .text = tr("Cloud backup has been stopped because the system has been shut down. "
                     "It must be active to perform a backup to cloud storage. Contact your channel "
                     "partner for assistance"),
                 .level = BarDescription::BarLevel::Error,
