@@ -80,8 +80,7 @@ AbstractCertificateVerifier::~AbstractCertificateVerifier() {}
 void AbstractCertificateVerifier::loadTrustedCertificate(
     const QByteArray& data, const QString& name)
 {
-    const auto chain = nx::network::ssl::Certificate::parse(data.toStdString(),
-        /*assertOnFail*/ false);
+    const auto chain = nx::network::ssl::Certificate::parse(data.toStdString());
     if (chain.size() != 1)
     {
         NX_WARNING(this,

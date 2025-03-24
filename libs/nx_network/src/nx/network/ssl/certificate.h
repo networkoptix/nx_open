@@ -168,8 +168,7 @@ public:
     explicit Certificate(const CertificateView& view);
 
     static std::vector<Certificate> parse(
-        const std::string& pemString,
-        bool assertOnFail = true);
+        const std::string& pemString);
 
 private:
     std::shared_ptr<X509> m_x509;

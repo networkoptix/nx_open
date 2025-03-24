@@ -477,20 +477,19 @@ Certificate::Certificate(const CertificateView& view)
 {
 }
 
-std::vector<Certificate> Certificate::parse(const std::string& pemString, bool assertOnFail)
+std::vector<Certificate> Certificate::parse(const std::string& pemString)
 {
     X509Certificate x509;
 
-    bool parsed = !pemString.empty() && x509.parsePem(pemString);
+    std::string parsingError;
+    bool parsed = !pemString.empty() && x509.parsePem(pemString, {}, &parsingError);
     if (parsed)
         return x509.certificates();
 
     // Report an error.
-    const auto errorMessage = "Invalid certificate passed\n" + pemString;
-    if (assertOnFail)
-        NX_ASSERT(parsed, errorMessage);
-    else
-        NX_VERBOSE(NX_SCOPE_TAG, errorMessage);
+    NX_ERROR(NX_SCOPE_TAG,
+        QString("Unable to parse the provided certificate.\nError: %1\nRaw certificate data:\n%2")
+        .arg(QString::fromStdString(parsingError), QString::fromStdString(pemString)));
 
     return {};
 }
