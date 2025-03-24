@@ -9165,11 +9165,11 @@ Platsens prestanda är försämrad.</translation>
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
       <source>This group has been assigned at organization level and can be managed only at organization level</source>
-      <translation type="unfinished">This group has been assigned at organization level and can be managed only at organization level</translation>
+      <translation>Denna grupp har tilldelats på organisationsnivå och kan endast hanteras på organisationsnivå</translation>
     </message>
     <message>
       <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
-      <translation type="unfinished">The user has been assigned to this group at organization level and can be unassigned only at organization level</translation>
+      <translation>Användaren har tilldelats till denna grupp på organisationsnivå och kan endast kopplas bort på organisationsnivå</translation>
     </message>
   </context>
   <context>

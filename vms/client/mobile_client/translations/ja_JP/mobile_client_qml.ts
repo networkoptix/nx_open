@@ -820,7 +820,7 @@
     </message>
     <message>
       <source>NEW</source>
-      <translation type="unfinished">NEW</translation>
+      <translation>新規</translation>
     </message>
   </context>
   <context>

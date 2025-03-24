@@ -4536,7 +4536,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
-      <translation type="unfinished">Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
+      <translation>システムがシャットダウンされたため、クラウドバックアップは停止しました。クラウドストレージへのバックアップを実行するには、システムがアクティブである必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
     </message>
   </context>
   <context>
@@ -9025,11 +9025,11 @@ Site performance is degraded.</source>
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
       <source>This group has been assigned at organization level and can be managed only at organization level</source>
-      <translation type="unfinished">This group has been assigned at organization level and can be managed only at organization level</translation>
+      <translation>このグループは組織レベルで割り当てられており、組織レベルでのみ管理できます。</translation>
     </message>
     <message>
       <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
-      <translation type="unfinished">The user has been assigned to this group at organization level and can be unassigned only at organization level</translation>
+      <translation>ユーザーは組織レベルでこのグループに割り当てられており、組織レベルでのみ割り当てを解除できます。</translation>
     </message>
   </context>
   <context>
@@ -12559,15 +12559,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error: %1</source>
-      <translation type="unfinished">Delete rule error: %1</translation>
+      <translation>ルール削除時エラー: %1</translation>
     </message>
     <message>
       <source>Save rule error: %1</source>
-      <translation type="unfinished">Save rule error: %1</translation>
+      <translation>ルール保存時エラー: %1</translation>
     </message>
     <message>
       <source>Reset rules error: %1</source>
-      <translation type="unfinished">Reset rules error: %1</translation>
+      <translation>ルールリセット時エラー: %1</translation>
     </message>
   </context>
   <context>

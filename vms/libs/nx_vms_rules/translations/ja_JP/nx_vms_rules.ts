@@ -264,7 +264,7 @@
     </message>
     <message>
       <source>Field &quot;%1&quot; should be an object</source>
-      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+      <translation>フィールド &quot;%1&quot; はオブジェクトである必要があります。</translation>
     </message>
     <message>
       <source>Unable to deserialize properties for field: %1</source>
