@@ -143,9 +143,9 @@ void ServerSettingsBackupStoragesWatcher::setServer(const QnMediaServerResourceP
 
         connect(d->storageManager, &QnServerStorageManager::storageRemoved, this,
             [this]() { d->updateStoragesState(); });
-
-        d->updateStoragesState();
     }
+
+    d->updateStoragesState();
 }
 
 } // nx::vms::client::desktop
