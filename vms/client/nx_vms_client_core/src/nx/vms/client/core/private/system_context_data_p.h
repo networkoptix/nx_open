@@ -32,8 +32,6 @@ struct SystemContext::Private
 {
     void initializeIoPortsInterface();
 
-    void initializeQml();
-
     void initializeNetworkModule();
 
     SystemContext* const q;
@@ -64,9 +62,6 @@ struct SystemContext::Private
 
     // Should be destroyed before session/connection.
     std::unique_ptr<IoPortsCompatibilityInterface> ioPortsInterface;
-
-    using RemoveGuard = nx::utils::ScopeGuard<std::function<void ()>>;
-    std::unique_ptr<RemoveGuard> imageProviderRemoveGuard;
 };
 
 } // namespace nx::vms::client::core

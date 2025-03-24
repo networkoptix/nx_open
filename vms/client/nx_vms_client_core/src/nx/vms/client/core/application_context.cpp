@@ -31,6 +31,7 @@
 #include <nx/vms/client/core/skin/skin_image_provider.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
+#include <nx/vms/client/core/thumbnails/remote_async_image_provider.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
@@ -255,7 +256,10 @@ ApplicationContext::ApplicationContext(
         translationManager()->startLoadingTranslations();
 
     if (const auto engine = appContext()->qmlEngine())
+    {
         engine->addImageProvider("skin", new nx::vms::client::core::SkinImageProvider());
+        engine->addImageProvider("remote", new RemoteAsyncImageProvider());
+    }
 
     if (features.base.flags.testFlag(CommonFeatureFlag::networking))
         d->sessionTokenTerminator = std::make_unique<SessionTokenTerminator>();

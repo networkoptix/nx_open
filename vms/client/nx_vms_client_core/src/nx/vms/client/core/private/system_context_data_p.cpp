@@ -26,20 +26,6 @@ void SystemContext::Private::initializeIoPortsInterface()
         ioPortsInterface = std::make_unique<IoPortsCompatibilityInterface_latest>(q);
 }
 
-void SystemContext::Private::initializeQml()
-{
-    if (const auto engine = appContext()->qmlEngine())
-    {
-        engine->addImageProvider("remote",new RemoteAsyncImageProvider(q));
-        imageProviderRemoveGuard = std::make_unique<RemoveGuard>(
-            []()
-            {
-                if (const auto engine = appContext()->qmlEngine())
-                    engine->removeImageProvider("remote");
-            });
-    }
-}
-
 void SystemContext::Private::initializeNetworkModule()
 {
     if (appContext()->commonFeatures().flags.testFlag(

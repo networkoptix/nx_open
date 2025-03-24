@@ -4,8 +4,8 @@
 
 #include <QtCore/QPointer>
 
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/common/utils/thread_pool.h>
-#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/thumbnails/generic_remote_image_request.h>
 
 namespace nx::vms::client::core {
@@ -51,11 +51,6 @@ private:
     std::unique_ptr<GenericRemoteImageRequest> m_request;
 };
 
-RemoteAsyncImageProvider::RemoteAsyncImageProvider(SystemContext* systemContext):
-    SystemContextAware(systemContext)
-{
-}
-
 QQuickImageResponse* RemoteAsyncImageProvider::requestImageResponse(
     const QString& requestLine, const QSize& /*requestedSize*/)
 {
@@ -63,7 +58,7 @@ QQuickImageResponse* RemoteAsyncImageProvider::requestImageResponse(
     // If a particular request allows to obtain images of different sizes, the desired size must be
     // included in `requestLine`.
 
-    return new RemoteAsyncImageResponse(systemContext(), requestLine);
+    return new RemoteAsyncImageResponse(appContext()->currentSystemContext(), requestLine);
 }
 
 } // namespace nx::vms::client::core

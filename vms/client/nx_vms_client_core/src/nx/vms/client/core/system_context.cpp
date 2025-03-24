@@ -60,7 +60,6 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
                 /*separateThread*/ false);
             d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             d->videoCache = std::make_unique<VideoCache>(this);
-            d->initializeQml();
             d->initializeNetworkModule();
             break;
         }
@@ -79,7 +78,6 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
 
         case Mode::cloudLayouts:
         case Mode::unitTests:
-            d->initializeQml();
             d->initializeNetworkModule();
             break;
         case Mode::server:
