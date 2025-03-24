@@ -41,8 +41,7 @@ Dialog
     topPadding: 0
     bottomPadding: 0
 
-    acceptShortcutEnabled: !tableView.editing && !tableView.selectionModel.hasSelection
-    rejectShortcutEnabled: !tableView.editing
+    acceptShortcutEnabled: !tableView.selectionModel.hasSelection
 
     onVisibleChanged: tableView.checkedRows = []
 
@@ -224,10 +223,8 @@ Dialog
                     {
                         onClicked:
                         {
-                            tableView.editing = true
                             root.dialog.editRule(tableView.model.data(
                                 tableView.model.index(row, column), RulesTableModel.RuleIdRole))
-                            tableView.editing = false
                         }
                     }
                 }
@@ -236,10 +233,8 @@ Dialog
             deleteShortcut.onActivated: root.deleteCheckedRules()
             enterShortcut.onActivated:
             {
-                tableView.editing = true
                 root.dialog.editRule(tableView.model.data(
                     tableView.selectionModel.selectedIndexes[0], RulesTableModel.RuleIdRole))
-                tableView.editing = false
             }
 
             Component.onCompleted:
