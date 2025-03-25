@@ -11,15 +11,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnIOStateData, (ubjson)(json), QnIOStateData_Fi
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnCameraIOStateData, (ubjson)(json), QnCameraIOStateData_Fields)
 
-QnIOPortData::QnIOPortData()
-    :
-    portType(Qn::PT_Disabled),
-    iDefaultState(Qn::IO_OpenCircuit),
-    oDefaultState(Qn::IO_OpenCircuit),
-    autoResetTimeoutMs(0)
-{
-}
-
 QString toString(const QnIOPortData& ioPortData)
 {
     return QJson::serialized(ioPortData);

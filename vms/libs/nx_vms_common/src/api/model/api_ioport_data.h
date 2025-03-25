@@ -27,8 +27,6 @@ Q_DECLARE_FLAGS(ExtendedCameraOutputs, ExtendedCameraOutput)
 
 struct NX_VMS_COMMON_API QnIOPortData
 {
-    QnIOPortData();
-
     QString toString() const;
     QString getName() const;
 
@@ -37,13 +35,13 @@ struct NX_VMS_COMMON_API QnIOPortData
     Qn::IODefaultState getDefaultState() const;
 
     QString id;
-    Qn::IOPortType portType;
+    Qn::IOPortType portType = Qn::PT_Disabled;
     Qn::IOPortTypes supportedPortTypes;
     QString inputName;
     QString outputName;
-    Qn::IODefaultState iDefaultState;
-    Qn::IODefaultState oDefaultState;
-    int autoResetTimeoutMs; // for output only. Keep output state on during timeout if non zero
+    Qn::IODefaultState iDefaultState = Qn::IO_OpenCircuit;
+    Qn::IODefaultState oDefaultState = Qn::IO_OpenCircuit;
+    int autoResetTimeoutMs = 0; // For output only. Keep output state on during timeout if non zero.
 
     bool operator==(const QnIOPortData& other) const = default;
 };
