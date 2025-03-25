@@ -52,6 +52,19 @@ int getDefaultDstSampleRate(int srcSampleRate, const AVCodec* avCodec)
     return result;
 }
 
+int getDefaultFrameSize(const AVCodec* avCodec)
+{
+    switch(avCodec->id)
+    {
+        case AV_CODEC_ID_ADPCM_G726:
+        case AV_CODEC_ID_PCM_MULAW:
+        case AV_CODEC_ID_PCM_ALAW:
+            return 128;
+        default:
+            return 1024;
+    }
+}
+
 int getDefaultBitrate(AVCodecContext* context)
 {
     if (context->codec_id == AV_CODEC_ID_ADPCM_G726)
@@ -81,6 +94,7 @@ void AudioEncoder::close()
     if (m_encoderContext)
         avcodec_free_context(&m_encoderContext);
     m_resampler.reset();
+    m_flushMode = false;
 }
 
 CodecParametersPtr AudioEncoder::codecParameters()
@@ -132,9 +146,8 @@ bool AudioEncoder::open(
         return false;
     }
 
-    const int kDefaultFrameSize = 1024;
     if (m_encoderContext->frame_size == 0)
-        m_encoderContext->frame_size = (dstFrameSize > 0 ? dstFrameSize : kDefaultFrameSize);
+        m_encoderContext->frame_size = (dstFrameSize > 0 ? dstFrameSize : getDefaultFrameSize(codec));
 
     m_codecParams.reset(new CodecParameters(m_encoderContext));
 
@@ -153,6 +166,11 @@ bool AudioEncoder::open(
 
 bool AudioEncoder::sendFrame(uint8_t* data, int size)
 {
+    if (!data)
+    {
+        sendFrame(nullptr);
+        return true;
+    }
     m_inputFrame->data[0] = data;
     m_inputFrame->extended_data = m_inputFrame->data;
     m_inputFrame->nb_samples = size;
@@ -166,6 +184,11 @@ bool AudioEncoder::sendFrame(uint8_t* data, int size)
 
 bool AudioEncoder::sendFrame(AVFrame* inputFrame)
 {
+    if (!inputFrame)
+    {
+        m_flushMode = true;
+        return true;
+    }
     if (!m_resampler->pushFrame(inputFrame))
     {
         NX_WARNING(this, "Could not allocate sample buffers");
@@ -200,7 +223,7 @@ bool AudioEncoder::receivePacket(QnWritableCompressedAudioDataPtr& result)
 
         // 2. Send data to the encoder.
         AVFrame* resampledFrame = m_resampler->nextFrame();
-        if (!resampledFrame)
+        if (!resampledFrame && !m_flushMode)
             return true;
 
         status = avcodec_send_frame(m_encoderContext, resampledFrame);

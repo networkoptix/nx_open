@@ -92,8 +92,12 @@ bool TwoWayAudioController::Private::setActive(bool active, OperationCallback&& 
     }
     else
     {
-        streamer.reset();
         setStarted(false);
+        if (streamer)
+        {
+            streamer->stop();
+            streamer.reset();
+        }
         if (callback)
             callback(true);
     }

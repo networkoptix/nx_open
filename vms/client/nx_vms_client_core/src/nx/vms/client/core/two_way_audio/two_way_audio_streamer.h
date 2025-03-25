@@ -26,6 +26,8 @@ public:
         const nx::network::http::Credentials& credentials,
         const QnVirtualCameraResourcePtr& camera);
 
+    void stop();
+
 public: // QnAbstractMediaDataReceptor impl.
     virtual bool canAcceptData() const override;
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
@@ -51,7 +53,6 @@ private:
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
     nx::network::aio::AsyncChannelPtr m_streamChannel;
     std::unique_ptr<QnAbstractStreamDataProvider> m_provider;
-    std::atomic<bool> m_stop = false;
     std::atomic<bool> m_sendInProcess = false;
 };
 

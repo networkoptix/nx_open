@@ -117,9 +117,17 @@ bool DesktopDataProviderBase::initAudioDecoder(int sampleRate, AVSampleFormat fo
     return m_audioEncoder.open(AV_CODEC_ID_MP3, sampleRate, format, layout, /*bitrate*/0);
 }
 
+void DesktopDataProviderBase::pleaseStopSync()
+{
+    pleaseStop();
+    wait();
+    // Flush audio encoder.
+    encodeAndPutAudioData(nullptr, 0, /*channelNumber*/ 0);
+}
+
 bool DesktopDataProviderBase::encodeAndPutAudioData(uint8_t* buffer, int size, int channelNumber)
 {
-     if (!m_audioEncoder.sendFrame(buffer, size))
+    if (!m_audioEncoder.sendFrame(buffer, size))
         return false;
 
     QnWritableCompressedAudioDataPtr packet;

@@ -28,6 +28,7 @@ public:
     bool sendFrame(uint8_t* data, int size);
     bool sendFrame(AVFrame* inputFrame);
     bool receivePacket(QnWritableCompressedAudioDataPtr& result);
+
     CodecParametersPtr codecParameters();
 
     /**
@@ -41,6 +42,7 @@ private:
     void close();
 
 private:
+    bool m_flushMode = false;
     int m_dstSampleRate = 0;
     int m_bitrate = -1;
     int64_t m_ptsUs = 0;

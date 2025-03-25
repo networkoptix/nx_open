@@ -24,7 +24,6 @@ TwoWayAudioStreamer::TwoWayAudioStreamer(std::unique_ptr<QnAbstractStreamDataPro
 bool TwoWayAudioStreamer::start(
     const nx::network::http::Credentials& credentials, const QnVirtualCameraResourcePtr& camera)
 {
-    m_stop = false;
     m_httpClient = std::make_unique<nx::network::http::AsyncClient>(
         nx::network::ssl::kAcceptAnyCertificate);
 
@@ -68,12 +67,12 @@ bool TwoWayAudioStreamer::start(
         m_httpClient->doUpgrade(url,
             nx::network::http::Method::get,
             nx::network::websocket::kWebsocketProtocolName,
-            [this] () mutable { onUpgradeHttpClient(); });
+            [this, self = shared_from_this()] () mutable { onUpgradeHttpClient(); });
     }
     else
     {
         m_httpClient->setOnRequestHasBeenSent(
-            [this] (bool /*isRetryAfterUnauthorizedResponse*/) mutable { onHttpRequest(); });
+            [this, self = shared_from_this()] (bool /*isRetryAfterUnauthorizedResponse*/) mutable { onHttpRequest(); });
         m_httpClient->doPost(url, [] () mutable { });
     }
     return true;
@@ -81,18 +80,27 @@ bool TwoWayAudioStreamer::start(
 
 TwoWayAudioStreamer::~TwoWayAudioStreamer()
 {
-    m_stop = true;
     if (m_provider)
-    {
         m_provider->unsubscribe(this);
-        m_provider->pleaseStop();
-    }
 
     if (m_httpClient)
         m_httpClient->pleaseStopSync();
 
     if (m_streamChannel)
         m_streamChannel->cancelIOSync(network::aio::EventType::etAll);
+}
+
+void TwoWayAudioStreamer::stop()
+{
+    if (m_provider)
+    {
+        auto provider = dynamic_cast<DesktopDataProviderBase*>(m_provider.get());
+        if (provider)
+            provider->pleaseStopSync(); //< Flush audio encoder.
+
+        m_provider->unsubscribe(this);
+        m_provider.reset();
+    }
 }
 
 void TwoWayAudioStreamer::onHttpRequest()
@@ -106,6 +114,7 @@ void TwoWayAudioStreamer::onHttpRequest()
 
     socket->setNonBlockingMode(true);
     m_streamChannel = nx::network::aio::makeAsyncChannelAdapter(std::move(socket));
+    m_httpClient->setOnRequestHasBeenSent(nullptr);
     startProvider();
 }
 
@@ -151,9 +160,6 @@ void TwoWayAudioStreamer::startProvider()
 
 void TwoWayAudioStreamer::onDataSent()
 {
-    if (m_stop)
-        return;
-
     {
         auto bufferQueue = m_bufferQueue.lock();
         if (bufferQueue->empty())
@@ -166,7 +172,7 @@ void TwoWayAudioStreamer::onDataSent()
         m_dataBuffer.assign(data->data(), data->size());
     }
     m_streamChannel->sendAsync(&m_dataBuffer,
-        [this](SystemError::ErrorCode errorCode, std::size_t bytesSent)
+        [this, self = shared_from_this()](SystemError::ErrorCode errorCode, std::size_t bytesSent)
         {
             if (nx::network::socketCannotRecoverFromError(errorCode) || bytesSent == 0)
             {

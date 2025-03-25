@@ -33,6 +33,8 @@ public:
     virtual QString lastErrorStr() const;
     virtual bool readyToStop() const = 0;
 
+    void pleaseStopSync();
+
 protected:
     bool initAudioDecoder(int sampleRate, AVSampleFormat format, int channels);
     bool encodeAndPutAudioData(uint8_t* buffer, int size, int channelNumber);
