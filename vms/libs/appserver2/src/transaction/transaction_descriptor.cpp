@@ -2746,10 +2746,12 @@ struct ShowreelAccessById
 
 struct SaveStoredFileAccess
 {
-    Result operator()(SystemContext*, const nx::network::rest::UserAccessData& accessData, const nx::vms::api::StoredFileData& data)
+    Result operator()(SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData, const nx::vms::api::StoredFileData& data)
     {
         if (hasSystemAccess(accessData))
             return {};
+        if (auto r = PowerUserAccess()(systemContext, accessData, data); !r)
+            return r;
         if (!validateNotEmptyWithoutSpaces(data.path))
             return invalidParameterError("path");
 

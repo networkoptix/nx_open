@@ -832,7 +832,7 @@ void registerRestHandlers(
      * %caption Get Stored Files
      * %ingroup Stored Files
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
-     * %permissions Depends on Resource access rights.
+     * %permissions Any User.
      * %return:{StoredFileDataList} List of all Stored File records.
      *
      **%apidoc GET /rest/v{1-}/storedFiles/{path}
@@ -843,7 +843,7 @@ void registerRestHandlers(
      * %param:string path Stored File path (can be obtained from `path` field via
      *     `GET /rest/v{1-}/storedFiles`).
      * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
-     * %permissions Depends on Resource access rights.
+     * %permissions Any User.
      * %return:{StoredFileData} Stored File record.
      *
      **%apidoc PUT /rest/v{1-}/storedFiles/{path}
@@ -854,7 +854,7 @@ void registerRestHandlers(
      * %param:string path Stored File path (can be obtained from `path` field via
      *     `GET /rest/v{1-}/storedFiles`).
      * %param[ref] _strict,_ticket
-     * %permissions Depends on Resource access rights.
+     * %permissions Power User.
      * %return:{StoredFileData} Stored File record.
      *
      **%apidoc DELETE /rest/v{1-}/storedFiles/{path}
@@ -864,9 +864,9 @@ void registerRestHandlers(
      * %param:string path Stored File path (can be obtained from `path` field via
      *     `GET /rest/v{1-}/storedFiles`).
      * %param[ref] _strict,_ticket
-     * %permissions Depends on Resource access rights.
+     * %permissions Power User.
      */
-    reg("rest/v{1-}/storedFiles/:path+", GlobalPermission::none,
+    reg("rest/v{1-}/storedFiles/:path+", GlobalPermission::none, GlobalPermission::powerUser,
         std::make_unique<nx::vms::server::StoredFilesHandler<QueryProcessor>>(queryProcessor));
 
     /**%apidoc GET /rest/v{1-}/licenses
