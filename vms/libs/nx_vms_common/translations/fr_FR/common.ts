@@ -1502,10 +1502,6 @@
       <translation>Activer ou désactiver la création de nouvelles demandes d'enregistrement d'intégration</translation>
     </message>
     <message>
-      <source>SMTP settings.</source>
-      <translation>Paramètres SMTP.</translation>
-    </message>
-    <message>
       <source>Anonymous statistics report allowed.</source>
       <translation>Statistique anonyme autorisée.</translation>
     </message>
@@ -1920,6 +1916,10 @@
     <message>
       <source>LDAP settings.</source>
       <translation>Paramètres LDAP.</translation>
+    </message>
+    <message>
+      <source>SMTP settings. These settings are visible for Power Users only.</source>
+      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
     </message>
   </context>
 </TS>

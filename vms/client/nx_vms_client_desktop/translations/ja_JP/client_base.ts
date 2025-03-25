@@ -4535,8 +4535,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>クラウドバックアップを有効化する際、&quot;すべての録画データ&quot; で構成されたデバイスの設定は &quot;モーション, オブジェクト, ブックマーク&quot; に変更されます。</translation>
     </message>
     <message>
-      <source>Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
-      <translation>システムがシャットダウンされたため、クラウドバックアップは停止しました。クラウドストレージへのバックアップを実行するには、システムがアクティブである必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
+      <source>Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
+      <translation type="unfinished">Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
     </message>
   </context>
   <context>

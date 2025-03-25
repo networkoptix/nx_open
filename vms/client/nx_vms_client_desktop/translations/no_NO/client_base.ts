@@ -4582,8 +4582,8 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
     </message>
     <message>
-      <source>Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
-      <translation type="unfinished">Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
+      <source>Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
+      <translation type="unfinished">Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
     </message>
   </context>
   <context>
@@ -9169,7 +9169,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
-      <translation type="unfinished">The user has been assigned to this group at organization level and can be unassigned only at organization level</translation>
+      <translation>Brukeren er tildelt denne gruppen på organisasjonsnivå og kan bare bli fjernet på organisasjonsnivå</translation>
     </message>
   </context>
   <context>

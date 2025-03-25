@@ -4676,8 +4676,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
     </message>
     <message>
-      <source>Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
-      <translation type="unfinished">Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
+      <source>Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
+      <translation type="unfinished">Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
     </message>
   </context>
   <context>

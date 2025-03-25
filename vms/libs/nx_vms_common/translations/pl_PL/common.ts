@@ -1642,10 +1642,6 @@
       <translation>Włącz lub wyłącz tworzenie nowych wniosków o rejestrację integracji</translation>
     </message>
     <message>
-      <source>SMTP settings.</source>
-      <translation>Ustawienia SMTP.</translation>
-    </message>
-    <message>
       <source>Anonymous statistics report allowed.</source>
       <translation>Dozwolony anonimowy raport statystyk.</translation>
     </message>
@@ -2060,6 +2056,10 @@
     <message>
       <source>LDAP settings.</source>
       <translation>Ustawienia LDAP.</translation>
+    </message>
+    <message>
+      <source>SMTP settings. These settings are visible for Power Users only.</source>
+      <translation>Ustawienia SMTP. Te ustawienia są widoczne tylko dla użytkowników zaawansowanych.</translation>
     </message>
   </context>
 </TS>

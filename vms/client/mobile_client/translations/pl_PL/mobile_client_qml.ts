@@ -823,7 +823,7 @@
     </message>
     <message>
       <source>NEW</source>
-      <translation type="unfinished">NEW</translation>
+      <translation>NOWY</translation>
     </message>
   </context>
   <context>

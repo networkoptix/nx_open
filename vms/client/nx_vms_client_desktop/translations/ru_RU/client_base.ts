@@ -4676,8 +4676,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
     </message>
     <message>
-      <source>Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
-      <translation type="unfinished">Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
+      <source>Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
+      <translation type="unfinished">Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
     </message>
   </context>
   <context>
@@ -9447,11 +9447,11 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
       <source>This group has been assigned at organization level and can be managed only at organization level</source>
-      <translation type="unfinished">This group has been assigned at organization level and can be managed only at organization level</translation>
+      <translation>Эта группа назначена на уровне организации и может управляться только на уровне организации</translation>
     </message>
     <message>
       <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
-      <translation type="unfinished">The user has been assigned to this group at organization level and can be unassigned only at organization level</translation>
+      <translation>Пользователь был назначен в эту группу на уровне организации и может быть изменен только на уровне организации</translation>
     </message>
   </context>
   <context>

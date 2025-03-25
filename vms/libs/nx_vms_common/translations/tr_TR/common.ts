@@ -1502,10 +1502,6 @@
       <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
     </message>
     <message>
-      <source>SMTP settings.</source>
-      <translation>SMTP ayarları.</translation>
-    </message>
-    <message>
       <source>Anonymous statistics report allowed.</source>
       <translation>Anonim istatistik raporuna izin verilir.</translation>
     </message>
@@ -1920,6 +1916,10 @@
     <message>
       <source>LDAP settings.</source>
       <translation>LDAP ayarları.</translation>
+    </message>
+    <message>
+      <source>SMTP settings. These settings are visible for Power Users only.</source>
+      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
     </message>
   </context>
 </TS>

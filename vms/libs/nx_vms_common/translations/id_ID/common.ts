@@ -1432,10 +1432,6 @@
       <translation>Mengaktifkan atau menonaktifkan pembuatan permintaan pendaftaran Integrasi baru</translation>
     </message>
     <message>
-      <source>SMTP settings.</source>
-      <translation>Pengaturan SMTP.</translation>
-    </message>
-    <message>
       <source>Anonymous statistics report allowed.</source>
       <translation>Laporan statistik anonim diperbolehkan.</translation>
     </message>
@@ -1850,6 +1846,10 @@
     <message>
       <source>LDAP settings.</source>
       <translation>Pengaturan LDAP.</translation>
+    </message>
+    <message>
+      <source>SMTP settings. These settings are visible for Power Users only.</source>
+      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
     </message>
   </context>
 </TS>

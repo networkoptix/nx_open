@@ -1432,10 +1432,6 @@
       <translation>Bật hoặc tắt việc tạo yêu cầu đăng ký tích hợp mới</translation>
     </message>
     <message>
-      <source>SMTP settings.</source>
-      <translation>Cài đặt SMTP.</translation>
-    </message>
-    <message>
       <source>Anonymous statistics report allowed.</source>
       <translation>Cho phép báo cáo thống kê ẩn danh.</translation>
     </message>
@@ -1850,6 +1846,10 @@
     <message>
       <source>LDAP settings.</source>
       <translation>Cài đặt LDAP.</translation>
+    </message>
+    <message>
+      <source>SMTP settings. These settings are visible for Power Users only.</source>
+      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
     </message>
   </context>
 </TS>

@@ -1502,10 +1502,6 @@
       <translation>Aktiver eller deaktiver oppretting av nye integreringsregistreringsforespørsler</translation>
     </message>
     <message>
-      <source>SMTP settings.</source>
-      <translation>SMTP-innstillinger.</translation>
-    </message>
-    <message>
       <source>Anonymous statistics report allowed.</source>
       <translation>Anonym statistikkrapport tillatt.</translation>
     </message>
@@ -1920,6 +1916,10 @@
     <message>
       <source>LDAP settings.</source>
       <translation>LDAP-innstillinger.</translation>
+    </message>
+    <message>
+      <source>SMTP settings. These settings are visible for Power Users only.</source>
+      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
     </message>
   </context>
 </TS>

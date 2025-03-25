@@ -1432,10 +1432,6 @@
       <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
     </message>
     <message>
-      <source>SMTP settings.</source>
-      <translation>SMTP 설정.</translation>
-    </message>
-    <message>
       <source>Anonymous statistics report allowed.</source>
       <translation>익명의 통계 보고서 허용.</translation>
     </message>
@@ -1850,6 +1846,10 @@
     <message>
       <source>LDAP settings.</source>
       <translation>LDAP 설정.</translation>
+    </message>
+    <message>
+      <source>SMTP settings. These settings are visible for Power Users only.</source>
+      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
     </message>
   </context>
 </TS>

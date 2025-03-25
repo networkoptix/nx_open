@@ -4582,8 +4582,8 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Enheter konfigurerade med &quot;Inställningen för alla arkiv&quot; kommer att ändras till &quot;Rörelse, Objekt och Bokmärken&quot; när molnsäkerhetskopiering är aktiverat</translation>
     </message>
     <message>
-      <source>Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
-      <translation>Molnsäkerhetskopiering har stoppats eftersom systemet har stängts. Det måste vara aktivt för att utföra en säkerhetskopia till molnlagring. Kontakta din kanalpartner för hjälp</translation>
+      <source>Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
+      <translation type="unfinished">Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
     </message>
   </context>
   <context>

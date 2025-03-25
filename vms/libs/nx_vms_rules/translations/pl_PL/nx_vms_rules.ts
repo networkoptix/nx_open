@@ -282,11 +282,11 @@
     </message>
     <message>
       <source>Field &quot;%1&quot; should be an object</source>
-      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+      <translation>Pole &quot;%1&quot; powinno być obiektem</translation>
     </message>
     <message>
       <source>Unable to deserialize properties for field: %1</source>
-      <translation type="unfinished">Unable to deserialize properties for field: %1</translation>
+      <translation>Nie można konwertować właściwości dla pola: %1</translation>
     </message>
     <message>
       <source>Event: %1 is not registered</source>

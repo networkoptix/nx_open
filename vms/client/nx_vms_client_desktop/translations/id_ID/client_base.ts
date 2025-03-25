@@ -4535,8 +4535,8 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <translation>Perangkat yang dikonfigurasi dengan pengaturan &quot;Semua archive&quot; akan diubah menjadi &quot;Gerakan, Objek, dan Bookmark&quot; saat backup cloud diaktifkan</translation>
     </message>
     <message>
-      <source>Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
-      <translation type="unfinished">Cloud backup has been stopped because the system has been shutdown. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
+      <source>Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
+      <translation type="unfinished">Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
     </message>
   </context>
   <context>

@@ -1432,10 +1432,6 @@
       <translation>啟用或停用建立新的整合註冊請求</translation>
     </message>
     <message>
-      <source>SMTP settings.</source>
-      <translation>SMTP設定.</translation>
-    </message>
-    <message>
       <source>Anonymous statistics report allowed.</source>
       <translation>允許匿名統計報告.</translation>
     </message>
@@ -1850,6 +1846,10 @@
     <message>
       <source>LDAP settings.</source>
       <translation>LDAP設定.</translation>
+    </message>
+    <message>
+      <source>SMTP settings. These settings are visible for Power Users only.</source>
+      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
     </message>
   </context>
 </TS>

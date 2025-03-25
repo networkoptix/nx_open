@@ -1432,10 +1432,6 @@
       <translation>新しいインテグレーション登録リクエストの作成を有効または無効にする</translation>
     </message>
     <message>
-      <source>SMTP settings.</source>
-      <translation>SMTP 設定。</translation>
-    </message>
-    <message>
       <source>Anonymous statistics report allowed.</source>
       <translation>匿名統計レポートを許可する。</translation>
     </message>
@@ -1850,6 +1846,10 @@
     <message>
       <source>LDAP settings.</source>
       <translation>LDAP 設定。</translation>
+    </message>
+    <message>
+      <source>SMTP settings. These settings are visible for Power Users only.</source>
+      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
     </message>
   </context>
 </TS>

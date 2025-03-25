@@ -821,7 +821,7 @@
     </message>
     <message>
       <source>NEW</source>
-      <translation type="unfinished">NEW</translation>
+      <translation>NY</translation>
     </message>
   </context>
   <context>
