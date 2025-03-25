@@ -260,7 +260,7 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextData()
 
     reportNetworkIssue(qnSyncTime->currentTimePoint(), reason, info);
 
-    NX_VERBOSE(this, "No video frame for URL %1", m_url);
+    NX_DEBUG(this, "No video frame for URL %1", m_url);
     return result;
 }
 
@@ -301,9 +301,11 @@ void RtspStreamProvider::processCameraTimeHelperEvent(
     switch (event)
     {
         case CameraTimeHelper::EventType::BadCameraTime:
+            NX_DEBUG(this, "Bad camera time network issue for camera %1", m_resource->getUrl());
             reportNetworkIssue(currentTime, EventReason::networkBadCameraTime, {});
             return;
         case CameraTimeHelper::EventType::CameraTimeBackToNormal:
+            NX_DEBUG(this, "Camera %1 time is back to normal", m_resource->getUrl());
             reportNetworkIssue(currentTime, EventReason::networkCameraTimeBackToNormal, {});
             return;
         default:
@@ -1359,6 +1361,7 @@ CameraDiagnostics::Result RtspResourceStreamProvider::registerAddressIfNeeded(
     if (!multicastAddress.address.isMulticast()
         || multicastAddress.port <= 0)
     {
+        NX_DEBUG(this, "Invalid multicast address %1", multicastAddress);
         reportNetworkIssue(
             qnSyncTime->currentTimePoint(),
             vms::api::EventReason::networkMulticastAddressIsInvalid,
@@ -1398,6 +1401,7 @@ CameraDiagnostics::Result RtspResourceStreamProvider::registerAddressIfNeeded(
             .stream = addressUsageInfo.stream,
         };
 
+        NX_DEBUG(this, "Multicast address %1 is already in use by %2", multicastAddress, deviceName);
         reportNetworkIssue(
             qnSyncTime->currentTimePoint(),
             vms::api::EventReason::networkMulticastAddressConflict,
