@@ -13,8 +13,8 @@ ListView
     property alias siteModel: filterModel.sourceModel
     property alias hideOrgSystemsFromSites: filterModel.hideOrgSystemsFromSites
 
-    signal itemClicked(var nodeId)
-    signal itemEditClicked(var nodeId)
+    signal itemClicked(var nodeId, string systemId)
+    signal itemEditClicked(var nodeId, string systemId)
 
     spacing: cellsInRow == 1 ? 8 : 12
 
@@ -138,8 +138,8 @@ ListView
                 invalidVersion: modelData.wrongVersion ? modelData.wrongVersion.toString() : ""
                 editEnabled: modelData.type == OrganizationsModel.System && !cloudSystem
 
-                onClicked: siteList.itemClicked(modelData.nodeId)
-                onEditClicked: siteList.itemEditClicked(modelData.nodeId)
+                onClicked: siteList.itemClicked(modelData.nodeId, modelData.systemId)
+                onEditClicked: siteList.itemEditClicked(modelData.nodeId, modelData.systemId)
             }
         }
     }

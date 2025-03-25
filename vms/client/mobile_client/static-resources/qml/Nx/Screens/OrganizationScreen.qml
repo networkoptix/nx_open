@@ -111,7 +111,7 @@ Page
         if (!searchField.visible)
             return
 
-        let index = model.indexFromId(prevRootId)
+        let index = model.indexFromNodeId(prevRootId)
         if (index.row != -1)
             subtreeModel.sourceRoot = index
         prevRootId = null
@@ -184,7 +184,7 @@ Page
 
         onItemClicked: (nodeId) =>
         {
-            goInto(organizationScreen.model.indexFromId(nodeId))
+            goInto(organizationScreen.model.indexFromNodeId(nodeId))
         }
 
         function openWith(root)
@@ -290,9 +290,9 @@ Page
 
         siteModel: subtreeModel
 
-        onItemClicked: (nodeId) =>
+        onItemClicked: (nodeId, systemId) =>
         {
-            goInto(organizationScreen.model.indexFromId(nodeId))
+            goInto(organizationScreen.model.indexFromNodeId(nodeId))
         }
     }
 }

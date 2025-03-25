@@ -96,7 +96,7 @@ public:
     AbstractSystemsController* controller;
     nx::utils::ScopedConnections connections;
     InternalList internalData;
-    QHash<nx::Uuid, int> systemIdToRow;
+    QHash<QString, int> systemIdToRow;
     mutable QHash<QString, QString> searchServerNamesHostsCache;
 };
 
@@ -127,7 +127,7 @@ QnSystemsModel::~QnSystemsModel()
 {
 }
 
-int QnSystemsModel::getRowIndex(const nx::Uuid& systemId) const
+int QnSystemsModel::getRowIndex(const QString& systemId) const
 {
     Q_D(const QnSystemsModel);
 
@@ -452,10 +452,8 @@ void QnSystemsModelPrivate::addSystem(const SystemDescriptionPtr& systemDescript
                     });
             });
 
-    const auto systemId = nx::Uuid::fromStringSafe(systemDescription->id());
-
     q->beginInsertRows(QModelIndex(), internalData.size(), internalData.size());
-    systemIdToRow[systemId] = internalData.size();
+    systemIdToRow[systemDescription->id()] = internalData.size();
     internalData.append(data);
     q->endInsertRows();
 }
@@ -479,12 +477,11 @@ void QnSystemsModelPrivate::removeSystem(const QString &systemId, const nx::Uuid
     q->beginRemoveRows(QModelIndex(), position, position);
     internalData.erase(removeIt);
     // Adjust row numbers in systemId -> row mapping.
-    const auto systemUuid = nx::Uuid::fromStringSafe(systemId);
     for (auto it = systemIdToRow.begin(); it != systemIdToRow.end();)
     {
         if (it.value() > position)
             it.value()--;
-        if (it.key() == systemUuid)
+        if (it.key() == systemId)
             it = systemIdToRow.erase(it);
         else
             ++it;
@@ -506,7 +503,7 @@ void QnSystemsModelPrivate::emitDataChanged(const SystemDescriptionPtr& systemDe
 {
     Q_Q(QnSystemsModel);
 
-    const int row = q->getRowIndex(nx::Uuid::fromStringSafe(systemDescription->id()));
+    const int row = q->getRowIndex(systemDescription->id());
     if (row == -1)
         return;
     const auto modelIndex = q->index(row);
@@ -523,7 +520,7 @@ void QnSystemsModelPrivate::at_serverChanged(
 
     Q_Q(QnSystemsModel);
 
-    const int row = q->getRowIndex(nx::Uuid::fromStringSafe(systemDescription->id()));
+    const int row = q->getRowIndex(systemDescription->id());
     if (row == -1)
         return;
 

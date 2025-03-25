@@ -65,7 +65,7 @@ public: // overrides
     bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
     QHash<int, QByteArray> roleNames() const override { return kRoleNames; }
 
-    int getRowIndex(const nx::Uuid& systemId) const;
+    int getRowIndex(const QString& systemId) const;
 
 private:
     QScopedPointer<QnSystemsModelPrivate> d_ptr;

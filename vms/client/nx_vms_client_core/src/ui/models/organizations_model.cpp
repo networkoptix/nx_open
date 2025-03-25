@@ -575,23 +575,30 @@ OrganizationsModel::OrganizationsModel(QObject* parent):
 OrganizationsModel::~OrganizationsModel()
 {}
 
-QModelIndex OrganizationsModel::indexFromId(nx::Uuid id) const
+QModelIndex OrganizationsModel::indexFromNodeId(nx::Uuid id) const
 {
     if (auto node = d->nodes.find(id))
         return createIndex(node->row(), 0, node);
 
-    if (!d->proxyModel)
-        return {};
+    return {};
+}
 
-    auto systemsModel = qobject_cast<QnSystemsModel*>(d->proxyModel->sourceModel());
-    if (!systemsModel)
-        return {};
+QModelIndex OrganizationsModel::indexFromSystemId(const QString& id) const
+{
+    if (d->proxyModel)
+    {
+        auto systemsModel = qobject_cast<QnSystemsModel*>(d->proxyModel->sourceModel());
+        if (!systemsModel)
+            return {};
 
-    auto row = systemsModel->getRowIndex(id);
-    if (row == -1)
-        return {};
+        auto row = systemsModel->getRowIndex(id);
+        if (row == -1)
+            return {};
 
-    return d->mapFromProxyModel(d->proxyModel->mapFromSource(systemsModel->index(row, 0)));
+        return d->mapFromProxyModel(d->proxyModel->mapFromSource(systemsModel->index(row, 0)));
+    }
+
+    return {};
 }
 
 int OrganizationsModel::rowCount(const QModelIndex& parent) const
@@ -649,14 +656,6 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
             case Qt::DisplayRole:
                 role = QnSystemsModel::SystemNameRoleId;
                 break;
-            case IdRole:
-            {
-                // Return id as nx::Uuid instead of string.
-                auto id = d->proxyModel->data(
-                    d->mapToProxyModel(index),
-                    QnSystemsModel::SystemIdRoleId).toString();
-                return QVariant::fromValue(nx::Uuid::fromStringSafe(id));
-            }
             case TypeRole:
                 return QVariant::fromValue(OrganizationsModel::System);
             case IsFromSitesRole:
@@ -683,8 +682,9 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
         case QnSystemsModel::SystemNameRoleId:
             return node->name;
         case IdRole:
-        case QnSystemsModel::SystemIdRoleId:
             return QVariant::fromValue(node->id);
+        case QnSystemsModel::SystemIdRoleId:
+            return node->id.toSimpleString();
         case SytemCountRole:
             return node->systemCount;
         case TypeRole:
@@ -710,7 +710,7 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
                 if (!systemsModel)
                     return {};
 
-                const int rowInSystems = systemsModel->getRowIndex(node->id);
+                const int rowInSystems = systemsModel->getRowIndex(node->id.toSimpleString());
                 if (rowInSystems == -1)
                     return {};
 

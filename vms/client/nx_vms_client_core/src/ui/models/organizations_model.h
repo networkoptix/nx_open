@@ -78,7 +78,8 @@ public:
     OrganizationsModel(QObject* parent = nullptr);
     virtual ~OrganizationsModel();
 
-    Q_INVOKABLE QModelIndex indexFromId(nx::Uuid id) const;
+    Q_INVOKABLE QModelIndex indexFromNodeId(nx::Uuid id) const;
+    Q_INVOKABLE QModelIndex indexFromSystemId(const QString& id) const;
 
 public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;

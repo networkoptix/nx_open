@@ -258,9 +258,15 @@ Page
         siteModel: linearizationListModel
         hideOrgSystemsFromSites: cloudUserProfileWatcher.isOrgUser
 
-        onItemClicked: (nodeId) =>
+        onItemClicked: (nodeId, systemId) =>
         {
-            let current = organizationsModel.indexFromId(nodeId)
+            if (!nodeId)
+            {
+                sessionsScreen.openSystem(organizationsModel.indexFromSystemId(systemId))
+                return
+            }
+
+            let current = organizationsModel.indexFromNodeId(nodeId)
 
             if (accessor.getData(current, "type") != OrganizationsModel.System)
             {
@@ -271,9 +277,12 @@ Page
             sessionsScreen.openSystem(current)
         }
 
-        onItemEditClicked: (nodeId) =>
+        onItemEditClicked: (nodeId, systemId) =>
         {
-            let current = organizationsModel.indexFromId(nodeId)
+            if (nodeId)
+                return
+
+            let current = organizationsModel.indexFromSystemId(systemId)
             sessionsScreen.editSystem(current)
         }
     }
