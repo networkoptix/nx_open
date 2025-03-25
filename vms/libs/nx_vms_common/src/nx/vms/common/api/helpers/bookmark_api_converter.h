@@ -80,6 +80,10 @@ Bookmark bookmarkToApi(T&& oldBookmark, nx::Uuid serverId, bool includeDigest = 
 
             result.share = std::move(share);
         }
+        else
+        {
+            result.share = std::nullptr_t{};
+        }
     }
 
     return result;
