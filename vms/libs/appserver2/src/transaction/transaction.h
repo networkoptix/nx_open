@@ -1051,7 +1051,7 @@ APPLY(904, removeStoredFile, nx::vms::api::StoredFilePath, \
         notificationParams.storedFileNotificationManager->triggerNotification( \
             tran, notificationParams.source); \
     }, \
-    AllowForAllAccess(), /*< save permission checker */ \
+    PowerUserAccess(), /*< save permission checker */ \
     AllowForAllAccess(), /*< read permission checker */ \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
@@ -1074,7 +1074,7 @@ APPLY(902, addStoredFile, nx::vms::api::StoredFileData, \
     false, /*< isRemoveOperation */ \
     &createHashForApiStoredFileDataHelper, \
     StoredFileNotificationManagerHelper(), \
-    AllowForAllAccess(), /*< save permission checker */ \
+    PowerUserAccess(), /*< save permission checker */ \
     AllowForAllAccess(), /*< read permission checker */ \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
@@ -1086,7 +1086,7 @@ APPLY(903, updateStoredFile, nx::vms::api::StoredFileData, \
     false, /*< isRemoveOperation */ \
     &createHashForApiStoredFileDataHelper, \
     StoredFileNotificationManagerHelper(), \
-    AllowForAllAccess(), /*< save permission checker */ \
+    PowerUserAccess(), /*< save permission checker */ \
     AllowForAllAccess(), /*< read permission checker */ \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
