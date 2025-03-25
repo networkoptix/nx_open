@@ -1928,7 +1928,7 @@
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only</source>
-      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only</translation>
+      <translation>Ustawienia SMTP. Te ustawienia są widoczne tylko dla użytkowników zaawansowanych</translation>
     </message>
   </context>
   <context>
