@@ -1502,10 +1502,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>SMTP settings.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Anonymous statistics report allowed.</source>
         <translation></translation>
     </message>
@@ -1920,6 +1916,10 @@
     <message>
         <source>LDAP settings.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>SMTP settings. These settings are visible for Power Users only.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
