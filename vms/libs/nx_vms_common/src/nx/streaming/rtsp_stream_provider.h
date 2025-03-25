@@ -195,7 +195,7 @@ private:
         quint8* buffer, int bufferSize, int bufferCapacity);
     void buildClientRTCPReport(quint8 chNumber);
     QnAbstractMediaDataPtr getNextDataInternal();
-    void processCameraTimeHelperEvent(nx::streaming::rtp::CameraTimeHelper::EventType event);
+    virtual void processCameraTimeHelperEvent(nx::streaming::rtp::CameraTimeHelper::EventType event) {}
 
     bool isFormatSupported(const nx::rtp::Sdp::Media media) const;
     bool processData(
@@ -283,6 +283,8 @@ protected:
     virtual void updateStreamUrlIfNeeded() override;
     virtual nx::streaming::rtp::TimePolicy getTimePolicy() const override;
     virtual CameraDiagnostics::Result registerMulticastAddressesIfNeeded() override;
+    virtual void processCameraTimeHelperEvent(
+        nx::streaming::rtp::CameraTimeHelper::EventType event) override;
 
 private:
     CameraDiagnostics::Result registerAddressIfNeeded(

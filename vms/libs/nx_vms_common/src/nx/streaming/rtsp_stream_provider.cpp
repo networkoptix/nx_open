@@ -292,27 +292,6 @@ void RtspStreamProvider::buildClientRTCPReport(quint8 chNumber)
     }
 }
 
-void RtspStreamProvider::processCameraTimeHelperEvent(
-    nx::streaming::rtp::CameraTimeHelper::EventType event)
-{
-    using namespace nx::streaming::rtp;
-    using namespace vms::api;
-    const auto currentTime = qnSyncTime->currentTimePoint();
-    switch (event)
-    {
-        case CameraTimeHelper::EventType::BadCameraTime:
-            NX_DEBUG(this, "Bad camera time network issue for camera %1", m_resource->getUrl());
-            reportNetworkIssue(currentTime, EventReason::networkBadCameraTime, {});
-            return;
-        case CameraTimeHelper::EventType::CameraTimeBackToNormal:
-            NX_DEBUG(this, "Camera %1 time is back to normal", m_resource->getUrl());
-            reportNetworkIssue(currentTime, EventReason::networkCameraTimeBackToNormal, {});
-            return;
-        default:
-            return;
-    }
-}
-
 QnAbstractMediaDataPtr RtspStreamProvider::getNextDataInternal()
 {
     for (auto& track: m_tracks)
@@ -1413,6 +1392,37 @@ CameraDiagnostics::Result RtspResourceStreamProvider::registerAddressIfNeeded(
     }
 
     return CameraDiagnostics::NoErrorResult();
+}
+
+void RtspResourceStreamProvider::processCameraTimeHelperEvent(
+    nx::streaming::rtp::CameraTimeHelper::EventType event)
+{
+    using namespace nx::streaming::rtp;
+    using namespace vms::api;
+    const auto currentTime = qnSyncTime->currentTimePoint();
+
+    const nx::utils::Url url(m_resource->getUrl());
+    nx::vms::rules::NetworkIssueInfo info;
+    info.deviceName = m_resource->getName();
+    info.address.address = url.host();
+    info.address.port = url.port();
+    info.stream = (m_role == Qn::CR_SecondaryLiveVideo)
+        ? nx::vms::api::StreamIndex::secondary
+        : nx::vms::api::StreamIndex::primary;
+
+    switch (event)
+    {
+    case CameraTimeHelper::EventType::BadCameraTime:
+        NX_DEBUG(this, "Bad camera time network issue for camera %1", url);
+        reportNetworkIssue(currentTime, EventReason::networkBadCameraTime, info);
+        return;
+    case CameraTimeHelper::EventType::CameraTimeBackToNormal:
+        NX_DEBUG(this, "Camera %1 time is back to normal", url);
+        reportNetworkIssue(currentTime, EventReason::networkCameraTimeBackToNormal, info);
+        return;
+    default:
+        return;
+    }
 }
 
 } // namespace nx::streaming
