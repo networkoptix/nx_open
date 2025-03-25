@@ -44,7 +44,7 @@ public:
         {
             auto converted = nx::network::ssl::Certificate::parse(cert.toPem().data());
 
-            if (!NX_ASSERT(converted.size() == 1))
+            if (converted.size() != 1)
                 continue;
 
             X509_STORE_add_cert(m_x509Store.get(), converted.at(0).x509());
