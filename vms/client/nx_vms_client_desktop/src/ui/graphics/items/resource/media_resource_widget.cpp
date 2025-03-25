@@ -1149,7 +1149,6 @@ void QnMediaResourceWidget::createButtons()
             if (objectSearchButton->isClicked() && on)
                 selectThisWidget(true);
 
-            setProperty(Qn::NoHandScrollOver, on);
             action(menu::ObjectSearchModeAction)->setChecked(on);
         });
 
@@ -2277,6 +2276,9 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
         const auto hotspotsButton = titleBar()->rightButtonsBar()->button(Qn::HotspotsButton);
         setButtonCheckedSilent(hotspotsButton, options().testFlag(DisplayHotspots));
     }
+
+    setProperty(Qn::NoHandScrollOver,
+        options().testAnyFlags({ControlPtz, DisplayAnalyticsObjects}));
 
     base_type::optionsChangedNotify(changedFlags);
 }
