@@ -920,7 +920,19 @@ APPLY(803, resetEventRules, nx::vms::api::ResetEventRulesData, \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
-/* Transaction 804 (broadcastAction) removed, the code is forbidden. */ \
+/* Remove `broadcastAction` when mobile client no longer have to support 6.0 servers. */ \
+/**%apidoc[unused] */ \
+APPLY(804, broadcastAction, nx::vms::api::EventActionData, \
+    false, /*< isPersistent */ \
+    false, /*< isSystem */ \
+    false, /*< isRemoveOperation */ \
+    InvalidGetHashHelper(), \
+    EmptyNotificationHelper(), \
+    InvalidAccess(), /*< save permission checker */ \
+    InvalidAccess(), /*< read permission checker */ \
+    InvalidFilterFunc(), /*< filter read func */ \
+    InvalidAccessOut(), /*< check remote peer rights for outgoing transaction */ \
+    RegularTransactionType()) /*< regular transaction type */ \
 /**%apidoc[proprietary] */ \
 APPLY(810, getVmsRules, nx::vms::api::rules::RuleList, \
     false, /*< isPersistent */ \

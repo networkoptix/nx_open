@@ -83,8 +83,10 @@ bool handleTransaction2(
     const Function& function,
     FastFunctionType fastFunction)
 {
-    static const int kGetKnownPeersSystemTime = 2005;
-    if ((int) transaction.command == kGetKnownPeersSystemTime)
+    static constexpr int kBroadcastAction = 804;
+    static constexpr int kGetKnownPeersSystemTime = 2005;
+    if ((int) transaction.command == kBroadcastAction
+        || (int) transaction.command == kGetKnownPeersSystemTime)
     {
         NX_VERBOSE(bus, "Ignore deprecated unused transaction %1", transaction.command);
         return true;
