@@ -255,6 +255,11 @@ TileBase
         {
             tileController.clicked(index, mouse.button, mouse.modifiers)
         }
+
+        onDoubleClicked: (mouse) =>
+        {
+            tileController.doubleClicked(mouse)
+        }
     }
 
     ImageButton
