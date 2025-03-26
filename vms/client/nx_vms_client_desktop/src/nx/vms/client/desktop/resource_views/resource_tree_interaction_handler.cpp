@@ -314,6 +314,10 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
         result.setArgument(Qn::ParentNodeTypeRole, parentIndexNodeType);
         result.setArgument(Qn::TopLevelParentNodeTypeRole, topLevelParentNodeType(index));
 
+        const auto uuid = index.data(core::UuidRole).value<nx::Uuid>();
+        if (!uuid.isNull())
+            result.setArgument(core::UuidRole, uuid);
+
         QSet<QnResourcePtr> resources;
 
         // Consider recorder's children its siblings.
