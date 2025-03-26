@@ -4,13 +4,13 @@
 
 #ifndef QT_NO_PROCESS
 
-#include <sys/time.h>
-#include <sys/resource.h>
-#include <unistd.h>
 #include <errno.h>
+#include <sys/resource.h>
+#include <sys/time.h>
+#include <unistd.h>
 
-#include <QtCore/QProcess>
 #include <QtCore/QPointer>
+#include <QtCore/QProcess>
 
 
 #include <nx/utils/log/log.h>
@@ -169,7 +169,7 @@ void QnUnixProcess::setPriority(Priority priority) {
     if (setpriority(PRIO_PROCESS, d->pid, systemPriority) != 0)
     {
         NX_WARNING(this, "Could not set priority [%1] for process [%2]: %3",
-            static_cast<int>(priority), d->pid, strerror(errno));
+            static_cast<int>(priority), d->pid, SystemError::toString(errno));
         return;
     }
 }

@@ -11,20 +11,20 @@
 #include "nx/sdk/cloud_storage/helpers/data.h"
 
 #if defined (_WIN32)
-    #include <windows.h>
     #include <Shlwapi.h>
+    #include <windows.h>
 
     #pragma comment(lib, "Shlwapi.lib")
 
 #elif defined (__unix__) || defined(__APPLE__)
-#include <dirent.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+    #include <dirent.h>
+    #include <errno.h>
+    #include <fcntl.h>
+    #include <stdio.h>
+    #include <string.h>
+    #include <unistd.h>
 
-#include <sys/stat.h>
+    #include <sys/stat.h>
 
 #endif // _WIN32
 
@@ -194,6 +194,23 @@ std::string winApiErrorString(DWORD code)
     return result;
 }
 
+#else
+
+// TODO: Consider moving to nx_kit and use it in other places instead of duplicating the code.
+std::string safeStrerror(int errorCode)
+{
+    char errorBuffer[1024]; //< 1024 is taken from glibc perror implementation.
+    #if defined(__APPLE__) || defined(ANDROID) || defined(__ANDROID__)
+        // POSIX strerror_r implementation returns error code, not the error message. If the
+        // function fails, return an empty string.
+        if (!strerror_r(errorCode, errorBuffer, sizeof(errorBuffer)))
+            std::string();
+        return errorBuffer;
+    #else
+        return strerror_r(errorCode, errorBuffer, sizeof(errorBuffer));
+    #endif
+}
+
 #endif // WIN32
 
 void ensureDir(std::string path)
@@ -251,7 +268,7 @@ void ensureDir(std::string path)
             if (mkdir(subPath.data(), 0777) != 0)
             {
                 throw std::runtime_error(
-                    std::string("mkdir failed for '") + subPath + "' " + strerror(errno));
+                    std::string("mkdir failed for '") + subPath + "' " + safeStrerror(errno));
             }
         #endif // _WIN32
 
@@ -435,7 +452,7 @@ public:
             if (readResult < 0)
             {
                 throw std::runtime_error(
-                    "Read failed '" + m_path + "'. Error: " + strerror(errno));
+                    "Read failed '" + m_path + "'. Error: " + safeStrerror(errno));
             }
 
             append(buf, readResult, &result);
@@ -455,7 +472,7 @@ public:
             {
                 throw std::runtime_error(
                     "Write all failed (close & delete) '" + m_path
-                    + "'. Error: " + strerror(errno));
+                    + "'. Error: " + safeStrerror(errno));
             }
 
             openFile();
@@ -465,7 +482,7 @@ public:
         if (writeResult < 0 || writeResult != (int) data.size())
         {
             throw std::runtime_error(
-                "Write failed '" + m_path + "'. Error: " + strerror(errno));
+                "Write failed '" + m_path + "'. Error: " + safeStrerror(errno));
         }
     }
 
@@ -479,7 +496,7 @@ private:
         if (m_fd < 0)
         {
             throw std::runtime_error(
-                "Failed to open file '" + m_path + "'. Error: " + strerror(errno));
+                "Failed to open file '" + m_path + "'. Error: " + safeStrerror(errno));
         }
     }
 };
@@ -491,7 +508,7 @@ void moveFile(const std::string& oldPath, const std::string& newPath)
     {
         throw std::runtime_error(
             "Move failed old: '" + oldPath + "', new: '" + newPath
-            + "'. Error: " + strerror(errno));
+            + "'. Error: " + safeStrerror(errno));
     }
 }
 

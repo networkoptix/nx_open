@@ -34,14 +34,15 @@
         "Invalid socket type is used in AbstractSocket.");
     typedef char raw_type;       // Type used for raw data on this platform
 #else
-    #include <sys/types.h>       // For data types
-    #include <sys/socket.h>      // For socket(), connect(), send(), and recv()
+    #include <fcntl.h>
     #include <netdb.h>           // For getaddrinfo()
-    #include <arpa/inet.h>       // For inet_addr()
+    #include <sys/socket.h>      // For socket(), connect(), send(), and recv()
+    #include <sys/types.h>       // For data types
     #include <unistd.h>          // For close()
+
+    #include <arpa/inet.h>       // For inet_addr()
     #include <netinet/in.h>      // For sockaddr_in
     #include <netinet/tcp.h>      // For TCP_NODELAY
-    #include <fcntl.h>
     typedef void raw_type;       // Type used for raw data on this platform
 #endif
 
@@ -489,7 +490,7 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
     m_fd = ::socket(m_ipVersion, type, protocol);
     if (m_fd < 0)
     {
-        qWarning() << strerror(errno);
+        NX_WARNING(this, "Can not create socket: %1", SystemError::toString(errno));
         return false;
     }
 
@@ -510,13 +511,11 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
     int flags = fcntl(m_fd, F_GETFD, 0);
     if (flags < 0)
     {
-        NX_WARNING(this, nx::format("Can not read options by fcntl: %1")
-            .arg(SystemError::getLastOSErrorCode()));
+        NX_WARNING(this, "Can not read options by fcntl: %1", SystemError::getLastOSErrorCode());
     }
     else if (fcntl(m_fd, F_SETFD, flags | FD_CLOEXEC) < 0)
     {
-        NX_WARNING(this, nx::format("Can not set FD_CLOEXEC by fcntl: %1")
-            .arg(SystemError::getLastOSErrorCode()));
+        NX_WARNING(this, "Can not set FD_CLOEXEC by fcntl: %1", SystemError::getLastOSErrorCode());
     }
 #endif
     return true;

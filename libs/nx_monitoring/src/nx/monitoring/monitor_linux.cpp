@@ -1,17 +1,20 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "monitor_linux.h"
-#include "private/monitor_p_linux.h"
 
 #include <iostream>
-#include <optional>
 #include <map>
+#include <optional>
 #include <thread>
+
 #include <unistd.h>
 
 #include <QtCore/QDir>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/system_error.h>
+
+#include "private/monitor_p_linux.h"
 
 namespace nx::monitoring {
 
@@ -31,7 +34,8 @@ MemoryStats getMemoryStats()
     std::ifstream statm(kStatmFilename);
     if (!statm.is_open())
     {
-        NX_WARNING(NX_SCOPE_TAG, "Failed to open file %1: %2", kStatmFilename, strerror(errno));
+        NX_WARNING(NX_SCOPE_TAG,
+            "Failed to open file %1: %2", kStatmFilename, SystemError::toString(errno));
         return {0, 0};
     }
 

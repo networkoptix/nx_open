@@ -6,7 +6,7 @@
 #include <locale>
 
 #ifndef _WIN32
-#include <cerrno>
+    #include <cerrno>
 #endif
 
 #include <QtCore/QString>
@@ -56,7 +56,17 @@ std::string toString(ErrorCode errorCode)
     if (errorCode == dnsServerFailure)
         return "DNS server failure";
 
-    return QString::fromLocal8Bit(strerror(errorCode)).toStdString();
+    char errorBuffer[1024]; //< 1024 is taken from glibc perror implementation.
+    #if defined(__APPLE__) || defined(ANDROID) || defined(__ANDROID__)
+        // POSIX strerror_r implementation returns error code, not the error message. If the
+        // function fails, return an empty string.
+        if (!strerror_r(errorCode, errorBuffer, sizeof(errorBuffer)))
+            std::string();
+        return errorBuffer;
+    #else
+        // Linux strerror_r implementation returns error message.
+        return strerror_r(errorCode, errorBuffer, sizeof(errorBuffer));
+    #endif
 #endif
 }
 

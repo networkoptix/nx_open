@@ -60,7 +60,7 @@ void sslKeyLogFileCallback(const SSL* /*ssl*/, const char* line)
             FILE* file = std::fopen(path, "ab");
             if (!file)
             {
-                static const auto error = std::strerror(errno);
+                static const auto error = SystemError::toString(errno);
                 NX_ERROR(NX_SCOPE_TAG, "Unable to open %1: %2", path, error);
                 return static_cast<FILE*>(nullptr);
             }
