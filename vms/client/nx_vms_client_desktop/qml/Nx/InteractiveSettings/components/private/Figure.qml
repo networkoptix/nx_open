@@ -19,6 +19,7 @@ LabeledItem
     property var figureSettings
     property var figure
     property bool useLabelField: true
+    property bool useDisplayOnCamera: true
     property var defaultValue //< Not used but required by the backend.
 
     signal valueChanged(bool activated)
@@ -85,6 +86,7 @@ LabeledItem
             id: showOnCameraCheckBox
             text: qsTr("Display on video")
             enabled: figureView.hasFigure
+            visible: useDisplayOnCamera
             onCheckedChanged: valueChanged(/*activated*/ true)
             topPadding: 0
         }

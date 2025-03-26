@@ -485,8 +485,10 @@ NOTE: There is a similar non-editable item with a different look, called `Banner
 ---------------------------------------------------------------------------------------------------
 ## PolygonFigure
 
-Polygon figure field. Supports maximum points limitation. The `"useLabelField"` field is optional
-(`true` by default) and is used to show or hide the figure label text field.
+Polygon figure field. Supports maximum points limitation. The following fields are optional:
+- `"useLabelField"` (`true` by default) is used to show or hide the figure label text field.
+- `"useDisplayOnCamera"` (`true` by default) is used to show or hide the "Display on camera"
+    checkbox.
 
 [proprietary]
 
@@ -503,6 +505,7 @@ Polygon figure field. Supports maximum points limitation. The `"useLabelField"` 
         "caption": "Polygon",
         "description": "Some polygon",
         "useLabelField": true,
+        "useDisplayOnCamera": true,
         "minPoints": 4,
         "maxPoints": 8
     }
@@ -525,8 +528,10 @@ Polygon figure field. Supports maximum points limitation. The `"useLabelField"` 
 ---------------------------------------------------------------------------------------------------
 ## BoxFigure
 
-Box figure field. The `"useLabelField"` field is optional (`true` by default) and is used to show
-or hide the figure label text field.
+Box figure field. The following fields are optional:
+- `"useLabelField"` (`true` by default) is used to show or hide the figure label text field.
+- `"useDisplayOnCamera"` (`true` by default) is used to show or hide the "Display on camera"
+    checkbox.
 
 [proprietary]
 
@@ -541,7 +546,8 @@ or hide the figure label text field.
         "name": "box1",
         "caption": "Box",
         "description": "Some box",
-        "useLabelField": true
+        "useLabelField": true,
+        "useDisplayOnCamera": true
     }
 
 ### Setting Value
@@ -563,8 +569,10 @@ or hide the figure label text field.
 
 Line or polyline figure field. Supports minimum and maximum points limitation (default value: 2 for
 both min and max). Can have single crossing direction or not have any (equivalent to having both
-directions). The `"useLabelField"` field is optional (`true` by default) and is used to show or
-hide the figure label text field.
+directions). The following fields are optional:
+- `"useLabelField"` (`true` by default) is used to show or hide the figure label text field.
+- `"useDisplayOnCamera"` (`true` by default) is used to show or hide the "Display on camera"
+    checkbox.
 
 [proprietary]
 
@@ -580,6 +588,7 @@ hide the figure label text field.
         "caption": "Line",
         "description": "Some line",
         "useLabelField": true,
+        "useDisplayOnCamera": true,
         "minPoints": 2,
         "maxPoints": 8,
         "allowedDirections": "one"
