@@ -28,6 +28,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <network/system_helpers.h>
 #include <nx/analytics/action_type_descriptor_manager.h>
 #include <nx/analytics/taxonomy/abstract_engine.h>
 #include <nx/analytics/taxonomy/abstract_object_type.h>
@@ -48,6 +49,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/icon.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
@@ -123,6 +125,7 @@ public:
 public:
     QPointer<TaxonomyManager> taxonomyManager;
     nx::utils::ScopedConnection m_currentTaxonomyChangedConnection;
+    nx::utils::ScopedConnection m_systemBecomeOfflineConnection;
 
 private:
     void setupEngineSelection();
@@ -304,26 +307,27 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
             if (!nx::vms::client::core::ini().allowCslObjectSearch)
                 return;
 
-            // TODO: #dfisenko Remade models and everything connected to work with possible
-            // null system context.
-            if (!cameraContext)
-                cameraContext = appContext()->currentSystemContext();
-
-            NX_CRITICAL(cameraContext);
-
             m_currentTaxonomyChangedConnection.reset();
-            if (taxonomyManager = cameraContext->taxonomyManager())
-            {
-                if (!cameraContext->messageProcessor())
-                {
-                    // It is cross-system context case.
-                    cameraContext->createMessageProcessor<QnDesktopClientMessageProcessor>(
-                        taxonomyManager);
-                }
 
-                m_currentTaxonomyChangedConnection.reset(
-                    connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged,
-                        this, &AnalyticsSearchWidget::Private::updateAllowanceAndTaxonomy));
+            if (cameraContext)
+            {
+                if (taxonomyManager = cameraContext->taxonomyManager())
+                {
+                    if (!cameraContext->messageProcessor())
+                    {
+                        // It is cross-system context case.
+                        cameraContext->createMessageProcessor<QnDesktopClientMessageProcessor>(
+                            taxonomyManager);
+                    }
+
+                    m_currentTaxonomyChangedConnection.reset(
+                        connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged,
+                            this, &AnalyticsSearchWidget::Private::updateAllowanceAndTaxonomy));
+                }
+            }
+            else
+            {
+                taxonomyManager = nullptr;
             }
 
             m_filterModel->setTaxonomyManager(taxonomyManager);
@@ -350,13 +354,58 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
             setSystemContextToModels(nullptr);
         });
 
-    connect(q->windowContext()->navigator(), &QnWorkbenchNavigator::currentResourceChanged, this,
-        [this, q, setSystemContextToModels]()
+    const auto handleCurrentResourceChanged =
+        [this, setSystemContextToModels]()
         {
-            const auto selectedCamera = q->windowContext()->navigator()->currentResource()
-                .dynamicCast<QnVirtualCameraResource>();
-            setSystemContextToModels(SystemContext::fromResource(selectedCamera));
-        });
+            m_systemBecomeOfflineConnection.reset();
+
+            SystemContext* cameraContext = nullptr;
+
+            if (const auto currentResource =
+                this->q->windowContext()->navigator()->currentResource())
+            {
+                cameraContext = SystemContext::fromResource(currentResource);
+            }
+            else
+            {
+                const auto currentLayout =
+                    this->q->windowContext()->workbench()->currentLayout()->resource();
+                if (!currentLayout->flags().testFlag(Qn::cross_system))
+                    cameraContext = appContext()->currentSystemContext();
+            }
+
+            setSystemContextToModels(cameraContext);
+
+            if (!cameraContext)
+                return;
+
+            const auto systemId = helpers::getTargetSystemId(cameraContext->moduleInformation());
+            auto systemDescription = appContext()->systemFinder()->getSystem(systemId);
+            if (!systemDescription)
+                return;
+
+            m_systemBecomeOfflineConnection.reset(
+                connect(
+                    systemDescription.get(),
+                    &nx::vms::client::core::SystemDescription::onlineStateChanged,
+                    this,
+                    [this, systemDescription, setSystemContextToModels]()
+                    {
+                        if (systemDescription->isOnline())
+                        {
+                            const auto cameraContext = SystemContext::fromResource(
+                                this->q->windowContext()->navigator()->currentResource());
+                            setSystemContextToModels(cameraContext);
+                        }
+                        else
+                        {
+                            setSystemContextToModels(nullptr);
+                        }
+                    }));
+        };
+
+    connect(q->windowContext()->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
+        this, handleCurrentResourceChanged);
 }
 
 void AnalyticsSearchWidget::Private::resetFilters()

@@ -19,6 +19,7 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <network/system_helpers.h>
 #include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/fusion/model_functions.h>
@@ -40,6 +41,7 @@
 #include <nx/vms/client/core/image_providers/resource_thumbnail_provider.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/thumbnails/abstract_caching_resource_thumbnail.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/utils/managed_camera_set.h>
@@ -261,6 +263,7 @@ private:
 
     nx::utils::ScopedConnections m_contextConnections;
     nx::utils::ScopedConnections m_modelConnections;
+    nx::utils::ScopedConnection m_systemBecomeOfflineConnection;
 
     std::unique_ptr<AbstractSearchSynchronizer> m_synchronizer;
 
@@ -1165,25 +1168,22 @@ void RightPanelModelsAdapter::Private::initCslSupport(
     auto setSystemContextToModels =
         [this, analyticsModel, analyticsFilterModel](SystemContext* cameraContext)
         {
-            // TODO: #dfisenko Remade models and everything connected to work with possible
-            // null system context.
-            if (!cameraContext)
-                cameraContext = appContext()->currentSystemContext();
+            nx::vms::client::core::analytics::TaxonomyManager* taxonomyManager = nullptr;
 
-            NX_CRITICAL(cameraContext);
-
-            if (cameraContext == q->commonSetup()->systemContext())
-                return;
-
-            const auto taxonomyManager = cameraContext->taxonomyManager();
-            analyticsFilterModel->setTaxonomyManager(taxonomyManager);
-
-            if (NX_ASSERT(taxonomyManager) && !cameraContext->messageProcessor())
+            if (cameraContext)
             {
-                // It is cross-system context case.
-                cameraContext->createMessageProcessor<QnDesktopClientMessageProcessor>(
-                    taxonomyManager);
+                if (taxonomyManager = cameraContext->taxonomyManager())
+                {
+                    if (!cameraContext->messageProcessor())
+                    {
+                        // It is cross-system context case.
+                        cameraContext->createMessageProcessor<QnDesktopClientMessageProcessor>(
+                            taxonomyManager);
+                    }
+                }
             }
+
+            analyticsFilterModel->setTaxonomyManager(taxonomyManager);
 
             analyticsModel->setSystemContext(cameraContext);
             q->commonSetup()->setSystemContext(cameraContext);
@@ -1207,31 +1207,59 @@ void RightPanelModelsAdapter::Private::initCslSupport(
             emit q->crossSiteModeChanged();
         });
 
+    const auto handleCurrentResourceChanged =
+        [this, setSystemContextToModels]()
+        {
+            m_systemBecomeOfflineConnection.reset();
+
+            SystemContext* cameraContext = nullptr;
+            if (const auto currentResource = m_context->navigator()->currentResource())
+            {
+                cameraContext = SystemContext::fromResource(currentResource);
+
+                const auto systemId =
+                    helpers::getTargetSystemId(cameraContext->moduleInformation());
+
+                if (const auto systemDescription =
+                    appContext()->systemFinder()->getSystem(systemId))
+                {
+                    m_systemBecomeOfflineConnection.reset(
+                        connect(
+                            systemDescription.get(),
+                            &nx::vms::client::core::SystemDescription::onlineStateChanged,
+                            this,
+                            [this, systemDescription, setSystemContextToModels]()
+                            {
+                                if (systemDescription->isOnline())
+                                {
+                                    const auto cameraContext = SystemContext::fromResource(
+                                        m_context->navigator()->currentResource());
+                                    setSystemContextToModels(cameraContext);
+                                }
+                                else
+                                {
+                                    setSystemContextToModels(nullptr);
+                                }
+                            }));
+                }
+            }
+            else
+            {
+                const auto currentLayout = m_context->workbench()->currentLayout()->resource();
+                if (!currentLayout->flags().testFlag(Qn::cross_system))
+                    cameraContext = appContext()->currentSystemContext();
+            }
+
+            setSystemContextToModels(cameraContext);
+
+            emit q->crossSiteModeChanged();
+        };
+
     m_modelConnections << connect(
         m_context->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
-        this,
-        [this, setSystemContextToModels]
-        {
-            setSystemContextToModels(
-                SystemContext::fromResource(m_context->navigator()->currentResource()));
+        this, handleCurrentResourceChanged);
 
-            emit q->crossSiteModeChanged();
-        });
-
-    m_modelConnections << connect(
-        m_context->workbench(),
-        &Workbench::currentLayoutChanged,
-        this,
-        [this, setSystemContextToModels]
-        {
-            setSystemContextToModels(
-                SystemContext::fromResource(m_context->navigator()->currentResource()));
-
-            emit q->crossSiteModeChanged();
-        });
-
-    setSystemContextToModels(
-        SystemContext::fromResource(m_context->navigator()->currentResource()));
+    handleCurrentResourceChanged();
 }
 
 void RightPanelModelsAdapter::Private::setHighlightedTimestamp(microseconds value)

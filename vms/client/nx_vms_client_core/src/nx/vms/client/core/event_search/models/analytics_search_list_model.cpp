@@ -1086,7 +1086,10 @@ void AnalyticsSearchListModel::setSystemContext(SystemContext* systemContext)
     base_type::setSystemContext(systemContext);
 
     if (!systemContext)
+    {
+        d->updateMetadataReceivers();
         return;
+    }
 
     d->permissionsMaybeChangedConnection.reset(
         connect(systemContext->accessController(), &AccessController::permissionsMaybeChanged, this,
@@ -1156,6 +1159,8 @@ void AnalyticsSearchListModel::setSystemContext(SystemContext* systemContext)
             connect(stateWatcher, &nx::analytics::taxonomy::AbstractStateWatcher::stateChanged, this,
                 [this]() { d->objectTypeAcceptanceCache.clear(); }));
     }
+
+    d->updateMetadataReceivers();
 }
 
 QRectF AnalyticsSearchListModel::filterRect() const
