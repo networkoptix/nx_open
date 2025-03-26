@@ -58,6 +58,8 @@ Page
                 id: fullNameLabel
                 Layout.topMargin: 12
                 Layout.fillWidth: true
+                Layout.leftMargin: 20
+                Layout.rightMargin: 20
 
                 horizontalAlignment: Text.AlignHCenter
                 text: cloudScreen.fullName
@@ -71,6 +73,8 @@ Page
             {
                 Layout.topMargin: 6
                 Layout.fillWidth: true
+                Layout.leftMargin: 20
+                Layout.rightMargin: 20
 
                 horizontalAlignment: Text.AlignHCenter
                 text: cloudStatusWatcher.cloudLogin
