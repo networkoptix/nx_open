@@ -155,7 +155,7 @@ std::tuple<GlobalPermissionsDeprecated, std::optional<std::vector<nx::Uuid>>, bo
             temporaryAccessibleResources.push_back(id);
     }
 
-    utils::unique_sort(temporaryAccessibleResources);
+    utils::unique_sort(&temporaryAccessibleResources);
 
     if (permissions.testFlag(GlobalPermission::viewLogs))
         deprecatedPermissions |= GlobalPermissionDeprecated::viewLogs;

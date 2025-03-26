@@ -239,15 +239,15 @@ decltype(auto) y_combinator(Functor&& functor)
  *     `bool cmp(const Type1& a, const Type2& b);`
  */
 template <typename T, typename Allocator, typename Compare>
-void unique_sort(std::vector<T, Allocator> &vec, Compare comp)
+void unique_sort(std::vector<T, Allocator>* vec, Compare comp)
 {
-    std::sort(vec.begin(), vec.end(), comp);
-    vec.erase(
-        std::unique(vec.begin(), vec.end(),
-            [comp](const auto& lhs, const auto& rhs) -> bool
+    std::sort(vec->begin(), vec->end(), comp);
+    vec->erase(
+        std::unique(vec->begin(), vec->end(),
+            [comp = std::move(comp)](const auto& lhs, const auto& rhs) -> bool
             {
                 return !comp(lhs, rhs) && !comp(rhs, lhs);
-            }), vec.end());
+            }), vec->end());
 }
 
 /**
@@ -255,9 +255,15 @@ void unique_sort(std::vector<T, Allocator> &vec, Compare comp)
  * @param vec vector to sort
  */
 template <typename T, typename Allocator>
-void unique_sort(std::vector<T, Allocator> &vec)
+void unique_sort(std::vector<T, Allocator>* vec)
 {
     return unique_sort(vec, std::less<T>{});
+}
+
+template<typename T, typename Allocator, typename SortPredicate = std::less<>>
+void sort(std::vector<T, Allocator>* v, SortPredicate p = {})
+{
+    std::sort(v->begin(), v->end(), std::move(p));
 }
 
 /**
@@ -310,7 +316,7 @@ template <typename Container>
 template <typename Compare, typename T, typename Allocator>
 [[nodiscard]] std::vector<T, Allocator> unique_sorted(std::vector<T, Allocator> items, Compare comp)
 {
-    unique_sort(items, comp);
+    unique_sort(&items, comp);
     return items;
 }
 
@@ -324,8 +330,15 @@ template <typename Compare, typename T, typename Allocator>
 template <typename T, typename Allocator>
 [[nodiscard]] std::vector<T, Allocator> unique_sorted(std::vector<T, Allocator> items)
 {
-    unique_sort(items);
+    unique_sort(&items);
     return items;
+}
+
+template<typename T, typename Allocator, typename SortPredicate = std::less<>>
+[[nodiscard]] std::vector<T, Allocator> sorted(std::vector<T, Allocator> v, SortPredicate p = {})
+{
+    std::sort(v.begin(), v.end(), std::move(p));
+    return v;
 }
 
 template<typename Container, typename UnaryPred,

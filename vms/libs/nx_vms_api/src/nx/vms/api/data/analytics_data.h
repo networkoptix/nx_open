@@ -345,7 +345,7 @@ struct ObjectTrackTitle
 
     bool operator<(const ObjectTrackTitle& other) const noexcept { return text < other.text; }
 };
-#define ObjectTrackTitle_Fields (text)(imageInfo)
+#define ObjectTrackTitle_Fields (text)(imageInfo)(isImageAvailable)
 NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackTitle, (json));
 NX_REFLECTION_INSTRUMENT(ObjectTrackTitle, ObjectTrackTitle_Fields)
 
