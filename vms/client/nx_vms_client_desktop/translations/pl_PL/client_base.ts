@@ -4676,7 +4676,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
-      <translation type="unfinished">Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
+      <translation>Tworzenie kopii zapasowej w chmurze zostało zatrzymane, ponieważ system został zamknięty. Musi być aktywny, aby wykonać kopię zapasową w chmurze. Skontaktuj się z partnerem kanałowym, aby uzyskać pomoc</translation>
     </message>
   </context>
   <context>
