@@ -3126,10 +3126,18 @@ void QnMediaResourceWidget::processSettingsRequest()
 
 void QnMediaResourceWidget::processMoreLicensesRequest()
 {
-    statisticsModule()->controls()->registerClick(
-        "resource_status_overlay_more_licenses");
+    statisticsModule()->controls()->registerClick("resource_status_overlay_more_licenses");
 
-    menu()->trigger(menu::PreferencesLicensesTabAction);
+    if (d->isIoModule)
+    {
+        menu()->trigger(menu::CameraSettingsAction,
+            menu::Parameters(d->camera).withArgument(
+                Qn::FocusTabRole, int(CameraSettingsTab::general)));
+    }
+    else
+    {
+        menu()->trigger(menu::PreferencesLicensesTabAction);
+    }
 }
 
 void QnMediaResourceWidget::processEncryptedArchiveUnlockRequst()
