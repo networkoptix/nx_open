@@ -44,6 +44,7 @@ Item
 
     property alias allowInsecure: allowInsecureCheckBox.checked
     property bool allowInsecureEditable: true
+    property bool insecureAuthEnabledBySiteSettings: true
 
     property alias model: groupsComboBox.groupsModel
     property alias parentGroupsEditable: groupsComboBox.enabled
@@ -407,6 +408,7 @@ Item
 
                         visible: !isCloudUser()
                             && control.userType != UserSettingsGlobal.TemporaryUser
+                            && control.insecureAuthEnabledBySiteSettings
 
                         Component
                         {

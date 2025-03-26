@@ -30,6 +30,7 @@ Item
     property alias linkValidUntil: temporaryLinkSettings.linkValidUntil
     property alias expiresAfterLoginS: temporaryLinkSettings.expiresAfterLoginS
     property alias revokeAccessEnabled: temporaryLinkSettings.revokeAccessEnabled
+    property bool insecureAuthEnabledBySiteSettings: true
 
     property int userType: UserSettingsGlobal.LocalUser
     readonly property bool isLocalUser: userType != UserSettingsGlobal.CloudUser
@@ -327,6 +328,7 @@ Item
             {
                 visible: control.userType != UserSettingsGlobal.CloudUser
                     && control.userType != UserSettingsGlobal.TemporaryUser
+                    && control.insecureAuthEnabledBySiteSettings
 
                 CheckBox
                 {

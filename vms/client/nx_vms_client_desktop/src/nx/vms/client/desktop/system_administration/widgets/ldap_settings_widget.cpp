@@ -195,7 +195,7 @@ struct LdapSettingsWidget::Private
         }
     }
 
-    static LdapSettings stateFromApi(const nx::vms::api::LdapSettings& settings)
+    LdapSettings stateFromApi(const nx::vms::api::LdapSettings& settings)
     {
         LdapSettings state;
 
@@ -226,6 +226,8 @@ struct LdapSettingsWidget::Private
         state.preferredSyncServer = settings.preferredMasterSyncServer;
         state.isHttpDigestEnabledOnImport = settings.isHttpDigestEnabledOnImport;
         state.isHttpDigestEnabledOnImportInitial = settings.isHttpDigestEnabledOnImport;
+        state.insecureAuthEnabledBySiteSettings =
+            q->globalSettings()->isInsecureDeprecatedAuthEnabled();
 
         state.defaultUserLocale = settings.defaultUserLocale;
 

@@ -39,6 +39,7 @@ Rectangle
     property var preferredSyncServer
     property bool isHttpDigestEnabledOnImport
     property bool isHttpDigestEnabledOnImportInitial
+    property bool insecureAuthEnabledBySiteSettings: true
 
     property string defaultUserLocale
 
@@ -523,6 +524,8 @@ Rectangle
                             advancedSettingsDialog.isHttpDigestEnabledOnImportInitial =
                                 control.isHttpDigestEnabledOnImportInitial
                             advancedSettingsDialog.defaultUserLocale = control.defaultUserLocale
+                            advancedSettingsDialog.insecureAuthEnabledBySiteSettings =
+                                control.insecureAuthEnabledBySiteSettings
 
                             advancedSettingsDialog.show()
                         }

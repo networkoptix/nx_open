@@ -1117,6 +1117,8 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
 {
     UserSettingsDialogState state;
 
+    state.insecureAuthEnabledBySiteSettings =
+        system()->globalSettings()->isInsecureDeprecatedAuthEnabled();
     if (!user)
     {
         if (d->dialogType == CreateUser)

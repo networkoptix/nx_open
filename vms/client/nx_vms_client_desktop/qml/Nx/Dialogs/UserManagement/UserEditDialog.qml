@@ -51,6 +51,7 @@ DialogWithState
     property alias userEnabledEditable: generalSettings.userEnabledEditable
     property alias allowInsecure: generalSettings.allowInsecure
     property alias allowInsecureEditable: generalSettings.allowInsecureEditable
+    property alias insecureAuthEnabledBySiteSettings: generalSettings.insecureAuthEnabledBySiteSettings
     property alias parentGroups: membersModel.parentGroups
     property bool parentGroupsEditable: true
     property alias globalPermissions: globalPermissionsModel.globalPermissions

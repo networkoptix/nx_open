@@ -51,6 +51,7 @@ struct LdapSettings
     Q_PROPERTY(nx::Uuid preferredSyncServer MEMBER preferredSyncServer)
     Q_PROPERTY(bool isHttpDigestEnabledOnImport MEMBER isHttpDigestEnabledOnImport)
     Q_PROPERTY(bool isHttpDigestEnabledOnImportInitial MEMBER isHttpDigestEnabledOnImportInitial)
+    Q_PROPERTY(bool insecureAuthEnabledBySiteSettings MEMBER insecureAuthEnabledBySiteSettings)
 
     Q_PROPERTY(QString defaultUserLocale MEMBER defaultUserLocale)
 
@@ -74,6 +75,7 @@ public:
     nx::Uuid preferredSyncServer;
     bool isHttpDigestEnabledOnImport = false;
     bool isHttpDigestEnabledOnImportInitial = false;
+    bool insecureAuthEnabledBySiteSettings = true;
 
     QString defaultUserLocale;
 };

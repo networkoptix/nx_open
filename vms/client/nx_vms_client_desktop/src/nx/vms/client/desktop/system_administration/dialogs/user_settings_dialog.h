@@ -44,6 +44,7 @@ struct UserSettingsDialogState
     Q_PROPERTY(bool userEnabledEditable MEMBER userEnabledEditable)
     Q_PROPERTY(bool allowInsecure MEMBER allowInsecure)
     Q_PROPERTY(bool allowInsecureEditable MEMBER allowInsecureEditable)
+    Q_PROPERTY(bool insecureAuthEnabledBySiteSettings MEMBER insecureAuthEnabledBySiteSettings)
     Q_PROPERTY(QList<nx::vms::client::desktop::MembersModelGroup> parentGroups
         READ getParentGroups
         WRITE setParentGroups)
@@ -80,6 +81,7 @@ public:
     bool userEnabledEditable = true;
     bool allowInsecure = false;
     bool allowInsecureEditable = true;
+    bool insecureAuthEnabledBySiteSettings = true;
     bool nameIsUnique = true;
 
     // Expose set of groups as QList for interoperability with QML and correct state comparison.

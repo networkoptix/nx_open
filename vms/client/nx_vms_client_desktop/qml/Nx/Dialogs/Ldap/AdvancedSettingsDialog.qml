@@ -37,6 +37,7 @@ Dialog
     property alias continuousSync: syncComboBox.selectedSync
 
     property alias defaultUserLocale: languageComboBox.value
+    property bool insecureAuthEnabledBySiteSettings: true
 
     modality: Qt.ApplicationModal
 
@@ -177,6 +178,7 @@ Dialog
         {
             leftSideMargin: 180
             rightSideMargin: 0
+            visible: dialog.insecureAuthEnabledBySiteSettings
 
             RowLayout
             {
