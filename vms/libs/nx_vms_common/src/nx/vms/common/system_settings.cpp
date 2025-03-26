@@ -980,7 +980,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         });
 
     d->allowRegisteringIntegrationsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "allowRegisteringIntegrations", /*defaultValue*/ true, this,
+        "allowRegisteringIntegrations", /*defaultValue*/ false, this,
             []()
             {
                 return tr("Enable or disable the creation of new Integration registration requests");

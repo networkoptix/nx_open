@@ -112,7 +112,7 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
     .backupSettings = BackupSettings{},
     .metadataStorageChangePolicy = MetadataStorageChangePolicy::keep,
 
-    .allowRegisteringIntegrations = true,
+    .allowRegisteringIntegrations = false,
 
     .additionalLocalFsTypes = QString{},
     .arecontRtspEnabled = false,
