@@ -82,8 +82,6 @@ private:
 
 private:
     QPointer<QnResourcePool> m_resourcePool;
-    nx::utils::ScopedConnection resourcePoolResourcesAddedConnection;
-    nx::utils::ScopedConnection resourcePoolResourcesRemovedConnection;
 
     const Filter m_filter;
     Type m_type = Type::multiple;

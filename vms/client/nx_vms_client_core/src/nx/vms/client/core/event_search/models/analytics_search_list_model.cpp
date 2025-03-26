@@ -563,10 +563,7 @@ nx::utils::Guard AnalyticsSearchListModel::Private::makeAvailableNewTracksGuard(
 
 void AnalyticsSearchListModel::Private::updateMetadataReceivers()
 {
-    if (!NX_ASSERT(q->systemContext()))
-        return;
-
-    if (liveReceptionActive)
+    if (q->systemContext() && liveReceptionActive)
     {
         auto cameras = q->cameraSet().cameras();
         MetadataReceiverList newMetadataReceivers;
@@ -1081,7 +1078,15 @@ void AnalyticsSearchListModel::setSystemContext(SystemContext* systemContext)
     if (systemContext == this->systemContext())
         return;
 
+    d->permissionsMaybeChangedConnection.reset();
+    d->activeMetadataStorageChangedConnection.reset();
+    d->stateChangedConnection.reset();
+    d->cameraStatusListener.reset();
+
     base_type::setSystemContext(systemContext);
+
+    if (!systemContext)
+        return;
 
     d->permissionsMaybeChangedConnection.reset(
         connect(systemContext->accessController(), &AccessController::permissionsMaybeChanged, this,

@@ -353,7 +353,9 @@ void NotificationListModel::Private::onNotificationAction(
     eventData.level = QnNotificationLevel::convert(action->level());
     eventData.iconPath = iconPath(action, cloudSystemId);
     eventData.cloudSystemId = cloudSystemId;
-    fillEventData(system(), action.get(), eventData);
+
+    if (NX_ASSERT(system()))
+        fillEventData(system(), action.get(), eventData);
 
     setupClientAction(action, eventData);
 
@@ -372,7 +374,8 @@ void NotificationListModel::Private::onRepeatSoundAction(
         eventData.level = QnNotificationLevel::convert(nx::vms::event::Level::common);
         eventData.iconPath = eventIconPath(nx::vms::rules::Icon::inputSignal);
         eventData.sourceName = action->sourceName();
-        fillEventData(system(), action.get(), eventData);
+        if (NX_ASSERT(system()))
+            fillEventData(system(), action.get(), eventData);
 
         if (!this->q->addEvent(eventData))
             return;
@@ -402,15 +405,21 @@ void NotificationListModel::Private::onAlarmLayoutAction(
     eventData.level = QnNotificationLevel::convert(nx::vms::event::Level::critical);
     eventData.iconPath = "16x16/Outline/soft_trigger.svg";
     eventData.sourceName = action->sourceName();
-    eventData.previewCamera =
-        system()->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->eventDeviceIds())
-            .value(0);
-    eventData.cameras =
-        system()->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(action->deviceIds());
+
+    if (NX_ASSERT(system()))
+    {
+        eventData.previewCamera =
+            system()->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+                action->eventDeviceIds()).value(0);
+        eventData.cameras =
+            system()->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+                action->deviceIds());
+    }
     eventData.actionId = menu::OpenInAlarmLayoutAction;
     eventData.actionParameters = eventData.cameras;
 
-    fillEventData(system(), action.get(), eventData);
+    if (NX_ASSERT(system()))
+        fillEventData(system(), action.get(), eventData);
 
     if (!this->q->addEvent(eventData))
         return;
@@ -506,7 +515,8 @@ void NotificationListModel::Private::setupAcknowledgeAction(
     if (!camera || !action->acknowledge())
         return;
 
-    if (!system()->accessController()->hasPermissions(camera, Qn::ManageBookmarksPermission))
+    if (NX_ASSERT(system()) &&
+        !system()->accessController()->hasPermissions(camera, Qn::ManageBookmarksPermission))
     {
         NX_VERBOSE(this, "Can't setup acknowledge action id: %1, lacking bookmark permissions",
             action->id());

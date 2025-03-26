@@ -100,6 +100,9 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(
 
         case MessageType::saasTierIssue:
         {
+            if (!NX_ASSERT(systemContext))
+                return QnNotificationLevel::Value::CriticalNotification;
+
             auto saas = systemContext->saasServiceManager();
             std::optional<int> daysLeft = saas->tierGracePeriodDaysLeft();
             if (daysLeft.has_value() && *daysLeft <= 10)

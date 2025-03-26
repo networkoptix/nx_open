@@ -43,6 +43,9 @@ void postRejectIntercomCall(
     nx::Uuid intercomId,
     nx::utils::AsyncHandlerExecutor executor)
 {
+    if (!NX_ASSERT(system))
+        return;
+
     auto serverApi = system->connectedServerApi();
     if (!NX_ASSERT(serverApi))
         return;
@@ -104,6 +107,9 @@ void CallNotificationsListModel::Private::addNotification(
 {
     if (!messageIsSupported(message.type))
         return; //< Message type is processed in a separate model.
+
+    if (!NX_ASSERT(system()))
+        return;
 
     const auto camera = system()->resourcePool()->getResourceById<QnVirtualCameraResource>(message.resourceId());
 

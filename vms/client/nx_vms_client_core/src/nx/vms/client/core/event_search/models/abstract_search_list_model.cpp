@@ -128,7 +128,10 @@ void AbstractSearchListModel::setSystemContext(SystemContext* systemContext)
     d->userWatcherChangedConnection.reset();
     base_type::setSystemContext(systemContext);
 
-    if (NX_ASSERT(systemContext))
+    d->cameraSet.setResourcePool(nullptr);
+    d->userWatcherChangedConnection.reset();
+
+    if (systemContext)
     {
         d->cameraSet.setResourcePool(systemContext->resourcePool());
 
@@ -141,6 +144,10 @@ void AbstractSearchListModel::setSystemContext(SystemContext* systemContext)
                 }));
 
         onOnlineChanged(!watcher->user().isNull());
+    }
+    else
+    {
+        onOnlineChanged(/*isOnline*/ false);
     }
 }
 

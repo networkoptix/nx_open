@@ -123,6 +123,9 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
     q(q),
     m_popupSystemHealthFilter(system()->userNotificationSettingsManager()->watchedMessages())
 {
+    if (!NX_ASSERT(system()))
+        return;
+
     // Handle system health state.
 
     const auto systemHealthState = system()->systemHealthState();
@@ -251,8 +254,11 @@ QString SystemHealthListModel::Private::title(int index) const
         }
 
         default:
+        {
+            NX_ASSERT(system());
             return QnSystemHealthStringsHelper::messageNotificationTitle(
                 system(), item.type, getResourceSet(item.type));
+        }
     }
 }
 
@@ -326,6 +332,9 @@ QString SystemHealthListModel::Private::toolTip(int index) const
 
     if (const auto serviceType = overusedSaasServiceType(item.type))
     {
+        if (!NX_ASSERT(system()))
+            return {};
+
         const auto serviceManager = system()->saasServiceManager();
         const auto issueExpirationDate =
             serviceManager->serviceStatus(*serviceType).issueExpirationDate.date();
@@ -392,12 +401,14 @@ QString SystemHealthListModel::Private::toolTip(int index) const
         return tooltipLines.join("<br>");
     }
 
+    NX_ASSERT(system());
     return QnSystemHealthStringsHelper::messageTooltip(
         system(), item.type, getResourceSet(item.type));
 }
 
 QString SystemHealthListModel::Private::decorationPath(int index) const
 {
+    NX_ASSERT(system());
     return decorationPath(system(), m_items[index].type);
 }
 
@@ -430,6 +441,7 @@ QString SystemHealthListModel::Private::servicesDisabledReason(
 
 QColor SystemHealthListModel::Private::color(int index) const
 {
+    NX_ASSERT(system());
     return QnNotificationLevel::notificationTextColor(
         QnNotificationLevel::valueOf(system(), m_items[index].type));
 }
@@ -454,6 +466,7 @@ int SystemHealthListModel::Private::helpId(int index) const
 
 int SystemHealthListModel::Private::priority(int index) const
 {
+    NX_ASSERT(system());
     return priority(system(), m_items[index].type);
 }
 
@@ -667,6 +680,9 @@ void SystemHealthListModel::Private::addItem(const Message& message)
 QSet<QnResourcePtr> SystemHealthListModel::Private::getResourceSet(
     MessageType message) const
 {
+    if (!NX_ASSERT(system()))
+        return {};
+
     return system()->systemHealthState()->data(message).value<QSet<QnResourcePtr>>();
 }
 
@@ -696,6 +712,9 @@ QnResourceList SystemHealthListModel::Private::getSortedResourceList(
 void SystemHealthListModel::Private::doAddItem(const Message& message, bool initial)
 {
     NX_VERBOSE(this, "Adding a system health message %1", message.type);
+
+    if (!NX_ASSERT(system()))
+        return;
 
     if (!messageIsSupported(message.type))
         return; //< Message type is processed in a separate model.
@@ -733,6 +752,9 @@ void SystemHealthListModel::Private::doAddItem(const Message& message, bool init
 
 void SystemHealthListModel::Private::removeItem(const Message& message)
 {
+    if (!NX_ASSERT(system()))
+        return;
+
     if (!messageIsSupported(message.type))
         return; //< Message type is processed in a separate model.
 
