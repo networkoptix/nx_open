@@ -623,6 +623,9 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
 
                 case UserTypeColumn:
                 {
+                    if (user->isOrg())
+                        return tr("Organization user");
+
                     switch (user->userType())
                     {
                         case nx::vms::api::UserType::local:
