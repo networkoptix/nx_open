@@ -416,7 +416,12 @@ Window
 
                         onClicked: (row) =>
                         {
-                            if (!showPreview)
+                            if (showOnLayoutButton.hovered)
+                            {
+                                eventModel.showOnLayout(
+                                    eventGrid.tileController.hoveredTile.tileIndex)
+                            }
+                            else if (!showPreview)
                             {
                                 previewPanel.slideAnimationEnabled = true
                                 showPreview = true
@@ -453,11 +458,10 @@ Window
 
                             TileOverlayButton
                             {
+                                id: showOnLayoutButton
+
                                 icon.source: "image://skin/20x20/Solid/show_on_layout.svg"
                                 accent: true
-
-                                onClicked: eventModel.showOnLayout(
-                                    eventGrid.tileController.hoveredTile.tileIndex)
                             }
                         }
                     }
