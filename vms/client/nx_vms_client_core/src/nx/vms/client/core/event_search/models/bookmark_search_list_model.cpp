@@ -21,6 +21,7 @@
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/common/bookmark/bookmark_facade.h>
 #include <nx/vms/common/html/html.h>
+#include <utils/common/synctime.h>
 
 #include "detail/multi_request_id_holder.h"
 
@@ -368,7 +369,9 @@ QVariant BookmarkSearchListModel::data(const QModelIndex& index, int role) const
 
         case BookmarkTagRole:
             return QVariant::fromValue(bookmark.tags);
-
+        case IsSharedBookmark:
+            return bookmark.shareable() && bookmark.bookmarkMatchesFilter(
+                api::BookmarkShareFilter::shared | api::BookmarkShareFilter::accessible);
         default:
             return {};
     }

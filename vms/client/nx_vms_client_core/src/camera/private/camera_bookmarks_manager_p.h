@@ -8,6 +8,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QTimer>
 
+#include <api/rest_types.h>
 #include <api/server_rest_connection_fwd.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/camera_bookmark.h>
@@ -111,6 +112,15 @@ public:
         std::chrono::milliseconds timePoint,
         BookmarksCallbackType callback);
 
+    using RestRequestCallback = rest::Callback<rest::ErrorOrData<QByteArray>>;
+    rest::Handle sendRestRequest(
+        const QString& path,
+        const nx::vms::api::BookmarkV3& bookmark,
+        const nx::network::http::Method& method,
+        RestRequestCallback&& callback);
+
+    std::optional<nx::Uuid> getServerForBookmark(const QnCameraBookmark& bookmark);
+
 private:
     void handleQueryReply(
         const QUuid& queryId,
@@ -168,14 +178,8 @@ private:
         QnMultiserverRequestData& request,
         std::optional<nx::Uuid> serverId = {});
 
-    rest::Handle sendPatchRequest(
-        const QString& path,
-        const nx::vms::api::BookmarkV3& bookmark);
-
     int sendGetRequest(const QString& path, QnMultiserverRequestData& request,
         RawResponseType callback);
-
-    std::optional<nx::Uuid> getServerForBookmark(const QnCameraBookmark& bookmark);
 
     void startOperationsTimer();
 

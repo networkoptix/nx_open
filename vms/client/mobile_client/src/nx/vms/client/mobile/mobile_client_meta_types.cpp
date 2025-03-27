@@ -26,6 +26,7 @@
 #include <nx/vms/client/mobile/camera/buttons/camera_button_controller.h>
 #include <nx/vms/client/mobile/camera/buttons/camera_buttons_model.h>
 #include <nx/vms/client/mobile/camera/media_download_backend.h>
+#include <nx/vms/client/mobile/camera/share_bookmark_backend.h>
 #include <nx/vms/client/mobile/event_search/models/parameters_visualization_model.h>
 #include <nx/vms/client/mobile/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/mobile/maintenance/remote_log_manager.h>
@@ -117,6 +118,7 @@ void registerQmlTypes()
     CameraButtonController::registerQmlType();
     CameraButtonsModel::registerQmlType();
     MediaDownloadBackend::registerQmlType();
+    ShareBookmarkBackend::registerQmlType();
 
     qmlRegisterUncreatableMetaObject(nx::vms::api::staticMetaObject, "nx.vms.api", 1, 0,
         "API", "API is a namespace");

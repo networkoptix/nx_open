@@ -331,25 +331,20 @@ int QnCameraBookmarksManagerPrivate::sendPostRequest(
         makeProxyToServerHeaders(serverId));
 }
 
-rest::Handle QnCameraBookmarksManagerPrivate::sendPatchRequest(
-    const QString& path, const nx::vms::api::BookmarkV3& bookmark)
+rest::Handle QnCameraBookmarksManagerPrivate::sendRestRequest(
+    const QString& path,
+    const nx::vms::api::BookmarkV3& bookmark,
+    const nx::network::http::Method& method,
+    RestRequestCallback&& callback)
 {
     auto serverApi = connectedServerApi();
 
     if (!serverApi)
         return kInvalidRequestId;
 
-    auto callback = [this](
-            bool success,
-            rest::Handle handle,
-            rest::ErrorOrData<QByteArray> /*response*/)
-        {
-            handleBookmarkOperation(success, handle);
-        };
-
     return serverApi->sendRequest<rest::ErrorOrData<QByteArray>>(
         systemContext()->getSessionTokenHelper(),
-        nx::network::http::Method::patch,
+        method,
         path,
         nx::network::rest::Params{},
         nx::reflect::json::serialize(bookmark),
@@ -523,13 +518,18 @@ void QnCameraBookmarksManagerPrivate::updateCameraBookmark(
     if (!bookmark.isValid())
         return;
 
-    auto bookmarkModel = nx::vms::common::bookmarkToApi<nx::vms::api::BookmarkV3>(
-        bookmark, getServerForBookmark(bookmark).value_or(nx::Uuid{}));
+    auto restCallback =
+        [this](bool success, rest::Handle handle, rest::ErrorOrData<QByteArray> /*response*/)
+        {
+            handleBookmarkOperation(success, handle);
+        };
 
-    const auto handle = sendPatchRequest(
-        nx::format("rest/v4/devices/%1/bookmarks/%2", bookmarkModel.deviceId, bookmarkModel.id)
-            .toQString(),
-        bookmarkModel);
+    auto bookmarkModel = nx::vms::common::bookmarkToApi<nx::vms::api::BookmarkV3>(
+        bookmark, getServerForBookmark(bookmark).value_or(nx::Uuid{}), /*includeDigest*/ true);
+    const auto path = nx::format("rest/v4/devices/%1/bookmarks/%2",
+        bookmarkModel.deviceId, bookmarkModel.id).toQString();
+    const auto handle = sendRestRequest(path, bookmarkModel, nx::network::http::Method::patch,
+        std::move(restCallback));
 
     if (handle != kInvalidRequestId)
     {

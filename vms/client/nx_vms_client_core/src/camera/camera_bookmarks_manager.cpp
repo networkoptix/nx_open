@@ -6,6 +6,7 @@
 #include <camera/private/camera_bookmarks_manager_p.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/common/api/helpers/bookmark_api_converter.h>
 #include <nx/vms/common/bookmark/bookmark_facade.h>
 
 QnCameraBookmarksManager::QnCameraBookmarksManager(
@@ -77,6 +78,48 @@ void QnCameraBookmarksManager::addExistingBookmark(const QnCameraBookmark& bookm
     d->addExistingBookmark(bookmark);
 
     emit bookmarkAdded(bookmark);
+}
+
+bool QnCameraBookmarksManager::changeBookmarkRest(BookmarkOperation operation,
+    const QnCameraBookmark& bookmark,
+    OperationV4Callback&& callback)
+{
+    NX_ASSERT(bookmark.isValid(), "Invalid bookmark must not be added");
+    if (!bookmark.isValid())
+        return false;
+
+    const auto model = nx::vms::common::bookmarkToApi<nx::vms::api::BookmarkV3>(
+        bookmark, d->getServerForBookmark(bookmark).value_or(nx::Uuid{}), /*includeDigest*/ true);
+    const auto path = operation == BookmarkOperation::create
+        ? nx::format("rest/v4/devices/%1/bookmarks", model.deviceId).toQString()
+        : nx::format("rest/v4/devices/%1/bookmarks/%2", model.deviceId, model.id).toQString();
+    const auto method = operation == BookmarkOperation::create
+        ? nx::network::http::Method::post
+        : nx::network::http::Method::patch;
+
+    auto localCallback =
+        [this, requestCallback = std::move(callback), operation]
+            (bool success, rest::Handle /*handle*/, rest::ErrorOrData<QByteArray> response)
+        {
+            nx::vms::api::BookmarkV3 result;
+            if (!success || !response.has_value()
+                || !QJson::deserialize<nx::vms::api::BookmarkV3>(response.value(), &result))
+            {
+                requestCallback(false, {});
+                return;
+            }
+
+            requestCallback(true, result);
+
+            const auto bookmark = nx::vms::common::bookmarkFromApi(result); //< result is moved here.
+            if (operation == BookmarkOperation::create)
+                emit bookmarkAdded(bookmark);
+            else
+                emit bookmarkUpdated(bookmark);
+
+        };
+
+    return d->sendRestRequest(path, model, method, std::move(localCallback)) != -1;
 }
 
 void QnCameraBookmarksManager::addAcknowledge(

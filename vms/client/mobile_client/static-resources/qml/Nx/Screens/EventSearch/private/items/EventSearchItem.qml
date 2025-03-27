@@ -25,6 +25,7 @@ MouseArea
     property alias title: titleItem.text
     property alias extraText: extraTextItem.text
     property alias eventTimestampText: eventTimeItem.text
+    property bool shared: false
 
     height: d.kRowHeight
     width: (parent && parent.width) ?? 0
@@ -39,6 +40,24 @@ MouseArea
         x: 12
         width: parent.height * d.kPreviewAspect
         height: parent.height
+
+        Rectangle
+        {
+            width: 20
+            height: parent.height
+            color: ColorTheme.colors.green_core
+            visible: control.shared
+
+            Text
+            {
+                rotation: -90
+                font.weight: 700
+                color: ColorTheme.colors.dark1
+                anchors.centerIn: parent
+                width: Math.min(implicitWidth, parent.height - 16)
+                text: qsTr("SHARED")
+            }
+        }
     }
 
     Item

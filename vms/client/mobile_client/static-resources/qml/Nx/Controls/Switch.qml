@@ -11,6 +11,7 @@ Control
     id: control
 
     property alias checkState: indicator.checkState
+    property alias animationDuration: indicator.animationDuration
 
     signal clicked()
 

@@ -38,7 +38,7 @@ enum CoreItemDataRole
 
     CameraBookmarkRole,             /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveBookmarkAction */
     BookmarkTagRole,                /**< Role for bookmark tag. Used in OpenBookmarksSearchAction */
-
+    IsSharedBookmark,               /**< Role shows if bookmark is shared now. */
     AnalyticsEngineNameRole,        /**< Role for related analytics engine name. (QString) */
 
     HasExternalBestShotRole,        /**< Whether object detection track has an external best shot image (bool). */

@@ -142,6 +142,7 @@ Page
             title: model.display
             extraText: model.description
             timestampMs: model.timestampMs
+            shared: !!model.isSharedBookmark
 
             onVisibleChanged: model.visible = visible
             Component.onCompleted: model.visible = visible

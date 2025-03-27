@@ -80,6 +80,7 @@ QHash<int, QByteArray> clientCoreRoleNames()
     roles[DescriptionTextRole] = "description";
     roles[DurationMsRole] = "durationMs";
     roles[BookmarkTagRole] = "tags";
+    roles[IsSharedBookmark] = "isSharedBookmark";
     roles[DisplayedResourceListRole] = "resourceList";
     roles[ThumbnailRole] = "thumbnail";
     roles[IpAddressRole] = "ipAddress";

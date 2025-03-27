@@ -1,0 +1,4 @@
+module Nx.Ui.Sheets
+
+HowItWorksSheet 1.0 HowItWorksSheet.qml
+ShareBookmarkSheet 1.0 ShareBookmarkSheet.qml

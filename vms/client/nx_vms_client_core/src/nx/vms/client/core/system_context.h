@@ -11,6 +11,7 @@
 
 #include "system_context_aware.h" //< Forward declarations.
 
+Q_MOC_INCLUDE("camera/camera_bookmarks_manager.h")
 Q_MOC_INCLUDE("nx/vms/client/core/watchers/user_watcher.h")
 Q_MOC_INCLUDE("nx/vms/client/core/watchers/watermark_watcher.h")
 
@@ -59,8 +60,12 @@ class NX_VMS_CLIENT_CORE_API SystemContext: public common::SystemContext
         READ watermarkWatcher
         CONSTANT)
 
-    Q_PROPERTY(UserWatcher userWatcher
+    Q_PROPERTY(UserWatcher* userWatcher
         READ userWatcher
+        CONSTANT)
+
+    Q_PROPERTY(QnCameraBookmarksManager* bookmarksManager
+        READ cameraBookmarksManager
         CONSTANT)
 
 public:
@@ -121,6 +126,11 @@ public:
      * Local id of the system to which we are currently connected.
      */
     nx::Uuid localSystemId() const;
+
+    /**
+     * Cloud id of the system (if any) to which we are currently connected.
+     */
+    QString cloudSystemId() const;
 
     /**
      * Credentials we are using to authorize the connection.

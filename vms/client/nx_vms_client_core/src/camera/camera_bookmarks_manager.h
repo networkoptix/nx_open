@@ -57,6 +57,23 @@ public:
     /** Add already created bookmark, e.g. from standalone API call. */
     void addExistingBookmark(const QnCameraBookmark& bookmark);
 
+    enum class BookmarkOperation
+    {
+        create,
+        update
+    };
+
+    /**
+     * @brief Creates or updates bookmark with modern REST Api. Returns updated bookmark in callback.
+     * This function does not support all underlying updates which we have in other functions in
+     * this class, for now.
+     */
+    using OperationV4Callback =
+        std::function<void (bool success, const nx::vms::api::BookmarkV3& result)>;
+    bool changeBookmarkRest(BookmarkOperation operation,
+        const QnCameraBookmark& bookmark,
+        OperationV4Callback&& callback);
+
     /// @brief                  Add the bookmark to the camera and stores record in event log
     ///                         for the specified event.
     /// @param bookmark         Target bookmark.

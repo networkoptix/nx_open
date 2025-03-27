@@ -55,7 +55,7 @@ signals:
     void errorOccured(const QString& title, const QString& description);
 
 private:
-    void onContextReady();
+    virtual void onContextReady() override;
 
 private:
     struct Private;

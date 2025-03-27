@@ -173,6 +173,12 @@ nx::Uuid SystemContext::localSystemId() const
     return currentConnection ? currentConnection->moduleInformation().localSystemId : nx::Uuid();
 }
 
+QString SystemContext::cloudSystemId() const
+{
+    const auto& currentConnection = connection();
+    return currentConnection ? currentConnection->moduleInformation().cloudSystemId : QString{};
+}
+
 nx::network::http::Credentials SystemContext::connectionCredentials() const
 {
     if (auto connection = this->connection())

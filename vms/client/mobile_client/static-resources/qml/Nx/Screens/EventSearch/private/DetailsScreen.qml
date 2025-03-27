@@ -11,11 +11,14 @@ import Nx.Core.Items
 import Nx.Core.Ui
 import Nx.Items
 import Nx.Mobile
+import Nx.Mobile.Controls as MobileControls
 import Nx.Models
 import Nx.Screens
 import Nx.Ui
+import Nx.Ui.Sheets
 
 import nx.vms.client.core
+import nx.vms.client.mobile
 
 import "items"
 
@@ -40,16 +43,35 @@ Page
 
     clip: false
 
-    rightControl: DownloadMediaButton
+    rightControl: IconButton
     {
-        id: downloadButton
+        id: shareButton
 
         anchors.centerIn: parent
 
-        enabled: preview.player && !preview.player.cannotDecryptMediaError
-        resource: preview.resource
-        positionMs: preview.startTimeMs
-        durationMs: preview.durationMs
+        padding: 0
+        icon.source: backend.isShared && !eventDetailsScreen.isAnalyticsDetails
+            ? "image://skin/20x20/Solid/shared.svg?primary=light10&secondary=green"
+            : "image://skin/20x20/Solid/share.svg?primary=light10"
+        icon.width: 24
+        icon.height: icon.width
+
+        visible: backend.isAvailable
+
+        ShareBookmarkSheet
+        {
+            id: shareBookmarkSheet
+
+            isAnalyticsItemMode: eventDetailsScreen.isAnalyticsDetails
+            backend: ShareBookmarkBackend
+            {
+                id: backend
+
+                modelIndex: eventSearchModel.index(currentEventIndex, 0)
+            }
+        }
+
+        onClicked: shareBookmarkSheet.open()
     }
 
     toolBar.contentItem.clip: false
@@ -137,27 +159,79 @@ Page
             visible: mainWindow.isPortraitLayout && opacity > 0
         }
 
+        DownloadMediaButton
+        {
+            id: downloadButton
+
+            x: parent.width - width - orientationModeButton.width - goToCameraButton.width
+            y: parent.height - height
+
+            enabled: preview.player && !preview.player.cannotDecryptMediaError
+            resource: preview.resource
+            positionMs: preview.startTimeMs
+            durationMs: preview.durationMs
+        }
+
         IconButton
         {
-            id: goFullscreenModeButton
+            id: goToCameraButton
 
-            x: parent.width - width
-            y: parent.height - height
-            width: 48
-            height: 48
             visible: mainWindow.isPortraitLayout && !preview.cannotDecryptMedia
 
-            icon.source: lp("images/fullscreen_view_mode.svg")
+            x: parent.width - width - orientationModeButton.width
+            y: parent.height - height
+
+            padding: 0
+            icon.source: lp("/images/go_to_camera.svg")
+            icon.width: 24
+            icon.height: icon.width
+            onClicked: d.goToCamera()
+        }
+
+        IconButton
+        {
+            id: orientationModeButton
+
+            parent: mainWindow.isPortraitLayout
+                ? preview
+                : playbackPanel
+
+            x: mainWindow.isPortraitLayout
+                ? parent.width - width
+                : parent.width - width - 16;
+            y: mainWindow.isPortraitLayout
+                ? parent.height - height
+                : (parent.height - height) / 2
+
+            width: 48
+            height: 48
+            visible: !preview.cannotDecryptMedia
+
+            icon.source: mainWindow.isPortraitLayout
+                ? lp("/images/fullscreen_view_mode.svg")
+                : lp("/images/exit_fullscreen_mode.svg")
             icon.width: 24
             icon.height: icon.width
             padding: 0
 
             onClicked:
             {
-                if (CoreUtils.isMobile())
-                    setScreenOrientation(Qt.LandscapeOrientation)
+                if (mainWindow.isPortraitLayout)
+                {
+                    // Go to landscape mode.
+                    if (CoreUtils.isMobile())
+                        setScreenOrientation(Qt.LandscapeOrientation)
+                    else
+                        [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
+                }
                 else
-                    [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
+                {
+                    // Go to portrait mode.
+                    if (CoreUtils.isMobile())
+                        setScreenOrientation(Qt.PortraitOrientation)
+                    else
+                        [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
+                }
             }
         }
     }
@@ -205,7 +279,7 @@ Page
                 text: d.accessor.getData(currentEventIndex, "resource").name
             }
 
-            TagsView
+            MobileControls.TagView
             {
                 width: parent.width
                 model: d.accessor.getData(currentEventIndex, "tags")
@@ -352,7 +426,8 @@ Page
         visible: !preview.cannotDecryptMedia
         x: mainWindow.isPortraitLayout
             ? 16
-            : parent.width - width - 16 - (headerButton.visible ? headerButton.width + 16 : 0)
+            : parent.width - width - 16
+                -(mainWindow.isPortraitLayout ? 0 : orientationModeButton.width + 16)
         y: mainWindow.isPortraitLayout
             ? parent.height - height - 14
             : (parent.height - height) / 2
@@ -362,45 +437,6 @@ Page
         color: ColorTheme.colors.light4
 
         text: EventSearchUtils.timestampText(slider.value, windowContext.mainSystemContext)
-    }
-
-    IconButton
-    {
-        id: headerButton
-
-        parent: mainWindow.isPortraitLayout
-            ? preview
-            : playbackPanel
-
-        visible: !preview.cannotDecryptMedia
-        x: mainWindow.isPortraitLayout
-            ? parent.width - width - goFullscreenModeButton.width
-            : parent.width - width - 16;
-
-        y: mainWindow.isPortraitLayout
-            ? parent.height - height
-            : (parent.height - height) / 2
-        padding: 0
-        icon.source: mainWindow.isPortraitLayout
-            ? lp("/images/go_to_camera.svg")
-            : lp("/images/exit_fullscreen_mode.svg")
-        icon.width: 24
-        icon.height: icon.height
-        onClicked:
-        {
-            if (mainWindow.isPortraitLayout)
-            {
-                d.goToCamera()
-            }
-            else
-            {
-                // Go to portrait mode.
-                if (CoreUtils.isMobile())
-                    setScreenOrientation(Qt.PortraitOrientation)
-                else
-                    [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
-            }
-        }
     }
 
     Rectangle

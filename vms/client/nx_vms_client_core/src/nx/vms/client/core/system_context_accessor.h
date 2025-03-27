@@ -48,12 +48,15 @@ public:
 
     virtual ~SystemContextAccessor() override;
 
+    QnResourcePtr resource() const;
     QnResource* rawResource() const;
     void setRawResource(const QnResource* value);
 
     SystemContext* systemContext() const;
 
     QnResourcePool* resourcePool() const;
+
+    void updateFromModelIndex(const QModelIndex& index);
 
 signals:
     void resourceChanged();

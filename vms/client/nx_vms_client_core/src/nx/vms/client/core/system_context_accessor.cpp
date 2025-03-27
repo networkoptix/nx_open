@@ -56,6 +56,11 @@ SystemContextAccessor::SystemContextAccessor(const QModelIndex& index,
 {
 }
 
+QnResourcePtr SystemContextAccessor::resource() const
+{
+    return d->resource;
+}
+
 QnResource* SystemContextAccessor::rawResource() const
 {
     return d->resource.get();
@@ -94,5 +99,9 @@ QnResourcePool* SystemContextAccessor::resourcePool() const
         : nullptr;
 }
 
+void SystemContextAccessor::updateFromModelIndex(const QModelIndex& index)
+{
+    setRawResource(index.data(RawResourceRole).value<QnResource*>());
+}
 
 } // namespace nx::vms::client::core
