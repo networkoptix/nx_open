@@ -67,6 +67,7 @@ struct NX_VMS_API UserGroupData: IdData
     (externalId) \
     (resourceAccessRights)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserGroupData)
+NX_REFLECTION_INSTRUMENT(UserGroupData, UserGroupData_Fields)
 
 NX_VMS_API extern const nx::Uuid kAdministratorsGroupId; //< ex-Owners.
 NX_VMS_API extern const nx::Uuid kPowerUsersGroupId; //< ex-Administrators.

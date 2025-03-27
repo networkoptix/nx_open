@@ -25,12 +25,12 @@ common::BookmarkShareableParams shareableParams(
         {
             auto& sharingSettings = std::get<api::BookmarkSharingSettings>(data.share.value());
             std::optional<QString> digest;
-            if (!sharingSettings.password.isEmpty())
+            if (sharingSettings.password && !sharingSettings.password->isEmpty())
             {
                 if (digestPassword)
                 {
                     digest = api::BookmarkProtection::getDigest(
-                        data.bookmarkId(), data.serverId(), sharingSettings.password);
+                        data.bookmarkId(), data.serverId(), *sharingSettings.password);
                 }
                 else
                 {

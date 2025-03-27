@@ -181,8 +181,8 @@ struct NX_VMS_API BookmarkSharingSettings
     /**%apidoc[opt] Time the shareable Bookmark expires in milliseconds since epoch. */
     std::chrono::milliseconds expirationTimeMs{0};
 
-    /**%apidoc[opt] Password required to access the Bookmark. */
-    QString password;
+    /**%apidoc Password required to access the Bookmark. */
+    std::optional<QString> password;
     bool operator==(const BookmarkSharingSettings& other) const = default;
 };
 #define BookmarkSharingSettings_Fields (expirationTimeMs)(password)

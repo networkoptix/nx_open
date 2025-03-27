@@ -43,7 +43,7 @@ struct NX_VMS_API VirtualDeviceLockInfo
     std::chrono::milliseconds ttlMs;
 
     /**%apidoc Consume progress, if ongoing. */
-    std::optional<int> progress = 0;
+    int progress = 0;
 };
 #define VirtualDeviceLockInfo_Fields (userId)(token)(ttlMs)(progress)
 QN_FUSION_DECLARE_FUNCTIONS(VirtualDeviceLockInfo, (json), NX_VMS_API)

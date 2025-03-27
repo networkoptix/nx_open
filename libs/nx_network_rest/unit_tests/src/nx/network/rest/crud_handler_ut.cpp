@@ -31,11 +31,11 @@ public:
         if (auto shareValue = request.param("share"); shareValue && !shareValue->isEmpty())
         {
             auto share = QJson::deserialized<BookmarkSharingSettings>(shareValue->toUtf8());
-            if (!share.password.isEmpty())
+            if (share.password && !share.password->isEmpty())
             {
                 std::get<BookmarkSharingSettings>(*data.share).password =
                     BookmarkProtection::getDigest(
-                        data.bookmarkId(), data.serverId(), share.password);
+                        data.bookmarkId(), data.serverId(), *share.password);
             }
         }
         EXPECT_EQ(data.eventRuleId, eventRuleId);
