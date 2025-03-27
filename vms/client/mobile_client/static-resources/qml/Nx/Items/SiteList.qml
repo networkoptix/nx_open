@@ -13,6 +13,8 @@ ListView
     property alias siteModel: filterModel.sourceModel
     property alias hideOrgSystemsFromSites: filterModel.hideOrgSystemsFromSites
 
+    property var organizationsModel: siteModel.sourceModel
+
     signal itemClicked(var nodeId, string systemId)
     signal itemEditClicked(var nodeId, string systemId)
 
@@ -128,7 +130,7 @@ ListView
                 cloudSystem: modelData.isCloudSystem || false
                 factorySystem: modelData.isFactorySystem || false
                 isSaas: !modelData.isSaasUninitialized
-                    && (siteList.siteModel.channelPartner != NxGlobals.uuid(""))
+                    && (organizationsModel.channelPartner != NxGlobals.uuid(""))
                 needDigestCloudPassword: !modelData.isOauthSupported && !hasDigestCloudPassword
                 ownerDescription: cloudSystem ? modelData.ownerDescription : ""
                 running: modelData.isOnline || false
