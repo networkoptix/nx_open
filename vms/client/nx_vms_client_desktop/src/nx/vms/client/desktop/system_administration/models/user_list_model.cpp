@@ -13,6 +13,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/user_group_data.h>
@@ -113,8 +114,9 @@ QStringList userGroupNamesSorted(const QnUserResourcePtr & user)
     if (!user || !user->systemContext())
         return {};
 
-    // TODO: Split Site's and Organization's groups.
-    return nx::vms::common::userGroupNames(user->systemContext(), user->allGroupIds(),
+    return nx::vms::common::userGroupNames(
+        user->systemContext(),
+        utils::unique_sorted(user->allGroupIds()),
         [](const auto& g1, const auto& g2)
         {
             return ComparableGroup(g1) < ComparableGroup(g2);
@@ -649,8 +651,8 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
 
                 case UserGroupsColumn:
                 {
-                    auto groups =
-                        d->systemContext()->userGroupManager()->getGroupsByIds(user->allGroupIds());
+                    auto groups = d->systemContext()->userGroupManager()->getGroupsByIds(
+                        utils::unique_sorted(user->allGroupIds()));
                     std::sort(groups.begin(), groups.end(),
                         [](const auto& left, const auto& right)
                         {

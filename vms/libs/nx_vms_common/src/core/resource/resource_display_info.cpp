@@ -13,6 +13,7 @@
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/vms/common/resource/server_host_priority.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
@@ -155,7 +156,9 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
     {
         if (const auto user = m_resource.dynamicCast<QnUserResource>())
         {
-            const auto names = nx::vms::common::userGroupNames(user);
+            const auto names = nx::vms::common::userGroupNames(
+                user->systemContext(),
+                nx::utils::unique_sorted(user->allGroupIds()));
             switch (names.size())
             {
                 case 0:
