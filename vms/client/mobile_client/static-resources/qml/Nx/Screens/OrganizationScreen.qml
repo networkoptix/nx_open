@@ -117,6 +117,7 @@ Page
         prevRootId = null
         searchField.visible = false
         searchField.clear()
+        searchField.resetFocus()
         siteList.positionViewAtBeginning()
     }
 
