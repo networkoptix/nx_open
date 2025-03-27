@@ -72,10 +72,10 @@ Page
         anchors
         {
             fill: parent
-            topMargin: 4
-            bottomMargin: 4
-            leftMargin: 4
-            rightMargin: 4
+            topMargin: 4 - camerasGrid.spacing / 2
+            bottomMargin: 4 - camerasGrid.spacing / 2
+            leftMargin: 4 - camerasGrid.spacing / 2
+            rightMargin: 4 - camerasGrid.spacing / 2
         }
 
         enabled: !sessionManager.hasReconnectingSession && !loadingDummy.visible

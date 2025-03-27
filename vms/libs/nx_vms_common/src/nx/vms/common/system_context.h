@@ -17,6 +17,7 @@ class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
 class QnRouter;
 class QnServerAdditionalAddressesDictionary;
+class QnLongRunableCleanup;
 
 namespace nx::analytics::taxonomy {
 class AbstractState;
@@ -266,6 +267,9 @@ public:
     std::shared_ptr<nx::metric::Storage> metrics() const;
 
     QnCameraNamesWatcher* cameraNamesWatcher() const;
+
+    QnLongRunableCleanup* longRunableCleanup() const;
+    void stopLongRunnables();
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);

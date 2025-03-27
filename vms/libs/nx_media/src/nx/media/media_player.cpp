@@ -1252,10 +1252,18 @@ void Player::stop()
     d->dataConsumer.reset();
     if (d->archiveReader)
     {
-        if (auto context = nx::vms::common::appContext(); NX_ASSERT(context))
-            context->longRunableCleanup()->cleanupAsync(std::move(d->archiveReader));
+        if (d->resource && d->resource->systemContext())
+        {
+            d->resource->systemContext()->longRunableCleanup()->cleanupAsync(
+                std::move(d->archiveReader));
+        }
         else
-            d->archiveReader.reset();
+        {
+            if (auto context = nx::vms::common::appContext(); NX_ASSERT(context))
+                context->longRunableCleanup()->cleanupAsync(std::move(d->archiveReader));
+            else
+                d->archiveReader.reset();
+        }
     }
     d->clearCurrentFrame();
     d->updateCurrentResolution(QSize());

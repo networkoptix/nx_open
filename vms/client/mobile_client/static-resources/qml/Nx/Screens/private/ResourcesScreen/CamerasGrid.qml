@@ -6,7 +6,7 @@ import QtQuick.Window
 import Nx.Core
 import Nx.Mobile
 
-Flickable
+GridView
 {
     id: control
 
@@ -14,50 +14,39 @@ Flickable
     property bool keepStatuses: false
     property bool active: false
     property alias filterIds: camerasModel.filterIds
-    property alias count: repeater.count
     signal openVideoScreen(var resource, var thumbnailUrl, var camerasModel)
 
-    contentWidth: width
-    contentHeight: flowLayout.height
+    property real spacing: 2
 
-    function itemAtIndex(index)
+    cellWidth: d.cellWidth
+    cellHeight: d.cellHeight
+
+    model: QnCameraListModel
     {
-        return repeater.itemAt(index)
+        id: camerasModel
     }
 
-    Flow
+    delegate: Item
     {
-        id: flowLayout
+        width: d.cellWidth
+        height: d.cellHeight
 
-        spacing: 2
-        width: d.availableWidth
-
-        Repeater
+        CameraItem
         {
-            id: repeater
+            aspectRatio: d.kAspectRatio
+            anchors.fill: parent
+            anchors.margins: control.spacing / 2
 
-            model: QnCameraListModel
-            {
-                id: camerasModel
-            }
+            text: model.resourceName
+            status: model.resourceStatus
+            thumbnail: model.thumbnail
+            keepStatus: control.keepStatuses
+            resource: model.resource
+            active: control.active
 
-            CameraItem
-            {
-                aspectRatio: d.kAspectRatio
-                width: d.cellWidth
-                height: d.cellHeight
+            onClicked: control.openVideoScreen(model.resource, model.thumbnail, camerasModel)
 
-                text: model.resourceName
-                status: model.resourceStatus
-                thumbnail: model.thumbnail
-                keepStatus: control.keepStatuses
-                resource: model.resource
-                active: control.active
-
-                onClicked: control.openVideoScreen(model.resource, model.thumbnail, camerasModel)
-
-                onThumbnailRefreshRequested: camerasModel.refreshThumbnail(index)
-            }
+            onThumbnailRefreshRequested: camerasModel.refreshThumbnail(index)
         }
     }
 
@@ -80,14 +69,13 @@ Flickable
         }
 
         readonly property int columnsCount: d.getColumnsCount(/**/320)
-        readonly property real cellWidth: Math.floor(
-            (d.availableWidth - (d.columnsCount - 1) * flowLayout.spacing) / d.columnsCount)
-        readonly property real cellHeight: cellWidth * kAspectRatio
+        readonly property real cellWidth: Math.floor(d.availableWidth / d.columnsCount)
+        readonly property real cellHeight:
+            (cellWidth - control.spacing / 2) * kAspectRatio + control.spacing / 2
 
         function getColumnsCount(itemWidth)
         {
-            const spacing = flowLayout.spacing
-            const columns = Math.ceil((d.availableWidth - spacing) / (spacing + itemWidth))
+            const columns = Math.ceil(d.availableWidth / itemWidth)
             return Math.max(2, Math.min(columns, d.maxColumnsCount))
         }
     }
