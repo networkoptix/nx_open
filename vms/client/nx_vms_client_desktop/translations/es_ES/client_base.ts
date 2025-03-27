@@ -10874,7 +10874,7 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
     </message>
     <message>
       <source>Confirm</source>
-      <translation type="unfinished">Confirm</translation>
+      <translation>Confirmar</translation>
     </message>
   </context>
   <context>
