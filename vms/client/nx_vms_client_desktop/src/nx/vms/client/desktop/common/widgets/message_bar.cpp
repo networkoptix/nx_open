@@ -53,7 +53,6 @@ MessageBarBlock::MessageBarBlock(QWidget* parent):
     d(new Private())
 {
     auto layout = new QVBoxLayout;
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     layout->setContentsMargins({});
     layout->setSpacing(1);
     setLayout(layout);
@@ -125,6 +124,7 @@ CommonMessageBar::CommonMessageBar(QWidget* parent, const BarDescription& descri
     d->buttonsHorizontalLayout->setSpacing(style::Metrics::kStandardPadding);
     d->buttonsHorizontalLayout->addStretch();
     verticalLayout()->addLayout(d->buttonsHorizontalLayout);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 }
 
 CommonMessageBar::~CommonMessageBar()
