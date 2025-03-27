@@ -10299,7 +10299,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Confirm</source>
-      <translation type="unfinished">Confirm</translation>
+      <translation>Confirmar</translation>
     </message>
   </context>
   <context>

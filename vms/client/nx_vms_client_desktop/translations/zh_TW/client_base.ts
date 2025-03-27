@@ -2155,14 +2155,14 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>This server is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This server is removed from Site</numerusform>
+      <translation>
+        <numerusform>此伺服器已從站點中移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>This user is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This user is removed from Site</numerusform>
+      <translation>
+        <numerusform>此使用者已從站點中移除</numerusform>
       </translation>
     </message>
   </context>
@@ -3537,8 +3537,8 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>Set for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n devices</numerusform>
+      <translation>
+        <numerusform>為 %n 台裝置設定</numerusform>
       </translation>
     </message>
     <message>
@@ -4335,7 +4335,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>CONNECTION LOST</source>
-      <translation type="unfinished">CONNECTION LOST</translation>
+      <translation>失去連線</translation>
     </message>
   </context>
   <context>
@@ -4516,7 +4516,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud storage cannot be enabled.</source>
-      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+      <translation>無法啟用雲端儲存。</translation>
     </message>
     <message>
       <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
@@ -5040,11 +5040,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording disabled</source>
-      <translation type="unfinished">Recording disabled</translation>
+      <translation>已停用錄影</translation>
     </message>
     <message>
       <source>Cloud storage backup disabled</source>
-      <translation type="unfinished">Cloud storage backup disabled</translation>
+      <translation>已停用雲端儲存備份</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
@@ -7909,7 +7909,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
-      <translation type="unfinished">Server cannot answer in reasonable time. Consider narrowing period or filter.</translation>
+      <translation>伺服器無法在合理的時間內回應。請考慮縮小週期或篩選。</translation>
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
@@ -8812,7 +8812,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>&lt;None&gt;</source>
-      <translation type="unfinished">&lt;None&gt;</translation>
+      <translation>&lt;無&gt;</translation>
     </message>
   </context>
   <context>
@@ -9024,11 +9024,11 @@ Site performance is degraded.</source>
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
       <source>This group has been assigned at organization level and can be managed only at organization level</source>
-      <translation type="unfinished">This group has been assigned at organization level and can be managed only at organization level</translation>
+      <translation>此群組是透過組織層級分配，因此只能在組織層級中管理</translation>
     </message>
     <message>
       <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
-      <translation type="unfinished">The user has been assigned to this group at organization level and can be unassigned only at organization level</translation>
+      <translation>此使用者是在組織層級分配到此群組，因此只能在組織層級取消分配</translation>
     </message>
   </context>
   <context>
@@ -12146,11 +12146,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>找不到與所選項目對應的工具</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
-      <translation type="unfinished">Cannot maximize the item</translation>
+      <translation>無法最大化該項目</translation>
     </message>
   </context>
   <context>
@@ -12348,13 +12348,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
     <message>
       <source>No custom headers</source>
-      <translation type="unfinished">No custom headers</translation>
+      <translation>無自訂標頭</translation>
     </message>
     <message numerus="yes">
       <source>%n custom headers</source>
       <comment>%n is a number of custom headers</comment>
-      <translation type="unfinished">
-        <numerusform>%n custom headers</numerusform>
+      <translation>
+        <numerusform>%n個自訂標頭</numerusform>
       </translation>
     </message>
   </context>
@@ -12555,15 +12555,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error: %1</source>
-      <translation type="unfinished">Delete rule error: %1</translation>
+      <translation>刪除規則錯誤： %1</translation>
     </message>
     <message>
       <source>Save rule error: %1</source>
-      <translation type="unfinished">Save rule error: %1</translation>
+      <translation>儲存規則錯誤： %1</translation>
     </message>
     <message>
       <source>Reset rules error: %1</source>
-      <translation type="unfinished">Reset rules error: %1</translation>
+      <translation>重設規則錯誤： %1</translation>
     </message>
   </context>
   <context>
