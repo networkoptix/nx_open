@@ -7,13 +7,13 @@
 
 namespace nx::media {
 
-NX_VMS_COMMON_API std::vector<uint8_t> buildExtraDataMp4(const QnCompressedVideoData* frame);
-NX_VMS_COMMON_API bool isMp4Format(const QnCompressedVideoData* videoData);
-NX_VMS_COMMON_API bool isAnnexb(const QnCompressedVideoData* videoData);
-NX_VMS_COMMON_API QnCompressedVideoDataPtr convertStartCodesToSizes(
+NX_MEDIA_CORE_API std::vector<uint8_t> buildExtraDataMp4(const QnCompressedVideoData* frame);
+NX_MEDIA_CORE_API bool isMp4Format(const QnCompressedVideoData* videoData);
+NX_MEDIA_CORE_API bool isAnnexb(const QnCompressedVideoData* videoData);
+NX_MEDIA_CORE_API QnCompressedVideoDataPtr convertStartCodesToSizes(
     const QnCompressedVideoData* frame);
 
-class NX_VMS_COMMON_API AnnexbToMp4
+class NX_MEDIA_CORE_API AnnexbToMp4
 {
 public:
     QnCompressedVideoDataPtr process(const QnCompressedVideoData* frame);

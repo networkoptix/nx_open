@@ -11,7 +11,6 @@ extern "C" {
 #include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
-#include <utils/media/ffmpeg_io_context.h>
 
 namespace {
 

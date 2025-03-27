@@ -12,7 +12,6 @@ extern "C" {
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
-#include <utils/media/ffmpeg_io_context.h>
 
 using namespace nx::vms::api;
 

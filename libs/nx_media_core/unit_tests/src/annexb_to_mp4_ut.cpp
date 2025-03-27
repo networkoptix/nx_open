@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <utils/media/annexb_to_mp4.h>
+#include <nx/media/annexb_to_mp4.h>
 #include <nx/media/ffmpeg_helper.h>
 
 TEST(AnnexbToMp4, EmptyCodecParameters)

@@ -6,13 +6,13 @@
 
 #include <core/resource/avi/avi_archive_metadata.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/media/annexb_to_mp4.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/video_data_packet.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <recording/abstract_recording_context.h>
 #include <recording/abstract_recording_context_callback.h>
 #include <recording/stream_recorder_data.h>
-#include <utils/media/annexb_to_mp4.h>
 
 namespace nx {
 

@@ -23,6 +23,7 @@ extern "C"
 
 #include <nx/build_info.h>
 #include <nx/codec/nal_units.h>
+#include <nx/media/annexb_to_mp4.h>
 #include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/hw_video_decoder.h>
 #include <nx/media/ffmpeg_helper.h>
@@ -31,7 +32,6 @@ extern "C"
 #include <nx/media/video_frame.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
-#include <utils/media/annexb_to_mp4.h>
 
 #include "mac_utils.h"
 
