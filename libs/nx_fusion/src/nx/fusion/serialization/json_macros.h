@@ -114,6 +114,17 @@ public:
         return operator()(target, access, access(setter_tag));
     }
 
+    template<class T, class Access>
+    bool operator()(const T&, const Access&, const QnFusion::end_tag&)
+    {
+        if (m_ctx->trackUnparsed() && !m_object.isEmpty())
+        {
+            m_ctx->setFailedKeyValue({m_object.begin().key(), "unexpected"});
+            return false;
+        }
+        return true;
+    }
+
 private:
     /**
      * Retrieve map of deprecated field names, if it is available. If T provides
@@ -153,10 +164,11 @@ private:
         using namespace QnFusion;
 
         bool found = false;
+        const auto key = access(/*QnFusion::key*/ name);
         if (!QJson::deserialize(
             m_ctx,
             m_object,
-            access(/*QnFusion::key*/ name),
+            key,
             &(target.*access(/*QnFusion::key*/ setter)),
             access(/*QnFusion::key*/ optional, /*defaultValue*/ true),
             &found,
@@ -167,9 +179,14 @@ private:
         }
 
         if (found)
-            m_ctx->setSomeFieldsFound(true);
+        {
+            if (m_ctx->trackUnparsed())
+                m_object.remove(key);
+        }
         else
+        {
             m_ctx->setSomeFieldsNotFound(true);
+        }
         return true;
     }
 
@@ -180,11 +197,12 @@ private:
         using namespace QnFusion;
 
         bool found = false;
+        const auto key = access(/*QnFusion::key*/ name);
         Member member;
         if (!QJson::deserialize(
             m_ctx,
             m_object,
-            access(/*QnFusion::key*/ name),
+            key,
             &member,
             access(/*QnFusion::key*/ optional, /*defaultValue*/ true),
             &found,
@@ -195,9 +213,15 @@ private:
         }
 
         if (found)
+        {
             invoke(access(/*QnFusion::key*/ setter), target, std::move(member));
+            if (m_ctx->trackUnparsed())
+                m_object.remove(key);
+        }
         else
+        {
             m_ctx->setSomeFieldsNotFound(true);
+        }
         return true;
     }
 

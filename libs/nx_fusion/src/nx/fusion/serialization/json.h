@@ -58,8 +58,8 @@ public:
     bool areSomeFieldsNotFound() const { return m_someFieldsNotFound; }
     void setSomeFieldsNotFound(bool value) { m_someFieldsNotFound = value; }
 
-    bool areSomeFieldsFound() const { return m_someFieldsFound; }
-    void setSomeFieldsFound(bool value) { m_someFieldsFound = value; }
+    bool trackUnparsed() const { return m_trackUnparsed; }
+    void setTrackUnparsed(bool value) { m_trackUnparsed = value; }
 
     bool serializeMapToObject() const { return m_serializeMapToObject; }
     void setSerializeMapToObject(bool value) { m_serializeMapToObject = value; }
@@ -115,6 +115,7 @@ public:
     bool serializeUuidWithBraces() const { return m_serializeUuidWithBraces; }
     void setSerializeUuidWithBraces(bool value) { m_serializeUuidWithBraces = value; }
 
+    void resetFailedKeyValue() { m_failed = {}; }
     const std::pair<QString, QString>& getFailedKeyValue() const { return m_failed; }
     void setFailedKeyValue(const std::pair<QString, QString>& failed)
     {
@@ -126,7 +127,7 @@ public:
 
 private:
     bool m_someFieldsNotFound{false};
-    bool m_someFieldsFound{false};
+    bool m_trackUnparsed{false};
     bool m_serializeMapToObject{false};
     bool m_isMapKeyDeserializationMode{false};
     bool m_allowStringConversions{false};

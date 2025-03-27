@@ -407,6 +407,7 @@ namespace QJsonDetail {
         const QJsonValue& value,
         std::variant<Args...>* target)
     {
+        ctx->resetFailedKeyValue();
         static_assert(!nx::utils::Is<std::optional, T>());
         if constexpr (std::is_same<std::nullptr_t, T>::value)
         {
@@ -428,23 +429,18 @@ namespace QJsonDetail {
         }
 
         const bool areSomeFieldsNotFound = ctx->areSomeFieldsNotFound();
-        nx::utils::ScopeGuard guard(
-            [ctx, areSomeFieldsNotFound]()
-            {
-                ctx->setSomeFieldsNotFound(areSomeFieldsNotFound);
-            });
+        const bool trackUnparsed = ctx->trackUnparsed();
         ctx->setSomeFieldsNotFound(false);
-        ctx->setSomeFieldsFound(false);
+        ctx->setTrackUnparsed(true);
 
         if (!deserialize(ctx, value, &typedTarget))
+        {
+            ctx->setSomeFieldsNotFound(areSomeFieldsNotFound);
+            ctx->setTrackUnparsed(trackUnparsed);
             return false;
+        }
 
-        if (!ctx->areSomeFieldsFound())
-            return false;
-
-        if (ctx->isStrictMode() && ctx->areSomeFieldsNotFound())
-            return false;
-
+        ctx->setTrackUnparsed(trackUnparsed);
         *target = typedTarget;
         return true;
     }

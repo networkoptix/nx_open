@@ -603,6 +603,58 @@ TEST_F(QnJsonTextFixture, StructWithVariant)
     EXPECT_EQ(data, QJson::deserialized<MockDataWithVariant>(jsonStr));
 }
 
+namespace {
+
+struct VariantAB
+{
+    std::optional<int> a;
+    std::optional<int> b;
+
+    bool operator==(const VariantAB&) const = default;
+};
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(VariantAB, (json), (a)(b))
+
+struct VariantAC
+{
+    std::optional<int> a;
+    std::optional<int> c;
+
+    bool operator==(const VariantAC&) const = default;
+};
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(VariantAC, (json), (a)(c))
+
+} // namespace
+
+TEST_F(QnJsonTextFixture, DeserializVariantWithOptional)
+{
+    using Variant = std::variant<VariantAB, VariantAC>;
+    #define ASSERT_VARIANT(JSON, VALUE) \
+        { \
+            bool ok = false; \
+            auto data = QJson::deserialized<Variant>(JSON, {}, &ok); \
+            ASSERT_TRUE(ok); \
+            const Variant expected = VALUE; \
+            ASSERT_EQ(data, expected); \
+        }
+    ASSERT_VARIANT(R"json({"a": 1, "b": 2})json", (VariantAB{1, 2}))
+    ASSERT_VARIANT(R"json({"a": 1, "c": 3})json", (VariantAC{1, 3}))
+    ASSERT_VARIANT(R"json({"c": 3, "a": 1})json", (VariantAC{1, 3}))
+    ASSERT_VARIANT(R"json({"b": 2})json", (VariantAB{std::nullopt, 2}))
+    ASSERT_VARIANT(R"json({"c": 3})json", (VariantAC{std::nullopt, 3}))
+    ASSERT_VARIANT(R"json({})json", (VariantAB{std::nullopt, std::nullopt}))
+
+    #define ASSERT_ERROR(JSON, ERROR) \
+        { \
+            QnJsonContext context; \
+            Variant data; \
+            ASSERT_FALSE(QJson::deserialize(&context, QByteArray(JSON), &data)); \
+            ASSERT_EQ(context.getFailedKeyValue(), ERROR); \
+        }
+    ASSERT_ERROR(
+        R"json({"a": 1, "b": 2, "c": 3})json", (std::pair<QString, QString>("b", "unexpected")))
+    ASSERT_ERROR(R"json({"d": 4})json", (std::pair<QString, QString>("d", "unexpected")))
+}
+
 TEST_F(QnJsonTextFixture, qJsonValue)
 {
     BriefMockDataWithQJsonValue value;

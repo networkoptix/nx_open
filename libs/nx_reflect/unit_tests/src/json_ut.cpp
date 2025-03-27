@@ -662,6 +662,7 @@ TEST_F(Json, deserialize_variant)
     ASSERT_VARIANT(R"json({"c": 3, "a": 1})json", (VariantAC{1, 3}))
     ASSERT_VARIANT(R"json({"b": 2})json", (VariantAB{0, 2}))
     ASSERT_VARIANT(R"json({"c": 3})json", (VariantAC{0, 3}))
+    ASSERT_VARIANT(R"json({})json", (VariantAB{0, 0}))
 
     #define ASSERT_ERROR(JSON, ERROR) \
         { \
