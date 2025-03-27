@@ -828,10 +828,14 @@ void QnMessageBox::showEvent(QShowEvent* event)
     // We really can survive without proper escape button.
     // NX_ASSERT(d->escapeButton);
 
-    if (d->informativeLabels.isEmpty() && d->customWidgets.isEmpty() && !isCheckBoxEnabled())
+    if (d->informativeLabels.isEmpty()
+        && d->customWidgets.isEmpty()
+        && !isCheckBoxEnabled()
+        && ui->verticalSpacer)
     {
         ui->verticalLayout->removeItem(ui->verticalSpacer);
         delete ui->verticalSpacer;
+        ui->verticalSpacer = nullptr;
     }
 
     adjustSize();
