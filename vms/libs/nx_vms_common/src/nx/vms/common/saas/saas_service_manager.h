@@ -102,6 +102,12 @@ public:
      */
     bool saasSuspendedOrShutDown() const;
 
+    /**
+     * @return Whether SaaS is in active or suspended state. These states allow to use already
+     * activated services.
+     */
+    bool saasServiceOperational() const;
+
     static bool saasSuspendedOrShutDown(nx::vms::api::SaasState state);
 
     /**

@@ -39,8 +39,7 @@ bool saasInitialized(const SystemContext* systemContext)
 
 bool saasServicesOperational(SystemContext* systemContext)
 {
-    const auto state = systemContext->saasServiceManager()->saasState();
-    return state == SaasState::active || state == SaasState::suspended;
+    return systemContext->saasServiceManager()->saasServiceOperational();
 }
 
 bool crossSiteNotificationsAllowed(SystemContext* systemContext)

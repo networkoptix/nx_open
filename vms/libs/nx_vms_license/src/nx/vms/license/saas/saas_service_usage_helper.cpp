@@ -476,11 +476,10 @@ std::map<QString, nx::Uuid> CloudStorageServiceUsageHelper::servicesByCameras() 
 
     std::map<QString, nx::Uuid> result;
     using Data = std::pair<nx::Uuid, int>; //< ServiceId and channels.
-    const auto saasData = saasServiceManager()->data();
     std::multimap<int, Data> availableChannels;
-    if (saasData.state == SaasState::active || saasData.state == SaasState::suspended)
+    if (saasServiceManager()->saasServiceOperational())
     {
-        auto cloudStorageData = systemContext()->saasServiceManager()->cloudStorageData();
+        auto cloudStorageData = saasServiceManager()->cloudStorageData();
         for (const auto& [id, parameters]: cloudStorageData)
         {
             if (parameters.totalChannelNumber > 0)
@@ -593,7 +592,7 @@ LicenseSummaryDataEx LiveViewUsageHelper::info() const
 
     const auto cameras = getAllCameras();
 
-    if (systemContext()->saasServiceManager()->saasState() == api::SaasState::active)
+    if (systemContext()->saasServiceManager()->saasServiceOperational())
     {
         // Add local recording services as well.
         for (const auto& [serviceId, parameters]:

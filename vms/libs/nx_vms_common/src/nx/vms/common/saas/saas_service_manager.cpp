@@ -277,6 +277,12 @@ bool ServiceManager::saasSuspendedOrShutDown(SaasState state)
     return state == SaasState::suspended || saasShutDown(state);
 }
 
+bool ServiceManager::saasServiceOperational() const
+{
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    return m_data.state == SaasState::active || m_data.state == SaasState::suspended;
+}
+
 bool ServiceManager::saasShutDown() const
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);

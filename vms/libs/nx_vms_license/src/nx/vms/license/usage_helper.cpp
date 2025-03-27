@@ -615,15 +615,18 @@ bool VideoWallLicenseUsageHelper::isValid() const
         return false;
     const auto state = saas->saasState();
     if (state != nx::vms::api::SaasState::uninitialized)
-        return state == nx::vms::api::SaasState::active;
+        return saas->saasServiceOperational();
     return base_type::isValid();
 }
 
 bool VideoWallLicenseUsageHelper::isValid(Qn::LicenseType licenseType) const
 {
-    const auto state = systemContext()->saasServiceManager()->saasState();
+    const auto saas = systemContext()->saasServiceManager();
+    if (!saas->hasFeature(nx::vms::api::SaasTierLimitName::videowallEnabled))
+        return false;
+    const auto state = saas->saasState();
     if (state != nx::vms::api::SaasState::uninitialized)
-        return state == nx::vms::api::SaasState::active;
+        return saas->saasServiceOperational();
     return base_type::isValid(licenseType);
 }
 
