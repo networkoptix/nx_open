@@ -129,6 +129,8 @@ ThumbnailTooltip::ThumbnailTooltip(WindowContext* context):
     BubbleToolTip(context, QUrl("qrc:/qml/Nx/RightPanel/private/ThumbnailTooltip.qml")),
     d(new Private{this})
 {
+    constexpr auto kMaxTooltipWidth = 252;
+    QmlProperty<qreal>{widget(), "maximumWidth"} = kMaxTooltipWidth;
 }
 
 ThumbnailTooltip::~ThumbnailTooltip()
