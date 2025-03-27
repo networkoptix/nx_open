@@ -67,7 +67,7 @@ QString StorageIssueEvent::reason(common::SystemContext* /*context*/) const
             return tr("I/O error has occurred at %1.").arg(storageUrl);
 
         case EventReason::storageTooSlow:
-            return tr("Not enough HDD/SSD speed for recording to %1.").arg(storageUrl);
+            return tr("Not enough HDD/SSD/Network speed for recording to %1.").arg(storageUrl);
 
         case EventReason::storageFull:
             return tr("HDD/SSD disk \"%1\" is full. Disk contains too much data"
