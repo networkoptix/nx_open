@@ -593,7 +593,7 @@ APPLY(408, saveStorages, nx::vms::api::StorageDataList, \
     false, /*< isRemoveOperation */ \
     InvalidGetHashHelper(), /*< getHash */ \
     MediaServerNotificationManagerHelper(), \
-    nullptr, /*< save permission checker */ \
+    ModifyStoragesAccess(), /*< save permission checker */ \
     InvalidAccess(), /*< read permission checker */ \
     FilterListByAccess<ReadResourceAccess>(), /*< filter read func */ \
     ReadListAccessOut<ReadResourceAccess>(), /*< check remote peer rights for outgoing transaction */ \

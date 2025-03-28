@@ -162,10 +162,24 @@ int QnMediaServerManager<T>::saveStorages(
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
+    using namespace nx::vms::api;
+    auto data = dataList;
+    /** Save storages with usedForWriting = false first.
+     * It prevents potential issue when several backup storages
+     * exists in the same time.
+     */
+    std::sort(data.begin(), data.end(),
+        [](const StorageData& left, const StorageData& right)
+        {
+            if (left.usedForWriting != right.usedForWriting)
+                return left.usedForWriting < right.usedForWriting;
+            return left.id < right.id;
+        });
+
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::saveStorages,
-        dataList,
+        data,
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);

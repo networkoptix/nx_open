@@ -1015,6 +1015,8 @@ struct ModifyResourceAccess
 
 struct ModifyStorageAccess
 {
+    std::optional<bool> hasUsedCloudStorageHint;
+
     Result operator()(
         SystemContext* systemContext,
         const nx::network::rest::UserAccessData& accessData,
@@ -1039,15 +1041,23 @@ struct ModifyStorageAccess
         }
 
         transaction_descriptor::CanModifyStorageData data;
-        for (const auto& s: resourcePool->getResources<QnStorageResource>())
+
+        if (!hasUsedCloudStorageHint.has_value())
         {
-            if (s->getStorageType() == nx::vms::api::kCloudStorageType
-                && s->isBackup()
-                && s->isUsedForWriting())
+            for (const auto& s: resourcePool->getResources<QnStorageResource>())
             {
-                data.hasUsedCloudStorage = true;
-                break;
+                if (s->getStorageType() == nx::vms::api::kCloudStorageType
+                    && s->isBackup()
+                    && s->isUsedForWriting())
+                {
+                    data.hasUsedCloudStorage = true;
+                    break;
+                }
             }
+        }
+        else
+        {
+            data.hasUsedCloudStorage = *hasUsedCloudStorageHint;
         }
 
         data.hasExistingStorage = (bool) existingResource;
@@ -1065,6 +1075,37 @@ struct ModifyStorageAccess
         amendOutputDataIfNeeded(accessData, systemContext->resourceAccessManager(), &data.request);
 
         return transaction_descriptor::canModifyStorage(systemContext, data);
+    }
+};
+
+struct ModifyStoragesAccess
+{
+    Result operator()(
+        SystemContext* systemContext,
+        const nx::network::rest::UserAccessData& accessData,
+        const nx::vms::api::StorageDataList& params)
+    {
+        if (hasSystemAccess(accessData))
+            return {};
+
+        ModifyStorageAccess access;
+        // Find cloud storage in the list. If it present, then use 'usedForWriting' from its value
+        // instead of resourcePool.
+        for (const auto& storage: params)
+        {
+            if (storage.storageType == nx::vms::api::kCloudStorageType && storage.isBackup)
+            {
+                access.hasUsedCloudStorageHint = storage.usedForWriting;
+                break;
+            }
+        }
+
+        for (const auto& storage: params)
+        {
+            if (auto result = access(systemContext, accessData, storage); !result)
+                return result;
+        }
+        return {};
     }
 };
 
