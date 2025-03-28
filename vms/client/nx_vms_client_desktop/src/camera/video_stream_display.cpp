@@ -116,7 +116,6 @@ QnVideoStreamDisplay::~QnVideoStreamDisplay()
 
 void QnVideoStreamDisplay::endOfRun()
 {
-    NX_MUTEX_LOCKER lock(&m_mtx);
     m_decoderData.decoder.reset();
 }
 
@@ -564,7 +563,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
 
     if (needReinitDecoders)
     {
-        NX_MUTEX_LOCKER lock(&m_mtx);
         if (m_decoderData.decoder)
             m_decoderData.decoder->setMultiThreadDecodePolicy(toEncoderPolicy(m_mtDecoding));
     }
@@ -578,7 +576,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     if (reverseMode != m_prevReverseMode || m_needResetDecoder)
     {
         clearReverseQueue();
-        NX_MUTEX_LOCKER lock( &m_mtx );
         if (reverseMode != m_prevReverseMode)
             m_decoderData.decoder.reset();
 
@@ -587,8 +584,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
 
     QnAbstractVideoDecoder* dec = nullptr;
     {
-        NX_MUTEX_LOCKER lock(&m_mtx);
-
         // Check can we use one more HW decoder or HW accelersation is disabled.
         if (data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
         {
@@ -620,12 +615,9 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
 
     if (m_needResetDecoder)
     {
-        NX_MUTEX_LOCKER lock(&m_mtx);
         m_decoderData.decoder->resetDecoder(data);
         m_needResetDecoder = false;
     }
-
-    m_mtx.lock();
 
     if (data->flags.testFlag(QnAbstractMediaData::MediaFlags_AfterEOF))
     {
@@ -651,11 +643,9 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
         if (dec->getLastDecodeResult() < 0 && dec->hardwareDecoder())
         {
             m_decoderData.decoder.reset();
-            m_mtx.unlock();
             return Status_Skipped;
         }
 
-        m_mtx.unlock();
         if (m_decodeMode == QnAbstractVideoDecoder::DecodeMode_Fastest)
             return Status_Skipped;
         if (!m_reverseQueue.isEmpty()
@@ -673,10 +663,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
                 return Status_Buffered;
         }
 
-        m_mtx.lock();
         auto lastError = dec->getLastDecodeResult();
-        m_mtx.unlock();
-
         if (lastError < 0)
             return Status_Skipped;
         else
@@ -687,7 +674,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
         NX_MUTEX_LOCKER lock(&m_lastDisplayedFrameMutex);
         m_lastDisplayedFrame = decodedFrame;
     }
-    m_mtx.unlock();
     m_rawDataSize = QSize(decodedFrame->width,decodedFrame->height);
     if (decodedFrame->width)
     {
@@ -818,7 +804,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(
     outFrame->channel = channel;
     double decoderSar = 1.0;
     {
-        NX_MUTEX_LOCKER lock(&m_mtx);
         if (!m_decoderData.decoder->decode(QnCompressedVideoDataPtr(), &decodedFrame))
             return Status_Skipped;
         decoderSar = m_decoderData.decoder->getSampleAspectRatio();
@@ -911,8 +896,6 @@ bool QnVideoStreamDisplay::rescaleFrame(
 void QnVideoStreamDisplay::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
 {
     m_decodeMode = val;
-    NX_MUTEX_LOCKER mutex( &m_mtx );
-
     if (m_decoderData.decoder)
         m_decoderData.decoder->setLightCpuMode(val);
 }
@@ -1005,7 +988,6 @@ void QnVideoStreamDisplay::clearReverseQueue()
     for (const auto& render: m_renderList)
         render->finishPostedFramesRender(0);
 
-    NX_MUTEX_LOCKER lock( &m_mtx );
     m_reverseQueue.clear();
     m_reverseSizeInBytes = 0;
 }

@@ -88,8 +88,6 @@ public: // used only by QnCamDisplay
     MultiThreadDecodePolicy toEncoderPolicy(bool useMtDecoding) const;
 
 private:
-    mutable nx::Mutex m_mtx;
-
     struct Decoder
     {
         AVCodecID compressionType = AVCodecID::AV_CODEC_ID_NONE;
