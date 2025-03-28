@@ -10,6 +10,7 @@
 #include <QtCore/QStringList>
 #include <QtGui/QStandardItemModel>
 #include <QtTest/QAbstractItemModelTester>
+#include <QtTest/QSignalSpy>
 
 #include <QtCore/private/qabstractitemmodel_p.h>
 
@@ -214,7 +215,16 @@ TEST_F(LinearizationListModelTest, initialState)
 
 TEST_F(LinearizationListModelTest, customSourceRoot)
 {
+    QSignalSpy aboutToBeResetSpy(testModel.get(), &QAbstractItemModel::modelAboutToBeReset);
+    QSignalSpy resetSpy(testModel.get(), &QAbstractItemModel::modelAboutToBeReset);
+    QSignalSpy sourceRootChangedSpy(testModel.get(), &LinearizationListModel::sourceRootChanged);
+
     testModel->setSourceRoot(sourceIndex({1}));
+
+    ASSERT_EQ(aboutToBeResetSpy.count(), 1);
+    ASSERT_EQ(resetSpy.count(), 1);
+    ASSERT_EQ(sourceRootChangedSpy.count(), 1);
+
     ASSERT_EQ(itemData<QString>(Qt::DisplayRole), QStringList({"10", "11", "12"}));
     ASSERT_EQ(itemData<int>(LLM::LevelRole), QList<int>({0, 0, 0}));
     ASSERT_EQ(itemData<bool>(LLM::HasChildrenRole), QList<bool>({false, true, false}));
@@ -931,6 +941,36 @@ TEST_F(LinearizationListModelTest, autoExpand)
         {true, true, true, true, true, false, true, false, false, false}));
     ASSERT_EQ(itemData<bool>(LLM::ExpandedRole), QList<bool>(
         {false, false, true, true, true, false, false, false, false, false}));
+}
+
+TEST_F(LinearizationListModelTest, sourceModelReset)
+{
+    ASSERT_NE(testModel->rowCount(), 0);
+
+    QSignalSpy aboutToBeResetSpy(testModel.get(), &QAbstractItemModel::modelAboutToBeReset);
+    QSignalSpy resetSpy(testModel.get(), &QAbstractItemModel::modelAboutToBeReset);
+
+    sourceModel->clear();
+    ASSERT_EQ(testModel->rowCount(), 0);
+
+    ASSERT_EQ(aboutToBeResetSpy.count(), 1);
+    ASSERT_EQ(resetSpy.count(), 1);
+}
+
+TEST_F(LinearizationListModelTest, sourceModelDestroyed)
+{
+    ASSERT_NE(testModel->rowCount(), 0);
+
+    QSignalSpy aboutToBeResetSpy(testModel.get(), &QAbstractItemModel::modelAboutToBeReset);
+    QSignalSpy resetSpy(testModel.get(), &QAbstractItemModel::modelAboutToBeReset);
+    QSignalSpy sourceModelChangedSpy(testModel.get(), &LinearizationListModel::sourceModelChanged);
+
+    sourceModel.reset();
+    ASSERT_EQ(testModel->rowCount(), 0);
+
+    ASSERT_EQ(aboutToBeResetSpy.count(), 1);
+    ASSERT_EQ(resetSpy.count(), 1);
+    ASSERT_EQ(sourceModelChangedSpy.count(), 1);
 }
 
 } // namespace test
