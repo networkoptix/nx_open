@@ -23,8 +23,8 @@
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
-#include <nx/vms/license/saas/saas_service_usage_helper.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/license/saas/saas_service_usage_helper.h>
 
 namespace {
 
@@ -152,6 +152,8 @@ struct BackupSettingsDecoratorModel::Private
 
     int availableCloudStorageServices(const QnVirtualCameraResourcePtr& camera) const;
     void proposeServicesUsageChange();
+
+    bool isCloudStorageInSuspendedState() const;
 
     bool hasChanges() const;
     void applyChanges();
@@ -362,6 +364,11 @@ void BackupSettingsDecoratorModel::Private::proposeServicesUsageChange()
     cloudStorageUsageHelper->proposeChange(toAdd, toRemove);
 }
 
+bool BackupSettingsDecoratorModel::Private::isCloudStorageInSuspendedState() const
+{
+    return isCloudBackupStorage && q->systemContext()->saasServiceManager()->saasSuspended();
+}
+
 bool BackupSettingsDecoratorModel::Private::hasChanges() const
 {
     return !changedContentTypes.isEmpty()
@@ -556,8 +563,11 @@ QVariant BackupSettingsDecoratorModel::data(const QModelIndex& index, int role) 
             break;
 
         case Qn::ItemMouseCursorRole:
-            if (column == SwitchColumn && insufficientServices && !backupEnabled)
+            if (column == SwitchColumn && !backupEnabled
+                && (insufficientServices || d->isCloudStorageInSuspendedState()))
+            {
                 return QVariant::fromValue<int>(Qt::ForbiddenCursor);
+            }
             break;
 
         case IsItemHighlightedRole:
@@ -577,6 +587,10 @@ QVariant BackupSettingsDecoratorModel::data(const QModelIndex& index, int role) 
         case HasDropdownMenuRole:
             if (!isDropdownColumn(index))
                 return {};
+
+            if (d->isCloudStorageInSuspendedState())
+                return {};
+
             return column != QualityColumn || camera->hasDualStreaming();
 
         case InfoMessageRole:
@@ -733,6 +747,9 @@ void BackupSettingsDecoratorModel::setBackupEnabled(
             {
                 continue;
             }
+
+            if (enabled && d->isCloudStorageInSuspendedState())
+                continue;
 
             if (d->backupEnabled(camera) != enabled)
             {

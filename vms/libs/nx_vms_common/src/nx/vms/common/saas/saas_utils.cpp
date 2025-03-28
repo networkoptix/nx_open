@@ -81,7 +81,7 @@ QString StringsHelper::recommendedAction(nx::vms::api::SaasState state)
 
         case SaasState::suspended:
         case SaasState::shutdown:
-            return tr("Contact your channel partner for details.");
+            return tr("Contact your channel partner for assistance.");
 
         case SaasState::autoShutdown:
             return tr("Check internet connection between VMS and license server.");
