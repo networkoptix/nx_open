@@ -230,7 +230,7 @@ bool LocalNotificationsListModel::setData(const QModelIndex& index, const QVaria
         return false;
     }
 
-    workbenchContext()->instance<workbench::LocalNotificationsManager>()->interact(
+    windowContext()->localNotificationsManager()->interact(
         m_notifications[index.row()]);
     return true;
 }
