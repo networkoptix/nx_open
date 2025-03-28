@@ -11450,6 +11450,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
       <translation>Hai outro usuario con este inicio de sesión. Para evitar problemas, é necesario que todos os usuarios teñan un inicio de sesión único.</translation>
     </message>
+    <message>
+      <source>Organization user</source>
+      <translation type="unfinished">Organization user</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>

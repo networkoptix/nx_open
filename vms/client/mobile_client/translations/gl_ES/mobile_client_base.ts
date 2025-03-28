@@ -88,4 +88,16 @@
       <translation>Por favor, comproba a túa conexión a internet</translation>
     </message>
   </context>
+  <context>
+    <name>nx::vms::client::mobile::ShareBookmarkBackend</name>
+    <message>
+      <source>Camera</source>
+      <translation type="unfinished">Camera</translation>
+    </message>
+    <message>
+      <source>Expires in %1</source>
+      <comment>%1 is time text like &apos;48 minutes&apos;</comment>
+      <translation type="unfinished">Expires in %1</translation>
+    </message>
+  </context>
 </TS>

@@ -257,6 +257,13 @@
     </message>
   </context>
   <context>
+    <name>EventSearchItem</name>
+    <message>
+      <source>SHARED</source>
+      <translation type="unfinished">SHARED</translation>
+    </message>
+  </context>
+  <context>
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
@@ -317,6 +324,17 @@
     <message>
       <source>Close</source>
       <translation>Bezár</translation>
+    </message>
+  </context>
+  <context>
+    <name>HowItWorksSheet</name>
+    <message>
+      <source>How it works</source>
+      <translation type="unfinished">How it works</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Mégsem</translation>
     </message>
   </context>
   <context>
@@ -781,6 +799,65 @@
     <message>
       <source>Decode some rare video formats using software decoder</source>
       <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+    </message>
+  </context>
+  <context>
+    <name>ShareBookmarkSheet</name>
+    <message>
+      <source>New Bookmark</source>
+      <translation type="unfinished">New Bookmark</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation type="unfinished">Name</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation type="unfinished">Description</translation>
+    </message>
+    <message>
+      <source>Lifetime</source>
+      <translation type="unfinished">Lifetime</translation>
+    </message>
+    <message>
+      <source>Protect with Password (optional)</source>
+      <translation type="unfinished">Protect with Password (optional)</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Mégsem</translation>
+    </message>
+    <message>
+      <source>Create &amp; Share</source>
+      <translation type="unfinished">Create &amp; Share</translation>
+    </message>
+    <message>
+      <source>Save &amp; Share</source>
+      <translation type="unfinished">Save &amp; Share</translation>
+    </message>
+    <message>
+      <source>Stop Sharing</source>
+      <translation type="unfinished">Stop Sharing</translation>
+    </message>
+    <message>
+      <source>Expires in an hour</source>
+      <translation type="unfinished">Expires in an hour</translation>
+    </message>
+    <message>
+      <source>Expires in a day</source>
+      <translation type="unfinished">Expires in a day</translation>
+    </message>
+    <message>
+      <source>Expires in a month</source>
+      <translation type="unfinished">Expires in a month</translation>
+    </message>
+    <message>
+      <source>Never expires</source>
+      <translation type="unfinished">Never expires</translation>
+    </message>
+    <message>
+      <source>Shared link options</source>
+      <translation type="unfinished">Shared link options</translation>
     </message>
   </context>
   <context>

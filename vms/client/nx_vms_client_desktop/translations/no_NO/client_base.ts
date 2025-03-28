@@ -11447,6 +11447,10 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
       <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
     </message>
+    <message>
+      <source>Organization user</source>
+      <translation type="unfinished">Organization user</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>

@@ -21,7 +21,7 @@
     <message>
       <source>On %1 --&gt; %2</source>
       <comment>%1 is the event name, %2 is the action name</comment>
-      <translation type="unfinished">On %1 --&gt; %2</translation>
+      <translation>在 %1 --&gt; %2</translation>
     </message>
   </context>
   <context>
@@ -264,7 +264,7 @@
     </message>
     <message>
       <source>Field &quot;%1&quot; should be an object</source>
-      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+      <translation>欄位 &quot;%1&quot; 應為一個物件</translation>
     </message>
     <message>
       <source>Unable to deserialize properties for field: %1</source>
@@ -320,7 +320,7 @@
     </message>
     <message>
       <source>And attributes</source>
-      <translation type="unfinished">And attributes</translation>
+      <translation>和屬性</translation>
     </message>
   </context>
   <context>
@@ -577,7 +577,7 @@
     </message>
     <message>
       <source>Custom headers</source>
-      <translation type="unfinished">Custom headers</translation>
+      <translation>自訂標頭</translation>
     </message>
   </context>
   <context>
@@ -595,14 +595,14 @@
     <name>nx::vms::rules::HttpHeadersFieldValidator</name>
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
-      <translation type="unfinished">
-        <numerusform>Some of the headers are not valid</numerusform>
+      <translation>
+        <numerusform>有些標頭無效</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
-      <translation type="unfinished">
-        <numerusform>All the headers are not valid</numerusform>
+      <translation>
+        <numerusform>所有標頭皆無效</numerusform>
       </translation>
     </message>
   </context>
@@ -617,7 +617,7 @@
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
       <source>Integration Diagnostic Event</source>
-      <translation type="unfinished">Integration Diagnostic Event</translation>
+      <translation>整合服務診斷事件</translation>
     </message>
     <message>
       <source>For Plugin</source>
@@ -1081,11 +1081,11 @@
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
       <source>Site HTTP(S) Request</source>
-      <translation type="unfinished">Site HTTP(S) Request</translation>
+      <translation>站點 HTTP(S) 請求</translation>
     </message>
     <message>
       <source>Endpoint</source>
-      <translation type="unfinished">Endpoint</translation>
+      <translation>端點</translation>
     </message>
     <message>
       <source>Method</source>
@@ -1241,7 +1241,7 @@
     </message>
     <message>
       <source>Invalid UUID string</source>
-      <translation type="unfinished">Invalid UUID string</translation>
+      <translation>無效的 UUID 字串</translation>
     </message>
   </context>
   <context>
@@ -1275,11 +1275,11 @@
     </message>
     <message>
       <source>Endpoint cannot be empty</source>
-      <translation type="unfinished">Endpoint cannot be empty</translation>
+      <translation>端點不能為空白</translation>
     </message>
     <message>
       <source>Endpoint mustn&apos;t contains any space</source>
-      <translation type="unfinished">Endpoint mustn&apos;t contains any space</translation>
+      <translation>端點不能包含空白</translation>
     </message>
   </context>
   <context>

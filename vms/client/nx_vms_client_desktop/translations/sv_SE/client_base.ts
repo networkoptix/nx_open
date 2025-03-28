@@ -4583,7 +4583,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
-      <translation type="unfinished">Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
+      <translation>Cloud backup har stoppats eftersom systemet har stängts av. Den måste vara aktiv för att göra en säkerhetskopiering till molnlagring. Kontakta din kanalpartner för hjälp</translation>
     </message>
   </context>
   <context>
@@ -11448,6 +11448,10 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
       <translation>Det finns en annan användare med denna inloggning. För att undvika problem krävs det att alla användare har en unik inloggning.</translation>
+    </message>
+    <message>
+      <source>Organization user</source>
+      <translation type="unfinished">Organization user</translation>
     </message>
   </context>
   <context>

@@ -11451,6 +11451,10 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
       <translation>Il existe un autre utilisateur avec ce login. Pour éviter tout problème, il est nécessaire que tous les utilisateurs disposent d'un login unique.</translation>
     </message>
+    <message>
+      <source>Organization user</source>
+      <translation type="unfinished">Organization user</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>

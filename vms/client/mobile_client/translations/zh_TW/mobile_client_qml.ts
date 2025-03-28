@@ -256,10 +256,17 @@
     </message>
   </context>
   <context>
+    <name>EventSearchItem</name>
+    <message>
+      <source>SHARED</source>
+      <translation type="unfinished">SHARED</translation>
+    </message>
+  </context>
+  <context>
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
-      <translation type="unfinished">Looking for</translation>
+      <translation>尋找</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -319,6 +326,17 @@
     </message>
   </context>
   <context>
+    <name>HowItWorksSheet</name>
+    <message>
+      <source>How it works</source>
+      <translation type="unfinished">How it works</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>取消</translation>
+    </message>
+  </context>
+  <context>
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
@@ -370,7 +388,7 @@
     <name>MenuScreen</name>
     <message>
       <source>App Settings</source>
-      <translation type="unfinished">App Settings</translation>
+      <translation>應用程式設定</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -417,19 +435,19 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>沒有站點</translation>
     </message>
     <message>
       <source>We did not find any sites in this organization</source>
-      <translation type="unfinished">We did not find any sites in this organization</translation>
+      <translation>我們在此組織中沒有找到任何站點</translation>
     </message>
     <message>
       <source>We did not find any sites in this folder</source>
-      <translation type="unfinished">We did not find any sites in this folder</translation>
+      <translation>我們在此資料夾中沒有找到任何站點</translation>
     </message>
     <message>
       <source>How to connect sites?</source>
-      <translation type="unfinished">How to connect sites?</translation>
+      <translation>如何連結站點？</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -641,7 +659,7 @@
     </message>
     <message>
       <source>Host: Port</source>
-      <translation type="unfinished">Host: Port</translation>
+      <translation>主機: 連接埠</translation>
     </message>
   </context>
   <context>
@@ -672,19 +690,19 @@
     </message>
     <message>
       <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation type="unfinished">We didn&apos;t find any organizations, try contacting support</translation>
+      <translation>我們沒有找到任何組織，請聯絡技術支援</translation>
     </message>
     <message>
       <source>No Sites Found</source>
-      <translation type="unfinished">No Sites Found</translation>
+      <translation>未找到站點</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</translation>
+      <translation>我們在你的區域網路沒有找到任何站點，試著手動加入伺服器或登入你的cloud帳號</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually</translation>
+      <translation>我們在你的區域網路沒有找到任何站點，試著手動加入伺服器</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -783,6 +801,65 @@
     </message>
   </context>
   <context>
+    <name>ShareBookmarkSheet</name>
+    <message>
+      <source>New Bookmark</source>
+      <translation type="unfinished">New Bookmark</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation type="unfinished">Name</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation type="unfinished">Description</translation>
+    </message>
+    <message>
+      <source>Lifetime</source>
+      <translation type="unfinished">Lifetime</translation>
+    </message>
+    <message>
+      <source>Protect with Password (optional)</source>
+      <translation type="unfinished">Protect with Password (optional)</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>取消</translation>
+    </message>
+    <message>
+      <source>Create &amp; Share</source>
+      <translation type="unfinished">Create &amp; Share</translation>
+    </message>
+    <message>
+      <source>Save &amp; Share</source>
+      <translation type="unfinished">Save &amp; Share</translation>
+    </message>
+    <message>
+      <source>Stop Sharing</source>
+      <translation type="unfinished">Stop Sharing</translation>
+    </message>
+    <message>
+      <source>Expires in an hour</source>
+      <translation type="unfinished">Expires in an hour</translation>
+    </message>
+    <message>
+      <source>Expires in a day</source>
+      <translation type="unfinished">Expires in a day</translation>
+    </message>
+    <message>
+      <source>Expires in a month</source>
+      <translation type="unfinished">Expires in a month</translation>
+    </message>
+    <message>
+      <source>Never expires</source>
+      <translation type="unfinished">Never expires</translation>
+    </message>
+    <message>
+      <source>Shared link options</source>
+      <translation type="unfinished">Shared link options</translation>
+    </message>
+  </context>
+  <context>
     <name>SideNavigation</name>
     <message>
       <source>New connection</source>
@@ -820,7 +897,7 @@
     </message>
     <message>
       <source>NEW</source>
-      <translation type="unfinished">NEW</translation>
+      <translation>新的</translation>
     </message>
   </context>
   <context>
@@ -856,7 +933,7 @@
     <message>
       <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Open %1</translation>
+      <translation>開啟%1</translation>
     </message>
     <message>
       <source>Channel Partner</source>

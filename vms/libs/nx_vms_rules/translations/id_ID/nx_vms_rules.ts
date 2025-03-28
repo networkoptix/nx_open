@@ -264,7 +264,7 @@
     </message>
     <message>
       <source>Field &quot;%1&quot; should be an object</source>
-      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+      <translation>Bidang &quot;%1&quot; harus berupa objek</translation>
     </message>
     <message>
       <source>Unable to deserialize properties for field: %1</source>

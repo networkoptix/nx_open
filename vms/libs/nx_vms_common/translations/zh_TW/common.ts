@@ -238,14 +238,14 @@
     <name>QnCameraAnalyticsEventsPolicy</name>
     <message>
       <source>Analytics events are not available for %1</source>
-      <translation type="unfinished">Analytics events are not available for %1</translation>
+      <translation>分析事件不適用於 %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsObjectsPolicy</name>
     <message>
       <source>Analytics objects are not available for %1</source>
-      <translation type="unfinished">Analytics objects are not available for %1</translation>
+      <translation>分析物件不適用於 %1</translation>
     </message>
   </context>
   <context>
@@ -1577,7 +1577,7 @@
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
-      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
+      <translation>書籤的最大數量。小於或等於 0 的值是無限。</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption).</source>
@@ -1589,7 +1589,7 @@
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
-      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages).</translation>
+      <translation>向管理員揭露儲存在 VMS 中裝置的密碼（針對網頁）</translation>
     </message>
     <message>
       <source>Enable auto-discovery.</source>
@@ -1621,7 +1621,7 @@
     </message>
     <message>
       <source>Enable RTSP for Arecont.</source>
-      <translation type="unfinished">Enable RTSP for Arecont.</translation>
+      <translation>於Arecont 攝影機啟用RTSP協定</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher.</source>
@@ -1649,7 +1649,7 @@
     </message>
     <message>
       <source>Max RTSP connection duration (seconds).</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds).</translation>
+      <translation>RTSP 連線的最久持續時間（秒）</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching.</source>
@@ -1673,7 +1673,7 @@
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</translation>
+      <translation>遠端存檔同步的最大執行緒數（&lt;=0 - 自動，最大 32）</translation>
     </message>
     <message>
       <source>Update releases.json file URL.</source>
@@ -1709,7 +1709,7 @@
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds).</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds).</translation>
+      <translation>工作階段授權Token的生命週期（秒）。</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens.</source>
@@ -1725,11 +1725,11 @@
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud).</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud).</translation>
+      <translation>遠端連線token快取的更新間隔（其他伺服器和Cloud）</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud).</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud).</translation>
+      <translation>遠端連線token快取的等待時間（其他伺服器和Cloud）</translation>
     </message>
     <message>
       <source>Default video codec.</source>
@@ -1781,11 +1781,11 @@
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4MB).</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4MB).</translation>
+      <translation>媒體緩衝區大小（KB, 10KB-4MB）</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB).</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB).</translation>
+      <translation>僅音訊裝置的媒體緩衝區大小（KB、1KB-1MB）</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure.</source>
@@ -1793,7 +1793,7 @@
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds).</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds).</translation>
+      <translation>檢查VMS伺服器中影像串流權限的週期（毫秒）</translation>
     </message>
     <message>
       <source>Storage encryption enabled.</source>
@@ -1829,11 +1829,11 @@
     </message>
     <message>
       <source>Enable deprecated API functions (insecure).</source>
-      <translation type="unfinished">Enable deprecated API functions (insecure).</translation>
+      <translation>啟用已棄用的 API 功能（不安全）</translation>
     </message>
     <message>
       <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
-      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
+      <translation>啟用已棄用的 HTTP 基本驗證和摘要驗證（不安全）。</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery.</source>
@@ -1849,7 +1849,7 @@
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
-      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+      <translation>SMTP 設定。僅有進階使用者可以看到這些設定。</translation>
     </message>
   </context>
 </TS>

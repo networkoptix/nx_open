@@ -11284,6 +11284,10 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
       <translation>Có một người dùng khác có thông tin đăng nhập này. Để tránh sự cố, tất cả người dùng phải có thông tin đăng nhập duy nhất.</translation>
     </message>
+    <message>
+      <source>Organization user</source>
+      <translation type="unfinished">Organization user</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>

@@ -4536,7 +4536,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
-      <translation type="unfinished">Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
+      <translation>Backup cloud telah dihentikan karena sistem telah dimatikan. Sistem harus aktif untuk melakukan backup ke penyimpanan cloud. Hubungi channel partner Anda untuk mendapatkan bantuan</translation>
     </message>
   </context>
   <context>
@@ -9024,11 +9024,11 @@ Performa Site menurun.</translation>
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
       <source>This group has been assigned at organization level and can be managed only at organization level</source>
-      <translation type="unfinished">This group has been assigned at organization level and can be managed only at organization level</translation>
+      <translation>Grup ini telah ditetapkan pada tingkat organisasi dan hanya dapat dikelola pada tingkat organisasi</translation>
     </message>
     <message>
       <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
-      <translation type="unfinished">The user has been assigned to this group at organization level and can be unassigned only at organization level</translation>
+      <translation>Pengguna telah ditetapkan ke grup ini di tingkat organisasi dan hanya dapat dibatalkan penetapannya di tingkat organisasi</translation>
     </message>
   </context>
   <context>
@@ -11284,6 +11284,10 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
       <translation>Ada user lain dengan login ini. Untuk menghindari masalah, semua user diharuskan memiliki login yang unik.</translation>
     </message>
+    <message>
+      <source>Organization user</source>
+      <translation type="unfinished">Organization user</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>
@@ -12560,15 +12564,15 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error: %1</source>
-      <translation type="unfinished">Delete rule error: %1</translation>
+      <translation>Hapus aturan error: %1</translation>
     </message>
     <message>
       <source>Save rule error: %1</source>
-      <translation type="unfinished">Save rule error: %1</translation>
+      <translation>Simpan aturan error: %1</translation>
     </message>
     <message>
       <source>Reset rules error: %1</source>
-      <translation type="unfinished">Reset rules error: %1</translation>
+      <translation>Reset aturan error: %1</translation>
     </message>
   </context>
   <context>

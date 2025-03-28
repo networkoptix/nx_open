@@ -11285,6 +11285,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
       <translation>同じログイン名を持つ別のユーザーが存在します。問題を回避するには、すべてのユーザーに一意のログイン名を持たせる必要があります。</translation>
     </message>
+    <message>
+      <source>Organization user</source>
+      <translation type="unfinished">Organization user</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>

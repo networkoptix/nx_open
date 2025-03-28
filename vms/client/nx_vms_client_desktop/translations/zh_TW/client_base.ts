@@ -3543,7 +3543,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation type="unfinished">Cloud authorization request should only be performed for cloud cross system resources</translation>
+      <translation>雲端授權請求僅應針對雲端跨系統資源執行</translation>
     </message>
   </context>
   <context>
@@ -4327,11 +4327,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
-      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+      <translation>無法連線至該攝影機。在 Nx Witness 桌面用戶端中執行攝影機診斷以取得更多資訊。</translation>
     </message>
     <message>
       <source>Access to this camera requires authorization credentials.</source>
-      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+      <translation>連線至此相機需要授權帳號密碼。</translation>
     </message>
     <message>
       <source>CONNECTION LOST</source>
@@ -4520,7 +4520,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
-      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+      <translation>要啟用請再增加 %1 個適當的服務或減少啟用備份的攝影機數量。</translation>
     </message>
     <message>
       <source>Insufficient services</source>
@@ -4528,15 +4528,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
-      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+      <translation>啟用雲端備份將停用所有非雲端備份儲存。設定為 &quot;所有存檔&quot; 的裝置設將變更設定為 &quot;移動、物件和書籤&quot;</translation>
     </message>
     <message>
       <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
-      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
+      <translation>設定為 &quot;所有存檔&quot; 的裝置設將在雲端備份啟用後變更設定為 &quot;位移、物件和書籤&quot;</translation>
     </message>
     <message>
       <source>Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
-      <translation type="unfinished">Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
+      <translation>由於系統已關閉，雲端備份已停止。系統必須處於活躍狀態才能進行雲端備份。請聯絡您的通路夥伴尋求協助</translation>
     </message>
   </context>
   <context>
@@ -5861,26 +5861,26 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n removed devices</source>
-      <translation type="unfinished">
-        <numerusform>%n removed devices</numerusform>
+      <translation>
+        <numerusform>%n 台已移除的裝置</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n removed cameras</numerusform>
+      <translation>
+        <numerusform>%n 台已移除的攝影機</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed servers</source>
-      <translation type="unfinished">
-        <numerusform>%n removed servers</numerusform>
+      <translation>
+        <numerusform>%n 台已移除的伺服器</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n removed layouts</numerusform>
+      <translation>
+        <numerusform>%n 個已移除的佈局</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5891,36 +5891,36 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n devices more</source>
-      <translation type="unfinished">
-        <numerusform>%n devices more</numerusform>
+      <translation>
+        <numerusform>再%n台裝置</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras more</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras more</numerusform>
+      <translation>
+        <numerusform>再%n台攝影機</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers more</source>
-      <translation type="unfinished">
-        <numerusform>%n servers more</numerusform>
+      <translation>
+        <numerusform>再%n台伺服器</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts more</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts more</numerusform>
+      <translation>
+        <numerusform>再%n個佈局</numerusform>
       </translation>
     </message>
     <message>
       <source>Removed subject</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">Removed subject</translation>
+      <translation>移除的主旨</translation>
     </message>
     <message>
       <source>Removed device</source>
-      <translation type="unfinished">Removed device</translation>
+      <translation>移除的裝置</translation>
     </message>
     <message>
       <source>Removed camera</source>
@@ -5928,11 +5928,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Removed server</source>
-      <translation type="unfinished">Removed server</translation>
+      <translation>移除的伺服器</translation>
     </message>
     <message>
       <source>Removed layout</source>
-      <translation type="unfinished">Removed layout</translation>
+      <translation>移除的佈局</translation>
     </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
@@ -6570,19 +6570,19 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
       <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
-      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+      <translation>需要再%1個適當的雲端儲存服務才能將所有選擇的裝置啟用備份</translation>
     </message>
     <message>
       <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
-      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+      <translation>但你仍然可以使用一般的開關為那些可以備份的攝影機啟用備份</translation>
     </message>
     <message>
       <source>Backup will not be activated for %1 devices: </source>
-      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
+      <translation> %1 的裝置將不會啟用備份： </translation>
     </message>
     <message>
       <source>%1 suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
+      <translation>需要再%1個適當的雲端儲存服務才能將它們啟用備份</translation>
     </message>
   </context>
   <context>
@@ -6915,7 +6915,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
-      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+      <translation>偵測到裝置具有PTZ功能。如果視野改變可能導致熱點不再對應。</translation>
     </message>
   </context>
   <context>
@@ -6942,7 +6942,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use this link to add the camera to another site</source>
-      <translation type="unfinished">Use this link to add the camera to another site</translation>
+      <translation>使用此連結將攝影機新增至另一個站點</translation>
     </message>
   </context>
   <context>
@@ -7531,11 +7531,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Channel Partner users have access to this site</source>
-      <translation type="unfinished">Channel Partner users have access to this site</translation>
+      <translation>通路夥伴使用者可以造訪此站點</translation>
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</translation>
+      <translation>通路夥伴使用者的存取權限是在組織層級進行管理，因此不會出現在站點的使用者管理頁面。&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;了解更多&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
@@ -11280,6 +11280,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
       <translation>系統中已存在具有相同登入名稱的使用者。為了避免問題，所有使用者都需要不重複的登入名稱。</translation>
+    </message>
+    <message>
+      <source>Organization user</source>
+      <translation type="unfinished">Organization user</translation>
     </message>
   </context>
   <context>

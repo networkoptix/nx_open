@@ -131,7 +131,7 @@
     </message>
     <message>
       <source>with</source>
-      <translation type="unfinished">with</translation>
+      <translation>avec</translation>
     </message>
     <message>
       <source>Simultaneous Streams</source>
