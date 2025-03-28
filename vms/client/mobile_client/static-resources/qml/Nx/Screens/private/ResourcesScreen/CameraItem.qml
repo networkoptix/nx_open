@@ -82,45 +82,52 @@ Control
             id: thumbnailContainer
 
             width: parent.width
-            height:
+            height: width * cameraItem.aspectRatio
+
+
+            color: d.showTumbnailDummy ? ColorTheme.colors.dark8 : ColorTheme.colors.dark4
+
+            Item
             {
-                const dummyModeOffset = d.showTumbnailDummy
-                    ? cameraInfo.height + cameraInfo.margin * 2
-                    : 0
-                return parent.width * cameraItem.aspectRatio - dummyModeOffset
-            }
-
-            color: d.showTumbnailDummy ? ColorTheme.colors.dark7 : ColorTheme.colors.dark4
-
-            Loader
-            {
-                id: thumbnailContentLoader
-
-                anchors.centerIn: parent
-                state:
+                width: parent.width
+                height:
                 {
-                    if (d.showTumbnailDummy)
-                        return "dummyContent"
-
-                    const allowVideoContent = !initialLoadingTimer.running
-                        && cameraItem.active
-                        && settings.liveVideoPreviews
-
-                    return allowVideoContent
-                        ? "videoContent"
-                        : "thumbnailContent"
+                    const dummyModeOffset = d.showTumbnailDummy
+                        ? cameraInfo.height + cameraInfo.margin * 2
+                        : 0
+                    return parent.width * cameraItem.aspectRatio - dummyModeOffset
                 }
 
-                sourceComponent:
+                Loader
                 {
-                    switch (state)
+                    id: thumbnailContentLoader
+
+                    anchors.centerIn: parent
+                    state:
                     {
-                        case "thumbnailContent":
-                            return thumbnailComponent
-                        case "videoContent":
-                            return videoComponent
-                        default:
-                            return dummyComponent
+                        if (d.showTumbnailDummy)
+                            return "dummyContent"
+
+                        const allowVideoContent = !initialLoadingTimer.running
+                            && cameraItem.active
+                            && settings.liveVideoPreviews
+
+                        return allowVideoContent
+                            ? "videoContent"
+                            : "thumbnailContent"
+                    }
+
+                    sourceComponent:
+                    {
+                        switch (state)
+                        {
+                            case "thumbnailContent":
+                                return thumbnailComponent
+                            case "videoContent":
+                                return videoComponent
+                            default:
+                                return dummyComponent
+                        }
                     }
                 }
             }
@@ -135,7 +142,7 @@ Control
             readonly property int spacing: 2
 
             radius: 3
-            color: ColorTheme.transparent(ColorTheme.colors.dark8, 0.6)
+            color: ColorTheme.transparent(ColorTheme.colors.dark6, 0.6)
 
             x: margin
             y: parent.height - height - margin
