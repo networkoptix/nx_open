@@ -5,7 +5,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QMetaObject>
 
-#include <nx/network/http/rest/http_rest_client.h>
 #include <nx/utils/coro/task_utils.h>
 #include <nx/utils/coro/when_all.h>
 #include <nx/utils/guarded_callback.h>
@@ -474,9 +473,9 @@ nx::coro::FireAndForget OrganizationsModel::Private::loadOrgs(nx::Uuid cpId)
             "status",
             [](auto value) { return value == CloudStatusWatcher::Online; });
 
-        auto orgsPath = nx::network::http::rest::substituteParameters(
-            "/partners/api/v2/channel_partners/{id}/organizations/",
-            {cpId.toSimpleStdString()});
+        auto orgsPath = nx::format(
+            "/partners/api/v2/channel_partners/%1/organizations/",
+            cpId.toSimpleStdString()).toStdString();
         auto orgList = co_await cloudGet<OrganizationList>(
             statusWatcher,
             orgsPath);
@@ -502,12 +501,12 @@ nx::coro::FireAndForget OrganizationsModel::Private::loadOrgs(nx::Uuid cpId)
             loadTasks.push_back(
                 [](auto self, auto org) -> nx::coro::Task<bool>
                 {
-                    auto groupsPath = nx::network::http::rest::substituteParameters(
-                        "/partners/api/v2/organizations/{id}/groups_structure/",
-                        {org.id.toSimpleStdString()});
-                    auto systemsPath = nx::network::http::rest::substituteParameters(
-                        "/partners/api/v2/organizations/{id}/cloud_systems/user_systems/",
-                        {org.id.toSimpleStdString()});
+                    auto groupsPath = nx::format(
+                        "/partners/api/v2/organizations/%1/groups_structure/",
+                        org.id.toSimpleStdString()).toStdString();
+                    auto systemsPath = nx::format(
+                        "/partners/api/v2/organizations/%1/cloud_systems/user_systems/",
+                        org.id.toSimpleStdString()).toStdString();
 
                     auto [groupStructure, systems] = co_await nx::coro::whenAll(
                         cloudGet<std::vector<GroupStructure>>(
