@@ -26,7 +26,7 @@ Rectangle
         && sessionManager.hasActiveSession
 
     x: 0
-    y: parent.height - height
+    y: mainWindow.availableHeight - height
     width: parent.width
     height:d.kBarSize
 
