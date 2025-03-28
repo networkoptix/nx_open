@@ -29,10 +29,18 @@ Dialog
     property var store: null
     property var requestsModel: store ? store.makeApiIntegrationRequestsModel() : null
 
+    function setCurrentTab(type)
+    {
+        const index = tabs.visibleTabs.findIndex((tab) => tab.type === type)
+        tabs.currentTabIndex = index >= 0 ? index : 0
+    }
+
     WindowContextAware.onBeforeSystemChanged: reject()
 
     DialogTabControl
     {
+        id: tabs
+
         anchors.fill: parent
         anchors.bottomMargin: buttonBox.height
 
@@ -42,6 +50,8 @@ Dialog
 
         Tab
         {
+            readonly property int type: IntegrationsDialog.Tab.integrations
+
             button: PrimaryTabButton
             {
                 text: qsTr("Integrations")
@@ -57,6 +67,8 @@ Dialog
 
         Tab
         {
+            readonly property int type: IntegrationsDialog.Tab.settings
+
             button: PrimaryTabButton
             {
                 text: qsTr("Settings")

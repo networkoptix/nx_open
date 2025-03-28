@@ -18,4 +18,15 @@ IntegrationsDialog::IntegrationsDialog(QWidget* parent):
     rootObjectHolder()->object()->setProperty("store", QVariant::fromValue(store.get()));
 }
 
+void IntegrationsDialog::setCurrentTab(Tab tab)
+{
+    QMetaObject::invokeMethod(
+        rootObjectHolder()->object(), "setCurrentTab", Q_ARG(QVariant, QVariant::fromValue(tab)));
+}
+
+void IntegrationsDialog::registerQmlType()
+{
+    qmlRegisterType<IntegrationsDialog>("nx.vms.client.desktop", 1, 0, "IntegrationsDialog");
+}
+
 } // namespace nx::vms::client::desktop

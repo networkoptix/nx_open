@@ -14,6 +14,7 @@
 #include <nx/vms/client/desktop/settings/user_specific_settings.h>
 #include <nx/vms/client/desktop/showreel/showreel_state_manager.h>
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
+#include <nx/vms/client/desktop/system_administration/watchers/integration_settings_watcher.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
 #include <nx/vms/client/desktop/system_administration/watchers/traffic_relay_url_watcher.h>
@@ -47,6 +48,7 @@ struct SystemContext::Private
     std::unique_ptr<VirtualCameraManager> virtualCameraManager;
     std::unique_ptr<LocalResourcesInitializer> localResourcesInitializer;
     std::unique_ptr<ShowreelStateManager> showreelStateManager;
+    std::unique_ptr<IntegrationSettingsWatcher> integrationSettingsWatcher;
     std::unique_ptr<LogsManagementWatcher> logsManagementWatcher;
     std::unique_ptr<QnMediaServerStatisticsManager> mediaServerStatisticsManager;
     std::unique_ptr<SystemSpecificLocalSettings> localSettings;

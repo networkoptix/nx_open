@@ -18,7 +18,18 @@ class NX_VMS_CLIENT_DESKTOP_API IntegrationsDialog:
     Q_OBJECT
 
 public:
+    enum class Tab
+    {
+        integrations,
+        settings
+    };
+    Q_ENUM(Tab);
+
+public:
     IntegrationsDialog(QWidget* parent = nullptr);
+    void setCurrentTab(Tab tab);
+
+    static void registerQmlType();
 
 private:
     std::unique_ptr<AnalyticsSettingsStore> store;

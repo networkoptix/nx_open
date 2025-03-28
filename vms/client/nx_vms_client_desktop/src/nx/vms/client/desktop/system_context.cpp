@@ -123,6 +123,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             // before LayoutSnapshotManager to avoid modifying layouts after they are opened.
             d->localResourcesInitializer = std::make_unique<LocalResourcesInitializer>(this);
             d->showreelStateManager = std::make_unique<ShowreelStateManager>(this);
+            d->integrationSettingsWatcher = std::make_unique<IntegrationSettingsWatcher>(this);
             d->logsManagementWatcher = std::make_unique<LogsManagementWatcher>(this);
             d->mediaServerStatisticsManager = std::make_unique<QnMediaServerStatisticsManager>(
                 this);

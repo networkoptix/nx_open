@@ -2126,6 +2126,11 @@ void ActionHandler::openIntegrationsActionTriggered()
     const auto parent = utils::extractParentWidget(parameters, mainWindowWidget());
     m_integrationsDialog->setTransientParent(parent);
 
+    if (parameters.hasArgument(Qn::FocusTabRole))
+    {
+        m_integrationsDialog->setCurrentTab(
+            parameters.argument(Qn::FocusTabRole).value<IntegrationsDialog::Tab>());
+    }
     m_integrationsDialog->open();
     m_integrationsDialog->raise();
 }
