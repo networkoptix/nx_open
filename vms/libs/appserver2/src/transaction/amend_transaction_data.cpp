@@ -27,6 +27,7 @@
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
 #include <nx/vms/api/rules/rule.h>
+#include <nx/vms/api/types/proxy_connection_access_policy.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/crypt/crypt.h>
@@ -49,6 +50,34 @@ const std::set<QString>& resourceParamToAmend()
             return s;
         }();
     return kResult;
+}
+
+static const std::set<QString>& powerUsersOnlyResourceParamToAmend()
+{
+    static const std::set<QString> kResult{
+        nx::vms::api::server_properties::kMetadataStorageIdKey,
+        nx::vms::api::server_properties::kHddList};
+    return kResult;
+}
+
+static bool amendOutputServerPortForwarding(
+    const nx::network::rest::UserAccessData& accessData,
+    QnResourceAccessManager* accessManager,
+    nx::vms::api::ResourceParamData* paramData)
+{
+    static const QString kEmptyPortForwarding = "[]";
+    if (paramData->value == kEmptyPortForwarding)
+        return false;
+    const auto requiredPermissions =
+        accessManager->globalSettings()->proxyConnectionAccessPolicy()
+            == nx::vms::api::ProxyConnectionAccessPolicy::powerUsers
+            ? nx::vms::api::GlobalPermission::powerUser
+            : nx::vms::api::GlobalPermission::administrator;
+    if (accessManager->hasGlobalPermission(accessData, requiredPermissions))
+        return false;
+
+    paramData->value = kEmptyPortForwarding;
+    return true;
 }
 
 bool amendOutputDataIfNeeded(
@@ -77,8 +106,10 @@ bool amendOutputDataIfNeeded(
         }
         return true;
     }
+    if (accessData == nx::network::rest::kSystemAccess)
+        return false;
 
-    if (accessData != nx::network::rest::kSystemAccess && paramData->name.startsWith("aes_key_"))
+    if (paramData->name.startsWith("aes_key_"))
     {
         using namespace nx::vms::crypt;
         bool success = false;
@@ -101,7 +132,18 @@ bool amendOutputDataIfNeeded(
         return true;
     }
 
-    if (accessData != nx::network::rest::kSystemAccess && paramData->name == "ldap")
+    if (paramData->name == nx::vms::api::server_properties::kPortForwardingConfigurations)
+        return amendOutputServerPortForwarding(accessData, accessManager, paramData);
+
+    if (powerUsersOnlyResourceParamToAmend().contains(paramData->name))
+    {
+        if (paramData->value.isEmpty() || accessManager->hasPowerUserPermissions(accessData))
+            return false;
+        paramData->value.clear();
+        return true;
+    }
+
+    if (paramData->name == "ldap")
     {
         bool success = false;
         auto ldap =
@@ -234,6 +276,24 @@ bool amendOutputDataIfNeeded(
         accessData, accessManager, (nx::vms::api::MediaServerData*) mediaServerDataEx);
     for (auto& storage: mediaServerDataEx->storages)
         result |= amendOutputDataIfNeeded(accessData, accessManager, &storage);
+
+    if (accessData == nx::network::rest::kSystemAccess)
+        return result;
+
+    bool hasPowerUserPermissions = accessManager->hasPowerUserPermissions(accessData);
+    for (auto& paramData: mediaServerDataEx->addParams)
+    {
+        if (paramData.name == nx::vms::api::server_properties::kPortForwardingConfigurations)
+            result |= amendOutputServerPortForwarding(accessData, accessManager, &paramData);
+
+        if (!hasPowerUserPermissions
+            && powerUsersOnlyResourceParamToAmend().contains(paramData.name)
+            && !paramData.value.isEmpty())
+        {
+            paramData.value.clear();
+            result = true;
+        }
+    }
     return result;
 }
 

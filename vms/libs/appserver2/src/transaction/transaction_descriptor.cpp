@@ -1739,11 +1739,7 @@ struct ReadResourceParamAccess
         if (const auto r = checkReadResourceAccess(systemContext, accessData, param.resourceId); !r)
             return r;
 
-        operator()(
-            systemContext,
-            accessData,
-            static_cast<nx::vms::api::ResourceParamData&>(param));
-        return Result();
+        return {};
     }
 
     Result operator()(

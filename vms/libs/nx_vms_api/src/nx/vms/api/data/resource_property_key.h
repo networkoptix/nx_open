@@ -11,6 +11,7 @@ namespace server_properties {
 NX_VMS_API extern const QString kCpuArchitecture;
 NX_VMS_API extern const QString kCpuModelName;
 NX_VMS_API extern const QString kFlavor;
+// Deprecated unused property, was replaced by MediaServerData field.
 NX_VMS_API extern const QString kOsInfo;
 NX_VMS_API extern const QString kPhysicalMemory;
 NX_VMS_API extern const QString kGuidConflictDetected;

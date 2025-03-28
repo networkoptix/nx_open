@@ -312,7 +312,7 @@ std::vector<Model> fromDbTypes(typename Model::DbListTypes all)
         {
             for (const auto& parameter: parameters->second)
             {
-                if (parameter.name == "portForwardingConfigurations")
+                if (parameter.name == server_properties::kPortForwardingConfigurations)
                 {
                     NX_ASSERT(QJson::deserialize(parameter.value, &s.portForwardingConfigurations),
                         "%1", parameter.value);
