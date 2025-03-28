@@ -88,8 +88,6 @@ Page
             height: 36
             anchors.verticalCenter: parent.verticalCenter
             placeholderText: qsTr("Search")
-
-            onDisplayTextChanged: siteList.searchText = displayText
         }
     ]
 
@@ -290,6 +288,12 @@ Page
         anchors.fill: parent
 
         siteModel: subtreeModel
+
+        PropertyUpdateFilter on searchText
+        {
+            source: searchField.displayText
+            minimumIntervalMs: 250
+        }
 
         onItemClicked: (nodeId, systemId) =>
         {
