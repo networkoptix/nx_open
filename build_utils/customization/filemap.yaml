@@ -11,8 +11,6 @@ desktop: {
   # Desktop client section.
   welcome_page_logo.png: 'nx_client_desktop/resources/skin/welcome_page/logo.png', #120x120, rounded.
   welcome_page_logo@2x.png: 'nx_client_desktop/resources/skin/welcome_page/logo@2x.png',
-  intro.mkv: 'nx_client_desktop/resources/skin/intro.mkv',
-  intro.png: 'nx_client_desktop/resources/skin/intro.png', # 720x400.
   background.png: 'nx_client_desktop/resources/skin/background.png', # 2160x2160.
 
   # Server section

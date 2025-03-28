@@ -48,8 +48,6 @@ private:
 
     void at_testButton_clicked();
 
-    void setupIntroView();
-
     nx::vms::client::core::ConnectionInfo connectionInfo() const;
     bool isValid() const;
 

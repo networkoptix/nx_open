@@ -49,11 +49,6 @@ namespace {
 
 static const QString kLocalHost("127.0.0.1");
 
-static std::vector<const char*> kIntroNames {
-    "intro.mkv",
-    "intro.png",
-};
-
 void setEnabledExcept(const QObjectList& objects, QObject* exclude, bool enabled)
 {
     for (QObject* object: objects)
@@ -66,28 +61,12 @@ void setEnabledExcept(const QObjectList& objects, QObject* exclude, bool enabled
     }
 }
 
-class IntroContainer: public QWidget
-{
-public:
-    IntroContainer(QWidget* intro, QWidget* parent = nullptr): QWidget(parent)
-    {
-        intro->setParent(this);
-        anchorWidgetToParent(intro);
-    }
-
-    static constexpr qreal kAspectRatio = 16.0 / 9.0;
-
-    virtual bool hasHeightForWidth() const override { return true; }
-    virtual int heightForWidth(int width) const override { return width / kAspectRatio; }
-};
-
 } // namespace
 
 struct LoginDialog::Private
 {
     RemoteConnectionFactory::ProcessPtr connectionProcess;
     std::shared_ptr<QnStatisticsScenarioGuard> scenarioGuard;
-    QnResourcePtr introResource;
 
     void resetConnectionProcess(bool async)
     {
@@ -124,8 +103,6 @@ LoginDialog::LoginDialog(QWidget *parent):
         buttonBoxLayout->insertWidget(0, versionLabel);
     }
 
-    setupIntroView();
-
     connect(ui->testButton, &QPushButton::clicked, this,
         &LoginDialog::at_testButton_clicked);
     connect(ui->passwordEdit, &nx::vms::client::desktop::PasswordInputField::textChanged, this,
@@ -161,57 +138,6 @@ LoginDialog::LoginDialog(QWidget *parent):
 
 LoginDialog::~LoginDialog()
 {
-}
-
-void LoginDialog::setupIntroView()
-{
-    QString introPath;
-    for (auto name: kIntroNames)
-    {
-        introPath = qnSkin->path(name);
-        if (!introPath.isEmpty())
-            break;
-    }
-
-    if (!NX_ASSERT(!introPath.isEmpty()))
-        return;
-
-    introPath.replace('\\', "/");
-
-    auto layout = new QVBoxLayout(ui->videoSpacer);
-    layout->setSpacing(0);
-    layout->setContentsMargins({});
-
-    QImage image;
-    if (image.load(introPath))
-    {
-        const auto staticIntro = new QLabel(this);
-        staticIntro->setAlignment(Qt::AlignCenter);
-        staticIntro->setPixmap(QPixmap::fromImage(image));
-        layout->addWidget(new IntroContainer(staticIntro));
-    }
-    else
-    {
-        d->introResource.reset(new QnAviResource(QString("file:///") + introPath));
-        d->introResource->setStatus(nx::vms::api::ResourceStatus::online);
-
-        const auto introWidget = new QQuickWidget(appContext()->qmlEngine(), this);
-
-        connect(introWidget, &QQuickWidget::statusChanged, this,
-            [this, introWidget](QQuickWidget::Status status)
-            {
-                if (status != QQuickWidget::Ready)
-                    return;
-
-                introWidget->rootObject()->setProperty(
-                    "introResource",
-                    QVariant::fromValue(d->introResource.get()));
-            });
-
-        layout->addWidget(new IntroContainer(introWidget));
-        introWidget->setSource({ "Nx/Intro/Intro.qml" });
-        introWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
-    }
 }
 
 void LoginDialog::updateFocus()

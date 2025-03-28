@@ -7,10 +7,10 @@
     <x>0</x>
     <y>0</y>
     <width>572</width>
-    <height>552</height>
+    <height>193</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,1000,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -26,9 +26,6 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
-   <item>
-    <widget class="QWidget" name="videoSpacer" native="true"/>
-   </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="spacing">
@@ -63,7 +60,7 @@
         </attribute>
         <layout class="QGridLayout" name="gridLayout">
          <property name="sizeConstraint">
-          <enum>QLayout::SetMinimumSize</enum>
+          <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
          </property>
          <property name="leftMargin">
           <number>16</number>
@@ -80,7 +77,7 @@
          <item row="0" column="0">
           <layout class="QFormLayout" name="credentialsLayout">
            <property name="sizeConstraint">
-            <enum>QLayout::SetMinimumSize</enum>
+            <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
            </property>
            <property name="horizontalSpacing">
             <number>8</number>
@@ -109,7 +106,7 @@
                 </sizepolicy>
                </property>
                <property name="contextMenuPolicy">
-                <enum>Qt::NoContextMenu</enum>
+                <enum>Qt::ContextMenuPolicy::NoContextMenu</enum>
                </property>
                <property name="maxLength">
                 <number>500</number>
@@ -154,7 +151,7 @@
               </sizepolicy>
              </property>
              <property name="contextMenuPolicy">
-              <enum>Qt::NoContextMenu</enum>
+              <enum>Qt::ContextMenuPolicy::NoContextMenu</enum>
              </property>
              <property name="inputMask">
               <string notr="true"/>
@@ -198,7 +195,7 @@
                  </size>
                 </property>
                 <property name="contextMenuPolicy">
-                 <enum>Qt::NoContextMenu</enum>
+                 <enum>Qt::ContextMenuPolicy::NoContextMenu</enum>
                 </property>
                </widget>
               </item>
@@ -221,10 +218,10 @@
            <item row="3" column="0" colspan="2">
             <spacer name="verticalSpacer_2">
              <property name="orientation">
-              <enum>Qt::Vertical</enum>
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
              <property name="sizeType">
-              <enum>QSizePolicy::MinimumExpanding</enum>
+              <enum>QSizePolicy::Policy::MinimumExpanding</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -244,7 +241,7 @@
         </attribute>
         <layout class="QGridLayout" name="gridLayout_2">
          <property name="sizeConstraint">
-          <enum>QLayout::SetMinimumSize</enum>
+          <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
          </property>
          <property name="leftMargin">
           <number>16</number>
@@ -284,7 +281,7 @@
               <string>Link</string>
              </property>
              <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
              </property>
              <property name="buddy">
               <cstring>linkLineEdit</cstring>
@@ -306,17 +303,17 @@
               </size>
              </property>
              <property name="contextMenuPolicy">
-              <enum>Qt::NoContextMenu</enum>
+              <enum>Qt::ContextMenuPolicy::NoContextMenu</enum>
              </property>
             </widget>
            </item>
            <item row="1" column="0" colspan="2">
             <spacer name="verticalSpacer">
              <property name="orientation">
-              <enum>Qt::Vertical</enum>
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
              <property name="sizeType">
-              <enum>QSizePolicy::MinimumExpanding</enum>
+              <enum>QSizePolicy::Policy::MinimumExpanding</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -335,19 +332,26 @@
     </layout>
    </item>
    <item>
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </spacer>
+   </item>
+   <item>
     <widget class="Line" name="line">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
      </property>
      <property name="centerButtons">
       <bool>false</bool>
