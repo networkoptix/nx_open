@@ -40,7 +40,7 @@ Control
             {
                 text: `  \u2022  ${permission}`
                 font.pixelSize: 14
-                color: highlighted ? ColorTheme.colors.yellow_attention : ColorTheme.windowText
+                color: highlighted ? ColorTheme.colors.yellow_d : ColorTheme.windowText
             }
         }
 

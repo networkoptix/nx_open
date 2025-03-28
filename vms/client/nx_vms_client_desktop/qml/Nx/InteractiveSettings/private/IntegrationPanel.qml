@@ -106,6 +106,7 @@ PanelBase
 
     permissions
     {
+        highlighted: !!request && !!request.permission
         collapsible: !request
         permission: (engineInfo && engineInfo.permission) || (request && request.permission) || ""
     }
