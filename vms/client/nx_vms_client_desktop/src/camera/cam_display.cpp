@@ -653,7 +653,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 //qDebug() << "sleepTimer=" << sleepTimer.elapsed() << "extSleep=" << realSleepTime;
             }
         }
-        else if (!m_display[0]->selfSyncUsed())
+        else
         {
             if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
                 realSleepTime = doSmartSleep(needToSleep, speed);
@@ -1714,9 +1714,6 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             if (!vd)
                 return result; // impossible? incoming vd!=0
 
-            if(m_display[channel] != nullptr)
-                m_display[channel]->setCurrentTime(AV_NOPTS_VALUE);
-
             if (!display(vd, !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore), speed)) {
                 restoreVideoQueue(incoming, vd, vd->channelNumber);
                 return false; // keep frame
@@ -1783,11 +1780,6 @@ bool QnCamDisplay::processVideoData(QnCompressedVideoDataPtr incoming, int chann
 
         if (m_lastAudioPacketTime != m_syncAudioTime)
         {
-            qint64 currentAudioTime =
-                m_lastAudioPacketTime - (quint64)m_audioDisplay->msInBuffer() * 1000 /*ms to us*/;
-            if (m_display[channel])
-                m_display[channel]->setCurrentTime(currentAudioTime);
-
             // Sync audio time prevent stopping video, if audio track is disapearred.
             m_syncAudioTime = m_lastAudioPacketTime;
         }
@@ -2124,9 +2116,6 @@ qint64 QnCamDisplay::getExternalTime() const
 void QnCamDisplay::setExternalTimeSource(QnlTimeSource* value)
 {
     m_extTimeSrc = value;
-    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-        m_display[i]->canUseBufferedFrameDisplayer(m_extTimeSrc == 0);
-    }
 }
 
 bool QnCamDisplay::isRealTimeSource() const

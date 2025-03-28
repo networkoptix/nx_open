@@ -42,7 +42,6 @@ extern "C" {
     #include <nx/media/quick_sync/quick_sync_video_decoder_old_player.h>
 #endif
 
-#include "buffered_frame_displayer.h"
 #include "gl_renderer.h"
 
 using namespace std::chrono;
@@ -96,10 +95,8 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(
     m_flushedBeforeReverseStart(false),
     m_reverseSizeInBytes(0),
     m_timeChangeEnabled(true),
-    m_canUseBufferedFrameDisplayer(true),
     m_rawDataSize(0,0),
     m_speed(1.0),
-    m_queueWasFilled(false),
     m_needResetDecoder(false),
     m_lastDisplayedFrame(nullptr),
     m_prevSrcWidth(0),
@@ -328,16 +325,8 @@ void QnVideoStreamDisplay::checkQueueOverflow()
 
 void QnVideoStreamDisplay::waitForFramesDisplayed()
 {
-    if (m_bufferedFrameDisplayer)
-    {
-        m_bufferedFrameDisplayer->waitForFramesDisplayed();
-    }
-    else
-    {
-        for (const auto& render: m_renderList)
-            render->waitForFrameDisplayed(0); //< Wait for the old frame.
-    }
-    m_queueWasFilled = false;
+    for (const auto& render: m_renderList)
+        render->waitForFrameDisplayed(0); //< Wait for the old frame.
 }
 
 qint64 QnVideoStreamDisplay::nextReverseTime() const
@@ -374,9 +363,6 @@ void QnVideoStreamDisplay::updateRenderList()
             renderer->notInUse();
 
         m_renderList = m_newList;
-        if (m_bufferedFrameDisplayer)
-            m_bufferedFrameDisplayer->setRenderList(m_renderList);
-
         m_renderListModified = false;
     }
 };
@@ -576,27 +562,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     m_isLive = data->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE);
     const bool needReinitDecoders = m_needReinitDecoders.exchange(false);
 
-    if (qAbs(m_speed - 1.0) < FPS_EPS && m_canUseBufferedFrameDisplayer)
-    {
-        if (!m_bufferedFrameDisplayer)
-        {
-            //NX_MUTEX_LOCKER lock( &m_timeMutex );
-            m_bufferedFrameDisplayer = std::make_unique<QnBufferedFrameDisplayer>();
-            m_bufferedFrameDisplayer->setRenderList(m_renderList);
-            m_queueWasFilled = false;
-        }
-    }
-    else
-    {
-        if (m_bufferedFrameDisplayer)
-        {
-            m_bufferedFrameDisplayer->waitForFramesDisplayed();
-            //overrideTimestampOfNextFrameToRender(m_bufferedFrameDisplayer->getTimestampOfNextFrameToRender());
-            //NX_MUTEX_LOCKER lock( &m_timeMutex );
-            m_bufferedFrameDisplayer.reset();
-        }
-    }
-
     if (needReinitDecoders)
     {
         NX_MUTEX_LOCKER lock(&m_mtx);
@@ -709,8 +674,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
         }
 
         m_mtx.lock();
-        if (m_bufferedFrameDisplayer)
-            dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full);
         auto lastError = dec->getLastDecodeResult();
         m_mtx.unlock();
 
@@ -877,9 +840,6 @@ bool QnVideoStreamDisplay::processDecodedFrame(
     if (outFrame->isEmpty())
         return false;
 
-    if (outFrame->memoryType() == MemoryType::VideoMemory)
-        m_canUseBufferedFrameDisplayer = false;
-
     if (m_isLive && outFrame->memoryType() != MemoryType::VideoMemory)
     {
         auto systemContext = SystemContext::fromResource(m_resource);
@@ -888,42 +848,17 @@ bool QnVideoStreamDisplay::processDecodedFrame(
 
     NX_ASSERT(!outFrame->isExternalData());
 
-    if (m_bufferedFrameDisplayer && m_canUseBufferedFrameDisplayer)
+    if (std::abs(static_cast<double>(m_speed)) < 1.0 + FPS_EPS)
     {
-        const bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
-        const qint64 bufferedDuration = m_bufferedFrameDisplayer->bufferedDuration();
-
-        NX_MUTEX_LOCKER lock(&m_mtx);
-        if (wasWaiting)
-        {
-            m_decoderData.decoder->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full);
-            m_queueWasFilled = true;
-        }
-        else
-        {
-            if (m_queueWasFilled && bufferedDuration <= kMaxQueueTime / 4)
-                m_decoderData.decoder->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Fast);
-        }
-    }
-    else
-    {
-        if (std::abs(static_cast<double>(m_speed)) < 1.0 + FPS_EPS)
-        {
-            for (const auto render: m_renderList)
-            {
-                // Wait for old frame.
-                render->waitForQueueLessThan(outFrame->channel, kMaxFrameQueueSize);
-            }
-        }
         for (const auto render: m_renderList)
-            render->draw(outFrame, getMaxScreenSizeUnsafe()); //< Send the new one.
+        {
+            // Wait for old frame.
+            render->waitForQueueLessThan(outFrame->channel, kMaxFrameQueueSize);
+        }
     }
+    for (const auto render: m_renderList)
+        render->draw(outFrame, getMaxScreenSizeUnsafe()); //< Send the new one.
     return true;
-}
-
-bool QnVideoStreamDisplay::selfSyncUsed() const
-{
-    return m_bufferedFrameDisplayer != nullptr;
 }
 
 QnAspectRatio QnVideoStreamDisplay::overridenAspectRatio() const
@@ -999,8 +934,6 @@ void QnVideoStreamDisplay::overrideTimestampOfNextFrameToRender(qint64 value)
     for (const auto& render: m_renderList)
     {
         render->blockTimeValue(m_channelNumber, microseconds(value));
-        if (m_bufferedFrameDisplayer)
-            m_bufferedFrameDisplayer->clear();
         render->finishPostedFramesRender(m_channelNumber);
         render->unblockTimeValue(m_channelNumber);
     }
@@ -1061,12 +994,9 @@ void QnVideoStreamDisplay::unblockTimeValue()
 void QnVideoStreamDisplay::afterJump()
 {
     clearReverseQueue();
-    if (m_bufferedFrameDisplayer)
-        m_bufferedFrameDisplayer->clear();
     for (const auto& render: m_renderList)
         render->finishPostedFramesRender(m_channelNumber);
     m_needResetDecoder = true;
-    m_queueWasFilled = false;
     m_lastIgnoreTime = AV_NOPTS_VALUE;
 }
 
@@ -1112,17 +1042,6 @@ CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
     outFrame->copyFrom(m_lastDisplayedFrame.data());
     NX_DEBUG(this, "Got screenshot with resolution: %1", outFrame->size());
     return outFrame;
-}
-
-void QnVideoStreamDisplay::setCurrentTime(qint64 time)
-{
-    if (m_bufferedFrameDisplayer)
-        m_bufferedFrameDisplayer->setCurrentTime(time);
-}
-
-void QnVideoStreamDisplay::canUseBufferedFrameDisplayer(bool value)
-{
-    m_canUseBufferedFrameDisplayer = value;
 }
 
 QSize QnVideoStreamDisplay::getImageSize() const

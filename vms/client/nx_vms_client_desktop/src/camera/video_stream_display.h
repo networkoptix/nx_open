@@ -23,7 +23,6 @@ struct SwsContext;
 class QnAbstractVideoDecoder;
 class QnCompressedVideoData;
 class QnResourceWidgetRenderer;
-class QnBufferedFrameDisplayer;
 
 constexpr int kMaxQueueTime = 1000 * 200;
 
@@ -55,13 +54,10 @@ public:
     void setSpeed(float value);
     virtual CLVideoDecoderOutputPtr getScreenshot(bool anyQuality) override;
     virtual QImage getGrayscaleScreenshot() override;
-    void setCurrentTime(qint64 time);
-    void canUseBufferedFrameDisplayer(bool value);
     qint64 nextReverseTime() const;
     QSize getImageSize() const;
 
     QSize getMaxScreenSize() const;
-    bool selfSyncUsed() const;
 
     QnAspectRatio overridenAspectRatio() const;
     void setOverridenAspectRatio(QnAspectRatio aspectRatio);
@@ -125,11 +121,8 @@ private:
     bool m_flushedBeforeReverseStart;
     qint64 m_reverseSizeInBytes;
     bool m_timeChangeEnabled;
-    std::unique_ptr<QnBufferedFrameDisplayer> m_bufferedFrameDisplayer;
-    bool m_canUseBufferedFrameDisplayer;
     QSize m_rawDataSize;
     float m_speed;
-    bool m_queueWasFilled;
     bool m_needResetDecoder;
     mutable nx::Mutex m_lastDisplayedFrameMutex;
     CLConstVideoDecoderOutputPtr m_lastDisplayedFrame;
