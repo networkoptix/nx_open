@@ -41,6 +41,8 @@ public:
     Property<bool> storageConfigUsbWarning{this, "storageConfigUsbWarning", true};
     Property<bool> storageConfigCloudStorageWarning{this, "storageConfigCloudStorageWarning", true};
     Property<bool> cloudBackupStoppedWarning{this, "cloudBackupStoppedWarning", true};
+    Property<bool> cloudStorageUsedInSuspendedStateWarning{
+        this, "cloudStorageUsedInSuspendedStateWarning", true};
     Property<bool> multiServerUpdateWeekendWarning{this, "multiServerUpdateWeekendWarning", true};
     Property<bool> multiServerUpdateCustomClientWarning{
         this, "multiServerUpdateCustomClientWarning", true};

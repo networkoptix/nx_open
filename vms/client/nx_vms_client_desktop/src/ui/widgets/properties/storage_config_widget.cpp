@@ -587,8 +587,14 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent):
     m_updateStatusTimer(new QTimer(this)),
     m_storagePoolMenu(createStoragePoolMenu())
 {
+    using namespace nx::vms::common;
+
     ui->setupUi(this);
-    connect(m_model.get(), &QnStorageListModel::dataChanged, [this] { updateWarnings(); });
+    connect(m_model.get(), &QnStorageListModel::dataChanged,
+        this, &QnStorageConfigWidget::updateWarnings);
+
+    connect(systemContext()->saasServiceManager(), &saas::ServiceManager::saasStateChanged,
+        this, &QnStorageConfigWidget::updateWarnings);
 
     setHelpTopic(this, HelpTopic::Id::ServerSettings_Storages);
 
@@ -811,6 +817,13 @@ QnStorageConfigWidget::StorageConfigWarningFlags
 
         if (storageResource->isCloudStorage()
             && storageInfo.isUsed
+            && system()->saasServiceManager()->saasSuspended())
+        {
+            flags.setFlag(cloudStorageUsedInSuspendedState);
+        }
+
+        if (storageResource->isCloudStorage()
+            && storageInfo.isUsed
             && system()->saasServiceManager()->saasShutDown())
         {
             flags.setFlag(cloudBackupStopped);
@@ -925,11 +938,23 @@ void QnStorageConfigWidget::updateWarnings()
     {
         messages.push_back(
             {
-                .text = tr("Cloud backup has been stopped because the system has been shut down. "
+                .text = tr("Cloud backup has been stopped because the Site has been shut down. "
                     "It must be active to perform a backup to cloud storage. Contact your channel "
-                    "partner for assistance"),
+                    "partner for assistance."),
                 .level = BarDescription::BarLevel::Error,
                 .isEnabledProperty = &messageBarSettings()->cloudBackupStoppedWarning
+            });
+    }
+
+    if (flags.testFlag(cloudStorageUsedInSuspendedState))
+    {
+        messages.push_back(
+            {
+                .text = tr("Cloud backup continues, but the Site is currently suspended. It "
+                    "must be active to modify the backup configuration or to enable cloud storage "
+                    "location. Contact your channel partner for assistance."),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty = &messageBarSettings()->cloudStorageUsedInSuspendedStateWarning
             });
     }
 
@@ -1231,6 +1256,16 @@ void QnStorageConfigWidget::atStorageViewClicked(const QModelIndex& index)
                     QString("%1\n\n%2").arg(errorText, bodyText));
                 record.isUsed = false;
                 m_model->updateStorage(record);
+            }
+            else if (system()->saasServiceManager()->saasSuspended())
+            {
+                record.isUsed = false;
+                m_model->updateStorage(record);
+                const auto errorText = tr("The Site must be active to enable cloud storage "
+                    "location. Contact your channel partner for assistance.");
+                QnMessageBox::critical(this,
+                    tr("Site suspended"),
+                    errorText);
             }
             else
             {

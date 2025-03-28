@@ -56,6 +56,7 @@ private:
         backupStorageBeingReplacedByCloudStorage = 1 << 5,
         notEnoughLicensesForCloudStorage = 1 << 6,
         cloudBackupStopped = 1 << 7,
+        cloudStorageUsedInSuspendedState = 1 << 8,
     };
     Q_DECLARE_FLAGS(StorageConfigWarningFlags, StorageConfigWarningFlag)
 
