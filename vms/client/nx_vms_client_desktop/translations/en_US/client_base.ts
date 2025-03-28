@@ -11434,6 +11434,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Organization user</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>

@@ -257,6 +257,13 @@
     </message>
 </context>
 <context>
+    <name>EventSearchItem</name>
+    <message>
+        <source>SHARED</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>EventSearchMenuScreen</name>
     <message>
         <source>Looking for</source>
@@ -317,6 +324,17 @@
     <message>
         <source>Close</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>HowItWorksSheet</name>
+    <message>
+        <source>How it works</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -781,6 +799,65 @@
     <message>
         <source>Decode some rare video formats using software decoder</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>ShareBookmarkSheet</name>
+    <message>
+        <source>New Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lifetime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Protect with Password (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create &amp; Share</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save &amp; Share</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Sharing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expires in an hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expires in a day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expires in a month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never expires</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shared link options</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
