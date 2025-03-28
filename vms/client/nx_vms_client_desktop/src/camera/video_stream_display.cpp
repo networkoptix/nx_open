@@ -857,7 +857,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(
 
     NX_ASSERT(!outFrame->isExternalData());
 
-    if (m_bufferedFrameDisplayer)
+    if (m_bufferedFrameDisplayer && outFrame->memoryType() != MemoryType::VideoMemory)
     {
         const bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
         const qint64 bufferedDuration = m_bufferedFrameDisplayer->bufferedDuration();
