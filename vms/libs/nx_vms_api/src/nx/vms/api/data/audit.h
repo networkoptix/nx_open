@@ -148,7 +148,7 @@ private:
         QnJsonContext*, const QJsonValue&, Collection*, const Element*, const QnCollection::list_tag&);
 };
 #define AuditRecord_Fields (serverId)(eventType)(createdTimeS)(authSession)(details)(apiInfo)
-QN_FUSION_DECLARE_FUNCTIONS(AuditRecord, (ubjson)(json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(AuditRecord, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(AuditRecord, AuditRecord_Fields)
 NX_REFLECTION_TAG_TYPE(AuditRecord, jsonSerializeChronoDurationAsNumber)
 

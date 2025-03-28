@@ -7,7 +7,7 @@
 namespace nx::vms::api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AuditLogFilter, (json), AuditLogFilter_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AuditRecord, (ubjson)(json), AuditRecord_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AuditRecord, (json), AuditRecord_Fields)
 
 AuditRecord AuditRecord::prepareRecord(
     AuditRecordType type,

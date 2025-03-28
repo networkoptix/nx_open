@@ -45,7 +45,7 @@ struct NX_VMS_API DescriptionDetails
     bool operator==(const DescriptionDetails& other) const = default;
 };
 #define DescriptionDetails_Fields (description)
-QN_FUSION_DECLARE_FUNCTIONS(DescriptionDetails, (ubjson)(json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(DescriptionDetails, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DescriptionDetails, DescriptionDetails_Fields)
 
 /**%apidoc
@@ -57,7 +57,7 @@ struct NX_VMS_API SessionDetails: PeriodDetails
     bool operator==(const SessionDetails& other) const = default;
 };
 #define SessionDetails_Fields PeriodDetails_Fields(authMethod)
-QN_FUSION_DECLARE_FUNCTIONS(SessionDetails, (ubjson)(json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(SessionDetails, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SessionDetails, SessionDetails_Fields)
 
 /**%apidoc
@@ -74,7 +74,7 @@ struct NX_VMS_API PlaybackDetails: IdDetails, PeriodDetails
     bool operator==(const PlaybackDetails& other) const = default;
 };
 #define PlaybackDetails_Fields IdDetails_Fields PeriodDetails_Fields(archiveExists)
-QN_FUSION_DECLARE_FUNCTIONS(PlaybackDetails, (ubjson)(json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(PlaybackDetails, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(PlaybackDetails, PlaybackDetails_Fields)
 
 /**%apidoc
@@ -87,7 +87,7 @@ struct NX_VMS_API ResourceDetails: IdDetails, DescriptionDetails
     bool operator==(const ResourceDetails& other) const = default;
 };
 #define ResourceDetails_Fields IdDetails_Fields DescriptionDetails_Fields
-QN_FUSION_DECLARE_FUNCTIONS(ResourceDetails, (ubjson)(json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(ResourceDetails, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ResourceDetails, ResourceDetails_Fields)
 
 /**%apidoc
@@ -101,7 +101,7 @@ struct NX_VMS_API DeviceDetails: ResourceDetails
     bool operator==(const DeviceDetails& other) const = default;
 };
 #define DeviceDetails_Fields ResourceDetails_Fields(macs)
-QN_FUSION_DECLARE_FUNCTIONS(DeviceDetails, (ubjson)(json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceDetails, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceDetails, DeviceDetails_Fields)
 
 /**%apidoc Used when `eventType` equals to `mitmAttack`. */
@@ -118,7 +118,7 @@ struct NX_VMS_API MitmDetails
     bool operator==(const MitmDetails& other) const = default;
 };
 #define MitmDetails_Fields (id)(expectedPem)(actualPem)(url)
-QN_FUSION_DECLARE_FUNCTIONS(MitmDetails, (ubjson)(json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(MitmDetails, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(MitmDetails, MitmDetails_Fields)
 
 /**%apidoc Used when `eventType` equals to `updateInstall`. */
@@ -129,7 +129,7 @@ struct NX_VMS_API UpdateDetails
     bool operator==(const UpdateDetails& other) const = default;
 };
 #define UpdateDetails_Fields (version)
-QN_FUSION_DECLARE_FUNCTIONS(UpdateDetails, (ubjson)(json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(UpdateDetails, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UpdateDetails, UpdateDetails_Fields)
 
 /**%apidoc Used when `eventType` equals to `proxySession`. */
@@ -140,7 +140,7 @@ struct NX_VMS_API ProxySessionDetails: PeriodDetails
     bool operator==(const ProxySessionDetails& other) const = default;
 };
 #define ProxySessionDetails_Fields PeriodDetails_Fields(target)(wasConnected)
-QN_FUSION_DECLARE_FUNCTIONS(ProxySessionDetails, (ubjson)(json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(ProxySessionDetails, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ProxySessionDetails, ProxySessionDetails_Fields)
 
 namespace details
@@ -265,8 +265,5 @@ using AllAuditDetails =
 
 NX_VMS_API void serialize_field(const AllAuditDetails::type& data, QVariant* target);
 NX_VMS_API void deserialize_field(const QVariant& value, AllAuditDetails::type* target);
-
-NX_VMS_API void serialize(const AllAuditDetails::type& data, QnUbjsonWriter<QByteArray>* stream);
-NX_VMS_API bool deserialize(QnUbjsonReader<QByteArray>* stream, AllAuditDetails::type* target);
 
 } // namespace nx::vms::api
