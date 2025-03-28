@@ -18,14 +18,8 @@ AnalyticsObjectTypeField::AnalyticsObjectTypeField(
 
 bool AnalyticsObjectTypeField::match(const QVariant& eventValue) const
 {
-    const auto typeId = eventValue.toString();
-    if (typeId == value())
-        return true;
-
-    return nx::analytics::taxonomy::isBaseType(
-        analyticsTaxonomyState().get(),
-        value(),
-        typeId);
+    return nx::analytics::taxonomy::isTypeOrSubtypeOf(
+        analyticsTaxonomyState().get(), value(), eventValue.toString());
 }
 
 QJsonObject AnalyticsObjectTypeField::openApiDescriptor(const QVariantMap& properties)

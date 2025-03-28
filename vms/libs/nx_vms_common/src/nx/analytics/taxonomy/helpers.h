@@ -19,4 +19,7 @@ NX_VMS_COMMON_API std::set<QString> getAllBaseTypeIds(
 NX_VMS_COMMON_API bool isBaseType(
     const AbstractState* state, const QString& baseTypeId, const QString& derivedTypeId);
 
+NX_VMS_COMMON_API bool isTypeOrSubtypeOf(
+    AbstractState* state, const QString& typeId, const QString& targetTypeId);
+
 } // namespace nx::analytics::taxonomy

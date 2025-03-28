@@ -56,4 +56,9 @@ bool isBaseType(const AbstractState* state, const QString& baseTypeId, const QSt
     return false;
 }
 
+bool isTypeOrSubtypeOf(AbstractState* state, const QString& typeId, const QString& targetTypeId)
+{
+    return targetTypeId == typeId || isBaseType(state, typeId, targetTypeId);
+}
+
 } // namespace nx::analytics::taxonomy

@@ -2,6 +2,7 @@
 
 #include "object_lookup_field_validator.h"
 
+#include <nx/analytics/taxonomy/helpers.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/analytics_object_type_field.h>
@@ -44,7 +45,9 @@ ValidationResult ObjectLookupFieldValidator::validity(
                 Strings::fieldValueMustBeProvided(utils::kObjectTypeIdFieldName)};
         }
 
-        if (analyticsObjectTypeField->value() != lookupList.objectTypeId)
+        if (!nx::analytics::taxonomy::isTypeOrSubtypeOf(context->analyticsTaxonomyState().get(),
+                analyticsObjectTypeField->value(),
+                lookupList.objectTypeId))
         {
             return {
                 QValidator::State::Invalid,

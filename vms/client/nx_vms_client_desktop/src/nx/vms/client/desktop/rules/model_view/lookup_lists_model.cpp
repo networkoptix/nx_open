@@ -2,6 +2,7 @@
 
 #include "lookup_lists_model.h"
 
+#include <nx/analytics/taxonomy/helpers.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 
@@ -92,8 +93,11 @@ void LookupListsModel::setObjectTypeId(std::optional<QString> type)
     {
         for (const auto& list: systemContext()->lookupListManager()->lookupLists())
         {
-            if (m_objectTypeId == list.objectTypeId)
+            if (nx::analytics::taxonomy::isTypeOrSubtypeOf(
+                    analyticsTaxonomyState().get(), m_objectTypeId.value(), list.objectTypeId))
+            {
                 m_lookupLists.emplace_back(list.id, list.name);
+            }
         }
     }
 
