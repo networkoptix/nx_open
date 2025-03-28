@@ -80,7 +80,7 @@ public:
     Private(LinearizationListModel* q): q(q) {}
 
     QAbstractItemModel* sourceModel() const { return m_sourceModel.data(); }
-    void setSourceModel(QAbstractItemModel* value);
+    void setSourceModel(QAbstractItemModel* value, bool forced = false);
 
     QModelIndex sourceRoot() const;
     void setSourceRoot(const QModelIndex& sourceIndex);
@@ -111,6 +111,7 @@ public:
     void collapseAll();
 
 private:
+    void sourceModelDestroyed();
     void sourceModelAboutToBeReset();
     void sourceModelReset();
     void sourceColumnsAboutToBeChanged(const QModelIndex& sourceParent);
@@ -187,6 +188,7 @@ private:
     QPointer<QAbstractItemModel> m_sourceModel;
     QPersistentModelIndex m_sourceRoot;
     QSet<QPersistentModelIndex> m_expandedSourceIndices;
+    bool m_sourceModelDestroying = false;
 
     std::vector<PersistentIndexPair> m_changingIndices;
     NodeList m_layoutChangingNodes;
@@ -413,9 +415,9 @@ void LinearizationListModel::registerQmlType()
 // ------------------------------------------------------------------------------------------------
 // LinearizationListModel::Private
 
-void LinearizationListModel::Private::setSourceModel(QAbstractItemModel* value)
+void LinearizationListModel::Private::setSourceModel(QAbstractItemModel* value, bool forced)
 {
-    if (m_sourceModel == value)
+    if (!forced && m_sourceModel == value)
         return;
 
     NX_CRITICAL(!m_operationInProgress);
@@ -447,6 +449,8 @@ void LinearizationListModel::Private::setSourceModel(QAbstractItemModel* value)
 
     if (!m_sourceModel)
         return;
+
+    connect(m_sourceModel, &QObject::destroyed, this, &Private::sourceModelDestroyed);
 
     connect(m_sourceModel, &QAbstractItemModel::modelAboutToBeReset,
         this, &Private::sourceModelAboutToBeReset);
@@ -582,6 +586,13 @@ int LinearizationListModel::Private::calculateAutoExpandRole() const
         [this](const QString& name) { return m_autoExpandRoleName == name; });
 
     return (iter != roleNames.cend()) ? iter.key() : kNoRole;
+}
+
+void LinearizationListModel::Private::sourceModelDestroyed()
+{
+    NX_VERBOSE(q, "Source model destroyed");
+    m_sourceModelDestroying = true;
+    setSourceModel(nullptr, /*forced*/ true);
 }
 
 void LinearizationListModel::Private::sourceModelAboutToBeReset()
@@ -1476,6 +1487,7 @@ void LinearizationListModel::Private::reset()
     m_rootNode = std::make_shared<Node>();
     m_nodeList.clear();
     m_expandedSourceIndices.clear();
+    m_sourceModelDestroying = false;
 
     if (!m_sourceModel)
         return;
@@ -1752,7 +1764,7 @@ LinearizationListModel::Private::NodePtr LinearizationListModel::Private::getNod
 
 QModelIndex LinearizationListModel::Private::sourceIndex(const NodePtr& node) const
 {
-    if (node == m_rootNode || !NX_ASSERT(node && m_sourceModel))
+    if (node == m_rootNode || m_sourceModelDestroying || !NX_ASSERT(node && m_sourceModel))
         return m_sourceRoot;
 
     return m_sourceModel->index(node->sourceRow, 0, sourceIndex(node->parent.lock()));
