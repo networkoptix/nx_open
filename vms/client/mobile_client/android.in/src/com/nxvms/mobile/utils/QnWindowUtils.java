@@ -239,6 +239,17 @@ public class QnWindowUtils
         return (realWidth - displayWidth) > 0 || (realHeight - displayHeight) > 0;
     }
 
+    public static void shareLink(String link)
+    {
+        final Activity context = activity();
+        final Intent sendIntent = new Intent(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, link);
+        sendIntent.setType("text/plain");
+
+        Intent shareIntent = Intent.createChooser(sendIntent, null);
+        context.startActivity(shareIntent);
+    }
+
     public static void showOsPushSettingsScreen()
     {
         final Activity context = activity();

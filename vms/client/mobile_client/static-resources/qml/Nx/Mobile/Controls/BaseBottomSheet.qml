@@ -16,12 +16,13 @@ Popup
     y: mainWindow.height - height - d.keyboardHeight
     implicitWidth: mainWindow.width
     implicitHeight: Math.min(
-        flickable.contentHeight + control.topPadding + bottomPadding,
+        flickable.contentHeight + control.topPadding + control.bottomPadding,
         mainWindow.availableHeight - d.keyboardHeight)
 
     modal: true
     padding: 20
     topPadding: 22
+    bottomPadding: 32
 
     background: Item
     {

@@ -4,8 +4,10 @@
 
 #include <QtCore/QString>
 
+class QUrl;
+
 namespace nx::vms::client::mobile {
 
-void shareLink(const QString& link);
+void shareLink(const QUrl& link);
 
 } // namespace nx::vms::client::mobile

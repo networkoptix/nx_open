@@ -139,7 +139,7 @@ void ShareBookmarkBackend::Private::shareBookmarkLink(const QString& bookmarkFul
         .toUrl().toQUrl();
 
     NX_DEBUG(this, "Shared bookmark link: ", result.toString());
-    shareLink(result.toString());
+    shareLink(result);
 }
 
 bool ShareBookmarkBackend::Private::updateShareParams(

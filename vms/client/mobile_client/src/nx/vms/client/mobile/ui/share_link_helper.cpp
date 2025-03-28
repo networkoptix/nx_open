@@ -2,14 +2,19 @@
 
 #include "share_link_helper.h"
 
+#include <QtCore/QUrl>
 #include <QtGui/QClipboard>
 #include <QtWidgets/QApplication>
 
+#if not defined(Q_OS_IOS) && not defined(Q_OS_ANDROID)
+
 namespace nx::vms::client::mobile {
 
-void shareLink(const QString& link)
+void shareLink(const QUrl& link)
 {
-    qApp->clipboard()->setText(link);
+    qApp->clipboard()->setText(link.toString());
 }
 
 } // namespace nx::vms::client::mobile
+
+#endif

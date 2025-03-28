@@ -109,6 +109,7 @@ if(IOS)
         src/nx/vms/client/mobile/push_notification/details/ios/push_platform_helpers.mm
         src/nx/vms/client/mobile/push_notification/details/ios/push_permission_manager.mm
         src/nx/vms/client/mobile/push_notification/details/ios/token_data_provider.mm
+        src/nx/vms/client/mobile/ui/share_link_helper_ios.mm
     )
 
     set(icons_dir ${customization_dir}/icons/ios/ios/images)
