@@ -36,6 +36,10 @@ bool NvidiaDriverDecoderProxy::load()
     if (!cuvidCreateDecoder)
         return false;
 
+    cuvidReconfigureDecoder = (CuvidReconfigureDecoderType) m_loader.getFunction("cuvidReconfigureDecoder");
+    if (!cuvidReconfigureDecoder)
+        return false;
+
     cuvidGetDecoderCaps = (CuvidGetDecoderCapsType) m_loader.getFunction("cuvidGetDecoderCaps");
     if (!cuvidGetDecoderCaps)
         return false;
