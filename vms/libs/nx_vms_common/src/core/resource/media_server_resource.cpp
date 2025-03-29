@@ -448,11 +448,12 @@ void QnMediaServerResource::setServerFlags(vms::api::ServerFlags flags)
 
 QnStorageResourcePtr QnMediaServerResource::getStorageByUrl(const QString& url) const
 {
-   for(const QnStorageResourcePtr& storage: getStorages()) {
-       if (storage->getUrl() == url)
-           return storage;
-   }
-   return QnStorageResourcePtr();
+    for (const QnStorageResourcePtr& storage: getStorages())
+    {
+        if (QUrl(storage->getUrl()).matches({url}, QUrl::RemoveUserInfo))
+            return storage;
+    }
+    return {};
 }
 
 void QnMediaServerResource::updateInternal(const QnResourcePtr& source, NotifierList& notifiers)

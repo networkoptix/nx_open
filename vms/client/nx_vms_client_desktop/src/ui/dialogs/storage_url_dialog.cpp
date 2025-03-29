@@ -108,6 +108,10 @@ QString QnStorageUrlDialog::normalizePath(QString path)
     result = path.replace('\\', separator);
     if (result.endsWith(separator))
         result.chop(1);
+
+    if (result.isEmpty())
+        return result;
+
     if (separator == lit("/"))
     {
         int i = 0;
@@ -332,14 +336,8 @@ bool QnStorageUrlDialog::storageAlreadyUsed(const QString& path) const
     bool usedOnCurrentServer = std::any_of(m_currentServerStorages.begin(), m_currentServerStorages.end(),
         [path](const QnStorageModelInfo& info)
         {
-            return info.url == path;
+            return QUrl(info.url).matches({path}, QUrl::RemoveUserInfo);
         });
-
-    if (usedOnOtherServers)
-        qDebug() << "storage" << path << "is used on other servers";
-
-    if (usedOnCurrentServer)
-        qDebug() << "storage" << path << "is used on current server";
 
     return usedOnOtherServers || usedOnCurrentServer;
 }
