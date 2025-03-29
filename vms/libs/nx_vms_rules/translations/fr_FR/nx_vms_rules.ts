@@ -1185,10 +1185,6 @@
       <translation>Une erreur d'E/S s'est produite à %1.</translation>
     </message>
     <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>Vitesse HDD/SSD insuffisante pour l'enregistrement sur %1.</translation>
-    </message>
-    <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
       <translation>Le disque HDD/SSD &quot;%1&quot; est plein. Le disque contient trop de données qui ne sont pas gérées par le VMS.</translation>
     </message>
@@ -1219,6 +1215,10 @@
     <message>
       <source>RAID error: %1.</source>
       <translation>Erreur RAID : %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
+      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
     </message>
   </context>
   <context>

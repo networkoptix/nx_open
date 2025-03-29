@@ -332,7 +332,7 @@
     <name>HowItWorksSheet</name>
     <message>
       <source>How it works</source>
-      <translation type="unfinished">How it works</translation>
+      <translation>איך זה עובד</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -811,11 +811,11 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>שם</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>&amp;תיאור</translation>
     </message>
     <message>
       <source>Lifetime</source>

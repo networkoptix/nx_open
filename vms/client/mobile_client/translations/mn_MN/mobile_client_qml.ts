@@ -330,7 +330,7 @@
     <name>HowItWorksSheet</name>
     <message>
       <source>How it works</source>
-      <translation type="unfinished">How it works</translation>
+      <translation>Энэ хэрхэн ажилладаг вэ?</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -809,7 +809,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Description</source>

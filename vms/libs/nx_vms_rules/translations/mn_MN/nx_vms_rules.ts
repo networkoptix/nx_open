@@ -1185,10 +1185,6 @@
       <translation>%1 дээр I/O-н алдаа заалаа.</translation>
     </message>
     <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>%1 дээр бичилт хийхэд HDD/SSD-н хурд хүрэлцэхгүй байна.</translation>
-    </message>
-    <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
       <translation>&quot;%1&quot; HDD/SSD диск дүүрсэн байна. Уг диск дээр VMS-тэй хамааралгүй хэт их дата хадгалагдсан байна.</translation>
     </message>
@@ -1219,6 +1215,10 @@
     <message>
       <source>RAID error: %1.</source>
       <translation type="unfinished">RAID error: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
+      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
     </message>
   </context>
   <context>

@@ -330,7 +330,7 @@
     <name>HowItWorksSheet</name>
     <message>
       <source>How it works</source>
-      <translation type="unfinished">How it works</translation>
+      <translation>Hvordan det fungerer</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -809,15 +809,15 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Beskrivelse</translation>
     </message>
     <message>
       <source>Lifetime</source>
-      <translation type="unfinished">Lifetime</translation>
+      <translation>Levetid</translation>
     </message>
     <message>
       <source>Protect with Password (optional)</source>
@@ -837,23 +837,23 @@
     </message>
     <message>
       <source>Stop Sharing</source>
-      <translation type="unfinished">Stop Sharing</translation>
+      <translation>Avslutt deling</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>Utløper om en time</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>Utløper om en dag</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>Utløper om en måned</translation>
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Utløper aldri</translation>
     </message>
     <message>
       <source>Shared link options</source>

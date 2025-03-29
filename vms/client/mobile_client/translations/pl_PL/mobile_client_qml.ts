@@ -262,7 +262,7 @@
     <name>EventSearchItem</name>
     <message>
       <source>SHARED</source>
-      <translation type="unfinished">SHARED</translation>
+      <translation>UDOSTĘPNIONE</translation>
     </message>
   </context>
   <context>
@@ -332,7 +332,7 @@
     <name>HowItWorksSheet</name>
     <message>
       <source>How it works</source>
-      <translation type="unfinished">How it works</translation>
+      <translation>Jak to działa</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -807,23 +807,23 @@
     <name>ShareBookmarkSheet</name>
     <message>
       <source>New Bookmark</source>
-      <translation type="unfinished">New Bookmark</translation>
+      <translation>Nowa Zakładka</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Opis</translation>
     </message>
     <message>
       <source>Lifetime</source>
-      <translation type="unfinished">Lifetime</translation>
+      <translation>Wieczysta</translation>
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation type="unfinished">Protect with Password (optional)</translation>
+      <translation>Chroń hasłem (opcjonalnie)</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -831,35 +831,35 @@
     </message>
     <message>
       <source>Create &amp; Share</source>
-      <translation type="unfinished">Create &amp; Share</translation>
+      <translation>Utwórz i udostępnij</translation>
     </message>
     <message>
       <source>Save &amp; Share</source>
-      <translation type="unfinished">Save &amp; Share</translation>
+      <translation>Zapisz i udostępnij</translation>
     </message>
     <message>
       <source>Stop Sharing</source>
-      <translation type="unfinished">Stop Sharing</translation>
+      <translation>Przestań udostępniać</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>Wygasa za godzinę</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>Wygasa za 1 dzień</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>Wygasa za miesiąc</translation>
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Nigdy nie wygasa</translation>
     </message>
     <message>
       <source>Shared link options</source>
-      <translation type="unfinished">Shared link options</translation>
+      <translation>Opcje udostępnionego linku</translation>
     </message>
   </context>
   <context>

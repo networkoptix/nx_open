@@ -259,7 +259,7 @@
     <name>EventSearchItem</name>
     <message>
       <source>SHARED</source>
-      <translation type="unfinished">SHARED</translation>
+      <translation>共有</translation>
     </message>
   </context>
   <context>
@@ -329,7 +329,7 @@
     <name>HowItWorksSheet</name>
     <message>
       <source>How it works</source>
-      <translation type="unfinished">How it works</translation>
+      <translation>動作説明</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -804,23 +804,23 @@
     <name>ShareBookmarkSheet</name>
     <message>
       <source>New Bookmark</source>
-      <translation type="unfinished">New Bookmark</translation>
+      <translation>新規ブックマーク</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>名前</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>説明</translation>
     </message>
     <message>
       <source>Lifetime</source>
-      <translation type="unfinished">Lifetime</translation>
+      <translation>有効期間</translation>
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation type="unfinished">Protect with Password (optional)</translation>
+      <translation>パスワードで保護 (オプション)</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -828,35 +828,35 @@
     </message>
     <message>
       <source>Create &amp; Share</source>
-      <translation type="unfinished">Create &amp; Share</translation>
+      <translation>作成 &amp; 共有</translation>
     </message>
     <message>
       <source>Save &amp; Share</source>
-      <translation type="unfinished">Save &amp; Share</translation>
+      <translation>保存 &amp; 共有</translation>
     </message>
     <message>
       <source>Stop Sharing</source>
-      <translation type="unfinished">Stop Sharing</translation>
+      <translation>共有を停止</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>1時間で期限切れ</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>1日で期限切れ</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>1ヶ月以内に期限切れ</translation>
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>無期限</translation>
     </message>
     <message>
       <source>Shared link options</source>
-      <translation type="unfinished">Shared link options</translation>
+      <translation>共有リンクのオプション</translation>
     </message>
   </context>
   <context>

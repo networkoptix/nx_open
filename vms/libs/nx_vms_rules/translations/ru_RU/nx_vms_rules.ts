@@ -1213,10 +1213,6 @@
       <translation>Ошибка ввода/вывода на %1.</translation>
     </message>
     <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>Не хватает скорости HDD/SSD для записи на %1.</translation>
-    </message>
-    <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
       <translation>Диск &quot;%1&quot; переполнен. Диск содержит слишком много данных, не относящихся к системе.</translation>
     </message>
@@ -1247,6 +1243,10 @@
     <message>
       <source>RAID error: %1.</source>
       <translation type="unfinished">RAID error: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
+      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
     </message>
   </context>
   <context>

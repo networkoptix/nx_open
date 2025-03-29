@@ -1185,10 +1185,6 @@
       <translation>I/O hiba történt: %1.</translation>
     </message>
     <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>Nincs elegendő HDD/SDD sebesség a rögzítéshez: %1.</translation>
-    </message>
-    <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
       <translation>&quot;%1&quot; HDD/SDD lemez megtelt. A lemez túl sok adatot tartalmaz amit a VMS nem menedzsel.</translation>
     </message>
@@ -1219,6 +1215,10 @@
     <message>
       <source>RAID error: %1.</source>
       <translation type="unfinished">RAID error: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
+      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
     </message>
   </context>
   <context>

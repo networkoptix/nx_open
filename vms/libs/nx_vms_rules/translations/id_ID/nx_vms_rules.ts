@@ -1171,10 +1171,6 @@
       <translation>Error I/O telah terjadi di %1.</translation>
     </message>
     <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>Kecepatan HDD/SSD tidak cukup untuk merekam ke %1.</translation>
-    </message>
-    <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
       <translation>Disk HDD/SSD &quot;%1&quot; penuh. Disk berisi terlalu banyak data yang tidak dikelola oleh VMS.</translation>
     </message>
@@ -1205,6 +1201,10 @@
     <message>
       <source>RAID error: %1.</source>
       <translation>Error RAID: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
+      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
     </message>
   </context>
   <context>

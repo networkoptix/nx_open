@@ -330,7 +330,7 @@
     <name>HowItWorksSheet</name>
     <message>
       <source>How it works</source>
-      <translation type="unfinished">How it works</translation>
+      <translation>Comment ça fonctionne</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -809,15 +809,15 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nom</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Description</translation>
     </message>
     <message>
       <source>Lifetime</source>
-      <translation type="unfinished">Lifetime</translation>
+      <translation>Durée de vie</translation>
     </message>
     <message>
       <source>Protect with Password (optional)</source>
@@ -837,23 +837,23 @@
     </message>
     <message>
       <source>Stop Sharing</source>
-      <translation type="unfinished">Stop Sharing</translation>
+      <translation>Arrêter le partage</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>Expire dans une heure</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>Expire dans un jour</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>Expire dans un mois</translation>
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>N’expire jamais</translation>
     </message>
     <message>
       <source>Shared link options</source>

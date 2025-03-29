@@ -11451,7 +11451,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>Organization user</source>
-      <translation type="unfinished">Organization user</translation>
+      <translation>Organisationsanvändare</translation>
     </message>
   </context>
   <context>

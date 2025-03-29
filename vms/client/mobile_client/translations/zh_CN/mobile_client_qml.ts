@@ -329,7 +329,7 @@
     <name>HowItWorksSheet</name>
     <message>
       <source>How it works</source>
-      <translation type="unfinished">How it works</translation>
+      <translation>功能说明</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -808,11 +808,11 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>名称</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>&amp;描述</translation>
     </message>
     <message>
       <source>Lifetime</source>

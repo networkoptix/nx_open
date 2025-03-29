@@ -329,7 +329,7 @@
     <name>HowItWorksSheet</name>
     <message>
       <source>How it works</source>
-      <translation type="unfinished">How it works</translation>
+      <translation>Cách hoạt động</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -808,15 +808,15 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Tên người sử dụng</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>Lifetime</source>
-      <translation type="unfinished">Lifetime</translation>
+      <translation>Vĩnh viễn</translation>
     </message>
     <message>
       <source>Protect with Password (optional)</source>
@@ -836,23 +836,23 @@
     </message>
     <message>
       <source>Stop Sharing</source>
-      <translation type="unfinished">Stop Sharing</translation>
+      <translation>Ngừng chia sẻ</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>Hết hạn sau một giờ</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>Hết hạn sau một ngày</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>Hết hạn sau một tháng</translation>
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Không bao giờ hết hạn</translation>
     </message>
     <message>
       <source>Shared link options</source>

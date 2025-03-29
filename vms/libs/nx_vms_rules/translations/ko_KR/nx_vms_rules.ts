@@ -1171,10 +1171,6 @@
       <translation>%1에 I/O 오류 발생.</translation>
     </message>
     <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>%1. 에 저장을 위한 HDD/SSD 속도 정보.</translation>
-    </message>
-    <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
       <translation>HDD/SSD 디스크 "%1" 꽉 찼습니다. 디스크에 VM에 의해 관리 되지 않는 너무 많은 데이터를 포함 합니다.</translation>
     </message>
@@ -1205,6 +1201,10 @@
     <message>
       <source>RAID error: %1.</source>
       <translation>RAID 오류: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
+      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
     </message>
   </context>
   <context>

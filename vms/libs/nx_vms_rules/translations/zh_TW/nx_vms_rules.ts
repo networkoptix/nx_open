@@ -1171,10 +1171,6 @@
       <translation>在寫入資料至 %1 時發生I/O錯誤問題。</translation>
     </message>
     <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>HDD/SSD %1 速度不足以錄影。</translation>
-    </message>
-    <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
       <translation>HDD/SSD &quot;%1&quot; 已滿。硬碟裡包含太多非VMS資料。</translation>
     </message>
@@ -1205,6 +1201,10 @@
     <message>
       <source>RAID error: %1.</source>
       <translation>RAID錯誤: %1。</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
+      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
     </message>
   </context>
   <context>

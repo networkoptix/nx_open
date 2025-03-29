@@ -964,7 +964,7 @@
     </message>
     <message>
       <source>Show Servers</source>
-      <translation>サーバー一覧を表示</translation>
+      <translation>サーバーを表示</translation>
     </message>
     <message>
       <source>Save Window Configuration</source>
@@ -11287,7 +11287,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Organization user</source>
-      <translation type="unfinished">Organization user</translation>
+      <translation>組織ユーザー</translation>
     </message>
   </context>
   <context>

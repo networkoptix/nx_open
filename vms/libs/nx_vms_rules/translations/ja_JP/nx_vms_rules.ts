@@ -1171,10 +1171,6 @@
       <translation>%1 でI/Oエラーが発生しました。</translation>
     </message>
     <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>%1 へのHDD/SSD書き込み速度が不十分です。</translation>
-    </message>
-    <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
       <translation>HDD/SSDディスク &quot;%1&quot; がいっぱいです。ディスク上にVMS管理外のデータが多すぎます。</translation>
     </message>
@@ -1205,6 +1201,10 @@
     <message>
       <source>RAID error: %1.</source>
       <translation>RAID エラー: %1。</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
+      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
     </message>
   </context>
   <context>

@@ -1213,10 +1213,6 @@
       <translation>שגיאת קלט/פלט אירעה ב%1.</translation>
     </message>
     <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>מהירות הדיסק הקשיח/SSD אינה מספיקה להקלטה אל %1.</translation>
-    </message>
-    <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
       <translation>הכונן הקשיח &quot;%1&quot; מלא. הכונן מכיל יותר מדי מידע שאינו מנוהל על ידי מערכת ההקלטה.</translation>
     </message>
@@ -1247,6 +1243,10 @@
     <message>
       <source>RAID error: %1.</source>
       <translation type="unfinished">RAID error: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
+      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
     </message>
   </context>
   <context>

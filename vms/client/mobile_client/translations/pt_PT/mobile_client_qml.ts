@@ -809,11 +809,11 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nome</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>&amp;Descrição</translation>
     </message>
     <message>
       <source>Lifetime</source>
