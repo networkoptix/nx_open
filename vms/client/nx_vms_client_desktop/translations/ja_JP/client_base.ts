@@ -899,7 +899,7 @@
     </message>
     <message>
       <source>Show Servers</source>
-      <translation>サーバー一覧を表示</translation>
+      <translation>サーバーを表示</translation>
     </message>
     <message>
       <source>Save Window Configuration</source>
