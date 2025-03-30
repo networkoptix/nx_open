@@ -1285,12 +1285,12 @@
   <context>
     <name>StringsHelper</name>
     <message>
-      <source>Contact your channel partner for details.</source>
-      <translation>자세한 내용은 채널 파트너에게 문의하세요.</translation>
-    </message>
-    <message>
       <source>Check internet connection between VMS and license server.</source>
       <translation>VMS와 라이선스 서버 간의 인터넷 연결을 확인하세요.</translation>
+    </message>
+    <message>
+      <source>Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Contact your channel partner for assistance.</translation>
     </message>
   </context>
   <context>

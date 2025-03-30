@@ -1486,12 +1486,12 @@
   <context>
     <name>StringsHelper</name>
     <message>
-      <source>Contact your channel partner for details.</source>
-      <translation>Skontaktuj się z partnerem kanału aby dodać usługi.</translation>
-    </message>
-    <message>
       <source>Check internet connection between VMS and license server.</source>
       <translation>Sprawdź połączenie internetowe pomiędzy VMS a serwerem licencji.</translation>
+    </message>
+    <message>
+      <source>Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Contact your channel partner for assistance.</translation>
     </message>
   </context>
   <context>

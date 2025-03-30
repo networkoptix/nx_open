@@ -1285,12 +1285,12 @@
   <context>
     <name>StringsHelper</name>
     <message>
-      <source>Contact your channel partner for details.</source>
-      <translation>詳細については、チャネルパートナーにお問い合わせください。</translation>
-    </message>
-    <message>
       <source>Check internet connection between VMS and license server.</source>
       <translation>VMS とライセンスサーバー間のインターネット接続を確認してください。</translation>
+    </message>
+    <message>
+      <source>Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Contact your channel partner for assistance.</translation>
     </message>
   </context>
   <context>

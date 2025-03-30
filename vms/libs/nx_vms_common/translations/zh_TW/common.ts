@@ -1285,12 +1285,12 @@
   <context>
     <name>StringsHelper</name>
     <message>
-      <source>Contact your channel partner for details.</source>
-      <translation>請聯絡您的通路夥伴以了解細節。</translation>
-    </message>
-    <message>
       <source>Check internet connection between VMS and license server.</source>
       <translation>檢查 VMS 和授權 (license) 伺服器之間的網際網路連線。</translation>
+    </message>
+    <message>
+      <source>Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Contact your channel partner for assistance.</translation>
     </message>
   </context>
   <context>

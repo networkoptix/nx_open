@@ -4582,8 +4582,20 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Enheter konfigurerade med &quot;Inställningen för alla arkiv&quot; kommer att ändras till &quot;Rörelse, Objekt och Bokmärken&quot; när molnsäkerhetskopiering är aktiverat</translation>
     </message>
     <message>
-      <source>Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
-      <translation>Cloud backup har stoppats eftersom systemet har stängts av. Den måste vara aktiv för att göra en säkerhetskopiering till molnlagring. Kontakta din kanalpartner för hjälp</translation>
+      <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Site suspended</source>
+      <translation type="unfinished">Site suspended</translation>
     </message>
   </context>
   <context>
@@ -6745,8 +6757,8 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>För att säkerhetskopiera till en molnlagring bör systemet vara i aktivt tillstånd. %1</translation>
     </message>
     <message>
-      <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
-      <translation>Systemet är avstängt. För att göra ändringar i säkerhetskopieringskonfigurationen bör systemet vara i aktivt tillstånd. %1</translation>
+      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</source>
+      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</translation>
     </message>
   </context>
   <context>

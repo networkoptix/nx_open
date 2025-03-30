@@ -4675,8 +4675,20 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Urządzenia z ustawieniem &quot;Wszystkie archiwum&quot; zostaną zmienione na &quot;Ruch, Obiekt i Zakładki&quot; po włączeniu kopii zapasowej w chmurze</translation>
     </message>
     <message>
-      <source>Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
-      <translation>Tworzenie kopii zapasowej w chmurze zostało zatrzymane, ponieważ system został zamknięty. Musi być aktywny, aby wykonać kopię zapasową w chmurze. Skontaktuj się z partnerem kanałowym, aby uzyskać pomoc</translation>
+      <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Site suspended</source>
+      <translation type="unfinished">Site suspended</translation>
     </message>
   </context>
   <context>
@@ -6966,8 +6978,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Aby wykonać kopię zapasową w chmurze, witryna musi być aktywna. %1</translation>
     </message>
     <message>
-      <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
-      <translation>Witryna zawieszona. Aby dokonać zmian w konfiguracji kopii zapasowej, witryna powinna być w stanie aktywnym. %1</translation>
+      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</source>
+      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</translation>
     </message>
   </context>
   <context>

@@ -4582,8 +4582,20 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
     </message>
     <message>
-      <source>Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
-      <translation type="unfinished">Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</translation>
+      <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Site suspended</source>
+      <translation type="unfinished">Site suspended</translation>
     </message>
   </context>
   <context>
@@ -6745,8 +6757,8 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Pour effectuer une sauvegarde sur un stockage cloud, le site doit être dans un état actif. %1</translation>
     </message>
     <message>
-      <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
-      <translation>Site suspendu. Pour modifier la configuration de sauvegarde, le site doit être en état actif. %1</translation>
+      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</source>
+      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</translation>
     </message>
   </context>
   <context>
