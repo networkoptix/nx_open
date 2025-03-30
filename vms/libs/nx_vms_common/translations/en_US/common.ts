@@ -1352,12 +1352,12 @@
 <context>
     <name>StringsHelper</name>
     <message>
-        <source>Contact your channel partner for details.</source>
+        <source>Check internet connection between VMS and license server.</source>
         <translation></translation>
     </message>
     <message>
-        <source>Check internet connection between VMS and license server.</source>
-        <translation></translation>
+        <source>Contact your channel partner for assistance.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

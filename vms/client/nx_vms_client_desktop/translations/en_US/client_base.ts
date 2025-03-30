@@ -4580,7 +4580,19 @@ If you intended to move analytics data to another storage location, please conta
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cloud backup has been stopped because the system has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance</source>
+        <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Site suspended</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6743,8 +6755,8 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
-        <translation></translation>
+        <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
