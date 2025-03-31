@@ -13,9 +13,11 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/jose/jws.h>
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/components/debug_info_storage.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/common/html/html.h>
@@ -25,6 +27,7 @@ namespace {
 
 static const QString kDigestDebugInfoKey = "userDigest";
 static const QString kTokenDebugInfoKey = "userToken";
+static const QString kCloudAccessTokenDebugInfoKey = "cloudAccessToken";
 static const QString kElideString = "...";
 static constexpr int kMaxTokenLength = 50;
 
@@ -93,6 +96,38 @@ void elideIfNeeded(QString& str)
     const int partLength = (kMaxTokenLength - kElideString.length()) / 2;
     str = str.first(partLength) + kElideString + str.last(partLength);
 }
+
+void processToken(
+    const nx::network::http::AuthToken& token, const QString prefix, const QString& key)
+{
+    if (token.isBearerToken())
+    {
+        QString displayToken;
+        const auto encoded =
+            std::string_view(token.value)
+                .substr(nx::cloud::db::api::OauthManager::kTokenPrefix.size());
+        if (const auto jwt =
+                nx::network::jws::decodeToken<nx::cloud::db::api::ClaimSet>(encoded))
+        {
+            const auto tokenInfo = getFormatJWTInfo(jwt.value());
+            displayToken = nx::vms::common::html::kLineBreak
+                + tokenInfo.join(nx::vms::common::html::kLineBreak);
+        }
+        else
+        {
+            displayToken = QString::fromStdString(token.value);
+            elideIfNeeded(displayToken);
+        }
+
+        DebugInfoStorage::instance()->setValue(
+            key, prefix + displayToken);
+    }
+    else
+    {
+        DebugInfoStorage::instance()->removeValue(key);
+    }
+}
+
 class UserAuthDebugInfoWatcher::Private
 {
     UserAuthDebugInfoWatcher* q;
@@ -113,32 +148,7 @@ public:
             {
                 const auto session = q->networkModule()->session();
                 const auto token = session->connection()->credentials().authToken;
-                if (token.isBearerToken())
-                {
-                    QString displayToken;
-                    const auto encoded =
-                        std::string_view(token.value)
-                            .substr(nx::cloud::db::api::OauthManager::kTokenPrefix.size());
-                    if (const auto jwt =
-                            nx::network::jws::decodeToken<nx::cloud::db::api::ClaimSet>(encoded))
-                    {
-                        const auto tokenInfo = getFormatJWTInfo(jwt.value());
-                        displayToken = nx::vms::common::html::kLineBreak
-                            + tokenInfo.join(nx::vms::common::html::kLineBreak);
-                    }
-                    else
-                    {
-                        displayToken = QString::fromStdString(token.value);
-                        elideIfNeeded(displayToken);
-                    }
-
-                    DebugInfoStorage::instance()->setValue(
-                        kTokenDebugInfoKey, "Token: " + displayToken);
-                }
-                else
-                {
-                    DebugInfoStorage::instance()->removeValue(kTokenDebugInfoKey);
-                }
+                processToken(token, "Token: ", kTokenDebugInfoKey);
             };
 
         // When a new session appears, this old connection will be destroyed.
@@ -194,6 +204,38 @@ UserAuthDebugInfoWatcher::UserAuthDebugInfoWatcher(QObject* parent):
             updateDigestInfoForDebugInfo();
 
             d->updateSessionDebugInfo();
+        });
+
+    connect(appContext()->cloudStatusWatcher(),
+        &core::CloudStatusWatcher::statusChanged,
+        this,
+        [this](core::CloudStatusWatcher::Status status)
+        {
+            if (status != core::CloudStatusWatcher::Status::Online)
+            {
+                DebugInfoStorage::instance()->removeValue(kCloudAccessTokenDebugInfoKey);
+                return;
+            }
+
+            const auto filter = DebugInfoStorage::instance()->filter();
+            if (filter.contains(DebugInfoStorage::Field::cloudAccessToken))
+                return;
+
+            const auto updateCloudAccessTokenInfoForDebugInfo =
+            [this]()
+            {
+                const auto token = appContext()->cloudStatusWatcher()->credentials().authToken;
+                processToken(token, "Cloud Access Token: ", kCloudAccessTokenDebugInfoKey);
+            };
+
+            // When a new session appears, this old connection will be destroyed.
+            connect(appContext()->cloudStatusWatcher(),
+                &core::CloudStatusWatcher::credentialsChanged,
+                this,
+                updateCloudAccessTokenInfoForDebugInfo);
+
+            updateCloudAccessTokenInfoForDebugInfo();
+
         });
 }
 

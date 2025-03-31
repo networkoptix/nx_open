@@ -32,6 +32,7 @@ public:
         threads,
         digest,
         token,
+        cloudAccessToken,
         typ_header,
         alg,
         kid,
