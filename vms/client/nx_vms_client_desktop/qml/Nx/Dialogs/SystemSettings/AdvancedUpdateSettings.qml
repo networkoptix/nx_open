@@ -204,6 +204,8 @@ Dialog
             title: qsTr("Offline client updates")
             checkable: true
 
+            visible: LocalSettings.iniConfigValue("offlineClientUpdateEnabled")
+
             Binding on checked { value: offlineUpdatesEnabled }
 
             contentItem: Label

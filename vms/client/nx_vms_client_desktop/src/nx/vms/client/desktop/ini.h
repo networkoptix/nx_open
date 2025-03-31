@@ -107,6 +107,10 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Dev] Forces client-only update to start update of the current Client immediately when\n"
         "an update is available. Any update date planning is not performed in this case.");
 
+    NX_INI_FLAG(false, offlineClientUpdateEnabled,
+        "[Dev] Enables storing update packages on servers persistently to make offline updates\n"
+        "possible.");
+
     NX_INI_FLAG(false, alwaysShowGetUpdateFileButton,
         "[Dev] Always show Get Update File button.");
 

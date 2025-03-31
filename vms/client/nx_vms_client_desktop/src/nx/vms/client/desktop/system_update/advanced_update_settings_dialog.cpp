@@ -77,13 +77,16 @@ void AdvancedUpdateSettingsDialog::saveSettings()
             }
         };
 
-    m_currentRequest = connectedServerApi()->patchSystemSettings(
-        systemContext()->getSessionTokenHelper(), {{
-            .updateNotificationsEnabled = notifyAboutUpdates,
-            .targetPersistentUpdateStorage = api::PersistentUpdateStorage{
-                .autoSelection = offlineUpdatesEnabled}}},
-        callback,
-        this);
+    if (const rest::ServerConnectionPtr connection = connectedServerApi())
+    {
+        m_currentRequest = connection->patchSystemSettings(
+            systemContext()->getSessionTokenHelper(), {{
+                .updateNotificationsEnabled = notifyAboutUpdates,
+                .targetPersistentUpdateStorage = api::PersistentUpdateStorage{
+                    .autoSelection = offlineUpdatesEnabled}}},
+            callback,
+            this);
+    }
 }
 
 } // namespace nx::vms::client::desktop
