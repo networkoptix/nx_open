@@ -4595,7 +4595,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Site suspendu</translation>
     </message>
   </context>
   <context>

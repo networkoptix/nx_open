@@ -1204,7 +1204,7 @@
     </message>
     <message>
       <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
+      <translation>%1 に録画するための HDD/SSD/ネットワーク速度が不足しています。</translation>
     </message>
   </context>
   <context>

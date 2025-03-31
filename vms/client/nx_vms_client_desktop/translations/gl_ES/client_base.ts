@@ -4595,7 +4595,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Sitio suspendido</translation>
     </message>
   </context>
   <context>

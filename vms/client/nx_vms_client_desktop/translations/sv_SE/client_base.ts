@@ -4583,19 +4583,19 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</translation>
+      <translation>Cloud backup har stoppats eftersom platsen har stängts av. Den måste vara aktiv för att göra en säkerhetskopiering till molnlagring. Kontakta din kanalpartner för hjälp.</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>Säkerhetskopiering till molnet fortsätter, men platsen är för närvarande avstängd. Det måste vara aktivt för att ändra säkerhetskopieringskonfigurationen eller för att aktivera molnlagringsplats. Kontakta din kanalpartner för hjälp.</translation>
     </message>
     <message>
       <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>Platsen måste vara aktiv för att möjliggöra molnlagringsplats. Kontakta din kanalpartner för hjälp.</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Webbplatsen avstängd</translation>
     </message>
   </context>
   <context>
@@ -6758,7 +6758,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</translation>
+      <translation>Säkerhetskopiering till molnet fortsätter, men platsen är för närvarande avstängd. Den måste vara aktiv för att ändra säkerhetskopieringskonfigurationen eller för att aktivera molnlagringsplats. %1</translation>
     </message>
   </context>
   <context>

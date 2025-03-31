@@ -4536,19 +4536,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</translation>
+      <translation>サイトがシャットダウンされたため、クラウドバックアップは停止しました。クラウドストレージへのバックアップを実行するには、システムがアクティブである必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>クラウドバックアップは継続されますが、サイトは現在サスペンドされています。バックアップ設定の変更やクラウドストレージの有効化を行うには、サイトがアクティブである必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>クラウドストレージを有効化するには、サイトがアクティブである必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>サイトのサスペンド</translation>
     </message>
   </context>
   <context>
@@ -6648,7 +6648,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</translation>
+      <translation>クラウドバックアップは継続されますが、サイトは現在サスペンドされています。バックアップ設定の変更やクラウドストレージの有効化を行うには、サイトがアクティブである必要があります。%1</translation>
     </message>
   </context>
   <context>

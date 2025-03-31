@@ -4548,7 +4548,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>站點已暫停</translation>
     </message>
   </context>
   <context>

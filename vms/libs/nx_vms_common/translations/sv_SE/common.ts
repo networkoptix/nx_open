@@ -1357,7 +1357,7 @@
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Contact your channel partner for assistance.</translation>
+      <translation>Kontakta din kanalpartner för hjälp.</translation>
     </message>
   </context>
   <context>

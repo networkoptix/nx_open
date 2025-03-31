@@ -1290,7 +1290,7 @@
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Contact your channel partner for assistance.</translation>
+      <translation>サポートについては、チャネルパートナーにお問い合わせください。</translation>
     </message>
   </context>
   <context>

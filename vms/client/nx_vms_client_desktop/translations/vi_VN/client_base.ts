@@ -4548,7 +4548,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Chi nhánh bị đình chỉ</translation>
     </message>
   </context>
   <context>
