@@ -286,7 +286,8 @@ QVariant ServicesUsageModel::data(const QModelIndex& index, int role) const
 
         QStringList toolTipLines;
         toolTipLines.push_back(html::paragraph(
-            tr("Number of devices using this service exceeds the available service quantity.")));
+            tr("The number of devices using this service exceeds the available capacity. "
+               "Add more services or disable the services on some devices.")));
 
         if (serviceTypeStatus.status == nx::vms::api::UseStatus::overUse)
         {
@@ -294,10 +295,9 @@ QVariant ServicesUsageModel::data(const QModelIndex& index, int role) const
             const auto expirationDateString =
                 formatter->toString(serviceTypeStatus.issueExpirationDate);
 
-            // TODO: #vbreus Rewording needed.
             toolTipLines.push_back(html::paragraph(
-                tr("Please disable it for some devices or add more suitable services. "
-                   "Otherwise it will be done automatically on %1").arg(expirationDateString)));
+                tr("On %1, the system will automatically disable the service on some devices.",
+                    "%1 will be substituted with date and time").arg(expirationDateString)));
         }
 
         return toolTipLines.join("");
