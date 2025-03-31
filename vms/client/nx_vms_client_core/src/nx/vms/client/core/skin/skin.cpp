@@ -338,28 +338,33 @@ QPixmap Skin::pixmap(
 
 std::pair<QPixmap, QString> Skin::createPixmap(const QString& name)
 {
+    const QString dpiDependedName = getDpiDependedName(name);
+
     QPixmap pixmap;
     QString error;
-    if (!QPixmapCache::find(name, &pixmap))
+    if (!QPixmapCache::find(dpiDependedName, &pixmap))
     {
-        if (m_externalPixmaps.contains(name))
+        if (m_externalPixmaps.contains(dpiDependedName))
         {
-            pixmap = m_externalPixmaps[name];
+            pixmap = m_externalPixmaps[dpiDependedName];
         }
-        else if (const auto fullPath = path(name);
+        else if (const auto fullPath = path(dpiDependedName);
             fullPath.isEmpty())
         {
-            if (!name.contains(kHiDpiSuffix))
-                error = nx::format("Name does not include \"%1\"", kHiDpiSuffix);
+            if (!dpiDependedName.contains(kHiDpiSuffix))
+            {
+                error = nx::format("Name does not include \"%1\": %2, %3",
+                    kHiDpiSuffix, dpiDependedName, name);
+            }
         }
         else
         {
             pixmap = QPixmap::fromImage(QImage(fullPath), Qt::OrderedDither | Qt::OrderedAlphaDither);
             pixmap.setDevicePixelRatio(1); // Force to use not scaled images
             if (pixmap.isNull())
-                error = nx::format("Can't find icon %1", fullPath);
+                error = nx::format("Can't find icon: %1, %2", fullPath, name);
         }
-        QPixmapCache::insert(name, pixmap);
+        QPixmapCache::insert(dpiDependedName, pixmap);
     }
     return {pixmap, error};
 }
@@ -372,7 +377,7 @@ std::pair<QPixmap, QString> Skin::pixmapInternal(
     if (name.endsWith(".svg"))
         return createPixmapFromSvg(name, correctDevicePixelRatio, desiredSize);
 
-    std::pair<QPixmap, QString> result = createPixmap(getDpiDependedName(name));
+    std::pair<QPixmap, QString> result = createPixmap(name);
     if (correctDevicePixelRatio)
         correctPixelRatio(result.first);
 
@@ -543,7 +548,7 @@ QPixmap Skin::colorizedPixmap(
     auto [pixmap, error] = pixmapInternal(path, /*correctDevicePixelRatio*/ true);
 
     static const QString kIgnoreErrorsFragment = "ignoreErrors";
-    const bool ignoreErrors = url.hasFragment() && url.fragment() != kIgnoreErrorsFragment;
+    const bool ignoreErrors = url.hasFragment() && url.fragment() == kIgnoreErrorsFragment;
 
     if (!error.isEmpty())
     {
