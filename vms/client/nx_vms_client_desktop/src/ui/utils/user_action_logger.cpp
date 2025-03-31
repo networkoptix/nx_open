@@ -31,7 +31,7 @@ QString getTextFromItem(QObject* object)
         "text", "currentText", "display", "label", "plainText", "logText"};
     for (const char* prop: kTextProperties)
     {
-        QVariant value = object->property(prop);
+        const QVariant value = object->property(prop);
         const auto stringValue = value.toString();
         if (stringValue.contains("TextBesideIcon"))
         {
@@ -42,7 +42,7 @@ QString getTextFromItem(QObject* object)
             return stringValue;
     }
 
-    auto possibleValue = object->property("value");
+    const auto possibleValue = object->property("value");
     if (possibleValue.isValid())
     {
         bool ok;
@@ -50,9 +50,9 @@ QString getTextFromItem(QObject* object)
         return ok ? QString::number(possibleValue.toDouble()) : possibleValue.toString();
     }
 
-    bool isWindow = qobject_cast<QQuickWindow*>(object) || qobject_cast<QWindow*>(object)
+    const bool isWindow = qobject_cast<QQuickWindow*>(object) || qobject_cast<QWindow*>(object)
         || qobject_cast<QDialog*>(object);
-    auto possibleTitle = object->property("title");
+    const auto possibleTitle = object->property("title");
 
     // The "title" property is often used for window titles, but the object's "title" is required.
     // Explicitly check if it's a window.
@@ -60,18 +60,36 @@ QString getTextFromItem(QObject* object)
         return possibleTitle.toString();
 
     // Check tooltip only if all other properties failed.
-    auto possibleTooltip = object->property("tooltip");
+    const auto possibleTooltip = object->property("tooltip");
     if (possibleTooltip.isValid())
         return possibleTooltip.toString();
 
     return {};
 }
 
+void addMetaObjectInfo(QObject* object, QStringList& result)
+{
+    if (result.empty())
+        return;
+
+    QStringList additionalInfo;
+
+    if (!object->objectName().isEmpty())
+        additionalInfo << "Object name (" << object->objectName() << ")";
+    else
+        additionalInfo << "Class name (" << object->metaObject()->className() << ")";
+
+    result << additionalInfo.join(' ');
+}
+
 void addCheckedInformation(QObject* obj, QStringList& result)
 {
+    QStringList additionalInfo;
     if (!obj->property("checkable").toBool())
         return;
-    result << "Was" << (obj->property("checked").toBool() ? "unchecked" : "checked");
+
+    additionalInfo << "Was" << (obj->property("checked").toBool() ? "unchecked" : "checked");
+    result << additionalInfo.join(' ');
 }
 
 QString getTextFromDelegateItem(QObject* object)
@@ -120,30 +138,27 @@ QString getWindowTitle(QObject* obj)
 
 namespace nx::vms::client::desktop {
 
-void handleMouseButtonRelease(QObject* object, QStringList& resultString)
+void handleMouseButtonRelease(QObject* object, QStringList& resultLog)
 {
+    QStringList initialInfo;
     if (auto* tabWidget = qobject_cast<QTabBar*>(object))
     {
-        resultString << "Switched to tab " << tabWidget->tabText(tabWidget->currentIndex());
-    }
-    else if (auto* toolButton = qobject_cast<QToolButton*>(object))
-    {
-        resultString << "Clicked ToolButton:" << toolButton->toolTip();
+        initialInfo << "Switched to tab " << tabWidget->tabText(tabWidget->currentIndex());
     }
     else if (auto* closeButton = qobject_cast<CloseButton*>(object))
     {
-        resultString << "Close button clicked";
+        initialInfo << "Close button clicked";
         if (closeButton->parent())
         {
             QString parentText = getTextFromItem(closeButton->parent());
             if (!parentText.isEmpty())
-                resultString << "Parent:" << parentText;
+                initialInfo << "Parent:" << parentText;
         }
     }
     else if (auto* menu = qobject_cast<QMenu*>(object))
     {
         if (QAction* selectedAction = menu->activeAction())
-            resultString << "Selected menu action:" << selectedAction->text();
+            initialInfo << "Selected menu action:" << selectedAction->text();
     }
     else
     {
@@ -151,14 +166,17 @@ void handleMouseButtonRelease(QObject* object, QStringList& resultString)
         if (objectText.isEmpty())
             objectText = getTextFromDelegateItem(object);
         if (!objectText.isEmpty())
-        {
-            resultString << "Clicked on:" << objectText << "("
-                         << object->metaObject()->className() << ")";
-        }
+            initialInfo << "Clicked on:" << objectText;
     }
 
+    if (!initialInfo.isEmpty())
+        resultLog.append(initialInfo.join(' '));
     // Add additional info for CheckBox, GroupBox, etc.
-    addCheckedInformation(object, resultString);
+    addCheckedInformation(object, resultLog);
+
+    // For some objects, the metaobject info can contain useful information (e.g., buttons on the
+    // Timeline).
+    addMetaObjectInfo(object, resultLog);
 
     // TODO: #vbutkevich Add support for QComboBox. (QML ComboBox supported)
     // The clicked event is not processed directly on QComboBox, but on internal private
@@ -170,11 +188,31 @@ void handleMouseButtonRelease(QObject* object, QStringList& resultString)
 
 void handleToolTip(QStringList& resultString)
 {
-    QString tooltipText = QToolTip::text();
+    const QString tooltipText = QToolTip::text();
     if (!tooltipText.isEmpty())
-        resultString << "Displayed tooltip:" << tooltipText;
+        resultString << "Displayed tooltip:" + tooltipText;
 }
 
+void handleKeyPress(QKeyEvent* keyPressEvent, QStringList& resultString)
+{
+    if (!keyPressEvent)
+        return;
+
+    const QString keySequence =
+        QKeySequence(keyPressEvent->modifiers(), keyPressEvent->key()).toString();
+
+    if (!keySequence.isEmpty())
+        resultString << "Key combination pressed:" + keySequence;
+}
+
+void handleShortcut(QShortcutEvent* shortcutEvent, QStringList& resultString)
+{
+    if (!shortcutEvent)
+        return;
+    const QString combination = shortcutEvent->key().toString();
+    if (!combination.isEmpty())
+        resultString << "Shortcut triggered:" + combination;
+}
 
 void handleFocusOut(QObject* object, QStringList& resultString)
 {
@@ -185,7 +223,7 @@ void handleFocusOut(QObject* object, QStringList& resultString)
     auto* qmlItem = qobject_cast<QQuickItem*>(object);
     if ((lineEdit || textEdit || qmlItem) && !containsSensitiveInfo(object))
     {
-        QString text = getTextFromItem(object);
+        const QString text = getTextFromItem(object);
         if (!text.isEmpty())
             resultString << "Set element text:" << text;
     }
@@ -199,15 +237,23 @@ QStringList defaultHandler(QObject* object, QEvent* event)
     {
         case QEvent::MouseButtonRelease:
             handleMouseButtonRelease(object, resultString);
-        break;
+            break;
 
         case QEvent::ToolTip:
             handleToolTip(resultString);
-        break;
+            break;
 
         case QEvent::FocusOut:
             handleFocusOut(object, resultString);
-        break;
+            break;
+
+        case QEvent::Shortcut:
+            handleShortcut(static_cast<QShortcutEvent*>(event), resultString);
+            break;
+
+        case QEvent::KeyPress:
+            handleKeyPress(static_cast<QKeyEvent*>(event), resultString);
+            break;
 
         default:
             break;
@@ -229,19 +275,19 @@ void UserActionsLogger::registerLogHandlerForClass(const QString& metatypeClassN
 
 bool UserActionsLogger::eventFilter(QObject* obj, QEvent* event)
 {
-    QStringList resultLogString;
+    QStringList resultLogInfo;
     if (const auto& handler = m_handlers[obj->metaObject()->className()])
-        resultLogString = handler(obj, event);
+        resultLogInfo = handler(obj, event);
     else
-        resultLogString = defaultHandler(obj, event);
+        resultLogInfo = defaultHandler(obj, event);
 
-    if (!resultLogString.isEmpty())
+    if (!resultLogInfo.isEmpty())
     {
         QString windowTitle = getWindowTitle(obj);
         if (!windowTitle.isEmpty())
             windowTitle = "Window:" + windowTitle + ".";
 
-        NX_INFO(this, windowTitle + resultLogString.join(" "));
+        NX_INFO(this, windowTitle + resultLogInfo.join("."));
     }
 
     return QObject::eventFilter(obj, event);

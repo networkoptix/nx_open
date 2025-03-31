@@ -258,9 +258,9 @@ void QnMessageBox::registerLogInfoHandler()
                     return {};
 
                 log << "Show messageBox with level: "
-                    << QString::fromStdString(nx::reflect::toString(messageBox->icon()))
-                    << "Title: " << messageBox->text()
-                    << "Description: " << messageBox->informativeText();
+                        + QString::fromStdString(nx::reflect::toString(messageBox->icon()))
+                    << "Title: " + messageBox->text()
+                    << "Description: " + messageBox->informativeText();
             }
             return log;
         };

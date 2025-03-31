@@ -23,6 +23,9 @@ class UserActionsLogger: public QObject
     Q_OBJECT
 
 public:
+    /**
+     * Each item in the result QStringList should be a complete sentence.
+     */
     using LogHandler = std::function<QStringList(QObject* object, QEvent* event)>;
 
     static UserActionsLogger* instance();
