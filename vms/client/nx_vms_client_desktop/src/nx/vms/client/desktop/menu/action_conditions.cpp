@@ -1693,8 +1693,14 @@ ActionVisibility CloudServerCondition::check(const QnResourceList& resources, Wi
 }
 
 ActionVisibility ReachableServerCondition::check(
-    const Parameters& parameters, WindowContext* /*context*/)
+    const Parameters& parameters, WindowContext* context)
 {
+    if (!context->system()->accessController()->hasPowerUserPermissions()
+        && !context->system()->globalSettings()->showServersInTreeForNonAdmins())
+    {
+        return InvisibleAction;
+    }
+
     const auto server = parameters.resource().dynamicCast<QnMediaServerResource>();
     if (!server)
         return InvisibleAction;

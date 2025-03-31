@@ -1292,7 +1292,6 @@ void initialize(Manager* manager, Action* root)
     factory(SelectCurrentServerAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Connect to this Server"))
-        .requiredPowerUserPermissions()
         .condition(new ReachableServerCondition());
 
     factory()
