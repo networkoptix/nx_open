@@ -56,6 +56,12 @@ function(add_android_apk target)
         set(APK_TARGET_SDK_VERSION 34)
     endif()
 
+    if(CMAKE_HOST_WIN32)
+        set(host_executable_suffix ".exe")
+    else()
+        set(host_executable_suffix "")
+    endif()
+
     set(settings
         "{\n"
         "    \"description\": \"This file is generated and should not be modified by hand.\",\n"
@@ -76,8 +82,8 @@ function(add_android_apk target)
         "    \"stdcpp-path\": \"${CMAKE_ANDROID_NDK}/toolchains/llvm/prebuilt/${ANDROID_HOST_TAG}/sysroot/usr/lib\",\n"
         "    \"qml-root-path\": \"${APK_QML_ROOT_PATH}\",\n"
         ${qml_import_paths}
-        "    \"qml-importscanner-binary\": \"${QT_HOST_PATH}/${QT6_HOST_INFO_LIBEXECDIR}/qmlimportscanner\",\n"
-        "    \"rcc-binary\": \"${QT_HOST_PATH}/${QT6_HOST_INFO_LIBEXECDIR}/rcc\",\n"
+        "    \"qml-importscanner-binary\": \"${QT_HOST_PATH}/${QT6_HOST_INFO_LIBEXECDIR}/qmlimportscanner${host_executable_suffix}\",\n"
+        "    \"rcc-binary\": \"${QT_HOST_PATH}/${QT6_HOST_INFO_LIBEXECDIR}/rcc${host_executable_suffix}\",\n"
         "    \"application-binary\": \"${APK_TARGET}\"\n"
         "}\n"
     )

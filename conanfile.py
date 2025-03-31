@@ -7,6 +7,7 @@ from conan.tools.system.package_manager import Apt
 from conan import ConanFile
 from itertools import chain
 from pathlib import Path
+import platform
 import shutil
 import sys
 import yaml
@@ -341,7 +342,7 @@ class NxOpenConan(ConanFile):
 
     # Temporary workaround for conan issue 6470.
     def fixLibraryPermissions(self):
-        if self.isWindows:
+        if platform.system() == "Windows":
             return
 
         if self._lib_path.is_dir():
