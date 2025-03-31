@@ -4,6 +4,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_availability_watcher.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/videowall/desktop_camera_connection_controller.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -28,6 +29,10 @@ struct TwoWayAudioDesktopCameraInitializer::Private
     void initializeDesktopCameraConnection()
     {
         if (!watcher->available())
+            return;
+
+        //TODO: #dfisenko This is temporarily fix of VMS-56854. It will be removed in VMS-36266.
+        if (watcher->camera()->hasFlags(Qn::cross_system))
             return;
 
         auto desktopCameraConnectionController =
