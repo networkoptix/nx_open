@@ -168,7 +168,7 @@ public:
     {
         SCOPED_TRACE(fieldMetatype<F>().toStdString());
 
-        EXPECT_TRUE(Plugin::registerActionField<F>(m_engine, args...));
+        EXPECT_TRUE(Plugin::registerActionFieldWithEngine<F>(m_engine, args...));
 
         const auto& meta = F::staticMetaObject;
 

@@ -29,7 +29,7 @@ public:
 
 public:
     template <class F>
-    static bool registerActionField(Engine* engine, auto... args)
+    static bool registerActionFieldWithEngine(Engine* engine, auto... args)
     {
         const QString id = fieldMetatype<F>();
         if (!NX_ASSERT(!id.isEmpty(), "Class does not have required 'metatype' property"))
@@ -65,7 +65,7 @@ protected:
     template<class F>
     bool registerActionField(auto... args) const
     {
-        return registerActionField<F>(m_engine, args...);
+        return registerActionFieldWithEngine<F>(m_engine, args...);
     }
 
     template<class F>
