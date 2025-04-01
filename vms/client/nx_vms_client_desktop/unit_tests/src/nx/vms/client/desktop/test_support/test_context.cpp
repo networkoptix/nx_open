@@ -55,8 +55,8 @@ void SystemContextBasedTest::initAppContext(ApplicationContext::Features feature
 {
     sAppContext = std::make_unique<ApplicationContext>(
         ApplicationContext::Mode::unitTests,
-        QnStartupParameters(),
-        features);
+        features,
+        QnStartupParameters());
 }
 
 void SystemContextBasedTest::deinitAppContext()

@@ -662,17 +662,17 @@ using CoreFeatureFlag = core::ApplicationContext::FeatureFlag;
 
 ApplicationContext::ApplicationContext(
     Mode mode,
-    const QnStartupParameters& startupParameters,
     Features features,
+    const QnStartupParameters& startupParameters,
     QObject* parent)
     :
     core::ApplicationContext(
         toCoreMode(mode),
         appSerializationFormat(),
         peerType(startupParameters),
+        features.core,
         actualCloudHost(),
         /*customExternalResourceFile*/ "client_external.dat",
-        features.core,
         parent),
     d(new Private{
         .q = this,

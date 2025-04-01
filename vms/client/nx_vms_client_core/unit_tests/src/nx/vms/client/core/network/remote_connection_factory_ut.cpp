@@ -313,17 +313,9 @@ public:
     }
 
 public:
-    using CommonContext = common::ApplicationContext;
     // RemoteConnectionFactory uses application secure settings for connection cache.
-    ApplicationContext appContext{
-        ApplicationContext::Mode::unitTests,
-        Qn::SerializationFormat::ubjson,
-        nx::vms::api::PeerType::notDefined,
-        /*customCloudHost*/ QString(),
-        /*customExternalResourceFile*/ QString(),
-        ApplicationContext::Features(
-            CommonContext::Features(CommonContext::FeatureFlag::networking),
-            ApplicationContext::FeatureFlag::none)};
+    ApplicationContext appContext{ApplicationContext::Mode::unitTests,
+        Qn::SerializationFormat::ubjson};
 
     std::unique_ptr<SystemContext> systemContext;
 

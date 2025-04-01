@@ -4,7 +4,7 @@
 
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_item_index.h>

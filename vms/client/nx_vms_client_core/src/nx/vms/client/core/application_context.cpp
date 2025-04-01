@@ -201,15 +201,15 @@ ApplicationContext::ApplicationContext(
     Mode mode,
     Qn::SerializationFormat serializationFormat,
     PeerType peerType,
+    Features features,
     const QString& customCloudHost,
     const QString& customExternalResourceFile,
-    Features features,
     QObject* parent)
     :
     common::ApplicationContext(
         peerType,
-        customCloudHost,
         features.base,
+        customCloudHost,
         parent),
     d(new Private{
         .q = this,

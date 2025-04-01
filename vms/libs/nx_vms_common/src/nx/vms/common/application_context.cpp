@@ -81,8 +81,8 @@ struct ApplicationContext::Private
 
 ApplicationContext::ApplicationContext(
     PeerType localPeerType,
-    const QString& customCloudHost,
     Features features,
+    const QString& customCloudHost,
     QObject* parent)
     :
     QObject(parent),

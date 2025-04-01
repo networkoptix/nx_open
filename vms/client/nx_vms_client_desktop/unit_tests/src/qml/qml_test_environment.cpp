@@ -30,8 +30,8 @@ QmlTestEnvironment::QmlTestEnvironment(QObject* parent):
     QObject(parent),
     m_appContext(new ApplicationContext(
         ApplicationContext::Mode::unitTests,
-        /*startupParameters*/ QnStartupParameters{},
-        kFeatures))
+        kFeatures,
+        QnStartupParameters()))
 {
     engine()->setBaseUrl(QUrl(kQmlRoot));
     engine()->addImportPath(kQmlRoot);

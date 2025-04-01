@@ -110,8 +110,8 @@ public:
 
     ApplicationContext(
         Mode mode,
+        Features features,
         const QnStartupParameters& startupParameters,
-        Features features = Features::all(),
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
 

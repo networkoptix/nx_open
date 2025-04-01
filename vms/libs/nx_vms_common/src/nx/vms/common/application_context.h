@@ -59,9 +59,10 @@ public:
 
     ApplicationContext(
         PeerType localPeerType = PeerType::notDefined,
+        Features features = Features::none(),
         const QString& customCloudHost = QString{},
-        Features features = Features::all(),
         QObject* parent = nullptr);
+
     virtual ~ApplicationContext() override;
 
     const Features& commonFeatures() const;

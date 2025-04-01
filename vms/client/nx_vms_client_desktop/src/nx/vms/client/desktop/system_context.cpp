@@ -12,13 +12,14 @@
 #include <nx/branding.h>
 #include <nx/vms/client/core/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/access/cloud_cross_system_access_controller.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/resource/local_resources_initializer.h>
@@ -31,6 +32,7 @@
 #include <nx/vms/client/desktop/system_administration/watchers/traffic_relay_url_watcher.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
+#include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
 #include <nx/vms/client/desktop/system_logon/logic/delayed_data_loader.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
@@ -41,6 +43,7 @@
 #include <nx/vms/client/desktop/utils/user_notification_settings_manager.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_manager.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <storage/server_storage_manager.h>
 
 #include "application_context.h"
@@ -65,6 +68,19 @@ nx::vms::api::RuntimeData createLocalRuntimeInfo(SystemContext* q)
     runtimeData.customization = ini().developerMode ? QString() : nx::branding::customization();
     runtimeData.videoWallInstanceGuid = appContext()->videoWallInstanceId();
     return runtimeData;
+}
+
+void initializeConnectionUserInteractionDelegate(SystemContext* q)
+{
+    if (auto networkModule = q->networkModule())
+    {
+        networkModule->connectionFactory()->setUserInteractionDelegate(
+            createConnectionUserInteractionDelegate(q,
+                []()
+                {
+                    return appContext()->mainWindowContext()->mainWindowWidget();
+                }));
+    }
 }
 
 } // namespace
@@ -125,14 +141,14 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->serverRemoteAccessWatcher = std::make_unique<ServerRemoteAccessWatcher>(this);
             d->userNotificationSettingsManager =
                 std::make_unique<UserNotificationSettingsManager>(this);
-            d->initializeNetworkModules();
+            initializeConnectionUserInteractionDelegate(this);
             break;
 
         case Mode::crossSystem:
             d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
             d->mediaServerStatisticsManager = std::make_unique<QnMediaServerStatisticsManager>(
                 this);
-            d->initializeNetworkModules();
+            initializeConnectionUserInteractionDelegate(this);
             break;
 
         case Mode::cloudLayouts:

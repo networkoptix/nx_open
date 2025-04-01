@@ -93,9 +93,9 @@ public:
         Mode mode,
         Qn::SerializationFormat serializationFormat,
         PeerType peerType = PeerType::notDefined,
+        Features features = Features::none(),
         const QString& customCloudHost = {},
         const QString& customExternalResourceFile = {},
-        Features features = Features::all(),
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
 

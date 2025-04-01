@@ -40,9 +40,9 @@ ApplicationContext::ApplicationContext(QObject* parent):
     base_type(Mode::mobileClient,
         Qn::SerializationFormat::json,
         nx::vms::api::PeerType::mobileClient,
+        makeFeatures(),
         qnSettings->customCloudHost(),
         /*customExternalResourceFile*/ {},
-        makeFeatures(),
         parent),
     d(new Private{})
 {

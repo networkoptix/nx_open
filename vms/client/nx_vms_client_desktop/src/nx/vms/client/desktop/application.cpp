@@ -353,7 +353,14 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
         ? ApplicationContext::Mode::selfUpdate
         : ApplicationContext::Mode::desktopClient;
 
-    auto applicationContext = std::make_unique<ApplicationContext>(applicationMode, startupParams);
+    ApplicationContext::Features features = startupParams.selfUpdateMode
+        ? ApplicationContext::Features::none()
+        : ApplicationContext::Features::all();
+
+    auto applicationContext = std::make_unique<ApplicationContext>(
+        applicationMode,
+        features,
+        startupParams);
 
     /* Running updater after QApplication and logging are initialized. */
     if (qnRuntime->isDesktopMode() && !startupParams.exportedMode)
