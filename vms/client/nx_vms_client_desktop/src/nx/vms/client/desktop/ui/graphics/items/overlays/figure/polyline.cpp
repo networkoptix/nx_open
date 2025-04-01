@@ -49,12 +49,12 @@ QRectF Polyline::visualRect(const QSizeF& scale) const
     if (result.width() < kMinSideSize)
     {
         result.moveLeft(-kMinSideSize / 2);
-        result.setWidth(kMinSideSize);
+        result.setWidth(result.width() + kMinSideSize);
     }
     if (result.height() < kMinSideSize)
     {
         result.moveTop(-kMinSideSize / 2);
-        result.setHeight(kMinSideSize);
+        result.setHeight(result.height() + kMinSideSize);
     }
 
     return result;
