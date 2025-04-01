@@ -98,6 +98,9 @@ public:
     static QString negativeDuration();
     static QString invalidDuration(
         std::chrono::microseconds value, std::chrono::seconds min, std::chrono::seconds max);
+    static QString selectIntegrationAction();
+    static QString integrationNotFoundForIntegrationAction(const QString& integrationAction);
+    static QString complexJsonValueType(const QString& key);
 
     /** "Name" or "Name: value". */
     static QString nameAndValue(const QString& name, const QString& value);

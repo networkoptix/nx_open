@@ -30,6 +30,8 @@ struct PropertyDescriptor
 };
 
 const auto kUuidExample = QStringLiteral("89abcdef-0123-4567-89ab-cdef01234567");
+const auto kJsonObjectExample = QStringLiteral(
+    "{\"key1\": \"string_value\", \"key2\": 123, \"key3\": true, \"key4\": null}");
 
 /**
  * Changes the input string to start with a capital letter and removes the last letter 's' if present.
@@ -73,6 +75,7 @@ PropertyDescriptor mapMetaTypeToJsonTypeAndExample(const QMetaType& metaType)
             {.type = "string",
                 .example = kUuidExample,
                 .format = "uuid"}},
+        {QMetaType::QJsonObject, {.type = "string", .example = kJsonObjectExample}},
     };
 
     auto it = metaTypeToDescriptor.find(metaType.id());

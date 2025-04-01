@@ -87,7 +87,7 @@ struct TextWithFieldsPicker::Private: public QObject
             cursor.setPosition(val.start);
             cursor.setPosition(val.start + val.length, QTextCursor::KeepAnchor);
 
-            if (val.type == vms::rules::utils::TextTokenType::Substitution)
+            if (val.type == vms::rules::utils::TextTokenType::substitution)
             {
                 // TODO: #vbutkevich Move value validation to TextWithFieldsValidator once it
                 // supports collection of all attributes.

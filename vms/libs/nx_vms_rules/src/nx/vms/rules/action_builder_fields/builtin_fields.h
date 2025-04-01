@@ -13,6 +13,8 @@
 #include "http_headers_field.h"
 #include "http_method_field.h"
 #include "int_field.h"
+#include "integration_action_field.h"
+#include "integration_action_parameters_field.h"
 #include "optional_time_field.h"
 #include "output_port_field.h"
 #include "password_field.h"

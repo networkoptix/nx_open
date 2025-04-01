@@ -137,4 +137,11 @@ NX_VMS_COMMON_API std::set<QString> supportedObjectTypeIdsFromManifest(
 NX_VMS_COMMON_API std::set<QString> supportedEventTypeIdsFromManifest(
     const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
+NX_VMS_COMMON_API nx::vms::common::AnalyticsEngineResourcePtr findEngineByIntegrationActionId(
+    const QString& integrationAction, const QnResourcePool* resourcePool);
+
+NX_VMS_COMMON_API std::optional<QJsonObject> findSettingsModelByIntegrationActionId(
+    const QString& integrationAction,
+    const nx::vms::common::AnalyticsEngineResourceList& engines);
+
 } // namespace nx::analytics

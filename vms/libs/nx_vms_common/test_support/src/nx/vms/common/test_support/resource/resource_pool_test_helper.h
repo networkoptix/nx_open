@@ -95,5 +95,8 @@ public:
     void addOrUpdateUserGroup(const nx::vms::api::UserGroupData& group);
     void removeUserGroup(const nx::Uuid& groupId);
 
+    nx::vms::common::AnalyticsPluginResourcePtr addAnalyticsIntegration(
+        const nx::vms::api::analytics::EngineManifest& manifest = {});
+
     void clear();
 };

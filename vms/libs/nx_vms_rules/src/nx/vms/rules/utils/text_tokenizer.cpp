@@ -2,10 +2,7 @@
 
 #include "text_tokenizer.h"
 
-namespace nx::vms::rules::utils::TextTokenizer
-{
-
-using namespace nx::vms::rules::utils;
+namespace nx::vms::rules::utils {
 
 TextTokenList tokenizeText(QString text)
 {
@@ -21,7 +18,7 @@ TextTokenList tokenizeText(QString text)
             if (start != cur)
             {
                 result += {
-                    .type = TextTokenType::Text,
+                    .type = TextTokenType::text,
                     .value = text.mid(start, cur - start),
                     .start = start,
                     .length = cur - start,
@@ -36,7 +33,7 @@ TextTokenList tokenizeText(QString text)
             if (start + 1 != cur)
             {
                 TextToken desc = {
-                    .type = TextTokenType::Substitution,
+                    .type = TextTokenType::substitution,
                     .value = text.mid(start + 1, cur - start - 1),
                     .start = start};
                 desc.length = desc.value.size() + 2;
@@ -46,7 +43,7 @@ TextTokenList tokenizeText(QString text)
             {
                 // Empty brackets.
                 result += {
-                    .type = TextTokenType::Text,
+                    .type = TextTokenType::text,
                     .value = "{}",
                     .start = start,
                 };
@@ -60,7 +57,7 @@ TextTokenList tokenizeText(QString text)
 
     if (start < text.size())
     {
-        result += {.type = TextTokenType::Text,
+        result += {.type = TextTokenType::text,
             .value = text.mid(start),
             .start = start,
             .length = text.size() - start};
@@ -75,9 +72,9 @@ QString composeTextFromTokenList(
     const AggregatedEventPtr& eventAggregator)
 {
     QString result;
-    for (const TextToken token: tokens)
+    for (const auto& token: tokens)
     {
-        if (token.type == TextTokenType::Substitution)
+        if (token.type == TextTokenType::substitution)
         {
             result += EventParameterHelper::instance()->evaluateEventParameter(
                 systemContext, eventAggregator, token.value);
@@ -90,4 +87,4 @@ QString composeTextFromTokenList(
     return result;
 }
 
-} // namespace nx::vms::rules::utils::TextTokenizer
+} // namespace nx::vms::rules::utils

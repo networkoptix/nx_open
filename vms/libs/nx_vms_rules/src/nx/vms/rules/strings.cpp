@@ -424,6 +424,21 @@ QString Strings::source(const QString& value)
     return nameAndValue(tr("Source"), value);
 }
 
+QString Strings::selectIntegrationAction()
+{
+    return tr("Select Integration Action");
+}
+
+QString Strings::integrationNotFoundForIntegrationAction(const QString& integrationAction)
+{
+    return tr("Integration not found for Integration Action %1").arg(integrationAction);
+}
+
+QString Strings::complexJsonValueType(const QString& key)
+{
+    return tr("Unsupported JSON value type in key %1").arg(key);
+}
+
 TranslatableString Strings::at()
 {
     return NX_DYNAMIC_TRANSLATABLE(tr("At"));

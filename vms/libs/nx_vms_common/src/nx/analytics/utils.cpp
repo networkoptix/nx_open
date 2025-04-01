@@ -5,6 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 namespace nx::analytics {
 
@@ -54,6 +55,39 @@ bool serverHasActiveObjectEngines(const QnMediaServerResourcePtr& server)
     auto cameras = server->resourcePool()->getAllCameras(server);
     return std::any_of(cameras.cbegin(), cameras.cend(),
         [](const auto& camera) { return !camera->supportedObjectTypes().empty(); });
+}
+
+nx::vms::common::AnalyticsEngineResourcePtr findEngineByIntegrationActionId(
+    const QString& integrationAction, const QnResourcePool* resourcePool)
+{
+    const auto engines = resourcePool->getResources<nx::vms::common::AnalyticsEngineResource>();
+    auto it = std::find_if(engines.begin(), engines.end(),
+        [&integrationAction](const auto& e)
+        {
+            auto manifest = e->manifest();
+            return std::any_of(manifest.objectActions.begin(), manifest.objectActions.end(),
+                [&integrationAction](const auto& oa) { return oa.id == integrationAction; });
+        });
+
+    return it != engines.end()
+        ? *it
+        : QnSharedResourcePointer<nx::vms::common::AnalyticsEngineResource>();
+}
+
+std::optional<QJsonObject> findSettingsModelByIntegrationActionId(
+    const QString& integrationAction,
+    const nx::vms::common::AnalyticsEngineResourceList& engines)
+{
+    for (const auto& engine : engines)
+    {
+        const auto manifest = engine->manifest();
+        for (const auto& objectAction : manifest.objectActions)
+        {
+            if (objectAction.id == integrationAction)
+                return objectAction.parametersModel;
+        }
+    }
+    return std::nullopt;
 }
 
 } // namespace nx::analytics

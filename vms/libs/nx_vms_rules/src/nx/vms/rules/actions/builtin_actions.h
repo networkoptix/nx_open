@@ -10,6 +10,7 @@
 #include "enter_fullscreen_action.h"
 #include "exit_fullscreen_action.h"
 #include "http_action.h"
+#include "integration_action.h"
 #include "open_layout_action.h"
 #include "panic_recording_action.h"
 #include "play_sound_action.h"

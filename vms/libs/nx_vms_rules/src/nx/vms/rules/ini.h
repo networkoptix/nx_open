@@ -18,6 +18,9 @@ struct NX_VMS_RULES_API Ini: public nx::kit::IniConfig
 
     NX_INI_INT(5, analyticsEventInactivityS,
         "Timeout in seconds for analytics events to auto generate Stop event.");
+
+    NX_INI_FLAG(false, integrationActions, "Enable Integration Actions.");
+
 };
 
 NX_VMS_RULES_API Ini& ini();

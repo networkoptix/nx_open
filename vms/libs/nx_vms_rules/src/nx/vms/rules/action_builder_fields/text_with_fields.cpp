@@ -26,8 +26,7 @@ TextWithFields::~TextWithFields()
 
 QVariant TextWithFields::build(const AggregatedEventPtr& eventAggregator) const
 {
-    return utils::TextTokenizer::composeTextFromTokenList(
-        m_tokenizedText, systemContext(), eventAggregator);
+    return utils::composeTextFromTokenList(m_tokenizedText, systemContext(), eventAggregator);
 }
 
 QString TextWithFields::text() const
@@ -37,7 +36,7 @@ QString TextWithFields::text() const
 
 void TextWithFields::parseText()
 {
-    m_tokenizedText = utils::TextTokenizer::tokenizeText(m_rawText);
+    m_tokenizedText = utils::tokenizeText(m_rawText);
 }
 
 void TextWithFields::setText(const QString& text)

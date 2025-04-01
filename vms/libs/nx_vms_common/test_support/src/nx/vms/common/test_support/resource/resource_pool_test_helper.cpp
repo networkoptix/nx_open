@@ -11,6 +11,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/user_group_data.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/storage_resource_stub.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
@@ -309,4 +311,25 @@ void QnResourcePoolTestHelper::clear()
     auto groups = systemContext()->userGroupManager()->ids(UserGroupManager::Selection::custom);
     for (auto groupId: groups)
         systemContext()->userGroupManager()->remove(groupId);
+}
+
+nx::vms::common::AnalyticsPluginResourcePtr QnResourcePoolTestHelper::addAnalyticsIntegration(
+    const nx::vms::api::analytics::EngineManifest& manifest)
+{
+    using namespace nx::vms::common;
+
+    AnalyticsPluginResourcePtr integration(new AnalyticsPluginResource());
+    integration->setIdUnsafe(nx::Uuid::createUuid());
+    integration->setTypeId(nx::vms::api::AnalyticsPluginData::kResourceTypeId);
+    resourcePool()->addResource(integration);
+
+    auto engine = AnalyticsEngineResourcePtr(new AnalyticsEngineResource());
+    engine->setIdUnsafe(nx::Uuid::createUuid());
+    engine->setTypeId(nx::vms::api::AnalyticsEngineData::kResourceTypeId);
+    engine->setParentId(integration->getId());
+    resourcePool()->addResource(engine);
+
+    engine->setManifest(manifest);
+
+    return integration;
 }
