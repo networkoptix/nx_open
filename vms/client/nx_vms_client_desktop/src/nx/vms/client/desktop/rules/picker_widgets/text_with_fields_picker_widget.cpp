@@ -67,7 +67,7 @@ struct TextWithFieldsPicker::Private: public QObject
         return charFormat;
     }
 
-    void addFormattingToText(const vms::rules::TextWithFields::ParsedValues& parsedValues)
+    void addFormattingToText(const vms::rules::utils::TextTokenList& parsedValues)
     {
         if (q->m_textEdit->toPlainText().isEmpty())
             return;
@@ -87,7 +87,7 @@ struct TextWithFieldsPicker::Private: public QObject
             cursor.setPosition(val.start);
             cursor.setPosition(val.start + val.length, QTextCursor::KeepAnchor);
 
-            if (val.type == vms::rules::TextWithFields::FieldType::Substitution)
+            if (val.type == vms::rules::utils::TextTokenType::Substitution)
             {
                 // TODO: #vbutkevich Move value validation to TextWithFieldsValidator once it
                 // supports collection of all attributes.
@@ -222,7 +222,7 @@ void TextWithFieldsPicker::updateUi()
 void TextWithFieldsPicker::setValidity(const vms::rules::ValidationResult& validationResult)
 {
     if (!NX_ASSERT(validationResult.additionalData
-        .canConvert<vms::rules::TextWithFields::ParsedValues>(), "Invalid input data"))
+        .canConvert<vms::rules::utils::TextTokenList>(), "Invalid input data"))
     {
         return;
     }
@@ -230,7 +230,7 @@ void TextWithFieldsPicker::setValidity(const vms::rules::ValidationResult& valid
     if (d->highlightErrors)
     {
         d->addFormattingToText(
-            validationResult.additionalData.value<vms::rules::TextWithFields::ParsedValues>());
+            validationResult.additionalData.value<vms::rules::utils::TextTokenList>());
     }
 
     if (validationResult.isValid())

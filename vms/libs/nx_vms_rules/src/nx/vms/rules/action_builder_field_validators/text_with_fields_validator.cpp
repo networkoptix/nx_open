@@ -38,7 +38,7 @@ ValidationResult TextWithFieldsValidator::validity(
         size_t offset{};
         for (const auto& valueDescriptor: parsedValues)
         {
-            if (valueDescriptor.type != TextWithFields::FieldType::Substitution)
+            if (valueDescriptor.type != utils::TextTokenType::Substitution)
                 continue;
 
             static const QString kPlaceholder{"_"};

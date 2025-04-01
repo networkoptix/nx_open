@@ -11,79 +11,12 @@
 
 namespace nx::vms::rules {
 
-struct TextWithFields::Private
-{
-    QString text;
-    QList<ValueDescriptor> values;
-
-    void parseText()
-    {
-        values.clear();
-
-        bool inSub = false;
-        int start = 0, cur = 0;
-
-        while (cur != text.size())
-        {
-            if (utils::EventParameterHelper::isStartOfEventParameter(text[cur]))
-            {
-                if (start != cur)
-                {
-                    values += {
-                        .type = FieldType::Text,
-                        .value = text.mid(start, cur - start),
-                        .start = start,
-                        .length = cur - start,
-                    };
-                }
-                start = cur;
-                inSub = true;
-            }
-
-            if (utils::EventParameterHelper::isEndOfEventParameter(text[cur]) && inSub)
-            {
-                if (start + 1 != cur)
-                {
-                    ValueDescriptor desc = {.type = FieldType::Substitution,
-                        .value = text.mid(start + 1, cur - start - 1),
-                        .start = start};
-                    desc.length = desc.value.size() + 2;
-                    values += desc;
-                }
-                else
-                {
-                    // Empty brackets.
-                    values += {
-                        .type = FieldType::Text,
-                        .value = "{}",
-                        .start = start,
-                    };
-
-                }
-                start = cur + 1;
-                inSub = false;
-            }
-
-            ++cur;
-        }
-
-        if (start < text.size())
-        {
-            values += {.type = FieldType::Text,
-                .value = text.mid(start),
-                .start = start,
-                .length = text.size() - start};
-        }
-    }
-};
-
 TextWithFields::TextWithFields(
     common::SystemContext* context,
     const FieldDescriptor* descriptor)
     :
     ActionBuilderField{descriptor},
-    common::SystemContextAware(context),
-    d(new Private())
+    common::SystemContextAware(context)
 {
 }
 
@@ -93,41 +26,27 @@ TextWithFields::~TextWithFields()
 
 QVariant TextWithFields::build(const AggregatedEventPtr& eventAggregator) const
 {
-    QString result;
-    for (const auto& value: d->values)
-    {
-        if (value.type == FieldType::Substitution)
-        {
-            result += utils::EventParameterHelper::instance()->evaluateEventParameter(
-                systemContext(), eventAggregator, value.value);
-        }
-        else
-        {
-            // It's just a text, add it to the result.
-            result += value.value;
-        }
-    }
-
-    return result;
+    return utils::TextTokenizer::composeTextFromTokenList(
+        m_tokenizedText, systemContext(), eventAggregator);
 }
 
 QString TextWithFields::text() const
 {
-    return d->text;
+    return m_rawText;
 }
 
 void TextWithFields::parseText()
 {
-    d->parseText();
+    m_tokenizedText = utils::TextTokenizer::tokenizeText(m_rawText);
 }
 
 void TextWithFields::setText(const QString& text)
 {
-    if (d->text == text)
+    if (m_rawText == text)
         return;
 
-    d->text = text;
-    d->parseText();
+    m_rawText = text;
+    parseText();
     emit textChanged();
 }
 
@@ -136,15 +55,15 @@ TextWithFieldsFieldProperties TextWithFields::properties() const
     return TextWithFieldsFieldProperties::fromVariantMap(descriptor()->properties);
 }
 
-const TextWithFields::ParsedValues& TextWithFields::parsedValues() const
+const utils::TextTokenList& TextWithFields::parsedValues() const
 {
-    return d->values;
+    return m_tokenizedText;
 }
 
 QJsonObject TextWithFields::openApiDescriptor(const QVariantMap& properties)
 {
     auto descriptor =
-        utils::getPropertyOpenApiDescriptor(QMetaType::fromType<decltype(d->text)>());
+        utils::getPropertyOpenApiDescriptor(QMetaType::fromType<decltype(m_rawText)>());
     const bool isUrl = properties["validationPolicy"] == kUrlValidationPolicy;
     descriptor[utils::kExampleProperty] = isUrl
         ? "http://exampleServer/rest/v4/login/users/{user.name}"

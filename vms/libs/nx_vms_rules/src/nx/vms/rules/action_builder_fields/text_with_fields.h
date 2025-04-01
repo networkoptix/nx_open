@@ -4,6 +4,7 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/common/system_context_aware.h>
+#include <nx/vms/rules/utils/text_tokenizer.h>
 
 #include "../action_builder_field.h"
 
@@ -69,30 +70,13 @@ public:
 
     void parseText();
 
-    enum class FieldType
-    {
-        Text,
-        Substitution
-    };
-
-    struct ValueDescriptor
-    {
-        FieldType type = FieldType::Text;
-        QString value;
-        bool isValid = true;
-        qsizetype start = 0;
-        qsizetype length = 0;
-    };
-
-    using ParsedValues = QList<ValueDescriptor>;
-
-    const ParsedValues& parsedValues() const;
+    const utils::TextTokenList& parsedValues() const;
 signals:
     void textChanged();
 
 private:
-    struct Private;
-    nx::utils::ImplPtr<Private> d;
+    QString m_rawText;
+    utils::TextTokenList m_tokenizedText;
 };
 
 } // namespace nx::vms::rules
