@@ -2,13 +2,14 @@
 
 #include "decorations_helper.h"
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
 #include <QtGui/QPolygonF>
 #include <QtGui/QTransform>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/core/utils/geometry.h>
 
 #include "polygon.h"
@@ -660,10 +661,13 @@ std::optional<LabelPosition> getLabelPosition(
         dynamic_cast<nx::vms::client::desktop::figure::ClosedShapeFigure*>(figure.get());
 
     Lines visibleEdges = cullInvisibleEdgeParts(edges, sceneRect);
-    std::sort(visibleEdges.begin(), visibleEdges.end(),
+    std::stable_sort(visibleEdges.begin(), visibleEdges.end(),
         [](const QLineF& lhs, const QLineF& rhs)
         {
-            return lhs.length() > rhs.length(); // Descending order.
+            const auto lhsLength = lhs.length();
+            const auto rhsLength = rhs.length();
+            return !qFuzzyEquals(lhsLength, rhsLength)
+                && lhs.length() > rhs.length(); //< Descending order.
         });
 
     // Try to place label along the longest edges.
