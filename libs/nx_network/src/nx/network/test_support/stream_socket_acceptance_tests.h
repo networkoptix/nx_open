@@ -632,7 +632,7 @@ protected:
 
     void whenServerReadsBytesWithFlags(std::size_t bytesExpected, int recvFlags)
     {
-        std::basic_string<uint8_t> readBuf(bytesExpected, 'x');
+        std::vector<uint8_t> readBuf(bytesExpected, 'x');
 
         std::size_t totalBytesReceived = 0;
         while (totalBytesReceived < bytesExpected)

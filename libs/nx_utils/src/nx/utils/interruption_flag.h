@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <string>
 #include <thread>
+
+#include <boost/container/small_vector.hpp>
 
 namespace nx::utils {
 
@@ -77,10 +78,10 @@ public:
     };
 
 private:
-    // Using basic_string but not vector because the number of elements in this array is
-    // very low (e.g., one) at most times. And basic_string stores the first 15 elements
-    // on stack, without allocating memory on heap.
-    std::basic_string<bool*> m_watcherStates;
+    // The number of elements in this array is very low (e.g., one) at most times.
+    // Using 15 elements on all platforms - previously the MSVC implementation of std::basic_string
+    // was used and it's in-place storage was 15 elements.
+    boost::container::small_vector<bool*, 15> m_watcherStates;
     std::thread::id m_lastWatchingThreadId;
 
     void pushWatcherState(bool* watcherState);

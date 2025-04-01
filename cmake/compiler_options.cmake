@@ -65,6 +65,7 @@ add_definitions(
     -D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
     -DQT_NO_EXCEPTIONS
     -DRAPIDJSON_HAS_STDSTRING
+    -DBOOST_NO_CXX98_FUNCTION_BASE
 )
 
 # These definitions are specific for Windows headers.
