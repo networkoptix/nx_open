@@ -86,10 +86,10 @@ public:
     template<class T> void sendTransaction(const ec2::QnTransaction<T>& tran);
 
     template<class T>
-    void sendTransaction(const ec2::QnTransaction<T>& tran, const TransportHeader& header);
+    void proxyTransaction(const ec2::QnTransaction<T>& tran, const TransportHeader& header);
 
     template<class T>
-    bool sendTransaction(const ec2::QnTransaction<T>& tran, const vms::api::PeerSet& dstPeers);
+    bool sendUnicastTransaction(const QnTransaction<T>& tran, const vms::api::PeerSet& dstPeers);
 
     bool isSubscribedTo(const vms::api::PersistentIdData& peer) const;
     qint32 distanceTo(const vms::api::PersistentIdData& peer) const;
@@ -115,9 +115,6 @@ protected:
         TransportHeader transportHeader);
 
     template<class T>
-    bool sendUnicastTransaction(const QnTransaction<T>& tran, const vms::api::PeerSet& dstPeers);
-
-    template<class T>
     bool sendUnicastTransactionImpl(
         const QnTransaction<T>& tran,
         const QMap<P2pConnectionPtr, TransportHeader>& dstByConnection);
@@ -140,7 +137,6 @@ protected:
     virtual bool handlePushTransactionData(
         const P2pConnectionPtr& connection,
         const QByteArray& data,
-        const TransportHeader& header,
         nx::Locker<nx::Mutex>* lock);
     virtual bool handlePushImpersistentBroadcastTransaction(
         const P2pConnectionPtr& connection,

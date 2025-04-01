@@ -17,11 +17,11 @@ NX_REFLECTION_ENUM_CLASS(MessageType,
     resolvePeerNumberRequest,
     resolvePeerNumberResponse,
     alivePeers,
-    subscribeForDataUpdates, //< Subscribe for specified ID numbers
-    pushTransactionData, //< transaction data
-    pushTransactionList, //< for UbJson format only. transaction list
-    pushImpersistentBroadcastTransaction, //< transportHeader + transaction data
-    pushImpersistentUnicastTransaction, //< transportHeader + transaction data
+    subscribeForDataUpdates, //< Subscribe for specified ID numbers.
+    pushTransactionData, //< Just transaction data.
+    pushTransactionList, //< Transaction list for ubjson, for json is empty only.
+    pushImpersistentBroadcastTransaction, //< TransportHeader + transaction data.
+    pushImpersistentUnicastTransaction, //< TransportHeader + transaction data.
 
     /**
      * Subscribe for all data updates. This request contains current peer state.

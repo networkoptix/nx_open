@@ -4,8 +4,8 @@
 
 #include <chrono>
 
-#include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QObject>
 
 #include <core/resource/shared_resource_pointer.h>
 #include <nx/network/deprecated/asynchttpclient.h>
@@ -308,7 +308,6 @@ private:
     int64_t m_extraBufferSize = 0;
     size_t m_maxBufferSize = 0;
     nx::network::aio::Timer m_pongTimer;
-    const bool m_isClient;
     std::unique_ptr<TransactionFilter> m_filter;
 
     // For tests.

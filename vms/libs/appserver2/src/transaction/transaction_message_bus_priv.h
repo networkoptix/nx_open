@@ -1,5 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <nx/fusion/serialization/json_functions.h>
 #include <nx/p2p/p2p_connection_base.h>
 #include <nx/p2p/p2p_serialization.h>
 #include <nx_ec/data/api_fwd.h>
@@ -103,12 +104,13 @@ bool handleTransaction2(
 
 #undef HANDLE_TRANSACTION_PARAMS_APPLY
 
-template<class Function>
+template<typename Function>
 bool handleTransaction(
     AbstractTransactionMessageBus* bus,
     Qn::SerializationFormat tranFormat,
-    const QByteArray &serializedTransaction,
-    const Function &function,
+    const QByteArray& serializedTransaction,
+    const QJsonValue& json,
+    const Function& function,
     FastFunctionType fastFunction)
 {
     if (tranFormat == Qn::SerializationFormat::ubjson)
@@ -122,35 +124,20 @@ bool handleTransaction(
         }
 
         return handleTransaction2(
-            bus,
-            transaction,
-            &stream,
-            serializedTransaction,
-            function,
-            fastFunction);
+            bus, transaction, &stream, serializedTransaction, function, fastFunction);
     }
-    else if (tranFormat == Qn::SerializationFormat::json)
+
+    if (tranFormat == Qn::SerializationFormat::json)
     {
         QnAbstractTransaction transaction;
-        QJsonObject tranObject;
-        //TODO #akolesnikov take tranObject from cache
-        if (!QJson::deserialize(serializedTransaction, &tranObject))
-            return false;
-        if (!QJson::deserialize(tranObject["tran"], &transaction))
+        if (!QJson::deserialize(json, &transaction))
             return false;
 
         return handleTransaction2(
-            bus,
-            transaction,
-            tranObject["tran"].toObject(),
-            serializedTransaction,
-            function,
-            fastFunction);
+            bus, transaction, json.toObject(), serializedTransaction, function, fastFunction);
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 template<typename MessageBus, typename Function>
@@ -163,10 +150,18 @@ bool handleTransactionWithHeader(
 {
     int headerSize = 0;
     nx::p2p::TransportHeader header;
+    QJsonObject json;
     if (connection->remotePeer().dataFormat == Qn::SerializationFormat::ubjson)
+    {
         header = nx::p2p::deserializeTransportHeader(data, &headerSize);
+    }
     else
-        header.dstPeers.push_back(bus->localPeer().id);
+    {
+        if (!QJson::deserialize(data, &json))
+            return false;
+
+        QJson::deserialize(json["header"], &header);
+    }
 
     using namespace std::placeholders;
 
@@ -174,6 +169,7 @@ bool handleTransactionWithHeader(
         bus,
         connection->remotePeer().dataFormat,
         data.mid(headerSize),
+        json["tran"],
         std::bind(function, bus, _1, connection, header, lock),
         [](Qn::SerializationFormat, const QnAbstractTransaction&, const QByteArray&) { return false; });
 

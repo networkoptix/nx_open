@@ -76,25 +76,32 @@ namespace ec2 {
 
     public:
         template<class T>
-        void sendTransaction(const QnTransaction<T>& tran, nx::p2p::TransportHeader header = {})
+        void sendTransaction(const QnTransaction<T>& tran)
         {
             if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>(); NX_CRITICAL(p2pBus))
-                p2pBus->sendTransaction(tran, std::move(header));
+                p2pBus->sendTransaction(tran);
         }
 
         template<class T>
-        bool sendTransaction(const QnTransaction<T>& tran, const nx::vms::api::PeerSet& dstPeers)
+        void proxyTransaction(const QnTransaction<T>& tran, nx::p2p::TransportHeader header)
+        {
+            if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>(); NX_CRITICAL(p2pBus))
+                p2pBus->proxyTransaction(tran, std::move(header));
+        }
+
+        template<class T>
+        bool sendUnicastTransaction(const QnTransaction<T>& tran, const nx::vms::api::PeerSet& dstPeers)
         {
             if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
-                return p2pBus->sendTransaction(tran, dstPeers);
+                return p2pBus->sendUnicastTransaction(tran, dstPeers);
             return false;
         }
 
         template<class T>
-        bool sendTransaction(const QnTransaction<T>& tran, const nx::Uuid& peer)
+        bool sendUnicastTransaction(const QnTransaction<T>& tran, const nx::Uuid& peer)
         {
             if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
-                return p2pBus->sendTransaction(tran, {peer});
+                return p2pBus->sendUnicastTransaction(tran, {peer});
 
             NX_CRITICAL(false, "Not implemented");
             return false;

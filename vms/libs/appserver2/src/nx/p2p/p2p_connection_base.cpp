@@ -76,8 +76,7 @@ ConnectionBase::ConnectionBase(
     m_remotePeerUrl(remotePeerUrl),
     m_keepAliveTimeout(keepAliveTimeout),
     m_opaqueObject(std::move(opaqueObject)),
-    m_connectionLockGuard(std::move(connectionLockGuard)),
-    m_isClient(true)
+    m_connectionLockGuard(std::move(connectionLockGuard))
 {
     if (remotePeerType == vms::api::PeerType::cloudServer)
         setFilter(std::make_unique<CloudTransactionFilter>());
@@ -109,8 +108,7 @@ ConnectionBase::ConnectionBase(
     m_p2pTransport(std::move(p2pTransport)),
     m_state(State::Connected),
     m_opaqueObject(std::move(opaqueObject)),
-    m_connectionLockGuard(std::move(connectionLockGuard)),
-    m_isClient(false)
+    m_connectionLockGuard(std::move(connectionLockGuard))
 {
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
 

@@ -737,7 +737,7 @@ void MessageBus::at_gotMessage(
         result = handleSubscribeForAllDataUpdates(connection, payload);
         break;
     case MessageType::pushTransactionData:
-        result = handlePushTransactionData(connection, payload, TransportHeader(), &lock);
+        result = handlePushTransactionData(connection, payload, &lock);
         break;
     case MessageType::pushTransactionList:
         result = handlePushTransactionList(connection, payload, &lock);
@@ -1068,29 +1068,30 @@ void MessageBus::sendTransactionImpl(
     switch (connection->remotePeer().dataFormat)
     {
     case Qn::SerializationFormat::json:
-        connection->sendTransaction(tran, MessageType::pushTransactionData,
-            m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
-        break;
-    case Qn::SerializationFormat::ubjson:
-        if (connection->remotePeer().isClient())
+        if (connection->remotePeer().isClient() || descriptor->isPersistent)
         {
             connection->sendTransaction(tran, MessageType::pushTransactionData,
-                m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
+                m_jsonTranSerializer->serializedTransactionWithoutHeader(tran));
         }
-        else if (descriptor->isPersistent)
+        else
         {
-            connection->sendTransaction(
-                tran,
-                MessageType::pushTransactionData,
+            TransportHeader header(transportHeader);
+            header.via.insert(localPeer().id);
+            connection->sendTransaction(tran, MessageType::pushImpersistentBroadcastTransaction,
+                m_jsonTranSerializer->serializedTransactionWithHeader(tran, std::move(header)));
+        }
+        break;
+    case Qn::SerializationFormat::ubjson:
+        if (connection->remotePeer().isClient() || descriptor->isPersistent)
+        {
+            connection->sendTransaction(tran, MessageType::pushTransactionData,
                 m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
         }
         else
         {
             TransportHeader header(transportHeader);
             header.via.insert(localPeer().id);
-            connection->sendTransaction(
-                tran,
-                MessageType::pushImpersistentBroadcastTransaction,
+            connection->sendTransaction(tran, MessageType::pushImpersistentBroadcastTransaction,
                 m_ubjsonTranSerializer->serializedTransactionWithHeader(tran, header));
         }
         break;
@@ -1253,7 +1254,7 @@ void MessageBus::gotTransaction(
     {
         NX_VERBOSE(this, "Peer %1 ignore runtimeInfo from peer %2 because it is already processed",
             peerName(localPeer().id), peerName(peerId.id));
-        sendTransaction(tran, transportHeader); //< Proxy transaction.
+        proxyTransaction(tran, transportHeader); //< Proxy transaction.
         return; //< Already processed on the local peer.
     }
 
@@ -1272,7 +1273,7 @@ void MessageBus::gotTransaction(
     }
     emitPeerFoundLostSignals();
     // Proxy transaction to subscribed peers
-    sendTransaction(tran, transportHeader);
+    proxyTransaction(tran, transportHeader);
 }
 
 template <class T>
@@ -1367,7 +1368,7 @@ bool MessageBus::handlePushTransactionList(
         connection->remotePeer().id, tranList.size());
     for (const auto& transaction: tranList)
     {
-        if (!handlePushTransactionData(connection, transaction, TransportHeader(), lock))
+        if (!handlePushTransactionData(connection, transaction, lock))
             return false;
     }
     return true;
@@ -1376,15 +1377,22 @@ bool MessageBus::handlePushTransactionList(
 bool MessageBus::handlePushTransactionData(
     const P2pConnectionPtr& connection,
     const QByteArray& serializedTran,
-    const TransportHeader& header,
     nx::Locker<nx::Mutex>* lock)
 {
     using namespace std::placeholders;
+    QJsonObject tranObject;
+    if (connection->remotePeer().dataFormat == Qn::SerializationFormat::json
+        && !QJson::deserialize(serializedTran, &tranObject))
+    {
+        return false;
+    }
+
     return handleTransaction(
         this,
         connection->localPeer().dataFormat,
         std::move(serializedTran),
-        std::bind(GotTransactionFuction(), this, _1, connection, header, lock),
+        tranObject["tran"],
+        std::bind(GotTransactionFuction(), this, _1, connection, TransportHeader(), lock),
         [](Qn::SerializationFormat, const QnAbstractTransaction&, const QByteArray&) { return false; });
 }
 
@@ -1670,7 +1678,7 @@ void MessageBus::sendTransaction(const ec2::QnTransaction<vms::api::RuntimeData>
 }
 
 template<class T>
-void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran, const TransportHeader& header)
+void MessageBus::proxyTransaction(const ec2::QnTransaction<T>& tran, const TransportHeader& header)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     for (const auto& connection: m_connections)
@@ -1686,14 +1694,6 @@ void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran, const Transp
 }
 
 template<class T>
-bool MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran, const vms::api::PeerSet& dstPeers)
-{
-    NX_ASSERT(tran.command != ApiCommand::NotDefined);
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    return sendUnicastTransaction(tran, dstPeers);
-}
-
-template<class T>
 void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -1704,6 +1704,9 @@ void MessageBus::sendTransaction(const ec2::QnTransaction<T>& tran)
 template<class T>
 bool MessageBus::sendUnicastTransaction(const QnTransaction<T>& tran, const vms::api::PeerSet& dstPeers)
 {
+    NX_ASSERT(tran.command != ApiCommand::NotDefined);
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
     QMap<P2pConnectionPtr, TransportHeader> dstByConnection;
 
     // split dstPeers by connection
@@ -1761,7 +1764,7 @@ bool MessageBus::sendUnicastTransactionImpl(
             {
                 case Qn::SerializationFormat::json:
                     connection->sendTransaction(tran, MessageType::pushTransactionData,
-                        m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
+                        m_jsonTranSerializer->serializedTransactionWithoutHeader(tran));
                     result = true;
                     break;
                 case Qn::SerializationFormat::ubjson:
@@ -1778,13 +1781,19 @@ bool MessageBus::sendUnicastTransactionImpl(
         }
         else
         {
+            transportHeader.via.insert(localPeer().id);
             switch (connection->remotePeer().dataFormat)
             {
-                case Qn::SerializationFormat::ubjson:
-                    transportHeader.via.insert(localPeer().id);
+                case Qn::SerializationFormat::json:
                     connection->sendTransaction(
-                        tran,
-                        MessageType::pushImpersistentUnicastTransaction,
+                        tran, MessageType::pushImpersistentUnicastTransaction,
+                        m_jsonTranSerializer->serializedTransactionWithHeader(
+                            tran, std::move(transportHeader)));
+                    result = true;
+                    break;
+                case Qn::SerializationFormat::ubjson:
+                    connection->sendTransaction(
+                        tran, MessageType::pushImpersistentUnicastTransaction,
                         m_ubjsonTranSerializer->serializedTransactionWithHeader(tran, transportHeader));
                     result = true;
                     break;
@@ -1835,8 +1844,8 @@ ConnectionGuardSharedState* MessageBus::connectionGuardSharedState()
 
 #define INSTANTIATE(unused1, unused2, T) \
 template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&); \
-template void MessageBus::sendTransaction(const ec2::QnTransaction<T>&, const TransportHeader&); \
-template bool MessageBus::sendTransaction(const ec2::QnTransaction<T>&, const vms::api::PeerSet&); \
+template void MessageBus::proxyTransaction(const ec2::QnTransaction<T>&, const TransportHeader&); \
+template bool MessageBus::sendUnicastTransaction(const ec2::QnTransaction<T>&, const vms::api::PeerSet&); \
 template void MessageBus::sendTransactionImpl( \
     const P2pConnectionPtr&, const ec2::QnTransaction<T>&, TransportHeader);
 
