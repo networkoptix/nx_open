@@ -5555,7 +5555,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>System suspended</source>
-      <translation>システムのサスペンド</translation>
+      <translation>システムはサスペンドされています</translation>
     </message>
     <message>
       <source>System shut down</source>

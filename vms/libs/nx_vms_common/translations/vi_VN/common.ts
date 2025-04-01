@@ -1751,7 +1751,7 @@
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only</source>
-      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only</translation>
+      <translation>Cài đặt SMTP. Những cài đặt này chỉ hiển thị cho Người dùng cấp cao</translation>
     </message>
   </context>
   <context>
