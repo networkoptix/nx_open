@@ -8,11 +8,12 @@ namespace nx::vms::client::desktop {
 
 AnalyticsActionSettingsDialog::AnalyticsActionSettingsDialog(
     const QJsonObject& settingsModel,
+    const QJsonObject& initialValues,
     QWidget* parent)
     :
     QmlDialogWrapper(
         QUrl("Nx/InteractiveSettings/SettingsDialog.qml"),
-        QVariantMap{{"settingsModel", settingsModel}},
+        QVariantMap{{"settingsModel", settingsModel}, {"initialValues", initialValues}},
         parent),
     QnSessionAwareDelegate(parent)
 {
@@ -33,12 +34,13 @@ bool AnalyticsActionSettingsDialog::tryClose(bool /*force*/)
 void AnalyticsActionSettingsDialog::request(
     const QJsonObject& settingsModel,
     std::function<void(std::optional<QJsonObject>)> requestHandler,
+    const QJsonObject& initialValues,
     QWidget* parent)
 {
     if(!NX_ASSERT(requestHandler))
         return;
 
-    auto dialog = new AnalyticsActionSettingsDialog(settingsModel, parent);
+    auto dialog = new AnalyticsActionSettingsDialog(settingsModel, initialValues, parent);
     connect(
         dialog,
         &QmlDialogWrapper::done,

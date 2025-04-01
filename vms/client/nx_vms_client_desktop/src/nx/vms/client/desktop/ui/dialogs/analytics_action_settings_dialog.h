@@ -19,6 +19,7 @@ class AnalyticsActionSettingsDialog:
 public:
     AnalyticsActionSettingsDialog(
         const QJsonObject& settingsModel,
+        const QJsonObject& initialValues = {},
         QWidget* parent = nullptr);
 
     QJsonObject getValues() const;
@@ -28,6 +29,7 @@ public:
     static void request(
         const QJsonObject& settingsModel,
         std::function<void(std::optional<QJsonObject>)> requestHandler,
+        const QJsonObject& initialValues = {},
         QWidget* parent = nullptr);
 };
 

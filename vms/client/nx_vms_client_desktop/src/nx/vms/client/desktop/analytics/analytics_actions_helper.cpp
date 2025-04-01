@@ -93,7 +93,7 @@ void AnalyticsActionsHelper::requestSettingsJson(
         return;
     }
 
-    AnalyticsActionSettingsDialog::request(settingsModel, std::move(callback), parent);
+    AnalyticsActionSettingsDialog::request(settingsModel, std::move(callback), {}, parent);
 }
 
 } // namespace nx::vms::client::desktop

@@ -27,6 +27,7 @@ Dialog
     title: settingsModel && settingsModel.title || ""
 
     property var settingsModel: null
+    property var initialValues: null
     property int padding: 16
     property int preferredHeight: 400
 
@@ -48,7 +49,7 @@ Dialog
             y -= (height - previousHeight) / 2
     }
 
-    onSettingsModelChanged: settingsView.loadModel(settingsModel)
+    onSettingsModelChanged: settingsView.loadModel(settingsModel, initialValues)
 
     component Header: RowLayout
     {
