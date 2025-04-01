@@ -2,15 +2,14 @@
 
 #include "user_action_logger.h"
 
-
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickWindow>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QTextEdit>
-#include <QtWidgets/QToolButton>
 #include <QtWidgets/QToolTip>
 
 #include <nx/utils/log/log.h>
@@ -26,6 +25,9 @@ bool containsSensitiveInfo(QObject* object)
 
 QString getTextFromItem(QObject* object)
 {
+    if (!object)
+        return {};
+
     // Check common text properties.
     static const char* kTextProperties[] = {
         "text", "currentText", "display", "label", "plainText", "logText"};
@@ -177,14 +179,31 @@ void handleMouseButtonRelease(QObject* object, QStringList& resultLog)
     // For some objects, the metaobject info can contain useful information (e.g., buttons on the
     // Timeline).
     addMetaObjectInfo(object, resultLog);
-
-    // TODO: #vbutkevich Add support for QComboBox. (QML ComboBox supported)
-    // The clicked event is not processed directly on QComboBox, but on internal private
-    // containers. So required some good workaround to get text of QComboBox AFTER click was performed
-    // and currentText was changed.
-
 }
 
+/** Workaround to handle selection in QComboBox. Triggered when the internal popup view is about
+ * to lose focus, which happens after the user selects an item via mouse or keyboard.
+ */
+void handleFocusAboutToChange(QObject* object, QStringList& resultString)
+{
+    const bool grandparentIsComboBox = object->parent() && object->parent()->parent()
+        && qobject_cast<QComboBox*>(object->parent()->parent());
+
+    if (!grandparentIsComboBox)
+        return;
+
+    const auto* itemView = qobject_cast<QAbstractItemView*>(object);
+    if (!itemView || !itemView->selectionModel())
+        return;
+
+    const QModelIndex index = itemView->selectionModel()->currentIndex();
+    if (!index.isValid())
+        return;
+
+    const QString text = index.data(Qt::DisplayRole).toString();
+    if (!text.isEmpty())
+        resultString << "Selected item in ComboBox:" + text;
+}
 
 void handleToolTip(QStringList& resultString)
 {
@@ -225,7 +244,7 @@ void handleFocusOut(QObject* object, QStringList& resultString)
     {
         const QString text = getTextFromItem(object);
         if (!text.isEmpty())
-            resultString << "Set element text:" << text;
+            resultString << "Set element text:" + text;
     }
 }
 
@@ -253,6 +272,10 @@ QStringList defaultHandler(QObject* object, QEvent* event)
 
         case QEvent::KeyPress:
             handleKeyPress(static_cast<QKeyEvent*>(event), resultString);
+            break;
+
+        case QEvent::FocusAboutToChange:
+            handleFocusAboutToChange(object, resultString);
             break;
 
         default:
