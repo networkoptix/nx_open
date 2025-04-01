@@ -1613,7 +1613,7 @@
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation>%1 または %2 を使用して複数リソースを選択、 %3 を使用して選択をクリア</translation>
+      <translation>%1 や %2 で複数リソース選択、 %3 で選択をクリア</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
