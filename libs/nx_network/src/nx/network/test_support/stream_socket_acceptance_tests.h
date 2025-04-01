@@ -632,7 +632,7 @@ protected:
 
     void whenServerReadsBytesWithFlags(std::size_t bytesExpected, int recvFlags)
     {
-        std::basic_string<uint8_t> readBuf(bytesExpected, 'x');
+        std::vector<uint8_t> readBuf(bytesExpected, 'x');
 
         std::size_t totalBytesReceived = 0;
         while (totalBytesReceived < bytesExpected)
@@ -647,9 +647,9 @@ protected:
         }
     }
 
-    std::tuple<int /*bytesReadCnt*/, std::basic_string<uint8_t> /*buf*/> whenServerReadsSome()
+    std::tuple<int /*bytesReadCnt*/, std::vector<uint8_t> /*buf*/> whenServerReadsSome()
     {
-        std::basic_string<uint8_t> readBuf(4096, 'x');
+        std::vector<uint8_t> readBuf(4096, 'x');
 
         int bytesReceived = std::get<1>(m_prevAcceptResult)->recv(readBuf.data(), readBuf.size(), 0);
         if (bytesReceived > 0)

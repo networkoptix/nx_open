@@ -222,7 +222,7 @@ TEST_F(ActionFieldTest, EventStartTimeInstantEvent)
 
 TEST_F(ActionFieldTest, EventTimeProlongedEvent)
 {
-    Plugin::registerActionField<TextWithFields>(engine.get(), systemContext());
+    Plugin::registerActionFieldWithEngine<TextWithFields>(engine.get(), systemContext());
 
     engine->registerAction(
         TestActionWithTextWithFields::manifest(),

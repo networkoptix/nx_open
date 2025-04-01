@@ -258,7 +258,7 @@ TEST_F(EngineTest, manifestFieldNamesShouldBeUnique)
 
 TEST_F(EngineTest, actionFieldBuiltWithCorrectType)
 {
-    ASSERT_TRUE(Plugin::registerActionField<TestActionField>(engine.get()));
+    ASSERT_TRUE(Plugin::registerActionFieldWithEngine<TestActionField>(engine.get()));
 
     auto field = engine->buildActionField(&kTestActionFieldDescriptor);
 
@@ -274,7 +274,7 @@ TEST_F(EngineTest, buildActionFieldMustFailIfFieldNotRegistered)
 
 TEST_F(EngineTest, actionBuilderBuiltWithCorrectTypeAndCorrectFields)
 {
-    ASSERT_TRUE(Plugin::registerActionField<TestActionField>(engine.get()));
+    ASSERT_TRUE(Plugin::registerActionFieldWithEngine<TestActionField>(engine.get()));
 
     const QString fieldName = "testField";
 
@@ -400,7 +400,7 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
     engine->registerEvent(eventDescriptor, testEventConstructor);
 
     const QString actionFieldType = fieldMetatype<TestActionField>();
-    Plugin::registerActionField<TestActionField>(engine.get());
+    Plugin::registerActionFieldWithEngine<TestActionField>(engine.get());
 
     ItemDescriptor actionDescriptor{
         .id = kTestActionId,
@@ -449,7 +449,7 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
 
 TEST_F(EngineTest, onlyValidProlongedActionRegistered)
 {
-    ASSERT_TRUE(Plugin::registerActionField<OptionalTimeField>(engine.get()));
+    ASSERT_TRUE(Plugin::registerActionFieldWithEngine<OptionalTimeField>(engine.get()));
 
     ItemDescriptor withoutFields{
         .id = "withoutFields",

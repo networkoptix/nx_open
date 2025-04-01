@@ -67,7 +67,7 @@ template<typename Value>
 typename QnJsonResourceProperty<Value>::Editor& QnJsonResourceProperty<Value>::Editor::operator=(Editor&& rhs)
 {
     std::swap(m_parent, rhs.m_parent);
-    std::swap(m_value, rhs.value);
+    std::swap(m_value, rhs.m_value);
 }
 
 template<typename Value>
