@@ -887,12 +887,17 @@ bool MembersModel::canEditMembers(const nx::Uuid& id) const
     const auto accessController = qobject_cast<AccessController*>(
         systemContext()->accessController());
 
-    return canModifyRelation(id) && m_cache
+    const auto canModify = canModifyRelation(id) && m_cache
         && m_cache->info(id).userType != UserSettingsGlobal::LdapUser
         && NX_ASSERT(accessController)
         && accessController->canCreateUser(
             /*targetPermissions*/ {},
             /*targetGroups*/ {id});
+
+    if (auto user = systemContext()->resourcePool()->getResourceById<QnUserResource>(m_subjectId))
+        return canModify && accessController->hasPermissions(m_subjectId, Qn::WriteAccessRightsPermission);
+
+    return canModify;
 }
 
 bool MembersModel::setData(const QModelIndex& index, const QVariant& value, int role)

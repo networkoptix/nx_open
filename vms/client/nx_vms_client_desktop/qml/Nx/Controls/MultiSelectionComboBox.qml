@@ -151,6 +151,7 @@ Control
                 sourcePath: "image://skin/16x16/Outline/arrow_down.svg"
                 primaryColor: ColorTheme.colors.light16
                 sourceSize: Qt.size(16, 16)
+                opacity: control.enabled ? 1.0 : 0.3
             }
         }
     }
