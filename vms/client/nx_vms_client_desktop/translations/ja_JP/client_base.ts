@@ -3067,7 +3067,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Notifications filters are moved to the right panel</source>
-      <translation>通知フィルターは右側のパネルに移動されました。</translation>
+      <translation>通知フィルターは右パネルに移動されました。</translation>
     </message>
   </context>
   <context>
@@ -4548,7 +4548,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site suspended</source>
-      <translation>サイトのサスペンド</translation>
+      <translation>サイトはサスペンドされています</translation>
     </message>
   </context>
   <context>
@@ -4927,7 +4927,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site suspended</source>
-      <translation>サイトのサスペンド</translation>
+      <translation>サイトはサスペンドされています</translation>
     </message>
     <message>
       <source>Site shut down</source>
@@ -5044,7 +5044,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Notification and interface languages differ</source>
-      <translation>通知言語とインターフェース言語が異なります。</translation>
+      <translation>通知言語とインターフェイス言語の相違</translation>
     </message>
     <message>
       <source>Notifications language differs from the interface language</source>

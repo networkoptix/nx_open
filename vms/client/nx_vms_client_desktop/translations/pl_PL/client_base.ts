@@ -4676,15 +4676,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</translation>
+      <translation>Tworzenie kopii zapasowej w chmurze zostało zatrzymane, ponieważ witryna została zamknięta. Musi być ona aktywna, aby wykonać kopię zapasową w chmurze. Skontaktuj się z partnerem kanałowym, aby uzyskać pomoc.</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>Tworzenie kopii zapasowych w chmurze jest kontynuowane, ale witryna jest obecnie zawieszona. Musi być aktywna, aby móc modyfikować konfigurację kopii zapasowej lub włączyć lokalizację pamięci masowej w chmurze. Skontaktuj się z partnerem kanałowym, aby uzyskać pomoc.</translation>
     </message>
     <message>
       <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>Witryna musi być aktywna, aby umożliwić przechowywanie danych w chmurze. Skontaktuj się z partnerem kanału, aby uzyskać pomoc.</translation>
     </message>
     <message>
       <source>Site suspended</source>
@@ -6979,7 +6979,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</translation>
+      <translation>Tworzenie kopii zapasowych w chmurze jest kontynuowane, ale witryna jest obecnie zawieszona. Musi być aktywna, aby móc modyfikować konfigurację kopii zapasowej lub włączyć lokalizację pamięci masowej w chmurze. %1</translation>
     </message>
   </context>
   <context>

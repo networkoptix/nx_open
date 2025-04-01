@@ -238,11 +238,11 @@
     </message>
     <message>
       <source>Switch to table view</source>
-      <translation type="unfinished">Switch to table view</translation>
+      <translation>Chuyển sang chế độ xem bảng</translation>
     </message>
     <message>
       <source>Switch to card view</source>
-      <translation type="unfinished">Switch to card view</translation>
+      <translation>Chuyển sang chế độ xem thẻ</translation>
     </message>
   </context>
   <context>
@@ -643,7 +643,7 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     <name>CustomHttpHeadersDialog</name>
     <message>
       <source>Custom HTTP headers</source>
-      <translation type="unfinished">Custom HTTP headers</translation>
+      <translation>Tiêu đề HTTP tùy chỉnh</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1143,12 +1143,12 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">BUILT-IN</translation>
+      <translation>TÍCH HỢP</translation>
     </message>
     <message>
       <source>CUSTOM</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">CUSTOM</translation>
+      <translation>Tùy chỉnh</translation>
     </message>
   </context>
   <context>

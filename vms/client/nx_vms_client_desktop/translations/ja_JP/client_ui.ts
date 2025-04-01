@@ -1544,7 +1544,7 @@
     </message>
     <message>
       <source>Show timestamp on LIVE</source>
-      <translation>ライブ再生でタイムスタンプを表示</translation>
+      <translation>ライブ再生でタイムスタンプを表示する</translation>
     </message>
   </context>
   <context>

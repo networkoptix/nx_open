@@ -1246,7 +1246,7 @@
     </message>
     <message>
       <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
+      <translation>Niewystarczająca prędkość dysku HDD/dysku SSD/sieci do nagrywania na %1.</translation>
     </message>
   </context>
   <context>

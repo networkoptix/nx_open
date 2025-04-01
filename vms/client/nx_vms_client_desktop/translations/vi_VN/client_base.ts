@@ -2155,14 +2155,14 @@ Khóa giấy phép: %2</translation>
     </message>
     <message numerus="yes">
       <source>This server is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This server is removed from Site</numerusform>
+      <translation>
+        <numerusform>Máy chủ này đã bị xóa khỏi Chi nhánh</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>This user is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This user is removed from Site</numerusform>
+      <translation>
+        <numerusform>Người dùng này đã bị xóa khỏi Chi nhánh</numerusform>
       </translation>
     </message>
   </context>
@@ -3537,13 +3537,13 @@ Khóa giấy phép: %2</translation>
     </message>
     <message numerus="yes">
       <source>Set for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n devices</numerusform>
+      <translation>
+        <numerusform>Thiết lập cho %n thiết bị</numerusform>
       </translation>
     </message>
     <message>
       <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation type="unfinished">Cloud authorization request should only be performed for cloud cross system resources</translation>
+      <translation>Yêu cầu ủy quyền đám mây chỉ nên được thực hiện cho các tài nguyên chéo các hệ thống đám mây</translation>
     </message>
   </context>
   <context>
@@ -4327,15 +4327,15 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
-      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+      <translation>Không thể truy cập camera này. Chạy chẩn đoán camera trong Ứng dụng máy khách để biết thêm thông tin.</translation>
     </message>
     <message>
       <source>Access to this camera requires authorization credentials.</source>
-      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+      <translation>Cần phải có thông tin xác thực để có thể truy cập vào camera này.</translation>
     </message>
     <message>
       <source>CONNECTION LOST</source>
-      <translation type="unfinished">CONNECTION LOST</translation>
+      <translation>MẤT KẾT NỐI</translation>
     </message>
   </context>
   <context>
@@ -4516,11 +4516,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Cloud storage cannot be enabled.</source>
-      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+      <translation>Không thể bật lưu trữ đám mây.</translation>
     </message>
     <message>
       <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
-      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+      <translation>Để kích hoạt, hãy thêm %1 dịch vụ phù hợp hơn hoặc giảm số lượng camera có chức năng sao lưu.</translation>
     </message>
     <message>
       <source>Insufficient services</source>
@@ -4528,23 +4528,23 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
-      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+      <translation>Tất cả các kho lưu trữ không phải sao lưu đám mây sẽ bị vô hiệu hóa khi sao lưu đám mây được bật. Các thiết bị được cấu hình với &quot;Tất cả lưu trữ&quot; sẽ được thay đổi thành &quot;Chuyển động, Đối tượng và Dấu trang&quot;</translation>
     </message>
     <message>
       <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
-      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
+      <translation>Các thiết bị được cấu hình với &quot;Tất cả lưu trữ&quot; sẽ được thay đổi thành &quot;Chuyển động, Đối tượng và Dấu trang&quot; khi bật sao lưu đám mây</translation>
     </message>
     <message>
       <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</translation>
+      <translation>Sao lưu đám mây đã dừng vì Chi nhánh đã bị đóng. Chi nhánh phải hoạt động để thực hiện sao lưu vào bộ nhớ đám mây. Liên hệ với đối tác kênh của bạn để được hỗ trợ.</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>Sao lưu đám mây vẫn tiếp tục, nhưng Chi nhánh hiện đang bị tạm dừng. Chi nhánh phải hoạt động để chỉnh cấu hình sao lưu hoặc để bật vị trí lưu trữ đám mây. Liên hệ với đối tác kênh của bạn để được hỗ trợ.</translation>
     </message>
     <message>
       <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>Chi nhánh phải hoạt động để cho phép lưu trữ vị trí đám mây. Liên hệ với đối tác kênh của bạn để được hỗ trợ.</translation>
     </message>
     <message>
       <source>Site suspended</source>
@@ -5052,11 +5052,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Recording disabled</source>
-      <translation type="unfinished">Recording disabled</translation>
+      <translation>Đã tắt ghi</translation>
     </message>
     <message>
       <source>Cloud storage backup disabled</source>
-      <translation type="unfinished">Cloud storage backup disabled</translation>
+      <translation>Sao lưu đám mây đã bị vô hiệu hóa</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
@@ -5873,26 +5873,26 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message numerus="yes">
       <source>%n removed devices</source>
-      <translation type="unfinished">
-        <numerusform>%n removed devices</numerusform>
+      <translation>
+        <numerusform>%n thiết bị đã xóa</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n removed cameras</numerusform>
+      <translation>
+        <numerusform>%n camera đã xóa</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed servers</source>
-      <translation type="unfinished">
-        <numerusform>%n removed servers</numerusform>
+      <translation>
+        <numerusform>%n máy chủ đã bị xóa</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n removed layouts</numerusform>
+      <translation>
+        <numerusform>%n bố cục đã xóa</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5903,36 +5903,36 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message numerus="yes">
       <source>%n devices more</source>
-      <translation type="unfinished">
-        <numerusform>%n devices more</numerusform>
+      <translation>
+        <numerusform>%n Thiết bị đã được thêm</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras more</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras more</numerusform>
+      <translation>
+        <numerusform>%n camera đã được thêm</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers more</source>
-      <translation type="unfinished">
-        <numerusform>%n servers more</numerusform>
+      <translation>
+        <numerusform>%n máy chủ đã được thêm</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts more</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts more</numerusform>
+      <translation>
+        <numerusform>%n bố cục đã được thêm</numerusform>
       </translation>
     </message>
     <message>
       <source>Removed subject</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">Removed subject</translation>
+      <translation>Chủ đề đã bị xóa</translation>
     </message>
     <message>
       <source>Removed device</source>
-      <translation type="unfinished">Removed device</translation>
+      <translation>Thiết bị đã xóa</translation>
     </message>
     <message>
       <source>Removed camera</source>
@@ -5940,11 +5940,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Removed server</source>
-      <translation type="unfinished">Removed server</translation>
+      <translation>Máy chủ đã bị xóa</translation>
     </message>
     <message>
       <source>Removed layout</source>
-      <translation type="unfinished">Removed layout</translation>
+      <translation>Bố cục đã xóa</translation>
     </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
@@ -6582,19 +6582,19 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
       <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
-      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+      <translation>%1 cần có các dịch vụ lưu trữ đám mây phù hợp hơn để kích hoạt sao lưu cho tất cả các thiết bị đã chọn</translation>
     </message>
     <message>
       <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
-      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+      <translation>Nhưng bạn vẫn có thể sử dụng một công tắc chung để bật tính năng sao lưu cho những camera có thể thực hiện được điều này</translation>
     </message>
     <message>
       <source>Backup will not be activated for %1 devices: </source>
-      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
+      <translation>Sao lưu sẽ không được kích hoạt cho %1 thiết bị: </translation>
     </message>
     <message>
       <source>%1 suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
+      <translation>%1 cần có dịch vụ lưu trữ đám mây phù hợp để kích hoạt tính năng sao lưu.</translation>
     </message>
   </context>
   <context>
@@ -6647,7 +6647,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</translation>
+      <translation>Sao lưu đám mây vẫn tiếp tục, nhưng Chi nhánh hiện đang bị tạm dừng. Chi nhánh phải hoạt động để chỉnh cấu hình sao lưu hoặc để bật vị trí lưu trữ đám mây. %1</translation>
     </message>
   </context>
   <context>
@@ -6927,7 +6927,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
-      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+      <translation>Thiết bị được phát hiện có khả năng xoay, nghiêng và/hoặc thu phóng. Bất kỳ thay đổi nào đối với vùng nhìn thông qua việc sử dụng cài đặt trước hoặc di chuyển có thể khiến điểm liên kết camera không còn khả dụng nữa.</translation>
     </message>
   </context>
   <context>
@@ -6954,7 +6954,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Use this link to add the camera to another site</source>
-      <translation type="unfinished">Use this link to add the camera to another site</translation>
+      <translation>Sử dụng liên kết này để thêm camera vào Chi nhánh khác</translation>
     </message>
   </context>
   <context>
@@ -7543,11 +7543,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Channel Partner users have access to this site</source>
-      <translation type="unfinished">Channel Partner users have access to this site</translation>
+      <translation>Người dùng Đối tác kênh có quyền truy cập vào Chi nhánh này</translation>
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</translation>
+      <translation>Quyền truy cập của người dùng Đối tác kênh&apos; được quản lý ở cấp Tổ chức và họ không hiển thị trong quản lý người dùng Chi nhánh.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Tìm hiểu thêm&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
@@ -7921,7 +7921,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
-      <translation type="unfinished">Server cannot answer in reasonable time. Consider narrowing period or filter.</translation>
+      <translation>Máy chủ không thể trả lời trong thời gian hợp lý. Hãy xem xét thu hẹp thời gian hoặc bộ lọc.</translation>
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
@@ -8824,7 +8824,7 @@ Hãy nhớ khôi phục Mức ghi nhật ký về cài đặt mặc định sau 
     </message>
     <message>
       <source>&lt;None&gt;</source>
-      <translation type="unfinished">&lt;None&gt;</translation>
+      <translation>&lt;None&gt;</translation>
     </message>
   </context>
   <context>
@@ -9036,7 +9036,7 @@ Hiệu suất Chi nhánh bị giảm.</translation>
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
       <source>This group has been assigned at organization level and can be managed only at organization level</source>
-      <translation type="unfinished">This group has been assigned at organization level and can be managed only at organization level</translation>
+      <translation>Nhóm này đã được chỉ định ở cấp độ tổ chức và chỉ có thể được quản lý ở cấp độ tổ chức</translation>
     </message>
     <message>
       <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>

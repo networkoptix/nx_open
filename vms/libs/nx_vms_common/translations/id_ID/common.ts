@@ -1290,7 +1290,7 @@
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Contact your channel partner for assistance.</translation>
+      <translation>Hubungi channel partner Anda untuk mendapatkan bantuan.</translation>
     </message>
   </context>
   <context>

@@ -238,14 +238,14 @@
     <name>QnCameraAnalyticsEventsPolicy</name>
     <message>
       <source>Analytics events are not available for %1</source>
-      <translation type="unfinished">Analytics events are not available for %1</translation>
+      <translation>Sự kiện phân tích không khả dụng cho %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsObjectsPolicy</name>
     <message>
       <source>Analytics objects are not available for %1</source>
-      <translation type="unfinished">Analytics objects are not available for %1</translation>
+      <translation>Đối tượng phân tích không khả dụng cho %1</translation>
     </message>
   </context>
   <context>
@@ -1290,7 +1290,7 @@
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Contact your channel partner for assistance.</translation>
+      <translation>Liên hệ với đối tác kênh của bạn để được hỗ trợ.</translation>
     </message>
   </context>
   <context>
@@ -1577,7 +1577,7 @@
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
-      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
+      <translation>Số lượng dấu trang tối đa. Giá trị nhỏ hơn hoặc bằng 0 là vô hạn.</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption).</source>
@@ -1833,7 +1833,7 @@
     </message>
     <message>
       <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
-      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
+      <translation>Bật Xác thực HTTP Basic và Digest đã lỗi thời (không an toàn).</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery.</source>
@@ -1849,7 +1849,7 @@
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
-      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+      <translation>Cài đặt SMTP. Những cài đặt này chỉ hiển thị cho Người dùng cấp cao.</translation>
     </message>
   </context>
 </TS>

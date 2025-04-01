@@ -342,7 +342,7 @@
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>Thư mục</translation>
     </message>
     <message>
       <source>Sites</source>

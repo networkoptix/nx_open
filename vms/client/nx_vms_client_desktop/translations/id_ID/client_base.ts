@@ -4536,15 +4536,15 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</translation>
+      <translation>Backup cloud telah dihentikan karena Site telah ditutup. Site harus aktif untuk melakukan backup ke penyimpanan cloud. Hubungi channel partner Anda untuk mendapatkan bantuan.</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>Backup cloud terus berlanjut, tetapi Site saat ini ditangguhkan. Site harus aktif untuk mengubah konfigurasi backup atau mengaktifkan lokasi penyimpanan Cloud. Hubungi channel partner Anda untuk mendapatkan bantuan.</translation>
     </message>
     <message>
       <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>Site harus aktif untuk mengaktifkan lokasi penyimpanan cloud. Hubungi channel partner Anda untuk mendapatkan bantuan.</translation>
     </message>
     <message>
       <source>Site suspended</source>
@@ -6647,7 +6647,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</translation>
+      <translation>Backup cloud terus berlanjut, tetapi Site saat ini ditangguhkan. Site harus aktif untuk mengubah konfigurasi backup atau mengaktifkan lokasi penyimpanan cloud. %1</translation>
     </message>
   </context>
   <context>
@@ -11298,7 +11298,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Organization user</source>
-      <translation type="unfinished">Organization user</translation>
+      <translation>User organisasi</translation>
     </message>
   </context>
   <context>

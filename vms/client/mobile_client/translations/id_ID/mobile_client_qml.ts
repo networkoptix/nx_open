@@ -259,7 +259,7 @@
     <name>EventSearchItem</name>
     <message>
       <source>SHARED</source>
-      <translation type="unfinished">SHARED</translation>
+      <translation>DIBAGIKAN</translation>
     </message>
   </context>
   <context>
@@ -804,7 +804,7 @@
     <name>ShareBookmarkSheet</name>
     <message>
       <source>New Bookmark</source>
-      <translation type="unfinished">New Bookmark</translation>
+      <translation>Bookmark baru</translation>
     </message>
     <message>
       <source>Name</source>
@@ -820,7 +820,7 @@
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation type="unfinished">Protect with Password (optional)</translation>
+      <translation>Proteksi dengan Kata Sandi (opsional)</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -828,11 +828,11 @@
     </message>
     <message>
       <source>Create &amp; Share</source>
-      <translation type="unfinished">Create &amp; Share</translation>
+      <translation>Buat &amp; Bagikan</translation>
     </message>
     <message>
       <source>Save &amp; Share</source>
-      <translation type="unfinished">Save &amp; Share</translation>
+      <translation>Simpan &amp; Bagikan</translation>
     </message>
     <message>
       <source>Stop Sharing</source>
@@ -856,7 +856,7 @@
     </message>
     <message>
       <source>Shared link options</source>
-      <translation type="unfinished">Shared link options</translation>
+      <translation>Opsi link yang dibagikan</translation>
     </message>
   </context>
   <context>

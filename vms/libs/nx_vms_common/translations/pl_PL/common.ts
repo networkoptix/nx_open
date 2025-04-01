@@ -1491,7 +1491,7 @@
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Contact your channel partner for assistance.</translation>
+      <translation>Aby uzyskać pomoc, skontaktuj się ze swoim partnerem kanałowym.</translation>
     </message>
   </context>
   <context>

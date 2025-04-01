@@ -21,7 +21,7 @@
     <message>
       <source>On %1 --&gt; %2</source>
       <comment>%1 is the event name, %2 is the action name</comment>
-      <translation type="unfinished">On %1 --&gt; %2</translation>
+      <translation>Vào %1 --&gt; %2</translation>
     </message>
   </context>
   <context>
@@ -264,7 +264,7 @@
     </message>
     <message>
       <source>Field &quot;%1&quot; should be an object</source>
-      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+      <translation>Trường &quot;%1&quot; phải là một đối tượng</translation>
     </message>
     <message>
       <source>Unable to deserialize properties for field: %1</source>
@@ -320,7 +320,7 @@
     </message>
     <message>
       <source>And attributes</source>
-      <translation type="unfinished">And attributes</translation>
+      <translation>Và các thuộc tính</translation>
     </message>
   </context>
   <context>
@@ -577,7 +577,7 @@
     </message>
     <message>
       <source>Custom headers</source>
-      <translation type="unfinished">Custom headers</translation>
+      <translation>Tuỳ chỉnh Đầu trang</translation>
     </message>
   </context>
   <context>
@@ -595,14 +595,14 @@
     <name>nx::vms::rules::HttpHeadersFieldValidator</name>
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
-      <translation type="unfinished">
-        <numerusform>Some of the headers are not valid</numerusform>
+      <translation>
+        <numerusform>Một số tiêu đề không hợp lệ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
-      <translation type="unfinished">
-        <numerusform>All the headers are not valid</numerusform>
+      <translation>
+        <numerusform>Tất cả các tiêu đề đều không hợp lệ</numerusform>
       </translation>
     </message>
   </context>
@@ -617,7 +617,7 @@
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
       <source>Integration Diagnostic Event</source>
-      <translation type="unfinished">Integration Diagnostic Event</translation>
+      <translation>Sự kiện chẩn đoán tích hợp</translation>
     </message>
     <message>
       <source>For Plugin</source>
@@ -1081,11 +1081,11 @@
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
       <source>Site HTTP(S) Request</source>
-      <translation type="unfinished">Site HTTP(S) Request</translation>
+      <translation>Yêu cầu HTTP(S) của Chi nhánh</translation>
     </message>
     <message>
       <source>Endpoint</source>
-      <translation type="unfinished">Endpoint</translation>
+      <translation>Điểm cuối</translation>
     </message>
     <message>
       <source>Method</source>
@@ -1204,7 +1204,7 @@
     </message>
     <message>
       <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
+      <translation>Không đủ tốc độ ổ cứng HDD/SSD/Mạng để ghi vào %1.</translation>
     </message>
   </context>
   <context>
@@ -1241,7 +1241,7 @@
     </message>
     <message>
       <source>Invalid UUID string</source>
-      <translation type="unfinished">Invalid UUID string</translation>
+      <translation>Chuỗi UUID không hợp lệ</translation>
     </message>
   </context>
   <context>
@@ -1275,11 +1275,11 @@
     </message>
     <message>
       <source>Endpoint cannot be empty</source>
-      <translation type="unfinished">Endpoint cannot be empty</translation>
+      <translation>Điểm cuối không được để trống</translation>
     </message>
     <message>
       <source>Endpoint mustn&apos;t contains any space</source>
-      <translation type="unfinished">Endpoint mustn&apos;t contains any space</translation>
+      <translation>Điểm cuối không được&apos;chứa bất kỳ khoảng trắng nào</translation>
     </message>
   </context>
   <context>

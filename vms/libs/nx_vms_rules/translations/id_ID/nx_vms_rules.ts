@@ -1204,7 +1204,7 @@
     </message>
     <message>
       <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
+      <translation>Kecepatan HDD/SSD/Jaringan tidak cukup untuk merekam ke %1.</translation>
     </message>
   </context>
   <context>

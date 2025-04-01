@@ -6758,7 +6758,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</translation>
+      <translation>Skysikkerhetskopiering fortsetter, men nettstedet er for øyeblikket suspendert. Den må være aktiv for å endre sikkerhetskopikonfigurasjonen eller for å aktivere skylagringsplassering. %1</translation>
     </message>
   </context>
   <context>
