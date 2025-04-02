@@ -35,7 +35,8 @@ std::string Playlist::toString() const
     playlistStr +=
         "#EXTM3U\r\n"
         "#EXT-X-VERSION:3\r\n";
-    playlistStr += "#EXT-X-TARGETDURATION:" + std::to_string(targetDuration.count()) + "\r\n";
+    auto targetSec = std::chrono::ceil<std::chrono::seconds>(targetDuration).count();
+    playlistStr += "#EXT-X-TARGETDURATION:" + std::to_string(targetSec) + "\r\n";
     playlistStr += "#EXT-X-MEDIA-SEQUENCE:" + std::to_string(mediaSequence) + "\r\n";
     if (allowCache)
     {
@@ -62,7 +63,10 @@ std::string Playlist::toString() const
             playlistStr += dateTime.toStdString(); //< data/time.
             playlistStr += "\r\n";
         }
-        playlistStr += "#EXTINF:" + std::to_string(chunk.duration.count()) + ",\r\n";
+        double chunkDuration = std::chrono::duration<double>(chunk.duration).count();
+        std::ostringstream oss;
+        oss << std::fixed << std::setprecision(3) << chunkDuration;
+        playlistStr += "#EXTINF:" + oss.str() + ",\r\n";
 
         // NOTE: Reporting only path if host not specified.
         playlistStr += chunk.url.host().isEmpty()
