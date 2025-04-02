@@ -27,8 +27,11 @@ struct NX_VMS_API WebRtcTrackerSettings: public MediaSettings
 
     /**%apidoc[opt] */
     WebRtcMethod deliveryMethod = WebRtcMethod::srtp;
+
+    /**%apidoc[opt] If specified, don't resend lost UDP packets. */
+    bool unreliableTransport = false;
 };
-#define WebRtcTrackerSettings_Fields MediaSettings_Fields(speed)(deliveryMethod)
+#define WebRtcTrackerSettings_Fields MediaSettings_Fields(id)(speed)(deliveryMethod)(unreliableTransport)
 QN_FUSION_DECLARE_FUNCTIONS(WebRtcTrackerSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(WebRtcTrackerSettings, WebRtcTrackerSettings_Fields)
 
