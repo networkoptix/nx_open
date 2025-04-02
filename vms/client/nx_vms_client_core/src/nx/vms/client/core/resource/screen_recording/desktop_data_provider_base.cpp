@@ -7,12 +7,6 @@
 
 namespace nx::vms::client::core {
 
-DesktopDataProviderBase::DesktopDataProviderBase(const QnResourcePtr& ptr):
-    QnAbstractMediaStreamDataProvider(ptr)
-{
-
-}
-
 QString DesktopDataProviderBase::lastErrorStr() const
 {
     return m_lastErrorStr;

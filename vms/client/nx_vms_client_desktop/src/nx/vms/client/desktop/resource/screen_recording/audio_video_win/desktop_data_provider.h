@@ -17,7 +17,6 @@ class DesktopDataProvider: public core::DesktopDataProviderBase
 
 public:
     DesktopDataProvider(
-        const QnResourcePtr& res,
         int desktopNum, // = 0,
         const core::AudioDeviceInfo* audioDevice,
         const core::AudioDeviceInfo* audioDevice2,
@@ -25,6 +24,7 @@ public:
         bool captureCursor,
         const QSize& captureResolution,
         float encodeQualuty, // in range 0.0 .. 1.0
+        const QString& videoCodec,
         QWidget* glWidget, // used in application capture mode only
         const QPixmap& logo // logo over video
     );
@@ -32,8 +32,8 @@ public:
 
     virtual void start(Priority priority = InheritPriority) override;
 
-    virtual void beforeDestroyDataProvider(QnAbstractMediaDataReceptor* dataProviderWrapper) override;
-    void addDataProcessor(QnAbstractMediaDataReceptor* consumer);
+    void addDataProcessor(QnAbstractMediaDataReceptor* consumer) override;
+    void removeDataProcessor(QnAbstractMediaDataReceptor* consumer) override;
 
     virtual bool isInitialized() const override;
 

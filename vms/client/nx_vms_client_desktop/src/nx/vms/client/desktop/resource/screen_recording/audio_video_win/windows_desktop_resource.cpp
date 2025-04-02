@@ -167,14 +167,20 @@ void WindowsDesktopResource::createSharedDataProvider()
     float encodingQuality = qualityToNumeric(screenRecordingSettings()->quality());
     CaptureMode captureMode = screenRecordingSettings()->captureMode();
 
-    m_desktopDataProvider = new DesktopDataProvider(toSharedPointer(),
-        screen,
+    QString videoCodecName;
+    if (encodeQualuty <= 0.5)
+        videoCodecName = systemContext()->globalSettings()->lowQualityScreenVideoCodec();
+    else
+        videoCodecName = systemContext()->globalSettings()->defaultExportVideoCodec();
+
+    m_desktopDataProvider = new DesktopDataProvider(screen,
         audioDevice.isNull() ? 0 : &audioDevice,
         secondAudioDevice.isNull() ? 0 : &secondAudioDevice,
         captureMode,
         captureCursor,
         encodingSize,
         encodingQuality,
+        videoCodecName,
         m_mainWidget,
         QPixmap());
 }

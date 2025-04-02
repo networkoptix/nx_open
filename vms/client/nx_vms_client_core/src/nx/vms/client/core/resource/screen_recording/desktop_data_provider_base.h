@@ -16,11 +16,9 @@ class QnAbstractDataConsumer;
 
 namespace nx::vms::client::core {
 
-class NX_VMS_CLIENT_CORE_API DesktopDataProviderBase: public QnAbstractMediaStreamDataProvider
+class NX_VMS_CLIENT_CORE_API DesktopDataProviderBase: public QnAbstractStreamDataProvider
 {
 public:
-    DesktopDataProviderBase(const QnResourcePtr& ptr);
-
     static void stereoAudioMux(qint16* a1, qint16* a2, int lenInShort);
     static void monoToStereo(qint16* dst, qint16* src, int lenInShort);
     static void monoToStereo(qint16* dst, qint16* src1, qint16* src2, int lenInShort);
@@ -29,7 +27,6 @@ public:
 
     virtual bool isInitialized() const = 0;
     virtual AudioLayoutConstPtr getAudioLayout();
-    virtual void beforeDestroyDataProvider(QnAbstractMediaDataReceptor* dataProviderWrapper) = 0;
     virtual QString lastErrorStr() const;
     virtual bool readyToStop() const = 0;
 

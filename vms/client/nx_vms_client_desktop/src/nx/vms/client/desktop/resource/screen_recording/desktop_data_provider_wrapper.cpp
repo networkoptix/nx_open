@@ -7,10 +7,8 @@
 namespace nx::vms::client::desktop {
 
 DesktopDataProviderWrapper::DesktopDataProviderWrapper(
-    QnResourcePtr res,
     core::DesktopDataProviderBase* owner)
     :
-    QnAbstractMediaStreamDataProvider(res),
     m_owner(owner)
 {}
 

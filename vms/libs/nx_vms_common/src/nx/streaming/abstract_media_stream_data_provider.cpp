@@ -52,15 +52,16 @@ void QnAbstractMediaStreamDataProvider::onEvent(CameraDiagnostics::Result event)
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(
     const QnResourcePtr& resource)
     :
-    QnAbstractStreamDataProvider(resource),
+    m_resource(resource),
     m_numberOfChannels(
         [this]
         {
             auto mediaResource = m_resource.dynamicCast<QnMediaResource>();
             return mediaResource ? mediaResource->getVideoLayout(this)->channelCount() : 1;
         })
+
 {
-    std::fill(m_gotKeyFrame.begin(), m_gotKeyFrame.end(), 0);
+    m_gotKeyFrame.fill(0);
     resetTimeCheck();
     m_isCamera = (bool) resource.dynamicCast<QnVirtualCameraResource>();
     connect(resource.data(), &QnResource::propertyChanged, this,
@@ -84,8 +85,7 @@ void QnAbstractMediaStreamDataProvider::setNeedKeyData(int channel)
 
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
-    for (int i = 0; i < getNumberOfChannels(); ++i)
-        m_gotKeyFrame.at(i) = 0;
+    m_gotKeyFrame.fill(0);
 }
 
 bool QnAbstractMediaStreamDataProvider::needKeyData(int channel) const
@@ -167,7 +167,7 @@ float QnAbstractMediaStreamDataProvider::getAverageGopSize() const
 
 void QnAbstractMediaStreamDataProvider::resetTimeCheck()
 {
-    for (int i = 0; i < CL_MAX_CHANNELS+1; ++i)
+    for (int i = 0; i < CL_MAX_CHANNEL_NUMBER+1; ++i)
         m_lastMediaTime[i] = AV_NOPTS_VALUE;
 }
 
@@ -178,7 +178,7 @@ void QnAbstractMediaStreamDataProvider::checkAndFixTimeFromCamera(const QnAbstra
         // correct packets timestamp if we have got several packets very fast
         int channel = media->channelNumber;
         if (media->dataType == QnAbstractMediaData::AUDIO)
-            channel = CL_MAX_CHANNELS; //< use last vector element for audio timings control
+            channel = CL_MAX_CHANNEL_NUMBER; //< use last vector element for audio timings control
 
         if (nxStreamingIni().enableTimeCorrection)
         {
@@ -209,4 +209,9 @@ void QnAbstractMediaStreamDataProvider::checkAndFixTimeFromCamera(const QnAbstra
 CameraDiagnostics::Result QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection()
 {
     return CameraDiagnostics::NotImplementedResult();
+}
+
+const QnResourcePtr& QnAbstractMediaStreamDataProvider::getResource() const
+{
+    return m_resource;
 }

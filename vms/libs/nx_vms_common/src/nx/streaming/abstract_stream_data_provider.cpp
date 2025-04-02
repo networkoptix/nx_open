@@ -6,8 +6,7 @@
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <nx/utils/log/log.h>
 
-QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(const QnResourcePtr& resource):
-    m_resource(resource),
+QnAbstractStreamDataProvider::QnAbstractStreamDataProvider():
     m_role(Qn::CR_Default)
 {
     NX_DEBUG(this, "New");
@@ -96,9 +95,4 @@ void QnAbstractStreamDataProvider::setRole(Qn::ConnectionRole role)
 Qn::ConnectionRole QnAbstractStreamDataProvider::getRole() const
 {
     return m_role;
-}
-
-const QnResourcePtr& QnAbstractStreamDataProvider::getResource() const
-{
-    return m_resource;
 }

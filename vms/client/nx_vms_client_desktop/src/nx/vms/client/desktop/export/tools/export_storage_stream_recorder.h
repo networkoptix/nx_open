@@ -22,7 +22,7 @@ class ExportStorageStreamRecorder:
 {
 public:
     ExportStorageStreamRecorder(
-        const QnResourcePtr& dev, QnAbstractMediaStreamDataProvider* mediaProvider);
+        const QnResourcePtr& dev, QnAbstractStreamDataProvider* mediaProvider);
     virtual ~ExportStorageStreamRecorder() override;
 
     void setTranscodeFilters(const nx::core::transcoding::FilterChain& filters);
@@ -46,7 +46,7 @@ protected:
     virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md) override;
 
 private:
-    QnAbstractMediaStreamDataProvider* m_mediaProvider;
+    QnAbstractStreamDataProvider* m_mediaProvider;
     bool m_isLayoutsInitialised = false;
     int64_t m_preciseStartTimeUs = 0;
     std::optional<nx::core::transcoding::FilterChain> m_transcodeFilters;

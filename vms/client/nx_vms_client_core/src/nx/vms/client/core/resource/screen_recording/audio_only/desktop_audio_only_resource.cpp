@@ -35,7 +35,7 @@ AudioLayoutConstPtr DesktopAudioOnlyResource::getAudioLayout(
 QnAbstractStreamDataProvider* DesktopAudioOnlyResource::createDataProvider(
     Qn::ConnectionRole /*role*/)
 {
-    return new DesktopAudioOnlyDataProvider(toSharedPointer());
+    return new DesktopAudioOnlyDataProvider();
 }
 
 } // namespace nx::vms::client::core

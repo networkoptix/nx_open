@@ -35,6 +35,7 @@ public:
     virtual bool hasThread() const { return true; }
     virtual bool reinitResourceOnStreamError() const { return true; }
     bool isConnectionLost() const;
+    const QnResourcePtr& getResource() const;
 
 protected:
     virtual void sleepIfNeeded() {}
@@ -48,6 +49,7 @@ protected:
     void resetTimeCheck();
     void onEvent(CameraDiagnostics::Result event);
     void resetMediaStatistics();
+
 protected:
     QnMediaStreamStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
     std::array<int, CL_MAX_CHANNEL_NUMBER> m_gotKeyFrame;
@@ -57,12 +59,15 @@ protected:
     virtual bool needKeyData(int channel) const;
     virtual bool needKeyData() const;
 
+protected:
+    QnResourcePtr m_resource;
+
 private:
     int getNumberOfChannels() const;
 
 private:
     nx::utils::CachedValue<int> m_numberOfChannels;
-    qint64 m_lastMediaTime[CL_MAX_CHANNELS + 1]; //< max video channels + audio channel
+    qint64 m_lastMediaTime[CL_MAX_CHANNEL_NUMBER + 1]; //< max video channels + audio channel
     bool m_isCamera;
     std::atomic<int> m_numberOfErrors{};
 };

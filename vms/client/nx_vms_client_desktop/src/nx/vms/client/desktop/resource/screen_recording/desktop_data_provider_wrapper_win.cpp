@@ -8,17 +8,15 @@
 namespace nx::vms::client::desktop {
 
 DesktopDataProviderWrapper::DesktopDataProviderWrapper(
-    QnResourcePtr res,
     core::DesktopDataProviderBase* owner)
     :
-    QnAbstractMediaStreamDataProvider(res),
     m_owner(owner)
 {
 }
 
 DesktopDataProviderWrapper::~DesktopDataProviderWrapper()
 {
-    m_owner->beforeDestroyDataProvider(this);
+    m_owner->removeDataProcessor(this);
 }
 
 bool DesktopDataProviderWrapper::canAcceptData() const

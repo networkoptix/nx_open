@@ -1971,7 +1971,7 @@ void QnCamDisplay::onRealTimeStreamHint(bool value)
         m_liveBufferSizeMkSec = initialLiveBufferMkSecs();
         m_liveMaxLenReached = false;
         m_realTimeHurryUp = false;
-        auto archive = dynamic_cast<QnAbstractStreamDataProvider*>(sender());
+        auto archive = dynamic_cast<QnAbstractMediaStreamDataProvider*>(sender());
         if (archive)
         {
             QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(archive->getResource());

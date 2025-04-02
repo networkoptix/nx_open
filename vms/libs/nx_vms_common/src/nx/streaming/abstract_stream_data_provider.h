@@ -22,7 +22,7 @@ class NX_VMS_COMMON_API QnAbstractStreamDataProvider:
 {
     Q_OBJECT
 public:
-    explicit QnAbstractStreamDataProvider(const QnResourcePtr& resource);
+    QnAbstractStreamDataProvider();
     virtual ~QnAbstractStreamDataProvider() override;
 
     virtual bool dataCanBeAccepted() const;
@@ -58,7 +58,6 @@ protected:
 
 protected:
     nx::Lockable<QList<QnAbstractMediaDataReceptor*>> m_dataprocessors;
-    QnResourcePtr m_resource;
 
 private:
     std::atomic<Qn::ConnectionRole> m_role;

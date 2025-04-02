@@ -59,11 +59,6 @@ DesktopAudioOnlyDataProvider::AudioSourceInfo::~AudioSourceInfo()
         qFreeAligned(frameBuffer);
 }
 
-DesktopAudioOnlyDataProvider::DesktopAudioOnlyDataProvider(QnResourcePtr ptr):
-    DesktopDataProviderBase(ptr)
-{
-}
-
 DesktopAudioOnlyDataProvider::~DesktopAudioOnlyDataProvider()
 {
     directDisconnectAll();
@@ -330,11 +325,6 @@ void DesktopAudioOnlyDataProvider::preprocessAudioBuffers(
 bool DesktopAudioOnlyDataProvider::isInitialized() const
 {
     return m_initialized;
-}
-
-void DesktopAudioOnlyDataProvider::beforeDestroyDataProvider(
-    QnAbstractMediaDataReceptor* /*dataProviderWrapper*/)
-{
 }
 
 bool DesktopAudioOnlyDataProvider::readyToStop() const

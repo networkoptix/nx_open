@@ -347,6 +347,7 @@ struct DesktopDataProvider::Private
     const bool captureCursor;
     const QSize captureResolution;
     const float encodeQualuty;
+    const QString videoCodec;
     QWidget* const widget;
     const QPixmap logo;
 
@@ -389,16 +390,17 @@ DesktopDataProvider::DesktopDataProvider(
     bool captureCursor,
     const QSize& captureResolution,
     float encodeQualuty, //< In range [0.0, 1.0].
+    const QString& videoCodec,
     QWidget* glWidget,
     const QPixmap& logo)
     :
-    core::DesktopDataProviderBase(res),
     d(new Private{
         .desktopNum = desktopNum,
         .captureMode = captureMode,
         .captureCursor = captureCursor,
         .captureResolution = captureResolution,
         .encodeQualuty = encodeQualuty,
+        .videoCodec = videoCodec,
         .widget = glWidget,
         .logo = logo
         })
@@ -483,21 +485,15 @@ bool DesktopDataProvider::initVideoCapturing()
         return false;
     }
 
-    QString videoCodecName;
-    if (d->encodeQualuty <= 0.5)
-        videoCodecName = getResource()->systemContext()->globalSettings()->lowQualityScreenVideoCodec();
-    else
-        videoCodecName = getResource()->systemContext()->globalSettings()->defaultExportVideoCodec();
-
-    const AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toLatin1().data());
+    const AVCodec* videoCodec = avcodec_find_encoder_by_name(d->videoCodec.toLatin1().data());
     if (!videoCodec)
     {
-        NX_WARNING(this, "Configured codec: %1 not found, h263p will used", videoCodecName);
+        NX_WARNING(this, "Configured codec: %1 not found, h263p will used", d->videoCodec);
         videoCodec = avcodec_find_encoder(AV_CODEC_ID_H263P);
     }
     if(videoCodec == 0)
     {
-        m_lastErrorStr = tr("Could not find video encoder %1.").arg(videoCodecName);
+        m_lastErrorStr = tr("Could not find video encoder %1.").arg(d->videoCodec);
         return false;
     }
 
@@ -510,16 +506,11 @@ bool DesktopDataProvider::initVideoCapturing()
     d->videoCodecCtx->codec_id = videoCodec->id;
     d->videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO ;
     d->videoCodecCtx->thread_count = QThread::idealThreadCount();
-
-
     d->videoCodecCtx->time_base = d->grabber->getFrameRate();
-
     d->videoCodecCtx->pix_fmt = d->grabber->format();
     d->videoCodecCtx->coded_width = d->videoCodecCtx->width = d->grabber->width();
     d->videoCodecCtx->coded_height = d->videoCodecCtx->height = d->grabber->height();
     d->videoCodecCtx->bit_rate = calculateBitrate(videoCodec->name);
-
-    QString codec_prop;
 
     if (d->encodeQualuty == 1)
     {
@@ -879,10 +870,10 @@ int DesktopDataProvider::frameSize() const
     return d->frameSize;
 }
 
-void DesktopDataProvider::beforeDestroyDataProvider(QnAbstractMediaDataReceptor* consumer)
+void DesktopDataProvider::removeDataProcessor(QnAbstractMediaDataReceptor* consumer)
 {
     NX_MUTEX_LOCKER lock( &d->startMutex );
-    removeDataProcessor(consumer);
+    QnAbstractMediaStreamDataProvider::removeDataProcessor(consumer);
     if (processorsCount() == 0)
         pleaseStop();
 }

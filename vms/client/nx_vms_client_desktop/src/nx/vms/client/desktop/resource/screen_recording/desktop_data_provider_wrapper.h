@@ -15,17 +15,16 @@ namespace nx::vms::client::desktop {
 * This class used for sharing desktop media stream.
 */
 class DesktopDataProviderWrapper:
-    public QnAbstractMediaStreamDataProvider,
+    public QnAbstractStreamDataProvider,
     public QnAbstractMediaDataReceptor
 {
 public:
-    DesktopDataProviderWrapper(QnResourcePtr res, core::DesktopDataProviderBase* owner);
+    DesktopDataProviderWrapper(core::DesktopDataProviderBase* owner);
     virtual ~DesktopDataProviderWrapper();
 
     virtual void start(Priority priority = InheritPriority) override;
     bool isInitialized() const;
     QString lastErrorStr() const;
-    virtual bool hasThread() const override { return false; }
     virtual bool canAcceptData() const override;
     virtual bool needConfigureProvider() const override;
     void clearUnprocessedData() override {};

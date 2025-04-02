@@ -64,7 +64,6 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
             connect(m_dataProvider, &QnAbstractStreamDataProvider::finished,
                 m_dataProvider, &QObject::deleteLater);
         }
-
     }
 }
 

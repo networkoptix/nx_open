@@ -17,11 +17,9 @@ class DesktopAudioOnlyDataProvider: public DesktopDataProviderBase
 {
     Q_OBJECT;
 public:
-    DesktopAudioOnlyDataProvider(QnResourcePtr res);
     virtual ~DesktopAudioOnlyDataProvider();
 
     virtual bool isInitialized() const override;
-    virtual void beforeDestroyDataProvider(QnAbstractMediaDataReceptor* dataProviderWrapper) override;
     virtual bool readyToStop() const override;
     virtual void pleaseStop() override;
 
