@@ -1806,7 +1806,7 @@
     </message>
     <message>
       <source>Last master Site merge ID</source>
-      <translation>ID Chi nhánh chính hợp nhất gần đây</translation>
+      <translation>ID hợp nhất hệ thống chính gần đây nhất</translation>
     </message>
     <message>
       <source>Last slave Site merge ID</source>
