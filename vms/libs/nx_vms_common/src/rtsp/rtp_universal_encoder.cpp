@@ -325,16 +325,15 @@ bool QnUniversalRtpEncoder::open(
     bool status = false;
     if (media->dataType == QnAbstractMediaData::VIDEO)
     {
+        QSize sourceSize;
         if (method == QnFfmpegTranscoder::TM_FfmpegTranscode)
         {
-            QSize sourceSize = getVideoSize(media);
+            sourceSize = getVideoSize(media);
             if (sourceSize.isEmpty())
                 NX_DEBUG(this, "Failed to get frame size, codec: %1", media->compressionType);
-            else
-                m_transcoder.setSourceResolution(sourceSize);
         }
         m_transcoder.setTranscodingSettings(extraTranscodeParams);
-        m_transcoder.setVideoCodec(codec, method, Qn::StreamQuality::normal, videoSize);
+        m_transcoder.setVideoCodec(codec, method, Qn::StreamQuality::normal, sourceSize, videoSize);
         status = m_transcoder.open(
             std::dynamic_pointer_cast<const QnCompressedVideoData>(media),
             QnConstCompressedAudioDataPtr());

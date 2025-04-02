@@ -176,29 +176,6 @@ QSize normalizeResolution(const QSize& target, const QSize& source)
     return target;
 }
 
-QSize findMaxSavedResolution(const QnConstCompressedVideoDataPtr& video)
-{
-    if (!video->dataProvider)
-        return QSize();
-
-    QnResourcePtr res = video->dataProvider->getResource();
-    if (!res)
-        return QSize();
-
-    const CameraMediaStreams supportedMediaStreams =
-        QJson::deserialized<CameraMediaStreams>(
-            res->getProperty(ResourcePropertyKey::kMediaStreams).toLatin1());
-
-    QSize result;
-    for(const auto& stream: supportedMediaStreams.streams)
-    {
-        QSize size = stream.getResolution();
-        if (size.height() > result.height())
-            result = size;
-    }
-    return result;
-}
-
 } // namespace nx::transcoding
 
 int suggestBitrate(

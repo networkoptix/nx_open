@@ -103,9 +103,6 @@ bool QnFfmpegVideoTranscoder::prepareFilters(
 
     m_sourceResolution = m_config.sourceResolution;
     if (!m_sourceResolution.isValid())
-        m_sourceResolution = nx::transcoding::findMaxSavedResolution(video);
-
-    if (!m_sourceResolution.isValid())
     {
         NX_DEBUG(this, "Failed to get max resolution from resource, try to get it from data");
         m_sourceResolution = nx::media::getFrameSize(video.get());

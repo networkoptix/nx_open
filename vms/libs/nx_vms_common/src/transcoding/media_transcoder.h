@@ -41,6 +41,7 @@ public:
     bool setVideoCodec(
         AVCodecID codec,
         Qn::StreamQuality quality,
+        const QSize& sourceResolution,
         const QSize& resolution = QSize(),
         int bitrate = -1,
         QnCodecParams::Value params = QnCodecParams::Value());
@@ -79,7 +80,6 @@ public:
     void resetAudio();
     void setAudioSampleRate(int value);
     void setTranscodingSettings(const QnLegacyTranscodingSettings& settings);
-    void setSourceResolution(const QSize& resolution);
 
 private:
     const Config m_config;
@@ -87,5 +87,4 @@ private:
     std::unique_ptr<QnFfmpegVideoTranscoder> m_vTranscoder;
     std::unique_ptr<QnFfmpegAudioTranscoder> m_aTranscoder;
     QnLegacyTranscodingSettings m_transcodingSettings;
-    QSize m_sourceResolution;
 };

@@ -29,7 +29,9 @@ public:
         bool useMultiThreadEncode = false;
         bool useRealTimeOptimization = false;
         QSize outputResolutionLimit;
-        // Force to use this source resolution, instead of max stream resolution from resource.
+        // Source resolution, if empty - first video frame will be used(it can be low quality, and
+        // in that case result will be transcoded to low quality resolution). So if source stream
+        // has mixed high/low video data, set this option to high quality resolution.
         QSize sourceResolution;
         // Set output stream bitrate (bps).
         int bitrate = -1;

@@ -29,12 +29,14 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metric
     setSsrc(kNxBasicSsrc);
 }
 
-void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideoSize, AVCodecID dstCodec)
+void QnRtspFfmpegEncoder::setDstResolution(
+    const QSize& srcVideoSize, const QSize& dstVideoSize, AVCodecID dstCodec)
 {
     QnFfmpegVideoTranscoder::Config config;
     config.decoderConfig = m_decoderConfig;
     config.targetCodecId = dstCodec;
     config.outputResolutionLimit = dstVideoSize;
+    config.sourceResolution = srcVideoSize;
     m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(config, m_metrics));
 }
 

@@ -2,7 +2,7 @@
 
 #include "export_storage_stream_recorder.h"
 
-#include <core/resource/media_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/storage_resource.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
@@ -235,6 +235,9 @@ CodecParametersPtr ExportStorageStreamRecorder::getVideoCodecParameters(
         if (m_transcoderFixedFrameRate)
             config.fixedFrameRate = m_transcoderFixedFrameRate;
         config.params = suggestMediaStreamParams(m_dstVideoCodec, m_transcodeQuality);
+
+        if (auto cameraRes = m_resource.dynamicCast<QnVirtualCameraResource>())
+            config.sourceResolution = cameraRes->getMaxVideoResolution();
 
         m_videoTranscoder = std::make_unique<QnFfmpegVideoTranscoder>(
             config,

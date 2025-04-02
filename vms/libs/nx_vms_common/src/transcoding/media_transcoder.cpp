@@ -19,6 +19,7 @@ MediaTranscoder::MediaTranscoder(const Config& config, nx::metric::Storage* metr
 bool MediaTranscoder::setVideoCodec(
     AVCodecID codec,
     Qn::StreamQuality quality,
+    const QSize& sourceResolution,
     const QSize& resolution,
     int bitrate,
     QnCodecParams::Value params)
@@ -27,7 +28,7 @@ bool MediaTranscoder::setVideoCodec(
         params = suggestMediaStreamParams(codec, quality);
 
     QnFfmpegVideoTranscoder::Config config;
-    config.sourceResolution = m_sourceResolution;
+    config.sourceResolution = sourceResolution;
     config.outputResolutionLimit = resolution;
     config.bitrate = bitrate;
     config.params = params;
@@ -62,11 +63,6 @@ bool MediaTranscoder::setAudioCodec(AVCodecID codec)
 void MediaTranscoder::setTranscodingSettings(const QnLegacyTranscodingSettings& settings)
 {
     m_transcodingSettings = settings;
-}
-
-void MediaTranscoder::setSourceResolution(const QSize& resolution)
-{
-    m_sourceResolution = resolution;
 }
 
 bool MediaTranscoder::openVideo(const QnConstCompressedVideoDataPtr& video)

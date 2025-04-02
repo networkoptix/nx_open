@@ -26,6 +26,7 @@ bool QnFfmpegTranscoder::setVideoCodec(
     AVCodecID codec,
     TranscodeMethod method,
     Qn::StreamQuality quality,
+    const QSize& srcResolution,
     const QSize& resolution,
     int bitrate,
     QnCodecParams::Value params)
@@ -37,7 +38,7 @@ bool QnFfmpegTranscoder::setVideoCodec(
             m_mediaTranscoder.resetVideo();
             break;
         case TM_FfmpegTranscode:
-            m_mediaTranscoder.setVideoCodec(codec, quality, resolution, bitrate, params);
+            m_mediaTranscoder.setVideoCodec(codec, quality, srcResolution, resolution, bitrate, params);
             break;
         default:
             NX_ERROR(this, "Unknown transcoding method.");
@@ -220,11 +221,6 @@ QnFfmpegTranscoder::~QnFfmpegTranscoder()
 {
     NX_DEBUG(this, "Destroying ffmpeg transcoder. Total transcoder count %1",
         QnFfmpegTranscoder_count.fetchAndAddOrdered(-1) - 1);
-}
-
-void QnFfmpegTranscoder::setSourceResolution(const QSize& resolution)
-{
-    m_mediaTranscoder.setSourceResolution(resolution);
 }
 
 bool QnFfmpegTranscoder::open(const AVCodecParameters* codecParameters)

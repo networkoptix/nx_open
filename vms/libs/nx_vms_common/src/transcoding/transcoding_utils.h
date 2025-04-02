@@ -42,7 +42,6 @@ NX_VMS_COMMON_API QSize adjustCodecRestrictions(AVCodecID codec, const QSize& so
 QSize cropResolution(const QSize& source, const QSize& max);
 QSize downscaleByHeight(const QSize& source, int newHeight);
 QSize downscaleByWidth(const QSize& source, int newWidth);
-QSize findMaxSavedResolution(const QnConstCompressedVideoDataPtr& video);
 
 } // namespace nx::transcoding
 

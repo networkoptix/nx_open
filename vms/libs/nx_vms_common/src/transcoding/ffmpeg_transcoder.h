@@ -50,7 +50,6 @@ public:
     // Direct stream copy of one stream only to support usage as muxer in QnUniversalRtpEncoder.
     bool open(const AVCodecParameters* codecParameters);
     void setTranscodingSettings(const QnLegacyTranscodingSettings& settings);
-    void setSourceResolution(const QSize& resolution);
 
     using BeforeOpenCallback = nx::utils::MoveOnlyFunc<void(
         QnFfmpegTranscoder* transcoder,
@@ -71,6 +70,7 @@ public:
         AVCodecID codec,
         TranscodeMethod method,
         Qn::StreamQuality quality,
+        const QSize& srcResolution,
         const QSize& resolution = QSize(),
         int bitrate = -1,
         QnCodecParams::Value params = QnCodecParams::Value());

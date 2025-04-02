@@ -24,7 +24,7 @@ public:
     virtual bool isEof() const override { return false; }
     virtual void setMtu(int mtu) override;
 
-    void setDstResolution(const QSize& dstVideoSize, AVCodecID dstCodec);
+    void setDstResolution(const QSize& srcVideoSize, const QSize& dstVideoSize, AVCodecID dstCodec);
 
     void setLiveMarker(int value);
     void setAdditionFlags(quint16 value);

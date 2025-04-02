@@ -57,7 +57,7 @@ bool FileTranscoder::setVideoCodec(
     int bitrate,
     QnCodecParams::Value params )
 {
-    return m_transcoder.setVideoCodec( codec, transcodeMethod, quality, resolution, bitrate, params );
+    return m_transcoder.setVideoCodec( codec, transcodeMethod, quality, QSize(), resolution, bitrate, params );
 }
 
 bool FileTranscoder::setAudioCodec(
