@@ -811,7 +811,7 @@
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation>Thumbnail Display</translation>
+      <translation>Hiển thị hình thu nhỏ</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
