@@ -255,6 +255,7 @@ public:
 
     // Hardware decoding has been used for the last presented frame.
     bool isHwAccelerated = false;
+    QString codecName;
 
     // Human-readable tag for logging and debugging purposes.
     QString tag = "MediaPlayer";
@@ -641,6 +642,7 @@ void Player::Private::presentNextFrame()
     {
         setMediaStatus(MediaStatus::Loaded);
         isHwAccelerated = metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_HWDecodingUsed);
+        codecName = metadata.codecName;
         videoSurface->setVideoFrame(*scaleFrame(videoFrameToRender));
         if (dataConsumer)
         {
@@ -1562,8 +1564,7 @@ PlayerStatistics Player::currentStatistics() const
         result.bitrate += statistics->bitrateBitsPerSecond() / 1024.0 / 1024.0;
     }
 
-    if (const auto codecContext = d->archiveReader->getCodecContext())
-        result.codec = codecContext->getCodecName();
+    result.codec = d->codecName;
     result.isHwAccelerated = d->isHwAccelerated;
     return result;
 }

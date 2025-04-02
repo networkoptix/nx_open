@@ -35,6 +35,7 @@ struct NX_MEDIA_API FrameMetadata
     int videoChannel; /**< For multi-sensor cameras. */
     int sequence; /**< Number of playback request. */
     QnAbstractMediaData::DataType dataType;
+    QString codecName;
 private:
     bool isNull() const;
 };

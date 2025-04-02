@@ -882,17 +882,6 @@ begin_label:
     if (videoData && (videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && m_ignoreSkippingFrame)
         goto begin_label;
 
-    auto mediaRes = m_resource.dynamicCast<QnMediaResource>();
-    if (mediaRes && !mediaRes->hasVideo(this))
-    {
-        if (m_currentData && m_currentData->channelNumber == 0)
-            m_codecContext = m_currentData->context;
-    }
-    else {
-        if (videoData && videoData->context)
-            m_codecContext = videoData->context;
-    }
-
     if (reverseMode && !delegateForNegativeSpeed)
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
 
@@ -1431,11 +1420,6 @@ double QnArchiveStreamReader::getSpeed() const
         return m_navDelegate->getSpeed();
 
     return m_speed;
-}
-
-CodecParametersConstPtr QnArchiveStreamReader::getCodecContext() const
-{
-    return m_codecContext;
 }
 
 qint64 QnArchiveStreamReader::startTime() const

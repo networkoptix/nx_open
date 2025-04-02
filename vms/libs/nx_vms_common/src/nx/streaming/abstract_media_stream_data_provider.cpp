@@ -206,11 +206,6 @@ void QnAbstractMediaStreamDataProvider::checkAndFixTimeFromCamera(const QnAbstra
     }
 }
 
-CodecParametersConstPtr QnAbstractMediaStreamDataProvider::getCodecContext() const
-{
-    return CodecParametersConstPtr(nullptr);
-}
-
 CameraDiagnostics::Result QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection()
 {
     return CameraDiagnostics::NotImplementedResult();

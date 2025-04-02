@@ -2301,9 +2301,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const
         mbps += statistics->bitrateBitsPerSecond() / 1024.0 / 1024.0;
     }
 
-    QString codecString;
-    if (CodecParametersConstPtr codecContext = d->display()->mediaProvider()->getCodecContext())
-        codecString = codecContext->getCodecName();
+    QString codecString = d->display()->getCodecName();
     if (m_renderer->isHardwareDecoderUsed(0))
         codecString += " (HW)";
 

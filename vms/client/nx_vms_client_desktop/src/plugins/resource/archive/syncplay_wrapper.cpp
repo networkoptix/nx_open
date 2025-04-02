@@ -157,10 +157,10 @@ void QnArchiveSyncPlayWrapper::directJumpToNonKeyFrame(qint64 mksec)
     {
         if (!info.reader->isEnabled())
             continue;
-            info.reader->setNavDelegate(0);
-            info.reader->directJumpToNonKeyFrame(mksec);
-            info.reader->setNavDelegate(this);
-        }
+        info.reader->setNavDelegate(0);
+        info.reader->directJumpToNonKeyFrame(mksec);
+        info.reader->setNavDelegate(this);
+    }
 }
 
 void QnArchiveSyncPlayWrapper::setJumpTime(qint64 mksec)

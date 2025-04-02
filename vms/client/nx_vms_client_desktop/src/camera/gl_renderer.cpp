@@ -42,8 +42,6 @@ using namespace nx::vms::api;
 
 namespace {
 
-const int ROUND_COEFF = 8;
-
 int minPow2(int value)
 {
     int result = 1;

@@ -126,6 +126,8 @@ public:
     void addMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
     void removeMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
 
+    QString getCodecName();
+
 protected:
     void disconnectFromResource();
 

@@ -230,3 +230,11 @@ void QnResourceDisplay::removeMetadataConsumer(
     if (m_camera)
         m_camera->getCamDisplay()->removeMetadataConsumer(metadataConsumer);
 }
+
+QString QnResourceDisplay::getCodecName()
+{
+    if (m_camera)
+        return m_camera->getCamDisplay()->getCodecName();
+
+    return QString();
+}

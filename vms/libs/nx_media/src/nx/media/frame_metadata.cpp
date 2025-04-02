@@ -30,6 +30,8 @@ FrameMetadata::FrameMetadata(const QnConstCompressedVideoDataPtr& frame):
     flags = frame->flags;
     sequence = frame->opaque;
     dataType = frame->dataType;
+    if (frame->context)
+        codecName = frame->context->getCodecName();
 }
 
 FrameMetadata::FrameMetadata(const QnEmptyMediaDataPtr& frame):

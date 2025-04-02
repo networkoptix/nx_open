@@ -1378,6 +1378,14 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     if (!media)
         return true;
 
+    m_hasVideo = m_resource->hasVideo(media->dataProvider);
+    if (!m_hasVideo && media->dataType == QnAbstractMediaData::AUDIO
+        || media->dataType == QnAbstractMediaData::VIDEO)
+    {
+        auto name = m_codecName.lock();
+        *name = media->context->getCodecName();
+    }
+
     if (const auto& metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data))
         processMetadata(metadata);
 
@@ -1406,8 +1414,6 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     QnCompressedAudioDataPtr ad = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
 
     m_processedPackets++;
-
-    m_hasVideo = m_resource->hasVideo(media->dataProvider);
 
     if (media->dataType == QnAbstractMediaData::VIDEO ||
         media->dataType == QnAbstractMediaData::AUDIO)
@@ -1830,6 +1836,11 @@ void QnCamDisplay::playAudio(bool play)
         else
             setMTDecoding(play);
     }
+}
+
+QString QnCamDisplay::getCodecName()
+{
+    return *m_codecName.lock();
 }
 
 // ==========================================================================

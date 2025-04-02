@@ -23,6 +23,7 @@
 #include <nx/media/audio/format.h>
 #include <nx/media/stream_event.h>
 #include <nx/utils/elapsed_timer.h>
+#include <nx/utils/lockable.h>
 #include <nx/vms/client/desktop/camera/abstract_video_display.h>
 #include <nx/vms/client/desktop/camera/audio_decode_mode.h>
 
@@ -156,6 +157,7 @@ public:
     nx::vms::client::desktop::AudioDecodeMode audioDecodeMode() const;
     void setAudioDecodeMode(nx::vms::client::desktop::AudioDecodeMode decodeMode);
     nx::vms::client::core::SpectrumData audioSpectrum() const;
+    QString getCodecName();
 
 public slots:
     void onBeforeJump(qint64 time);
@@ -330,6 +332,7 @@ protected:
 
     nx::vms::client::desktop::AudioDecodeMode m_audioDecodeMode =
         nx::vms::client::desktop::AudioDecodeMode::normal;
+    nx::Lockable<QString> m_codecName;
 };
 
 #endif //QN_CAM_DISPLAY_H
