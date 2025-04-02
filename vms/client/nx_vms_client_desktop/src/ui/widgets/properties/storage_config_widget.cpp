@@ -1338,6 +1338,7 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr& server)
     m_server = server;
     m_metadataWatcher->setServer(server);
     m_model->setServer(server);
+    m_model->setStorages({}); // < In case of valid server storages will be loaded later.
 
     if (m_server)
     {
