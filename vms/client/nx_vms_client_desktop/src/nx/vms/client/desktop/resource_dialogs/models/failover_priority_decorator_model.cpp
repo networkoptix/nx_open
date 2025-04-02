@@ -67,13 +67,9 @@ void FailoverPriorityDecoratorModel::setFailoverPriorityOverride(
         {
             m_failoverPriorityOverride.insert(cameraResource, failoverPriority);
         }
-    }
 
-    const auto columnCount = failover_priority_view::ColumnCount;
-    emit dataChanged(
-        index(0, columnCount - 1),
-        index(rowCount() - 1, columnCount - 1),
-        {ResourceDialogItemRole::FailoverPriorityRole});
+        dataChanged(failoverIndex, failoverIndex, {ResourceDialogItemRole::FailoverPriorityRole});
+    }
 }
 
 } // namespace nx::vms::client::desktop
