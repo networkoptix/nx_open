@@ -36,32 +36,14 @@ SoftTriggerEvent::SoftTriggerEvent(
 {
 }
 
-QString SoftTriggerEvent::aggregationSubKey() const
-{
-    // All the soft trigger events must be considered as unique events.
-    return nx::Uuid::createUuid().toSimpleString();
-}
-
-QString SoftTriggerEvent::resourceKey() const
-{
-    return deviceId().toSimpleString();
-}
-
-QString SoftTriggerEvent::aggregationKey() const
-{
-    // Soft trigger are aggregated regardless to resource.
-    // See eventKey in RuleProcessor::processInstantAction.
-    return m_triggerId.toSimpleString();
-}
-
 QVariantMap SoftTriggerEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo);
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
 
     result.insert(utils::kCaptionDetailName, caption());
-    result.insert(utils::kExtendedCaptionDetailName, extendedCaption());
-    result.insert(utils::kDetailingDetailName, detailing(context));
     utils::insertIfValid(result, utils::kUserIdDetailName, QVariant::fromValue(m_userId));
 
     utils::insertLevel(result, nx::vms::event::Level::common);
@@ -69,28 +51,37 @@ QVariantMap SoftTriggerEvent::details(
     utils::insertIfNotEmpty(result, utils::kCustomIconDetailName, triggerIcon());
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCameraOnTime);
 
-    return result;
-}
+    result[utils::kAggregationKeyDetailName] = Strings::softTriggerName(m_triggerName);
+    result[utils::kAggregationKeyIconDetailName] = "soft_trigger";
 
-QString SoftTriggerEvent::trigger() const
-{
-    return m_triggerName.isEmpty() ? tr("Trigger Name") : m_triggerName;
+    result[utils::kSourceTextDetailName] = Strings::resource(context, deviceId(), detailLevel);
+    result[utils::kSourceResourcesTypeDetailName] = QVariant::fromValue(ResourceType::device);
+    result[utils::kSourceResourcesIdsDetailName] = QVariant::fromValue(UuidList{deviceId()});
+
+    result[utils::kDetailingDetailName] = detailing(context);
+    result[utils::kHtmlDetailsName] = QStringList{{
+        Strings::resource(context, deviceId(), Qn::RI_WithUrl),
+        Strings::resource(context, m_userId)
+    }};
+
+    return result;
 }
 
 QString SoftTriggerEvent::caption() const
 {
-    return QString("%1 %2").arg(manifest().displayName).arg(trigger());
+    return QString("%1 %2").arg(manifest().displayName).arg(m_triggerName);
 }
 
 QStringList SoftTriggerEvent::detailing(common::SystemContext* context) const
 {
     QStringList result;
-    result << tr("Source: %1").arg(Strings::resource(context, deviceId(), Qn::RI_WithUrl));
+    result << Strings::source(Strings::resource(context, deviceId(), Qn::RI_WithUrl));
     result << tr("User: %1").arg(Strings::resource(context, m_userId));
     return result;
 }
 
-QString SoftTriggerEvent::extendedCaption() const
+QString SoftTriggerEvent::extendedCaption(common::SystemContext* /*context*/,
+    Qn::ResourceInfoLevel /*detailLevel*/) const
 {
     return caption();
 }
@@ -134,8 +125,7 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
             {utils::kDeviceIdFieldName,
                 {ResourceType::device, Qn::ViewContentPermission, Qn::SoftTriggerPermission}},
             {utils::kUserIdFieldName, {ResourceType::user, {}, Qn::WritePermission}}},
-        .createPermissions = nx::vms::api::GlobalPermission::none,
-        .emailTemplateName = "timestamp_and_details.mustache"
+        .createPermissions = nx::vms::api::GlobalPermission::none
     };
     return kDescriptor;
 }

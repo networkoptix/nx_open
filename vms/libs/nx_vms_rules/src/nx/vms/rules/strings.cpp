@@ -220,17 +220,7 @@ QString Strings::eventName(common::SystemContext* context, const QString& type)
 
 QStringList Strings::eventDetails(const QVariantMap& details)
 {
-    QStringList result;
-
-    if (auto reason = details.value(utils::kReasonDetailName).toStringList(); !reason.isEmpty())
-    {
-        reason.front() = tr("Reason: %1").arg(reason.front());
-        result << reason;
-    }
-
-    result << details.value(utils::kDetailingDetailName).toStringList();
-
-    return result;
+    return details.value(utils::kDetailingDetailName).toStringList();
 }
 
 QString Strings::actionName(Engine* engine, const QString& type)
@@ -410,6 +400,28 @@ QString Strings::invalidDuration(
     }
 
     return {};
+}
+
+QString Strings::nameAndValue(const QString& name, const QString& value)
+{
+    return value.isEmpty()
+        ? name
+        : name + ": " + value;
+}
+
+QString Strings::caption(const QString& value)
+{
+    return nameAndValue(tr("Caption"), value);
+}
+
+QString Strings::description(const QString& value)
+{
+    return nameAndValue(tr("Description"), value);
+}
+
+QString Strings::source(const QString& value)
+{
+    return nameAndValue(tr("Source"), value);
 }
 
 TranslatableString Strings::at()

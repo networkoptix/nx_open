@@ -14,6 +14,9 @@ NX_REFLECTION_ENUM_CLASS(ClientAction,
     licensesSettings,
     previewCamera,
     previewCameraOnTime,
-    browseUrl);
+
+    /** Url should be passed in the details[kUrlDetailName]. */
+    browseUrl
+);
 
 } // namespace nx::vms::api::rules

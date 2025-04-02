@@ -34,7 +34,7 @@ public:
 
     using BasicEvent::BasicEvent;
 
-    QString resourceKey() const override
+    virtual QString aggregationKey() const override
     {
         return {};
     }

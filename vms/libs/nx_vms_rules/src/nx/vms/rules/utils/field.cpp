@@ -125,13 +125,14 @@ FieldDescriptor makeStateFieldDescriptor(
 
 FieldDescriptor makeExtractDetailFieldDescriptor(
     const QString& fieldName,
-    const QString& detailName)
+    const QString& detailName,
+    Qn::ResourceInfoLevel detailLevel)
 {
     return makeFieldDescriptor<ExtractDetailField>(
         fieldName,
         {},
         {},
-        {{ "detailName", detailName }, {"visible", false}});
+        {{ "detailName", detailName }, {"detailLevel", detailLevel}, {"visible", false}});
 }
 
 FieldDescriptor makeNotificationTextWithFieldsDescriptor(const QString& fieldName,
@@ -144,14 +145,14 @@ FieldDescriptor makeNotificationTextWithFieldsDescriptor(const QString& fieldNam
     if (fieldName == kCaptionFieldName)
     {
         defaultText = defaultText.isEmpty() ? QString("{event.caption}") : defaultText;
-        displayName = displayName.empty() ? NX_DYNAMIC_TRANSLATABLE(BasicAction::tr("Caption"))
+        displayName = displayName.empty() ? NX_DYNAMIC_TRANSLATABLE(Strings::caption())
                                           : displayName;
         description = QString("Notification title, displayed on the event tile.");
     }
     else if (fieldName == kDescriptionFieldName)
     {
         defaultText = defaultText.isEmpty() ? QString("{event.details}") : defaultText;
-        displayName = displayName.empty() ? NX_DYNAMIC_TRANSLATABLE(BasicAction::tr("Description"))
+        displayName = displayName.empty() ? NX_DYNAMIC_TRANSLATABLE(Strings::description())
                                           : displayName;
         description = QString("Description, displayed on the event tile.");
     }

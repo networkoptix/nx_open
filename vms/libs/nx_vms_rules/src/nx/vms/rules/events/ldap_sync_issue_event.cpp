@@ -4,7 +4,9 @@
 
 #include <chrono>
 
+#include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization/json_functions.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/icon.h>
 #include <nx/vms/rules/utils/event_details.h>
@@ -36,36 +38,33 @@ bool isValidReason(nx::vms::api::EventReason reason)
 
 namespace nx::vms::rules {
 
-LdapSyncIssueEvent::LdapSyncIssueEvent(std::chrono::microseconds timestamp,
-    vms::api::EventReason reasonCode,
+LdapSyncIssueEvent::LdapSyncIssueEvent(
+    std::chrono::microseconds timestamp,
+    vms::api::EventReason reason,
     std::chrono::seconds syncInterval,
     nx::Uuid serverId)
     :
     BasicEvent(timestamp),
-    m_reason(reasonCode),
-    m_syncInterval(syncInterval),
-    m_serverId(serverId)
+    m_serverId(serverId),
+    m_reason(reason),
+    m_syncInterval(syncInterval)
 {
-}
-
-QString LdapSyncIssueEvent::resourceKey() const
-{
-    return {};
-}
-
-QString LdapSyncIssueEvent::aggregationSubKey() const
-{
-    return utils::makeKey(
-        BasicEvent::aggregationSubKey(), QString::number(static_cast<int>(reason())));
 }
 
 QVariantMap LdapSyncIssueEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo);
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
+
     utils::insertLevel(result, nx::vms::event::Level::important);
     utils::insertIcon(result, nx::vms::rules::Icon::server);
-    utils::insertIfNotEmpty(result, utils::kReasonDetailName, reasonText(aggregatedInfo));
+
+    const QString detailing = reasonText(m_reason);
+    result[utils::kDetailingDetailName] = detailing;
+    result[utils::kHtmlDetailsName] = detailing;
 
     return result;
 }
@@ -83,7 +82,7 @@ nx::vms::api::rules::PropertyMap LdapSyncIssueEvent::aggregatedInfo(
             continue;
 
         const auto reason = ldapSyncIssueEvent->reason();
-        if (!NX_ASSERT(isValidReason(reason), "Unexpected reasonCode value: %1.", reason))
+        if (!NX_ASSERT(isValidReason(reason), "Unexpected reason value: %1.", reason))
             continue;
 
         reasonToCount[reason]++;
@@ -101,17 +100,11 @@ nx::vms::api::rules::PropertyMap LdapSyncIssueEvent::aggregatedInfo(
     return aggregatedInfo;
 }
 
-const ItemDescriptor& LdapSyncIssueEvent::manifest()
+QString LdapSyncIssueEvent::extendedCaption(common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    static const auto kDescriptor = ItemDescriptor{
-        .id = utils::type<LdapSyncIssueEvent>(),
-        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("LDAP Sync Issue Event")),
-        .description = "Triggered when the LDAP server fails to synchronize with the site.",
-        .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported},
-        .fields = {},
-        .emailTemplateName = "ldap_sync_issue.mustache"
-    };
-    return kDescriptor;
+    const auto resourceName = Strings::resource(context, serverId(), detailLevel);
+    return tr("LDAP Sync Issue at %1").arg(resourceName);
 }
 
 QString LdapSyncIssueEvent::reasonText(
@@ -153,6 +146,17 @@ QString LdapSyncIssueEvent::reasonText(vms::api::EventReason reason) const
             NX_ASSERT(false, "Unexpected reason: %1", (int) reason);
             return {};
     }
+}
+
+const ItemDescriptor& LdapSyncIssueEvent::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = utils::type<LdapSyncIssueEvent>(),
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("LDAP Sync Issue")),
+        .description = "Triggered when the LDAP server fails to synchronize with the site.",
+        .flags = {ItemFlag::instant}
+    };
+    return kDescriptor;
 }
 
 } // namespace nx::vms::rules

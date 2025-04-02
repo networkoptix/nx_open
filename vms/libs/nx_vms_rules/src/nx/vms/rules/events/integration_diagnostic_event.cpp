@@ -2,6 +2,8 @@
 
 #include "integration_diagnostic_event.h"
 
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/event_filter_fields/analytics_engine_field.h>
 #include <nx/vms/rules/event_filter_fields/analytics_event_level_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
@@ -15,9 +17,6 @@
 namespace nx::vms::rules {
 
 namespace {
-
-const auto kCaption =
-    NX_DYNAMIC_TRANSLATABLE(IntegrationDiagnosticEvent::tr("Integration Diagnostic Event"));
 
 nx::vms::event::Level calculateLevel(nx::vms::api::EventLevel eventLevel)
 {
@@ -47,45 +46,91 @@ IntegrationDiagnosticEvent::IntegrationDiagnosticEvent(
     nx::Uuid engineId,
     nx::vms::api::EventLevel level)
     :
-    AnalyticsEngineEvent(timestamp, caption, description, deviceId, engineId),
+    BasicEvent(timestamp),
+    m_deviceId(deviceId),
+    m_engineId(engineId),
+    m_caption(caption),
+    m_description(description),
     m_level(level)
 {
 }
 
-QVariantMap IntegrationDiagnosticEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
+QString IntegrationDiagnosticEvent::aggregationKey() const
 {
-    auto result = AnalyticsEngineEvent::details(context, aggregatedInfo);
+    return aggregationResourceId().toSimpleString();
+}
 
-    if (deviceId().isNull())
-        result[utils::kSourceIdDetailName] = QVariant::fromValue(engineId());
+QVariantMap IntegrationDiagnosticEvent::details(
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
+{
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    if (!m_deviceId.isNull())
+    {
+        fillAggregationDetailsForDevice(result, context, deviceId(), detailLevel);
+    }
+    else
+    {
+        const auto engine = context->resourcePool()->getResourceById(engineId());
 
-    if (!result.contains(utils::kCaptionDetailName))
-        result.insert(utils::kCaptionDetailName, eventCaption());
+        const auto engineName = engine ? Strings::resource(engine, detailLevel) : QString();
+        result[utils::kAggregationKeyDetailName] = engineName;
+        result[utils::kAggregationKeyDetailsDetailName] = Strings::resourceIp(engine);
+        result[utils::kAggregationKeyIconDetailName] = "server";
 
-    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
+        result[utils::kSourceTextDetailName] = engineName;
+        result[utils::kSourceResourcesTypeDetailName] =
+            QVariant::fromValue(ResourceType::analyticsEngine);
+        result[utils::kSourceResourcesIdsDetailName] = QVariant::fromValue(UuidList{engineId()});
+    }
+
+    result[utils::kCaptionDetailName] = m_caption.isEmpty()
+        ? manifest().displayName
+        : m_caption;
+
+    utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, m_description);
     utils::insertLevel(result, calculateLevel(level()));
     utils::insertIcon(result, nx::vms::rules::Icon::integrationDiagnostic);
+
+    result[utils::kDetailingDetailName] = detailing();
+    result[utils::kHtmlDetailsName] = QStringList{{
+        caption(),
+        description()
+    }};
 
     return result;
 }
 
-QString IntegrationDiagnosticEvent::eventCaption() const
+QString IntegrationDiagnosticEvent::extendedCaption(
+    common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    return caption().isEmpty() ? kCaption : caption();
+    const auto resourceName = Strings::resource(context, aggregationResourceId(), detailLevel);
+    return tr("Integration Diagnostic at %1").arg(resourceName);
 }
 
-QString IntegrationDiagnosticEvent::extendedCaption(common::SystemContext* context) const
+QStringList IntegrationDiagnosticEvent::detailing() const
 {
-    const auto resourceName = Strings::resource(context, deviceId(), Qn::RI_WithUrl);
-    return nx::format("%1 - %2", resourceName, eventCaption());
+    QStringList details;
+    if (!caption().isEmpty())
+        details.push_back(Strings::caption(caption()));
+    if (!description().isEmpty())
+        details.push_back(Strings::description(description()));
+
+    return details;
+}
+
+nx::Uuid IntegrationDiagnosticEvent::aggregationResourceId() const
+{
+    return m_deviceId.isNull() ? m_engineId : m_deviceId;
 }
 
 const ItemDescriptor& IntegrationDiagnosticEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<IntegrationDiagnosticEvent>(),
-        .displayName = kCaption,
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Integration Diagnostic")),
         .description = "Triggered when an event is received from "
             "a plugin device connected to the site.",
         .fields = {
@@ -111,8 +156,7 @@ const ItemDescriptor& IntegrationDiagnosticEvent::manifest()
         },
         .resources = {
             {utils::kDeviceIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
-            {utils::kEngineIdFieldName, {ResourceType::analyticsEngine}}},
-        .emailTemplateName = "integration_diagnostic.mustache"
+            {utils::kEngineIdFieldName, {ResourceType::analyticsEngine}}}
     };
 
     return kDescriptor;

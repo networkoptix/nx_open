@@ -10,20 +10,6 @@
 
 namespace nx::vms::rules {
 
-QVariantMap StorageIssueEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
-{
-    auto result = BasicEvent::details(context, aggregatedInfo);
-
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    utils::insertIfNotEmpty(result, utils::kReasonDetailName, reason(context));
-    utils::insertLevel(result, nx::vms::event::Level::critical);
-    utils::insertIcon(result, nx::vms::rules::Icon::storage);
-    utils::insertClientAction(result, nx::vms::rules::ClientAction::serverSettings);
-
-    return result;
-}
-
 StorageIssueEvent::StorageIssueEvent(
     std::chrono::microseconds timestamp,
     nx::Uuid serverId,
@@ -37,26 +23,33 @@ StorageIssueEvent::StorageIssueEvent(
 {
 }
 
-QString StorageIssueEvent::resourceKey() const
+QVariantMap StorageIssueEvent::details(
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    return m_serverId.toSimpleString();
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
+
+    utils::insertLevel(result, nx::vms::event::Level::critical);
+    utils::insertIcon(result, nx::vms::rules::Icon::storage);
+    utils::insertClientAction(result, nx::vms::rules::ClientAction::serverSettings);
+
+    const QString detailing = extendedReasonText();
+    result[utils::kDetailingDetailName] = detailing;
+    result[utils::kHtmlDetailsName] = detailing;
+
+    return result;
 }
 
-QString StorageIssueEvent::extendedCaption(common::SystemContext* context) const
+QString StorageIssueEvent::extendedCaption(common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    const auto resourceName = Strings::resource(context, serverId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, serverId(), detailLevel);
     return tr("Storage Issue at %1").arg(resourceName);
 }
 
-QString StorageIssueEvent::aggregationSubKey() const
-{
-    return (m_reason == nx::vms::api::EventReason::backupFailedSourceFileError)
-        ? utils::makeKey(BasicEvent::aggregationSubKey(), QString::number((int) m_reason))
-        : utils::makeKey(
-              BasicEvent::aggregationSubKey(), QString::number((int) m_reason), m_reasonText);
-}
-
-QString StorageIssueEvent::reason(common::SystemContext* /*context*/) const
+QString StorageIssueEvent::extendedReasonText() const
 {
     using nx::vms::api::EventReason;
     const QString storageUrl = m_reasonText;
@@ -113,8 +106,7 @@ const ItemDescriptor& StorageIssueEvent::manifest()
         .description = "Triggered when the server fails to write data "
             "to one or more storage devices.",
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
-        .readPermissions = GlobalPermission::powerUser,
-        .emailTemplateName = "timestamp_and_details.mustache"
+        .readPermissions = GlobalPermission::powerUser
     };
     return kDescriptor;
 }

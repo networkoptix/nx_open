@@ -69,6 +69,9 @@ NX_VMS_RULES_API UuidList getDeviceIds(const AggregatedEventPtr& event);
 NX_VMS_RULES_API UuidList getDeviceIds(const EventPtr& event);
 NX_VMS_RULES_API UuidList getDeviceIds(const ActionPtr& action);
 
+NX_VMS_RULES_API UuidList getServerIds(const EventPtr& event);
+NX_VMS_RULES_API UuidList getServerIds(const AggregatedEventPtr& event);
+
 NX_VMS_RULES_API UuidList getResourceIds(const AggregatedEventPtr& event);
 NX_VMS_RULES_API UuidList getResourceIds(const ActionPtr& action);
 

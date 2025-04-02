@@ -26,8 +26,9 @@ AnalyticsObjectEvent::AnalyticsObjectEvent(
     nx::Uuid objectTrackId,
     const nx::common::metadata::Attributes& attributes)
     :
-    AnalyticsEngineEvent(
-        timestamp, /*caption*/ QString(), /*description*/ QString(), deviceId, engineId),
+    BasicEvent(timestamp),
+    m_deviceId(deviceId),
+    m_engineId(engineId),
     m_objectTypeId(objectTypeId),
     m_objectTrackId(objectTrackId),
     m_attributes(attributes)
@@ -40,14 +41,9 @@ QString AnalyticsObjectEvent::subtype() const
     return objectTypeId();
 }
 
-QString AnalyticsObjectEvent::resourceKey() const
+QString AnalyticsObjectEvent::sequenceKey() const
 {
-    return utils::makeKey(AnalyticsEngineEvent::resourceKey(), m_objectTrackId.toSimpleString());
-}
-
-QString AnalyticsObjectEvent::aggregationKey() const
-{
-    return deviceId().toSimpleString();
+    return utils::makeKey(m_deviceId.toSimpleString(), m_objectTrackId.toSimpleString());
 }
 
 QString AnalyticsObjectEvent::cacheKey() const
@@ -67,12 +63,14 @@ nx::analytics::taxonomy::AbstractObjectType* AnalyticsObjectEvent::objectTypeByI
 }
 
 QVariantMap AnalyticsObjectEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = AnalyticsEngineEvent::details(context, aggregatedInfo);
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    fillAggregationDetailsForDevice(result, context, deviceId(), detailLevel);
 
     result.insert(utils::kCaptionDetailName, analyticsObjectCaption(context));
-    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
 
     // TODO: #sivanov Do we need to repeat this as a separate property?
     result.insert(utils::kAnalyticsObjectTypeDetailName, analyticsObjectCaption(context));
@@ -94,16 +92,15 @@ QString AnalyticsObjectEvent::analyticsObjectCaption(common::SystemContext* cont
     return objectType ? objectType->name() : tr("Object detected");
 }
 
-QString AnalyticsObjectEvent::extendedCaption(common::SystemContext* context) const
+QString AnalyticsObjectEvent::extendedCaption(common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    const auto resourceName = Strings::resource(context, deviceId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, deviceId(), detailLevel);
     const auto objectCaption = analyticsObjectCaption(context);
 
-    return tr("%1 at %2", " is detected")
+    return tr("%1 at %2", "Object %1 is detected at camera %2")
         .arg(objectCaption)
         .arg(resourceName);
-
-    return BasicEvent::extendedCaption(context);
 }
 
 const ItemDescriptor& AnalyticsObjectEvent::manifest()
@@ -136,8 +133,7 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
         },
         .resources = {
             {utils::kDeviceIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
-            {utils::kEngineIdFieldName, {ResourceType::analyticsEngine}}},
-        .emailTemplateName = "analytics_object.mustache"
+            {utils::kEngineIdFieldName, {ResourceType::analyticsEngine}}}
     };
 
     return kDescriptor;

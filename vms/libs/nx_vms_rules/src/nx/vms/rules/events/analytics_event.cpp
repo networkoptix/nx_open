@@ -5,6 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
+#include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
 
 #include "../event_filter_fields/analytics_attributes_field.h"
@@ -31,7 +32,11 @@ AnalyticsEvent::AnalyticsEvent(
     const QString& key,
     const QRectF& boundingBox)
     :
-    AnalyticsEngineEvent(timestamp, caption, description, deviceId, engineId),
+    BasicEvent(timestamp),
+    m_deviceId(deviceId),
+    m_engineId(engineId),
+    m_caption(caption),
+    m_description(description),
     m_eventTypeId(eventTypeId),
     m_attributes(attributes),
     m_objectTrackId(objectTrackId),
@@ -47,37 +52,39 @@ QString AnalyticsEvent::subtype() const
     return eventTypeId();
 }
 
-QString AnalyticsEvent::resourceKey() const
+QString AnalyticsEvent::sequenceKey() const
 {
     return utils::makeKey(
-        AnalyticsEngineEvent::resourceKey(),
+        m_deviceId.toSimpleString(),
         m_eventTypeId,
         m_objectTrackId.toSimpleString(),
         m_key);
 }
 
-QString AnalyticsEvent::aggregationKey() const
-{
-    return deviceId().toSimpleString();
-}
-
 QVariantMap AnalyticsEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = AnalyticsEngineEvent::details(context, aggregatedInfo);
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    fillAggregationDetailsForDevice(result, context, deviceId(), detailLevel);
 
-    if (!result.contains(utils::kCaptionDetailName))
-        result.insert(utils::kCaptionDetailName, analyticsEventCaption(context));
+    result[utils::kCaptionDetailName] = m_caption.isEmpty()
+        ? analyticsEventCaption(context)
+        : m_caption;
 
-    utils::insertIfNotEmpty(result, utils::kExtraCaptionDetailName, extraCaption());
-
-    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
-
+    utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, m_description);
     utils::insertIfNotEmpty(
         result, utils::kAnalyticsEventTypeDetailName, analyticsEventCaption(context));
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::analyticsEvent);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCameraOnTime);
+
+    result.insert(utils::kDetailingDetailName, detailing());
+    result[utils::kHtmlDetailsName] = QStringList{{
+        caption(),
+        description()
+    }};
 
     return result;
 }
@@ -94,14 +101,26 @@ QString AnalyticsEvent::analyticsEventCaption(common::SystemContext* context) co
     return eventType ? eventType->name() : tr("Analytics Event");
 }
 
-QString AnalyticsEvent::extendedCaption(common::SystemContext* context) const
+QString AnalyticsEvent::extendedCaption(common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    const auto resourceName = Strings::resource(context, deviceId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, deviceId(), detailLevel);
     const auto eventCaption = analyticsEventCaption(context);
 
     return tr("%1 at %2", "Analytics Event at some camera")
         .arg(eventCaption)
         .arg(resourceName);
+}
+
+QStringList AnalyticsEvent::detailing() const
+{
+    QStringList details;
+    if (!caption().isEmpty())
+        details.push_back(Strings::caption(caption()));
+    if (!description().isEmpty())
+        details.push_back(Strings::description(description()));
+
+    return details;
 }
 
 const ItemDescriptor& AnalyticsEvent::manifest()
@@ -143,8 +162,7 @@ const ItemDescriptor& AnalyticsEvent::manifest()
         },
         .resources = {
             {utils::kDeviceIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
-            {utils::kEngineIdFieldName, {ResourceType::analyticsEngine}}},
-        .emailTemplateName = "analytics_event.mustache"
+            {utils::kEngineIdFieldName, {ResourceType::analyticsEngine}}}
     };
     return kDescriptor;
 }

@@ -384,8 +384,11 @@ void ActionBuilder::processEvent(const EventPtr& event)
     if (!NX_ASSERT(eventDescriptor) || !NX_ASSERT(actionDescriptor))
         return;
 
-    const auto isEventProlonged = rules::isProlonged(event); //< Whether event state is 'started' or 'stopped'.
-    const auto isActionProlonged = isProlonged(); //< Whether action has 'prolonged' flag and duration is not set.
+    // Whether event state is 'started' or 'stopped'.
+    const auto isEventProlonged = rules::isProlonged(event);
+
+    // Whether action has 'prolonged' flag and duration is not set.
+    const auto isActionProlonged = isProlonged();
     if (isActionProlonged && !isEventProlonged)
     {
         // Prolonged action without fixed duration must be started and stopped according to the
@@ -394,21 +397,22 @@ void ActionBuilder::processEvent(const EventPtr& event)
         return;
     }
 
-    const bool aggregateByType = utils::aggregateByType(*eventDescriptor, *actionDescriptor);
-
-    static const auto aggregationKey = [](const EventPtr& e) { return e->aggregationKey(); };
-    static const auto eventType = [](const EventPtr& e) { return e->type(); };
-
-    if (!isActionProlonged //< Only events for instant or fixed duration action might be aggregated.
+    // Only events for instant or fixed duration action might be aggregated.
+    if (!isActionProlonged
         && m_aggregator //< Action has 'interval' field and interval value more than zero.
         && m_aggregator->aggregate(
-            event, (aggregateByType ? eventType : aggregationKey)))
+            event, ([](const EventPtr& e) { return e->aggregationKey(); })))
     {
-        NX_VERBOSE(this, "Event %1(%2) occurred and was aggregated", event->type(), event->state());
+        NX_VERBOSE(
+            this, "Event %1(%2) occurred and was aggregated", event->type(), event->state());
     }
     else
     {
-        NX_VERBOSE(this, "Event %1(%2) occurred and was sent to execution", event->type(), event->state());
+        NX_VERBOSE(
+            this,
+            "Event %1(%2) occurred and was sent to execution",
+            event->type(),
+            event->state());
         buildAndEmitAction(AggregatedEventPtr::create(event));
     }
 }

@@ -11,22 +11,24 @@ class NX_VMS_RULES_API FanErrorEvent: public BasicEvent
 {
     Q_OBJECT
     Q_CLASSINFO("type", "fanError")
-    using base_type = BasicEvent;
-
     FIELD(nx::Uuid, serverId, setServerId)
 
 public:
     FanErrorEvent() = default;
     FanErrorEvent(std::chrono::microseconds timestamp, nx::Uuid serverId);
 
-    virtual QString resourceKey() const override;
-    virtual QVariantMap details(common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
+    virtual QString aggregationKey() const override { return m_serverId.toSimpleString(); }
+    virtual QVariantMap details(
+        common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+        Qn::ResourceInfoLevel detailLevel) const override;
 
     static const ItemDescriptor& manifest();
 
-private:
-    QString extendedCaption(common::SystemContext* context) const;
+protected:
+    virtual QString extendedCaption(
+        common::SystemContext* context,
+        Qn::ResourceInfoLevel detailLevel) const override;
 };
 
 } // namespace nx::vms::rules

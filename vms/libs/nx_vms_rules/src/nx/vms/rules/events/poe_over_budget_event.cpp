@@ -38,30 +38,24 @@ PoeOverBudgetEvent::PoeOverBudgetEvent(
 {
 }
 
-QString PoeOverBudgetEvent::resourceKey() const
-{
-    return m_serverId.toSimpleString();
-}
-
 QVariantMap PoeOverBudgetEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo);
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
 
-    utils::insertIfNotEmpty(result, utils::kReasonDetailName, reason());
     utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, description());
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    result.insert(utils::kDetailingDetailName, detailing());
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::poeSettings);
     utils::insertIcon(result, nx::vms::rules::Icon::networkIssue);
 
-    return result;
-}
+    const QStringList details(detailing());
+    result[utils::kDetailingDetailName] = details;
+    result[utils::kHtmlDetailsName] = details;
 
-QString PoeOverBudgetEvent::reason() const
-{
-    return tr("Power limit exceeded (%1)", "%1 is consumption").arg(overallConsumption());
+    return result;
 }
 
 QString PoeOverBudgetEvent::overallConsumption(double current, double limit)
@@ -88,9 +82,10 @@ QString PoeOverBudgetEvent::description() const
     return QString("%1 %2").arg(common::html::bold(tr("Consumption"))).arg(consumption);
 }
 
-QString PoeOverBudgetEvent::extendedCaption(common::SystemContext* context) const
+QString PoeOverBudgetEvent::extendedCaption(common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    const auto resourceName = Strings::resource(context, m_serverId, Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, serverId(), detailLevel);
     return tr("PoE over budget on %1").arg(resourceName);
 }
 
@@ -125,7 +120,6 @@ const ItemDescriptor& PoeOverBudgetEvent::manifest()
         },
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
-        .emailTemplateName = "timestamp_and_details.mustache",
         .serverFlags = {api::ServerFlag::SF_HasPoeManagementCapability}
     };
     return kDescriptor;

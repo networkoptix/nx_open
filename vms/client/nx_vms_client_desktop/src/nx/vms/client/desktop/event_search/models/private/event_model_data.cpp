@@ -3,8 +3,11 @@
 #include "event_model_data.h"
 
 #include <nx/vms/api/rules/event_log.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/event_search/utils/event_data.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/basic_action.h>
 #include <nx/vms/rules/basic_event.h>
 #include <nx/vms/rules/engine.h>
@@ -21,10 +24,14 @@ const nx::vms::api::rules::EventLogRecord& EventModelData::record() const
     return m_record;
 }
 
-nx::vms::rules::EventPtr EventModelData::event(core::SystemContext* context) const
+nx::vms::rules::AggregatedEventPtr EventModelData::event(core::SystemContext* context) const
 {
     if (!m_event)
-        m_event = context->vmsRulesEngine()->buildEvent(m_record.eventData);
+    {
+        m_event = nx::vms::rules::AggregatedEventPtr::create(
+            context->vmsRulesEngine()->buildEvent(m_record.eventData),
+            m_record.aggregatedInfo);
+    }
 
     NX_ASSERT(m_event);
     return m_event;
@@ -32,8 +39,9 @@ nx::vms::rules::EventPtr EventModelData::event(core::SystemContext* context) con
 
 const QVariantMap& EventModelData::details(SystemContext* context) const
 {
+    const auto detailLevel = appContext()->localSettings()->resourceInfoLevel();
     if (m_details.empty())
-        m_details = event(context)->details(context, m_record.aggregatedInfo);
+        m_details = event(context)->details(context, detailLevel);
 
     NX_ASSERT(!m_details.empty());
     return m_details;

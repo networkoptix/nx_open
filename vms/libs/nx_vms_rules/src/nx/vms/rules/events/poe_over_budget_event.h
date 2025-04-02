@@ -11,7 +11,6 @@ class NX_VMS_RULES_API PoeOverBudgetEvent: public BasicEvent
 {
     Q_OBJECT
     Q_CLASSINFO("type", "poeOverBudget")
-
     FIELD(nx::Uuid, serverId, setServerId)
     FIELD(double, currentConsumptionW, setCurrentConsumptionW)
     FIELD(double, upperLimitW, setUpperLimitW)
@@ -19,7 +18,6 @@ class NX_VMS_RULES_API PoeOverBudgetEvent: public BasicEvent
 
 public:
     PoeOverBudgetEvent() = default;
-
     PoeOverBudgetEvent(
         std::chrono::microseconds timestamp,
         State state,
@@ -28,18 +26,23 @@ public:
         double upperLimitW,
         double lowerLimitW);
 
-    virtual QString resourceKey() const override;
-    virtual QVariantMap details(common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
+    virtual QString aggregationKey() const override { return m_serverId.toSimpleString(); }
+    virtual QVariantMap details(
+        common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+        Qn::ResourceInfoLevel detailLevel) const override;
 
     static QString overallConsumption(double current, double limit);
 
     static const ItemDescriptor& manifest();
 
+protected:
+    virtual QString extendedCaption(
+        common::SystemContext* context,
+        Qn::ResourceInfoLevel detailLevel) const override;
+
 private:
     QString description() const;
-    QString extendedCaption(common::SystemContext* context) const;
-    QString reason() const;
     QStringList detailing() const;
 
     bool isEmpty() const;

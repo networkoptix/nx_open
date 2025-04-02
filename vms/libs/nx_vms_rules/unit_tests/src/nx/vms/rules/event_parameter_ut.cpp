@@ -199,11 +199,10 @@ TEST_F(EventParameterTest, fields)
 TEST_F(EventParameterTest, details)
 {
     auto event = testEvent();
-    const auto details = event->details(systemContext(), {});
+    const auto details = event->details(systemContext(), {}, Qn::RI_WithUrl);
 
     EXPECT_EQ(details.value("url").toString(), evaluate(event, "event.details.url"));
     EXPECT_EQ(details.value("number").toString(), evaluate(event, "event.details.number"));
-    EXPECT_EQ(event->m_deviceId.toSimpleString(), evaluate(event, "event.details.sourceId"));
 
     EXPECT_EQ(
         details.value("detailing").value<QStringList>().join(", "),

@@ -50,7 +50,7 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
             utils::makeNotificationTextWithFieldsDescriptor(
                 utils::kTooltipFieldName, /* isVisibilityConfigurable */ true),
             utils::makeExtractDetailFieldDescriptor("sourceName",
-                utils::kSourceNameDetailName),
+                utils::kSourceTextDetailName),
         },
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::ViewContentPermission}},

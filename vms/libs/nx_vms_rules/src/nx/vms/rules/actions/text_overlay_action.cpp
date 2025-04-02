@@ -49,7 +49,6 @@ const ItemDescriptor& TextOverlayAction::manifest()
                     .base = FieldProperties{.visible = false},
                     .acceptAll = true
                 }.toVariantMap()),
-            // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine
             utils::makeExtractDetailFieldDescriptor(
                 utils::kExtendedCaptionFieldName,
                 utils::kExtendedCaptionDetailName),

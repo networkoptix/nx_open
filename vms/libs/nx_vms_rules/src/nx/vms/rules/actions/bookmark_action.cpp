@@ -62,7 +62,6 @@ const ItemDescriptor& BookmarkAction::manifest()
                 "List of tags associated with the bookmark. "
                     "To assign multiple tags, separate them with commas."),
 
-            // TODO: #amalov Use Qn::ResouceInfoLevel::RI_WithUrl & AttrSerializePolicy::singleLine
             utils::makeExtractDetailFieldDescriptor(
                 utils::kNameFieldName,
                 utils::kExtendedCaptionDetailName),

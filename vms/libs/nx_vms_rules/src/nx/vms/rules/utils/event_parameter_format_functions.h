@@ -49,7 +49,12 @@ QString eventTimestamp(SubstitutionContext* substitution, common::SystemContext*
     const auto count = std::chrono::duration_cast<T>(substitution->event->timestamp()).count();
     return QString::fromStdString(reflect::toString(count));
 }
-QString eventSource(SubstitutionContext* substitution, common::SystemContext* context);
+
+/**
+ * Event source name. By default this is the device (if present) or server name where the event was
+ * produced. Generic event may overwrite it.
+ */
+QString eventSourceName(SubstitutionContext* substitution, common::SystemContext* context);
 
 QString eventAttribute(SubstitutionContext* substitution, common::SystemContext* context);
 QString eventAttributeName(SubstitutionContext* substitution);

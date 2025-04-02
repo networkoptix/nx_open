@@ -12,7 +12,6 @@ class NX_VMS_RULES_API SoftTriggerEvent: public BasicEvent
 {
     Q_OBJECT
     Q_CLASSINFO("type", "softTrigger")
-
     FIELD(nx::Uuid, triggerId, setTriggerId)
     FIELD(nx::Uuid, deviceId, setDeviceId)
     FIELD(nx::Uuid, userId, setUserId)
@@ -30,19 +29,23 @@ public:
         const QString& name,
         const QString& icon);
 
-    virtual QString resourceKey() const override;
-    virtual QString aggregationKey() const override;
-    virtual QString aggregationSubKey() const override;
-    virtual QVariantMap details(common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
+    virtual QString sequenceKey() const override { return m_deviceId.toSimpleString(); }
+    virtual QString aggregationKey() const override { return m_triggerId.toSimpleString(); }
+    virtual QVariantMap details(
+        common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+        Qn::ResourceInfoLevel detailLevel) const override;
 
     static const ItemDescriptor& manifest();
 
+protected:
+    virtual QString extendedCaption(
+        common::SystemContext* context,
+        Qn::ResourceInfoLevel detailLevel) const override;
+
 private:
-    QString trigger() const;
     QString caption() const;
     QStringList detailing(common::SystemContext* context) const;
-    QString extendedCaption() const;
 };
 
 } // namespace nx::vms::rules

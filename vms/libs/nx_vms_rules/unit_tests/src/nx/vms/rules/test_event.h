@@ -38,9 +38,16 @@ public:
         };
     }
 
-    using BasicEvent::BasicEvent;
+    TestEventInstant()
+    {
+    }
 
-    virtual QString resourceKey() const override
+    TestEventInstant(std::chrono::microseconds timestamp, State state = State::instant):
+        BasicEvent(timestamp, state)
+    {
+    }
+
+    virtual QString aggregationKey() const override
     {
         return m_deviceId.toSimpleString();
     }
@@ -94,23 +101,27 @@ public:
         };
     }
 
-    using BasicEvent::BasicEvent;
-
-    virtual QString aggregationSubKey() const override
+    TestEvent()
     {
-        return utils::makeKey(BasicEvent::aggregationSubKey(), m_deviceId.toSimpleString());
     }
 
-    virtual QString resourceKey() const override
+    TestEvent(std::chrono::microseconds timestamp, State state = State::instant):
+        BasicEvent(timestamp, state)
+    {
+    }
+
+    virtual QString aggregationKey() const override
     {
         return m_deviceId.toSimpleString();
     }
 
-    virtual QVariantMap details(common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override
+    virtual QVariantMap details(
+        common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+        Qn::ResourceInfoLevel detailLevel) const override
     {
-        auto result = base_type::details(context, aggregatedInfo);
-        result[utils::kSourceNameDetailName] = "Test resource";
+        auto result = base_type::details(context, aggregatedInfo, detailLevel);
+        result[utils::kSourceTextDetailName] = "Test resource";
         nx::vms::rules::utils::insertLevel(result, level);
         nx::vms::rules::utils::insertIcon(result, nx::vms::rules::Icon::alert);
         result[nx::vms::rules::utils::kCustomIconDetailName] = "test";
@@ -146,7 +157,14 @@ class TestEventProlonged : public nx::vms::rules::BasicEvent
     Q_PROPERTY(nx::Uuid deviceId MEMBER m_deviceId)
 
 public:
-    using BasicEvent::BasicEvent;
+    TestEventProlonged()
+    {
+    }
+
+    TestEventProlonged(std::chrono::microseconds timestamp, State state = State::instant):
+        BasicEvent(timestamp, state)
+    {
+    }
 
     static ItemDescriptor manifest()
     {
@@ -168,7 +186,7 @@ public:
         };
     }
 
-    QString resourceKey() const override
+    virtual QString aggregationKey() const override
     {
         return m_deviceId.toSimpleString();
     }

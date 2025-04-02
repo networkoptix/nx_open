@@ -137,6 +137,16 @@ UuidList getServerIds(const ActionPtr& action)
     return serverIds(action);
 }
 
+UuidList getServerIds(const EventPtr& event)
+{
+    return serverIds(event);
+}
+
+UuidList getServerIds(const AggregatedEventPtr& event)
+{
+    return serverIds(event);
+}
+
 UuidList getResourceIds(const AggregatedEventPtr& event)
 {
     auto result = getDeviceIds(event);

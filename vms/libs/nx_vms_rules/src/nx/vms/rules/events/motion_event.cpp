@@ -13,22 +13,19 @@
 namespace nx::vms::rules {
 
 MotionEvent::MotionEvent(std::chrono::microseconds timestamp, State state, nx::Uuid deviceId):
-    base_type(timestamp, state),
+    BasicEvent(timestamp, state),
     m_deviceId(deviceId)
 {
 }
 
-QString MotionEvent::resourceKey() const
-{
-    return deviceId().toSimpleString();
-}
-
 QVariantMap MotionEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = base_type::details(context, aggregatedInfo);
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    fillAggregationDetailsForDevice(result, context, deviceId(), detailLevel);
 
-    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::motion);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCameraOnTime);
@@ -36,9 +33,10 @@ QVariantMap MotionEvent::details(
     return result;
 }
 
-QString MotionEvent::extendedCaption(common::SystemContext* context) const
+QString MotionEvent::extendedCaption(common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    const auto resourceName = Strings::resource(context, deviceId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, deviceId(), detailLevel);
     return tr("Motion on %1").arg(resourceName);
 }
 
@@ -63,8 +61,7 @@ const ItemDescriptor& MotionEvent::manifest()
                 }.toVariantMap()),
         },
         .resources = {
-            {utils::kDeviceIdFieldName, {ResourceType::device, Qn::ViewContentPermission}}},
-        .emailTemplateName = "camera_motion.mustache"
+            {utils::kDeviceIdFieldName, {ResourceType::device, Qn::ViewContentPermission}}}
     };
     return kDescriptor;
 }

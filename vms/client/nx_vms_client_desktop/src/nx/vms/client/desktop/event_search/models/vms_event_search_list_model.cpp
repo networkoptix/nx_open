@@ -19,9 +19,11 @@
 #include <nx/vms/client/core/event_search/models/fetch_request.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
 #include <nx/vms/client/core/utils/managed_camera_set.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/event_search/models/private/event_model_data.h>
 #include <nx/vms/client/desktop/event_search/utils/event_data.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
@@ -30,7 +32,9 @@
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/rules_fwd.h>
 #include <nx/vms/rules/strings.h>
+#include <nx/vms/rules/utils/event.h>
 #include <nx/vms/rules/utils/event_details.h>
+#include <nx/vms/rules/utils/event_log.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/resource.h>
 #include <ui/common/notification_levels.h>
@@ -73,7 +77,7 @@ struct Facade
     }
 };
 
-bool hasPreview(const EventPtr& event)
+bool hasPreview(const nx::vms::rules::AggregatedEventPtr& event)
 {
     return event->property(rules::utils::kDeviceIdFieldName).isValid()
         || event->property(rules::utils::kDeviceIdsFieldName).isValid();
@@ -96,7 +100,7 @@ QColor color(const QVariantMap& details)
 }
 
 QString iconPath(
-    const EventPtr& event,
+    const nx::vms::rules::AggregatedEventPtr& event,
     const QVariantMap& details,
     QnResourcePool* pool)
 {
@@ -110,7 +114,7 @@ QString iconPath(
     if (needIconDevices(icon))
     {
         devices = pool->getResourcesByIds<QnVirtualCameraResource>(
-            rules::utils::getDeviceIds(rules::AggregatedEventPtr::create(event)));
+            rules::utils::getDeviceIds(event));
     }
 
     return eventIconPath(icon, customIcon, devices);
@@ -421,9 +425,11 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
     if (!NX_ASSERT(systemContext()))
         return {};
 
-    const auto& event = systemContext()->vmsRulesEngine()->buildEvent(
-        d->data[index.row()].eventData);
-    const auto& details = event->details(systemContext(), d->data[index.row()].aggregatedInfo);
+    const auto infoLevel = appContext()->localSettings()->resourceInfoLevel();
+    const auto event = nx::vms::rules::AggregatedEventPtr::create(
+        systemContext()->vmsRulesEngine()->buildEvent(d->data[index.row()].eventData),
+        d->data[index.row()].aggregatedInfo);
+    const auto details = event->details(systemContext(), infoLevel);
 
     switch (role)
     {
@@ -471,29 +477,16 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
         case core::ObjectTrackIdRole:
             return event->property("objectTrackId");
 
+        // TODO: #sivanov Replace with a corresponding function when the event search unit
+        // tests are ready.
         case core::DisplayedResourceListRole:
-            if (const auto sourceName = details.value(rules::utils::kSourceNameDetailName);
-                sourceName.isValid())
-            {
-                return QVariant::fromValue(QStringList(sourceName.toString()));
-            }
-        [[fallthrough]];
+            return nx::vms::rules::utils::eventSourceText(details);
+
         case core::ResourceListRole:
         {
-            if (const auto sourceId = details.value(rules::utils::kSourceIdDetailName);
-                sourceId.isValid())
-            {
-                if (const auto resource =
-                    systemContext()->resourcePool()->getResourceById(sourceId.value<nx::Uuid>()))
-                {
-                    return QVariant::fromValue(QnResourceList({resource}));
-                }
-
-                if (role == core::DisplayedResourceListRole)
-                    return {}; //< TODO: #vkutin Replace with <deleted camera> or <deleted server>.
-            }
-
-            return {};
+            QnResourceList resources = systemContext()->resourcePool()->getResourcesByIds(
+                nx::vms::rules::utils::getResourceIds(event));
+            return QVariant::fromValue(resources);
         }
 
         case core::ResourceRole: //< Resource for thumbnail preview only.
@@ -501,9 +494,12 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
             if (!hasPreview(event))
                 return {};
 
-            return QVariant::fromValue<QnResourcePtr>(
-                systemContext()->resourcePool()->getResourceById<QnVirtualCameraResource>(
-                    details.value(rules::utils::kSourceIdDetailName).value<nx::Uuid>()));
+            QnResourceList devices = systemContext()->resourcePool()->getResourcesByIds(
+                nx::vms::rules::utils::getDeviceIds(event));
+
+            // FIXME: #sivanov Cover with tests, more devices can be here.
+            if (!devices.empty())
+                return QVariant::fromValue<QnResourcePtr>(devices.first());
         }
 
         case Qn::HelpTopicIdRole:

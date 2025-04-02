@@ -92,23 +92,6 @@ std::string getDeviceField(const vms::rules::ItemDescriptor& eventDescriptor)
     return utils::resourceField(eventDescriptor, rules::ResourceType::device);
 }
 
-nx::Uuid sourceId(const BasicEvent* event)
-{
-    const auto getId =
-        [event](const char* propName)
-        {
-            return event->property(propName).value<nx::Uuid>();
-        };
-
-    if (const auto deviceId = getId(utils::kDeviceIdFieldName); !deviceId.isNull())
-        return deviceId;
-
-    if (const auto serverId = getId(utils::kServerIdFieldName); !serverId.isNull())
-        return serverId;
-
-    return {};
-}
-
 EventDurationType getEventDurationType(const vms::rules::ItemDescriptor& eventDescriptor)
 {
     const auto isInstant = eventDescriptor.flags.testFlag(ItemFlag::instant);

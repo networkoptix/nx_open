@@ -294,7 +294,7 @@ void EventParameterHelper::Private::initFormatFunctions()
             .documentation =
             {
                 .text = "Type of the device which generated the event. "
-                    "For the Site events this will be the Site name.",
+                    "For the events without device this will be the \"Server\" keyword.",
                 .resultExample = "Camera"
             }
         });
@@ -360,12 +360,11 @@ void EventParameterHelper::Private::initFormatFunctions()
 
     registerFormatFunction("event.source",
         {
-            .formatFunction = &eventSource,
+            .formatFunction = &eventSourceName,
             .documentation =
             {
-                .text = "Event source. Can be manually filled for the generic or analytic events, "
-                    "otherwise the source server name (for server-based events) "
-                    "or camera name (for soft triggers) is used.",
+                .text = "Event source. By default this is the device (if present) or server name "
+                    "where the event was produced. Generic event may overwrite it.",
                 .resultExample = kCustomTextExample
             }
         });

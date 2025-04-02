@@ -51,7 +51,7 @@ template<class FieldType>
 static QJsonObject constructOpenApiDescriptor()
 {
     QJsonObject result;
-    result["type"] = "object";
+    result[kTypeProperty] = "object";
 
     const QMetaObject* metaObject = &FieldType::staticMetaObject;
     static const auto propOffset =
@@ -66,7 +66,7 @@ static QJsonObject constructOpenApiDescriptor()
         properties[apiFieldName] = getPropertyOpenApiDescriptor(property.metaType());
     }
 
-    result["properties"] = properties;
+    result[kPropertyKey] = properties;
     return result;
 }
 

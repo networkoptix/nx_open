@@ -25,6 +25,15 @@ AggregatedEvent::AggregatedEvent(std::vector<EventPtr>&& eventList):
 {
 }
 
+AggregatedEvent::AggregatedEvent(
+    const EventPtr& event,
+    nx::vms::api::rules::PropertyMap aggregatedInfo)
+    :
+    m_aggregatedEvents{event},
+    m_aggregatedInfo(aggregatedInfo)
+{
+}
+
 QString AggregatedEvent::type() const
 {
     return m_aggregatedEvents.empty() ? QString{} : initialEvent()->type();
@@ -47,13 +56,21 @@ State AggregatedEvent::state() const
     return NX_ASSERT(!m_aggregatedEvents.empty()) ? initialEvent()->state() : State::none;
 }
 
-QVariantMap AggregatedEvent::details(common::SystemContext* context) const
+QVariantMap AggregatedEvent::details(
+    common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
     if (m_aggregatedEvents.empty())
         return {};
 
-    auto aggregatedInfo = initialEvent()->aggregatedInfo(*this);
-    auto eventDetails = initialEvent()->details(context, aggregatedInfo);
+    auto aggregatedInfo = m_aggregatedInfo
+        ? *m_aggregatedInfo
+        : initialEvent()->aggregatedInfo(*this);
+
+    auto eventDetails = initialEvent()->details(
+        context,
+        aggregatedInfo,
+        detailLevel);
     return eventDetails;
 }
 

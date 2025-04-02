@@ -2,7 +2,6 @@
 
 #include "event_parameter_format_functions.h"
 
-#include <QAuthenticator>
 #include <chrono>
 
 #include <core/resource/camera_resource.h>
@@ -21,7 +20,9 @@
 #include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/event.h>
 #include <nx/vms/rules/utils/event_details.h>
+#include <nx/vms/rules/utils/event_log.h>
 #include <nx/vms/rules/utils/field.h>
+#include <nx/vms/rules/utils/resource.h>
 #include <nx/vms/rules/utils/type.h>
 
 namespace nx::vms::rules::utils {
@@ -30,10 +31,7 @@ namespace {
 
 constexpr auto kDelimiter = QLatin1StringView(", ");
 
-QStringList toStringList(const QVariant& value)
-{
-    return value.canConvert<QStringList>() ? value.toStringList() : QStringList();
-}
+constexpr auto kDefaultSubstitutionDetailLevel = Qn::RI_WithUrl;
 
 QString detailToString(const QVariantMap& details, const QString& key)
 {
@@ -73,23 +71,23 @@ std::optional<QString> variantToString(const QVariant& var)
     return {};
 }
 
-nx::Uuid eventSourceId(const AggregatedEventPtr& eventAggregator)
-{
-    return eventAggregator ? sourceId(eventAggregator->initialEvent().get()) : nx::Uuid();
-}
-
 QnVirtualCameraResourcePtr eventDevice(
-    SubstitutionContext* substitution, common::SystemContext* context)
+    const AggregatedEventPtr& event,
+    common::SystemContext* context)
 {
-    return context->resourcePool()->getResourceById<QnVirtualCameraResource>(
-        eventSourceId(substitution->event));
+    const auto devices = context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+        nx::vms::rules::utils::getDeviceIds(event));
+    return devices.empty()
+        ? QnVirtualCameraResourcePtr()
+        : devices.first();
 }
 
 } // namespace
 
 QString eventType(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    const auto result = substitution->event->details(context).value(kEventTypeIdFieldName);
+    const auto result = substitution->event->details(context, kDefaultSubstitutionDetailLevel)
+        .value(kEventTypeIdFieldName);
     if (result.canConvert<QString>())
         return result.toString();
 
@@ -102,7 +100,7 @@ QString eventCaption(SubstitutionContext* substitution, common::SystemContext* c
     if (!result.isEmpty())
         return result;
 
-    const auto details = substitution->event->details(context);
+    const auto details = substitution->event->details(context, kDefaultSubstitutionDetailLevel);
     result = detailToString(details, kCaptionDetailName);
 
     if (result.isEmpty())
@@ -114,7 +112,7 @@ QString eventCaption(SubstitutionContext* substitution, common::SystemContext* c
 
 QString eventName(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    const auto details = substitution->event->details(context);
+    const auto details = substitution->event->details(context, kDefaultSubstitutionDetailLevel);
 
     auto result = detailToString(details, kAnalyticsEventTypeDetailName);
 
@@ -126,7 +124,8 @@ QString eventName(SubstitutionContext* substitution, common::SystemContext* cont
 
 QString eventDescription(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    auto result = detailToString(substitution->event->details(context), kDescriptionDetailName);
+    auto result = detailToString(substitution->event->details(context, kDefaultSubstitutionDetailLevel),
+        kDescriptionDetailName);
 
     if (result.isEmpty())
         result = propertyToString(substitution->event, kDescriptionFieldName);
@@ -136,38 +135,41 @@ QString eventDescription(SubstitutionContext* substitution, common::SystemContex
 
 QString eventDetails(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    return Strings::eventDetails(substitution->event->details(context))
+    return Strings::eventDetails(substitution->event->details(context, kDefaultSubstitutionDetailLevel))
         .join(common::html::kLineBreak);
 }
 
+// As of now the only place this function is used is the event tile tooltip.
 QString extendedEventDescription(
     SubstitutionContext* substitution, common::SystemContext* context)
 {
-    const auto eventDetails = substitution->event->details(context);
+    const auto eventDetails = substitution->event->details(context, kDefaultSubstitutionDetailLevel);
 
     QStringList extendedDescription;
-    if (const auto it = eventDetails.find(utils::kNameDetailName); it != eventDetails.end())
-        extendedDescription << QString("Event: %1").arg(it->toString());
+    //if (const auto it = eventDetails.find(utils::kNameDetailName); it != eventDetails.end())
+    //    extendedDescription << QString("Event: %1").arg(it->toString());
 
-    if (const auto it = eventDetails.find(utils::kSourceNameDetailName); it != eventDetails.end())
-        extendedDescription << QString("Source: %1").arg(it->toString());
+    //if (const auto it = eventDetails.find(utils::kSourceNameDetailName); it != eventDetails.end())
+    //    extendedDescription << QString("Source: %1").arg(it->toString());
 
-    if (const auto it = eventDetails.find(kPluginIdDetailName); it != eventDetails.end())
-    {
-        extendedDescription << QString("Plugin: %1")
-            .arg(Strings::plugin(context, it->value<nx::Uuid>()));
-    }
+    //if (const auto it = eventDetails.find(kPluginIdDetailName); it != eventDetails.end())
+    //{
+    //    extendedDescription << QString("Plugin: %1")
+    //        .arg(Strings::plugin(context, it->value<nx::Uuid>()));
+    //}
 
-    if (const auto it = eventDetails.find(kExtraCaptionDetailName); it != eventDetails.end())
-        extendedDescription << QString("Caption: %1").arg(it->toString());
+    // Extra Caption was calculated as:
+    // `(!m_caption.isEmpty() && !m_description.startsWith(m_caption)) ? m_caption : QString();`
+    //if (const auto it = eventDetails.find(kExtraCaptionDetailName); it != eventDetails.end())
+    //    extendedDescription << QString("Caption: %1").arg(it->toString());
 
-    extendedDescription << Strings::timestamp(
-        substitution->event->initialEvent()->timestamp(),
-        static_cast<int>(substitution->event->count()));
+    //extendedDescription << Strings::timestamp(
+    //    substitution->event->initialEvent()->timestamp(),
+    //    static_cast<int>(substitution->event->count()));
 
     extendedDescription << Strings::eventDetails(eventDetails);
 
-    return toStringList(extendedDescription).join(common::html::kLineBreak);
+    return extendedDescription.join(common::html::kLineBreak);
 }
 
 QString eventTime(SubstitutionContext* substitution, common::SystemContext* /*context*/)
@@ -200,22 +202,14 @@ QString eventTimeEnd(SubstitutionContext* substitution, common::SystemContext* c
     return eventTime(substitution, context);
 }
 
-QString eventSource(SubstitutionContext* substitution, common::SystemContext* context)
+QString eventSourceName(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    const auto source = propertyToString(substitution->event, kCaptionFieldName);
-    if (!source.isEmpty())
-        return source;
-
-    const auto sourceId = eventSourceId(substitution->event);
-    if (const auto resource = context->resourcePool()->getResourceById(sourceId))
-        return QnResourceDisplayInfo(resource).name();
-
-    return sourceId.toSimpleString();
+    return eventSourceText(substitution->event, context, Qn::RI_NameOnly);
 }
 
 QString deviceIp(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    if (const auto device = eventDevice(substitution, context))
+    if (const auto device = eventDevice(substitution->event, context))
         return QnResourceDisplayInfo(device).host();
 
     return {};
@@ -223,7 +217,7 @@ QString deviceIp(SubstitutionContext* substitution, common::SystemContext* conte
 
 QString deviceId(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    if (const auto device = eventDevice(substitution, context))
+    if (const auto device = eventDevice(substitution->event, context))
         return device->getId().toSimpleString();
 
     return {};
@@ -231,7 +225,7 @@ QString deviceId(SubstitutionContext* substitution, common::SystemContext* conte
 
 QString deviceMac(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    if (const auto device = eventDevice(substitution, context))
+    if (const auto device = eventDevice(substitution->event, context))
         return device->getMAC().toString();
 
     return {};
@@ -239,7 +233,7 @@ QString deviceMac(SubstitutionContext* substitution, common::SystemContext* cont
 
 QString deviceName(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    if (const auto device = eventDevice(substitution, context))
+    if (const auto device = eventDevice(substitution->event, context))
         return QnResourceDisplayInfo(device).name();
 
     return {};
@@ -247,23 +241,15 @@ QString deviceName(SubstitutionContext* substitution, common::SystemContext* con
 
 QString deviceType(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    const auto sourceId = eventSourceId(substitution->event);
-    if (const auto camera =
-            context->resourcePool()->getResourceById<QnVirtualCameraResource>(sourceId))
-    {
-        return QString::fromStdString(nx::reflect::toString(camera->deviceType()));
-    }
-    if (const auto resource =
-            context->resourcePool()->getResourceById<QnMediaServerResource>(sourceId))
-    {
-        return "Server";
-    }
-    return {};
+    if (const auto device = eventDevice(substitution->event, context))
+        return QString::fromStdString(nx::reflect::toString(device->deviceType()));
+
+    return "Server";
 }
 
 QString deviceLogicalId(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    if (const auto device = eventDevice(substitution, context))
+    if (const auto device = eventDevice(substitution->event, context))
         return QString::number(device->logicalId());
 
     return {};
@@ -276,8 +262,8 @@ QString siteName(SubstitutionContext*, common::SystemContext* context)
 
 QString userName(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    const auto userUuid =
-        substitution->event->details(context).value(kUserIdDetailName).value<nx::Uuid>();
+    const auto userUuid = substitution->event->details(context, kDefaultSubstitutionDetailLevel)
+        .value(kUserIdDetailName).value<nx::Uuid>();
     if (userUuid.isNull())
         return {};
 
@@ -313,13 +299,19 @@ QString eventAttribute(SubstitutionContext* substitution, common::SystemContext*
 
 QString serverName(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    auto resource = context->resourcePool()->getResourceById(eventSourceId(substitution->event));
-    while (resource)
+    if (const auto servers = context->resourcePool()->getResourcesByIds<QnMediaServerResource>(
+            getServerIds(substitution->event));
+        !servers.empty())
     {
-        if (const auto server = resource.dynamicCast<QnMediaServerResource>())
-            return server->getName();
-        resource = resource->getParentResource();
+        return servers.first()->getName();
     }
+
+    if (const auto device = eventDevice(substitution->event, context))
+    {
+        if (const auto server = device->getParentServer())
+            return server->getName();
+    }
+
     return {};
 }
 
@@ -332,7 +324,7 @@ QString eventField(SubstitutionContext* substitution, common::SystemContext* con
 
 QString eventDetail(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    return variantToString(substitution->event->details(context).value(
+    return variantToString(substitution->event->details(context, kDefaultSubstitutionDetailLevel).value(
         substitution->name.sliced(kEventDetailsPrefix.size())))
             .value_or(EventParameterHelper::addBrackets(substitution->name));
 }

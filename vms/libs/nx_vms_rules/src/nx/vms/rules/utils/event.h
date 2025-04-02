@@ -19,11 +19,6 @@ inline bool isInstant(const EventPtr& event)
     return event->state() == State::instant;
 }
 
-/**
- * Returns event source to display in notification tile and tooltip.
- */
-NX_VMS_RULES_API nx::Uuid sourceId(const BasicEvent* event);
-
 NX_VMS_RULES_API bool hasSourceCamera(const vms::rules::ItemDescriptor& eventDescriptor);
 
 NX_VMS_RULES_API bool hasSourceServer(const vms::rules::ItemDescriptor& eventDescriptor);

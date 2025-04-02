@@ -10,24 +10,25 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API MotionEvent: public BasicEvent
 {
     Q_OBJECT
-    using base_type = BasicEvent;
     Q_CLASSINFO("type", "motion")
-
     FIELD(nx::Uuid, deviceId, setDeviceId)
 
 public:
     MotionEvent() = default;
     MotionEvent(std::chrono::microseconds timestamp, State state, nx::Uuid deviceId);
 
-    virtual QString resourceKey() const override;
-
-    virtual QVariantMap details(common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
+    virtual QString aggregationKey() const override { return m_deviceId.toSimpleString(); }
+    virtual QVariantMap details(
+        common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+        Qn::ResourceInfoLevel detailLevel) const override;
 
     static const ItemDescriptor& manifest();
 
-private:
-    QString extendedCaption(common::SystemContext* context) const;
+protected:
+    virtual QString extendedCaption(
+        common::SystemContext* context,
+        Qn::ResourceInfoLevel detailLevel) const override;
 };
 
 } // namespace nx::vms::rules

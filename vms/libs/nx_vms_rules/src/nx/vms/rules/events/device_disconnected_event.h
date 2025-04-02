@@ -11,25 +11,28 @@ class NX_VMS_RULES_API DeviceDisconnectedEvent: public BasicEvent
 {
     Q_OBJECT
     Q_CLASSINFO("type", "deviceDisconnected")
-    using base_type = BasicEvent;
-
     FIELD(nx::Uuid, deviceId, setDeviceId)
 
 public:
     DeviceDisconnectedEvent() = default;
     DeviceDisconnectedEvent(std::chrono::microseconds timestamp, nx::Uuid deviceId);
 
-    virtual QString aggregationSubKey() const override;
-    virtual QString resourceKey() const override;
-    virtual QVariantMap details(common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
+    virtual QString aggregationKey() const override { return m_deviceId.toSimpleString(); }
+    virtual QVariantMap details(
+        common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+        Qn::ResourceInfoLevel detailLevel) const override;
 
     static ItemDescriptor manifest(common::SystemContext* context);
 
+protected:
+    virtual QString extendedCaption(
+        common::SystemContext* context,
+        Qn::ResourceInfoLevel detailLevel) const override;
+
 private:
     QString caption(common::SystemContext* context) const;
-    QString extendedCaption(common::SystemContext* context) const;
-    static QString name(common::SystemContext* context);
+    virtual QString name(common::SystemContext* context) const override;
 };
 
 } // namespace nx::vms::rules

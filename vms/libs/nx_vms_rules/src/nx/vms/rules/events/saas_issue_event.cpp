@@ -8,6 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <licensing/license.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
 
 #include "../group.h"
@@ -46,64 +47,39 @@ SaasIssueEvent::SaasIssueEvent(
     NX_ASSERT(!isLicenseMigrationIssue());
 }
 
-QString SaasIssueEvent::resourceKey() const
-{
-    return m_serverId.toSimpleString();
-}
-
 QVariantMap SaasIssueEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo);
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
 
-    result.insert(utils::kExtendedCaptionDetailName, extendedCaption());
-    result.insert(utils::kReasonDetailName, reason(context));
-    result.insert(utils::kDetailingDetailName, detailing(context));
     utils::insertLevel(result, nx::vms::event::Level::important);
     utils::insertIcon(result, nx::vms::rules::Icon::license);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::licensesSettings);
+
+    auto [reasonText, devices] = detailing(context);
+
+    QStringList details{{reasonText}};
+    static const QString kRow = "- %1";
+    for (const auto& device: devices)
+        details.push_back(kRow.arg(device));
+    result[utils::kDetailingDetailName] = details;
+
+    result[utils::kHtmlDetailsName] = QStringList{{
+        reasonText,
+        devices.join(common::html::kLineBreak)
+    }};
+
     return result;
 }
 
-QString SaasIssueEvent::extendedCaption() const
+QString SaasIssueEvent::extendedCaption(common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    using namespace nx::vms::api;
-
-    switch (m_reason)
-    {
-        case EventReason::licenseMigrationFailed:
-        case EventReason::licenseMigrationSkipped:
-             return tr("License migration issue");
-
-        case EventReason::notEnoughLocalRecordingServices:
-            return tr("Recording services disabled");
-
-        case EventReason::notEnoughCloudRecordingServices:
-            return tr("Cloud storage services disabled");
-
-        case EventReason::notEnoughIntegrationServices:
-            return tr("Paid integration services disabled");
-
-        default:
-            NX_ASSERT(false, "Unexpected event reason");
-            return manifest().displayName;
-    }
-}
-
-const ItemDescriptor& SaasIssueEvent::manifest()
-{
-    static const auto kDescriptor = ItemDescriptor{
-        .id = utils::type<SaasIssueEvent>(),
-        .groupId = kServerIssueEventGroup,
-        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Services Issue")),
-        .description = "Triggered when there is a problem with one or more Services.",
-        .flags = {ItemFlag::instant, ItemFlag::saasLicense},
-        .resources = {
-            {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::ViewContentPermission}},
-            {utils::kServerIdFieldName, {ResourceType::server}}},
-        .emailTemplateName = "timestamp_and_details.mustache"
-    };
-    return kDescriptor;
+    const auto resourceName = Strings::resource(context, serverId(), detailLevel);
+    return tr("Services Issue on %1").arg(resourceName);
 }
 
 QString SaasIssueEvent::licenseMigrationReason() const
@@ -158,20 +134,18 @@ QString SaasIssueEvent::reason(nx::vms::common::SystemContext* context) const
         : serviceDisabledReason(context);
 }
 
-QStringList SaasIssueEvent::detailing(nx::vms::common::SystemContext* context) const
+std::pair<QString, QStringList> SaasIssueEvent::detailing(
+    nx::vms::common::SystemContext* context) const
 {
-    auto makeRow =
-        [](const QString& text) { return QString(" - %1").arg(text); };
-
     QStringList result;
     if (isLicenseMigrationIssue())
     {
         for (const auto& key: m_licenseKeys)
         {
             if (const QnLicensePtr license = context->licensePool()->findLicense(key))
-                result << makeRow(QnLicense::displayText(license->type(), license->cameraCount()));
+                result << QnLicense::displayText(license->type(), license->cameraCount());
             else
-                result << makeRow(key);
+                result << key;
         }
     }
     else
@@ -179,9 +153,9 @@ QStringList SaasIssueEvent::detailing(nx::vms::common::SystemContext* context) c
         const auto devices =
             context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(m_deviceIds);
         for (const auto& device: devices)
-            result << makeRow(Strings::resource(device, Qn::RI_WithUrl));
+            result << Strings::resource(device, Qn::RI_WithUrl);
     }
-    return result;
+    return std::make_pair(reason(context), result);
 }
 
 QString SaasIssueEvent::serviceDisabledReason(nx::vms::common::SystemContext* context) const
@@ -214,6 +188,21 @@ QString SaasIssueEvent::serviceDisabledReason(nx::vms::common::SystemContext* co
     }
 
     return {};
+}
+
+const ItemDescriptor& SaasIssueEvent::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = utils::type<SaasIssueEvent>(),
+        .groupId = kServerIssueEventGroup,
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Services Issue")),
+        .description = "Triggered when there is a problem with one or more Services.",
+        .flags = {ItemFlag::instant, ItemFlag::saasLicense},
+        .resources = {
+            {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::ViewContentPermission}},
+            {utils::kServerIdFieldName, {ResourceType::server}}}
+    };
+    return kDescriptor;
 }
 
 } // namespace nx::vms::rules

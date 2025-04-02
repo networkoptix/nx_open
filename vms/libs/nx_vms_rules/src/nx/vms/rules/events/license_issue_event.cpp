@@ -6,6 +6,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
 
 #include "../group.h"
@@ -27,39 +28,60 @@ LicenseIssueEvent::LicenseIssueEvent(
 {
 }
 
-QString LicenseIssueEvent::resourceKey() const
-{
-    return m_serverId.toSimpleString();
-}
-
-QString LicenseIssueEvent::aggregationSubKey() const
-{
-    QStringList cameras;
-    for (const auto id: m_deviceIds)
-        cameras << id.toSimpleString();
-    cameras.sort();
-    return utils::makeKey(cameras);
-}
-
 QVariantMap LicenseIssueEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo);
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
 
-    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
-    result.insert(utils::kReasonDetailName, reason(context));
-    result.insert(utils::kDetailingDetailName, detailing(context));
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertIcon(result, nx::vms::rules::Icon::license);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::licensesSettings);
 
+    auto [text, devices] = detailing(context);
+
+    QStringList details{{text}};
+    static const QString kRow = "- %1";
+    for (const auto& device: devices)
+        details.push_back(kRow.arg(device));
+    result[utils::kDetailingDetailName] = details;
+
+    result[utils::kHtmlDetailsName] = QStringList{{
+        text,
+        devices.join(common::html::kLineBreak)
+    }};
+
     return result;
 }
 
-QString LicenseIssueEvent::extendedCaption(common::SystemContext* context) const
+QString LicenseIssueEvent::extendedCaption(common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    const auto resourceName = Strings::resource(context, serverId(), Qn::RI_WithUrl);
-    return tr("%1 has a license problem", "Server name will be substituted").arg(resourceName);
+    const auto resourceName = Strings::resource(context, serverId(), detailLevel);
+    return tr("Not enough licenses on %1", "Server name will be substituted").arg(resourceName);
+}
+
+std::pair<QString, QStringList> LicenseIssueEvent::detailing(
+    nx::vms::common::SystemContext* context) const
+{
+    const auto devices =
+        context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(m_deviceIds);
+    const QString text = QnDeviceDependentStrings::getNameFromSet(
+        context->resourcePool(),
+        {
+            tr("Recording has been disabled on the following devices:"),
+            tr("Recording has been disabled on the following cameras:")
+        },
+        devices);
+
+    QStringList deviceNames;
+    for (const auto& device: devices)
+        deviceNames.push_back(Strings::resource(device, Qn::RI_WithUrl));
+    deviceNames.sort();
+
+    return std::make_pair(text, deviceNames);
 }
 
 const ItemDescriptor& LicenseIssueEvent::manifest()
@@ -68,47 +90,14 @@ const ItemDescriptor& LicenseIssueEvent::manifest()
         .id = utils::type<LicenseIssueEvent>(),
         .groupId = kServerIssueEventGroup,
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("License Issue")),
-        .description =  "Triggered when a trial license expires or when "
+        .description = "Triggered when a trial license expires or when "
             "the server with activated licenses goes offline.",
         .flags = {ItemFlag::instant, ItemFlag::localLicense},
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::ViewContentPermission}},
-            {utils::kServerIdFieldName, {ResourceType::server}}},
-        .emailTemplateName = "timestamp_and_details.mustache"
+            {utils::kServerIdFieldName, {ResourceType::server}}}
     };
     return kDescriptor;
-}
-
-QString LicenseIssueEvent::reason(nx::vms::common::SystemContext* context) const
-{
-    QnVirtualCameraResourceList disabledCameras =
-        context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(deviceIds());
-
-    return QnDeviceDependentStrings::getNameFromSet(
-        context->resourcePool(),
-        QnCameraDeviceStringSet(
-            tr("Not enough licenses. Recording has been disabled on the following devices:"),
-            tr("Not enough licenses. Recording has been disabled on the following cameras:"),
-            tr("Not enough licenses. Recording has been disabled on the following I/O modules:")),
-        disabledCameras);
-}
-
-QStringList LicenseIssueEvent::detailing(nx::vms::common::SystemContext* context) const
-{
-    QnVirtualCameraResourceList disabledCameras =
-        context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(deviceIds());
-
-    if (!NX_ASSERT(!disabledCameras.isEmpty(),
-        "At least one camera should be disabled on this event"))
-    {
-        return {};
-    }
-
-    QStringList result;
-    for (const auto& camera: disabledCameras)
-        result << Strings::resource(camera, Qn::RI_WithUrl);
-
-    return result;
 }
 
 } // namespace nx::vms::rules

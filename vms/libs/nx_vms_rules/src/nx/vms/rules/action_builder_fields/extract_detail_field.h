@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <common/common_globals.h>
 #include <nx/vms/common/system_context_aware.h>
 
 #include "../action_builder_field.h"
@@ -18,6 +19,7 @@ class NX_VMS_RULES_API ExtractDetailField:
     Q_CLASSINFO("metatype", "extractDetail")
 
     FIELD(QString, detailName, setDetailName);
+    FIELD(Qn::ResourceInfoLevel, detailLevel, setDetailLevel)
 
 public:
     ExtractDetailField(nx::vms::common::SystemContext* context, const FieldDescriptor* descriptor);

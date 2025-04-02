@@ -24,25 +24,18 @@ NX_REFLECTION_ENUM_CLASS(ItemFlag,
     /** The action may be displayed in the event log, but not in the rule editor. */
     system = 1 << 2,
 
-    /**
-     * The default way to aggregate events is to use the EventPtr::aggregationKey function.
-     * If both the event and the action have the flag, more generic aggregation
-     * must be used by the event type.
-     */
-    aggregationByTypeSupported = 1 << 3,
-
     /** The item may appear in the event log, but must not be created. */
-    deprecated = 1 << 4,
+    deprecated = 1 << 3,
 
     /** Type of license required for item to be visible in UI. */
-    saasLicense = 1 << 5,
-    localLicense = 1 << 6,
+    saasLicense = 1 << 4,
+    localLicense = 1 << 5,
 
     /** User event filtration is used for action delivery. */
-    userFiltered = 1 << 7,
+    userFiltered = 1 << 6,
 
     /** Event global and resource read permissions check is performed for the action recipient */
-    eventPermissions = 1 << 8
+    eventPermissions = 1 << 7
 )
 
 Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
@@ -148,6 +141,8 @@ NX_VMS_RULES_API void serialize(
     QnJsonContext* ctx, const FieldDescriptor& value, QJsonValue* target);
 NX_REFLECTION_INSTRUMENT(FieldDescriptor, nx_vms_rules_FieldDescriptor_Fields)
 
+// TODO: #amalov Consider unifying fields, permissions and resources members.
+
 /** Description of event or action with default field set. */
 struct ItemDescriptor
 {
@@ -183,12 +178,6 @@ struct ItemDescriptor
     nx::vms::api::GlobalPermissions createPermissions =
         nx::vms::api::GlobalPermission::generateEvents;
 
-    // TODO: #amalov Consider unifying fields, permissions and resources members.
-
-    // TODO: #mmalofeev split ItemDescriptor to EventDescriptor and ActionDescriptor.
-    /**%apidoc Filename of the mustache template file used to generate email. */
-    QString emailTemplateName;
-
     /**%apidoc[opt]
      * Required Server flags on at least one Server of the merged ones to deal with such an event
      * or action.
@@ -197,7 +186,7 @@ struct ItemDescriptor
 };
 #define nx_vms_rules_ItemDescriptor_Fields \
     (id)(groupId)(displayName)(description)(flags)(executionTargets)(targetServers)(fields) \
-    (resources)(readPermissions)(createPermissions)(emailTemplateName)(serverFlags)
+    (resources)(readPermissions)(createPermissions)(serverFlags)
 NX_VMS_RULES_API void serialize(
     QnJsonContext* ctx, const ItemDescriptor& value, QJsonValue* target);
 NX_REFLECTION_INSTRUMENT(ItemDescriptor, nx_vms_rules_ItemDescriptor_Fields)

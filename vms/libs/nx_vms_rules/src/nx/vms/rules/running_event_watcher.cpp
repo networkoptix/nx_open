@@ -11,7 +11,7 @@ namespace {
 
 QString runningEventKey(const EventPtr& event)
 {
-    return utils::makeKey(event->type(), event->resourceKey());
+    return utils::makeKey(event->type(), event->sequenceKey());
 }
 
 } // namespace

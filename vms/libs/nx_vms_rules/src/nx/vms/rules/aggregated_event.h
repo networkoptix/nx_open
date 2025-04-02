@@ -10,7 +10,10 @@ namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::rules {
 
-/** Wrapper around a list of event aggregation information. */
+/**
+ * Wrapper around a list of event aggregation information. May be constructed directly from the
+ * list of events - or from a serialized aggregation information.
+ */
 class NX_VMS_RULES_API AggregatedEvent: public QObject
 {
     Q_OBJECT
@@ -18,6 +21,10 @@ class NX_VMS_RULES_API AggregatedEvent: public QObject
 public:
     explicit AggregatedEvent(const EventPtr& event);
     explicit AggregatedEvent(std::vector<EventPtr>&& eventList);
+
+    /** Constructor from the serialized data. */
+    AggregatedEvent(const EventPtr& event, nx::vms::api::rules::PropertyMap aggregatedInfo);
+
     ~AggregatedEvent() override = default;
 
     /** Returns property with the given name of the initial event. */
@@ -33,7 +40,7 @@ public:
     State state() const;
 
     /** Returns initial event details plus aggregated details. */
-    QVariantMap details(common::SystemContext* context) const;
+    QVariantMap details(common::SystemContext* context, Qn::ResourceInfoLevel detailLevel) const;
 
     using Filter = std::function<EventPtr(const EventPtr&)>;
     /**
@@ -61,6 +68,7 @@ public:
 private:
     std::vector<EventPtr> m_aggregatedEvents;
     nx::Uuid m_ruleId;
+    std::optional<nx::vms::api::rules::PropertyMap> m_aggregatedInfo;
 
     AggregatedEvent() = default;
 };

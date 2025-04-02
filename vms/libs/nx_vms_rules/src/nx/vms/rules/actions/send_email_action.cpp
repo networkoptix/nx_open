@@ -24,8 +24,7 @@ const ItemDescriptor& SendEmailAction::manifest()
         .id = utils::type<SendEmailAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Send Email")),
         .description = {},
-        .flags = {
-            ItemFlag::instant, ItemFlag::aggregationByTypeSupported, ItemFlag::eventPermissions},
+        .flags = {ItemFlag::instant, ItemFlag::eventPermissions},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::cloud},
         .fields = {
             makeFieldDescriptor<TargetUsersField>(

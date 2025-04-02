@@ -2,6 +2,9 @@
 
 #include "fan_error_event.h"
 
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/common/system_context.h>
+
 #include "../event_filter_fields/source_server_field.h"
 #include "../group.h"
 #include "../strings.h"
@@ -12,22 +15,19 @@
 namespace nx::vms::rules {
 
 FanErrorEvent::FanErrorEvent(std::chrono::microseconds timestamp, nx::Uuid serverId):
-    base_type(timestamp),
+    BasicEvent(timestamp),
     m_serverId(serverId)
 {
 }
 
-QString FanErrorEvent::resourceKey() const
-{
-    return m_serverId.toSimpleString();
-}
-
 QVariantMap FanErrorEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo);
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
 
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::poeSettings);
     utils::insertIcon(result, nx::vms::rules::Icon::fanError);
@@ -35,9 +35,10 @@ QVariantMap FanErrorEvent::details(
     return result;
 }
 
-QString FanErrorEvent::extendedCaption(common::SystemContext* context) const
+QString FanErrorEvent::extendedCaption(common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    const auto resourceName = Strings::resource(context, m_serverId, Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, serverId(), detailLevel);
     return tr("Fan error at %1").arg(resourceName);
 }
 
@@ -60,7 +61,6 @@ const ItemDescriptor& FanErrorEvent::manifest()
         },
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
         .readPermissions = GlobalPermission::powerUser,
-        .emailTemplateName = "timestamp_only.mustache",
         .serverFlags = {api::ServerFlag::SF_HasFanMonitoringCapability}
     };
     return kDescriptor;

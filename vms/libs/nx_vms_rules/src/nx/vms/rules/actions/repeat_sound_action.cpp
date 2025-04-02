@@ -59,7 +59,7 @@ const ItemDescriptor& RepeatSoundAction::manifest()
             utils::makeNotificationTextWithFieldsDescriptor(
                 utils::kTooltipFieldName, /* isVisibilityConfigurable */ true),
             utils::makeExtractDetailFieldDescriptor(
-                "sourceName", utils::kSourceNameDetailName),
+                "sourceName", utils::kSourceTextDetailName),
         },
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}},

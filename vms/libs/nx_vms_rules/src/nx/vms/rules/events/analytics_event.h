@@ -4,16 +4,19 @@
 
 #include <analytics/common/object_metadata.h>
 
+#include "../basic_event.h"
 #include "../data_macros.h"
-#include "analytics_engine_event.h"
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API AnalyticsEvent: public AnalyticsEngineEvent
+class NX_VMS_RULES_API AnalyticsEvent: public BasicEvent
 {
     Q_OBJECT
     Q_CLASSINFO("type", "analytics")
-
+    FIELD(nx::Uuid, deviceId, setDeviceId)
+    FIELD(nx::Uuid, engineId, setEngineId)
+    FIELD(QString, caption, setCaption)
+    FIELD(QString, description, setDescription)
     FIELD(QString, eventTypeId, setEventTypeId)
     FIELD(nx::common::metadata::Attributes, attributes, setAttributes)
     FIELD(nx::Uuid, objectTrackId, setObjectTrackId)
@@ -22,12 +25,11 @@ class NX_VMS_RULES_API AnalyticsEvent: public AnalyticsEngineEvent
 
 public:
     AnalyticsEvent() = default;
-
     AnalyticsEvent(
         std::chrono::microseconds timestamp,
         State state,
-        const QString &caption,
-        const QString &description,
+        const QString& caption,
+        const QString& description,
         nx::Uuid deviceId,
         nx::Uuid engineId,
         const QString& eventTypeId,
@@ -36,17 +38,24 @@ public:
         const QString& key,
         const QRectF& boundingBox);
 
+    virtual QString aggregationKey() const override { return m_deviceId.toSimpleString(); }
     virtual QString subtype() const override;
-    virtual QString resourceKey() const override;
-    virtual QString aggregationKey() const override;
-    virtual QVariantMap details(common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
+    virtual QString sequenceKey() const override;
+    virtual QVariantMap details(
+        common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+        Qn::ResourceInfoLevel detailLevel) const override;
 
     static const ItemDescriptor& manifest();
 
+protected:
+    virtual QString extendedCaption(
+        common::SystemContext* context,
+        Qn::ResourceInfoLevel detailLevel) const override;
+
 private:
     QString analyticsEventCaption(common::SystemContext* context) const;
-    QString extendedCaption(common::SystemContext* context) const;
+    QStringList detailing() const;
 };
 
 } // namespace nx::vms::rules

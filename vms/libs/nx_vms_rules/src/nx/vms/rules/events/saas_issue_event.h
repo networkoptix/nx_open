@@ -13,7 +13,6 @@ class NX_VMS_RULES_API SaasIssueEvent: public BasicEvent
 {
     Q_OBJECT
     Q_CLASSINFO("type", "saasIssue")
-
     FIELD(nx::Uuid, serverId, setServerId)
     FIELD(QStringList, licenseKeys, setLicenseKeys)
     FIELD(UuidList, deviceIds, setDeviceIds)
@@ -32,21 +31,28 @@ public:
         const UuidList& deviceIds,
         nx::vms::api::EventReason reason);
 
-    virtual QString resourceKey() const override;
-    virtual QVariantMap details(common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
+    virtual QString aggregationKey() const override { return m_serverId.toSimpleString(); }
+    virtual QVariantMap details(
+        common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+        Qn::ResourceInfoLevel detailLevel) const override;
 
     static const ItemDescriptor& manifest();
 
     static bool isLicenseMigrationIssue(nx::vms::api::EventReason reason);
 
+protected:
+    virtual QString extendedCaption(
+        common::SystemContext* context,
+        Qn::ResourceInfoLevel detailLevel) const override;
+
 private:
-    QString extendedCaption() const;
     QString reason(nx::vms::common::SystemContext* context) const;
     QString serviceDisabledReason(common::SystemContext* context) const;
     QString licenseMigrationReason() const;
-    QStringList detailing(common::SystemContext* context) const;
     bool isLicenseMigrationIssue() const;
+
+    std::pair<QString, QStringList> detailing(nx::vms::common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

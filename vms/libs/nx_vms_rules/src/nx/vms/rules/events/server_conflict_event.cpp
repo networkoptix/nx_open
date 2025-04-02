@@ -2,7 +2,11 @@
 
 #include "server_conflict_event.h"
 
+#include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_context.h>
 
 #include "../group.h"
 #include "../strings.h"
@@ -23,49 +27,67 @@ ServerConflictEvent::ServerConflictEvent(
 {
 }
 
-QString ServerConflictEvent::resourceKey() const
-{
-    return m_serverId.toSimpleString();
-}
-
 QVariantMap ServerConflictEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo);
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
 
-    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
-    result.insert(utils::kDetailingDetailName, detailing());
-    result.insert(utils::kDescriptionDetailName, detailing());
     utils::insertLevel(result, nx::vms::event::Level::important);
     utils::insertIcon(result, nx::vms::rules::Icon::server);
 
-    return result;
-}
+    const bool isServerIdConflict = m_conflicts.camerasByServer.empty();
 
-QStringList ServerConflictEvent::detailing() const
-{
-    QStringList result;
+    const QString reason = isServerIdConflict
+        ? tr("Discovered a server with the same ID in the same local network")
+        : tr("Servers in the same local network have conflict on the following devices");
 
-    int n = 0;
-    for (const auto& [server, cameras]: nx::utils::constKeyValueRange(m_conflicts.camerasByServer))
+    QStringList detailing{{reason + ":"}};
+    QStringList htmlDetails{{reason}};
+
+    const QString serverRow = tr("Server: %1");
+    const QString textRow("- %1");
+
+    if (isServerIdConflict)
     {
-        //: Conflicting Server #5: 10.0.2.1
-        result << tr("Conflicting Server #%1: %2").arg(++n).arg(server);
-        int m = 0;
-        //: MAC #2: D0-50-99-38-1E-12
-        for (const QString &camera: cameras)
-            result << tr("MAC #%1: %2").arg(++m).arg(camera);
+        detailing.push_back(serverRow.arg(m_conflicts.sourceServer));
+        htmlDetails.push_back(m_conflicts.sourceServer);
+    }
+    else
+    {
+        QStringList htmlRows;
+
+        for (const auto& [server, cameras]: m_conflicts.camerasByServer.asKeyValueRange())
+        {
+            detailing.push_back(serverRow.arg(server));
+            htmlRows.push_back(common::html::bold(serverRow.arg(server)));
+
+            for (const QString& id: cameras)
+            {
+                auto device = context->resourcePool()->getCameraByPhysicalId(id);
+                const QString deviceName = device
+                    ? Strings::resource(device, Qn::RI_WithUrl)
+                    : id;
+                detailing.push_back(textRow.arg(deviceName));
+                htmlRows.push_back(deviceName);
+            }
+        }
+
+        htmlDetails.push_back(htmlRows.join(common::html::kLineBreak));
     }
 
-    if (result.empty())
-        result << tr("Conflicting Server: %1").arg(m_conflicts.sourceServer);
+    result[utils::kDetailingDetailName] = detailing;
+    result[utils::kHtmlDetailsName] = htmlDetails;
 
     return result;
 }
 
-QString ServerConflictEvent::extendedCaption(common::SystemContext* context) const
+QString ServerConflictEvent::extendedCaption(common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    const auto resourceName = Strings::resource(context, serverId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, serverId(), detailLevel);
     return tr("%1 Conflict", "Server name will be substituted").arg(resourceName);
 }
 
@@ -78,8 +100,7 @@ const ItemDescriptor& ServerConflictEvent::manifest()
         .description = "Triggered when multiple servers on the same network access "
             "the same devices.",
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
-        .readPermissions = GlobalPermission::powerUser,
-        .emailTemplateName = "timestamp_and_details.mustache"
+        .readPermissions = GlobalPermission::powerUser
     };
 
     return kDescriptor;

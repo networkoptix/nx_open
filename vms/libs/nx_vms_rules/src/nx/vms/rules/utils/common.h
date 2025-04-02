@@ -13,14 +13,6 @@ namespace nx::vms::rules { class StateField; }
 
 namespace nx::vms::rules::utils {
 
-inline bool aggregateByType(
-    const ItemDescriptor& eventDescriptor,
-    const ItemDescriptor& actionDescriptor)
-{
-    return actionDescriptor.flags.testFlag(ItemFlag::aggregationByTypeSupported)
-        && eventDescriptor.flags.testFlag(ItemFlag::aggregationByTypeSupported);
-}
-
 inline bool isInstantOnly(const ItemDescriptor& descriptor)
 {
     return descriptor.flags.testFlag(vms::rules::ItemFlag::instant)

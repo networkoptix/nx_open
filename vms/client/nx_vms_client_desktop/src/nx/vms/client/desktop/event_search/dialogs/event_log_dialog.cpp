@@ -183,9 +183,13 @@ EventLogDialog::EventLogDialog(QWidget* parent):
 
     setHelpTopic(this, HelpTopic::Id::MainWindow_Notifications_EventLog);
 
-    QList<EventLogModel::Column> columns;
-    columns << EventLogModel::DateTimeColumn << EventLogModel::EventColumn << EventLogModel::EventCameraColumn <<
-        EventLogModel::ActionColumn << EventLogModel::ActionCameraColumn << EventLogModel::DescriptionColumn;
+    QList<EventLogModel::Column> columns{
+        EventLogModel::DateTimeColumn,
+        EventLogModel::EventColumn,
+        EventLogModel::EventSourceColumn,
+        EventLogModel::ActionColumn,
+        EventLogModel::ActionCameraColumn,
+        EventLogModel::DescriptionColumn};
 
     m_model = new EventLogModel(system(), this);
     m_model->setColumns(columns);
@@ -258,7 +262,7 @@ EventLogDialog::EventLogDialog(QWidget* parent):
 
     // Pending is implemented on the dialog side, so no additional delay is needed.
     ui->textSearchLineEdit->setTextChangedSignalFilterMs(0);
-    ui->textSearchLineEdit->lineEdit()->setPlaceholderText(tr("Description"));
+    ui->textSearchLineEdit->lineEdit()->setPlaceholderText(Strings::description());
     connect(ui->textSearchLineEdit, &SearchLineEdit::textChanged,
         this, &EventLogDialog::updateDataDelayed);
     m_delayUpdateTimer.setSingleShot(true);
@@ -300,7 +304,7 @@ QStandardItem* EventLogDialog::createEventTree(const Group& group)
 
     for (const auto& eventType: group.items)
     {
-        auto eventItem = new QStandardItem(rules::Strings::eventName(systemContext(), eventType));
+        auto eventItem = new QStandardItem(Strings::eventName(systemContext(), eventType));
         eventItem->setData(eventType, EventTypeRole);
         item->appendRow(eventItem);
 
@@ -466,7 +470,7 @@ void EventLogDialog::initActionsModel()
     for (const auto& actionDesc: systemContext()->vmsRulesEngine()->actions())
     {
         QStandardItem* item = new QStandardItem(
-            rules::Strings::actionName(systemContext(), actionDesc.id));
+            Strings::actionName(systemContext(), actionDesc.id));
         item->setData(actionDesc.id, ActionTypeRole);
         item->setData(
             actionDesc.flags.testFlag(ItemFlag::prolonged) && !hasDuration(actionDesc),
@@ -825,9 +829,13 @@ void EventLogDialog::at_filterAction_triggered()
     if (parentEventType != EventType::anyEvent && parentEventType != EventType::undefinedEvent)
         recordEventType = parentEventType;
 */
+
+    // Add device from the Source column to the filter if it is present.
     QSet<nx::Uuid> camList;
-    const auto cameraResource =
-        m_model->eventResource(idx.row()).dynamicCast<QnVirtualCameraResource>();
+    auto eventSourceIdx = idx.sibling(idx.row(), EventLogModel::EventSourceColumn);
+    const auto cameraResource = m_model->data(eventSourceIdx, core::ResourceRole)
+        .value<QnResourcePtr>()
+        .dynamicCast<QnVirtualCameraResource>();
     if (cameraResource)
         camList << cameraResource->getId();
 

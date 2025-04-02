@@ -32,6 +32,8 @@
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/common.h>
+#include <nx/vms/rules/utils/event.h>
+#include <nx/vms/rules/utils/event_log.h>
 #include <nx/vms/rules/utils/event_details.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/resource.h>
@@ -47,6 +49,7 @@ namespace nx::vms::client::desktop {
 
 using namespace std::chrono;
 using namespace nx::vms::rules;
+using namespace nx::vms::rules::utils;
 
 namespace {
 
@@ -74,13 +77,13 @@ ResourceData actionUserData(SystemContext* systemContext, const EventLogModelDat
     const auto action = data.action(systemContext);
     ResourceData result;
 
-    for (auto email: action->property(nx::vms::rules::utils::kEmailsFieldName).toString().split(
+    for (auto email: action->property(kEmailsFieldName).toString().split(
         ';', Qt::SkipEmptyParts))
     {
         result.names.push_back(email.trimmed());
     }
 
-    if (const auto userProp = action->property(nx::vms::rules::utils::kUsersFieldName);
+    if (const auto userProp = action->property(kUsersFieldName);
         userProp.isValid() && userProp.canConvert<UuidSelection>())
     {
         const auto selection = userProp.value<UuidSelection>();
@@ -128,7 +131,7 @@ ResourceDataMap actionResourceMap(SystemContext* systemContext, const EventLogMo
         else
         {
             const auto ids =
-                nx::vms::rules::utils::fieldResourceIds(data.action(systemContext), name);
+                fieldResourceIds(data.action(systemContext), name);
 
             if (ids.empty())
                 continue;
@@ -279,49 +282,14 @@ QnResourceIconCache::Key actionTargetIcon(SystemContext* context, const EventLog
     return resourceIconKey(resourceMap.begin()->first, multiple);
 }
 
-nx::Uuid eventSourceId(SystemContext* context, const EventLogModelData& data)
-{
-    return data.details(context).value(utils::kSourceIdDetailName).value<nx::Uuid>();
-}
-
-ResourceType eventSourceType(SystemContext* context, const EventLogModelData& data)
-{
-    const auto manifest = context->vmsRulesEngine()->eventDescriptor(data.eventType());
-    std::map<ResourceType, int> resourceCount;
-
-    for (const auto& [_, desc]: manifest->resources)
-        ++resourceCount[desc.type];
-
-    for (const auto type: {ResourceType::device, ResourceType::server})
-    {
-        if (resourceCount[type] > 0)
-            return type;
-    }
-
-    return ResourceType::none;
-}
-
+// TODO: #sivanov This logic should be moved to the event itself and covered by tests.
 QString eventSourceText(SystemContext* context, const EventLogModelData& data)
 {
-    if (auto sourceName = data.details(context).value(vms::rules::utils::kSourceNameDetailName);
-        sourceName.isValid())
-    {
-        return sourceName.toString();
-    }
-
-    const auto sourceId = eventSourceId(context, data);
-    if (sourceId.isNull())
-        return {};
-
-    if (const auto resource = context->resourcePool()->getResourceById(sourceId))
-        return resourceName(resource);
-
-    // Resource was removed.
-    if (const auto type = eventSourceType(context, data); type != ResourceType::none)
-        return desktop::rules::Strings::removed(context, type);
-
-    NX_ASSERT(false, "Unexpected resource type");
-    return {};
+    const auto [resourceType, _] = eventSourceIcon(data.details(context));
+    const auto result = nx::vms::rules::utils::eventSourceText(data.details(context));
+    return result.isEmpty()
+        ? desktop::rules::Strings::removed(context, resourceType)
+        : result;
 }
 
 bool hasVideoLink(SystemContext* context, const EventLogModelData& data)
@@ -330,7 +298,7 @@ bool hasVideoLink(SystemContext* context, const EventLogModelData& data)
         return false;
 
     for (const auto& device: context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-        nx::vms::rules::utils::getDeviceIds(data.event(context))))
+        getDeviceIds(data.event(context))))
     {
         if (context->accessController()->hasPermissions(device, Qn::ViewContentPermission))
             return true;
@@ -565,10 +533,16 @@ QVariant EventLogModel::mouseCursorData(
     return QVariant();
 }
 
-QnResourcePtr EventLogModel::getResource(Column column, const EventLogModelData& data) const
+QnResourcePtr EventLogModel::resourceData(Column column, const EventLogModelData& data) const
 {
-    if (column == EventLogModel::EventCameraColumn)
-        return resourcePool()->getResourceById(eventSourceId(systemContext(), data));
+    if (column == EventLogModel::EventSourceColumn)
+    {
+        const auto resources = resourcePool()->getResourcesByIds(
+            nx::vms::rules::utils::eventSourceResourceIds(data.details(systemContext())));
+
+        if (!resources.empty())
+            return resources.first();
+    }
 
     if (column == EventLogModel::ActionCameraColumn)
     {
@@ -587,20 +561,10 @@ QVariant EventLogModel::iconData(Column column, const EventLogModelData& data) c
     if (column == ActionCameraColumn)
         return resourceIcon(actionTargetIcon(systemContext(), data));
 
-    if (column == EventCameraColumn)
+    if (column == EventSourceColumn)
     {
-        if (data.details(systemContext()).value(utils::kSourceNameDetailName).isValid())
-            return {};
-
-        const auto sourceId = eventSourceId(systemContext(), data);
-        if (sourceId.isNull())
-            return {};
-
-        if (const auto resource = resourcePool()->getResourceById(sourceId))
-            return qnResIconCache->icon(resource);
-
-        return resourceIcon(resourceIconKey(
-            eventSourceType(systemContext(), data), /*multiple*/ false));
+        auto [resourceType, plural] = eventSourceIcon(data.details(systemContext()));
+        return resourceIcon(resourceIconKey(resourceType, plural));
     }
 
     return {};
@@ -619,7 +583,7 @@ QString EventLogModel::textData(Column column, const EventLogModelData& data) co
         case EventColumn:
             return data.eventTitle(systemContext());
 
-        case EventCameraColumn:
+        case EventSourceColumn:
             return eventSourceText(systemContext(), data);
 
         case ActionColumn:
@@ -663,12 +627,12 @@ QString EventLogModel::description(const EventLogModelData& data) const
         vms::rules::utils::kDescriptionDetailName).toString();
 
     if (result.isEmpty())
-        result = nx::vms::rules::Strings::eventDetails(data.details(systemContext())).join('\n');
+        result = Strings::eventDetails(data.details(systemContext())).join('\n');
 
     if (result.isEmpty() && hasVideoLink(systemContext(), data))
     {
         if (const auto devices = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-            nx::vms::rules::utils::getDeviceIds(data.event(systemContext())));
+            getDeviceIds(data.event(systemContext())));
             !devices.empty())
         {
             const bool hasAccessToArchive = std::ranges::all_of(devices,
@@ -706,9 +670,10 @@ QString EventLogModel::motionUrl(Column column, const EventLogModelData& data) c
     if (column != DescriptionColumn || !hasVideoLink(systemContext(), data))
         return {};
 
-    const auto device = getResource(EventCameraColumn, data)
-        .dynamicCast<QnVirtualCameraResource>();
-    if (!device)
+    const auto devices = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+        getDeviceIds(data.event(systemContext())));
+
+    if (devices.empty())
         return {};
 
     nx::network::SocketAddress connectionAddress;
@@ -716,7 +681,7 @@ QString EventLogModel::motionUrl(Column column, const EventLogModelData& data) c
         connectionAddress = connection->address();
 
     return vms::rules::Strings::urlForCamera(
-        device,
+        devices.first(),
         data.event(systemContext())->timestamp(),
         vms::rules::Strings::publicIp, //< Not used on the client side anyway.
         connectionAddress);
@@ -724,7 +689,6 @@ QString EventLogModel::motionUrl(Column column, const EventLogModelData& data) c
 
 QnResourceList EventLogModel::resourcesForPlayback(const QModelIndex &index) const
 {
-    QnResourceList result;
     if (index.column() != DescriptionColumn || !m_index->isValidRow(index.row()))
         return {};
 
@@ -732,8 +696,7 @@ QnResourceList EventLogModel::resourcesForPlayback(const QModelIndex &index) con
     if (!hasVideoLink(systemContext(), data))
         return {};
 
-    return resourcePool()->getResourcesByIds(
-        nx::vms::rules::utils::getDeviceIds(data.event(systemContext())));
+    return resourcePool()->getResourcesByIds(getResourceIds(data.event(systemContext())));
 }
 
 int EventLogModel::columnCount(const QModelIndex &parent) const
@@ -756,12 +719,18 @@ QVariant EventLogModel::headerData(int section, Qt::Orientation orientation, int
     {
         switch (m_columns[section])
         {
-            case DateTimeColumn:        return tr("Date/Time");
-            case EventColumn:           return tr("Event");
-            case EventCameraColumn:     return tr("Source");
-            case ActionColumn:          return tr("Action");
-            case ActionCameraColumn:    return tr("Target");
-            case DescriptionColumn:     return tr("Description");
+            case DateTimeColumn:
+                return tr("Date/Time");
+            case EventColumn:
+                return tr("Event");
+            case EventSourceColumn:
+                return Strings::source();
+            case ActionColumn:
+                return tr("Action");
+            case ActionCameraColumn:
+                return tr("Target");
+            case DescriptionColumn:
+                return Strings::description();
             default:
                 break;
         }
@@ -802,7 +771,7 @@ QVariant EventLogModel::data(const QModelIndex& index, int role) const
             return mouseCursorData(column, data);
 
         case core::ResourceRole:
-            return QVariant::fromValue<QnResourcePtr>(getResource(column, data));
+            return QVariant::fromValue<QnResourcePtr>(resourceData(column, data));
 
         case Qn::DisplayHtmlRole:
             return htmlData(column, data);
@@ -831,14 +800,6 @@ vms::api::analytics::EventTypeId EventLogModel::analyticsEventType(int row) cons
 
     return m_index->at(row).event(systemContext())
         ->property(vms::rules::utils::kAnalyticsEventTypeDetailName).toString();
-}
-
-QnResourcePtr EventLogModel::eventResource(int row) const
-{
-    if (!m_index->isValidRow(row))
-        return {};
-
-    return getResource(EventCameraColumn, m_index->at(row));
 }
 
 std::chrono::milliseconds EventLogModel::eventTimestamp(int row) const

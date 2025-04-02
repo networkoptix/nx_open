@@ -1034,7 +1034,7 @@ bool Engine::checkRunningEvent(nx::Uuid ruleId, const EventPtr& event)
         if (isEventRunning)
         {
             NX_VERBOSE(this, "Event %1-%2 doesn't match due to repeated start",
-                event->type(), event->resourceKey());
+                event->type(), event->sequenceKey());
             return false;
         }
 
@@ -1047,7 +1047,7 @@ bool Engine::checkRunningEvent(nx::Uuid ruleId, const EventPtr& event)
         if (!isEventRunning)
         {
             NX_VERBOSE(this, "Event %1-%2 doesn't match due to stop without start",
-                event->type(), event->resourceKey());
+                event->type(), event->sequenceKey());
             return false;
         }
 
@@ -1055,7 +1055,7 @@ bool Engine::checkRunningEvent(nx::Uuid ruleId, const EventPtr& event)
         if (runningEventWatcher.runningResourceCount() > 1)
         {
             NX_VERBOSE(this, "Event %1-%2 will not stop action since other events are running.",
-                event->type(), event->resourceKey());
+                event->type(), event->sequenceKey());
 
             return false;
         }

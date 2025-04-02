@@ -10,11 +10,9 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API CameraInputEvent: public BasicEvent
 {
     Q_OBJECT
-    using base_type = BasicEvent;
     Q_CLASSINFO("type", "cameraInput")
-
-    FIELD(QString, inputPortId, setInputPortId)
     FIELD(nx::Uuid, deviceId, setDeviceId)
+    FIELD(QString, inputPortId, setInputPortId)
 
 public:
     CameraInputEvent(
@@ -25,17 +23,22 @@ public:
 
     CameraInputEvent() = default;
 
-    virtual QString resourceKey() const override;
-    virtual QString aggregationKey() const override;
-    virtual QString aggregationSubKey() const override;
-    virtual QVariantMap details(common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
+    virtual QString aggregationKey() const override { return m_deviceId.toSimpleString(); }
+    virtual QString sequenceKey() const override;
+    virtual QVariantMap details(
+        common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+        Qn::ResourceInfoLevel detailLevel) const override;
 
     static ItemDescriptor manifest(common::SystemContext* context);
 
+protected:
+    virtual QString extendedCaption(
+        common::SystemContext* context,
+        Qn::ResourceInfoLevel detailLevel) const override;
+
 private:
     QString detailing() const;
-    QString extendedCaption(common::SystemContext* context) const;
 };
 
 } // namespace nx::vms::rules

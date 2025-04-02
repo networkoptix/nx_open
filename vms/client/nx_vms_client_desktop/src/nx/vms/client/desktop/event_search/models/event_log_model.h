@@ -26,7 +26,7 @@ public:
     {
         DateTimeColumn,
         EventColumn,
-        EventCameraColumn,
+        EventSourceColumn,
         ActionColumn,
         ActionCameraColumn,
         DescriptionColumn,
@@ -50,11 +50,11 @@ public:
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
+    /** United list of all event resources, which can be opened on the scene (devices, servers). */
     QnResourceList resourcesForPlayback(const QModelIndex& index) const;
 
     QString eventType(int row) const;
     nx::vms::api::analytics::EventTypeId analyticsEventType(int row) const;
-    QnResourcePtr eventResource(int row) const;
     std::chrono::milliseconds eventTimestamp(int row) const;
     QString actionType(int row) const;
 
@@ -63,7 +63,7 @@ public:
 private:
     class DataIndex;
 
-    QnResourcePtr getResource(Column column, const EventLogModelData& data) const;
+    QnResourcePtr resourceData(Column column, const EventLogModelData& data) const;
     QString motionUrl(Column column, const EventLogModelData& data) const;
 
     QVariant foregroundData(Column column, const EventLogModelData& data) const;

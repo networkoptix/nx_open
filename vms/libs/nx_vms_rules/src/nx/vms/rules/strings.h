@@ -99,6 +99,18 @@ public:
     static QString invalidDuration(
         std::chrono::microseconds value, std::chrono::seconds min, std::chrono::seconds max);
 
+    /** "Name" or "Name: value". */
+    static QString nameAndValue(const QString& name, const QString& value);
+
+    /** "Caption" or "Caption: value". */
+    static QString caption(const QString& value = {});
+
+    /** "Description" or "Description: value". */
+    static QString description(const QString& value = {});
+
+    /** "Source" or "Source: value". */
+    static QString source(const QString& value = {});
+
     static TranslatableString at();
     static TranslatableString to();
     static TranslatableString toUsers();

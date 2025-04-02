@@ -28,36 +28,30 @@ NetworkIssueEvent::NetworkIssueEvent(
 {
 }
 
-QString NetworkIssueEvent::resourceKey() const
-{
-    return m_deviceId.toSimpleString();
-}
-
-QString NetworkIssueEvent::aggregationSubKey() const
-{
-    return utils::makeKey(
-        BasicEvent::aggregationSubKey(),
-        deviceId().toSimpleString(),
-        QString::number(static_cast<int>(reason())));
-}
-
 QVariantMap NetworkIssueEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo);
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    fillAggregationDetailsForDevice(result, context, deviceId(), detailLevel);
 
-    result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
-    utils::insertIfNotEmpty(result, utils::kReasonDetailName, reasonText(context));
+    const QString reason = reasonText(context);
+
     utils::insertLevel(result, nx::vms::event::Level::important);
     utils::insertIcon(result, nx::vms::rules::Icon::networkIssue);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::cameraSettings);
 
+    result[utils::kDetailingDetailName] = reason;
+    result[utils::kHtmlDetailsName] = reason;
+
     return result;
 }
 
-QString NetworkIssueEvent::extendedCaption(common::SystemContext* context) const
+QString NetworkIssueEvent::extendedCaption(common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    const auto resourceName = Strings::resource(context, deviceId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, deviceId(), detailLevel);
     return tr("Network Issue at %1").arg(resourceName);
 }
 
@@ -146,10 +140,9 @@ const ItemDescriptor& NetworkIssueEvent::manifest()
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Network Issue")),
         .description = "Triggered when data transfer between the device and server fails, "
             "and packet loss is detected.",
-        .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported},
+        .flags = {ItemFlag::instant},
         .resources = {
-            {utils::kDeviceIdFieldName, { ResourceType::device, Qn::ViewContentPermission}}},
-        .emailTemplateName = "timestamp_and_details.mustache"
+            {utils::kDeviceIdFieldName, { ResourceType::device, Qn::ViewContentPermission}}}
     };
     return kDescriptor;
 }

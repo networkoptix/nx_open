@@ -22,7 +22,7 @@ public:
 
     const nx::vms::api::rules::EventLogRecord& record() const;
 
-    nx::vms::rules::EventPtr event(core::SystemContext* context) const;
+    nx::vms::rules::AggregatedEventPtr event(core::SystemContext* context) const;
     const QVariantMap& details(SystemContext* context) const;
     QString eventType() const;
 
@@ -30,7 +30,7 @@ protected:
     nx::vms::api::rules::EventLogRecord m_record;
 
 private:
-    mutable nx::vms::rules::EventPtr m_event;
+    mutable nx::vms::rules::AggregatedEventPtr m_event;
     mutable QVariantMap m_details;
 };
 

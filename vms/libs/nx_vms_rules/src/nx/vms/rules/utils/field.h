@@ -84,7 +84,8 @@ FieldDescriptor makeStateFieldDescriptor(
 
 FieldDescriptor makeExtractDetailFieldDescriptor(
     const QString& fieldName,
-    const QString& detailName);
+    const QString& detailName,
+    Qn::ResourceInfoLevel detailLevel = Qn::RI_WithUrl);
 
 FieldDescriptor makeNotificationTextWithFieldsDescriptor(const QString& fieldName,
     bool isVisibilityConfigurable = false,

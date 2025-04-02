@@ -2,6 +2,11 @@
 
 #include "generic_event.h"
 
+#include <core/resource/device_dependent_strings.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_context.h>
+
 #include "../event_filter_fields/customizable_flag_field.h"
 #include "../event_filter_fields/text_lookup_field.h"
 #include "../strings.h"
@@ -20,48 +25,96 @@ GenericEvent::GenericEvent(
     nx::Uuid serverId,
     const UuidList& deviceIds)
     :
-    base_type(timestamp, caption, description),
-    m_source(source),
+    BasicEvent(timestamp),
     m_serverId(serverId),
+    m_caption(caption),
+    m_description(description),
+    m_source(source),
     m_deviceIds(deviceIds)
 {
     setState(state);
 }
 
-QString GenericEvent::resourceKey() const
-{
-    return {};
-}
-
 QVariantMap GenericEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = base_type::details(context, aggregatedInfo);
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
 
-    // There is a separate source string field in the event;
-    result.remove(utils::kSourceIdDetailName);
-    result[utils::kSourceNameDetailName] = source();
+    result[utils::kCaptionDetailName] = m_caption.isEmpty()
+        ? manifest().displayName
+        : m_caption;
 
-    utils::insertIfNotEmpty(result, utils::kExtraCaptionDetailName, extraCaption());
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption());
-    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, description());
+    // Overwrite source data with devices if they are provided.
+    if (!m_deviceIds.isEmpty())
+    {
+        result[utils::kSourceResourcesTypeDetailName] = QVariant::fromValue(ResourceType::device);
+        result[utils::kSourceResourcesIdsDetailName] = QVariant::fromValue(m_deviceIds);
+
+        // Write first device name as an event source.
+        if (const auto device = context->resourcePool()->getResourceById(m_deviceIds.first()))
+            result[utils::kSourceTextDetailName] = Strings::resource(device, detailLevel);
+    }
+
+    // Finally overwrite source field if the custom one is provided.
+    if (!m_source.isEmpty())
+        result[utils::kSourceTextDetailName] = m_source;
+
+    utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, m_description);
+    utils::insertIfNotEmpty(result, utils::kDetailingDetailName, detailing(context));
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, icon());
     utils::insertClientAction(result, ClientAction::previewCameraOnTime);
 
+    QStringList devices;
+    for (const auto& id: m_deviceIds)
+        devices.push_back(Strings::resource(context, id, Qn::RI_WithUrl));
+
+    result[utils::kHtmlDetailsName] = QStringList{{
+        source(),
+        caption(),
+        description(),
+        devices.join(common::html::kLineBreak),
+    }};
+
     return result;
 }
 
-QString GenericEvent::extendedCaption() const
+QString GenericEvent::extendedCaption(common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    return m_source.isEmpty()
-        ? tr("Generic Event")
-        : tr("Generic Event from %1").arg(m_source);
+    const auto resourceName = Strings::resource(context, serverId(), detailLevel);
+    return tr("Generic Event at %1").arg(resourceName);
+}
+
+QStringList GenericEvent::detailing(common::SystemContext* context) const
+{
+    QStringList details;
+    if (!source().isEmpty())
+        details.push_back(Strings::source(source()));
+    if (!caption().isEmpty())
+        details.push_back(Strings::caption(caption()));
+    if (!description().isEmpty())
+        details.push_back(Strings::description(description()));
+    if (!m_deviceIds.empty())
+    {
+        details.push_back(QnDeviceDependentStrings::getDefaultNameFromSet(context->resourcePool(),
+            tr("Related devices:"),
+            tr("Related cameras:")));
+
+        static const QString kRow = "- %1";
+        for (const auto& id: m_deviceIds)
+            details.push_back(kRow.arg(Strings::resource(context, id, Qn::RI_WithUrl)));
+    }
+
+    return details;
 }
 
 Icon GenericEvent::icon() const
 {
-    return deviceIds().isEmpty() ? Icon::generic : Icon::resource;
+    return m_deviceIds.isEmpty() ? Icon::generic : Icon::resource;
 }
 
 const ItemDescriptor& GenericEvent::manifest()
@@ -104,8 +157,7 @@ const ItemDescriptor& GenericEvent::manifest()
                 ResourceType::device,
                 Qn::ViewContentPermission,
                 Qn::UserInputPermissions,
-                FieldFlag::optional}}},
-        .emailTemplateName = "generic_event.mustache"
+                FieldFlag::optional}}}
     };
     return kDescriptor;
 }

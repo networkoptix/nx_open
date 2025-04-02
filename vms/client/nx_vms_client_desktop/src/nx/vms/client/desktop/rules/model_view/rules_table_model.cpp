@@ -332,7 +332,7 @@ QVariant RulesTableModel::headerData(int section, Qt::Orientation orientation, i
                 case EventColumn:
                     return tr("Event");
                 case SourceColumn:
-                    return tr("Source");
+                    return nx::vms::rules::Strings::source();
                 case ActionColumn:
                     return tr("Action");
                 case TargetColumn:

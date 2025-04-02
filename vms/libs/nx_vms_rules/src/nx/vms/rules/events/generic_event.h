@@ -4,19 +4,19 @@
 
 #include <nx/vms/rules/icon.h>
 
+#include "../basic_event.h"
 #include "../data_macros.h"
-#include "described_event.h"
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API GenericEvent: public DescribedEvent
+class NX_VMS_RULES_API GenericEvent: public BasicEvent
 {
-    using base_type = DescribedEvent;
     Q_OBJECT
     Q_CLASSINFO("type", "generic")
-
-    FIELD(QString, source, setSource)
     FIELD(nx::Uuid, serverId, setServerId)
+    FIELD(QString, caption, setCaption)
+    FIELD(QString, description, setDescription)
+    FIELD(QString, source, setSource)
     FIELD(UuidList, deviceIds, setDeviceIds)
     FIELD(bool, omitLogging, setOmitLogging)
 
@@ -31,14 +31,21 @@ public:
         nx::Uuid serverId,
         const UuidList& deviceIds);
 
-    virtual QString resourceKey() const override;
-    virtual QVariantMap details(common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
+    virtual QString aggregationKey() const override { return m_serverId.toSimpleString(); }
+    virtual QVariantMap details(
+        common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+        Qn::ResourceInfoLevel detailLevel) const override;
 
     static const ItemDescriptor& manifest();
 
+protected:
+    virtual QString extendedCaption(
+        common::SystemContext* context,
+        Qn::ResourceInfoLevel detailLevel) const override;
+
 private:
-    QString extendedCaption() const;
+    QStringList detailing(common::SystemContext* context) const;
     Icon icon() const;
 };
 

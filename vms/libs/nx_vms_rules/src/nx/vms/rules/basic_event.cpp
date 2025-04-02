@@ -59,38 +59,20 @@ void BasicEvent::setState(State state)
     m_state = state;
 }
 
-QString BasicEvent::aggregationKey() const
-{
-    return resourceKey();
-}
-
-QString BasicEvent::aggregationSubKey() const
-{
-    return type();
-}
-
 QString BasicEvent::cacheKey() const
 {
     return {};
 }
 
-QVariantMap BasicEvent::details(common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& /*aggregatedInfo*/) const
+QVariantMap BasicEvent::details(
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& /*aggregatedInfo*/,
+    Qn::ResourceInfoLevel detailLevel) const
 {
     QVariantMap result;
-
-    utils::insertIfNotEmpty(result, utils::kTypeDetailName, type());
     utils::insertIfNotEmpty(result, utils::kNameDetailName, name(context));
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-
-    // TODO: #amalov Get rid of SourceId detail. User manifest resource map to find event source.
-    if (const auto source = sourceId(this); !source.isNull())
-    {
-        result[utils::kSourceIdDetailName] = QVariant::fromValue(source);
-        utils::insertIfNotEmpty(
-            result, utils::kSourceNameDetailName, Strings::resource(context, source));
-    }
-
+    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName,
+        extendedCaption(context, detailLevel));
     return result;
 }
 
@@ -104,9 +86,54 @@ QString BasicEvent::name(common::SystemContext* context) const
     return Strings::eventName(context, type());
 }
 
-QString BasicEvent::extendedCaption(common::SystemContext* context) const
+QString BasicEvent::extendedCaption(common::SystemContext* context,
+    Qn::ResourceInfoLevel /*detailLevel*/) const
 {
     return name(context);
+}
+
+void BasicEvent::fillAggregationDetailsForServer(
+    QVariantMap& details,
+    common::SystemContext* context,
+    nx::Uuid serverId,
+    Qn::ResourceInfoLevel detailLevel,
+    bool useAsSource)
+{
+    const auto server = context->resourcePool()->getResourceById(serverId);
+    const auto serverName = server ? Strings::resource(server, detailLevel) : QString();
+
+    details[utils::kAggregationKeyDetailName] = serverName;
+    details[utils::kAggregationKeyDetailsDetailName] = Strings::resourceIp(server);
+    details[utils::kAggregationKeyIconDetailName] = "server";
+
+    if (useAsSource)
+    {
+        details[utils::kSourceResourcesTypeDetailName] = QVariant::fromValue(ResourceType::server);
+        details[utils::kSourceTextDetailName] = serverName;
+        details[utils::kSourceResourcesIdsDetailName] = QVariant::fromValue(UuidList({serverId}));
+    }
+}
+
+void BasicEvent::fillAggregationDetailsForDevice(
+    QVariantMap& details,
+    common::SystemContext* context,
+    nx::Uuid deviceId,
+    Qn::ResourceInfoLevel detailLevel,
+    bool useAsSource)
+{
+    const auto device = context->resourcePool()->getResourceById(deviceId);
+
+    const auto deviceName = device ? Strings::resource(device, detailLevel) : QString();
+    details[utils::kAggregationKeyDetailName] = deviceName;
+    details[utils::kAggregationKeyDetailsDetailName] = Strings::resourceIp(device);
+    details[utils::kAggregationKeyIconDetailName] = "camera";
+
+    if (useAsSource)
+    {
+        details[utils::kSourceResourcesTypeDetailName] = QVariant::fromValue(ResourceType::device);
+        details[utils::kSourceTextDetailName] = deviceName;
+        details[utils::kSourceResourcesIdsDetailName] = QVariant::fromValue(UuidList({deviceId}));
+    }
 }
 
 } // namespace nx::vms::rules

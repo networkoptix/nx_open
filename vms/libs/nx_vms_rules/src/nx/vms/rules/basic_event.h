@@ -17,23 +17,20 @@ namespace nx::vms::common { class SystemContext; }
 namespace nx::vms::rules {
 
 /**
- * Base class for storing data of input events produced by event connectors.
- * Derived classes should provide Q_PROPERTY's for all significant variables
- * (event fields) of their event type.
+ * Base class for storing data of input events produced by event connectors. Derived classes must
+ * provide Q_PROPERTY's for all significant variables (event fields) of their event type because
+ * the event instance should be able to be rebuilt from the properties set.
  */
 class NX_VMS_RULES_API BasicEvent: public QObject
 {
+    // Do not include FIELD macro header to avoid global macro propagation.
     Q_OBJECT
-    using base_type = QObject;
-
     Q_PROPERTY(QString type READ type CONSTANT FINAL)
     Q_PROPERTY(std::chrono::microseconds timestamp READ timestamp WRITE setTimestamp)
     Q_PROPERTY(nx::vms::api::rules::State state READ state WRITE setState)
 
 public:
-    explicit BasicEvent(
-        std::chrono::microseconds timestamp,
-        State state = State::instant);
+    explicit BasicEvent(std::chrono::microseconds timestamp, State state = State::instant);
 
     QString type() const;
 
@@ -51,37 +48,43 @@ public:
     void setState(State state);
 
     /**
-     * Returns string represent event uniqueness dependent on the resource produced the event.
-     * Used for caching and matching prolonged events.
-     * Keep in sync with RuleProcessor::getResourceKey().
+     * Key for the event aggregation. Required to unite several sequentially incoming events into a
+     * single AggregatedEvent instance. Usually it is either device or server id.
      */
-    virtual QString resourceKey() const = 0;
+    virtual QString aggregationKey() const = 0;
 
     /**
-     * Key for basic event aggregation.
-     * Returns resourceKey() by default.
-     * Keep in sync with eventKey in RuleProcessor::processInstantAction().
+     * Returns string representing event uniqueness. It is needed to distinguish whether event
+     * start actually relies to the event already running (very important for the camera motion),
+     * and to ignore event stops without corresponding start.
      */
-    virtual QString aggregationKey() const;
-
-    /**
-     * Key for more detailed event aggregation. Used in SendMailAction.
-     * Returns event type by default.
-     * Keep in sync with EventParameters::getParamsHash().
-     */
-    virtual QString aggregationSubKey() const;
+    virtual QString sequenceKey() const
+    {
+        return aggregationKey();
+    }
 
     /**
      * Used for caching and limiting repeat of instant events or repeating 'start' of prolonged
      * events.
      * Returns empty string by default.
-     * Keep in sync with uniqueKey in RuleProcessor::checkEventCondition().
      */
     virtual QString cacheKey() const;
 
-    /** Returns the event details(such as caption, description, timestamp, source etc.). */
-    virtual QVariantMap details(common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo) const;
+    /**
+     * Event details (such as caption, description, timestamp, source etc.) in a human-readable
+     *     form. These details are used to show the event information in the event log, and able to
+     *     be substituted to action fields. Also they are used by default in some built-in actions
+     *     like Notification or Email actions to make the actual content.
+     * @param context System Context to get all required resources data.
+     * @param aggregatedInfo Aggregation info from the database. This info is stored when the
+     *     aggregated event is processed, and can be used to show additional details if the only
+     *     sample event is accessible (e.g. in the Event Log).
+     * @param detailLevel Detail level of the resource name string representation.
+     */
+    virtual QVariantMap details(
+        common::SystemContext* context,
+        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+        Qn::ResourceInfoLevel detailLevel) const;
 
     virtual nx::vms::api::rules::PropertyMap aggregatedInfo(
         const AggregatedEvent& aggregatedEvent) const;
@@ -89,8 +92,38 @@ public:
 protected:
     BasicEvent() = default;
 
-    QString name(common::SystemContext* context) const;
-    QString extendedCaption(common::SystemContext* context) const;
+    /** Event name, e.g. "Device Disconnected". Added to details, used in substitutions . */
+    virtual QString name(common::SystemContext* context) const;
+
+    /**
+     * Extended event caption, e.g. "MyCamera was disconnected". Added to details, used in some
+     * built-in actions, e.g. as email subject or bookmark name.
+     */
+    virtual QString extendedCaption(
+        common::SystemContext* context,
+        Qn::ResourceInfoLevel detailLevel) const;
+
+    /**
+     * Fill all aggregation-related details, using passed id as a server id.
+     * @param useAsSource Fill source-related details as well.
+     */
+    static void fillAggregationDetailsForServer(
+        QVariantMap& details,
+        common::SystemContext* context,
+        nx::Uuid serverId,
+        Qn::ResourceInfoLevel detailLevel,
+        bool useAsSource = true);
+
+    /**
+     * Fill all aggregation-related details, using passed id as a device id.
+     * @param useAsSource Fill source-related details as well.
+     */
+    static void fillAggregationDetailsForDevice(
+        QVariantMap& details,
+        common::SystemContext* context,
+        nx::Uuid deviceId,
+        Qn::ResourceInfoLevel detailLevel,
+        bool useAsSource = true);
 
 private:
     std::chrono::microseconds m_timestamp = std::chrono::microseconds::zero();

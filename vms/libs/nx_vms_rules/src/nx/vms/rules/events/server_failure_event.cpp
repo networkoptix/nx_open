@@ -21,36 +21,30 @@ ServerFailureEvent::ServerFailureEvent(
 {
 }
 
-QString ServerFailureEvent::resourceKey() const
-{
-    return m_serverId.toSimpleString();
-}
-
 QVariantMap ServerFailureEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo);
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
 
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
-    utils::insertIfNotEmpty(result, utils::kReasonDetailName, reason(context));
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertIcon(result, nx::vms::rules::Icon::server);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::serverSettings);
 
+    const QString detailing = reason(context);
+    result[utils::kDetailingDetailName] = detailing;
+    result[utils::kHtmlDetailsName] = detailing;
+
     return result;
 }
 
-QString ServerFailureEvent::extendedCaption(common::SystemContext* context) const
+QString ServerFailureEvent::extendedCaption(common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    const auto resourceName = Strings::resource(context, serverId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, serverId(), detailLevel);
     return tr("%1 Failure").arg(resourceName);
-}
-
-QString ServerFailureEvent::aggregationSubKey() const
-{
-    return utils::makeKey(
-        BasicEvent::aggregationSubKey(),
-        QString::number(static_cast<int>(reason())));
 }
 
 QString ServerFailureEvent::reason(common::SystemContext* /*context*/) const
@@ -80,8 +74,7 @@ const ItemDescriptor& ServerFailureEvent::manifest()
         .description = "Triggered when a server goes down due to hardware failure, "
             "software issue, or manual/emergency shutdown.",
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
-        .readPermissions = GlobalPermission::powerUser,
-        .emailTemplateName = "timestamp_and_details.mustache"
+        .readPermissions = GlobalPermission::powerUser
     };
     return kDescriptor;
 }

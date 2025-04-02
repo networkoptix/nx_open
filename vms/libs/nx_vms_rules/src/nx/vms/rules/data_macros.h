@@ -4,7 +4,7 @@
 
 #include <QtCore/QObject>
 
-// Do not include this header to base class definitions to avoid global macro propagation.
+// Do not include this header the to base class definitions to avoid global macro propagation.
 
 namespace nx::vms::rules {
 
@@ -13,7 +13,7 @@ namespace nx::vms::rules {
     Q_PROPERTY(type getter READ getter WRITE setter) \
 public: \
     type getter() const { return m_##getter; } \
-    void setter(const type &val) { m_##getter = val; } \
+    void setter(const type& val) { m_##getter = val; } \
 private: \
     type m_##getter{};
 

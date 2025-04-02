@@ -14,22 +14,19 @@ ServerCertificateErrorEvent::ServerCertificateErrorEvent(
     std::chrono::microseconds timestamp,
     nx::Uuid serverId)
     :
-    base_type(timestamp),
+    BasicEvent(timestamp),
     m_serverId(serverId)
 {
 }
 
-QString ServerCertificateErrorEvent::resourceKey() const
-{
-    return m_serverId.toSimpleString();
-}
-
 QVariantMap ServerCertificateErrorEvent::details(
-    common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
+    common::SystemContext* context,
+    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo);
+    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
 
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertIcon(result, nx::vms::rules::Icon::server);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::serverSettings);
@@ -37,9 +34,10 @@ QVariantMap ServerCertificateErrorEvent::details(
     return result;
 }
 
-QString ServerCertificateErrorEvent::extendedCaption(common::SystemContext* context) const
+QString ServerCertificateErrorEvent::extendedCaption(common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
-    const auto resourceName = Strings::resource(context, m_serverId, Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, serverId(), detailLevel);
     return tr("%1 certificate error", "Server name will be substituted").arg(resourceName);
 }
 
@@ -51,8 +49,7 @@ const ItemDescriptor& ServerCertificateErrorEvent::manifest()
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Server Certificate Error")),
         .description = "Triggered when the SSL certificate cannot be verified.",
         .resources = {{utils::kServerIdFieldName, {ResourceType::server}}},
-        .readPermissions = GlobalPermission::powerUser,
-        .emailTemplateName = "timestamp_only.mustache"
+        .readPermissions = GlobalPermission::powerUser
     };
     return kDescriptor;
 }

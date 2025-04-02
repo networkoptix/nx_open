@@ -351,7 +351,7 @@ TEST_F(ActionFieldTest, EventDotSource)
 
     field.setText("{event.source}");
 
-    EXPECT_EQ(event->m_deviceId.toSimpleString(), field.build(eventAggregator).toString());
+    EXPECT_EQ("Test resource", field.build(eventAggregator).toString());
 }
 
 TEST_F(ActionFieldTest, EventTooltip)
