@@ -47,6 +47,7 @@ private:
 private:
     StreamInfo m_streamInfo;
     std::set<std::string> m_disabledObjectTypeIds;
+    std::set<std::string> m_disabledTracks;
     int m_frameNumber = 0;
     int m_maxFrameNumber = 0;
     std::map<std::string, nx::sdk::Uuid> m_trackIdByRef;

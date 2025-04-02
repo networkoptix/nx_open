@@ -2,6 +2,7 @@
 
 #include "device_agent.h"
 
+#include <algorithm>
 #include <fstream>
 #include <streambuf>
 
@@ -109,6 +110,9 @@ std::vector<Ptr<IMetadataPacket>> DeviceAgent::generateMetadata(
         {
             continue;
         }
+
+        if (m_disabledTracks.count(object.trackIdRef))
+            continue;
 
         const int64_t timestampUs = object.timestampUs >= 0
             ? object.timestampUs
@@ -255,6 +259,30 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
         if (startsWith(settingName, kObjectTypeFilterPrefix) && !toBool(settingValue))
             m_disabledObjectTypeIds.insert(settingName.substr(kObjectTypeFilterPrefix.length()));
     }
+
+    std::set<std::string> disabledIds; //< These tracks contain disabled type ids
+    std::set<std::string> enabledIds; //< These tracks contain enabled type ids
+    for (const auto& [_, objects]: m_streamInfo.objectsByFrameNumber)
+    {
+        for (const auto& object: objects)
+        {
+            if (!object.typeId.empty())
+            {
+                if (m_disabledObjectTypeIds.count(object.typeId))
+                    disabledIds.insert(object.trackIdRef);
+                else
+                    enabledIds.insert(object.trackIdRef);
+            }
+        }
+    }
+
+    m_disabledTracks.clear();
+    // Store tracks that contain only disabled type ids. These tracks should be completely
+    // filtered out, including metadata without type id.
+    std::set_difference(
+        disabledIds.begin(), disabledIds.end(),
+        enabledIds.begin(), enabledIds.end(),
+        std::inserter(m_disabledTracks, m_disabledTracks.begin()));
 
     return makeSettingsResponse(manifestFilePath, streamFilePath).releasePtr();
 }
