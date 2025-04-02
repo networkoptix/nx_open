@@ -20,7 +20,6 @@ class NX_VMS_COMMON_API MediaTranscoder
 public:
     struct Config
     {
-        bool keepOriginalTimestamps = false;
         bool useRealTimeOptimization = false;
         // Set this to true if stream will mux into RTP.
         bool rtpContatiner = false;

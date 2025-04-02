@@ -27,8 +27,6 @@ public:
         DecoderConfig decoderConfig;
         AVCodecID targetCodecId = AV_CODEC_ID_NONE;
         bool useMultiThreadEncode = false;
-        // Do not rewrite a "strange" timestamps, e.g. in case with seek.
-        bool keepOriginalTimestamps = true;
         bool useRealTimeOptimization = false;
         QSize outputResolutionLimit;
         // Force to use this source resolution, instead of max stream resolution from resource.

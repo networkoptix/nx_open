@@ -359,7 +359,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     }
 
     // FFmpeg encoder failed when PTS <= last PTS, (at least mjpeg encoder)
-    if (m_lastEncodedPts && decodedFrame->pts <= m_lastEncodedPts && !m_config.keepOriginalTimestamps)
+    if (m_lastEncodedPts && decodedFrame->pts <= m_lastEncodedPts)
         decodedFrame->pts = m_lastEncodedPts.value() + 1;
 
     m_lastEncodedPts = decodedFrame->pts;

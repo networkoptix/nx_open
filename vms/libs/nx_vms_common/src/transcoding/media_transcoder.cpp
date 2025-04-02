@@ -27,7 +27,6 @@ bool MediaTranscoder::setVideoCodec(
         params = suggestMediaStreamParams(codec, quality);
 
     QnFfmpegVideoTranscoder::Config config;
-    config.keepOriginalTimestamps = m_config.keepOriginalTimestamps;
     config.sourceResolution = m_sourceResolution;
     config.outputResolutionLimit = resolution;
     config.bitrate = bitrate;
