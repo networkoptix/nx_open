@@ -416,6 +416,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     m_SessionId.clear();
     m_url = url;
     m_responseBufferLen = 0;
+    m_nonceCount = 0;
     m_isProxyAuthorizationRequired = false;
     if (m_defaultAuthScheme == nx::network::http::header::AuthScheme::basic)
         m_responseAuthenticate = nx::network::http::header::WWWAuthenticate(m_defaultAuthScheme);
