@@ -880,7 +880,7 @@
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation>Thumbnail Display</translation>
+      <translation>Hiển thị hình thu nhỏ</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
@@ -9040,7 +9040,7 @@ Hiệu suất Chi nhánh bị giảm.</translation>
     </message>
     <message>
       <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
-      <translation type="unfinished">The user has been assigned to this group at organization level and can be unassigned only at organization level</translation>
+      <translation>Người dùng đã được chỉ định vào nhóm này ở cấp độ tổ chức và chỉ có thể được bỏ chỉ định ở cấp độ tổ chức</translation>
     </message>
   </context>
   <context>
@@ -11298,7 +11298,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Organization user</source>
-      <translation type="unfinished">Organization user</translation>
+      <translation>Người dùng tổ chức</translation>
     </message>
   </context>
   <context>
@@ -12171,7 +12171,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Cannot maximize the item</source>
-      <translation type="unfinished">Cannot maximize the item</translation>
+      <translation>Không thể tối đa hóa mục</translation>
     </message>
   </context>
   <context>
@@ -12369,13 +12369,13 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
     <message>
       <source>No custom headers</source>
-      <translation type="unfinished">No custom headers</translation>
+      <translation>Không có tiêu đề tùy chỉnh</translation>
     </message>
     <message numerus="yes">
       <source>%n custom headers</source>
       <comment>%n is a number of custom headers</comment>
-      <translation type="unfinished">
-        <numerusform>%n custom headers</numerusform>
+      <translation>
+        <numerusform>%n tiêu đề tùy chỉnh</numerusform>
       </translation>
     </message>
   </context>
@@ -12576,15 +12576,15 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error: %1</source>
-      <translation type="unfinished">Delete rule error: %1</translation>
+      <translation>Lỗi xóa quy tắc: %1</translation>
     </message>
     <message>
       <source>Save rule error: %1</source>
-      <translation type="unfinished">Save rule error: %1</translation>
+      <translation>Lưu lỗi quy tắc: %1</translation>
     </message>
     <message>
       <source>Reset rules error: %1</source>
-      <translation type="unfinished">Reset rules error: %1</translation>
+      <translation>Lỗi đặt lại quy tắc: %1</translation>
     </message>
   </context>
   <context>

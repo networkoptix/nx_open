@@ -259,14 +259,14 @@
     <name>EventSearchItem</name>
     <message>
       <source>SHARED</source>
-      <translation type="unfinished">SHARED</translation>
+      <translation>CHIA SẺ</translation>
     </message>
   </context>
   <context>
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
-      <translation type="unfinished">Looking for</translation>
+      <translation>Tìm kiếm</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -388,7 +388,7 @@
     <name>MenuScreen</name>
     <message>
       <source>App Settings</source>
-      <translation type="unfinished">App Settings</translation>
+      <translation>Cài đặt ứng dụng</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -435,19 +435,19 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Không có Chi nhánh</translation>
     </message>
     <message>
       <source>We did not find any sites in this organization</source>
-      <translation type="unfinished">We did not find any sites in this organization</translation>
+      <translation>Chúng tôi không tìm thấy bất kỳ Chi nhánh nào trong tổ chức này</translation>
     </message>
     <message>
       <source>We did not find any sites in this folder</source>
-      <translation type="unfinished">We did not find any sites in this folder</translation>
+      <translation>Chúng tôi không tìm thấy bất kỳ Chi nhánh nào trong thư mục này</translation>
     </message>
     <message>
       <source>How to connect sites?</source>
-      <translation type="unfinished">How to connect sites?</translation>
+      <translation>Làm thế nào để kết nối các Chi nhánh?</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -659,7 +659,7 @@
     </message>
     <message>
       <source>Host: Port</source>
-      <translation type="unfinished">Host: Port</translation>
+      <translation>Máy chủ: Cổng</translation>
     </message>
   </context>
   <context>
@@ -690,19 +690,19 @@
     </message>
     <message>
       <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation type="unfinished">We didn&apos;t find any organizations, try contacting support</translation>
+      <translation>Chúng tôi không tìm thấy bất kỳ tổ chức nào, hãy thử liên hệ với bộ phận hỗ trợ</translation>
     </message>
     <message>
       <source>No Sites Found</source>
-      <translation type="unfinished">No Sites Found</translation>
+      <translation>Không tìm thấy Chi nhánh nào</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</translation>
+      <translation>Chúng tôi không tìm thấy bất kỳ Chi nhánh nào trong mạng cục bộ, hãy thử thêm máy chủ theo cách thủ công hoặc đăng nhập vào tài khoản đám mây của bạn</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually</translation>
+      <translation>Chúng tôi không tìm thấy bất kỳ Chi nhánh nào trong mạng cục bộ, hãy thử thêm máy chủ theo cách thủ công</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -804,7 +804,7 @@
     <name>ShareBookmarkSheet</name>
     <message>
       <source>New Bookmark</source>
-      <translation type="unfinished">New Bookmark</translation>
+      <translation>Dấu trang mới</translation>
     </message>
     <message>
       <source>Name</source>
@@ -820,7 +820,7 @@
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation type="unfinished">Protect with Password (optional)</translation>
+      <translation>Bảo vệ bằng mật khẩu (tùy chọn)</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -828,11 +828,11 @@
     </message>
     <message>
       <source>Create &amp; Share</source>
-      <translation type="unfinished">Create &amp; Share</translation>
+      <translation>Tạo &amp; Chia sẻ</translation>
     </message>
     <message>
       <source>Save &amp; Share</source>
-      <translation type="unfinished">Save &amp; Share</translation>
+      <translation>Lưu &amp; Chia sẻ</translation>
     </message>
     <message>
       <source>Stop Sharing</source>
@@ -856,7 +856,7 @@
     </message>
     <message>
       <source>Shared link options</source>
-      <translation type="unfinished">Shared link options</translation>
+      <translation>Tùy chọn liên kết chia sẻ</translation>
     </message>
   </context>
   <context>
@@ -874,7 +874,7 @@
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>Thư mục</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -897,7 +897,7 @@
     </message>
     <message>
       <source>NEW</source>
-      <translation type="unfinished">NEW</translation>
+      <translation>MỚI</translation>
     </message>
   </context>
   <context>
@@ -933,7 +933,7 @@
     <message>
       <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Open %1</translation>
+      <translation>Mở %1</translation>
     </message>
     <message>
       <source>Channel Partner</source>
