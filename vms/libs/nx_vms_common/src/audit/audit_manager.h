@@ -34,6 +34,9 @@ public:
         const nx::utils::Url& dstUrl,
         bool wasConnected) = 0;
 
+    virtual void openLoginSessionIfNeeded(
+        const nx::network::rest::audit::Record& auditRecord) = 0;
+
     template <nx::vms::api::AuditRecordType type,
         typename Details = typename nx::vms::api::details::details_type<type,
             nx::vms::api::AllAuditDetails::mapping>::type>
