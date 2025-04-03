@@ -1014,10 +1014,19 @@ FetchedDataRanges AnalyticsSearchListModel::Private::applyFetchedData(
     const auto newerResultsCount = request.direction == FetchDirection::newer
         ? fetched.ranges.tail.length
         : fetched.ranges.body.length;
+
     const auto availableNewTracksGuard = makeAvailableNewTracksGuard();
-    gapBeforeNewTracks |= newerResultsCount >= q->maximumCount() / 2;
-    if (liveProcessingMode == LiveProcessingMode::automaticAdd)
-        q->setLive(!gapBeforeNewTracks);
+    const bool fetchedLessThanRequested = newerResultsCount < q->maximumCount() / 2;
+
+    if (liveProcessingMode == LiveProcessingMode::manualAdd)
+    {
+        gapBeforeNewTracks |= (!fetchedLessThanRequested);
+    }
+    else if (request.direction == FetchDirection::newer && fetchedLessThanRequested)
+    {
+        gapBeforeNewTracks = false;
+        q->setLive(true);
+    }
 
     truncateFetchedData(fetched, request.direction, q->maximumCount());
 
