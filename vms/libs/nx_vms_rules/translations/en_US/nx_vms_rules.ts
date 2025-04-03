@@ -4,14 +4,6 @@
 <context>
     <name>BasicAction</name>
     <message>
-        <source>Caption</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Tooltip text</source>
         <translation type="unfinished"></translation>
     </message>
@@ -49,10 +41,6 @@
     </message>
     <message>
         <source>Unknown event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reason: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -288,6 +276,18 @@
         <source>Rule validation failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Caption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
@@ -353,7 +353,7 @@
     </message>
     <message>
         <source>%1 at %2</source>
-        <comment> is detected</comment>
+        <comment>Object %1 is detected at camera %2</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -452,10 +452,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>MAC #%1: %2</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Device IP Conflict at %1</source>
         <comment>Device IP Conflict at &lt;server_name&gt;</comment>
         <translation></translation>
@@ -472,6 +468,16 @@
     <message>
         <source>Camera IP Conflict</source>
         <translation type="unfinished">Camera IP Conflict</translation>
+    </message>
+    <message>
+        <source>Device #%1: %2 (%3)</source>
+        <comment>Device #1: &lt;device_name&gt; (MAC address)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera #%1: %2 (%3)</source>
+        <comment>Camera #1: &lt;device_name&gt; (MAC address)</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -552,7 +558,15 @@
         <translation></translation>
     </message>
     <message>
-        <source>Generic Event from %1</source>
+        <source>Generic Event at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Related devices:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Related cameras:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -625,15 +639,19 @@
 <context>
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
-        <source>Integration Diagnostic Event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>For Plugin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>And Level Is</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Integration Diagnostic at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Integration Diagnostic</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -646,10 +664,6 @@
 </context>
 <context>
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
-    <message>
-        <source>LDAP Sync Issue Event</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>%1 (%n times)</source>
         <comment>%1 is a cause of the event</comment>
@@ -675,6 +689,14 @@
         <source>Some LDAP users or groups were not found in the LDAP database.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>LDAP Sync Issue at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP Sync Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
@@ -683,20 +705,16 @@
         <translation></translation>
     </message>
     <message>
-        <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 has a license problem</source>
+        <source>Not enough licenses on %1</source>
         <comment>Server name will be substituted</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording has been disabled on the following devices:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording has been disabled on the following cameras:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -856,11 +874,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Power limit exceeded (%1)</source>
-        <comment>%1 is consumption</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>PoE over budget on %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -943,22 +956,6 @@
 </context>
 <context>
     <name>nx::vms::rules::SaasIssueEvent</name>
-    <message>
-        <source>License migration issue</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Recording services disabled</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cloud storage services disabled</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Paid integration services disabled</source>
-        <translation></translation>
-    </message>
     <message numerus="yes">
         <source>Recording on %n channels was stopped due to service overuse.</source>
         <translation>
@@ -992,6 +989,10 @@
         <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Services Issue on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::SendEmailAction</name>
@@ -1023,26 +1024,24 @@
 <context>
     <name>nx::vms::rules::ServerConflictEvent</name>
     <message>
-        <source>Conflicting Server: %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Conflicting Server #%1: %2</source>
-        <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>MAC #%1: %2</source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Server Conflict</source>
         <translation></translation>
     </message>
     <message>
         <source>%1 Conflict</source>
         <comment>Server name will be substituted</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discovered a server with the same ID in the same local network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Servers in the same local network have conflict on the following devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server: %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1113,10 +1112,6 @@
 <context>
     <name>nx::vms::rules::SoftTriggerEvent</name>
     <message>
-        <source>Trigger Name</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Soft Trigger</source>
         <translation></translation>
     </message>
@@ -1131,10 +1126,6 @@
     <message>
         <source>By</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Source: %1</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>User: %1</source>

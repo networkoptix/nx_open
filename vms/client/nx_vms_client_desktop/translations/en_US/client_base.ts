@@ -8015,10 +8015,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Description</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>No events</source>
         <translation></translation>
     </message>
@@ -8066,19 +8062,11 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Source</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Action</source>
         <translation></translation>
     </message>
     <message>
         <source>Target</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Description</source>
         <translation></translation>
     </message>
     <message>
@@ -12584,10 +12572,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Source</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Target</source>
         <translation></translation>
     </message>
@@ -12773,12 +12757,13 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Number of devices using this service exceeds the available service quantity.</source>
-        <translation></translation>
+        <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
-        <translation></translation>
+        <source>On %1, the system will automatically disable the service on some devices.</source>
+        <comment>%1 will be substituted with date and time</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
