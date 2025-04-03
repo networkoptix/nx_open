@@ -242,8 +242,8 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
         if (cloudBackupStorage && saasState == nx::vms::api::SaasState::suspended)
         {
             alertBarMessage = tr("Cloud backup continues, but the Site is currently suspended. "
-                "It must be active to modify the backup configuration or to enable "
-                "cloud storage location. %1")
+                "It must be active to modify the \"What to backup\" and \"Quality\" settings for a "
+                "device, or to enable cloud backup. You can also disable it. %1")
                     .arg(nx::vms::common::saas::StringsHelper::recommendedAction(saasState));
             m_backupSettingsViewWidget->resourceViewWidget()->footerWidget()->setHidden(true);
         }
