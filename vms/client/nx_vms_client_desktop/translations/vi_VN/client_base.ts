@@ -79,7 +79,7 @@
     <name>CertificatesModel</name>
     <message>
       <source>Subject</source>
-      <translation>Môn học</translation>
+      <translation>Tiêu đề</translation>
     </message>
     <message>
       <source>Issuer</source>
@@ -887,7 +887,7 @@
     </message>
     <message>
       <source>New</source>
-      <translation>Tạo</translation>
+      <translation>Mới</translation>
     </message>
     <message>
       <source>Welcome Screen</source>
@@ -5770,7 +5770,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation>Không thể xác nhận sự kiện trên máy ảnh bị xóa.</translation>
+      <translation>Không thể xác nhận sự kiện trên camera đã xóa.</translation>
     </message>
   </context>
   <context>
@@ -5890,7 +5890,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Camera name:</source>
-      <translation>Tên máy ảnh:</translation>
+      <translation>Tên camera:</translation>
     </message>
   </context>
   <context>
@@ -5981,7 +5981,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>System shut down</source>
-      <translation>Hệ thống tắt</translation>
+      <translation>Hệ thống đã tắt</translation>
     </message>
     <message>
       <source>To add a Video Wall, the System should be in active state. %1</source>
@@ -6012,7 +6012,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation>Các tệp đã tải lên sẽ được lưu giữ.</translation>
+      <translation>Các tập tin đã tải lên sẽ được giữ lại.</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
@@ -6032,7 +6032,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation>Chỉ các tập tin video với dấu thời gian chính xác được hỗ trợ.</translation>
+      <translation>Chỉ hỗ trợ các tệp video có dấu thời gian chính xác.</translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
@@ -6043,7 +6043,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
       <translation>
-        <numerusform>Tệp đã chọn đã được ghi lại trên %1, nhưng chỉ có thể tải lên các tệp được ghi lại trong %n ngày qua. Bạn có thể thay đổi điều này trong cài đặt lưu trữ trên camera.</numerusform>
+        <numerusform>Tệp đã chọn được ghi vào %1, nhưng chỉ có thể tải lên các tệp được ghi trong %n ngày gần nhất. Bạn có thể thay đổi điều này trong cài đặt lưu trữ camera.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6067,7 +6067,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <translation>
-        <numerusform>Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên</numerusform>
+        <numerusform>Các tệp đã chọn bao gồm các khoảng thời gian mà video đã được tải lên</numerusform>
       </translation>
     </message>
     <message>
@@ -6508,7 +6508,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Also show on source camera</source>
-      <translation>Cũng hiển thị trên máy ảnh nguồn</translation>
+      <translation>Cũng hiển thị trên camera nguồn</translation>
     </message>
     <message>
       <source>Use event source camera</source>
@@ -6629,7 +6629,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation>Không xóa được nhóm %1.</translation>
+      <translation>Không xóa được nhóm &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Failed to delete group.</source>
@@ -7970,7 +7970,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation>Không có luồng thứ cấp</translation>
+      <translation>Không có luồng phụ</translation>
     </message>
     <message>
       <source>Invalid stream address</source>
@@ -8044,7 +8044,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Internal error.</source>
-      <translation>Lỗi bên trong.</translation>
+      <translation>Lỗi nội bộ.</translation>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
@@ -8741,7 +8741,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Internal error</source>
-      <translation>Lỗi bên trong</translation>
+      <translation>Lỗi nội bộ</translation>
     </message>
     <message>
       <source>Video transcoding required.</source>
@@ -8768,7 +8768,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Export Settings</source>
-      <translation>Lưu cầu hình cài đặt</translation>
+      <translation>Xuất Cài Đặt</translation>
     </message>
     <message>
       <source>Add Timestamp</source>
@@ -8776,7 +8776,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Delete Timestamp</source>
-      <translation>Xóa thời gian đã xuất</translation>
+      <translation>Xóa Dấu Thời Gian</translation>
     </message>
     <message>
       <source>Timestamp</source>
@@ -8796,7 +8796,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Add Text</source>
-      <translation>Thêm nội dung văn bản</translation>
+      <translation>Thêm văn bản</translation>
     </message>
     <message>
       <source>Delete Text</source>
@@ -8812,7 +8812,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Add Bookmark Info</source>
-      <translation>Đánh dấu thông tin</translation>
+      <translation>Thêm thông tin dấu trang</translation>
     </message>
     <message>
       <source>Delete Bookmark Info</source>
@@ -8820,7 +8820,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Bookmark Info</source>
-      <translation>Đánh dấu thông tin</translation>
+      <translation>Thông tin dấu trang</translation>
     </message>
     <message>
       <source>exported</source>
@@ -8828,7 +8828,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation>Cài đặt đã chọn được yêu cầu chuyển mã. Nó sẽ làm tăng việc sử dụng CPU và có thể tốn nhiều thời gian.</translation>
+      <translation>Các thiết lập đã chọn yêu cầu chuyển mã. Nó sẽ làm tăng mức sử dụng CPU và có thể mất nhiều thời gian.</translation>
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
@@ -9687,7 +9687,7 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation>Chỉ cho giấy phép Khởi đầu cho mỗi Hệ thống, do đó giấy phép thứ hai sẽ bị vô hiệu hóa.</translation>
+      <translation>Mỗi Hệ thống chỉ được phép có một giấy phép Starter, do đó giấy phép thứ hai sẽ bị hủy kích hoạt.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
@@ -9793,7 +9793,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Build not found</source>
-      <translation>Bản dựng không tìm thấy</translation>
+      <translation>Không tìm thấy bản dựng</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
@@ -9834,7 +9834,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Update Files</source>
-      <translation>Cập nhật tệp</translation>
+      <translation>Tệp cập nhật</translation>
     </message>
     <message>
       <source>Some servers are offline and will not be updated. Skip them?</source>
@@ -10382,7 +10382,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <name>nx::vms::client::desktop::PresentedStateDelegate</name>
     <message>
       <source>Added</source>
-      <translation>Thêm</translation>
+      <translation>Đã thêm</translation>
     </message>
     <message>
       <source>Adding</source>
@@ -10607,7 +10607,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>Chuyển động + Lo-Res</translation>
+      <translation>Chuyển động + Độ phân giải thấp</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
@@ -10631,7 +10631,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Objects only</source>
-      <translation>Đối tượng chỉ</translation>
+      <translation>Chỉ đối tượng</translation>
     </message>
     <message>
       <source>Motion, Objects + Lo-Res</source>
@@ -10763,7 +10763,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Device IP Conflict</source>
-      <translation>Thiết bị xung đột IP</translation>
+      <translation>Xung đột IP thiết bị</translation>
     </message>
     <message numerus="yes">
       <source>+%n values</source>
@@ -10784,7 +10784,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Shut down</source>
-      <translation>Tắt nguồn</translation>
+      <translation>Tắt</translation>
     </message>
   </context>
   <context>
@@ -10798,7 +10798,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <name>nx::vms::client::desktop::ScheduleSettingsWidget</name>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation>Thiết đặt chất lượng xác định tỷ lệ nén chỉ, và không ảnh hưởng đến độ phân giải. Thấp, Trung bình, cao và tốt nhất là giá trị đặt trước bitrate.</translation>
+      <translation>Cài đặt chất lượng chỉ xác định tỷ lệ nén và không ảnh hưởng đến độ phân giải. Thấp, Trung bình, Cao và Tốt nhất là các giá trị bitrate được cài đặt sẵn.</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -10848,7 +10848,7 @@ Bạn vẫn có thể thay đổi chất lượng và FPS trực tiếp trên ca
     </message>
     <message>
       <source>Objects Only</source>
-      <translation>Chỉ có đối tượng</translation>
+      <translation>Chỉ đối tượng</translation>
     </message>
     <message>
       <source>Objects
@@ -10858,7 +10858,7 @@ Bạn vẫn có thể thay đổi chất lượng và FPS trực tiếp trên ca
     </message>
     <message>
       <source>Motion Only</source>
-      <translation>Chỉ phát hiện di dời</translation>
+      <translation>Chỉ chuyển động</translation>
     </message>
     <message>
       <source>Motion
@@ -11358,7 +11358,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
-      <translation>Vận động</translation>
+      <translation>Chuyển động</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -11563,7 +11563,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation>Giờ hệ điều hành máy chủ</translation>
+      <translation>Thời gian hệ điều hành máy chủ</translation>
     </message>
     <message>
       <source>VMS Time</source>
@@ -11574,15 +11574,15 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation>Thời gian, phổ biến và đồng bộ giữa tất cả các máy chủ. Có thể khác với thời gian hệ điều hành trên bất kỳ máy chủ cụ thể.</translation>
+      <translation>Thời gian, chung và được đồng bộ giữa tất cả các máy chủ. Có thể khác nhau tùy theo thời gian của hệ điều hành trên bất kỳ máy chủ cụ thể nào.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation>Đồng bộ hóa với Internet</translation>
+      <translation>Đồng bộ với Internet</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation>Đồng bộ hóa với giờ cục bộ tại máy chủ được chọn</translation>
+      <translation>Đồng bộ với giờ địa phương tại máy chủ đã chọn</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
@@ -11598,7 +11598,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation>Máy chủ thời gian đang ngoại tuyến. Thời gian không được đồng bộ hóa.</translation>
+      <translation>Máy chủ thời gian đang ngoại tuyến. Thời gian không được đồng bộ.</translation>
     </message>
   </context>
   <context>
@@ -11628,7 +11628,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation>Không thể tải đoạn tệp lên máy chủ</translation>
+      <translation>Không thể tải tập tin chunk lên máy chủ</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
@@ -11636,7 +11636,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation>Tệp bị hỏng trong khi tải lên máy chủ</translation>
+      <translation>Tệp tin bị hỏng khi đang được tải lên máy chủ</translation>
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
@@ -11710,7 +11710,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Internal error</source>
-      <translation>Lỗi bên trong</translation>
+      <translation>Lỗi nội bộ</translation>
     </message>
     <message>
       <source>Connection failure</source>
@@ -11849,7 +11849,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Discard</source>
-      <translation>loại bỏ</translation>
+      <translation>Hủy bỏ</translation>
     </message>
     <message>
       <source>Copy Access Link</source>
@@ -11978,14 +11978,14 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation>Kích hoạt hoặc vô hiệu hóa cài đặt này không thay đổi bất cứ điều gì trong kho lưu trữ hiện có.</translation>
+      <translation>Bật hoặc tắt cài đặt này không làm thay đổi bất cứ điều gì trong kho lưu trữ hiện có.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::VirtualCameraUploadWidget</name>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation>Người dùng hiện đang tải lên cảnh quay cho camera này.</translation>
+      <translation>Một người dùng khác hiện đang tải cảnh quay lên camera này.</translation>
     </message>
     <message>
       <source>User %1 is currently uploading footage to this camera.</source>
@@ -11994,12 +11994,12 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>(%1 of %2)</source>
       <comment>Uploaded and total number of files will be substituted</comment>
-      <translation>(%1 đến %2)</translation>
+      <translation>(%1 trong số %2)</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
       <comment>Filename will be substituted</comment>
-      <translation>Hoàn thiện %1...</translation>
+      <translation>Đang hoàn thiện %1...</translation>
     </message>
     <message>
       <source>Uploading %1...</source>
@@ -13262,7 +13262,7 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation>Lưu file dưới dạng...</translation>
+      <translation>Lưu tệp dưới dạng...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -13274,15 +13274,15 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation>Thư mục %1 bị chặn để viết.</translation>
+      <translation>Thư mục %1 bị chặn không cho ghi.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation>Dữ liệu đang tải...</translation>
+      <translation>Đang tải xuống tệp...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>Mở thư mục tập tin</translation>
+      <translation>Mở thư mục chứa</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

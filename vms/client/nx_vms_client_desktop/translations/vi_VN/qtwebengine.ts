@@ -5,15 +5,15 @@
     <name>DownloadInterruptReason</name>
     <message>
       <source>Unknown reason or not interrupted</source>
-      <translation>Không rõ lý do hay không bị gián đoạn</translation>
+      <translation>Không rõ lý do hoặc không bị gián đoạn</translation>
     </message>
     <message>
       <source>General file operation failure</source>
-      <translation>Lỗi tập tin chung</translation>
+      <translation>Lỗi thao tác tập tin chung</translation>
     </message>
     <message>
       <source>The file cannot be written locally, due to access restrictions</source>
-      <translation>Các tập tin không thể được ghi cục bộ do các hạn chế về quyền truy cập</translation>
+      <translation>Không thể ghi tệp cục bộ do hạn chế truy cập</translation>
     </message>
     <message>
       <source>Insufficient space on the target drive</source>
@@ -65,7 +65,7 @@
     </message>
     <message>
       <source>The server has gone down</source>
-      <translation>Máy chủ đã bị sập</translation>
+      <translation>Máy chủ đã ngừng hoạt động</translation>
     </message>
     <message>
       <source>The network request was invalid (for example, the URL or scheme is invalid)</source>
@@ -104,11 +104,11 @@
     <name>QQuickWebEngineView</name>
     <message>
       <source>Stop</source>
-      <translation>Dừng lại</translation>
+      <translation>Dừng</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation>Tải lại và bỏ qua bộ nhớ cache</translation>
+      <translation>Tải lại và bỏ qua bộ nhớ đệm</translation>
     </message>
     <message>
       <source>Open link in this window</source>
@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>&amp;Bold</source>
-      <translation>&amp;Dũng cảm</translation>
+      <translation>&amp;In đậm</translation>
     </message>
     <message>
       <source>&amp;Italic</source>
@@ -140,27 +140,27 @@
     </message>
     <message>
       <source>&amp;Underline</source>
-      <translation>&amp; Gạch chân</translation>
+      <translation>&amp;Gạch chân</translation>
     </message>
     <message>
       <source>&amp;Strikethrough</source>
-      <translation>&amp; Truyền thông</translation>
+      <translation>&amp;Gạch ngang</translation>
     </message>
     <message>
       <source>Align &amp;Left</source>
-      <translation>Căn và trái</translation>
+      <translation>Căn chỉnh &amp;Trái</translation>
     </message>
     <message>
       <source>Align &amp;Center</source>
-      <translation>Align &amp; Center</translation>
+      <translation>Căn chỉnh &amp;Giữa</translation>
     </message>
     <message>
       <source>Align &amp;Right</source>
-      <translation>Sắp xếp đúng</translation>
+      <translation>Căn chỉnh &amp;Phải</translation>
     </message>
     <message>
       <source>Align &amp;Justified</source>
-      <translation>Căn chỉnh &amp; hợp lý</translation>
+      <translation>Căn chỉnh &amp;Hợp lý</translation>
     </message>
     <message>
       <source>&amp;Indent</source>
@@ -168,7 +168,7 @@
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation>&amp; Hết hạn</translation>
+      <translation>&amp;Ngoài lề</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
@@ -397,7 +397,7 @@
     </message>
     <message>
       <source>Javascript Alert - %1</source>
-      <translation>Thông báo Javascript - %1</translation>
+      <translation>Cảnh báo Javascript - %1</translation>
     </message>
     <message>
       <source>Javascript Confirm - %1</source>
