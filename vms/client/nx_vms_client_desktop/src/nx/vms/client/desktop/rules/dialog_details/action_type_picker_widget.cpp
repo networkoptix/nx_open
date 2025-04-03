@@ -12,7 +12,7 @@
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/strings.h>
-#include <nx/vms/rules/utils/common.h>
+#include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/compatibility.h>
 #include <nx/vms/rules/utils/field.h>
 #include <ui/common/palette.h>
@@ -81,13 +81,7 @@ void ActionTypePickerWidget::setProlongedActionsEnabled(bool enabled)
         auto item = model->item(row);
         const auto actionId = item->data(Qt::UserRole).toString();
 
-        const auto actionDescriptor = engine->actionDescriptor(actionId);
-
-        const auto isProlonged = actionDescriptor->flags.testFlag(vms::rules::ItemFlag::prolonged);
-        const auto hasDuration = vms::rules::utils::fieldByName(
-            vms::rules::utils::kDurationFieldName, actionDescriptor.value());
-
-        if (isProlonged && !hasDuration)
+        if (isProlongedOnly(*engine->actionDescriptor(actionId)))
         {
             item->setFlags(enabled
                 ? item->flags() | Qt::ItemIsEnabled

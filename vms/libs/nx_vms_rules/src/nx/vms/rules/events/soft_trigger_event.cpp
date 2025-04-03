@@ -98,6 +98,7 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
             "the <code>triggerName</code> field on hover.",
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
+            utils::makeStateFieldDescriptor(Strings::state(), {}, State::instant),
             makeFieldDescriptor<UniqueIdField>("triggerId", TranslatableString("Invisible")),
             makeFieldDescriptor<SourceCameraField>(
                 utils::kDeviceIdFieldName,

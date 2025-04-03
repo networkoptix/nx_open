@@ -13,24 +13,15 @@ namespace nx::vms::rules { class StateField; }
 
 namespace nx::vms::rules::utils {
 
-inline bool isInstantOnly(const ItemDescriptor& descriptor)
-{
-    return descriptor.flags.testFlag(vms::rules::ItemFlag::instant)
-        && !descriptor.flags.testFlags(vms::rules::ItemFlag::prolonged);
-}
-
-inline bool isProlongedOnly(const ItemDescriptor& descriptor)
-{
-    return descriptor.flags.testFlag(vms::rules::ItemFlag::prolonged)
-        && !descriptor.flags.testFlags(vms::rules::ItemFlag::instant);
-}
-
 /**
  * Returns field descriptor with the given field name from the given field descriptor or
  * std::nullopt if there is no such field.
  */
 NX_VMS_RULES_API std::optional<FieldDescriptor> fieldByName(
     const QString& fieldName, const ItemDescriptor& descriptor);
+
+NX_VMS_RULES_API const FieldDescriptor* fieldByType(
+    const QString& type, const ItemDescriptor& descriptor);
 
 /** Returns whether logging is allowed for the given rule. */
 NX_VMS_RULES_API bool isLoggingAllowed(const Engine* engine, nx::Uuid ruleId);

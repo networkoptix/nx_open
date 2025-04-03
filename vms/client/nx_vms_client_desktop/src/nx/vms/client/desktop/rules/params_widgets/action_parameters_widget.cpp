@@ -20,6 +20,8 @@
 
 namespace nx::vms::client::desktop::rules {
 
+using namespace nx::vms::rules;
+
 ActionParametersWidget::ActionParametersWidget(WindowContext* context, QWidget* parent):
     ParamsWidget(context, parent)
 {
@@ -105,7 +107,7 @@ void ActionParametersWidget::updateUi()
 
 PickerWidget* ActionParametersWidget::createStatePickerIfRequired()
 {
-    if (vms::rules::utils::isInstantOnly(eventDescriptor().value()))
+    if (!eventDescriptor()->flags.testFlag(ItemFlag::prolonged))
     {
         // If the event is only instant, thus user has only one option to choose, there is no sense
         // to show picker widget.
@@ -119,7 +121,7 @@ PickerWidget* ActionParametersWidget::createStatePickerIfRequired()
         return nullptr;
     }
 
-    if (vms::rules::utils::isProlongedOnly(actionDescriptor().value()))
+    if (!actionDescriptor()->flags.testFlag(ItemFlag::instant))
     {
         // If the action is prolonged only, there are two possible options: the first one when the
         // action has 'duration' field, in that case state field will be controlled by the duration

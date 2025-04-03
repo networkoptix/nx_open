@@ -88,6 +88,10 @@ public:
 
     ActionFieldTest()
     {
+        engine->registerEventField(
+            fieldMetatype<StateField>(),
+            [](const FieldDescriptor* descriptor) { return new StateField(descriptor); });
+
         engine->registerEvent(TestEvent::manifest(), []{ return new TestEvent(); });
     }
 
@@ -103,9 +107,6 @@ public:
 
     EventPtr makeAnalyticsEvent()
     {
-        engine->registerEventField(
-            fieldMetatype<StateField>(),
-            [](const FieldDescriptor* descriptor) { return new StateField(descriptor); });
         engine->registerEventField(
             fieldMetatype<SourceCameraField>(),
             [](const FieldDescriptor* descriptor) { return new SourceCameraField(descriptor); });

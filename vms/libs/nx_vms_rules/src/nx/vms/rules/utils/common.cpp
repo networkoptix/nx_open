@@ -27,6 +27,14 @@ std::optional<FieldDescriptor> fieldByName(
     return std::nullopt;
 }
 
+const FieldDescriptor* fieldByType(const QString& type, const ItemDescriptor& descriptor)
+{
+    auto it = std::ranges::find_if(
+        descriptor.fields, [&type](const auto& field) { return field.id == type; });
+
+    return it == descriptor.fields.end() ? nullptr : &*it;
+}
+
 bool isLoggingAllowed(const Engine* engine, nx::Uuid ruleId)
 {
     const auto rule = engine->rule(ruleId);

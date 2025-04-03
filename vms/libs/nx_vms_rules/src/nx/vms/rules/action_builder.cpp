@@ -393,7 +393,8 @@ void ActionBuilder::processEvent(const EventPtr& event)
     {
         // Prolonged action without fixed duration must be started and stopped according to the
         // event state. As instant event does not have such states and not supported.
-        NX_ASSERT(false, "Only prolonged events are supported by the prolonged actions");
+        NX_ASSERT(false, "Only prolonged events are supported by the prolonged actions, event: %1,"
+            " state: %2, action: %3", event->type(), event->state(), m_actionType);
         return;
     }
 

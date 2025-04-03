@@ -237,7 +237,10 @@ public:
         ASSERT_TRUE(registerEvent<T>(args...));
 
         const auto filter = engine->buildEventFilter(manifest.id);
-        EXPECT_TRUE(filter);
+        ASSERT_TRUE(filter);
+
+        if (manifest.flags.testFlag(ItemFlag::prolonged))
+            EXPECT_TRUE(filter->template fieldByName<StateField>(rules::utils::kStateFieldName));
 
         // Check for serialization assertions.
         const auto event = QSharedPointer<T>::create();

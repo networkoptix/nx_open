@@ -55,6 +55,6 @@ NX_VMS_COMMON_API QList<ActionType> allActions();
 
 NX_VMS_COMMON_API bool requiresUserResource(ActionType actionType);
 NX_VMS_COMMON_API bool isActionProlonged(ActionType actionType, const ActionParameters &parameters);
-
+NX_VMS_COMMON_API bool isProlongedOnly(ActionType actionType);
 
 } // namespace nx::vms::event

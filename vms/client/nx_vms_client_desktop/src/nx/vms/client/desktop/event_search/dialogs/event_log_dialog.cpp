@@ -472,9 +472,7 @@ void EventLogDialog::initActionsModel()
         QStandardItem* item = new QStandardItem(
             Strings::actionName(systemContext(), actionDesc.id));
         item->setData(actionDesc.id, ActionTypeRole);
-        item->setData(
-            actionDesc.flags.testFlag(ItemFlag::prolonged) && !hasDuration(actionDesc),
-            ProlongedOnlyActionRole);
+        item->setData(isProlongedOnly(actionDesc), ProlongedOnlyActionRole);
 
         m_actionTypesModel->appendRow(item);
     }

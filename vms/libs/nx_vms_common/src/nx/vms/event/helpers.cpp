@@ -247,7 +247,6 @@ bool requiresUserResource(ActionType actionType)
     }
 }
 
-
 bool hasToggleState(ActionType actionType)
 {
     switch (actionType)
@@ -268,13 +267,13 @@ bool hasToggleState(ActionType actionType)
         case ActionType::exitFullscreenAction:
             return false;
 
+        case ActionType::bookmarkAction:
+        case ActionType::buzzerAction:
         case ActionType::cameraOutputAction:
         case ActionType::cameraRecordingAction:
         case ActionType::panicRecordingAction:
         case ActionType::playSoundAction:
-        case ActionType::bookmarkAction:
         case ActionType::showTextOverlayAction:
-        case ActionType::buzzerAction:
             return true;
 
         default:
@@ -289,10 +288,10 @@ bool supportsDuration(ActionType actionType)
     switch (actionType)
     {
         case ActionType::bookmarkAction:
-        case ActionType::showTextOverlayAction:
+        case ActionType::buzzerAction:
         case ActionType::cameraOutputAction:
         case ActionType::cameraRecordingAction:
-        case ActionType::buzzerAction:
+        case ActionType::showTextOverlayAction:
             NX_ASSERT(hasToggleState(actionType),
                 "Action %1 should have toggle state to support duration", actionType);
             return true;
@@ -307,6 +306,11 @@ bool isActionProlonged(ActionType actionType, const ActionParameters &parameters
         return parameters.durationMs <= 0;
 
     return hasToggleState(actionType);
+}
+
+bool isProlongedOnly(ActionType actionType)
+{
+    return hasToggleState(actionType) && !supportsDuration(actionType);
 }
 
 } // namespace nx::vms::event

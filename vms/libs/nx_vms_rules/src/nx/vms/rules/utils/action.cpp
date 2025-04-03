@@ -25,6 +25,12 @@ bool isProlonged(const Engine* engine, const ActionBuilder* builder)
     return (!durationField || durationField->value() <= std::chrono::seconds::zero());
 }
 
+bool isProlongedOnly(const vms::rules::ItemDescriptor& actionDescriptor)
+{
+    return actionDescriptor.flags.testFlag(ItemFlag::prolonged)
+        && !hasDuration(actionDescriptor);
+}
+
 bool hasDuration(const vms::rules::ItemDescriptor& actionDescriptor)
 {
     return utils::fieldByName(utils::kDurationFieldName, actionDescriptor).has_value();
