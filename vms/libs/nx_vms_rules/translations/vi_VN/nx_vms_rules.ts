@@ -369,7 +369,7 @@
     </message>
     <message>
       <source>At</source>
-      <translation>Tại camera</translation>
+      <translation>Tại</translation>
     </message>
   </context>
   <context>
@@ -380,11 +380,11 @@
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation>Sự kiện Generic %1</translation>
+      <translation>Sự kiện chung tại %1</translation>
     </message>
     <message>
       <source>State</source>
-      <translation>Tiểu bang</translation>
+      <translation>Trạng thái</translation>
     </message>
     <message>
       <source>Omit logging</source>
@@ -495,11 +495,11 @@
     <name>nx::vms::rules::NetworkIssueEvent</name>
     <message>
       <source>Network Issue at %1</source>
-      <translation>%1 lỗi mạng</translation>
+      <translation>Sự cố mạng tại %1</translation>
     </message>
     <message>
       <source>Network Issue</source>
-      <translation>Vấn đề về mạng</translation>
+      <translation>Lỗi mạng</translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
@@ -616,7 +616,7 @@
     <name>nx::vms::rules::PanicRecordingAction</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>Chế độ Ghi âm Panic sẽ chuyển cài đặt ghi hình cho tất cả các camera thành FPS và chất lượng tối đa.</translation>
+      <translation>Chế độ Ghi Panic sẽ chuyển cài đặt ghi hình cho tất cả các camera thành FPS và chất lượng tối đa.</translation>
     </message>
     <message>
       <source>Panic Recording</source>
@@ -635,7 +635,7 @@
     </message>
     <message>
       <source>At</source>
-      <translation>Tại camera</translation>
+      <translation>Tại</translation>
     </message>
     <message>
       <source>To Users</source>
@@ -677,7 +677,7 @@
     <name>nx::vms::rules::PoeOverBudgetEvent</name>
     <message>
       <source>Consumption</source>
-      <translation>Tiêu dùng</translation>
+      <translation>Tiêu thụ</translation>
     </message>
     <message>
       <source>PoE over budget at %1</source>
@@ -709,7 +709,7 @@
     </message>
     <message>
       <source>At</source>
-      <translation>Tại camera</translation>
+      <translation>Tại</translation>
     </message>
     <message>
       <source>PTZ Preset</source>
@@ -736,7 +736,7 @@
     </message>
     <message>
       <source>Body</source>
-      <translation>Nội dung</translation>
+      <translation>Thân</translation>
     </message>
     <message>
       <source>Send Mobile Notification</source>
@@ -767,7 +767,7 @@
     </message>
     <message>
       <source>At</source>
-      <translation>Tại camera</translation>
+      <translation>Tại</translation>
     </message>
     <message>
       <source>To</source>

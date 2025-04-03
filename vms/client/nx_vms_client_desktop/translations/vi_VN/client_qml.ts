@@ -1954,7 +1954,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Layouts</translation>
+      <translation>Bố cục</translation>
     </message>
     <message>
       <source>Showreels</source>
@@ -1962,7 +1962,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation>Video Walls</translation>
+      <translation>Tường video</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -1970,7 +1970,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Local Files</source>
-      <translation>Tập tin có sẵn</translation>
+      <translation>Tệp cục bộ</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -1996,7 +1996,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation>Vận động</translation>
+      <translation>Chuyển động</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -2412,7 +2412,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Type</source>
-      <translation>Kiểu</translation>
+      <translation>Loại</translation>
     </message>
     <message>
       <source>Local</source>
