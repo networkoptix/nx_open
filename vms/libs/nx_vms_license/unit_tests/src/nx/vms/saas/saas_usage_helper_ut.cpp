@@ -186,8 +186,8 @@ protected:
         m_liveHelper.reset(new LiveViewUsageHelper(systemContext()));
 
         auto manager = systemContext()->saasServiceManager();
-        manager->loadServiceData(kServiceDataJson);
-        manager->loadSaasData(kSaasDataJson);
+        manager->loadServiceDataAsync(kServiceDataJson);
+        manager->loadSaasDataAsync(kSaasDataJson);
 
         for (const auto& data: testPluginData)
         {
@@ -418,7 +418,7 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasMapping)
         auto manager = systemContext()->saasServiceManager();
         auto saasData = manager->data();
         saasData.state = state;
-        manager->loadSaasData(nx::reflect::json::serialize(saasData));
+        manager->loadSaasDataAsync(nx::reflect::json::serialize(saasData));
         auto services = m_cloudeStorageHelper->servicesByCameras();
         int usedServices = 0;
         for (const auto& [cameraId, serviceId]: services)
@@ -674,7 +674,7 @@ TEST_F(SaasServiceUsageHelperTest, liveServiceUsage)
     ASSERT_EQ(10, liveDetails.exceedDevices.size());
 
     // Switch system from saas to oldLicenseMode
-    manager->loadSaasData("");
+    manager->loadSaasDataAsync("");
     liveDetails = m_liveHelper->info();
     ASSERT_EQ(25, liveDetails.exceedDevices.size()); //< Thre is no recording licenses now.
 
@@ -684,7 +684,7 @@ TEST_F(SaasServiceUsageHelperTest, liveServiceUsage)
 
     // Rollback state
     nx::vms::license::setFakeLicenseCount(0, Qn::LicenseType::LC_Professional);
-    manager->loadSaasData(kSaasDataJson);
+    manager->loadSaasDataAsync(kSaasDataJson);
 }
 
 } // nx::vms::license::saas::test

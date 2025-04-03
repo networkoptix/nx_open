@@ -155,9 +155,17 @@ void ServiceManager::resetGracePeriodCache()
     m_tierGracePeriodExpirationTime.reset();
 }
 
-void ServiceManager::loadSaasData(const std::string_view& saasDataJson)
+void ServiceManager::loadSaasDataAsync(const std::string_view& saasDataJson)
 {
     setJsonToDictionaryAsync(
+        resourcePropertyDictionary(),
+        kSaasDataPropertyKey,
+        saasDataJson);
+}
+
+void ServiceManager::loadSaasData(const std::string_view& saasDataJson)
+{
+    setJsonToDictionarySync(
         resourcePropertyDictionary(),
         kSaasDataPropertyKey,
         saasDataJson);
@@ -170,6 +178,14 @@ QByteArray ServiceManager::rawData() const
 }
 
 void ServiceManager::loadServiceData(const std::string_view& servicesJson)
+{
+    setJsonToDictionarySync(
+        resourcePropertyDictionary(),
+        kSaasServicesPropertyKey,
+        servicesJson);
+}
+
+void ServiceManager::loadServiceDataAsync(const std::string_view& servicesJson)
 {
     setJsonToDictionaryAsync(
         resourcePropertyDictionary(),
