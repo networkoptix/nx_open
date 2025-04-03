@@ -7890,10 +7890,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>필터 초기화</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>상세설명</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>이벤트 없음</translation>
     </message>
@@ -7939,20 +7935,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>이벤트</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>소스</translation>
-    </message>
-    <message>
       <source>Action</source>
       <translation>동작</translation>
     </message>
     <message>
       <source>Target</source>
       <translation>대상</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>상세설명</translation>
     </message>
     <message>
       <source>Open event video</source>
@@ -12425,10 +12413,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>동작</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>소스</translation>
-    </message>
-    <message>
       <source>Target</source>
       <translation>대상</translation>
     </message>
@@ -12611,12 +12595,13 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>사용됨</translation>
     </message>
     <message>
-      <source>Number of devices using this service exceeds the available service quantity.</source>
-      <translation>이 서비스를 사용하는 기기의 수가 사용 가능한 서비스 수량을 초과합니다.</translation>
+      <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
+      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
     </message>
     <message>
-      <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
-      <translation>일부 기기에서는 비활성화하거나 더 적합한 서비스를 추가하세요. 그렇지 않으면 %1에서 자동으로 수행됩니다.</translation>
+      <source>On %1, the system will automatically disable the service on some devices.</source>
+      <comment>%1 will be substituted with date and time</comment>
+      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
     </message>
   </context>
   <context>

@@ -8017,10 +8017,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Rensa filter</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>Beskrivning</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Inga händelser</translation>
     </message>
@@ -8068,20 +8064,12 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Händelse</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Källa</translation>
-    </message>
-    <message>
       <source>Action</source>
       <translation>Åtgärd</translation>
     </message>
     <message>
       <source>Target</source>
       <translation>Mål</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Beskrivning</translation>
     </message>
     <message>
       <source>Open event video</source>
@@ -12605,10 +12593,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Åtgärd</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Källa</translation>
-    </message>
-    <message>
       <source>Target</source>
       <translation>Mål</translation>
     </message>
@@ -12794,12 +12778,13 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Använt</translation>
     </message>
     <message>
-      <source>Number of devices using this service exceeds the available service quantity.</source>
-      <translation>Antalet enheter som använder den här tjänsten överstiger det tillgängliga antalet tjänster.</translation>
+      <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
+      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
     </message>
     <message>
-      <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
-      <translation>Inaktivera det för vissa enheter eller lägg till lämpligare tjänster. Annars kommer det att göras automatiskt på %1</translation>
+      <source>On %1, the system will automatically disable the service on some devices.</source>
+      <comment>%1 will be substituted with date and time</comment>
+      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
     </message>
   </context>
   <context>

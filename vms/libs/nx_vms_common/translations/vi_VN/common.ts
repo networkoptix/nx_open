@@ -563,7 +563,7 @@
     <name>QnFullscreenCameraPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation>Chọn đúng một máy ảnh</translation>
+      <translation>Chọn đúng một camera</translation>
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
@@ -1653,7 +1653,7 @@
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching.</source>
-      <translation>Bật kết nối đám mây UDP hole-punching.</translation>
+      <translation>Cho phép đục lỗ UDP kết nối đám mây.</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage.</source>
@@ -1737,7 +1737,7 @@
     </message>
     <message>
       <source>Default codec for export video.</source>
-      <translation>Codec mặc định cho xuất video.</translation>
+      <translation>Bộ giải mã mặc định để xuất video.</translation>
     </message>
     <message>
       <source>Low quality screen video codec.</source>

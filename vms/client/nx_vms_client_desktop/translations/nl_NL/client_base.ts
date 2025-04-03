@@ -8017,10 +8017,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Filter wissen</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>Omschrijving</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Geen gebeurtenissen</translation>
     </message>
@@ -8068,20 +8064,12 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Event</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Bron</translation>
-    </message>
-    <message>
       <source>Action</source>
       <translation>Actie</translation>
     </message>
     <message>
       <source>Target</source>
       <translation>Doel</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Omschrijving</translation>
     </message>
     <message>
       <source>Open event video</source>
@@ -12606,10 +12594,6 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
       <translation>Actie</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Bron</translation>
-    </message>
-    <message>
       <source>Target</source>
       <translation>Doel</translation>
     </message>
@@ -12795,12 +12779,13 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
       <translation type="unfinished">Used</translation>
     </message>
     <message>
-      <source>Number of devices using this service exceeds the available service quantity.</source>
-      <translation type="unfinished">Number of devices using this service exceeds the available service quantity.</translation>
+      <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
+      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
     </message>
     <message>
-      <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
-      <translation type="unfinished">Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</translation>
+      <source>On %1, the system will automatically disable the service on some devices.</source>
+      <comment>%1 will be substituted with date and time</comment>
+      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
     </message>
   </context>
   <context>

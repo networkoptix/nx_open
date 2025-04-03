@@ -8017,10 +8017,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Tøm filter</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>Beskrivelse</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Ingen hendelser</translation>
     </message>
@@ -8068,20 +8064,12 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Hendelse</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Kilde</translation>
-    </message>
-    <message>
       <source>Action</source>
       <translation>Handling</translation>
     </message>
     <message>
       <source>Target</source>
       <translation>Mål</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Beskrivelse</translation>
     </message>
     <message>
       <source>Open event video</source>
@@ -12602,10 +12590,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Handling</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Kilde</translation>
-    </message>
-    <message>
       <source>Target</source>
       <translation>Mål</translation>
     </message>
@@ -12791,12 +12775,13 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation type="unfinished">Used</translation>
     </message>
     <message>
-      <source>Number of devices using this service exceeds the available service quantity.</source>
-      <translation>Antall enheter som bruker denne tjenesten, overstiger tilgjengelig tjenestemengde.</translation>
+      <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
+      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
     </message>
     <message>
-      <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
-      <translation>Vennligst deaktiver den for enkelte enheter eller legg til flere passende tjenester. Ellers vil det gjøres automatisk på %1</translation>
+      <source>On %1, the system will automatically disable the service on some devices.</source>
+      <comment>%1 will be substituted with date and time</comment>
+      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
     </message>
   </context>
   <context>

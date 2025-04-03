@@ -353,11 +353,11 @@
     <name>nx::vms::client::core::RecordingStatusHelper</name>
     <message>
       <source>Not recording</source>
-      <translation>Không có video</translation>
+      <translation>Không có bản ghi</translation>
     </message>
     <message>
       <source>Recording everything</source>
-      <translation>Video liên tục</translation>
+      <translation>Ghi mọi thứ</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
@@ -365,7 +365,7 @@
     </message>
     <message>
       <source>Recording motion only</source>
-      <translation>Ghi âm phát hiện Displacement chỉ</translation>
+      <translation>Chỉ ghi chuyển động</translation>
     </message>
     <message>
       <source>Recording objects only</source>
@@ -377,7 +377,7 @@
     </message>
     <message>
       <source>Recording motion and low quality</source>
-      <translation>Phát hiện chuyển động + chất lượng thấp video liên tục</translation>
+      <translation>Ghi chuyển động và chất lượng thấp</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
@@ -385,7 +385,7 @@
     </message>
     <message>
       <source>Continuous</source>
-      <translation>Video liên tục</translation>
+      <translation>Liên tục</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -393,11 +393,11 @@
     </message>
     <message>
       <source>Motion only</source>
-      <translation>Chỉ phát hiện di dời</translation>
+      <translation>Chỉ chuyển động</translation>
     </message>
     <message>
       <source>Objects only</source>
-      <translation>Đối tượng chỉ</translation>
+      <translation>Chỉ đối tượng</translation>
     </message>
     <message>
       <source>Motion, Objects + Lo-Res</source>
@@ -405,7 +405,7 @@
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>Displacement + chất lượng thấp</translation>
+      <translation>Chuyển động + Độ phân giải thấp</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>

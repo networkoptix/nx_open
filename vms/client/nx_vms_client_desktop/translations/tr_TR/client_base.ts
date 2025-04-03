@@ -8016,10 +8016,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Filtreyi Temizle</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>Açıklama</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Olay yok</translation>
     </message>
@@ -8067,20 +8063,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Durum</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Kaynak</translation>
-    </message>
-    <message>
       <source>Action</source>
       <translation>Hareket</translation>
     </message>
     <message>
       <source>Target</source>
       <translation>Hedef</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Açıklama</translation>
     </message>
     <message>
       <source>Open event video</source>
@@ -12600,10 +12588,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
       <translation>Hareket</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Kaynak</translation>
-    </message>
-    <message>
       <source>Target</source>
       <translation>Hedef</translation>
     </message>
@@ -12789,12 +12773,13 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
       <translation>Kullanılmış</translation>
     </message>
     <message>
-      <source>Number of devices using this service exceeds the available service quantity.</source>
-      <translation>Bu hizmeti kullanan cihaz sayısı mevcut hizmet miktarını aşıyor.</translation>
+      <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
+      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
     </message>
     <message>
-      <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
-      <translation>Lütfen bazı cihazlar için bu özelliği devre dışı bırakın veya daha fazla uygun hizmet ekleyin. Aksi halde %1 tarihinde otomatik olarak yapılacaktır</translation>
+      <source>On %1, the system will automatically disable the service on some devices.</source>
+      <comment>%1 will be substituted with date and time</comment>
+      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
     </message>
   </context>
   <context>

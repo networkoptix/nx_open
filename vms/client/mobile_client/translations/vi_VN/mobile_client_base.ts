@@ -90,7 +90,7 @@
     <name>nx::vms::client::mobile::ShareBookmarkBackend</name>
     <message>
       <source>Camera</source>
-      <translation>Máy chụp hình</translation>
+      <translation>Camera</translation>
     </message>
     <message>
       <source>Expires in %1</source>

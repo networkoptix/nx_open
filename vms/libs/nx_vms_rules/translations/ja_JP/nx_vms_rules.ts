@@ -4,14 +4,6 @@
   <context>
     <name>BasicAction</name>
     <message>
-      <source>Caption</source>
-      <translation>キャプション</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>説明</translation>
-    </message>
-    <message>
       <source>Tooltip text</source>
       <translation>ツールチップテキスト</translation>
     </message>
@@ -48,10 +40,6 @@
     <message>
       <source>Unknown event</source>
       <translation>不明なイベント</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>理由: %1</translation>
     </message>
     <message>
       <source>Unknown action</source>
@@ -282,6 +270,18 @@
       <source>Rule validation failed: %1</source>
       <translation>ルールの検証に失敗しました: %1</translation>
     </message>
+    <message>
+      <source>Caption</source>
+      <translation>キャプション</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>説明</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>ソース</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
@@ -346,7 +346,7 @@
     </message>
     <message>
       <source>%1 at %2</source>
-      <comment> is detected</comment>
+      <comment>Object %1 is detected at camera %2</comment>
       <translation>%2 の %1</translation>
     </message>
   </context>
@@ -445,10 +445,6 @@
       <translation>競合アドレス: %1</translation>
     </message>
     <message>
-      <source>MAC #%1: %2</source>
-      <translation>MAC #%1: %2</translation>
-    </message>
-    <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
       <translation>%1 でデバイスIPが競合しています</translation>
@@ -465,6 +461,16 @@
     <message>
       <source>Camera IP Conflict</source>
       <translation>カメラのIP競合</translation>
+    </message>
+    <message>
+      <source>Device #%1: %2 (%3)</source>
+      <comment>Device #1: &lt;device_name&gt; (MAC address)</comment>
+      <translation type="unfinished">Device #%1: %2 (%3)</translation>
+    </message>
+    <message>
+      <source>Camera #%1: %2 (%3)</source>
+      <comment>Camera #1: &lt;device_name&gt; (MAC address)</comment>
+      <translation type="unfinished">Camera #%1: %2 (%3)</translation>
     </message>
   </context>
   <context>
@@ -545,8 +551,16 @@
       <translation>ソース</translation>
     </message>
     <message>
-      <source>Generic Event from %1</source>
-      <translation>%1 からの汎用イベント</translation>
+      <source>Generic Event at %1</source>
+      <translation>%1 の汎用イベント</translation>
+    </message>
+    <message>
+      <source>Related devices:</source>
+      <translation type="unfinished">Related devices:</translation>
+    </message>
+    <message>
+      <source>Related cameras:</source>
+      <translation>関連カメラ:</translation>
     </message>
   </context>
   <context>
@@ -616,16 +630,20 @@
   <context>
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
-      <source>Integration Diagnostic Event</source>
-      <translation>インテグレーション診断イベント</translation>
-    </message>
-    <message>
       <source>For Plugin</source>
       <translation>プラグイン</translation>
     </message>
     <message>
       <source>And Level Is</source>
       <translation>レベル</translation>
+    </message>
+    <message>
+      <source>Integration Diagnostic at %1</source>
+      <translation type="unfinished">Integration Diagnostic at %1</translation>
+    </message>
+    <message>
+      <source>Integration Diagnostic</source>
+      <translation type="unfinished">Integration Diagnostic</translation>
     </message>
   </context>
   <context>
@@ -637,10 +655,6 @@
   </context>
   <context>
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
-    <message>
-      <source>LDAP Sync Issue Event</source>
-      <translation>LDAP 同期障害イベント</translation>
-    </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is a cause of the event</comment>
@@ -665,6 +679,14 @@
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
       <translation>一部の LDAP ユーザーまたはグループが LDAP データベース内に見つかりませんでした。</translation>
     </message>
+    <message>
+      <source>LDAP Sync Issue at %1</source>
+      <translation type="unfinished">LDAP Sync Issue at %1</translation>
+    </message>
+    <message>
+      <source>LDAP Sync Issue</source>
+      <translation>LDAP 同期障害</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
@@ -673,21 +695,17 @@
       <translation>ライセンス障害</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation>ライセンスが不足しています。以下のデバイスで録画が無効になっています:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation>ライセンスが不足しています。以下のカメラで録画が無効になっています:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation>ライセンスが不足しています。以下のI/Oモジュールで録音が無効になっています:</translation>
-    </message>
-    <message>
-      <source>%1 has a license problem</source>
+      <source>Not enough licenses on %1</source>
       <comment>Server name will be substituted</comment>
-      <translation>%1 のライセンスに問題があります</translation>
+      <translation type="unfinished">Not enough licenses on %1</translation>
+    </message>
+    <message>
+      <source>Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Recording has been disabled on the following devices:</translation>
+    </message>
+    <message>
+      <source>Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Recording has been disabled on the following cameras:</translation>
     </message>
   </context>
   <context>
@@ -845,11 +863,6 @@
       <translation>PoE給電容量超過</translation>
     </message>
     <message>
-      <source>Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation>電力上限を超過しました (%1)</translation>
-    </message>
-    <message>
       <source>PoE over budget on %1</source>
       <translation>%1 のPoE給電量が給電能力を超えています。</translation>
     </message>
@@ -932,22 +945,6 @@
   </context>
   <context>
     <name>nx::vms::rules::SaasIssueEvent</name>
-    <message>
-      <source>License migration issue</source>
-      <translation>ライセンス移行障害</translation>
-    </message>
-    <message>
-      <source>Recording services disabled</source>
-      <translation>録画サービスが無効になっています</translation>
-    </message>
-    <message>
-      <source>Cloud storage services disabled</source>
-      <translation>クラウドストレージサービスが無効になっています</translation>
-    </message>
-    <message>
-      <source>Paid integration services disabled</source>
-      <translation>有料インテグレーションサービスが無効になっています</translation>
-    </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
       <translation>
@@ -977,6 +974,10 @@
     <message>
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
       <translation>ライセンスのインポートをスキップしました。後ほど別の移行試行が自動的にスケジュールされます。</translation>
+    </message>
+    <message>
+      <source>Services Issue on %1</source>
+      <translation type="unfinished">Services Issue on %1</translation>
     </message>
   </context>
   <context>
@@ -1009,20 +1010,6 @@
   <context>
     <name>nx::vms::rules::ServerConflictEvent</name>
     <message>
-      <source>Conflicting Server: %1</source>
-      <translation>競合サーバー: %1</translation>
-    </message>
-    <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>競合サーバー #%1: %2</translation>
-    </message>
-    <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2</translation>
-    </message>
-    <message>
       <source>Server Conflict</source>
       <translation>サーバー競合</translation>
     </message>
@@ -1030,6 +1017,18 @@
       <source>%1 Conflict</source>
       <comment>Server name will be substituted</comment>
       <translation>%1 競合</translation>
+    </message>
+    <message>
+      <source>Discovered a server with the same ID in the same local network</source>
+      <translation type="unfinished">Discovered a server with the same ID in the same local network</translation>
+    </message>
+    <message>
+      <source>Servers in the same local network have conflict on the following devices</source>
+      <translation type="unfinished">Servers in the same local network have conflict on the following devices</translation>
+    </message>
+    <message>
+      <source>Server: %1</source>
+      <translation type="unfinished">Server: %1</translation>
     </message>
   </context>
   <context>
@@ -1099,10 +1098,6 @@
   <context>
     <name>nx::vms::rules::SoftTriggerEvent</name>
     <message>
-      <source>Trigger Name</source>
-      <translation>トリガー名</translation>
-    </message>
-    <message>
       <source>Soft Trigger</source>
       <translation>ソフトトリガー</translation>
     </message>
@@ -1117,10 +1112,6 @@
     <message>
       <source>By</source>
       <translation>ユーザー</translation>
-    </message>
-    <message>
-      <source>Source: %1</source>
-      <translation>ソース: %1</translation>
     </message>
     <message>
       <source>User: %1</source>

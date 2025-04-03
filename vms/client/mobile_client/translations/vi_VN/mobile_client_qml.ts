@@ -424,7 +424,7 @@
     <name>OptionSelectorScreen</name>
     <message>
       <source>Clear</source>
-      <translation>Tẩy</translation>
+      <translation>Xóa</translation>
     </message>
   </context>
   <context>
@@ -808,7 +808,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation>Tên người sử dụng</translation>
+      <translation>Tên</translation>
     </message>
     <message>
       <source>Description</source>

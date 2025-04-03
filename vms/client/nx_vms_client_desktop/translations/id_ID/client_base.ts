@@ -7890,10 +7890,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <translation>Hapus Filter</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>Deskripsi</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Tidak ada event</translation>
     </message>
@@ -7939,20 +7935,12 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <translation>Event</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Source</translation>
-    </message>
-    <message>
       <source>Action</source>
       <translation>Aksi</translation>
     </message>
     <message>
       <source>Target</source>
       <translation>Target</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Deskripsi</translation>
     </message>
     <message>
       <source>Open event video</source>
@@ -12427,10 +12415,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
       <translation>Aksi</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Source</translation>
-    </message>
-    <message>
       <source>Target</source>
       <translation>Target</translation>
     </message>
@@ -12613,12 +12597,13 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
       <translation>Digunakan</translation>
     </message>
     <message>
-      <source>Number of devices using this service exceeds the available service quantity.</source>
-      <translation>Jumlah perangkat yang menggunakan layanan ini melebihi kuantitas layanan yang tersedia.</translation>
+      <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
+      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
     </message>
     <message>
-      <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
-      <translation>Mohon nonaktifkan untuk beberapa perangkat atau tambahkan layanan yang lebih sesuai. Jika tidak maka akan dilakukan secara otomatis pada %1</translation>
+      <source>On %1, the system will automatically disable the service on some devices.</source>
+      <comment>%1 will be substituted with date and time</comment>
+      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
     </message>
   </context>
   <context>

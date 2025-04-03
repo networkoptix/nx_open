@@ -4,14 +4,6 @@
   <context>
     <name>BasicAction</name>
     <message>
-      <source>Caption</source>
-      <translation>표제</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>설명</translation>
-    </message>
-    <message>
       <source>Tooltip text</source>
       <translation type="unfinished">Tooltip text</translation>
     </message>
@@ -48,10 +40,6 @@
     <message>
       <source>Unknown event</source>
       <translation>알 수 없는 이벤트</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>원인: %1</translation>
     </message>
     <message>
       <source>Unknown action</source>
@@ -282,6 +270,18 @@
       <source>Rule validation failed: %1</source>
       <translation type="unfinished">Rule validation failed: %1</translation>
     </message>
+    <message>
+      <source>Caption</source>
+      <translation>표제</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>설명</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>소스</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
@@ -346,7 +346,7 @@
     </message>
     <message>
       <source>%1 at %2</source>
-      <comment> is detected</comment>
+      <comment>Object %1 is detected at camera %2</comment>
       <translation>%2 에서 %1</translation>
     </message>
   </context>
@@ -445,10 +445,6 @@
       <translation>충돌 주소: %1</translation>
     </message>
     <message>
-      <source>MAC #%1: %2</source>
-      <translation>맥 #%1: %2</translation>
-    </message>
-    <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
       <translation>%1에서 장치 IP 충돌</translation>
@@ -465,6 +461,16 @@
     <message>
       <source>Camera IP Conflict</source>
       <translation>카메라 IP 충돌</translation>
+    </message>
+    <message>
+      <source>Device #%1: %2 (%3)</source>
+      <comment>Device #1: &lt;device_name&gt; (MAC address)</comment>
+      <translation type="unfinished">Device #%1: %2 (%3)</translation>
+    </message>
+    <message>
+      <source>Camera #%1: %2 (%3)</source>
+      <comment>Camera #1: &lt;device_name&gt; (MAC address)</comment>
+      <translation type="unfinished">Camera #%1: %2 (%3)</translation>
     </message>
   </context>
   <context>
@@ -545,8 +551,16 @@
       <translation type="unfinished">And Source</translation>
     </message>
     <message>
-      <source>Generic Event from %1</source>
-      <translation type="unfinished">Generic Event from %1</translation>
+      <source>Generic Event at %1</source>
+      <translation>%1에서 일반 이벤트</translation>
+    </message>
+    <message>
+      <source>Related devices:</source>
+      <translation type="unfinished">Related devices:</translation>
+    </message>
+    <message>
+      <source>Related cameras:</source>
+      <translation type="unfinished">Related cameras:</translation>
     </message>
   </context>
   <context>
@@ -616,16 +630,20 @@
   <context>
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
-      <source>Integration Diagnostic Event</source>
-      <translation type="unfinished">Integration Diagnostic Event</translation>
-    </message>
-    <message>
       <source>For Plugin</source>
       <translation type="unfinished">For Plugin</translation>
     </message>
     <message>
       <source>And Level Is</source>
       <translation type="unfinished">And Level Is</translation>
+    </message>
+    <message>
+      <source>Integration Diagnostic at %1</source>
+      <translation type="unfinished">Integration Diagnostic at %1</translation>
+    </message>
+    <message>
+      <source>Integration Diagnostic</source>
+      <translation type="unfinished">Integration Diagnostic</translation>
     </message>
   </context>
   <context>
@@ -637,10 +655,6 @@
   </context>
   <context>
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
-    <message>
-      <source>LDAP Sync Issue Event</source>
-      <translation type="unfinished">LDAP Sync Issue Event</translation>
-    </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is a cause of the event</comment>
@@ -665,6 +679,14 @@
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
       <translation>LDAP 데이터베이스에서 일부 LDAP 사용자 또는 그룹을 찾을 수 없습니다.</translation>
     </message>
+    <message>
+      <source>LDAP Sync Issue at %1</source>
+      <translation type="unfinished">LDAP Sync Issue at %1</translation>
+    </message>
+    <message>
+      <source>LDAP Sync Issue</source>
+      <translation>LDAP 동기화 문제</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
@@ -673,21 +695,17 @@
       <translation>인증키 이슈</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation>라이센스가 충분하지 않습니다. 다음 기기에서 녹화가 비활성화되었습니다.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation>라이센스가 충분하지 않습니다. 다음 카메라에서 녹화가 비활성화되었습니다.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation>라이센스가 충분하지 않습니다. 다음 I/O 모듈에서 레코딩이 비활성화되었습니다.</translation>
-    </message>
-    <message>
-      <source>%1 has a license problem</source>
+      <source>Not enough licenses on %1</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 has a license problem</translation>
+      <translation type="unfinished">Not enough licenses on %1</translation>
+    </message>
+    <message>
+      <source>Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Recording has been disabled on the following devices:</translation>
+    </message>
+    <message>
+      <source>Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Recording has been disabled on the following cameras:</translation>
     </message>
   </context>
   <context>
@@ -845,11 +863,6 @@
       <translation type="unfinished">PoE Over Budget</translation>
     </message>
     <message>
-      <source>Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation type="unfinished">Power limit exceeded (%1)</translation>
-    </message>
-    <message>
       <source>PoE over budget on %1</source>
       <translation type="unfinished">PoE over budget on %1</translation>
     </message>
@@ -932,22 +945,6 @@
   </context>
   <context>
     <name>nx::vms::rules::SaasIssueEvent</name>
-    <message>
-      <source>License migration issue</source>
-      <translation>라이센스 마이그레이션 문제</translation>
-    </message>
-    <message>
-      <source>Recording services disabled</source>
-      <translation>녹음 서비스 비활성화됨</translation>
-    </message>
-    <message>
-      <source>Cloud storage services disabled</source>
-      <translation type="unfinished">Cloud storage services disabled</translation>
-    </message>
-    <message>
-      <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
-    </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
       <translation>
@@ -977,6 +974,10 @@
     <message>
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
       <translation>라이센스 가져오기 건너뛰기. 다른 마이그레이션 시도가 나중에 자동으로 예약됩니다.</translation>
+    </message>
+    <message>
+      <source>Services Issue on %1</source>
+      <translation type="unfinished">Services Issue on %1</translation>
     </message>
   </context>
   <context>
@@ -1009,20 +1010,6 @@
   <context>
     <name>nx::vms::rules::ServerConflictEvent</name>
     <message>
-      <source>Conflicting Server: %1</source>
-      <translation>서버 충돌: %1</translation>
-    </message>
-    <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>%1 서버 충돌 중: %2</translation>
-    </message>
-    <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>맥 #%1: %2</translation>
-    </message>
-    <message>
       <source>Server Conflict</source>
       <translation>서버 충돌</translation>
     </message>
@@ -1030,6 +1017,18 @@
       <source>%1 Conflict</source>
       <comment>Server name will be substituted</comment>
       <translation type="unfinished">%1 Conflict</translation>
+    </message>
+    <message>
+      <source>Discovered a server with the same ID in the same local network</source>
+      <translation type="unfinished">Discovered a server with the same ID in the same local network</translation>
+    </message>
+    <message>
+      <source>Servers in the same local network have conflict on the following devices</source>
+      <translation type="unfinished">Servers in the same local network have conflict on the following devices</translation>
+    </message>
+    <message>
+      <source>Server: %1</source>
+      <translation type="unfinished">Server: %1</translation>
     </message>
   </context>
   <context>
@@ -1099,10 +1098,6 @@
   <context>
     <name>nx::vms::rules::SoftTriggerEvent</name>
     <message>
-      <source>Trigger Name</source>
-      <translation>트리거 이름</translation>
-    </message>
-    <message>
       <source>Soft Trigger</source>
       <translation>Soft Trigger</translation>
     </message>
@@ -1117,10 +1112,6 @@
     <message>
       <source>By</source>
       <translation type="unfinished">By</translation>
-    </message>
-    <message>
-      <source>Source: %1</source>
-      <translation>소스: %1</translation>
     </message>
     <message>
       <source>User: %1</source>

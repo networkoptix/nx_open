@@ -4,14 +4,6 @@
   <context>
     <name>BasicAction</name>
     <message>
-      <source>Caption</source>
-      <translation>Rubrik</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Beskrivning</translation>
-    </message>
-    <message>
       <source>Tooltip text</source>
       <translation>Verktygstips text</translation>
     </message>
@@ -50,10 +42,6 @@
     <message>
       <source>Unknown event</source>
       <translation>Okänd händelse</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>Anledning: %1</translation>
     </message>
     <message>
       <source>Unknown action</source>
@@ -288,6 +276,18 @@
       <source>Rule validation failed: %1</source>
       <translation>Regelvalidering misslyckades: %1</translation>
     </message>
+    <message>
+      <source>Caption</source>
+      <translation>Rubrik</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Beskrivning</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Källa</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
@@ -353,7 +353,7 @@
     </message>
     <message>
       <source>%1 at %2</source>
-      <comment> is detected</comment>
+      <comment>Object %1 is detected at camera %2</comment>
       <translation>%1 vid %2</translation>
     </message>
   </context>
@@ -452,10 +452,6 @@
       <translation>Motstridig adress: %1</translation>
     </message>
     <message>
-      <source>MAC #%1: %2</source>
-      <translation>MAC #%1: %2</translation>
-    </message>
-    <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
       <translation>Enhets-IP-konflikt vid %1</translation>
@@ -472,6 +468,16 @@
     <message>
       <source>Camera IP Conflict</source>
       <translation>Kamera IP-konflikt</translation>
+    </message>
+    <message>
+      <source>Device #%1: %2 (%3)</source>
+      <comment>Device #1: &lt;device_name&gt; (MAC address)</comment>
+      <translation type="unfinished">Device #%1: %2 (%3)</translation>
+    </message>
+    <message>
+      <source>Camera #%1: %2 (%3)</source>
+      <comment>Camera #1: &lt;device_name&gt; (MAC address)</comment>
+      <translation type="unfinished">Camera #%1: %2 (%3)</translation>
     </message>
   </context>
   <context>
@@ -552,8 +558,16 @@
       <translation>Och Källa</translation>
     </message>
     <message>
-      <source>Generic Event from %1</source>
-      <translation>Generisk händelse från %1</translation>
+      <source>Generic Event at %1</source>
+      <translation>Generisk händelse vid %1</translation>
+    </message>
+    <message>
+      <source>Related devices:</source>
+      <translation type="unfinished">Related devices:</translation>
+    </message>
+    <message>
+      <source>Related cameras:</source>
+      <translation>Relaterade kameror:</translation>
     </message>
   </context>
   <context>
@@ -625,16 +639,20 @@
   <context>
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
-      <source>Integration Diagnostic Event</source>
-      <translation>Integreringsdiagnostikhändelse</translation>
-    </message>
-    <message>
       <source>For Plugin</source>
       <translation>För plugin</translation>
     </message>
     <message>
       <source>And Level Is</source>
       <translation>Och nivå är</translation>
+    </message>
+    <message>
+      <source>Integration Diagnostic at %1</source>
+      <translation type="unfinished">Integration Diagnostic at %1</translation>
+    </message>
+    <message>
+      <source>Integration Diagnostic</source>
+      <translation type="unfinished">Integration Diagnostic</translation>
     </message>
   </context>
   <context>
@@ -646,10 +664,6 @@
   </context>
   <context>
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
-    <message>
-      <source>LDAP Sync Issue Event</source>
-      <translation>Ldap Sync-problemhändelse</translation>
-    </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is a cause of the event</comment>
@@ -675,6 +689,14 @@
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
       <translation>Vissa LDAP-användare eller grupper hittades inte i LDAP-databasen.</translation>
     </message>
+    <message>
+      <source>LDAP Sync Issue at %1</source>
+      <translation type="unfinished">LDAP Sync Issue at %1</translation>
+    </message>
+    <message>
+      <source>LDAP Sync Issue</source>
+      <translation>LDAP-synkroniseringsproblem</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
@@ -683,21 +705,17 @@
       <translation>Licensproblem</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation>Inte tillräckligt med licenser. Inspelningen har inaktiverats på följande enheter:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation>Inte tillräckligt med licenser. Inspelning har inaktiverats på följande kameror:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation>Inte tillräckligt med licenser. Inspelning har inaktiverats på följande I/O-moduler:</translation>
-    </message>
-    <message>
-      <source>%1 has a license problem</source>
+      <source>Not enough licenses on %1</source>
       <comment>Server name will be substituted</comment>
-      <translation>%1 har ett licensproblem</translation>
+      <translation type="unfinished">Not enough licenses on %1</translation>
+    </message>
+    <message>
+      <source>Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Recording has been disabled on the following devices:</translation>
+    </message>
+    <message>
+      <source>Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Recording has been disabled on the following cameras:</translation>
     </message>
   </context>
   <context>
@@ -856,11 +874,6 @@
       <translation>PoE över budget</translation>
     </message>
     <message>
-      <source>Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation>Effektgränsen har överskridits (%1)</translation>
-    </message>
-    <message>
       <source>PoE over budget on %1</source>
       <translation>PoE över budget på %1</translation>
     </message>
@@ -943,22 +956,6 @@
   </context>
   <context>
     <name>nx::vms::rules::SaasIssueEvent</name>
-    <message>
-      <source>License migration issue</source>
-      <translation>Problem med licensmigrering</translation>
-    </message>
-    <message>
-      <source>Recording services disabled</source>
-      <translation>Inspelningstjänster inaktiverade</translation>
-    </message>
-    <message>
-      <source>Cloud storage services disabled</source>
-      <translation>Molnlagringstjänster inaktiverade</translation>
-    </message>
-    <message>
-      <source>Paid integration services disabled</source>
-      <translation>Betalda integrationstjänster inaktiverade</translation>
-    </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
       <translation>
@@ -992,6 +989,10 @@
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
       <translation>Hoppade över import av licenser. Ett nytt migreringsförsök schemaläggs automatiskt för senare.</translation>
     </message>
+    <message>
+      <source>Services Issue on %1</source>
+      <translation type="unfinished">Services Issue on %1</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::SendEmailAction</name>
@@ -1023,20 +1024,6 @@
   <context>
     <name>nx::vms::rules::ServerConflictEvent</name>
     <message>
-      <source>Conflicting Server: %1</source>
-      <translation>Motstridig Server: %1</translation>
-    </message>
-    <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Motstridig Server #%1: %2</translation>
-    </message>
-    <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2</translation>
-    </message>
-    <message>
       <source>Server Conflict</source>
       <translation>Serverkonflikt</translation>
     </message>
@@ -1044,6 +1031,18 @@
       <source>%1 Conflict</source>
       <comment>Server name will be substituted</comment>
       <translation>%1 Konflikt</translation>
+    </message>
+    <message>
+      <source>Discovered a server with the same ID in the same local network</source>
+      <translation type="unfinished">Discovered a server with the same ID in the same local network</translation>
+    </message>
+    <message>
+      <source>Servers in the same local network have conflict on the following devices</source>
+      <translation type="unfinished">Servers in the same local network have conflict on the following devices</translation>
+    </message>
+    <message>
+      <source>Server: %1</source>
+      <translation type="unfinished">Server: %1</translation>
     </message>
   </context>
   <context>
@@ -1113,10 +1112,6 @@
   <context>
     <name>nx::vms::rules::SoftTriggerEvent</name>
     <message>
-      <source>Trigger Name</source>
-      <translation>Utlösarens namn</translation>
-    </message>
-    <message>
       <source>Soft Trigger</source>
       <translation>Utlösare</translation>
     </message>
@@ -1131,10 +1126,6 @@
     <message>
       <source>By</source>
       <translation>Med</translation>
-    </message>
-    <message>
-      <source>Source: %1</source>
-      <translation>Källa: %1</translation>
     </message>
     <message>
       <source>User: %1</source>

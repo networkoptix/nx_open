@@ -4,14 +4,6 @@
   <context>
     <name>BasicAction</name>
     <message>
-      <source>Caption</source>
-      <translation>Felirat</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>&amp;Leírás</translation>
-    </message>
-    <message>
       <source>Tooltip text</source>
       <translation type="unfinished">Tooltip text</translation>
     </message>
@@ -50,10 +42,6 @@
     <message>
       <source>Unknown event</source>
       <translation type="unfinished">Unknown event</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>Ok: %1</translation>
     </message>
     <message>
       <source>Unknown action</source>
@@ -288,6 +276,18 @@
       <source>Rule validation failed: %1</source>
       <translation type="unfinished">Rule validation failed: %1</translation>
     </message>
+    <message>
+      <source>Caption</source>
+      <translation>Felirat</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>&amp;Leírás</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Eszköz</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
@@ -353,7 +353,7 @@
     </message>
     <message>
       <source>%1 at %2</source>
-      <comment> is detected</comment>
+      <comment>Object %1 is detected at camera %2</comment>
       <translation>%1 ezen %2</translation>
     </message>
   </context>
@@ -452,10 +452,6 @@
       <translation>Címütközés: %1</translation>
     </message>
     <message>
-      <source>MAC #%1: %2</source>
-      <translation>MAC #%1: %2 {1:?} {2?}</translation>
-    </message>
-    <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
       <translation>Eszköz IP ütközés %1 szerveren</translation>
@@ -472,6 +468,16 @@
     <message>
       <source>Camera IP Conflict</source>
       <translation>Kamera IP ütközés</translation>
+    </message>
+    <message>
+      <source>Device #%1: %2 (%3)</source>
+      <comment>Device #1: &lt;device_name&gt; (MAC address)</comment>
+      <translation type="unfinished">Device #%1: %2 (%3)</translation>
+    </message>
+    <message>
+      <source>Camera #%1: %2 (%3)</source>
+      <comment>Camera #1: &lt;device_name&gt; (MAC address)</comment>
+      <translation type="unfinished">Camera #%1: %2 (%3)</translation>
     </message>
   </context>
   <context>
@@ -552,8 +558,16 @@
       <translation type="unfinished">And Source</translation>
     </message>
     <message>
-      <source>Generic Event from %1</source>
-      <translation type="unfinished">Generic Event from %1</translation>
+      <source>Generic Event at %1</source>
+      <translation>%1 - általános esemény</translation>
+    </message>
+    <message>
+      <source>Related devices:</source>
+      <translation type="unfinished">Related devices:</translation>
+    </message>
+    <message>
+      <source>Related cameras:</source>
+      <translation type="unfinished">Related cameras:</translation>
     </message>
   </context>
   <context>
@@ -625,16 +639,20 @@
   <context>
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
-      <source>Integration Diagnostic Event</source>
-      <translation type="unfinished">Integration Diagnostic Event</translation>
-    </message>
-    <message>
       <source>For Plugin</source>
       <translation type="unfinished">For Plugin</translation>
     </message>
     <message>
       <source>And Level Is</source>
       <translation type="unfinished">And Level Is</translation>
+    </message>
+    <message>
+      <source>Integration Diagnostic at %1</source>
+      <translation type="unfinished">Integration Diagnostic at %1</translation>
+    </message>
+    <message>
+      <source>Integration Diagnostic</source>
+      <translation type="unfinished">Integration Diagnostic</translation>
     </message>
   </context>
   <context>
@@ -646,10 +664,6 @@
   </context>
   <context>
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
-    <message>
-      <source>LDAP Sync Issue Event</source>
-      <translation type="unfinished">LDAP Sync Issue Event</translation>
-    </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is a cause of the event</comment>
@@ -675,6 +689,14 @@
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
       <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
     </message>
+    <message>
+      <source>LDAP Sync Issue at %1</source>
+      <translation type="unfinished">LDAP Sync Issue at %1</translation>
+    </message>
+    <message>
+      <source>LDAP Sync Issue</source>
+      <translation type="unfinished">LDAP Sync Issue</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
@@ -683,21 +705,17 @@
       <translation>Licence probléma</translation>
     </message>
     <message>
-      <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
-    </message>
-    <message>
-      <source>%1 has a license problem</source>
+      <source>Not enough licenses on %1</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 has a license problem</translation>
+      <translation type="unfinished">Not enough licenses on %1</translation>
+    </message>
+    <message>
+      <source>Recording has been disabled on the following devices:</source>
+      <translation type="unfinished">Recording has been disabled on the following devices:</translation>
+    </message>
+    <message>
+      <source>Recording has been disabled on the following cameras:</source>
+      <translation type="unfinished">Recording has been disabled on the following cameras:</translation>
     </message>
   </context>
   <context>
@@ -856,11 +874,6 @@
       <translation type="unfinished">PoE Over Budget</translation>
     </message>
     <message>
-      <source>Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation type="unfinished">Power limit exceeded (%1)</translation>
-    </message>
-    <message>
       <source>PoE over budget on %1</source>
       <translation type="unfinished">PoE over budget on %1</translation>
     </message>
@@ -943,22 +956,6 @@
   </context>
   <context>
     <name>nx::vms::rules::SaasIssueEvent</name>
-    <message>
-      <source>License migration issue</source>
-      <translation type="unfinished">License migration issue</translation>
-    </message>
-    <message>
-      <source>Recording services disabled</source>
-      <translation type="unfinished">Recording services disabled</translation>
-    </message>
-    <message>
-      <source>Cloud storage services disabled</source>
-      <translation type="unfinished">Cloud storage services disabled</translation>
-    </message>
-    <message>
-      <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
-    </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
@@ -992,6 +989,10 @@
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
       <translation type="unfinished">Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</translation>
     </message>
+    <message>
+      <source>Services Issue on %1</source>
+      <translation type="unfinished">Services Issue on %1</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::SendEmailAction</name>
@@ -1023,20 +1024,6 @@
   <context>
     <name>nx::vms::rules::ServerConflictEvent</name>
     <message>
-      <source>Conflicting Server: %1</source>
-      <translation>Ütköző szerver: %1</translation>
-    </message>
-    <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Ütköző szerver: #%1: %2</translation>
-    </message>
-    <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2 {1:?} {2?}</translation>
-    </message>
-    <message>
       <source>Server Conflict</source>
       <translation>Szerver ütközés</translation>
     </message>
@@ -1044,6 +1031,18 @@
       <source>%1 Conflict</source>
       <comment>Server name will be substituted</comment>
       <translation type="unfinished">%1 Conflict</translation>
+    </message>
+    <message>
+      <source>Discovered a server with the same ID in the same local network</source>
+      <translation type="unfinished">Discovered a server with the same ID in the same local network</translation>
+    </message>
+    <message>
+      <source>Servers in the same local network have conflict on the following devices</source>
+      <translation type="unfinished">Servers in the same local network have conflict on the following devices</translation>
+    </message>
+    <message>
+      <source>Server: %1</source>
+      <translation type="unfinished">Server: %1</translation>
     </message>
   </context>
   <context>
@@ -1113,10 +1112,6 @@
   <context>
     <name>nx::vms::rules::SoftTriggerEvent</name>
     <message>
-      <source>Trigger Name</source>
-      <translation>Eseményindító neve</translation>
-    </message>
-    <message>
       <source>Soft Trigger</source>
       <translation>Szoft eseményindítás</translation>
     </message>
@@ -1131,10 +1126,6 @@
     <message>
       <source>By</source>
       <translation type="unfinished">By</translation>
-    </message>
-    <message>
-      <source>Source: %1</source>
-      <translation>Forrás: %1</translation>
     </message>
     <message>
       <source>User: %1</source>

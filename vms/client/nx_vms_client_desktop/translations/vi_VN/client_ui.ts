@@ -123,7 +123,7 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>Làm xong</translation>
+      <translation>Hoàn Thành</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
@@ -297,7 +297,7 @@
     <name>BookmarkOverlaySettingsWidget</name>
     <message>
       <source>Bookmark Info</source>
-      <translation>Đánh dấu thông tin</translation>
+      <translation>Thông tin dấu trang</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -305,7 +305,7 @@
     </message>
     <message>
       <source>Area Width</source>
-      <translation>Chiều rộng diện tích</translation>
+      <translation>Chiều rộng khu vực</translation>
     </message>
     <message>
       <source>Font Size</source>
@@ -392,7 +392,7 @@
     </message>
     <message>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation>Tính tỷ lệ bit trên mỗi GOP thay vì tốc độ bit trên giây</translation>
+      <translation>Tính toán tốc độ bit trên mỗi GOP thay vì tốc độ bit trên mỗi giây</translation>
     </message>
     <message>
       <source>It will increase bitrate for camera.</source>
@@ -400,7 +400,7 @@
     </message>
     <message>
       <source>Disable secondary stream</source>
-      <translation>Vô hiệu hóa luồng thứ cấp</translation>
+      <translation>Tắt Luồng phụ</translation>
     </message>
     <message>
       <source>Motion Detection</source>
@@ -408,7 +408,7 @@
     </message>
     <message>
       <source>Media Streaming</source>
-      <translation>Luồng truyền thông</translation>
+      <translation>Truyền phát phương tiện</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -424,27 +424,27 @@
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>ID hợp lý</translation>
+      <translation>ID logic</translation>
     </message>
     <message>
       <source>Trust camera timestamp</source>
-      <translation>Tin cậy dấu thời gian máy ảnh</translation>
+      <translation>Tin dấu thời gian camera</translation>
     </message>
     <message>
       <source>Native camera presets will not be avaliable.</source>
-      <translation>Cài đặt gốc camera trước sẽ không có sẵn.</translation>
+      <translation>Cài đặt gốc của camera sẽ không có sẵn.</translation>
     </message>
     <message>
       <source>This camera supports pan and tilt</source>
-      <translation>Camera này hỗ trợ xoay tròn, nghiêng lên xuống</translation>
+      <translation>Camera này hỗ trợ quay ngang và nghiêng</translation>
     </message>
     <message>
       <source>This camera supports zoom</source>
-      <translation>Camera này hỗ trợ zoom</translation>
+      <translation>Camera này hỗ trợ phóng to</translation>
     </message>
     <message>
       <source>Detect motion during archive import</source>
-      <translation>Phát hiện chuyển động trong quá trình nhập kho</translation>
+      <translation>Phát hiện chuyển động trong quá trình nhập lưu trữ</translation>
     </message>
     <message>
       <source>Stream Settings</source>
@@ -1155,7 +1155,7 @@
     </message>
     <message>
       <source>Aspect ratio</source>
-      <translation>Tỷ lệ khía cạnh</translation>
+      <translation>Tỷ lệ khung hình</translation>
     </message>
     <message>
       <source>Default rotation</source>
@@ -1212,7 +1212,7 @@
     </message>
     <message>
       <source>Camera name</source>
-      <translation>Tên máy ảnh</translation>
+      <translation>Tên camera</translation>
     </message>
     <message>
       <source>Export date</source>
@@ -1224,7 +1224,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation>Xoá</translation>
     </message>
   </context>
   <context>
@@ -1293,7 +1293,7 @@
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>ID hợp lý</translation>
+      <translation>ID logic</translation>
     </message>
     <message>
       <source>Generate</source>
@@ -1305,7 +1305,7 @@
     </message>
     <message>
       <source>Minimum Grid Size</source>
-      <translation>Kích thước lưới điện tối thiểu</translation>
+      <translation>Kích thước lưới tối thiểu</translation>
     </message>
   </context>
   <context>
@@ -1477,11 +1477,11 @@
     </message>
     <message>
       <source>Done</source>
-      <translation>Làm xong</translation>
+      <translation>Hoàn Thành</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation>thử lại</translation>
+      <translation>Thử lại</translation>
     </message>
     <message>
       <source>Open files folder</source>
@@ -1540,7 +1540,7 @@
     </message>
     <message>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation>Hiển thị lớp phủ có tiêu điểm cho camera PTZ</translation>
+      <translation>Hiển thị lớp phủ mục tiêu cho camera PTZ</translation>
     </message>
     <message>
       <source>Show timestamp on LIVE</source>
@@ -1590,7 +1590,7 @@
     </message>
     <message>
       <source>Browse</source>
-      <translation>Chọn</translation>
+      <translation>Duyệt</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -1735,7 +1735,7 @@
     </message>
     <message>
       <source>Support Signature</source>
-      <translation>Chữ ký Hỗ trợ</translation>
+      <translation>Hỗ trợ chữ ký</translation>
     </message>
     <message>
       <source>Username</source>
@@ -2559,7 +2559,7 @@
     </message>
     <message>
       <source>Upload Footage</source>
-      <translation>Tải lên đoạn phim</translation>
+      <translation>Tải lên cảnh quay</translation>
     </message>
     <message>
       <source>Upload File...</source>

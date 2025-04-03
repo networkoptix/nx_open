@@ -7891,10 +7891,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>フィルターを解除</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>説明</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>イベントはありません</translation>
     </message>
@@ -7940,20 +7936,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>イベント</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>ソース</translation>
-    </message>
-    <message>
       <source>Action</source>
       <translation>アクション</translation>
     </message>
     <message>
       <source>Target</source>
       <translation>ターゲット</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>説明</translation>
     </message>
     <message>
       <source>Open event video</source>
@@ -12426,10 +12414,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>アクション</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>ソース</translation>
-    </message>
-    <message>
       <source>Target</source>
       <translation>ターゲット</translation>
     </message>
@@ -12612,12 +12596,13 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>使用中</translation>
     </message>
     <message>
-      <source>Number of devices using this service exceeds the available service quantity.</source>
-      <translation>このサービスを使用しているデバイスの数が、利用可能なサービス数を超えています。</translation>
+      <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
+      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
     </message>
     <message>
-      <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
-      <translation>不足分のデバイス数だけ無効化、もしくは適切なサービスを追加してください。対処されない場合、%1 に自動的に実行されます。</translation>
+      <source>On %1, the system will automatically disable the service on some devices.</source>
+      <comment>%1 will be substituted with date and time</comment>
+      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
     </message>
   </context>
   <context>
