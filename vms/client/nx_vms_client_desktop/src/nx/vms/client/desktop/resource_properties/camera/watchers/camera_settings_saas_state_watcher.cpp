@@ -24,19 +24,22 @@ CameraSettingsSaasStateWatcher::CameraSettingsSaasStateWatcher(
     if (!NX_ASSERT(store && systemContext))
         return;
 
-    const auto setSaasInitializedStateToStore =
+    const auto setSaasStateToStore =
         [systemContext, store]
         {
+            const auto saasManager = systemContext->saasServiceManager();
             store->setSaasInitialized(saas::saasInitialized(systemContext));
+            store->setSaasSuspended(saasManager->saasSuspended());
+            store->setSaasShutDown(saasManager->saasShutDown());
         };
 
     connect(systemContext->saasServiceManager(), &saas::ServiceManager::dataChanged,
-        this, setSaasInitializedStateToStore);
+        this, setSaasStateToStore);
 
     connect(systemContext->globalSettings(), &SystemSettings::cloudSettingsChanged,
-        this, setSaasInitializedStateToStore);
+        this, setSaasStateToStore);
 
-    setSaasInitializedStateToStore();
+    setSaasStateToStore();
 }
 
 } // namespace nx::vms::client::desktop

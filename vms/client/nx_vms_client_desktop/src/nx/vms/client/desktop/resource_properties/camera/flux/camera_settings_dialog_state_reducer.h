@@ -88,6 +88,9 @@ public:
     static std::pair<bool, State> setPermissions(
         State state, Qn::Permissions singleCameraPermissions, bool allCamerasEditable);
     static std::pair<bool, State> setSaasInitialized(State state, bool value);
+    static std::pair<bool, State> setSaasSuspended(State state, bool value);
+    static std::pair<bool, State> setSaasShutDown(State state, bool value);
+
     static State setSingleVirtualCameraState(State state, const VirtualCameraState& value);
 
     static State setSingleCameraUserName(State state, const QString& text);

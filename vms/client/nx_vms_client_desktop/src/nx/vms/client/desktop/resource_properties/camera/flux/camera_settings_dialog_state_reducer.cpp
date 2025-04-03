@@ -689,14 +689,22 @@ State::ScheduleAlerts calculateScheduleAlerts(const State& state)
 void updateRecordingAlerts(State& state)
 {
     const bool highArchiveLengthWarning = state.recording.minPeriod.hasManualPeriodValue()
-        && state.recording.minPeriod.displayValue() > kMinArchiveDurationAlertThreshold;
+        && state.recording.minPeriod.displayValue() > kMinArchiveDurationAlertThreshold
+        && state.recording.enabled.valueOr(false);
     state.recordingAlerts.setFlag(
         State::RecordingAlert::highArchiveLength, highArchiveLengthWarning);
 
     const bool highPreRecordingValueWarning = state.recording.thresholds.beforeSec.hasValue()
-        && seconds(state.recording.thresholds.beforeSec()) >= kPreRecordingAlertThreshold;
+        && seconds(state.recording.thresholds.beforeSec()) >= kPreRecordingAlertThreshold
+        && state.recording.enabled.valueOr(false);
     state.recordingAlerts.setFlag(
         State::RecordingAlert::highPreRecordingValue, highPreRecordingValueWarning);
+
+    state.recordingAlerts.setFlag(State::RecordingAlert::recordingNotAvailableDueSuspendedSite,
+        state.saasSuspended);
+
+    state.recordingAlerts.setFlag(State::RecordingAlert::recordingNotAvailableDueShutDownSite,
+        state.saasShutDown);
 }
 
 bool canForceZoomCapability(const Camera& camera)
@@ -1056,6 +1064,36 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setSaasInitialized(
         return {false, std::move(state)};
 
     state.saasInitialized = value;
+    return {true, std::move(state)};
+}
+
+std::pair<bool, State> CameraSettingsDialogStateReducer::setSaasSuspended(
+    State state,
+    bool value)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    if (state.saasSuspended == value)
+        return {false, std::move(state)};
+
+    state.saasSuspended = value;
+    updateRecordingAlerts(state);
+
+    return {true, std::move(state)};
+}
+
+std::pair<bool, State> CameraSettingsDialogStateReducer::setSaasShutDown(
+    State state,
+    bool value)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
+    if (state.saasShutDown == value)
+        return {false, std::move(state)};
+
+    state.saasShutDown = value;
+    updateRecordingAlerts(state);
+
     return {true, std::move(state)};
 }
 
@@ -1542,6 +1580,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.recording.maxPeriod = RecordingPeriod::maxPeriod(cameras);
 
     state.selectedTab = fixupSelectedTab(state);
+    updateRecordingAlerts(state);
 
     return state;
 }
@@ -2172,6 +2211,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setRecordingEnabled(
     }
 
     state.scheduleAlerts = calculateScheduleAlerts(state);
+    updateRecordingAlerts(state);
 
     return {true, std::move(state)};
 }

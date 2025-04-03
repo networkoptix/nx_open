@@ -68,16 +68,6 @@ CameraScheduleWidget::CameraScheduleWidget(
     setupUi();
     NX_ASSERT(store && licenseUsageProvider);
 
-    ui->highArchiveLengthAlertBar->init({
-        .level = BarDescription::BarLevel::Warning,
-        .isEnabledProperty = &messageBarSettings()->highArchiveLengthWarning,
-    });
-    ui->highPreRecordingValueAlertBar->init({
-        .level = BarDescription::BarLevel::Warning,
-        .isEnabledProperty = &messageBarSettings()->highPreRecordingValueWarning,
-    });
-    ui->hintBar->init({.level = BarDescription::BarLevel::Info});
-
     auto licenseUsageTextDisplay = new ProvidedTextDisplay(m_licenseUsageProvider, this);
     licenseUsageTextDisplay->setDisplayingWidget(ui->licenseUsageLabel);
 
@@ -99,8 +89,12 @@ CameraScheduleWidget::CameraScheduleWidget(
     connect(ui->enableRecordingCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setRecordingEnabled);
 
-    connect(ui->enableRecordingCheckBox, &CheckBox::cannotBeToggled, this,
-        [this] { BackgroundFlasher::flash(ui->licenseUsageLabel, core::colorTheme()->color("red")); });
+    connect(ui->enableRecordingCheckBox, &CheckBox::cannotBeToggled, store,
+        [this, store]
+        {
+            if (!store->state().saasSuspended && !store->state().saasShutDown)
+                BackgroundFlasher::flash(ui->licenseUsageLabel, core::colorTheme()->color("red"));
+        });
 
     // Called when a cell is Alt-clicked. Fetches cell settings as current.
     connect(ui->gridWidget, &ScheduleGridWidget::cellClicked, store,
@@ -129,7 +123,7 @@ CameraScheduleWidget::CameraScheduleWidget(
     connect(licenseUsageProvider, &LicenseUsageProvider::stateChanged, store,
         [this, store]()
         {
-            ui->enableRecordingCheckBox->setCanBeChecked(!m_licenseUsageProvider->limitExceeded());
+            updateEnableRecordingCheckBox(store->state());
             updateLicensesButton(store->state());
         });
 }
@@ -152,7 +146,7 @@ void CameraScheduleWidget::setupUi()
 
     ui->scheduleGridGroupBox->setTitle(lit("%1\t(%2)").arg(
         tr("Recording Schedule")).arg(
-            tr("based on server time")));
+        tr("based on server time")));
 
     installEventHandler(ui->scrollAreaWidgetContents, QEvent::Resize, this,
         [this]()
@@ -258,48 +252,89 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
     }
     ui->recordingThresholdGroupBox->setToolTip(recordingThresholdGroupBoxTooltip);
 
-    ui->scheduleSettingsWidget->setEnabled(recordingEnabled);
-    setLayoutEnabled(ui->recordingScheduleLayout, recordingEnabled);
-    setLayoutEnabled(ui->bottomParametersLayout, recordingEnabled);
+    const bool settingsNotAvailableDueSaasState = state.saasShutDown || state.saasSuspended;
+    ui->enableRecordingCheckBox->setCanBeChecked(!settingsNotAvailableDueSaasState);
+    ui->scheduleSettingsWidget->setEnabled(recordingEnabled && !settingsNotAvailableDueSaasState);
+    setLayoutEnabled(ui->recordingScheduleLayout,
+        recordingEnabled && !settingsNotAvailableDueSaasState);
+    setLayoutEnabled(ui->bottomParametersLayout,
+        recordingEnabled && !settingsNotAvailableDueSaasState);
 
     loadAlerts(state);
 }
 
 void CameraScheduleWidget::loadAlerts(const CameraSettingsDialogState& state)
 {
-    ui->hintBar->setText(
-        [&state]()
-        {
-            if (!state.recordingHint)
-                return QString();
+    using RecordingHint = CameraSettingsDialogState::RecordingHint;
+    using RecordingAlert = CameraSettingsDialogState::RecordingAlert;
 
-            switch (*state.recordingHint)
+    std::vector<BarDescription> messages;
+
+    if (state.recordingHint == RecordingHint::brushChanged)
+    {
+        messages.push_back(
             {
-                case CameraSettingsDialogState::RecordingHint::brushChanged:
-                    return tr("Select areas on the schedule to apply chosen parameters to");
+                .text = tr("Select areas on the schedule to apply chosen parameters to"),
+                .level = BarDescription::BarLevel::Info
+            });
+    }
 
-                case CameraSettingsDialogState::RecordingHint::emptySchedule:
-                    return tr("Set recording parameters and select areas "
-                        "on the schedule grid to apply them to");
-            }
+    if (state.recordingHint == RecordingHint::emptySchedule)
+    {
+        messages.push_back(
+            {
+                .text = tr("Set recording parameters and select areas on the schedule grid "
+                    "to apply them to"),
+                .level = BarDescription::BarLevel::Info
+            });
+    }
 
-            return QString();
-        }());
+    if (state.recordingAlerts.testFlag(RecordingAlert::highPreRecordingValue))
+    {
+        messages.push_back(
+            {
+                .text = tr("High pre-recording time will increase RAM utilization on the server"),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty = &messageBarSettings()->highPreRecordingValueWarning
+            });
+    }
 
-    ui->highPreRecordingValueAlertBar->setText(
-        state.recordingAlerts.testFlag(
-            CameraSettingsDialogState::RecordingAlert::highPreRecordingValue)
-            ? tr("High pre-recording time will increase RAM utilization on the server")
-            : QString());
+    if (state.recordingAlerts.testFlag(RecordingAlert::highArchiveLength))
+    {
+        messages.push_back(
+            {
+                .text = QnCameraDeviceStringSet(
+                    tr("High minimum value can lead to archive length decrease on other devices"),
+                    tr("High minimum value can lead to archive length decrease on other cameras"))
+                        .getString(state.deviceType),
+                .level = BarDescription::BarLevel::Warning,
+                .isEnabledProperty = &messageBarSettings()->highArchiveLengthWarning
+            });
+    }
 
-    ui->highArchiveLengthAlertBar->setText(
-        state.recordingAlerts.testFlag(
-            CameraSettingsDialogState::RecordingAlert::highArchiveLength)
-            ? QnCameraDeviceStringSet(
-                tr("High minimum value can lead to archive length decrease on other devices"),
-                tr("High minimum value can lead to archive length decrease on other cameras"))
-                  .getString(state.deviceType)
-            : QString());
+    if (state.recordingAlerts.testFlag(RecordingAlert::recordingNotAvailableDueSuspendedSite))
+    {
+        messages.push_back(
+            {
+                .text = tr("Recording continues, but the site is currently suspended. It must be "
+                    "active to change the recording settings for a device or to enable recording. "
+                    "Contact your channel partner for assistance."),
+                .level = BarDescription::BarLevel::Warning
+            });
+    }
+
+    if (state.recordingAlerts.testFlag(RecordingAlert::recordingNotAvailableDueShutDownSite))
+    {
+        messages.push_back(
+            {
+                .text = tr("Recording has been stopped because the site has been shut down. It must "
+                    "be active to enable recording for a device. Contact your channel partner for "
+                    "assistance."),
+                .level = BarDescription::BarLevel::Error
+            });
+    }
+
+    ui->messageBarBlock->setMessageBars(messages);
 }
 
 QnScheduleTaskList CameraScheduleWidget::calculateScheduleTasks() const
@@ -376,6 +411,13 @@ void CameraScheduleWidget::updateLicensesButton(const CameraSettingsDialogState&
         && m_licenseUsageProvider->limitExceeded()
         && state.hasPowerUserPermissions
         && !state.saasInitialized);
+}
+
+void CameraScheduleWidget::updateEnableRecordingCheckBox(const CameraSettingsDialogState& state)
+{
+    ui->enableRecordingCheckBox->setCanBeChecked(!m_licenseUsageProvider->limitExceeded()
+        && !state.saasShutDown
+        && !state.saasSuspended);
 }
 
 } // namespace nx::vms::client::desktop

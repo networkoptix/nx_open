@@ -44,13 +44,13 @@
       <item>
        <widget class="QScrollArea" name="scrollArea">
         <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
+         <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
         </property>
         <property name="widgetResizable">
          <bool>true</bool>
         </property>
         <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
         </property>
         <widget class="QWidget" name="scrollAreaWidgetContents">
          <property name="geometry">
@@ -58,7 +58,7 @@
            <x>0</x>
            <y>0</y>
            <width>924</width>
-           <height>756</height>
+           <height>767</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,0,0,1">
@@ -67,7 +67,7 @@
           </property>
           <item>
            <layout class="QHBoxLayout" name="topButtonsLayout">
-            <item alignment="Qt::AlignTop">
+            <item alignment="Qt::AlignmentFlag::AlignTop">
              <widget class="nx::vms::client::desktop::CheckBox" name="enableRecordingCheckBox">
               <property name="text">
                <string>Recording</string>
@@ -77,7 +77,7 @@
               </property>
              </widget>
             </item>
-            <item alignment="Qt::AlignTop">
+            <item alignment="Qt::AlignmentFlag::AlignTop">
              <widget class="QLabel" name="licenseUsageLabel">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -93,7 +93,7 @@
             <item>
              <spacer name="horizontalSpacer">
               <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+               <enum>Qt::Orientation::Horizontal</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -103,7 +103,7 @@
               </property>
              </spacer>
             </item>
-            <item alignment="Qt::AlignTop">
+            <item alignment="Qt::AlignmentFlag::AlignTop">
              <widget class="QPushButton" name="licensesButton">
               <property name="text">
                <string>Activate License...</string>
@@ -182,7 +182,7 @@
                <item>
                 <spacer name="verticalSpacer">
                  <property name="orientation">
-                  <enum>Qt::Vertical</enum>
+                  <enum>Qt::Orientation::Vertical</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
@@ -229,7 +229,7 @@
                <item>
                 <spacer name="verticalSpacer_4">
                  <property name="orientation">
-                  <enum>Qt::Vertical</enum>
+                  <enum>Qt::Orientation::Vertical</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
@@ -247,10 +247,10 @@
           <item>
            <spacer name="verticalSpacer_7">
             <property name="orientation">
-             <enum>Qt::Vertical</enum>
+             <enum>Qt::Orientation::Vertical</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::MinimumExpanding</enum>
+             <enum>QSizePolicy::Policy::MinimumExpanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -268,13 +268,7 @@
     </widget>
    </item>
    <item>
-    <widget class="nx::vms::client::desktop::CommonMessageBar" name="hintBar" native="true"/>
-   </item>
-   <item>
-    <widget class="nx::vms::client::desktop::CommonMessageBar" name="highArchiveLengthAlertBar" native="true"/>
-   </item>
-   <item>
-    <widget class="nx::vms::client::desktop::CommonMessageBar" name="highPreRecordingValueAlertBar" native="true"/>
+    <widget class="nx::vms::client::desktop::MessageBarBlock" name="messageBarBlock" native="true"/>
    </item>
   </layout>
  </widget>
@@ -309,10 +303,9 @@
    <header location="global">nx/vms/client/desktop/common/widgets/check_box.h</header>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::CommonMessageBar</class>
+   <class>nx::vms::client::desktop::MessageBarBlock</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>

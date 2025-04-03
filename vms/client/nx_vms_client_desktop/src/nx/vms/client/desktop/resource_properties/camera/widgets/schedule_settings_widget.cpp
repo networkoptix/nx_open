@@ -404,16 +404,20 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     ui->settingsGroupBox->layout()->activate();
     layout()->activate();
 
-    const bool recordingEnabled = recording.enabled.valueOr(false);
+    const bool recordingSettingsEnabled = recording.enabled.valueOr(false)
+        && !state.saasSuspended
+        && !state.saasShutDown;
+
     const auto labels =
         {ui->labelAlways, ui->labelMetadataOnly, ui->labelMetadataPlusLQ, ui->labelNoRecord};
 
     for (auto label: labels)
     {
         const auto button = qobject_cast<QAbstractButton*>(label->buddy());
-        const QPalette::ColorRole foreground = button && button->isChecked() && recordingEnabled
-            ? QPalette::Highlight
-            : QPalette::WindowText;
+        const QPalette::ColorRole foreground =
+            button && button->isChecked() && recordingSettingsEnabled
+                ? QPalette::Highlight
+                : QPalette::WindowText;
         label->setForegroundRole(foreground);
     }
 }

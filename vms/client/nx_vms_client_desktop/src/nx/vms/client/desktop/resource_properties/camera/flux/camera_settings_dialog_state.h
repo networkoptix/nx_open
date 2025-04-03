@@ -182,6 +182,14 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
 
         // High pre-recording value selected, resulting in increased RAM usage on the server.
         highPreRecordingValue = 1 << 1,
+
+        // Editing of recording parameters, except for disabling the recording, is unavailable due
+        // suspended state of services.
+        recordingNotAvailableDueSuspendedSite = 1 << 2,
+
+        // Editing of recording parameters, except for disabling the recording, is unavailable due
+        // shutdown state of services.
+        recordingNotAvailableDueShutDownSite = 1 << 3,
     };
     Q_DECLARE_FLAGS(RecordingAlerts, RecordingAlert)
 
@@ -240,6 +248,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     // System info.
 
     bool saasInitialized = false;
+    bool saasSuspended = false;
+    bool saasShutDown = false;
 
     // Generic cameras info.
 

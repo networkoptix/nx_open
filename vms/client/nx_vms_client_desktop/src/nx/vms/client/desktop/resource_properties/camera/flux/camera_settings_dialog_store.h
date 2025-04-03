@@ -98,6 +98,8 @@ public:
     void setHasEventLogPermission(bool value);
     void setPermissions(Qn::Permissions singleCameraPermissions, bool allCamerasEditable);
     void setSaasInitialized(bool value);
+    void setSaasSuspended(bool value);
+    void setSaasShutDown(bool value);
     void setSingleVirtualCameraState(const VirtualCameraState& value);
     void setSingleCameraUserName(const QString& text);
     void setSingleCameraIsOnline(bool isOnline);

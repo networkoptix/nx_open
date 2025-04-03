@@ -45,6 +45,7 @@ private:
 
     QnScheduleTaskList calculateScheduleTasks() const;
     void updateLicensesButton(const CameraSettingsDialogState& state);
+    void updateEnableRecordingCheckBox(const CameraSettingsDialogState& state);
 
 private:
     nx::utils::ImplPtr<Ui::CameraScheduleWidget> ui;

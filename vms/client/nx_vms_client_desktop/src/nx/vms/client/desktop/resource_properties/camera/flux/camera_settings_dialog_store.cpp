@@ -237,6 +237,18 @@ void CameraSettingsDialogStore::setSaasInitialized(bool value)
         [&](State state) { return Reducer::setSaasInitialized(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setSaasSuspended(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setSaasSuspended(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setSaasShutDown(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setSaasShutDown(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::setSingleVirtualCameraState(const VirtualCameraState& value)
 {
     d->executeAction(

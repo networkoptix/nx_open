@@ -7,10 +7,6 @@
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/common/saas/saas_service_manager.h>
-#include <nx/vms/common/saas/saas_utils.h>
-#include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "../flux/camera_settings_dialog_store.h"
@@ -30,16 +26,6 @@ CameraSettingsReadOnlyWatcher::CameraSettingsReadOnlyWatcher(
         store, &CameraSettingsDialogStore::setReadOnly);
 
     connect(context(), &QnWorkbenchContext::userChanged, this,
-        &CameraSettingsReadOnlyWatcher::updateReadOnly);
-
-    connect(systemContext()->saasServiceManager(),
-        &nx::vms::common::saas::ServiceManager::dataChanged,
-        this,
-        &CameraSettingsReadOnlyWatcher::updateReadOnly);
-
-    connect(systemContext()->globalSettings(),
-        &nx::vms::common::SystemSettings::organizationIdChanged,
-        this,
         &CameraSettingsReadOnlyWatcher::updateReadOnly);
 
     updateReadOnly();
@@ -76,13 +62,6 @@ void CameraSettingsReadOnlyWatcher::updateReadOnly()
 
 bool CameraSettingsReadOnlyWatcher::calculateReadOnly() const
 {
-    if (nx::vms::common::saas::saasInitialized(systemContext()))
-    {
-        const auto serviceManager = systemContext()->saasServiceManager();
-        if (serviceManager->saasShutDown())
-            return true;
-    }
-
     return std::any_of(m_cameras.cbegin(), m_cameras.cend(),
         [](const QnVirtualCameraResourcePtr& camera)
         {
