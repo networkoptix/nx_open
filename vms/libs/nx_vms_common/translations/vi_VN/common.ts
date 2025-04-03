@@ -556,7 +556,7 @@
     <name>QnFullscreenCameraPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation>Chọn đúng một máy ảnh</translation>
+      <translation>Chọn đúng một camera</translation>
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>

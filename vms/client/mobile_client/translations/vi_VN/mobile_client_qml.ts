@@ -346,7 +346,7 @@
     <name>OptionSelectorScreen</name>
     <message>
       <source>Clear</source>
-      <translation>Tẩy</translation>
+      <translation>Xóa</translation>
     </message>
   </context>
   <context>
