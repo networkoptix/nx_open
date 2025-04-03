@@ -9,10 +9,10 @@
 #include <licensing/license.h>
 #include <nx/branding.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
-#include <nx/vms/client/desktop/licensing/customer_support.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/license/customer_support.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
@@ -206,6 +206,8 @@ void QnLicenseWidget::updateControls()
 
 QString QnLicenseWidget::calculateManualActivationLinkText() const
 {
+    using namespace nx::vms::common;
+
     CustomerSupport customerSupport(systemContext());
 
     if (customerSupport.regionalContacts.empty())

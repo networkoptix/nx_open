@@ -4,18 +4,19 @@
 
 #include <vector>
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QString>
 
 #include <licensing/license_fwd.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::common {
 
 class SystemContext;
 
 /**
  * Can contain an email, a web site url or a phone number.
  */
-struct NX_VMS_CLIENT_DESKTOP_API ContactAddress
+struct NX_VMS_COMMON_API ContactAddress
 {
     ContactAddress(const QString& address);
 
@@ -34,8 +35,11 @@ struct NX_VMS_CLIENT_DESKTOP_API ContactAddress
     const QString rawData;
 };
 
-struct NX_VMS_CLIENT_DESKTOP_API CustomerSupport
+struct NX_VMS_COMMON_API CustomerSupport
 {
+    Q_DECLARE_TR_FUNCTIONS(CustomerSupport)
+
+public:
     /** Get customer support contacts for the whole system. */
     explicit CustomerSupport(SystemContext* systemContext);
 
@@ -47,7 +51,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CustomerSupport
      */
     CustomerSupport(const QString& supportContact, const QnLicenseList& systemLicenses);
 
-    struct Contact
+    struct NX_VMS_COMMON_API Contact
     {
         /**
          * Supporter company name.
@@ -79,6 +83,16 @@ struct NX_VMS_CLIENT_DESKTOP_API CustomerSupport
 
     /** Regional application support. */
     const std::vector<Contact> regionalContacts;
+
+    /**
+     * Create a support message, referring to regional support, mentioned in the provided licenses.
+     * If no licenses are provided, all system licenses are used.
+     */
+    static QString customerSupportMessage(
+        SystemContext* context,
+        const QString& genericString,
+        const QString& regionalSupportString,
+        std::optional<QnLicenseList> limitToLicenses = std::nullopt);
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::common
