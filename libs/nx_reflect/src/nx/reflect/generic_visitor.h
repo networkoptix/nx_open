@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <utility>
+
 namespace nx::reflect {
 
 /**

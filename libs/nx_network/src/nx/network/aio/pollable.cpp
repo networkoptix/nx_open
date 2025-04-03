@@ -13,6 +13,12 @@ namespace nx::network {
 
 Pollable::Pollable(
     aio::AbstractAioThread* aioThread,
+    AbstractSocket::SOCKET_HANDLE fd): Pollable(aioThread, fd, nullptr)
+{
+}
+
+Pollable::Pollable(
+    aio::AbstractAioThread* aioThread,
     AbstractSocket::SOCKET_HANDLE fd,
     std::unique_ptr<CommonSocketImpl> impl)
     :

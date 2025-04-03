@@ -135,7 +135,7 @@ private:
 
     std::chrono::steady_clock::time_point m_startTime;
     const char* m_name;
-    std::aligned_storage_t<sizeof(ArgsType), alignof(ArgsType)> m_data;
+    alignas(ArgsType) std::byte m_data[sizeof(ArgsType)];
 };
 
 } // namespace nx::utils::trace

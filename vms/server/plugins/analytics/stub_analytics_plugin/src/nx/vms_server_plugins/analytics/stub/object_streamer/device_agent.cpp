@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <iterator>
 #include <streambuf>
 
 #include <nx/sdk/analytics/helpers/object_metadata.h>

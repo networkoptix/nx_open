@@ -28,8 +28,17 @@ public:
      */
     Pollable(
         aio::AbstractAioThread* aioThread,
+        AbstractSocket::SOCKET_HANDLE fd);
+
+    /**
+     * @param aioThread to bind to. Null is allowed here.
+     * @param fd File descriptor (optional, can be INVALID_SOCKET).
+     * It is not closed on object destruction!
+     */
+    Pollable(
+        aio::AbstractAioThread* aioThread,
         AbstractSocket::SOCKET_HANDLE fd,
-        std::unique_ptr<CommonSocketImpl> impl = nullptr);
+        std::unique_ptr<CommonSocketImpl> impl);
 
     Pollable(const Pollable&) = delete;
     Pollable& operator=(const Pollable&) = delete;
