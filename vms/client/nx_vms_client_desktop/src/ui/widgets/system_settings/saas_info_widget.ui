@@ -313,7 +313,7 @@
           <item>
            <widget class="QGroupBox" name="servicesUsageGroupBox">
             <property name="title">
-             <string>Services Usage</string>
+             <string>Service Allocation</string>
             </property>
             <property name="flat">
              <bool>true</bool>
