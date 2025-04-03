@@ -10,7 +10,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/websocket/websocket.h>
 #include <nx/network/websocket/websocket_handshake.h>
-
+#include <nx/vms/client/core/resource/screen_recording/desktop_data_provider_base.h>
 
 static constexpr int kMaxBufferLength = 100;
 
@@ -18,8 +18,7 @@ namespace nx::vms::client::core {
 
 TwoWayAudioStreamer::TwoWayAudioStreamer(std::unique_ptr<QnAbstractStreamDataProvider> provider):
     m_provider(std::move(provider))
-{
-}
+{}
 
 bool TwoWayAudioStreamer::start(
     const nx::network::http::Credentials& credentials, const QnVirtualCameraResourcePtr& camera)
@@ -81,7 +80,7 @@ bool TwoWayAudioStreamer::start(
 TwoWayAudioStreamer::~TwoWayAudioStreamer()
 {
     if (m_provider)
-        m_provider->unsubscribe(this);
+        m_provider->removeDataProcessor(this);
 
     if (m_httpClient)
         m_httpClient->pleaseStopSync();
@@ -98,7 +97,7 @@ void TwoWayAudioStreamer::stop()
         if (provider)
             provider->pleaseStopSync(); //< Flush audio encoder.
 
-        m_provider->unsubscribe(this);
+        m_provider->removeDataProcessor(this);
         m_provider.reset();
     }
 }

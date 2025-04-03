@@ -97,7 +97,7 @@ void AudioEncoder::close()
     m_flushMode = false;
 }
 
-CodecParametersPtr AudioEncoder::codecParameters()
+CodecParametersPtr AudioEncoder::codecParameters() const
 {
     return m_codecParams;
 }

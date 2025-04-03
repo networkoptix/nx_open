@@ -32,8 +32,8 @@ public:
 
     virtual void start(Priority priority = InheritPriority) override;
 
-    void addDataProcessor(QnAbstractMediaDataReceptor* consumer) override;
-    void removeDataProcessor(QnAbstractMediaDataReceptor* consumer) override;
+    void addDataProcessor(QnAbstractMediaDataReceptor* consumer);
+    void removeDataProcessor(QnAbstractMediaDataReceptor* consumer);
 
     virtual bool isInitialized() const override;
 

@@ -236,8 +236,8 @@ CodecParametersPtr ExportStorageStreamRecorder::getVideoCodecParameters(
             config.fixedFrameRate = m_transcoderFixedFrameRate;
         config.params = suggestMediaStreamParams(m_dstVideoCodec, m_transcodeQuality);
 
-        if (auto cameraRes = m_resource.dynamicCast<QnVirtualCameraResource>())
-            config.sourceResolution = cameraRes->getMaxVideoResolution();
+        if (auto camera = m_resource.dynamicCast<QnVirtualCameraResource>())
+            config.sourceResolution = camera->maxVideoResolution();
 
         m_videoTranscoder = std::make_unique<QnFfmpegVideoTranscoder>(
             config,

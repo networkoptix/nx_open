@@ -28,7 +28,6 @@
 #include <nx/vms/client/core/system_logon/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/core/resource/resource_processor.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource_searcher.h>
-#include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource_searcher_impl.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
@@ -178,17 +177,11 @@ SystemContext::SystemContext(WindowContext* context,
     connect(userWatcher(), &core::UserWatcher::userChanged,
         d->availableCamerasWatcher.get(), &QnAvailableCamerasWatcher::setUser);
 
-
     d->resourceDiscoveryManager = std::make_unique<QnResourceDiscoveryManager>(this);
     d->resourceProcessor = std::make_unique<core::ResourceProcessor>(this);
     d->resourceProcessor->moveToThread(d->resourceDiscoveryManager.get());
     d->resourceDiscoveryManager->setResourceProcessor(d->resourceProcessor.get());
     d->resourceDiscoveryManager->setReady(true);
-
-    // Initialize desktop camera searcher.
-    d->desktopResourceSearcher = std::make_unique<core::DesktopResourceSearcher>(
-        new core::DesktopAudioOnlyResourceSearcherImpl(), this);
-    d->desktopResourceSearcher->setLocal(true);
     d->resourceDiscoveryManager->start();
 
     d->serverAudioConnectionWatcher =

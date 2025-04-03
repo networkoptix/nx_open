@@ -15,11 +15,12 @@ extern "C" {
 #include <libavutil/opt.h>
 } // extern "C"
 
+#include <speex/speex_preprocess.h>
+
 #include <core/resource/resource.h>
 #include <decoders/audio/ffmpeg_audio_decoder.h>
 #include <nx/media/codec_parameters.h>
 #include <nx/media/config.h>
-#include <transcoding/audio_encoder.h>
 #include <nx/media/ffmpeg/av_options.h>
 #include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/old_api.h>
@@ -32,7 +33,7 @@ extern "C" {
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
-#include <speex/speex_preprocess.h>
+#include <transcoding/audio_encoder.h>
 #include <utils/common/synctime.h>
 
 #include "audio_device_change_notifier.h"
@@ -382,7 +383,6 @@ struct DesktopDataProvider::Private
 };
 
 DesktopDataProvider::DesktopDataProvider(
-    const QnResourcePtr& res,
     int desktopNum,
     const core::AudioDeviceInfo* audioDevice,
     const core::AudioDeviceInfo* audioDevice2,
@@ -491,7 +491,7 @@ bool DesktopDataProvider::initVideoCapturing()
         NX_WARNING(this, "Configured codec: %1 not found, h263p will used", d->videoCodec);
         videoCodec = avcodec_find_encoder(AV_CODEC_ID_H263P);
     }
-    if(videoCodec == 0)
+    if (videoCodec == 0)
     {
         m_lastErrorStr = tr("Could not find video encoder %1.").arg(d->videoCodec);
         return false;
@@ -873,7 +873,7 @@ int DesktopDataProvider::frameSize() const
 void DesktopDataProvider::removeDataProcessor(QnAbstractMediaDataReceptor* consumer)
 {
     NX_MUTEX_LOCKER lock( &d->startMutex );
-    QnAbstractMediaStreamDataProvider::removeDataProcessor(consumer);
+    QnAbstractStreamDataProvider::removeDataProcessor(consumer);
     if (processorsCount() == 0)
         pleaseStop();
 }
@@ -885,7 +885,7 @@ void DesktopDataProvider::addDataProcessor(QnAbstractMediaDataReceptor* consumer
         wait(); // wait previous thread instance
         d->started = false; // now we ready to restart
     }
-    QnAbstractMediaStreamDataProvider::addDataProcessor(consumer);
+    QnAbstractStreamDataProvider::addDataProcessor(consumer);
 }
 
 bool DesktopDataProvider::readyToStop() const

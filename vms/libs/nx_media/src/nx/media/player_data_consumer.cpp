@@ -279,7 +279,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
     auto archiveReader = dynamic_cast<const QnArchiveStreamReader*>(data->dataProvider);
     if (archiveReader)
     {
-        auto resource = archiveReader->getResource();
+        auto resource = archiveReader->resource();
         if (resource)
         {
             if (auto camera = resource.dynamicCast<QnMediaResource>())

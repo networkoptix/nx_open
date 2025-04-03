@@ -33,7 +33,6 @@ public:
 
     virtual void subscribe(QnAbstractMediaDataReceptor* dp) { addDataProcessor(dp); }
     virtual void unsubscribe(QnAbstractMediaDataReceptor* dp) { removeDataProcessor(dp); }
-    const QnResourcePtr& getResource() const;
 
     virtual bool isReverseMode() const { return false;}
 

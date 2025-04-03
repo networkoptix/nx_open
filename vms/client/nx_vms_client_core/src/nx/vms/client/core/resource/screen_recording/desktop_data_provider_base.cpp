@@ -91,7 +91,7 @@ AVSampleFormat DesktopDataProviderBase::fromQtAudioFormat(const QAudioFormat& fo
     return AV_SAMPLE_FMT_NONE;
 }
 
-AudioLayoutConstPtr DesktopDataProviderBase::getAudioLayout()
+AudioLayoutConstPtr DesktopDataProviderBase::getAudioLayout() const
 {
     if (!m_audioLayout)
         m_audioLayout.reset(new AudioLayout(m_audioEncoder.codecParameters()));

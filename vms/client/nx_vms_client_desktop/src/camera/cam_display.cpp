@@ -1379,11 +1379,14 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         return true;
 
     m_hasVideo = m_resource->hasVideo(media->dataProvider);
-    if (!m_hasVideo && media->dataType == QnAbstractMediaData::AUDIO
-        || media->dataType == QnAbstractMediaData::VIDEO)
+    if (media->context &&
+        ((!m_hasVideo && media->dataType == QnAbstractMediaData::AUDIO)
+        || media->dataType == QnAbstractMediaData::VIDEO))
     {
-        auto name = m_codecName.lock();
-        *name = media->context->getCodecName();
+        if (m_codecId != media->context->getCodecId())
+            *m_codecName.lock() = media->context->codecName();
+
+        m_codecId = media->context->getCodecId();
     }
 
     if (const auto& metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data))
@@ -1838,7 +1841,7 @@ void QnCamDisplay::playAudio(bool play)
     }
 }
 
-QString QnCamDisplay::getCodecName()
+QString QnCamDisplay::codecName()
 {
     return *m_codecName.lock();
 }
@@ -1974,7 +1977,7 @@ void QnCamDisplay::onRealTimeStreamHint(bool value)
         auto archive = dynamic_cast<QnAbstractMediaStreamDataProvider*>(sender());
         if (archive)
         {
-            QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(archive->getResource());
+            QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(archive->resource());
             if (camera)
                 m_hadAudio = camera->isAudioEnabled();
             else
@@ -2237,7 +2240,7 @@ AbstractVideoDisplay::CameraID QnCamDisplay::getCameraID() const
     if (!reader)
         return CameraID();
 
-    const auto& camera = reader->getResource().dynamicCast<QnVirtualCameraResource>();
+    const auto& camera = reader->resource().dynamicCast<QnVirtualCameraResource>();
     return camera ? camera->getId() : CameraID();
 }
 

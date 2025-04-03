@@ -3314,17 +3314,15 @@ bool QnVirtualCameraResource::isVmsCloudUrl() const
     return nx::utils::Url(getUrl()).host().endsWith(kRelayHost);
 }
 
-QSize QnVirtualCameraResource::getMaxVideoResolution()
+QSize QnVirtualCameraResource::maxVideoResolution() const
 {
-    const CameraMediaStreams supportedMediaStreams =
-        QJson::deserialized<CameraMediaStreams>(
-            getProperty(ResourcePropertyKey::kMediaStreams).toLatin1());
+    const CameraMediaStreams supportedMediaStreams = mediaStreams();
 
     QSize result;
-    for(const auto& stream: supportedMediaStreams.streams)
+    for (const auto& stream: supportedMediaStreams.streams)
     {
         QSize size = stream.getResolution();
-        if (size.height() > result.height())
+        if (size.height() * size.width() > result.height() * result.width())
             result = size;
     }
     return result;

@@ -34,7 +34,7 @@ void QnSignDialogDisplay::finalizeSign()
         {
             auto signPattern = aviFile->metadata()->signature;
             if (signPattern.isEmpty())
-                signPattern = QnSignHelper::loadSignatureFromFileEnd(m_reader->getResource()->getUrl());
+                signPattern = QnSignHelper::loadSignatureFromFileEnd(m_reader->resource()->getUrl());
             if (!signPattern.isEmpty())
             {
                 calculatedSign = m_mediaSigner.buildSignature(signPattern);

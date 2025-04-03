@@ -24,7 +24,7 @@ QnSingleShotFileStreamreader::QnSingleShotFileStreamreader(
 QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
 {
     AVCodecID compressionType;
-    QString lowerFileName = getResource()->getUrl().toLower();
+    QString lowerFileName = resource()->getUrl().toLower();
 
 
     if (lowerFileName.endsWith(QLatin1String(".png")))
@@ -43,9 +43,9 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
     if (!m_storage)
     {
         m_storage = QnStorageResourcePtr(
-            appContext()->storagePluginFactory()->createStorage(getResource()->getUrl()));
+            appContext()->storagePluginFactory()->createStorage(resource()->getUrl()));
     }
-    QIODevice* file = m_storage->open(getResource()->getUrl(), QIODevice::ReadOnly);
+    QIODevice* file = m_storage->open(resource()->getUrl(), QIODevice::ReadOnly);
     if (file == 0)
         return QnAbstractMediaDataPtr();
 

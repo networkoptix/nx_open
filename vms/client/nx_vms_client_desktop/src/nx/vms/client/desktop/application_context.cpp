@@ -42,7 +42,6 @@
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/analytics/object_display_settings.h>
 #include <nx/vms/client/core/resource/resource_processor.h>
-#include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource_searcher.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
@@ -62,6 +61,7 @@
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/resource/resource_factory.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
+#include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/audio_video_input.h>
 #include <nx/vms/client/desktop/settings/ipc_settings_synchronizer.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/message_bar_settings.h>
@@ -91,8 +91,6 @@
 
 #if defined(Q_OS_WIN)
     #include <nx/vms/client/desktop/resource/screen_recording/audio_video_win/windows_desktop_resource_searcher_impl.h>
-#else
-    #include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource_searcher_impl.h>
 #endif
 
 #if defined(Q_OS_MACOS)
@@ -365,6 +363,7 @@ struct ApplicationContext::Private
     std::unique_ptr<QnQtbugWorkaround> qtBugWorkarounds;
     std::unique_ptr<core::DesktopResourceSearcher> desktopResourceSearcher;
     std::unique_ptr<nx::vms::client::desktop::joystick::Manager> joystickManager;
+    std::unique_ptr<nx::vms::client::desktop::AudioVideoInput> audioVideoInput;
 
     // Network modules
     std::unique_ptr<CloudCrossSystemManager> cloudCrossSystemManager;
@@ -828,15 +827,14 @@ void ApplicationContext::removeWindowContext(WindowContext* windowContext)
 void ApplicationContext::initializeDesktopCamera([[maybe_unused]] QOpenGLWidget* window)
 {
 #if defined(Q_OS_WIN)
-    auto impl = new WindowsDesktopResourceSearcherImpl(window);
-#else
-    auto impl = new core::DesktopAudioOnlyResourceSearcherImpl();
-#endif
+    d->audioVideoInput = std::make_unique<AudioVideoInput>(window);
+    auto impl = new WindowsDesktopResourceSearcherImpl();
     d->desktopResourceSearcher = std::make_unique<core::DesktopResourceSearcher>(
         impl,
         currentSystemContext()); //< TODO: #sivanov Use the same system context as for local files.
     d->desktopResourceSearcher->setLocal(true);
     resourceDiscoveryManager()->addDeviceSearcher(d->desktopResourceSearcher.get());
+#endif
 }
 
 nx::Uuid ApplicationContext::peerId() const
@@ -992,6 +990,15 @@ FontConfig* ApplicationContext::fontConfig() const
 joystick::Manager* ApplicationContext::joystickManager() const
 {
     return d->joystickManager.get();
+}
+
+std::unique_ptr<QnAbstractStreamDataProvider> ApplicationContext::createAudioInputProvider() const
+{
+#if defined(Q_OS_WIN)
+    return d->audioVideoInput->createAudioInputProvider();
+#else
+    return base_type::createAudioInputProvider();
+#endif
 }
 
 } // namespace nx::vms::client::desktop

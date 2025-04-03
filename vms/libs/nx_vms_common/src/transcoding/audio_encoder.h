@@ -29,7 +29,7 @@ public:
     bool sendFrame(AVFrame* inputFrame);
     bool receivePacket(QnWritableCompressedAudioDataPtr& result);
 
-    CodecParametersPtr codecParameters();
+    CodecParametersPtr codecParameters() const;
 
     /**
      * \brief Sets destination sample rate.

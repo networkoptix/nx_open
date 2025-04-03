@@ -2,8 +2,8 @@
 
 #include "abstract_stream_data_provider.h"
 
-#include <core/resource/resource.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
+#include <core/resource/resource.h>
 #include <nx/utils/log/log.h>
 
 QnAbstractStreamDataProvider::QnAbstractStreamDataProvider():

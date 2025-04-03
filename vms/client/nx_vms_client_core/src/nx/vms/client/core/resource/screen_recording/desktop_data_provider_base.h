@@ -8,9 +8,9 @@
 #include <QtMultimedia/QAudioFormat>
 
 #include <nx/media/audio_data_packet.h>
-#include <transcoding/audio_encoder.h>
-#include <nx/streaming/abstract_media_stream_data_provider.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/vms/client/core/media/voice_spectrum_analyzer.h>
+#include <transcoding/audio_encoder.h>
 
 class QnAbstractDataConsumer;
 
@@ -26,10 +26,9 @@ public:
     virtual ~DesktopDataProviderBase() {};
 
     virtual bool isInitialized() const = 0;
-    virtual AudioLayoutConstPtr getAudioLayout();
+    virtual AudioLayoutConstPtr getAudioLayout() const;
     virtual QString lastErrorStr() const;
     virtual bool readyToStop() const = 0;
-
     void pleaseStopSync();
 
 protected:
@@ -42,7 +41,7 @@ protected:
     QString m_lastErrorStr;
 
 private:
-    AudioLayoutPtr m_audioLayout;
+    mutable AudioLayoutPtr m_audioLayout;
     int64_t m_utcTimstampOffsetUs = 0;
     nx::media::ffmpeg::AudioEncoder m_audioEncoder;
 };

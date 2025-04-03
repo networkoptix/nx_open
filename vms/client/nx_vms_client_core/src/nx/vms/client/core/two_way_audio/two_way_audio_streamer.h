@@ -2,15 +2,15 @@
 
 #pragma once
 
-#include <memory>
 #include <deque>
+#include <memory>
 
 #include <core/dataconsumer/abstract_data_receptor.h>
+#include <nx/media/audio_data_packet.h>
 #include <nx/network/aio/async_channel_adapter.h>
 #include <nx/network/http/http_async_client.h>
-#include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_data_provider.h>
 #include <nx/utils/lockable.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <transcoding/ffmpeg_muxer.h>
 
 namespace nx::vms::client::core {

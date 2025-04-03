@@ -18,8 +18,7 @@
 
 namespace nx::vms::client::desktop {
 
-WindowsDesktopResourceSearcherImpl::WindowsDesktopResourceSearcherImpl(QOpenGLWidget* mainWidget):
-    m_mainWidget(mainWidget),
+WindowsDesktopResourceSearcherImpl::WindowsDesktopResourceSearcherImpl():
     m_pD3D(Direct3DCreate9(D3D_SDK_VERSION))
 {
 }
@@ -49,7 +48,7 @@ QnResourceList WindowsDesktopResourceSearcherImpl::findResources()
         if (FAILED(m_pD3D->GetAdapterDisplayMode(i, &ddm)))
             break;
 
-        QnResourcePtr dev(new WindowsDesktopResource(m_mainWidget));
+        QnResourcePtr dev(new WindowsDesktopResource());
         result.push_back(dev);
     }
 

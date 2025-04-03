@@ -10,12 +10,10 @@
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
 
-
 QnWritableCompressedVideoDataPtr getVideoData()
 {
     QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(1024));
     videoData->compressionType = AV_CODEC_ID_H264;
-    videoData->dataProvider = provider;
     return videoData;
 }
 
@@ -38,7 +36,7 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         config.sourceResolution = QSize(1920, 1080);
         QnFfmpegVideoTranscoder transcoder(config, nullptr);
         ASSERT_TRUE(transcoder.open(getVideoData()));
-        ASSERT_EQ(transcoder.getOutputResolution(), maxResourceResolution);
+        ASSERT_EQ(transcoder.getOutputResolution(), QSize(1920, 1080));
     }
     {
         // Stream 4k as is.
@@ -47,7 +45,7 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         config.sourceResolution = QSize(4096, 2160);
         QnFfmpegVideoTranscoder transcoder(config, nullptr);
         ASSERT_TRUE(transcoder.open(getVideoData()));
-        ASSERT_EQ(transcoder.getOutputResolution(), maxResourceResolution);
+        ASSERT_EQ(transcoder.getOutputResolution(), QSize(4096, 2160));
     }
     {
         // Stream 4k downscaled due to codec restrictions.

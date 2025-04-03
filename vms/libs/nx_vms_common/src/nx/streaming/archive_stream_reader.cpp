@@ -218,7 +218,7 @@ void QnArchiveStreamReader::reopen()
 QnConstResourceVideoLayoutPtr QnArchiveStreamReader::getDPVideoLayout() const
 {
     if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
-        m_delegate->open(m_resource, m_archiveIntegrityWatcher);
+        m_delegate->open(resource(), m_archiveIntegrityWatcher);
     return m_delegate->getVideoLayout();
 }
 
@@ -226,7 +226,7 @@ bool QnArchiveStreamReader::hasVideo() const
 {
     if (!m_hasVideo.has_value()) {
         if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineHasVideo)) {
-            m_delegate->open(m_resource, m_archiveIntegrityWatcher);
+            m_delegate->open(resource(), m_archiveIntegrityWatcher);
         }
         m_hasVideo = m_delegate->hasVideo();
     }
@@ -236,7 +236,7 @@ bool QnArchiveStreamReader::hasVideo() const
 AudioLayoutConstPtr QnArchiveStreamReader::getDPAudioLayout() const
 {
     if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
-        m_delegate->open(m_resource, m_archiveIntegrityWatcher);
+        m_delegate->open(resource(), m_archiveIntegrityWatcher);
     return m_delegate->getAudioLayout();
 }
 
@@ -304,7 +304,7 @@ bool QnArchiveStreamReader::init()
 
     m_prevStreamDataFilter = streamDataFilter;
     m_delegate->setStreamDataFilter(streamDataFilter);
-    bool opened = m_delegate->open(m_resource, m_archiveIntegrityWatcher);
+    bool opened = m_delegate->open(resource(), m_archiveIntegrityWatcher);
 
     if (jumpTime != qint64(AV_NOPTS_VALUE))
         emitJumpOccurred(jumpTime, usePreciseSeek, m_delegate->getSequence());
@@ -431,7 +431,7 @@ bool QnArchiveStreamReader::isCompatiblePacketForMask(const QnAbstractMediaDataP
 
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
-    NX_VERBOSE(this, "Next data requested from %1", m_resource);
+    NX_VERBOSE(this, "Next data requested from %1", resource());
 
     while (!m_skippedMetadata.isEmpty())
         return m_skippedMetadata.dequeue();
@@ -467,7 +467,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
     bool singleShotMode = m_singleShot;
 
 begin_label:
-    if (needToStop() || m_resource->hasFlags(Qn::removed))
+    if (needToStop() || resource()->hasFlags(Qn::removed))
     {
         NX_VERBOSE(this, "Need to stop, return null packet");
         return QnAbstractMediaDataPtr();
@@ -481,7 +481,7 @@ begin_label:
             m_firstTime = false;
         }
         else {
-            if (m_resource->hasFlags(Qn::local))
+            if (resource()->hasFlags(Qn::local))
                 m_firstTime = false; //< Do not try to reopen local file if it can't be opened.
             // If media data can't be opened report 'no data'
             NX_DEBUG(this, "Failed to init, return empty packet");
@@ -899,7 +899,7 @@ begin_label:
     // Do not display archive in a future
     if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_UnsyncTime))
     {
-        if (!m_resource->hasFlags(Qn::local) &&
+        if (!resource()->hasFlags(Qn::local) &&
             isCompatiblePacketForMask(m_currentData) &&
             m_currentData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
         {
@@ -1017,14 +1017,14 @@ void QnArchiveStreamReader::internalJumpTo(qint64 mksec)
     m_nextData.reset();
     m_afterMotionData.reset();
     qint64 seekRez = 0;
-    if (mksec > 0 || m_resource->hasFlags(Qn::live_cam)) {
+    if (mksec > 0 || resource()->hasFlags(Qn::live_cam)) {
         seekRez = m_delegate->seek(mksec, !m_exactJumpToSpecifiedFrame);
     }
     else {
         // some local files can't correctly jump to 0
         m_delegate->close();
         init();
-        m_delegate->open(m_resource, m_archiveIntegrityWatcher);
+        m_delegate->open(resource(), m_archiveIntegrityWatcher);
     }
 
     m_exactJumpToSpecifiedFrame = false;
@@ -1253,7 +1253,7 @@ bool QnArchiveStreamReader::jumpToEx(
         return m_navDelegate->jumpTo(mksec, skipTime);
     }
 
-    NX_VERBOSE(this, "Set position %1 for device %2", mksecToDateTime(mksec), m_resource);
+    NX_VERBOSE(this, "Set position %1 for device %2", mksecToDateTime(mksec), resource());
 
     qint64 newTime = mksec;
     if (bindPositionToPlaybackMask)
@@ -1464,7 +1464,7 @@ void QnArchiveStreamReader::setGroupId(const nx::String& guid)
 
 bool QnArchiveStreamReader::isPaused() const
 {
-    if (isGroupPlayOnly(getResource()))
+    if (isGroupPlayOnly(resource()))
     {
         NX_MUTEX_LOCKER lock(&m_stopMutex);
         return m_stopCond;
@@ -1477,7 +1477,7 @@ bool QnArchiveStreamReader::isPaused() const
 
 void QnArchiveStreamReader::pause()
 {
-    if (isGroupPlayOnly(getResource()))
+    if (isGroupPlayOnly(resource()))
     {
         NX_MUTEX_LOCKER lock( &m_stopMutex );
         m_delegate->beforeClose();
@@ -1491,7 +1491,7 @@ void QnArchiveStreamReader::pause()
 
 void QnArchiveStreamReader::resume()
 {
-    if (isGroupPlayOnly(getResource()))
+    if (isGroupPlayOnly(resource()))
     {
         NX_MUTEX_LOCKER lock( &m_stopMutex );
         m_stopCond = false; // for VMAX

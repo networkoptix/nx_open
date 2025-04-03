@@ -12,6 +12,7 @@ Q_MOC_INCLUDE("nx/vms/client/core/network/cloud_status_watcher.h")
 
 class QQmlEngine;
 
+class QnAbstractStreamDataProvider;
 class QnClientCoreSettings;
 
 namespace nx::i18n { class TranslationManager; }
@@ -171,6 +172,9 @@ public:
     SessionTokenTerminator* sessionTokenTerminator() const;
 
     virtual bool isCertificateValidationLevelStrict() const override;
+
+    /** Provider of input audio data from the system microphone. */
+    virtual std::unique_ptr<QnAbstractStreamDataProvider> createAudioInputProvider() const;
 
 signals:
     void systemContextAdded(SystemContext* systemContext);

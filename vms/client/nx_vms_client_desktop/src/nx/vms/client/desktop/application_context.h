@@ -182,6 +182,9 @@ public:
 
     ScreenRecordingSettings* screenRecordingSettings() const;
 
+    /** Provider of input audio data from the system microphone. */
+    virtual std::unique_ptr<QnAbstractStreamDataProvider> createAudioInputProvider() const override;
+
     ShowOnceSettings* showOnceSettings() const;
     MessageBarSettings* messageBarSettings() const;
 

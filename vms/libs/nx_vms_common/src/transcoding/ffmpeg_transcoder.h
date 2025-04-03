@@ -15,9 +15,9 @@ extern "C" {
 #include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/move_only_func.h>
-#include <transcoding/transcoding_utils.h>
-#include <transcoding/media_transcoder.h>
 #include <transcoding/ffmpeg_muxer.h>
+#include <transcoding/media_transcoder.h>
+#include <transcoding/transcoding_utils.h>
 
 class QnLicensePool;
 
@@ -70,7 +70,7 @@ public:
         AVCodecID codec,
         TranscodeMethod method,
         Qn::StreamQuality quality,
-        const QSize& srcResolution,
+        const QSize& sourceResolition,
         const QSize& resolution = QSize(),
         int bitrate = -1,
         QnCodecParams::Value params = QnCodecParams::Value());

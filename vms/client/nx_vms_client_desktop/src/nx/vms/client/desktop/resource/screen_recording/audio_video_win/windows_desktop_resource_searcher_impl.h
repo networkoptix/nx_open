@@ -12,13 +12,12 @@ namespace nx::vms::client::desktop {
 class WindowsDesktopResourceSearcherImpl: public QnAbstractDesktopResourceSearcherImpl
 {
 public:
-    WindowsDesktopResourceSearcherImpl(QOpenGLWidget* mainWidget);
+    WindowsDesktopResourceSearcherImpl();
     virtual ~WindowsDesktopResourceSearcherImpl() override;
 
     virtual QnResourceList findResources() override;
 
 private:
-    QOpenGLWidget* const m_mainWidget;
     IDirect3D9* const m_pD3D;
 };
 

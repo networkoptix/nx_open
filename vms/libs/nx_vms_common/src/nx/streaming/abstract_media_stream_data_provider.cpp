@@ -211,7 +211,7 @@ CameraDiagnostics::Result QnAbstractMediaStreamDataProvider::diagnoseMediaStream
     return CameraDiagnostics::NotImplementedResult();
 }
 
-const QnResourcePtr& QnAbstractMediaStreamDataProvider::getResource() const
+const QnResourcePtr& QnAbstractMediaStreamDataProvider::resource() const
 {
     return m_resource;
 }

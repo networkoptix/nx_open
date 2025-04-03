@@ -1,17 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "desktop_data_provider_wrapper.h"
-
-#include "audio_video_win/windows_desktop_resource.h"
 #include "audio_video_win/desktop_data_provider.h"
+#include "audio_video_win/windows_desktop_resource.h"
+#include "desktop_data_provider_wrapper.h"
 
 namespace nx::vms::client::desktop {
 
-DesktopDataProviderWrapper::DesktopDataProviderWrapper(
-    core::DesktopDataProviderBase* owner)
-    :
+DesktopDataProviderWrapper::DesktopDataProviderWrapper(core::DesktopDataProviderBase* owner):
     m_owner(owner)
 {
+    m_owner->addDataProcessor(this);
 }
 
 DesktopDataProviderWrapper::~DesktopDataProviderWrapper()

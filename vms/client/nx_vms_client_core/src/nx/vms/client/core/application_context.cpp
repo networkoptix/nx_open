@@ -23,6 +23,7 @@
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
 #include <nx/vms/client/core/network/session_token_terminator.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
+#include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_data_provider.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/systems_visibility_manager.h>
@@ -453,6 +454,11 @@ bool ApplicationContext::isCertificateValidationLevelStrict() const
 SessionTokenTerminator* ApplicationContext::sessionTokenTerminator() const
 {
     return d->sessionTokenTerminator.get();
+}
+
+std::unique_ptr<QnAbstractStreamDataProvider> ApplicationContext::createAudioInputProvider() const
+{
+    return std::make_unique<DesktopAudioOnlyDataProvider>();
 }
 
 } // namespace nx::vms::client::core

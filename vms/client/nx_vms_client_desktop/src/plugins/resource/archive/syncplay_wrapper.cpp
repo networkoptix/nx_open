@@ -264,7 +264,7 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveStreamReader* r
     connect(reader, &QnLongRunnable::paused, this,
         [reader]
         {
-            auto camera = reader->getResource().dynamicCast<QnVirtualCameraResource>();
+            auto camera = reader->resource().dynamicCast<QnVirtualCameraResource>();
             if (camera
                 && camera->hasCameraCapabilities(
                     nx::vms::api::DeviceCapability::synchronousChannel))
@@ -722,7 +722,7 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
     QnAbstractArchiveStreamReader* reader = dynamic_cast<QnAbstractArchiveStreamReader*> (_reader);
     if (!reader)
         return;
-    bool isSyncReader = reader->getResource()->hasFlags(Qn::sync);
+    bool isSyncReader = reader->resource()->hasFlags(Qn::sync);
 
     // Use seek for live too. to clear curent buffer
     if (!reader->isEnabled() && !value)

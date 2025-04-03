@@ -2,14 +2,9 @@
 
 #include "windows_desktop_resource.h"
 
-#if defined(Q_OS_WIN)
-#include <d3d9.h>
-#endif
-
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtMultimedia/QMediaDevices>
-#include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include <core/resource/media_server_resource.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_camera_connection.h>
@@ -20,91 +15,7 @@
 
 namespace nx::vms::client::desktop {
 
-using namespace screen_recording;
-
-namespace {
-
-int screenToAdapter(int screen)
-{
-    #if defined(Q_OS_WIN)
-        IDirect3D9* pD3D;
-        if ((pD3D = Direct3DCreate9(D3D_SDK_VERSION)) == nullptr)
-            return 0;
-
-        const auto screens = QGuiApplication::screens();
-        if (!NX_ASSERT(screen >= 0 && screen < screens.size()))
-            return 0;
-
-        QRect rect = screens.at(screen)->geometry();
-        MONITORINFO monitorInfo;
-        memset(&monitorInfo, 0, sizeof(monitorInfo));
-        monitorInfo.cbSize = sizeof(monitorInfo);
-
-        int result = 0;
-        for (int i = 0; i < screens.size(); ++i)
-        {
-            if (!GetMonitorInfo(pD3D->GetAdapterMonitor(i), &monitorInfo))
-                break;
-
-            if (monitorInfo.rcMonitor.left == rect.left()
-                && monitorInfo.rcMonitor.top == rect.top())
-            {
-                result = i;
-                break;
-            }
-        }
-        pD3D->Release();
-        return result;
-    #else
-        return screen;
-    #endif
-}
-
-QSize resolutionToSize(Resolution resolution)
-{
-    switch (resolution)
-    {
-        case Resolution::native:
-            return QSize(0, 0);
-        case Resolution::quarterNative:
-            return QSize(-2, -2);
-        case Resolution::_1920x1080:
-            return QSize(1920, 1080);
-        case Resolution::_1280x720:
-            return QSize(1280, 720);
-        case Resolution::_640x480:
-            return QSize(640, 480);
-        case Resolution::_320x240:
-            return QSize(320, 240);
-        default:
-            NX_ASSERT(false,
-                "Invalid resolution value '%1', treating as native resolution.",
-                (int) resolution);
-            return QSize(0, 0);
-    }
-}
-
-float qualityToNumeric(Quality quality)
-{
-    switch (quality)
-    {
-        case Quality::best:
-            return 1.0;
-        case Quality::balanced:
-            return 0.75;
-        case Quality::performance:
-            return 0.5;
-        default:
-            NX_ASSERT(
-                false, "Invalid quality value '%1', treating as best quality.", (int) quality);
-            return 1.0;
-    }
-}
-
-} // namespace
-
-WindowsDesktopResource::WindowsDesktopResource(QOpenGLWidget* mainWindow):
-    m_mainWidget(mainWindow)
+WindowsDesktopResource::WindowsDesktopResource()
 {
     addFlags(Qn::local_live_cam | Qn::desktop_camera);
 
@@ -116,11 +27,6 @@ WindowsDesktopResource::WindowsDesktopResource(QOpenGLWidget* mainWindow):
     setIdUnsafe(core::DesktopResource::getDesktopResourceUuid());
 }
 
-WindowsDesktopResource::~WindowsDesktopResource()
-{
-    delete m_desktopDataProvider;
-}
-
 bool WindowsDesktopResource::hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
     return true;
@@ -129,64 +35,14 @@ bool WindowsDesktopResource::hasVideo(const QnAbstractStreamDataProvider* /*data
 QnAbstractStreamDataProvider* WindowsDesktopResource::createDataProvider(
     Qn::ConnectionRole /*role*/)
 {
-    NX_MUTEX_LOCKER lock(&m_dpMutex);
-
-    createSharedDataProvider();
-    if (!m_desktopDataProvider)
-        return nullptr;
-
-    auto processor = new DesktopDataProviderWrapper(toSharedPointer(), m_desktopDataProvider);
-    m_desktopDataProvider->addDataProcessor(processor);
-    return processor;
-}
-
-void WindowsDesktopResource::createSharedDataProvider()
-{
-    if (m_desktopDataProvider)
-    {
-        if (m_desktopDataProvider->readyToStop())
-            delete m_desktopDataProvider; // stop and destroy old instance
-        else
-            return; // already exists
-    }
-
-    appContext()->voiceSpectrumAnalyzer()->reset();
-
-    core::AudioDeviceInfo audioDevice = screenRecordingSettings()->primaryAudioDevice();
-    core::AudioDeviceInfo secondAudioDevice;
-    if (screenRecordingSettings()->secondaryAudioDevice().fullName() != audioDevice.fullName())
-        secondAudioDevice = screenRecordingSettings()->secondaryAudioDevice();
-    if (QMediaDevices::audioInputs().isEmpty())
-    {
-        audioDevice = core::AudioDeviceInfo(); // no audio devices
-        secondAudioDevice = core::AudioDeviceInfo();
-    }
-    int screen = screenToAdapter(screenRecordingSettings()->screen());
-    bool captureCursor = screenRecordingSettings()->captureCursor();
-    QSize encodingSize = resolutionToSize(screenRecordingSettings()->resolution());
-    float encodingQuality = qualityToNumeric(screenRecordingSettings()->quality());
-    CaptureMode captureMode = screenRecordingSettings()->captureMode();
-
-    QString videoCodecName;
-    if (encodeQualuty <= 0.5)
-        videoCodecName = systemContext()->globalSettings()->lowQualityScreenVideoCodec();
-    else
-        videoCodecName = systemContext()->globalSettings()->defaultExportVideoCodec();
-
-    m_desktopDataProvider = new DesktopDataProvider(screen,
-        audioDevice.isNull() ? 0 : &audioDevice,
-        secondAudioDevice.isNull() ? 0 : &secondAudioDevice,
-        captureMode,
-        captureCursor,
-        encodingSize,
-        encodingQuality,
-        videoCodecName,
-        m_mainWidget,
-        QPixmap());
+    // According to legacy design, the caller will retain ownership of the created object, this
+    // should be fixed in the future.
+    return appContext()->createAudioInputProvider().release();
 }
 
 bool WindowsDesktopResource::isRendererSlow() const
 {
+    using namespace screen_recording;
     CaptureMode captureMode = screenRecordingSettings()->captureMode();
     return captureMode == CaptureMode::fullScreen;
 }
@@ -194,10 +50,11 @@ bool WindowsDesktopResource::isRendererSlow() const
 static AudioLayoutConstPtr emptyAudioLayout(new AudioLayout());
 
 AudioLayoutConstPtr WindowsDesktopResource::getAudioLayout(
-    const QnAbstractStreamDataProvider* /*dataProvider*/) const
+    const QnAbstractStreamDataProvider* dataProvider) const
 {
-    if (m_desktopDataProvider && m_desktopDataProvider->getAudioLayout())
-        return m_desktopDataProvider->getAudioLayout();
+    auto provider = dynamic_cast<const core::DesktopDataProviderBase*>(dataProvider);
+    if (provider && provider->getAudioLayout())
+        return provider->getAudioLayout();
     return emptyAudioLayout;
 }
 

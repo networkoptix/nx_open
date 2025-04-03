@@ -884,7 +884,7 @@ public:
     nx::utils::Url vmsCloudUrl() const;
     bool isVmsCloudUrl() const;
 
-    QSize getMaxVideoResolution();
+    QSize maxVideoResolution() const;
 
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);

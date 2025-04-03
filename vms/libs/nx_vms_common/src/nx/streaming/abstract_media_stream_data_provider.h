@@ -35,14 +35,12 @@ public:
     virtual bool hasThread() const { return true; }
     virtual bool reinitResourceOnStreamError() const { return true; }
     bool isConnectionLost() const;
-    const QnResourcePtr& getResource() const;
+    const QnResourcePtr& resource() const;
 
 protected:
     virtual void sleepIfNeeded() {}
-
     virtual void beforeRun();
     virtual void afterRun();
-
     virtual bool beforeGetData() { return true; }
 
     void checkAndFixTimeFromCamera(const QnAbstractMediaDataPtr& data);
@@ -59,13 +57,11 @@ protected:
     virtual bool needKeyData(int channel) const;
     virtual bool needKeyData() const;
 
-protected:
-    QnResourcePtr m_resource;
-
 private:
     int getNumberOfChannels() const;
 
 private:
+    QnResourcePtr m_resource;
     nx::utils::CachedValue<int> m_numberOfChannels;
     qint64 m_lastMediaTime[CL_MAX_CHANNEL_NUMBER + 1]; //< max video channels + audio channel
     bool m_isCamera;

@@ -62,7 +62,7 @@ public:
     QString toString() const;
 
     // Can be empty, but never null.
-    QString getCodecName() const;
+    QString codecName() const;
 
     // Can be empty, but never null.
     QString getAudioCodecDescription() const;

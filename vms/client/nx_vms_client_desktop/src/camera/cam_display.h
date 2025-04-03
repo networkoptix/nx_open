@@ -157,7 +157,7 @@ public:
     nx::vms::client::desktop::AudioDecodeMode audioDecodeMode() const;
     void setAudioDecodeMode(nx::vms::client::desktop::AudioDecodeMode decodeMode);
     nx::vms::client::core::SpectrumData audioSpectrum() const;
-    QString getCodecName();
+    QString codecName();
 
 public slots:
     void onBeforeJump(qint64 time);
@@ -333,6 +333,7 @@ protected:
     nx::vms::client::desktop::AudioDecodeMode m_audioDecodeMode =
         nx::vms::client::desktop::AudioDecodeMode::normal;
     nx::Lockable<QString> m_codecName;
+    AVCodecID m_codecId = AV_CODEC_ID_NONE;
 };
 
 #endif //QN_CAM_DISPLAY_H

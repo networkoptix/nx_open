@@ -71,7 +71,7 @@ void QnAbstractArchiveStreamReader::setCycleMode(bool value)
 bool QnAbstractArchiveStreamReader::open(AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher)
 {
     m_archiveIntegrityWatcher = archiveIntegrityWatcher;
-    return m_delegate && m_delegate->open(m_resource, archiveIntegrityWatcher);
+    return m_delegate && m_delegate->open(resource(), archiveIntegrityWatcher);
 }
 
 void QnAbstractArchiveStreamReader::jumpToPreviousFrame(qint64 usec)
@@ -151,7 +151,7 @@ void QnAbstractArchiveStreamReader::run()
 
         if (data && m_realTimeSpeed.has_value())
         {
-            auto mediaRes = m_resource.dynamicCast<QnMediaResource>();
+            auto mediaRes = resource().dynamicCast<QnMediaResource>();
             if (mediaRes && !mediaRes->hasVideo(this) && data->dataType == QnAbstractMediaData::AUDIO)
                 std::this_thread::sleep_for(getDelay(data->timestamp));
             else if (data->dataType == QnAbstractMediaData::VIDEO)
@@ -223,7 +223,7 @@ void QnAbstractArchiveStreamReader::run()
             }
         }
 
-        auto mediaRes = m_resource.dynamicCast<QnMediaResource>();
+        auto mediaRes = resource().dynamicCast<QnMediaResource>();
         if (mediaRes && !mediaRes->hasVideo(this))
         {
             if (data)
@@ -233,7 +233,6 @@ void QnAbstractArchiveStreamReader::run()
             if (videoData)
                 m_stat[data->channelNumber].onData(data);
         }
-
 
         putData(std::move(data));
     }

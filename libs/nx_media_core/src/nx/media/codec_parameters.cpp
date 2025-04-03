@@ -191,7 +191,7 @@ QString CodecParameters::toString() const
             getExtradataSize());
 }
 
-QString CodecParameters::getCodecName() const
+QString CodecParameters::codecName() const
 {
     return QnAvCodecHelper::codecIdToString(getCodecId());
 }
