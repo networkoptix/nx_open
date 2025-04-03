@@ -371,30 +371,28 @@ void MotionSelectionInstrument::dragMove(DragInfo* info)
     {
         selectionItem()->setRect(QPointF(0, 0), QPointF(0, 0)); /* Ignore small deltas. */
         m_gridRect = QRect();
+        return;
     }
-    else
-    {
-        QPoint gridOrigin = target()->mapToMotionGrid(mouseOrigin);
-        QPoint gridCorner = target()->mapToMotionGrid(mouseCorner) + QPoint(1, 1);
 
-        if (gridCorner.x() <= gridOrigin.x())
-        {
-            gridCorner -= QPoint(1, 0);
-            gridOrigin += QPoint(1, 0);
-        }
+    QPoint gridOrigin = target()->mapToMotionGrid(mouseOrigin);
+    QPoint gridCorner = target()->mapToMotionGrid(mouseCorner);
 
-        if (gridCorner.y() <= gridOrigin.y())
-        {
-            gridCorner -= QPoint(0, 1);
-            gridOrigin += QPoint(0, 1);
-        }
+    // Compute inclusive selection bounds.
+    int left = qMin(gridOrigin.x(), gridCorner.x());
+    int right = qMax(gridOrigin.x(), gridCorner.x());
+    int top = qMin(gridOrigin.y(), gridCorner.y());
+    int bottom = qMax(gridOrigin.y(), gridCorner.y());
 
-        QPointF origin = target()->mapFromMotionGrid(gridOrigin);
-        QPointF corner = target()->mapFromMotionGrid(gridCorner);
-        selectionItem()->setRect(origin, corner);
+    // QRect expects bottom-right to be exclusive, so add +1 to width/height.
+    QRect gridRect(QPoint(left, top), QPoint(right + 1, bottom + 1));
 
-        m_gridRect = QRect(gridOrigin, gridCorner).normalized().adjusted(0, 0, -1, -1);
-    }
+    // Convert grid rectangle back to scene coordinates for display.
+    QPointF topLeft = target()->mapFromMotionGrid(gridRect.topLeft());
+    QPointF bottomRight = target()->mapFromMotionGrid(gridRect.bottomRight());
+
+    selectionItem()->setRect(topLeft, bottomRight);
+
+    m_gridRect = QRect(QPoint(left, top), QPoint(right, bottom));
 }
 
 void MotionSelectionInstrument::finishDrag(DragInfo* info)
