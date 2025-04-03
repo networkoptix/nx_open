@@ -12,10 +12,10 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
-#include <nx/vms/client/desktop/licensing/customer_support.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/license/customer_support.h>
 #include <nx/vms/license/validator.h>
 #include <nx_ec/ec_api_common.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
@@ -98,43 +98,15 @@ public:
         const QString& regionalSupportString,
         std::optional<QnLicenseList> limitToLicenses = std::nullopt)
     {
-        NX_ASSERT(genericString.contains("%1"));
         auto context = dynamic_cast<QnWorkbenchContextAware*>(parent);
         if (!NX_ASSERT(context))
             return QString();
 
-        QnLicenseList licenses = limitToLicenses
-            ? *limitToLicenses
-            : context->systemContext()->licensePool()->getLicenses();
-
-        CustomerSupport customerSupport(context->systemContext());
-        const auto regionalContacts = customerSupport.regionalContactsForLicenses(licenses);
-
-        if (regionalContacts.empty())
-        {
-            const ContactAddress licensingAddress = customerSupport.licensingContact.address;
-            if (NX_ASSERT(licensingAddress.channel != ContactAddress::Channel::empty,
-                "Customization is invalid!"))
-            {
-                QString supportLink = licensingAddress.href;
-
-                // Http links must be on a separate string to avoid line break on "http://".
-                if (licensingAddress.channel == ContactAddress::Channel::link)
-                   supportLink = html::kLineBreak + supportLink;
-
-                return genericString.arg(supportLink);
-            }
-
-            // Backup string, this must never happen.
-            return genericString.arg("your Regional / License support");
-        }
-
-        QStringList regionalSupport;
-        regionalSupport.push_back(regionalSupportString);
-        for (const CustomerSupport::Contact& contact: regionalContacts)
-            regionalSupport.push_back(contact.company + html::kLineBreak + contact.address.href);
-        return regionalSupport.join(kEmptyLine);
-
+        return CustomerSupport::customerSupportMessage(
+            context->systemContext(),
+            genericString,
+            regionalSupportString,
+            std::move(limitToLicenses));
     }
 
     static QString getValidLicenseKeyMessage(QWidget* parent)

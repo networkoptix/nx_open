@@ -1,15 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <memory>
+
+#include <gtest/gtest.h>
 
 #include <licensing/license.h>
 #include <nx/vms/api/data/license_data.h>
-#include <nx/vms/client/desktop/licensing/customer_support.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/license/customer_support.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::common {
 
 using Channel = ContactAddress::Channel;
 
@@ -183,4 +183,4 @@ INSTANTIATE_TEST_SUITE_P(RegionalSupportContactsTest,
 } // namespace regional_support
 
 } // namespace test
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::common

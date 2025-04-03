@@ -8,14 +8,16 @@
 #include <licensing/license.h>
 #include <nx/branding.h>
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <utils/email/email.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::common {
 
 namespace {
+
+static const QString kEmptyLine = QString(html::kLineBreak) + html::kLineBreak;
 
 ContactAddress::Channel detectChannel(const QString& address)
 {
@@ -145,4 +147,46 @@ QString CustomerSupport::Contact::toString() const
     return result;
 }
 
-} // namespace nx::vms::client::desktop
+QString CustomerSupport::customerSupportMessage(
+    SystemContext* context,
+    const QString& genericString,
+    const QString& regionalSupportString,
+    std::optional<QnLicenseList> limitToLicenses)
+{
+    NX_ASSERT(genericString.contains("%1"));
+
+    QnLicenseList licenses = limitToLicenses
+        ? *limitToLicenses
+        : context->licensePool()->getLicenses();
+
+    CustomerSupport customerSupport(context);
+    const auto regionalContacts = customerSupport.regionalContactsForLicenses(licenses);
+
+    if (regionalContacts.empty())
+    {
+        const ContactAddress licensingAddress = customerSupport.licensingContact.address;
+        if (NX_ASSERT(licensingAddress.channel != ContactAddress::Channel::empty,
+            "Customization is invalid!"))
+        {
+            QString supportLink = licensingAddress.href;
+
+            // Http links must be on a separate string to avoid line break on "http://".
+            if (licensingAddress.channel == ContactAddress::Channel::link)
+                supportLink = html::kLineBreak + supportLink;
+
+            return genericString.arg(supportLink);
+        }
+
+        // Backup string, this must never happen.
+        return genericString.arg(tr("your Regional / License support"));
+    }
+
+    QStringList regionalSupport;
+    regionalSupport.push_back(regionalSupportString);
+    for (const CustomerSupport::Contact& contact: regionalContacts)
+        regionalSupport.push_back(contact.company + html::kLineBreak + contact.address.href);
+
+    return regionalSupport.join(kEmptyLine);
+}
+
+} // namespace nx::vms::common

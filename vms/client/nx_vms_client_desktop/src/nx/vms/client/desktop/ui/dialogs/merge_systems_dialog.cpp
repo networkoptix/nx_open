@@ -24,7 +24,6 @@
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
-#include <nx/vms/client/desktop/licensing/customer_support.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -34,6 +33,7 @@
 #include <nx/vms/client/desktop/system_merge/merge_systems_validator.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/license/customer_support.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <ui/common/palette.h>
@@ -73,7 +73,7 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
     setPaletteColor(ui->warningLabel, QPalette::WindowText, core::colorTheme()->color("yellow_d2"));
     setPaletteColor(ui->contactSupportLabel, QPalette::WindowText, core::colorTheme()->color("yellow_d2"));
 
-    CustomerSupport customerSupport(systemContext());
+    common::CustomerSupport customerSupport(systemContext());
     const QUrl url(customerSupport.systemContact.address.rawData);
     ui->contactSupportLabel->setText(tr("It is recommended to contact %1 before proceeding.")
         .arg(nx::vms::common::html::link(tr("support"), url)));
