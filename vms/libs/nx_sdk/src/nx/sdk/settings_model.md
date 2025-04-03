@@ -392,6 +392,26 @@ Boolean data field, alternative visual representation.
     "switch1": true
 
 ---------------------------------------------------------------------------------------------------
+## Label
+
+A static text. The `"text"` field supports hyperlinks, for example:
+`"<a href=\"https://example.com/\">example</a>"`.
+
+[proprietary]
+
+![](doc/images/label.png)
+
+[/proprietary]
+
+### Setting Model
+
+    {
+        "type": "Label",
+        "caption": "Text caption",
+        "text": "Some text"
+    }
+
+---------------------------------------------------------------------------------------------------
 ## Link
 
 A clickable hyperlink.

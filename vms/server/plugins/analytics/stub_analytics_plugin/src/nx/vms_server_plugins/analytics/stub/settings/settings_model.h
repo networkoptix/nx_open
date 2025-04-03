@@ -192,6 +192,12 @@ static const std::string kEngineSettingsModel = /*suppress newline*/ 1 + R"json(
                             "type": "Link",
                             "caption": "Customer Support",
                             "url": "https://example.com/"
+                        },
+                        {
+                            "type": "Label",
+                            "caption": "Label",
+                            "description": "A Label",
+                            "text": "Example"
                         }
                     ]
                 },
