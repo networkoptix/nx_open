@@ -9,13 +9,12 @@
 
 namespace nx::vms::api {
 
-enum class PtzApiType
-{
+NX_REFLECTION_ENUM_CLASS(PtzApiType,
     none,
     operational,
     configurational,
-    any,
-};
+    any
+);
 
 NX_REFLECTION_ENUM_CLASS(PtzPositionType,
 
