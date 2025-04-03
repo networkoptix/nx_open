@@ -169,8 +169,8 @@ protected:
         m_localRecordingHelper.reset(new LocalRecordingUsageHelper(systemContext()));
 
         auto manager = systemContext()->saasServiceManager();
-        manager->loadServiceData(kServiceDataJson);
-        manager->loadSaasData(kSaasDataJson);
+        manager->loadServiceDataAsync(kServiceDataJson);
+        manager->loadSaasDataAsync(kSaasDataJson);
 
         for (const auto& data: testPluginData)
         {

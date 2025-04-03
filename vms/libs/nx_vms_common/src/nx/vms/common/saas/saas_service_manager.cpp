@@ -19,13 +19,22 @@ static const QString kSaasServicesPropertyKey("saasServices");
 
 namespace {
 
-void setJsonToDictionary(
+void setJsonToDictionaryAsync(
     QnResourcePropertyDictionary* dictionary,
     const QString& propertyKey,
     const std::string_view& json)
 {
     if (dictionary->setValue(nx::Uuid(), propertyKey, QString::fromUtf8(json)))
         dictionary->saveParamsAsync(nx::Uuid());
+}
+
+void setJsonToDictionarySync(
+    QnResourcePropertyDictionary* dictionary,
+    const QString& propertyKey,
+    const std::string_view& json)
+{
+    if (dictionary->setValue(nx::Uuid(), propertyKey, QString::fromUtf8(json)))
+        dictionary->saveParams(nx::Uuid());
 }
 
 template <typename T>
@@ -96,9 +105,17 @@ ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
         });
 }
 
+void ServiceManager::loadSaasDataAsync(const std::string_view& saasDataJson)
+{
+    setJsonToDictionaryAsync(
+        systemContext()->resourcePropertyDictionary(),
+        kSaasDataPropertyKey,
+        saasDataJson);
+}
+
 void ServiceManager::loadSaasData(const std::string_view& saasDataJson)
 {
-    setJsonToDictionary(
+    setJsonToDictionarySync(
         systemContext()->resourcePropertyDictionary(),
         kSaasDataPropertyKey,
         saasDataJson);
@@ -112,7 +129,15 @@ QByteArray ServiceManager::rawData() const
 
 void ServiceManager::loadServiceData(const std::string_view& servicesJson)
 {
-    setJsonToDictionary(
+    setJsonToDictionarySync(
+        systemContext()->resourcePropertyDictionary(),
+        kSaasServicesPropertyKey,
+        servicesJson);
+}
+
+void ServiceManager::loadServiceDataAsync(const std::string_view& servicesJson)
+{
+    setJsonToDictionaryAsync(
         systemContext()->resourcePropertyDictionary(),
         kSaasServicesPropertyKey,
         servicesJson);

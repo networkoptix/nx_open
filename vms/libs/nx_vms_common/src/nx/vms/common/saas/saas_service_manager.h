@@ -29,6 +29,7 @@ public:
      *     as response from the licensing server.
      */
     void loadSaasData(const std::string_view& saasDataJson);
+    void loadSaasDataAsync(const std::string_view& saasDataJson);
 
     /**
      * Sets and stores services available to the system from Channel Partners.
@@ -36,6 +37,7 @@ public:
      *     expected to be as response from the licensing server
      */
     void loadServiceData(const std::string_view& servicesJson);
+    void loadServiceDataAsync(const std::string_view& servicesJson);
 
     /**
      * @return Detailed structure describing whole aspects of SaaS licensing state of the system.
