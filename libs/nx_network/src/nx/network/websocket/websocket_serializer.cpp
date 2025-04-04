@@ -96,7 +96,9 @@ nx::Buffer Serializer::prepareMessage(
 nx::Buffer Serializer::prepareFrame(
     nx::Buffer payload, FrameType type, bool fin, std::optional<Compression> compression)
 {
-    if (!isDataFrame(type))
+    if (isDataFrame(type))
+        m_statistics.totalIn += payload.size();
+    else
         compression.reset();
 
     if (compression)
@@ -153,6 +155,8 @@ nx::Buffer Serializer::prepareFrame(
             payload[i] = payload[i] ^ ((unsigned char*) (&m_mask))[i % 4];
     }
 
+    if (isDataFrame(type))
+        m_statistics.totalOut += payload.size();
     return header + payload;
 }
 

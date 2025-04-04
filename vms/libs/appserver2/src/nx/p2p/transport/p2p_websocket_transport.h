@@ -33,6 +33,12 @@ public:
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) override;
 
     virtual QString lastErrorMessage() const override;
+
+    nx::network::websocket::Statistics outputStatistics() const
+    {
+        return m_webSocket->outputStatistics();
+    }
+
 private:
     network::WebSocketPtr m_webSocket;
 };

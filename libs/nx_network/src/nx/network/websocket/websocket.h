@@ -80,6 +80,8 @@ public:
     const AbstractStreamSocket* socket() const { return m_socket.get(); }
     QString lastErrorMessage() const;
 
+    Statistics outputStatistics() const { return m_serializer.statistics(); }
+
     /**
      * Disable PONG responses.
      * NOTE: Don't call it unless you are completely sure what you are doing.

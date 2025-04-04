@@ -32,11 +32,14 @@ public:
     nx::Buffer prepareFrame(
         nx::Buffer payload, FrameType type, bool fin, std::optional<Compression> compression);
 
+    Statistics statistics() const { return m_statistics; }
+
 private:
     struct Private;
     std::unique_ptr<Private> d;
     bool m_masked = false;
     unsigned m_mask = 0;
+    Statistics m_statistics;
 
     void setMasked(bool masked, unsigned mask = 0);
     int fillHeader(

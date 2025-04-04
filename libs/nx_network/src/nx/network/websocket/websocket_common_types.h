@@ -94,4 +94,10 @@ inline bool isDataFrame(FrameType frameType)
         || frameType == FrameType::continuation;
 }
 
+struct Statistics
+{
+    size_t totalIn = 0;
+    size_t totalOut = 0;
+};
+
 } // namespace nx::network::websocket
