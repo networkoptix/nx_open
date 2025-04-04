@@ -203,7 +203,7 @@ bool IOModuleMonitor::open()
             NX_WARNING(this, "Can't detect server IP address to open IO monitor connection.");
             return false; //< No primary interface have found for media server yet. Try to connect later.
         }
-        requestUrl.setHost(route.addr.address.toString());
+        requestUrl.setHost(route.addr.address);
         requestUrl.setPort(route.addr.port);
     }
 

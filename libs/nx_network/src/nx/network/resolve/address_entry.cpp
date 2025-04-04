@@ -35,7 +35,7 @@ std::string TypedAddress::toString() const
 
 //-------------------------------------------------------------------------------------------------
 
-AddressAttribute::AddressAttribute(AddressAttributeType type_, quint64 value_):
+AddressAttribute::AddressAttribute(AddressAttributeType type_, std::uint64_t value_):
     type(type_),
     value(value_)
 {

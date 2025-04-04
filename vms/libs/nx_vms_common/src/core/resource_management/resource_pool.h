@@ -12,6 +12,7 @@
 #include <api/helpers/camera_id_helper.h>
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/network/socket_common.h>
 #include <nx/string.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/log/log.h>
@@ -230,7 +231,8 @@ public:
         return false;
     }
 
-    QnVirtualCameraResourceList getAllNetResourceByHostAddress(const nx::String& hostAddress) const;
+    QnVirtualCameraResourceList getAllNetResourceByHostAddress(
+        const nx::network::HostAddress& hostAddress) const;
 
     QnVirtualCameraResourceList getAllCameras(
         const nx::Uuid& parentId = {}, bool ignoreDesktopCameras = false) const;
@@ -317,6 +319,7 @@ public:
         const nx::vms::common::ResourceDescriptor& descriptor) const;
 
     QnResourcePtr getResourceByUrl(
+        // TODO: #skolesnik nx::util::Url
         const QString& url, const nx::Uuid& parentServerId = nx::Uuid()) const;
 
     QnVirtualCameraResourcePtr getCameraByPhysicalId(const QString& physicalId) const;

@@ -398,7 +398,7 @@ QString ServerCertificateViewer::calculateServerInfo(
     const nx::network::SocketAddress& primaryAddress)
 {
     const QString serverInfo = highlightedText(nx::format(
-        "%1 (%2)", target.name, primaryAddress.address.toString()));
+        "%1 (%2)", target.name, primaryAddress.address));
 
     switch (mode)
     {

@@ -101,7 +101,7 @@ QVariant QnCameraListModel::data(const QModelIndex& index, int role) const
                 case FirmwareColumn:
                     return camera->getFirmware();
                 case IpColumn:
-                    return camera->getHostAddress();
+                    return QString::fromStdString(camera->getHostAddress().toString());
                 case MacColumn:
                     return camera->getMAC().toString();
                 case LogicalIdColumn:

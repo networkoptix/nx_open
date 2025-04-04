@@ -575,7 +575,7 @@ void AsyncClient::doRequest(
 
     if (m_messagePipeline && url.host().isEmpty())
     {
-        url.setHost(m_messagePipeline->socket()->getForeignAddress().address.toString());
+        url.setHost(m_messagePipeline->socket()->getForeignAddress().address);
         url.setPort(m_messagePipeline->socket()->getForeignAddress().port);
     }
 

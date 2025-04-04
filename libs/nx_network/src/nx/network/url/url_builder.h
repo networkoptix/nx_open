@@ -4,6 +4,7 @@
 
 #include <string>
 
+#include <nx/network/socket_common.h>
 #include <nx/utils/log/to_string.h>
 #include <nx/utils/url.h>
 #include <nx/utils/url_query.h>
@@ -26,11 +27,10 @@ public:
     Builder& setUserInfo(const std::string& userInfo, QUrl::ParsingMode mode = QUrl::TolerantMode);
     Builder& setUserName(const QString& userName, QUrl::ParsingMode mode = QUrl::DecodedMode);
     Builder& setPassword(const QString& password, QUrl::ParsingMode mode = QUrl::DecodedMode);
+    Builder& setHost(const nx::network::HostAddress& hostAddress);
     Builder& setHost(const QString& host, QUrl::ParsingMode mode = QUrl::DecodedMode);
     Builder& setPort(int port);
-    Builder& setEndpoint(
-        const SocketAddress& endpoint,
-        QUrl::ParsingMode mode = QUrl::DecodedMode);
+    Builder& setEndpoint(const SocketAddress& endpoint);
 
     Builder& setPath(const std::string_view& path, QUrl::ParsingMode mode = QUrl::DecodedMode);
     Builder& setPath(const QString& path, QUrl::ParsingMode mode = QUrl::DecodedMode);

@@ -156,7 +156,7 @@ protected:
             // str could be host:port.
             const SocketAddress endpoint(str);
             url = nx::utils::Url();
-            url.setHost(endpoint.address.toString());
+            url.setHost(endpoint.address);
             if (endpoint.port > 0)
                 url.setPort(endpoint.port);
         }

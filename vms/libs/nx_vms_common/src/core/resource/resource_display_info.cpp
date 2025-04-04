@@ -145,7 +145,7 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
         else if (flags.testFlag(Qn::network))
         {
             if (const auto networkResource = m_resource.dynamicCast<QnVirtualCameraResource>())
-                m_host = networkResource->getHostAddress();
+                m_host = QString::fromStdString(networkResource->getHostAddress().toString());
         }
     }
 

@@ -1006,7 +1006,7 @@ void ConnectActionsHandler::storeConnectionRecord(
     }
     else
     {
-        NX_ASSERT(!connectionInfo.address.address.toString().empty(),
+        NX_ASSERT(!connectionInfo.address.address.isEmpty(),
             "Wrong host is going to be saved to the recent connections list");
 
         nx::network::url::Builder builder;

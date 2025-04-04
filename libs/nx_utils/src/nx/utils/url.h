@@ -10,6 +10,8 @@
 #include <nx/reflect/instrument.h>
 #include <nx/utils/json/qt_core_types.h>
 
+namespace nx::network { class HostAddress; }
+
 namespace nx::utils {
 
 class NX_UTILS_API Url
@@ -116,6 +118,9 @@ public:
     void setPassword(const std::string_view& password, QUrl::ParsingMode mode = QUrl::DecodedMode);
     void setPassword(const char* password, QUrl::ParsingMode mode = QUrl::DecodedMode);
     Q_INVOKABLE QString password(QUrl::ComponentFormattingOptions = QUrl::FullyDecoded) const;
+
+    template<typename T, typename = std::enable_if_t<std::is_same_v<nx::network::HostAddress, T>>>
+    void setHost(const T& hostName) { return setHost(hostName.toString(), QUrl::DecodedMode); }
 
     void setHost(const QString& host, QUrl::ParsingMode mode = QUrl::DecodedMode);
     void setHost(const std::string& host, QUrl::ParsingMode mode = QUrl::DecodedMode);

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <ostream>
+#include <cstdint>
 
 #include "../socket_common.h"
 
@@ -36,9 +36,9 @@ enum class AddressAttributeType
 struct NX_NETWORK_API AddressAttribute
 {
     AddressAttributeType type;
-    quint64 value; // TODO: boost::variant when int is not enough
+    std::uint64_t value; // TODO: boost::variant when int is not enough
 
-    AddressAttribute(AddressAttributeType type_, quint64 value_ = 0);
+    AddressAttribute(AddressAttributeType type_, std::uint64_t value_ = 0);
     bool operator ==(const AddressAttribute& rhs) const;
     bool operator <(const AddressAttribute& rhs) const;
     std::string toString() const;

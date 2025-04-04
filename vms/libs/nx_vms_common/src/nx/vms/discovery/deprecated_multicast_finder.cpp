@@ -420,7 +420,7 @@ bool DeprecatedMulticastFinder::processDiscoveryResponse(UDPSocket *udpSocket)
 
     emit responseReceived(
         *response,
-        nx::network::SocketAddress(remoteEndpoint.address.toString(), response->port),
+        nx::network::SocketAddress(remoteEndpoint.address, response->port),
         remoteEndpoint.address);
     return true;
 }

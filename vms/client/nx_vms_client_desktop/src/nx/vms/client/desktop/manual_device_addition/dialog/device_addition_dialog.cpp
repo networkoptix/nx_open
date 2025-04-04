@@ -4,6 +4,7 @@
 #include "ui_device_addition_dialog.h"
 
 #include <QtCore/QScopedValueRollback>
+#include <QtNetwork/QHostAddress>
 
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>

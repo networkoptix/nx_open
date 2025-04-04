@@ -111,7 +111,7 @@ void VmsServerConnector::connectTo(const SocketAddress& address, DoneCallback on
     // Build a special url which enables VMS server to tunnel connection data inside web socket.
     const auto url = url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
-        .setPath(nx::format("/proxy/socks5/%1:%2", address.address.toString(), address.port))
+        .setPath(nx::format("/proxy/socks5/%1:%2", address.address, address.port))
         .setEndpoint(connection()->address())
         .toUrl();
 

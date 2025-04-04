@@ -27,7 +27,7 @@ ModuleEndpoint::ModuleEndpoint(
     nx::vms::api::ModuleInformationWithAddresses(std::move(old)),
     endpoint(std::move(endpoint))
 {
-    NX_ASSERT(!this->endpoint.address.toString().empty());
+    NX_ASSERT(!this->endpoint.address.isEmpty());
 }
 
 struct Manager::Private
@@ -57,7 +57,7 @@ struct Manager::Private
             {
                 NX_VERBOSE(this, "Received module info: %1", QJson::serialized(information));
 
-                NX_ASSERT(!requestedEndpoint.address.toString().empty());
+                NX_ASSERT(!requestedEndpoint.address.isEmpty());
                 ModuleEndpoint module(std::move(information), std::move(requestedEndpoint));
 
                 if (serverModeInfo && serverModeInfo->peerId == module.id)

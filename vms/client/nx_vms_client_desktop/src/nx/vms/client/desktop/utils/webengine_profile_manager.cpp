@@ -8,6 +8,7 @@
 #include <QtWebEngineQuick/QQuickWebEngineDownloadRequest>
 
 #include <core/resource_management/resource_pool.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
@@ -96,15 +97,15 @@ Q_INVOKABLE QQuickWebEngineProfile* WebEngineProfileManager::getProfile(
 
     const auto proxyAddress = LocalProxyServer::instance()->address();
 
-    QUrl proxyUrl;
-
-    proxyUrl.setScheme("socks5");
-    proxyUrl.setHost(proxyAddress.address.toString().c_str());
-    proxyUrl.setPort(proxyAddress.port);
-    proxyUrl.setUserName(resourceId);
-    proxyUrl.setPassword(QString::fromStdString(LocalProxyServer::instance()->password()));
-
-    return d->getOrCreateProfile(name + "_" + resourceId, offTheRecord, proxyUrl);
+    return d->getOrCreateProfile(name + "_" + resourceId,
+        offTheRecord,
+        nx::network::url::Builder()
+            .setScheme("socks5")
+            .setHost(proxyAddress.address)
+            .setPort(proxyAddress.port)
+            .setUserName(resourceId)
+            .setPassword(QString::fromStdString(LocalProxyServer::instance()->password()))
+            .toUrl() .toQUrl());
 }
 
 WebEngineProfileManager* WebEngineProfileManager::instance()

@@ -24,7 +24,6 @@
 #include <nx/network/aio/aio_service.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/nettools.h>
-#include <nx/network/ping.h>
 #include <nx/network/rest/user_access_data.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
@@ -719,10 +718,15 @@ void QnVirtualCameraResource::setUrl(const QString& url)
     emit urlChanged(toSharedPointer(this));
 }
 
-QString QnVirtualCameraResource::getHostAddress() const
+nx::network::HostAddress QnVirtualCameraResource::getHostAddress() const
 {
     // Secured by the same mutex as ::setUrl(), so thread-safe.
     return m_cachedHostAddress.get();
+}
+
+void QnVirtualCameraResource::setHostAddress(const nx::network::HostAddress& ip)
+{
+    return setHostAddress(QString::fromStdString(ip.toString()));
 }
 
 void QnVirtualCameraResource::setHostAddress(const QString& ip)
@@ -808,12 +812,12 @@ QAuthenticator QnVirtualCameraResource::parseAuth(const QString& value)
     return auth;
 }
 
-int QnVirtualCameraResource::httpPort() const
+std::uint16_t QnVirtualCameraResource::httpPort() const
 {
     return m_httpPort;
 }
 
-void QnVirtualCameraResource::setHttpPort( int newPort )
+void QnVirtualCameraResource::setHttpPort(std::uint16_t newPort)
 {
     m_httpPort = newPort;
 }
@@ -867,9 +871,7 @@ bool QnVirtualCameraResource::ping()
 {
     auto sock =
         nx::network::SocketFactory::createStreamSocket(nx::network::ssl::kAcceptAnyCertificate);
-    return sock->connect(
-        getHostAddress().toStdString(),
-        QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT),
+    return sock->connect({getHostAddress(), nx::network::http::DEFAULT_HTTP_PORT},
         nx::network::deprecated::kDefaultConnectTimeout);
 }
 

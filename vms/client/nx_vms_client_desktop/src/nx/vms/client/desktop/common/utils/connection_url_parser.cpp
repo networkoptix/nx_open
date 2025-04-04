@@ -31,7 +31,7 @@ nx::utils::Url parseConnectionUrlFromUserInput(const QString& input)
             : nx::network::http::kSecureUrlSchemeName);
 
         nx::network::SocketAddress address(match.captured("address").toStdString());
-        result.setHost(address.address.toString());
+        result.setHost(address.address);
         result.setPort(address.port > 0
             ? address.port
             : helpers::kDefaultConnectionPort);

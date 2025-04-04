@@ -160,7 +160,7 @@ bool PortMapper::searchForMappers(
             continue; // uninteresting
 
         nx::utils::Url url;
-        url.setHost(devAddress.address.toString());
+        url.setHost(devAddress.address);
         url.setPort(devAddress.port);
         url.setPath(service.controlUrl);
 

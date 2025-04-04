@@ -17,11 +17,12 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/core/resource/using_media2_type.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/network/socket_common.h>
 #include <nx/utils/lockable.h>
 #include <nx/utils/mac_address.h>
+#include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
-#include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/value_cache.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/vms/api/data/device_model.h>
@@ -135,9 +136,13 @@ public:
 
     virtual QString getProperty(const QString& key) const override;
 
+    // TODO: #skolesnik nx::utils::Url
     virtual void setUrl(const QString& url) override;
 
-    virtual QString getHostAddress() const;
+    virtual nx::network::HostAddress getHostAddress() const;
+    virtual void setHostAddress(const nx::network::HostAddress &ip);
+
+    // TODO: #skolesnik Remove unsafe QString
     virtual void setHostAddress(const QString &ip);
 
     nx::utils::MacAddress getMAC() const;
@@ -160,8 +165,8 @@ public:
     QAuthenticator getAuth() const;
     QAuthenticator getDefaultAuth() const;
 
-    virtual int httpPort() const;
-    virtual void setHttpPort(int newPort);
+    virtual std::uint16_t httpPort() const;
+    virtual void setHttpPort(std::uint16_t newPort);
 
     /* By default, it is rtsp port (554). */
     virtual int mediaPort() const;
@@ -697,6 +702,7 @@ public:
      */
     bool isBackupEnabled() const;
 
+    // TODO: #skolesnik nx::utils::Url ?
     virtual QString getUrl() const override;
 
     nx::vms::api::CameraAttributesData getUserAttributes() const;
@@ -940,11 +946,11 @@ private:
     unsigned int m_networkTimeout = 1000 * 10;
 
     // Initialized in cpp to avoid transitional includes.
-    int m_httpPort;
+    std::uint16_t m_httpPort;
 
     QDateTime m_lastDiscoveredTime;
 
-    nx::utils::CachedValue<QString> m_cachedHostAddress;
+    nx::utils::CachedValue<nx::network::HostAddress> m_cachedHostAddress;
 private:
     /** Identifier of the type of this Device. */
     nx::Uuid m_typeId;

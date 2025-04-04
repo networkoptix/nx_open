@@ -219,7 +219,7 @@ void DirectSystemFinder::updateServerInternal(
 
     auto updatedModule = module;
     updatedModule.endpoint = nx::network::url::getEndpoint(serverHost);
-    NX_ASSERT(!updatedModule.endpoint.address.toString().empty());
+    NX_ASSERT(!updatedModule.endpoint.address.isEmpty());
     updatePrimaryAddress(updatedModule);
 }
 

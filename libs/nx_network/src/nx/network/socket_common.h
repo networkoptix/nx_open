@@ -20,12 +20,7 @@
 #include <string>
 #include <string_view>
 
-#include <stdint.h>
-
-#include <QtCore/QString>
-#include <QtCore/QtEndian>
-#include <QtCore/QtGlobal>
-#include <QtNetwork/QHostAddress>
+#include <cstdint>
 
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/tags.h>
@@ -41,6 +36,9 @@ NX_NETWORK_API bool operator==(const in6_addr& left, const in6_addr& right);
 
 // Needed for compatibility with nx_fusion.
 // Luckily, custom nx_fusion serialization support does not require dependency on nx_fusion itself.
+class QHostAddress;
+class QJsonValue;
+class QString;
 class QnJsonContext;
 
 namespace nx::utils { class Url; }
@@ -202,7 +200,7 @@ NX_NETWORK_API void PrintTo(const HostAddress& val, ::std::ostream* os);
 
 //-------------------------------------------------------------------------------------------------
 
-static constexpr quint16 kAnyPort = 0;
+static constexpr std::uint16_t kAnyPort = 0;
 
 /**
  * Represents host and port (e.g. 127.0.0.1:1234).
@@ -211,13 +209,14 @@ class NX_NETWORK_API SocketAddress
 {
 public:
     HostAddress address = HostAddress::anyHost;
-    quint16 port = kAnyPort;
+    std::uint16_t port = kAnyPort;
 
     SocketAddress() = default;
     SocketAddress(const SocketAddress&) = default;
+
     SocketAddress(SocketAddress&&) = default;
 
-    SocketAddress(const HostAddress& address, quint16 port);
+    SocketAddress(const HostAddress& address, std::uint16_t port);
     SocketAddress(const std::string_view& endpointStr);
     SocketAddress(const char* endpointStr);
 
@@ -253,6 +252,7 @@ public:
     static const SocketAddress anyPrivateAddressV6;
 
     static std::string_view trimIpV6(const std::string_view& str);
+
     static SocketAddress fromString(const std::string_view& str);
     static SocketAddress fromUrl(const nx::utils::Url& url, bool useDefaultPortFromScheme = false);
 
@@ -269,12 +269,6 @@ public:
     static std::pair<std::string_view, std::optional<int>> split(const std::string& str);
     static std::pair<std::string_view, std::optional<int>> split(std::string&& str) = delete;
 };
-
-// TODO: #akolesnikov Remove this function.
-inline size_t qHash(const SocketAddress &address)
-{
-    return qHash(QString::fromStdString(address.address.toString()), address.port);
-}
 
 NX_NETWORK_API void PrintTo(const SocketAddress& val, ::std::ostream* os);
 
@@ -336,8 +330,8 @@ template <> struct hash<nx::network::SocketAddress>
 
 } // namespace std
 
-inline unsigned long long qn_htonll(unsigned long long value) { return qToBigEndian(value); }
-inline unsigned long long qn_ntohll(unsigned long long value) { return qFromBigEndian(value); }
+NX_NETWORK_API unsigned long long qn_htonll(unsigned long long value);
+NX_NETWORK_API unsigned long long qn_ntohll(unsigned long long value);
 
 /* Note that we have to use #defines here so that these functions work even if
  * they are also defined in system network headers. */

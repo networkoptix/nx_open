@@ -1264,6 +1264,7 @@ std::string RtspResourceStreamProvider::timeHelperKey() const
 
 void RtspResourceStreamProvider::updateStreamUrlIfNeeded()
 {
+    // TODO: #skolesnik nx::network::url::Builder() ?
     int mediaPort = m_resource->mediaPort();
     if (m_request.startsWith("rtsp://") || m_request.startsWith("rtsps://"))
     {
@@ -1275,7 +1276,7 @@ void RtspResourceStreamProvider::updateStreamUrlIfNeeded()
     {
         m_url.clear();
         m_url.setScheme("rtsp");
-        m_url.setHost(m_resource->getHostAddress());
+        m_url.setHost(m_resource->getHostAddress().toString());
         m_url.setPort(mediaPort ? mediaPort : nx::network::rtsp::DEFAULT_RTSP_PORT);
 
         if (!m_request.isEmpty())

@@ -2,6 +2,8 @@
 
 #include "message_serializer.h"
 
+#include <QtCore/QtEndian>
+
 #include <bitset>
 
 #include <boost/crc.hpp>

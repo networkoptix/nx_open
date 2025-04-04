@@ -100,7 +100,7 @@ Matches matchSearchWords(const QStringList& searchWords, const QnResourcePtr& re
             checkParameter(Parameter::id, camera->getId().toSimpleString(), kIdMatchLength);
             checkParameter(Parameter::id, camera->getId().toString(QUuid::WithBraces), kIdMatchLength);
             checkParameter(Parameter::mac, camera->getMAC().toString());
-            checkParameter(Parameter::host, camera->getHostAddress());
+            checkParameter(Parameter::host, QString::fromStdString(camera->getHostAddress().toString()));
             checkParameter(Parameter::model, camera->getModel());
             checkParameter(Parameter::vendor, camera->getVendor());
             checkParameter(Parameter::firmware, camera->getFirmware());

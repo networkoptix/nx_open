@@ -6,6 +6,8 @@
 
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
+#include <QtCore/QString>
+#include <QtNetwork/QHostAddress>
 
 #include <nx/network/http/http_types.h>
 #include <nx/utils/timer_manager.h>
@@ -470,7 +472,7 @@ void PrintTo(const HostAddress& val, ::std::ostream* os)
 //-------------------------------------------------------------------------------------------------
 // SocketAddress
 
-SocketAddress::SocketAddress(const HostAddress& address, quint16 port):
+SocketAddress::SocketAddress(const HostAddress& address, std::uint16_t port):
     address(address),
     port(port)
 {
@@ -724,3 +726,6 @@ void PrintTo(const KeepAliveOptions& val, ::std::ostream* os)
 }
 
 } // namespace nx::network
+
+unsigned long long qn_htonll(unsigned long long value) { return qToBigEndian(value); }
+unsigned long long qn_ntohll(unsigned long long value) { return qFromBigEndian(value); }

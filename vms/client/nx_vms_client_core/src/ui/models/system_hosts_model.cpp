@@ -35,12 +35,12 @@ QSet<nx::utils::Url> formAdditionalUrlsSet(
     {
         nx::utils::Url localhostUrl;
         localhostUrl.setScheme("https");
-        localhostUrl.setHost(nx::network::HostAddress::localhost.toString());
+        localhostUrl.setHost(nx::network::HostAddress::localhost);
         localhostUrl.setPort(mainServerUrl.port());
 
         nx::utils::Url localhostIpUrl;
         localhostIpUrl.setScheme("https");
-        localhostIpUrl.setHost(QHostAddress(QHostAddress::LocalHost).toString());
+        localhostIpUrl.setHost(nx::network::HostAddress::localhost);
         localhostIpUrl.setPort(mainServerUrl.port());
 
         return systemDescription->getServerRemoteAddresses(serverId)

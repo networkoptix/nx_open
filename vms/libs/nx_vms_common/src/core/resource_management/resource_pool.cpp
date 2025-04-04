@@ -424,7 +424,7 @@ QnResourceList QnResourcePool::getResourcesByParentId(const nx::Uuid& parentId) 
 }
 
 QnVirtualCameraResourceList QnResourcePool::getAllNetResourceByHostAddress(
-    const nx::String& hostAddress) const
+    const nx::network::HostAddress& hostAddress) const
 {
     return getResources<QnVirtualCameraResource>(
         [&hostAddress](const QnVirtualCameraResourcePtr& resource)

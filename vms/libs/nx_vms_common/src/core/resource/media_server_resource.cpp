@@ -391,7 +391,7 @@ void QnMediaServerResource::setPrimaryAddress(const nx::network::SocketAddress& 
             return;
 
         m_primaryAddress = primaryAddress;
-        NX_ASSERT(!m_primaryAddress.address.toString().empty());
+        NX_ASSERT(!m_primaryAddress.address.isEmpty());
     }
 
     emit primaryAddressChanged(toSharedPointer(this));

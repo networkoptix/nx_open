@@ -31,7 +31,7 @@ public:
         const nx::Uuid& serverId, const nx::network::SocketAddress& endpoint)
     {
         nx::utils::Url url;
-        url.setHost(endpoint.address.toString());
+        url.setHost(endpoint.address);
         url.setPort(endpoint.port);
         return makeAdapterFunc(serverId, url);
     }

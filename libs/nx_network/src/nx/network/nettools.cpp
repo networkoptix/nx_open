@@ -18,8 +18,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
-#include "ping.h"
-
 #if defined(Q_OS_LINUX)
     #include <netdb.h>
 

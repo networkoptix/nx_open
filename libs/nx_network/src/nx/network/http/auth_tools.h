@@ -10,14 +10,14 @@
 #include <optional>
 #include <string>
 
-#include <QtCore/QString>
-
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
 #include "../app_info.h"
 #include "http_types.h"
+
+class QAuthenticator;
 
 namespace nx::network::http {
 

@@ -2835,7 +2835,7 @@ bool setupAuth(
                 return false;
 
             const auto address = connection->address();
-            request.url.setHost(address.address.toString());
+            request.url.setHost(address.address);
             if ((int16_t) address.port != -1)
                 request.url.setPort(address.port);
         }
@@ -2854,7 +2854,7 @@ bool setupAuth(
     }
     else if (!route.addr.isNull())
     {
-        request.url.setHost(route.addr.address.toString());
+        request.url.setHost(route.addr.address);
         request.url.setPort(route.addr.port);
     }
 

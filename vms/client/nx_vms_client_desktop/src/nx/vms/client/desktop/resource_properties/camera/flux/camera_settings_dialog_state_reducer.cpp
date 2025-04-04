@@ -27,9 +27,9 @@
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/rtp_types.h>
+#include <nx/vms/client/core/analytics/analytics_settings_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/core/analytics/analytics_settings_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/utils/camera_hotspots_support.h>
 #include <utils/camera/camera_bitrate_calculator.h>

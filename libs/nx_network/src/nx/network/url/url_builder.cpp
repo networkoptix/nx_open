@@ -51,6 +51,13 @@ Builder& Builder::setPassword(const QString& password, QUrl::ParsingMode mode)
     return *this;
 }
 
+Builder& Builder::setHost(const nx::network::HostAddress &hostAddress)
+{
+    m_url.setHost(hostAddress.toString(), QUrl::DecodedMode);
+    setPath(m_url.path().toStdString());
+    return *this;
+}
+
 Builder& Builder::setHost(const QString& host, QUrl::ParsingMode mode)
 {
     m_url.setHost(host, mode);
@@ -64,9 +71,9 @@ Builder& Builder::setPort(int port)
     return *this;
 }
 
-Builder& Builder::setEndpoint(const SocketAddress& endpoint, QUrl::ParsingMode mode)
+Builder& Builder::setEndpoint(const SocketAddress& endpoint)
 {
-    setHost(endpoint.address.toString(), mode);
+    setHost(endpoint.address);
     if (endpoint.port > 0)
         m_url.setPort(endpoint.port);
     return *this;

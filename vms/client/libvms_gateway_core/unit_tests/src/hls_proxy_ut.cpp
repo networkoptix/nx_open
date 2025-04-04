@@ -85,7 +85,7 @@ protected:
 
         if (chunkUrl.host().isEmpty())
         {
-            chunkUrl.setHost(moduleInstance()->impl()->httpEndpoints()[0].address.toString());
+            chunkUrl.setHost(moduleInstance()->impl()->httpEndpoints()[0].address);
             chunkUrl.setPort(moduleInstance()->impl()->httpEndpoints()[0].port);
             chunkUrl.setScheme("http");
         }

@@ -3,6 +3,7 @@
 #include "merge_systems_dialog.h"
 #include "ui_merge_systems_dialog.h"
 
+#include <QtNetwork/QHostAddress>
 #include <QtWidgets/QButtonGroup>
 
 #include <api/server_rest_connection.h>

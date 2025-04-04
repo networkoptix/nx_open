@@ -230,7 +230,7 @@ void Builder::configureServerUrls(Context* ctx, bool sslRequired)
             urls.begin(), urls.end(),
             [&endpoint](auto& url)
             {
-                url.setHost(endpoint.address.toString());
+                url.setHost(endpoint.address);
                 if (endpoint.port > 0)
                     url.setPort(endpoint.port);
                 if (endpoint.port == 443)

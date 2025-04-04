@@ -56,7 +56,7 @@ QString firstResourceIp(const QnResourcePool* pool, const QnLegacyAuditRecord *d
     if (d1->resources.empty())
         return QString{};
     if (QnVirtualCameraResourcePtr res = pool->getResourceById<QnVirtualCameraResource>(d1->resources[0]))
-        return res->getHostAddress();
+        return QString::fromStdString(res->getHostAddress().toString());
     else
         return QString{};
 }
