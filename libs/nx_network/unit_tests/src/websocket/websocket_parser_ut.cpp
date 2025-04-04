@@ -23,8 +23,9 @@ static nx::Buffer prepareMessage(
 {
     Serializer serializer(masked, mask);
     NX_ASSERT(frameCount > 0);
+    auto compression = Serializer::defaultCompression(compressionType, type);
     if (frameCount == 1)
-        return serializer.prepareMessage(payload, type, compressionType);
+        return serializer.prepareMessage(payload, type, compression);
 
     nx::Buffer result;
     for (int i = 0; i < frameCount; ++i)
@@ -33,7 +34,7 @@ static nx::Buffer prepareMessage(
         if (i > 0)
             opCode = FrameType::continuation;
 
-        result += serializer.prepareFrame(payload, opCode, i == frameCount - 1);
+        result += serializer.prepareFrame(payload, opCode, i == frameCount - 1, compression);
     }
 
     return result;

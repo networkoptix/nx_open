@@ -8,7 +8,6 @@
 namespace nx::utils::bstream::gzip {
 
 static constexpr int kOutputBufferSize = 16 * 1024;
-static constexpr int kDeflateWindowSize = 15; //< Max window size.
 
 class Uncompressor::Private
 {
@@ -49,8 +48,8 @@ bool Uncompressor::processData(const ConstBufferRefType& data)
     if (data.empty())
         return true;
 
-    bool isFirstInflateAttempt = true;
-    int zFlushMode = Z_NO_FLUSH;
+    bool isFirstInflateAttempt = d->method == Method::gzip;
+    int zFlushMode = d->method == Method::gzip ? Z_NO_FLUSH : Z_SYNC_FLUSH;
 
     d->zStream.next_in = (Bytef*) data.data();
     d->zStream.avail_in = (uInt) data.size();
@@ -63,13 +62,14 @@ bool Uncompressor::processData(const ConstBufferRefType& data)
         switch (d->state)
         {
             case Private::State::init:
-            case Private::State::done: //< To support stream of gzipped files.
-                // 32 is added for automatic zlib header detection, see
-                // http://www.zlib.net/manual.html#Advanced.
+            case Private::State::done:
                 inflateEnd(&d->zStream);
+
+                // 32 is added to support stream of gzipped files for automatic zlib header
+                // detection. Using negative windowBits parameter turns off looking for header.
+                // See http://www.zlib.net/manual.html#Advanced.
                 zResult = inflateInit2(
-                    &d->zStream,
-                    d->method == Method::gzip ? (32 + MAX_WBITS) : -kDeflateWindowSize);
+                    &d->zStream, d->method == Method::gzip ? (32 + MAX_WBITS) : -MAX_WBITS);
                 NX_ASSERT(zResult == Z_OK);
                 d->state = Private::State::inProgress;
                 continue;
@@ -86,13 +86,11 @@ bool Uncompressor::processData(const ConstBufferRefType& data)
                     isFirstInflateAttempt = false;
                     // Some servers seem to not generate zlib headers, try to decompress
                     // headless. This code is similar to the code in the curl utility.
-                    if (zResult == Z_DATA_ERROR)
+                    if (zResult != Z_OK && zResult != Z_STREAM_END)
                     {
                         inflateEnd(&d->zStream);
                         d->zStream.next_in = (Bytef*) data.data();
                         d->zStream.avail_in = (uInt) data.size();
-                        // Using negative windowBits parameter turns off looking for
-                        // header, see http://www.zlib.net/manual.html#Advanced
                         zResult = inflateInit2(&d->zStream, -MAX_WBITS);
                         NX_ASSERT(zResult == Z_OK);
                         continue;

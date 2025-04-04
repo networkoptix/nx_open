@@ -112,7 +112,6 @@ private:
     std::queue<std::pair<IoCompletionHandler, nx::Buffer>> m_writeQueue;
     UserReadContextPtr m_userReadContext;
     websocket::MultiBuffer m_incomingMessageQueue;
-    nx::Buffer m_controlBuffer;
     nx::Buffer m_readBuffer;
     std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
     std::unique_ptr<nx::network::aio::Timer> m_pongTimer;
@@ -120,7 +119,7 @@ private:
     nx::utils::InterruptionFlag m_destructionFlag;
     bool m_failed = false;
     FrameType m_defaultFrameType;
-    network::websocket::CompressionType m_compressionType;
+    std::optional<Serializer::Compression> m_compression;
     bool m_readingCeased = false;
     bool m_pingPongDisabled = false;
     QString m_lastErrorMessage;

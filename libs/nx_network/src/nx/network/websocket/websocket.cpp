@@ -29,11 +29,8 @@ WebSocket::WebSocket(
     m_pingTimer(new nx::network::aio::Timer),
     m_pongTimer(new nx::network::aio::Timer),
     m_aliveTimeout(kAliveTimeout),
-    m_defaultFrameType(
-        frameType == FrameType::binary || frameType == FrameType::text
-            ? frameType
-            : FrameType::binary),
-    m_compressionType(compressionType)
+    m_defaultFrameType(frameType == FrameType::text ? FrameType::text : FrameType::binary),
+    m_compression(Serializer::defaultCompression(compressionType, frameType))
 {
     SocketGlobals::instance().allocationAnalyzer().recordObjectCreation(this);
     ++SocketGlobals::instance().debugCounters().websocketConnectionCount;
@@ -279,12 +276,13 @@ void WebSocket::sendAsync(Frame&& frame, IoCompletionHandler handler)
             nx::Buffer writeBuffer;
             if (m_sendMode == SendMode::singleMessage)
             {
-                writeBuffer = m_serializer.prepareMessage(frame.buffer, frame.type, m_compressionType);
+                writeBuffer = m_serializer.prepareMessage(frame.buffer, frame.type, m_compression);
             }
             else
             {
                 FrameType type = !m_isFirstFrame ? FrameType::continuation : frame.type;
-                writeBuffer = m_serializer.prepareFrame(frame.buffer, type, m_isLastFrame);
+                writeBuffer =
+                    m_serializer.prepareFrame(frame.buffer, type, m_isLastFrame, m_compression);
                 m_isFirstFrame = m_isLastFrame;
                 if (m_isLastFrame)
                     m_isLastFrame = false;
@@ -431,7 +429,6 @@ void WebSocket::gotFrame(FrameType type, nx::Buffer&& data, bool fin)
                 sendControlResponse(FrameType::pong);
             break;
         case FrameType::pong:
-            NX_ASSERT(m_controlBuffer.empty());
             break;
         case FrameType::close:
             sendControlResponse(FrameType::close);
@@ -448,9 +445,7 @@ void WebSocket::gotFrame(FrameType type, nx::Buffer&& data, bool fin)
 
 void WebSocket::sendControlResponse(FrameType type)
 {
-    nx::Buffer responseFrame =
-        m_serializer.prepareMessage(m_controlBuffer, type, m_compressionType);
-    m_controlBuffer.resize(0);
+    nx::Buffer responseFrame = m_serializer.prepareMessage({}, type);
 
     sendMessage(
         responseFrame, responseFrame.size(),
@@ -466,7 +461,7 @@ void WebSocket::sendControlResponse(FrameType type)
 
 void WebSocket::sendControlRequest(FrameType type)
 {
-    nx::Buffer requestFrame = m_serializer.prepareMessage("", type, m_compressionType);
+    nx::Buffer requestFrame = m_serializer.prepareMessage({}, type);
     sendMessage(
         requestFrame, requestFrame.size(),
         [this, type](SystemError::ErrorCode error, size_t /*transferred*/)

@@ -2,11 +2,12 @@
 
 #include "websocket_serializer.h"
 
-#include <nx/network/socket_common.h>
-#include <nx/utils/random.h>
-#include <nx/utils/gzip/gzip_compressor.h>
-
 #include <stdint.h>
+#include <zlib.h>
+
+#include <nx/network/socket_common.h>
+#include <nx/utils/gzip/gzip_compressor.h>
+#include <nx/utils/random.h>
 
 namespace nx::network::websocket {
 
@@ -33,35 +34,118 @@ static int payloadLenTypeByLen(int64_t len)
 
 } // namespace <anonymous>
 
+struct Serializer::Private
+{
+    z_stream stream{};
+    const int initError;
+
+    Private():
+        initError(deflateInit2(
+            &stream,
+            Z_DEFAULT_COMPRESSION,
+            Z_DEFLATED,
+            -MAX_WBITS,
+            MAX_MEM_LEVEL,
+            Z_DEFAULT_STRATEGY))
+    {
+    }
+
+    ~Private()
+    {
+        if (initError == Z_OK)
+            deflateEnd(&stream);
+    }
+
+    nx::Buffer compress(nx::Buffer payload)
+    {
+        if (initError != Z_OK)
+            return payload;
+
+        static constexpr size_t kSyncTailLength = 4;
+        nx::Buffer output;
+        output.resize(deflateBound(&stream, (uLong) payload.size()) + kSyncTailLength);
+        stream.next_in = (Bytef*) payload.data();
+        stream.avail_in = (uInt) payload.size();
+        stream.next_out = (Bytef*) output.data();
+        stream.avail_out = (uInt) output.size();
+        if (deflate(&stream, Z_SYNC_FLUSH) != Z_OK)
+            return payload;
+
+        if (stream.avail_in == 0)
+        {
+            output.resize(output.size() - (size_t) stream.avail_out - kSyncTailLength);
+            return output;
+        }
+        return payload;
+    }
+};
+
 Serializer::Serializer(bool masked, unsigned mask)
 {
     setMasked(masked, mask);
 }
 
+Serializer::~Serializer() = default;
+
 nx::Buffer Serializer::prepareMessage(
-    const nx::Buffer& payload, FrameType type, CompressionType compressionType)
+    const nx::Buffer& payload, FrameType type, std::optional<Compression> compression)
 {
-    m_doCompress = shouldMessageBeCompressed(type, compressionType, payload.size());
-    return prepareFrame(payload, type, /*fin*/true);
+    return prepareFrame(payload, type, /*fin*/ true, std::move(compression));
 }
 
-nx::Buffer Serializer::prepareFrame(nx::Buffer payload, FrameType type, bool fin)
+nx::Buffer Serializer::prepareFrame(
+    nx::Buffer payload, FrameType type, bool fin, std::optional<Compression> compression)
 {
-    if (m_doCompress)
+    if (!isDataFrame(type))
+        compression.reset();
+
+    if (compression)
     {
-        payload = nx::utils::bstream::gzip::Compressor::deflateData(std::move(payload));
-        /* https://datatracker.ietf.org/doc/html/rfc7692#section-7.2.3.4
-         * deflateData() generates DEFLATE block with BFINAL bit set.
-         * Such payload should be flushed with empty uncompressed DEFLATE block with BFINAL set to 0.
-         * */
-        payload.append("\x0", 1);
+        switch (*compression)
+        {
+            case Compression::gzip:
+            {
+                constexpr int kCompressionMessageThreshold = 64;
+                if (payload.size() <= kCompressionMessageThreshold)
+                {
+                    compression.reset();
+                }
+                else
+                {
+                    payload =
+                        nx::utils::bstream::gzip::Compressor::deflateData(std::move(payload));
+                    /* https://datatracker.ietf.org/doc/html/rfc7692#section-7.2.3.4
+                     * deflateData() generates DEFLATE block with BFINAL bit set. Such payload
+                     * should be flushed with empty uncompressed DEFLATE block with BFINAL set to 0.
+                     */
+                    payload.append('\x00');
+                }
+                break;
+            }
+            case Compression::deflate:
+                if (payload.empty())
+                {
+                    compression.reset();
+                }
+                else
+                {
+                    if (!d)
+                        d = std::make_unique<Private>();
+                    payload = d->compress(std::move(payload));
+                }
+                break;
+            default:
+                NX_ASSERT(false, "Unsupported compression %1", (int) *compression);
+                compression.reset();
+                break;
+        }
     }
 
     nx::Buffer header;
     int payloadLenType = payloadLenTypeByLen(payload.size());
     header.resize(calcHeaderSize(m_masked, payloadLenType));
     memset(header.data(), 0, header.size());
-    fillHeader(header.data(), fin, type, payloadLenType, payload.size());
+    fillHeader(header.data(), fin, type, payloadLenType, payload.size(), compression.has_value());
 
     if (m_masked)
     {
@@ -82,14 +166,14 @@ void Serializer::setMasked(bool masked, unsigned mask)
 }
 
 int Serializer::fillHeader(
-    char* data, bool fin, FrameType opCode, int payloadLenType, int payloadLen)
+    char* data, bool fin, FrameType opCode, int payloadLenType, int payloadLen, bool compression)
 {
     char* pdata = data;
 
     if (fin)
         *pdata |= 1 << 7;
 
-    if (m_doCompress)
+    if (compression && (opCode == FrameType::binary || opCode == FrameType::text))
         *pdata |= 1 << 6; //< Setting the RSV1 bit
 
     *pdata |= opCode & 0xf;

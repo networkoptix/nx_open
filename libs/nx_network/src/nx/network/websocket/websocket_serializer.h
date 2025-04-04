@@ -12,17 +12,40 @@ class NX_NETWORK_API Serializer
 {
 public:
     Serializer(bool masked, unsigned mask = 0);
+    ~Serializer();
 
-    nx::Buffer prepareMessage(const nx::Buffer& payload, FrameType type, CompressionType compressionType);
-    nx::Buffer prepareFrame(nx::Buffer payload, FrameType type, bool fin);
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Compression, gzip, deflate)
+
+    static std::optional<Compression> defaultCompression(
+        CompressionType compressionType, FrameType frameType)
+    {
+        return
+            compressionType == CompressionType::none
+                ? std::nullopt
+                : frameType == FrameType::text
+                    ? std::optional<Compression>{Compression::deflate}
+                    : std::optional<Compression>{Compression::gzip};
+    }
+
+    nx::Buffer prepareMessage(
+        const nx::Buffer& payload, FrameType type, std::optional<Compression> compression = {});
+    nx::Buffer prepareFrame(
+        nx::Buffer payload, FrameType type, bool fin, std::optional<Compression> compression);
 
 private:
+    struct Private;
+    std::unique_ptr<Private> d;
     bool m_masked = false;
-    bool m_doCompress = false;
     unsigned m_mask = 0;
 
     void setMasked(bool masked, unsigned mask = 0);
-    int fillHeader(char* data, bool fin, FrameType opCode, int payloadLenType, int payloadLen);
+    int fillHeader(
+        char* data,
+        bool fin,
+        FrameType opCode,
+        int payloadLenType,
+        int payloadLen,
+        bool compression);
 };
 
 

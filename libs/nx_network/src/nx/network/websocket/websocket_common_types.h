@@ -2,11 +2,7 @@
 
 #pragma once
 
-#include <functional>
 #include <string>
-
-#include <nx/utils/move_only_func.h>
-#include <nx/utils/system_error.h>
 
 namespace nx::network::websocket {
 
@@ -96,23 +92,6 @@ inline bool isDataFrame(FrameType frameType)
     return frameType == FrameType::binary
         || frameType == FrameType::text
         || frameType == FrameType::continuation;
-}
-
-/**
- * If message size is less than this constant, the message won't be compressed even if the
- * PerMessageDeflate mode is enabled
- */
-constexpr int kCompressionMessageThreshold = 64;
-
-inline bool shouldMessageBeCompressed(
-    FrameType frameType,
-    CompressionType compressionType,
-    int payloadLen)
-{
-    if (!isDataFrame(frameType) || compressionType == CompressionType::none)
-        return false;
-
-    return payloadLen > kCompressionMessageThreshold;
 }
 
 } // namespace nx::network::websocket

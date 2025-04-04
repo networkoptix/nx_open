@@ -152,18 +152,9 @@ void Parser::handleFrame()
         }
         else
         {
+            m_frameBuffer.append("\x00\x00\xff\xff", 4);
             m_uncompressor.processData(m_frameBuffer);
             m_frameBuffer = m_uncompressed;
-
-            if (m_fin)
-            {
-                // https://datatracker.ietf.org/doc/html/rfc7692#section-7.2.2
-                // Block with "\x00\x00\xff\xff" should be inflated in separate call of 'inflate()',
-                // this logic is copied from Chromium sources.
-                static const nx::Buffer buf("\x00\x00\xff\xff", 4);
-                m_uncompressor.processData(buf);
-            }
-
             m_uncompressed.clear();
         }
     }

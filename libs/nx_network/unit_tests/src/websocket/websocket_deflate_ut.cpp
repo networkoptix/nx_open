@@ -25,11 +25,10 @@ TEST(Websockets, DeflateCompressDecompressWithContext)
             ASSERT_EQ(type, FrameType::binary);
         });
     auto test =
-        [&](size_t size)
+        [&](auto size, auto compression)
         {
             auto buf = nx::utils::random::generate(size);
-            auto message = serializer.prepareMessage(
-                buf, FrameType::binary, CompressionType::perMessageDeflate);
+            auto message = serializer.prepareMessage(buf, FrameType::binary, compression);
             parser.consume(message);
             ASSERT_EQ(outputBuffer.size(), buf.size());
             nx::utils::QnCryptographicHash hash1(nx::utils::QnCryptographicHash::Algorithm::Sha256);
@@ -41,8 +40,12 @@ TEST(Websockets, DeflateCompressDecompressWithContext)
             ASSERT_EQ(fingerprint1, fingerprint2);
             outputBuffer.clear();
         };
-    for (size_t size = 16; size < 1024 * 1024 * 16; size = size * 2)
+    for (auto type: {Serializer::Compression::gzip, Serializer::Compression::deflate})
     {
-        test(size);
+        for (size_t size = 16; size < 1024 * 1024 * 16; size = size * 2)
+        {
+            SCOPED_TRACE(NX_FMT("size: %1, type: %2", size, type).toStdString());
+            test(size, type);
+        }
     }
 }
