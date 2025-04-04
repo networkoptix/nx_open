@@ -81,6 +81,11 @@ void QnAbstractDataConsumer::runCycle()
         QnSleep::msleep(kNoDataDelayIntervalMs);
         return;
     }
+    processDataCycle(data);
+}
+
+void QnAbstractDataConsumer::processDataCycle(const QnAbstractDataPacketPtr& data)
+{
     while(!needToStop())
     {
         if (processData(data))

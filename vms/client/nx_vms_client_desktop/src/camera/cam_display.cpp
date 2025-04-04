@@ -1761,7 +1761,13 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
                 if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed && !m_afterJump)
                     m_singleShotQuantProcessed = true;
             }
-
+            if (result
+                && !m_videoQueue[channel].isEmpty()
+                && m_videoQueue[channel].front()->timestamp < m_audioDisplay->getCurrentTime())
+            {
+                // Take one more video frame from the buffer
+                processDataCycle(dequeueVideo(channel));
+            }
         }
 
         return result;
