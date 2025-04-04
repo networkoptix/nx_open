@@ -2483,6 +2483,10 @@ Press Alt + Click to follow object</source>
       <source>Accept API Integrations registration requests</source>
       <translation>接受 API 整合註冊請求</translation>
     </message>
+    <message>
+      <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
+      <translation type="unfinished">Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</translation>
+    </message>
   </context>
   <context>
     <name>SizeConstraints</name>

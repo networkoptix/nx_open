@@ -64,6 +64,13 @@
     </message>
   </context>
   <context>
+    <name>CustomerSupport</name>
+    <message>
+      <source>your Regional / License support</source>
+      <translation type="unfinished">your Regional / License support</translation>
+    </message>
+  </context>
+  <context>
     <name>HumanReadable</name>
     <message>
       <source>B</source>
@@ -1919,7 +1926,7 @@
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
-      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+      <translation>SMTP-asetukset. Nämä asetukset näkyvät vain tehokäyttäjille.</translation>
     </message>
   </context>
 </TS>

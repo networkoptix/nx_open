@@ -898,7 +898,7 @@
     </message>
     <message>
       <source>NEW</source>
-      <translation type="unfinished">NEW</translation>
+      <translation>UUSI</translation>
     </message>
   </context>
   <context>

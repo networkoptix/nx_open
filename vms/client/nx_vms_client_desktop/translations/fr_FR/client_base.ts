@@ -6757,8 +6757,8 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Pour effectuer une sauvegarde sur un stockage cloud, le site doit être dans un état actif. %1</translation>
     </message>
     <message>
-      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</translation>
+      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
+      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
     </message>
   </context>
   <context>
@@ -8593,6 +8593,17 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Failed to merge %1 to our site.</source>
       <translation>Impossible de fusionner %1 vers notre site.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::IntegrationSettingsWatcher</name>
+    <message>
+      <source>API Integrations approval requests are permitted</source>
+      <translation type="unfinished">API Integrations approval requests are permitted</translation>
+    </message>
+    <message>
+      <source>API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</source>
+      <translation type="unfinished">API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</translation>
     </message>
   </context>
   <context>

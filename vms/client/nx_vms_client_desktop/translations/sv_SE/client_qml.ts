@@ -2499,6 +2499,10 @@ Tryck på Alt + Klicka för att följa objektet</translation>
       <source>Accept API Integrations registration requests</source>
       <translation>Acceptera registreringsförfrågningar för API-integrationer</translation>
     </message>
+    <message>
+      <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
+      <translation type="unfinished">Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</translation>
+    </message>
   </context>
   <context>
     <name>SizeConstraints</name>

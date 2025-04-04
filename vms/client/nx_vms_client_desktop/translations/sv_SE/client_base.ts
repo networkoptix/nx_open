@@ -6757,8 +6757,8 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>För att säkerhetskopiera till en molnlagring bör systemet vara i aktivt tillstånd. %1</translation>
     </message>
     <message>
-      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</source>
-      <translation>Säkerhetskopiering till molnet fortsätter, men platsen är för närvarande avstängd. Den måste vara aktiv för att ändra säkerhetskopieringskonfigurationen eller för att aktivera molnlagringsplats. %1</translation>
+      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
+      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
     </message>
   </context>
   <context>
@@ -8593,6 +8593,17 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Failed to merge %1 to our site.</source>
       <translation>Misslyckades att slå ihop %1 till vår plats.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::IntegrationSettingsWatcher</name>
+    <message>
+      <source>API Integrations approval requests are permitted</source>
+      <translation type="unfinished">API Integrations approval requests are permitted</translation>
+    </message>
+    <message>
+      <source>API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</source>
+      <translation type="unfinished">API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</translation>
     </message>
   </context>
   <context>
@@ -12779,12 +12790,12 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
-      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
+      <translation>Antalet enheter som använder denna tjänst överskrider den tillgängliga kapaciteten. Lägg till fler tjänster eller inaktivera tjänsterna på vissa enheter.</translation>
     </message>
     <message>
       <source>On %1, the system will automatically disable the service on some devices.</source>
       <comment>%1 will be substituted with date and time</comment>
-      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
+      <translation>På %1kommer systemet automatiskt att inaktivera tjänsten på vissa enheter.</translation>
     </message>
   </context>
   <context>

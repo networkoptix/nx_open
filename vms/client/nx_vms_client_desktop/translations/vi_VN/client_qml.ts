@@ -2486,6 +2486,10 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
       <source>Accept API Integrations registration requests</source>
       <translation>Chấp nhận yêu cầu đăng ký tích hợp API</translation>
     </message>
+    <message>
+      <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
+      <translation type="unfinished">Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</translation>
+    </message>
   </context>
   <context>
     <name>SizeConstraints</name>

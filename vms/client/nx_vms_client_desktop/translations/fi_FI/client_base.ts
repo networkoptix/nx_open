@@ -6757,8 +6757,8 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <translation type="unfinished">To perform backup to a cloud storage, the Site should be in active state. %1</translation>
     </message>
     <message>
-      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</translation>
+      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
+      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
     </message>
   </context>
   <context>
@@ -8596,6 +8596,17 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::IntegrationSettingsWatcher</name>
+    <message>
+      <source>API Integrations approval requests are permitted</source>
+      <translation type="unfinished">API Integrations approval requests are permitted</translation>
+    </message>
+    <message>
+      <source>API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</source>
+      <translation type="unfinished">API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::JumpToLiveButton</name>
     <message>
       <source>Go to Live</source>
@@ -9169,7 +9180,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
-      <translation type="unfinished">The user has been assigned to this group at organization level and can be unassigned only at organization level</translation>
+      <translation>Käyttäjä on määritetty tähän ryhmään organisaatiotasolla, ja hänen määritys voidaan poistaa vain organisaatiotasolla</translation>
     </message>
   </context>
   <context>

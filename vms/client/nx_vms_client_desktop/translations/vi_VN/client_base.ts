@@ -6646,8 +6646,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Để thực hiện sao lưu vào bộ nhớ đám mây, Chi nhánh phải ở trạng thái hoạt động. %1</translation>
     </message>
     <message>
-      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. %1</source>
-      <translation>Sao lưu đám mây vẫn tiếp tục, nhưng Chi nhánh hiện đang bị tạm dừng. Chi nhánh phải hoạt động để chỉnh cấu hình sao lưu hoặc để bật vị trí lưu trữ đám mây. %1</translation>
+      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
+      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
     </message>
   </context>
   <context>
@@ -8460,6 +8460,17 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Failed to merge %1 to our site.</source>
       <translation>Không thể hợp nhất %1 vào Chi nhánh của chúng tôi.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::IntegrationSettingsWatcher</name>
+    <message>
+      <source>API Integrations approval requests are permitted</source>
+      <translation type="unfinished">API Integrations approval requests are permitted</translation>
+    </message>
+    <message>
+      <source>API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</source>
+      <translation type="unfinished">API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</translation>
     </message>
   </context>
   <context>

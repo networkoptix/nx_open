@@ -2525,6 +2525,10 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
       <source>Accept API Integrations registration requests</source>
       <translation>Akceptuj prośby o rejestrację integracji API</translation>
     </message>
+    <message>
+      <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
+      <translation type="unfinished">Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</translation>
+    </message>
   </context>
   <context>
     <name>SizeConstraints</name>
