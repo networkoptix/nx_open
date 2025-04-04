@@ -10,12 +10,14 @@
 
 #include <nx/build_info.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace nx::utils {
 
 // Counted list of registered directories. Each may be registered several times.
 static std::multiset<QString> g_registeredDirectories;
+static std::map<QString, QStringList> g_registeredAssets;
 
 /**
  * Avoid creating the mutex until other code needs it to allow ini tweaks to modify its
@@ -75,6 +77,8 @@ bool registerExternalResourceDirectory(const QString& directory)
     }
 
     const auto filenames = assetsDirectory.entryList(QDir::Filter::Files);
+    g_registeredAssets[directory] = filenames;
+
     return std::all_of(filenames.cbegin(), filenames.cend(),
         [&assetsDirectory](const auto& filename)
         {
@@ -101,14 +105,18 @@ bool unregisterExternalResourceDirectory(const QString& directory)
     }
 
     const auto filenames = assetsDirectory.entryList(QDir::Filter::Files);
+    NX_ASSERT(g_registeredAssets[directory] == filenames,
+        "Asset list has been changed in directory: %1. Old value: %2, new value: %3",
+        directory, g_registeredAssets[directory], filenames);
+
     bool result = std::all_of(filenames.cbegin(), filenames.cend(),
         [&assetsDirectory](const auto& filename)
         {
             const auto r = assetsDirectory.absoluteFilePath(filename);
-            return NX_ASSERT(
-                QResource::unregisterResource(r),
-                "Unable to unregister asset: %1",
-                r);
+            bool result = QResource::unregisterResource(r);
+            if (!result)
+                NX_ERROR(NX_SCOPE_TAG, "Unable to unregister asset: %1", r);
+            return result;
         });
 
     return result;
