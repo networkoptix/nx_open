@@ -1521,7 +1521,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation>有効なライセンスキーを取得するには、 %1 までご連絡ください。</translation>
+      <translation>有効なライセンスキーを取得するには、 %1 にお問い合わせください。</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
@@ -1533,7 +1533,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation>有効なライセンスキーを入手するには、地域/ライセンスサポートにお問い合わせください:</translation>
+      <translation>有効なライセンスキーを取得するには、地域/ライセンスサポートにお問い合わせください:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
@@ -4524,7 +4524,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation>不十分なサービス</translation>
+      <translation>サービスが不足しています</translation>
     </message>
     <message>
       <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
@@ -6506,7 +6506,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation>不十分なサービス</translation>
+      <translation>サービスが不足しています</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
@@ -6648,7 +6648,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>クラウドバックアップは継続されますが、サイトは現在サスペンドされています。&quot;バックアップ対象&quot; および &quot;ストリーム品質&quot; 設定の変更や、クラウドバックアップの有効化を行う場合は、サイトがアクティブである必要があります。無効化も可能です。%1</translation>
     </message>
   </context>
   <context>
@@ -8467,11 +8467,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::IntegrationSettingsWatcher</name>
     <message>
       <source>API Integrations approval requests are permitted</source>
-      <translation type="unfinished">API Integrations approval requests are permitted</translation>
+      <translation>APIインテグレーションの承認リクエストが許可されています。</translation>
     </message>
     <message>
       <source>API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</translation>
+      <translation>API インテグレーションの登録リクエストが有効になっています。安全策は講じられていますが、長時間の使用は推奨されません。すべての必要なインテグレーションのインストール完了後、このオプションの無効化をご検討ください。</translation>
     </message>
   </context>
   <context>

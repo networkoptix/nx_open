@@ -67,7 +67,7 @@
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation type="unfinished">your Regional / License support</translation>
+      <translation>support Regional / Lisensi</translation>
     </message>
   </context>
   <context>

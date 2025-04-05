@@ -465,12 +465,12 @@
     <message>
       <source>Device #%1: %2 (%3)</source>
       <comment>Device #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Device #%1: %2 (%3)</translation>
+      <translation>Thiết bị #%1: %2 (%3)</translation>
     </message>
     <message>
       <source>Camera #%1: %2 (%3)</source>
       <comment>Camera #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Camera #%1: %2 (%3)</translation>
+      <translation>Camera #%1: %2 (%3)</translation>
     </message>
   </context>
   <context>
@@ -556,7 +556,7 @@
     </message>
     <message>
       <source>Related devices:</source>
-      <translation type="unfinished">Related devices:</translation>
+      <translation>Thiết bị liên quan:</translation>
     </message>
     <message>
       <source>Related cameras:</source>
@@ -639,11 +639,11 @@
     </message>
     <message>
       <source>Integration Diagnostic at %1</source>
-      <translation type="unfinished">Integration Diagnostic at %1</translation>
+      <translation>Chẩn đoán tích hợp tại %1</translation>
     </message>
     <message>
       <source>Integration Diagnostic</source>
-      <translation type="unfinished">Integration Diagnostic</translation>
+      <translation>Chẩn đoán tích hợp</translation>
     </message>
   </context>
   <context>
@@ -681,7 +681,7 @@
     </message>
     <message>
       <source>LDAP Sync Issue at %1</source>
-      <translation type="unfinished">LDAP Sync Issue at %1</translation>
+      <translation>Sự cố đồng bộ LDAP tại %1</translation>
     </message>
     <message>
       <source>LDAP Sync Issue</source>
@@ -697,15 +697,15 @@
     <message>
       <source>Not enough licenses on %1</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">Not enough licenses on %1</translation>
+      <translation>Không đủ giấy phép trên %1</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Recording has been disabled on the following devices:</translation>
+      <translation>Tính năng ghi đã bị vô hiệu hóa trên các thiết bị sau:</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Recording has been disabled on the following cameras:</translation>
+      <translation>Tính năng ghi đã bị vô hiệu hóa trên các camera sau:</translation>
     </message>
   </context>
   <context>
@@ -977,7 +977,7 @@
     </message>
     <message>
       <source>Services Issue on %1</source>
-      <translation type="unfinished">Services Issue on %1</translation>
+      <translation>Sự cố dịch vụ trên %1</translation>
     </message>
   </context>
   <context>
@@ -1020,15 +1020,15 @@
     </message>
     <message>
       <source>Discovered a server with the same ID in the same local network</source>
-      <translation type="unfinished">Discovered a server with the same ID in the same local network</translation>
+      <translation>Đã phát hiện ra một máy chủ có cùng ID trong cùng một mạng cục bộ</translation>
     </message>
     <message>
       <source>Servers in the same local network have conflict on the following devices</source>
-      <translation type="unfinished">Servers in the same local network have conflict on the following devices</translation>
+      <translation>Các máy chủ trong cùng một mạng cục bộ có xung đột trên các thiết bị sau</translation>
     </message>
     <message>
       <source>Server: %1</source>
-      <translation type="unfinished">Server: %1</translation>
+      <translation>Máy chủ: %1</translation>
     </message>
   </context>
   <context>

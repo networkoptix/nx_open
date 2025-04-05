@@ -6647,7 +6647,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>Backup cloud terus berlanjut, tetapi Site saat ini ditangguhkan. Site harus aktif untuk mengubah pengaturan &quot;Apa yang akan dibackup&quot; dan &quot;Kualitas&quot; untuk perangkat, atau untuk mengaktifkan backup cloud. Anda juga dapat menonaktifkannya. %1</translation>
     </message>
   </context>
   <context>
@@ -8466,11 +8466,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::IntegrationSettingsWatcher</name>
     <message>
       <source>API Integrations approval requests are permitted</source>
-      <translation type="unfinished">API Integrations approval requests are permitted</translation>
+      <translation>Permintaan persetujuan Integrasi API diizinkan</translation>
     </message>
     <message>
       <source>API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</translation>
+      <translation>Permintaan pendaftaran Integrasi API diaktifkan. Meskipun ada pengamanan, penggunaan jangka panjang tidak disarankan. Pertimbangkan untuk menonaktifkan opsi ini setelah semua Integrasi yang diperlukan diinstal.</translation>
     </message>
   </context>
   <context>
@@ -12609,12 +12609,12 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
-      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
+      <translation>Jumlah perangkat yang menggunakan layanan ini melebihi kapasitas yang tersedia. Tambahkan lebih banyak layanan atau nonaktifkan layanan pada beberapa perangkat.</translation>
     </message>
     <message>
       <source>On %1, the system will automatically disable the service on some devices.</source>
       <comment>%1 will be substituted with date and time</comment>
-      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
+      <translation>Pada %1, sistem akan secara otomatis menonaktifkan layanan pada beberapa perangkat.</translation>
     </message>
   </context>
   <context>

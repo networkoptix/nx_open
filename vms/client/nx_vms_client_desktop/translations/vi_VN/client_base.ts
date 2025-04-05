@@ -6647,7 +6647,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>Sao lưu đám mây vẫn tiếp tục, nhưng Chi nhánh hiện đang bị tạm dừng. Phải kích hoạt để sửa đổi cài đặt &quot;Cái gì cần sao lưu&quot; và &quot;Chất lượng&quot; cho thiết bị hoặc để bật sao lưu đám mây. Bạn cũng có thể tắt nó. %1</translation>
     </message>
   </context>
   <context>
@@ -8466,11 +8466,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::IntegrationSettingsWatcher</name>
     <message>
       <source>API Integrations approval requests are permitted</source>
-      <translation type="unfinished">API Integrations approval requests are permitted</translation>
+      <translation>Yêu cầu phê duyệt tích hợp API được phép</translation>
     </message>
     <message>
       <source>API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</translation>
+      <translation>Yêu cầu đăng ký tích hợp API được bật. Mặc dù có biện pháp bảo vệ, nhưng không nên sử dụng kéo dài. Hãy cân nhắc tắt tùy chọn này sau khi tất cả các tích hợp cần thiết được cài đặt.</translation>
     </message>
   </context>
   <context>
@@ -12609,12 +12609,12 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
-      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
+      <translation>Số lượng thiết bị sử dụng dịch vụ này vượt quá dung lượng khả dụng. Thêm dịch vụ hoặc tắt dịch vụ trên một số thiết bị.</translation>
     </message>
     <message>
       <source>On %1, the system will automatically disable the service on some devices.</source>
       <comment>%1 will be substituted with date and time</comment>
-      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
+      <translation>Vào %1, hệ thống sẽ tự động vô hiệu hóa dịch vụ trên một số thiết bị.</translation>
     </message>
   </context>
   <context>

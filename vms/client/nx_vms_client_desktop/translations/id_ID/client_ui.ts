@@ -2079,16 +2079,16 @@
       <translation>Kontak Channel Partner</translation>
     </message>
     <message>
-      <source>Services Usage</source>
-      <translation>Penggunaan Layanan</translation>
-    </message>
-    <message>
       <source>Services state</source>
       <translation>Status layanan</translation>
     </message>
     <message>
       <source>Organization&apos;s limits violation</source>
       <translation>Batas pelanggaran organisasi&apos;</translation>
+    </message>
+    <message>
+      <source>Service Allocation</source>
+      <translation type="unfinished">Service Allocation</translation>
     </message>
   </context>
   <context>

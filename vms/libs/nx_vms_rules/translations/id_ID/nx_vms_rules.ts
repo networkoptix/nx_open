@@ -465,12 +465,12 @@
     <message>
       <source>Device #%1: %2 (%3)</source>
       <comment>Device #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Device #%1: %2 (%3)</translation>
+      <translation>Perangkat #%1: %2 (%3)</translation>
     </message>
     <message>
       <source>Camera #%1: %2 (%3)</source>
       <comment>Camera #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Camera #%1: %2 (%3)</translation>
+      <translation>Kamera #%1: %2 (%3)</translation>
     </message>
   </context>
   <context>
@@ -556,7 +556,7 @@
     </message>
     <message>
       <source>Related devices:</source>
-      <translation type="unfinished">Related devices:</translation>
+      <translation>Perangkat terkait:</translation>
     </message>
     <message>
       <source>Related cameras:</source>
@@ -639,11 +639,11 @@
     </message>
     <message>
       <source>Integration Diagnostic at %1</source>
-      <translation type="unfinished">Integration Diagnostic at %1</translation>
+      <translation>Diagnostik Integrasi di %1</translation>
     </message>
     <message>
       <source>Integration Diagnostic</source>
-      <translation type="unfinished">Integration Diagnostic</translation>
+      <translation>Diagnostik Integrasi</translation>
     </message>
   </context>
   <context>
@@ -681,7 +681,7 @@
     </message>
     <message>
       <source>LDAP Sync Issue at %1</source>
-      <translation type="unfinished">LDAP Sync Issue at %1</translation>
+      <translation>Masalah Sinkronisasi LDAP di %1</translation>
     </message>
     <message>
       <source>LDAP Sync Issue</source>
@@ -697,15 +697,15 @@
     <message>
       <source>Not enough licenses on %1</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">Not enough licenses on %1</translation>
+      <translation>Lisensi tidak cukup pada %1</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Recording has been disabled on the following devices:</translation>
+      <translation>Perekaman telah dinonaktifkan pada perangkat berikut:</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Recording has been disabled on the following cameras:</translation>
+      <translation>Perekaman telah dinonaktifkan pada kamera berikut:</translation>
     </message>
   </context>
   <context>
@@ -977,7 +977,7 @@
     </message>
     <message>
       <source>Services Issue on %1</source>
-      <translation type="unfinished">Services Issue on %1</translation>
+      <translation>Masalah Layanan pada %1</translation>
     </message>
   </context>
   <context>
@@ -1020,15 +1020,15 @@
     </message>
     <message>
       <source>Discovered a server with the same ID in the same local network</source>
-      <translation type="unfinished">Discovered a server with the same ID in the same local network</translation>
+      <translation>Menemukan server dengan ID yang sama di jaringan lokal yang sama</translation>
     </message>
     <message>
       <source>Servers in the same local network have conflict on the following devices</source>
-      <translation type="unfinished">Servers in the same local network have conflict on the following devices</translation>
+      <translation>Server di jaringan lokal yang sama mengalami konflik pada perangkat berikut</translation>
     </message>
     <message>
       <source>Server: %1</source>
-      <translation type="unfinished">Server: %1</translation>
+      <translation>Server: %1</translation>
     </message>
   </context>
   <context>

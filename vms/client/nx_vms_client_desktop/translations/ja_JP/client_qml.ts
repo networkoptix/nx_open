@@ -277,7 +277,7 @@
     </message>
     <message>
       <source>API Integrations</source>
-      <translation>APIインテグレーション</translation>
+      <translation>API インテグレーション</translation>
     </message>
   </context>
   <context>
@@ -293,11 +293,11 @@ Select an Integration to begin configuring its parameters.</source>
     <name>ApiIntegrations</name>
     <message>
       <source>API Integrations</source>
-      <translation>APIインテグレーション</translation>
+      <translation>API インテグレーション</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation>APIインテグレーションは、REST APIを介して %1 サーバーとやり取りし、メタデータを交換します</translation>
+      <translation>API インテグレーションは、REST API を介して %1 サーバーとやり取りし、メタデータを交換します。</translation>
     </message>
     <message>
       <source>New requests</source>
@@ -2488,11 +2488,11 @@ Alt + クリックを使用してください。</translation>
     <name>SettingsTab</name>
     <message>
       <source>Accept API Integrations registration requests</source>
-      <translation>APIインテグレーション登録リクエストを承認する</translation>
+      <translation>API インテグレーション登録リクエストを承認する</translation>
     </message>
     <message>
       <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</translation>
+      <translation>API インテグレーションの登録リクエストを有効化すると、サードパーティが統合を通じて承認リクエストを送信できるようになります。安全策は講じられていますが、長時間の使用は推奨されません。使用状況を注意深く監視し、すべての必要なインテグレーションのインストール完了後、このオプションを無効化してください。</translation>
     </message>
   </context>
   <context>

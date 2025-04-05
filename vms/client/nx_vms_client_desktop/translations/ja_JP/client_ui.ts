@@ -2079,16 +2079,16 @@
       <translation>チャネルパートナーの連絡先</translation>
     </message>
     <message>
-      <source>Services Usage</source>
-      <translation>サービス利用状況</translation>
-    </message>
-    <message>
       <source>Services state</source>
       <translation>サービスの状態</translation>
     </message>
     <message>
       <source>Organization&apos;s limits violation</source>
       <translation>組織制限を超過</translation>
+    </message>
+    <message>
+      <source>Service Allocation</source>
+      <translation type="unfinished">Service Allocation</translation>
     </message>
   </context>
   <context>

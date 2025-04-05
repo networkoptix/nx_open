@@ -2079,16 +2079,16 @@
       <translation>通路合作夥伴聯絡方式</translation>
     </message>
     <message>
-      <source>Services Usage</source>
-      <translation>服務使用情況</translation>
-    </message>
-    <message>
       <source>Services state</source>
       <translation>服務狀態</translation>
     </message>
     <message>
       <source>Organization&apos;s limits violation</source>
       <translation>違反組織限制</translation>
+    </message>
+    <message>
+      <source>Service Allocation</source>
+      <translation type="unfinished">Service Allocation</translation>
     </message>
   </context>
   <context>

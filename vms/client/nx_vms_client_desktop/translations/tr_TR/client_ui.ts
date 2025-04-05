@@ -2079,16 +2079,16 @@
       <translation>Kanal Ortağı İletişimi</translation>
     </message>
     <message>
-      <source>Services Usage</source>
-      <translation>Servislerin Kullanımı</translation>
-    </message>
-    <message>
       <source>Services state</source>
       <translation>Hizmetlerin durumu</translation>
     </message>
     <message>
       <source>Organization&apos;s limits violation</source>
       <translation type="unfinished">Organization&apos;s limits violation</translation>
+    </message>
+    <message>
+      <source>Service Allocation</source>
+      <translation type="unfinished">Service Allocation</translation>
     </message>
   </context>
   <context>

@@ -6979,7 +6979,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>Tworzenie kopii zapasowych w chmurze jest kontynuowane, ale witryna jest obecnie zawieszona. Musi być aktywna, aby zmodyfikować ustawienia &quot;Co kopiować&quot; i &quot;Jakość kopii&quot; dla urządzenia lub włączyć kopię zapasową w chmurze. Możesz ją również wyłączyć. %1</translation>
     </message>
   </context>
   <context>
@@ -8864,11 +8864,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::IntegrationSettingsWatcher</name>
     <message>
       <source>API Integrations approval requests are permitted</source>
-      <translation type="unfinished">API Integrations approval requests are permitted</translation>
+      <translation>Żądania zatwierdzenia integracji API są dozwolone</translation>
     </message>
     <message>
       <source>API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</translation>
+      <translation>Żądania rejestracji integracji API są włączone. Chociaż istnieją zabezpieczenia, nie zaleca się długotrwałego użytkowania. Rozważ wyłączenie tej opcji po zainstalowaniu wszystkich niezbędnych integracji.</translation>
     </message>
   </context>
   <context>
@@ -13151,12 +13151,12 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
-      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
+      <translation>Liczba urządzeń korzystających z tej usługi przekracza dostępną pojemność. Dodaj więcej usług lub wyłącz usługi na niektórych urządzeniach.</translation>
     </message>
     <message>
       <source>On %1, the system will automatically disable the service on some devices.</source>
       <comment>%1 will be substituted with date and time</comment>
-      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
+      <translation>W dniu %1 system automatycznie wyłączy usługę na niektórych urządzeniach.</translation>
     </message>
   </context>
   <context>

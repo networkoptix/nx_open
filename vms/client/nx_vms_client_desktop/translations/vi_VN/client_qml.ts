@@ -2488,7 +2488,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</translation>
+      <translation>Bật yêu cầu đăng ký tích hợp API cho phép bên thứ ba gửi yêu cầu phê duyệt thông qua tích hợp. Mặc dù có biện pháp bảo vệ, nhưng không nên sử dụng kéo dài. Theo dõi chặt chẽ việc sử dụng và tắt tùy chọn này sau khi tất cả các tích hợp cần thiết được cài đặt.</translation>
     </message>
   </context>
   <context>
