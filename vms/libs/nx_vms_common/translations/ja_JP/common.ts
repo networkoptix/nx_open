@@ -99,6 +99,13 @@
     </message>
   </context>
   <context>
+    <name>CustomerSupport</name>
+    <message>
+      <source>your Regional / License support</source>
+      <translation>地域/ライセンスサポート</translation>
+    </message>
+  </context>
+  <context>
     <name>HumanReadable</name>
     <message>
       <source>B</source>

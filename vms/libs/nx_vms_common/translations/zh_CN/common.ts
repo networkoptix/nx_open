@@ -99,6 +99,13 @@
     </message>
   </context>
   <context>
+    <name>CustomerSupport</name>
+    <message>
+      <source>your Regional / License support</source>
+      <translation type="unfinished">your Regional / License support</translation>
+    </message>
+  </context>
+  <context>
     <name>HumanReadable</name>
     <message>
       <source>B</source>
