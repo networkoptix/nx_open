@@ -246,7 +246,7 @@
     </message>
     <message>
       <source>API Integrations</source>
-      <translation>APIインテグレーション</translation>
+      <translation>API インテグレーション</translation>
     </message>
   </context>
   <context>
@@ -260,11 +260,11 @@
     <name>ApiIntegrations</name>
     <message>
       <source>API Integrations</source>
-      <translation>APIインテグレーション</translation>
+      <translation>API インテグレーション</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation>APIインテグレーションは、REST APIを介して %1 サーバーとやり取りし、メタデータを交換します</translation>
+      <translation>API インテグレーションは、REST API を介して %1 サーバーとやり取りし、メタデータを交換します。</translation>
     </message>
     <message>
       <source>New requests</source>

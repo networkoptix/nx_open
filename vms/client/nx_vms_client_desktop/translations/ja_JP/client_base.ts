@@ -1552,7 +1552,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation>有効なライセンスキーを取得するには、 %1 までご連絡ください。</translation>
+      <translation>有効なライセンスキーを取得するには、 %1 にお問い合わせください。</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
@@ -1564,7 +1564,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation>有効なライセンスキーを入手するには、地域/ライセンスサポートにお問い合わせください:</translation>
+      <translation>有効なライセンスキーを取得するには、地域/ライセンスサポートにお問い合わせください:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
@@ -7197,7 +7197,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation>不十分なサービス</translation>
+      <translation>サービスが不足しています</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
