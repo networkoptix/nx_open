@@ -2501,7 +2501,7 @@ Tryck på Alt + Klicka för att följa objektet</translation>
     </message>
     <message>
       <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</translation>
+      <translation>Genom att aktivera registreringsförfrågningar för API Integrationer kan tredje part skicka in godkännandeförfrågningar genom integration. Även om det finns skyddsåtgärder, rekommenderas inte långvarig användning. Övervaka användning nära och inaktivera detta alternativ när alla nödvändiga Integrationer är installerade.</translation>
     </message>
   </context>
   <context>

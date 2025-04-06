@@ -6758,7 +6758,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>Säkerhetskopiering till molnet fortsätter, men Webbplatsen är för närvarande avstängd. Det måste vara aktivt för att ändra &quot;Vad att säkerhetskopiera&quot; och &quot;Kvalitet&quot; inställningar för en enhet, eller för att aktivera molnsäkerhetskopiering. Du kan också inaktivera det. %1</translation>
     </message>
   </context>
   <context>
@@ -8599,11 +8599,11 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <name>nx::vms::client::desktop::IntegrationSettingsWatcher</name>
     <message>
       <source>API Integrations approval requests are permitted</source>
-      <translation type="unfinished">API Integrations approval requests are permitted</translation>
+      <translation>Begäran om godkännande av API-integrationer är tillåten</translation>
     </message>
     <message>
       <source>API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</translation>
+      <translation>Registreringsförfrågningar för API-integrationer är aktiverade. Medan säkerhetsåtgärder existerar, rekommenderas inte långvarig användning. Överväg att inaktivera detta alternativ när alla nödvändiga Integrationer är installerade.</translation>
     </message>
   </context>
   <context>
