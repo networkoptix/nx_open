@@ -41,7 +41,7 @@ Window
         previewPanel.setWidth(previewPanel.width)
     }
 
-    color: ColorTheme.colors.dark3
+    color: ColorTheme.colors.dark2
 
     title: qsTr("Advanced Object Search")
 
