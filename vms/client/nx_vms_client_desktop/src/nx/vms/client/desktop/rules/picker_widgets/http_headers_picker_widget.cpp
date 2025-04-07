@@ -7,6 +7,7 @@
 #include <nx/vms/client/desktop/style/helper.h>
 
 #include "private/custom_http_headers_dialog.h"
+#include "private/multiline_elided_label.h"
 
 namespace nx::vms::client::desktop::rules {
 

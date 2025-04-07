@@ -4,6 +4,8 @@
 
 #include <nx/vms/rules/utils/field.h>
 
+#include "private/multiline_elided_label.h"
+
 namespace nx::vms::client::desktop::rules {
 
 StatePicker::StatePicker(

@@ -7,6 +7,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <nx/vms/client/desktop/event_rules/widgets/detectable_object_type_combo_box.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
@@ -162,10 +163,11 @@ public:
             field, context, parent),
         m_analyticsSdkEventModel(new ui::AnalyticsSdkEventModel(systemContext(), this))
     {
-        m_label->addHintLine(tr("Analytics events can be set up on a certain cameras."));
-        m_label->addHintLine(
+        m_hintButton->addHintLine(tr("Analytics events can be set up on a certain cameras."));
+        m_hintButton->addHintLine(
             tr("Choose cameras using the button above to see the list of supported events."));
-        setHelpTopic(m_label, HelpTopic::Id::EventsActions_VideoAnalytics);
+        m_hintButton->setVisible(true);
+        setHelpTopic(m_hintButton, HelpTopic::Id::EventsActions_VideoAnalytics);
 
         auto sortModel = new QSortFilterProxyModel(this);
         sortModel->setDynamicSortFilter(true);
@@ -269,10 +271,12 @@ public:
         :
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsObjectTypeField, DetectableObjectTypeComboBox>{field, context, parent}
     {
-        m_label->addHintLine(tr("Analytics object detection can be set up on a certain cameras."));
-        m_label->addHintLine(
+        m_hintButton->addHintLine(
+            tr("Analytics object detection can be set up on a certain cameras."));
+        m_hintButton->addHintLine(
             tr("Choose cameras using the button above to see the list of supported events."));
-        setHelpTopic(m_label, HelpTopic::Id::EventsActions_VideoAnalytics);
+        m_hintButton->setVisible(true);
+        setHelpTopic(m_hintButton, HelpTopic::Id::EventsActions_VideoAnalytics);
     }
 
 protected:

@@ -16,6 +16,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include "../utils/strings.h"
+#include "private/multiline_elided_label.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -59,11 +60,8 @@ struct HttpAuthPicker::Private
     {
         auto lineLayout = createLayout<QHBoxLayout>();
 
-        auto label = new WidgetWithHint<QnElidedLabel>;
-        label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        label->setElideMode(Qt::ElideRight);
-        label->setFixedHeight(28);
-        label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
+        auto label = new MultilineElidedLabel;
+        label->setFixedHeight(30);
         label->setText(labelText);
         lineLayout->addWidget(label);
 

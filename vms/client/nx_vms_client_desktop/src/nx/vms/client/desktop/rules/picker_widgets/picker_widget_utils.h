@@ -5,6 +5,7 @@
 namespace nx::vms::client::desktop::rules {
 
 #define BASE_COMMON_USINGS using base::m_label;\
+    using base::m_hintButton;\
     using base::m_contentWidget;\
     using base::m_field;\
     using base::connect;\

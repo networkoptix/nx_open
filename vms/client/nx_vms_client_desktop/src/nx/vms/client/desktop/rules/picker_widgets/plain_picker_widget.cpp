@@ -7,6 +7,8 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 
+#include "private/multiline_elided_label.h"
+
 namespace nx::vms::client::desktop::rules {
 
 PlainPickerWidget::PlainPickerWidget(
@@ -24,13 +26,17 @@ PlainPickerWidget::PlainPickerWidget(
         style::Metrics::kDefaultTopLevelMargin,
         4);
 
-    m_label = new WidgetWithHint<QnWordWrappedLabel>;
-    m_label->label()->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    m_label->setFixedHeight(28);
-    m_label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
+    auto labelWithHintLayout = new QHBoxLayout;
+    m_label = new MultilineElidedLabel;
+    m_label->setFixedHeight(30);
     m_label->setText(displayName);
-    mainLayout->addWidget(m_label);
-    mainLayout->setAlignment(m_label, Qt::AlignTop);
+    labelWithHintLayout->addWidget(m_label);
+
+    m_hintButton = new HintButton;
+    m_hintButton->setVisible(false);
+    labelWithHintLayout->addWidget(m_hintButton);
+
+    mainLayout->addLayout(labelWithHintLayout);
 
     auto contentLayout = new QVBoxLayout;
     m_contentWidget = new QWidget;

@@ -3,12 +3,13 @@
 #pragma once
 
 #include <nx/vms/client/desktop/common/widgets/alert_label.h>
-#include <nx/vms/client/desktop/common/widgets/widget_with_hint.h>
-#include <ui/widgets/word_wrapped_label.h>
+#include <nx/vms/client/desktop/common/widgets/hint_button.h>
 
 #include "picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
+
+class MultilineElidedLabel;
 
 /** Base class for the pickers with label on the left side and content on the right. */
 class PlainPickerWidget: public PickerWidget
@@ -23,7 +24,8 @@ public:
     void setValidity(const vms::rules::ValidationResult& validationResult) override;
 
 protected:
-    WidgetWithHint<QnWordWrappedLabel>* m_label{nullptr};
+    MultilineElidedLabel* m_label{nullptr};
+    HintButton* m_hintButton{nullptr};
     QWidget* m_contentWidget{nullptr};
 
 private:
