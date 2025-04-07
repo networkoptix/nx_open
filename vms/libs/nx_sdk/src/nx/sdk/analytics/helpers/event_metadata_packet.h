@@ -30,8 +30,8 @@ protected:
 
 private:
     Flags m_flags = Flags::none;
-    int64_t m_timestampUs = -1;
-    int64_t m_durationUs = -1;
+    int64_t m_timestampUs = 0;
+    int64_t m_durationUs = 0;
 
     std::vector<Ptr<const IEventMetadata>> m_events;
 };

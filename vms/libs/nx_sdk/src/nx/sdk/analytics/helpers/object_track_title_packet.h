@@ -66,7 +66,7 @@ public:
 private:
     Uuid m_trackId;
     Flags m_flags = Flags::none;
-    int64_t m_timestampUs = -1;
+    int64_t m_timestampUs = 0;
     Rect m_boundingBox;
     std::string m_text;
 
