@@ -32,7 +32,7 @@ public:
         threads,
         digest,
         token,
-        cloudAccessToken,
+        cloud_access_token,
         typ_header,
         alg,
         kid,
@@ -46,6 +46,7 @@ public:
         client_id,
         iss,
         requests_per_min,
+        developer_build,
         last)
 
     DebugInfoStorage(QObject* parent = nullptr);

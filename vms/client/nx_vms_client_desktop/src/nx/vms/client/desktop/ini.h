@@ -206,7 +206,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Dev] Use shared memory implementation based on the memory mapped file.");
 
     NX_INI_STRING(
-        "typ_header alg kid sid typ_payload client_id iss",
+        "typ_header alg kid sid typ_payload client_id iss cloud_access_token",
         debugInfoFilter,
         "[Dev] Disables output of fields in the information widget. Allows to disable output of\n"
         "fields you don't need. Use \"all\" to disable all output of fields. More precise\n"
@@ -220,6 +220,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         " * \"threads\",\n"
         " * \"digest\",\n"
         " * \"token\",\n"
+        " * \"cloud_access_token\",\n"
         " * \"typ_header\",\n"
         " * \"alg\",\n"
         " * \"kid\",\n"
@@ -232,7 +233,8 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         " * \"sub\",\n"
         " * \"client_id\",\n"
         " * \"iss\",\n"
-        " * \"requests_per_min\".\n"
+        " * \"requests_per_min\",\n"
+        " * \"developer_build\".\n"
         "Fields can be combined using space, comma or any other separator."
     );
 

@@ -170,6 +170,9 @@ void QnAboutDialog::retranslateUi()
         .arg(nx::build_info::applicationPlatform())
         .arg(nx::build_info::applicationArch())
         .arg(nx::build_info::applicationCompiler());
+    #if defined(NX_DEVELOPER_BUILD)
+        version << tr("Developer Build");
+    #endif
     ui->versionLabel->setText(version.join(html::kLineBreak));
 
     const QString brandName = html::bold(nx::branding::company());

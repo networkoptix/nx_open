@@ -151,6 +151,13 @@ void PerformanceInfo::setPerformanceValues(const QVariantMap& values)
     if (!filter.contains(DebugInfoStorage::Field::threads))
         counters << QString("Threads: %1").arg(threadsText);
 
+    if (!filter.contains(DebugInfoStorage::Field::developer_build))
+    {
+        #if defined(NX_DEVELOPER_BUILD)
+            counters << QString("Developer Build");
+        #endif
+    }
+
     // Show all other values.
     for (auto i = remaining.constBegin(); i != remaining.constEnd(); ++i)
         counters << QString("%1: %2").arg(i.key()).arg(i.value().toString());

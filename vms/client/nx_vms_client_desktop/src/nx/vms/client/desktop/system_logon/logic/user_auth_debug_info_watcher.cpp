@@ -218,7 +218,7 @@ UserAuthDebugInfoWatcher::UserAuthDebugInfoWatcher(QObject* parent):
             }
 
             const auto filter = DebugInfoStorage::instance()->filter();
-            if (filter.contains(DebugInfoStorage::Field::cloudAccessToken))
+            if (filter.contains(DebugInfoStorage::Field::cloud_access_token))
                 return;
 
             const auto updateCloudAccessTokenInfoForDebugInfo =
