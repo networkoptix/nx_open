@@ -379,7 +379,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     }
 
     if (d->camera
-        && !d->camera->hasFlags(Qn::cross_system)
         && !d->isPreviewSearchLayout
         && !qnRuntime->isVideoWallMode())
     {

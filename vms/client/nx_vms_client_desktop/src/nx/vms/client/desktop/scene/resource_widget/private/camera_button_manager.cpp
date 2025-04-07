@@ -150,11 +150,14 @@ void updateTooltip(CameraButton* button, const QString& tooltip)
         NX_ASSERT(false, "Unexpected button type");
 }
 
-AggregatedControllerPtr createController()
+AggregatedControllerPtr createController(QnMediaResourceWidget* mediaResourceWidget)
 {
     auto result = std::make_unique<core::AggregatedCameraButtonController>();
 
     result->addController<core::TwoWayAudioCameraButtonController>(ButtonGroup::twoWayAudio);
+
+    if (mediaResourceWidget->resource()->hasFlags(Qn::cross_system))
+        return result;
 
     using HintStyle = core::SoftwareTriggerCameraButtonController::HintStyle;
     result->addController<core::SoftwareTriggerCameraButtonController>(
@@ -211,7 +214,7 @@ CameraButtonManager::Private::Private(
     :
     q(q),
     mediaResourceWidget(mediaResourceWidget),
-    controller(createController()),
+    controller(createController(mediaResourceWidget)),
     container(createContainer(mediaResourceWidget)),
     objectTrackingContainer(createObjectTrackingContainer(mediaResourceWidget))
 {

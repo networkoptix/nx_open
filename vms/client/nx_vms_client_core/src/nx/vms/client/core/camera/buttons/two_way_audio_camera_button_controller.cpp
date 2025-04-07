@@ -45,7 +45,7 @@ void TwoWayAudioCameraButtonController::Private::updateButton()
         [this]() -> OptionalCameraButtonData
         {
             const auto camera = q->camera();
-            if (!camera || camera->flags().testFlag(Qn::cross_system))
+            if (!camera)
                 return {};
 
             if (!controller->available() || !q->hasRequiredPermissions())
