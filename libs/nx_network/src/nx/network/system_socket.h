@@ -2,10 +2,12 @@
 
 #pragma once
 
+// This header includes <windows.h> and _must_ be included before everything
+#include <nx/utils/system_network_headers.h>
+/////////////////////////////////////////////////////////////////////////////////////////
+
 #include <string>
 #include <type_traits>
-
-#include <nx/utils/system_network_headers.h>
 
 #ifndef _WIN32
     #include <netinet/in.h>

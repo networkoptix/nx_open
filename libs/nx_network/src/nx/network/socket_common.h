@@ -2,43 +2,32 @@
 
 #pragma once
 
-#include <nx/utils/system_network_headers.h>
-
-#ifdef _WIN32
-    #include <in6addr.h>
-    #include <ws2ipdef.h>
-
-    // Windows does not support this flag, so we emulate it
-    #define MSG_DONTWAIT 0x01000000
-#else
-    #include <netinet/in.h>
-    #include <sys/socket.h>
-#endif
-
+#include <array>
 #include <chrono>
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
-
-#include <cstdint>
 
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/tags.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/type_utils.h>
 
-NX_NETWORK_API bool operator==(const in_addr& left, const in_addr& right);
-NX_NETWORK_API bool operator==(const in6_addr& left, const in6_addr& right);
+// TODO: #skolesnik Move all related conversion functions to separate header.
+// very error prone
+// For definitions use `#include <nx/utils/system_network_headers.h>`
+struct in_addr;
+struct in6_addr;
+struct sockaddr_in;
+struct sockaddr_in6;
 
-#if !defined(_WIN32)
-    NX_NETWORK_API extern const in_addr in4addr_loopback;
-#endif
+class QHostAddress;
+class QString;
 
 // Needed for compatibility with nx_fusion.
 // Luckily, custom nx_fusion serialization support does not require dependency on nx_fusion itself.
-class QHostAddress;
 class QJsonValue;
-class QString;
 class QnJsonContext;
 
 namespace nx::utils { class Url; }
@@ -92,13 +81,18 @@ using IpV6WithScope = std::pair<std::optional<in6_addr>, std::optional<uint32_t>
 class NX_NETWORK_API HostAddress
 {
 public:
-    HostAddress(const in_addr& addr);
-    HostAddress(
-        const in6_addr& addr = in6addr_any,
-        std::optional<uint32_t> scopeId = std::nullopt);
-
+    HostAddress();
+    HostAddress(const in_addr& v4Address);
+    HostAddress(const in6_addr& v6Address, std::optional<uint32_t> scopeId = std::nullopt);
     HostAddress(const std::string_view& addrStr);
-    HostAddress(const char* addrStr);
+
+    // Construct from string literal
+    template<size_t N>
+    HostAddress(const char (&addrStr)[N]): HostAddress(std::string_view(addrStr))
+    {
+    }
+
+    // TODO: #skolesnik Remove these
     HostAddress(const QString& str);
     HostAddress(const QHostAddress& host);
 
@@ -114,6 +108,11 @@ public:
         HostAddress(std::string_view(str.data(), (std::size_t) str.size()))
     {
     }
+
+    HostAddress(const HostAddress& other);
+    HostAddress(HostAddress&& other) noexcept;
+    HostAddress& operator=(const HostAddress& other);
+    HostAddress& operator=(HostAddress&& other) noexcept;
 
     ~HostAddress();
 
@@ -182,9 +181,19 @@ public:
     void swap(HostAddress& other);
 
 private:
+    // Type-erasing adapter with the same size and alignment as `in_addr`
+    using InAddr = std::uint32_t;
+
+    // `in6_addr` differs in alignment between Windows and POSIX
+    #if defined(_WIN32)
+    struct alignas(2) In6Addr { std::uint8_t value[16]; };
+    #else
+    struct alignas(4) In6Addr { std::uint8_t value[16]; };
+    #endif
+
     mutable std::optional<std::string> m_string;
-    std::optional<in_addr> m_ipV4;
-    std::optional<in6_addr> m_ipV6;
+    std::optional<InAddr> m_ipV4;
+    std::optional<In6Addr> m_ipV6;
     std::optional<uint32_t> m_scopeId;
 
     HostAddress(
@@ -217,8 +226,14 @@ public:
     SocketAddress(SocketAddress&&) = default;
 
     SocketAddress(const HostAddress& address, std::uint16_t port);
-    SocketAddress(const std::string_view& endpointStr);
-    SocketAddress(const char* endpointStr);
+    SocketAddress(std::string_view endpoint);
+
+    // From string literal
+    template<size_t N>
+    SocketAddress(const char (&endpoint)[N]):
+        SocketAddress(std::string_view(endpoint))
+    {
+    }
 
     /**
      * NOTE: This constructor works with any type that has "const char* data()" and "size()".
@@ -329,15 +344,3 @@ template <> struct hash<nx::network::SocketAddress>
 };
 
 } // namespace std
-
-NX_NETWORK_API unsigned long long qn_htonll(unsigned long long value);
-NX_NETWORK_API unsigned long long qn_ntohll(unsigned long long value);
-
-/* Note that we have to use #defines here so that these functions work even if
- * they are also defined in system network headers. */
-#ifndef htonll
-#define htonll qn_htonll
-#endif
-#ifndef ntohll
-#define ntohll qn_ntohll
-#endif

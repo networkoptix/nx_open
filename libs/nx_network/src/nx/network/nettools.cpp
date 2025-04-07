@@ -1,12 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+// This header includes <windows.h> and _must_ be included before everything
+#include <nx/utils/system_network_headers.h>
+/////////////////////////////////////////////////////////////////////////////////////////
+
 #include "nettools.h"
 
 #include <iostream>
 #include <memory>
 #include <sstream>
-
-#include <nx/utils/system_network_headers.h>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>

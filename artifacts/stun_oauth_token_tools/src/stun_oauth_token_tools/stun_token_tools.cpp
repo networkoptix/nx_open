@@ -28,6 +28,10 @@
  * SUCH DAMAGE.
  */
 
+// This header includes <windows.h> and _must_ be included before everything
+#include <nx/utils/system_network_headers.h>
+/////////////////////////////////////////////////////////////////////////////////////////
+
 #include "stun_token_tools.h"
 
 #include <cstdio>
@@ -38,13 +42,6 @@
 #include <openssl/evp.h>
 #include <openssl/ssl.h>
 
-#if defined(_WIN32)
-    #include <winsock2.h>
-#else
-    #include <arpa/inet.h>
-#endif
-
-#include <nx/network/socket_common.h>
 #include <nx/utils/base64.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>

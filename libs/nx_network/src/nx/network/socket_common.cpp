@@ -1,8 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "socket_common.h"
+// This header includes <windows.h> and _must_ be included before everything
+#include <nx/utils/system_network_headers.h>
+/////////////////////////////////////////////////////////////////////////////////////////
 
-#include <cstring>
+#include "socket_common.h"
 
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
@@ -13,27 +15,9 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/url.h>
 
+#include <cstring>
+
 #include "socket_global.h"
-
-bool operator==(const in_addr& left, const in_addr& right)
-{
-    return memcmp(&left, &right, sizeof(left)) == 0;
-}
-
-bool operator==(const in6_addr& left, const in6_addr& right)
-{
-    return memcmp(&left, &right, sizeof(left)) == 0;
-}
-
-#if !defined(_WIN32)
-    #if defined(__arm__) && !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
-        #undef htonl
-    #endif
-
-    // NOTE: calcLoopbackAddr() fixes a compile error on clang in the Release mode.
-    auto calcLoopbackAddr() { return htonl(INADDR_LOOPBACK); }
-    const in_addr in4addr_loopback{ calcLoopbackAddr() };
-#endif
 
 namespace nx::network {
 
@@ -47,6 +31,11 @@ bool socketCannotRecoverFromError(SystemError::ErrorCode sysErrorCode)
         && sysErrorCode != SystemError::inProgress;
 }
 
+HostAddress::HostAddress():
+    m_ipV6(std::bit_cast<In6Addr>(in6addr_any))
+{
+}
+
 //-------------------------------------------------------------------------------------------------
 // HostAddress
 
@@ -56,9 +45,14 @@ HostAddress::HostAddress(
     std::optional<in6_addr> ipV6)
     :
     m_string(std::move(addressString)),
-    m_ipV4(std::move(ipV4)),
-    m_ipV6(std::move(ipV6))
+    m_ipV4(ipV4 ? std::optional{std::bit_cast<InAddr>(*ipV4)} : std::nullopt),
+    m_ipV6(ipV6 ? std::optional{std::bit_cast<In6Addr>(*ipV6)} : std::nullopt)
 {
+    static_assert(sizeof(InAddr) == sizeof(in_addr));
+    static_assert(alignof(InAddr) == alignof(in_addr));
+
+    static_assert(sizeof(In6Addr) == sizeof(in6_addr));
+    static_assert(alignof(In6Addr) == alignof(in6_addr));
 }
 
 const HostAddress HostAddress::localhost(
@@ -67,12 +61,12 @@ const HostAddress HostAddress::localhost(
 const HostAddress HostAddress::anyHost(*ipV4from("0.0.0.0"));
 
 HostAddress::HostAddress(const in_addr& addr):
-    m_ipV4(addr)
+    m_ipV4(std::bit_cast<InAddr>(addr))
 {
 }
 
 HostAddress::HostAddress(const in6_addr& addr, std::optional<uint32_t> scopeId):
-    m_ipV6(addr),
+    m_ipV6(std::bit_cast<In6Addr>(addr)),
     m_scopeId(scopeId)
 {
 }
@@ -86,11 +80,6 @@ HostAddress::HostAddress(const std::string_view& host): m_string(host)
     }
 }
 
-HostAddress::HostAddress(const char* addrStr):
-    HostAddress(std::string_view(addrStr))
-{
-}
-
 HostAddress::HostAddress(const QString& str):
     HostAddress(str.toStdString())
 {
@@ -100,6 +89,11 @@ HostAddress::HostAddress(const QHostAddress& host):
     HostAddress(host.toString().toStdString())
 {
 }
+
+HostAddress::HostAddress(const HostAddress& other) = default;
+HostAddress::HostAddress(HostAddress&& other) noexcept = default;
+HostAddress& HostAddress::operator=(const HostAddress& other) = default;
+HostAddress& HostAddress::operator=(HostAddress&& other) noexcept = default;
 
 HostAddress::~HostAddress() = default;
 
@@ -149,12 +143,15 @@ const std::string& HostAddress::toString() const
     //  Try to map it from IPv4 as v4 format is preferable
     auto ipV4 = m_ipV4;
     if (!ipV4)
-        ipV4 = ipV4from(*m_ipV6);
+    {
+        if (const auto converted = ipV4from(std::bit_cast<in6_addr>(*m_ipV6)))
+            ipV4 = std::bit_cast<InAddr>(*converted);
+    }
 
     if (ipV4)
-        m_string = ipToString(*ipV4);
+        m_string = ipToString(std::bit_cast<in_addr>(*ipV4));
     else
-        m_string = ipToString(*m_ipV6, m_scopeId);
+        m_string = ipToString(std::bit_cast<in6_addr>(*m_ipV6), m_scopeId);
 
     return *m_string;
 }
@@ -162,13 +159,13 @@ const std::string& HostAddress::toString() const
 std::optional<in_addr> HostAddress::ipV4() const
 {
     if (m_ipV4)
-        return m_ipV4;
+        return std::bit_cast<in_addr>(*m_ipV4);
 
     // FIXME: Remove this code when IPv6 is properly supported.
     //  Try to map it from IPv4 as v4 format is preferable
     if (m_ipV6)
     {
-        if (const auto ipV4 = ipV4from(*m_ipV6))
+        if (const auto ipV4 = ipV4from(std::bit_cast<in6_addr>(*m_ipV6)))
             return ipV4;
     }
 
@@ -191,10 +188,10 @@ std::optional<in_addr> HostAddress::ipV4() const
 IpV6WithScope HostAddress::ipV6() const
 {
     if (m_ipV6)
-        return IpV6WithScope(m_ipV6, m_scopeId);
+        return IpV6WithScope(std::bit_cast<in6_addr>(*m_ipV6), m_scopeId);
 
     if (m_ipV4)
-        return ipV6from(*m_ipV4);
+        return ipV6from(std::bit_cast<in_addr>(*m_ipV4));
 
     const auto ipV6 = ipV6from(*m_string);
     if (ipV6.first)
@@ -456,7 +453,7 @@ HostAddress HostAddress::fromString(const std::string_view& host)
     else
         ipV6 = in6addr_any;
     std::optional<in_addr> ipV4;
-    return HostAddress(std::move(addressString), std::move(ipV4), std::move(ipV6));
+    return HostAddress(addressString, ipV4, ipV6);
 }
 
 void swap(HostAddress& one, HostAddress& two)
@@ -478,19 +475,16 @@ SocketAddress::SocketAddress(const HostAddress& address, std::uint16_t port):
 {
 }
 
-SocketAddress::SocketAddress(const std::string_view& str)
+SocketAddress::SocketAddress(std::string_view str):
+    SocketAddress(
+        [](std::string_view str)
+        {
+            const auto [hostStr, parsedPort] = split(str);
+            return SocketAddress(HostAddress(hostStr),
+                parsedPort.value_or(kAnyPort));
+        }(str))
 {
-    const auto [hostStr, parsedPort] = split(str);
-    address = HostAddress(hostStr);
-    if (parsedPort)
-        port = *parsedPort;
-
     NX_ASSERT_HEAVY_CONDITION(!toString().empty());
-}
-
-SocketAddress::SocketAddress(const char* endpointStr):
-    SocketAddress(std::string_view(endpointStr))
-{
 }
 
 SocketAddress::SocketAddress(const sockaddr_in& ipv4Endpoint):
@@ -726,6 +720,3 @@ void PrintTo(const KeepAliveOptions& val, ::std::ostream* os)
 }
 
 } // namespace nx::network
-
-unsigned long long qn_htonll(unsigned long long value) { return qToBigEndian(value); }
-unsigned long long qn_ntohll(unsigned long long value) { return qFromBigEndian(value); }

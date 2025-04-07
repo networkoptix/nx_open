@@ -5,12 +5,10 @@
 #include <string>
 
 #include <nx/network/socket_common.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/to_string.h>
 #include <nx/utils/url.h>
 #include <nx/utils/url_query.h>
-
-#include "../socket_common.h"
-#include "url_parse_helper.h"
 
 namespace nx::network::url {
 

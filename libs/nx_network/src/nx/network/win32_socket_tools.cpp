@@ -2,9 +2,11 @@
 
 #ifdef _WIN32
 
-#include <memory>
-
+// This header includes <windows.h> and _must_ be included before everything
 #include <nx/utils/system_network_headers.h>
+/////////////////////////////////////////////////////////////////////////////////////////
+
+#include <memory>
 
 #include <Tcpestats.h>
 #include <tcpmib.h>

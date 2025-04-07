@@ -1,5 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+// This header includes <windows.h> and _must_ be included before everything
+#include <nx/utils/system_network_headers.h>
+/////////////////////////////////////////////////////////////////////////////////////////
+
 #ifdef _WIN32
 #include <Winsock2.h>
 #include <Ws2tcpip.h>
@@ -21,11 +25,11 @@ static void testHostAddress(
     HostAddress host,
     std::optional<in_addr_t> ipv4,
     std::optional<in6_addr> ipv6,
-    const char* string,
+    std::string_view string,
     bool isIpAddress)
 {
     ASSERT_EQ(isIpAddress, host.isIpAddress());
-    ASSERT_EQ(std::string(string), host.toString());
+    ASSERT_EQ(string, host.toString());
 
     if (ipv4)
     {
@@ -51,12 +55,12 @@ static void testHostAddress(
 }
 
 static void testHostAddress(
-    const char* string4,
-    const char* string6,
+    std::string_view string4,
+    std::string_view string6,
     std::optional<in_addr_t> ipv4,
     std::optional<in6_addr> ipv6)
 {
-    if (string4)
+    if (!string4.empty())
         testHostAddress(string4, ipv4, ipv6, string4, false);
 
     testHostAddress(string6, ipv4, ipv6, string6, false);
@@ -89,7 +93,7 @@ TEST(HostAddress, Base)
     ASSERT_TRUE((bool)kIpV6b);
 
     testHostAddress("12.34.56.78", "::ffff:12.34.56.78", kIpV4a->s_addr, kIpV6a);
-    testHostAddress(nullptr, "2001:db8:0:2::1", std::nullopt, kIpV6b);
+    testHostAddress({}, "2001:db8:0:2::1", std::nullopt, kIpV6b);
 }
 
 TEST(HostAddress, localhost)
@@ -250,7 +254,7 @@ protected:
     void assertEndpointIsParsedAsExpected(
         const network::SocketAddress& endpoint,
         const std::string& expectedEndpointString,
-        const char* host,
+        std::string_view host,
         int port)
     {
         ASSERT_EQ(host, endpoint.address.toString());
