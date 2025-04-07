@@ -274,8 +274,8 @@ nx::utils::SoftwareVersion SingleSystemDescription::version() const
 
 QString SingleSystemDescription::idForToStringFromPtr() const
 {
-    return nx::format("System %1 [id: %2, local id: %3]",
-        name(), id(), localId());
+    return nx::format("System: %1 [id: %2, local id: %3]",
+        name(), id(), localId().toSimpleString());
 }
 
 void SingleSystemDescription::handleReachableServerAdded(const nx::Uuid& serverId)

@@ -26,6 +26,8 @@ struct NX_VMS_COMMON_API ModuleEndpoint: api::ModuleInformationWithAddresses
     bool operator==(const ModuleEndpoint& rhs) const = default;
 };
 
+NX_VMS_COMMON_API QString toString(const nx::vms::discovery::ModuleEndpoint& module);
+
 /**
  * Discovers VMS modules, notifies their module information and availability changes.
  *

@@ -41,8 +41,7 @@ DirectSystemFinder::DirectSystemFinder(
     m_searchAddressManager(searchAddressManager)
 {
     const auto moduleManager = appContext()->moduleDiscoveryManager();
-    NX_ASSERT(moduleManager, "Module finder does not exist");
-    if (!moduleManager)
+    if (!NX_ASSERT(moduleManager, "Module finder does not exist"))
         return;
 
     moduleManager->onSignals(this,
@@ -80,8 +79,9 @@ void DirectSystemFinder::removeSystem(SystemsHash::iterator it)
     if (it == m_systems.end())
         return;
 
-    NX_VERBOSE(this, nx::format("Removed system %1").arg(it.value()->id()));
-    const auto system = it.value();
+    const auto& system = it.value();
+    NX_VERBOSE(this, "Removing %1", system);
+
     for (const auto& server: system->servers())
         system->removeServer(server.id);
 
@@ -94,14 +94,16 @@ void DirectSystemFinder::updateServerData(const nx::vms::discovery::ModuleEndpoi
     const nx::Uuid localSystemId = helpers::getLocalSystemId(module);
     const QString systemId = helpers::getTargetSystemId(module);
 
+    NX_VERBOSE(this, "Update server %1 with system id: %2, local id: %3",
+        module, systemId, localSystemId);
+
     m_searchAddressManager->updateServerRemoteAddresses(
         localSystemId,
         module.id,
         module.remoteAddresses
     );
 
-    const auto systemIt = getSystemItByServer(module.id);
-    if (systemIt != m_systems.end())
+    if (const auto systemIt = getSystemItByServer(module.id); systemIt != m_systems.end())
     {
         /**
         * We can check for system state/id change only here because in this
@@ -118,8 +120,7 @@ void DirectSystemFinder::updateServerData(const nx::vms::discovery::ModuleEndpoi
 
         if (sameNewSystemState && belongsToSameSystem)
         {
-            NX_VERBOSE(this, nx::format("New server %1 updates existing system %2").args(
-                module.id, current->id()));
+            NX_VERBOSE(this, "Same new system state and belongs to same system");
 
             // Just update system
             updateServerInternal(systemIt, module);
@@ -135,6 +136,8 @@ void DirectSystemFinder::updateServerData(const nx::vms::discovery::ModuleEndpoi
         // Do not allow servers with cloud host to be discovered.
         if (isCloudAddress(module.endpoint.address))
             return;
+
+        NX_VERBOSE(this, "Creating new system id: %1, local id: %2", systemId, localSystemId);
 
         const auto systemName = (isOldServer(module)
             ? tr("Site")
@@ -165,7 +168,7 @@ void DirectSystemFinder::updateServerData(const nx::vms::discovery::ModuleEndpoi
     // Notify of system discovered only if it was not removed on the previous step.
     if (createNewSystem && m_systems.contains(systemId))
     {
-        NX_VERBOSE(this, nx::format("New system %1").arg(systemDescription->id()));
+        NX_VERBOSE(this, "New system discovered %1", systemDescription);
         emit systemDiscovered(systemDescription);
     }
 }
@@ -176,40 +179,36 @@ void DirectSystemFinder::removeServer(nx::Uuid id)
     const auto serverIsInKnownSystem = (systemIt != m_systems.end());
     if (!serverIsInKnownSystem)
     {
-        NX_WARNING(this, nx::format("Server id %1 is not known").arg(id));
+        NX_WARNING(this, nx::format("Server %1 is not known").arg(id));
         return;
     }
 
-    NX_VERBOSE(this, nx::format("Removed server %1 from system %2").args(id, systemIt.value()->id()));
-    const auto removedCount = m_serverToSystem.remove(id);
-    if (!removedCount)
+    const auto& system = systemIt.value();
+    NX_VERBOSE(this, "Removing server %1 from %2", id, system);
+
+    if (!m_serverToSystem.remove(id))
         return;
 
-    const auto systemDescription = systemIt.value();
-    systemDescription->removeServer(id);
-    if (!systemDescription->servers().isEmpty())
-        return;
-
-    removeSystem(systemIt);
+    system->removeServer(id);
+    if (system->servers().isEmpty())
+        removeSystem(systemIt);
 }
 
 void DirectSystemFinder::updateServerInternal(
     SystemsHash::iterator systemIt, const nx::vms::discovery::ModuleEndpoint& module)
 {
-    const bool serverIsInKnownSystem = (systemIt != m_systems.end());
-    NX_ASSERT(serverIsInKnownSystem, "Server is not known");
-    if (!serverIsInKnownSystem)
+    if (!NX_ASSERT(systemIt != m_systems.end(), "Server %1 is not in known system", module.id))
         return;
 
     auto systemDescription = systemIt.value();
+    NX_VERBOSE(this, "Update server %1 for %2", module, systemDescription);
+
     const auto changes = systemDescription->updateServer(module);
     if (!changes.testFlag(QnServerField::CloudId))
     {
         updatePrimaryAddress(module);
         return;
     }
-
-    NX_VERBOSE(this, nx::format("Update server %1").arg(module.id));
 
     // Factory status has changed. We have to
     // remove server from current system and add to new
@@ -228,6 +227,9 @@ void DirectSystemFinder::updatePrimaryAddress(const nx::vms::discovery::ModuleEn
     auto systemIt = getSystemItByServer(module.id);
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
     const bool isCloudHost = isCloudAddress(module.endpoint.address);
+
+    NX_VERBOSE(this, "Update primary address, server %1, known system: %2",
+        module, serverIsInKnownSystem);
 
     if (isCloudHost)
     {

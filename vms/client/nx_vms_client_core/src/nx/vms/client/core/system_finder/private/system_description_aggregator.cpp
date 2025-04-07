@@ -499,8 +499,8 @@ nx::utils::SoftwareVersion SystemDescriptionAggregator::version() const
 
 QString SystemDescriptionAggregator::idForToStringFromPtr() const
 {
-    QString result = nx::format("System Aggregator %1 [id: %2, local id: %3]:\n",
-        name(), id(), localId());
+    QString result = nx::format("System Aggregator: %1 [id: %2, local id: %3]:\n",
+        name(), id(), localId().toSimpleString());
     for (const auto& system: m_systems)
         result += nx::toString(system) + '\n';
     return result;

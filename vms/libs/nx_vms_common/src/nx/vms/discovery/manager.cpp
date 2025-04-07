@@ -21,6 +21,11 @@
 
 namespace nx::vms::discovery {
 
+QString toString(const nx::vms::discovery::ModuleEndpoint& module)
+{
+    return NX_FMT("id: %1, addr: %2", module.id.toSimpleString(), module.endpoint);
+}
+
 ModuleEndpoint::ModuleEndpoint(
     nx::vms::api::ModuleInformationWithAddresses old, nx::network::SocketAddress endpoint)
     :
