@@ -512,13 +512,14 @@ struct ApplicationContext::Private
     {
         using namespace nx::vms::common;
         using Protocol = ServerCompatibilityValidator::Protocol;
+        using DeveloperFlag = ServerCompatibilityValidator::DeveloperFlag;
 
         ServerCompatibilityValidator::DeveloperFlags developerFlags;
-        if (ini().developerMode)
-            developerFlags.setFlag(ServerCompatibilityValidator::DeveloperFlag::ignoreCustomization);
+        if (ini().developerMode || ini().demoMode)
+            developerFlags.setFlag(DeveloperFlag::ignoreCustomization);
 
         if (ini().isAutoCloudHostDeductionMode())
-            developerFlags.setFlag(ServerCompatibilityValidator::DeveloperFlag::ignoreCloudHost);
+            developerFlags.setFlag(DeveloperFlag::ignoreCloudHost);
 
         ServerCompatibilityValidator::initialize(
             q->localPeerType(),

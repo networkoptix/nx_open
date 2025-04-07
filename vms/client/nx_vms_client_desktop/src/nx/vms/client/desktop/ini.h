@@ -27,8 +27,12 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(kEnableDeveloperModeByDefault, developerMode,
         "[Dev] Enable developer mode.");
 
+    NX_INI_FLAG(false, demoMode,
+        "[Dev] Allow client to connect to servers of all customizations. Enables automatic \n"
+        "cloud host deduction if it is not passed explicitly.");
+
     NX_INI_FLAG(false, profilerMode,
-        "[Dev] Enables client profiling options.");
+        "[Dev] Enables client profiling mode. Includes only statistics panel display as of now.");
 
     NX_INI_STRING("", cloudHost,
         "[Dev] Overrides the current Client's Cloud Host. Allows to connect to the Server that \n"
