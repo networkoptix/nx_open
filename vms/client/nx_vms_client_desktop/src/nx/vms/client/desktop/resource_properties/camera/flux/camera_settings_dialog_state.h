@@ -111,6 +111,7 @@ struct CombinedProperties
     CombinedValue supportsSchedule = CombinedValue::None;
     CombinedValue isUdpMulticastTransportAllowed = CombinedValue::None;
     CombinedValue streamCapabilitiesInitialized = CombinedValue::None;
+    CombinedValue hasRtspSettings = CombinedValue::None;
 
     int maxFps = 0;
 };
@@ -122,7 +123,7 @@ NX_REFLECTION_INSTRUMENT(CombinedProperties,
     (canForceZoomCapability)(hasStoppablePtz)(canAdjustPtzSensitivity)
     (hasCustomMediaPortCapability)
     (hasCustomMediaPort)(supportsSchedule)(isUdpMulticastTransportAllowed)
-    (streamCapabilitiesInitialized)(maxFps))
+    (streamCapabilitiesInitialized)(hasRtspSettings)(maxFps))
 
 struct MotionConstraints
 {
@@ -481,6 +482,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         MetadataRadioButton value);
 
     bool isDualStreamingEnabled() const;
+    bool hasRtspSettings() const;
     bool supportsSchedule() const;
     bool supportsVideoStreamControl() const;
     bool analyticsStreamSelectionEnabled(const nx::Uuid& engineId) const;

@@ -79,6 +79,11 @@ bool CameraSettingsDialogState::isDualStreamingEnabled() const
         && expert.secondaryRecordingDisabled.equals(false);
 }
 
+bool CameraSettingsDialogState::hasRtspSettings() const
+{
+    return supportsSchedule() || devicesDescription.hasRtspSettings == CombinedValue::All;
+}
+
 bool CameraSettingsDialogState::supportsSchedule() const
 {
     return devicesDescription.supportsSchedule == CombinedValue::All;

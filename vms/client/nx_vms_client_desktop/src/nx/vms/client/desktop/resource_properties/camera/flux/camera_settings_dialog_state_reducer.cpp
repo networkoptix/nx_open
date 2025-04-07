@@ -1288,6 +1288,11 @@ State CameraSettingsDialogStateReducer::loadCameras(
         [](const Camera& camera) { return camera->isDtsBased(); });
     state.devicesDescription.supportsSchedule = combinedValue(cameras,
         [](const Camera& camera) { return camera->supportsSchedule(); });
+    state.devicesDescription.hasRtspSettings = combinedValue(cameras,
+        [](const Camera& camera)
+        {
+            return !camera->getProperty(ResourcePropertyKey::kHasRtspSettings).isEmpty();
+        });
 
     state.devicesDescription.isVirtualCamera = combinedValue(cameras,
         [](const Camera& camera) { return camera->hasFlags(Qn::virtual_camera); });

@@ -70,6 +70,7 @@ NX_VMS_COMMON_API extern  const QString kAvailableProfiles;
 NX_VMS_COMMON_API extern  const QString kForcedPrimaryProfile;
 NX_VMS_COMMON_API extern  const QString kForcedSecondaryProfile;
 NX_VMS_COMMON_API extern  const QString kStorageInfo;
+NX_VMS_COMMON_API extern  const QString kHasRtspSettings;
 
 // Used as Resource-type-only property for some kind of recorders.
 NX_VMS_COMMON_API extern const QString kGroupPlayParamName;

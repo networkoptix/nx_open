@@ -85,6 +85,8 @@ const QString kNoVideoSupport("noVideoSupport");
 
 const QString kStorageInfo("storageInfo");
 
+const QString kHasRtspSettings("hasRtspSettings");
+
 namespace Onvif {
 
 const QString kMediaUrl("MediaUrl");

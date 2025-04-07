@@ -413,8 +413,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     ui->settingsGroupBox->setEnabled(supportsVideoStreamControl);
     ui->timeSettingsGroupBox->setEnabled(supportsVideoStreamControl);
     ui->useMedia2ToFetchProfilesGroupBox->setEnabled(supportsVideoStreamControl);
-
-    ui->groupBoxRTP->setEnabled(state.supportsSchedule() /*has video and/or audio stream(s)*/);
+    ui->groupBoxRTP->setEnabled(state.hasRtspSettings());
 
     const bool hasDualStreaming =
         state.devicesDescription.hasDualStreamingCapability != CombinedValue::None;
