@@ -5,7 +5,6 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/url.h>
-#include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -53,8 +52,7 @@ void DefaultWebpageManager::tryOpenDefaultWebPage()
 
 void DefaultWebpageManager::openDefaultWebPage(const QnWebPageResourcePtr& webpage)
 {
-    auto layout = layoutFromResource(webpage);
-    menu()->trigger(ui::action::OpenInNewTabAction, layout);
+    menu()->trigger(ui::action::OpenInNewTabAction, webpage);
 
     if (NX_ASSERT(workbench()->currentLayout()->items().size() == 1))
     {
