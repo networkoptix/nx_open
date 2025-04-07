@@ -596,6 +596,13 @@ QVariant BackupSettingsDecoratorModel::data(const QModelIndex& index, int role) 
         case InfoMessageRole:
             if (d->isCloudBackupStorage && !backupEnabled && !servicesOveruseWarning)
             {
+                if (d->isCloudStorageInSuspendedState())
+                {
+                    return column == SwitchColumn
+                        ? tr("Site is currently suspended")
+                        : QVariant();
+                }
+
                 return availableServices > 0
                     ? tr("%n suitable cloud storage services available", "", availableServices)
                     : tr("No suitable cloud storage services available");
@@ -875,7 +882,7 @@ void BackupSettingsDecoratorModel::fixBackupContentTypesForCloudStorage()
     std::copy_if(leafIndexes.cbegin(), leafIndexes.cend(), std::back_inserter(camerasIndexes),
         [this](const QModelIndex& index)
         {
-            if (const auto camera = cameraResource(index))
+            if (const auto camera = cameraResource(index); camera && isBackupSupported(camera))
                 return d->backupContentTypes(camera) == nx::vms::api::BackupContentType::archive;
 
             return false;

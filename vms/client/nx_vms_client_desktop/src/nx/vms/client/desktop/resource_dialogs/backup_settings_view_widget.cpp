@@ -26,6 +26,7 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/license/saas/saas_service_usage_helper.h>
 #include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
@@ -106,7 +107,7 @@ BackupSettingsViewWidget::BackupSettingsViewWidget(
 
             cloudStorageUsageHelper->proposeChange(toAdd, {});
             const auto deficit = cloudStorageUsageHelper->licenseDeficit();
-             if (deficit < 1)
+            if (deficit < 1)
                 return;
 
             const auto accentColor = nx::vms::client::core::colorTheme()->color("red");
@@ -144,7 +145,12 @@ BackupSettingsViewWidget::BackupSettingsViewWidget(
         {
             const auto accentColor = nx::vms::client::core::colorTheme()->color("red");
             const auto availableServicesData = index.data(AvailableCloudStorageServices);
-            if (!availableServicesData.isNull() && availableServicesData.toInt() < 1)
+
+            const bool notEnoughServices =
+                !availableServicesData.isNull() && availableServicesData.toInt() < 1;
+            const bool siteSuspended = systemContext()->saasServiceManager()->saasSuspended();
+
+            if (notEnoughServices || siteSuspended)
                 detailsWidget->setMessage(infoMessageData.toString(), accentColor);
             else
                 detailsWidget->setMessage(infoMessageData.toString());
