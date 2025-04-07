@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.14
+import QtQuick
+import QtQuick.Controls
 
 import Nx.Core
 
@@ -40,7 +41,7 @@ NxObject
     Connections
     {
         target: view
-        enabled: controller.enabled
+        enabled: controller.enabled && view.ScrollBar.vertical?.active
 
         function onAtYEndChanged()
         {
@@ -61,6 +62,12 @@ NxObject
                     d.updateData()
             }
         }
+    }
+
+    Connections
+    {
+        target: view
+        enabled: controller.enabled
 
         function onVisibleChanged()
         {
@@ -115,6 +122,8 @@ NxObject
             console.debug(loggingCategory, `${view.objectName}: fetch finished, `
                 + `direction=${d.directionName(request.direction)}, POI=${centralItemIndex}`)
 
+            d.fixupInProgress = true
+
             topPreloader.visible = false
             bottomPreloader.visible = false
 
@@ -140,6 +149,8 @@ NxObject
                         ? ListView.Beginning
                         : ListView.End)
             }
+
+            d.fixupInProgress = false
         }
 
         function onAsyncFetchStarted(request)
@@ -218,8 +229,12 @@ NxObject
 
         function updateData()
         {
-            if (!controller.enabled || (!view.visible && !model.placeholderRequired))
+            if (!controller.enabled
+                || fixupInProgress
+                || (!view.visible && !model.placeholderRequired))
+            {
                 return
+            }
 
             function whereAt()
             {

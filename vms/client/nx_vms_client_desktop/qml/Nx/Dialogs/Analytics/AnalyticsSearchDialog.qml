@@ -509,9 +509,6 @@ Window
 
                     columnWidth: (availableWidth / numColumns) - columnSpacing
 
-                    width: resultsPanel.width
-                    height: resultsPanel.height - counterBlock.height
-
                     model: eventModel
 
                     Shortcut

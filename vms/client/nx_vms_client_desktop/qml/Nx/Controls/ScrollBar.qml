@@ -14,6 +14,9 @@ ScrollBar
 
     visible: policy === ScrollBar.AlwaysOn || (policy === ScrollBar.AsNeeded && size < 1.0)
 
+    // Use `scrollBar.active` to check that a position change is caused by user interaction
+    // or by a scrollBy/scrollBySteps call, rather than by a change in size or parameters.
+
     function scrollBy(delta)
     {
         const wasActive = active
