@@ -16,7 +16,6 @@
 #include <nx/network/flash_socket/types.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_types.h>
-#include <nx/network/rest/result.h>
 #include <nx/network/stun/message.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/gzip/gzip_compressor.h>
@@ -348,7 +347,9 @@ QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
 }
 
 std::pair<nx::String, nx::String> QnTCPConnectionProcessor::generateErrorResponse(
-    nx::network::http::StatusCode::Value errorCode, const nx::String& details) const
+    nx::network::http::StatusCode::Value errorCode,
+    const nx::String& details,
+    std::optional<nx::network::rest::ErrorId> errorId) const
 {
     Q_D(const QnTCPConnectionProcessor);
     using namespace nx::network::http;
@@ -363,7 +364,8 @@ std::pair<nx::String, nx::String> QnTCPConnectionProcessor::generateErrorRespons
         return std::pair<nx::String, nx::String>(
             header::ContentType::kJson.toString(),
             QJson::serialized(nx::network::rest::Result{
-                nx::network::rest::Result::errorFromHttpStatus(errorCode), details}));
+                errorId.value_or(nx::network::rest::Result::errorFromHttpStatus(errorCode)),
+                details}));
     }
 
     static const nx::String kAuthEnumPrefix = "Auth_";
@@ -831,7 +833,8 @@ void QnTCPConnectionProcessor::sendErrorResponse(
 
 void QnTCPConnectionProcessor::sendUnauthorizedResponse(
     nx::network::http::StatusCode::Value httpResult,
-    const QByteArray& messageBody, const nx::String& details)
+    const nx::network::rest::Result& result,
+    const QByteArray& messageBody)
 {
     Q_D(QnTCPConnectionProcessor);
 
@@ -842,7 +845,8 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(
         if (messageBody.isEmpty())
         {
             std::tie(contentType, d->response.messageBody) =
-                generateErrorResponse(nx::network::http::StatusCode::unauthorized, details);
+                generateErrorResponse(nx::network::http::StatusCode::unauthorized,
+                    result.errorString, result.errorId);
         }
         else
         {
@@ -855,8 +859,8 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(
                 d->request.headers, nx::network::http::header::kAccept)).value
             == nx::network::http::header::ContentType::kJson.value)
         {
-            d->response.messageBody =
-                QJson::serialized(nx::network::rest::Result::unauthorized(details)).toStdString();
+            contentType = nx::network::http::header::ContentType::kJson.toString();
+            d->response.messageBody = QJson::serialized(result);
         }
     }
 

@@ -5,6 +5,7 @@
 #include <optional>
 
 #include <nx/network/http/http_types.h>
+#include <nx/network/rest/result.h>
 #include <nx/network/rest/user_access_data.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_delegate.h>
@@ -121,7 +122,9 @@ protected:
     static QString extractPath(const QString& fullUrl);
 
     std::pair<nx::String, nx::String> generateErrorResponse(
-        nx::network::http::StatusCode::Value errorCode, const nx::String& errorDetails = {}) const;
+        nx::network::http::StatusCode::Value errorCode,
+        const nx::String& errorDetails = {},
+        std::optional<nx::network::rest::ErrorId> errorId = std::nullopt) const;
 
     //nx::utils::ByteArray& getSendBuffer();
     //void bufferData(const char* data, int size);
@@ -165,7 +168,8 @@ protected:
 
     void sendUnauthorizedResponse(
         nx::network::http::StatusCode::Value httpResult,
-        const QByteArray& messageBody = {}, const nx::String& details = {});
+        const nx::network::rest::Result& result,
+        const QByteArray& messageBody = {});
 
     void logRequestOrResponse(
         const QByteArray& logMessage,
