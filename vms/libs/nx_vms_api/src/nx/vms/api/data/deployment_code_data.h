@@ -73,12 +73,6 @@ NX_REFLECTION_ENUM_CLASS(QrCodeImageType,
     png
 );
 
-/**%apidoc Deployment code type. */
-NX_REFLECTION_ENUM_CLASS(DeploymentCodeLength,
-    eight = 8,
-    thirtyTwo = 32
-);
-
 /**%apidoc Qr Code request data. */
 struct NX_VMS_API DeploymentCodeRequestData
 {
@@ -113,16 +107,10 @@ struct NX_VMS_API DeploymentCodeRequestData
      * %example 10
      */
     int pixelSize = 10;
-
-    /**%apidoc
-     * Deployment code length.
-     * %example thirtyTwo
-     */
-    DeploymentCodeLength codeLength = DeploymentCodeLength::thirtyTwo;
 };
 
 #define DeploymentCodeRequestData_Fields (serverId)(version)(correctionLevel)(imageType) \
-    (pixelSize)(codeLength)
+    (pixelSize)
 
 NX_REFLECTION_INSTRUMENT(DeploymentCodeRequestData, DeploymentCodeRequestData_Fields)
 
