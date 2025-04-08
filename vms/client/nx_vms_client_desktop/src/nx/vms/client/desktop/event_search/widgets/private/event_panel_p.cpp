@@ -238,37 +238,28 @@ EventPanel::Private::Private(EventPanel* q):
         connect(data.synchronizer, &AbstractSearchSynchronizer::activeChanged, this,
             [this, &data](bool isActive)
             {
-                if (data.searchWidget->isAllowed())
-                    setTabCurrent(data.tab, isActive);
+                if (!data.searchWidget->isAllowed())
+                    return;
+
+                if (isActive)
+                    m_tabs->setCurrentWidget(data.tab);
+                else if (m_tabs->currentWidget() == data.tab)
+                    setCurrentTab(Tab::notifications);
             });
     }
 
     connect(m_tabs, &QTabWidget::currentChanged, this,
         [this]
         {
-            const auto isSpecialTab =
-                [this](const QWidget* tab) -> bool
-                {
-                    return tab == m_motionTab || tab == m_analyticsTab;
-                };
-
             const auto currentTab = m_tabs->currentWidget();
-
-            if (!isSpecialTab(m_lastTab) || !isSpecialTab(currentTab))
-                m_previousTab = m_notificationsTab;
-
-            m_lastTab = currentTab;
 
             for (const auto& data: m_synchronizers)
                 data.synchronizer->setActive(m_tabs->currentWidget() == data.tab);
 
             m_callAlarmManager->setActive(currentTab != m_notificationsTab);
 
-            NX_VERBOSE(this->q, "Tab changed; previous: %1, current: %2",
-                m_previousTab, m_lastTab);
-
             emit this->q->currentTabChanged(
-                m_tabIds.value(m_lastTab), EventPanel::QPrivateSignal());
+                m_tabIds.value(currentTab), EventPanel::QPrivateSignal());
         });
 
     connect(action(menu::NotificationsTabAction), &QAction::triggered, this,
@@ -383,8 +374,6 @@ EventPanel::Tab EventPanel::Private::currentTab() const
 
 bool EventPanel::Private::setCurrentTab(Tab tab)
 {
-    m_requestedTab = tab; // It's possible that this tab will be temporary hidden in rebuildTabs().
-
     const int index = m_tabs->indexOf(m_tabIds.key(tab));
     if (index < 0)
         return false;
@@ -405,88 +394,70 @@ AbstractSearchWidget* EventPanel::Private::currentSearchWidget() const
     return nullptr;
 }
 
-void EventPanel::Private::setTabCurrent(QWidget* tab, bool current)
-{
-    if (current)
-    {
-        if (m_tabs->indexOf(tab) >= 0)
-        {
-            m_tabs->setCurrentWidget(tab);
-            NX_ASSERT(m_tabs->currentWidget() == tab);
-        }
-    }
-    else
-    {
-        if (m_previousTab
-            && m_tabs->currentWidget() == tab
-            && NX_ASSERT(m_tabs->indexOf(m_previousTab) >= 0))
-        {
-            m_tabs->setCurrentWidget(m_previousTab);
-        }
-    }
-}
-
 void EventPanel::Private::rebuildTabs()
 {
-    int currentIndex = 0;
-
-    static constexpr int kNotificationTabIndex = 0;
+    const auto selectedTab = m_tabs->currentWidget();
+    int updatingVisibleTabIndex = 0;
 
     const auto updateTab =
-        [this, &currentIndex](
+        [this, selectedTab, &updatingVisibleTabIndex](
             QWidget* tab,
-            bool condition,
+            bool showTab,
             const QIcon& icon,
             const QString& text,
             QWidget* tabButton = nullptr)
         {
-            const int oldIndex = m_tabs->indexOf(tab);
-            NX_ASSERT(oldIndex < 0 || oldIndex == currentIndex);
+            const int tabIndexBeforeRebuild = m_tabs->indexOf(tab);
+            const bool tabWasVisibleBeforeRebuild = tabIndexBeforeRebuild >= 0;
 
-            const bool tabVisible = oldIndex >= 0;
-            if (condition)
+            NX_ASSERT(tabIndexBeforeRebuild < 0
+                || tabIndexBeforeRebuild == updatingVisibleTabIndex);
+
+            if (showTab)
             {
-                if (!tabVisible)
+                if (!tabWasVisibleBeforeRebuild)
                 {
                     // Add tab.
-                    if (currentIndex == kNotificationTabIndex)
+                    if (tab == m_notificationsTab)
                     {
                         NX_ASSERT(!m_notificationBellWidget);
                         m_notificationBellWidget = new NotificationBellWidget(q);
 
                         m_tabs->insertIconWidgetTab(
-                            currentIndex,
+                            updatingVisibleTabIndex,
                             tab,
                             m_notificationBellWidget,
                             text.toUpper());
                     }
                     else
                     {
-                        m_tabs->insertTab(currentIndex, tab, icon, text.toUpper());
+                        m_tabs->insertTab(updatingVisibleTabIndex, tab, icon, text.toUpper());
                     }
-                    m_tabs->setTabToolTip(currentIndex, text);
+                    m_tabs->setTabToolTip(updatingVisibleTabIndex, text);
 
                     if (tabButton)
-                        m_tabs->tabBar()->setTabButton(currentIndex, QTabBar::LeftSide, tabButton);
+                        m_tabs->tabBar()->setTabButton(updatingVisibleTabIndex, QTabBar::LeftSide, tabButton);
                 }
 
-                ++currentIndex;
+                ++updatingVisibleTabIndex;
             }
-            else if (tabVisible)
+            else //< Hide tab.
             {
-                // Remove tab.
-                if (m_previousTab == tab || m_tabs->indexOf(m_previousTab) < 0)
-                    m_previousTab = m_notificationsTab;
-                setTabCurrent(tab, false);
-                m_tabs->removeTab(currentIndex);
-                tab->hide();
+                if (selectedTab == tab) //< If True, selected tab is not visible anymore.
+                    m_tabs->setCurrentIndex(0); //< Show Notifications tab by default.
+
+                if (tabWasVisibleBeforeRebuild)
+                {
+                    m_tabs->removeTab(updatingVisibleTabIndex);
+                    tab->hide();
+                }
             }
         };
 
     const auto resource = navigator()->currentResource();
 
     updateTab(m_notificationsTab,
-        true,
+        true, // Notifications tab is always visible.
         qnSkin->icon(kNotificationIcon),
         tr("Notifications", "Notifications tab title"));
 
@@ -509,9 +480,6 @@ void EventPanel::Private::rebuildTabs()
         m_analyticsTab->searchWidget()->isAllowed(),
         qnSkin->icon(kObjectIcon),
         tr("Objects", "Analytics tab title"));
-
-    // Update current tab to the one that was explicitly selected early.
-    setCurrentTab(m_requestedTab);
 
     // Make sure the number of notifications doesn't get obscured by the bell icon.
     m_counterLabel->raise();

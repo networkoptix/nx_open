@@ -83,9 +83,6 @@ private:
     QList<SynchronizerData> m_synchronizers;
     QHash<QWidget*, Tab> m_tabIds;
 
-    QWidget* m_previousTab = nullptr;
-    QWidget* m_lastTab = nullptr;
-
     std::unique_ptr<CallAlarmManager> m_callAlarmManager;
     QPointer<NotificationBellWidget> m_notificationBellWidget;
 
@@ -96,8 +93,6 @@ private:
     std::unique_ptr<QObject> hoveredTilePositionWatcher;
 
     nx::utils::ScopedConnections m_connections; //< Connections that should be guarded.
-
-    Tab m_requestedTab = Tab::notifications; //< Used to restore session state.
 };
 
 } // namespace nx::vms::client::desktop
