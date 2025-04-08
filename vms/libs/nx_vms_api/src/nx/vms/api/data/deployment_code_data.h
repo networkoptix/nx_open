@@ -122,11 +122,6 @@ struct NX_VMS_API DeploymentCodeData
     /**%apidoc Deployment code usable for adding Server during the Deployment Code Site set-up. */
     std::string code;
 
-    /**%apidoc Hardware code which can be optionally used when adding Server during the
-     * Deployment Code Site set-up.
-     */
-    std::string hardwareCode;
-
     /**%apidoc[opt] Complete URL leading to the Cloud Portal QR Code setup section. */
     std::string url;
 
@@ -134,7 +129,7 @@ struct NX_VMS_API DeploymentCodeData
     std::string imageBase64;
 };
 
-#define DeploymentCodeData_Fields (serverId)(code)(hardwareCode)(url)(imageBase64)
+#define DeploymentCodeData_Fields (serverId)(code)(url)(imageBase64)
 NX_REFLECTION_INSTRUMENT(DeploymentCodeData, DeploymentCodeData_Fields)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeploymentCodeRequestData, (json), NX_VMS_API)
