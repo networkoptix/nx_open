@@ -848,6 +848,9 @@ bool QnVideoStreamDisplay::processDecodedFrame(
     if (outFrame->isEmpty())
         return false;
 
+    if (outFrame->memoryType() == MemoryType::VideoMemory)
+        m_canUseBufferedFrameDisplayer = false;
+
     if (m_isLive && outFrame->memoryType() != MemoryType::VideoMemory)
     {
         auto camera = m_resource->toResourcePtr();
@@ -857,7 +860,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(
 
     NX_ASSERT(!outFrame->isExternalData());
 
-    if (m_bufferedFrameDisplayer && outFrame->memoryType() != MemoryType::VideoMemory)
+    if (m_bufferedFrameDisplayer && m_canUseBufferedFrameDisplayer)
     {
         const bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
         const qint64 bufferedDuration = m_bufferedFrameDisplayer->bufferedDuration();
