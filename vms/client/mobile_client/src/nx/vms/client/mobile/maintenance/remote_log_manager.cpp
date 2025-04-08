@@ -6,8 +6,12 @@
 #include <QtGui/QGuiApplication>
 #include <QtQml/QtQml>
 
-#include <mobile_client/mobile_client_module.h>
+#include <nx/branding.h>
 #include <mobile_client/mobile_client_settings.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/maintenance/log/collector_api_paths.h>
+#include <nx/network/maintenance/log/uploader.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/mobile/push_notification/details/push_ipc_data.h>
 #include <utils/common/synctime.h>
@@ -16,14 +20,16 @@
 
 namespace nx::vms::client::mobile {
 
+using network::maintenance::log::UploaderManager;
+
 namespace {
 
 QString startLogSession(
+    const std::unique_ptr<UploaderManager>& uploader,
     std::chrono::milliseconds duration,
     const std::string& forceSessionId = {})
 {
     using namespace std::chrono;
-    const auto uploader = qnMobileClientModule->remoteLogsUploader();
     const auto sessionId = uploader->start(duration, forceSessionId);
     if (sessionId.empty())
         return {};
@@ -39,26 +45,36 @@ QString startLogSession(
 
 void RemoteLogManager::registerQmlType()
 {
-    qmlRegisterSingletonType<RemoteLogManager>("nx.vms.client.mobile", 1, 0, "LogManager",
-        [](QQmlEngine* /*engine*/, QJSEngine* /*jsEngine*/)
-        {
-            return core::withCppOwnership(instance());
-        });
-}
-
-RemoteLogManager* RemoteLogManager::instance()
-{
-    static RemoteLogManager instance;
-    return &instance;
+    qmlRegisterType<RemoteLogManager>("nx.vms.client.mobile", 1, 0, "LogManager");
 }
 
 RemoteLogManager::RemoteLogManager(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    m_uploader(
+        []()
+        {
+            nx::log::LevelSettings logUploadFilter;
+            logUploadFilter.primary = nx::log::Level::verbose;
+            logUploadFilter.filters.emplace(std::string("nx"), nx::log::Level::verbose);
+            logUploadFilter.filters.emplace(std::string("Qn"), nx::log::Level::verbose);
+
+            const auto url = nx::network::url::Builder()
+                .setScheme(nx::network::http::kUrlSchemeName)
+                .setHost(nx::branding::cloudHost())
+                .setPath(nx::network::maintenance::log::kLogCollectorPathPrefix);
+            return std::make_unique<UploaderManager>(url, logUploadFilter);
+
+        }())
 {
     const auto lastSession = qnSettings->remoteLogSessionData();
     const qint64 remainingTimeMs = lastSession.endTimeMs - qnSyncTime->currentMSecsSinceEpoch();
-    if (remainingTimeMs > 0)
-        startLogSession(std::chrono::milliseconds(remainingTimeMs), lastSession.sessionId);
+    if (remainingTimeMs <= 0)
+        return;
+
+    startLogSession(
+        m_uploader,
+        std::chrono::milliseconds(remainingTimeMs),
+        lastSession.sessionId);
 }
 
 RemoteLogManager::~RemoteLogManager()
@@ -67,7 +83,7 @@ RemoteLogManager::~RemoteLogManager()
 
 QString RemoteLogManager::startRemoteLogSession(int durationMinutes)
 {
-    const auto result = startLogSession(std::chrono::minutes(durationMinutes));
+    const auto result = startLogSession(m_uploader, std::chrono::minutes(durationMinutes));
     if (!result.isEmpty())
         qApp->clipboard()->setText(result);
     return result;
@@ -75,7 +91,7 @@ QString RemoteLogManager::startRemoteLogSession(int durationMinutes)
 
 QString RemoteLogManager::remoteLogSessionId() const
 {
-    return QString::fromStdString(qnMobileClientModule->remoteLogsUploader()->currentSessionId());
+    return QString::fromStdString(m_uploader->currentSessionId());
 }
 
 } // namespace nx::vms::client::mobile

@@ -24,7 +24,7 @@ Page
     onLeftButtonClicked: Workflow.popCurrentScreen()
 
     title: qsTr("%1 Account", "%1 is the short cloud name (like 'Cloud')")
-        .arg(applicationInfo.shortCloudName())
+        .arg(appContext.appInfo.shortCloudName())
 
     Rectangle
     {
@@ -77,7 +77,7 @@ Page
                 Layout.rightMargin: 20
 
                 horizontalAlignment: Text.AlignHCenter
-                text: cloudStatusWatcher.cloudLogin
+                text: appContext.cloudStatusWatcher.cloudLogin
                 elide: Text.ElideRight
                 font.pixelSize: 14
                 font.weight: Font.Normal
@@ -103,7 +103,7 @@ Page
                     Layout.fillWidth: true
 
                     text: qsTr("Open %1", "%1 is the short cloud name (like 'Cloud')").arg(
-                        applicationInfo.cloudName())
+                        appContext.appInfo.cloudName())
 
                     padding: 0
                     leftPadding: 0
@@ -114,7 +114,7 @@ Page
                         // Forcing active focus to prevent keyboard capture form the QML side.
                         // Otherwise embedded browser can't show keyboard for input fields.
                         openCloudButton.forceActiveFocus()
-                        openExternalLink(cloudUrlHelper.mainUrl())
+                        Qt.openUrlExternally(CloudUrlHelper.mainUrl())
                     }
                 }
 
@@ -132,7 +132,7 @@ Page
 
                     onClicked:
                     {
-                        cloudStatusWatcher.resetAuthData();
+                        appContext.cloudStatusWatcher.resetAuthData();
                         Workflow.popCurrentScreen()
                     }
                 }

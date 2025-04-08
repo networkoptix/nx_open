@@ -20,41 +20,30 @@ EventRulesWatcher::EventRulesWatcher(nx::vms::client::mobile::SystemContext* con
     base_type(parent),
     SystemContextAware(context)
 {
-    const auto rulesManager = systemContext()->eventRuleManager();
+    connect(systemContext()->eventRuleManager(), &RuleManager::rulesReset, this,
+        [this](const nx::vms::event::RuleList& rules)
+        {
+            if (!rules.isEmpty())
+                return;
 
-    connect(rulesManager, &RuleManager::rulesReset,
-        this, &EventRulesWatcher::handleRulesReset);
-}
+            const auto serverId = systemContext()->currentServerId();
+            if (serverId.isNull())
+                return;
 
-void EventRulesWatcher::handleRulesReset(const nx::vms::event::RuleList& rules)
-{
-    if (!rules.isEmpty() || m_updated)
-        return;
+            const auto connection = systemContext()->messageBusConnection();
+            if (!connection)
+                return;
 
-    const auto serverId = systemContext()->currentServerId();
-    if (serverId.isNull())
-        return;
+            const auto manager = connection->getEventRulesManager(nx::network::rest::kSystemSession);
+            nx::vms::api::EventRuleDataList receivedRules;
+            if (manager->getEventRulesSync(&receivedRules) != ec2::ErrorCode::ok)
+                return;
 
-    const auto connection = systemContext()->messageBusConnection();
-    if (!connection)
-        return;
-
-    const auto manager = connection->getEventRulesManager(nx::network::rest::kSystemSession);
-    nx::vms::api::EventRuleDataList receivedRules;
-    if (manager->getEventRulesSync(&receivedRules) != ec2::ErrorCode::ok)
-        return;
-
-    m_updated = true;
-
-    vms::event::RuleList ruleList;
-    ec2::fromApiToResourceList(receivedRules, ruleList);
-    const auto eventRuleManager = systemContext()->eventRuleManager();
-    eventRuleManager->resetRules(ruleList);
-}
-
-void EventRulesWatcher::handleConnectionChanged()
-{
-    m_updated = false;
+            vms::event::RuleList ruleList;
+            ec2::fromApiToResourceList(receivedRules, ruleList);
+            const auto eventRuleManager = systemContext()->eventRuleManager();
+            eventRuleManager->resetRules(ruleList);
+        });
 }
 
 } // namespace mobile

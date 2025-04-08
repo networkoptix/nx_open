@@ -241,7 +241,7 @@ Item
                     control.ptzButtonClicked()
                     return
                 case CameraButtonController.ButtonGroup.twoWayAudio:
-                    requestRecordAudioPermissionIfNeeded()
+                    windowContext.ui.windowHelpers.requestRecordAudioPermissionIfNeeded()
                     hintControl.showCustomProcess(voiceVisualizerComponent, d.iconPath(index))
                     return
                 default:

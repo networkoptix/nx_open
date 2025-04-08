@@ -7,14 +7,22 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/mobile/window_context_aware.h>
 
 Q_MOC_INCLUDE("core/resource/layout_resource.h")
+Q_MOC_INCLUDE("nx/vms/client/mobile/utils/operation_manager.h")
 
-class QnContext;
-namespace nx::vms::client::mobile { class SessionManager; }
+namespace nx::vms::client::mobile {
+
+class SessionManager;
+class OperationManager;
+
+} // namespace nx::vms::client::mobile
 
 class QnMobileClientUiControllerPrivate;
-class QnMobileClientUiController: public QObject
+class QnMobileClientUiController:
+    public QObject,
+    public nx::vms::client::mobile::WindowContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -52,21 +60,20 @@ private:
         WRITE setRawLayout
         NOTIFY layoutChanged)
 
-//    Q_PROPERTY(QString currentSystemName
-//        READ currentSystemName
-//        NOTIFY currentSystemNameChanged)
+    Q_PROPERTY(nx::vms::client::mobile::OperationManager* operationManager
+        READ operationManager
+        CONSTANT)
 
     using ResourceIdList = QList<nx::Uuid>;
     using SessionManager = nx::vms::client::mobile::SessionManager;
 
 public:
-    QnMobileClientUiController(QObject* parent = nullptr);
+    QnMobileClientUiController(
+        nx::vms::client::mobile::WindowContext* context,
+        QObject* parent = nullptr);
 
     ~QnMobileClientUiController();
 
-    void initialize(
-        SessionManager* sessionManager,
-        QnContext* context);
 
 public:
     // Properties section.
@@ -76,7 +83,7 @@ public:
     QnLayoutResource* rawLayout() const;
     void setRawLayout(QnLayoutResource* value);
 
-//    QString currentSystemName() const;
+    nx::vms::client::mobile::OperationManager* operationManager() const;
 
 public:
     Q_INVOKABLE void openConnectToServerScreen(
@@ -97,8 +104,6 @@ signals:
         const QString& user,
         const QString& password,
         const QString& operationId);
-
-//    void currentSystemNameChanged();
 
     void currentScreenChanged();
 

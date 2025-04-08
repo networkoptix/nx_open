@@ -33,6 +33,11 @@ SessionManager* WindowContextAware::sessionManager() const
     return windowContext()->sessionManager();
 }
 
+UiController* WindowContextAware::uiController() const
+{
+    return windowContext()->uiController();
+}
+
 SystemContext* WindowContextAware::createSystemContext()
 {
     return windowContext()->createSystemContext();

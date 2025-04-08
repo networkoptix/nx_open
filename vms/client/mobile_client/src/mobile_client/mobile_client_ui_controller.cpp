@@ -2,49 +2,45 @@
 
 #include "mobile_client_ui_controller.h"
 
-#include <context/context.h>
+#include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/remote_connection_error.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/session/ui_messages.h>
 #include <nx/vms/common/system_settings.h>
-
+#include <nx/vms/client/mobile/ui/ui_controller.h>
+#include <nx/vms/client/mobile/utils/operation_manager.h>
 
 class QnMobileClientUiControllerPrivate
 {
 public:
+    std::unique_ptr<nx::vms::client::mobile::OperationManager> operationManager;
     QnLayoutResourcePtr layout;
     QnMobileClientUiController::Screen currentScreen =
         QnMobileClientUiController::Screen::UnknownScreen;
 };
 
-QnMobileClientUiController::QnMobileClientUiController(QObject* parent):
+QnMobileClientUiController::QnMobileClientUiController(
+    nx::vms::client::mobile::WindowContext* context,
+    QObject* parent)
+    :
     base_type(parent),
-    d_ptr(new QnMobileClientUiControllerPrivate())
+    nx::vms::client::mobile::WindowContextAware(context),
+    d_ptr(new QnMobileClientUiControllerPrivate{
+        .operationManager = std::make_unique<nx::vms::client::mobile::OperationManager>()})
 {
     NX_DEBUG(this, "QnMobileClientUiController(): created mobile client UI controller");
 
-//    connect(globalSettings(), &nx::vms::common::SystemSettings::systemNameChanged,
-//        this, &QnMobileClientUiController::currentSystemNameChanged);
-}
-
-QnMobileClientUiController::~QnMobileClientUiController()
-{
-}
-
-void QnMobileClientUiController::initialize(
-    SessionManager* sessionManager,
-    QnContext *context)
-{
-    connect(sessionManager, &SessionManager::hasSessionChanged, this,
-        [this, sessionManager]()
+    connect(sessionManager(), &SessionManager::hasSessionChanged, this,
+        [this]()
         {
             NX_DEBUG(this, "initialize(): hasSessionChanged: screen is <%1>, has session is <%2>",
-                currentScreen(), sessionManager->hasSession());
+                currentScreen(), sessionManager()->hasSession());
 
             const auto screen = currentScreen();
 
@@ -52,7 +48,7 @@ void QnMobileClientUiController::initialize(
             if (screen == Screen::CustomConnectionScreen)
                 return;
 
-            if (sessionManager->hasSession())
+            if (sessionManager()->hasSession())
             {
                 openResourcesScreen();
             }
@@ -64,14 +60,14 @@ void QnMobileClientUiController::initialize(
             }
         });
 
-    connect(sessionManager, &SessionManager::sessionStoppedManually, this,
+    connect(sessionManager(), &SessionManager::sessionStoppedManually, this,
         [this]()
         {
             NX_DEBUG(this, "initialize(): sessionStoppedManually(): called");
             nx::vms::client::core::appContext()->coreSettings()->lastConnection = {};
         });
 
-    connect(sessionManager, &SessionManager::sessionStartedSuccessfully, this,
+    connect(sessionManager(), &SessionManager::sessionStartedSuccessfully, this,
         [this]()
         {
             NX_DEBUG(this, "initialize(): sessionStartedSuccessfully(): current screen is <%1>",
@@ -83,9 +79,7 @@ void QnMobileClientUiController::initialize(
     using Session = nx::vms::client::mobile::Session;
     using RemoteConnectionErrorCode = nx::vms::client::core::RemoteConnectionErrorCode;
     const auto handleSessionError =
-        [this, context](
-            const QString& systemName,
-            RemoteConnectionErrorCode status)
+        [this](const QString& systemName, RemoteConnectionErrorCode status)
         {
             NX_DEBUG(this, "initialize(): sessionFinishedWithError: current screen is <%1>",
                 currentScreen());
@@ -98,10 +92,13 @@ void QnMobileClientUiController::initialize(
 
             using UiMessages = nx::vms::client::mobile::UiMessages;
             const auto errorText = UiMessages::getConnectionErrorText(status);
-            context->showConnectionErrorMessage(systemName, errorText);
+            uiController()->showConnectionErrorMessage(systemName, errorText);
         };
-    connect(sessionManager, &SessionManager::sessionFinishedWithError,
-        context, handleSessionError);
+    connect(sessionManager(), &SessionManager::sessionFinishedWithError, this, handleSessionError);
+}
+
+QnMobileClientUiController::~QnMobileClientUiController()
+{
 }
 
 QnMobileClientUiController::Screen QnMobileClientUiController::currentScreen() const
@@ -141,10 +138,11 @@ void QnMobileClientUiController::setRawLayout(QnLayoutResource* value)
     emit layoutChanged();
 }
 
-//QString QnMobileClientUiController::currentSystemName() const
-//{
-//    return globalSettings()->systemName();
-//}
+nx::vms::client::mobile::OperationManager* QnMobileClientUiController::operationManager() const
+{
+    Q_D(const QnMobileClientUiController);
+    return d->operationManager.get();
+}
 
 void QnMobileClientUiController::openConnectToServerScreen(
     const nx::utils::Url& url,

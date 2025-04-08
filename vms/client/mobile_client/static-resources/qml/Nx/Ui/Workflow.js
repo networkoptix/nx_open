@@ -283,7 +283,7 @@ function openDialog(path, properties)
     return dialog
 }
 
-function openStandardDialog(title, message, buttonsModel, disableAutoClose = false)
+function openStandardDialog(title, message = "", buttonsModel = ["OK"], disableAutoClose = false)
 {
     return openDialog(
         "../Dialogs/StandardDialog.qml",
@@ -291,7 +291,7 @@ function openStandardDialog(title, message, buttonsModel, disableAutoClose = fal
             "title": title,
             "message": message,
             "disableAutoClose": disableAutoClose,
-            "buttonsModel": buttonsModel ? buttonsModel : ["OK"]
+            "buttonsModel": buttonsModel
         }
     )
 }

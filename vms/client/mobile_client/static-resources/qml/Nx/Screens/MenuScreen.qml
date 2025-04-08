@@ -30,9 +30,9 @@ Page
         model: [
             {
                 "iconSource": "image://skin/24x24/Outline/disconnect.svg",
-                "text": sessionManager.systemName,
+                "text": windowContext.sessionManager.systemName,
                 "initialize": (item) => item.customAreaComponent = disconnectButtonCustomArea,
-                "action": () => sessionManager.stopSessionByUser()
+                "action": () => windowContext.sessionManager.stopSessionByUser()
             },
             {
                 "iconSource": "image://skin/24x24/Outline/settings.svg",

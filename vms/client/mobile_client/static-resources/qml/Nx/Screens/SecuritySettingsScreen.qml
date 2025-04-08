@@ -33,13 +33,14 @@ Page
             id: strictChoice
 
             width: parent.width
-            checked: settings.certificateValidationLevel == Certificate.ValidationLevel.strict
+            checked: appContext.settings.certificateValidationLevel
+                == Certificate.ValidationLevel.strict
             text: qsTr("Strict")
             extraText: qsTr("Connect only servers with public certificates")
 
             onCheckedChanged:
             {
-                settings.certificateValidationLevel = strictChoice.checked
+                appContext.settings.certificateValidationLevel = strictChoice.checked
                     ? Certificate.ValidationLevel.strict
                     : Certificate.ValidationLevel.recommended
             }

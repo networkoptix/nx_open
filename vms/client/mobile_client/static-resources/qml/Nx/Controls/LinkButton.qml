@@ -39,7 +39,7 @@ Button
                 // Forcing active focus to prevent keyboard capture form the QML side.
                 // Otherwise embedded browser can't show keyboard for input fields.
                 control.forceActiveFocus()
-                openExternalLink(url)
+                Qt.openUrlExternally(url)
             }
 
             control.clicked()

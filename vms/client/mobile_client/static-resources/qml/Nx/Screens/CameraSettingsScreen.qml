@@ -38,8 +38,9 @@ Page
 
             text: qsTr("Information")
             width: parent.width
-            checkState: showCameraInfo ? Qt.Checked : Qt.Unchecked
-            onCheckStateChanged: showCameraInfo = checkState !== Qt.Unchecked
+            checkState: appContext.settings.showCameraInfo ? Qt.Checked : Qt.Unchecked
+            onCheckStateChanged:
+                appContext.settings.showCameraInfo = checkState !== Qt.Unchecked
         }
 
         LabeledSwitch
@@ -72,7 +73,19 @@ Page
 
             customArea: Text
             {
-                text: qualityText(player.currentResolution, player.videoQuality)
+                text:
+                {
+                    const resolution = player.currentResolution
+                    if (resolution.width > 0 && resolution.height > 0)
+                        return ("%1x%2").arg(resolution.width).arg(resolution.height);
+
+                    if (player.videoQuality !== MediaPlayer.LowVideoQuality
+                        && player.videoQuality !== MediaPlayer.HighVideoQuality)
+                    {
+                        return ("%1p").arg(player.videoQuality);
+                    }
+                    return tr("Unknown");
+                }
                 font.pixelSize: 16
                 color: ColorTheme.colors.light16
                 anchors.verticalCenter: parent.verticalCenter
@@ -105,7 +118,7 @@ Page
                 dialog.onActiveQualityChanged.connect(
                     function()
                     {
-                        settings.lastUsedQuality = dialog.activeQuality
+                        appContext.settings.lastUsedQuality = dialog.activeQuality
                     }
                 )
             }

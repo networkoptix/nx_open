@@ -12,7 +12,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <mobile_client/mobile_client_message_processor.h>
-#include <mobile_client/mobile_client_module.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <network/system_helpers.h>
 #include <nx/network/address_resolver.h>
@@ -722,8 +721,10 @@ void Session::Private::gatherInitialConnectionInfo(int remainingTriesCount)
                     properties["cloudSystemId"] = cloudData->cloudSystemId;
 
                     const QPointer<Private> guard = this;
-                    const auto password = nx::vms::client::mobile::QmlWrapperHelper::showScreen(
-                        QUrl("qrc:qml/Nx/Screens/Cloud/DigestLogin.qml"), properties);
+                    static const auto kDigestLoginUrl =
+                        QUrl("qrc:qml/Nx/Screens/Cloud/DigestLogin.qml");
+                    const auto password = QmlWrapperHelper::showScreen(
+                        q->windowContext(), kDigestLoginUrl, properties);
 
                     if (!guard)
                         return;

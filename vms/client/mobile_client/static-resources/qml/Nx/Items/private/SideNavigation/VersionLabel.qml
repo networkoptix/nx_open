@@ -13,13 +13,13 @@ AbstractButton
     implicitWidth: parent ? parent.width : 200
     implicitHeight: 32
 
-    text: applicationInfo.version()
+    text: appContext.appInfo.version()
     background: null
     leftPadding: 16
     rightPadding: 16
     font.pixelSize: 13
 
-    onDoubleClicked: copyToClipboard(versionText.text)
+    onDoubleClicked: windowContext.ui.windowHelpers.copyToClipboard(versionText.text)
 
     onPressed: developerSettingsTimer.restart()
     onReleased: developerSettingsTimer.stop()

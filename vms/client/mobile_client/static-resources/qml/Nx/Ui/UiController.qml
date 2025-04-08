@@ -15,7 +15,7 @@ NxObject
 
     Connections
     {
-        target: uiController
+        target: windowContext.depricatedUiController
 
         function onConnectToServerScreenRequested(host, user, password, operationId)
         {
@@ -24,7 +24,7 @@ NxObject
 
         function onResourcesScreenRequested(filterIds)
         {
-            Workflow.openResourcesScreen(sessionManager.systemName, filterIds)
+            Workflow.openResourcesScreen(windowContext.sessionManager.systemName, filterIds)
         }
 
         function onVideoScreenRequested(cameraResource, timestamp)
@@ -40,7 +40,7 @@ NxObject
 
     Binding
     {
-        target: uiController
+        target: windowContext.depricatedUiController
         property: "currentScreen"
         value: d.screenByName(stackView && stackView.currentItem
             ? stackView.currentItem.objectName

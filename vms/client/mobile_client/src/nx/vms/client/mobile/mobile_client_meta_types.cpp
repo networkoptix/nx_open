@@ -35,6 +35,7 @@
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/session/ui_messages.h>
 #include <nx/vms/client/mobile/utils/navigation_bar_utils.h>
+#include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <nx/vms/client/mobile/workaround/back_gesture_workaround.h>
 #include <private/qqmlvaluetype_p.h>
 #include <resources/camera_access_rights_helper.h>
@@ -61,8 +62,7 @@ void registerQmlTypes()
 {
     qmlRegisterUncreatableType<QnMobileAppInfo>("Nx.Mobile", 1, 0,
         "QnMobileAppInfo", "Cannot create an instance of QnMobileAppInfo.");
-    qmlRegisterUncreatableType<core::CloudUrlHelper>("nx.vms.client.core", 1, 0,
-        "CloudUrlHelper", "Cannot create an instance of QnCloudUrlHelper.");
+
     qmlRegisterUncreatableType<nx::client::mobile::QmlSettingsAdaptor>(
         "Nx.Settings", 1, 0, "MobileSettings", "Cannot create an instance of MobileSettings.");
 
@@ -102,6 +102,9 @@ void registerQmlTypes()
     qmlRegisterRevision<QQuickTextInput, 6>("Nx.Controls", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("Nx.Controls", 1, 0);
 
+    core::CloudUrlHelper::registerSingletonType(
+        utils::SystemUri::ReferralSource::MobileClient,
+        utils::SystemUri::ReferralContext::WelcomePage);
     core::WatermarkWatcher::registerQmlType();
     nx::client::mobile::VoiceSpectrumItem::registerQmlType();
     nx::client::mobile::MotionPlaybackMaskWatcher::registerQmlType();
@@ -118,6 +121,7 @@ void registerQmlTypes()
     CameraButtonController::registerQmlType();
     CameraButtonsModel::registerQmlType();
     MediaDownloadBackend::registerQmlType();
+    UiController::registerQmlType();
     ShareBookmarkBackend::registerQmlType();
 
     qmlRegisterUncreatableMetaObject(nx::vms::api::staticMetaObject, "nx.vms.api", 1, 0,

@@ -17,7 +17,7 @@ Item
     property alias description: descriptionText.text
     property bool needDigestCloudPassword: false
     readonly property bool cloudAvailable:
-        cloudStatusWatcher.status === CloudStatusWatcher.Online
+        appContext.cloudStatusWatcher.status === CloudStatusWatcher.Online
 
     Column
     {

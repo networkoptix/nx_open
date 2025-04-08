@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <chrono>
-
 #include <QtCore/QObject>
+
+namespace nx::network::maintenance::log { class UploaderManager; }
 
 namespace nx::vms::client::mobile {
 
@@ -15,13 +15,15 @@ class RemoteLogManager: public QObject
 
 public:
     static void registerQmlType();
-    static RemoteLogManager* instance();
 
     RemoteLogManager(QObject* parent = nullptr);
     virtual ~RemoteLogManager() override;
 
     Q_INVOKABLE QString startRemoteLogSession(int durationMinutes);
     Q_INVOKABLE QString remoteLogSessionId() const;
+
+private:
+    const std::unique_ptr<network::maintenance::log::UploaderManager> m_uploader;
 };
 
 } // namespace nx::vms::client::mobile

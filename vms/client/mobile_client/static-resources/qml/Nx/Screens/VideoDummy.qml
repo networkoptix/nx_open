@@ -92,7 +92,7 @@ DummyMessage
                 description: qsTr(
                     "Set password on this camera using %1 client or camera web-page to view video",
                     "%1 is the short desktop client name (like 'Nx Witness')")
-                    .arg(applicationInfo.productName());
+                    .arg(appContext.appInfo.productName());
             }
         },
         State
@@ -148,7 +148,7 @@ DummyMessage
                     "In this app I/O module can be used as a sound input device only."
                     + " To use it as a control module, please use desktop version of %1",
                     "%1 is the short desktop client name (like 'Nx Witness')")
-                    .arg(applicationInfo.productName())
+                    .arg(appContext.appInfo.productName())
                 image: lp("/images/alert_io.png")
             }
         },

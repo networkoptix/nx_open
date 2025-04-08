@@ -177,7 +177,8 @@ Pane
 
                 onClicked:
                 {
-                    removeSavedCredentials(authDataModel.localSystemId, loginField.text.trim())
+                    appContext.credentialsHelper.removeSavedCredentials(
+                        authDataModel.localSystemId, loginField.text.trim())
                 }
             }
         }

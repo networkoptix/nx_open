@@ -201,7 +201,7 @@ Item
             if (d.customRoi)
                 d.customRoi.hide()
 
-            makeShortVibration()
+            windowContext.ui.windowHelpers.makeShortVibration()
         }
         else
         {

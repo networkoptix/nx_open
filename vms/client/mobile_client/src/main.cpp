@@ -19,11 +19,9 @@ extern "C" {
 #include <QtQuickControls2/QQuickStyle>
 #include <QtWebView/QtWebView>
 
-#include <context/context.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/storage/file_storage/qtfile_storage_resource.h>
-#include <mobile_client/mobile_client_module.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_startup_parameters.h>
 #include <mobile_client/mobile_client_ui_controller.h>
@@ -43,7 +41,6 @@ extern "C" {
 #include <nx/utils/rlimit.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/timer_manager.h>
-#include <nx/vms/client/core/media/watermark_image_provider.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
@@ -125,14 +122,6 @@ int runUi(QGuiApplication* application)
     const auto targetFont = QFont(getTargetFontFamiliy("Roboto",
         nx::vms::client::core::appContext()->coreSettings()->locale()));
     QGuiApplication::setFont(targetFont);
-
-    const auto applicationContext = mobile::appContext();
-    const auto engine = applicationContext->qmlEngine();
-
-    engine->addImageProvider(nx::vms::client::core::WatermarkImageProvider::name(),
-        new nx::vms::client::core::WatermarkImageProvider());
-
-    prepareWindow();
 
     QSize maxFfmpegResolution = qnSettings->maxFfmpegResolution();
     QSize maxFfmpegHevcResolution = maxFfmpegResolution;
@@ -305,6 +294,8 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
 
 int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
 {
+    Q_INIT_RESOURCE(mobile_client);
+
     QQuickStyle::setStyle("Basic");
 
     nx::utils::rlimit::setMaxFileDescriptors(1024);
@@ -359,8 +350,7 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     bool loggingIsInitialized = initializeLogging(startupParams);
 
     QnMobileClientSettings settings;
-    const auto applicationContext = std::make_unique<mobile::ApplicationContext>();
-    const auto mobileClient = std::make_unique<QnMobileClientModule>(startupParams);
+    const auto applicationContext = std::make_unique<mobile::ApplicationContext>(startupParams);
 
     if (!loggingIsInitialized)
     {

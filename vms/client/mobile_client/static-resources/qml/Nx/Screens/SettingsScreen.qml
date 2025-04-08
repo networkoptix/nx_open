@@ -42,23 +42,26 @@ Page
 
                 width: parent.width
                 text: qsTr("Live previews")
-                checkState: settings.liveVideoPreviews ? Qt.Checked : Qt.Unchecked
+                checkState: appContext.settings.liveVideoPreviews
+                    ? Qt.Checked
+                    : Qt.Unchecked
                 icon: lp("/images/live_previews_settings_option.svg")
                 extraText: qsTr("Show previews in the cameras list")
-                onCheckStateChanged: settings.liveVideoPreviews = checkState != Qt.Unchecked
+                onCheckStateChanged:
+                    appContext.settings.liveVideoPreviews = checkState != Qt.Unchecked
             }
 
             LabeledSwitch
             {
                 width: parent.width
                 text: qsTr("Save passwords")
-                checkState: settings.savePasswords ? Qt.Checked : Qt.Unchecked
+                checkState: appContext.settings.savePasswords ? Qt.Checked : Qt.Unchecked
                 icon: lp("/images/save_passwords_settings_option.svg")
                 extraText: qsTr("Automatically log in to servers")
                 onClicked:
                 {
-                    settings.savePasswords = checkState
-                    if (settings.savePasswords)
+                    appContext.settings.savePasswords = checkState
+                    if (appContext.settings.savePasswords)
                         return
 
                     var dialog = Workflow.openStandardDialog(
@@ -72,7 +75,7 @@ Page
                         function(buttonId)
                         {
                             if (buttonId == "DELETE")
-                                clearSavedPasswords()
+                                appContext.credentialsHelper.clearSavedPasswords()
                         })
                 }
             }
@@ -84,7 +87,7 @@ Page
                 icon: lp("/images/security_settings_option.svg")
 
                 showCustomArea: checkState === Qt.Checked
-                checkState: settings.certificateValidationLevel == Certificate.ValidationLevel.disabled
+                checkState: appContext.settings.certificateValidationLevel == Certificate.ValidationLevel.disabled
                     ? Qt.Unchecked
                     : Qt.Checked
 
@@ -94,18 +97,24 @@ Page
 
                     font.pixelSize: 16
                     color: ColorTheme.colors.light16
-                    text: settings.certificateValidationLevel
-                          == Certificate.ValidationLevel.recommended
-                          ? qsTr("Recommended")
-                          : qsTr("Strict")
+                    text: appContext.settings.certificateValidationLevel
+                        == Certificate.ValidationLevel.recommended
+                        ? qsTr("Recommended")
+                        : qsTr("Strict")
                 }
 
                 onClicked:
                 {
                     if (checkState == Qt.Checked)
-                        settings.certificateValidationLevel = Certificate.ValidationLevel.recommended
+                    {
+                        appContext.settings.certificateValidationLevel =
+                            Certificate.ValidationLevel.recommended
+                    }
                     else
-                        settings.certificateValidationLevel = Certificate.ValidationLevel.disabled
+                    {
+                        appContext.settings.certificateValidationLevel =
+                            Certificate.ValidationLevel.disabled
+                    }
                 }
 
                 customAreaClickHandler: ()=>Workflow.openSecuritySettingsScreen()
@@ -115,11 +124,11 @@ Page
             {
                 width: parent.width
                 text: qsTr("Use server time")
-                checkState: applicationContext.serverTimeMode ? Qt.Checked : Qt.Unchecked
+                checkState: appContext.settings.serverTimeMode ? Qt.Checked : Qt.Unchecked
                 icon: lp("/images/server_time_settings_option.svg")
                 onCheckStateChanged:
                 {
-                    applicationContext.serverTimeMode = checkState != Qt.Unchecked
+                    appContext.settings.serverTimeMode = checkState != Qt.Unchecked
                 }
             }
 
@@ -129,8 +138,11 @@ Page
                 text: qsTr("Enable hardware acceleration")
                 extraText: qsTr("Increase performance and battery life")
                 icon: lp("/images/hardware_decoder.svg")
-                checkState: settings.enableHardwareDecoding  ? Qt.Checked : Qt.Unchecked
-                onCheckStateChanged: settings.enableHardwareDecoding = checkState != Qt.Unchecked
+                checkState: appContext.settings.enableHardwareDecoding
+                    ? Qt.Checked
+                    : Qt.Unchecked
+                onCheckStateChanged:
+                    appContext.settings.enableHardwareDecoding = checkState != Qt.Unchecked
             }
 
             LabeledSwitch
@@ -139,10 +151,11 @@ Page
                 text: qsTr("Enable software decoder fallback")
                 extraText: qsTr("Decode some rare video formats using software decoder")
                 icon: lp("/images/decoder_fallback.svg")
-                checkState:
-                    settings.enableSoftwareDecoderFallback ? Qt.Checked : Qt.Unchecked
-                onCheckStateChanged:
-                    settings.enableSoftwareDecoderFallback = checkState != Qt.Unchecked
+                checkState: appContext.settings.enableSoftwareDecoderFallback
+                    ? Qt.Checked
+                    : Qt.Unchecked
+                onCheckStateChanged: appContext.settings.enableSoftwareDecoderFallback =
+                    checkState != Qt.Unchecked
             }
 
             LabeledSwitch
@@ -154,16 +167,16 @@ Page
                 icon: lp("/images/notifications_settings_option.svg")
                 text: qsTr("Push notifications")
                 manualStateChange: true
-                interactive: !pushManager.userUpdateInProgress
-                showIndicator: pushManager.loggedIn && pushManager.hasOsPermission
-                onClicked: pushManager.setEnabled(checkState == Qt.Unchecked)
-                showCustomArea: checkState == Qt.Checked && pushManager.systemsCount > 1
+                interactive: !appContext.pushManager.userUpdateInProgress
+                showIndicator: appContext.pushManager.loggedIn && appContext.pushManager.hasOsPermission
+                onClicked: appContext.pushManager.setEnabled(checkState == Qt.Unchecked)
+                showCustomArea: checkState == Qt.Checked && appContext.pushManager.systemsCount > 1
 
                 Binding
                 {
                     target: notificationsSwitch
                     property: "checkState"
-                    value: pushManager.enabledCheckState
+                    value: appContext.pushManager.enabledCheckState
                 }
 
                 customArea: Text
@@ -174,18 +187,19 @@ Page
 
                     font.pixelSize: 16
                     color: ColorTheme.colors.light16
-                    text: pushManager.expertMode
-                        ? pushManager.usedSystemsCount + " / " + pushManager.systemsCount
+                    text: appContext.pushManager.expertMode
+                        ? appContext.pushManager.usedSystemsCount
+                            + " / " + appContext.pushManager.systemsCount
                         : qsTr("All");
                 }
 
                 customAreaClickHandler:
                     function()
                     {
-                        if (!pushManager.loggedIn)
+                        if (!appContext.pushManager.loggedIn)
                             Workflow.openCloudLoginScreen()
-                        else if (!pushManager.hasOsPermission)
-                            pushManager.showOsPushSettings()
+                        else if (!appContext.pushManager.hasOsPermission)
+                            appContext.pushManager.showOsPushSettings()
                         else if (notificationsSwitch.showCustomArea)
                             Workflow.openPushExpertModeScreen()
                         else
@@ -194,20 +208,20 @@ Page
 
                 extraText:
                 {
-                    if (!pushManager.loggedIn)
+                    if (!appContext.pushManager.loggedIn)
                         return qsTr("Log in to the cloud to use push notifications")
 
-                    return pushManager.hasOsPermission
+                    return appContext.pushManager.hasOsPermission
                         ? ""
                         : qsTr("Notifications are turned off in the device settings")
                 }
 
                 extraTextColor:
                 {
-                    if (!pushManager.loggedIn)
+                    if (!appContext.pushManager.loggedIn)
                         return ColorTheme.colors.brand_core
 
-                    return pushManager.hasOsPermission
+                    return appContext.pushManager.hasOsPermission
                         ? notificationsSwitch.extraTextStandardColor
                         : ColorTheme.colors.red_l2
                 }

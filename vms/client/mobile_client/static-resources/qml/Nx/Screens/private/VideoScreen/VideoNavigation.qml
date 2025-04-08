@@ -315,7 +315,7 @@ Item
                 readonly property int kMinuteOffsetMs: 60 * 1000
                 readonly property int kFiveSecondsOffsetMs: 5 * 1000
                 rightChunksOffsetMs:
-                    sessionManager.connectedServerVersion.major >= kFullLengthArchiveSupportVersion
+                    windowContext.sessionManager.connectedServerVersion.major >= kFullLengthArchiveSupportVersion
                         ? kFiveSecondsOffsetMs
                         : kMinuteOffsetMs
 

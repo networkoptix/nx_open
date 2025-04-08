@@ -364,7 +364,6 @@ struct ApplicationContext::Private
     std::unique_ptr<WebPageDataCache> webPageDataCache;
     std::unique_ptr<QnQtbugWorkaround> qtBugWorkarounds;
     std::unique_ptr<core::DesktopResourceSearcher> desktopResourceSearcher;
-    std::unique_ptr<core::SystemsVisibilityManager> systemsVisibilityManager;
     std::unique_ptr<nx::vms::client::desktop::joystick::Manager> joystickManager;
 
     // Network modules
@@ -746,7 +745,6 @@ ApplicationContext::ApplicationContext(
             d->qtBugWorkarounds = std::make_unique<QnQtbugWorkaround>();
             d->cloudGateway = std::make_unique<nx::cloud::gateway::VmsGatewayEmbeddable>();
             d->localProxyServer = std::make_unique<LocalProxyServer>();
-            d->systemsVisibilityManager = std::make_unique<core::SystemsVisibilityManager>();
             d->joystickManager.reset(joystick::Manager::create());
 
             QObject::connect(d->sharedMemoryManager.get(),

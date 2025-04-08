@@ -16,7 +16,7 @@ Pane
 
     clip: true
 
-    readonly property string login: cloudStatusWatcher.cloudLogin
+    readonly property string login: appContext.cloudStatusWatcher.cloudLogin
 
     background: Rectangle
     {
@@ -49,8 +49,8 @@ Pane
         anchors.fill: parent
         onClicked:
         {
-            var showSummary = cloudStatusWatcher.status == CloudStatusWatcher.Online
-                || cloudStatusWatcher.status == CloudStatusWatcher.Offline
+            var showSummary = appContext.cloudStatusWatcher.status === CloudStatusWatcher.Online
+                || appContext.cloudStatusWatcher.status === CloudStatusWatcher.Offline
 
             if (showSummary)
                 Workflow.openCloudSummaryScreen()
@@ -76,7 +76,8 @@ Pane
             width: parent.width - x
             text: login
                 ? login
-                : qsTr("Log in to %1", "%1 is the short cloud name (like 'Cloud')").arg(applicationInfo.cloudName())
+                : qsTr("Log in to %1", "%1 is the short cloud name (like 'Cloud')")
+                    .arg(appContext.appInfo.cloudName())
             anchors.verticalCenter: parent.verticalCenter
             font.pixelSize: 14
             font.weight: Font.DemiBold

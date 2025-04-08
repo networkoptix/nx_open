@@ -90,7 +90,7 @@ Page
         id: audioController
 
         resource: preview.resource
-        serverSessionManager: sessionManager
+        serverSessionManager: windowContext.sessionManager
     }
 
     MediaPlaybackInterruptor
@@ -220,7 +220,7 @@ Page
                 {
                     // Go to landscape mode.
                     if (CoreUtils.isMobile())
-                        setScreenOrientation(Qt.LandscapeOrientation)
+                        windowContext.ui.windowHelpers.setScreenOrientation(Qt.LandscapeOrientation)
                     else
                         [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
                 }
@@ -228,7 +228,7 @@ Page
                 {
                     // Go to portrait mode.
                     if (CoreUtils.isMobile())
-                        setScreenOrientation(Qt.PortraitOrientation)
+                        windowContext.ui.windowHelpers.setScreenOrientation(Qt.PortraitOrientation)
                     else
                         [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
                 }
@@ -596,9 +596,9 @@ Page
         function updateStatusBarVisibility()
         {
             if (d.hasControls)
-                exitFullscreen()
+                windowContext.ui.windowHelpers.exitFullscreen()
             else
-                enterFullscreen()
+                windowContext.ui.windowHelpers.enterFullscreen()
         }
 
         function goToCamera()
@@ -609,7 +609,8 @@ Page
 
         function updateGestureExclusionArea()
         {
-            setGestureExclusionArea(d.exclusionAreaY, slider.height * Screen.devicePixelRatio)
+            windowContext.windowHeleprs.setGestureExclusionArea(
+                d.exclusionAreaY, slider.height * Screen.devicePixelRatio)
         }
 
         onHasControlsChanged: updateStatusBarVisibility()

@@ -22,13 +22,8 @@ class EventRulesWatcher:
 public:
     EventRulesWatcher(nx::vms::client::mobile::SystemContext* context, QObject* parent = nullptr);
 
-    void handleConnectionChanged();
-
 private:
     void handleRulesReset(const nx::vms::event::RuleList& rules);
-
-private:
-    bool m_updated = false;
 };
 
 } // namespace mobile

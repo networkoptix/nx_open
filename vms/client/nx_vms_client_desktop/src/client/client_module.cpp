@@ -94,8 +94,6 @@ QnClientModule::QnClientModule(
     else
         s_instance = this;
 
-    core::appContext()->knownServerConnectionsWatcher()->start();
-
     d->analyticsSettingsManager = core::AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
         systemContext);
 

@@ -7,7 +7,6 @@
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickWindow>
 
-#include <mobile_client/mobile_client_module.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/window_context.h>
 
@@ -16,13 +15,14 @@
 namespace nx::vms::client::mobile {
 
 QString QmlWrapperHelper::showPopup(
+    WindowContext* context,
     const QUrl& source,
     QVariantMap properties)
 {
-    const auto engine = core::appContext()->qmlEngine();
+    const auto engine = appContext()->qmlEngine();
     QQmlComponent component(engine, source);
 
-    const auto parentItem = appContext()->mainWindowContext()->mainWindow()->contentItem();
+    const auto parentItem = context->mainWindow()->contentItem();
     properties.insert("parent", QVariant::fromValue(parentItem));
 
     const auto popup = component.createWithInitialProperties(properties);
@@ -49,10 +49,11 @@ QString QmlWrapperHelper::showPopup(
 }
 
 QString QmlWrapperHelper::showScreen(
+    WindowContext* context,
     const QUrl& source,
     const QVariantMap& properties)
 {
-    auto stackView = appContext()->mainWindowContext()->mainWindow()->findChild<QObject*>(
+    auto stackView = context->mainWindow()->findChild<QObject*>(
         "mainStackView");
     QObject* screen = nullptr;
     QMetaObject::invokeMethod(stackView, "safePush", Qt::DirectConnection,

@@ -40,7 +40,7 @@ Page
 
         navigator: navigator
 
-        mediaPlayer.videoQuality: settings.lastUsedQuality
+        mediaPlayer.videoQuality: appContext.settings.lastUsedQuality
 
         mediaPlayer.onPlayingChanged:
         {
@@ -132,7 +132,7 @@ Page
             {
                 if (controller.serverOffline)
                 {
-                    exitFullscreen()
+                    windowContext.ui.windowHelpers.exitFullscreen()
                     controlsVisible = false
                     uiVisible = true
                 }
@@ -371,10 +371,11 @@ Page
 
         property real customHeight:
         {
+            const barSize = windowContext.ui.windowHelpers.navigationBarSize()
             if (d.ptzMode || ptzPanel.moveOnTapMode)
-                return getNavigationBarSize()
+                return barSize
 
-            return navigator.buttonsPanelHeight + getNavigationBarSize()
+            return navigator.buttonsPanelHeight + barSize
         }
 
         x: -mainWindow.leftPadding
@@ -410,7 +411,7 @@ Page
             anchors.right: parent.right
             anchors.rightMargin: 8
             opacity: Math.min(d.uiOpacity, d.cameraUiOpacity)
-            active: showCameraInfo
+            active: appContext.settings.showCameraInfo
             sourceComponent: InformationLabel
             {
                 videoScreenController: controller
@@ -656,18 +657,18 @@ Page
         }
     }
 
-    Component.onDestruction: exitFullscreen()
+    Component.onDestruction: windowContext.ui.windowHelpers.exitFullscreen()
 
     function hideUi()
     {
         d.uiVisible = false
         if (CoreUtils.isMobile())
-            enterFullscreen()
+            windowContext.ui.windowHelpers.enterFullscreen()
     }
 
     function showUi()
     {
-        exitFullscreen()
+        windowContext.ui.windowHelpers.exitFullscreen()
         d.uiVisible = true
     }
 

@@ -1,10 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick 2.6
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import Nx.Settings 1.0
-import Nx.Ui 1.0
+
+import Nx.Core
+import Nx.Controls
+import Nx.Mobile
+import Nx.Settings
+import Nx.Ui
 
 Page
 {
@@ -13,7 +15,7 @@ Page
     objectName: "pushExpertModeScreen"
 
     opacity: enabled ? 1.0 : 0.3
-    enabled: !pushManager.userUpdateInProgress
+    enabled: !appContext.pushManager.userUpdateInProgress
 
     customBackHandler: () => d.handleBackClicked()
     onLeftButtonClicked: () => d.handleBackClicked()
@@ -33,7 +35,7 @@ Page
         visible: d.hasChanges
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
-        enabled: !pushManager.userUpdateInProgress
+        enabled: !appContext.pushManager.userUpdateInProgress
 
         text: qsTr("Done")
         color: "transparent"
@@ -51,9 +53,9 @@ Page
     Item
     {
         id: content
-        enabled: !pushManager.userUpdateInProgress
+        enabled: !appContext.pushManager.userUpdateInProgress
 
-        y: deviceStatusBarHeight
+        y: windowContext.ui.measurements.deviceStatusBarHeight
         width: parent.width
         height: parent.height - toolBar.statusBarHeight
 
@@ -139,17 +141,17 @@ Page
 
     Component.onCompleted:
     {
-        expertModeRadioButton.checked = pushManager.expertMode
-        simpleModeRadioButton.checked = !pushManager.expertMode
+        expertModeRadioButton.checked = appContext.pushManager.expertMode
+        simpleModeRadioButton.checked = !appContext.pushManager.expertMode
     }
 
     Connections
     {
-        target: pushManager
+        target: appContext.pushManager
 
         function onUserUpdateInProgressChanged()
         {
-            if (pushManager.userUpdateInProgress)
+            if (appContext.pushManager.userUpdateInProgress)
                 preloaderOverlay.open()
             else
                 preloaderOverlay.close()
@@ -164,20 +166,27 @@ Page
         blurSource: pushExpertModeScreen
     }
 
+    Connections
+    {
+        target: appContext.pushManager
+        onShowPushSettingsErrorMessage:
+            (title, message) => windowContext.ui.showMessage(title, message)
+    }
+
     NxObject
     {
         id: d
 
         property bool hasChanges:
         {
-            if (pushManager.expertMode != expertModeRadioButton.checked)
+            if (appContext.pushManager.expertMode != expertModeRadioButton.checked)
                 return true
 
             return expertModeRadioButton.checked
                 && (d.selectionModel ? d.selectionModel.hasChanges : false)
         }
 
-        property QtObject selectionModel: createPushSelectionModel()
+        property PushSystemsSelectionModel selectionModel: PushSystemsSelectionModel {}
 
         function tryApplyAndReturn(successCallback)
         {
@@ -210,9 +219,9 @@ Page
                 }
 
             if (expertModeRadioButton.checked)
-                pushManager.setExpertMode(d.selectionModel.selectedSystems, callback)
+                appContext.pushManager.setExpertMode(d.selectionModel.selectedSystems, callback)
             else
-                pushManager.setSimpleMode(callback)
+                appContext.pushManager.setSimpleMode(callback)
         }
 
         function handleBackClicked()

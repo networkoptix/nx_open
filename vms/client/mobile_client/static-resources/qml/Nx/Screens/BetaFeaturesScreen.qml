@@ -40,8 +40,14 @@ Page
                 icon: lp("/images/download_setting.svg")
                 text: qsTr("Video Download")
                 extraText: qsTr("Ability to download video")
-                checkState: settings.useVideoDownloadFeature ? Qt.Checked : Qt.Unchecked
-                onCheckStateChanged: settings.useVideoDownloadFeature = checkState !== Qt.Unchecked
+                checkState: appContext.settings.useVideoDownloadFeature
+                    ? Qt.Checked
+                    : Qt.Unchecked
+                onCheckStateChanged:
+                {
+                    appContext.settings.useVideoDownloadFeature =
+                        checkState !== Qt.Unchecked
+                }
             }
 
             LabeledSwitch
@@ -53,14 +59,16 @@ Page
                 icon: lp("/images/speedup_connections.svg")
                 text: qsTr("Speedup connections")
                 extraText: qsTr("Improve network performance")
-                checkState: settings.enableHolePunching ? Qt.Checked : Qt.Unchecked
+                checkState: appContext.settings.enableHolePunching
+                    ? Qt.Checked
+                    : Qt.Unchecked
                 onCheckStateChanged:
                 {
                     const value = checkState !== Qt.Unchecked
-                    if (value === settings.enableHolePunching)
+                    if (value === appContext.settings.enableHolePunching)
                         return
 
-                    settings.enableHolePunching = value
+                    appContext.settings.enableHolePunching = value
                     d.openRestartDialog()
                 }
             }
@@ -75,14 +83,16 @@ Page
                 text: qsTr("Maximum decoders count")
                 extraText:
                     qsTr("Improve video decoding perfomance using maximum hardware decoders count")
-                checkState: settings.useMaxHardwareDecodersCount ? Qt.Checked : Qt.Unchecked
+                checkState: appContext.settings.useMaxHardwareDecodersCount
+                    ? Qt.Checked
+                    : Qt.Unchecked
                 onCheckStateChanged:
                 {
                     const value = checkState !== Qt.Unchecked
-                    if (value === settings.useMaxHardwareDecodersCount)
+                    if (value === appContext.settings.useMaxHardwareDecodersCount)
                         return
 
-                    settings.useMaxHardwareDecodersCount = value
+                    appContext.settings.useMaxHardwareDecodersCount = value
                     d.openRestartDialog()
                 }
             }

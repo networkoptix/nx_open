@@ -38,7 +38,7 @@ Popup
     contentItem: MouseArea
     {
         anchors.fill: parent
-        anchors.topMargin: deviceStatusBarHeight
+        anchors.topMargin: windowContext.ui.measurements.deviceStatusBarHeight
 
         Flickable
         {

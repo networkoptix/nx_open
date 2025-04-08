@@ -25,6 +25,7 @@
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/settings/systems_visibility_manager.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/font_config.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -134,27 +135,6 @@ struct ApplicationContext::Private
             });
     }
 
-    void initializeNetworkModules()
-    {
-        using namespace nx::vms::common;
-        using Protocol = ServerCompatibilityValidator::Protocol;
-
-        ServerCompatibilityValidator::DeveloperFlags developerFlags;
-        if (features.ignoreCustomization)
-            developerFlags.setFlag(ServerCompatibilityValidator::DeveloperFlag::ignoreCustomization);
-
-        if (!nx::vms::common::ServerCompatibilityValidator::isInitialized())
-        {
-            nx::vms::common::ServerCompatibilityValidator::initialize(
-                q->localPeerType(),
-                Protocol::autoDetect,
-                developerFlags);
-        }
-        cloudStatusWatcher = std::make_unique<CloudStatusWatcher>();
-        moduleDiscoveryManager = std::make_unique<nx::vms::discovery::Manager>();
-        systemFinder = std::make_unique<SystemFinder>();
-    }
-
     void initializeExternalResources()
     {
         if (!customExternalResourceFile.isEmpty())
@@ -193,6 +173,7 @@ struct ApplicationContext::Private
     std::unique_ptr<LocalNetworkInterfacesManager> localNetworkInterfacesManager;
     std::unique_ptr<watchers::KnownServerConnections> knownServerConnectionsWatcher;
     std::unique_ptr<SessionTokenTerminator> sessionTokenTerminator;
+    std::unique_ptr<SystemsVisibilityManager> systemsVisibilityManager;
 
     QString customExternalResourceFile;
 };
@@ -249,6 +230,7 @@ ApplicationContext::ApplicationContext(
             d->localNetworkInterfacesManager = std::make_unique<LocalNetworkInterfacesManager>();
             d->knownServerConnectionsWatcher =
                 std::make_unique<watchers::KnownServerConnections>();
+            d->systemsVisibilityManager = std::make_unique<core::SystemsVisibilityManager>();
             break;
     }
 
@@ -287,7 +269,30 @@ Qn::SerializationFormat ApplicationContext::serializationFormat() const
 void ApplicationContext::initializeNetworkModules()
 {
     NX_ASSERT(d->features.base.flags.testFlag(CommonFeatureFlag::networking));
-    d->initializeNetworkModules();
+
+    using namespace nx::vms::common;
+    using Protocol = ServerCompatibilityValidator::Protocol;
+
+    ServerCompatibilityValidator::DeveloperFlags developerFlags;
+    if (d->features.ignoreCustomization)
+        developerFlags.setFlag(ServerCompatibilityValidator::DeveloperFlag::ignoreCustomization);
+
+    if (!nx::vms::common::ServerCompatibilityValidator::isInitialized())
+    {
+        nx::vms::common::ServerCompatibilityValidator::initialize(
+            localPeerType(),
+            Protocol::autoDetect,
+            developerFlags);
+    }
+    d->cloudStatusWatcher = std::make_unique<CloudStatusWatcher>();
+
+    d->moduleDiscoveryManager = std::make_unique<nx::vms::discovery::Manager>();
+    moduleDiscoveryManager()->start();
+
+    d->systemFinder = std::make_unique<SystemFinder>();
+
+    if (d->knownServerConnectionsWatcher)
+        d->knownServerConnectionsWatcher->start();
 }
 
 void ApplicationContext::initializeTranslations(const QString& targetLocale)

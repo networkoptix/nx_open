@@ -211,12 +211,12 @@ Page
                 const url = NxGlobals.urlFromUserInput(address)
                 if (credentialsEditor.isPasswordSaved)
                 {
-                    sessionManager.startSessionWithStoredCredentials(
+                    windowContext.sessionManager.startSessionWithStoredCredentials(
                         url, NxGlobals.uuid(localSystemId), login, callback)
                 }
                 else
                 {
-                    sessionManager.startSession(url, login, password, systemName, callback)
+                    windowContext.sessionManager.startSession(url, login, password, systemName, callback)
                 }
             }, kAnimationDelayMs, this)
     }
@@ -228,7 +228,8 @@ Page
         switch (errorCode)
         {
             case SessionManager.LocalSessionExiredStatus:
-                removeSavedAuth(customConnectionScreen.localSystemId, credentialsEditor.login)
+                appContext.credentialsHelper.removeSavedAuth(
+                    customConnectionScreen.localSystemId, credentialsEditor.login)
                 // Fallthrough.
             case SessionManager.UserTemporaryLockedOutConnectionStatus:
                 // Fallthrough.
@@ -278,7 +279,7 @@ Page
         if (!operationId.length)
             return;
 
-        operationManager.finishOperation(operationId, false)
+        windowContext.depricatedUiController.operationManager.finishOperation(operationId, false)
         operationId = ""
     }
 }

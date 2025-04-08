@@ -4,7 +4,6 @@
 
 #include <optional>
 
-#include <context/context.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>

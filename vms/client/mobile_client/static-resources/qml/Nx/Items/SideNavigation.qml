@@ -72,24 +72,24 @@ Drawer
 
                     SystemInformationPanel
                     {
-                        visible: sessionManager.hasActiveSession
+                        visible: windowContext.sessionManager.hasActiveSession
                     }
                 }
 
-                model: sessionManager.hasActiveSession ? layoutsModel : undefined
+                model: windowContext.sessionManager.hasActiveSession ? layoutsModel : undefined
 
                 delegate: LayoutItem
                 {
                     text: resourceName
                     layoutResource: model.resource
                     shared: shared
-                    active: uiController.layout === layoutResource
+                    active: windowContext.depricatedUiController.layout === layoutResource
                     type: itemType
                     count: itemsCount
                     onClicked:
                     {
                         Workflow.openResourcesScreen()
-                        uiController.layout = layoutResource
+                        windowContext.depricatedUiController.layout = layoutResource
                     }
                 }
 
@@ -119,7 +119,7 @@ Drawer
                 anchors.fill: layoutsList
                 anchors.margins: 16
 
-                visible: !sessionManager.hasSession
+                visible: !windowContext.sessionManager.hasSession
             }
 
             Column

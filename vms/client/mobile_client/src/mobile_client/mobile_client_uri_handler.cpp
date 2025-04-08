@@ -4,7 +4,6 @@
 
 #include <QtGui/QDesktopServices>
 
-#include <context/context.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
@@ -27,7 +26,6 @@
 #include <nx/vms/utils/system_uri.h>
 #include <utils/common/delayed.h>
 
-#include "mobile_client_module.h"
 #include "mobile_client_settings.h"
 #include "mobile_client_ui_controller.h"
 
@@ -35,6 +33,11 @@ using nx::vms::utils::SystemUri;
 using nx::vms::client::core::CloudStatusWatcher;
 
 namespace {
+
+nx::vms::client::mobile::ApplicationContext* appContext()
+{
+    return nx::vms::client::mobile::appContext();
+}
 
 nx::utils::Url connectionUrl(const SystemUri& uri)
 {
@@ -80,7 +83,7 @@ std::string decodeUsername(const QString& authCode)
 class QnMobileClientUriHandler::Private: public QObject
 {
 public:
-    Private(QnContext* context);
+    Private(QnMobileClientUiController* controller);
 
     bool waitForCloudLogIn();
     bool tryConnectToCloudWithCode(const QString& authCode);
@@ -108,10 +111,11 @@ private:
     void switchToSessionsScreen();
 };
 
-QnMobileClientUriHandler::Private::Private(QnContext* context):
-    operationManager(context->operationManager()),
-    uiController(context->uiController()),
-    cloudStatusWatcher(context->cloudStatusWatcher())
+QnMobileClientUriHandler::Private::Private(QnMobileClientUiController* controller)
+    :
+    operationManager(controller->operationManager()),
+    uiController(controller),
+    cloudStatusWatcher(appContext()->cloudStatusWatcher())
 {
 }
 
@@ -217,12 +221,13 @@ bool QnMobileClientUriHandler::Private::loginToCloud(const SystemUri& uri)
         return true;
     }
     cloudStatusWatcher->resetAuthData();
-    nx::vms::client::mobile::appContext()->mainWindowContext()->sessionManager()->stopSessionByUser();
+    appContext()->mainWindowContext()->sessionManager()->stopSessionByUser();
 
     QVariantMap properties;
     properties["user"] = QString::fromStdString(username);
+    static const auto kLoginScreenUrl = QUrl("qrc:qml/Nx/Screens/Cloud/Login.qml");
     const bool authorized = nx::vms::client::mobile::QmlWrapperHelper::showScreen(
-        QUrl("qrc:qml/Nx/Screens/Cloud/Login.qml"), properties) == "success";
+        appContext()->mainWindowContext(), kLoginScreenUrl, properties) == "success";
 
     NX_DEBUG(this, "loginToCloud(): authorized on cloud: %1", authorized);
 
@@ -249,8 +254,8 @@ void QnMobileClientUriHandler::Private::connectedCallback(const SystemUri& uri)
             "connectedCallback(): end: opening video screen for resource %1 with timestamp <%2>",
             resourceIds.first(), timestamp);
 
-        const auto camera = nx::vms::client::mobile::appContext()->currentSystemContext()
-            ->resourcePool()->getResourceById(resourceIds.first());
+        const auto camera = appContext()->currentSystemContext()->resourcePool()->getResourceById(
+            resourceIds.first());
         uiController->openVideoScreen(nx::vms::client::core::withCppOwnership(camera), timestamp);
     }
     else
@@ -303,8 +308,7 @@ void QnMobileClientUriHandler::Private::switchToSessionsScreen()
 void QnMobileClientUriHandler::Private::connectToServerDirectly(const SystemUri& uri)
 {
     NX_DEBUG(this, "connectToServerDirectly(): start");
-    const auto sessionManager =
-        nx::vms::client::mobile::appContext()->mainWindowContext()->sessionManager();
+    const auto sessionManager = appContext()->mainWindowContext()->sessionManager();
     sessionManager->stopSessionByUser();
 
     // Switch to sessions screen and wait for the change to avoid side effects with a login process.
@@ -394,9 +398,12 @@ void QnMobileClientUriHandler::Private::handleClientCommand(const SystemUri& uri
 
 //-------------------------------------------------------------------------------------------------
 
-QnMobileClientUriHandler::QnMobileClientUriHandler(QnContext* context, QObject* parent):
+QnMobileClientUriHandler::QnMobileClientUriHandler(
+    QnMobileClientUiController* controller,
+    QObject* parent)
+    :
     base_type(parent),
-    d(new Private(context))
+    d(new Private(controller))
 {
     for (const auto& scheme: supportedSchemes())
         QDesktopServices::setUrlHandler(scheme, this, handlerMethodName());

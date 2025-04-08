@@ -3,7 +3,6 @@
 #include "network_interface_watcher.h"
 
 #include <core/resource_management/resource_discovery_manager.h>
-#include <mobile_client/mobile_client_module.h>
 #include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/window_context.h>
 

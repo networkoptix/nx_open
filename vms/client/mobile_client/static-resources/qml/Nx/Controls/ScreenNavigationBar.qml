@@ -22,8 +22,9 @@ Rectangle
         : 0
 
     visible: d.currentIndex !== -1
-        && d.buttonModel[d.currentIndex].screenId === uiController.currentScreen
-        && sessionManager.hasActiveSession
+        && windowContext.sessionManager.hasActiveSession
+        && d.buttonModel[d.currentIndex].screenId
+             === windowContext.depricatedUiController.currentScreen
 
     x: 0
     y: mainWindow.availableHeight - height
@@ -96,13 +97,14 @@ Rectangle
 
     Connections
     {
-        target: uiController
+        target: windowContext.depricatedUiController
 
         function onCurrentScreenChanged()
         {
             for (let index = 0; index !== d.buttonModel.length; ++index)
             {
-                if (d.buttonModel[index].screenId === uiController.currentScreen)
+                if (d.buttonModel[index].screenId
+                    === windowContext.depricatedUiController.currentScreen)
                 {
                     d.currentIndex = index
                     return;
@@ -125,7 +127,8 @@ Rectangle
                 "objectName": "switchToResourcesScreenButton",
                 "iconSource": "image://skin/24x24/Outline/camera.svg",
                 "screenId": Controller.ResourcesScreen,
-                "openScreen": () => Workflow.openResourcesScreen(uiController.currentSystemName)
+                "openScreen": () => Workflow.openResourcesScreen(
+                    windowContext.sessionManager.systemName)
             },
             // Icon paths below will be fixed as we get them in core icons pack.
             {

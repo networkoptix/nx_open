@@ -20,7 +20,7 @@ Column
     Text
     {
         id: label
-        text: applicationInfo.cloudName()
+        text: appContext.appInfo.cloudName()
         width: parent.width
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter

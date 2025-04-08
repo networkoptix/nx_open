@@ -9,7 +9,7 @@ ToolBar
     id: toolBar
 
     property bool useGradientBackground: false
-    property real statusBarHeight: deviceStatusBarHeight
+    property real statusBarHeight: windowContext.ui.measurements.deviceStatusBarHeight
 
     signal clicked()
 

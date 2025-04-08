@@ -52,7 +52,7 @@ Page
 
                 text: qsTr("Enter your %1 account password to connect to the Site",
                     "%1 is the short cloud name (like 'Cloud')")
-                    .arg(applicationInfo.shortCloudName())
+                    .arg(appContext.appInfo.shortCloudName())
             }
 
             TextField

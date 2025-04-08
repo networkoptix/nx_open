@@ -8,6 +8,7 @@ namespace nx::vms::client::mobile {
 
 class SessionManager;
 class SystemContext;
+class UiController;
 class WindowContext;
 
 class WindowContextAware: public core::WindowContextAware
@@ -23,6 +24,8 @@ public:
     SystemContext* mainSystemContext();
 
     SessionManager* sessionManager() const;
+
+    UiController* uiController() const;
 
     SystemContext* createSystemContext();
     void deleteSystemContext(SystemContext* context);

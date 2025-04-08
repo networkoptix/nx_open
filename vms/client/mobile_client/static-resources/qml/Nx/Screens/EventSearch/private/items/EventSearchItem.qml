@@ -93,7 +93,7 @@ MouseArea
                 id: extraTextItem
 
                 width: parent.width
-                visible: !!plainText(text)
+                visible: !!NxGlobals.toPlainText(text)
                 elide: Text.ElideRight
                 wrapMode: Text.WrapAnywhere
                 maximumLineCount: 2

@@ -110,7 +110,7 @@ Control
 
                         const allowVideoContent = !initialLoadingTimer.running
                             && cameraItem.active
-                            && settings.liveVideoPreviews
+                            && appContext.settings.liveVideoPreviews
 
                         return allowVideoContent
                             ? "videoContent"
@@ -314,11 +314,14 @@ Control
 
                 Connections
                 {
-                    target: uiController
+                    target: windowContext.depricatedUiController
                     function onCurrentScreenChanged()
                     {
-                        if (uiController.currentScreen === Controller.ResourcesScreen)
+                        if (windowContext.depricatedUiController.currentScreen
+                            === Controller.ResourcesScreen)
+                        {
                             mediaPlayer.playLive()
+                        }
                     }
                 }
 
@@ -329,7 +332,7 @@ Control
                     resource: cameraItem.resource
                     videoQuality: mediaResourceHelper.livePreviewVideoQuality
                     audioEnabled: false
-                    allowHardwareAcceleration: settings.enableHardwareDecoding
+                    allowHardwareAcceleration: appContext.settings.enableHardwareDecoding
                     maxTextureSize: textureSizeHelper.maxTextureSize
 
                     Component.onCompleted:
@@ -383,7 +386,7 @@ Control
         interval: initialLoadDelay
         repeat: true
         running: active
-            && sessionManager.hasConnectedSession
+            && windowContext.sessionManager.hasConnectedSession
             && thumbnailContentLoader.state !== "dummyContent"
 
         onTriggered:

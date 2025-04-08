@@ -12,7 +12,6 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <mobile_client/mobile_client_module.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>

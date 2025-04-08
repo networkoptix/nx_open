@@ -8,6 +8,7 @@
 #include <QtCore/QRegularExpression>
 #include <QtCore/QtMath>
 #include <QtGui/QClipboard>
+#include <QtGui/QTextDocumentFragment>
 #include <QtGui/rhi/qrhi.h>
 #include <QtQuick/private/qquickflickable_p.h>
 #include <QtQuick/private/qquickitem_p.h>
@@ -389,6 +390,11 @@ QString NxGlobalsObject::highlightMatch(
 QString NxGlobalsObject::toHtmlEscaped(const QString& text) const
 {
     return common::html::toHtmlEscaped(text);
+}
+
+QString NxGlobalsObject::toPlainText(const QString& value) const
+{
+    return QTextDocumentFragment::fromHtml(value).toPlainText();
 }
 
 qint64 NxGlobalsObject::syncTimeCurrentTimePointMs() const

@@ -29,12 +29,12 @@ Pane
     {
         topPadding: 16
         bottomPadding: 0
-        systemName: sessionManager.systemName
-        address: sessionManager.sessionHost
+        systemName: windowContext.sessionManager.systemName
+        address: windowContext.sessionManager.sessionHost
         user: windowContext.systemContext
             ? windowContext.systemContext.userWatcher.userName
             : ""
         ownerDescription: cloudInformationWatcher.ownerDescription
-        cloud: sessionManager.isCloudSession
+        cloud: windowContext.sessionManager.isCloudSession
     }
 }

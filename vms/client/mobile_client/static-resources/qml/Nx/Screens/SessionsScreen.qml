@@ -19,7 +19,7 @@ Page
     id: sessionsScreen
     objectName: "sessionsScreen"
 
-    leftButtonImageSource: cloudStatusWatcher.status == CloudStatusWatcher.Online
+    leftButtonImageSource: appContext.cloudStatusWatcher.status == CloudStatusWatcher.Online
         ? cloudUserProfileWatcher.avatarUrl
         : ""
     leftButtonIcon.source: "image://skin/32x32/Outline/avatar.svg"
@@ -28,8 +28,8 @@ Page
 
     onLeftButtonClicked:
     {
-        var showSummary = cloudStatusWatcher.status == CloudStatusWatcher.Online
-            || cloudStatusWatcher.status == CloudStatusWatcher.Offline
+        var showSummary = appContext.cloudStatusWatcher.status == CloudStatusWatcher.Online
+            || appContext.cloudStatusWatcher.status == CloudStatusWatcher.Offline
 
         if (!showSummary)
         {
@@ -232,7 +232,7 @@ Page
         anchors.verticalCenterOffset: -header.height / 2
 
         readonly property bool isLoggedOut:
-            cloudStatusWatcher.status == CloudStatusWatcher.LoggedOut
+            appContext.cloudStatusWatcher.status == CloudStatusWatcher.LoggedOut
 
         imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10"
         text: qsTr("No Sites Found")
@@ -458,11 +458,12 @@ Page
                                 systemId, localId, systemName, defaultAddress, errorMessage)
                         }
 
-                    connectionStarted = sessionManager.startSessionWithStoredCredentials(
-                        defaultAddress,
-                        NxGlobals.uuid(localId),
-                        authenticationDataModel.defaultCredentials.user,
-                        callback)
+                    connectionStarted =
+                        windowContext.sessionManager.startSessionWithStoredCredentials(
+                            defaultAddress,
+                            NxGlobals.uuid(localId),
+                            authenticationDataModel.defaultCredentials.user,
+                            callback)
                 }
 
                 if (!connectionStarted)
@@ -476,7 +477,7 @@ Page
         }
         else if (!hostsModel.isEmpty)
         {
-            sessionManager.startCloudSession(systemId, systemName)
+            windowContext.sessionManager.startCloudSession(systemId, systemName)
         }
     }
 

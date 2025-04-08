@@ -6,21 +6,30 @@
 #include <QtQml/QQmlFileSelector>
 #include <QtQuick/QQuickWindow>
 
+#include <core/resource/mobile_client_resource_factory.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <nx/build_info.h>
 #include <nx/utils/serialization/format.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/http/http_async_client.h>
+#include <nx/vms/client/core/media/watermark_image_provider.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/mobile/mobile_client_meta_types.h>
 #include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/window_context.h>
+#include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
+#include <nx/vms/client/mobile/ui/detail/credentials_helper.h>
 #include <nx/vms/discovery/manager.h>
+#include <nx/vms/time/formatter.h>
+#include <settings/qml_settings_adaptor.h>
+#include <utils/mobile_app_info.h>
 
 namespace nx::vms::client::mobile {
 
 namespace {
-
-static const QString kQmlRoot = "qrc:///qml/";
 
 core::ApplicationContext::Features makeFeatures()
 {
@@ -33,48 +42,170 @@ core::ApplicationContext::Features makeFeatures()
 
 struct ApplicationContext::Private
 {
+    ApplicationContext* const q;
+    std::unique_ptr<QnMobileClientResourceFactory> resourceFactory =
+        std::make_unique<QnMobileClientResourceFactory>();
+    std::unique_ptr<nx::client::mobile::QmlSettingsAdaptor> settingsAdaptor;
     std::unique_ptr<WindowContext> windowContext;
+    std::unique_ptr<QnMobileAppInfo> appInfo = std::make_unique<QnMobileAppInfo>();
+    std::unique_ptr<PushNotificationManager> pushManager;
+    std::unique_ptr<detail::CredentialsHelper> credentialsHelper;
+
+    void initializeHolePunching();
+    void initializeTranslations();
+    void initializePushManager();
+    void initializeEngine(const QnMobileClientStartupParameters& params);
+    void initializeMainWindowContext();
+    void initializeTrafficLogginOptionHandling();
+    void initOsSpecificStuff();
 };
 
-ApplicationContext::ApplicationContext(QObject* parent):
-    base_type(Mode::mobileClient,
-        Qn::SerializationFormat::json,
-        nx::vms::api::PeerType::mobileClient,
-        makeFeatures(),
-        qnSettings->customCloudHost(),
-        /*customExternalResourceFile*/ {},
-        parent),
-    d(new Private{})
+void ApplicationContext::Private::initializeHolePunching()
 {
-    initializeMetaTypes();
+    if (!qnSettings->enableHolePunching()) {
+        // Disable UDP hole punching.
+        network::SocketGlobals::instance().cloud().applyArguments(
+            ArgumentParser({"--cloud-connect-disable-udp"}));
+    }
+    else
+    {
+        NX_DEBUG(this, "Hole punching is enabled");
+    }
+}
 
-    initializeNetworkModules();
-    const auto selectedLocale = coreSettings()->locale();
-    initializeTranslations(selectedLocale.isEmpty()
+void ApplicationContext::Private::initializeTranslations()
+{
+    const auto selectedLocale = q->coreSettings()->locale();
+    q->initializeTranslations(selectedLocale.isEmpty()
         ? QLocale::system().name()
         : selectedLocale);
+}
 
-    const auto engine = qmlEngine();
+void ApplicationContext::Private::initializePushManager()
+{
+    pushManager = std::make_unique<PushNotificationManager>();
+
+    const auto cloudWatcher = q->cloudStatusWatcher();
+    const auto updateFirebaseCredentials = utils::guarded(q,
+        [this, cloudWatcher]()
+        {
+            pushManager->setCredentials(
+                cloudWatcher->status() == core::CloudStatusWatcher::LoggedOut
+                ? network::http::Credentials()
+                : cloudWatcher->credentials());
+        });
+
+    updateFirebaseCredentials();
+    connect(cloudWatcher, &core::CloudStatusWatcher::credentialsChanged,
+        q, updateFirebaseCredentials);
+    connect(cloudWatcher, &core::CloudStatusWatcher::statusChanged, q,
+        [updateFirebaseCredentials](core::CloudStatusWatcher::Status)
+        {
+            updateFirebaseCredentials();
+        });
+
+    const auto updateSourceSystemsForPushNotifications = utils::guarded(q,
+        [this, cloudWatcher]()
+        {
+            QStringList systems;
+            for (const auto& system: cloudWatcher->recentCloudSystems())
+                systems.append(system.cloudId);
+            pushManager->setSystems(systems);
+        });
+    updateSourceSystemsForPushNotifications();
+    connect(cloudWatcher, &core::CloudStatusWatcher::recentCloudSystemsChanged,
+        q, updateSourceSystemsForPushNotifications);
+}
+
+void ApplicationContext::Private::initializeEngine(
+    const QnMobileClientStartupParameters& params)
+{
+    const auto engine = q->qmlEngine();
 
     QStringList selectors;
     QFileSelector fileSelector;
     fileSelector.setExtraSelectors(selectors);
+
     QQmlFileSelector qmlFileSelector(engine);
     qmlFileSelector.setSelector(&fileSelector);
 
-    engine->setBaseUrl(QUrl(kQmlRoot));
-    engine->addImportPath(kQmlRoot);
+    engine->addImageProvider(core::WatermarkImageProvider::name(),
+        new core::WatermarkImageProvider());
+
+    static const QString kQmlRoot = "qrc:///qml";
+    auto qmlRoot = params.qmlRoot.isEmpty() ? kQmlRoot : params.qmlRoot;
+    if (!qmlRoot.endsWith('/'))
+        qmlRoot.append('/');
+    NX_INFO(this, "Setting QML root to %1", qmlRoot);
+
+    engine->setBaseUrl(
+        qmlRoot.startsWith("qrc:") ? QUrl(qmlRoot) : QUrl::fromLocalFile(qmlRoot));
+    engine->addImportPath(qmlRoot);
 
     if (build_info::isIos())
         engine->addImportPath("qt_qml");
 
-    d->windowContext = std::make_unique<WindowContext>();
-    d->windowContext->initializeWindow();
-    const auto notifier = qnSettings->notifier(QnMobileClientSettings::ServerTimeMode);
-    connect(notifier, &QnPropertyNotifier::valueChanged,
-        this, &ApplicationContext::serverTimeModeChanged);
+    for (const QString& path: params.qmlImportPaths)
+        engine->addImportPath(path);
+}
 
-    moduleDiscoveryManager()->start();
+void ApplicationContext::Private::initializeMainWindowContext()
+{
+    settingsAdaptor = std::make_unique<nx::client::mobile::QmlSettingsAdaptor>();
+    windowContext = std::make_unique<WindowContext>(q);
+}
+
+void ApplicationContext::Private::initializeTrafficLogginOptionHandling()
+{
+    using namespace nx::network::http;
+    const auto updateTrafficLogging =
+        []() { AsyncClient::setForceTrafficLogging(qnSettings->forceTrafficLogging()); };
+
+    connect(qnSettings, &QnMobileClientSettings::valueChanged, q,
+        [updateTrafficLogging](int id)
+        {
+            if (id == QnMobileClientSettings::ForceTrafficLogging)
+                updateTrafficLogging();
+        });
+
+    updateTrafficLogging();
+}
+
+void ApplicationContext::Private::initOsSpecificStuff()
+{
+    if (build_info::isAndroid())
+    {
+        // We have to use android-specific code to check if we use 24-hours time format.
+        time::Formatter::forceSystemTimeFormat(time::is24HoursTimeFormat());
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+ApplicationContext::ApplicationContext(
+    const QnMobileClientStartupParameters& startupParams,
+    QObject* parent)
+    :
+    base_type(Mode::mobileClient,
+        Qn::SerializationFormat::json,
+        api::PeerType::mobileClient,
+        makeFeatures(),
+        qnSettings->customCloudHost(),
+        /*customExternalResourceFile*/ {},
+        parent),
+    d(new Private{
+        .q = this,
+        .credentialsHelper = std::make_unique<detail::CredentialsHelper>()})
+{
+    d->initializeHolePunching();
+    initializeNetworkModules();
+    initializeMetaTypes();
+    d->initializeTranslations();
+    d->initializeEngine(startupParams);
+    d->initializePushManager();
+    d->initializeMainWindowContext();
+    d->initializeTrafficLogginOptionHandling();
+    d->initOsSpecificStuff();
 }
 
 ApplicationContext::~ApplicationContext()
@@ -107,14 +238,24 @@ void ApplicationContext::closeWindow()
     QObject::connect(window, &QObject::destroyed, qApp, &QGuiApplication::quit);
 }
 
-bool ApplicationContext::isServerTimeMode() const
+QnMobileAppInfo* ApplicationContext::appInfo() const
 {
-    return qnSettings->serverTimeMode();
+    return d->appInfo.get();
 }
 
-void ApplicationContext::setServerTimeMode(bool value)
+PushNotificationManager* ApplicationContext::pushManager() const
 {
-    qnSettings->setServerTimeMode(value);
+    return d->pushManager.get();
+}
+
+detail::CredentialsHelper* ApplicationContext::credentialsHelper() const
+{
+    return d->credentialsHelper.get();
+}
+
+nx::client::mobile::QmlSettingsAdaptor* ApplicationContext::settings() const
+{
+    return d->settingsAdaptor.get();
 }
 
 } // namespace nx::vms::client::mobile

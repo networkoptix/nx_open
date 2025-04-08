@@ -48,7 +48,7 @@ Page
                 text: "Upload logs next"
                 onClicked:
                 {
-                    d.logSessionId = LogManager.startRemoteLogSession(
+                    d.logSessionId = windowContext.logManager.startRemoteLogSession(
                         parseInt(minutesComboBox.currentValue))
                 }
             }
@@ -88,14 +88,14 @@ Page
                 id: languageComboBox
 
                 model: TranslationListModel {}
-                currentIndex: !!settings.locale
-                    ? model.localeIndex(settings.locale)
+                currentIndex: !!appContext.settings.locale
+                    ? model.localeIndex(appContext.settings.locale)
                     : -1
                 textRole: "display"
                 valueRole: "localeCode"
                 width: 200
 
-                onCurrentValueChanged: settings.locale = currentValue
+                onCurrentValueChanged: appContext.settings.locale = currentValue
             }
         }
 
@@ -107,7 +107,7 @@ Page
             {
                 id: customCloudHostTextField
 
-                text: settings.customCloudHost
+                text: appContext.settings.customCloudHost
                 width: settingsScreen.width / 2
             }
 
@@ -118,10 +118,10 @@ Page
                 onClicked:
                 {
                     const value = customCloudHostTextField.text.trim()
-                    if (value === settings.customCloudHost)
+                    if (value === appContext.settings.customCloudHost)
                         return
 
-                    settings.customCloudHost = value
+                    appContext.settings.customCloudHost = value
                     d.openRestartDialog()
                 }
             }
@@ -133,14 +133,14 @@ Page
 
             width: parent.width
             text: "Force traffic logging"
-            checkState: settings.forceTrafficLogging ? Qt.Checked : Qt.Unchecked
+            checkState: appContext.settings.forceTrafficLogging ? Qt.Checked : Qt.Unchecked
             onCheckStateChanged:
             {
                 const value = checkState != Qt.Unchecked
-                if (value == settings.forceTrafficLogging)
+                if (value == appContext.settings.forceTrafficLogging)
                     return
 
-                settings.forceTrafficLogging = value
+                appContext.settings.forceTrafficLogging = value
             }
         }
 
@@ -150,14 +150,14 @@ Page
 
             width: parent.width
             text: "Ignore customization"
-            checkState: settings.ignoreCustomization ? Qt.Checked : Qt.Unchecked
+            checkState: appContext.settings.ignoreCustomization ? Qt.Checked : Qt.Unchecked
             onCheckStateChanged:
             {
                 const value = checkState != Qt.Unchecked
-                if (value == settings.ignoreCustomization)
+                if (value == appContext.settings.ignoreCustomization)
                     return
 
-                settings.ignoreCustomization = value
+                appContext.settings.ignoreCustomization = value
                 d.openRestartDialog()
             }
         }
@@ -211,7 +211,7 @@ Page
         function copySessionIdToClipboard()
         {
             if (logSessionId)
-                copyToClipboard(d.logSessionId)
+                windowContext.ui.windowHelpers.copyToClipboard(d.logSessionId)
         }
 
         function openRestartDialog()
@@ -219,7 +219,7 @@ Page
             Workflow.openStandardDialog("Please restart the app to apply the changes")
         }
 
-        property string logSessionId: LogManager.remoteLogSessionId()
+        property string logSessionId: windowContext.logManager.remoteLogSessionId()
 
         onLogSessionIdChanged: copySessionIdToClipboard()
         Component.onCompleted: copySessionIdToClipboard()

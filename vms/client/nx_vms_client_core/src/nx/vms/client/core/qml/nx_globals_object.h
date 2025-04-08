@@ -105,6 +105,8 @@ public:
 
     Q_INVOKABLE QString toHtmlEscaped(const QString& text) const;
 
+    Q_INVOKABLE QString toPlainText(const QString& value) const;
+
     /**
      * Returns qnSyncTime->currentTimePoint() but in milliseconds for easier usage with JS Date.
      */

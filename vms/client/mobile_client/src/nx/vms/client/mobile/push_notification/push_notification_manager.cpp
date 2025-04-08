@@ -139,7 +139,7 @@ void PushNotificationManager::Private::setTargetSystems(
                 if (success)
                     return;
 
-                emit q->showPushErrorMessage(
+                emit q->showPushSettingsErrorMessage(
                     tr("Cannot change push notifications settings"),
                     q->checkConnectionErrorText());
             }));
@@ -183,7 +183,7 @@ void PushNotificationManager::Private::handleConfirmedSettingsChanged()
 
 void PushNotificationManager::Private::showCannotSubscribeMessage() const
 {
-    emit q->showPushErrorMessage(
+    emit q->showPushActivateErrorMessage(
         tr("Cannot enable push notifications"),
         q->checkConnectionErrorText());
 }

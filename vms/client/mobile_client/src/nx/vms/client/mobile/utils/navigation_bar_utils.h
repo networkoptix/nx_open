@@ -22,7 +22,7 @@ public:
         LeftNavigationBar,
         RightNavigationBar
     };
-    Q_ENUM(Type);
+    Q_ENUM(Type)
 
     static Type navigationBarType();
 

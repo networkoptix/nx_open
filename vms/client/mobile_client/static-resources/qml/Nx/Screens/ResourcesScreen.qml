@@ -34,7 +34,7 @@ Page
         padding: 0
         icon.source: lp("/images/search.png")
         enabled: camerasGrid.enabled
-        opacity: sessionManager.hasReconnectingSession ? 0.2 : 1.0
+        opacity: windowContext.sessionManager.hasReconnectingSession ? 0.2 : 1.0
         onClicked:
         {
             sideNavigation.close()
@@ -45,16 +45,16 @@ Page
 
     ResourceHelper
     {
-        id: layoutHelper
-        resource: uiController.layout
+        id: layout
+        resource: windowContext.depricatedUiController.layout
     }
 
     Binding
     {
         target: resourcesScreen
         property: "title"
-        value: layoutHelper.resourceName || sessionManager.systemName
-        when: sessionManager.hasActiveSession
+        value: layout.resourceName || windowContext.sessionManager.systemName
+        when: windowContext.sessionManager.hasActiveSession
         restoreMode: Binding.RestoreBinding
     }
 
@@ -78,11 +78,11 @@ Page
             rightMargin: 4 - camerasGrid.spacing / 2
         }
 
-        enabled: !sessionManager.hasReconnectingSession && !loadingDummy.visible
+        enabled: !windowContext.sessionManager.hasReconnectingSession && !loadingDummy.visible
 
-        layout: uiController.layout
+        layout: windowContext.depricatedUiController.layout
 
-        keepStatuses: !sessionManager.hasReconnectingSession && !sessionManager.hasConnectedSession
+        keepStatuses: !windowContext.sessionManager.hasReconnectingSession && !windowContext.sessionManager.hasConnectedSession
 
         active: activePage
 
@@ -96,10 +96,10 @@ Page
         anchors.fill: parent
         title: qsTr("No cameras available on this layout")
         buttonText: qsTr("Show all cameras")
-        onButtonClicked: uiController.layout = null
+        onButtonClicked: windowContext.depricatedUiController.layout = null
         visible: camerasGrid.count == 0
-                 && uiController.layout
-                 && sessionManager.hasActiveSession
+                 && windowContext.depricatedUiController.layout
+                 && windowContext.sessionManager.hasActiveSession
     }
 
     Loader
@@ -176,7 +176,7 @@ Page
         color: ColorTheme.transparent(ColorTheme.colors.dark5, 0.8)
 
         Behavior on opacity { NumberAnimation { duration: 200 } }
-        opacity: sessionManager.hasReconnectingSession ? 1.0 : 0.0
+        opacity: windowContext.sessionManager.hasReconnectingSession ? 1.0 : 0.0
         visible: opacity > 0
     }
 
@@ -188,7 +188,7 @@ Page
         color: ColorTheme.colors.windowBackground
         Behavior on opacity { NumberAnimation { duration: 200 } }
         visible: opacity > 0
-        opacity: sessionManager.hasActiveSession ? 0.0 : 1.0
+        opacity: windowContext.sessionManager.hasActiveSession ? 0.0 : 1.0
 
         Column
         {
@@ -207,7 +207,7 @@ Page
             {
                 anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
                 topPadding: 26
-                text: sessionManager.hasConnectingSession
+                text: windowContext.sessionManager.hasConnectingSession
                     ? qsTr("Connecting...")
                     : qsTr("Loading...")
                 font.pixelSize: 22

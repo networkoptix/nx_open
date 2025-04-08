@@ -8,6 +8,8 @@
 #include <nx/utils/serialization/format.h>
 #include <nx/vms/common/application_context.h>
 
+Q_MOC_INCLUDE("nx/vms/client/core/network/cloud_status_watcher.h")
+
 class QQmlEngine;
 
 class QnClientCoreSettings;
@@ -38,6 +40,10 @@ namespace watchers { class KnownServerConnections; }
 class NX_VMS_CLIENT_CORE_API ApplicationContext: public common::ApplicationContext
 {
     Q_OBJECT
+
+    Q_PROPERTY(CloudStatusWatcher* cloudStatusWatcher
+        READ cloudStatusWatcher
+        CONSTANT)
 
 public:
     enum class Mode

@@ -16,6 +16,10 @@ class NX_VMS_CLIENT_CORE_API CloudUrlHelper: public QObject
     Q_OBJECT
 
 public:
+    static void registerSingletonType(
+        utils::SystemUri::ReferralSource source,
+        utils::SystemUri::ReferralContext context);
+
     CloudUrlHelper(
         utils::SystemUri::ReferralSource source,
         utils::SystemUri::ReferralContext context,

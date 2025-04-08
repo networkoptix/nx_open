@@ -34,6 +34,7 @@ public:
         welcome_screen::TileVisibilityScope visibilityScope);
 
 private:
+
     SystemVisibilityScopeInfoHash m_visibilityScopes;
 };
 

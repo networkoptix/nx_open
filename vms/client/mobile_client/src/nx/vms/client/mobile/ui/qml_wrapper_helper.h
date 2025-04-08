@@ -7,14 +7,18 @@
 
 namespace nx::vms::client::mobile {
 
+class WindowContext;
+
 class QmlWrapperHelper
 {
 public:
     static QString showPopup(
+        WindowContext* context,
         const QUrl& source,
         QVariantMap properties = QVariantMap());
 
     static QString showScreen(
+        WindowContext* context,
         const QUrl& source,
         const QVariantMap& properties = QVariantMap());
 };

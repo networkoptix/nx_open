@@ -94,10 +94,10 @@ QuickControls.Page
                 {
                     sideNavigation.close()
                 }
-                else if (sessionManager.hasConnectingSession
-                    || sessionManager.hasAwaitingResourcesSession)
+                else if (windowContext.sessionManager.hasConnectingSession
+                    || windowContext.sessionManager.hasAwaitingResourcesSession)
                 {
-                    sessionManager.stopSessionByUser();
+                    windowContext.sessionManager.stopSession();
                 }
                 else if (stackView.depth > 1)
                 {
@@ -105,7 +105,7 @@ QuickControls.Page
                 }
                 else if (event.key != Qt.Key_Escape)
                 {
-                    quitApplication()
+                    appContext.closeWindow()
                 }
                 else
                 {

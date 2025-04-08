@@ -58,6 +58,13 @@ QmlSettingsAdaptor::QmlSettingsAdaptor(QObject* parent):
 
                 case QnMobileClientSettings::EnableSoftwareDecoderFallback:
                     emit enableSoftwareDecoderFallbackChanged();
+
+                case QnMobileClientSettings::ServerTimeMode:
+                    emit serverTimeModeChanged();
+
+                case QnMobileClientSettings::ShowCameraInfo:
+                    emit showCameraInfoChanged();
+
                 default:
                     break;
             }
@@ -190,6 +197,28 @@ void QmlSettingsAdaptor::setLocale(const QString& value)
     appContext()->coreSettings()->locale = value;
 
     emit localeChanged();
+}
+
+bool QmlSettingsAdaptor::serverTimeMode() const
+{
+    return qnSettings->serverTimeMode();
+}
+
+void QmlSettingsAdaptor::setServerTimeMode(bool value)
+{
+    qnSettings->setServerTimeMode(value);
+    qnSettings->save();
+}
+
+bool QmlSettingsAdaptor::showCameraInfo() const
+{
+    return qnSettings->showCameraInfo();
+}
+
+void QmlSettingsAdaptor::setShowCameraInfo(bool value)
+{
+    qnSettings->setShowCameraInfo(value);
+    qnSettings->save();
 }
 
 bool QmlSettingsAdaptor::useVideoDownloadFeature() const

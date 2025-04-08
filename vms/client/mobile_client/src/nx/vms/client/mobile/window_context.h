@@ -7,8 +7,14 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/window_context.h>
 
+Q_MOC_INCLUDE("mobile_client/mobile_client_ui_controller.h")
+Q_MOC_INCLUDE("nx/vms/client/mobile/maintenance/remote_log_manager.h")
 Q_MOC_INCLUDE("nx/vms/client/mobile/session/session_manager.h")
 Q_MOC_INCLUDE("nx/vms/client/mobile/system_context.h")
+Q_MOC_INCLUDE("nx/vms/client/mobile/ui/ui_controller.h")
+
+class QQuickWindow;
+class QnMobileClientUiController;
 
 class QQuickWindow;
 class QnTextureSizeHelper;
@@ -19,6 +25,9 @@ namespace nx::vms::client::mobile {
 
 class SessionManager;
 class SystemContext;
+class RemoteLogManager;
+class UiController;
+class WindowHelpers;
 
 class WindowContext: public core::WindowContext
 {
@@ -29,27 +38,45 @@ class WindowContext: public core::WindowContext
         READ mainSystemContext
         NOTIFY mainSystemContextChanged)
 
+    Q_PROPERTY(UiController* ui
+        READ uiController
+        CONSTANT)
+
     Q_PROPERTY(SessionManager* sessionManager
         READ sessionManager
+        CONSTANT)
+
+    Q_PROPERTY(RemoteLogManager* logManager
+        READ logManager
+        CONSTANT)
+
+    // Depricated classes.
+    Q_PROPERTY(QnMobileClientUiController* depricatedUiController
+        READ depricatedUiController
         CONSTANT)
 
 public:
     WindowContext(QObject* parent = nullptr);
     virtual ~WindowContext() override;
 
-    void initializeWindow();
-
     QQuickWindow* mainWindow() const;
-
-    QnTextureSizeHelper* textureSizeHelper() const;
 
     // Returns current system context. Can be nullptr if there is no connection to the system.
     SystemContext* mainSystemContext();
 
-    SessionManager* sessionManager() const;
+    UiController* uiController() const;
+
+    QQuickWindow* window() const;
 
     SystemContext* createSystemContext();
     void deleteSystemContext(SystemContext* context);
+
+    SessionManager* sessionManager() const;
+
+    RemoteLogManager* logManager() const;
+
+    // Deprivated classes
+    QnMobileClientUiController* depricatedUiController() const;
 
 signals:
     void mainSystemContextChanged();

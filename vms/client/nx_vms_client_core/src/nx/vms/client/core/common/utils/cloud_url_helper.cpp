@@ -2,6 +2,8 @@
 
 #include "cloud_url_helper.h"
 
+#include <QtQml/QtQml>
+
 #include <nx/branding.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
@@ -14,6 +16,16 @@
 namespace nx::vms::client::core {
 
 using nx::vms::utils::SystemUri;
+
+void CloudUrlHelper::registerSingletonType(utils::SystemUri::ReferralSource source,
+    utils::SystemUri::ReferralContext context)
+{
+    qmlRegisterSingletonType<core::CloudUrlHelper>("nx.vms.client.core", 1, 0, "CloudUrlHelper",
+        [source, context](QQmlEngine* /*qmlEngine*/, QJSEngine* /*jsEngine*/) -> QObject*
+        {
+            return new core::CloudUrlHelper(source, context);
+        });
+}
 
 CloudUrlHelper::CloudUrlHelper(
     SystemUri::ReferralSource source,

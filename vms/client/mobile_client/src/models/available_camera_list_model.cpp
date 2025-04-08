@@ -7,7 +7,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
-#include <mobile_client/mobile_client_module.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/system_context_accessor.h>

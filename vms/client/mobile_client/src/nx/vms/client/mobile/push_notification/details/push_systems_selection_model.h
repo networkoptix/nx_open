@@ -26,10 +26,7 @@ class PushSystemsSelectionModel: public QAbstractListModel
 public:
     static void registerQmlType();
 
-    PushSystemsSelectionModel(
-        const QnCloudSystemList& systems,
-        const QStringList& selectedSystems,
-        QObject* parent = nullptr);
+    PushSystemsSelectionModel(QObject* parent = nullptr);
     virtual ~PushSystemsSelectionModel() override;
 
     QStringList selectedSystems() const;

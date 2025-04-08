@@ -38,6 +38,8 @@
 #include <nx/vms/client/mobile/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/ui/qml_wrapper_helper.h>
+#include <nx/vms/client/mobile/ui/ui_controller.h>
+#include <nx/vms/client/mobile/ui/detail/screens.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/utils/guarded_callback.h>
 #include <ui/camera_thumbnail_provider.h>
@@ -48,64 +50,65 @@ namespace nx::vms::client::mobile {
 namespace {
 static const nx::utils::SoftwareVersion kObjectSearchMinimalSupportVersion(5, 0);
 
-void initializeConnectionUserInteractionDelegate(SystemContext* context)
+void initializeConnectionUserInteractionDelegate(WindowContext* windowContext,
+    SystemContext* systemContext)
 {
     using namespace nx::vms::client::core;
     using Delegate = nx::vms::client::core::RemoteConnectionUserInteractionDelegate;
 
     const auto validateToken =
-        [](const nx::network::http::Credentials& credentials)
-    {
-//        return m_context->show2faValidationScreen(credentials); //< Fix me.
-        return true;
-    };
+        [windowContext](const nx::network::http::Credentials& credentials)
+        {
+            return windowContext->uiController()->screens()->show2faValidationScreen(credentials);
+        };
 
     const auto askToAcceptCertificates =
-        [](const QList<core::TargetCertificateInfo>& certificatesInfo,
+        [systemContext](const QList<core::TargetCertificateInfo>& certificatesInfo,
             CertificateWarning::Reason reason)
-    {
-        if (!NX_ASSERT(!certificatesInfo.isEmpty()))
-            return false;
-
-        const auto& info = certificatesInfo.first();
-
-        const auto url = QUrl("Nx/Web/SslCertificateDialog.qml");
-        QVariantMap props;
-        props["headerText"] = CertificateWarning::header(
-            reason, info.target, certificatesInfo.size());
-        props["messageText"] = CertificateWarning::details(reason, certificatesInfo.size());
-        props["adviceText"] = CertificateWarning::advice(
-            reason, CertificateWarning::ClientType::mobile);
-
-               // TODO: Show all certificates.
-        if (const auto& chain = info.chain;
-            !chain.empty())
         {
-            const auto& certificate = *chain.begin();
-            const auto& expiresAt = duration_cast<std::chrono::seconds>(
-                certificate.notAfter().time_since_epoch());
-            props["certificateExpires"] =
-                QDateTime::fromSecsSinceEpoch(expiresAt.count()).toString();
-            props["certificateCommonName"] = QString::fromStdString(
-                certificateName(certificate.subject()).value_or(std::string()));
-            props["certificateIssuedBy"] = QString::fromStdString(
-                certificateName(certificate.issuer()).value_or(std::string()));
-            props["certificateSHA256"] = formattedFingerprint(certificate.sha256());
-            props["certificateSHA1"] = formattedFingerprint(certificate.sha1());
-        }
+            if (!NX_ASSERT(!certificatesInfo.isEmpty()))
+                return false;
 
-        return QmlWrapperHelper::showPopup(url, props) == "connect";
-    };
+            const auto& info = certificatesInfo.first();
+
+            const auto url = QUrl("Nx/Web/SslCertificateDialog.qml");
+            QVariantMap props;
+            props["headerText"] = CertificateWarning::header(
+                reason, info.target, certificatesInfo.size());
+            props["messageText"] = CertificateWarning::details(reason, certificatesInfo.size());
+            props["adviceText"] = CertificateWarning::advice(
+                reason, CertificateWarning::ClientType::mobile);
+
+                   // TODO: Show all certificates.
+            if (const auto& chain = info.chain;
+                !chain.empty())
+            {
+                const auto& certificate = *chain.begin();
+                const auto& expiresAt = duration_cast<std::chrono::seconds>(
+                    certificate.notAfter().time_since_epoch());
+                props["certificateExpires"] =
+                    QDateTime::fromSecsSinceEpoch(expiresAt.count()).toString();
+                props["certificateCommonName"] = QString::fromStdString(
+                    certificateName(certificate.subject()).value_or(std::string()));
+                props["certificateIssuedBy"] = QString::fromStdString(
+                    certificateName(certificate.issuer()).value_or(std::string()));
+                props["certificateSHA256"] = formattedFingerprint(certificate.sha256());
+                props["certificateSHA1"] = formattedFingerprint(certificate.sha1());
+            }
+
+            return QmlWrapperHelper::showPopup(
+                systemContext->windowContext(), url, props) == "connect";
+        };
 
     const auto showCertificateError =
         [](const core::TargetCertificateInfo& /*certificateInfo*/)
-    {
-      // Mobile client shows connection error itself.
-    };
+        {
+          // Mobile client shows connection error itself.
+        };
 
     auto delegate = std::make_unique<Delegate>(
-        context, validateToken, askToAcceptCertificates, showCertificateError);
-    context->networkModule()->connectionFactory()->setUserInteractionDelegate(std::move(delegate));
+        systemContext, validateToken, askToAcceptCertificates, showCertificateError);
+    systemContext->networkModule()->connectionFactory()->setUserInteractionDelegate(std::move(delegate));
 }
 
 } // namespace
@@ -267,7 +270,7 @@ SystemContext::SystemContext(WindowContext* context,
     engine->addImageProvider("thumbnail", thumbnailProvider);
     engine->addImageProvider("active", activeCameraThumbnailProvider);
 
-    initializeConnectionUserInteractionDelegate(this);
+    initializeConnectionUserInteractionDelegate(context, this);
 }
 
 SystemContext::~SystemContext()

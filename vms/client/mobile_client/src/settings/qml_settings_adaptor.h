@@ -15,30 +15,41 @@ class QmlSettingsAdaptor: public QObject
     Q_OBJECT
 
     Q_PROPERTY(bool liveVideoPreviews
-        READ liveVideoPreviews WRITE setLiveVideoPreviews
+        READ liveVideoPreviews
+        WRITE setLiveVideoPreviews
         NOTIFY liveVideoPreviewsChanged)
+
     Q_PROPERTY(int lastUsedQuality
-        READ lastUsedQuality WRITE setLastUsedQuality
+        READ lastUsedQuality
+        WRITE setLastUsedQuality
         NOTIFY lastUsedQualityChanged)
+
     Q_PROPERTY(bool savePasswords
-        READ savePasswords WRITE setSavePasswords
+        READ savePasswords
+        WRITE setSavePasswords
         NOTIFY savePasswordsChanged)
+
     Q_PROPERTY(nx::vms::client::core::network::server_certificate::ValidationLevel
         certificateValidationLevel
-        READ certificateValidationLevel WRITE setCertificateValidationLevel
+        READ certificateValidationLevel
+        WRITE setCertificateValidationLevel
         NOTIFY certificateValidationLevelChanged)
+
     Q_PROPERTY(bool enableHardwareDecoding
         READ enableHardwareDecoding
         WRITE setEnableHardwareDecoding
         NOTIFY enableHardwareDecodingChanged)
+
     Q_PROPERTY(bool forceTrafficLogging
         READ forceTrafficLogging
         WRITE setForceTrafficLogging
         NOTIFY forceTrafficLoggingChanged)
+
     Q_PROPERTY(QString customCloudHost
         READ customCloudHost
         WRITE setCustomCloudHost
         NOTIFY customCloudHostChanged)
+
     Q_PROPERTY(bool ignoreCustomization
         READ ignoreCustomization
         WRITE setIgnoreCustomization
@@ -48,6 +59,16 @@ class QmlSettingsAdaptor: public QObject
         READ locale
         WRITE setLocale
         NOTIFY localeChanged)
+
+    Q_PROPERTY(bool serverTimeMode
+        READ serverTimeMode
+        WRITE setServerTimeMode
+        NOTIFY serverTimeModeChanged)
+
+    Q_PROPERTY(bool showCameraInfo
+        READ showCameraInfo
+        WRITE setShowCameraInfo
+        NOTIFY showCameraInfoChanged)
 
     // Beta features.
     Q_PROPERTY(bool enableHolePunching
@@ -104,6 +125,12 @@ public:
     QString locale() const;
     void setLocale(const QString& value);
 
+    bool serverTimeMode() const;
+    void setServerTimeMode(bool value);
+
+    bool showCameraInfo() const;
+    void setShowCameraInfo(bool value);
+
     bool useVideoDownloadFeature() const;
     void setUseVideoDownloadFeature(bool value);
 
@@ -124,6 +151,8 @@ signals:
     void customCloudHostChanged();
     void ignoreCustomizationChanged();
     void localeChanged();
+    void serverTimeModeChanged();
+    void showCameraInfoChanged();
     void useVideoDownloadFeatureChanged();
     void useMaxHardwareDecodersCountChanged();
     void enableSoftwareDecoderFallbackChanged();

@@ -7,6 +7,10 @@
 #include <nx/utils/math/math.h>
 #include <nx/utils/qt_helpers.h>
 
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/mobile/application_context.h>
+#include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
+
 #include "push_notification_structures.h"
 
 namespace nx::vms::client::mobile::details {
@@ -77,24 +81,21 @@ void PushSystemsSelectionModel::Private::setHasChanges(bool value)
 
 void PushSystemsSelectionModel::registerQmlType()
 {
-    qmlRegisterUncreatableType<PushSystemsSelectionModel>("Nx.Mobile", 1, 0,
-        "PushSystemsSelectionModel", "Cannot create an instance of PushSystemsSelectionModel");
+    qmlRegisterType<PushSystemsSelectionModel>("Nx.Mobile", 1, 0, "PushSystemsSelectionModel");
 }
 
-PushSystemsSelectionModel::PushSystemsSelectionModel(
-    const QnCloudSystemList& systems,
-    const QStringList& selectedSystems,
-    QObject* parent)
-    :
+PushSystemsSelectionModel::PushSystemsSelectionModel(QObject* parent):
     base_type(parent),
     d(new Private{this})
 {
-    d->systems = sortedByName(systems);
+
+    d->systems = sortedByName(appContext()->cloudStatusWatcher()->recentCloudSystems());
 
     for (int row = 0; row != d->systems.size(); ++row)
         d->systemRowHash.insert(d->systems[row].cloudId, row);
 
-    setSelectedSystems(selectedSystems);
+
+    setSelectedSystems(appContext()->pushManager()->selectedSystems());
 }
 
 PushSystemsSelectionModel::~PushSystemsSelectionModel()

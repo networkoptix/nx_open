@@ -17,11 +17,13 @@ Controls.ApplicationWindow
 {
     id: mainWindow
 
-    property real leftPadding: leftCustomMargin
-    property real rightPadding: rightCustomMargin
-    property real bottomPadding: bottomCustomMargin
+    readonly property var customMargins: windowContext.ui.measurements.customMargins
+    property real leftPadding: customMargins.left
+    property real rightPadding: customMargins.right
+    property real bottomPadding: customMargins.bottom
 
-    readonly property bool hasNavigationBar: getNavigationBarSize()
+    readonly property bool hasNavigationBar:
+        !!windowContext.ui.windowHelpers.navigationBarSize()
 
     // Qt bug workaround. For some reason on the new devices with iOS 12+
     // Qt.inputMethod.visible hangs with wrong value. It is "true" even if
@@ -45,11 +47,16 @@ Controls.ApplicationWindow
     visible: true
     color: ColorTheme.colors.windowBackground ?? "transparent"
 
+    function lp(path)
+    {
+        return "qrc://" + path
+    }
+
     SideNavigation
     {
         id: sideNavigation
 
-        y: topLevelWarning.height + deviceStatusBarHeight
+        y: topLevelWarning.height + windowContext.ui.measurements.deviceStatusBarHeight
     }
 
     StackView
@@ -82,7 +89,7 @@ Controls.ApplicationWindow
                 : ColorTheme.colors.windowBackground
 
             sideNavigation.close()
-            updateCustomMargins()
+            windowContext.ui.measurements.updateCustomMargins()
         }
         onWidthChanged: autoScrollDelayTimer.restart()
         onHeightChanged: autoScrollDelayTimer.restart()
@@ -104,14 +111,16 @@ Controls.ApplicationWindow
     {
         id: topLevelWarning
 
-        y: deviceStatusBarHeight
-        x: -leftCustomMargin
-        width: mainWindow.availableWidth + leftCustomMargin + rightCustomMargin
+        y: windowContext.ui.measurements.deviceStatusBarHeight
+        x: -customMargins.left
+        width: mainWindow.availableWidth
+            + customMargins.left
+            + customMargins.right
         text: d.warningText
         opened: text.length
     }
 
-    onSceneGraphInitialized: updateCustomMargins()
+    onSceneGraphInitialized: windowContext.ui.measurements.updateCustomMargins()
 
     Screen.onPrimaryOrientationChanged: androidBarPositionWorkaround.updateBarPosition()
 
@@ -132,7 +141,7 @@ Controls.ApplicationWindow
         running: Qt.platform.os == "android"
 
         property int lastBarSize: -1
-        property int lastBarType: navigationBarType()
+        property int lastBarType: windowContext.ui.windowHelpers.navigationBarType()
 
         onTriggered: tryUpdateBarPosition()
 
@@ -141,8 +150,8 @@ Controls.ApplicationWindow
             if (Qt.platform.os != "android")
                 return
 
-            var barSize = getNavigationBarSize()
-            var barType = navigationBarType()
+            var barSize = windowContext.ui.measurements.navigationBarSize()
+            var barType = windowContext.ui.windowHelpers.navigationBarType()
 
             if (barSize == lastBarSize && lastBarType == barType)
                 return
@@ -159,11 +168,12 @@ Controls.ApplicationWindow
                 return
 
             // TODO: #future #ynikitenkov Check if we can get rid of check for tablet device type.
-            if (!getDeviceIsPhone() || lastBarType == NavigationBar.BottomNavigationBar)
+            if (!windowContext.ui.windowHelpers.isRunOnPhone()
+                || lastBarType == NavigationBar.BottomNavigationBar)
             {
-                rightPadding = rightCustomMargin
-                leftPadding = leftCustomMargin
-                bottomPadding = bottomCustomMargin + lastBarSize
+                rightPadding = customMargins.right
+                leftPadding = customMargins.left
+                bottomPadding = customMargins.bottom + lastBarSize
             }
             else
             {
@@ -196,9 +206,9 @@ Controls.ApplicationWindow
     CloudUserProfileWatcher
     {
         id: cloudUserProfileWatcher
-        statusWatcher: cloudStatusWatcher
+        statusWatcher: appContext.cloudStatusWatcher
         readonly property bool isOrgUser:
-            cloudStatusWatcher.status != CloudStatusWatcher.LoggedOut
+            appContext.cloudStatusWatcher.status != CloudStatusWatcher.LoggedOut
             && channelPartnerList && channelPartnerList.length
     }
 
@@ -206,18 +216,20 @@ Controls.ApplicationWindow
     {
         id: d
 
-        readonly property bool cloudOffline: cloudStatusWatcher.status == CloudStatusWatcher.Offline
+        readonly property bool cloudOffline:
+            appContext.cloudStatusWatcher.status === CloudStatusWatcher.Offline
 
         property bool cloudOfflineDelayed: false
         property bool showCloudOfflineWarning:
-            stackView.currentItem && stackView.currentItem.objectName == "sessionsScreen" && cloudOfflineDelayed
+            stackView.currentItem && stackView.currentItem.objectName === "sessionsScreen" && cloudOfflineDelayed
 
         readonly property string warningText:
         {
-            if (sessionManager.hasReconnectingSession)
+            if (windowContext.sessionManager.hasReconnectingSession)
                 return qsTr("Server offline. Reconnecting...")
             return showCloudOfflineWarning
-                ? qsTr("Cannot connect to %1", "%1 is the short cloud name (like 'Cloud')").arg(applicationInfo.cloudName())
+                ? qsTr("Cannot connect to %1", "%1 is the short cloud name (like 'Cloud')")
+                    .arg(appContext.appInfo.cloudName())
                 : ""
         }
 
@@ -241,15 +253,6 @@ Controls.ApplicationWindow
         }
     }
 
-    Connections
-    {
-        target: context()
-        function onShowMessage(caption, description)
-        {
-            Workflow.openStandardDialog(caption, description)
-        }
-    }
-
     Android10BackGestureWorkaround
     {
         workaroundParentItem: contentItem
@@ -268,24 +271,24 @@ Controls.ApplicationWindow
             // To make sure that we have the correct order of deinitialization we
             // handle window closing manually.
             close.accepted = false
-            applicationContext.closeWindow()
+            appContext.closeWindow()
         }
 
     Component.onCompleted:
     {
         setupColorTheme()
 
-        updateCustomMargins()
+        windowContext.ui.measurements.updateCustomMargins()
         androidBarPositionWorkaround.tryUpdateBarPosition()
 
         let startupHandler =
             function()
             {
-                if (tryRestoreLastUsedConnection())
+                if (windowContext.ui.tryRestoreLastUsedConnection())
                     return
 
-                if (uiController.currentScreen === Controller.UnknownScreen)
-                    uiController.openSessionsScreen()
+                if (windowContext.depricatedUiController.currentScreen === Controller.UnknownScreen)
+                    windowContext.depricatedUiController.openSessionsScreen()
             };
 
         CoreUtils.executeLater(startupHandler, this)

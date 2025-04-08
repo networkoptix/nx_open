@@ -5,7 +5,7 @@
 namespace nx::vms::client::core {
 
 namespace {
-static const QString kQmlPropertyName("applicationContext");
+static const QString kQmlPropertyName("appContext");
 } // namespace
 
 ApplicationContextQmlInitializer::ApplicationContextQmlInitializer(QObject* owner):

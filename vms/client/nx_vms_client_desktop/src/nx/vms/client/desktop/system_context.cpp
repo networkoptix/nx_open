@@ -166,6 +166,18 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             if (d->virtualCameraManager)
                 d->virtualCameraManager->setCurrentUser(user);
         });
+
+    if (appContext()->commonFeatures().flags.testFlag(
+        common::ApplicationContext::FeatureFlag::networking))
+    {
+        networkModule()->connectionFactory()->setUserInteractionDelegate(
+            createConnectionUserInteractionDelegate(
+                this,
+                [this]()
+                {
+                    return appContext()->mainWindowContext()->mainWindowWidget();
+                }));
+    }
 }
 
 SystemContext::~SystemContext()

@@ -63,10 +63,11 @@ void WindowContextAware::initializeSafetyChecks(WindowContext* context) const
     if (auto qobject = dynamic_cast<const QObject*>(this))
     {
         QObject::connect(context, &QObject::destroyed, qobject,
-            []()
+            [qobject]()
             {
                 NX_ASSERT(false,
-                    "Context-aware object must be destroyed before the corresponding context is.");
+                    "Context-aware object must be destroyed before the corresponding context is. %1",
+                    qobject);
             });
     }
 }

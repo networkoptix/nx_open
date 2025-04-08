@@ -61,7 +61,7 @@ Page
 
         property OauthClient oauthClient:
         {
-            const helper = createOauthClient(token, user)
+            const helper = appContext.credentialsHelper.createOauthClient(token, user)
             const closePage = ()=>Workflow.popCurrentScreen()
             helper.authDataReady.connect(closePage)
             helper.cancelled.connect(closePage)
@@ -73,8 +73,9 @@ Page
         {
             webView.visible = false
             const title = qsTr("Cannot connect to %1",
-                "%1 is the short cloud name (like 'Cloud')").arg(applicationInfo.cloudName())
-            const message = pushManager.checkConnectionErrorText()
+                "%1 is the short cloud name (like 'Cloud')")
+                    .arg(appContext.appInfo.cloudName())
+            const message = appContext.pushManager.checkConnectionErrorText()
             const warning = Workflow.openStandardDialog(title, message,
                 /*buttonsModel*/ null, /*disableAutoClose*/ true)
             warning.buttonClicked.connect(

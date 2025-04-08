@@ -19,7 +19,7 @@ NxObject
     readonly property alias audioController: audioController
     readonly property alias resource: resourceHelper.resource
     readonly property alias systemContext: systemContextAccessor.systemContext
-    readonly property bool serverOffline: sessionManager.hasReconnectingSession
+    readonly property bool serverOffline: windowContext.sessionManager.hasReconnectingSession
     readonly property bool cameraOffline:
         mediaPlayer.liveMode
             && resourceHelper.resourceStatus === API.ResourceStatus.offline
@@ -182,7 +182,7 @@ NxObject
         id: playbackInterruptor
 
         player: mediaPlayer
-        playable: sessionManager.hasConnectedSession
+        playable: windowContext.sessionManager.hasConnectedSession
             && !navigator.forceVideoPause
 
         interruptOnInactivity: CoreUtils.isMobile()
@@ -211,7 +211,7 @@ NxObject
         id: audioController
 
         resource: controller.resource
-        serverSessionManager: sessionManager
+        serverSessionManager: windowContext.sessionManager
     }
 
     MediaPlayer
@@ -226,15 +226,15 @@ NxObject
             if (videoScreen.activePage)
                 return true
 
-            return uiController.currentScreen === Controller.CameraSettingsScreen
+            return windowContext.depricatedUiController.currentScreen === Controller.CameraSettingsScreen
                 && stackView.currentItem.audioController === audioController
         }
 
         resource: resourceHelper.resource
-        onPlayingChanged: setKeepScreenOn(playing)
-        maxTextureSize: getMaxTextureSize()
-        allowHardwareAcceleration: settings.enableHardwareDecoding
-        allowSoftwareDecoderFallback: settings.enableSoftwareDecoderFallback
+        onPlayingChanged: windowContext.ui.windowHelpers.setKeepScreenOn(playing)
+        maxTextureSize: windowContext.ui.measurements.getMaxTextureSize()
+        allowHardwareAcceleration: appContext.settings.enableHardwareDecoding
+        allowSoftwareDecoderFallback: appContext.settings.enableSoftwareDecoderFallback
 
         onPositionChanged:
         {
@@ -300,13 +300,13 @@ NxObject
         }
     }
 
-    Component.onDestruction: setKeepScreenOn(false)
+    Component.onDestruction: windowContext.ui.windowHelpers.setKeepScreenOn(false)
 
     function start(targetResource, timestamp)
     {
         setResource(targetResource)
 
-        mediaPlayer.maxTextureSize = getMaxTextureSize()
+        mediaPlayer.maxTextureSize = windowContext.ui.measurements.getMaxTextureSize()
         if (timestamp && timestamp > 0)
         {
             if (Qt.application.state !== Qt.ApplicationActive)

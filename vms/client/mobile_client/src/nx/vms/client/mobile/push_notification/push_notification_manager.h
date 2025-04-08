@@ -153,7 +153,10 @@ public:
 signals:
     void enabledCheckStateChanged();
     void expertModeChanged();
-    void showPushErrorMessage(
+    void showPushSettingsErrorMessage(
+        const QString& caption,
+        const QString& description);
+    void showPushActivateErrorMessage(
         const QString& caption,
         const QString& description);
     void userUpdateInProgressChanged();

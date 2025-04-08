@@ -6,15 +6,20 @@
 
 #include "window_context_qml_initializer.h"
 
+#include "window_context_qml_initializer.h"
+
 namespace nx::vms::client::core {
 
 namespace menu { class Manager; }
 
 class SystemContext;
 class WindowContext;
+class WindowContextQmlInitializer;
 
 class NX_VMS_CLIENT_CORE_API WindowContextAware
 {
+    using base_type = QQmlParserStatus;
+
 public:
     WindowContextAware(WindowContext* windowContext);
     WindowContextAware(WindowContextAware* windowContextAware);

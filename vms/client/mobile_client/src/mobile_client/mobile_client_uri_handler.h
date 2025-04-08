@@ -7,14 +7,17 @@
 
 #include <nx/utils/url.h>
 
-class QnContext;
+class QnMobileClientUiController;
+
 class QnMobileClientUriHandler : public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    explicit QnMobileClientUriHandler(QnContext* context, QObject* parent = nullptr);
+    explicit QnMobileClientUriHandler(
+        QnMobileClientUiController* controller,
+        QObject* parent = nullptr);
     virtual ~QnMobileClientUriHandler() override;
 
     static QStringList supportedSchemes();
