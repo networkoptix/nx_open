@@ -279,7 +279,7 @@ QString QnLicense::displayName(Qn::LicenseType licenseType)
         case Qn::LC_Nvr:
             return tr("NVR");
         case Qn::LC_SaasLocalRecording:
-            return tr("Local Recording");
+            return tr("Local recording");
         case Qn::LC_Invalid:
             return tr("Invalid");
         default:
@@ -321,7 +321,7 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType)
         case Qn::LC_Nvr:
             return tr("NVR Licenses");
         case Qn::LC_SaasLocalRecording:
-            return tr("Local Recording service");
+            return tr("Local recording service");
         case Qn::LC_Invalid:
             return tr("Invalid Licenses");
         default:
@@ -358,7 +358,7 @@ QString QnLicense::displayText(Qn::LicenseType licenseType, int count)
         case Qn::LC_Nvr:
             return tr("%n NVR Licenses", "", count);
         case Qn::LC_SaasLocalRecording:
-            return tr("%n Local Recording Services", "", count);
+            return tr("%n Local recording services", "", count);
         case Qn::LC_Invalid:
             return tr("%n Invalid Licenses", "", count);
         default:
@@ -407,7 +407,7 @@ QString QnLicense::displayText(Qn::LicenseType licenseType, int count, int total
             return tr("%n/%1 NVR Licenses",
                 "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_SaasLocalRecording:
-            return tr("%n/%1 Local Recording Services",
+            return tr("%n/%1 Local recording services",
                 "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_Invalid:
             return tr("%n/%1 Invalid Licenses",
