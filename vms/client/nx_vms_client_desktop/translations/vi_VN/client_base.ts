@@ -1943,6 +1943,10 @@ Khóa giấy phép: %2</translation>
       <source>Platform</source>
       <translation>Nền tảng</translation>
     </message>
+    <message>
+      <source>Developer Build</source>
+      <translation type="unfinished">Developer Build</translation>
+    </message>
   </context>
   <context>
     <name>QnAbstractPtzDialog</name>

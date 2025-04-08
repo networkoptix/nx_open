@@ -2088,7 +2088,7 @@
     </message>
     <message>
       <source>Service Allocation</source>
-      <translation type="unfinished">Service Allocation</translation>
+      <translation>Przydział usług</translation>
     </message>
   </context>
   <context>

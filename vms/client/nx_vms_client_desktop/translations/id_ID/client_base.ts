@@ -1943,6 +1943,10 @@ Kunci Lisensi: %2</translation>
       <source>Platform</source>
       <translation>Platform</translation>
     </message>
+    <message>
+      <source>Developer Build</source>
+      <translation type="unfinished">Developer Build</translation>
+    </message>
   </context>
   <context>
     <name>QnAbstractPtzDialog</name>
