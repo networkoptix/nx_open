@@ -2520,7 +2520,6 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
 
     if (d->hasVideo
         && d->camera
-        && !workbench()->currentLayout()->resource()->hasFlags(Qn::cross_system)
         && d->isAnalyticsSupported
         && ResourceAccessManager::hasPermissions(d->camera, Qn::ViewFootagePermission))
     {
