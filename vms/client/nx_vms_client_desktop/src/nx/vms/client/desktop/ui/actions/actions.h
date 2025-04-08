@@ -1108,6 +1108,8 @@ enum IDType
      */
     SetCurrentLayoutItemSpacingLargeAction,
 
+    CurrentLayoutItemSpacingCustomMenuItem,
+
     /**
      * Toggles Showreel mode.
      */

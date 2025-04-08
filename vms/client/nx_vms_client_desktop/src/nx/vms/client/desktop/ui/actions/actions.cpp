@@ -1865,6 +1865,14 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("Large"))
             .checkable()
             .checked(QnWorkbenchLayout::kDefaultCellSpacing == Qn::CellSpacing::Large);
+
+        factory(CurrentLayoutItemSpacingCustomMenuItem)
+            .flags(Scene | NoTarget)
+            .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
+            .text(ContextMenu::tr("Custom"))
+            .checkable()
+            .condition(condition::customCellSpacingIsSet());
+
         factory.endGroup();
 
     } factory.endSubMenu();

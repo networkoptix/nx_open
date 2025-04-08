@@ -2625,6 +2625,21 @@ ConditionWrapper isWebPageOrIntegration()
     return hasWebPageSubtype(std::nullopt);
 }
 
+ConditionWrapper customCellSpacingIsSet()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            const auto layout = context->workbench()->currentLayout();
+            auto cellSpacing = layout->cellSpacing();
+
+            return !qFuzzyEquals(cellSpacing, LayoutResource::cellSpacingValue(Qn::CellSpacing::None))
+                && !qFuzzyEquals(cellSpacing, LayoutResource::cellSpacingValue(Qn::CellSpacing::Small))
+                && !qFuzzyEquals(cellSpacing, LayoutResource::cellSpacingValue(Qn::CellSpacing::Medium))
+                && !qFuzzyEquals(cellSpacing, LayoutResource::cellSpacingValue(Qn::CellSpacing::Large));
+        });
+}
+
 } // namespace condition
 } // namespace action
 } // namespace ui
