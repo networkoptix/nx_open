@@ -29,6 +29,8 @@ ColumnLayout
         id: banner
 
         style: DialogBanner.Style.Warning
+        visible: !closed && !!store && store.isNewRequestsEnabled
+        watchToReopen: !!store && store.isNewRequestsEnabled
         closeable: true
         text: qsTr("Enabling API Integrations registration requests allows third parties to "
             + "submit approval requests through integration. While safeguards exist, prolonged "
