@@ -170,9 +170,13 @@ struct TokenIntrospectionRequest
 
     /**%apidoc Skip non-shared systems from system_ids in response.*/
     bool skip_non_shared = false;
+
+    // For cross service requests only. Skip MFA state check.
+    // Required for token validation during MFA confirmation
+    bool ignore_mfa_state = false;
 };
 
-NX_REFLECTION_INSTRUMENT(TokenIntrospectionRequest, (token)(system_ids)(skip_non_shared))
+NX_REFLECTION_INSTRUMENT(TokenIntrospectionRequest, (token)(system_ids)(skip_non_shared)(ignore_mfa_state))
 
 struct TokenIntrospectionResponse
 {
