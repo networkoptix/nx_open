@@ -1963,6 +1963,10 @@ License Key: %2</source>
         <source>Platform</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Developer Build</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAbstractPtzDialog</name>
