@@ -774,6 +774,11 @@ ConditionWrapper homeTabIsNotActive(ActionVisibility defaultVisibility = Invisib
 
 ConditionWrapper screenRecordingSupported();
 
+/**
+ * Check whether custom cell spacing is set.
+ */
+ConditionWrapper customCellSpacingIsSet();
+
 } // namespace condition
 
 } // namespace menu
