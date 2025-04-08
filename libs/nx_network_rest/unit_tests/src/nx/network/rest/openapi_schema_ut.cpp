@@ -186,15 +186,15 @@ NX_REFLECTION_INSTRUMENT(Base64Model, (param))
      * %return Device information object.
      *     %struct TestDeviceModel
      *
-     * %apidoc PATCH /rest/v{3-}/devices/{id}
+     **%apidoc PATCH /rest/v{3-}/devices/{id}
      * Patch the device specified by {id} with new data provided.
      * The device must be created before.
      * %ingroup Test
-     * %struct [opt] TestDeviceModel
+     * %struct [opt] DeviceModelV3
      * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId"
      *     field via GET on /rest/v{3-}/devices) or MAC address (not supported for certain cameras).
      * %return Device information object.
-     *     %struct TestDeviceModel
+     *     %struct DeviceModelV3
      *
      * %apidoc DELETE /rest/v{3-}/devices/{id}
      * Delete the device specified by {id}. The device must be created before.
@@ -343,7 +343,7 @@ TEST_P(OpenApiSchemaTest, Validate)
     m_schemas->validateOrThrow(
         restRequest({"GET /rest/{version}/layouts?_format=json&_keepDefault HTTP/1.1"}).get());
     m_schemas->validateOrThrow(restRequest({"PATCH /rest/{version}/devices/{id} HTTP/1.1"},
-        R"json({"_orderBy": "attributes.scheduleTasks[].startTime", "id": "id"})json").get());
+        R"json({"_orderBy": "schedule.tasks[].startTime", "id": "id"})json").get());
     ASSERT_THROW(
         try
         {

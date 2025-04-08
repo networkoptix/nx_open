@@ -43,11 +43,8 @@ enum class DefaultValueAction: bool
 
 namespace details {
 
-NX_NETWORK_REST_API bool merge(
-    QJsonValue* existingValue,
-    const QJsonValue& incompleteValue,
-    QString* outErrorMessage,
-    const QString& fieldName);
+NX_NETWORK_REST_API void merge(
+    QJsonValue* existingValue, const QJsonValue& incompleteValue, const QString& fieldName);
 
 NX_NETWORK_REST_API void filter(
     QJsonValue* value,
@@ -62,6 +59,67 @@ NX_NETWORK_REST_API void filter(
 
 } // namespace details
 
+} // namespace nx::network::rest::json
+
+namespace nx::reflect {
+
+template<template<typename...> typename Container, typename Key, typename Value>
+requires std::is_same_v<Container<Key, Value>, std::map<Key, QJsonValue>>
+    || std::is_same_v<Container<Key, Value>, QMap<Key, QJsonValue>>
+void merge(Container<Key, Value>* origin,
+    Container<Key, Value>* updated,
+    DeserializationResult::Fields /*fields*/,
+    DeserializationResult::Fields* /*originFields*/,
+    bool /*replaceAssociativeContainer*/)
+{
+    auto originIt = origin->begin();
+    auto updatedIt = updated->begin();
+    while (originIt != origin->end() && updatedIt != updated->end())
+    {
+        int compare = -1;
+        if constexpr (std::is_same_v<Container<Key, Value>, std::map<Key, QJsonValue>>)
+            compare = originIt->first.compare(updatedIt->first);
+        else if constexpr (std::is_same_v<Container<Key, Value>, QMap<Key, QJsonValue>>)
+            compare = originIt.key().compare(updatedIt.key());
+        if (compare < 0)
+        {
+            ++originIt;
+        }
+        else if (compare == 0)
+        {
+            using namespace nx::network::rest::json;
+            if constexpr (std::is_same_v<Container<Key, Value>, std::map<Key, QJsonValue>>)
+                details::merge(&originIt->second, updatedIt->second, originIt->first);
+            else if constexpr (std::is_same_v<Container<Key, Value>, QMap<Key, QJsonValue>>)
+                details::merge(&originIt.value(), updatedIt.value(), originIt.key());
+            ++originIt;
+            ++updatedIt;
+        }
+        else
+        {
+            if constexpr (std::is_same_v<Container<Key, Value>, std::map<Key, QJsonValue>>)
+                originIt = origin->emplace_hint(originIt, updatedIt->first, updatedIt->second);
+            else if constexpr (std::is_same_v<Container<Key, Value>, QMap<Key, QJsonValue>>)
+                originIt = origin->insert(originIt, updatedIt->key(), updatedIt->value());
+            ++originIt;
+            ++updatedIt;
+        }
+    }
+    while (updatedIt != updated->end())
+    {
+        if constexpr (std::is_same_v<Container<Key, Value>, std::map<Key, QJsonValue>>)
+            originIt = origin->emplace_hint(originIt, updatedIt->first, updatedIt->second);
+        else if constexpr (std::is_same_v<Container<Key, Value>, QMap<Key, QJsonValue>>)
+            originIt = origin->insert(originIt, updatedIt->key(), updatedIt->value());
+        ++originIt;
+        ++updatedIt;
+    }
+}
+
+} // namespace nx::reflect
+
+namespace nx::network::rest::json {
+
 template<typename Output, typename Input>
 bool merge(
     Output* requestedValue,
@@ -75,8 +133,7 @@ bool merge(
 
     QJsonValue jsonValue;
     QJson::serialize(&jsonContext, existingValue, &jsonValue);
-    if (!details::merge(&jsonValue, incompleteValue, outErrorMessage, QString()))
-        return false;
+    details::merge(&jsonValue, incompleteValue, /*fieldName*/ QString());
 
     jsonContext.setStrictMode(true);
     jsonContext.deserializeReplacesExistingOptional(false);

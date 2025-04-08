@@ -14,16 +14,9 @@ namespace nx::network::rest::json {
 
 namespace details {
 
-bool merge(
-    QJsonValue* existingValue,
-    const QJsonValue& incompleteValue,
-    QString* outErrorMessage,
-    const QString& fieldName);
+void merge(QJsonValue* existingValue, const QJsonValue& incompleteValue, const QString& fieldName);
 
-bool merge(
-    QJsonObject* object,
-    const QJsonObject& incompleteObject,
-    QString* outErrorMessage)
+void merge(QJsonObject* object, const QJsonObject& incompleteObject)
 {
     auto field = object->begin();
     auto incompleteField = incompleteObject.constBegin();
@@ -38,8 +31,7 @@ bool merge(
         else if (compare == 0)
         {
             QJsonValue value = field.value();
-            if (!merge(&value, *incompleteField, outErrorMessage, field.key()))
-                return false;
+            merge(&value, *incompleteField, field.key());
             NX_VERBOSE(NX_SCOPE_TAG, "    Replaced field \"%1\"", field.key());
             field.value() = value;
             ++field;
@@ -57,14 +49,9 @@ bool merge(
         NX_VERBOSE(NX_SCOPE_TAG, "    Added field \"%1\"", incompleteField.key());
         object->insert(incompleteField.key(), *incompleteField);
     }
-    return true;
 }
 
-bool merge(
-    QJsonValue* existingValue,
-    const QJsonValue& incompleteValue,
-    QString* outErrorMessage,
-    const QString& fieldName)
+void merge(QJsonValue* existingValue, const QJsonValue& incompleteValue, const QString& fieldName)
 {
     const QString fieldReference = fieldName.isEmpty() ? "" : NX_FMT(" field \"%1\"", fieldName);
     NX_VERBOSE(NX_SCOPE_TAG, "BEGIN merge%1", fieldReference);
@@ -72,7 +59,7 @@ bool merge(
     if (incompleteValue.type() == QJsonValue::Undefined) //< Missing field type, as per Qt doc.
     {
         NX_VERBOSE(NX_SCOPE_TAG, "    Incomplete value is missing - ignored");
-        return true; //< leave recursion
+        return; //< leave recursion
     }
 
     switch (existingValue->type())
@@ -99,8 +86,7 @@ bool merge(
 
             NX_VERBOSE(NX_SCOPE_TAG, "    Object - process recursively");
             QJsonObject object = existingValue->toObject();
-            if (!merge(&object, incompleteValue.toObject(), outErrorMessage))
-                return false;
+            merge(&object, incompleteValue.toObject());
             *existingValue = object; //< Write back possibly changed object.
             break;
         }
@@ -110,7 +96,6 @@ bool merge(
     }
 
     NX_VERBOSE(NX_SCOPE_TAG, "END merge%1", fieldReference);
-    return true;
 }
 
 namespace

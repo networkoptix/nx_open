@@ -33,7 +33,9 @@
 
 #include <nx/reflect/from_string.h>
 #include <nx/reflect/to_string.h>
+#include <nx/reflect/type_utils.h>
 #include <nx/utils/buffer.h>
+#include <nx/utils/json/qt_containers_reflect.h>
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/uuid.h>
@@ -588,8 +590,17 @@ inline bool deserialize(
     const QJsonValue& value,
     std::optional<T>* target)
 {
-    if (!ctx->doesDeserializeReplaceExistingOptional() && !value.isObject() && *target)
-        return true;
+    if (!ctx->doesDeserializeReplaceExistingOptional() && *target)
+    {
+        using namespace nx::reflect;
+        if constexpr ((IsAssociativeContainerV<T> && !IsSetContainerV<T>)
+            || (IsUnorderedAssociativeContainerV<T> && !IsUnorderedSetContainerV<T>)
+            || IsQtAssociativeContainerV<T>
+            || std::is_same_v<T, QJsonObject>)
+        {
+            return true;
+        }
+    }
 
     if (value.isUndefined())
     {
