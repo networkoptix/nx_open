@@ -1,9 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include "oauth2_client_mock.h"
+
+#include <utility>
+
 #include <nx/network/http/rest/http_rest_client.h>
 
 #include "../api/request_paths.h"
-#include "oauth2_client_mock.h"
 
 namespace nx::cloud::oauth2::client::test {
 
@@ -62,7 +65,7 @@ void Oauth2ClientMock::logout(nx::utils::MoveOnlyFunc<void(db::api::ResultCode)>
 {
     Oauth2ClientMockManager::RequestPath path = {
         api::kOauthLogoutPath, nx::network::http::Method::delete_};
-    processRequest<void>(path, std::move(completionHandler));
+    processRequest<void>(path, std::move(completionHandler), Oauth2MockResult{});
 }
 
 void Oauth2ClientMock::getJwtPublicKeys(
@@ -71,7 +74,7 @@ void Oauth2ClientMock::getJwtPublicKeys(
 {
     Oauth2ClientMockManager::RequestPath path = {
         api::kOauthJwksPath, nx::network::http::Method::get};
-    processRequest<std::vector<nx::network::jwk::Key>>(path, std::move(completionHandler));
+    processRequest<std::vector<nx::network::jwk::Key>>(path, std::move(completionHandler), Oauth2MockResult{});
 }
 
 void Oauth2ClientMock::getJwtPublicKeyByKid(
@@ -149,6 +152,13 @@ void Oauth2ClientMockManager::setResponse(const RequestPath& requestPath, const 
 void Oauth2ClientMockManager::setRequest(const RequestPath& requestPath, const std::string& request)
 {
     m_requests[requestPath] = request;
+}
+
+void Oauth2ClientMockManager::setRequestPattern(
+    const RequestPathRegex& requestPath,
+    const Response& response)
+{
+    m_requestPatterns.emplace_back(std::make_pair(requestPath, response));
 }
 
 int Oauth2ClientMockManager::getNumCalls(const RequestPath& requestPath)

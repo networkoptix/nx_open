@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <nx/network/http/http_types.h>
 
 #include "../oauth2_client.h"
@@ -12,12 +14,16 @@ class Oauth2ClientMockManager
 {
 public:
     using RequestPath = std::pair<std::string /* Path */, std::string_view /* Method */>;
+    using RequestPathRegex = std::pair<std::regex /* Path */, std::string_view /* Method */>;
     using Response =
         std::pair<db::api::ResultCode /* result */, std::string /* serialized response*/>;
 
 public:
+
     void setResponse(const RequestPath& requestPath, const Response& response);
     void setRequest(const RequestPath& requestPath, const std::string& request = "*");
+    void setRequestPattern(const RequestPathRegex& requestPath, const Response& response);
+
     int getNumCalls(const RequestPath& requestPath);
 
 private:
@@ -34,10 +40,18 @@ private:
     };
 
 private:
+    std::vector<std::pair<RequestPathRegex, Response>> m_requestPatterns;
     std::unordered_map<RequestPath, Response, PathHash> m_responses;
     std::unordered_map<RequestPath, std::string, PathHash> m_requests;
     std::unordered_map<RequestPath, int, PathHash> m_requestsCounter;
 };
+
+struct Oauth2MockResult
+{
+    db::api::ResultCode code = db::api::ResultCode::ok;
+    std::string response;
+};
+
 
 class Oauth2ClientMock: public AbstractOauth2Client
 {
@@ -117,7 +131,8 @@ protected:
     template<class Response, class CompletionHandler>
     void processRequest(
         const Oauth2ClientMockManager::RequestPath& requestPath,
-        CompletionHandler handler);
+        CompletionHandler handler,
+        const Oauth2MockResult& result);
 
 private:
     Oauth2ClientMockManager& m_manager;
@@ -135,33 +150,53 @@ void nx::cloud::oauth2::client::test::Oauth2ClientMock::processRequest(
     else
         requestStr = nx::reflect::json::serialize(request);
 
-    if (!m_manager.m_requests.contains(requestPath))
-        NX_ASSERT(false, "Unexpected request path: %1", requestPath);
-
-    const std::string& registeredRequestStr = m_manager.m_requests[requestPath];
-    if (registeredRequestStr != "*" && registeredRequestStr != requestStr)
+    std::optional<Oauth2MockResult> response;
+    for (const auto& [pattern, reqResponse] : m_manager.m_requestPatterns)
     {
-        NX_ASSERT(false, "Unexpected request for path %1: %2. Should be: %3",
-            requestPath, requestStr, m_manager.m_requests[requestPath]);
+        if (pattern.second != requestPath.second)
+            continue;
+        if (std::regex_match(requestPath.first, pattern.first))
+        {
+            response = {reqResponse.first, reqResponse.second};
+            break;
+        }
     }
-
-    processRequest<Response>(requestPath, std::move(handler));
+    if (!response)
+    {
+        if (!m_manager.m_requests.contains(requestPath))
+        {
+            NX_ASSERT(false, "Unexpected request path: %1", requestPath);
+            return;
+        }
+        const std::string& registeredRequestStr = m_manager.m_requests[requestPath];
+        if (registeredRequestStr != "*" && registeredRequestStr != requestStr)
+        {
+            NX_ASSERT(false, "Unexpected request for path %1: %2. Should be: %3",
+                requestPath, requestStr, m_manager.m_requests[requestPath]);
+        }
+        response = Oauth2MockResult{
+            m_manager.m_responses[requestPath].first,
+            m_manager.m_responses[requestPath].second};
+    }
+    processRequest<Response>(requestPath, std::move(handler), *response);
 }
 
 template<class Response, class CompletionHandler>
 void nx::cloud::oauth2::client::test::Oauth2ClientMock::processRequest(
-    const Oauth2ClientMockManager::RequestPath& requestPath, CompletionHandler handler)
+    const Oauth2ClientMockManager::RequestPath& requestPath,
+    CompletionHandler handler,
+    const Oauth2MockResult& result)
 {
     m_manager.m_requestsCounter[requestPath]++;
     if constexpr (!std::is_same_v<Response, void>)
     {
         Response response;
-        nx::reflect::json::deserialize(m_manager.m_responses[requestPath].second, &response);
-        return handler(m_manager.m_responses[requestPath].first, response);
+        nx::reflect::json::deserialize(result.response, &response);
+        return handler(result.code, response);
     }
     else
     {
-        return handler(m_manager.m_responses[requestPath].first);
+        return handler(result.code);
     }
 }
 
