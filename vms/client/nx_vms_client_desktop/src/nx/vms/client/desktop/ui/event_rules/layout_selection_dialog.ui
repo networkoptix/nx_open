@@ -168,7 +168,7 @@
              </sizepolicy>
             </property>
             <property name="title">
-             <string notr="true">User's local layouts</string>
+             <string>User's local layouts</string>
             </property>
             <property name="flat">
              <bool>true</bool>

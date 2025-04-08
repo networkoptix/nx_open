@@ -105,7 +105,7 @@ ServerCertificateWarning::ServerCertificateWarning(
     frameLayout->addWidget(area);
 
     auto createPanel =
-        [=, this](const core::TargetCertificateInfo& certificateInfo)
+        [this, statistics, statisticsName](const core::TargetCertificateInfo& certificateInfo)
         {
             auto widget = new QWidget();
 
@@ -126,7 +126,7 @@ ServerCertificateWarning::ServerCertificateWarning(
             setPaletteColor(serverNameLabel, QPalette::WindowText, foregroundColor);
 
             auto certificateDetailsLabel = new QLabel(
-                common::html::localLink("Certificate details", kCertificateLink));
+                common::html::localLink(tr("Certificate details"), kCertificateLink));
 
             connect(certificateDetailsLabel , &QLabel::linkActivated, this,
                 [this, statistics, certificateInfo, statisticsName](const QString& link)

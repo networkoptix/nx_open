@@ -156,6 +156,9 @@ core::CachingCameraDataLoaderPtr initDataLoader(const QnVirtualCameraResourcePtr
 
 struct WorkbenchExportHandler::Private
 {
+    Q_DECLARE_TR_FUNCTIONS(WorkbenchExportHandler::Private)
+
+public:
     WorkbenchExportHandler* const q;
     QScopedPointer<ExportManager> exportManager;
 
