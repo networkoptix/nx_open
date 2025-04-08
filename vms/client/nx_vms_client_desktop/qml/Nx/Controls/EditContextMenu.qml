@@ -30,7 +30,7 @@ Menu
 
     Action
     {
-        text: "Cut"
+        text: qsTr("Cut")
         shortcut: StandardKey.Cut
         onTriggered: menu.cutAction()
         visible: menu.readActionsVisible && menu.editingEnabled
@@ -39,7 +39,7 @@ Menu
 
     Action
     {
-        text: "Copy"
+        text: qsTr("Copy")
         shortcut: StandardKey.Copy
         onTriggered: menu.copyAction()
         visible: menu.readActionsVisible
@@ -48,7 +48,7 @@ Menu
 
     Action
     {
-        text: "Paste"
+        text: qsTr("Paste")
         shortcut: StandardKey.Paste
         onTriggered: menu.pasteAction()
         visible: menu.editingEnabled
@@ -57,7 +57,7 @@ Menu
 
     Action
     {
-        text: "Delete"
+        text: qsTr("Delete")
         onTriggered: menu.deleteAction()
         visible: menu.editingEnabled
         enabled: menu.selectionActionsEnabled && menu.editingEnabled && menu.visible

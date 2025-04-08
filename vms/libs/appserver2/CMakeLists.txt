@@ -23,6 +23,8 @@ nx_add_target(appserver2 LIBRARY NO_API_MACROS
 )
 target_include_directories(appserver2 PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
+nx_make_target_translatable(appserver2 COMPONENTS "server")
+
 if(withTests AND (withMediaServer OR withClouds OR openSourceBuild))
     add_subdirectory(unit_tests)
 endif()
