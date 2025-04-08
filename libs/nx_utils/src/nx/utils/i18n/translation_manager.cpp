@@ -143,6 +143,8 @@ void TranslationManager::installTranslation(const Translation& translation)
         if (NX_ASSERT(translator->load(file), "File %1 cannot be loaded", file))
         {
             d->translators.append(translator);
+            // Return value is not checked intentionally as it returns false if the file does not
+            // contain any translations (which can easily happen).
             qApp->installTranslator(translator);
         }
         else

@@ -2,19 +2,22 @@
 
 #pragma once
 
-#include <QtCore/QDir>
-
-#include <nx/utils/impl_ptr.h>
+#include <QtCore/QScopedPointer>
 
 #include "abstract_backend.h"
 
+class QSettings;
+
 namespace nx::utils::property_storage {
 
-/** Stores properties in separate files in the given directory. */
-class NX_VMS_COMMON_API FileSystemBackend: public AbstractBackend
+class NX_UTILS_API QSettingsBackend: public AbstractBackend
 {
 public:
-    FileSystemBackend(const QDir& path);
+    /**
+     * Note: backend takes ownership of QSettings object.
+     */
+    QSettingsBackend(QSettings* settings, const QString& group = QString());
+    virtual ~QSettingsBackend() override;
 
     virtual bool isWritable() const override;
     virtual QString readValue(const QString& name, bool* success = nullptr) override;
@@ -23,8 +26,11 @@ public:
     virtual bool exists(const QString& name) const override;
     virtual bool sync() override;
 
-protected:
-    QDir m_path;
+    QSettings* qSettings() const;
+
+private:
+    QScopedPointer<QSettings> m_settings;
+    QString m_group;
 };
 
 } // namespace nx::utils::property_storage

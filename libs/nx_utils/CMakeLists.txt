@@ -39,7 +39,10 @@ set(mocableFiles
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/thread/long_runnable.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/thread/thread.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/async_handler_executor_detail.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/coro/task_utils.h)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/coro/task_utils.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/property_storage/property.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/property_storage/storage.h
+)
 
 nx_add_qt_mocables(nx_utils ${mocableFiles}
     INCLUDE_DIRS

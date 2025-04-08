@@ -187,7 +187,8 @@ public:
     void migrateOldSettings();
 
 private:
-    // Deperecated properties.
+    // Deprecated properties, moved to the client core settings and kept here only for the
+    // migration reasons.
     Property<QString> locale{this, "locale", nx::branding::defaultLocale()};
 
     Property<bool> muteOnAudioTransmit{this, "muteOnAudioTransmit", true,

@@ -10,7 +10,7 @@
 
 namespace nx::utils::property_storage {
 
-class NX_VMS_COMMON_API Storage: public QObject
+class NX_UTILS_API Storage: public QObject
 {
     Q_OBJECT
 
