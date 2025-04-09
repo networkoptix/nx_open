@@ -2481,7 +2481,7 @@ struct SaveUserRoleAccess
                 return {ErrorCode::forbidden,
                     nx::format(
                         ServerApiErrors::tr(
-                            "User '%1(%2) is not permitted to create new User Groups.'"),
+                            "User '%1(%2)' is not permitted to create new User Groups."),
                         accessor.name,
                         accessor.id)};
             }
