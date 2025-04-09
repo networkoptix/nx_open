@@ -1240,6 +1240,10 @@
       <source>Monitor in New Window</source>
       <translation>Surveiller dans une nouvelle fenêtre</translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation>Personnalisé</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4387,6 +4391,10 @@ Clé de licence : %2</translation>
       <source>CONNECTION LOST</source>
       <translation type="unfinished">CONNECTION LOST</translation>
     </message>
+    <message>
+      <source>NOT ACTIVATED</source>
+      <translation type="unfinished">NOT ACTIVATED</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6296,6 +6304,23 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation>Impossible d'écrire le fichier</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation>la longueur du nom de fichier %1 est supérieure à %2 caractères.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 est utilisé par une autre exportation.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -6664,6 +6689,10 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
       <translation>L'option &quot;Toutes les archives&quot; a été changée en &quot;Mouvement, Objets, Signets&quot; en raison de la sauvegarde du stockage cloud a été activée</translation>
+    </message>
+    <message>
+      <source>Site is currently suspended</source>
+      <translation type="unfinished">Site is currently suspended</translation>
     </message>
   </context>
   <context>
@@ -7225,6 +7254,14 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras</source>
       <translation>Haute valeur minimale peut conduire à la diminution de la longueur d'archive sur d'autre caméras</translation>
+    </message>
+    <message>
+      <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
     </message>
   </context>
   <context>
@@ -10766,6 +10803,10 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
       <source>I trust this server</source>
       <translation>Je fais confiance à ce serveur</translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation type="unfinished">Certificate details</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -11976,15 +12017,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>Impossible d'écrire le fichier</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 est utilisé par une autre exportation.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>Exportation terminée</translation>
     </message>
@@ -12023,11 +12055,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Nous préparons des fichiers pour le processus d'exportation. S.V.P. patienter quelques secondes.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation>la longueur du nom de fichier %1 est supérieure à %2 caractères.</translation>
     </message>
   </context>
   <context>

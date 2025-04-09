@@ -1318,6 +1318,10 @@
       <source>Shared layouts</source>
       <translation>共有レイアウト</translation>
     </message>
+    <message>
+      <source>User&apos;s local layouts</source>
+      <translation type="unfinished">User&apos;s local layouts</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>
@@ -1842,7 +1846,7 @@
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>ビデオウォールに割り当て...</translation>
+      <translation>ビデオウォールへの割り当て...</translation>
     </message>
     <message>
       <source>Preview</source>

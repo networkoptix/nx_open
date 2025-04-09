@@ -1240,6 +1240,10 @@
       <source>Monitor in New Window</source>
       <translation>Serverstatus i nytt vindu</translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation>Tilpasset</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1966,7 +1970,7 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>Developer Build</source>
-      <translation type="unfinished">Developer Build</translation>
+      <translation>Utvikler build</translation>
     </message>
   </context>
   <context>
@@ -4387,6 +4391,10 @@ Lisensnøkkel: %2</translation>
       <source>CONNECTION LOST</source>
       <translation type="unfinished">CONNECTION LOST</translation>
     </message>
+    <message>
+      <source>NOT ACTIVATED</source>
+      <translation type="unfinished">NOT ACTIVATED</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6296,6 +6304,23 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation>Kan ikke skrive fil</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 filnavnlengden er mer enn %2 tegn.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 er i bruk av en annen eksport.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -6664,6 +6689,10 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
       <translation>&quot;Alt arkiv&quot; -alternativet ble endret til &quot;Motion, Objects, Bookmarks&quot; på grunn av at sikkerhetskopiering av skylagring ble aktivert</translation>
+    </message>
+    <message>
+      <source>Site is currently suspended</source>
+      <translation type="unfinished">Site is currently suspended</translation>
     </message>
   </context>
   <context>
@@ -7225,6 +7254,14 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras</source>
       <translation>Høy minimumsverdi kan føre til redusert arkivlengde på andre kameraer</translation>
+    </message>
+    <message>
+      <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
     </message>
   </context>
   <context>
@@ -10763,6 +10800,10 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <source>I trust this server</source>
       <translation>Jeg stoler på denne serveren</translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation type="unfinished">Certificate details</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -11971,15 +12012,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>Kan ikke skrive fil</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 er i bruk av en annen eksport.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>Eksport fullført</translation>
     </message>
@@ -12018,11 +12050,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Vi forbereder filer for eksportprosessen. Vent noen sekunder.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 filnavnlengden er mer enn %2 tegn.</translation>
     </message>
   </context>
   <context>

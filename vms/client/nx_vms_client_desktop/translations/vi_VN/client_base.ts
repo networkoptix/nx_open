@@ -1232,6 +1232,10 @@
       <source>Monitor in New Window</source>
       <translation>Giám sát trong cửa sổ mới</translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation>Tùy chỉnh</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4341,6 +4345,10 @@ Khóa giấy phép: %2</translation>
       <source>CONNECTION LOST</source>
       <translation>MẤT KẾT NỐI</translation>
     </message>
+    <message>
+      <source>NOT ACTIVATED</source>
+      <translation type="unfinished">NOT ACTIVATED</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6191,6 +6199,23 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation>Không thể ghi tệp</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation>Độ dài tên tệp %1 dài hơn %2 ký tự.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 đang được sử dụng bởi một người dùng khác.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -6554,6 +6579,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
       <translation>&quot;Tất cả tùy chọn lưu trữ&quot; đã được thay đổi thành &quot;Chuyển động, Đối tượng, Dấu trang&quot; do tính năng sao lưu bộ nhớ đám mây đã được bật</translation>
+    </message>
+    <message>
+      <source>Site is currently suspended</source>
+      <translation type="unfinished">Site is currently suspended</translation>
     </message>
   </context>
   <context>
@@ -7108,6 +7137,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras</source>
       <translation>Giá trị nhỏ nhất có thể dẫn đến giảm độ dài lưu trữ trên camera</translation>
+    </message>
+    <message>
+      <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
     </message>
   </context>
   <context>
@@ -10607,6 +10644,10 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <source>I trust this server</source>
       <translation>Tôi tin tưởng máy chủ này</translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation type="unfinished">Certificate details</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -11797,15 +11838,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>Không thể ghi tệp</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 đang được sử dụng bởi một người dùng khác.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>Hoàn thành xuất file</translation>
     </message>
@@ -11844,11 +11876,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Chúng tôi đang chuẩn bị các tập tin cho quá trình xuất khẩu. Xin vui lòng chờ trong vài giây.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation>Độ dài tên tệp %1 dài hơn %2 ký tự.</translation>
     </message>
   </context>
   <context>

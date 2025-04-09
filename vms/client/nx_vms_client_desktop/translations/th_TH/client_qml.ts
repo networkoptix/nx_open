@@ -678,6 +678,25 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
   </context>
   <context>
+    <name>EditContextMenu</name>
+    <message>
+      <source>Cut</source>
+      <translation>ตัด</translation>
+    </message>
+    <message>
+      <source>Copy</source>
+      <translation>สำเนา</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <translation>แปะ</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>ลบ</translation>
+    </message>
+  </context>
+  <context>
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>

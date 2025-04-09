@@ -1232,6 +1232,10 @@
       <source>Monitor in New Window</source>
       <translation>Monitor di Window Baru</translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation>Kustom</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1945,7 +1949,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Developer Build</source>
-      <translation type="unfinished">Developer Build</translation>
+      <translation>Build Developer</translation>
     </message>
   </context>
   <context>
@@ -4341,6 +4345,10 @@ Kunci Lisensi: %2</translation>
       <source>CONNECTION LOST</source>
       <translation>KONEKSI TERPUTUS</translation>
     </message>
+    <message>
+      <source>NOT ACTIVATED</source>
+      <translation type="unfinished">NOT ACTIVATED</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6191,6 +6199,23 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation>Tidak dapat menulis file</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 panjang nama file lebih dari %2 karakter.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 sedang digunakan oleh ekspor lain.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -6554,6 +6579,10 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
       <translation>&quot;Semua archive&quot; opsi diubah menjadi &quot;Gerakan, Objek, Bookmark&quot; karena backup penyimpanan cloud diaktifkan</translation>
+    </message>
+    <message>
+      <source>Site is currently suspended</source>
+      <translation type="unfinished">Site is currently suspended</translation>
     </message>
   </context>
   <context>
@@ -7108,6 +7137,14 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras</source>
       <translation>Nilai minimum yang tinggi dapat menyebabkan berkurangnya panjang archive pada kamera lain</translation>
+    </message>
+    <message>
+      <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
     </message>
   </context>
   <context>
@@ -10607,6 +10644,10 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
       <source>I trust this server</source>
       <translation>Saya percaya server ini</translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation type="unfinished">Certificate details</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -11797,15 +11838,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>Tidak dapat menulis file</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 sedang digunakan oleh ekspor lain.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>Ekspor selesai</translation>
     </message>
@@ -11844,11 +11876,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Kami sedang mempersiapkan file untuk proses ekspor. Harap tunggu beberapa detik.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 panjang nama file lebih dari %2 karakter.</translation>
     </message>
   </context>
   <context>

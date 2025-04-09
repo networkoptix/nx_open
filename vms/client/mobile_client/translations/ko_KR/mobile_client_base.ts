@@ -38,22 +38,6 @@
     </message>
   </context>
   <context>
-    <name>QnContext</name>
-    <message>
-      <source>Cannot connect to the Server</source>
-      <translation>서버에 연결할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Cannot connect to the Site &quot;%1&quot;</source>
-      <comment>%1 is a site name</comment>
-      <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>알 수 없음</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLayoutsModelUnsorted</name>
     <message>
       <source>All Cameras</source>
@@ -96,6 +80,18 @@
       <source>Expires in %1</source>
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
       <translation type="unfinished">Expires in %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::mobile::UiController</name>
+    <message>
+      <source>Cannot connect to the Server</source>
+      <translation>서버에 연결할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the Site &quot;%1&quot;</source>
+      <comment>%1 is a site name</comment>
+      <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
     </message>
   </context>
 </TS>

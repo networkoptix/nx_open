@@ -1240,6 +1240,10 @@
       <source>Monitor in New Window</source>
       <translation>Monitor en una finestra nova</translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation>Personalitzada</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4387,6 +4391,10 @@ License Key: %2</translation>
       <source>CONNECTION LOST</source>
       <translation type="unfinished">CONNECTION LOST</translation>
     </message>
+    <message>
+      <source>NOT ACTIVATED</source>
+      <translation type="unfinished">NOT ACTIVATED</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6296,6 +6304,23 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation>No es pot escriure l'arxiu</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>Una altra exportació està utilitzant %1.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -6664,6 +6689,10 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
       <translation type="unfinished">&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</translation>
+    </message>
+    <message>
+      <source>Site is currently suspended</source>
+      <translation type="unfinished">Site is currently suspended</translation>
     </message>
   </context>
   <context>
@@ -7225,6 +7254,14 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras</source>
       <translation>Un valor mínim elevat pot provocar una disminució de la longitud de l'arxiu en altres càmeres</translation>
+    </message>
+    <message>
+      <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
     </message>
   </context>
   <context>
@@ -10766,6 +10803,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>I trust this server</source>
       <translation type="unfinished">I trust this server</translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation type="unfinished">Certificate details</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -11975,15 +12016,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>No es pot escriure l'arxiu</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>Una altra exportació està utilitzant %1.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>Exportació completada</translation>
     </message>
@@ -12022,11 +12054,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Estem preparant els arxius per al procés d'exportació. Espereu uns quants segons.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
   </context>
   <context>

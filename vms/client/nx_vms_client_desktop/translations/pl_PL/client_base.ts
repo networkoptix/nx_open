@@ -1256,6 +1256,10 @@
       <source>Monitor in New Window</source>
       <translation>Monitoruj w nowym oknie</translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation>Niestandardowa</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -2008,7 +2012,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Developer Build</source>
-      <translation type="unfinished">Developer Build</translation>
+      <translation>Wersja deweloperska</translation>
     </message>
   </context>
   <context>
@@ -2247,7 +2251,7 @@ Klucz licencyjny: %2</translation>
     <message numerus="yes">
       <source>This user is removed from Site</source>
       <translation type="unfinished">
-        <numerusform>This user is removed from Site</numerusform>
+        <numerusform>Ten użytkownik został usunięty z witryny</numerusform>
         <numerusform>This user is removed from Site</numerusform>
         <numerusform>This user is removed from Site</numerusform>
         <numerusform>This user is removed from Site</numerusform>
@@ -3644,7 +3648,7 @@ Klucz licencyjny: %2</translation>
     <message numerus="yes">
       <source>Set for %n devices</source>
       <translation type="unfinished">
-        <numerusform>Set for %n devices</numerusform>
+        <numerusform>Ustawienie dla %n urządzeń</numerusform>
         <numerusform>Set for %n devices</numerusform>
         <numerusform>Set for %n devices</numerusform>
         <numerusform>Set for %n devices</numerusform>
@@ -3652,7 +3656,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation type="unfinished">Cloud authorization request should only be performed for cloud cross system resources</translation>
+      <translation>Żądanie autoryzacji w chmurze powinno być wykonywane tylko dla zasobów międzysystemowych w chmurze</translation>
     </message>
   </context>
   <context>
@@ -4473,11 +4477,15 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Access to this camera requires authorization credentials.</source>
-      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+      <translation>Dostęp do tej kamery wymaga podania danych uwierzytelniających.</translation>
     </message>
     <message>
       <source>CONNECTION LOST</source>
       <translation>UTRACONO POŁĄCZENIE</translation>
+    </message>
+    <message>
+      <source>NOT ACTIVATED</source>
+      <translation type="unfinished">NOT ACTIVATED</translation>
     </message>
   </context>
   <context>
@@ -4664,7 +4672,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
-      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+      <translation>Aby aktywować, dodaj %1 więcej odpowiednich usług lub zmniejsz liczbę kamer z włączoną funkcją tworzenia kopii zapasowych.</translation>
     </message>
     <message>
       <source>Insufficient services</source>
@@ -5228,7 +5236,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Płatne usługi integracyjne wyłączone</translation>
     </message>
   </context>
   <context>
@@ -6138,7 +6146,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n removed devices</source>
       <translation type="unfinished">
-        <numerusform>%n removed devices</numerusform>
+        <numerusform>%n usuniętych urządzeń</numerusform>
         <numerusform>%n removed devices</numerusform>
         <numerusform>%n removed devices</numerusform>
         <numerusform>%n removed devices</numerusform>
@@ -6147,7 +6155,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n removed cameras</source>
       <translation type="unfinished">
-        <numerusform>%n removed cameras</numerusform>
+        <numerusform>%n usuniętych kamer</numerusform>
         <numerusform>%n removed cameras</numerusform>
         <numerusform>%n removed cameras</numerusform>
         <numerusform>%n removed cameras</numerusform>
@@ -6156,7 +6164,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n removed servers</source>
       <translation type="unfinished">
-        <numerusform>%n removed servers</numerusform>
+        <numerusform>%n usuniętych serwerów</numerusform>
         <numerusform>%n removed servers</numerusform>
         <numerusform>%n removed servers</numerusform>
         <numerusform>%n removed servers</numerusform>
@@ -6165,7 +6173,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n removed layouts</source>
       <translation type="unfinished">
-        <numerusform>%n removed layouts</numerusform>
+        <numerusform>%n usuniętych układów</numerusform>
         <numerusform>%n removed layouts</numerusform>
         <numerusform>%n removed layouts</numerusform>
         <numerusform>%n removed layouts</numerusform>
@@ -6183,7 +6191,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n devices more</source>
       <translation type="unfinished">
-        <numerusform>%n devices more</numerusform>
+        <numerusform>%n urządzeń więcej</numerusform>
         <numerusform>%n devices more</numerusform>
         <numerusform>%n devices more</numerusform>
         <numerusform>%n devices more</numerusform>
@@ -6192,7 +6200,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n cameras more</source>
       <translation type="unfinished">
-        <numerusform>%n cameras more</numerusform>
+        <numerusform>%n więcej kamer</numerusform>
         <numerusform>%n cameras more</numerusform>
         <numerusform>%n cameras more</numerusform>
         <numerusform>%n cameras more</numerusform>
@@ -6201,7 +6209,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n servers more</source>
       <translation type="unfinished">
-        <numerusform>%n servers more</numerusform>
+        <numerusform>%n więcej serwerów</numerusform>
         <numerusform>%n servers more</numerusform>
         <numerusform>%n servers more</numerusform>
         <numerusform>%n servers more</numerusform>
@@ -6210,7 +6218,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n layouts more</source>
       <translation type="unfinished">
-        <numerusform>%n layouts more</numerusform>
+        <numerusform>%n więcej układów</numerusform>
         <numerusform>%n layouts more</numerusform>
         <numerusform>%n layouts more</numerusform>
         <numerusform>%n layouts more</numerusform>
@@ -6502,6 +6510,23 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Delete %n rules?</numerusform>
         <numerusform>Delete %n rules?</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation>Nie można zapisać pliku</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 jest używany przez inny proces eksportowania.</translation>
     </message>
   </context>
   <context>
@@ -6883,6 +6908,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
       <translation>&quot;Wszystkie opcje archiwum&quot; zostały zmienione na &quot;Ruch, Obiekty, Zakładki&quot; z powodu włączenia kopii zapasowej w chmurze</translation>
+    </message>
+    <message>
+      <source>Site is currently suspended</source>
+      <translation type="unfinished">Site is currently suspended</translation>
     </message>
   </context>
   <context>
@@ -7458,6 +7487,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras</source>
       <translation>Wysoka wartość minimalna może doprowadzić do zmniejszenia długości archiwum na innych kamerach</translation>
+    </message>
+    <message>
+      <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
     </message>
   </context>
   <context>
@@ -11082,6 +11119,10 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
       <source>I trust this server</source>
       <translation>Ufam temu serwerowi</translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation type="unfinished">Certificate details</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -12327,15 +12368,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>Nie można zapisać pliku</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 jest używany przez inny proces eksportowania.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>Zakończono eksportowanie</translation>
     </message>
@@ -12374,11 +12406,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Przygotowujemy pliki do eksportu. Proszę zaczekać kilka sekund.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
   </context>
   <context>

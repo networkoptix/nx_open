@@ -907,26 +907,26 @@
       </translation>
     </message>
     <message>
-      <source>Local Recording</source>
+      <source>Local recording</source>
       <translation>Grabación local</translation>
     </message>
     <message>
-      <source>Local Recording service</source>
-      <translation>Servicio de grabación local</translation>
+      <source>Local recording service</source>
+      <translation type="unfinished">Local recording service</translation>
     </message>
     <message numerus="yes">
-      <source>%n Local Recording Services</source>
-      <translation>
-        <numerusform>%n Servicios de Grabación Local</numerusform>
-        <numerusform>%n Servicios de Grabación Local</numerusform>
+      <source>%n Local recording services</source>
+      <translation type="unfinished">
+        <numerusform>%n Local recording services</numerusform>
+        <numerusform>%n Local recording services</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>%n/%1 Local Recording Services</source>
+      <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation>
-        <numerusform>%nServicios%1 grabación locales</numerusform>
-        <numerusform>%nServicios%1 grabación locales</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Local recording services</numerusform>
+        <numerusform>%n/%1 Local recording services</numerusform>
       </translation>
     </message>
   </context>

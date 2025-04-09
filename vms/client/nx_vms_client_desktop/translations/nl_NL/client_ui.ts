@@ -1318,6 +1318,10 @@
       <source>Shared layouts</source>
       <translation>Gedeelde schermindelingen</translation>
     </message>
+    <message>
+      <source>User&apos;s local layouts</source>
+      <translation type="unfinished">User&apos;s local layouts</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>

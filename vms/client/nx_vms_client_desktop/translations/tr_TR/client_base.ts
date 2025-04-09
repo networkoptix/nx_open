@@ -1240,6 +1240,10 @@
       <source>Monitor in New Window</source>
       <translation>Yeni Pencerede İzle</translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation>Özel Ayarlar</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4386,6 +4390,10 @@ License Key: %2</source>
       <source>CONNECTION LOST</source>
       <translation type="unfinished">CONNECTION LOST</translation>
     </message>
+    <message>
+      <source>NOT ACTIVATED</source>
+      <translation type="unfinished">NOT ACTIVATED</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6295,6 +6303,23 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation>Dosyaya yazılamıyor</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 dosya adı uzunluğu %2 karakterden fazla.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 başka bir aktarma işlemi tarafından kullanılıyor.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -6663,6 +6688,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
       <translation>&quot;Tüm arşiv&quot; seçeneği, bulut depolama yedeklemesinin etkinleştirilmesi nedeniyle &quot;Hareket, Nesneler, Yer İmleri&quot; olarak değiştirildi</translation>
+    </message>
+    <message>
+      <source>Site is currently suspended</source>
+      <translation type="unfinished">Site is currently suspended</translation>
     </message>
   </context>
   <context>
@@ -7224,6 +7253,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras</source>
       <translation>Yüksek değerler diğer kameraların arşiv boyutunu düşürebilir</translation>
+    </message>
+    <message>
+      <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
     </message>
   </context>
   <context>
@@ -10762,6 +10799,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>I trust this server</source>
       <translation>Bu sunucuya güveniyorum</translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation type="unfinished">Certificate details</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -11969,15 +12010,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>Dosyaya yazılamıyor</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 başka bir aktarma işlemi tarafından kullanılıyor.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>Aktarma tamamlandı</translation>
     </message>
@@ -12016,11 +12048,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Dosyaları dışarı aktarma işlemini hazırlıyorum. Lütfen birkaç saniye bekleyiniz.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 dosya adı uzunluğu %2 karakterden fazla.</translation>
     </message>
   </context>
   <context>

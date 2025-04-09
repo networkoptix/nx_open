@@ -1232,6 +1232,10 @@
       <source>Monitor in New Window</source>
       <translation>새 창으로 모니터링</translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation>사용자 정의</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4341,6 +4345,10 @@ License Key: %2</source>
       <source>CONNECTION LOST</source>
       <translation type="unfinished">CONNECTION LOST</translation>
     </message>
+    <message>
+      <source>NOT ACTIVATED</source>
+      <translation type="unfinished">NOT ACTIVATED</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6191,6 +6199,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation>파일을 쓸 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 파일 이름의 길이가 %2 자보다 깁니다.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1이 다른 내보내기에서 사용 중입니다.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -6554,6 +6579,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
       <translation>&quot;모든 보관함&quot; 옵션이 클라우드 스토리지 백업이 활성화되어 &quot;동작, 객체, 북마크&quot; 로 변경되었습니다.</translation>
+    </message>
+    <message>
+      <source>Site is currently suspended</source>
+      <translation type="unfinished">Site is currently suspended</translation>
     </message>
   </context>
   <context>
@@ -7108,6 +7137,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras</source>
       <translation>High minimum value can lead to archive length decrease on other cameras</translation>
+    </message>
+    <message>
+      <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
     </message>
   </context>
   <context>
@@ -10607,6 +10644,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>I trust this server</source>
       <translation>나는 이 서버를 신뢰합니다</translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation type="unfinished">Certificate details</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -11795,15 +11836,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>파일을 쓸 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1이 다른 내보내기에서 사용 중입니다.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>내보내기 완료</translation>
     </message>
@@ -11842,11 +11874,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>내보내기 프로세스를 위해 파일을 준비 중입니다. 몇 초 정도 기다리십시오.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 파일 이름의 길이가 %2 자보다 깁니다.</translation>
     </message>
   </context>
   <context>

@@ -908,26 +908,26 @@
       </translation>
     </message>
     <message>
-      <source>Local Recording</source>
-      <translation type="unfinished">Local Recording</translation>
+      <source>Local recording</source>
+      <translation type="unfinished">Local recording</translation>
     </message>
     <message>
-      <source>Local Recording service</source>
-      <translation type="unfinished">Local Recording service</translation>
+      <source>Local recording service</source>
+      <translation type="unfinished">Local recording service</translation>
     </message>
     <message numerus="yes">
-      <source>%n Local Recording Services</source>
+      <source>%n Local recording services</source>
       <translation type="unfinished">
-        <numerusform>%n Local Recording Services</numerusform>
-        <numerusform>%n Local Recording Services</numerusform>
+        <numerusform>%n Local recording services</numerusform>
+        <numerusform>%n Local recording services</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>%n/%1 Local Recording Services</source>
+      <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Local Recording Services</numerusform>
-        <numerusform>%n/%1 Local Recording Services</numerusform>
+        <numerusform>%n/%1 Local recording services</numerusform>
+        <numerusform>%n/%1 Local recording services</numerusform>
       </translation>
     </message>
   </context>

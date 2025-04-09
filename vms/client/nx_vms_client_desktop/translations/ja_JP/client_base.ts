@@ -464,7 +464,7 @@
     </message>
     <message>
       <source>Add Bookmark...</source>
-      <translation>ブックマーク追加...</translation>
+      <translation>ブックマークを追加...</translation>
     </message>
     <message>
       <source>Edit Bookmark...</source>
@@ -500,7 +500,7 @@
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>ビデオウォールに割り当て...</translation>
+      <translation>このPCにビデオウォールを設定...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
@@ -540,11 +540,11 @@
     </message>
     <message>
       <source>Maximize Item</source>
-      <translation>最大化</translation>
+      <translation>アイテムを最大化</translation>
     </message>
     <message>
       <source>Restore Item</source>
-      <translation>元に戻す</translation>
+      <translation>アイテムを元に戻す</translation>
     </message>
     <message>
       <source>Save Current Position...</source>
@@ -652,7 +652,7 @@
     </message>
     <message>
       <source>I/O Module Rules...</source>
-      <translation>I/Oモジュール ルール...</translation>
+      <translation>I/Oモジュールルール...</translation>
     </message>
     <message>
       <source>Device Settings...</source>
@@ -944,7 +944,7 @@
     </message>
     <message>
       <source>Switch to Cameras &amp; Resources tab</source>
-      <translation>[カメラとリソース] タブに切り替え</translation>
+      <translation>カメラ&amp;リソースタブに切り替え</translation>
     </message>
     <message>
       <source>Search Cameras &amp; Resources</source>
@@ -1231,6 +1231,10 @@
     <message>
       <source>Monitor in New Window</source>
       <translation>モニターを新規ウィンドウで開く</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>カスタム</translation>
     </message>
   </context>
   <context>
@@ -1945,7 +1949,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Developer Build</source>
-      <translation type="unfinished">Developer Build</translation>
+      <translation>開発者ビルド</translation>
     </message>
   </context>
   <context>
@@ -2045,7 +2049,7 @@ License Key: %2</source>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
-      <translation>サイトがシャットダウンしました。ビデオウォールに接続するには、サイトがアクティブな状態である必要があります。 %1</translation>
+      <translation>サイトがシャットダウン状態です。ビデオウォールへの割り当てを行うには、サイトがアクティブ状態である必要があります。 %1</translation>
     </message>
   </context>
   <context>
@@ -4295,7 +4299,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>SITE SHUT DOWN</source>
-      <translation>サイトはシャットダウンしました</translation>
+      <translation>サイト機能停止</translation>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
@@ -4340,6 +4344,10 @@ License Key: %2</source>
     <message>
       <source>CONNECTION LOST</source>
       <translation>接続が失われました</translation>
+    </message>
+    <message>
+      <source>NOT ACTIVATED</source>
+      <translation type="unfinished">NOT ACTIVATED</translation>
     </message>
   </context>
   <context>
@@ -5048,11 +5056,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Notification and interface languages differ</source>
-      <translation>通知言語とインターフェイス言語の相違</translation>
+      <translation>通知言語とインターフェース言語の相違</translation>
     </message>
     <message>
       <source>Notifications language differs from the interface language</source>
-      <translation>通知言語はインターフェース言語と異なります。</translation>
+      <translation>通知言語がインターフェース言語と異なります。</translation>
     </message>
     <message>
       <source>Recording disabled</source>
@@ -6166,7 +6174,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
-      <translation>ローカルファイルは、別のコンピューターに接続されたビデオウォール画面には配置できません</translation>
+      <translation>他のコンピューターに割り当てられたビデオウォール画面には、ローカルファイルを配置できません</translation>
     </message>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
@@ -6188,6 +6196,23 @@ If you intended to move analytics data to another storage location, please conta
       <translation>
         <numerusform>%n ルールを削除しますか?</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation>ファイルの書き込みができません</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 ファイル名の長さが %2 文字を超えています。</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 は別のエクスポートで使用されています。</translation>
     </message>
   </context>
   <context>
@@ -6555,6 +6580,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
       <translation>クラウドストレージが有効化されたため、&quot;すべての録画データ&quot; オプションは &quot;モーション, オブジェクト, ブックマーク&quot; に変更されました。</translation>
+    </message>
+    <message>
+      <source>Site is currently suspended</source>
+      <translation type="unfinished">Site is currently suspended</translation>
     </message>
   </context>
   <context>
@@ -7109,6 +7138,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras</source>
       <translation>最小値を高くすると、他のカメラのアーカイブ期間が減少する可能性があります</translation>
+    </message>
+    <message>
+      <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
     </message>
   </context>
   <context>
@@ -10608,6 +10645,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>I trust this server</source>
       <translation>このサーバーを信用する</translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation type="unfinished">Certificate details</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -11796,15 +11837,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>ファイルの書き込みができません</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 は別のエクスポートで使用されています。</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>エクスポートが完了しました</translation>
     </message>
@@ -11843,11 +11875,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>エクスポート処理用のファイルを準備中です。しばらくお待ちください。</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 ファイル名の長さが %2 文字を超えています。</translation>
     </message>
   </context>
   <context>

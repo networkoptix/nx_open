@@ -1232,6 +1232,10 @@
       <source>Monitor in New Window</source>
       <translation>於新視窗中檢視</translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation>自訂</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -4341,6 +4345,10 @@ License Key: %2</source>
       <source>CONNECTION LOST</source>
       <translation>失去連線</translation>
     </message>
+    <message>
+      <source>NOT ACTIVATED</source>
+      <translation type="unfinished">NOT ACTIVATED</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6191,6 +6199,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation>無法寫入檔案</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation>檔名%1長度超過%2字元。</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 正在被另一個匯出使用.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -6554,6 +6579,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
       <translation>由於啟用了雲端備份，&quot;所有存檔&quot; 選項已更改為 &quot;位移、物件、書籤&quot; </translation>
+    </message>
+    <message>
+      <source>Site is currently suspended</source>
+      <translation type="unfinished">Site is currently suspended</translation>
     </message>
   </context>
   <context>
@@ -7108,6 +7137,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras</source>
       <translation>過高的最小值可能會導致其它攝影機上的錄影天數減少</translation>
+    </message>
+    <message>
+      <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+    </message>
+    <message>
+      <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
+      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
     </message>
   </context>
   <context>
@@ -10604,6 +10641,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>I trust this server</source>
       <translation>信任此伺服器</translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation type="unfinished">Certificate details</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -11792,15 +11833,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>無法寫入檔案</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 正在被另一個匯出使用.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>匯出完成</translation>
     </message>
@@ -11839,11 +11871,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>正在為匯出準備檔案。請稍待片刻。</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation>檔名%1長度超過%2字元。</translation>
     </message>
   </context>
   <context>

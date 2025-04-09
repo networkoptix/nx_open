@@ -1318,6 +1318,10 @@
       <source>Shared layouts</source>
       <translation>Layout yang dibagikan</translation>
     </message>
+    <message>
+      <source>User&apos;s local layouts</source>
+      <translation type="unfinished">User&apos;s local layouts</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>
@@ -2088,7 +2092,7 @@
     </message>
     <message>
       <source>Service Allocation</source>
-      <translation type="unfinished">Service Allocation</translation>
+      <translation>Alokasi Layanan</translation>
     </message>
   </context>
   <context>

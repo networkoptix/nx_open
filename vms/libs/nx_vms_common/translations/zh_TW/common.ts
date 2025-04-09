@@ -868,24 +868,24 @@
       </translation>
     </message>
     <message>
-      <source>Local Recording</source>
+      <source>Local recording</source>
       <translation>本地錄影</translation>
     </message>
     <message>
-      <source>Local Recording service</source>
-      <translation>本地錄影服務</translation>
+      <source>Local recording service</source>
+      <translation type="unfinished">Local recording service</translation>
     </message>
     <message numerus="yes">
-      <source>%n Local Recording Services</source>
-      <translation>
-        <numerusform>%n 本地錄影服務</numerusform>
+      <source>%n Local recording services</source>
+      <translation type="unfinished">
+        <numerusform>%n Local recording services</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>%n/%1 Local Recording Services</source>
+      <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation>
-        <numerusform>%n/%1  本地錄影服務</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n/%1 Local recording services</numerusform>
       </translation>
     </message>
   </context>

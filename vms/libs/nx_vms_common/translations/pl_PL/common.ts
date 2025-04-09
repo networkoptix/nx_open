@@ -985,30 +985,30 @@
       </translation>
     </message>
     <message>
-      <source>Local Recording</source>
+      <source>Local recording</source>
       <translation>Nagrywanie lokalne</translation>
     </message>
     <message>
-      <source>Local Recording service</source>
-      <translation>Lokalna usługa nagrywania</translation>
+      <source>Local recording service</source>
+      <translation type="unfinished">Local recording service</translation>
     </message>
     <message numerus="yes">
-      <source>%n Local Recording Services</source>
+      <source>%n Local recording services</source>
       <translation type="unfinished">
-        <numerusform>%n Lokalne usługi nagrywania</numerusform>
-        <numerusform>%n Local Recording Services</numerusform>
-        <numerusform>%n Local Recording Services</numerusform>
-        <numerusform>%n Local Recording Services</numerusform>
+        <numerusform>%n Local recording services</numerusform>
+        <numerusform>%n Local recording services</numerusform>
+        <numerusform>%n Local recording services</numerusform>
+        <numerusform>%n Local recording services</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>%n/%1 Local Recording Services</source>
+      <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Lokalne usługi nagrywania</numerusform>
-        <numerusform>%n/%1 Local Recording Services</numerusform>
-        <numerusform>%n/%1 Local Recording Services</numerusform>
-        <numerusform>%n/%1 Local Recording Services</numerusform>
+        <numerusform>%n/%1 Local recording services</numerusform>
+        <numerusform>%n/%1 Local recording services</numerusform>
+        <numerusform>%n/%1 Local recording services</numerusform>
+        <numerusform>%n/%1 Local recording services</numerusform>
       </translation>
     </message>
   </context>
