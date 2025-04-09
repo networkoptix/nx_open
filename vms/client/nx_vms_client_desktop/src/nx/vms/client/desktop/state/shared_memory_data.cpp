@@ -35,7 +35,13 @@ SharedMemoryData::Process* SharedMemoryData::findProcess(PidType pid)
 
 SharedMemoryData::Process* SharedMemoryData::addProcess(PidType pid)
 {
-    NX_ASSERT(!findProcess(pid), "Process %1 already exists");
+    // There can be a rare case when the client process crashed, and the next one has the same pid.
+    if (auto existing = findProcess(pid))
+    {
+        // Cleanup everything except pid.
+        *existing = {.pid = pid};
+        return existing;
+    }
 
     auto empty = findProcess(PidType());
     if (!NX_ASSERT(empty, "No space for new process"))
