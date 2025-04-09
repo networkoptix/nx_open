@@ -174,6 +174,11 @@ void registerRuleHandlers(
 
     /**%apidoc POST /rest/v{4-}/events/rules
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.
+     * <br/>
+     * A rule can only handle events that are created after the rule itself is created.
+     * For example, if an Generic event was created and entered the 'started' state before a rule
+     * was created, that later-created rule cannot handle the event when it subsequently moves to
+     * the 'stopped' state.
      * %caption Create Rule
      * %ingroup Events
      * %struct RuleV4
