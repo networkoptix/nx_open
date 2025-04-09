@@ -363,7 +363,7 @@
     </message>
     <message>
       <source>Add Bookmark...</source>
-      <translation>ブックマーク追加...</translation>
+      <translation>ブックマークを追加...</translation>
     </message>
     <message>
       <source>Edit Bookmark...</source>
@@ -419,7 +419,7 @@
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>ビデオウォールに割り当て...</translation>
+      <translation>このPCにビデオウォールを設定...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
@@ -459,11 +459,11 @@
     </message>
     <message>
       <source>Maximize Item</source>
-      <translation>最大化</translation>
+      <translation>アイテムを最大化</translation>
     </message>
     <message>
       <source>Restore Item</source>
-      <translation>元に戻す</translation>
+      <translation>アイテムを元に戻す</translation>
     </message>
     <message>
       <source>Save Current Position...</source>
@@ -571,7 +571,7 @@
     </message>
     <message>
       <source>I/O Module Rules...</source>
-      <translation>I/Oモジュール ルール...</translation>
+      <translation>I/Oモジュールルール...</translation>
     </message>
     <message>
       <source>Device Settings...</source>
@@ -875,7 +875,7 @@
     </message>
     <message>
       <source>Switch to Cameras &amp; Resources tab</source>
-      <translation>[カメラとリソース] タブに切り替え</translation>
+      <translation>カメラ&amp;リソースタブに切り替え</translation>
     </message>
     <message>
       <source>Search Cameras &amp; Resources</source>
@@ -2068,7 +2068,7 @@ License Key: %2</source>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>System shut down. To attach to a Video Wall, the System should be in active state. %1</source>
-      <translation>システムはシャットダウン状態です。ビデオウォールに接続するには、システムがアクティブな状態である必要があります。 %1</translation>
+      <translation>システムがシャットダウン状態です。ビデオウォールへの割り当てを行うには、システムがアクティブ状態である必要があります。 %1</translation>
     </message>
   </context>
   <context>
@@ -6755,7 +6755,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
-      <translation>ローカルファイルは、別のコンピューターに接続されたビデオウォール画面には配置できません</translation>
+      <translation>他のコンピューターに割り当てられたビデオウォール画面には、ローカルファイルを配置できません</translation>
     </message>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
