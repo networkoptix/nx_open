@@ -314,6 +314,8 @@ public:
 
     void moveToDedicatedWindow();
 
+    void deinitialize();
+
 signals:
     void painted();
     void aspectRatioChanged();

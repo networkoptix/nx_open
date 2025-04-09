@@ -970,6 +970,8 @@ void QnWorkbenchDisplay::clearWidget(Qn::ItemRole role)
 
     m_widgetByRole[role] = nullptr;
 
+    oldWidget->deinitialize();
+
     if (role == Qn::ZoomedRole)
     {
         m_viewportAnimator->stop();

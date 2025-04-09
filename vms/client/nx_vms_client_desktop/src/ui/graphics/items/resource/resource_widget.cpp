@@ -947,6 +947,12 @@ void QnResourceWidget::moveToDedicatedWindow()
         close();
 }
 
+void QnResourceWidget::deinitialize()
+{
+    // It could be triggered in the process of widget removing from a layout, which is incorrect.
+    disconnect(titleBar()->rightButtonsBar(), nullptr, this, nullptr);
+}
+
 QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     QSizeF result;
