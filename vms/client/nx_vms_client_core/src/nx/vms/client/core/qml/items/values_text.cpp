@@ -411,13 +411,11 @@ void ValuesText::updateColorRow()
     QList<QTextLength> constraints;
     for (int i = 0; i < d->visibleValues.count(); ++i)
         constraints.append(QTextLength());
-    int spacerWidth = width() - valuesWidth - appendixWidth;
+    qreal spacerWidth = width() - valuesWidth - appendixWidth;
     if (spacerWidth > 0)
         constraints.append(QTextLength(QTextLength::FixedLength, spacerWidth));
     if (!appendix.isEmpty())
-    {
-        constraints.append(QTextLength(QTextLength::FixedLength, appendixWidth));
-    };
+        constraints.append(QTextLength(QTextLength::FixedLength, ceil(appendixWidth)));
     tableFormat.setColumnWidthConstraints(constraints);
     auto table = cursor.insertTable(1, constraints.count(), tableFormat);
 

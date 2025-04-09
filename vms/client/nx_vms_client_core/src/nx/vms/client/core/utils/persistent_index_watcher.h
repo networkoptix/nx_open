@@ -14,7 +14,7 @@ namespace nx::vms::client::core {
  * index (stored as a persistent index) was changed internally. An index is considered changed if
  * its row, column or parent (also stored as a persistent index) is changed.
  */
-class PersistentIndexWatcher: public QObject
+class NX_VMS_CLIENT_CORE_API PersistentIndexWatcher: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QModelIndex index READ index WRITE setIndex NOTIFY indexChanged)

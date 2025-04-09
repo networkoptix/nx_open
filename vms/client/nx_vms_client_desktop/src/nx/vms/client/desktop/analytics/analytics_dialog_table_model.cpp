@@ -216,7 +216,8 @@ void AnalyticsDialogTableModel::setSourceModel(QAbstractItemModel* model)
                 const QModelIndex& bottomRight,
                 const QList<int>& roles)
             {
-                emit dataChanged(mapFromSource(topLeft), mapFromSource(bottomRight), roles);
+                auto indexBottomRight = index(mapFromSource(bottomRight).row(), columnCount({}) - 1);
+                emit dataChanged(mapFromSource(topLeft), indexBottomRight, roles);
             });
 
         connect(model, &QAbstractItemModel::layoutAboutToBeChanged, this,

@@ -57,8 +57,12 @@ Rectangle
 
     onSelectedItemChanged:
     {
-        intervalPreview.resource = null
-        intervalPreview.startTimeMs = 0
+        if (selectedItem?.trackId !== intervalPreview.trackId)
+        {
+            intervalPreview.resource = null
+            intervalPreview.startTimeMs = 0
+            intervalPreview.trackId = selectedItem?.trackId
+        }
 
         if (selectedItem?.previewResource)
         {
@@ -137,6 +141,8 @@ Rectangle
             active: !!previewPanel.selectedItem
             loopDelayMs: 0 //< No need to pause because the user has manual controls.
             speedFactor: 1.0 //< This is a regular player (not tile preview) so use normal speed.
+
+            property var trackId: null
 
             Rectangle
             {

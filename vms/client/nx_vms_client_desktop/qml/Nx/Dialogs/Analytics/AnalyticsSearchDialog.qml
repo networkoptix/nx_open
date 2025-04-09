@@ -471,6 +471,20 @@ Window
                         id: selection
                     }
 
+                    Connections
+                    {
+                        target: selection.index.model
+
+                        function onDataChanged(topLeft, bottomRight)
+                        {
+                            const selectedRow = selection.index.row
+                            if (selectedRow < topLeft.row || selectedRow > bottomRight.row)
+                                return
+
+                            previewPanel.update()
+                        }
+                    }
+
                     ModelDataAccessor
                     {
                         id: accessor
@@ -936,10 +950,14 @@ Window
                 showPreview = false
             }
 
+            property int selectedItemUpdateInstigator: 0
+
             selectedItem:
             {
                 if (selection.index.row === -1 || !showPreview)
                     return null
+
+                selectedItemUpdateInstigator; //< Binding to this property for updating on command.
 
                 const paddingTimeMs = CoreSettings.iniConfigValue("previewPaddingTimeMs")
                 const getData = name => accessor.getData(selection.index, name)
@@ -959,6 +977,11 @@ Window
                     "attributes": getData("analyticsAttributes") || [],
                     "resourceList": getData("resourceList") || []
                 }
+            }
+
+            function update()
+            {
+                previewPanel.selectedItemUpdateInstigator++
             }
 
             function createSearchRequestText(key, values)
