@@ -20,6 +20,9 @@ class NX_VMS_CLIENT_CORE_API WatermarkWatcher:
     Q_OBJECT
     using base_type = QObject;
 
+    // Property `username` is necessary for functional tests.
+    Q_PROPERTY(QString username READ username NOTIFY usernameChanged);
+
 public:
     static void registerQmlType();
 
@@ -47,8 +50,11 @@ public:
         const nx::Uuid& id,
         const QSize& size);
 
+    QString username() const;
+
 signals:
     void watermarkImageUrlChanged(const nx::Uuid& id);
+    void usernameChanged();
 
 private:
     struct Private;

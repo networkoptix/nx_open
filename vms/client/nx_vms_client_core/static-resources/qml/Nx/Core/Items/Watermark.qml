@@ -13,8 +13,9 @@ Image
     property alias resource: contextAccessor.resource
     readonly property var watermarkId: NxGlobals.generateUuid()
     property size sourceSize
+    readonly property string text: d.systemContext?.watermarkWatcher.username ?? ""
 
-    visible: !!source
+    visible: !!source.toString()
     source: d.systemContext
         ? d.systemContext.watermarkWatcher.watermarkImageUrl(watermarkId)
         : ""
@@ -32,13 +33,13 @@ Image
     {
         id: contextAccessor
 
-        function onSystemContextChanged()
+        onSystemContextChanged:
         {
-            d.systemContext.watermarkWatcher.addWatermarkImageUrlWatcher(
+            systemContext.watermarkWatcher.addWatermarkImageUrlWatcher(
                 control.watermarkId, sourceSize)
         }
 
-        function onSystemContextIsAboutToBeChanged()
+        onSystemContextIsAboutToBeChanged:
         {
             d.removeWatcher()
         }

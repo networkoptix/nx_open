@@ -166,6 +166,8 @@ ScalableContentHolder
 
     Watermark
     {
+        id: watermark
+
         parent: videoContent.videoOutput
         anchors.fill: parent
 

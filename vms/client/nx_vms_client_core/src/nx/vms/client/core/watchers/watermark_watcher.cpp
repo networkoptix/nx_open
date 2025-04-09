@@ -66,6 +66,7 @@ void WatermarkWatcher::Private::updateUser()
         return;
 
     user = value;
+    emit q->usernameChanged();
     updateWatermark();
 }
 
@@ -158,6 +159,11 @@ void WatermarkWatcher::updateWatermarkImageUrlSize(
 
     it->second.size = size;
     emit watermarkImageUrlChanged(id);
+}
+
+QString WatermarkWatcher::username() const
+{
+    return QString(d->user);
 }
 
 } // nx::vms::client::core
