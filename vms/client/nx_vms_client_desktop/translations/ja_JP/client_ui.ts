@@ -2182,7 +2182,7 @@
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>ビデオウォールに割り当て...</translation>
+      <translation>ビデオウォールへの割り当て...</translation>
     </message>
     <message>
       <source>Preview</source>
