@@ -120,6 +120,7 @@ struct SystemData
     std::string name;
     std::string customization;
 
+    // TODO: #anekrasov It's a bad practice to pass raw password through network. Must be removed.
     /**%apidoc Key, system uses to authenticate requests to any cloud module. */
     std::string authKey;
 

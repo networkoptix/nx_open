@@ -552,7 +552,6 @@ private:
 
             if (newSize == m_recvBuffer->size())
                 newSize += kDefaultReserveSize;
-
             const auto bufSizeBak = m_recvBuffer->size();
             m_recvBuffer->resize(newSize);
             const auto bytesToRead = m_recvBuffer->size() - bufSizeBak;

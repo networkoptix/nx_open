@@ -73,9 +73,20 @@ void Oauth2Client::logout(nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> han
 {
     base_type::template makeAsyncCall<void>(
         nx::network::http::Method::delete_,
-        api::kOauthIntrospectPath,
+        api::kOauthLogoutPath,
         {}, // query
         std::move(handler));
+}
+
+void Oauth2Client::clientLogout(
+    const std::string& clientId,
+    nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler)
+{
+    base_type::template makeAsyncCall<void>(
+        nx::network::http::Method::delete_,
+        nx::network::http::rest::substituteParameters(api::kOauthClientLogoutPath, {clientId}),
+        {}, // query
+        std::move(completionHandler));
 }
 
 void Oauth2Client::getJwtPublicKeys(

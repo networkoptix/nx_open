@@ -68,6 +68,16 @@ void Oauth2ClientMock::logout(nx::utils::MoveOnlyFunc<void(db::api::ResultCode)>
     processRequest<void>(path, std::move(completionHandler), Oauth2MockResult{});
 }
 
+void Oauth2ClientMock::clientLogout(
+    const std::string& clientId,
+    nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler)
+{
+    Oauth2ClientMockManager::RequestPath path = {
+        nx::network::http::rest::substituteParameters(api::kOauthClientLogoutPath, {clientId}),
+        nx::network::http::Method::delete_};
+    processRequest<std::string, void>(path, clientId, std::move(completionHandler));
+}
+
 void Oauth2ClientMock::getJwtPublicKeys(
     nx::utils::MoveOnlyFunc<void(db::api::ResultCode, std::vector<nx::network::jwk::Key>)>
         completionHandler)

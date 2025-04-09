@@ -80,6 +80,10 @@ public:
 
     void logout(nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
 
+    virtual void clientLogout(
+        const std::string& clientId,
+        nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
+
     void getJwtPublicKeys(
         nx::utils::MoveOnlyFunc<void(db::api::ResultCode, std::vector<nx::network::jwk::Key>)>
             completionHandler) override;
