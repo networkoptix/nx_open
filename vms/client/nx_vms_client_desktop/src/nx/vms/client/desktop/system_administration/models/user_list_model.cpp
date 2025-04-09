@@ -840,10 +840,19 @@ Qt::ItemFlags UserListModel::flags(const QModelIndex& index) const
     if (!user)
         return flags;
 
-    flags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    flags |= Qt::ItemIsSelectable;
 
     if (index.column() == CheckBoxColumn)
+    {
         flags |= Qt::ItemIsUserCheckable;
+        const auto nonEditable = d->systemContext()->nonEditableUsersAndGroups();
+        if (!nonEditable->containsUser(user))
+            flags |= Qt::ItemIsEnabled;
+    }
+    else
+    {
+        flags |= Qt::ItemIsEnabled;
+    }
 
     return flags;
 }
