@@ -43,7 +43,7 @@ struct NX_VMS_API PtzPositionFilter
     bool operator==(const PtzPositionFilter&) const = default;
     QString toString() const;
 };
-#define PtzPositionFilter_Fields (deviceId)(type)
+#define PtzPositionFilter_Fields (deviceId)(type)(api)
 QN_FUSION_DECLARE_FUNCTIONS(PtzPositionFilter, (json), NX_VMS_API)
 
 struct NX_VMS_API PtzPosition: PtzPositionFilter
