@@ -461,6 +461,9 @@ void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent
 {
     aggregatedEvent->setRuleId(rule()->id());
 
+    auto scopedLocale = installScopedLocale(
+        engine()->systemContext()->globalSettings()->defaultUserLocale());
+
     // Action with all data without any user filtration for logging.
     ActionPtr logAction = buildAction(aggregatedEvent);
     if (!NX_ASSERT(logAction))
@@ -482,6 +485,8 @@ void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent
             serverAction->setProperty(utils::kUsersFieldName, {});
         actions.push_back(serverAction);
     }
+
+    scopedLocale.reset();
 
     std::erase(actions, ActionPtr());
     if (actions.empty())
@@ -601,9 +606,6 @@ ActionBuilder::Actions ActionBuilder::buildActionsForAdditionalRecipients(
         this,
         "Building action for additional recipients: %1",
         additionalRecipientsField->value());
-
-    auto scopedLocale = installScopedLocale(
-        engine()->systemContext()->globalSettings()->defaultUserLocale());
 
     // Only additional recipients must be in the action.
     return {buildAction(
