@@ -325,7 +325,8 @@ void EventRibbon::Private::updateTile(int index)
     widget->setTitle(title);
     widget->setTitleColor(modelIndex.data(Qt::ForegroundRole).value<QColor>());
     widget->setIconPath(modelIndex.data(core::DecorationPathRole).value<QString>());
-    widget->setTimestamp(modelIndex.data(core::TimestampTextRole).toString());
+    widget->setTimestampMs(modelIndex.data(core::TimestampMsRole)
+        .value<std::chrono::milliseconds>());
     widget->setDescription(tileDescription);
     widget->setFooterText(modelIndex.data(Qn::AdditionalTextRole).toString());
     widget->setAttributeList(modelIndex.data(core::AnalyticsAttributesRole)

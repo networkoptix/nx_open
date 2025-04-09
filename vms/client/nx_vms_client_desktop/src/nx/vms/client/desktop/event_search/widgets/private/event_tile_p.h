@@ -59,6 +59,8 @@ public:
     QString iconPath;
     bool previewEnabled = false;
     utils::PendingOperation checkDragIsFinished;
+    std::chrono::milliseconds timestampMs;
+    QScopedPointer<QTimer> timestampLabelUpdateTimer;
 
     Private(EventTile* q);
 
@@ -84,6 +86,9 @@ public:
     void updatePreviewsVisibility();
     void setWidgetHolder(QWidget* widget, QWidget* newHolder);
     QString getSystemName(const QString& systemId);
+    QString timestampText() const;
+    bool displayRelativeTimestamp() const;
+    void updateTimestampLabel();
 
     // For cloud notifications the system name must be displayed. The function returns the name of
     // a system different from the current one in the form required for display.

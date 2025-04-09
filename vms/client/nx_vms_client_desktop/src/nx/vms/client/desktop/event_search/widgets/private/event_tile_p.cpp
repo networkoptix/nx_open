@@ -12,15 +12,22 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
+#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/time/formatter.h>
 #include <utils/common/delayed.h>
+#include <utils/common/synctime.h>
+
+using namespace std::chrono;
 
 namespace {
+
 static constexpr qsizetype kResourcesInforemersTextSize = 12;
 // TODO: #vbutkevich make value dynamic, after removing QnSystemHealthStringsHelper::resourceText.
 static constexpr qsizetype kMaxResourceTextWidth = 50;
@@ -30,18 +37,24 @@ static constexpr qsizetype kMaximumResourceLineLimit = 1;
 static constexpr char kMultipleResourcesSeparator = ',';
 static constexpr int kTileTitleLineLimit = 2;
 static constexpr int kTileDescriptionLineLimit = 5;
+static constexpr auto kRelativeTimestampUpdateTime = 30s;
+
 } // namespace
 
-using namespace std::chrono;
 namespace nx::vms::client::desktop {
 
 EventTile::Private::Private(EventTile* q):
     q(q),
     progressLabel(new QnElidedLabel(q)),
-    loadPreviewTimer(new QTimer(q))
+    loadPreviewTimer(new QTimer(q)),
+    timestampLabelUpdateTimer(new QTimer(q))
 {
     loadPreviewTimer->setSingleShot(true);
     QObject::connect(loadPreviewTimer.get(), &QTimer::timeout, [this]() { requestPreview(); });
+
+    timestampLabelUpdateTimer->setInterval(kRelativeTimestampUpdateTime);
+    QObject::connect(timestampLabelUpdateTimer.get(), &QTimer::timeout,
+        [this]() { updateTimestampLabel(); });
 }
 
 void EventTile::Private::initLabelDescriptor(const QVariant& value, LabelDescriptor& descriptor)
@@ -392,6 +405,51 @@ QString EventTile::Private::getSystemName(const QString& systemId)
         return QString();
 
     return systemDescription->name();
+}
+
+QString EventTile::Private::timestampText() const
+{
+    const auto systemContext = appContext()->currentSystemContext();
+    if (timestampMs <= 0ms || !NX_ASSERT(systemContext))
+        return {};
+
+    if (displayRelativeTimestamp())
+    {
+        const auto secondsAgo = duration_cast<seconds>(milliseconds(
+            qnSyncTime->currentMSecsSinceEpoch() - timestampMs.count()));
+        return nx::vms::time::fromNow(secondsAgo).toUpper();
+    }
+
+    const auto dateTime = systemContext->serverTimeWatcher()->displayTime(timestampMs.count());
+    return nx::vms::time::toString(dateTime, nx::vms::time::Format::dd_MM_yy_hh_mm_ss);
+}
+
+bool EventTile::Private::displayRelativeTimestamp() const
+{
+    if (timestampMs <= 0ms)
+        return false;
+
+    const auto timestampDeltaMs = milliseconds(
+        qnSyncTime->currentMSecsSinceEpoch() - timestampMs.count());
+
+    if (timestampDeltaMs >= 24h)
+        return false;
+
+    return true;
+}
+
+void EventTile::Private::updateTimestampLabel()
+{
+    if (displayRelativeTimestamp() != timestampLabelUpdateTimer->isActive())
+    {
+        if (timestampLabelUpdateTimer->isActive())
+            timestampLabelUpdateTimer->stop();
+        else
+            timestampLabelUpdateTimer->start();
+    }
+
+    q->ui->timestampLabel->setText(timestampText());
+    q->ui->timestampLabel->setHidden(q->ui->timestampLabel->text().isEmpty());
 }
 
 // For cloud notifications the system name must be displayed. The function returns the name of

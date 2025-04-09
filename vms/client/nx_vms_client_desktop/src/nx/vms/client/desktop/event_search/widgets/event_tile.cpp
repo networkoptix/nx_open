@@ -381,15 +381,18 @@ void EventTile::setAttributeList(const core::analytics::AttributeList& value)
     ui->attributeTable->setHidden(!d->footerEnabled || value.empty());
 }
 
-QString EventTile::timestamp() const
+std::chrono::milliseconds EventTile::timestampMs() const
 {
-    return ui->timestampLabel->text();
+    return d->timestampMs;
 }
 
-void EventTile::setTimestamp(const QString& value)
+void EventTile::setTimestampMs(std::chrono::milliseconds value)
 {
-    ui->timestampLabel->setText(value);
-    ui->timestampLabel->setHidden(value.isEmpty());
+    if (d->timestampMs == value)
+        return;
+
+    d->timestampMs = value;
+    d->updateTimestampLabel();
 }
 
 QString EventTile::iconPath() const
@@ -815,7 +818,7 @@ void EventTile::clear()
     d->clearLabel(ui->descriptionLabel, d->descriptionLabelDescriptor);
     setAttributeList({});
     setFooterText({});
-    setTimestamp({});
+    setTimestampMs({});
     setPlaceholder({});
     setImageProvider({}, true);
     setVideoPreviewResource({});

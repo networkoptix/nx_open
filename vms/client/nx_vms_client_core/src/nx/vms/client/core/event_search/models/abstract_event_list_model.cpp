@@ -67,6 +67,10 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
 
     switch (role)
     {
+        case TimestampMsRole:
+            return QVariant::fromValue(
+                duration_cast<milliseconds>(index.data(TimestampRole).value<microseconds>()));
+
         case TimestampTextRole:
         {
             const auto timestampMs = duration_cast<milliseconds>(

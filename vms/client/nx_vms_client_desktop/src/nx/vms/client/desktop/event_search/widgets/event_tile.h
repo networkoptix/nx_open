@@ -47,8 +47,8 @@ public:
     core::analytics::AttributeList attributeList() const;
     void setAttributeList(const core::analytics::AttributeList& value);
 
-    QString timestamp() const;
-    void setTimestamp(const QString& value);
+    std::chrono::milliseconds timestampMs() const;
+    void setTimestampMs(std::chrono::milliseconds value);
 
     QString iconPath() const;
     void setIconPath(const QString& value);
