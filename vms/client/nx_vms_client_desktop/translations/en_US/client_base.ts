@@ -1240,6 +1240,10 @@
         <source>Monitor in New Window</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Deactivator</name>
@@ -4386,6 +4390,10 @@ License Key: %2</source>
         <source>CONNECTION LOST</source>
         <translation></translation>
     </message>
+    <message>
+        <source>NOT ACTIVATED</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -6294,6 +6302,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
 </context>
 <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+        <source>Cannot write file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 filename length is more than %2 characters.</source>
+        <comment>%1 is file name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is in use by another export.</source>
+        <comment>%1 is file name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx</name>
     <message>
         <source>Saving layout</source>
@@ -6662,6 +6687,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Site is currently suspended</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7223,6 +7252,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>High minimum value can lead to archive length decrease on other cameras</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10750,6 +10787,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <source>I trust this server</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Certificate details</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -11953,15 +11994,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         </translation>
     </message>
     <message>
-        <source>Cannot write file</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 is in use by another export.</source>
-        <comment>%1 is file name</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Export completed</source>
         <translation></translation>
     </message>
@@ -11999,11 +12031,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 filename length is more than %2 characters.</source>
-        <comment>%1 is file name</comment>
         <translation></translation>
     </message>
 </context>
