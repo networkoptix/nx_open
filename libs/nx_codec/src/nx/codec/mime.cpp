@@ -131,4 +131,26 @@ std::string getMimeType(const AVCodecParameters* codecpar)
     return result;
 }
 
+std::string getFormatMimeType(const std::string_view& format)
+{
+    if (format == "mkv")
+        return "video/x-matroska";
+    else if (format == "webm")
+        return "video/webm";
+    else if (format == "mpegts")
+        return "video/mp2t";
+    else if (format == "mp4")
+        return "video/mp4";
+    else if (format == "3gp" || format == "_3gp" || format == "rtp")
+        return "video/3gp";
+    else if (format == "flv")
+        return "video/x-flv";
+    else if (format == "f4v")
+        return "video/x-f4v";
+    else if (format == "mpjpeg")
+        return "multipart/x-mixed-replace;boundary=" + std::string(kMpjpegBoundary);
+    else
+        return {};
+}
+
 } // namespace nx::media
