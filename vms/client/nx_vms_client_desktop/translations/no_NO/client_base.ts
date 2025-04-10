@@ -12328,12 +12328,12 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation>Kan ikke skrive fil</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 er i bruk av en annen eksport.</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -12378,7 +12378,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 filnavnlengden er mer enn %2 tegn.</translation>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
   </context>
   <context>

@@ -12147,12 +12147,12 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation>Không thể ghi tệp</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 đang được sử dụng bởi một người dùng khác.</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -12197,7 +12197,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation>Độ dài tên tệp %1 dài hơn %2 ký tự.</translation>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
   </context>
   <context>

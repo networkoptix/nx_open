@@ -7746,7 +7746,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select areas on the schedule to apply chosen parameters to</source>
-      <translation>選択したパラメーターを適用するスケジュール領域を指定してください</translation>
+      <translation>選択したパラメーターを適用するスケジュール領域を指定してください。</translation>
     </message>
     <message>
       <source>Set recording parameters and select areas on the schedule grid to apply them to</source>
@@ -12148,12 +12148,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation>ファイルの書き込みができません</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 は別のエクスポートで使用されています。</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -12198,7 +12198,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 ファイル名の長さが %2 文字を超えています。</translation>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
   </context>
   <context>

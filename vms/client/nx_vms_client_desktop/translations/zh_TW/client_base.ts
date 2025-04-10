@@ -12143,12 +12143,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation>無法寫入檔案</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 正在被另一個匯出使用.</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -12193,7 +12193,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation>檔名%1長度超過%2字元。</translation>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
   </context>
   <context>

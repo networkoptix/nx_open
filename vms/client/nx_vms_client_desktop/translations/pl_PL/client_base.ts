@@ -12696,12 +12696,12 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation>Nie można zapisać pliku</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 jest używany przez inny proces eksportowania.</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
     <message>
       <source>Export completed</source>

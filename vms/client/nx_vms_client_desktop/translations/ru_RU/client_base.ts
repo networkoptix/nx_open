@@ -12699,12 +12699,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation>Не удается записать файл</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 используется другим процессом экспорта.</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
     <message>
       <source>Export completed</source>
