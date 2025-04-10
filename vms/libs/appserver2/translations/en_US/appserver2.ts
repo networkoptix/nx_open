@@ -265,10 +265,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>User &apos;%1(%2) is not permitted to create new User Groups.&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Creation of a non-local (%1) User Group is forbidden for VMS.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -338,6 +334,10 @@
     </message>
     <message>
         <source>Invalid parameter `%1`</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User &apos;%1(%2)&apos; is not permitted to create new User Groups.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
