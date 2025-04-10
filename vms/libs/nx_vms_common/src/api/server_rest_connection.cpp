@@ -161,6 +161,8 @@ struct ServerConnection::Private
                         h();
                     });
 
+                auto onSuspend = std::move(m_onSuspend);
+
                 auto context = m_connection->prepareContext(
                     m_request,
                     [this, h = std::move(h), guard = std::move(guard)](
@@ -181,11 +183,8 @@ struct ServerConnection::Private
 
                 auto handle = m_connection->sendRequest(context);
                 // If we resumed from sendRequest() immediately, `this` is already destroyed!
-                if (handle == 0)
-                    return;
-
-                m_onSuspend(handle);
-                m_onSuspend = {}; //< Destroy m_onSuspend early.
+                if (handle != 0)
+                    onSuspend(handle);
             }
 
             nx::network::http::ClientPool::ContextPtr await_resume() const
@@ -218,7 +217,11 @@ struct ServerConnection::Private
 
     // Coroutine-based request execution, resumes the coroutine on ASIO thread!
     // Reports rest::Handle from HttpClientPool via onSuspend callback.
-    nx::coro::Task<std::unique_ptr<BaseResultContext>> executeRequestAsync(
+    nx::coro::Task<
+        std::tuple<
+            std::unique_ptr<BaseResultContext>,
+            rest::Handle>>
+    executeRequestAsync(
         nx::network::http::ClientPool::Request request,
         std::unique_ptr<BaseResultContext> requestContext,
         std::optional<Timeouts> timeouts,
@@ -2607,7 +2610,10 @@ Handle ServerConnection::executeDelete(
 }
 
 // Coroutine style request.
-Task<std::unique_ptr<BaseResultContext>>
+nx::coro::Task<
+    std::tuple<
+        std::unique_ptr<BaseResultContext>,
+        rest::Handle>>
 ServerConnection::Private::executeRequestAsync(
     nx::network::http::ClientPool::Request request,
     std::unique_ptr<BaseResultContext> requestContext,
@@ -2617,17 +2623,13 @@ ServerConnection::Private::executeRequestAsync(
 {
     co_await guard(q);
 
-    rest::Handle originalHandle = 0;
-
     auto context = co_await executeRequestAwaitable(
         request,
         timeouts,
-        [onSuspend = std::move(onSuspend), &originalHandle](rest::Handle handle)
-        {
-            originalHandle = handle;
-            onSuspend(handle);
-        },
+        std::move(onSuspend),
         logTag);
+
+    rest::Handle originalHandle = context->handle;
 
     // Asio thread.
 
@@ -2695,7 +2697,7 @@ ServerConnection::Private::executeRequestAsync(
         }
     }
 
-    co_return requestContext;
+    co_return {std::move(requestContext), originalHandle};
 }
 
 // Callback style request.
@@ -2725,19 +2727,18 @@ Handle ServerConnection::Private::executeRequest(
     {
         co_await guard(q);
 
-        rest::Handle handle = 0;
         nx::log::Tag tag(QString("%1 [%2]").arg(
             nx::toString(typeid(rest::ServerConnection)), serverId.toSimpleString()));
 
         QElapsedTimer timer;
         timer.start();
 
-        auto context = co_await executeRequestAsync(
+        auto [context, handle] = co_await executeRequestAsync(
             request,
             std::move(requestContext),
             timeouts,
             helper,
-            [&handle, onHandle = std::move(onHandle)](rest::Handle h) { handle = h; onHandle(h); });
+            std::move(onHandle));
 
         const auto elapsedMs = timer.elapsed();
         if (context->isSuccess())
