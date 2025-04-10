@@ -1107,6 +1107,10 @@
         <numerusform>アイテムのミュートを解除</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation type="unfinished">Custom</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -6778,6 +6782,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation type="unfinished">Cannot write file</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 is in use by another export.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -7746,7 +7767,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select areas on the schedule to apply chosen parameters to</source>
-      <translation>選択したパラメーターを適用するスケジュール領域を指定してください</translation>
+      <translation>選択したパラメーターを適用するスケジュール領域を指定してください。</translation>
     </message>
     <message>
       <source>Set recording parameters and select areas on the schedule grid to apply them to</source>
@@ -11122,6 +11143,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <numerusform>このサーバーを信用する</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation>証明書の詳細</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -12147,15 +12172,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>ファイルの書き込みができません</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 は別のエクスポートで使用されています。</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>エクスポートが完了しました</translation>
     </message>
@@ -12194,11 +12210,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>エクスポート処理用のファイルを準備中です。しばらくお待ちください。</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 ファイル名の長さが %2 文字を超えています。</translation>
     </message>
   </context>
   <context>

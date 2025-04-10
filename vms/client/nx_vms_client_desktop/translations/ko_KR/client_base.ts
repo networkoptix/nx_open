@@ -1107,6 +1107,10 @@
         <numerusform>항목 음소거 해제</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation type="unfinished">Custom</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -6778,6 +6782,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation type="unfinished">Cannot write file</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 is in use by another export.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -11120,6 +11141,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <numerusform>나는 이 서버를 신뢰합니다</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation type="unfinished">Certificate details</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -12145,15 +12170,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>파일을 쓸 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1이 다른 내보내기에서 사용 중입니다.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>내보내기 완료</translation>
     </message>
@@ -12192,11 +12208,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>내보내기 프로세스를 위해 파일을 준비 중입니다. 몇 초 정도 기다리십시오.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 파일 이름의 길이가 %2 자보다 깁니다.</translation>
     </message>
   </context>
   <context>

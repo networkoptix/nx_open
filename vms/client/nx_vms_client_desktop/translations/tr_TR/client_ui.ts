@@ -1592,6 +1592,10 @@
       <source>Shared layouts</source>
       <translation>Paylaşılan ekran düzenleri</translation>
     </message>
+    <message>
+      <source>User&apos;s local layouts</source>
+      <translation type="unfinished">User&apos;s local layouts</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>

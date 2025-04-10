@@ -612,6 +612,25 @@
     </message>
   </context>
   <context>
+    <name>EditContextMenu</name>
+    <message>
+      <source>Cut</source>
+      <translation>Вырезать</translation>
+    </message>
+    <message>
+      <source>Copy</source>
+      <translation>Копировать</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <translation>Вставить</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
+    </message>
+  </context>
+  <context>
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>

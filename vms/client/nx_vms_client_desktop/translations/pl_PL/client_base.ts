@@ -1128,6 +1128,10 @@
         <numerusform>Unmute Items</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation type="unfinished">Custom</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -7131,6 +7135,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation type="unfinished">Cannot write file</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 is in use by another export.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -11637,6 +11658,10 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
         <numerusform>I trust these servers</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation>Szczegóły certyfikatu</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -12695,15 +12720,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>Nie można zapisać pliku</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 jest używany przez inny proces eksportowania.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>Zakończono eksportowanie</translation>
     </message>
@@ -12742,11 +12758,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Przygotowujemy pliki do eksportu. Proszę zaczekać kilka sekund.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
   </context>
   <context>

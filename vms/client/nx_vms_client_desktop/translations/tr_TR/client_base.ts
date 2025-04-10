@@ -1114,6 +1114,10 @@
         <numerusform>Unmute Items</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation type="unfinished">Custom</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -6894,6 +6898,23 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation type="unfinished">Cannot write file</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 is in use by another export.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -11288,6 +11309,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <numerusform>Bu sunuculara güveniyorum</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation type="unfinished">Certificate details</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -12324,15 +12349,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>Dosyaya yazılamıyor</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 başka bir aktarma işlemi tarafından kullanılıyor.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>Aktarma tamamlandı</translation>
     </message>
@@ -12371,11 +12387,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Dosyaları dışarı aktarma işlemini hazırlıyorum. Lütfen birkaç saniye bekleyiniz.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 dosya adı uzunluğu %2 karakterden fazla.</translation>
     </message>
   </context>
   <context>

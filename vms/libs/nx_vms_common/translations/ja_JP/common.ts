@@ -1134,7 +1134,7 @@
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation>必須パラメーターがありません: %1。</translation>
+      <translation>必須パラメーター %1 が存在しません。</translation>
     </message>
     <message>
       <source>Failed to process request.</source>

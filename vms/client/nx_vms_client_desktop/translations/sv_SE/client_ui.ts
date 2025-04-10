@@ -1592,6 +1592,10 @@
       <source>Shared layouts</source>
       <translation>Delade vyer</translation>
     </message>
+    <message>
+      <source>User&apos;s local layouts</source>
+      <translation>Användarens lokala layouter</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>

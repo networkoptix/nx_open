@@ -1114,6 +1114,10 @@
         <numerusform>Slå på ljudet för objekt</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation type="unfinished">Custom</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -6896,6 +6900,23 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation type="unfinished">Cannot write file</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 is in use by another export.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -11292,6 +11313,10 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
         <numerusform>Jag litar på dessa servrar</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation>Certifikatdetaljer</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -12330,15 +12355,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>Kan inte skriva filen</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 används av en annan export.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>Export slutförd</translation>
     </message>
@@ -12377,11 +12393,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Vi förbereder filer för exportprocessen. Vänta några sekunder.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 filnamnets längd är mer än %2 tecken.</translation>
     </message>
   </context>
   <context>

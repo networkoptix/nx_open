@@ -1592,6 +1592,10 @@
       <source>Shared layouts</source>
       <translation>Раскладки с общим доступом</translation>
     </message>
+    <message>
+      <source>User&apos;s local layouts</source>
+      <translation type="unfinished">User&apos;s local layouts</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>

@@ -1142,6 +1142,10 @@
         <numerusform>Unmute Items</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation type="unfinished">Custom</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -7368,6 +7372,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation type="unfinished">Cannot write file</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 is in use by another export.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -11985,6 +12006,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>I trust these servers</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation type="unfinished">Certificate details</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -13067,15 +13092,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>Export completed</translation>
     </message>
@@ -13114,11 +13130,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
   </context>
   <context>

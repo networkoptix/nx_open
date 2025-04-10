@@ -1107,6 +1107,10 @@
         <numerusform>Unmute Items</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation type="unfinished">Custom</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -6778,6 +6782,23 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation type="unfinished">Cannot write file</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 is in use by another export.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -11120,6 +11141,10 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
         <numerusform>Saya percaya server ini</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation>Detail sertifikat</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -12147,15 +12172,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>Tidak dapat menulis file</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 sedang digunakan oleh ekspor lain.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>Ekspor selesai</translation>
     </message>
@@ -12194,11 +12210,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Kami sedang mempersiapkan file untuk proses ekspor. Harap tunggu beberapa detik.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 panjang nama file lebih dari %2 karakter.</translation>
     </message>
   </context>
   <context>

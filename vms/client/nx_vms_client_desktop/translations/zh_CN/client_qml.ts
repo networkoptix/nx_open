@@ -594,6 +594,25 @@
     </message>
   </context>
   <context>
+    <name>EditContextMenu</name>
+    <message>
+      <source>Cut</source>
+      <translation>剪切</translation>
+    </message>
+    <message>
+      <source>Copy</source>
+      <translation>复制</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <translation>粘贴</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
+    </message>
+  </context>
+  <context>
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>

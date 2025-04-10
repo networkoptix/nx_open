@@ -1592,6 +1592,10 @@
       <source>Shared layouts</source>
       <translation>Udostępnione układy</translation>
     </message>
+    <message>
+      <source>User&apos;s local layouts</source>
+      <translation>Układy lokalne użytkownika</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>

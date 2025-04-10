@@ -594,6 +594,25 @@
     </message>
   </context>
   <context>
+    <name>EditContextMenu</name>
+    <message>
+      <source>Cut</source>
+      <translation>Cắt</translation>
+    </message>
+    <message>
+      <source>Copy</source>
+      <translation>Bản sao</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <translation>Dán</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
+    </message>
+  </context>
+  <context>
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>

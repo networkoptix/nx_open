@@ -805,7 +805,7 @@
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Płatne usługi integracyjne wyłączone</translation>
     </message>
     <message>
       <source>Services issue</source>

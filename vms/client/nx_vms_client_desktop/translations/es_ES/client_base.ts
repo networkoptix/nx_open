@@ -1114,6 +1114,10 @@
         <numerusform>Unmute Items</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation type="unfinished">Custom</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -6895,6 +6899,23 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation type="unfinished">Cannot write file</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 is in use by another export.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -11291,6 +11312,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>Confío en estos servidores</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation type="unfinished">Certificate details</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -12329,15 +12354,6 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>No se puede escribir archivo</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 está en uso por otra exportación.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>Exportación completada</translation>
     </message>
@@ -12376,11 +12392,6 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Estamos preparando archivos para el proceso de exportación. Por favor espere unos segundos.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
   </context>
   <context>

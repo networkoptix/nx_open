@@ -1592,6 +1592,10 @@
       <source>Shared layouts</source>
       <translation>共有レイアウト</translation>
     </message>
+    <message>
+      <source>User&apos;s local layouts</source>
+      <translation>ユーザーのローカルレイアウト</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>

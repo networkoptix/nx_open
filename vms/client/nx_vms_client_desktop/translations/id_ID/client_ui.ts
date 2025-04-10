@@ -1592,6 +1592,10 @@
       <source>Shared layouts</source>
       <translation>Layout yang dibagikan</translation>
     </message>
+    <message>
+      <source>User&apos;s local layouts</source>
+      <translation>Layout lokal User&apos;</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>

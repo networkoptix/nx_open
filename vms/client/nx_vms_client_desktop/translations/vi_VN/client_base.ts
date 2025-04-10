@@ -1107,6 +1107,10 @@
         <numerusform>Bỏ tắt tiếng các mục</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Custom</source>
+      <translation type="unfinished">Custom</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -6777,6 +6781,23 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler::Private</name>
+    <message>
+      <source>Cannot write file</source>
+      <translation type="unfinished">Cannot write file</translation>
+    </message>
+    <message>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 is in use by another export.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx</name>
     <message>
       <source>Saving layout</source>
@@ -11119,6 +11140,10 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
         <numerusform>Tôi tin tưởng những máy chủ này</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Certificate details</source>
+      <translation type="unfinished">Certificate details</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerListModel</name>
@@ -12146,15 +12171,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       </translation>
     </message>
     <message>
-      <source>Cannot write file</source>
-      <translation>Không thể ghi tệp</translation>
-    </message>
-    <message>
-      <source>%1 is in use by another export.</source>
-      <comment>%1 is file name</comment>
-      <translation>%1 đang được sử dụng bởi một người dùng khác.</translation>
-    </message>
-    <message>
       <source>Export completed</source>
       <translation>Hoàn thành xuất file</translation>
     </message>
@@ -12193,11 +12209,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Chúng tôi đang chuẩn bị các tập tin cho quá trình xuất khẩu. Xin vui lòng chờ trong vài giây.</translation>
-    </message>
-    <message>
-      <source>%1 filename length is more than %2 characters.</source>
-      <comment>%1 is file name</comment>
-      <translation>Độ dài tên tệp %1 dài hơn %2 ký tự.</translation>
     </message>
   </context>
   <context>

@@ -600,6 +600,25 @@
     </message>
   </context>
   <context>
+    <name>EditContextMenu</name>
+    <message>
+      <source>Cut</source>
+      <translation>Retalla</translation>
+    </message>
+    <message>
+      <source>Copy</source>
+      <translation>Copia</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <translation>Enganxa</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
+    </message>
+  </context>
+  <context>
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>
