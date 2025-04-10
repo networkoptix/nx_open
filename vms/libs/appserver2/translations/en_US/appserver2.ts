@@ -4,10 +4,6 @@
 <context>
     <name>ServerApiErrors</name>
     <message>
-        <source>Maximum number of archive seconds must be provided in range up to %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>User Group &apos;%1&apos; does not exist.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -74,15 +70,6 @@
     </message>
     <message>
         <source>Empty Storage URL is not allowed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Removal of the User with readonly attribute is forbidden for VMS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Removal of the User with Groups in an Organization is controlled by the %1</source>
-        <comment>%1 is the short Cloud name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -160,20 +147,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>User Groups in an Organization are controlled by by the %1</source>
-        <comment>%1 is the short Cloud name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Expected Device id %1 is not equal to actual id %2 (`physicalId` %3).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maximum number of Cameras for the Site is reached. Available %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maximum number of Layout items for the Site is reached. Available %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -315,29 +289,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 storage cannot be enabled due to insufficient services.</source>
-        <comment>%1 is the short cloud name (like Cloud)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Can&apos;t enable writing for local storage because there is an active %1 storage</source>
-        <comment>%1 is the short cloud name (like Cloud)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Changing storage URL is prohibited.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid `storageArchiveMode` value.</source>
+        <source>Removal of the User with readonly attribute is forbidden for VMS.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Changing `storageArchiveMode` to undefined is prohibited for existing storage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid parameter `%1`</source>
+        <source>the User %1 doesn&apos;t have &apos;generateEvents&apos; permission</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

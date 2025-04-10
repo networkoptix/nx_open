@@ -1592,6 +1592,10 @@
         <source>Shared layouts</source>
         <translation></translation>
     </message>
+    <message>
+        <source>User&apos;s local layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LicenseDetailsDialog</name>
