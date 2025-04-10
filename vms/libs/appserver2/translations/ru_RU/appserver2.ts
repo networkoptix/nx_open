@@ -186,7 +186,7 @@
     </message>
     <message>
       <source>Server %1 does not exist.</source>
-      <translation type="unfinished">Server %1 does not exist.</translation>
+      <translation>Сервер %1 не существует.</translation>
     </message>
     <message>
       <source>Storage %1 does not belong to this Server.</source>
@@ -265,10 +265,6 @@
       <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s settings.</translation>
     </message>
     <message>
-      <source>User &apos;%1(%2) is not permitted to create new User Groups.&apos;</source>
-      <translation type="unfinished">User &apos;%1(%2) is not permitted to create new User Groups.&apos;</translation>
-    </message>
-    <message>
       <source>Creation of a non-local (%1) User Group is forbidden for VMS.</source>
       <translation type="unfinished">Creation of a non-local (%1) User Group is forbidden for VMS.</translation>
     </message>
@@ -339,6 +335,10 @@
     <message>
       <source>Invalid parameter `%1`</source>
       <translation type="unfinished">Invalid parameter `%1`</translation>
+    </message>
+    <message>
+      <source>User &apos;%1(%2)&apos; is not permitted to create new User Groups.</source>
+      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to create new User Groups.</translation>
     </message>
   </context>
 </TS>

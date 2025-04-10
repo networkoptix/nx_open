@@ -701,15 +701,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EditContextMenu</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>قص</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Copy</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Paste</translation>
     </message>
     <message>
       <source>Delete</source>

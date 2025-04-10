@@ -873,19 +873,19 @@
     </message>
     <message>
       <source>Local recording service</source>
-      <translation type="unfinished">Local recording service</translation>
+      <translation>Layanan rekaman lokal</translation>
     </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
-      <translation type="unfinished">
-        <numerusform>%n Local recording services</numerusform>
+      <translation>
+        <numerusform>%n Layanan rekaman lokal</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Local recording services</numerusform>
+      <translation>
+        <numerusform>%n/%1 Layanan rekaman lokal</numerusform>
       </translation>
     </message>
   </context>

@@ -6307,17 +6307,17 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation>Kan ikke skrive fil</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 filnavnlengden er mer enn %2 tegn.</translation>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 er i bruk av en annen eksport.</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
   </context>
   <context>
@@ -12823,7 +12823,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>On %1, the system will automatically disable the service on some devices.</source>
       <comment>%1 will be substituted with date and time</comment>
-      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
+      <translation>På %1vil systemet automatisk deaktivere tjenesten på enkelte enheter.</translation>
     </message>
   </context>
   <context>

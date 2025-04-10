@@ -682,15 +682,15 @@ Select an Integration to begin configuring its parameters.</source>
     <name>EditContextMenu</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>切り取り</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>コピー</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>貼り付け</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2419,19 +2419,19 @@ Alt + クリックを使用してください。</translation>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation>サイトはサスペンドしています。現在のデバイスに対してインテグレーションの使用を有効化/無効化するには、サイトがアクティブな状態である必要があります。詳細については、チャネルパートナーにお問い合わせください。</translation>
+      <translation>サイトはサスペンドしています。現在のデバイスに対してインテグレーションの使用を有効化/無効化するには、サイトがアクティブ状態である必要があります。詳細については、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation>サイトはサスペンドしています。サイト内のデバイスに対してインテグレーションの使用を有効化/無効化するには、サイトがアクティブな状態である必要があります。詳細については、チャネルパートナーにお問い合わせください。</translation>
+      <translation>サイトはサスペンドしています。サイト内のデバイスに対してインテグレーションの使用を有効化/無効化するには、サイトがアクティブ状態である必要があります。詳細については、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation>サイトはシャットダウンされました。現在のデバイスに対してこのインテグレーションの使用を有効化するには、サイトがアクティブな状態である必要があります。詳細についてはチャネルパートナーにお問い合わせください。</translation>
+      <translation>サイトはシャットダウンされました。現在のデバイスに対してこのインテグレーションの使用を有効化するには、サイトがアクティブ状態である必要があります。詳細についてはチャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation>サイトはシャットダウンされました。サイト内のデバイスに対してこのインテグレーションの使用を有効化するには、サイトがアクティブな状態である必要があります。詳細についてはチャネルパートナーにお問い合わせください。</translation>
+      <translation>サイトはシャットダウンされました。サイト内のデバイスに対してこのインテグレーションの使用を有効化するには、サイトがアクティブ状態である必要があります。詳細についてはチャネルパートナーにお問い合わせください。</translation>
     </message>
   </context>
   <context>

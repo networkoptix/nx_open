@@ -685,15 +685,15 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>EditContextMenu</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Cortar</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Copiar</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Pegar</translation>
     </message>
     <message>
       <source>Delete</source>

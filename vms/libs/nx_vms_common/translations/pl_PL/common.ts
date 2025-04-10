@@ -990,12 +990,12 @@
     </message>
     <message>
       <source>Local recording service</source>
-      <translation type="unfinished">Local recording service</translation>
+      <translation>Lokalna usługa nagrywania</translation>
     </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
       <translation type="unfinished">
-        <numerusform>%n Local recording services</numerusform>
+        <numerusform>%n Lokalne usługi nagrywania</numerusform>
         <numerusform>%n Local recording services</numerusform>
         <numerusform>%n Local recording services</numerusform>
         <numerusform>%n Local recording services</numerusform>
@@ -1005,7 +1005,7 @@
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Local recording services</numerusform>
+        <numerusform>%n/%1 Lokalne usługi nagrywania</numerusform>
         <numerusform>%n/%1 Local recording services</numerusform>
         <numerusform>%n/%1 Local recording services</numerusform>
         <numerusform>%n/%1 Local recording services</numerusform>

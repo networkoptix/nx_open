@@ -6517,7 +6517,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation>Nelze zapsat soubor</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
@@ -6527,7 +6527,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 je používán jiným exportem.</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
   </context>
   <context>

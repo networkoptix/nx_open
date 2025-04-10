@@ -685,15 +685,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EditContextMenu</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Таслах</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Хуулах</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Буулгах</translation>
     </message>
     <message>
       <source>Delete</source>

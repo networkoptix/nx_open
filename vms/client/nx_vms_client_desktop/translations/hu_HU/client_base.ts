@@ -6307,7 +6307,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation>Nem lehet írni a fájlt</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
@@ -6317,7 +6317,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>A %1 más export által használva.</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
   </context>
   <context>

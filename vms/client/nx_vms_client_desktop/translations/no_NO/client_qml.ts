@@ -685,15 +685,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EditContextMenu</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Klipp ut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopiér</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Lim inn</translation>
     </message>
     <message>
       <source>Delete</source>

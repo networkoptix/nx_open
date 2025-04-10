@@ -6307,7 +6307,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation>Impossibile scrivere il file</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
@@ -6317,7 +6317,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 è in uso da un'altra esportazione.</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
   </context>
   <context>

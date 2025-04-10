@@ -693,15 +693,15 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <name>EditContextMenu</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Wytnij</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopiuj</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Wklej</translation>
     </message>
     <message>
       <source>Delete</source>

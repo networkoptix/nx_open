@@ -6517,7 +6517,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation>Не удается записать файл</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
@@ -6527,7 +6527,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 используется другим процессом экспорта.</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
   </context>
   <context>

@@ -4347,7 +4347,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>NOT ACTIVATED</source>
-      <translation type="unfinished">NOT ACTIVATED</translation>
+      <translation>有効化されていません</translation>
     </message>
   </context>
   <context>
@@ -4548,15 +4548,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
-      <translation>サイトがシャットダウンされたため、クラウドバックアップは停止しました。クラウドストレージへのバックアップを実行するには、システムがアクティブである必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
+      <translation>サイトがシャットダウンされたため、クラウドバックアップは停止しました。クラウドストレージへのバックアップを実行するには、システムがアクティブ状態である必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation>クラウドバックアップは継続されますが、サイトは現在サスペンドされています。バックアップ設定の変更やクラウドストレージの有効化を行うには、サイトがアクティブである必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
+      <translation>クラウドバックアップは継続されますが、サイトは現在サスペンドされています。バックアップ設定の変更やクラウドストレージの有効化を行うには、サイトがアクティブ状態である必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation>クラウドストレージを有効化するには、サイトがアクティブである必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
+      <translation>クラウドストレージを有効化するには、サイトがアクティブ状態である必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Site suspended</source>
@@ -6202,17 +6202,17 @@ If you intended to move analytics data to another storage location, please conta
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation>ファイルの書き込みができません</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 ファイル名の長さが %2 文字を超えています。</translation>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 は別のエクスポートで使用されています。</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
   </context>
   <context>
@@ -6583,7 +6583,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site is currently suspended</source>
-      <translation type="unfinished">Site is currently suspended</translation>
+      <translation>サイトは現在サスペンドされています。</translation>
     </message>
   </context>
   <context>
@@ -6681,7 +6681,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation>クラウドバックアップは継続されますが、サイトは現在サスペンドされています。&quot;バックアップ対象&quot; および &quot;ストリーム品質&quot; 設定の変更や、クラウドバックアップの有効化を行う場合は、サイトがアクティブである必要があります。無効化も可能です。%1</translation>
+      <translation>クラウドバックアップは継続されますが、サイトは現在サスペンドされています。&quot;バックアップ対象&quot; および &quot;ストリーム品質&quot; 設定の変更や、クラウドバックアップの有効化を行う場合は、サイトがアクティブ状態である必要があります。無効化も可能です。%1</translation>
     </message>
   </context>
   <context>
@@ -7125,7 +7125,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select areas on the schedule to apply chosen parameters to</source>
-      <translation>選択したパラメーターを適用するスケジュール領域を指定してください</translation>
+      <translation>選択したパラメーターを適用するスケジュール領域を指定してください。</translation>
     </message>
     <message>
       <source>Set recording parameters and select areas on the schedule grid to apply them to</source>
@@ -7141,11 +7141,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+      <translation>録画は継続していますが、サイトは現在サスペンドされています。デバイス録画設定の変更や録画の有効化を行うには、サイトがアクティブ状態である必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
+      <translation>サイトがシャットダウンされたため、録画は停止しました。デバイスの録画を有効化するには、システムがアクティブ状態である必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
     </message>
   </context>
   <context>
@@ -10647,7 +10647,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>証明書の詳細</translation>
     </message>
   </context>
   <context>

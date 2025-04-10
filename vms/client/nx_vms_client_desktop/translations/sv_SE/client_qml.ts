@@ -689,11 +689,11 @@ Välj en integration för att börja konfigurera dess parametrar.</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopiera</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Klistra in</translation>
     </message>
     <message>
       <source>Delete</source>

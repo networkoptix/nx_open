@@ -4393,7 +4393,7 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>NOT ACTIVATED</source>
-      <translation type="unfinished">NOT ACTIVATED</translation>
+      <translation>INTE AKTIVERAD</translation>
     </message>
   </context>
   <context>
@@ -6307,17 +6307,17 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation>Kan inte skriva filen</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 filnamnets längd är mer än %2 tecken.</translation>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 används av en annan export.</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
   </context>
   <context>
@@ -6692,7 +6692,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Site is currently suspended</source>
-      <translation type="unfinished">Site is currently suspended</translation>
+      <translation>Platsen är för närvarande avstängd</translation>
     </message>
   </context>
   <context>
@@ -7257,11 +7257,11 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+      <translation>Inspelning fortsätter, men platsen är för närvarande avstängd. Det måste vara aktiv för att ändra inspelningsinställningarna för en enhet eller för att aktivera inspelning. Kontakta din kanalpartner för hjälp.</translation>
     </message>
     <message>
       <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
+      <translation>Inspelning har stoppats eftersom sajten har stängts av. Den måste vara aktiv för att aktivera inspelning för en enhet. Kontakta din kanalpartner för hjälp.</translation>
     </message>
   </context>
   <context>
@@ -10804,7 +10804,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>Certifikatdetaljer</translation>
     </message>
   </context>
   <context>

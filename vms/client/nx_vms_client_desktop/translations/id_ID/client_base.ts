@@ -4347,7 +4347,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>NOT ACTIVATED</source>
-      <translation type="unfinished">NOT ACTIVATED</translation>
+      <translation>TIDAK DIAKTIFKAN</translation>
     </message>
   </context>
   <context>
@@ -6202,17 +6202,17 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation>Tidak dapat menulis file</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 panjang nama file lebih dari %2 karakter.</translation>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 sedang digunakan oleh ekspor lain.</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
   </context>
   <context>
@@ -6582,7 +6582,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Site is currently suspended</source>
-      <translation type="unfinished">Site is currently suspended</translation>
+      <translation>Site saat ini ditangguhkan</translation>
     </message>
   </context>
   <context>
@@ -7140,11 +7140,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+      <translation>Perekaman terus berlanjut, tetapi site tersebut saat ini ditangguhkan. Site tersebut harus aktif untuk mengubah pengaturan perekaman pada perangkat atau mengaktifkan perekaman. Hubungi channel partner Anda untuk mendapatkan bantuan.</translation>
     </message>
     <message>
       <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
+      <translation>Perekaman telah dihentikan karena site telah ditutup. Site harus aktif agar perekaman dapat diaktifkan untuk perangkat. Hubungi channel partner Anda untuk mendapatkan bantuan.</translation>
     </message>
   </context>
   <context>
@@ -10646,7 +10646,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>Detail sertifikat</translation>
     </message>
   </context>
   <context>

@@ -1320,7 +1320,7 @@
     </message>
     <message>
       <source>User&apos;s local layouts</source>
-      <translation type="unfinished">User&apos;s local layouts</translation>
+      <translation>Układy lokalne użytkownika</translation>
     </message>
   </context>
   <context>

@@ -4485,7 +4485,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>NOT ACTIVATED</source>
-      <translation type="unfinished">NOT ACTIVATED</translation>
+      <translation>NIE AKTYWOWANE</translation>
     </message>
   </context>
   <context>
@@ -6516,7 +6516,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation>Nie można zapisać pliku</translation>
+      <translation type="unfinished">Cannot write file</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
@@ -6526,7 +6526,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1 jest używany przez inny proces eksportowania.</translation>
+      <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
   </context>
   <context>
@@ -6911,7 +6911,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site is currently suspended</source>
-      <translation type="unfinished">Site is currently suspended</translation>
+      <translation>Witryna jest obecnie zawieszona</translation>
     </message>
   </context>
   <context>
@@ -7490,11 +7490,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+      <translation>Nagrywanie trwa, ale witryna jest obecnie zawieszona. Musi być aktywna, aby zmienić ustawienia nagrywania dla urządzenia lub włączyć nagrywanie. Skontaktuj się z partnerem kanału, aby uzyskać pomoc.</translation>
     </message>
     <message>
       <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
+      <translation>Nagrywanie zostało zatrzymane, ponieważ witryna została zamknięta. Musi być aktywna, aby włączyć nagrywanie dla urządzenia. Skontaktuj się z partnerem kanału, aby uzyskać pomoc.</translation>
     </message>
   </context>
   <context>
@@ -11121,7 +11121,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>Szczegóły certyfikatu</translation>
     </message>
   </context>
   <context>

@@ -133,7 +133,7 @@
     </message>
     <message>
       <source>Change of the User with readonly attribute is forbidden for VMS.</source>
-      <translation type="unfinished">Change of the User with readonly attribute is forbidden for VMS.</translation>
+      <translation>Việc thay đổi Người dùng có thuộc tính chỉ được đọc bị cấm đối với VMS.</translation>
     </message>
     <message>
       <source>Creation of the User with readonly attribute is forbidden for VMS.</source>
@@ -186,7 +186,7 @@
     </message>
     <message>
       <source>Server %1 does not exist.</source>
-      <translation type="unfinished">Server %1 does not exist.</translation>
+      <translation>Máy chủ %1 không tồn tại.</translation>
     </message>
     <message>
       <source>Storage %1 does not belong to this Server.</source>
@@ -234,7 +234,7 @@
     </message>
     <message>
       <source>Device %1 not found</source>
-      <translation type="unfinished">Device %1 not found</translation>
+      <translation>Không tìm thấy thiết bị %1</translation>
     </message>
     <message>
       <source>There is no license for camera %1</source>
@@ -263,10 +263,6 @@
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s settings.</source>
       <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s settings.</translation>
-    </message>
-    <message>
-      <source>User &apos;%1(%2) is not permitted to create new User Groups.&apos;</source>
-      <translation type="unfinished">User &apos;%1(%2) is not permitted to create new User Groups.&apos;</translation>
     </message>
     <message>
       <source>Creation of a non-local (%1) User Group is forbidden for VMS.</source>
@@ -338,7 +334,11 @@
     </message>
     <message>
       <source>Invalid parameter `%1`</source>
-      <translation type="unfinished">Invalid parameter `%1`</translation>
+      <translation>Tham số không hợp lệ `%1`</translation>
+    </message>
+    <message>
+      <source>User &apos;%1(%2)&apos; is not permitted to create new User Groups.</source>
+      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to create new User Groups.</translation>
     </message>
   </context>
 </TS>

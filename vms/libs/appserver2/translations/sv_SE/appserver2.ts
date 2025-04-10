@@ -5,23 +5,23 @@
     <name>ServerApiErrors</name>
     <message>
       <source>Maximum number of archive seconds must be provided in range up to %1.</source>
-      <translation type="unfinished">Maximum number of archive seconds must be provided in range up to %1.</translation>
+      <translation>Maximalt antal arkivsekunder måste tillhandahållas inom intervallet upp till %1.</translation>
     </message>
     <message>
       <source>User Group &apos;%1&apos; does not exist.</source>
-      <translation type="unfinished">User Group &apos;%1&apos; does not exist.</translation>
+      <translation>Användargrupp hittades inte.</translation>
     </message>
     <message>
       <source>Cannot add to a non-local (%1) User Group &apos;%2(%3)&apos;.</source>
-      <translation type="unfinished">Cannot add to a non-local (%1) User Group &apos;%2(%3)&apos;.</translation>
+      <translation>Det går inte att lägga till i en icke-lokal (%1) användargrupp %2(%3).</translation>
     </message>
     <message>
       <source>Circular dependencies are forbidden. The User Group &apos;%1(%2)&apos; is already inherited by &apos;%3&apos;.</source>
-      <translation type="unfinished">Circular dependencies are forbidden. The User Group &apos;%1(%2)&apos; is already inherited by &apos;%3&apos;.</translation>
+      <translation>Cirkulära beroenden är förbjudna. Användargruppen %1(%2) är redan ärvt av %3.</translation>
     </message>
     <message>
       <source>Forbidden to add any Users to an LDAP User Group &apos;%1(%2)&apos;.</source>
-      <translation type="unfinished">Forbidden to add any Users to an LDAP User Group &apos;%1(%2)&apos;.</translation>
+      <translation>Förbjudet att lägga till användare i en LDAP-användargrupp %1(%2).</translation>
     </message>
     <message>
       <source>Forbidden to add any User Groups to an LDAP User Group &apos;%1(%2)&apos;.</source>
@@ -133,7 +133,7 @@
     </message>
     <message>
       <source>Change of the User with readonly attribute is forbidden for VMS.</source>
-      <translation type="unfinished">Change of the User with readonly attribute is forbidden for VMS.</translation>
+      <translation>Ändring av användaren med skrivskyddad attribut är förbjuden för VMS.</translation>
     </message>
     <message>
       <source>Creation of the User with readonly attribute is forbidden for VMS.</source>
@@ -186,7 +186,7 @@
     </message>
     <message>
       <source>Server %1 does not exist.</source>
-      <translation type="unfinished">Server %1 does not exist.</translation>
+      <translation>Server %1 finns inte.</translation>
     </message>
     <message>
       <source>Storage %1 does not belong to this Server.</source>
@@ -234,7 +234,7 @@
     </message>
     <message>
       <source>Device %1 not found</source>
-      <translation type="unfinished">Device %1 not found</translation>
+      <translation>Enhet %1 hittades inte</translation>
     </message>
     <message>
       <source>There is no license for camera %1</source>
@@ -263,10 +263,6 @@
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s settings.</source>
       <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s settings.</translation>
-    </message>
-    <message>
-      <source>User &apos;%1(%2) is not permitted to create new User Groups.&apos;</source>
-      <translation type="unfinished">User &apos;%1(%2) is not permitted to create new User Groups.&apos;</translation>
     </message>
     <message>
       <source>Creation of a non-local (%1) User Group is forbidden for VMS.</source>
@@ -338,7 +334,11 @@
     </message>
     <message>
       <source>Invalid parameter `%1`</source>
-      <translation type="unfinished">Invalid parameter `%1`</translation>
+      <translation>Ogiltig parameter `%1`</translation>
+    </message>
+    <message>
+      <source>User &apos;%1(%2)&apos; is not permitted to create new User Groups.</source>
+      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to create new User Groups.</translation>
     </message>
   </context>
 </TS>

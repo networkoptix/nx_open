@@ -912,21 +912,21 @@
     </message>
     <message>
       <source>Local recording service</source>
-      <translation type="unfinished">Local recording service</translation>
+      <translation>Lokal inspelningstjänst</translation>
     </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
-      <translation type="unfinished">
-        <numerusform>%n Local recording services</numerusform>
-        <numerusform>%n Local recording services</numerusform>
+      <translation>
+        <numerusform>%n Lokala inspelningstjänster</numerusform>
+        <numerusform>%n Lokala inspelningstjänster</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Local recording services</numerusform>
-        <numerusform>%n/%1 Local recording services</numerusform>
+      <translation>
+        <numerusform>%n/%1 Lokala inspelningstjänster</numerusform>
+        <numerusform>%n/%1 Lokala inspelningstjänster</numerusform>
       </translation>
     </message>
   </context>

@@ -681,15 +681,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EditContextMenu</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>잘라내기</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>복사</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>붙여넣기</translation>
     </message>
     <message>
       <source>Delete</source>
