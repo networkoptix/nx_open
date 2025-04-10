@@ -715,13 +715,13 @@ void ActionHandler::at_workbench_cellSpacingChanged()
 {
     qreal value = workbench()->currentLayout()->cellSpacing();
 
-    if (qFuzzyIsNull(value))
+    if (LayoutResource::isEqualCellSpacing(Qn::CellSpacing::None, value))
         action(action::SetCurrentLayoutItemSpacingNoneAction)->setChecked(true);
-    else if (qFuzzyEquals(LayoutResource::cellSpacingValue(Qn::CellSpacing::Small), value))
+    else if (LayoutResource::isEqualCellSpacing(Qn::CellSpacing::Small, value))
         action(action::SetCurrentLayoutItemSpacingSmallAction)->setChecked(true);
-    else if (qFuzzyEquals(LayoutResource::cellSpacingValue(Qn::CellSpacing::Medium), value))
+    else if (LayoutResource::isEqualCellSpacing(Qn::CellSpacing::Medium, value))
         action(action::SetCurrentLayoutItemSpacingMediumAction)->setChecked(true);
-    else if (qFuzzyEquals(LayoutResource::cellSpacingValue(Qn::CellSpacing::Large), value))
+    else if (LayoutResource::isEqualCellSpacing(Qn::CellSpacing::Large, value))
         action(action::SetCurrentLayoutItemSpacingLargeAction)->setChecked(true);
     else
         action(action::CurrentLayoutItemSpacingCustomMenuItem)->setChecked(true);

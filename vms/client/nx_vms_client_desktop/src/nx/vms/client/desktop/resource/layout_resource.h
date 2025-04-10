@@ -25,6 +25,7 @@ public:
     using ItemsRemapHash = QHash<nx::Uuid, nx::Uuid>;
 
     static qreal cellSpacingValue(Qn::CellSpacing spacing);
+    static bool isEqualCellSpacing(Qn::CellSpacing spacing, qreal value);
 
     LayoutResource();
 

@@ -6,6 +6,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/common/intercom/utils.h>
@@ -24,6 +25,8 @@ public:
     virtual QnLayoutResourcePtr transientLayout() const override { return m_parentLayout; }
 };
 
+constexpr float kCellSpacingComparePrecision = 5; //< Compare the first five signs after the decimal point.
+
 } // namespace
 
 qreal LayoutResource::cellSpacingValue(Qn::CellSpacing spacing)
@@ -41,6 +44,11 @@ qreal LayoutResource::cellSpacingValue(Qn::CellSpacing spacing)
     }
     NX_ASSERT(false, "Unhandled enum value");
     return nx::vms::api::LayoutData::kDefaultCellSpacing;
+}
+
+bool LayoutResource::isEqualCellSpacing(Qn::CellSpacing spacing, qreal value)
+{
+    return equalWithPrecision(cellSpacingValue(spacing), value, kCellSpacingComparePrecision);
 }
 
 LayoutResource::LayoutResource()
