@@ -12,7 +12,7 @@ using namespace std::chrono;
 
 TEST(CameraTimeHelper, localOffset)
 {
-    CameraTimeHelper helper("test_resource", nullptr);
+    CameraTimeHelper helper(nx::rtp::Sdp::MediaType::Video, "test_resource", nullptr);
     helper.setResyncThreshold(milliseconds(1000));
 
     microseconds cameraTime = microseconds(1000);
@@ -57,7 +57,7 @@ TEST(CameraTimeHelper, rtpTimeOverflow)
 
 TEST(CameraTimeHelper, resetTimeOffset)
 {
-    CameraTimeHelper helper("test_resource", nullptr);
+    CameraTimeHelper helper(nx::rtp::Sdp::MediaType::Video, "test_resource", nullptr);
     helper.setResyncThreshold(milliseconds(1000));
 
     microseconds cameraTime = microseconds(1000);

@@ -934,7 +934,8 @@ void RtspStreamProvider::createTrackParsers()
         trackInfo.ioDevice = track.ioDevice.get();
         trackInfo.rtcpChannelNumber = track.interleaved.second;
         trackInfo.ioDevice->setForceRtcpReports(isRtcpReportsForced());
-        trackInfo.timeHelper = std::make_unique<nx::streaming::rtp::CameraTimeHelper>(timeHelperKey(), m_timeOffset);
+        trackInfo.timeHelper = std::make_unique<nx::streaming::rtp::CameraTimeHelper>(
+            track.sdpMedia.mediaType, timeHelperKey(), m_timeOffset);
 
         // Force camera time for NVR archives
         if (m_role == Qn::ConnectionRole::CR_Archive)
@@ -1259,7 +1260,8 @@ bool RtspResourceStreamProvider::isRtcpReportsForced() const
 
 std::string RtspResourceStreamProvider::timeHelperKey() const
 {
-    return m_resource->getPhysicalId().toStdString();
+    return nx::format("%1(%2)",
+        m_resource->getPhysicalId(), toString(toStreamIndex(m_role))).toStdString();
 }
 
 void RtspResourceStreamProvider::updateStreamUrlIfNeeded()

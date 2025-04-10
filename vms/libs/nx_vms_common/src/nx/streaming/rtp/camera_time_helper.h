@@ -9,6 +9,7 @@
 #include <optional>
 #include <string>
 
+#include <nx/rtp/sdp.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/timestamp_adjustment_history.h>
 
@@ -43,7 +44,10 @@ public:
     using EventCallback = std::function<void(EventType)>;
 
 public:
-    CameraTimeHelper(const std::string& resourceId, const TimeOffsetPtr& offset);
+    CameraTimeHelper(
+        nx::rtp::Sdp::MediaType mediaType,
+        const std::string& resourceId,
+        const TimeOffsetPtr& offset);
 
     std::chrono::microseconds getTime(
         const std::chrono::microseconds currentTime,
@@ -62,6 +66,9 @@ public:
         std::chrono::microseconds cameraTimestamp);
 
 private:
+    std::string getName() const;
+
+private:
     TimeOffsetPtr m_primaryOffset;
     TimeOffset m_localOffset; //< used in case when no rtcp reports
     std::chrono::milliseconds m_resyncThreshold;
@@ -70,6 +77,7 @@ private:
     const std::chrono::milliseconds m_maxExpectedMetadataDelay;
     nx::utils::ElapsedTimer m_waitSenderReportTimer; //< need to wait Sender Report before sending BadCameraTime event
     const std::string m_resourceId;
+    const nx::rtp::Sdp::MediaType m_mediaType;
     TimePolicy m_timePolicy = TimePolicy::bindCameraTimeToLocalTime;
     bool m_badCameraTimeState = false;
     nx::utils::TimestampAdjustmentHistory m_adjustmentHistory;

@@ -18,13 +18,21 @@ constexpr auto kWaitSenderReportThreshold = 20s;
 
 } // namespace
 
-CameraTimeHelper::CameraTimeHelper(const std::string& resourceId, const TimeOffsetPtr& offset):
+CameraTimeHelper::CameraTimeHelper(
+    nx::rtp::Sdp::MediaType mediaType,
+    const std::string& resourceId,
+    const TimeOffsetPtr& offset)
+    :
     m_primaryOffset(offset),
     m_resyncThreshold(milliseconds(nxStreamingIni().resyncThresholdMs)),
     m_streamsSyncThreshold(milliseconds(nxStreamingIni().streamsSyncThresholdMs)),
-    m_forceCameraTimeThreshold(milliseconds(nxStreamingIni().forceCameraTimeThresholdMs)),
+    m_forceCameraTimeThreshold(
+        mediaType == nx::rtp::Sdp::MediaType::Metadata
+            ? milliseconds(nxStreamingIni().cameraMetadataTimeThresholdMs)
+            : milliseconds(nxStreamingIni().forceCameraTimeThresholdMs)),
     m_maxExpectedMetadataDelay(milliseconds(nxStreamingIni().maxExpectedMetadataDelayMs)),
     m_resourceId(resourceId),
+    m_mediaType(mediaType),
     m_adjustmentHistory(kMaxAdjustmentHistoryRecordAge)
 {
     m_waitSenderReportTimer.restart();
@@ -104,16 +112,26 @@ microseconds CameraTimeHelper::getTime(
             m_badCameraTimeState = false;
             if (isPrimaryStream)
                 m_adjustmentHistory.record(cameraTime, 0us);
+            NX_VERBOSE(this,
+                "ResourceId: %1, camera time is accurate: %2ms, system time: %3ms, dt: %4ms",
+                getName(),
+                cameraTime.count() / 1000,
+                currentTime.count() / 1000,
+                (cameraTime - currentTime).count() / 1000);
             return cameraTime;
         }
         else if (!m_badCameraTimeState && m_waitSenderReportTimer.hasExpired(kWaitSenderReportThreshold))
         {
             NX_DEBUG(this,
-                "ResourceId: %1, camera time is not accurate: %2ms, system time: %3ms"
+                "ResourceId: %1, camera time is not accurate: %2ms, system time: %3ms, dt: %4ms"
                 ", system time will used",
-                m_resourceId, cameraTime.count() / 1000, currentTime.count() / 1000);
-            callback(EventType::BadCameraTime);
-            m_badCameraTimeState = true;
+                getName(), cameraTime.count() / 1000, currentTime.count() / 1000,
+                (cameraTime - currentTime).count() / 1000);
+            if (isPrimaryStream)
+            {
+                callback(EventType::BadCameraTime);
+                m_badCameraTimeState = true;
+            }
         }
     }
 
@@ -139,9 +157,10 @@ microseconds CameraTimeHelper::getTime(
 
     const microseconds deviation = abs(offset.value.load() + cameraTime - currentTime);
 
-    NX_VERBOSE(this, "Camera time: %1, vms time: %2 deviation: %3, offset: %4, isPrimaryStream: %5, useLocalOffset: %6, resyncThreshold: %7",
+    NX_VERBOSE(this, "Camera time: %1, vms time: %2, dt: %3ms, deviation: %4, offset: %5, isPrimaryStream: %6, useLocalOffset: %7, resyncThreshold: %8",
         std::chrono::duration_cast<std::chrono::milliseconds>(cameraTime),
         std::chrono::duration_cast<std::chrono::milliseconds>(currentTime),
+        (cameraTime - currentTime).count() / 1000,
         std::chrono::duration_cast<std::chrono::milliseconds>(deviation),
         std::chrono::duration_cast<std::chrono::milliseconds>(offset.value.load()),
         isPrimaryStream,
@@ -152,18 +171,24 @@ microseconds CameraTimeHelper::getTime(
     {
         NX_DEBUG(this,
             "ResourceId: %1. Resync camera time, deviation %2ms, cameraTime: %3ms, isPrimaryStream %4, useLocalOffset %5",
-            m_resourceId,
+            getName(),
             deviation.count() / 1000,
             cameraTime.count() / 1000,
             isPrimaryStream,
             useLocalOffset);
         offset.value = currentTime - cameraTime;
-        callback(EventType::ResyncToLocalTime);
+        if (isPrimaryStream)
+            callback(EventType::ResyncToLocalTime);
     }
     const auto offsetValue = offset.value.load();
     if (isPrimaryStream)
         m_adjustmentHistory.record(cameraTime, offsetValue);
     return offsetValue + cameraTime;
+}
+
+std::string CameraTimeHelper::getName() const
+{
+    return nx::format("%1(%2)", m_resourceId, toString(m_mediaType)).toStdString();
 }
 
 } //nx::streaming::rtp

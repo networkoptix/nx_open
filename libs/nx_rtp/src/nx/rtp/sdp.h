@@ -8,17 +8,17 @@
 #include <QtCore/QStringList>
 #include <QtNetwork/QHostAddress>
 
+#include <nx/reflect/enum_instrument.h>
+
 namespace nx::rtp {
 
 struct NX_RTP_API Sdp
 {
-    enum class MediaType
-    {
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(MediaType,
         Video,
         Audio,
         Metadata,
-        Unknown
-    };
+        Unknown);
 
     struct RtpMap
     {
