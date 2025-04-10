@@ -99,8 +99,18 @@ struct NX_VMS_API LoginSessionFilter
 
     /**%apidoc[opt] Set HTTP cookie for automatic login by browser. */
     bool setCookie = false;
+
+    // Only works for /rest/v4+.
+    /**%apidoc[opt]
+     * User to read sessions for (requires administrator permissions), empty means current user,
+     * explicit `*` means all users in the Site.
+     */
+    std::string username;
+
+    /**%apidoc[opt] Target server, entire Site if not specified. */
+    nx::Uuid serverId;
 };
-#define LoginSessionFilter_Fields (token)(setCookie)
+#define LoginSessionFilter_Fields (token)(setCookie)(username)(serverId)
 NX_VMS_API_DECLARE_STRUCT_EX(LoginSessionFilter, (json))
 NX_REFLECTION_INSTRUMENT(LoginSessionFilter, LoginSessionFilter_Fields)
 

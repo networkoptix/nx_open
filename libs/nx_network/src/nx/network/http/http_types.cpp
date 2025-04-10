@@ -1156,12 +1156,13 @@ void Authorization::clear()
     basic = nullptr;
 }
 
-std::string Authorization::userid() const
+const std::string& Authorization::userid() const
 {
+    static const std::string kEmpty;
     switch (authScheme)
     {
         case AuthScheme::none:
-            return std::string();
+            return kEmpty;
 
         case AuthScheme::basic:
             return basic->userid;
@@ -1174,7 +1175,18 @@ std::string Authorization::userid() const
     }
 
     NX_ASSERT(false, "Invalid value: %1", static_cast<int>(authScheme));
-    return NX_FMT("InvalidScheme(%1)", static_cast<int>(authScheme)).toStdString();
+    return kEmpty;
+}
+
+const std::string* Authorization::token() const
+{
+    if (authScheme == AuthScheme::bearer)
+        return &bearer->token;
+
+    if (AuthScheme::basic && basic->userid == TOKEN_USERID)
+        return &basic->password;
+
+    return nullptr;
 }
 
 BasicAuthorization::BasicAuthorization(

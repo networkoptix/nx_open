@@ -6,7 +6,8 @@
 
 static void registerLoginRestHandlers(
     nx::network::rest::HandlerPool* processorPool,
-    auth::Authenticator* authenticator)
+    auth::Authenticator* authenticator,
+    nx::vms::network::AbstractServerConnector* serverConnector)
 {
     const auto reg = processorPool->createRegisterHandlerFunctor();
 
@@ -46,20 +47,40 @@ static void registerLoginRestHandlers(
      * %caption Get login Session
      * %ingroup Login
      * %struct LoginSessionFilter
+     * %param[unused] username
      * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_with
      * %param[ref] _local
      * %permissions Authorization is not required.
      * %return:{LoginSession}
      *
-     **%apidoc GET /rest/v{1-}/login/sessions
-     * Retrieves the session information about all sessions known to this Server. The session
-     * information from the remote sources (other Servers or the Cloud) may be inaccurate and/or
-     * incomplete.
+     **%apidoc GET /rest/v{1-3}/login/sessions
+     * Retrieves the session information about all sessions known to this Server.
+     * <p>
+     * <b>ATTENTION:</b> The session information from the remote sources (other Servers or the
+     * Cloud) may be inaccurate and/or incomplete.
+     * </p>
      * %caption Get all login Sessions
      * %ingroup Login
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Administrator with a fresh session.
+     * %return:{LoginSessionList}
+     *
+     **%apidoc GET /rest/v{4-}/login/sessions
+     * Retrieves all login sessions known to the Site for a given user.
+     * <p>
+     * <b>ATTENTION:</b> If some of the Site servers are Offline of have unstable connection, the
+     * result may be incomplete. Use `_strict` to catch connection problems. The result never
+     * contains Cloud User sessions, they should be handled on the Cloud instead.
+     * </p>
+     * %caption Get all login Sessions
+     * %ingroup Login
+     * %struct LoginSessionFilter
+     * %param[unused] token
+     * %param[unused] setCookie
+     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _local
+     * %permissions Any User with a fresh session, only an administrator can read other User sessions.
      * %return:{LoginSessionList}
      *
      **%apidoc DELETE /rest/v{1-}/login/sessions/{token}
@@ -74,7 +95,7 @@ static void registerLoginRestHandlers(
      * %permissions Authorization is not required.
      */
     reg("rest/v{1-}/login/sessions/:token?", GlobalPermission::none,
-        std::make_unique<LoginSessionsHandler>(authenticator));
+        std::make_unique<LoginSessionsHandler>(authenticator, serverConnector));
 
     /**%apidoc POST /rest/v{3-}/login/temporaryToken
      * Logs in the Temporary User to the Site and generates a Session Token for further

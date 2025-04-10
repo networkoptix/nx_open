@@ -636,6 +636,7 @@ class NX_NETWORK_API Authorization
 {
 public:
     static constexpr char NAME[] = "Authorization";
+    static constexpr char TOKEN_USERID[] = "-";
 
     AuthScheme::Value authScheme;
     union
@@ -659,7 +660,8 @@ public:
     std::string toString() const;
     void clear();
 
-    std::string userid() const;
+    const std::string& userid() const;
+    const std::string* token() const;
 
 private:
     const Authorization& operator=(const Authorization&);
