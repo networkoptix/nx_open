@@ -18,7 +18,6 @@ namespace nx::vms::common {
 using DeveloperFlag = ServerCompatibilityValidator::DeveloperFlag;
 using DeveloperFlags = ServerCompatibilityValidator::DeveloperFlags;
 using Peer = ServerCompatibilityValidator::Peer;
-using Protocol = ServerCompatibilityValidator::Protocol;
 using PublicationType = nx::build_info::PublicationType;
 using Reason = ServerCompatibilityValidator::Reason;
 
@@ -52,22 +51,24 @@ protected:
     void givenDesktopClient()
     {
         m_validatorLabel = "Desktop Client";
-        ServerCompatibilityValidator::initialize(Peer::desktopClient);
+        ServerCompatibilityValidator::initialize(
+            Peer::desktopClient, Qn::SerializationFormat::json);
     }
 
     void givenMobileClient()
     {
         m_validatorLabel = "Mobile Client";
-        ServerCompatibilityValidator::initialize(Peer::mobileClient);
+        ServerCompatibilityValidator::initialize(
+            Peer::mobileClient, Qn::SerializationFormat::json);
     }
 
     void givenCompatibilityModeClient()
     {
-        m_validatorLabel = "Compatibility Mobile Client";
+        m_validatorLabel = "Compatibility Desktop Client";
         ServerCompatibilityValidator::initialize(
             Peer::desktopClient,
-            Protocol::json,
-            {DeveloperFlag::ignoreCustomization});
+            Qn::SerializationFormat::json,
+            {DeveloperFlag::ignoreCustomization, DeveloperFlag::ignoreProtocolVersion});
     }
 
     void givenRemoteServer()

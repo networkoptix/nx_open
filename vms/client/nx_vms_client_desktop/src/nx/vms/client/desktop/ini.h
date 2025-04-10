@@ -124,9 +124,6 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_STRING("", currentOsVariantVersionOverride,
         "[Dev] Override detected OS variant version value (e.g. \"16.04\").");
 
-    NX_INI_FLAG(false, forceJsonConnection,
-        "[Dev] Force desktop client use json data encoding");
-
     NX_INI_FLAG(false, overrideDialogFramesWIN,
         "[Dev] Replace system dialog frames with application defined ones (Windows-only).");
 

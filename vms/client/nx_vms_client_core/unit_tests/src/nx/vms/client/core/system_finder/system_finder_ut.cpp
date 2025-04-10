@@ -51,7 +51,7 @@ public:
     {
         appContext = std::make_unique<ApplicationContext>(
             ApplicationContext::Mode::unitTests,
-            Qn::SerializationFormat::ubjson,
+            Qn::SerializationFormat::json,
             nx::vms::api::PeerType::desktopClient);
         systemFinder = std::make_unique<QnSystemFinderMock>();
     }

@@ -166,7 +166,7 @@ public:
             requestsManager,
             certificateVerifier.get(),
             nx::vms::api::PeerType::desktopClient,
-            Qn::SerializationFormat::ubjson);
+            Qn::SerializationFormat::json);
 
         auto userInteractionDelegate = std::make_unique<UserInteractionDelegate>();
         connectionFactory->setUserInteractionDelegate(std::move(userInteractionDelegate));
@@ -257,7 +257,8 @@ public:
                 logonData.credentials.authToken = nx::network::http::PasswordAuthToken(kPassword);
         }
 
-        common::ServerCompatibilityValidator::initialize(data.peerType);
+        common::ServerCompatibilityValidator::initialize(
+            data.peerType, Qn::SerializationFormat::json);
     }
 
     void whenConnectToSystem()
@@ -314,8 +315,8 @@ public:
 
 public:
     // RemoteConnectionFactory uses application secure settings for connection cache.
-    ApplicationContext appContext{ApplicationContext::Mode::unitTests,
-        Qn::SerializationFormat::ubjson};
+    ApplicationContext appContext{
+        ApplicationContext::Mode::unitTests, Qn::SerializationFormat::json};
 
     std::unique_ptr<SystemContext> systemContext;
 

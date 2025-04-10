@@ -5,6 +5,7 @@
 #include <optional>
 
 #include <nx/reflect/enum_instrument.h>
+#include <nx/utils/serialization/format.h>
 #include <nx/utils/software_version.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <nx_ec/ec_api_fwd.h>
@@ -48,25 +49,18 @@ public:
 
     using Peer = nx::vms::api::PeerType;
 
-    enum class Protocol
-    {
-        undefined,
-        autoDetect,
-        ubjson,
-        json,
-    };
-
     enum class DeveloperFlag
     {
         empty = 0,
         ignoreCustomization = 0x1,
         ignoreCloudHost = 0x2,
+        ignoreProtocolVersion = 0x4,
     };
     Q_DECLARE_FLAGS(DeveloperFlags, DeveloperFlag)
 
     static void initialize(
         Peer localPeerType,
-        Protocol connectionProtocol = Protocol::autoDetect,
+        Qn::SerializationFormat serializationFormat,
         DeveloperFlags developerFlags = {DeveloperFlag::empty});
 
     static bool isInitialized();

@@ -13,6 +13,9 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(false, forceWebSocketForClient,
         "Force to use webSocket for clients in spite of user settings to enable/disable webSocket "
         "on the advanced tab.");
+
+    NX_INI_FLAG(false, forceUbjson,
+        "Force ubjson format for transaction message bus connection of desktop client and server.");
 };
 
 inline Ini& ini()

@@ -16,7 +16,6 @@ using namespace nx::vms::api;
 namespace nx::vms::common {
 
 using Peer = ServerCompatibilityValidator::Peer;
-using Protocol = ServerCompatibilityValidator::Protocol;
 using Purpose = ServerCompatibilityValidator::Purpose;
 using DeveloperFlag = ServerCompatibilityValidator::DeveloperFlag;
 using DeveloperFlags = ServerCompatibilityValidator::DeveloperFlags;
@@ -24,19 +23,8 @@ using DeveloperFlags = ServerCompatibilityValidator::DeveloperFlags;
 namespace {
 
 static Peer s_localPeerType = Peer::notDefined;
-static Protocol s_localProtocolType = Protocol::undefined;
+static Qn::SerializationFormat s_serializationFormat = Qn::SerializationFormat::unsupported;
 static DeveloperFlags s_developerFlags = {};
-
-static const QMap<Peer, Protocol> kDefaultProtocolByPeer{
-    {Peer::notDefined, Protocol::undefined},
-    {Peer::server, Protocol::ubjson},
-    {Peer::desktopClient, Protocol::ubjson},
-    {Peer::videowallClient, Protocol::ubjson},
-    {Peer::oldMobileClient, Protocol::json},
-    {Peer::mobileClient, Protocol::json},
-    {Peer::cloudServer, Protocol::json},
-    {Peer::oldServer, Protocol::json},
-};
 
 static const QMap<Purpose, nx::utils::SoftwareVersion> kMinimalVersionByPurpose{
     {Purpose::connect, {4, 0}},
@@ -97,8 +85,11 @@ std::optional<ServerCompatibilityValidator::Reason> checkInternal(
         return ServerCompatibilityValidator::Reason::cloudHostDiffers;
 
     // Binary protocol requires the same protocol version.
-    const bool ensureProtocolVersion = !compatibilityMode
-        && (s_localProtocolType == Protocol::ubjson)
+    const bool ensureProtocolVersion =
+        !s_developerFlags.testFlag(DeveloperFlag::ignoreProtocolVersion)
+        && !compatibilityMode
+        && (s_serializationFormat == Qn::SerializationFormat::ubjson
+            || api::canPeerUseUbjson(s_localPeerType))
         && (purpose != Purpose::connectInCrossSystemMode);
 
     if (ensureProtocolVersion && protoVersion != protocolVersion())
@@ -111,19 +102,18 @@ std::optional<ServerCompatibilityValidator::Reason> checkInternal(
 
 void ServerCompatibilityValidator::initialize(
     Peer localPeerType,
-    Protocol connectionProtocol,
+    Qn::SerializationFormat serializationFormat,
     DeveloperFlags developerFlags)
 {
     s_localPeerType = localPeerType;
-    s_localProtocolType = connectionProtocol == Protocol::autoDetect
-        ? kDefaultProtocolByPeer[localPeerType]
-        : connectionProtocol;
+    s_serializationFormat = serializationFormat;
     s_developerFlags = developerFlags;
 }
 
 bool ServerCompatibilityValidator::isInitialized()
 {
-    return s_localPeerType != Peer::notDefined && s_localProtocolType != Protocol::undefined;
+    return s_localPeerType != Peer::notDefined
+        && s_serializationFormat != Qn::SerializationFormat::unsupported;
 }
 
 std::optional<ServerCompatibilityValidator::Reason> ServerCompatibilityValidator::check(

@@ -106,4 +106,11 @@ constexpr auto nxReflectVisitAllEnumItems(RuntimeFlag*, Visitor&& visitor)
 Q_DECLARE_FLAGS(RuntimeFlags, RuntimeFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(RuntimeFlags)
 
+inline bool canPeerUseUbjson(PeerType peer)
+{
+    return peer == PeerType::server
+        || peer == PeerType::desktopClient
+        || peer == PeerType::videowallClient;
+}
+
 } // namespace nx::vms::api

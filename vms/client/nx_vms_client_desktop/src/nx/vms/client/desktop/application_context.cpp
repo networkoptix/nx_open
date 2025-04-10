@@ -32,6 +32,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
+#include <nx/p2p/p2p_ini.h>
 #include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/external_resources.h>
 #include <nx/utils/i18n/translation_manager.h>
@@ -168,27 +169,9 @@ QString actualCloudHost()
 
 Qn::SerializationFormat appSerializationFormat(const QnStartupParameters& startupParameters)
 {
-    return ini().forceJsonConnection || startupParameters.isVideoWallLauncherMode()
-        ? Qn::SerializationFormat::json
-        : Qn::SerializationFormat::ubjson;
-}
-
-nx::vms::common::ServerCompatibilityValidator::Protocol compatibilityProtocol(
-    Qn::SerializationFormat format)
-{
-    using Protocol = nx::vms::common::ServerCompatibilityValidator::Protocol;
-
-    switch (format)
-    {
-        case Qn::SerializationFormat::json:
-            return Protocol::json;
-        case Qn::SerializationFormat::ubjson:
-            return Protocol::ubjson;
-        default:
-            NX_ASSERT(false, "Unexpected serialization format: %1", format);
-    }
-
-    return Protocol::autoDetect;
+    return api::canPeerUseUbjson(peerType(startupParameters)) && nx::p2p::ini().forceUbjson
+        ? Qn::SerializationFormat::ubjson
+        : Qn::SerializationFormat::json;
 }
 
 void initDeveloperOptions(const QnStartupParameters& startupParameters)
@@ -539,8 +522,11 @@ struct ApplicationContext::Private
         if (ini().isAutoCloudHostDeductionMode())
             developerFlags.setFlag(DeveloperFlag::ignoreCloudHost);
 
+        if (ini().developerMode)
+            developerFlags.setFlag(DeveloperFlag::ignoreProtocolVersion);
+
         ServerCompatibilityValidator::initialize(
-            q->localPeerType(), compatibilityProtocol(q->serializationFormat()), developerFlags);
+            q->localPeerType(), q->serializationFormat(), developerFlags);
     }
 
     void initializeNetworkModules()

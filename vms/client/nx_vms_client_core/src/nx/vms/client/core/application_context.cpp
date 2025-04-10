@@ -13,6 +13,7 @@
 #include <nx/branding.h>
 #include <nx/branding_proxy.h>
 #include <nx/build_info_proxy.h>
+#include <nx/p2p/p2p_ini.h>
 #include <nx/utils/external_resources.h>
 #include <nx/utils/i18n/translation_manager.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
@@ -286,7 +287,6 @@ void ApplicationContext::initializeNetworkModules()
     NX_ASSERT(d->features.base.flags.testFlag(CommonFeatureFlag::networking));
 
     using namespace nx::vms::common;
-    using Protocol = ServerCompatibilityValidator::Protocol;
 
     ServerCompatibilityValidator::DeveloperFlags developerFlags;
     if (d->features.ignoreCustomization)
@@ -295,9 +295,7 @@ void ApplicationContext::initializeNetworkModules()
     if (!nx::vms::common::ServerCompatibilityValidator::isInitialized())
     {
         nx::vms::common::ServerCompatibilityValidator::initialize(
-            localPeerType(),
-            Protocol::autoDetect,
-            developerFlags);
+            localPeerType(), d->format, developerFlags);
     }
     d->cloudStatusWatcher = std::make_unique<CloudStatusWatcher>();
 
