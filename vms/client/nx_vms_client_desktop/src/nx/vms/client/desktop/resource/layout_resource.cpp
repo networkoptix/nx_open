@@ -10,6 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/rest/user_access_data.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -50,6 +51,8 @@ const auto unsavedChangedGuard(const LayoutResourcePtr& layout)
         });
 }
 
+constexpr float kCellSpacingComparePrecision = 5; //< Compare the first five signs after the decimal point.
+
 } // namespace
 
 qreal LayoutResource::cellSpacingValue(Qn::CellSpacing spacing)
@@ -67,6 +70,11 @@ qreal LayoutResource::cellSpacingValue(Qn::CellSpacing spacing)
     }
     NX_ASSERT(false, "Unhandled enum value");
     return nx::vms::api::LayoutData::kDefaultCellSpacing;
+}
+
+bool LayoutResource::isEqualCellSpacing(Qn::CellSpacing spacing, qreal value)
+{
+    return equalWithPrecision(cellSpacingValue(spacing), value, kCellSpacingComparePrecision);
 }
 
 LayoutResource::LayoutResource()

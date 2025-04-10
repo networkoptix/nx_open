@@ -2585,12 +2585,12 @@ ConditionWrapper customCellSpacingIsSet()
         [](const Parameters& /*parameters*/, WindowContext* context)
         {
             const auto layout = context->workbench()->currentLayout();
-            auto cellSpacing = layout->cellSpacing();
+            const auto cellSpacing = layout->cellSpacing();
 
-            return !qFuzzyEquals(cellSpacing, LayoutResource::cellSpacingValue(Qn::CellSpacing::None))
-                && !qFuzzyEquals(cellSpacing, LayoutResource::cellSpacingValue(Qn::CellSpacing::Small))
-                && !qFuzzyEquals(cellSpacing, LayoutResource::cellSpacingValue(Qn::CellSpacing::Medium))
-                && !qFuzzyEquals(cellSpacing, LayoutResource::cellSpacingValue(Qn::CellSpacing::Large));
+            return !LayoutResource::isEqualCellSpacing(Qn::CellSpacing::None, cellSpacing)
+                && !LayoutResource::isEqualCellSpacing(Qn::CellSpacing::Small, cellSpacing)
+                && !LayoutResource::isEqualCellSpacing(Qn::CellSpacing::Medium, cellSpacing)
+                && !LayoutResource::isEqualCellSpacing(Qn::CellSpacing::Large, cellSpacing);
         });
 }
 
