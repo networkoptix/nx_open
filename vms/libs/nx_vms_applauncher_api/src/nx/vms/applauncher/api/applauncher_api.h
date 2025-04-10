@@ -4,7 +4,7 @@
 
 #include <QtCore/QStringList>
 
-#include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/software_version.h>
 
 namespace nx::vms::applauncher::api {
@@ -25,6 +25,7 @@ NX_REFLECTION_ENUM_CLASS(TaskType,
     startZipInstallation,
     checkZipProgress,
     pingApplauncher,
+    getInstalledVersionsEx,
     unknown
 );
 
@@ -52,6 +53,17 @@ NX_REFLECTION_ENUM_CLASS(ResultType,
     /** Unknown error. */
     otherError
 );
+
+struct ClientVersionInfo
+{
+    nx::utils::SoftwareVersion version;
+    int protocolVersion = 0;
+};
+
+NX_REFLECTION_INSTRUMENT(ClientVersionInfo,
+    (version)(protocolVersion))
+
+using ClientVersionInfoList = std::vector<ClientVersionInfo>;
 
 class NX_VMS_APPLAUNCHER_API_API BaseTask
 {
@@ -215,6 +227,24 @@ class NX_VMS_APPLAUNCHER_API_API GetInstalledVersionsResponse: public Response
 {
 public:
     QList<nx::utils::SoftwareVersion> versions;
+
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QByteArray& data) override;
+};
+
+class NX_VMS_APPLAUNCHER_API_API GetInstalledVersionsExRequest: public BaseTask
+{
+public:
+    GetInstalledVersionsExRequest(): BaseTask(TaskType::getInstalledVersionsEx) {}
+
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QByteArray& data) override;
+};
+
+class NX_VMS_APPLAUNCHER_API_API GetInstalledVersionsExResponse: public Response
+{
+public:
+    ClientVersionInfoList versions;
 
     virtual QByteArray serialize() const override;
     virtual bool deserialize(const QByteArray& data) override;

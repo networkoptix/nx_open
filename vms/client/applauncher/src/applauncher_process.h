@@ -85,6 +85,9 @@ private:
     bool getInstalledVersions(
         const applauncher::api::GetInstalledVersionsRequest& request,
         applauncher::api::GetInstalledVersionsResponse& response);
+    bool getInstalledVersionsEx(
+        const applauncher::api::GetInstalledVersionsExRequest& /*request*/,
+        applauncher::api::GetInstalledVersionsExResponse& response);
     bool addProcessKillTimer(
         const applauncher::api::AddProcessKillTimerRequest& request,
         applauncher::api::AddProcessKillTimerResponse& response);

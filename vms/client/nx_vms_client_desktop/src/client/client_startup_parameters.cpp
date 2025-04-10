@@ -260,3 +260,8 @@ bool QnStartupParameters::isVideoWallMode() const
 {
     return !videoWallGuid.isNull();
 }
+
+bool QnStartupParameters::isVideoWallLauncherMode() const
+{
+    return isVideoWallMode() && videoWallItemGuid.isNull();
+}

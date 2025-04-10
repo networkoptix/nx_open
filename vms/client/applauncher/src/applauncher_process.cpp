@@ -153,6 +153,13 @@ void ApplauncherProcess::initChannels()
             getInstalledVersions(request, response);
         });
 
+    subscribe(TaskType::getInstalledVersionsEx,
+        [this](const GetInstalledVersionsExRequest& request, GetInstalledVersionsExResponse& response)
+        {
+            m_installationManager->updateInstalledVersionsInformation();
+            getInstalledVersionsEx(request, response);
+        });
+
     subscribe(TaskType::addProcessKillTimer,
         [this](const AddProcessKillTimerRequest& request, AddProcessKillTimerResponse& response)
         {
@@ -391,6 +398,23 @@ bool ApplauncherProcess::getInstalledVersions(
     GetInstalledVersionsResponse& response)
 {
     response.versions = m_installationManager->installedVersions();
+    return true;
+}
+
+bool ApplauncherProcess::getInstalledVersionsEx(
+    const GetInstalledVersionsExRequest& /*request*/,
+    GetInstalledVersionsExResponse& response)
+{
+    for (const auto& installation : m_installationManager->installations())
+    {
+        if (installation->exists())
+        {
+            response.versions.push_back(ClientVersionInfo{
+                .version = installation->version(),
+                .protocolVersion = installation->protocolVersion()});
+        }
+    }
+
     return true;
 }
 

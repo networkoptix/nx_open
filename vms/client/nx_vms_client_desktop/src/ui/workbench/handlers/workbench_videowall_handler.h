@@ -71,7 +71,13 @@ private:
 
     void switchToVideoWallMode(const QnVideoWallResourcePtr& videoWall);
 
-    void openNewWindow(nx::Uuid videoWallId, const QnVideoWallItem& item);
+    void launchItems(const QnVideoWallResourcePtr& videoWall);
+
+    void openNewWindow(
+        nx::Uuid videoWallId,
+        const QnVideoWallItem& item,
+        const nx::utils::SoftwareVersion& version = {});
+
     void openVideoWallItem(const QnVideoWallResourcePtr& videoWall);
     void closeInstanceDelayed();
 

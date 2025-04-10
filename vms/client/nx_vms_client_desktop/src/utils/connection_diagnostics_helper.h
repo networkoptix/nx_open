@@ -23,7 +23,7 @@ public:
     static bool downloadAndRunCompatibleVersion(
         QWidget* parentWidget,
         const nx::vms::api::ModuleInformation& moduleInformation,
-        nx::vms::client::core::LogonData logonData,
+        const nx::vms::client::core::LogonData& logonData,
         const nx::utils::SoftwareVersion& engineVersion);
 
     /**

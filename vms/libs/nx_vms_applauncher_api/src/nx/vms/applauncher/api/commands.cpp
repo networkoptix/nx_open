@@ -21,6 +21,9 @@ ResultType sendCommandToApplauncher(
 {
     nx::utils::NamedPipeSocket sock;
     const QString pipeName = launcherPipeName();
+    NX_VERBOSE(NX_SCOPE_TAG, "Send applauncher command: %1, timeout: %2",
+        commandToSend.type, timeoutMs);
+
     SystemError::ErrorCode resultCode = sock.connectToServerSync(pipeName.toStdString());
     if (resultCode != SystemError::noError)
     {

@@ -26,6 +26,13 @@ struct QnStartupParameters
 
     bool isVideoWallMode() const;
 
+    /**
+     * This mode may be active while launching a videowall shortcut. In this mode the client
+     * connects to server, reads videowall configuration and launches videowall items in separate
+     * instances of appropriate version.
+     */
+    bool isVideoWallLauncherMode() const;
+
     bool allowMultipleClientInstances = false;
     const static QString kAllowMultipleClientInstancesKey;
 

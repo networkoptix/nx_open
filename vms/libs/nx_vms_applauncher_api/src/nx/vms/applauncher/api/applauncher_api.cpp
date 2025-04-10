@@ -6,6 +6,7 @@
 
 #include <nx/branding.h>
 #include <nx/build_info.h>
+#include <nx/reflect/json.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/log.h>
 
@@ -235,6 +236,8 @@ bool AddProcessKillTimerRequest::deserialize(const QByteArray& data)
     return false;
 }
 
+//-------------------------------------------------------------------------------------------------
+
 QByteArray GetInstalledVersionsRequest::serialize() const
 {
     return serializeTaskParameters(type, {});
@@ -263,6 +266,32 @@ bool GetInstalledVersionsResponse::deserialize(const QByteArray& data)
     }
     return false;
 }
+
+QByteArray GetInstalledVersionsExRequest::serialize() const
+{
+    return serializeTaskParameters(type, {});
+}
+
+bool GetInstalledVersionsExRequest::deserialize(const QByteArray& data)
+{
+    return deserializeTaskParameters(type, 0, data).has_value();
+}
+
+QByteArray GetInstalledVersionsExResponse::serialize() const
+{
+    const auto data = nx::reflect::json::serialize(versions);
+    return serializeResponseParameters(result, {QString::fromStdString(data)});
+}
+
+bool GetInstalledVersionsExResponse::deserialize(const QByteArray& data)
+{
+    if (const auto parameters = deserializeResponseParameters(&result, 1, data))
+        return nx::reflect::json::deserialize(parameters->front().toStdString(), &versions);
+
+    return false;
+}
+
+//-------------------------------------------------------------------------------------------------
 
 QByteArray PingRequest::serialize() const
 {

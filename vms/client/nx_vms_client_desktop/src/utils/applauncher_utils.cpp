@@ -3,6 +3,7 @@
 #include "applauncher_utils.h"
 
 #include <chrono>
+#include <ranges>
 #include <thread>
 
 #include <QtGui/QScreen>
@@ -83,7 +84,7 @@ ResultType restartClient(
         arguments << "--auth" << auth;
     }
 
-    arguments << "--no-single-application";
+    arguments << QnStartupParameters::kAllowMultipleClientInstancesKey;
 
     Response response;
 
@@ -205,6 +206,33 @@ ResultType getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 
     *versions = response.versions;
     return response.result;
+}
+
+ResultType getInstalledVersionsEx(ClientVersionInfoList* versions)
+{
+    GetInstalledVersionsExRequest request;
+    GetInstalledVersionsExResponse response;
+    ResultType result = sendCommandToApplauncher(request, &response);
+    if (result != ResultType::ok)
+        return result;
+
+    *versions = response.versions;
+    return response.result;
+}
+
+nx::utils::SoftwareVersion latestVersionForProtocol(ClientVersionInfoList versions, int protocolVersion)
+{
+    constexpr auto greaterVersion =
+        [](const auto& lhs, const auto& rhs){ return lhs.version > rhs.version; };
+
+    std::ranges::sort(versions, greaterVersion);
+    for (const auto& version: versions)
+    {
+        if (version.protocolVersion == protocolVersion)
+            return version.version;
+    }
+
+    return {};
 }
 
 bool checkOnline()

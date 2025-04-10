@@ -16,6 +16,10 @@ ResultType isVersionInstalled(const nx::utils::SoftwareVersion& version, bool* c
 
 /** Retrieves a list of the installed versions. */
 ResultType getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions);
+ResultType getInstalledVersionsEx(ClientVersionInfoList *versions);
+
+nx::utils::SoftwareVersion latestVersionForProtocol(
+    ClientVersionInfoList versions, int protocolVersion);
 
 /**
  * Send the required version to the applauncher, close the current instance of the client.

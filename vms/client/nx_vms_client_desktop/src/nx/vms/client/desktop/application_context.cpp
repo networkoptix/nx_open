@@ -164,9 +164,29 @@ QString actualCloudHost()
         : ini().cloudHost;
 }
 
-Qn::SerializationFormat appSerializationFormat()
+Qn::SerializationFormat appSerializationFormat(const QnStartupParameters& startupParameters)
 {
-    return ini().forceJsonConnection ? Qn::SerializationFormat::json : Qn::SerializationFormat::ubjson;
+    return ini().forceJsonConnection || startupParameters.isVideoWallLauncherMode()
+        ? Qn::SerializationFormat::json
+        : Qn::SerializationFormat::ubjson;
+}
+
+nx::vms::common::ServerCompatibilityValidator::Protocol compatibilityProtocol(
+    Qn::SerializationFormat format)
+{
+    using Protocol = nx::vms::common::ServerCompatibilityValidator::Protocol;
+
+    switch (format)
+    {
+        case Qn::SerializationFormat::json:
+            return Protocol::json;
+        case Qn::SerializationFormat::ubjson:
+            return Protocol::ubjson;
+        default:
+            NX_ASSERT(false, "Unexpected serialization format: %1", format);
+    }
+
+    return Protocol::autoDetect;
 }
 
 void initDeveloperOptions(const QnStartupParameters& startupParameters)
@@ -509,7 +529,6 @@ struct ApplicationContext::Private
     void initializeServerCompatibilityValidator()
     {
         using namespace nx::vms::common;
-        using Protocol = ServerCompatibilityValidator::Protocol;
         using DeveloperFlag = ServerCompatibilityValidator::DeveloperFlag;
 
         ServerCompatibilityValidator::DeveloperFlags developerFlags;
@@ -520,9 +539,7 @@ struct ApplicationContext::Private
             developerFlags.setFlag(DeveloperFlag::ignoreCloudHost);
 
         ServerCompatibilityValidator::initialize(
-            q->localPeerType(),
-            ini().forceJsonConnection ? Protocol::json : Protocol::ubjson,
-            developerFlags);
+            q->localPeerType(), compatibilityProtocol(q->serializationFormat()), developerFlags);
     }
 
     void initializeNetworkModules()
@@ -667,7 +684,7 @@ ApplicationContext::ApplicationContext(
     :
     core::ApplicationContext(
         toCoreMode(mode),
-        appSerializationFormat(),
+        appSerializationFormat(startupParameters),
         peerType(startupParameters),
         features.core,
         actualCloudHost(),

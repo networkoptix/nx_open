@@ -217,7 +217,7 @@ bool agreeToTryAgain(
 bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
     QWidget* parentWidget,
     const nx::vms::api::ModuleInformation& moduleInformation,
-    nx::vms::client::core::LogonData logonData,
+    const nx::vms::client::core::LogonData& logonData,
     const nx::utils::SoftwareVersion& engineVersion)
 {
     using namespace nx::vms::applauncher::api;
@@ -259,8 +259,7 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
             return false;
 
         // Version is installed, trying to run.
-        const QStringList params(QnStartupParameters::kAllowMultipleClientInstancesKey);
-        switch (restartClient(moduleInformation.version, authString, params))
+        switch (restartClient(moduleInformation.version, authString, /*params*/{}))
         {
             case ResultType::ok:
             {
@@ -435,17 +434,17 @@ bool QnConnectionDiagnosticsHelper::getInstalledVersions(
     if (!nx::vms::applauncher::api::checkOnline())
         return false;
 
-    const auto result = nx::vms::applauncher::api::getInstalledVersions(versions);
-    if (result == ResultType::ok)
-        return true;
-
     static const int kMaxTries = 5;
     for (int i = 0; i < kMaxTries; ++i)
     {
+        const auto result = nx::vms::applauncher::api::getInstalledVersions(versions);
+        if (result == ResultType::ok)
+            return true;
+
+        NX_DEBUG(NX_SCOPE_TAG, "Cannot get installed versions: %1", result);
+
         QThread::msleep(100);
         qApp->processEvents();
-        if (nx::vms::applauncher::api::getInstalledVersions(versions) == ResultType::ok)
-            return true;
     }
     return false;
 }

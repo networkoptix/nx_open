@@ -53,17 +53,12 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-Qn::SerializationFormat serializationFormat()
-{
-    return ini().forceJsonConnection ? Qn::SerializationFormat::json : Qn::SerializationFormat::ubjson;
-}
-
 nx::vms::api::RuntimeData createLocalRuntimeInfo(SystemContext* q)
 {
     nx::vms::api::RuntimeData runtimeData;
     runtimeData.peer.id = q->peerId();
     runtimeData.peer.peerType = appContext()->localPeerType();
-    runtimeData.peer.dataFormat = serializationFormat();
+    runtimeData.peer.dataFormat = appContext()->serializationFormat();
     runtimeData.brand = ini().developerMode ? QString() : nx::branding::brand();
     runtimeData.customization = ini().developerMode ? QString() : nx::branding::customization();
     runtimeData.videoWallInstanceGuid = appContext()->videoWallInstanceId();

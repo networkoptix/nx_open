@@ -375,6 +375,12 @@ bool InstallationManager::isVersionInstalled(const nx::utils::SoftwareVersion& v
     return true;
 }
 
+QList<QnClientInstallationPtr> InstallationManager::installations() const
+{
+    std::unique_lock<std::mutex> lk(m_mutex);
+    return m_installationByVersion.values();
+}
+
 QList<nx::utils::SoftwareVersion> InstallationManager::installedVersions() const
 {
     std::unique_lock<std::mutex> lk(m_mutex);

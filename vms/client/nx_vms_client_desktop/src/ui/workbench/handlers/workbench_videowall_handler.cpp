@@ -38,6 +38,7 @@
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/data/videowall_data.h>
+#include <nx/vms/api/protocol_version.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
@@ -93,6 +94,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
+#include <utils/applauncher_utils.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delayed.h>
@@ -312,6 +314,25 @@ QRect mainWindowGeometry(const QnScreenSnaps& snaps, QWidget* mainWindowWidget)
         return {};
 
     return screenSnapsToWidgetGeometry(snaps, mainWindowWidget);
+}
+
+nx::utils::Url serverUrl(const nx::vms::client::core::RemoteConnectionPtr& connection)
+{
+    return nx::network::url::Builder()
+        .setScheme(nx::network::http::kSecureUrlSchemeName)
+        .setEndpoint(connection->address())
+        .toUrl();
+}
+
+nx::utils::Url serverUrl(const QnResourcePtr& resource)
+{
+    if (const auto context = resource->systemContext())
+    {
+        if (const auto connection = context->as<SystemContext>()->connection())
+            return serverUrl(connection);
+    }
+
+    return {};
 }
 
 } // namespace
@@ -771,16 +792,20 @@ void QnWorkbenchVideoWallHandler::switchToVideoWallMode(const QnVideoWallResourc
     }
 }
 
-void QnWorkbenchVideoWallHandler::openNewWindow(nx::Uuid videoWallId, const QnVideoWallItem& item)
+void QnWorkbenchVideoWallHandler::openNewWindow(
+    nx::Uuid videoWallId, const QnVideoWallItem& item, const nx::utils::SoftwareVersion& version)
 {
-    if (!NX_ASSERT(connection(), "Client must be connected while we are running the video wall"))
+    using namespace nx::vms::applauncher::api;
+
+    const auto connection = this->connection();
+
+    if (!NX_ASSERT(connection, "Client must be connected while we are running the video wall"))
         return;
 
-    nx::vms::client::core::LogonData logonData;
-    logonData.address = connection()->address();
     // Connection credentials will be constructed by callee from videowall IDs.
-
-    const int leftmostScreen = item.screenSnaps.left().screenIndex;
+    const auto url = serverUrl(connection);
+    NX_VERBOSE(this, "Opening item id: %1, videowall: %2, server: %3, version: %4",
+        item.uuid, videoWallId, url, version);
 
     QStringList arguments;
     arguments
@@ -789,9 +814,10 @@ void QnWorkbenchVideoWallHandler::openNewWindow(nx::Uuid videoWallId, const QnVi
         << "--videowall-instance"
         << item.uuid.toString(QUuid::WithBraces)
         << "--auth"
-        << QnStartupParameters::createAuthenticationString(logonData);
+        << url.toString();
 
-    ClientProcessRunner().runClient(arguments);
+    if (version.isNull() || restartClient(version, /*auth*/ {}, arguments) != ResultType::ok)
+        ClientProcessRunner().runClient(arguments);
 }
 
 void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr &videoWall)
@@ -1414,22 +1440,61 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
         return;
     }
 
-    bool master = m_videoWallMode.instanceGuid.isNull();
-    if (master)
-    {
-        foreach(const QnVideoWallItem &item, videoWall->items()->getItems())
-        {
-            if (item.pcUuid != pcUuid || item.runtimeStatus.online)
-                continue;
-
-            openNewWindow(m_videoWallMode.guid, item);
-        }
-        closeInstanceDelayed();
-    }
+    if (m_videoWallMode.instanceGuid.isNull()) //< Launcher mode.
+        launchItems(videoWall);
     else
-    {
         openVideoWallItem(videoWall);
+}
+
+void QnWorkbenchVideoWallHandler::launchItems(const QnVideoWallResourcePtr& videoWall)
+{
+    using namespace nx::vms::applauncher::api;
+
+    constexpr auto kCloseTimeout = 10s;
+
+    const auto connection = this->connection();
+    if (!NX_ASSERT(connection))
+        return;
+
+    const auto& moduleInformation = connection->moduleInformation();
+    nx::utils::SoftwareVersion targetVersion;
+
+    if (nx::vms::api::protocolVersion() != moduleInformation.protoVersion)
+    {
+        ClientVersionInfoList versions;
+        const auto ret = getInstalledVersionsEx(&versions);
+
+        targetVersion = latestVersionForProtocol(
+            std::move(versions), moduleInformation.protoVersion);
+
+        if (targetVersion.isNull())
+        {
+            NX_DEBUG(this, "No compatible client version %1, proto: %2, is installed: %3",
+                moduleInformation.version, moduleInformation.protoVersion, ret);
+
+            SceneBanner::show(
+                tr("Cannot find compatible client version: %1")
+                    .arg(moduleInformation.version.toString()),
+                kCloseTimeout);
+
+            executeDelayedParented(
+                [this]() { closeInstanceDelayed(); }, kCloseTimeout, this);
+
+            return;
+        }
     }
+
+    NX_DEBUG(this, "Launching child videowall items, version: %2", targetVersion);
+
+    const auto pcUuid = appContext()->localSettings()->pcUuid();
+    for (const auto& item: videoWall->items()->getItems())
+    {
+        if (item.pcUuid != pcUuid || item.runtimeStatus.online)
+            continue;
+
+        openNewWindow(m_videoWallMode.guid, item, targetVersion);
+    }
+    closeInstanceDelayed();
 }
 
 QnVideoWallItemIndexList QnWorkbenchVideoWallHandler::targetList() const
@@ -2444,28 +2509,15 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr& 
     if (!videoWall)
         return;
 
-    auto getServerUrl =
-        [this]
-        {
-            nx::network::SocketAddress connectionAddress;
-            if (auto connection = this->connection(); NX_ASSERT(connection))
-                connectionAddress = connection->address();
-
-            return nx::network::url::Builder()
-                .setScheme(nx::network::http::kSecureUrlSchemeName)
-                .setEndpoint(connectionAddress)
-                .toUrl();
-        };
-
     auto handleAutoRunChanged =
-        [getServerUrl](const QnVideoWallResourcePtr& videoWall)
+        [](const QnVideoWallResourcePtr& videoWall)
         {
             if (videoWall && videoWall->pcs()->hasItem(appContext()->localSettings()->pcUuid()))
             {
                 VideoWallShortcutHelper::setVideoWallAutorunEnabled(
                     videoWall->getId(),
                     videoWall->isAutorun(),
-                    getServerUrl());
+                    serverUrl(videoWall));
             }
         };
     handleAutoRunChanged(videoWall);
@@ -2473,7 +2525,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr& 
     connect(videoWall.get(), &QnVideoWallResource::autorunChanged, this, handleAutoRunChanged);
 
     connect(videoWall.get(), &QnVideoWallResource::pcAdded, this,
-        [getServerUrl](const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
+        [](const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
         {
             if (pc.uuid != appContext()->localSettings()->pcUuid())
                 return;
@@ -2481,7 +2533,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr& 
             VideoWallShortcutHelper::setVideoWallAutorunEnabled(
                 videoWall->getId(),
                 videoWall->isAutorun(),
-                getServerUrl());
+                serverUrl(videoWall));
         });
 
     connect(videoWall.get(), &QnVideoWallResource::pcRemoved, this,
@@ -2503,7 +2555,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr& 
             VideoWallShortcutHelper::setVideoWallAutorunEnabled(
                 videoWall->getId(),
                 videoWall->isAutorun(),
-                getServerUrl());
+                serverUrl(videoWall));
 
             auto handleTimelineEnabledChanged =
                 [this](const QnVideoWallResourcePtr& videoWall)

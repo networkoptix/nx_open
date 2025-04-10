@@ -55,8 +55,11 @@ public:
     nx::utils::SoftwareVersion latestVersion(int protocolVersion = 0) const;
 
     bool isVersionInstalled(const nx::utils::SoftwareVersion &version, bool strict = false) const;
-    QList<nx::utils::SoftwareVersion> installedVersions() const;
     nx::utils::SoftwareVersion nearestInstalledVersion(const nx::utils::SoftwareVersion &version) const;
+
+    QList<QnClientInstallationPtr> installations() const;
+    QList<nx::utils::SoftwareVersion> installedVersions() const;
+
     /**
      * @return false, if version is not found. Otherwise, true and fill *appData.
     */
