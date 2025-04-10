@@ -24,6 +24,7 @@ CameraDiagnostics::Result probeStreamWithClient(
 {
     QnRtspClient rtspClient(QnRtspClient::Config{});
     rtspClient.setTCPTimeout(timeout);
+    rtspClient.setConnectionTimeout(timeout);
     if (useCloud)
         rtspClient.setCloudConnectEnabled(true);
     if (credentials && authScheme)
@@ -160,7 +161,7 @@ bool RtspRestreamer::probeStream(
         std::string token, fingerprint;
         if (useCloud)
         {
-            auto result = requestToken(
+            auto result = requestToken(timeout,
                 url, std::string(login), std::string(password), token, fingerprint);
             if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
                 return false;
@@ -199,6 +200,7 @@ bool RtspRestreamer::probeStream(
 }
 
 CameraDiagnostics::Result RtspRestreamer::requestToken(
+    std::chrono::milliseconds timeout,
     const nx::utils::Url& rtspUrl,
     const std::string& username,
     const std::string& password,
@@ -208,6 +210,7 @@ CameraDiagnostics::Result RtspRestreamer::requestToken(
     using namespace nx::network;
     // TODO Use own callback and fill fingerprint.
     http::HttpClient httpClient{ssl::kAcceptAnyCertificate};
+    httpClient.setAllTimeouts(timeout);
     const auto requestData = QJson::serialized(
         nx::vms::api::LoginSessionRequest{
             .username = QString::fromStdString(username),
@@ -271,6 +274,7 @@ CameraDiagnostics::Result RtspRestreamer::openStream()
             const auto auth = m_camera->getAuth();
             std::string token, fingerprint;
             m_openStreamResult = requestToken(
+                m_reader.connectionTimeout(),
                 m_url, auth.user().toStdString(), auth.password().toStdString(), token, fingerprint);
 
             if (m_openStreamResult.errorCode != CameraDiagnostics::ErrorCode::noError)

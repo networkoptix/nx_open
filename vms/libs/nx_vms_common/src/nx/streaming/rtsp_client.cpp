@@ -1854,3 +1854,8 @@ void QnRtspClient::setConnectionTimeout(std::chrono::milliseconds timeout)
 {
     m_tcpConnectionTimeout = timeout;
 }
+
+std::chrono::milliseconds QnRtspClient::connectionTimeout() const
+{
+    return m_tcpConnectionTimeout;
+}

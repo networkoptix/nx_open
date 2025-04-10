@@ -1086,6 +1086,11 @@ void RtspStreamProvider::setConnectionTimeout(std::chrono::milliseconds timeout)
     m_RtpSession.setConnectionTimeout(timeout);
 }
 
+std::chrono::milliseconds RtspStreamProvider::connectionTimeout() const
+{
+    return m_RtpSession.connectionTimeout();
+}
+
 // ------------------------------------- RtspResourceStreamProvider -----------------------------------
 
 RtspResourceStreamProvider::RtspResourceStreamProvider(

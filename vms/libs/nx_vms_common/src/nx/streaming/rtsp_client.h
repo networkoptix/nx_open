@@ -325,6 +325,7 @@ public:
     void setDoSendOptions(bool value);
 
     void setConnectionTimeout(std::chrono::milliseconds timeout);
+    std::chrono::milliseconds connectionTimeout() const;
 
 private:
     void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );

@@ -63,6 +63,7 @@ public:
 private:
     static bool tryRewriteRequest(nx::utils::Url& url, bool force);
     static CameraDiagnostics::Result requestToken(
+        std::chrono::milliseconds timeout,
         const nx::utils::Url& rtspUrl,
         const std::string& username,
         const std::string& password,
