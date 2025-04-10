@@ -37,6 +37,13 @@ struct NxStreamingIniConfig: public nx::kit::IniConfig
         "camera clock will be used");
 
     NX_INI_INT(
+        3600'000,
+        cameraMetadataTimeThresholdMs,
+        "If the difference between metadata clock received via RTSP and the server clock is bigger\n"
+        "than this value then the server will bind the camera clock to the server one. Otherwise\n"
+        "the camera clock will be used");
+
+    NX_INI_INT(
         5'000,
         maxExpectedMetadataDelayMs,
         "For metadata arriving via a side channel (i.e not via the RTSP connection), when\n"
