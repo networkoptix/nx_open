@@ -12325,12 +12325,12 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>Dosyaya yazılamıyor</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 başka bir aktarma işlemi tarafından kullanılıyor.</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -12375,7 +12375,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+      <translation>%1 dosya adı uzunluğu %2 karakterden fazla.</translation>
     </message>
   </context>
   <context>

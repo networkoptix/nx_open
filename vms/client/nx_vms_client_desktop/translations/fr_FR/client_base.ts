@@ -12333,12 +12333,12 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>Impossible d'écrire le fichier</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 est utilisé par une autre exportation.</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -12383,7 +12383,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+      <translation>la longueur du nom de fichier %1 est supérieure à %2 caractères.</translation>
     </message>
   </context>
   <context>

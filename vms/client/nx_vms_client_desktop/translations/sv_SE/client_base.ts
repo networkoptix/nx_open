@@ -12331,12 +12331,12 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>Kan inte skriva filen</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 används av en annan export.</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -12381,7 +12381,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+      <translation>%1 filnamnets längd är mer än %2 tecken.</translation>
     </message>
   </context>
   <context>

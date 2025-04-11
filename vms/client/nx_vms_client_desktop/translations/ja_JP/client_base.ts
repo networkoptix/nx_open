@@ -961,7 +961,7 @@
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation>セル間隔</translation>
+      <translation>セルの間隔</translation>
     </message>
     <message>
       <source>Show Panel</source>
@@ -1041,7 +1041,7 @@
     </message>
     <message>
       <source>New Integration...</source>
-      <translation>新しいインテグレーション</translation>
+      <translation>新規インテグレーション...</translation>
     </message>
     <message>
       <source>New Web Page...</source>
@@ -8520,7 +8520,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
       <translation>
-        <numerusform>%n デバイスを追加しています。このダイアログを閉じることも、新しい検索を開始することもできます。</numerusform>
+        <numerusform>%n デバイスを追加しています。このダイアログを閉じることも、新しく検索を開始することもできます。</numerusform>
       </translation>
     </message>
     <message>
@@ -12148,12 +12148,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>ファイルの書き込みができません</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 は別のエクスポートで使用されています。</translation>
     </message>
     <message>
       <source>Export completed</source>
@@ -12198,7 +12198,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+      <translation>%1 ファイル名の長さが %2 文字を超えています。</translation>
     </message>
   </context>
   <context>

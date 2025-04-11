@@ -12331,12 +12331,12 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>Kan geen bestand schrijven</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 is in gebruik door een andere export.</translation>
     </message>
     <message>
       <source>Export completed</source>

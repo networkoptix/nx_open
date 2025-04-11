@@ -13249,7 +13249,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Save Layout As Cloud</source>
-      <translation type="unfinished">Save Layout As Cloud</translation>
+      <translation>บันทึกเค้าโครงเป็น</translation>
     </message>
   </context>
   <context>
