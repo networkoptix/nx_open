@@ -609,7 +609,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Delete</translation>
     </message>
   </context>
   <context>

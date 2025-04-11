@@ -136,23 +136,23 @@
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify User &apos;%3(%4)&apos; with &apos;%5&apos; rights.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify User &apos;%3(%4)&apos; with &apos;%5&apos; rights.</translation>
+      <translation>Użytkownik &apos;%1(%2)&apos; nie ma uprawnień do modyfikowania użytkownika &apos;%3(%4)&apos; z uprawnieniami &apos;%5&apos;.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to create new Users.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to create new Users.</translation>
+      <translation>Użytkownik &apos;%1(%2)&apos; nie ma uprawnień do tworzenia nowych użytkowników.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to create a User with &apos;%3&apos; rights.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to create a User with &apos;%3&apos; rights.</translation>
+      <translation>Użytkownik &apos;%1(%2)&apos; nie ma uprawnień do utworzenia użytkownika z uprawnieniami &apos;%3&apos;.</translation>
     </message>
     <message>
       <source>Expected Device id %1 is not equal to actual id %2 (`physicalId` %3).</source>
-      <translation type="unfinished">Expected Device id %1 is not equal to actual id %2 (`physicalId` %3).</translation>
+      <translation>Oczekiwany identyfikator urządzenia %1 nie jest równy rzeczywistemu identyfikatorowi %2 (`physicalId` %3).</translation>
     </message>
     <message>
       <source>Request of User %1 with %2 permissions to read Resource parameter `%3` is forbidden.</source>
-      <translation type="unfinished">Request of User %1 with %2 permissions to read Resource parameter `%3` is forbidden.</translation>
+      <translation>Żądanie użytkownika %1 z uprawnieniami %2 dotyczące odczytu parametru zasobu `%3` jest zabronione.</translation>
     </message>
     <message>
       <source>Not enough integration licenses for camera %1.</source>
@@ -168,19 +168,19 @@
     </message>
     <message>
       <source>Storage %1 can not store analytics.</source>
-      <translation type="unfinished">Storage %1 can not store analytics.</translation>
+      <translation>Pamięć %1 nie może przechowywać analiz.</translation>
     </message>
     <message>
       <source>User &apos;%1&apos; with %2 permissions is not allowed to modify Resource parameter &apos;%3&apos;.</source>
-      <translation type="unfinished">User &apos;%1&apos; with %2 permissions is not allowed to modify Resource parameter &apos;%3&apos;.</translation>
+      <translation>Użytkownik &apos;%1&apos; z uprawnieniami %2 nie ma uprawnień do modyfikowania parametru zasobu &apos;%3&apos;.</translation>
     </message>
     <message>
       <source>User &apos;%1&apos; with %2 permissions is not allowed to modify Resource parameter of %3.</source>
-      <translation type="unfinished">User &apos;%1&apos; with %2 permissions is not allowed to modify Resource parameter of %3.</translation>
+      <translation>Użytkownik &apos;%1&apos; z uprawnieniami %2 nie ma uprawnień do modyfikowania parametru zasobu %3.</translation>
     </message>
     <message>
       <source>`scheduleEnabled` set to true is not allowed for Device creation.</source>
-      <translation type="unfinished">`scheduleEnabled` set to true is not allowed for Device creation.</translation>
+      <translation>Ustawienie `scheduleEnabled` na true nie jest dozwolone podczas tworzenia urządzenia.</translation>
     </message>
     <message>
       <source>Saving Device attributes is forbidden: no saving permission.</source>
@@ -188,7 +188,7 @@
     </message>
     <message>
       <source>Motion mask should be in range: x in [0, %1], y in [0, %2], width in [1, %3], height in [1, %4]</source>
-      <translation type="unfinished">Motion mask should be in range: x in [0, %1], y in [0, %2], width in [1, %3], height in [1, %4]</translation>
+      <translation>Maska ruchu powinna mieścić się w zakresie: x w [0, %1], y w [0, %2], szerokość w [1, %3], wysokość w [1, %4]</translation>
     </message>
     <message>
       <source>Set %1 `scheduleEnabled` to true is forbidden: no license to enable recording.</source>
@@ -240,7 +240,7 @@
     </message>
     <message>
       <source>User &apos;%1(%2) is not permitted to create new User Groups.&apos;</source>
-      <translation type="unfinished">User &apos;%1(%2) is not permitted to create new User Groups.&apos;</translation>
+      <translation>Użytkownik &apos;%1(%2) nie ma uprawnień do tworzenia nowych grup użytkowników.&apos;</translation>
     </message>
     <message>
       <source>Creation of a non-local (%1) User Group is forbidden for VMS.</source>
@@ -294,11 +294,11 @@
     </message>
     <message>
       <source>Removal of the User with readonly attribute is forbidden for VMS.</source>
-      <translation type="unfinished">Removal of the User with readonly attribute is forbidden for VMS.</translation>
+      <translation>Usunięcie użytkownika z atrybutem tylko do odczytu jest zabronione dla VMS.</translation>
     </message>
     <message>
       <source>the User %1 doesn&apos;t have &apos;generateEvents&apos; permission</source>
-      <translation type="unfinished">the User %1 doesn&apos;t have &apos;generateEvents&apos; permission</translation>
+      <translation>Użytkownik %1 nie ma uprawnień do generowania zdarzeń</translation>
     </message>
   </context>
 </TS>

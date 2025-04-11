@@ -627,7 +627,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Smazat</translation>
     </message>
   </context>
   <context>

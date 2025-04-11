@@ -1116,7 +1116,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Brugerdefineret</translation>
     </message>
   </context>
   <context>
@@ -13442,7 +13442,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::ui::workbench::LayoutsHandler</name>
     <message>
       <source>Save Layout As</source>
-      <translation type="unfinished">Save Layout As</translation>
+      <translation>Gem layout som</translation>
     </message>
     <message>
       <source>Enter Layout Name:</source>
@@ -13458,7 +13458,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Save Layout As Cloud</source>
-      <translation type="unfinished">Save Layout As Cloud</translation>
+      <translation>Gem Layout Som Sky</translation>
     </message>
   </context>
   <context>

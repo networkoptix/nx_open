@@ -1116,7 +1116,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Özel Ayarlar</translation>
     </message>
   </context>
   <context>
@@ -6901,17 +6901,17 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>Dosyaya yazılamıyor</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+      <translation>%1 dosya adı uzunluğu %2 karakterden fazla.</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 başka bir aktarma işlemi tarafından kullanılıyor.</translation>
     </message>
   </context>
   <context>

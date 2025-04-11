@@ -1130,7 +1130,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Vlastní</translation>
     </message>
   </context>
   <context>
@@ -7139,7 +7139,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>Nelze zapsat soubor</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
@@ -7149,7 +7149,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 je používán jiným exportem.</translation>
     </message>
   </context>
   <context>

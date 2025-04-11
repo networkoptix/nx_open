@@ -240,7 +240,7 @@
     </message>
     <message>
       <source>User &apos;%1(%2) is not permitted to create new User Groups.&apos;</source>
-      <translation type="unfinished">User &apos;%1(%2) is not permitted to create new User Groups.&apos;</translation>
+      <translation>ユーザー &apos;%1(%2)&apos; には、新しいユーザーグループを作成する権限がありません。</translation>
     </message>
     <message>
       <source>Creation of a non-local (%1) User Group is forbidden for VMS.</source>
@@ -294,11 +294,11 @@
     </message>
     <message>
       <source>Removal of the User with readonly attribute is forbidden for VMS.</source>
-      <translation type="unfinished">Removal of the User with readonly attribute is forbidden for VMS.</translation>
+      <translation>VMSでは、読み取り専用属性を持つユーザーの削除は禁止されています。</translation>
     </message>
     <message>
       <source>the User %1 doesn&apos;t have &apos;generateEvents&apos; permission</source>
-      <translation type="unfinished">the User %1 doesn&apos;t have &apos;generateEvents&apos; permission</translation>
+      <translation>ユーザー %1 には、&apos;generateEvents&apos; 権限がありません。</translation>
     </message>
   </context>
 </TS>

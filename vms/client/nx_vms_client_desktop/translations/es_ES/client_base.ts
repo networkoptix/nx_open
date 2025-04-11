@@ -1116,7 +1116,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Personalizado</translation>
     </message>
   </context>
   <context>
@@ -6902,7 +6902,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>No se puede escribir archivo</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
@@ -6912,7 +6912,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 está en uso por otra exportación.</translation>
     </message>
   </context>
   <context>

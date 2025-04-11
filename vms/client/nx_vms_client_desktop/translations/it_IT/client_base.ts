@@ -1116,7 +1116,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Personalizzato</translation>
     </message>
   </context>
   <context>
@@ -6903,7 +6903,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>Impossibile scrivere il file</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
@@ -6913,7 +6913,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 è in uso da un'altra esportazione.</translation>
     </message>
   </context>
   <context>
