@@ -19,6 +19,7 @@
 #include "os_information.h"
 #include "runtime_data.h"
 #include "server_flags.h"
+#include "server_hardware_info.h"
 #include "server_timezone_information.h"
 #include "software_version_serialization.h"
 #include "timestamp.h"
@@ -288,19 +289,17 @@ struct NX_VMS_API ServerRuntimeInformation: ServerPortInformation, ServerTimeZon
     std::chrono::milliseconds synchronizedTimeMs{0};
 
     RuntimeData runtimeData;
-
     std::vector<std::string> storageProtocols;
+    ServerHardwareInfo hardware;
 
     ServerRuntimeInformation() = default;
     ~ServerRuntimeInformation() = default;
     ServerRuntimeInformation(const ServerRuntimeInformation& rhs) = default;
 };
-
 #define ServerRuntimeInformation_Fields \
     ServerPortInformation_Fields \
     ServerTimeZoneInformation_Fields \
-    (osInfo)(osTimeMs)(synchronizedTimeMs)(runtimeData)(storageProtocols)
-
+    (osInfo)(osTimeMs)(synchronizedTimeMs)(runtimeData)(storageProtocols)(hardware)
 NX_VMS_API_DECLARE_STRUCT_EX(ServerRuntimeInformation, (json))
 NX_REFLECTION_INSTRUMENT(ServerRuntimeInformation, ServerRuntimeInformation_Fields);
 

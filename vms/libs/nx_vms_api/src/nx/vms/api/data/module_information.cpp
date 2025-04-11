@@ -64,6 +64,8 @@ QString ModuleInformation::mediaServerId()
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    ServerPortInformation, (ubjson)(json)(xml)(csv_record), ServerPortInformation_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     ModuleInformation, (ubjson)(json)(xml)(csv_record), ModuleInformation_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ModuleInformationWithAddresses,
     (ubjson)(json)(xml)(csv_record), ModuleInformationWithAddresses_Fields)
