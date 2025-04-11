@@ -2092,7 +2092,7 @@
     </message>
     <message>
       <source>Service Allocation</source>
-      <translation type="unfinished">Service Allocation</translation>
+      <translation>Palvelun kohdistaminen</translation>
     </message>
   </context>
   <context>

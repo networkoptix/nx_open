@@ -1026,7 +1026,7 @@
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation>セル間隔</translation>
+      <translation>セルの間隔</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
@@ -1094,7 +1094,7 @@
     </message>
     <message>
       <source>New Integration...</source>
-      <translation>新しいインテグレーション</translation>
+      <translation>新規インテグレーション...</translation>
     </message>
     <message>
       <source>New Web Page...</source>
@@ -1175,7 +1175,7 @@
     <message>
       <source>Open in</source>
       <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
-      <translation>開く</translation>
+      <translation>次の場所で開く</translation>
     </message>
     <message>
       <source>New Tab</source>
@@ -5448,6 +5448,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>To add a Video Wall, the Site should be in active state. %1</source>
       <translation>ビデオウォールを追加するには、サイトがアクティブな状態である必要があります。 %1</translation>
     </message>
+    <message>
+      <source>Cannot find compatible client version: %1</source>
+      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+    </message>
   </context>
   <context>
     <name>Resources</name>
@@ -6202,17 +6206,17 @@ If you intended to move analytics data to another storage location, please conta
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>ファイルの書き込みができません</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+      <translation>%1 ファイル名の長さが %2 文字を超えています。</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 は別のエクスポートで使用されています。</translation>
     </message>
   </context>
   <context>
@@ -7857,7 +7861,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
       <translation>
-        <numerusform>%n デバイスを追加しています。このダイアログを閉じることも、新しい検索を開始することもできます。</numerusform>
+        <numerusform>%n デバイスを追加しています。このダイアログを閉じることも、新しく検索を開始することもできます。</numerusform>
       </translation>
     </message>
     <message>
@@ -9655,7 +9659,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
       <translation>
-        <numerusform>%n デバイスを追加しています。このダイアログを閉じることも、新しい検索を開始することもできます。</numerusform>
+        <numerusform>%n デバイスを追加しています。このダイアログを閉じることも、新しく検索を開始することもできます。</numerusform>
       </translation>
     </message>
     <message>

@@ -5448,6 +5448,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>To add a Video Wall, the Site should be in active state. %1</source>
       <translation>Để thêm Video Wall, Chi nhánh phải ở trạng thái hoạt động. %1</translation>
     </message>
+    <message>
+      <source>Cannot find compatible client version: %1</source>
+      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+    </message>
   </context>
   <context>
     <name>Resources</name>
@@ -6202,17 +6206,17 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>Không thể ghi tệp</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+      <translation>Độ dài tên tệp %1 dài hơn %2 ký tự.</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 đang được sử dụng bởi một người dùng khác.</translation>
     </message>
   </context>
   <context>

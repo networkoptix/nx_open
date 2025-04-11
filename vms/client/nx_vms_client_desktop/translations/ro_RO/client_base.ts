@@ -5574,6 +5574,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>To add a Video Wall, the Site should be in active state. %1</source>
       <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
     </message>
+    <message>
+      <source>Cannot find compatible client version: %1</source>
+      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+    </message>
   </context>
   <context>
     <name>Resources</name>

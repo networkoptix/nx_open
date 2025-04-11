@@ -1970,7 +1970,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Developer Build</source>
-      <translation type="unfinished">Developer Build</translation>
+      <translation>Kehittäjän Versio</translation>
     </message>
   </context>
   <context>
@@ -4607,7 +4607,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Sivusto jäädytetty</translation>
     </message>
   </context>
   <context>
@@ -5511,6 +5511,10 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <source>To add a Video Wall, the Site should be in active state. %1</source>
       <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
     </message>
+    <message>
+      <source>Cannot find compatible client version: %1</source>
+      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+    </message>
   </context>
   <context>
     <name>Resources</name>
@@ -6307,7 +6311,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>Tiedoston kirjoittaminen epäonnistui</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
@@ -6317,7 +6321,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 on toisen viennin käytössä.</translation>
     </message>
   </context>
   <context>
@@ -8644,7 +8648,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</translation>
+      <translation>API Integraatiot rekisteröintipyynnöt ovat käytössä. Suojauksen ollessa olemassa, pitkäaikainen käyttö ei ole suositeltavaa. Harkitse tämän vaihtoehdon poistamista kun kaikki tarvittavat Integraatiot on asennettu.</translation>
     </message>
   </context>
   <context>

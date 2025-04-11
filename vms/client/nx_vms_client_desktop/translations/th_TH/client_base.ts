@@ -5448,6 +5448,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>To add a Video Wall, the Site should be in active state. %1</source>
       <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
     </message>
+    <message>
+      <source>Cannot find compatible client version: %1</source>
+      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+    </message>
   </context>
   <context>
     <name>Resources</name>
@@ -6202,7 +6206,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>ไม่สามารถเขียนไฟล์ได้</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
@@ -6212,7 +6216,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 ถูกใช้โดยส่งออกอื่น</translation>
     </message>
   </context>
   <context>
@@ -8544,7 +8548,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Save Layout As Cloud</source>
-      <translation type="unfinished">Save Layout As Cloud</translation>
+      <translation>บันทึกเค้าโครงเป็น</translation>
     </message>
     <message>
       <source>New Layout</source>

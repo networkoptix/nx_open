@@ -5637,6 +5637,10 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <source>To add a Video Wall, the Site should be in active state. %1</source>
       <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
     </message>
+    <message>
+      <source>Cannot find compatible client version: %1</source>
+      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+    </message>
   </context>
   <context>
     <name>Resources</name>
@@ -6517,7 +6521,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>Nelze zapsat soubor</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
@@ -6527,7 +6531,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 je používán jiným exportem.</translation>
     </message>
   </context>
   <context>

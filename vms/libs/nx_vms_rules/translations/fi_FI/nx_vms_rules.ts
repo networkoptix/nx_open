@@ -1209,7 +1209,7 @@
     </message>
     <message>
       <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
+      <translation>HDD / SSD-nopeus ei riitä tallennukseen %1.</translation>
     </message>
   </context>
   <context>

@@ -5511,6 +5511,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>To add a Video Wall, the Site should be in active state. %1</source>
       <translation>Para engadir un muro de vídeo (video wall), o sitio debe estar en estado activo. %1</translation>
     </message>
+    <message>
+      <source>Cannot find compatible client version: %1</source>
+      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+    </message>
   </context>
   <context>
     <name>Resources</name>
@@ -8669,7 +8673,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LayoutActionHandler</name>
     <message>
       <source>Save Layout As</source>
-      <translation type="unfinished">Save Layout As</translation>
+      <translation>Gardar o deseño como</translation>
     </message>
     <message>
       <source>Enter Layout Name:</source>
@@ -8677,7 +8681,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Save Layout As Cloud</source>
-      <translation type="unfinished">Save Layout As Cloud</translation>
+      <translation>Gardar o deseño como nube</translation>
     </message>
     <message>
       <source>New Layout</source>

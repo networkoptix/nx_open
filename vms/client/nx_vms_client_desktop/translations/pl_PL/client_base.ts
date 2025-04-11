@@ -5636,6 +5636,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>To add a Video Wall, the Site should be in active state. %1</source>
       <translation>Aby dodać ścianę wideo, witryna musi być aktywna. %1</translation>
     </message>
+    <message>
+      <source>Cannot find compatible client version: %1</source>
+      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+    </message>
   </context>
   <context>
     <name>Resources</name>
@@ -6516,17 +6520,17 @@ If you intended to move analytics data to another storage location, please conta
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation type="unfinished">Cannot write file</translation>
+      <translation>Nie można zapisać pliku</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+      <translation>Długość nazwy pliku %1 jest większa niż %2 znaków.</translation>
     </message>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 is in use by another export.</translation>
+      <translation>%1 jest używany przez inny proces eksportowania.</translation>
     </message>
   </context>
   <context>

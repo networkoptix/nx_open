@@ -338,7 +338,7 @@
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to create new User Groups.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to create new User Groups.</translation>
+      <translation>ユーザー &apos;%1(%2)&apos; には、新しいユーザーグループを作成する権限がありません。</translation>
     </message>
   </context>
 </TS>
