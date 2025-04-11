@@ -227,7 +227,7 @@ void QmlTestDialog::registerAction()
                 /*initialProperties*/ {},
                 context->mainWindowWidget());
             connect(wrapper, &QmlDialogWrapper::done, wrapper, &QObject::deleteLater);
-            wrapper->exec();
+            wrapper->open();
         });
 }
 

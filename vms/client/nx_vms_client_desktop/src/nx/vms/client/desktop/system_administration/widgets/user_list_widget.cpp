@@ -307,6 +307,8 @@ private:
 
     void handleHeaderCheckStateChanged(Qt::CheckState state);
     void handleUsersTableClicked(const QModelIndex& index);
+    void handleSelectedUsersEdited(
+        const QSet<QnUserResourcePtr>& usersToEdit, const BatchEditSettings& settings);
 
     bool canDelete(const QSet<QnUserResourcePtr>& users) const;
     bool canEnableDisable(const QSet<QnUserResourcePtr>& users) const;
@@ -855,13 +857,13 @@ void UserListWidget::Private::editSelected(BatchEditSettings initialSettings)
         return;
     }
 
-    QmlDialogWrapper batchUserEditDialog(
+    auto batchUserEditDialog = new QmlDialogWrapper(
         QUrl("Nx/Dialogs/UserManagement/BatchUserEditDialog.qml"), dialogParameters, q);
 
-    q->connect(q, &UserListWidget::selectionUpdated, &batchUserEditDialog,
+    q->connect(q, &UserListWidget::selectionUpdated, batchUserEditDialog,
         [&batchUserEditDialog, &usersToEdit, getSelectedUsers]
         {
-            if (!NX_ASSERT(batchUserEditDialog.window()))
+            if (!NX_ASSERT(batchUserEditDialog->window()))
                 return;
 
             QVariantMap dialogParameters;
@@ -869,81 +871,44 @@ void UserListWidget::Private::editSelected(BatchEditSettings initialSettings)
 
             if (usersToEdit.empty())
             {
-                batchUserEditDialog.reject();
+                batchUserEditDialog->reject();
                 return;
             }
 
             for (const auto& [k, v]: dialogParameters.asKeyValueRange())
-                batchUserEditDialog.window()->setProperty(k.toStdString().c_str(), v);
+                batchUserEditDialog->window()->setProperty(k.toStdString().c_str(), v);
         });
 
-    if (!batchUserEditDialog.exec())
-        return; //< Cancelled.
-
-    // Selection might change during dialog execution.
-    if (usersToEdit.empty())
-        return;
-
-    const BatchEditSettings settings = {
-        .enableUsers = batchUserEditDialog.window()->property("enableUsers")
-            .value<Qt::CheckState>(),
-        .disableDigest = batchUserEditDialog.window()->property("disableDigest")
-            .value<Qt::CheckState>()
-    };
-
-    if (settings.enableUsers == Qt::PartiallyChecked
-        && settings.disableDigest == Qt::PartiallyChecked)
-    {
-        return; //< No changes.
-    }
-
-    requestChain.reset(new UserGroupRequestChain(q->systemContext()));
-    for (auto user: usersToEdit)
-    {
-        UserGroupRequest::UpdateUser updateUser;
-        updateUser.id = user->getId();
-
-        // TODO: #vkutin #ikulaychuk These fields should be optional in the API request.
-        // Refactor the client side.
-        updateUser.enabled = settings.enableUsers != Qt::PartiallyChecked
-            ? (settings.enableUsers == Qt::Checked)
-            : user->isEnabled();
-
-        if (!user->isCloud())
+    connect(
+        batchUserEditDialog,
+        &QmlDialogWrapper::done,
+        this,
+        [this, batchUserEditDialog, getSelectedUsers](bool accepted)
         {
-            updateUser.enableDigest = settings.disableDigest != Qt::PartiallyChecked
-                ? (settings.disableDigest == Qt::Checked)
-                : user->shouldDigestAuthBeUsed();
-        }
+            QScopedPointer<QmlDialogWrapper, QScopedPointerDeleteLater> scopedPtr{batchUserEditDialog};
 
-        requestChain->append(updateUser);
-    }
-
-    setMassEditInProgress(true);
-    auto rollback = nx::utils::makeScopeGuard([this]{ setMassEditInProgress(false); });
-
-    requestChain->start(
-        [this, rollback = std::move(rollback), settings](
-            bool success,  nx::network::rest::ErrorId errorCode, const QString& errorString)
-        {
-            if (success)
+            if (!accepted)
                 return;
 
-            if (errorCode == nx::network::rest::ErrorId::sessionExpired)
+            auto usersToEdit = std::get<0>(getSelectedUsers());
+            // Selection might change during dialog execution.
+            if (usersToEdit.empty())
+                return;
+
+            const BatchEditSettings settings = {
+                .enableUsers = batchUserEditDialog->window()->property("enableUsers")
+                    .value<Qt::CheckState>(),
+                .disableDigest = batchUserEditDialog->window()->property("disableDigest")
+                    .value<Qt::CheckState>()
+            };
+
+            if (settings.enableUsers == Qt::PartiallyChecked
+                && settings.disableDigest == Qt::PartiallyChecked)
             {
-                // Reopen the dialog with the last settings.
-                executeLater([this, settings](){ editSelected(settings); }, this);
-                return;
+                return; //< No changes.
             }
 
-            QnMessageBox messageBox(
-                QnMessageBoxIcon::Critical,
-                errorString,
-                {},
-                QDialogButtonBox::Ok,
-                QDialogButtonBox::Ok,
-                q);
-            messageBox.exec();
+            handleSelectedUsersEdited(usersToEdit, settings);
         });
 }
 
@@ -1064,6 +1029,59 @@ void UserListWidget::Private::handleUsersTableClicked(const QModelIndex& index)
             break;
         }
     }
+}
+
+void UserListWidget::Private::handleSelectedUsersEdited(
+    const QSet<QnUserResourcePtr>& usersToEdit, const BatchEditSettings& settings)
+{
+    requestChain.reset(new UserGroupRequestChain(q->systemContext()));
+    for (const auto& user: usersToEdit)
+    {
+        UserGroupRequest::UpdateUser updateUser;
+        updateUser.id = user->getId();
+
+        // TODO: #vkutin #ikulaychuk These fields should be optional in the API request.
+        // Refactor the client side.
+        updateUser.enabled = settings.enableUsers != Qt::PartiallyChecked
+            ? (settings.enableUsers == Qt::Checked)
+            : user->isEnabled();
+
+        if (!user->isCloud())
+        {
+            updateUser.enableDigest = settings.disableDigest != Qt::PartiallyChecked
+                ? (settings.disableDigest == Qt::Checked)
+                : user->shouldDigestAuthBeUsed();
+        }
+
+        requestChain->append(updateUser);
+    }
+
+    setMassEditInProgress(true);
+    auto rollback = nx::utils::makeScopeGuard([this]{ setMassEditInProgress(false); });
+
+    requestChain->start(
+        [this, rollback = std::move(rollback), settings](
+            bool success,  nx::network::rest::ErrorId errorCode, const QString& errorString)
+        {
+            if (success)
+                return;
+
+            if (errorCode == nx::network::rest::ErrorId::sessionExpired)
+            {
+                // Reopen the dialog with the last settings.
+                executeLater([this, settings](){ editSelected(settings); }, this);
+                return;
+            }
+
+            QnMessageBox messageBox(
+                QnMessageBoxIcon::Critical,
+                errorString,
+                {},
+                QDialogButtonBox::Ok,
+                QDialogButtonBox::Ok,
+                q);
+            messageBox.exec();
+        });
 }
 
 } // namespace nx::vms::client::desktop

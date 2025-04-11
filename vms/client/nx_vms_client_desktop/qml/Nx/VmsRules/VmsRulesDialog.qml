@@ -41,6 +41,8 @@ Dialog
     topPadding: 0
     bottomPadding: 0
 
+    modality: Qt.ApplicationModal
+
     acceptShortcutEnabled: !tableView.selectionModel.hasSelection
 
     onVisibleChanged: tableView.checkedRows = []

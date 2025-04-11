@@ -12,7 +12,7 @@ Dialog
     id: dialog
     objectName: "batchUserEditDialog" //< For autotesting.
 
-    modality: Qt.WindowModal
+    modality: Qt.ApplicationModal
 
     color: ColorTheme.colors.dark7
 

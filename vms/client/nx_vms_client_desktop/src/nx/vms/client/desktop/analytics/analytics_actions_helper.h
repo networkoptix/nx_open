@@ -7,8 +7,8 @@
 
 #include <QtCore/QJsonObject>
 
-#include <nx/vms/api/analytics/analytics_actions.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/api/analytics/analytics_actions.h>
 #include <nx/vms/client/desktop/common/utils/abstract_web_authenticator.h>
 
 class QWidget;
@@ -37,12 +37,14 @@ public:
         QWidget* parent = nullptr);
 
     using SettingsValuesMap = QMap<QString, QString>;
-    static std::optional<SettingsValuesMap> requestSettingsMap(
+    static void requestSettingsMap(
         const QJsonObject& settingsModel,
+        std::function<void(std::optional<SettingsValuesMap>)> callback,
         QWidget* parent = nullptr);
 
-    static std::optional<QJsonObject> requestSettingsJson(
+    static void requestSettingsJson(
         const QJsonObject& settingsModel,
+        std::function<void(std::optional<QJsonObject>)> callback,
         QWidget* parent = nullptr);
 };
 

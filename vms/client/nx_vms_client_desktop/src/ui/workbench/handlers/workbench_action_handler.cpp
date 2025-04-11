@@ -1835,7 +1835,7 @@ void ActionHandler::at_advancedUpdateSettingsAction_triggered()
 
     m_advancedUpdateSettingsDialog->advancedMode =
         menu()->currentParameters(sender()).argument(Qn::AdvancedModeRole).toBool();
-    m_advancedUpdateSettingsDialog->exec();
+    m_advancedUpdateSettingsDialog->open();
 }
 
 void ActionHandler::at_jumpToTimeAction_triggered()
@@ -3434,10 +3434,10 @@ void ActionHandler::at_openAdvancedSearchDialog_triggered()
 
 void ActionHandler::at_openImportFromDevicesDialog_triggered()
 {
-    std::unique_ptr<integrations::ImportFromDeviceDialog> dialog(
-        new integrations::ImportFromDeviceDialog(mainWindowWidget()));
+    auto dialog = new integrations::ImportFromDeviceDialog(mainWindowWidget());
+    connect(dialog, &QmlDialogWrapper::done, dialog, &QObject::deleteLater);
 
-    dialog->exec();
+    dialog->open();
 }
 
 void ActionHandler::deleteDialogs()

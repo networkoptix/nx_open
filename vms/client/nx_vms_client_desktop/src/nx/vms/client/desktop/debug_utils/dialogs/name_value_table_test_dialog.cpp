@@ -20,8 +20,9 @@ void NameValueTableTestDialog::registerAction()
         "Name-Value Table Test",
         [](QnWorkbenchContext* context)
         {
-            auto dialog = std::make_unique<NameValueTableTestDialog>(context->mainWindowWidget());
-            dialog->exec();
+            auto dialog = new NameValueTableTestDialog{context->mainWindowWidget()};
+            connect(dialog, &QmlDialogWrapper::done, dialog, &QObject::deleteLater);
+            dialog->open();
         });
 }
 

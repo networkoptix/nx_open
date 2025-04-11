@@ -20,7 +20,7 @@ public:
         ColumnCount
     };
 
-    explicit KeyValueModel(QList<vms::rules::KeyValueObject>& keyValueList, QObject* parent = nullptr);
+    explicit KeyValueModel(QList<vms::rules::KeyValueObject> keyValueList, QObject* parent = nullptr);
 
     int rowCount(const QModelIndex& parent) const override;
     int columnCount(const QModelIndex& parent) const override;
@@ -33,10 +33,12 @@ public:
 
     Q_INVOKABLE void append(const QString& key, const QString& value);
 
+    const QList<vms::rules::KeyValueObject>& data() const;
+
     static void registerQmlType();
 
 private:
-    QList<vms::rules::KeyValueObject>& m_keyValueList;
+    QList<vms::rules::KeyValueObject> m_keyValueList;
 };
 
 } // namespace nx::vms::client::desktop::rules

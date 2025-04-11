@@ -35,6 +35,7 @@ Dialog
     minimumHeight: 440
     maximumWidth: 500
     maximumHeight: 440
+    modality: Qt.ApplicationModal
 
     function updateSelected()
     {

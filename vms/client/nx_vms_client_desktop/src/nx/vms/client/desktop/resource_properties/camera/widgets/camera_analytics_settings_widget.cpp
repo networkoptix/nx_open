@@ -60,8 +60,25 @@ CameraAnalyticsSettingsWidget::CameraAnalyticsSettingsWidget(
 
 QVariant CameraAnalyticsSettingsWidget::requestParameters(const QJsonObject& model)
 {
-    auto result = AnalyticsActionsHelper::requestSettingsJson(model, this);
-    return result ? *result : QVariant{};
+    // TODO: #maltera make usage of the CameraAnalyticsSettingsWidget::requestParameters
+    // in the AnalyticsSettings.qml async.
+    QEventLoop loop;
+
+    QVariant result;
+    AnalyticsActionsHelper::requestSettingsJson(
+        model,
+        [&loop, &result](std::optional<QJsonObject> settingsJson)
+        {
+            if (settingsJson)
+                result = settingsJson.value();
+
+            loop.quit();
+        },
+        this);
+
+    loop.exec();
+
+    return result;
 }
 
 } // namespace nx::vms::client::desktop

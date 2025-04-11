@@ -13,6 +13,8 @@ Dialog
     fixedWidth: implicitWidth
     fixedHeight: implicitHeight
 
+    modality: Qt.ApplicationModal
+
     Collator
     {
         id: collator

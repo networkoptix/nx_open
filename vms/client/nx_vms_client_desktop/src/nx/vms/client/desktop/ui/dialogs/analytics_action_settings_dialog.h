@@ -25,9 +25,10 @@ public:
 
     virtual bool tryClose(bool force) override;
 
-    static std::optional<QJsonObject> request(
+    static void request(
         const QJsonObject& settingsModel,
+        std::function<void(std::optional<QJsonObject>)> requestHandler,
         QWidget* parent = nullptr);
 };
 
-} // nx::vms::client::desktop
+} // namespace nx::vms::client::desktop

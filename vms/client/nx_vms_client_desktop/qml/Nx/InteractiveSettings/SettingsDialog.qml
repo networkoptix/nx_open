@@ -22,6 +22,8 @@ Dialog
     minimumWidth: 300
     minimumHeight: 100
 
+    modality: Qt.ApplicationModal
+
     title: settingsModel && settingsModel.title || ""
 
     property var settingsModel: null

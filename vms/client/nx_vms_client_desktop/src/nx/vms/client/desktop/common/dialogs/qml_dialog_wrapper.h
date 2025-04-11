@@ -86,15 +86,12 @@ signals:
     void done(bool accepted);
     /** Emitted when the wrapped dialog changes are accepted. */
     void accepted();
-    /** Emitted when the wrapped dialog changes are rejected. */
+    /** Emitted when the wrapped dialog changes are rejected or the dialog is closed. */
     void rejected();
     /** Emitted when the wrapped dialog changes are applied. */
     void applied();
 
 public slots:
-    /** Open the wrapped dialog and wait until it's closed. */
-    bool exec(Qt::WindowModality modality = Qt::ApplicationModal);
-
     /** Open the wrapped dialog. */
     void open();
 

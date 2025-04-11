@@ -30,15 +30,30 @@ bool AnalyticsActionSettingsDialog::tryClose(bool /*force*/)
     return true;
 }
 
-std::optional<QJsonObject> AnalyticsActionSettingsDialog::request(
+void AnalyticsActionSettingsDialog::request(
     const QJsonObject& settingsModel,
+    std::function<void(std::optional<QJsonObject>)> requestHandler,
     QWidget* parent)
 {
-    AnalyticsActionSettingsDialog dialog(settingsModel, parent);
-    if (!dialog.exec(Qt::ApplicationModal))
-        return {};
+    if(!NX_ASSERT(requestHandler))
+        return;
 
-    return dialog.getValues();
+    auto dialog = new AnalyticsActionSettingsDialog(settingsModel, parent);
+    connect(
+        dialog,
+        &QmlDialogWrapper::done,
+        dialog,
+        [dialog, handler = std::move(requestHandler)](bool accepted)
+        {
+            if (accepted)
+                handler(dialog->getValues());
+            else
+                handler({});
+
+            dialog->deleteLater();
+        });
+
+    dialog->open();
 }
 
-} // nx::vms::client::desktop
+} // namespace nx::vms::client::desktop

@@ -87,7 +87,7 @@ struct LookupListActionHandler::Private
     };
 
     LookupListActionHandler* const q;
-    std::unique_ptr<LookupListsDialog> dialog;
+    QPointer<LookupListsDialog> dialog;
     nx::Uuid lastSelectedListId;
     std::optional<rest::Handle> requestId;
     std::deque<DataDescriptor> saveQueue;
@@ -302,38 +302,6 @@ LookupListActionHandler::LookupListActionHandler(QObject* parent):
     QnWorkbenchContextAware(parent),
     d(new Private{.q = this})
 {
-    registerDebugAction(
-        "Lists Lookup Dialog",
-        [this](QnWorkbenchContext* context)
-        {
-            using namespace std::chrono;
-            static constexpr auto kLoadDelay = 500ms;
-            static constexpr auto kSaveDelay = 1000ms;
-
-            static LookupListDataList sourceData = exampleData();
-
-            appContext()->qmlEngine()->clearComponentCache();
-            auto dialog = std::make_unique<LookupListsDialog>(
-                context->system(),
-                context->mainWindowWidget());
-            executeDelayedParented(
-                [d = dialog.get()]() { d->setData(sourceData); }, kLoadDelay, dialog.get());
-
-            connect(dialog.get(), &LookupListsDialog::saveRequested, this,
-                [d = dialog.get()](LookupListDataList data)
-                {
-                    executeDelayedParented(
-                        [data, d]
-                        {
-                            sourceData = data;
-                            d->setSaveResult(true);
-                        }, kSaveDelay, d);
-                });
-
-            dialog->exec();
-        });
-
-
     connect(action(menu::OpenEditLookupListsDialogAction),
         &QAction::triggered,
         this,
@@ -387,7 +355,7 @@ void LookupListActionHandler::openLookupListsDialog()
 
     if (!d->dialog)
     {
-        d->dialog = std::make_unique<LookupListsDialog>(systemContext(), mainWindowWidget());
+        d->dialog = new LookupListsDialog{systemContext(), mainWindowWidget()};
         if (lookupListManager()->isInitialized())
         {
             d->dialog->setData(lookupListManager()->lookupLists());
@@ -401,22 +369,29 @@ void LookupListActionHandler::openLookupListsDialog()
             [this]
             {
                 d->lastSelectedListId = nx::Uuid();
-                d->dialog.reset();
+
+                if (d->dialog)
+                    d->dialog->deleteLater();
+            });
+
+        connect(d->dialog.get(), &LookupListsDialog::done, this,
+            [this]
+            {
+                d->lastSelectedListId = d->dialog->selectedListId();
+
+                // TODO: #vbutkevich add real-time data update. For now the dialog must be
+                // recreated each time it is opened to ensure it reflects the current state.
+                // Remove assert in destructor.
+                d->dialog->deleteLater();
             });
     }
 
-    d->dialog->exec(Qt::ApplicationModal);
-
-    d->lastSelectedListId = d->dialog->selectedListId();
-
-    // TODO: #vbutkevich add real-time data update. For now the dialog must be recreated each time
-    // it is opened to ensure it reflects the current state.
-    d->dialog.reset();
+    d->dialog->open();
 }
 
 void LookupListActionHandler::openLookupListEditDialog()
 {
-    const auto params = menu()->currentParameters(sender());
+    auto params = menu()->currentParameters(sender());
 
     if (appContext()->qmlEngine()->baseUrl().isLocalFile())
         appContext()->qmlEngine()->clearComponentCache();
@@ -428,28 +403,39 @@ void LookupListActionHandler::openLookupListEditDialog()
 
     auto taxonomy = systemContext()->taxonomyManager()->createStateView();
     const auto parentWidget = utils::extractParentWidget(params, mainWindowWidget());
-    LookupListEditDialog dialog(systemContext(),
+    auto dialog = new LookupListEditDialog(systemContext(),
         taxonomy,
         // If there is argument Qn::AnalyticsObjectTypeIdRole, open LookupListEditDialog with
         // specified type otherwise, any type of list is allowed.
         params.hasArgument(Qn::AnalyticsObjectTypeIdRole) ? &sourceModel : nullptr,
         parentWidget);
-    dialog.setTransientParent(parentWidget);
 
-    if (dialog.exec(Qt::ApplicationModal) != QDialog::Accepted)
-        return;
+    connect(
+        dialog,
+        &QmlDialogWrapper::done,
+        this,
+        [this, dialog, params = std::move(params)](bool accepted)
+        {
+            if (accepted)
+            {
+                Private::DataDescriptor descriptor{.data = dialog->getLookupListData()};
+                if (params.hasArgument(Qn::LookupListEntryRole))
+                {
+                    d->updateDataDescriptorForAddEntryAction(
+                        descriptor, params.argument<api::LookupListEntry>(Qn::LookupListEntryRole));
+                }
 
-    Private::DataDescriptor descriptor{.data = dialog.getLookupListData()};
-    if (params.hasArgument(Qn::LookupListEntryRole))
-    {
-        d->updateDataDescriptorForAddEntryAction(
-            descriptor, params.argument<api::LookupListEntry>(Qn::LookupListEntryRole));
-    }
+                d->saveData(descriptor);
+                systemContext()->lookupListManager()->addOrUpdate(descriptor.data);
+                if (d->dialog)
+                    d->dialog->appendData({descriptor.data});
+            }
 
-    d->saveData(descriptor);
-    systemContext()->lookupListManager()->addOrUpdate(descriptor.data);
-    if (d->dialog)
-        d->dialog->appendData({descriptor.data});
+            dialog->deleteLater();
+        });
+
+    dialog->setTransientParent(parentWidget);
+    dialog->open();
 }
 
 } // namespace nx::vms::client::desktop

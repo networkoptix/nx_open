@@ -31,6 +31,8 @@ Dialog
     topPadding: 0
     bottomPadding: 0
 
+    modality: Qt.ApplicationModal
+
     contentItem: Rectangle
     {
         id: backgroundRect

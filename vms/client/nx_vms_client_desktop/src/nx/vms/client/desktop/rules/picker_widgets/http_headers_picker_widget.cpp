@@ -45,11 +45,20 @@ void HttpHeadersPickerWidget::updateUi()
 
 void HttpHeadersPickerWidget::onButtonClicked()
 {
-    auto headers = m_field->value();
+    auto dialog = new CustomHttpHeadersDialog{m_field->value(), this};
+    connect(
+        dialog,
+        &CustomHttpHeadersDialog::done,
+        this,
+        [this, dialog](bool accepted)
+        {
+            if (accepted)
+                m_field->setValue(dialog->headers());
 
-    CustomHttpHeadersDialog dialog{headers, this};
-    if (dialog.exec() == QDialog::Accepted)
-        m_field->setValue(headers);
+            dialog->deleteLater();
+        });
+
+    dialog->open();
 }
 
 } // namespace nx::vms::client::desktop::rules

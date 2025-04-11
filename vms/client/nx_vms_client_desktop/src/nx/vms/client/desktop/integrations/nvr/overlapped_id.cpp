@@ -104,43 +104,45 @@ void OverlappedIdIntegration::openOverlappedIdDialog(WindowContext* context)
 
     m_store->reset();
 
-    std::unique_ptr<OverlappedIdDialog> dialog(
-        new OverlappedIdDialog(m_store.get(), context->mainWindowWidget()));
-
+    auto dialog = new OverlappedIdDialog{m_store.get(), context->mainWindowWidget()};
     const auto groupId = cameras.first()->getGroupId();
 
-    connect(dialog.get(), &OverlappedIdDialog::accepted,
-        [this, context, groupId, cameras]()
+    connect(
+        dialog,
+        &OverlappedIdDialog::done,
+        this,
+        [this, context, groupId, cameras, dialog](bool accepted)
         {
-            auto connection = context->system()->connectedServerApi();
-            if (!connection)
-                return;
+            if (auto connection = context->system()->connectedServerApi(); connection && accepted)
+            {
+                auto callback = nx::utils::guarded(this,
+                    [this, context, cameras](
+                        bool success,
+                        rest::Handle /*requestId*/,
+                        nx::vms::api::OverlappedIdResponse /*result*/)
+                    {
+                        if (!success)
+                            NX_WARNING(this, "Overlapped id is not set.");
 
-            auto callback = nx::utils::guarded(this,
-                [this, context, cameras](
-                    bool success,
-                    rest::Handle /*requestId*/,
-                    nx::vms::api::OverlappedIdResponse /*result*/)
-                {
-                    if (!success)
-                        NX_WARNING(this, "Overlapped id is not set.");
+                        context->workbenchContext()->navigator()->reopenPlaybackConnection(cameras);
+                        context->workbenchContext()->navigator()->setPlaying(true);
+                    });
 
-                    context->workbenchContext()->navigator()->reopenPlaybackConnection(cameras);
-                    context->workbenchContext()->navigator()->setPlaying(true);
-                });
+                context->workbenchContext()->navigator()->setPlaying(false);
+                connection->setOverlappedId(
+                    groupId,
+                    m_store->state().currentId,
+                    callback,
+                    thread());
+            }
 
-            context->workbenchContext()->navigator()->setPlaying(false);
-            connection->setOverlappedId(
-                groupId,
-                m_store->state().currentId,
-                callback,
-                thread());
+            dialog->deleteLater();
         });
 
-    OverlappedIdLoader loader(context->system(), groupId, m_store, this);
-    loader.start();
+    auto loader = new OverlappedIdLoader{context->system(), groupId, m_store, dialog};
+    loader->start();
 
-    dialog->exec();
+    dialog->open();
 }
 
 } // namespace nx::vms::client::desktop::integrations

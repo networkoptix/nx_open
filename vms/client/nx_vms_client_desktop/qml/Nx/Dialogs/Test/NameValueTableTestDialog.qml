@@ -16,6 +16,8 @@ Dialog
     height: 400
     title: "Name-Value Table Test"
 
+    modality: Qt.ApplicationModal
+
     contentItem: RowLayout
     {
         spacing: 16

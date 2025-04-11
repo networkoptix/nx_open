@@ -27,6 +27,8 @@ Dialog
     acceptShortcutEnabled: !headersTableView.editing
     rejectShortcutEnabled: !headersTableView.editing
 
+    modality: Qt.ApplicationModal
+
     Control
     {
         id: header

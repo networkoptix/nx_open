@@ -15,6 +15,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 class QJsonObject;
+namespace nx::vms::api { struct AnalyticsAction; }
 namespace nx::utils { class PendingOperation; }
 namespace nx::analytics::db { struct ObjectTrack; }
 
@@ -91,6 +92,11 @@ signals:
 private:
     template<typename T>
     static TileInteractionHandler* doInstall(WindowContext* context, T* tileInteractionSource);
+
+    void executeAnalyticsAction(
+        const nx::Uuid& engineId,
+        const QnVirtualCameraResourcePtr& camera,
+        const api::AnalyticsAction& actionData) const;
 
 private:
     const QScopedPointer<nx::utils::PendingOperation> m_showPendingMessages;

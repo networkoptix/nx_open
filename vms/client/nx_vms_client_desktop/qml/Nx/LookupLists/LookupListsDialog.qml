@@ -40,6 +40,8 @@ Dialog
     topPadding: 0
     bottomPadding: 0
 
+    modality: Qt.ApplicationModal
+
     // TODO: #vbutkevich. Replace the current QML model with a standalone C++ model to encapsulate
     // all logic related to the model.
     ListModel

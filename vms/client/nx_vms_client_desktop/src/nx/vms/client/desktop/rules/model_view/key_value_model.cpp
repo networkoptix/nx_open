@@ -6,9 +6,9 @@
 
 namespace nx::vms::client::desktop::rules {
 
-KeyValueModel::KeyValueModel(QList<vms::rules::KeyValueObject>& keyValueList, QObject* parent):
+KeyValueModel::KeyValueModel(QList<vms::rules::KeyValueObject> keyValueList, QObject* parent):
     QAbstractTableModel{parent},
-    m_keyValueList{keyValueList}
+    m_keyValueList{std::move(keyValueList)}
 {
 }
 
@@ -99,6 +99,11 @@ void KeyValueModel::append(const QString& key, const QString& value)
     beginInsertRows({}, m_keyValueList.size(), m_keyValueList.size());
     m_keyValueList.append({key.trimmed(), value.trimmed()});
     endInsertRows();
+}
+
+const QList<vms::rules::KeyValueObject>& KeyValueModel::data() const
+{
+    return m_keyValueList;
 }
 
 void KeyValueModel::registerQmlType()

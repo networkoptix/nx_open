@@ -97,13 +97,15 @@ bool SettingsDialogManager::isEditUserDialogVisible() const
 
 void SettingsDialogManager::createUser(QWidget* parent)
 {
-    auto dialog = std::make_unique<UserSettingsDialog>(
+    auto dialog = new UserSettingsDialog(
         UserSettingsDialog::DialogType::CreateUser,
         systemContext(),
         windowContext(),
         parent);
+    connect(dialog, &QmlDialogWrapper::done, dialog, &QObject::deleteLater);
+
     dialog->setUser({});
-    dialog->exec(Qt::ApplicationModal);
+    dialog->open();
 }
 
 nx::Uuid SettingsDialogManager::currentEditedGroupId() const
@@ -166,13 +168,15 @@ bool SettingsDialogManager::isEditGroupDialogVisible() const
 
 void SettingsDialogManager::createGroup(QWidget* parent)
 {
-    auto dialog = std::make_unique<GroupSettingsDialog>(
+    auto dialog = new GroupSettingsDialog(
         GroupSettingsDialog::createGroup,
         systemContext(),
         windowContext(),
         parent);
+    connect(dialog, &QmlDialogWrapper::done, dialog, &QObject::deleteLater);
+
     dialog->setGroup({});
-    dialog->exec(Qt::ApplicationModal);
+    dialog->open();
 }
 
 } // namespace nx::vms::client::desktop

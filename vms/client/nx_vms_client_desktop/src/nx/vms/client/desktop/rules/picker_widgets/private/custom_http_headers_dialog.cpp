@@ -4,19 +4,23 @@
 
 #include <nx/vms/client/desktop/application_context.h>
 
-#include "../../model_view/key_value_model.h"
-
 namespace nx::vms::client::desktop::rules {
 
 CustomHttpHeadersDialog::CustomHttpHeadersDialog(
-    QList<vms::rules::KeyValueObject>& headers,
+    QList<vms::rules::KeyValueObject> headers,
     QWidget* parent)
     :
-    QnSessionAwareDelegate(parent)
+    QnSessionAwareDelegate(parent),
+    m_headersModel{new KeyValueModel{std::move(headers), this}}
 {
     setTransientParent(parent->window()->windowHandle());
-    setInitialProperties({{"headersModel", QVariant::fromValue(new KeyValueModel{headers, this})}});
+    setInitialProperties({{"headersModel", QVariant::fromValue(m_headersModel)}});
     setSource(QUrl("Nx/VmsRules/CustomHttpHeadersDialog.qml"));
+}
+
+const QList<vms::rules::KeyValueObject>& CustomHttpHeadersDialog::headers() const
+{
+    return m_headersModel->data();
 }
 
 bool CustomHttpHeadersDialog::tryClose(bool /*force*/)

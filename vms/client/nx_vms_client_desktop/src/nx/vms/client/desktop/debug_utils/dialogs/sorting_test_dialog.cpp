@@ -2,8 +2,6 @@
 
 #include "sorting_test_dialog.h"
 
-#include <memory>
-
 #include <QtCore/QUrl>
 
 #include <ui/workbench/workbench_context.h>
@@ -25,8 +23,9 @@ void SortingTestDialog::registerAction()
         "Sorting Test",
         [](QnWorkbenchContext* context)
         {
-            auto dialog = std::make_unique<SortingTestDialog>(context->mainWindowWidget());
-            dialog->exec();
+            auto dialog = new SortingTestDialog{context->mainWindowWidget()};
+            connect(dialog, &QmlDialogWrapper::done, dialog, &QObject::deleteLater);
+            dialog->open();
         });
 }
 

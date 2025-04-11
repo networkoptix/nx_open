@@ -100,8 +100,25 @@ QJsonObject AnalyticsSettingsStore::settingsValues(const nx::Uuid& engineId)
 
 QVariant AnalyticsSettingsStore::requestParameters(const QJsonObject& model)
 {
-    const auto values = AnalyticsActionsHelper::requestSettingsJson(model, m_parent);
-    return values ? *values : QVariant{};
+    // TODO: #maltera make usage of the CameraAnalyticsSettingsWidget::requestParameters
+    // in the AnalyticsSettings.qml async.
+    QEventLoop loop;
+
+    QVariant result;
+    AnalyticsActionsHelper::requestSettingsJson(
+        model,
+        [&loop, &result](std::optional<QJsonObject> settingsJson)
+        {
+            if (settingsJson)
+                result = settingsJson.value();
+
+            loop.quit();
+        },
+        mainWindowWidget());
+
+    loop.exec();
+
+    return result;
 }
 
 void AnalyticsSettingsStore::setSettingsValues(

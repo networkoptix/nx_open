@@ -2,7 +2,6 @@
 
 #include "qml_dialog_wrapper.h"
 
-#include <QtCore/QEventLoop>
 #include <QtGui/QWindow>
 #include <QtQml/QQmlComponent>
 #include <QtWidgets/QWidget>
@@ -19,7 +18,6 @@ public:
     QWindow* transientParent = nullptr;
     std::unique_ptr<QQuickWindow> window = nullptr;
     QmlDialogWrapper* q = nullptr;
-    QEventLoop eventLoop;
     QQmlComponent* qmlComponent = nullptr;
     QVariantMap initialProperties;
     core::QmlPropertyBase::ObjectHolder rootObjectHolder;
@@ -102,7 +100,15 @@ void QmlDialogWrapper::Private::restoreGeometryIfNecessary()
 bool QmlDialogWrapper::Private::eventFilter(QObject* /*object*/, QEvent* event)
 {
     if (event->type() == QEvent::Close)
+    {
         lastGeometry = window->geometry();
+
+        if (window->isVisible() && !done)
+        {
+            q->reject();
+            event->ignore();
+        }
+    }
 
     return false;
 }
@@ -244,37 +250,6 @@ void QmlDialogWrapper::setRestoreLastPositionWhenOpened(bool value)
     emit restoreLastPositionWhenOpenedChanged();
 }
 
-bool QmlDialogWrapper::exec(Qt::WindowModality modality)
-{
-    if (!d->window)
-        return false;
-
-    if (!NX_ASSERT(!d->eventLoop.isRunning(), "Dialog is already opened!"))
-        return false;
-
-    d->done = false;
-
-    d->restoreGeometryIfNecessary();
-
-    const auto oldModality = d->window->modality();
-    d->window->setModality(modality);
-
-    if (d->shownMaximized)
-        d->window->showMaximized();
-    else
-        d->window->show();
-
-    const int result = d->eventLoop.exec();
-    d->window->setModality(oldModality);
-
-    // For some reason if a dialog is closed by the [X] button or via the system menu,
-    // MS Windows passes activity to another application. So this workaround is required.
-    if (d->window->transientParent())
-        d->window->transientParent()->requestActivate();
-
-    return result == 0;
-}
-
 void QmlDialogWrapper::open()
 {
     if (!d->window)
@@ -284,15 +259,10 @@ void QmlDialogWrapper::open()
 
     d->restoreGeometryIfNecessary();
 
-    const auto oldModality = d->window->modality();
-    d->window->setModality(Qt::NonModal);
-
     if (d->shownMaximized)
         d->window->showMaximized();
     else
         d->window->show();
-
-    d->window->setModality(oldModality);
 }
 
 void QmlDialogWrapper::raise()
@@ -315,11 +285,8 @@ void QmlDialogWrapper::accept()
     if (d->window->metaObject()->indexOfMethod("accept") >= 0)
     {
         QMetaObject::invokeMethod(d->window.get(), "accept");
-        if (!d->window->isVisible() && d->eventLoop.isRunning())
-        {
+        if (!d->window->isVisible())
             d->done = true;
-            d->eventLoop.exit();
-        }
     }
     else
     {
@@ -334,9 +301,6 @@ void QmlDialogWrapper::accept()
 
         if (!closed)
             return;
-
-        if (d->eventLoop.isRunning())
-            d->eventLoop.exit();
 
         emit accepted();
     }
@@ -353,11 +317,8 @@ void QmlDialogWrapper::reject()
     if (d->window->metaObject()->indexOfMethod("reject") >= 0)
     {
         QMetaObject::invokeMethod(d->window.get(), "reject");
-        if (!d->window->isVisible() && d->eventLoop.isRunning())
-        {
+        if (!d->window->isVisible())
             d->done = true;
-            d->eventLoop.exit(1);
-        }
     }
     else
     {
@@ -370,8 +331,6 @@ void QmlDialogWrapper::reject()
             if (!d->window->close()) //< If close() didn't work at least hide the window.
                 d->window->hide();
         }
-        if (d->eventLoop.isRunning())
-            d->eventLoop.exit(1);
 
         emit rejected();
     }

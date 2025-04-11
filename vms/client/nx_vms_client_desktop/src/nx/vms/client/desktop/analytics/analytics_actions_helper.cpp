@@ -52,29 +52,48 @@ void AnalyticsActionsHelper::processResult(
     }
 }
 
-std::optional<AnalyticsActionsHelper::SettingsValuesMap>
-    AnalyticsActionsHelper::requestSettingsMap(
+void AnalyticsActionsHelper::requestSettingsMap(
         const QJsonObject& settingsModel,
+        std::function<void(std::optional<SettingsValuesMap>)> callback,
         QWidget* parent)
 {
-    const auto values = requestSettingsJson(settingsModel, parent);
-    if (!values)
-        return std::nullopt;
+    if(!NX_ASSERT(callback))
+        return;
 
-    SettingsValuesMap result;
-    for (const auto& key: values->keys())
-        result[key] = nx::toString(values->value(key));
+    requestSettingsJson(
+        settingsModel,
+        [callback = std::move(callback)](std::optional<QJsonObject> setingsJson)
+        {
+            if (!setingsJson)
+            {
+                callback({});
+                return;
+            }
 
-    return result;
+            SettingsValuesMap result;
+            for (const auto& key: setingsJson->keys())
+                result[key] = nx::toString(setingsJson->value(key));
+
+            callback(result);
+        },
+        parent);
 }
 
-std::optional<QJsonObject> AnalyticsActionsHelper::requestSettingsJson(
+void AnalyticsActionsHelper::requestSettingsJson(
     const QJsonObject& settingsModel,
+    std::function<void(std::optional<QJsonObject>)> callback,
     QWidget* parent)
 {
-    return settingsModel.isEmpty()
-        ? QJsonObject{}
-        : AnalyticsActionSettingsDialog::request(settingsModel, parent);
+    if(!NX_ASSERT(callback))
+        return;
+
+    if (settingsModel.isEmpty())
+    {
+        callback(QJsonObject{});
+        return;
+    }
+
+    AnalyticsActionSettingsDialog::request(settingsModel, std::move(callback), parent);
 }
 
 } // namespace nx::vms::client::desktop

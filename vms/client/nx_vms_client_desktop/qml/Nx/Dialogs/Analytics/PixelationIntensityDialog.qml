@@ -22,6 +22,8 @@ Dialog
     minimumHeight: implicitHeight
     maximumHeight: implicitHeight
 
+    modality: Qt.ApplicationModal
+
     contentItem: Column
     {
         spacing: 8

@@ -342,9 +342,7 @@ void TileInteractionHandler::executePluginAction(
     const QnVirtualCameraResourcePtr& camera) const
 {
     const auto systemContext = SystemContext::fromResource(camera);
-    const auto api = systemContext->connectedServerApi();
-
-    if (!api)
+    if (!systemContext->connectedServerApi())
         return;
 
     const nx::analytics::ActionTypeDescriptorManager descriptorManager(systemContext);
@@ -359,50 +357,27 @@ void TileInteractionHandler::executePluginAction(
     actionData.timestampUs = std::chrono::microseconds(track.firstAppearanceTimeUs);
     actionData.deviceId = toString(camera->getId());
 
-    if (!actionDescriptor->parametersModel.isEmpty())
+    if (actionDescriptor->parametersModel.isEmpty())
     {
-        // Show dialog to enter required parameters.
-        auto params = AnalyticsActionsHelper::requestSettingsMap(
-            actionDescriptor->parametersModel, mainWindowWidget());
-
-        if (!params)
-            return;
-
-        for (auto&& [k, v]: params->asKeyValueRange())
-            actionData.parameters.emplace(std::move(k), std::move(v));
+        executeAnalyticsAction(engineId, camera, actionData);
+        return;
     }
 
-    const auto resultCallback =
-        [this, camera, engineId](
-            bool success,
-            rest::Handle /*requestId*/,
-            nx::network::rest::JsonResult result)
+    // Show dialog to enter required parameters.
+    AnalyticsActionsHelper::requestSettingsMap(
+        actionDescriptor->parametersModel,
+        [this, engineId, camera, actionData = std::move(actionData)](
+            std::optional<AnalyticsActionsHelper::SettingsValuesMap> params) mutable
         {
-            if (result.errorId != nx::network::rest::ErrorId::ok)
-            {
-                QnMessageBox::warning(mainWindowWidget(), tr("Failed to execute plugin action"),
-                    result.errorString);
-                return;
-            }
-
-            if (!success)
+            if (!params)
                 return;
 
-            const auto systemContext = SystemContext::fromResource(camera);
-            if (!systemContext)
-                return;
+            for (auto&& [k, v]: params->asKeyValueRange())
+                actionData.parameters.emplace(k, std::move(v));
 
-            const auto reply = result.deserialized<api::AnalyticsActionResult>();
-            AnalyticsActionsHelper::processResult(
-                reply,
-                windowContext(),
-                systemContext->resourcePool()->getResourceById(engineId),
-                /*authenticator*/ {},
-                mainWindowWidget());
-        };
-
-    api->executeAnalyticsAction(
-        actionData, nx::utils::guarded(this, resultCallback), thread());
+            executeAnalyticsAction(engineId, camera, actionData);
+        },
+        mainWindowWidget());
 }
 
 void TileInteractionHandler::copyBookmarkToClipboard(const QModelIndex &index)
@@ -828,6 +803,49 @@ nx::utils::Guard TileInteractionHandler::scopedPlaybackStarter(bool baseConditio
             navigator()->setSpeed(1.0);
             navigator()->setPlaying(true);
         });
+}
+
+void TileInteractionHandler::executeAnalyticsAction(
+    const nx::Uuid& engineId,
+    const QnVirtualCameraResourcePtr& camera,
+    const api::AnalyticsAction& actionData) const
+{
+    const auto systemContext = SystemContext::fromResource(camera);
+    const auto api = systemContext->connectedServerApi();
+    if (!api)
+        return;
+
+    const auto resultCallback =
+        [this, camera, engineId](
+            bool success,
+            rest::Handle /*requestId*/,
+            nx::network::rest::JsonResult result)
+        {
+            if (result.errorId != nx::network::rest::ErrorId::ok)
+            {
+                QnMessageBox::warning(mainWindowWidget(), tr("Failed to execute plugin action"),
+                    result.errorString);
+                return;
+            }
+
+            if (!success)
+                return;
+
+            const auto systemContext = SystemContext::fromResource(camera);
+            if (!systemContext)
+                return;
+
+            const auto reply = result.deserialized<api::AnalyticsActionResult>();
+            AnalyticsActionsHelper::processResult(
+                reply,
+                windowContext(),
+                systemContext->resourcePool()->getResourceById(engineId),
+                /*authenticator*/ {},
+                mainWindowWidget());
+        };
+
+    api->executeAnalyticsAction(
+        actionData, nx::utils::guarded(this, resultCallback), thread());
 }
 
 } // namespace nx::vms::client::desktop

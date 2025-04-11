@@ -397,33 +397,55 @@ void SecuritySettingsWidget::loadDataToUi()
 
 void SecuritySettingsWidget::openPixelationObjectSelectionDialog()
 {
-    PixelationObjectSelectionDialog dialog(
+    auto dialog = new PixelationObjectSelectionDialog(
         systemContext(),
         m_pixelationSettings.isAllObjectTypes,
         m_pixelationSettings.objectTypeIds,
         mainWindowWidget());
 
-    if (dialog.exec(Qt::ApplicationModal) == QDialog::Accepted)
-    {
-        m_pixelationSettings.isAllObjectTypes = dialog.allObjects();
-        m_pixelationSettings.objectTypeIds = dialog.objectTypeIds();
+    connect(
+        dialog,
+        &QmlDialogWrapper::done,
+        this,
+        [this, dialog](bool accepted)
+        {
+            if (accepted)
+            {
+                m_pixelationSettings.isAllObjectTypes = dialog->allObjects();
+                m_pixelationSettings.objectTypeIds = dialog->objectTypeIds();
 
-        emit hasChangesChanged();
-        updatePixelationSettings();
-    }
+                emit hasChangesChanged();
+                updatePixelationSettings();
+            }
+
+            dialog->deleteLater();
+        });
+
+    dialog->open();
 }
 
 void SecuritySettingsWidget::openPixelationConfigurationDialog()
 {
-    PixelationIntensityDialog dialog(
+    auto dialog = new PixelationIntensityDialog(
         m_pixelationSettings.intensity,
         mainWindowWidget());
 
-    if (dialog.exec(Qt::ApplicationModal) == QDialog::Accepted)
-    {
-        m_pixelationSettings.intensity = dialog.intensity();
-        emit hasChangesChanged();
-    }
+    connect(
+        dialog,
+        &QmlDialogWrapper::done,
+        this,
+        [this, dialog](bool accepted)
+        {
+            if (accepted)
+            {
+                m_pixelationSettings.intensity = dialog->intensity();
+                emit hasChangesChanged();
+            }
+
+            dialog->deleteLater();
+        });
+
+    dialog->open();
 }
 
 void SecuritySettingsWidget::openExcludeCameraSelectionDialog()
