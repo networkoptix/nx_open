@@ -602,7 +602,7 @@ function(nx_download_from_artifactory url file)
     set(result FALSE)
 
     message(STATUS "Downloading ${file} from ${url}")
-    file(DOWNLOAD ${url}.sha256 ${file}.sha256 STATUS status TIMEOUT 3 ${auth_args})
+    file(DOWNLOAD ${url}.sha256 ${file}.sha256 STATUS status TIMEOUT 30 ${auth_args})
     if(status MATCHES "^0;.*")
         file(READ ${file}.sha256 sha256)
         file(REMOVE ${file}.sha256)
@@ -622,7 +622,7 @@ function(nx_download_from_artifactory url file)
             file(DOWNLOAD ${url} ${file}.tmp
                 EXPECTED_HASH SHA256=${sha256}
                 STATUS status
-                TIMEOUT 3 ${auth_args})
+                TIMEOUT 30 ${auth_args})
 
             if(status MATCHES "^0;.*")
                 file(RENAME ${file}.tmp ${file})
