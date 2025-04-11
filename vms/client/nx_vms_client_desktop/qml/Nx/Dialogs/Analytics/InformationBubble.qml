@@ -27,7 +27,6 @@ Bubble
         d.setData(null, null, null)
     }
 
-    parent: d.view
     color: ColorTheme.colors.dark13
 
     contentItem: Item
@@ -155,14 +154,14 @@ Bubble
             }
         }
 
-        property var parameters:
+        readonly property var parameters:
         {
-            if (!targetItem || !view)
+            if (!targetItem || !parent)
                 return undefined
 
-            const targetRect = view.contentItem.mapFromItem(targetItem,
-                -view.contentX, -view.contentY, targetItem.width, targetItem.height)
-            const enclosingRect = Qt.rect(0, 0, view.width, view.height)
+            const targetRect = parent.mapFromItem(
+                targetItem, 0, 0, targetItem.width, targetItem.height)
+            const enclosingRect = Qt.rect(0, 0, parent.width, parent.height)
             const kMinIntersection = 64
 
             return bubble.calculateParameters(

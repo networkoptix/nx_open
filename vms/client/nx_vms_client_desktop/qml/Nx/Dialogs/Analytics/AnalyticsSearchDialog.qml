@@ -491,28 +491,6 @@ Window
                         model: eventGrid.model
                     }
 
-                    InformationBubble
-                    {
-                        id: informationToolTip
-
-                        readonly property Item hoveredItem:
-                        {
-                            return dialog.tileView
-                                ? (eventGrid.hoveredItem?.item ?? null)
-                                : (tableView.hoveredItem ?? null)
-                        }
-
-                        onHoveredItemChanged:
-                        {
-                            if (dialog.tileView)
-                                open(eventGrid, hoveredItem, hoveredItem?.modelData)
-                            else
-                                open(tableView, hoveredItem, hoveredItem?.tooltipData)
-                        }
-
-                        z: 2
-                    }
-
                     readonly property real availableWidth: width - leftMargin - rightMargin
 
                     readonly property int numColumns: Math.floor(
@@ -1201,5 +1179,27 @@ Window
         title: qsTr("Table Settings")
         attributeManager: d.tableViewAttributeManager
         objectTypeIds: analyticsFilters.selectedObjectTypeIds
+    }
+
+    InformationBubble
+    {
+        id: informationToolTip
+
+        readonly property Item hoveredItem:
+        {
+            return dialog.tileView
+                ? (eventGrid.hoveredItem?.item ?? null)
+                : (tableView.hoveredItem ?? null)
+        }
+
+        onHoveredItemChanged:
+        {
+            if (dialog.tileView)
+                open(eventGrid, hoveredItem, hoveredItem?.modelData)
+            else
+                open(tableView, hoveredItem, hoveredItem?.tooltipData)
+        }
+
+        z: 2
     }
 }
