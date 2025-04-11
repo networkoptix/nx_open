@@ -1822,7 +1822,7 @@
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation>新しいインテグレーション登録リクエストの作成を有効または無効にする</translation>
+      <translation>新規インテグレーション登録リクエストの作成を有効化または無効化する</translation>
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL</source>
