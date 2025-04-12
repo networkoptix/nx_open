@@ -8883,7 +8883,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Exported: %1</source>
       <comment>Duration will be substituted</comment>
-      <translation>エクスポート完了: %1</translation>
+      <translation>エクスポート日: %1</translation>
     </message>
   </context>
   <context>
