@@ -192,19 +192,19 @@
     </message>
     <message>
       <source>Set %1 `scheduleEnabled` to true is forbidden: no license to enable recording.</source>
-      <translation type="unfinished">Set %1 `scheduleEnabled` to true is forbidden: no license to enable recording.</translation>
+      <translation>Ustawienie %1 `scheduleEnabled` na true jest zabronione: brak licencji umożliwiającej włączenie nagrywania.</translation>
     </message>
     <message>
       <source>It is forbidden to enable cloud backup for %1 since SaaS service is not active.</source>
-      <translation type="unfinished">It is forbidden to enable cloud backup for %1 since SaaS service is not active.</translation>
+      <translation>Zabronione jest włączenie kopii zapasowej w chmurze dla %1, ponieważ usługa SaaS nie jest aktywna.</translation>
     </message>
     <message>
       <source>It is forbidden to enable cloud backup for %1 because there is no appropriate SaaS service license.</source>
-      <translation type="unfinished">It is forbidden to enable cloud backup for %1 because there is no appropriate SaaS service license.</translation>
+      <translation>Zabronione jest włączenie kopii zapasowej w chmurze dla %1, ponieważ nie ma odpowiedniej licencji na usługi SaaS.</translation>
     </message>
     <message>
       <source>There is not enough save permissions</source>
-      <translation type="unfinished">There is not enough save permissions</translation>
+      <translation>Brak wystarczających uprawnień do zapisywania</translation>
     </message>
     <message>
       <source>Device %1 not found</source>
@@ -212,31 +212,31 @@
     </message>
     <message>
       <source>There is no license for camera %1</source>
-      <translation type="unfinished">There is no license for camera %1</translation>
+      <translation>Brak licencji dla kamery %1</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s attributes.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s attributes.</translation>
+      <translation>Użytkownik &apos;%1(%2)&apos; nie ma uprawnień do modyfikowania atrybutów Serwera.</translation>
     </message>
     <message>
       <source>User %1 with %2 permissions has no %3 permissions.</source>
-      <translation type="unfinished">User %1 with %2 permissions has no %3 permissions.</translation>
+      <translation>Użytkownik %1 z uprawnieniami %2 nie ma uprawnień %3.</translation>
     </message>
     <message>
       <source>User %1 does not have %2 access to %3.</source>
-      <translation type="unfinished">User %1 does not have %2 access to %3.</translation>
+      <translation>Użytkownik %1 nie ma dostępu %2 do %3.</translation>
     </message>
     <message>
       <source>Resource %1 does not exist.</source>
-      <translation type="unfinished">Resource %1 does not exist.</translation>
+      <translation>Zasób %1 nie istnieje.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to create a new Server.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to create a new Server.</translation>
+      <translation>Użytkownik &apos;%1(%2)&apos; nie ma uprawnień do utworzenia nowego serwera.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s settings.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s settings.</translation>
+      <translation>Użytkownik &apos;%1(%2)&apos; nie ma uprawnień do modyfikowania ustawień Serwera.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2) is not permitted to create new User Groups.&apos;</source>
@@ -244,49 +244,49 @@
     </message>
     <message>
       <source>Creation of a non-local (%1) User Group is forbidden for VMS.</source>
-      <translation type="unfinished">Creation of a non-local (%1) User Group is forbidden for VMS.</translation>
+      <translation>Tworzenie nielokalnej (%1) grupy użytkowników jest zabronione dla VMS.</translation>
     </message>
     <message>
       <source>Cannot modify the built-in User Group %1(%2).</source>
-      <translation type="unfinished">Cannot modify the built-in User Group %1(%2).</translation>
+      <translation>Nie można modyfikować wbudowanej grupy użytkowników %1(%2).</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</translation>
+      <translation>Użytkownik &apos;%1(%2)&apos; nie ma uprawnień do modyfikowania grupy użytkowników &apos;%3(%4)&apos; z uprawnieniami &apos;%5&apos;.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to delete User Groups.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to delete User Groups.</translation>
+      <translation>Użytkownik &apos;%1(%2)&apos; nie ma uprawnień do usuwania grup użytkowników.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to delete the User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to delete the User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</translation>
+      <translation>Użytkownik &apos;%1(%2)&apos; nie ma uprawnień do usunięcia grupy użytkowników &apos;%3(%4)&apos; z uprawnieniami &apos;%5&apos;.</translation>
     </message>
     <message>
       <source>Removing User Group is forbidden because it is still used by &apos;%1&apos;.</source>
-      <translation type="unfinished">Removing User Group is forbidden because it is still used by &apos;%1&apos;.</translation>
+      <translation>Usunięcie grupy użytkowników jest zabronione, ponieważ jest ona nadal używana przez &apos;%1&apos;.</translation>
     </message>
     <message>
       <source>Removing User Group is forbidden because it is still inherited by &apos;%1&apos;.</source>
-      <translation type="unfinished">Removing User Group is forbidden because it is still inherited by &apos;%1&apos;.</translation>
+      <translation>Usunięcie grupy użytkowników jest zabronione, ponieważ wciąż jest ona dziedziczona przez &apos;%1&apos;.</translation>
     </message>
     <message>
       <source>Cannot delete the built-in User Group %1(%2).</source>
-      <translation type="unfinished">Cannot delete the built-in User Group %1(%2).</translation>
+      <translation>Nie można usunąć wbudowanej grupy użytkowników %1(%2).</translation>
     </message>
     <message>
       <source>User %1 is not allowed to modify the Showreel with parentId %2.</source>
-      <translation type="unfinished">User %1 is not allowed to modify the Showreel with parentId %2.</translation>
+      <translation>Użytkownik %1 nie może modyfikować Showreel z nadrzędnym ID %2.</translation>
     </message>
     <message>
       <source>Modifying of %1 entries out of %2 is not allowed for %3.</source>
       <comment>%3 is a C++ type name</comment>
-      <translation type="unfinished">Modifying of %1 entries out of %2 is not allowed for %3.</translation>
+      <translation>Modyfikacja %1 wpisów spośród %2 nie jest dozwolone dla %3.</translation>
     </message>
     <message>
       <source>%1 storage can be only in the backup storage pool.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 storage can be only in the backup storage pool.</translation>
+      <translation>%1 magazyn może znajdować się tylko w puli pamięci kopii zapasowych.</translation>
     </message>
     <message>
       <source>Changing storage URL is prohibited.</source>

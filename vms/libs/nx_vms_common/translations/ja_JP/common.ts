@@ -2230,7 +2230,7 @@
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
       <comment> is detected</comment>
-      <translation>カメラ &apos;%2&apos; の %1</translation>
+      <translation>カメラ &apos;%2&apos; での %1 検出</translation>
     </message>
     <message>
       <source>Plugin: %1</source>
