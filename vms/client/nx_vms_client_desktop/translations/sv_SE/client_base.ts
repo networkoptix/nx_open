@@ -5513,7 +5513,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Cannot find compatible client version: %1</source>
-      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+      <translation>Kan inte hitta kompatibel klientversion: %1</translation>
     </message>
   </context>
   <context>

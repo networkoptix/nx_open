@@ -5638,7 +5638,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cannot find compatible client version: %1</source>
-      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+      <translation>Nie można znaleźć kompatybilnej wersji klienta: %1</translation>
     </message>
   </context>
   <context>

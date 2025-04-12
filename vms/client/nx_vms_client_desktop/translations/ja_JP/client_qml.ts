@@ -987,11 +987,11 @@ Select an Integration to begin configuring its parameters.</source>
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the site level, group members have permissions to:</source>
-      <translation>グループメンバーには以下のサイトレベルの行動を許可します:</translation>
+      <translation>グループメンバーに対して、以下のサイトレベルの行動を許可します:</translation>
     </message>
     <message>
       <source>At the site level, the user has permissions to:</source>
-      <translation>当ユーザーには以下のサイトレベルの行動を許可します:</translation>
+      <translation>このユーザーに対して、以下のサイトレベルの行動を許可します:</translation>
     </message>
   </context>
   <context>

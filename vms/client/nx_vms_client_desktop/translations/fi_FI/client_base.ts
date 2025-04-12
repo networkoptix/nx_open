@@ -4986,7 +4986,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Sivusto jäädytetty</translation>
     </message>
     <message>
       <source>Site shut down</source>
@@ -5513,7 +5513,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Cannot find compatible client version: %1</source>
-      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+      <translation>Yhteensopivaa client-versiota ei löydy: %1</translation>
     </message>
   </context>
   <context>

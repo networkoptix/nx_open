@@ -1151,7 +1151,7 @@
     <name>nx::vms::rules::StorageIssueEvent</name>
     <message>
       <source>Storage Issue at %1</source>
-      <translation>%1のストレージ障害</translation>
+      <translation>%1 のストレージ障害</translation>
     </message>
     <message>
       <source>Storage Issue</source>

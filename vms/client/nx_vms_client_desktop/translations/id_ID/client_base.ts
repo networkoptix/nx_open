@@ -5450,7 +5450,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Cannot find compatible client version: %1</source>
-      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+      <translation>Tidak dapat menemukan versi klien yang kompatibel: %1</translation>
     </message>
   </context>
   <context>

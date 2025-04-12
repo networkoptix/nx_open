@@ -5450,7 +5450,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cannot find compatible client version: %1</source>
-      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+      <translation>互換性のあるクライアントバージョンが見つかりません: %1</translation>
     </message>
   </context>
   <context>
@@ -8223,7 +8223,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Exported: %1</source>
       <comment>Duration will be substituted</comment>
-      <translation>エクスポート完了: %1</translation>
+      <translation>エクスポート日: %1</translation>
     </message>
   </context>
   <context>
