@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 
 def parse():
     output = subprocess.check_output(
-        ["/usr/libexec/PlistBuddy", "-x", "-c", "print IDEProvisioningTeams",
+        ["/usr/libexec/PlistBuddy", "-x", "-c", "print IDEProvisioningTeamByIdentifier",
          f"{os.environ['HOME']}/Library/Preferences/com.apple.dt.Xcode.plist"])
 
     for e in ET.fromstring(output).findall('dict/array/dict'):
