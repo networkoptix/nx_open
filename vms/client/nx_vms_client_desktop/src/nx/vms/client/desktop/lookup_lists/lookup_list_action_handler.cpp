@@ -39,40 +39,6 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-LookupListDataList exampleData()
-{
-    LookupListDataList result;
-
-    LookupListData e1;
-    e1.id = nx::Uuid::createUuid();
-    e1.name = "Numbers";
-    e1.attributeNames.push_back("Number");
-    e1.attributeNames.push_back("Color");
-    e1.entries = {
-        { {"Number", "12345"}, {"Color", "red"} },
-        { {"Number", "67890"} },
-        { {"Color", "blue"} }
-    };
-    result.push_back(e1);
-
-    LookupListData e2;
-    e2.id = nx::Uuid::createUuid();
-    e2.name = "Values";
-    e2.attributeNames.push_back("Value");
-    e2.entries = {
-        { {"Value", "0"} },
-        { {"Value", "1"} },
-        { {"Value", "2"} },
-        { {"Value", "3"} },
-        { {"Value", "4"} },
-        { {"Value", "5"} },
-        { {"Value", "6"} }
-    };
-    result.push_back(e2);
-
-    return result;
-}
-
 constexpr auto kMaxRequestAttemptCount = 5;
 
 } // namespace
@@ -399,7 +365,7 @@ void LookupListActionHandler::openLookupListEditDialog()
     LookupListData data;
     data.objectTypeId = params.argument(Qn::AnalyticsObjectTypeIdRole).toString();
     data.id = nx::Uuid::createUuid();
-    LookupListModel sourceModel(data);
+    auto sourceModel = new LookupListModel(data);
 
     auto taxonomy = systemContext()->taxonomyManager()->createStateView();
     const auto parentWidget = utils::extractParentWidget(params, mainWindowWidget());
@@ -407,8 +373,9 @@ void LookupListActionHandler::openLookupListEditDialog()
         taxonomy,
         // If there is argument Qn::AnalyticsObjectTypeIdRole, open LookupListEditDialog with
         // specified type otherwise, any type of list is allowed.
-        params.hasArgument(Qn::AnalyticsObjectTypeIdRole) ? &sourceModel : nullptr,
+        params.hasArgument(Qn::AnalyticsObjectTypeIdRole) ? sourceModel : nullptr,
         parentWidget);
+    sourceModel->setParent(dialog);
 
     connect(
         dialog,
