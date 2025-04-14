@@ -85,6 +85,7 @@ T.TextField
 
     leftPadding: 8
     rightPadding: 8
+    topPadding: 1 //< Adjustment to make text pixel-aligned.
 
     verticalAlignment: TextInput.AlignVCenter
     font.pixelSize: 14

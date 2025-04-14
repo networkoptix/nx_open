@@ -25,6 +25,7 @@ RowLayout
         id: textField
 
         Layout.fillWidth: true
+        Layout.alignment: Qt.AlignBaseline
         focus: true
         enabled: !autoCheckBox.checked
 
