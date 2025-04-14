@@ -190,6 +190,8 @@ public:
 
     NetworkModule* networkModule() const;
 
+    RemoteSessionTimeoutWatcher* sessionTimeoutWatcher() const;
+
 signals:
     void remoteIdChanged(const nx::Uuid& id);
 

@@ -26,19 +26,4 @@ void SystemContext::Private::initializeIoPortsInterface()
         ioPortsInterface = std::make_unique<IoPortsCompatibilityInterface_latest>(q);
 }
 
-void SystemContext::Private::initializeNetworkModule()
-{
-    if (appContext()->commonFeatures().flags.testFlag(
-        common::ApplicationContext::FeatureFlag::networking))
-    {
-        networkModule = std::make_unique<NetworkModule>(q);
-        const auto settings = appContext()->coreSettings();
-        connect(&settings->certificateValidationLevel, &Settings::BaseProperty::changed, q,
-            [this](nx::utils::property_storage::BaseProperty* /*property*/)
-            {
-                networkModule->reinitializeCertificateStorage();
-            });
-    }
-}
-
 } // namespace nx::vms::client::core

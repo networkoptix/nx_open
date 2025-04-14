@@ -293,7 +293,7 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
     // ACS clients display only fixed part of the archive, so they look quite safe.
     if (qnRuntime->isDesktopMode())
     {
-        auto sessionTimeoutWatcher = system()->networkModule()->sessionTimeoutWatcher();
+        auto sessionTimeoutWatcher = system()->sessionTimeoutWatcher();
         connect(sessionTimeoutWatcher, &RemoteSessionTimeoutWatcher::sessionExpired, this,
             [this](RemoteSessionTimeoutWatcher::SessionExpirationReason reason)
             {

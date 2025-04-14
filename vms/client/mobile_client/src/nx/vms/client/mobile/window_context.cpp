@@ -9,17 +9,20 @@
 #include <mobile_client/mobile_client_uri_handler.h>
 #include <nx/build_info.h>
 #include <nx/network/address_resolver.h>
-#include <nx/network/socket_global.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
+#include <nx/network/socket_global.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
+#include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/mobile/application_context.h>
-#include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
-#include <nx/vms/client/mobile/system_context.h>
-#include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/maintenance/remote_log_manager.h>
+#include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
+#include <nx/vms/client/mobile/session/session_manager.h>
+#include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <ui/texture_size_helper.h>
 #include <ui/window_utils.h>
@@ -172,6 +175,22 @@ SystemContext* WindowContext::createSystemContext()
         core::SystemContext::Mode::client,
         d->peerId);
     appContext()->addSystemContext(d->systemContext.get());
+
+    connect(d->systemContext->sessionTimeoutWatcher(),
+        &core::RemoteSessionTimeoutWatcher::sessionExpired,
+        this,
+        nx::utils::guarded(this,
+            [this](core::RemoteSessionTimeoutWatcher::SessionExpirationReason)
+            {
+                const auto manager = sessionManager();
+                if (!manager)
+                    return;
+
+                manager->stopSessionByUser();
+    //                emit m_context->showMessage(
+    //                    tr("Your session has expired"),
+    //                    tr("Session duration limit can be changed by the site administrators"));
+            }));
 
     emit mainSystemContextChanged();
     return d->systemContext.get();

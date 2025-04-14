@@ -21,6 +21,7 @@
 #include <nx/vms/client/core/media/voice_spectrum_analyzer.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/local_network_interfaces_manager.h>
+#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/session_token_terminator.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_data_provider.h>
@@ -154,6 +155,18 @@ struct ApplicationContext::Private
             analytics::IconManager::librariesRoot() + "bytedance.iconpark/");
     }
 
+    void initializeNetworkModule()
+    {
+        sessionTokenTerminator = std::make_unique<SessionTokenTerminator>();
+        networkModule = std::make_unique<NetworkModule>(q);
+        const auto settings = q->coreSettings();
+        connect(&settings->certificateValidationLevel, &Settings::BaseProperty::changed, q,
+            [this](nx::utils::property_storage::BaseProperty* /*property*/)
+            {
+                networkModule->reinitializeCertificateStorage();
+            });
+    }
+
     ApplicationContext* const q;
     const ApplicationContext::Mode mode;
     const Qn::SerializationFormat format;
@@ -174,6 +187,7 @@ struct ApplicationContext::Private
     std::unique_ptr<LocalNetworkInterfacesManager> localNetworkInterfacesManager;
     std::unique_ptr<watchers::KnownServerConnections> knownServerConnectionsWatcher;
     std::unique_ptr<SessionTokenTerminator> sessionTokenTerminator;
+    std::unique_ptr<NetworkModule> networkModule;
     std::unique_ptr<SystemsVisibilityManager> systemsVisibilityManager;
 
     QString customExternalResourceFile;
@@ -245,7 +259,7 @@ ApplicationContext::ApplicationContext(
     }
 
     if (features.base.flags.testFlag(CommonFeatureFlag::networking))
-        d->sessionTokenTerminator = std::make_unique<SessionTokenTerminator>();
+        d->initializeNetworkModule();
 
     ApplicationContextQmlInitializer::storeToQmlContext(this);
 }
@@ -442,13 +456,18 @@ void ApplicationContext::removeSystemContext(SystemContext* systemContext)
 void ApplicationContext::addMainContext(SystemContext* mainContext)
 {
     NX_ASSERT(d->systemContexts.empty()); //< Main context should be first.
-    d->systemContexts.push_back(mainContext);
+    addSystemContext(mainContext);
 }
 
 bool ApplicationContext::isCertificateValidationLevelStrict() const
 {
     return coreSettings()->certificateValidationLevel()
         == network::server_certificate::ValidationLevel::strict;
+}
+
+NetworkModule* ApplicationContext::networkModule() const
+{
+    return d->networkModule.get();
 }
 
 SessionTokenTerminator* ApplicationContext::sessionTokenTerminator() const

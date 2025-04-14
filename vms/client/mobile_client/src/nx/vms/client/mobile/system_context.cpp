@@ -14,6 +14,7 @@
 #include <nx/branding.h>
 #include <nx/client/mobile/software_trigger/event_rules_watcher.h>
 #include <nx/client/mobile/two_way_audio/server_audio_connection_watcher.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/event_search/models/analytics_search_list_model.h>
@@ -25,22 +26,21 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
-#include <nx/vms/client/core/system_logon/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/core/resource/resource_processor.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource_searcher.h>
+#include <nx/vms/client/core/system_logon/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/mobile/application_context.h>
-#include <nx/vms/client/mobile/system_context.h>
-#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/client/mobile/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
+#include <nx/vms/client/mobile/system_context.h>
+#include <nx/vms/client/mobile/ui/detail/screens.h>
 #include <nx/vms/client/mobile/ui/qml_wrapper_helper.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
-#include <nx/vms/client/mobile/ui/detail/screens.h>
+#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/discovery/manager.h>
-#include <nx/utils/guarded_callback.h>
 #include <ui/camera_thumbnail_provider.h>
 #include <watchers/available_cameras_watcher.h>
 
@@ -49,14 +49,14 @@ namespace nx::vms::client::mobile {
 namespace {
 static const nx::utils::SoftwareVersion kObjectSearchMinimalSupportVersion(5, 0);
 
-void initializeConnectionUserInteractionDelegate(WindowContext* windowContext,
-    SystemContext* systemContext)
+void initializeConnectionUserInteractionDelegate(SystemContext* systemContext)
 {
     using namespace nx::vms::client::core;
     using Delegate = nx::vms::client::core::RemoteConnectionUserInteractionDelegate;
 
     const auto validateToken =
-        [windowContext](const nx::network::http::Credentials& credentials)
+        [windowContext = systemContext->windowContext()](
+            const nx::network::http::Credentials& credentials)
         {
             return windowContext->uiController()->screens()->show2faValidationScreen(credentials);
         };
@@ -188,25 +188,7 @@ SystemContext::SystemContext(WindowContext* context,
         std::make_unique<nx::client::mobile::ServerAudioConnectionWatcher>(
             windowContext()->sessionManager(), this);
 
-    connect(networkModule()->sessionTimeoutWatcher(),
-        &core::RemoteSessionTimeoutWatcher::sessionExpired,
-        this,
-        nx::utils::guarded(this,
-            [this](core::RemoteSessionTimeoutWatcher::SessionExpirationReason)
-            {
-                const auto manager = windowContext()->sessionManager();
-                if (!manager)
-                    return;
-
-                manager->stopSessionByUser();
-//                emit m_context->showMessage(
-//                    tr("Your session has expired"),
-//                    tr("Session duration limit can be changed by the site administrators"));
-            }));
-
     d->twoWayAudioController = std::make_unique<core::TwoWayAudioController>(this);
-
-    //
 
     const auto updateTimeMode =
         [this]()
@@ -263,7 +245,7 @@ SystemContext::SystemContext(WindowContext* context,
     engine->addImageProvider("thumbnail", thumbnailProvider);
     engine->addImageProvider("active", activeCameraThumbnailProvider);
 
-    initializeConnectionUserInteractionDelegate(context, this);
+    initializeConnectionUserInteractionDelegate(this);
 }
 
 SystemContext::~SystemContext()

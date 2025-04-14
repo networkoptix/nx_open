@@ -460,8 +460,6 @@ CloudLayoutsManager::CloudLayoutsManager(QObject* parent):
         {
             d->setCloudStatus(status);
         });
-
-    appContext()->addSystemContext(d->systemContext.get());
 }
 
 CloudLayoutsManager::~CloudLayoutsManager()

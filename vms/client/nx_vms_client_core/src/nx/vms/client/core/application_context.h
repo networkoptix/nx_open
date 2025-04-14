@@ -23,6 +23,7 @@ namespace nx::vms::client::core {
 class ColorTheme;
 class CloudStatusWatcher;
 class FontConfig;
+class NetworkModule;
 class Skin;
 class Settings;
 class SystemContext;
@@ -176,12 +177,16 @@ public:
     /** Provider of input audio data from the system microphone. */
     virtual std::unique_ptr<QnAbstractStreamDataProvider> createAudioInputProvider() const;
 
+    NetworkModule* networkModule() const;
+
+    // Temporary workaround: needed until we have a single main SystemContext for all connections.
+    void addMainContext(SystemContext* mainContext);
+
 signals:
     void systemContextAdded(SystemContext* systemContext);
     void systemContextRemoved(SystemContext* systemContext);
 
 protected:
-    void addMainContext(SystemContext* mainContext);
 
     void storeFontConfig(FontConfig* config);
 

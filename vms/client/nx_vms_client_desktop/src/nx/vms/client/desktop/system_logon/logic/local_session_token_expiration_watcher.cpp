@@ -22,7 +22,7 @@ LocalSessionTokenExpirationWatcher::LocalSessionTokenExpirationWatcher(
     SystemContextAware(context),
     m_notificationManager(notificationManager)
 {
-    auto sessionTimeoutWatcher = systemContext()->networkModule()->sessionTimeoutWatcher();
+    auto sessionTimeoutWatcher = systemContext()->sessionTimeoutWatcher();
 
     connect(
         sessionTimeoutWatcher,
@@ -73,7 +73,7 @@ void LocalSessionTokenExpirationWatcher::notify(std::chrono::minutes timeLeft)
         [this](nx::Uuid notificationId)
         {
             if (notificationId == m_notification)
-                systemContext()->networkModule()->sessionTimeoutWatcher()->notificationHiddenByUser();
+                systemContext()->sessionTimeoutWatcher()->notificationHiddenByUser();
         });
 
     connect(

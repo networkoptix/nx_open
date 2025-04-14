@@ -41,6 +41,7 @@
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/analytics/object_display_settings.h>
+#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/resource/resource_processor.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource_searcher.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
@@ -78,6 +79,7 @@
 #include <nx/vms/client/desktop/style/old_style.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
+#include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <nx/vms/client/desktop/ui/image_providers/resource_icon_provider.h>
 #include <nx/vms/client/desktop/utils/applauncher_guard.h>
@@ -341,7 +343,6 @@ struct ApplicationContext::Private
     const Mode mode;
     const QnStartupParameters startupParameters;
     std::optional<nx::utils::SoftwareVersion> overriddenVersion;
-    std::vector<QPointer<SystemContext>> systemContexts;
     std::vector<QPointer<WindowContext>> windowContexts;
     std::unique_ptr<SystemContext> mainSystemContext; //< Main System Context;
     std::unique_ptr<core::UnifiedResourcePool> unifiedResourcePool;
@@ -574,11 +575,18 @@ struct ApplicationContext::Private
                 : SystemContext::Mode::client,
             peerId);
 
-        q->addSystemContext(mainSystemContext.get());
+        q->addMainContext(mainSystemContext.get());
 
         if (mode == Mode::desktopClient)
         {
             mainSystemContext->createMessageProcessor<QnDesktopClientMessageProcessor>(q);
+        }
+
+        if (auto networkModule = q->networkModule())
+        {
+            networkModule->connectionFactory()->setUserInteractionDelegate(
+                createConnectionUserInteractionDelegate(mainSystemContext.get(),
+                    []() { return appContext()->mainWindowContext()->mainWindowWidget(); }));
         }
     }
 
@@ -798,9 +806,11 @@ ApplicationContext::~ApplicationContext()
     // Local resources context temporary implementation depends on main system context.
     d->localResourcesContext.reset();
 
-    // Remote session must be fully destroyed while application context still exists.
-    d->mainSystemContext.reset();
     d->cloudLayoutsManager.reset();
+
+    // Remote session must be fully destroyed while application context still exists.
+    removeSystemContext(d->mainSystemContext.get());
+    d->mainSystemContext.reset();
 
     // Web Page icon cache uses application context.
     d->webPageDataCache.reset();

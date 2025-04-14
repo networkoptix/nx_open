@@ -8,10 +8,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/rules/client_router.h>
@@ -60,7 +60,8 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
                 /*separateThread*/ false);
             d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
             d->videoCache = std::make_unique<VideoCache>(this);
-            d->initializeNetworkModule();
+            d->sessionTimeoutWatcher =
+                std::make_unique<RemoteSessionTimeoutWatcher>(globalSettings());
             break;
         }
         case Mode::crossSystem:
@@ -72,13 +73,11 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
             if (ini().allowCslObjectSearch)
                 d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
-            d->initializeNetworkModule();
             break;
         }
 
         case Mode::cloudLayouts:
         case Mode::unitTests:
-            d->initializeNetworkModule();
             break;
         case Mode::server:
             NX_CRITICAL(mode != Mode::server, "Client context cannot be of server type");
@@ -121,12 +120,17 @@ nx::vms::api::ModuleInformation SystemContext::moduleInformation() const
 
 void SystemContext::setSession(std::shared_ptr<RemoteSession> session)
 {
+    if (d->sessionTimeoutWatcher)
+        d->sessionTimeoutWatcher->sessionStopped();
+
     {
         NX_MUTEX_LOCKER lock(&d->sessionMutex);
         NX_ASSERT(!d->connection);
         // Make sure existing session will be terminated outside of the mutex.
         std::swap(d->session, session);
     }
+    if (d->session && d->sessionTimeoutWatcher)
+        d->sessionTimeoutWatcher->sessionStarted(d->session);
 
     d->initializeIoPortsInterface();
 
@@ -318,7 +322,12 @@ IoPortsCompatibilityInterface* SystemContext::ioPortsInterface() const
 
 NetworkModule* SystemContext::networkModule() const
 {
-    return d->networkModule.get();
+    return appContext()->networkModule();
+}
+
+RemoteSessionTimeoutWatcher* SystemContext::sessionTimeoutWatcher() const
+{
+    return d->sessionTimeoutWatcher.get();
 }
 
 void SystemContext::resetAccessController(AccessController* accessController)

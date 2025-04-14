@@ -6,7 +6,6 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/core/system_context_aware.h>
 
 namespace nx::vms::api { enum class PeerType; }
 
@@ -19,19 +18,16 @@ class RemoteConnectionFactory;
  * Single storage place for all network-related classes intances in the client core.
  * Maintains their lifetime, internal dependencies and construction / destruction order.
  */
-class NX_VMS_CLIENT_CORE_API NetworkModule: public QObject,
-    public SystemContextAware
+class NX_VMS_CLIENT_CORE_API NetworkModule: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    NetworkModule(SystemContext* systemContext, QObject* parent = nullptr);
+    NetworkModule(QObject* parent = nullptr);
     virtual ~NetworkModule();
 
     RemoteConnectionFactory* connectionFactory() const;
-
-    RemoteSessionTimeoutWatcher* sessionTimeoutWatcher() const;
 
     std::shared_ptr<RemoteSession> session() const;
     void setSession(std::shared_ptr<RemoteSession> session);

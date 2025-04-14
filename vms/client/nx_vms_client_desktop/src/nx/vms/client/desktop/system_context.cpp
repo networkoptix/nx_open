@@ -65,19 +65,6 @@ nx::vms::api::RuntimeData createLocalRuntimeInfo(SystemContext* q)
     return runtimeData;
 }
 
-void initializeConnectionUserInteractionDelegate(SystemContext* q)
-{
-    if (auto networkModule = q->networkModule())
-    {
-        networkModule->connectionFactory()->setUserInteractionDelegate(
-            createConnectionUserInteractionDelegate(q,
-                []()
-                {
-                    return appContext()->mainWindowContext()->mainWindowWidget();
-                }));
-    }
-}
-
 } // namespace
 
 SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
@@ -137,14 +124,12 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->serverRemoteAccessWatcher = std::make_unique<ServerRemoteAccessWatcher>(this);
             d->userNotificationSettingsManager =
                 std::make_unique<UserNotificationSettingsManager>(this);
-            initializeConnectionUserInteractionDelegate(this);
             break;
 
         case Mode::crossSystem:
             d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
             d->mediaServerStatisticsManager = std::make_unique<QnMediaServerStatisticsManager>(
                 this);
-            initializeConnectionUserInteractionDelegate(this);
             break;
 
         case Mode::cloudLayouts:
@@ -161,18 +146,6 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             if (d->virtualCameraManager)
                 d->virtualCameraManager->setCurrentUser(user);
         });
-
-    if (appContext()->commonFeatures().flags.testFlag(
-        common::ApplicationContext::FeatureFlag::networking))
-    {
-        networkModule()->connectionFactory()->setUserInteractionDelegate(
-            createConnectionUserInteractionDelegate(
-                this,
-                [this]()
-                {
-                    return appContext()->mainWindowContext()->mainWindowWidget();
-                }));
-    }
 }
 
 SystemContext::~SystemContext()
