@@ -253,7 +253,7 @@ void CameraScheduleWidget::loadState(const CameraSettingsDialogState& state)
     ui->recordingThresholdGroupBox->setToolTip(recordingThresholdGroupBoxTooltip);
 
     const bool settingsNotAvailableDueSaasState = state.saasShutDown || state.saasSuspended;
-    ui->enableRecordingCheckBox->setCanBeChecked(!settingsNotAvailableDueSaasState);
+    updateEnableRecordingCheckBox(state);
     ui->scheduleSettingsWidget->setEnabled(recordingEnabled && !settingsNotAvailableDueSaasState);
     setLayoutEnabled(ui->recordingScheduleLayout,
         recordingEnabled && !settingsNotAvailableDueSaasState);
