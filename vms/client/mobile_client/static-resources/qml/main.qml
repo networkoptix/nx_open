@@ -150,7 +150,7 @@ Controls.ApplicationWindow
             if (Qt.platform.os != "android")
                 return
 
-            var barSize = windowContext.ui.measurements.navigationBarSize()
+            var barSize = windowContext.ui.windowHelpers.navigationBarSize()
             var barType = windowContext.ui.windowHelpers.navigationBarType()
 
             if (barSize == lastBarSize && lastBarType == barType)
