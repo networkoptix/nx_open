@@ -276,6 +276,11 @@ void ValuesText::updateTextRow()
 {
     QTextLayout layout;
     layout.setFont(d->document.defaultFont());
+
+    QTextOption option;
+    option.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+    layout.setTextOption(option);
+
     qreal textHeight = 0;
     qreal availableWidth = width();
     qreal appendixWidth = 0;
