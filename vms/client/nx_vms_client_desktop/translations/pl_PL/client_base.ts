@@ -6951,11 +6951,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
       <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
-      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+      <translation>%1 więcej usług przechowywania w chmurze jest wymagane, aby aktywować kopię zapasową dla wszystkich wybranych urządzeń</translation>
     </message>
     <message>
       <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
-      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+      <translation>Nadal jednak możesz używać wspólnego przełącznika, aby włączyć kopie zapasowe dla tych kamer, dla których jest to możliwe</translation>
     </message>
     <message>
       <source>Backup will not be activated for %1 devices: </source>
@@ -6963,7 +6963,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
+      <translation>%1 odpowiednich usług przechowywania w chmurze jest wymagane, aby aktywować kopię zapasową.</translation>
     </message>
   </context>
   <context>
@@ -7308,7 +7308,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
-      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+      <translation>Wykryto urządzenie z funkcją Pan, Tilt i/lub Zoom. Jakakolwiek zmiana pola widzenia poprzez zastosowanie ustawień wstępnych lub ruchów może spowodować, że hotspot nie będzie już istotny.</translation>
     </message>
   </context>
   <context>
@@ -7335,7 +7335,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use this link to add the camera to another site</source>
-      <translation type="unfinished">Use this link to add the camera to another site</translation>
+      <translation>Użyj tego łącza, aby dodać kamerę do innej witryny</translation>
     </message>
   </context>
   <context>
