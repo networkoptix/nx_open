@@ -12749,7 +12749,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 filename length is more than %2 characters.</source>
       <comment>%1 is file name</comment>
-      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
+      <translation>Длина имени файла %1 превышает %2 символов.</translation>
     </message>
   </context>
   <context>
