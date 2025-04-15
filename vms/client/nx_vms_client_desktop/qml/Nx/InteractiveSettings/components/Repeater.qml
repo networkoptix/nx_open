@@ -14,6 +14,8 @@ import "../settings.js" as Settings
 Item
 {
     id: control
+
+    property string name: ""
     property string addButtonCaption: ""
     property string deleteButtonCaption: ""
 

@@ -11,7 +11,9 @@ Rectangle
 {
     id: separator
 
+    property string name: ""
     property bool fillWidth: true
+
     implicitHeight: 1
     color: ColorTheme.dark
 }
