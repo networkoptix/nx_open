@@ -78,7 +78,7 @@
     </message>
     <message>
       <source>Removal of the User with readonly attribute is forbidden for VMS</source>
-      <translation type="unfinished">Removal of the User with readonly attribute is forbidden for VMS</translation>
+      <translation>Удаление пользователя с атрибутом «только для чтения» запрещено для VMS</translation>
     </message>
     <message>
       <source>Removal of the User with Groups in an Organization is controlled by the %1</source>
