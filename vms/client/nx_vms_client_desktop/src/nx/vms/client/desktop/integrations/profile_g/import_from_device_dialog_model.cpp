@@ -26,37 +26,34 @@ enum Columns
     ColumnCount
 };
 
-enum class State
-{
-    allImported,
-    inProgress,
-    disabled,
-    error
-};
+using StateCode = nx::vms::api::RemoteArchiveSynchronizationStateCode;
 
 struct DeviceData
 {
-    State state = State::allImported;
+    StateCode state = StateCode::disabled;
     QDate importedUpTo;
     std::chrono::milliseconds importTimeLeft{0};
 };
 
-State convertState(nx::vms::api::RemoteArchiveSynchronizationStateCode code)
+QString toDurationString(std::chrono::milliseconds value)
 {
-    switch (code)
-    {
-        case nx::vms::api::RemoteArchiveSynchronizationStateCode::idle:
-            return State::allImported;
-        case nx::vms::api::RemoteArchiveSynchronizationStateCode::inProgress:
-            return State::inProgress;
-        case nx::vms::api::RemoteArchiveSynchronizationStateCode::disabled:
-            return State::disabled;
-        case nx::vms::api::RemoteArchiveSynchronizationStateCode::error:
-            return State::error;
-    }
+    const auto days = std::chrono::duration_cast<std::chrono::days>(value);
+    const auto hours = std::chrono::duration_cast<std::chrono::hours>(value - days);
+    const auto minutes = std::chrono::duration_cast<std::chrono::minutes>(value - days - hours);
 
-    NX_ASSERT(false, "Unexpected archive sync state code");
-    return State::error;
+    constexpr int kWidth = 2;
+    constexpr int kBase = 10;
+    constexpr QChar kFillChar('0');
+
+    if (days.count() > 0)
+    {
+        return QString("%1d %2h")
+            .arg(days.count(), kWidth, kBase, kFillChar)
+            .arg(hours.count(), kWidth, kBase, kFillChar);
+    }
+    return QString("%1h %2m")
+        .arg(hours.count(), kWidth, kBase, kFillChar)
+        .arg(minutes.count(), kWidth, kBase, kFillChar);
 }
 
 } // namespace
@@ -122,10 +119,7 @@ QString ImportFromDeviceDialogModel::Private::getImportedUpToText(const QModelIn
     const QString kNoData = ImportFromDeviceDialogModel::tr("No data");
 
     const auto iter = getDeviceDataIter(index);
-    if (iter == deviceData.end())
-        return kNoData;
-
-    if (State::disabled == iter->second.state)
+    if (iter == deviceData.end() || iter->second.importedUpTo.isNull())
         return kNoData;
 
     return nx::vms::time::toString(iter->second.importedUpTo, nx::vms::time::Format::dd_MMMM_yyyy);
@@ -133,7 +127,7 @@ QString ImportFromDeviceDialogModel::Private::getImportedUpToText(const QModelIn
 
 QString ImportFromDeviceDialogModel::Private::getStatusText(const QModelIndex& index) const
 {
-    State state = State::disabled;
+    StateCode state = StateCode::disabled;
 
     const auto iter = getDeviceDataIter(index);
     if (iter != deviceData.end())
@@ -141,24 +135,22 @@ QString ImportFromDeviceDialogModel::Private::getStatusText(const QModelIndex& i
 
     switch (state)
     {
-        case State::allImported:
+        case StateCode::enabled:
         {
-            return ImportFromDeviceDialogModel::tr("All imported");
+            return ImportFromDeviceDialogModel::tr("Enabled");
         }
-        case State::inProgress:
+        case StateCode::inProgress:
         {
             NX_ASSERT(iter != deviceData.end());
-            const auto timeLeftString = nx::vms::time::toDurationString(
-                iter->second.importTimeLeft,
-                nx::vms::time::Duration::hh_mm);
+            const auto timeLeftString = toDurationString(iter->second.importTimeLeft);
 
             return ImportFromDeviceDialogModel::tr("In progress... (%1 left)").arg(timeLeftString);
         }
-        case State::disabled:
+        case StateCode::disabled:
         {
             return ImportFromDeviceDialogModel::tr("Disabled");
         }
-        case State::error:
+        case StateCode::error:
         {
             return ImportFromDeviceDialogModel::tr("Error");
         }
@@ -174,7 +166,7 @@ QString ImportFromDeviceDialogModel::Private::getTooltipText(const QModelIndex& 
         return {};
 
     const auto iter = getDeviceDataIter(index);
-    if (iter != deviceData.end() && iter->second.state == State::error)
+    if (iter != deviceData.end() && iter->second.state == StateCode::error)
         return ImportFromDeviceDialogModel::tr("Failed to import. Retry in 1 minute.");
 
     return {};
@@ -182,7 +174,7 @@ QString ImportFromDeviceDialogModel::Private::getTooltipText(const QModelIndex& 
 
 QColor ImportFromDeviceDialogModel::Private::getCellColor(const QModelIndex& index) const
 {
-    State state = State::disabled;
+    StateCode state = StateCode::disabled;
 
     const auto iter = getDeviceDataIter(index);
     if (iter != deviceData.end())
@@ -190,16 +182,16 @@ QColor ImportFromDeviceDialogModel::Private::getCellColor(const QModelIndex& ind
 
     switch (state)
     {
-        case State::allImported:
-        case State::inProgress:
+        case StateCode::enabled:
+        case StateCode::inProgress:
         {
             return colorTheme()->color("light10");
         }
-        case State::disabled:
+        case StateCode::disabled:
         {
             return colorTheme()->color("dark17");
         }
-        case State::error:
+        case StateCode::error:
         {
             return index.column() == StatusColumn
                 ? colorTheme()->color("red")
@@ -231,11 +223,14 @@ void ImportFromDeviceDialogModel::setData(
         const auto timeMs = duration_cast<milliseconds>(
             deviceStatus.importedPositionMs.time_since_epoch());
 
-        const auto dateTime = QDateTime::fromMSecsSinceEpoch(timeMs.count());
+        // Zero time means that the value is not set.
+        const auto importedUpTo = timeMs.count() > 0
+            ? QDateTime::fromMSecsSinceEpoch(timeMs.count()).date()
+            : QDate();
 
         d->deviceData[deviceStatus.getId().deviceId] = DeviceData{
-                .state = convertState(deviceStatus.code),
-                .importedUpTo = dateTime.date(),
+                .state = deviceStatus.code,
+                .importedUpTo = importedUpTo,
                 .importTimeLeft = deviceStatus.durationToImportMs
             };
     }

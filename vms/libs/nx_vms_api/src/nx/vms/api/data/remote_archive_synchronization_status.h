@@ -11,7 +11,7 @@
 namespace nx::vms::api {
 
 NX_REFLECTION_ENUM_CLASS(RemoteArchiveSynchronizationStateCode,
-    idle, /**<%apidoc Stopped because recording (but not import) has been disabled. */
+    enabled, /**<%apidoc Import from device is enabled, but not in progress. */
     inProgress,
     disabled,
     error
@@ -19,7 +19,7 @@ NX_REFLECTION_ENUM_CLASS(RemoteArchiveSynchronizationStateCode,
 
 struct NX_VMS_API RemoteArchiveSynchronizationStatus: ServerAndDeviceIdData
 {
-    RemoteArchiveSynchronizationStateCode code = RemoteArchiveSynchronizationStateCode::idle;
+    RemoteArchiveSynchronizationStateCode code = RemoteArchiveSynchronizationStateCode::disabled;
     /**%apidoc A Unix timestamp (milliseconds since epoch) of the current import position. */
     std::chrono::system_clock::time_point importedPositionMs{std::chrono::milliseconds(0)};
     /**%apidoc The duration of the archive left to import from the Device. */
