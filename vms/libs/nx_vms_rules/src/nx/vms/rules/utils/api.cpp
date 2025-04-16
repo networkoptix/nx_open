@@ -17,8 +17,11 @@
 #include "../engine.h"
 #include "../event_filter.h"
 #include "../event_filter_field.h"
+#include "../event_filter_fields/state_field.h"
 #include "../rule.h"
 #include "../strings.h"
+#include "../utils/action.h"
+#include "../utils/field_names.h"
 #include "api_renamer.h"
 #include "serialization.h"
 
@@ -230,7 +233,8 @@ api::EventFilter serialize(const EventFilter* filter)
 
     for (const auto& [name, field]: filter->fields().asKeyValueRange())
     {
-        if (!field->properties().visible)
+        // State field must be processed even if it is not visible.
+        if (!field->properties().visible && field->metatype() != fieldMetatype<StateField>())
             continue;
 
         api::Field serialized;
@@ -327,6 +331,17 @@ std::optional<nx::vms::api::rules::Rule> fromApi(
         !fromApi(std::move(simple.action), builder.get(), error))
     {
         return {};
+    }
+
+    const auto stateField = filter->fieldByName<StateField>(utils::kStateFieldName);
+    if (stateField && !stateField->properties().visible)
+    {
+        // This is the special case when the state filed (See `Soft Trigger` event) must be adjusted
+        // accordingly the current action.
+        if (nx::vms::rules::isProlonged(engine, builder.get()))
+            stateField->setValue(vms::api::rules::State::none);
+        else
+            stateField->setValue(vms::api::rules::State::instant);
     }
 
     const auto rule = std::make_unique<Rule>(simple.id, engine);

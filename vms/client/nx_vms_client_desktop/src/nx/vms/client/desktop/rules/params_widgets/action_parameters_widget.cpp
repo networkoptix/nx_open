@@ -16,7 +16,6 @@
 #include <ui/workbench/workbench_context.h>
 
 #include "../dialog_details/dotted_line.h"
-#include "../picker_widgets/plain_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -115,9 +114,9 @@ PickerWidget* ActionParametersWidget::createStatePickerIfRequired()
     }
 
     const auto stateField = eventFilter()->fieldByName(vms::rules::utils::kStateFieldName);
-    if (!stateField)
+    if (!stateField || !stateField->properties().visible)
     {
-        // State field is not added to the event manifest.
+        // State field is not added to the event manifest, or should not be edited by the user.
         return nullptr;
     }
 

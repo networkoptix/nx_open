@@ -54,9 +54,6 @@ public:
 
     std::chrono::microseconds aggregationInterval() const;
 
-    /** Action require separate start and end events.*/
-    bool isProlonged() const;
-
     template<class T = Field>
     const T* fieldByName(const QString& name) const
     {
@@ -104,6 +101,7 @@ private:
     Actions buildActionsForAdditionalRecipients(const AggregatedEventPtr& aggregatedEvent) const;
     ActionPtr buildAction(const AggregatedEventPtr& event, const QVariantMap& override = {}) const;
     Engine* engine() const;
+    bool isProlonged() const;
 
     nx::Uuid m_id;
     QString m_actionType;

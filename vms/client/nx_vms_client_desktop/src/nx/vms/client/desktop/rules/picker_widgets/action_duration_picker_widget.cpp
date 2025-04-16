@@ -64,15 +64,16 @@ ActionDurationPickerWidget::ActionDurationPickerWidget(
 
         const auto eventDescriptor = parentParamsWidget()->eventDescriptor();
 
-        const auto hasStateField = std::any_of(
+        const auto displayStateField = std::any_of(
             eventDescriptor->fields.cbegin(),
             eventDescriptor->fields.cend(),
             [](const auto& fieldDescriptor)
             {
-                return fieldDescriptor.fieldName == vms::rules::utils::kStateFieldName;
+                return fieldDescriptor.fieldName == vms::rules::utils::kStateFieldName
+                    && fieldDescriptor.properties.value("visible", true).toBool();
             });
 
-        if (hasStateField)
+        if (displayStateField)
         {
             auto contentLayout = new QVBoxLayout{m_contentWidget};
             contentLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());

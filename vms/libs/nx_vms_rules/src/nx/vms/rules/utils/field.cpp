@@ -112,7 +112,8 @@ FieldDescriptor makePlaybackFieldDescriptor(
 FieldDescriptor makeStateFieldDescriptor(
     const TranslatableString& displayName,
     const QString& description,
-    vms::rules::State defaultState)
+    vms::rules::State defaultState,
+    bool visible)
 {
     return makeFieldDescriptor<StateField>(
         kStateFieldName,
@@ -120,7 +121,7 @@ FieldDescriptor makeStateFieldDescriptor(
         description.isEmpty()
             ? QString("State field is required for prolonged event with instant action.")
             : description,
-        {{"value", QVariant::fromValue(defaultState)}});
+        {{"value", QVariant::fromValue(defaultState)}, {"visible", visible}});
 }
 
 FieldDescriptor makeExtractDetailFieldDescriptor(

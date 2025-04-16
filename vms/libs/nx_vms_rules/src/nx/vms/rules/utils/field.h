@@ -80,7 +80,8 @@ FieldDescriptor makePlaybackFieldDescriptor(
 FieldDescriptor makeStateFieldDescriptor(
     const TranslatableString& displayName,
     const QString& description = {},
-    vms::rules::State defaultState = vms::rules::State::started);
+    vms::rules::State defaultState = vms::rules::State::started,
+    bool visible = true);
 
 FieldDescriptor makeExtractDetailFieldDescriptor(
     const QString& fieldName,

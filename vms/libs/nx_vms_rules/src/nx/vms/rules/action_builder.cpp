@@ -439,11 +439,6 @@ void ActionBuilder::toggleAggregationTimer(bool on)
     m_timerActive = on;
 }
 
-bool ActionBuilder::isProlonged() const
-{
-    return nx::vms::rules::isProlonged(engine(), this);
-}
-
 void ActionBuilder::onTimer(const nx::utils::TimerId&)
 {
     if (!NX_ASSERT(m_aggregator) || !NX_ASSERT(m_timerActive) || m_aggregator->empty())
@@ -668,6 +663,11 @@ void ActionBuilder::handleAggregatedEvents()
 Engine* ActionBuilder::engine() const
 {
     return m_rule ? const_cast<Engine*>(m_rule->engine()) : nullptr;
+}
+
+bool ActionBuilder::isProlonged() const
+{
+    return nx::vms::rules::isProlonged(engine(), this);
 }
 
 void ActionBuilder::onFieldChanged()
