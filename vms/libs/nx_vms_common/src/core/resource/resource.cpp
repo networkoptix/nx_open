@@ -373,17 +373,16 @@ bool QnResource::setProperty(const QString& key, const QString& value, bool mark
     NX_ASSERT(!getId().isNull());
     if (auto* const context = systemContext(); NX_ASSERT(context))
     {
-        auto prevValue = getProperty(key);
-        const bool isModified = context->resourcePropertyDictionary()->setValue(
+        const auto prevValue = context->resourcePropertyDictionary()->setValue(
             getId(),
             key,
             value,
             markDirty);
 
-        if (isModified)
-            emitPropertyChanged(key, prevValue, value);
+        if (prevValue.has_value())
+            emitPropertyChanged(key, prevValue.value(), value);
 
-        return isModified;
+        return prevValue.has_value();
     }
 
     return false;

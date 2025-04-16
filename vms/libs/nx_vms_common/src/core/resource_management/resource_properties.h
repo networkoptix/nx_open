@@ -24,8 +24,11 @@ public:
 
     QString value(const nx::Uuid& resourceId, const QString& key) const;
 
-    /** @return Whether the stored value has been modified by this call. */
-    bool setValue(
+    /**
+     * @return Return previous stored value if value has been modified by this call
+     * otherwise std::nullopt.
+    */
+    std::optional<QString> setValue(
         const nx::Uuid& resourceId,
         const QString& key,
         const QString& value,

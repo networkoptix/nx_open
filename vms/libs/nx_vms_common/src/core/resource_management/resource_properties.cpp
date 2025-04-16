@@ -150,7 +150,8 @@ void QnResourcePropertyDictionary::markAllParamsDirty(
     }
 }
 
-bool QnResourcePropertyDictionary::setValue(const nx::Uuid& resourceId, const QString& key,
+std::optional<QString> QnResourcePropertyDictionary::setValue(
+    const nx::Uuid& resourceId, const QString& key,
     const QString& value, bool markDirty)
 {
     NX_MUTEX_LOCKER lock( &m_mutex );
@@ -160,12 +161,14 @@ bool QnResourcePropertyDictionary::setValue(const nx::Uuid& resourceId, const QS
 
     QnResourcePropertyList& properties = itr.value();
     auto itrValue = properties.find(key);
+    QString prevValue;
     if (itrValue == properties.end())
         properties.insert(key, value);
     else if (itrValue.value() != value)
-        itrValue.value() = value;
+        prevValue = std::exchange(itrValue.value(), value);
     else
-        return false; // nothing to change
+        return std::nullopt; // nothing to change
+
     if (markDirty)
     {
         m_modifiedItems[resourceId][key] = value;
@@ -182,7 +185,7 @@ bool QnResourcePropertyDictionary::setValue(const nx::Uuid& resourceId, const QS
 
     lock.unlock();
     emit propertyChanged(resourceId, key);
-    return true;
+    return prevValue;
 }
 
 bool QnResourcePropertyDictionary::hasProperty(const nx::Uuid& resourceId, const QString& key) const
