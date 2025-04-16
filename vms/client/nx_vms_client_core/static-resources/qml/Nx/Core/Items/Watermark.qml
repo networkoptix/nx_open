@@ -45,7 +45,10 @@ Image
         }
     }
 
-    Component.onDestruction: contextAccessor.onSystemContextIsAboutToBeChanged()
+    Component.onDestruction:
+    {
+        d.removeWatcher()
+    }
 
     NxObject
     {
