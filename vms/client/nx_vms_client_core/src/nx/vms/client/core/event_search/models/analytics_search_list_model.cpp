@@ -1112,14 +1112,18 @@ void AnalyticsSearchListModel::setSystemContext(SystemContext* systemContext)
         &QnResource::statusChanged,
         [this](const QnVirtualCameraResourcePtr& camera)
         {
-            if (NX_ASSERT(isOnline()) && !camera->enabledAnalyticsEngines().empty())
+            // Offline state is a valid situation when some properties is changed for
+            // an offline system camera on MediaWidget creation at cross-site layout.
+            if (isOnline() && !camera->enabledAnalyticsEngines().empty())
                 d->updateMetadataReceivers();
         });
 
     d->cameraStatusListener->addOnPropertyChangedHandler(
         [this](const QnVirtualCameraResourcePtr& camera, const QString& key)
         {
-            if (!NX_ASSERT(isOnline()) || !camera->isOnline())
+            // Offline state is a valid situation when some properties is changed for
+            // an offline system camera on MediaWidget creation at cross-site layout.
+            if (!isOnline() || !camera->isOnline())
                 return;
 
             if (key == QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty
