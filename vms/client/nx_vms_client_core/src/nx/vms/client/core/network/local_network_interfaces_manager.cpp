@@ -2,6 +2,7 @@
 
 #include "local_network_interfaces_manager.h"
 
+#include <QtCore/QSet>
 #include <QtCore/QTimer>
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QNetworkInterface>

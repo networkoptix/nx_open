@@ -65,7 +65,7 @@ QImage RhiOffscreenRenderer::render(RhiPaintDeviceRenderer* renderer)
         QImage::Format_RGBA8888_Premultiplied);
 
     if (m_rhi->isYUpInFramebuffer())
-        return nonOwningImage.mirrored(); //< Mirror vertically.
+        return nonOwningImage.flipped(Qt::Vertical);
 
     return nonOwningImage.copy();
 }

@@ -18,9 +18,9 @@ Controls.ApplicationWindow
     id: mainWindow
 
     readonly property var customMargins: windowContext.ui.measurements.customMargins
-    property real leftPadding: customMargins.left
-    property real rightPadding: customMargins.right
-    property real bottomPadding: customMargins.bottom
+    leftPadding: customMargins.left
+    rightPadding: customMargins.right
+    bottomPadding: customMargins.bottom
 
     readonly property bool hasNavigationBar:
         !!windowContext.ui.windowHelpers.navigationBarSize()

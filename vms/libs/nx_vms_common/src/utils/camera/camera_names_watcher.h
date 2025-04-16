@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QHash>
 #include <QtCore/QObject>
 
 #include <nx/utils/uuid.h>

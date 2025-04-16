@@ -23,7 +23,7 @@ QString replaceProhibitedChars(const QString& s)
                 result = s.left(i); //< Copy all the preceding chars (they are valid).
             }
             result.append(QStringLiteral("\\u%1").arg(
-                c.unicode(), /*fieldWidth*/ 4, /*base*/ 16, /*fillChar*/ QChar('0')));
+                (int) c.unicode(), /*fieldWidth*/ 4, /*base*/ 16, /*fillChar*/ QChar('0')));
         }
         else
         {

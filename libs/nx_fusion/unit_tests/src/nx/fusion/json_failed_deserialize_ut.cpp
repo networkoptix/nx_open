@@ -155,7 +155,7 @@ TEST(NxFusion, JsonFailedDeserializeInvalidJson)
     EXPECT_INVALID_JSON(QJsonValue, "tru", R"(Unable to parse a boolean from JSON: "tru")");
     EXPECT_INVALID_JSON(QJsonValue, "nu", R"(Unable to parse a null value from JSON: "nu")");
     EXPECT_INVALID_JSON(QJsonValue, "{1", "Unable to parse a JSON object: unterminated object at 2");
-    EXPECT_INVALID_JSON(QJsonValue, "[123", "Unable to parse a JSON array: invalid termination by number at 4");
+    EXPECT_INVALID_JSON(QJsonValue, "[123", "Unable to parse a JSON array: unterminated array at 4");
 
     // Backslash in R-strings causes an error in MSVC.
     EXPECT_INVALID_JSON(QJsonValue, "\"not string", "Unable to parse a string from JSON: \"\\\"not string\"");

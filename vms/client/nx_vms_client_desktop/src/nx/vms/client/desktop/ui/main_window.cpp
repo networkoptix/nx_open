@@ -4,7 +4,6 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFileInfo>
-#include <QtGui/private/qevent_p.h>
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlError>
@@ -16,6 +15,20 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/opengl/gl_functions.h>
+
+namespace {
+
+// The class is used to access protected fields of QMouseEvent.
+class MouseEventWorkaround: public QMouseEvent
+{
+public:
+    void setDoubleClick(bool value)
+    {
+        m_doubleClick = value;
+    }
+};
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 namespace ui {
@@ -54,7 +67,7 @@ protected:
             event->position(), event->scenePosition(), event->globalPosition(),
             event->button(), event->buttons(), event->modifiers(), event->pointingDevice());
 
-        QMutableSinglePointEvent::from(&pressEvent)->setDoubleClick(true);
+        static_cast<MouseEventWorkaround*>(&pressEvent)->setDoubleClick(true);
 
         QCoreApplication::sendEvent(quickWindow(), &pressEvent);
         event->setAccepted(pressEvent.isAccepted());

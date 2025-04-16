@@ -734,7 +734,7 @@ bool LicenseManagerWidget::activateLicense()
         m_currentRequest = api->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
             sessionTokenHelper,
             nx::network::http::Method::put,
-            QString("/rest/v2/licenses/%1").arg(body.key),
+            QString("/rest/v2/licenses/%1").arg(body.toString()),
             nx::network::rest::Params{},
             QByteArray::fromStdString(nx::reflect::json::serialize(body)),
             callback,
