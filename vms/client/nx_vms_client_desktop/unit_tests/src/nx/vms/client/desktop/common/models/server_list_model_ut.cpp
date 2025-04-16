@@ -10,6 +10,7 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/test_support/item_model_signal_log.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/manual_device_addition/dialog/private/current_system_servers.h>
 #include <nx/vms/client/desktop/system_administration/models/server_list_model.h>
@@ -80,77 +81,43 @@ TEST_F(ServerListModelTest, rowCount2)
 
 TEST_F(ServerListModelTest, signalEmission)
 {
-    QStringList signalLog;
-    QObject::connect(m_testModel.get(), &QAbstractItemModel::rowsAboutToBeInserted,
-        [this, &signalLog](const QModelIndex& /*parent*/, int first, int last)
-        {
-            signalLog << nx::format(
-                "rowsAboutToBeInserted(%1, %2) |%3", first, last, m_testModel->rowCount());
-        });
-
-    QObject::connect(m_testModel.get(), &QAbstractItemModel::rowsInserted,
-        [this, &signalLog](const QModelIndex& /*parent*/, int first, int last)
-        {
-            signalLog <<
-                nx::format("rowsInserted(%1, %2) |%3", first, last, m_testModel->rowCount());
-        });
-
-    QObject::connect(m_testModel.get(), &QAbstractItemModel::rowsAboutToBeRemoved,
-        [this, &signalLog](const QModelIndex& /*parent*/, int first, int last)
-        {
-            signalLog << nx::format(
-                "rowsAboutToBeRemoved(%1, %2) |%3", first, last, m_testModel->rowCount());
-        });
-
-    QObject::connect(m_testModel.get(), &QAbstractItemModel::rowsRemoved,
-        [this, &signalLog](const QModelIndex& /*parent*/, int first, int last)
-        {
-            signalLog <<
-                nx::format("rowsRemoved(%1, %2) |%3", first, last, m_testModel->rowCount());
-        });
-
-    QObject::connect(m_testModel.get(), &QAbstractItemModel::dataChanged,
-        [&signalLog](const QModelIndex& topLeft, const QModelIndex& bottomRight,
-            const QList<int>& /*roles*/)
-        {
-            signalLog << nx::format("dataChanged(%1, %2)", topLeft.row(), bottomRight.row());
-        });
+    nx::utils::test::ItemModelSignalLog signalLog(m_testModel.get());
 
     QObject::connect(m_testModel.get(), &ServerListModel::serverRemoved,
-        [&signalLog]()
-        {
-            signalLog << "serverRemoved()";
-        });
+        [&signalLog]() { signalLog.addCustomEntry("serverRemoved()"); });
 
     const auto server1 = registerNewServer("Server A1");
-    ASSERT_EQ(signalLog, QStringList({"rowsAboutToBeInserted(1, 1) |1", "rowsInserted(1, 1) |2"}));
+    ASSERT_EQ(signalLog.log(),
+        QStringList({"rowsAboutToBeInserted(1,1) |1", "rowsInserted(1,1) |2"}));
     signalLog.clear();
 
     const auto server2 = registerNewServer("Server A2");
-    ASSERT_EQ(signalLog, QStringList({"rowsAboutToBeInserted(2, 2) |2", "rowsInserted(2, 2) |3"}));
+    ASSERT_EQ(signalLog.log(),
+        QStringList({"rowsAboutToBeInserted(2,2) |2", "rowsInserted(2,2) |3"}));
     signalLog.clear();
 
     const auto server3 = registerNewServer("Server A3");
-    ASSERT_EQ(signalLog, QStringList({"rowsAboutToBeInserted(3, 3) |3", "rowsInserted(3, 3) |4"}));
+    ASSERT_EQ(signalLog.log(),
+        QStringList({"rowsAboutToBeInserted(3,3) |3", "rowsInserted(3,3) |4"}));
     signalLog.clear();
 
     resourcePool()->removeResources({server2});
-    ASSERT_EQ(signalLog,
-        QStringList({"rowsAboutToBeRemoved(2, 2) |4", "rowsRemoved(2, 2) |3", "serverRemoved()"}));
+    ASSERT_EQ(signalLog.log(),
+        QStringList({"rowsAboutToBeRemoved(2,2) |4", "rowsRemoved(2,2) |3", "serverRemoved()"}));
     signalLog.clear();
 
     server3->setName("Server B3");
-    ASSERT_EQ(signalLog, QStringList({"dataChanged(2, 2)"}));
+    ASSERT_EQ(signalLog.log(), QStringList({"dataChanged(2,2,[])"}));
     signalLog.clear();
 
     resourcePool()->removeResources({server3});
-    ASSERT_EQ(signalLog,
-        QStringList({"rowsAboutToBeRemoved(2, 2) |3", "rowsRemoved(2, 2) |2", "serverRemoved()"}));
+    ASSERT_EQ(signalLog.log(),
+        QStringList({"rowsAboutToBeRemoved(2,2) |3", "rowsRemoved(2,2) |2", "serverRemoved()"}));
     signalLog.clear();
 
     resourcePool()->removeResources({server1});
-    ASSERT_EQ(signalLog,
-        QStringList({"rowsAboutToBeRemoved(1, 1) |2", "rowsRemoved(1, 1) |1", "serverRemoved()"}));
+    ASSERT_EQ(signalLog.log(),
+        QStringList({"rowsAboutToBeRemoved(1,1) |2", "rowsRemoved(1,1) |1", "serverRemoved()"}));
 }
 
 TEST_F(ServerListModelTest, data)

@@ -6,7 +6,12 @@ namespace nx::vms::client::core::event_search {
 
 Item Item::create(std::chrono::milliseconds timestamp, const QString& name)
 {
-    return { nx::Uuid::createUuid(), name, timestamp};
+    return create(nx::Uuid::createUuid().toSimpleString(), timestamp, name);
+}
+
+Item Item::create(const QString& id, std::chrono::milliseconds timestamp, const QString& name)
+{
+    return Item{.id = id, .timestamp = timestamp, .name = name};
 }
 
 QString Item::toString() const
@@ -16,7 +21,7 @@ QString Item::toString() const
         : QString("%1 %2").arg(QString::number(timestamp.count()), name);
 }
 
-nx::Uuid Accessor::id(const Type& item)
+QString Accessor::id(const Type& item)
 {
     return item.id;
 }
@@ -24,6 +29,11 @@ nx::Uuid Accessor::id(const Type& item)
 Accessor::TimeType Accessor::startTime(const Type& item)
 {
     return item.timestamp;
+}
+
+bool Accessor::equal(const Item& a, const Item& b)
+{
+    return a == b;
 }
 
 } // namespace nx::vms::client::core::event_search

@@ -42,6 +42,7 @@ set(mocableFiles
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/coro/task_utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/property_storage/property.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/property_storage/storage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/test_support/item_model_signal_log.h
 )
 
 nx_add_qt_mocables(nx_utils ${mocableFiles}

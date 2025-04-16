@@ -157,6 +157,28 @@ void updateEventSearchData(Model* model,
     FetchedData& fetched,
     EventSearch::FetchDirection direction)
 {
+    const auto getLogStr =
+        [](const auto beginIt, const auto endIt)
+        {
+            QStringList result;
+            for (auto it = beginIt; it != endIt; ++it)
+            {
+                result.push_back(nx::format("{\"id\":\"%1\",\"startTime\":%2}",
+                    Facade::id(*it), Facade::startTime(*it).count()));
+            }
+            return nx::format("{%1}", result.join(","));
+        };
+
+    NX_TRACE(model, "*** Update data, direction=%1 ***\n"
+        "Current data (%1):\n%2\n"
+        "Fetched data (%3):\n%4\n"
+        "Body offset: %5, length: %6\n"
+        "Tail offset: %7, length: %8",
+        current.size(), getLogStr(current.cbegin(), current.cend()),
+        fetched.data.size(), getLogStr(fetched.data.cbegin(), fetched.data.cend()),
+        fetched.ranges.body.offset, fetched.ranges.body.length,
+        fetched.ranges.tail.offset, fetched.ranges.tail.length);
+
     detail::updateBody<Facade>(model, current, fetched);
     detail::insertTail(model, current, fetched, direction);
 }

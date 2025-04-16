@@ -67,22 +67,6 @@ void updateBody(
             return old.erase(begin, end);
         };
 
-    const auto getTimestamps =
-        [](const auto beginIt, const auto endIt)
-        {
-            QList<decltype(Accessor::startTime(*beginIt))> timestamps;
-            for (auto it = beginIt; it != endIt; ++it)
-                timestamps.push_back(Accessor::startTime(*it));
-            return timestamps;
-        };
-
-    NX_TRACE(model, "Update body\nOld data (%1): %2\nFetched data (%3): %4\n"
-        "Body offset: %5, length: %6\nTail offset: %7, length: %8",
-        old.size(), getTimestamps(old.cbegin(), old.cend()),
-        fetched.data.size(), getTimestamps(fetched.data.cbegin(), fetched.data.cend()),
-        fetched.ranges.body.offset, fetched.ranges.body.length,
-        fetched.ranges.tail.offset, fetched.ranges.tail.length);
-
     if (fetched.data.empty())
     {
         removeItems(old.begin(), old.end());
@@ -121,14 +105,14 @@ void updateBody(
         {
             // Insert all other fetched item to the end.
             insertItems(old.end(), fetchedBegin, fetchedEnd);
-            return;
+            break;
         }
 
         if (fetchedBegin == fetchedEnd)
         {
             // Remove all remaining current items.
             removeItems(itOld, old.end());
-            return;
+            break;
         }
 
         // We suppose there are not a lot items with the same timestamp. So to avoid redundant
@@ -137,11 +121,10 @@ void updateBody(
 
         // Remove all items "above" current fetched items.
         auto itRemoveEnd = itOld;
-        while (Accessor::startTime(*itRemoveEnd) > Accessor::startTime(*fetchedBegin)
-            && itRemoveEnd != old.end())
-        {
+        auto nextTimestamp = Accessor::startTime(*fetchedBegin);
+
+        while (itRemoveEnd != old.end() && Accessor::startTime(*itRemoveEnd) > nextTimestamp)
             ++itRemoveEnd;
-        }
 
         if (itOld != itRemoveEnd)
         {
@@ -152,8 +135,11 @@ void updateBody(
 
         // Insert all items "above" current old items.
         auto itInsertEnd = fetchedBegin;
-        while (Accessor::startTime(*itOld) < Accessor::startTime(*itInsertEnd))
+        nextTimestamp = Accessor::startTime(*itOld);
+
+        while (itInsertEnd != fetchedEnd && Accessor::startTime(*itInsertEnd) > nextTimestamp)
             ++itInsertEnd;
+
         if (fetchedBegin != itInsertEnd)
         {
             itOld = insertItems(itOld, fetchedBegin, itInsertEnd);
@@ -162,30 +148,26 @@ void updateBody(
                 continue;
         }
 
-        // Process "same timestamp" bookmarks
-        if (!NX_ASSERT(Accessor::startTime(*itOld) == Accessor::startTime(*fetchedBegin),
-            "Invalid situation in updateBody!\nOld data (%1): %2\nFetched data (%3): %4\n"
-            "Body offset: %5, length: %6\nTail offset: %7, length: %8",
-            old.size(), getTimestamps(old.cbegin(), old.cend()),
-            fetched.data.size(), getTimestamps(fetched.data.cbegin(), fetched.data.cend()),
-            fetched.ranges.body.offset, fetched.ranges.body.length,
-            fetched.ranges.tail.offset, fetched.ranges.tail.length))
+        if (Accessor::startTime(*itOld) != Accessor::startTime(*fetchedBegin))
         {
+            NX_ASSERT(Accessor::startTime(*itOld) > Accessor::startTime(*fetchedBegin));
             continue;
         }
 
-        const auto currentTimestamp = Accessor::startTime(*itOld);
+        // Process "same timestamp" bookmarks.
+
+        nextTimestamp = Accessor::startTime(*itOld);
         while (itOld != old.end() && fetchedBegin != fetchedEnd
-            && Accessor::startTime(*itOld) == currentTimestamp)
+            && Accessor::startTime(*itOld) == nextTimestamp)
         {
             auto fetchedIt = fetchedBegin;
-            while (fetchedIt != fetchedEnd && Accessor::startTime(*fetchedIt) == currentTimestamp
+            while (fetchedIt != fetchedEnd && Accessor::startTime(*fetchedIt) == nextTimestamp
                 && Accessor::id(*itOld) != Accessor::id(*fetchedIt))
             {
                 ++fetchedIt;
             }
 
-            if (fetchedIt == fetchedEnd || Accessor::startTime(*fetchedIt) != currentTimestamp)
+            if (fetchedIt == fetchedEnd || Accessor::startTime(*fetchedIt) != nextTimestamp)
             {
                 // Didn't find old item in the fetched items with the same timestamp.
                 itOld = removeItems(itOld, itOld + 1);
