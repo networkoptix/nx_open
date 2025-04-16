@@ -9,6 +9,11 @@
 
 #include <client/client_globals.h>
 #include <nx/vms/client/desktop/common/models/sort_filter_proxy_model.h>
+#include <utils/common/delayed.h>
+
+namespace {
+static constexpr qreal kMinimumColumnWidth = 30.0;
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -71,7 +76,7 @@ struct TableViewColumnsCalculator::Private
             allColumnWidth += width;
         }
         normalize();
-        tableView->forceLayout();
+        executeLater([this]() { tableView->forceLayout(); }, q);
     }
 
     void normalize()
@@ -82,7 +87,12 @@ struct TableViewColumnsCalculator::Private
             tableView->columnSpacing() * (tableView->columns() - 1);
         widths.clear();
         for (int col = 0; col < initialWidths.count(); ++col)
-            widths[col] = initialWidths[col] / allColumnWidth * availableWidth;
+        {
+            if (allColumnWidth == 0)
+                widths[col] = kMinimumColumnWidth;
+            else
+                widths[col] = initialWidths[col] / allColumnWidth * availableWidth;
+        }
     }
 };
 
@@ -98,7 +108,7 @@ TableViewColumnsCalculator::~TableViewColumnsCalculator()
 
 qreal TableViewColumnsCalculator::columnWidth(int index) const
 {
-    return qMax(d->widths.value(index, -1), 30.0);
+    return qMax(d->widths.value(index, -1), kMinimumColumnWidth);
 }
 
 void TableViewColumnsCalculator::componentComplete()
