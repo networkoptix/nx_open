@@ -184,17 +184,26 @@ private:
     // Type-erasing adapter with the same size and alignment as `in_addr`
     using InAddr = std::uint32_t;
 
+    #ifdef _MSC_VER
+        #pragma warning(push)
+        #pragma warning(disable:4324) //< 'structure was padded due to alignment specifier'
+    #endif
+
     // `in6_addr` differs in alignment between Windows and POSIX
     #if defined(_WIN32)
-    struct alignas(2) In6Addr { std::uint8_t value[16]; };
+        struct alignas(2) In6Addr { std::uint8_t value[16]; };
     #else
-    struct alignas(4) In6Addr { std::uint8_t value[16]; };
+        struct alignas(4) In6Addr { std::uint8_t value[16]; };
     #endif
 
     mutable std::optional<std::string> m_string;
     std::optional<InAddr> m_ipV4;
     std::optional<In6Addr> m_ipV6;
     std::optional<uint32_t> m_scopeId;
+
+    #ifdef _MSC_VER
+        #pragma warning(pop)
+    #endif
 
     HostAddress(
         std::optional<std::string_view> addressString,

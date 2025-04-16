@@ -56,9 +56,18 @@ private:
     Grid m_grid = Grid();
 };
 
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable:4324) //< 'structure was padded due to alignment specifier'
+#endif
+
 struct alignas(CL_MEDIA_ALIGNMENT) MotionGridBitMask:
     std::array<std::byte, MotionGrid::kGridByteSize>
 {
 };
+
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif
 
 } // namespace nx::vms::client::core

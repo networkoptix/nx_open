@@ -25,7 +25,18 @@ public:
 
 private:
     QnRegion m_region;
+
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable:4324) //< 'structure was padded due to alignment specifier'
+#endif
+
     nx::vms::client::core::MotionGridBitMask m_bitMask;
+
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif
+
 };
 
 } // namespace nx::vms::client::desktop

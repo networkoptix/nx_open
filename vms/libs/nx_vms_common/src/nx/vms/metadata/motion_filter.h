@@ -33,7 +33,17 @@ private:
     int m_maskStart = 0;
     int m_maskEnd = 0;
     bool m_wholeFrame = false;
+
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable:4324) //< 'structure was padded due to alignment specifier'
+#endif
+
     simd128i m_mask[kGridDataSizeBytes / sizeof(simd128i)];
+
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif
 };
 
 } // namespace nx::vms::metadata
