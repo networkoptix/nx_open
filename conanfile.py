@@ -72,7 +72,7 @@ class NxOpenConan(ConanFile):
         "mobile_user_manual:format": "pdf",
     }
 
-    ffmpeg_version_and_revision = "7.0.1#246524b032369db66cb2ab7a5e3ee27d"
+    ffmpeg_version_and_revision = "7.0.1#7395197c94840d269665fbcea07ada79"
 
     python_requires = (
         "os_deps_from_deb_based_distro/0.5" "#43dce86a813993ad9acb644d3941e399",
@@ -151,7 +151,7 @@ class NxOpenConan(ConanFile):
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:
-                self.build_requires("clang/18.1.6" "#701e83b53a73cea5282566e4190fc859")
+                self.build_requires("clang/18.1.6" "#60ad95b1d2a06384c6e9fed7ea032adb")
             self.build_requires("sdk-gcc/9.5" "#4934f8197fb3e1d7812bd951b1cbae85")
 
         if self.isWindows:
@@ -173,13 +173,13 @@ class NxOpenConan(ConanFile):
     def requirements(self):
         self.requires("libsrtp/2.6.0" "#248ee72d7d91db948f5651b7fe4905ea")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
-        self.requires("openssl/1.1.1q" "#29029859608219dca154603c384f5442")
-        self.requires("qt/6.8.2" "#c51ccf063912c621fd0041e1a9a44098")
+        self.requires("openssl/1.1.1q" "#cf9c0c761f39805e5a258dc39daff2bd")
+        self.requires("qt/6.8.2" "#094d20c4f30d57cd3701b9d3af337214")
         self.requires("roboto-fonts/1.0" "#1bff09c31c4d334f27795653e0f4b2bb")
         self.requires("boost/1.83.0" "#d150c9edc8081c98965b05ea9c2df318")
         self.requires("concurrentqueue/1.0.4" "#957c470e9abc81ff3850bbe39fc11135")
         self.requires("rapidjson/cci.20230929" "#624c0094d741e6a3749d2e44d834b96c")
-        self.requires("zlib/1.2.13" "#df233e6bed99052f285331b9f54d9070")
+        self.requires("zlib/1.3.1" "#99d6f9ea0a1dd63d973392c24ce0aa9b")
 
         if self.settings.os not in ("Android", "iOS"):
             # Qt dependency.
