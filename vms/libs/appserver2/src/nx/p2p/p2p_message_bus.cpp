@@ -754,7 +754,9 @@ void MessageBus::at_gotMessage(
         result = handlePushImpersistentBroadcastTransaction(connection, payload, &lock);
         break;
     default:
-        NX_ASSERT(0, "Unknown message type: %1", (int) messageType);
+        NX_ASSERT(false,
+            "Unknown message type %1 from %2 peer %3", (int) messageType, connection->remoteAddr(),
+            nx::reflect::json::serialize(connection->remotePeer()));
         break;
     }
     if (!result)
