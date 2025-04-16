@@ -91,7 +91,7 @@
     </message>
     <message>
       <source>Disable blur</source>
-      <translation>ぼかし効果を無効にする</translation>
+      <translation>ぼかし効果を無効化する</translation>
     </message>
     <message>
       <source>Limit Frame Rate to save CPU</source>
