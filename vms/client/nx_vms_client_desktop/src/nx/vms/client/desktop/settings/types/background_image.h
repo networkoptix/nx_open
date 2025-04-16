@@ -16,10 +16,8 @@ struct BackgroundImage
     QString originalName;
     Qn::ImageBehavior mode = Qn::ImageBehavior::Crop;
     qreal opacity = 0.5;
-
-    qreal actualImageOpacity() const;
-
-    static BackgroundImage defaultBackground();
+    QString imagePath() const;
+    bool isExternalImageEnabled() const;
 
     bool operator==(const BackgroundImage& other) const;
 };

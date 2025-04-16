@@ -116,9 +116,9 @@ BackgroundImageData BackgroundImageData::getForDefaultType()
 {
     const BackgroundImage background = appContext()->localSettings()->backgroundImage();
     return BackgroundImageData(
-        background.name,
+        background.imagePath(),
         kDefaultImageSize,
-        background.actualImageOpacity(),
+        background.opacity,
         background.mode,
         true); //< Image is always local for default background image.
 }
@@ -245,9 +245,10 @@ void QnGridBackgroundItem::updateDefaultBackground()
     const BackgroundImage background = appContext()->localSettings()->backgroundImage();
 
     bool hasChanges = false;
-    if (d->imageData.fileName != background.name)
+    const auto backgroundImagePath = background.imagePath();
+    if (d->imageData.fileName != backgroundImagePath)
     {
-        d->imageData.fileName = background.name;
+        d->imageData.fileName = backgroundImagePath;
         d->imageStatus = ImageStatus::None;
         if (d->nativePaintBackground)
             m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>();
@@ -257,9 +258,9 @@ void QnGridBackgroundItem::updateDefaultBackground()
         hasChanges = true;
     }
 
-    if (!qFuzzyEquals(d->imageData.opacity, background.actualImageOpacity()))
+    if (!qFuzzyEquals(d->imageData.opacity, background.opacity))
     {
-        d->imageData.opacity = background.actualImageOpacity();
+        d->imageData.opacity = background.opacity;
         hasChanges = true;
     }
 

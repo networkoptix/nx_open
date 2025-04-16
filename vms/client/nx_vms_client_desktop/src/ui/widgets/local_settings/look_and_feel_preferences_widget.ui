@@ -193,7 +193,7 @@
    <item>
     <widget class="QGroupBox" name="imageGroupBox">
      <property name="title">
-      <string>Background Image</string>
+      <string>Custom Background Image</string>
      </property>
      <property name="flat">
       <bool>true</bool>

@@ -396,7 +396,7 @@ bool QnAdvancedSettingsWidget::isRestartRequired() const
 
 void QnAdvancedSettingsWidget::at_clearCacheButton_clicked()
 {
-    QString backgroundImage = appContext()->localSettings()->backgroundImage().name;
+    QString backgroundImage = appContext()->localSettings()->backgroundImage().imagePath();
     /* Lock background image so it will not be deleted. */
     if (!backgroundImage.isEmpty())
     {

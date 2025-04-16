@@ -144,7 +144,7 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi()
     }
     else
     {
-        ui->imageGroupBox->setChecked(background.enabled);
+        ui->imageGroupBox->setChecked(background.isExternalImageEnabled());
         ui->imageNameLineEdit->setText(background.originalName);
         ui->imageModeComboBox->setCurrentIndex(ui->imageModeComboBox->findData(QVariant::fromValue(background.mode)));
         ui->imageOpacitySpinBox->setValue(opacityToPercent(background.opacity));
@@ -186,7 +186,7 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
     if (folder.isEmpty())
         folder = appContext()->localSettings()->backgroundsFolder();
 
-    const QString previousCachedName = appContext()->localSettings()->backgroundImage().name;
+    const QString previousCachedName = appContext()->localSettings()->backgroundImage().imagePath();
 
     QScopedPointer<QnCustomFileDialog> dialog(
         new QnCustomFileDialog(

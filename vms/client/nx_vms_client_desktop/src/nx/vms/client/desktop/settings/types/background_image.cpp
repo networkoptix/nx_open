@@ -7,23 +7,20 @@
 #include <nx/reflect/compare.h>
 
 namespace nx::vms::client::desktop {
+static const QString kDefaultBackgroundPath = ":/skin/background.png";
+static const bool kDefaultBackgroundExists = QFileInfo(kDefaultBackgroundPath).exists();
 
-qreal BackgroundImage::actualImageOpacity() const
+QString BackgroundImage::imagePath() const
 {
-    return enabled ? opacity : 0.0;
+    if (!enabled || name.isEmpty())
+        return kDefaultBackgroundExists ? kDefaultBackgroundPath : QString();
+
+    return name;
 }
 
-BackgroundImage BackgroundImage::defaultBackground()
+bool BackgroundImage::isExternalImageEnabled() const
 {
-    static const QString kDefaultBackgroundPath = ":/skin/background.png";
-    if (!QFileInfo::exists(kDefaultBackgroundPath))
-        return {};
-
-    BackgroundImage result{
-        .enabled = true,
-        .name = kDefaultBackgroundPath,
-    };
-    return result;
+    return enabled && !name.isEmpty() && !name.startsWith(":");
 }
 
 bool BackgroundImage::operator==(const BackgroundImage& other) const
