@@ -56,4 +56,15 @@ void ClaimSet::setSecuritySequence(int val)
     set("pwdSeq", val);
 }
 
+
+std::optional<std::string> ClaimSet::subjectTyp() const
+{
+    return get<std::string>("subjTyp");
+}
+
+void ClaimSet::setSubjectTyp(const std::string& val)
+{
+    set("subjTyp", val);
+}
+
 } // namespace nx::cloud::db::api

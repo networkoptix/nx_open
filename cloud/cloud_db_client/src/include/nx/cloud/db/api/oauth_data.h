@@ -17,7 +17,8 @@ namespace nx::cloud::db::api {
 NX_REFLECTION_ENUM_CLASS(GrantType,
     password,
     refresh_token,
-    authorization_code
+    authorization_code,
+    system_credentials
 );
 
 NX_REFLECTION_ENUM_CLASS(ResponseType,
@@ -232,6 +233,10 @@ public:
 
     std::optional<int> securitySequence() const;
     void setSecuritySequence(int val);
+
+    // Oauth subject type. MUST be one of user, system
+    std::optional<std::string> subjectTyp() const;
+    void setSubjectTyp(const std::string& val);
 };
 
 using Token = nx::network::jws::Token<ClaimSet>;
