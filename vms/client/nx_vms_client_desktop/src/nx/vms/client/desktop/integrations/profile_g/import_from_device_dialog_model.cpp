@@ -74,7 +74,6 @@ public:
     QString getNameText(const QModelIndex& index) const;
     QString getImportedUpToText(const QModelIndex& index) const;
     QString getStatusText(const QModelIndex& index) const;
-    QString getTooltipText(const QModelIndex& index) const;
     QColor getCellColor(const QModelIndex& index) const;
 };
 
@@ -157,18 +156,6 @@ QString ImportFromDeviceDialogModel::Private::getStatusText(const QModelIndex& i
     }
 
     NX_ASSERT(false, "Unexpected state");
-    return {};
-}
-
-QString ImportFromDeviceDialogModel::Private::getTooltipText(const QModelIndex& index) const
-{
-    if (index.column() != StatusColumn)
-        return {};
-
-    const auto iter = getDeviceDataIter(index);
-    if (iter != deviceData.end() && iter->second.state == StateCode::error)
-        return ImportFromDeviceDialogModel::tr("Failed to import. Retry in 1 minute.");
-
     return {};
 }
 
@@ -297,10 +284,6 @@ QVariant ImportFromDeviceDialogModel::data(const QModelIndex& index, int role) c
         case Qt::ForegroundRole:
         {
             return d->getCellColor(index);
-        }
-        case Qt::ToolTipRole:
-        {
-            return d->getTooltipText(index);
         }
     }
 
