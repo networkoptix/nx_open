@@ -9,7 +9,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/http/buffer_source.h>
-#include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
@@ -157,7 +156,7 @@ public:
     void setupClient(nx::network::http::AsyncClient* client)
     {
         NX_CRITICAL(client);
-        client->addAdditionalHeader(Qn::kAcceptLanguageHeader, m_locale);
+        client->addAdditionalHeader(nx::network::http::header::kAcceptLanguage, m_locale);
         NetworkManager::setDefaultTimeouts(client);
     }
 

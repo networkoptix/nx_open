@@ -64,8 +64,6 @@ static constexpr char PHYSICAL_ID_URL_QUERY_ITEM[] = "cameraId";
 static constexpr char FRAME_TIMESTAMP_US_HEADER_NAME[] = "Frame-Timestamp";
 static constexpr char FRAME_ENCODED_BY_PLUGIN[] = "Frame-From-Plugin";
 
-static constexpr char kAcceptLanguageHeader[] = "Accept-Language";
-
 static constexpr char kTicketUrlQueryName[] = "_ticket";
 
 static constexpr char VIDEOWALL_INSTANCE_HEADER_NAME[] = "videoWallInstanceGuid";

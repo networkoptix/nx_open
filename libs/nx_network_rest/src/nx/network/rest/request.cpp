@@ -5,7 +5,6 @@
 #include <QtCore/QJsonObject>
 
 #include <nx/branding.h>
-#include <nx/network/http/custom_headers.h>
 #include <nx/utils/json/qjson.h>
 
 #include "audit.h"
@@ -243,7 +242,7 @@ std::vector<QString> Request::preferredResponseLocales() const
     if (const auto p = m_urlParams.value("_language"); !p.isEmpty())
         locales.push_back(p);
 
-    if (const auto header = http::getHeaderValue(m_httpRequest->headers, Qn::kAcceptLanguageHeader);
+    if (const auto header = http::getHeaderValue(m_httpRequest->headers, http::header::kAcceptLanguage);
         !header.empty())
     {
         nx::utils::split(
