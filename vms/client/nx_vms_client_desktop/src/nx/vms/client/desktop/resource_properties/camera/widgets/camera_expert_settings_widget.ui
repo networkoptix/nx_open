@@ -97,7 +97,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="nx::vms::client::desktop::AlertLabel" name="alertLabel" native="true"/>
+                 <widget class="nx::vms::client::desktop::AlertLabel" name="settingsDisableControlCheckBoxAlertLabel" native="true"/>
                 </item>
                 <item>
                  <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="bitratePerGopCheckBox">
@@ -387,6 +387,9 @@
                   </property>
                  </widget>
                 </item>
+                <item>
+                 <widget class="nx::vms::client::desktop::AlertLabel" name="remoteArchiveSynchronizationAlertLabel" native="true"/>
+                </item>
                </layout>
               </widget>
              </item>
@@ -405,6 +408,9 @@
                    <string>Keep camera time settings</string>
                   </property>
                  </widget>
+                </item>
+                <item>
+                 <widget class="nx::vms::client::desktop::AlertLabel" name="keepCameraTimeSettingsAlertLabel" native="true"/>
                 </item>
                </layout>
               </widget>

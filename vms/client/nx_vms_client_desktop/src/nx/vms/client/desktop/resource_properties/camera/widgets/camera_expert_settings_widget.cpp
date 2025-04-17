@@ -392,8 +392,17 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
         "Only camera or server offline periods after the first addition to the site will be "
         "imported automatically."));
 
-    ui->alertLabel->setText(tr("Quality and frame rate (FPS) settings in the Recording Schedule"
-                               " will become irrelevant"));
+    ui->settingsDisableControlCheckBoxAlertLabel->setText(
+        tr("Quality and frame rate (FPS) settings in the "
+            "Recording Schedule will become irrelevant"));
+
+    ui->remoteArchiveSynchronizationAlertLabel->setText(
+        tr("To avoid irreversible changes in the archive, it is recommended to disable "
+            "\"Keep camera time settings\" before enabling \"Import video automatically\"."));
+
+    ui->keepCameraTimeSettingsAlertLabel->setText(
+        tr("Enabling this setting may lead to irreversible changes in the archive. "
+            "It is not recommended to enable it while \"Import video automatically\" is active"));
 }
 
 CameraExpertSettingsWidget::~CameraExpertSettingsWidget()
@@ -763,8 +772,14 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     ::setReadOnly(ui->restoreDefaultsButton, state.readOnly);
 
     // Alerts.
-    ui->alertLabel->setVisible(
+    ui->settingsDisableControlCheckBoxAlertLabel->setVisible(
         state.expertAlerts.testFlag(CameraSettingsDialogState::ExpertAlert::cameraControlYielded));
+
+    ui->remoteArchiveSynchronizationAlertLabel->setVisible(
+        state.expertAlerts.testFlag(CameraSettingsDialogState::ExpertAlert::importVideoChangedWarning));
+
+    ui->keepCameraTimeSettingsAlertLabel->setVisible(
+        state.expertAlerts.testFlag(CameraSettingsDialogState::ExpertAlert::timeSettingsChangedWarning));
 
     ui->motionImplicitlyDisabledAlertBar->setText(MotionStreamAlerts::implicitlyDisabledAlert(
         state.motion.streamAlert,

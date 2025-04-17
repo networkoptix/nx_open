@@ -2455,6 +2455,10 @@ CameraSettingsDialogStateReducer::State
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
 
+    state.expertAlerts.setFlag(State::ExpertAlert::timeSettingsChangedWarning,
+        value && state.expert.remoteArchiveSynchronizationEnabled.valueOr(false));
+    state.expertAlerts.setFlag(State::ExpertAlert::importVideoChangedWarning, false);
+
     return state;
 }
 
@@ -2627,6 +2631,11 @@ State CameraSettingsDialogStateReducer::setRemoteArchiveSynchronizationEnabled(
     state.expert.remoteArchiveSynchronizationEnabled.setUser(value);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
+
+    state.expertAlerts.setFlag(State::ExpertAlert::importVideoChangedWarning,
+        value && state.expert.keepCameraTimeSettings.valueOr(false));
+    state.expertAlerts.setFlag(State::ExpertAlert::timeSettingsChangedWarning, false);
+
     return state;
 }
 

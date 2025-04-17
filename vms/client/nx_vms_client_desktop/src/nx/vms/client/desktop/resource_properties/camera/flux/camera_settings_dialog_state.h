@@ -228,7 +228,13 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     enum class ExpertAlert
     {
         // Quality and FPS settings in the Recording Schedule will become irrelevant.
-        cameraControlYielded = 0x1
+        cameraControlYielded = 1 << 0,
+
+        // Archive may suffer irreversible changes because import video changed.
+        importVideoChangedWarning = 1 << 1,
+
+        // Archive may suffer irreversible changes because time settings changed.
+        timeSettingsChangedWarning = 1 << 2,
     };
     Q_DECLARE_FLAGS(ExpertAlerts, ExpertAlert)
 
