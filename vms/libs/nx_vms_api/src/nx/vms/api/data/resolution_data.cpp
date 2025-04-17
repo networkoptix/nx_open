@@ -10,7 +10,6 @@ namespace {
 
 const std::string kResolutionStringSeparator("x");
 const std::string kResolutionStringSuffix("p");
-const std::string kDefaultResolutionString("-1p");
 const std::regex kResolutionRegexp("^([+-]?\\d+)([px])([+-]?\\d+)?$");
 
 } // anonymous namespace
@@ -53,15 +52,7 @@ QString ResolutionData::toString() const
 
 bool fromString(const std::string_view& str, ResolutionData* target)
 {
-    // Regex below fails for this case.
-    if (str == kDefaultResolutionString)
-    {
-        target->size = QSize();
-        return true;
-    }
-
     std::match_results<std::string_view::const_iterator> match;
-
     if (!std::regex_search(str.begin(), str.end(), match, kResolutionRegexp))
         return false;
 
@@ -70,18 +61,20 @@ bool fromString(const std::string_view& str, ResolutionData* target)
 
     try
     {
-        if (match.size() < 4)
+        if (match.size() == 3 || match[3].str().empty())
         {
-            if (!(match[2] == kResolutionStringSuffix))
+            if (match[2] != kResolutionStringSuffix)
                 return false;
-            target->size.setHeight(std::stoi(match[1]));
+
+            target->size.setHeight(std::stoi(match[1].str()));
             return true;
         }
 
-        if (!(match[2] == kResolutionStringSeparator))
+        if (match[2] != kResolutionStringSeparator)
             return false;
-        target->size.setWidth(std::stoi(match[1]));
-        target->size.setHeight(std::stoi(match[3]));
+
+        target->size.setWidth(std::stoi(match[1].str()));
+        target->size.setHeight(std::stoi(match[3].str()));
         return true;
     }
     catch (const std::exception& e)
