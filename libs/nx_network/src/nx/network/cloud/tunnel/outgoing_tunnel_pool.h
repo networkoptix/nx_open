@@ -61,7 +61,6 @@ public:
      *   E.g., received from OutgoingTunnelPool::ownPeerId().
      */
     void setOwnPeerId(const std::string& peerId);
-    void clearOwnPeerIdIfEqual(const std::string& name, const nx::Uuid& uuid);
 
     void removeAllTunnelsSync();
 

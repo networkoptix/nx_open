@@ -126,18 +126,6 @@ void OutgoingTunnelPool::setOwnPeerId(const std::string& peerId)
     }
 }
 
-void OutgoingTunnelPool::clearOwnPeerIdIfEqual(const std::string& name, const nx::Uuid& uuid)
-{
-    NX_MUTEX_LOCKER lock(&m_mutex);
-
-    if (m_isOwnPeerIdAssigned &&
-        nx::utils::startsWith(m_ownPeerId, nx::utils::buildString(name, '_', uuid.toSimpleStdString())))
-    {
-        m_isOwnPeerIdAssigned = false;
-        m_ownPeerId.clear();
-    }
-}
-
 void OutgoingTunnelPool::removeAllTunnelsSync()
 {
     pleaseStopSync();
