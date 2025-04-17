@@ -35,7 +35,7 @@ public:
     NX_REFLECTION_ENUM_CLASS_IN_CLASS(Purpose,
         connect,
         merge,
-        connectInCompatibilityMode,
+        connectInCompatibilityMode, //< Skip protocol version & cloud host check.
         connectInCrossSystemMode
     );
 

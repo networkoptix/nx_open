@@ -1215,17 +1215,13 @@ void ConnectActionsHandler::at_connectAction_triggered()
 
     const auto actionParameters = menu()->currentParameters(sender());
 
-    auto logonData = actionParameters.hasArgument(Qn::LogonDataRole)
+    const auto logonData = actionParameters.hasArgument(Qn::LogonDataRole)
         ? std::make_optional(actionParameters.argument<LogonData>(Qn::LogonDataRole))
         : std::nullopt;
 
-    if (!qnRuntime->isDesktopMode())
+    if (!qnRuntime->isDesktopMode() && NX_ASSERT(logonData))
     {
-        if (NX_ASSERT(logonData))
-        {
-            logonData->purpose = LogonData::Purpose::connectInCompatibilityMode;
-            connectToServerInNonDesktopMode(*logonData);
-        }
+        connectToServerInNonDesktopMode(*logonData);
         return;
     }
 

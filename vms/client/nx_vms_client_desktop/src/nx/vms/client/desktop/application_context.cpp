@@ -522,7 +522,7 @@ struct ApplicationContext::Private
         if (ini().isAutoCloudHostDeductionMode())
             developerFlags.setFlag(DeveloperFlag::ignoreCloudHost);
 
-        if (ini().developerMode)
+        if (ini().developerMode || startupParameters.isVideoWallLauncherMode())
             developerFlags.setFlag(DeveloperFlag::ignoreProtocolVersion);
 
         ServerCompatibilityValidator::initialize(
