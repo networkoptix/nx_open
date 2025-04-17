@@ -88,6 +88,9 @@ signals:
 
     /** This signal is emitted every time when we cannot delete resources. */
     void resourceDeletingFailed(const QnResourceList &resources);
+
+private:
+    std::map<SystemContext*, std::unordered_set<Uuid>> mDeletingResources;
 };
 
 } // namespace nx::vms::client::desktop
