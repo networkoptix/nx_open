@@ -6995,6 +6995,14 @@ If you intended to move analytics data to another storage location, please conta
         <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
@@ -12214,10 +12222,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>All imported</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>In progress... (%1 left)</source>
         <translation></translation>
     </message>
@@ -12227,10 +12231,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>Error</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failed to import. Retry in 1 minute.</source>
         <translation></translation>
     </message>
     <message>
@@ -12244,6 +12244,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>Status</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

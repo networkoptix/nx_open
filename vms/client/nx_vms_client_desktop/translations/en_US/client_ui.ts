@@ -1499,10 +1499,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Background Image</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Browse...</source>
         <translation></translation>
     </message>
@@ -1549,6 +1545,10 @@
     <message>
         <source>Show timestamp on LIVE</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Custom Background Image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
