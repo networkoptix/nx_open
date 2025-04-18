@@ -779,7 +779,7 @@
     </message>
     <message>
       <source>Export Bookmark...</source>
-      <translation>ブックマークのエクスポート...</translation>
+      <translation>ブックマークをエクスポート...</translation>
     </message>
     <message>
       <source>Resolution...</source>
