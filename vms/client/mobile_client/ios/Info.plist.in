@@ -70,5 +70,7 @@
         <false/>
         <key>FirebaseMessagingAutoInitEnabled</key>
         <false/>
+        <key>NSLocalNetworkUsageDescription</key>
+        <string>${customization.mobile.displayName} uses the local network to discover ${customization.mobile.displayName} Servers on your local Wi-Fi network.</string>
 </dict>
 </plist>
