@@ -11142,7 +11142,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>Chi tiết chứng chỉ</translation>
     </message>
   </context>
   <context>

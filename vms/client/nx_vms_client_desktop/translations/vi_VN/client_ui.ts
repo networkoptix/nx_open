@@ -1594,7 +1594,7 @@
     </message>
     <message>
       <source>User&apos;s local layouts</source>
-      <translation type="unfinished">User&apos;s local layouts</translation>
+      <translation>Bố cục cục bộ của người dùng</translation>
     </message>
   </context>
   <context>

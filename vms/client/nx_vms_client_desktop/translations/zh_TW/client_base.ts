@@ -11140,7 +11140,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>憑證詳情</translation>
     </message>
   </context>
   <context>
