@@ -67,7 +67,7 @@
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation type="unfinished">your Regional / License support</translation>
+      <translation>votre support régional / de licence</translation>
     </message>
   </context>
   <context>
@@ -254,7 +254,7 @@
     <name>QnCameraAnalyticsEventsPolicy</name>
     <message>
       <source>Analytics events are not available for %1</source>
-      <translation type="unfinished">Analytics events are not available for %1</translation>
+      <translation>Les événements d'analyse ne sont pas disponibles pour %1</translation>
     </message>
   </context>
   <context>

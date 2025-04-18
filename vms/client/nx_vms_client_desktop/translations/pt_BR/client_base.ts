@@ -6997,6 +6997,14 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
       <translation type="unfinished">Only camera or server offline periods after the first addition to the site will be imported automatically.</translation>
     </message>
+    <message>
+      <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
+      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+    </message>
+    <message>
+      <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
+      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
@@ -12235,10 +12243,6 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
       <translation>Sem dados</translation>
     </message>
     <message>
-      <source>All imported</source>
-      <translation type="unfinished">All imported</translation>
-    </message>
-    <message>
       <source>In progress... (%1 left)</source>
       <translation type="unfinished">In progress... (%1 left)</translation>
     </message>
@@ -12251,10 +12255,6 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
       <translation>Erro</translation>
     </message>
     <message>
-      <source>Failed to import. Retry in 1 minute.</source>
-      <translation type="unfinished">Failed to import. Retry in 1 minute.</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>Nome</translation>
     </message>
@@ -12265,6 +12265,10 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <message>
       <source>Status</source>
       <translation>Estado</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Habilitado</translation>
     </message>
   </context>
   <context>

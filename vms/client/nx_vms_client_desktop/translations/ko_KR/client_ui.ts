@@ -1499,10 +1499,6 @@
       <translation>화면 설정</translation>
     </message>
     <message>
-      <source>Background Image</source>
-      <translation>배경 이미지</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>찾기...</translation>
     </message>
@@ -1549,6 +1545,10 @@
     <message>
       <source>Show timestamp on LIVE</source>
       <translation type="unfinished">Show timestamp on LIVE</translation>
+    </message>
+    <message>
+      <source>Custom Background Image</source>
+      <translation type="unfinished">Custom Background Image</translation>
     </message>
   </context>
   <context>

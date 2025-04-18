@@ -1949,7 +1949,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Developer Build</source>
-      <translation type="unfinished">Developer Build</translation>
+      <translation>Công cụ phát triển</translation>
     </message>
   </context>
   <context>
@@ -4347,7 +4347,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>NOT ACTIVATED</source>
-      <translation type="unfinished">NOT ACTIVATED</translation>
+      <translation>KHÔNG KÍCH HOẠT</translation>
     </message>
   </context>
   <context>
@@ -5450,7 +5450,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Cannot find compatible client version: %1</source>
-      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+      <translation>Không tìm thấy phiên bản máy khách tương thích: %1</translation>
     </message>
   </context>
   <context>
@@ -6586,7 +6586,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Site is currently suspended</source>
-      <translation type="unfinished">Site is currently suspended</translation>
+      <translation>Chi nhánh hiện đang bị đình chỉ</translation>
     </message>
   </context>
   <context>
@@ -6882,6 +6882,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
       <translation>Chỉ những khoảng thời gian camera hoặc máy chủ ngoại tuyến sau lần đầu tiên thêm vào trang web mới được tự động nhập.</translation>
     </message>
+    <message>
+      <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
+      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+    </message>
+    <message>
+      <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
+      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
@@ -7144,11 +7152,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+      <translation>Quá trình ghi vẫn tiếp tục, nhưng Chi nhánh hiện đang bị tạm dừng. Phải kích hoạt để thay đổi cài đặt ghi cho thiết bị hoặc để bật ghi. Liên hệ với đối tác kênh của bạn để được hỗ trợ.</translation>
     </message>
     <message>
       <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
+      <translation>Quá trình ghi đã dừng lại vì Chi nhánh đã bị đóng. Phải kích hoạt để có thể bật ghi cho thiết bị. Liên hệ với đối tác kênh của bạn để được hỗ trợ.</translation>
     </message>
   </context>
   <context>
@@ -10650,7 +10658,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>Chi tiết chứng chỉ</translation>
     </message>
   </context>
   <context>
@@ -12058,10 +12066,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Không có dữ liệu</translation>
     </message>
     <message>
-      <source>All imported</source>
-      <translation>Tất cả được nhập khẩu</translation>
-    </message>
-    <message>
       <source>In progress... (%1 left)</source>
       <translation>Đang tiến hành... (%1 còn lại)</translation>
     </message>
@@ -12074,10 +12078,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Lỗi</translation>
     </message>
     <message>
-      <source>Failed to import. Retry in 1 minute.</source>
-      <translation>Không thể nhập được. Hãy thử lại sau 1 phút.</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>Tên</translation>
     </message>
@@ -12088,6 +12088,10 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Status</source>
       <translation>Trạng thái</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Bật</translation>
     </message>
   </context>
   <context>

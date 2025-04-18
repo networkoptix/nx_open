@@ -6997,6 +6997,14 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
       <translation>Endast kamera- eller server offlineperioder efter det första tillägget till webbplatsen kommer att importeras automatiskt.</translation>
     </message>
+    <message>
+      <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
+      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+    </message>
+    <message>
+      <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
+      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
@@ -12235,10 +12243,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Data saknas</translation>
     </message>
     <message>
-      <source>All imported</source>
-      <translation>Alla importerade</translation>
-    </message>
-    <message>
       <source>In progress... (%1 left)</source>
       <translation>Pågående... (%1 kvar)</translation>
     </message>
@@ -12251,10 +12255,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Fel</translation>
     </message>
     <message>
-      <source>Failed to import. Retry in 1 minute.</source>
-      <translation>Kunde inte importera. Försök igen om 1 minut.</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>Namn</translation>
     </message>
@@ -12265,6 +12265,10 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Status</source>
       <translation>Status</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Aktiverad</translation>
     </message>
   </context>
   <context>

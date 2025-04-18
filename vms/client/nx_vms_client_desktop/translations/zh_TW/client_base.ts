@@ -1949,7 +1949,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Developer Build</source>
-      <translation type="unfinished">Developer Build</translation>
+      <translation>開發者版本</translation>
     </message>
   </context>
   <context>
@@ -4347,7 +4347,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>NOT ACTIVATED</source>
-      <translation type="unfinished">NOT ACTIVATED</translation>
+      <translation>未啟用</translation>
     </message>
   </context>
   <context>
@@ -6881,6 +6881,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
       <translation>只有首次新增至站點後的攝影機或伺服器的離線時間段會自動匯入。</translation>
+    </message>
+    <message>
+      <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
+      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+    </message>
+    <message>
+      <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
+      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
     </message>
   </context>
   <context>
@@ -10647,7 +10655,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>憑證詳情</translation>
     </message>
   </context>
   <context>
@@ -11343,7 +11351,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Organization user</source>
-      <translation type="unfinished">Organization user</translation>
+      <translation>組織使用者</translation>
     </message>
   </context>
   <context>
@@ -12053,10 +12061,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>無資料</translation>
     </message>
     <message>
-      <source>All imported</source>
-      <translation>已全部匯入</translation>
-    </message>
-    <message>
       <source>In progress... (%1 left)</source>
       <translation>進行中...（剩餘%1）</translation>
     </message>
@@ -12069,10 +12073,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>錯誤</translation>
     </message>
     <message>
-      <source>Failed to import. Retry in 1 minute.</source>
-      <translation>匯入失敗。 1 分鐘內重試。</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>名稱</translation>
     </message>
@@ -12083,6 +12083,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Status</source>
       <translation>狀態</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>啟用</translation>
     </message>
   </context>
   <context>

@@ -1320,7 +1320,7 @@
     </message>
     <message>
       <source>User&apos;s local layouts</source>
-      <translation type="unfinished">User&apos;s local layouts</translation>
+      <translation>Bố cục cục bộ của người dùng</translation>
     </message>
   </context>
   <context>
@@ -1499,10 +1499,6 @@
       <translation>Giao Diện</translation>
     </message>
     <message>
-      <source>Background Image</source>
-      <translation>Hình nền</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>Duyệt...</translation>
     </message>
@@ -1549,6 +1545,10 @@
     <message>
       <source>Show timestamp on LIVE</source>
       <translation>Hiển thị dấu thời gian trên LIVE</translation>
+    </message>
+    <message>
+      <source>Custom Background Image</source>
+      <translation type="unfinished">Custom Background Image</translation>
     </message>
   </context>
   <context>
@@ -2092,7 +2092,7 @@
     </message>
     <message>
       <source>Service Allocation</source>
-      <translation type="unfinished">Service Allocation</translation>
+      <translation>Phân bổ dịch vụ</translation>
     </message>
   </context>
   <context>

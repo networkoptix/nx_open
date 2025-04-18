@@ -6882,6 +6882,14 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
       <translation>Hanya kamera atau server offline yang akan diimpor secara otomatis setelah penambahan pertama ke site.</translation>
     </message>
+    <message>
+      <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
+      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+    </message>
+    <message>
+      <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
+      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
@@ -12058,10 +12066,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
       <translation>Tidak ada data</translation>
     </message>
     <message>
-      <source>All imported</source>
-      <translation>Semua diimpor</translation>
-    </message>
-    <message>
       <source>In progress... (%1 left)</source>
       <translation>Dalam progres... (%1 kiri)</translation>
     </message>
@@ -12074,10 +12078,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
       <translation>Error</translation>
     </message>
     <message>
-      <source>Failed to import. Retry in 1 minute.</source>
-      <translation>Gagal mengimpor. Coba lagi dalam 1 menit.</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>Nama</translation>
     </message>
@@ -12088,6 +12088,10 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>Status</source>
       <translation>Status</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Diaktifkan</translation>
     </message>
   </context>
   <context>

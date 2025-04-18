@@ -856,7 +856,7 @@
     </message>
     <message>
       <source>Export Bookmark...</source>
-      <translation>ブックマークのエクスポート...</translation>
+      <translation>ブックマークをエクスポート...</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
@@ -6883,6 +6883,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
       <translation>サイト追加後のカメラまたはサーバーのオフライン期間のみが自動的にインポートされます。</translation>
     </message>
+    <message>
+      <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
+      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+    </message>
+    <message>
+      <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
+      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
@@ -12057,10 +12065,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>データがありません</translation>
     </message>
     <message>
-      <source>All imported</source>
-      <translation>すべてインポート済み</translation>
-    </message>
-    <message>
       <source>In progress... (%1 left)</source>
       <translation>進行中... (残り %1)</translation>
     </message>
@@ -12073,10 +12077,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>エラー</translation>
     </message>
     <message>
-      <source>Failed to import. Retry in 1 minute.</source>
-      <translation>インポートに失敗しました。1 分後に再試行してください。</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>名前</translation>
     </message>
@@ -12087,6 +12087,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Status</source>
       <translation>ステータス</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>有効</translation>
     </message>
   </context>
   <context>

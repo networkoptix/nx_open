@@ -1499,10 +1499,6 @@
       <translation>Utseende och känsla</translation>
     </message>
     <message>
-      <source>Background Image</source>
-      <translation>Bakgrundsbild</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>Bläddra...</translation>
     </message>
@@ -1549,6 +1545,10 @@
     <message>
       <source>Show timestamp on LIVE</source>
       <translation>Visa tidsstämpel på LIVE</translation>
+    </message>
+    <message>
+      <source>Custom Background Image</source>
+      <translation type="unfinished">Custom Background Image</translation>
     </message>
   </context>
   <context>

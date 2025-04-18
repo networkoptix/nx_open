@@ -1499,10 +1499,6 @@
       <translation>Aspecto e Ambiente</translation>
     </message>
     <message>
-      <source>Background Image</source>
-      <translation>Imagem de Fundo</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>Procurar...</translation>
     </message>
@@ -1549,6 +1545,10 @@
     <message>
       <source>Show timestamp on LIVE</source>
       <translation type="unfinished">Show timestamp on LIVE</translation>
+    </message>
+    <message>
+      <source>Custom Background Image</source>
+      <translation type="unfinished">Custom Background Image</translation>
     </message>
   </context>
   <context>

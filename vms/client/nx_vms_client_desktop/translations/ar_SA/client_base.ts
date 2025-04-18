@@ -7457,6 +7457,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
       <translation type="unfinished">Only camera or server offline periods after the first addition to the site will be imported automatically.</translation>
     </message>
+    <message>
+      <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
+      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+    </message>
+    <message>
+      <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
+      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
@@ -12948,10 +12956,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>لا يوجد بيانات</translation>
     </message>
     <message>
-      <source>All imported</source>
-      <translation type="unfinished">All imported</translation>
-    </message>
-    <message>
       <source>In progress... (%1 left)</source>
       <translation type="unfinished">In progress... (%1 left)</translation>
     </message>
@@ -12964,10 +12968,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Error</translation>
     </message>
     <message>
-      <source>Failed to import. Retry in 1 minute.</source>
-      <translation type="unfinished">Failed to import. Retry in 1 minute.</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>Name</translation>
     </message>
@@ -12978,6 +12978,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Status</source>
       <translation>Status</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Enabled</translation>
     </message>
   </context>
   <context>

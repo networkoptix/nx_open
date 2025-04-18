@@ -6996,6 +6996,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
       <translation type="unfinished">Only camera or server offline periods after the first addition to the site will be imported automatically.</translation>
     </message>
+    <message>
+      <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
+      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+    </message>
+    <message>
+      <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
+      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
@@ -12230,10 +12238,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
       <translation>Veri bulunamadı</translation>
     </message>
     <message>
-      <source>All imported</source>
-      <translation>Tümü içe alındı</translation>
-    </message>
-    <message>
       <source>In progress... (%1 left)</source>
       <translation>Devam ediyor... (%1 kaldı)</translation>
     </message>
@@ -12246,10 +12250,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
       <translation>Hata</translation>
     </message>
     <message>
-      <source>Failed to import. Retry in 1 minute.</source>
-      <translation>İçe aktarma başarısız oldu. 1 dakika sonra tekrar deneyin.</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>İsim</translation>
     </message>
@@ -12260,6 +12260,10 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <message>
       <source>Status</source>
       <translation>Durum</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Etkinleştir</translation>
     </message>
   </context>
   <context>

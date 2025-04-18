@@ -6997,6 +6997,14 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
       <translation>Seules les périodes hors ligne de la caméra ou du serveur après le premier ajout au site seront importées automatiquement.</translation>
     </message>
+    <message>
+      <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
+      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+    </message>
+    <message>
+      <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
+      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
@@ -12237,10 +12245,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       <translation>Aucune donnée</translation>
     </message>
     <message>
-      <source>All imported</source>
-      <translation>Tous importés</translation>
-    </message>
-    <message>
       <source>In progress... (%1 left)</source>
       <translation>En cours... (%1 gauche)</translation>
     </message>
@@ -12253,10 +12257,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       <translation>Erreur</translation>
     </message>
     <message>
-      <source>Failed to import. Retry in 1 minute.</source>
-      <translation>Échec de l'importation. Réessayez dans 1 minute.</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>Nom</translation>
     </message>
@@ -12267,6 +12267,10 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message>
       <source>Status</source>
       <translation>État</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Activé</translation>
     </message>
   </context>
   <context>

@@ -1499,10 +1499,6 @@
       <translation>Tampilan dan Nuansa</translation>
     </message>
     <message>
-      <source>Background Image</source>
-      <translation>Latar belakang Image</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>Jelajahi...</translation>
     </message>
@@ -1549,6 +1545,10 @@
     <message>
       <source>Show timestamp on LIVE</source>
       <translation>Tampilkan timestamp di LIVE</translation>
+    </message>
+    <message>
+      <source>Custom Background Image</source>
+      <translation type="unfinished">Custom Background Image</translation>
     </message>
   </context>
   <context>
