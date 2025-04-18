@@ -16,9 +16,10 @@
 #include <QtGui/QImage>
 #include <QtGui/rhi/qrhi.h>
 
-#include <nx/utils/log/assert.h>
 #include <nx/pathkit/rhi_paint_device.h>
 #include <nx/pathkit/rhi_paint_engine.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/trace/trace_categories.h>
 
 namespace nx::pathkit {
 
@@ -430,6 +431,8 @@ void RhiPaintDeviceRenderer::createPathPipeline(QRhiRenderPassDescriptor* rp)
 
 bool RhiPaintDeviceRenderer::prepare(QRhiRenderPassDescriptor* rp, QRhiResourceUpdateBatch* u)
 {
+    TRACE_EVENT("rendering", "RhiPaintDeviceRenderer::prepare");
+
     if (!cps)
     {
         createPathPipeline(rp);
@@ -627,6 +630,8 @@ QRhiShaderResourceBindings* RhiPaintDeviceRenderer::getTextureBindings(
 
 void RhiPaintDeviceRenderer::prepareAtlas(const RhiPaintEngineSyncData::Entries& entries)
 {
+    TRACE_EVENT("rendering", "RhiPaintDeviceRenderer::prepareAtlas");
+
     std::unordered_set<Atlas::Rect> usedRects;
     bool atlasContainsNewRectsOnly = false;
 
@@ -862,6 +867,9 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
     std::vector<float>& textureVerts,
     QSize clip)
 {
+    TRACE_EVENT("rendering", "RhiPaintDeviceRenderer::processEntries",
+        "entries", entries.all().size());
+
     std::vector<RhiPaintDeviceRenderer::Batch> batches;
 
     textures.clear();
@@ -1075,6 +1083,8 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
 
 void RhiPaintDeviceRenderer::render(QRhiCommandBuffer* cb)
 {
+    TRACE_EVENT("rendering", "RhiPaintDeviceRenderer::render", "batches", batches.size());
+
     for (const auto& batch: batches)
     {
         if (batch.render)

@@ -38,6 +38,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
+#include <nx/utils/trace/session.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/analytics/object_display_settings.h>
@@ -329,6 +330,9 @@ struct ApplicationContext::Private
     std::unique_ptr<SystemContext> mainSystemContext; //< Main System Context;
     std::unique_ptr<core::UnifiedResourcePool> unifiedResourcePool;
 
+    // Performance tracing.
+    std::unique_ptr<nx::utils::trace::Session> tracingSession;
+
     // Settings modules.
     std::unique_ptr<LocalSettings> localSettings;
     std::unique_ptr<QnClientRuntimeSettings> runtimeSettings;
@@ -575,6 +579,14 @@ struct ApplicationContext::Private
         }
     }
 
+    void initializeTracing(const QnStartupParameters& startupParameters)
+    {
+        if (startupParameters.traceFile.isEmpty())
+            return;
+
+        tracingSession = nx::utils::trace::Session::start(startupParameters.traceFile);
+    }
+
     // This is a temporary step until QnClientCoreModule contents is moved to the corresponding
     // contexts.
     void updateVersionIfNeeded()
@@ -689,6 +701,7 @@ ApplicationContext::ApplicationContext(
         .startupParameters = startupParameters
     })
 {
+    d->initializeTracing(startupParameters);
     initDeveloperOptions(startupParameters);
     initializeResources();
     initializeExternalResources();
@@ -768,6 +781,10 @@ ApplicationContext::ApplicationContext(
             break;
         }
     }
+
+    // PerformanceMonitor provides additional trace data.
+    if (d->tracingSession)
+        d->performanceMonitor->setEnabled(true);
 }
 
 ApplicationContext::~ApplicationContext()

@@ -177,9 +177,9 @@ class NxOpenConan(ConanFile):
         self.requires("qt/6.9.0" "#5d7b0ae68dc714023bef0677ea3f5750")
         self.requires("roboto-fonts/1.0" "#1bff09c31c4d334f27795653e0f4b2bb")
         self.requires("boost/1.83.0" "#d150c9edc8081c98965b05ea9c2df318")
-        self.requires("concurrentqueue/1.0.4" "#957c470e9abc81ff3850bbe39fc11135")
         self.requires("rapidjson/cci.20230929" "#624c0094d741e6a3749d2e44d834b96c")
         self.requires("zlib/1.3.1" "#99d6f9ea0a1dd63d973392c24ce0aa9b")
+        self.requires("perfetto/47.0" "#fefcb910df242e7dca2a309cac9396cb")
 
         if self.settings.os not in ("Android", "iOS"):
             # Qt dependency.

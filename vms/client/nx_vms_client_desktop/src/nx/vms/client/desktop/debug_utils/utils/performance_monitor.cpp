@@ -6,8 +6,6 @@
 
 #include <QtCore/QThread>
 
-#include <nx/utils/trace/trace.h>
-
 namespace nx::vms::client::desktop {
 
 const QString PerformanceMonitor::kProcessCpu = "CPU";
@@ -52,9 +50,6 @@ bool PerformanceMonitor::isDebugInfoVisible() const
 
 void PerformanceMonitor::setVisible(bool visible)
 {
-    if (isEnabled() != visible)
-        setEnabled(nx::utils::trace::Log::isEnabled() || visible);
-
     if (d->visible == visible)
         return;
 

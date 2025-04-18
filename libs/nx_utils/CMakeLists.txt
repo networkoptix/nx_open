@@ -1,6 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-find_package(concurrentqueue REQUIRED)
+find_package(perfetto REQUIRED)
+nx_fix_target_interface_for_cuda(perfetto::perfetto)
 
 if(IOS)
     set(ios_sources "src/nx/utils/log/log_ios.mm")
@@ -15,6 +16,7 @@ nx_add_target(nx_utils LIBRARY
         ${ios_sources}
         ${aes_library_sources}
     PUBLIC_LIBS
+        perfetto::perfetto
         Boost::headers
         OpenSSL::OpenSSL
         Qt6::Core Qt6::Xml
@@ -23,8 +25,6 @@ nx_add_target(nx_utils LIBRARY
         nx_build_info
         nx_kit
         nx_reflect
-    PRIVATE_LIBS
-        concurrentqueue::concurrentqueue
     FOLDER common/libs
 )
 
