@@ -34,3 +34,14 @@ function(nx_force_include target)
         set_property(SOURCE ${sources} APPEND PROPERTY COMPILE_OPTIONS ${flags})
     endif()
 endfunction()
+
+# Wrap interface compile options of a C++ target with -Xcompiler= (for CUDA compiler).
+function(nx_fix_target_interface_for_cuda target)
+    get_property(old_flags TARGET ${target} PROPERTY INTERFACE_COMPILE_OPTIONS)
+    if(NOT "${old_flags}" STREQUAL "")
+        string(REPLACE ";" "," CUDA_flags "${old_flags}")
+        set_property(TARGET ${target} PROPERTY INTERFACE_COMPILE_OPTIONS
+            "$<$<BUILD_INTERFACE:$<COMPILE_LANGUAGE:CXX>>:${old_flags}>$<$<BUILD_INTERFACE:$<COMPILE_LANGUAGE:CUDA>>:-Xcompiler=${CUDA_flags}>"
+            )
+    endif()
+endfunction()

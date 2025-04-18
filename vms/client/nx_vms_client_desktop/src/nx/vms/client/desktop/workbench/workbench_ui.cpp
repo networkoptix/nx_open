@@ -19,7 +19,7 @@
 #include <core/resource/resource.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json_functions.h>
-#include <nx/utils/trace/trace.h>
+#include <nx/utils/trace/trace_categories.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/instruments/frame_time_points_provider_instrument.h>
@@ -404,10 +404,7 @@ WorkbenchUi::WorkbenchUi(QObject *parent):
 
 void WorkbenchUi::updateAutoFpsLimit()
 {
-    NX_TRACE_COUNTER("Items").args({{
-        "items",
-        workbench()->currentLayout()->items().count()
-    }});
+    TRACE_COUNTER("rendering", "Items on scene", workbench()->currentLayout()->items().count());
 
     m_instrumentManager->setFpsLimit(calculateAutoFpsLimit(workbench()->currentLayout()));
 }

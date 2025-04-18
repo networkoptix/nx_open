@@ -8,7 +8,7 @@
 
 #include <boost/circular_buffer.hpp>
 
-#include <nx/utils/trace/trace.h>
+#include <nx/utils/trace/trace_categories.h>
 #include <nx/vms/client/desktop/ini.h>
 
 namespace {
@@ -51,7 +51,7 @@ FrameTimePointsProviderInstrument::FrameTimePointsProviderInstrument(QObject* pa
                 - d->delayReferenceTimestampMs
                 - kCanaryIntervalMs;
 
-            NX_TRACE_COUNTER("Timer").args({{"delay", delayMs}});
+            TRACE_COUNTER("rendering", perfetto::CounterTrack("UI delay", "ms"), delayMs);
 
             d->delayReferenceTimestampMs = d->elapsedTimer.elapsed();
             d->delayMeasurementTimer.start();

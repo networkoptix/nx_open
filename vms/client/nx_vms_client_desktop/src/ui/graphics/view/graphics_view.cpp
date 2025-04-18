@@ -13,7 +13,7 @@
 #include <client/client_runtime_settings.h>
 #include <nx/pathkit/rhi_paint_device.h>
 #include <nx/utils/log/assert.h>
-#include <nx/utils/trace/trace.h>
+#include <nx/utils/trace/trace_categories.h>
 #include <nx/vms/client/core/common/helpers/texture_size_helper.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -130,6 +130,20 @@ QnGraphicsView::QnGraphicsView(QGraphicsScene* scene, nx::vms::client::desktop::
 
     d->quickWidget->quickWindow()->setColor(
         nx::vms::client::core::colorTheme()->color("dark3")); //< window
+
+    connect(d->quickWidget->quickWindow(), &QQuickWindow::beforeFrameBegin, this,
+        []()
+        {
+            TRACE_EVENT_BEGIN("rendering", "QnGraphicsView::frame");
+        },
+        Qt::DirectConnection);
+
+    connect(d->quickWidget->quickWindow(), &QQuickWindow::afterFrameEnd, this,
+        []()
+        {
+            TRACE_EVENT_END("rendering");
+        },
+        Qt::DirectConnection);
 }
 
 QnGraphicsView::~QnGraphicsView()
@@ -138,7 +152,7 @@ QnGraphicsView::~QnGraphicsView()
 
 void QnGraphicsView::paintEvent(QPaintEvent* event)
 {
-    NX_TRACE_SCOPE("paintEvent");
+    TRACE_EVENT("rendering", "QnGraphicsView::paintEvent");
 
     // Always make QOpenGLWidget context to be the current context.
     // This is what item paint functions expect and doing otherwise

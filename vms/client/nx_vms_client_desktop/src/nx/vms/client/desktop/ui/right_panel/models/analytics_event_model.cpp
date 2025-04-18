@@ -5,7 +5,7 @@
 #include <common/common_module.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
-#include <nx/utils/trace/trace.h>
+#include <nx/utils/trace/trace_categories.h>
 
 using namespace std::chrono;
 
@@ -26,7 +26,7 @@ public:
             [this, builder]
             {
                 NX_VERBOSE(this, "Rebuilding analytics event tree begin");
-                NX_TRACE_SCOPE("RebuildAnalyticsEventTree");
+                TRACE_EVENT("models", "RebuildAnalyticsEventTree");
                 const ScopedReset reset(this->q);
                 rootNode = builder->eventTypesTree();
                 NX_VERBOSE(this, "Rebuilding analytics event tree completed");

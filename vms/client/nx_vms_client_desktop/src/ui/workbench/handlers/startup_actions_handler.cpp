@@ -26,7 +26,6 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/utils/trace/trace.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
@@ -409,16 +408,6 @@ void StartupActionsHandler::handleStartupParameters()
 
     if (!startupParameters.scriptFile.isEmpty())
         handleScriptFile(startupParameters.scriptFile);
-
-    const auto traceFile = startupParameters.traceFile.isEmpty()
-        ? qgetenv("NX_TRACE_FILE").toStdString()
-        : startupParameters.traceFile.toStdString();
-
-    if (!traceFile.empty())
-    {
-        nx::utils::trace::Log::enable(traceFile);
-        appContext()->performanceMonitor()->setEnabled(true);
-    }
 }
 
 void StartupActionsHandler::handleInstantDrops(const QnResourceList& resources)

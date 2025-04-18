@@ -14,9 +14,10 @@
 #include <include/core/SkStrokeRec.h>
 #include <include/pathops/SkPathOps.h>
 
-#include <nx/utils/log/assert.h>
 #include <nx/pathkit/rhi_paint_device.h>
 #include <nx/pathkit/rhi_paint_engine.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/trace/trace_categories.h>
 
 using namespace pk;
 
@@ -231,6 +232,8 @@ void RhiPaintDeviceRenderer::createPathPipeline(QRhiRenderPassDescriptor* rp)
 
 bool RhiPaintDeviceRenderer::prepare(QRhiRenderPassDescriptor* rp, QRhiResourceUpdateBatch* u)
 {
+    TRACE_EVENT("rendering", "RhiPaintDeviceRenderer::prepare");
+
     if (!cps)
     {
         createPathPipeline(rp);
@@ -320,6 +323,9 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
     std::vector<float>& textureVerts,
     QSize clip)
 {
+    TRACE_EVENT("rendering", "RhiPaintDeviceRenderer::processEntries",
+        "entries", entries.size());
+
     std::vector<RhiPaintDeviceRenderer::Batch> batches;
 
     textures.clear();
@@ -449,6 +455,8 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
 
 void RhiPaintDeviceRenderer::render(QRhiCommandBuffer* cb)
 {
+    TRACE_EVENT("rendering", "RhiPaintDeviceRenderer::render", "batches", batches.size());
+
     for (const auto& batch: batches)
     {
         if (batch.render)

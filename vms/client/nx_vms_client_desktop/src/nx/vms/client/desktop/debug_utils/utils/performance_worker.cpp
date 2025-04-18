@@ -10,8 +10,8 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QTimer>
 
-#include <nx/utils/trace/trace.h>
 #include <nx/monitoring/activity_monitor.h>
+#include <nx/utils/trace/trace_categories.h>
 
 #if defined(Q_OS_WIN)
     #include <windows.h>
@@ -56,23 +56,26 @@ void PerformanceWorker::gatherValues()
         values["Objects GDI"] = gdiHandleCount;
         values["Objects USER"] = userHandleCount;
 
-        NX_TRACE_COUNTER("Gui Resources").args({
-            { "GDI", (qint64) gdiHandleCount },
-            { "USER", (qint64) userHandleCount }});
+        TRACE_COUNTER("resources", "GDI handles", (qint64) gdiHandleCount);
+        TRACE_COUNTER("resources", "USER handles", (qint64) userHandleCount);
     #endif
 
     static constexpr qreal kBytesInMB = 1024.0 * 1024.0;
 
     // Counters are stacked, so put each counter under its own name.
-    NX_TRACE_COUNTER("CPU").args({
-        { "Process (%) ", processCpuValue * 100 },
-        { "Total (%)", totalCpuValue * 100 }});
-    NX_TRACE_COUNTER("Memory").args({
-        { "Process private (MB)", (qreal) processPrivateMemoryValue / kBytesInMB },
-        { "Process (MB)", (qreal) processMemoryValue / kBytesInMB },
-        { "Total in use (MB)", (qreal) m_monitor->totalRamUsageBytes() / kBytesInMB }});
-    NX_TRACE_COUNTER("Threads").args({{ "Threads", threadCount }});
-    NX_TRACE_COUNTER("GPU").args({{ "GPU", processGpuValue * 100 }});
+    TRACE_COUNTER("resources", perfetto::CounterTrack("Process CPU", "%"), processCpuValue * 100);
+    TRACE_COUNTER("resources", perfetto::CounterTrack("Total CPU", "%"), totalCpuValue * 100);
+    TRACE_COUNTER("resources",
+        perfetto::CounterTrack("Process private memory", "MB"),
+        (qreal) processPrivateMemoryValue / kBytesInMB);
+    TRACE_COUNTER("resources",
+        perfetto::CounterTrack("Process memory", "MB"),
+        (qreal) processMemoryValue / kBytesInMB);
+    TRACE_COUNTER("resources",
+        perfetto::CounterTrack("Total memory used", "MB"),
+        (qreal) m_monitor->totalRamUsageBytes() / kBytesInMB);
+    TRACE_COUNTER("resources", "Threads", threadCount);
+    TRACE_COUNTER("resources", perfetto::CounterTrack("Process GPU", "%"), processGpuValue * 100);
 
     emit valuesChanged(values);
 }

@@ -51,7 +51,6 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/property_storage/property.h>
-#include <nx/utils/trace/trace.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
 #include <nx/vms/client/core/media/consuming_motion_metadata_provider.h>
@@ -1801,17 +1800,6 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true, true));
 
     updateInfoTextLater();
-    traceFps();
-}
-
-void QnMediaResourceWidget::traceFps() const
-{
-    if (!d->traceFpsTimer.hasExpired(1s))
-        return;
-    d->traceFpsTimer.restart();
-
-    NX_TRACE_COUNTER_ID("Item FPS", (int64_t) this).args(
-        {{ "FPS", d->getStatisticsFps(channelCount()) }});
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(

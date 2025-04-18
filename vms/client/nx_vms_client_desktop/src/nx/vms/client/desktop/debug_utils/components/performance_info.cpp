@@ -12,7 +12,7 @@
 #include <nx/build_info.h>
 #include <nx/metrics/application_metrics_storage.h>
 #include <nx/utils/log/format.h>
-#include <nx/utils/trace/trace.h>
+#include <nx/utils/trace/trace_categories.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/components/debug_info_storage.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
@@ -96,7 +96,8 @@ void PerformanceInfo::setPerformanceValues(const QVariantMap& values)
     // On each values update also calculate current FPS.
     const auto [fpsValue, frameTime] = d->calculateFpsValues();
 
-    NX_TRACE_COUNTER_ID("FPS", (int64_t) this).args({{ "FPS", fpsValue }});
+    const qreal fpsValueCopy = fpsValue; //< Workaround for older compilers.
+    TRACE_COUNTER("rendering", perfetto::CounterTrack("Framerate", "fps"), fpsValueCopy);
 
     // Create rich text with all values.
     auto remaining = values;
