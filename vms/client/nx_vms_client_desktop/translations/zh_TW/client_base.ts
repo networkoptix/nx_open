@@ -4548,15 +4548,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</translation>
+      <translation>由於站點已關閉，雲端備份已停止。站點必須處於活躍狀態才能進行雲端備份。請聯絡您的通路夥伴尋求協助。</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>雲端備份仍在繼續，但站點目前已暫停。它必須處於活躍狀態才能修改備份設定置或啟用雲端儲存位置。聯絡您的通路合作夥伴尋求協助。</translation>
     </message>
     <message>
       <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>站點必須處於活躍狀態才能啟用雲端儲存位置。聯絡您的通路夥伴尋求協助。</translation>
     </message>
     <message>
       <source>Site suspended</source>
@@ -5450,7 +5450,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cannot find compatible client version: %1</source>
-      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+      <translation>找不到相容的用戶端版本： %1</translation>
     </message>
   </context>
   <context>
@@ -6586,7 +6586,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site is currently suspended</source>
-      <translation type="unfinished">Site is currently suspended</translation>
+      <translation>站點目前已暫停</translation>
     </message>
   </context>
   <context>
@@ -6684,7 +6684,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>雲端備份仍在繼續，但站點目前已暫停。它必須處於活躍狀態才能修改裝置的 &quot;備份內容&quot; 和 &quot;品質&quot; 設定，或啟用雲端備份。您也可以停用雲端備份。 %1</translation>
     </message>
   </context>
   <context>
@@ -6884,11 +6884,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
-      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+      <translation>為避免檔案中發生不可回復的更改，建議在啟用 &quot;自動匯入影片&quot;之前，停用 &quot;保留攝影機時間設定&quot; 。</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
-      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+      <translation>啟用此設定可能會導致檔案發生不可逆的變更。不建議在啟用 &quot;自動匯入影片&quot; 時啟用它。</translation>
     </message>
   </context>
   <context>
@@ -7152,11 +7152,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+      <translation>錄影仍在繼續，但站點目前已暫停。站點必須處於活躍狀態才能更改裝置的錄影設定或啟用錄影。聯絡您的通路夥伴尋求協助。</translation>
     </message>
     <message>
       <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
+      <translation>由於站點已關閉，錄影份已停止。站點必須處於活躍狀態才能啟用錄影。請聯絡您的通路夥伴尋求協助。</translation>
     </message>
   </context>
   <context>
@@ -8519,11 +8519,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::IntegrationSettingsWatcher</name>
     <message>
       <source>API Integrations approval requests are permitted</source>
-      <translation type="unfinished">API Integrations approval requests are permitted</translation>
+      <translation>允許 API 整合核准請求</translation>
     </message>
     <message>
       <source>API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</translation>
+      <translation>已啟用API 整合登錄請求。雖然有安全防護，但不建議長期使用。請考慮在安裝所有必要的整合後，停用此選項。</translation>
     </message>
   </context>
   <context>
@@ -12643,12 +12643,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
-      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
+      <translation>使用此服務的裝置數量超出了可用數量。新增更多服務或在一些裝置停用服務。</translation>
     </message>
     <message>
       <source>On %1, the system will automatically disable the service on some devices.</source>
       <comment>%1 will be substituted with date and time</comment>
-      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
+      <translation>在 %1，系統將自動停一些裝置上的該服務。</translation>
     </message>
   </context>
   <context>

@@ -1320,7 +1320,7 @@
     </message>
     <message>
       <source>User&apos;s local layouts</source>
-      <translation type="unfinished">User&apos;s local layouts</translation>
+      <translation>使用者的本地佈局</translation>
     </message>
   </context>
   <context>
@@ -1548,7 +1548,7 @@
     </message>
     <message>
       <source>Custom Background Image</source>
-      <translation type="unfinished">Custom Background Image</translation>
+      <translation>自訂背景圖片</translation>
     </message>
   </context>
   <context>
@@ -2092,7 +2092,7 @@
     </message>
     <message>
       <source>Service Allocation</source>
-      <translation type="unfinished">Service Allocation</translation>
+      <translation>服務配置</translation>
     </message>
   </context>
   <context>

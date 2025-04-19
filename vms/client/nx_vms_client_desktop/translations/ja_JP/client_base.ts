@@ -6885,11 +6885,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
-      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+      <translation>アーカイブの不可逆的な変更を回避するために、 &quot;カメラの時刻設定を保持する&quot; を無効化してから、 &quot;映像を自動的にインポート&quot; を有効化することを推奨します。</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
-      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+      <translation>この設定を有効化すると、アーカイブに不可逆的な変更が生じる可能性があります。&quot;映像を自動的にインポート&quot; が有効な場合、この設定を有効化することは推奨されません。</translation>
     </message>
   </context>
   <context>

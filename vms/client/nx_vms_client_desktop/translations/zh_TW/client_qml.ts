@@ -2504,7 +2504,7 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</translation>
+      <translation>啟用API 整合登錄請求會允許第三方透過整合發送核准請求。雖然有安全防護，但不建議長期使用。請監控使用量，並於安裝所須的整合後停用此選項。</translation>
     </message>
   </context>
   <context>

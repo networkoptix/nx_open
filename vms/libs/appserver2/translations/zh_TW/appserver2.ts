@@ -9,35 +9,35 @@
     </message>
     <message>
       <source>User Group &apos;%1&apos; does not exist.</source>
-      <translation type="unfinished">User Group &apos;%1&apos; does not exist.</translation>
+      <translation>群組 &apos;%1&apos; 不存在。</translation>
     </message>
     <message>
       <source>Cannot add to a non-local (%1) User Group &apos;%2(%3)&apos;.</source>
-      <translation type="unfinished">Cannot add to a non-local (%1) User Group &apos;%2(%3)&apos;.</translation>
+      <translation>無法加入非本地（%1）群組 &apos;%2（%3）&apos;。</translation>
     </message>
     <message>
       <source>Circular dependencies are forbidden. The User Group &apos;%1(%2)&apos; is already inherited by &apos;%3&apos;.</source>
-      <translation type="unfinished">Circular dependencies are forbidden. The User Group &apos;%1(%2)&apos; is already inherited by &apos;%3&apos;.</translation>
+      <translation>禁止相依循環。群組 &apos;%1(%2)&apos; 已被 &apos;%3&apos;繼承。</translation>
     </message>
     <message>
       <source>Forbidden to add any Users to an LDAP User Group &apos;%1(%2)&apos;.</source>
-      <translation type="unfinished">Forbidden to add any Users to an LDAP User Group &apos;%1(%2)&apos;.</translation>
+      <translation>禁止將任何使用者加入 LDAP 群組 &apos;%1(%2)&apos;。</translation>
     </message>
     <message>
       <source>Forbidden to add any User Groups to an LDAP User Group &apos;%1(%2)&apos;.</source>
-      <translation type="unfinished">Forbidden to add any User Groups to an LDAP User Group &apos;%1(%2)&apos;.</translation>
+      <translation>禁止將任何使用者群組加入 LDAP 群組 &apos;%1(%2)&apos;。</translation>
     </message>
     <message>
       <source>Forbidden to remove any Users from an LDAP User Group &apos;%1(%2)&apos;.</source>
-      <translation type="unfinished">Forbidden to remove any Users from an LDAP User Group &apos;%1(%2)&apos;.</translation>
+      <translation>禁止將任何使用者從 LDAP 使用者群組 &apos;%1(%2)&apos;移除。</translation>
     </message>
     <message>
       <source>Forbidden to remove any User Groups from an LDAP User Group &apos;%1(%2)&apos;.</source>
-      <translation type="unfinished">Forbidden to remove any User Groups from an LDAP User Group &apos;%1(%2)&apos;.</translation>
+      <translation>禁止將任何使用者群組從 LDAP 使用者群組 &apos;%1(%2)&apos;移除。</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to add the User &apos;%3(%4)&apos; to the User Group &apos;%5(%6)&apos;.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to add the User &apos;%3(%4)&apos; to the User Group &apos;%5(%6)&apos;.</translation>
+      <translation>不允許使用者 &apos;%1(%2)&apos; 將使用者 &apos;%3(%4)&apos; 加入群組&apos;%5(%6)&apos;.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to add the User Group &apos;%3(%4)&apos; to the User Group &apos;%5(%6)&apos;.</source>
@@ -70,7 +70,7 @@
     </message>
     <message>
       <source>Invalid Resource type %1.</source>
-      <translation type="unfinished">Invalid Resource type %1.</translation>
+      <translation>無效的資源類型 %1。</translation>
     </message>
     <message>
       <source>Empty Storage URL is not allowed.</source>
@@ -182,7 +182,7 @@
     </message>
     <message>
       <source>Not enough integration licenses for camera %1.</source>
-      <translation type="unfinished">Not enough integration licenses for camera %1.</translation>
+      <translation>攝影機 %1的整合授權不足。</translation>
     </message>
     <message>
       <source>Server %1 does not exist.</source>
@@ -190,11 +190,11 @@
     </message>
     <message>
       <source>Storage %1 does not belong to this Server.</source>
-      <translation type="unfinished">Storage %1 does not belong to this Server.</translation>
+      <translation>儲存裝置 %1 不屬於此伺服器。</translation>
     </message>
     <message>
       <source>Storage %1 can not store analytics.</source>
-      <translation type="unfinished">Storage %1 can not store analytics.</translation>
+      <translation>儲存裝置 %1 無法儲存分析資料。</translation>
     </message>
     <message>
       <source>User &apos;%1&apos; with %2 permissions is not allowed to modify Resource parameter &apos;%3&apos;.</source>
