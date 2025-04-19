@@ -1014,4 +1014,9 @@ FontConfig* ApplicationContext::fontConfig() const
     return static_cast<FontConfig*>(core::ApplicationContext::fontConfig());
 }
 
+const QnStartupParameters& ApplicationContext::startupParameters() const
+{
+    return d->startupParameters;
+}
+
 } // namespace nx::vms::client::desktop

@@ -226,6 +226,8 @@ public:
 
     FontConfig* fontConfig() const;
 
+    const QnStartupParameters& startupParameters() const;
+
 signals:
     void systemContextAdded(SystemContext* systemContext);
     void systemContextRemoved(SystemContext* systemContext);

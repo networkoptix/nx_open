@@ -102,6 +102,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.ipVersion,            "--ip-version");
     addParserParam(commandLineParser, &result.scriptFile,           "--script-file");
     addParserParam(commandLineParser, &result.traceFile,            "--trace-file");
+    addParserParam(commandLineParser, &result.webServerPort,        "--web-server-port");
 
     /* Persistent settings override. */
     addParserParam(commandLineParser, &result.logLevel, "--log-level");

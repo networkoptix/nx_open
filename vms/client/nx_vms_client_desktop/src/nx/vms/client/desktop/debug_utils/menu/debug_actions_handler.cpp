@@ -9,6 +9,7 @@
 #include <api/common_message_processor.h>
 #include <api/server_rest_connection.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_startup_parameters.h>
 #include <nx/build_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/rules/rule.h>
@@ -123,7 +124,12 @@ DebugActionsHandler::DebugActionsHandler(QObject *parent):
             dialog->show();
         });
 
-    if (const int port = ini().clientWebServerPort; port > 0 && port < 65536)
+    // Command line argument overrides ini parameter.
+    int port = appContext()->startupParameters().webServerPort;
+    if (port <= 0 || port >= 65536)
+        port = ini().clientWebServerPort;
+
+    if (port > 0 && port < 65536)
     {
         auto director = context()->instance<DirectorWebserver>();
         QString host = ini().clientWebServerHost;
