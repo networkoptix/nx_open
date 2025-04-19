@@ -1594,7 +1594,7 @@
     </message>
     <message>
       <source>User&apos;s local layouts</source>
-      <translation type="unfinished">User&apos;s local layouts</translation>
+      <translation>使用者的本地佈局</translation>
     </message>
   </context>
   <context>
