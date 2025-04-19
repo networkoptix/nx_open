@@ -10,6 +10,7 @@
 #include <api/common_message_processor.h>
 #include <api/server_rest_connection.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_startup_parameters.h>
 #include <nx/build_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -84,7 +85,12 @@ struct DebugActionsHandler::Private
 {
     Private(WindowContext* windowContext)
     {
-        if (const int port = ini().clientWebServerPort; port > 0 && port < 65536)
+        // Command line argument overrides ini parameter.
+        int port = appContext()->startupParameters().webServerPort;
+        if (port <= 0 || port >= 65536)
+            port = ini().clientWebServerPort;
+
+        if (port > 0 && port < 65536)
         {
             // FIXME: #amalov Some parts of the director may go to the app context.
             director = std::make_unique<Director>(windowContext);

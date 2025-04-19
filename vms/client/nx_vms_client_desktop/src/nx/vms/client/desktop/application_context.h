@@ -246,6 +246,8 @@ public:
 
     joystick::Manager* joystickManager() const;
 
+    const QnStartupParameters& startupParameters() const;
+
 signals:
     void systemContextAdded(SystemContext* systemContext);
     void systemContextRemoved(SystemContext* systemContext);

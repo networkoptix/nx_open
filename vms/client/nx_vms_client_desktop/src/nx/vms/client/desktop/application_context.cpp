@@ -1003,6 +1003,11 @@ joystick::Manager* ApplicationContext::joystickManager() const
     return d->joystickManager.get();
 }
 
+const QnStartupParameters& ApplicationContext::startupParameters() const
+{
+    return d->startupParameters;
+}
+
 std::unique_ptr<QnAbstractStreamDataProvider> ApplicationContext::createAudioInputProvider() const
 {
 #if defined(Q_OS_WIN)

@@ -87,6 +87,9 @@ struct QnStartupParameters
     QString scriptFile;
     QString traceFile;
 
+    /** Director/testkit web server port, overrides the parameter from ini. */
+    int webServerPort = -1;
+
     /** Uri when the client was launched as uri handler. */
     nx::vms::utils::SystemUri customUri;
 
