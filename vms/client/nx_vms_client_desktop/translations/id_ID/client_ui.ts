@@ -1548,7 +1548,7 @@
     </message>
     <message>
       <source>Custom Background Image</source>
-      <translation type="unfinished">Custom Background Image</translation>
+      <translation>Kustom Gambar Latar Belakang</translation>
     </message>
   </context>
   <context>

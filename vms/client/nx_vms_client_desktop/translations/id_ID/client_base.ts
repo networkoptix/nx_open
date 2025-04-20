@@ -6884,11 +6884,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
-      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+      <translation>Untuk menghindari perubahan yang tidak dapat dikembalikan lagi pada archive, disarankan untuk menonaktifkan &quot;Pertahankan pengaturan waktu kamera&quot; sebelum mengaktifkan &quot;Impor video secara otomatis&quot;.</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
-      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+      <translation>Mengaktifkan pengaturan ini dapat menyebabkan perubahan yang tidak dapat dikembalikan pada archive. Tidak disarankan untuk mengaktifkannya saat &quot;Impor video secara otomatis&quot; aktif</translation>
     </message>
   </context>
   <context>
