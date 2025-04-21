@@ -19,7 +19,7 @@ Page
     id: sessionsScreen
     objectName: "sessionsScreen"
 
-    leftButtonImageSource: appContext.cloudStatusWatcher.status == CloudStatusWatcher.Online
+    leftButtonImageSource: appContext.cloudStatusWatcher.status !== CloudStatusWatcher.LoggedOut
         ? cloudUserProfileWatcher.avatarUrl
         : ""
     leftButtonIcon.source: "image://skin/32x32/Outline/avatar.svg"
@@ -28,16 +28,10 @@ Page
 
     onLeftButtonClicked:
     {
-        var showSummary = appContext.cloudStatusWatcher.status == CloudStatusWatcher.Online
-            || appContext.cloudStatusWatcher.status == CloudStatusWatcher.Offline
-
-        if (!showSummary)
-        {
+        if (appContext.cloudStatusWatcher.status === CloudStatusWatcher.LoggedOut)
             Workflow.openCloudLoginScreen()
-            return
-        }
-
-        Workflow.openCloudSummaryScreen(cloudUserProfileWatcher)
+        else
+            Workflow.openCloudSummaryScreen(cloudUserProfileWatcher)
     }
 
     readonly property bool searching: !!siteList.searchText
