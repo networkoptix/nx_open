@@ -45,7 +45,7 @@ public:
 
     void setTimeouts(const AsyncClient::Timeouts& timeouts);
     void setAuthType(AuthType value);
-    const Credentials& credentials() const;
+    Credentials credentials() const;
     void setCredentials(const Credentials& credentials);
     void addAdditionalHeader(const std::string& key, const std::string& value);
 

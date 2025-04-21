@@ -177,7 +177,7 @@ public:
     void setCredentials(const Credentials& credentials);
     void setProxyCredentials(const Credentials& credentials);
 
-    const Credentials& credentials() const;
+    Credentials credentials() const;
 
     void setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure, ssl::AdapterFunc adapterFunc);
 

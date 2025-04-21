@@ -8,8 +8,8 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
-#include <nx/utils/datetime.h>
 #include <nx/utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/thread/mutex.h>
@@ -54,57 +54,68 @@ void ClientOptions::Timeouts::setDefaults(Timeouts value)
 
 void ClientOptions::setUseCompression(bool toggleUseEntityEncoding)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_contentEncodingUsed = toggleUseEntityEncoding;
 }
 
 bool ClientOptions::useCompression() const
 {
+    NX_READ_LOCKER lock(&m_mutex);
     return m_contentEncodingUsed;
 }
 
 void ClientOptions::setSubsequentReconnectTries(int val)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_subsequentReconnectTries = val;
 }
 
 int ClientOptions::subsequentReconnectTries() const
 {
+    NX_READ_LOCKER lock(&m_mutex);
     return m_subsequentReconnectTries;
 }
 
 void ClientOptions::setTotalReconnectTries(int val)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_totalReconnectTries = val;
 }
 
 int ClientOptions::totalReconnectTries() const
 {
+    NX_READ_LOCKER lock(&m_mutex);
     return m_totalReconnectTries;
 }
 
 void ClientOptions::setUserAgent(const std::string& userAgent)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_userAgent = userAgent;
 }
 
-const std::string& ClientOptions::userAgent() const
+const std::string ClientOptions::userAgent() const
 {
+    NX_READ_LOCKER lock(&m_mutex);
     return m_userAgent;
 }
 
 void ClientOptions::setProxyCredentials(const Credentials& credentials)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_proxyCredentials = credentials;
 }
 
-const Credentials& ClientOptions::proxyCredentials() const
+Credentials ClientOptions::proxyCredentials() const
 {
+    NX_READ_LOCKER lock(&m_mutex);
     return m_proxyCredentials;
 }
 
 void ClientOptions::setProxyVia(
     const SocketAddress& proxyEndpoint, bool isSecure, ssl::AdapterFunc adapterFunc)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     if (proxyEndpoint.isNull())
     {
         m_proxyEndpoint.reset();
@@ -118,116 +129,155 @@ void ClientOptions::setProxyVia(
     }
 }
 
-const std::optional<SocketAddress>& ClientOptions::proxyEndpoint() const
+std::optional<SocketAddress> ClientOptions::proxyEndpoint() const
 {
+    NX_READ_LOCKER lock(&m_mutex);
     return m_proxyEndpoint;
 }
 
 bool ClientOptions::isProxySecure() const
 {
+    NX_READ_LOCKER lock(&m_mutex);
     return m_isProxySecure;
 }
 
-const ssl::AdapterFunc& ClientOptions::proxyAdapterFunc() const
+ssl::AdapterFunc ClientOptions::proxyAdapterFunc() const
 {
+    NX_READ_LOCKER lock(&m_mutex);
     return m_proxyAdapterFunc;
 }
 
 void ClientOptions::setDisablePrecalculatedAuthorization(bool val)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_precalculatedAuthorizationDisabled = val;
 }
 
 bool ClientOptions::disablePrecalculatedAuthorization() const
 {
+    NX_READ_LOCKER lock(&m_mutex);
     return m_precalculatedAuthorizationDisabled;
 }
 
 void ClientOptions::setSendTimeout(std::chrono::milliseconds sendTimeout)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_timeouts.sendTimeout = sendTimeout;
 }
 
 void ClientOptions::setResponseReadTimeout(
     std::chrono::milliseconds _responseReadTimeout)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_timeouts.responseReadTimeout = _responseReadTimeout;
 }
 
 void ClientOptions::setMessageBodyReadTimeout(
     std::chrono::milliseconds messageBodyReadTimeout)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_timeouts.messageBodyReadTimeout = messageBodyReadTimeout;
 }
 
 void ClientOptions::setTimeouts(const Timeouts& timeouts)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_timeouts = timeouts;
 }
 
-const ClientOptions::Timeouts& ClientOptions::timeouts() const
+ClientOptions::Timeouts ClientOptions::timeouts() const
 {
+    NX_READ_LOCKER lock(&m_mutex);
     return m_timeouts;
 }
 
 void ClientOptions::addAdditionalHeader(const std::string& key, const std::string& value)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_additionalHeaders.emplace(key, value);
 }
 
 void ClientOptions::removeAdditionalHeader(const std::string& key)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_additionalHeaders.erase(key);
 }
 
 void ClientOptions::setAdditionalHeaders(HttpHeaders additionalHeaders)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_additionalHeaders = std::move(additionalHeaders);
 }
 
-const HttpHeaders& ClientOptions::additionalHeaders() const
+HttpHeaders ClientOptions::additionalHeaders() const
 {
+    NX_READ_LOCKER lock(&m_mutex);
     return m_additionalHeaders;
 }
 
 void ClientOptions::addRequestHeaders(const HttpHeaders& headers)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_additionalHeaders.insert(headers.begin(), headers.end());
 }
 
 void ClientOptions::setAuthType(AuthType value)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_authType = value;
 }
 
 AuthType ClientOptions::authType() const
 {
+    NX_READ_LOCKER lock(&m_mutex);
     return m_authType;
 }
 
 void ClientOptions::setMaxNumberOfRedirects(int maxNumberOfRedirects)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_maxNumberOfRedirects = maxNumberOfRedirects;
 }
 
 int ClientOptions::maxNumberOfRedirects() const
 {
+    NX_READ_LOCKER lock(&m_mutex);
     return m_maxNumberOfRedirects;
 }
 
 void ClientOptions::setCredentials(const Credentials& credentials)
 {
+    NX_WRITE_LOCKER lock(&m_mutex);
     m_credentials = credentials;
 }
 
-const Credentials& ClientOptions::credentials() const
+Credentials ClientOptions::credentials() const
 {
+    NX_READ_LOCKER lock(&m_mutex);
     return m_credentials;
 }
 
 void ClientOptions::assignOptions(const ClientOptions& other)
 {
-    *this = other;
+    if (&other == this)
+        return;
+
+    NX_WRITE_LOCKER lock(&m_mutex);
+    NX_READ_LOCKER otherLock(&other.m_mutex);
+    this->m_contentEncodingUsed = other.m_contentEncodingUsed;
+    this->m_subsequentReconnectTries = other.m_subsequentReconnectTries;
+    this->m_totalReconnectTries = other.m_totalReconnectTries;
+    this->m_userAgent = other.m_userAgent;
+    this->m_credentials = other.m_credentials;
+    this->m_proxyCredentials = other.m_proxyCredentials;
+    this->m_proxyEndpoint = other.m_proxyEndpoint;
+    this->m_proxyAdapterFunc = other.m_proxyAdapterFunc;
+    this->m_isProxySecure = other.m_isProxySecure;
+    this->m_timeouts = other.m_timeouts;
+    this->m_authType = other.m_authType;
+    this->m_additionalHeaders = other.m_additionalHeaders;
+    this->m_precalculatedAuthorizationDisabled = other.m_precalculatedAuthorizationDisabled;
+    this->m_maxNumberOfRedirects = other.m_maxNumberOfRedirects;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -506,9 +556,10 @@ void AsyncClient::doUpgrade(
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    if (additionalHeaders().count("Connection") == 0)
+    auto headers = additionalHeaders();
+    if (headers.count("Connection") == 0)
         addAdditionalHeader("Connection", "Upgrade");
-    if (additionalHeaders().count("Upgrade") == 0)
+    if (headers.count("Upgrade") == 0)
         addAdditionalHeader("Upgrade", protocolToUpgradeTo);
     addAdditionalHeader("Content-Length", "0");
     composeRequest(method);
@@ -1292,11 +1343,12 @@ void AsyncClient::prepareRequestHeaders(
         HttpHeader(
             "User-Agent",
             userAgent().empty() ? nx::network::http::userAgentString() : userAgent()));
+    auto headers = additionalHeaders();
     if (useHttp11)
     {
         if (httpMethod == nx::network::http::Method::get || httpMethod == nx::network::http::Method::head)
         {
-            if (useCompression() && additionalHeaders().count("Accept-Encoding") == 0)
+            if (useCompression() && headers.count("Accept-Encoding") == 0)
             {
                 http::insertOrReplaceHeader(
                     &m_request.headers,
@@ -1304,22 +1356,22 @@ void AsyncClient::prepareRequestHeaders(
             }
         }
 
-        if (additionalHeaders().count("Connection") == 0)
+        if (headers.count("Connection") == 0)
         {
             nx::network::http::insertOrReplaceHeader(
                 &m_request.headers,
                 HttpHeader("Connection", "keep-alive"));
         }
 
-        if (additionalHeaders().count("Host") == 0)
+        if (headers.count("Host") == 0)
             insertOrReplaceHeader(&m_request.headers, header::Host(url::getEndpoint(m_contentLocationUrl)));
     }
 
     // It is not correct just to replace headers because there
     // could be multiple headers with same name in m_additionalHeaders.
-    for (const auto& header: additionalHeaders())
+    for (const auto& header: headers)
         m_request.headers.erase(header.first);
-    m_request.headers.insert(additionalHeaders().cbegin(), additionalHeaders().cend());
+    m_request.headers.insert(headers.cbegin(), headers.cend());
 
     addAppropriateAuthenticationInformation();
 }

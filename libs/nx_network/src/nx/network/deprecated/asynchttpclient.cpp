@@ -310,7 +310,7 @@ void AsyncHttpClient::setCredentials(const Credentials& credentials)
     m_delegate.setCredentials(credentials);
 }
 
-const Credentials& AsyncHttpClient::credentials() const
+Credentials AsyncHttpClient::credentials() const
 {
     return m_delegate.credentials();
 }

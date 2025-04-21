@@ -13,6 +13,7 @@
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/interruption_flag.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 
 #include "abstract_msg_body_source.h"
@@ -69,15 +70,15 @@ public:
     int totalReconnectTries() const;
 
     void setUserAgent(const std::string& userAgent);
-    const std::string& userAgent() const;
+    const std::string userAgent() const;
 
     void setProxyCredentials(const Credentials& credentials);
-    const Credentials& proxyCredentials() const;
+    Credentials proxyCredentials() const;
 
     void setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure, ssl::AdapterFunc adapterFunc);
-    const std::optional<SocketAddress>& proxyEndpoint() const;
+    std::optional<SocketAddress> proxyEndpoint() const;
     bool isProxySecure() const;
-    const ssl::AdapterFunc& proxyAdapterFunc() const;
+    ssl::AdapterFunc proxyAdapterFunc() const;
 
     /** If set to true client will not try to add Authorization header to the first request. false by default. */
     void setDisablePrecalculatedAuthorization(bool val);
@@ -101,13 +102,13 @@ public:
     void setMessageBodyReadTimeout(std::chrono::milliseconds messageBodyReadTimeout);
 
     void setTimeouts(const Timeouts& timeouts);
-    const Timeouts& timeouts() const;
+    Timeouts timeouts() const;
 
     void addAdditionalHeader(const std::string& key, const std::string& value);
     void addRequestHeaders(const HttpHeaders& headers);
     void removeAdditionalHeader(const std::string& key);
     void setAdditionalHeaders(HttpHeaders additionalHeaders);
-    const HttpHeaders& additionalHeaders() const;
+    HttpHeaders additionalHeaders() const;
 
     void setMaxNumberOfRedirects(int maxNumberOfRedirects);
     int maxNumberOfRedirects() const;
@@ -116,11 +117,12 @@ public:
     AuthType authType() const;
 
     void setCredentials(const Credentials& credentials);
-    const Credentials& credentials() const;
+    Credentials credentials() const;
 
     void assignOptions(const ClientOptions& other);
 
 private:
+    mutable nx::ReadWriteLock m_mutex;
     bool m_contentEncodingUsed = true;
     int m_subsequentReconnectTries = 1;
     int m_totalReconnectTries = 1;

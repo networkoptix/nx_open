@@ -55,7 +55,7 @@ void AsyncFileDownloader::setAuthType(AuthType value)
     m_client.setAuthType(value);
 }
 
-const Credentials& AsyncFileDownloader::credentials() const
+Credentials AsyncFileDownloader::credentials() const
 {
     return m_client.credentials();
 }
