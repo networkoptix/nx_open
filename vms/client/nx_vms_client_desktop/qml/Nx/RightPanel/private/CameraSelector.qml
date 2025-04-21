@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+import QtQuick.Window
 
 import Nx.Controls
 
@@ -119,9 +120,20 @@ SelectableTextButton
                 return
 
             if (action.data === EventSearch.CameraSelection.custom)
-                Qt.callLater(setup.chooseCustomCameras)
+            {
+                Qt.callLater(() =>
+                {
+                    setup.chooseCustomCameras()
+
+                    // Ensure the current window has focus after cameras are selected.
+                    cameraSelector.Window.window.raise()
+                    cameraSelector.Window.window.requestActivate()
+                })
+            }
             else
+            {
                 setup.cameraSelection = action.data
+            }
         }
     }
 }
