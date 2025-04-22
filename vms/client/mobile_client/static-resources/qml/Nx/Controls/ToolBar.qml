@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Layouts
 
 import Nx.Controls
+import Nx.Mobile.Ui
 import Nx.Core
 
 import "."
@@ -57,7 +58,7 @@ ToolBarBase
         anchors.rightMargin: 20
         height: parent.height
 
-        PageTitleLabel
+        TitleLabel
         {
             id: label
 
@@ -80,7 +81,6 @@ ToolBarBase
                     : Math.min(parent.width + 20 + 32, implicitWidth))
 
             anchors.verticalCenter: parent.verticalCenter
-
         }
 
         Canvas

@@ -52,13 +52,6 @@ Controls.ApplicationWindow
         return "qrc://" + path
     }
 
-    SideNavigation
-    {
-        id: sideNavigation
-
-        y: topLevelWarning.height + windowContext.ui.measurements.deviceStatusBarHeight
-    }
-
     StackView
     {
         id: stackView
@@ -88,7 +81,6 @@ Controls.ApplicationWindow
                 ? currentItem.backgroundColor
                 : ColorTheme.colors.windowBackground
 
-            sideNavigation.close()
             windowContext.ui.measurements.updateCustomMargins()
         }
         onWidthChanged: autoScrollDelayTimer.restart()

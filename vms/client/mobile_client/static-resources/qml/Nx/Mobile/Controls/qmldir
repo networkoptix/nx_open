@@ -14,3 +14,4 @@ FieldBackground 1.0 FieldBackground.qml
 TextArea 1.0 TextArea.qml
 TagView 1.0 TagView.qml
 PasswordInput 1.0 PasswordInput.qml
+Sheet 1.0 Sheet.qml

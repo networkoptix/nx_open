@@ -41,11 +41,7 @@ Page
 
         padding: 0
         icon.source: lp("/images/search.png")
-        onClicked:
-        {
-            sideNavigation.close()
-            searchToolBar.open()
-        }
+        onClicked: searchToolBar.open()
         alwaysCompleteHighlightAnimation: false
     }
 

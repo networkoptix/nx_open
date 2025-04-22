@@ -5,9 +5,9 @@ import Nx.Core 1.0
 
 Text
 {
-    font.pixelSize: 20
-    font.weight: Font.DemiBold
-    color: ColorTheme.windowText
+    font.pixelSize: 18
+    font.weight: 500
+    color: ColorTheme.colors.light1
     elide: Text.ElideRight
     horizontalAlignment: Text.AlignHCenter
     verticalAlignment: Text.AlignVCenter

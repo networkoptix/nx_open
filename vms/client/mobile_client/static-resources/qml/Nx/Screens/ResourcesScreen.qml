@@ -8,6 +8,7 @@ import Nx.Controls
 import Nx.Core
 import Nx.Items
 import Nx.Mobile
+import Nx.Mobile.Ui.Sheets
 import Nx.Ui
 
 import nx.vms.client.core
@@ -20,9 +21,18 @@ Page
     id: resourcesScreen
     objectName: "resourcesScreen"
 
-    leftButtonIcon.source: lp("/images/menu.png")
-    onLeftButtonClicked: sideNavigation.open()
-    sideNavigationEnabled: !searchToolBar.visible
+    leftButtonIcon.source: "image://skin/20x20/Solid/layouts.svg?primary=light10"
+    leftButtonIcon.width: 20
+    leftButtonIcon.height: 20
+
+    LayoutSheet
+    {
+        id: layoutSheet
+
+        y: -toolBar.height
+    }
+
+    onLeftButtonClicked: layoutSheet.open()
     property alias filterIds: camerasGrid.filterIds
 
     rightControl: IconButton
@@ -35,11 +45,7 @@ Page
         icon.source: lp("/images/search.png")
         enabled: camerasGrid.enabled
         opacity: windowContext.sessionManager.hasReconnectingSession ? 0.2 : 1.0
-        onClicked:
-        {
-            sideNavigation.close()
-            searchToolBar.open()
-        }
+        onClicked: searchToolBar.open()
         alwaysCompleteHighlightAnimation: false
     }
 

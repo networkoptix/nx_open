@@ -14,7 +14,6 @@ QuickControls.Page
 
     property bool activePage: StackView.status === StackView.Active
     property int pageStatus: StackView.status
-    property bool sideNavigationEnabled: true
     property var customBackHandler
     property string result
     property bool titleUnderlineVisible: false
@@ -73,13 +72,6 @@ QuickControls.Page
         color: ColorTheme.colors.windowBackground
     }
 
-    onSideNavigationEnabledChanged: updateSideNavigation()
-    onActivePageChanged:
-    {
-        if (activePage)
-            updateSideNavigation()
-    }
-
     Keys.onPressed: (event) =>
     {
         if (CoreUtils.keyIsBack(event.key))
@@ -90,11 +82,7 @@ QuickControls.Page
             }
             else if (leftButtonIcon.source === d.kBackButtonIconSource)
             {
-                if (sideNavigation.opened)
-                {
-                    sideNavigation.close()
-                }
-                else if (windowContext.sessionManager.hasConnectingSession
+                if (windowContext.sessionManager.hasConnectingSession
                     || windowContext.sessionManager.hasAwaitingResourcesSession)
                 {
                     windowContext.sessionManager.stopSession();
@@ -115,21 +103,6 @@ QuickControls.Page
 
             event.accepted = true
         }
-        else if (event.key == Qt.Key_F2)
-        {
-            if (sideNavigationEnabled)
-                sideNavigation.open()
-
-            event.accepted = true
-        }
-    }
-
-    function updateSideNavigation()
-    {
-        if (!sideNavigationEnabled)
-            sideNavigation.close()
-
-        sideNavigation.enabled = sideNavigationEnabled
     }
 
     QtObject

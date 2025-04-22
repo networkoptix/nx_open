@@ -9,6 +9,8 @@ import Nx.Controls
 import Nx.Items
 import Nx.Ui
 
+import nx.vms.client.core
+
 import "private"
 
 Page

@@ -12,10 +12,10 @@ import Nx.Core.Ui
 import Nx.Items
 import Nx.Mobile
 import Nx.Mobile.Controls as MobileControls
+import Nx.Mobile.Ui.Sheets
 import Nx.Models
 import Nx.Screens
 import Nx.Ui
-import Nx.Ui.Sheets
 
 import nx.vms.client.core
 import nx.vms.client.mobile
@@ -33,7 +33,6 @@ Page
     property alias eventSearchModel: d.accessor.model
     property int currentEventIndex: -1
 
-    sideNavigationEnabled: false
     onLeftButtonClicked: Workflow.popCurrentScreen()
 
     title: qsTr("Preview")

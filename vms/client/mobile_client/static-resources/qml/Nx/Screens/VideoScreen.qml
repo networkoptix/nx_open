@@ -154,7 +154,6 @@ Page
         }
     }
 
-    sideNavigationEnabled: false
     onLeftButtonClicked: Workflow.popCurrentScreen()
 
     rightControl: IconButton
