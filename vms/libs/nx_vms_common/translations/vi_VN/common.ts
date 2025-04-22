@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>User Input</source>
-      <translation>Nhập người dùng</translation>
+      <translation>Đầu vào của người dùng</translation>
     </message>
     <message>
       <source>Edit Settings</source>
@@ -224,21 +224,21 @@
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation>Chọn ít nhất một máy ảnh</translation>
+      <translation>Chọn ít nhất một Camera</translation>
     </message>
   </context>
   <context>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation>Máy chủ hỗ trợ buzzer</translation>
+      <translation>Máy chủ hỗ trợ còi báo động</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation>Analytics không khả dụng cho %1</translation>
+      <translation>Phân tích không khả dụng cho %1</translation>
     </message>
   </context>
   <context>
@@ -498,7 +498,7 @@
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>%1 Video bên giám sát hoặc chức năng dịch chuyển không thể được sử dụng</translation>
+      <translation>Tính năng ghi hoặc phát hiện chuyển động bị vô hiệu hóa trong khoảng %1</translation>
     </message>
   </context>
   <context>
@@ -521,7 +521,7 @@
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation>%1 video thể</translation>
+      <translation>Ghi bị vô hiệu hóa trong %1</translation>
     </message>
   </context>
   <context>
@@ -530,7 +530,7 @@
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
       <translation>
-        <numerusform>%n trên %1 người dùng được chọn không phải là người dùng %2 và sẽ không nhận được thông báo di động.</numerusform>
+        <numerusform>%n trong số %1 người dùng được chọn không phải là %2 người dùng và sẽ không nhận được thông báo trên thiết bị di động.</numerusform>
       </translation>
     </message>
   </context>
@@ -538,11 +538,11 @@
     <name>QnExecPtzPresetPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation>Chọn đúng một máy ảnh</translation>
+      <translation>Chọn đúng một camera</translation>
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
-      <translation>%1 không cài đặt sẵn PTZ</translation>
+      <translation>%1 không có cài đặt trước PTZ</translation>
     </message>
   </context>
   <context>
