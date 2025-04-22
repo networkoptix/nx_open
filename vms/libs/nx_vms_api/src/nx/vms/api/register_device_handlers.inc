@@ -406,8 +406,6 @@ void registerDeviceBaseHandlers(
      * %param[ref] _local,_strict
      * %permissions Depends on Resource access rights.
      * %return:{PtzPositionLimits} Device position limits
-     *     %param[unused] deviceId
-     *     %param[unused] type
      */
     reg("rest/v{3-}/devices/:deviceId/ptz/limits",
         GlobalPermission::none,
