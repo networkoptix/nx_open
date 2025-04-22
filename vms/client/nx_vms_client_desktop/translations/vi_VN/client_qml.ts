@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Add</source>
-      <translation>Thêm vào</translation>
+      <translation>Thêm</translation>
     </message>
   </context>
   <context>
@@ -303,7 +303,7 @@
     </message>
     <message>
       <source>Remove</source>
-      <translation>Tẩy</translation>
+      <translation>Xóa</translation>
     </message>
     <message>
       <source>Remove Request</source>
@@ -318,7 +318,7 @@
     </message>
     <message>
       <source>Auto</source>
-      <translation>tự động</translation>
+      <translation>Tự động</translation>
     </message>
   </context>
   <context>
@@ -517,7 +517,7 @@
     </message>
     <message>
       <source>Connecting...</source>
-      <translation>Kết nối ...</translation>
+      <translation>Đang kết nối...</translation>
     </message>
     <message>
       <source>Use StartTLS</source>
@@ -629,11 +629,11 @@
     </message>
     <message>
       <source>Type</source>
-      <translation>Kiểu</translation>
+      <translation>Loại</translation>
     </message>
     <message>
       <source>Attributes</source>
-      <translation>Các đặc tính</translation>
+      <translation>Thuộc tính</translation>
     </message>
   </context>
   <context>
@@ -1068,7 +1068,7 @@
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>OFFLINE</translation>
+      <translation>NGOẠI TUYẾN</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -1214,7 +1214,7 @@
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>OFFLINE</translation>
+      <translation>NGOẠI TUYẾN</translation>
     </message>
     <message>
       <source>Users</source>
@@ -1242,7 +1242,7 @@
     </message>
     <message>
       <source>Add</source>
-      <translation>Thêm vào</translation>
+      <translation>Thêm</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
@@ -1397,15 +1397,15 @@
     </message>
     <message>
       <source>Add</source>
-      <translation>Thêm vào</translation>
+      <translation>Thêm</translation>
     </message>
     <message>
       <source>Import</source>
-      <translation>Nhập vào</translation>
+      <translation>Nhập</translation>
     </message>
     <message>
       <source>Export</source>
-      <translation>Xuất ra</translation>
+      <translation>Xuất</translation>
     </message>
     <message>
       <source>Create New...</source>
@@ -1811,11 +1811,11 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation>Thêm vào</translation>
+      <translation>Thêm</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation>Xoá</translation>
     </message>
   </context>
   <context>
@@ -1868,7 +1868,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     <name>ResourceBrowser</name>
     <message>
       <source>No local files</source>
-      <translation>Không có tập tin trên thiết bị</translation>
+      <translation>Không có tập tin cục bộ</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1895,7 +1895,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Layouts</translation>
+      <translation>Bố cục</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
@@ -1911,7 +1911,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation>Video Walls</translation>
+      <translation>Tường video</translation>
     </message>
   </context>
   <context>
@@ -1927,7 +1927,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     <name>ResourcePreview</name>
     <message>
       <source>NO DATA</source>
-      <translation>Không có sẵn</translation>
+      <translation>KHÔNG CÓ DỮ LIỆU</translation>
     </message>
     <message>
       <source>OUTDATED</source>
