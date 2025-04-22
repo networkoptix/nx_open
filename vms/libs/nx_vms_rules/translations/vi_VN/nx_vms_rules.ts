@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation>Chọn ít nhất một máy ảnh</translation>
+      <translation>Chọn ít nhất một Camera</translation>
     </message>
     <message>
       <source>Not all servers are suitable</source>
@@ -119,7 +119,7 @@
     </message>
     <message>
       <source>At</source>
-      <translation>Tại camera</translation>
+      <translation>Tại</translation>
     </message>
     <message>
       <source>To</source>
@@ -135,15 +135,15 @@
     </message>
     <message>
       <source>Duration</source>
-      <translation>Thời gian</translation>
+      <translation>Thời lượng</translation>
     </message>
     <message>
       <source>Pre-Recording</source>
-      <translation>Trước khi ghi</translation>
+      <translation>Ghi trước</translation>
     </message>
     <message>
       <source>Post-Recording</source>
-      <translation>Video liên tục</translation>
+      <translation>Ghi sau</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -287,7 +287,7 @@
     <name>nx::vms::rules::AcknowledgeAction</name>
     <message>
       <source>Acknowledge</source>
-      <translation>Công nhận</translation>
+      <translation>Ghi nhận</translation>
     </message>
   </context>
   <context>
@@ -372,7 +372,7 @@
     <name>nx::vms::rules::BuzzerAction</name>
     <message>
       <source>Buzzer</source>
-      <translation>Buzzer</translation>
+      <translation>Còi báo động</translation>
     </message>
     <message>
       <source>Action Throttling</source>
@@ -452,7 +452,7 @@
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Camera IP xung đột tại %1</translation>
+      <translation>Xung đột IP camera tại %1</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
@@ -488,7 +488,7 @@
     <name>nx::vms::rules::DeviceRecordingAction</name>
     <message>
       <source>Quality</source>
-      <translation>Hình ảnh</translation>
+      <translation>Chất lượng</translation>
     </message>
     <message>
       <source>FPS</source>
@@ -1035,7 +1035,7 @@
     <name>nx::vms::rules::ServerFailureEvent</name>
     <message>
       <source>Server Failure</source>
-      <translation>Máy chủ thất bại</translation>
+      <translation>Lỗi máy chủ</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
@@ -1054,7 +1054,7 @@
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
       <source>Server Started</source>
-      <translation>Máy chủ bắt đầu</translation>
+      <translation>Máy chủ đã bắt đầu</translation>
     </message>
     <message>
       <source>%1 Started</source>

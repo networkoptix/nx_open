@@ -3255,7 +3255,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
-      <translation>Khóa ID phần cứng</translation>
+      <translation>Đã khóa vào ID phần cứng</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -3263,7 +3263,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation>Đặc trưng</translation>
+      <translation>Tính năng</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
@@ -3271,7 +3271,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation>Kiểm soát phiên được phép</translation>
+      <translation>Phiên điều khiển được phép</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
@@ -3279,7 +3279,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation>Vô hiệu hóa còn lại</translation>
+      <translation>Số lần hủy kích hoạt còn lại</translation>
     </message>
   </context>
   <context>
@@ -6206,7 +6206,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
-      <translation>Không thể ghi tệp</translation>
+      <translation>Không thể ghi tập tin</translation>
     </message>
     <message>
       <source>%1 filename length is more than %2 characters.</source>
@@ -6231,11 +6231,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation>Ngừng lưu</translation>
+      <translation>Dừng lưu</translation>
     </message>
     <message>
       <source>Stop Export</source>
-      <translation>Dừng xuất file</translation>
+      <translation>Dừng xuất</translation>
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
@@ -6301,7 +6301,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>User Input.</source>
-      <translation>Nhập người dùng.</translation>
+      <translation>Đầu vào của người dùng.</translation>
     </message>
     <message>
       <source>Edit Settings.</source>
@@ -6510,7 +6510,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Quality</source>
-      <translation>Hình ảnh</translation>
+      <translation>Chất lượng</translation>
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
@@ -6597,11 +6597,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>What to backup</source>
-      <translation>Những gì cần sao lưu</translation>
+      <translation>Cần sao lưu những gì</translation>
     </message>
     <message>
       <source>Quality</source>
-      <translation>Hình ảnh</translation>
+      <translation>Chất lượng</translation>
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
@@ -6768,7 +6768,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Source: %1</source>
-      <translation>nguồn：%1</translation>
+      <translation>Nguồn：%1</translation>
     </message>
   </context>
   <context>
@@ -6884,11 +6884,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
-      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+      <translation>Để tránh những thay đổi không thể đảo ngược trong kho lưu trữ, bạn nên tắt &quot;Giữ nguyên cài đặt thời gian của camera&quot; trước khi bật &quot;Tự động nhập video&quot;.</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
-      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+      <translation>Bật cài đặt này có thể dẫn đến những thay đổi không thể đảo ngược trong kho lưu trữ. Không nên bật cài đặt này khi &quot;Nhập video tự động&quot; đang hoạt động</translation>
     </message>
   </context>
   <context>
@@ -7136,7 +7136,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Select areas on the schedule to apply chosen parameters to</source>
-      <translation>Lựa chọn vùng trên biểu đồ ghi để áp dụng các thông số chọn</translation>
+      <translation>Chọn các khu vực trên lịch trình để áp dụng các thông số đã chọn</translation>
     </message>
     <message>
       <source>Set recording parameters and select areas on the schedule grid to apply them to</source>
@@ -7284,11 +7284,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Motion Only</source>
-      <translation>Chỉ phát hiện di dời</translation>
+      <translation>Chỉ chuyển động</translation>
     </message>
     <message>
       <source>Objects Only</source>
-      <translation>Chỉ có đối tượng</translation>
+      <translation>Chỉ đối tượng</translation>
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
@@ -7296,7 +7296,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>Chuyển động + Lo-Res</translation>
+      <translation>Chuyển động + Độ phân giải thấp</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
@@ -7974,7 +7974,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation>Tất cả máy chủ đang offline. Logs là không có sẵn.</translation>
+      <translation>Tất cả máy chủ đều ngoại tuyến. Không có nhật ký.</translation>
     </message>
   </context>
   <context>
@@ -8186,7 +8186,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>Đã xuất tệp .EXE sẽ có kích thước trên 4 GB và không thể mở bằng cách nhấp đúp vào trong Windows. Nó chỉ có thể được mở trong %1 Client.</translation>
+      <translation>Tệp .EXE đã xuất sẽ có kích thước trên 4 GB và không thể mở bằng cách nhấp đúp trong Windows. Chỉ có thể phát trong %1 Client.</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
@@ -8214,7 +8214,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
-      <translation>Định dạng AVI không được khuyến nghị để xuất video có bản âm thanh.</translation>
+      <translation>Không nên xuất bản bản ghi có bản âm thanh theo định dạng AVI.</translation>
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
@@ -8333,7 +8333,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
     <message>
       <source>Brand</source>
-      <translation>Nhãn hiệu</translation>
+      <translation>Thương hiệu</translation>
     </message>
     <message>
       <source>Model</source>
@@ -8621,7 +8621,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Background</source>
-      <translation>Lý lịch</translation>
+      <translation>Nền</translation>
     </message>
   </context>
   <context>
@@ -8743,7 +8743,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation>
-        <numerusform>%n hủy kích hoạt còn lại.</numerusform>
+        <numerusform>%n số lần hủy kích hoạt còn lại.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8967,7 +8967,7 @@ Hiệu suất Chi nhánh bị giảm.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation>thử lại</translation>
+      <translation>Thử lại</translation>
     </message>
   </context>
   <context>
@@ -9005,7 +9005,7 @@ Hiệu suất Chi nhánh bị giảm.</translation>
     </message>
     <message>
       <source>No</source>
-      <translation>Từ chối</translation>
+      <translation>Không</translation>
     </message>
     <message>
       <source>Present</source>
@@ -9516,7 +9516,7 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     </message>
     <message>
       <source>Updating to ...</source>
-      <translation>Đang cập nhật tới ...</translation>
+      <translation>Đang cập nhật lên...</translation>
     </message>
     <message>
       <source>Ready to update to</source>
@@ -9556,7 +9556,7 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation>Cập nhật từ server trung gian</translation>
+      <translation>Cập nhật từ máy chủ đa phương tiện</translation>
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
@@ -9823,7 +9823,7 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     </message>
     <message>
       <source>No update task</source>
-      <translation>Không có nhiệm vụ cập nhật</translation>
+      <translation>Không có tác vụ cập nhật</translation>
     </message>
     <message>
       <source>Ready to download update</source>
@@ -9958,7 +9958,7 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     </message>
     <message>
       <source>Consumption</source>
-      <translation>Tiêu dùng</translation>
+      <translation>Tiêu thụ</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9966,7 +9966,7 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     </message>
     <message>
       <source>Power</source>
-      <translation>Quyền lực</translation>
+      <translation>Nguồn</translation>
     </message>
     <message>
       <source>Unknown device</source>
@@ -11859,7 +11859,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation>Không thể xuất thời gian đã chọn cho máy ảnh hiện tại.</translation>
+      <translation>Không thể xuất khoảng thời gian đã chọn cho camera hiện tại.</translation>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
@@ -11875,11 +11875,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Starting export...</source>
-      <translation>Bắt đầu xuất khẩu...</translation>
+      <translation>Bắt đầu xuất...</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation>Lưu trữ thất bại</translation>
+      <translation>Lưu không thành công</translation>
     </message>
     <message>
       <source>Starting saving...</source>
@@ -11944,7 +11944,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Motion</source>
-      <translation>Vận động</translation>
+      <translation>Chuyển động</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -11956,11 +11956,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>High-Res</source>
-      <translation>High-Res</translation>
+      <translation>Độ phân giải cao</translation>
     </message>
     <message>
       <source>Low-Res</source>
-      <translation>Low-Res</translation>
+      <translation>Độ phân giải thấp</translation>
     </message>
     <message>
       <source>All streams</source>
@@ -12105,7 +12105,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
     <message>
       <source>Overlapped ID...</source>
-      <translation>ID chồng chéo...</translation>
+      <translation>ID trùng lặp...</translation>
     </message>
   </context>
   <context>
@@ -12152,7 +12152,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Multiple</source>
-      <translation>Bội số</translation>
+      <translation>Nhiều</translation>
     </message>
   </context>
   <context>
@@ -12316,11 +12316,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::rules::AnalyticsEventTypePicker</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation>Phân tích sự kiện có thể được thiết lập trên một camera nhất định.</translation>
+      <translation>Sự kiện phân tích có thể được thiết lập trên một số camera nhất định.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Chọn camera bằng cách sử dụng nút ở trên để xem danh sách các sự kiện được hỗ trợ.</translation>
+      <translation>Chọn camera bằng nút ở trên để xem danh sách các sự kiện được hỗ trợ.</translation>
     </message>
   </context>
   <context>
@@ -12425,7 +12425,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Value</source>
-      <translation>Giá trí</translation>
+      <translation>Giá trị</translation>
     </message>
   </context>
   <context>
@@ -12436,7 +12436,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Attributes</source>
-      <translation>Các đặc tính</translation>
+      <translation>Thuộc tính</translation>
     </message>
   </context>
   <context>
@@ -12451,7 +12451,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Value</source>
-      <translation>Giá trí</translation>
+      <translation>Giá trị</translation>
     </message>
   </context>
   <context>
@@ -12584,7 +12584,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation>Từ khóa ngăn cách bởi không gian</translation>
+      <translation>Từ khóa được phân tách bằng dấu cách</translation>
     </message>
     <message>
       <source>From</source>

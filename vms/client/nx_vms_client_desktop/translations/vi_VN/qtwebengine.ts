@@ -172,22 +172,22 @@
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation>Chèn danh sách &amp;đã sắp xếp</translation>
+      <translation>Chèn &amp;Danh sách có thứ tự</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation>Chèn danh sách &amp;chưa sắp xếp</translation>
+      <translation>Chèn &amp;Danh sách không có thứ tự</translation>
     </message>
   </context>
   <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Stop</source>
-      <translation>Dừng lại</translation>
+      <translation>Dừng</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation>Tải lại và bỏ qua bộ nhớ cache</translation>
+      <translation>Tải lại và bỏ qua bộ nhớ đệm</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
@@ -215,7 +215,7 @@
     </message>
     <message>
       <source>&amp;Bold</source>
-      <translation>&amp;Dũng cảm</translation>
+      <translation>&amp;In đậm</translation>
     </message>
     <message>
       <source>&amp;Italic</source>
@@ -227,23 +227,23 @@
     </message>
     <message>
       <source>&amp;Strikethrough</source>
-      <translation>&amp;Truyền thông</translation>
+      <translation>&amp;Gạch ngang</translation>
     </message>
     <message>
       <source>Align &amp;Left</source>
-      <translation>Căn và trái</translation>
+      <translation>Căn chỉnh &amp;Trái</translation>
     </message>
     <message>
       <source>Align &amp;Center</source>
-      <translation>Align &amp; Center</translation>
+      <translation>Căn chỉnh &amp; Căn giữa</translation>
     </message>
     <message>
       <source>Align &amp;Right</source>
-      <translation>Sắp xếp đúng</translation>
+      <translation>Căn chỉnh &amp;Phải</translation>
     </message>
     <message>
       <source>Align &amp;Justified</source>
-      <translation>Căn chỉnh &amp; hợp lý</translation>
+      <translation>Căn chỉnh &amp;Hợp lý</translation>
     </message>
     <message>
       <source>&amp;Indent</source>
@@ -251,15 +251,15 @@
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation>&amp;Hết hạn</translation>
+      <translation>&amp;Ngoài lề</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation>Chèn danh sách &amp;đã sắp xếp</translation>
+      <translation>Chèn &amp;Danh sách có thứ tự</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation>Chèn danh sách &amp;chưa sắp xếp</translation>
+      <translation>Chèn &amp;Danh sách không có thứ tự</translation>
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
@@ -267,11 +267,11 @@
     </message>
     <message>
       <source>&amp;Back</source>
-      <translation>&amp;Trở lại</translation>
+      <translation>&amp;Mặt sau</translation>
     </message>
     <message>
       <source>&amp;Forward</source>
-      <translation>&amp;Ở đằng trước</translation>
+      <translation>&amp;Phía trước</translation>
     </message>
     <message>
       <source>&amp;Reload</source>
@@ -286,11 +286,11 @@
     <name>RenderViewContextMenuQt</name>
     <message>
       <source>Back</source>
-      <translation>Trở lại</translation>
+      <translation>Quay lại</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation>Ở đằng trước</translation>
+      <translation>Chuyển tiếp</translation>
     </message>
     <message>
       <source>Reload</source>
@@ -322,7 +322,7 @@
     </message>
     <message>
       <source>Paste and match style</source>
-      <translation>Dán và kết hợp kiểu</translation>
+      <translation>Dán và khớp định dạng</translation>
     </message>
     <message>
       <source>Open link in new window</source>
@@ -362,7 +362,7 @@
     </message>
     <message>
       <source>Loop</source>
-      <translation>Vòng</translation>
+      <translation>Vòng lặp</translation>
     </message>
     <message>
       <source>Save media</source>
@@ -370,7 +370,7 @@
     </message>
     <message>
       <source>Inspect</source>
-      <translation>Quan sát</translation>
+      <translation>Kiểm tra</translation>
     </message>
     <message>
       <source>Exit full screen</source>

@@ -62,10 +62,10 @@
   <String Id="msierrFirewallCannotConnect">Không thể kết nối với tường lửa của Windows.  ([2] [3] [4] [5])</String>
   <String Id="WixSchedFirewallExceptionsInstall">Cấu hình tường lửa của Windows</String>
   <String Id="WixSchedFirewallExceptionsUninstall">Cấu hình tường lửa của Windows</String>
-  <String Id="WixRollbackFirewallExceptionsInstall">Lùi lại cấu hình tường lửa của Windows</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">Quay lại cấu hình Tường lửa Windows</String>
   <String Id="WixExecFirewallExceptionsInstall">Cài đặt cấu hình tường lửa của Windows</String>
-  <String Id="WixRollbackFirewallExceptionsUninstall">Lùi lại cấu hình tường lửa của Windows</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">Quay lại cấu hình Tường lửa Windows</String>
   <String Id="WixExecFirewallExceptionsUninstall">Gỡ cài đặt cấu hình tường lửa của Windows</String>
-  <String Id="Product_ArchMismatch_x86">Phần mềm này thiết kế cho hệ điều hành 32-bit. Sẽ thoát khỏi cài đặt.</String>
+  <String Id="Product_ArchMismatch_x86">Gói này được thiết kế cho hệ điều hành 32-bit. Thiết lập sẽ thoát ngay bây giờ.</String>
   <String Id="Product_ArchMismatch_x64">Phần mềm này thiết kế cho hệ điều hành 64-bit. Sẽ thoát khỏi cài đặt.</String>
 </WixLocalization>
