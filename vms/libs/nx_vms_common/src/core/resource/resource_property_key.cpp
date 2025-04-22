@@ -208,7 +208,7 @@ const QString kDisableRtspMetadataStream("disableRtspMetadataStream");
 
 const QString kOnvifRemoteArchiveDisableFastDownload("onvifRemoteArchiveDisableFastDownload");
 
-const QString kOnvifRemoteArchiveEnabled("onvifRemoteArchiveEnabled");
+const QString kOnvifRemoteArchiveDisabled("onvifRemoteArchiveDisabled");
 
 const QString kOnvifConfigurationParameters("onvifConfigurationParameters");
 
