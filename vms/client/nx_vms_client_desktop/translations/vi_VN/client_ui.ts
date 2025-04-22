@@ -613,7 +613,7 @@
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation>RTP Vận chuyển</translation>
+      <translation>Vận chuyển RTP</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
@@ -707,7 +707,7 @@
     </message>
     <message>
       <source>Camera ID</source>
-      <translation>Tên Camera</translation>
+      <translation>ID Camera</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -715,11 +715,11 @@
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation>Luồng dữ liệu chính</translation>
+      <translation>Luồng chính</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation>Luồng dữ liệu phụ</translation>
+      <translation>Luồng phụ</translation>
     </message>
     <message>
       <source>MAC Address</source>
@@ -735,11 +735,11 @@
     </message>
     <message>
       <source>Camera rules</source>
-      <translation>Nội quy Camera</translation>
+      <translation>Quy tắc camera</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>ID hợp lý</translation>
+      <translation>ID logic</translation>
     </message>
   </context>
   <context>
@@ -848,7 +848,7 @@
     <name>CameraSelectionDialog</name>
     <message>
       <source>All Cameras</source>
-      <translation>Tất cả máy ảnh</translation>
+      <translation>Tất cả camera</translation>
     </message>
     <message>
       <source>Select Cameras</source>
@@ -1221,7 +1221,7 @@
     <name>ExitFullscreenActionWidget</name>
     <message>
       <source>On layout</source>
-      <translation>Trong bố cục</translation>
+      <translation>Trên Bố cục</translation>
     </message>
   </context>
   <context>
@@ -1239,7 +1239,7 @@
     <name>ExportMediaSettingsWidget</name>
     <message>
       <source>Export Settings</source>
-      <translation>Lưu cầu hình cài đặt</translation>
+      <translation>Xuất Cài Đặt</translation>
     </message>
     <message>
       <source>Apply Filters</source>
@@ -1251,7 +1251,7 @@
     </message>
     <message>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation>Nếu đang áp dụng bộ lọc và thêm lớp phủ đòi hỏi chuyển mã sẽ làm tăng việc sử dụng CPU và có thể mất nhiều thời gian.</translation>
+      <translation>Việc áp dụng bộ lọc và thêm lớp phủ yêu cầu phải chuyển mã, điều này sẽ làm tăng mức sử dụng CPU và có thể mất nhiều thời gian.</translation>
     </message>
   </context>
   <context>
@@ -1277,7 +1277,7 @@
     </message>
     <message>
       <source>Export Settings</source>
-      <translation>Lưu cầu hình cài đặt</translation>
+      <translation>Xuất Cài Đặt</translation>
     </message>
     <message>
       <source>Multi Video</source>
@@ -1336,11 +1336,11 @@
     <name>FullscreenCameraActionWidget</name>
     <message>
       <source>On layout</source>
-      <translation>Trong bố cục</translation>
+      <translation>Trên Bố cục</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Máy chụp hình</translation>
+      <translation>Camera</translation>
     </message>
   </context>
   <context>
@@ -2179,7 +2179,7 @@
     </message>
     <message>
       <source>Add source device name in body</source>
-      <translation>Thêm tên thiết bị nguồn trong nội dung</translation>
+      <translation>Thêm tên thiết bị nguồn vào nội dung</translation>
     </message>
   </context>
   <context>
@@ -2283,7 +2283,7 @@
     </message>
     <message>
       <source>Enable timeline on video wall</source>
-      <translation>Kích hoạt dòng thời gian trên tường video</translation>
+      <translation>Bật dòng thời gian trên tường video</translation>
     </message>
   </context>
   <context>
@@ -2294,7 +2294,7 @@
     </message>
     <message>
       <source>Initial video length</source>
-      <translation>Chiều dài video ban đầu</translation>
+      <translation>Độ dài video ban đầu</translation>
     </message>
     <message>
       <source>Exported video length</source>
@@ -2517,7 +2517,7 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation>Vận động</translation>
+      <translation>Chuyển động</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2536,7 +2536,7 @@
     </message>
     <message>
       <source>Display watermark with username over video</source>
-      <translation>Hiển thị hình mờ với tên người dùng qua video</translation>
+      <translation>Hiển thị hình mờ có tên người dùng trên video</translation>
     </message>
     <message>
       <source>Watermark Preview</source>

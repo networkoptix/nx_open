@@ -40,11 +40,11 @@
     </message>
     <message>
       <source>Invalid customization</source>
-      <translation>tùy biến không hợp lệ</translation>
+      <translation>Tùy chỉnh không hợp lệ</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation>Bản quyền hết hạn</translation>
+      <translation>Giấy phép đã hết hạn</translation>
     </message>
     <message>
       <source>License is not validated by %1</source>
@@ -53,7 +53,7 @@
     </message>
     <message>
       <source>Invalid type</source>
-      <translation>kiểu không hợp lệ</translation>
+      <translation>Kiểu không hợp lệ</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System.</source>
@@ -81,7 +81,7 @@
     </message>
     <message>
       <source>This license type requires higher software version</source>
-      <translation>Bản quyền này yêu cầu phiên bản phần mềm cao hơn</translation>
+      <translation>Loại giấy phép này yêu cầu phiên bản phần mềm cao hơn</translation>
     </message>
     <message>
       <source>Unknown error</source>

@@ -105,11 +105,11 @@
     <name>nx::vms::rules::BookmarkAction</name>
     <message>
       <source>Pre-recording</source>
-      <translation>Trước khi ghi</translation>
+      <translation>Ghi trước</translation>
     </message>
     <message>
       <source>Post-recording</source>
-      <translation>Trước khi ghi</translation>
+      <translation>Ghi sau</translation>
     </message>
     <message>
       <source>Create Bookmark</source>
@@ -117,7 +117,7 @@
     </message>
     <message>
       <source>At</source>
-      <translation>Tại camera</translation>
+      <translation>Tại</translation>
     </message>
     <message>
       <source>Fixed Duration</source>
@@ -132,7 +132,7 @@
     <name>nx::vms::rules::BuzzerAction</name>
     <message>
       <source>Buzzer</source>
-      <translation>Buzzer</translation>
+      <translation>Còi báo động</translation>
     </message>
     <message>
       <source>Fixed duration</source>
@@ -140,7 +140,7 @@
     </message>
     <message>
       <source>At</source>
-      <translation>Tại camera</translation>
+      <translation>Tại</translation>
     </message>
     <message>
       <source>Action Throttling</source>
@@ -250,7 +250,7 @@
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Camera IP xung đột tại %1</translation>
+      <translation>Xung đột IP camera tại %1</translation>
     </message>
     <message numerus="yes">
       <source>Device IP Conflict</source>
@@ -277,7 +277,7 @@
     </message>
     <message>
       <source>At</source>
-      <translation>Tại camera</translation>
+      <translation>Tại</translation>
     </message>
     <message>
       <source>Fixed Duration</source>
@@ -288,7 +288,7 @@
     <name>nx::vms::rules::DeviceRecordingAction</name>
     <message>
       <source>Quality</source>
-      <translation>Hình ảnh</translation>
+      <translation>Chất lượng</translation>
     </message>
     <message>
       <source>FPS</source>
@@ -296,11 +296,11 @@
     </message>
     <message>
       <source>Pre-recording</source>
-      <translation>Trước khi ghi</translation>
+      <translation>Ghi trước</translation>
     </message>
     <message>
       <source>Post-recording</source>
-      <translation>Trước khi ghi</translation>
+      <translation>Ghi sau</translation>
     </message>
     <message>
       <source>Camera Recording</source>
@@ -882,7 +882,7 @@
     </message>
     <message>
       <source>Server Failure</source>
-      <translation>Máy chủ thất bại</translation>
+      <translation>Lỗi máy chủ</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
@@ -901,7 +901,7 @@
     </message>
     <message>
       <source>Server Started</source>
-      <translation>Máy chủ bắt đầu</translation>
+      <translation>Máy chủ đã bắt đầu</translation>
     </message>
   </context>
   <context>
@@ -939,7 +939,7 @@
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation>Trình kích hoạt mềm %1 tại %2</translation>
+      <translation>Kích hoạt mềm %1 tại %2</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -1048,7 +1048,7 @@
     </message>
     <message>
       <source>At</source>
-      <translation>Tại camera</translation>
+      <translation>Tại</translation>
     </message>
     <message>
       <source>Fixed Duration</source>
