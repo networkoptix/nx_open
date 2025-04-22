@@ -140,6 +140,8 @@ NX_DECLARE_COLORIZED_ICON(kIntegrationsIcon, "20x20/Solid/integrations.svg",\
 
 NX_DECLARE_COLORIZED_ICON(kIOOfflineIcon, "20x20/Solid/io_offline.svg",\
     kTreeThemeOfflineSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kIOWarningIcon, "20x20/Solid/io_warning.svg",\
+    kTreeThemeOfflineSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kIOUnauthorizedIcon, "20x20/Solid/io_unauthorized.svg",\
     kTreeThemeOfflineSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kIOIcon, "20x20/Solid/io.svg",\
@@ -380,7 +382,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(IOModule | NotificationMode, IconWithDescription(kIONotificationIcon));
     m_cache.insert(IOModule | Offline, IconWithDescription(kIOOfflineIcon));
     m_cache.insert(IOModule | Unauthorized, IconWithDescription(kIOUnauthorizedIcon));
-    m_cache.insert(IOModule | Incompatible, IconWithDescription(kCameraWarningIcon));
+    m_cache.insert(IOModule | Incompatible, IconWithDescription(kIOWarningIcon));
     m_cache.insert(Recorder, IconWithDescription(kEncoderIcon));
     m_cache.insert(Recorder | NotificationMode, IconWithDescription(kEncoderNotificationIcon));
     m_cache.insert(MultisensorCamera, IconWithDescription(kMultisensorIcon));
