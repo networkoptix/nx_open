@@ -4,6 +4,7 @@
 
 #include <QtCore/QSet>
 
+#include <nx/network/rest/request.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/rules/rule.h>
 
@@ -42,5 +43,12 @@ NX_VMS_RULES_API std::optional<nx::vms::api::rules::Rule> fromApi(
     nx::vms::api::rules::RuleV4&& rule,
     QString author,
     QString* error = nullptr);
+
+/** Returns name of the user who requested operation. */
+NX_VMS_RULES_API QString getRequestAuthorOrThrow(
+    nx::vms::rules::Engine* engine, const nx::network::rest::Request& request);
+
+NX_VMS_RULES_API QString getRequestAuthorOrThrow(
+    nx::vms::rules::Engine* engine, const nx::network::http::Request& request);
 
 } // namespace nx::vms::rules

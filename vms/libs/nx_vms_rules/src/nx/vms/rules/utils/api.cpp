@@ -4,6 +4,7 @@
 
 #include <QtCore/QJsonArray>
 
+#include <nx/network/http/custom_headers.h>
 #include <nx/utils/qobject.h>
 #include <nx/vms/api/rules/action_info.h>
 #include <nx/vms/api/rules/event_info.h>
@@ -198,6 +199,39 @@ bool fromApi(std::map<QString, QJsonValue>&& fieldMap, T* target, QString* error
     return true;
 }
 
+QString getRequestAuthorFromHeadersOrThrow(
+    nx::vms::rules::Engine* engine, const nx::network::http::HttpHeaders& httpHeaders)
+{
+    const auto ruleIdIt = httpHeaders.find(Qn::CREATED_BY_RULE_HEADER_NAME);
+    if (ruleIdIt == httpHeaders.end())
+    {
+        throw nx::network::rest::Exception::badRequest(
+            nx::format(
+                "Missed required `%1` header",
+                Qn::CREATED_BY_RULE_HEADER_NAME));
+    }
+
+    const auto rule = engine->rule(nx::Uuid::fromString(ruleIdIt->second));
+    if (!rule)
+    {
+        throw nx::network::rest::Exception::forbidden(
+            nx::format(
+                "Rule with `%1` id triggered the action is not found",
+                ruleIdIt->second));
+    }
+
+    auto author = rule->author();
+    if (author.isEmpty())
+    {
+        throw nx::network::rest::Exception::forbidden(
+            nx::format(
+                "Author is not provided for the rule with `%1` id triggered the action",
+                ruleIdIt->second));
+    }
+
+    return author;
+}
+
 } // namespace
 
 api::Rule serialize(const Rule* rule)
@@ -363,6 +397,21 @@ std::optional<nx::vms::api::rules::Rule> fromApi(
     }
 
     return serialize(rule.get());
+}
+
+QString getRequestAuthorOrThrow(
+    nx::vms::rules::Engine* engine, const nx::network::rest::Request& request)
+{
+    if (request.userSession.access.userId != nx::network::rest::kSystemAccess.userId)
+        return request.userSession.session.userName;
+
+    return getRequestAuthorFromHeadersOrThrow(engine, request.httpHeaders());
+}
+
+QString getRequestAuthorOrThrow(
+    nx::vms::rules::Engine* engine, const nx::network::http::Request& request)
+{
+    return getRequestAuthorFromHeadersOrThrow(engine, request.headers);
 }
 
 } // namespace nx::vms::rules

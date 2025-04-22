@@ -129,6 +129,7 @@ public:
     static TranslatableString ofType();
     static TranslatableString andCaption();
     static TranslatableString andDescription();
+    static TranslatableString method();
 };
 
 } // namespace nx::vms::rules

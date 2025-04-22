@@ -514,4 +514,9 @@ TranslatableString Strings::andDescription()
     return NX_DYNAMIC_TRANSLATABLE(tr("And Description"));
 }
 
+TranslatableString Strings::method()
+{
+    return NX_DYNAMIC_TRANSLATABLE(tr("Method"));
+}
+
 } // namespace nx::vms::rules

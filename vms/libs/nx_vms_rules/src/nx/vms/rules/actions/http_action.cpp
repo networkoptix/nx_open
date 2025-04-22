@@ -32,8 +32,8 @@ const ItemDescriptor& HttpAction::manifest()
                 TextWithFieldsFieldProperties{
                     .base = FieldProperties{.optional = false},
                     .validationPolicy = kUrlValidationPolicy}.toVariantMap()),
-            makeFieldDescriptor<HttpMethodField>("method",
-                NX_DYNAMIC_TRANSLATABLE(tr("Method")),
+            makeFieldDescriptor<HttpMethodField>(utils::kMethodFieldName,
+                Strings::method(),
                 {"If not set, it will be calculated automatically."}),
             makeFieldDescriptor<HttpHeadersField>("headers",
                 NX_DYNAMIC_TRANSLATABLE(tr("Custom headers")),

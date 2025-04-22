@@ -2,8 +2,6 @@
 
 #include "site_http_action.h"
 
-#include "../action_builder_fields/content_type_field.h"
-#include "../action_builder_fields/http_headers_field.h"
 #include "../action_builder_fields/http_method_field.h"
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/text_with_fields.h"
@@ -25,14 +23,14 @@ const ItemDescriptor& SiteHttpAction::manifest()
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::currentServer,
         .fields = {
-            makeFieldDescriptor<TextWithFields>("endpoint",
+            makeFieldDescriptor<TextWithFields>(utils::kEndpointFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Endpoint")),
                 "Endpoint supported by the given site.",
                 TextWithFieldsFieldProperties{
                     .base = FieldProperties{.optional = false},
                     .validationPolicy = kSiteEndpointValidationPolicy}.toVariantMap()),
-            makeFieldDescriptor<HttpMethodField>("method",
-                NX_DYNAMIC_TRANSLATABLE(tr("Method")),
+            makeFieldDescriptor<HttpMethodField>(utils::kMethodFieldName,
+                Strings::method(),
                 {"If not set, it will be calculated automatically."}),
             makeFieldDescriptor<TextWithFields>(utils::kContentFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Content")),
