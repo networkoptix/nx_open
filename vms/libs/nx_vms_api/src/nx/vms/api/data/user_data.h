@@ -38,12 +38,21 @@ NX_REFLECTION_ENUM_CLASS(UserAttribute,
     /**%apidoc This User should not be shown in user management by default. */
     hidden = 1 << 1,
 
+    /**%apidoc Cloud User is a member of an Organization. */
+    organization = 1 << 2,
+
+    /**%apidoc Cloud User is a member of a Channel Partner. */
+    channelPartner = 1 << 3,
+
     /**%apidoc[unused] The only possible action for such user is to recreate it. */
     removed = 1 << 30
 )
 
 Q_DECLARE_FLAGS(UserAttributes, UserAttribute)
 Q_DECLARE_OPERATORS_FOR_FLAGS(UserAttributes)
+
+constexpr UserAttributes kCloudUserTypeAttributes =
+    UserAttribute::organization | UserAttribute::channelPartner;
 
 /**%apidoc User information object.
  * %param[readonly] id Internal user identifier. This identifier can be used as {id} path parameter in

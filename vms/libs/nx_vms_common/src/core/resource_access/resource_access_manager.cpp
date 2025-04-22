@@ -831,6 +831,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                 }
                 case nx::vms::api::UserType::cloud:
                 {
+                    if (targetUser->isOrg())
+                        permissions.setFlag(Qn::RemovePermission, false);
                     return permissions & ~(
                         Qn::WritePasswordPermission
                         | Qn::WriteDigestPermission
