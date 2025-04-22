@@ -102,6 +102,7 @@ Page
             visible: saved
             leftPadding: 0
             rightPadding: 0
+            padding: 0
 
             implicitHeight: 44
 
