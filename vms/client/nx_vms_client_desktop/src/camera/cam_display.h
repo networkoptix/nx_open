@@ -197,6 +197,10 @@ protected:
     int getBufferingMask();
 
 private:
+    /** Process incoming video frame and clear the video queue if possible. */
+    bool processVideoData(QnCompressedVideoDataPtr incoming, int channel, float speed);
+
+    /** Push video frame to decode and display the video frame and create the appropriate delay.*/
     bool display(QnCompressedVideoDataPtr vd, bool sleep, float speed);
 
     void hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
