@@ -396,6 +396,11 @@ signals:
         const QString& prevValue,
         const QString& newValue);
 
+    /**
+     * Emitted whenever any resource parentId is changed.
+     */
+    void parentIdChanged(const QnResourcePtr& resource, const nx::Uuid& previousParentId);
+
     void resourceChanged(const QnResourcePtr& resource);
     void statusChanged(const QnResourcePtr& resource, Qn::StatusChangeReason reason);
 

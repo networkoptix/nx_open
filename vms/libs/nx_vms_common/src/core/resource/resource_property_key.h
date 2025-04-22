@@ -134,11 +134,6 @@ NX_VMS_COMMON_API extern const QString kDontRecordSecondaryStreamKey;
 NX_VMS_COMMON_API extern const QString kDontRecordAudio;
 
 /**
- * Remote archive before this time will not be synchronized.
- */
-NX_VMS_COMMON_API extern const QString kLastSyncronizedRemoteArchiveTimestampMs;
-
-/**
  * Whether to download remote (i.e. on-camera) archives.
  */
 NX_VMS_COMMON_API extern const QString kRemoteArchiveSynchronizationEnabled;
