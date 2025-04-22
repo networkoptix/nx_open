@@ -1379,6 +1379,8 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     if (!media)
         return true;
 
+    NX_VERBOSE(this, "Process data, type: %1, timestamp: %2ms, video queue size: %3",
+        media->dataType, media->timestamp / 1000, m_videoQueue[0].size());
     if (const auto& metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data))
         processMetadata(metadata);
 
@@ -1738,42 +1740,59 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             else {
                 result = false;
             }
-            vd = nextInOutVideodata(incoming, channel);
 
-            if (vd) {
-                if (!m_useMtDecoding && !m_isRealTimeSource)
-                    setMTDecoding(true);
+            if (!processVideoData(incoming, channel, speed))
+                return false; // keep frame
 
-                bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
-                if (!ignoreVideo) {
-                    NX_MUTEX_LOCKER lock( &m_timeMutex );
-                    m_lastDecodedTime = vd->timestamp;
-                }
-                if (m_lastAudioPacketTime != m_syncAudioTime) {
-                    qint64 currentAudioTime = m_lastAudioPacketTime - (quint64)m_audioDisplay->msInBuffer()*1000;
-                    if(m_display[channel])
-                        m_display[channel]->setCurrentTime(currentAudioTime);
-                    m_syncAudioTime = m_lastAudioPacketTime; // sync audio time prevent stopping video, if audio track is disapearred
-                }
-                if (!display(vd, !ignoreVideo, speed)) {
-                    restoreVideoQueue(incoming, vd, vd->channelNumber);
-                    return false;  // keep frame
-                }
-                if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed && !m_afterJump)
-                    m_singleShotQuantProcessed = true;
-            }
-            if (result
+            // Drain video frames queue.
+            while (result
                 && !m_videoQueue[channel].isEmpty()
                 && m_videoQueue[channel].front()->timestamp < m_audioDisplay->getCurrentTime())
             {
-                // Take one more video frame from the buffer
-                processDataCycle(dequeueVideo(channel));
+                processVideoData(/*incoming*/ {}, channel, speed);
             }
         }
 
         return result;
     }
 
+    return true;
+}
+
+bool QnCamDisplay::processVideoData(QnCompressedVideoDataPtr incoming, int channel, float speed)
+{
+    if (auto videoData = nextInOutVideodata(incoming, channel))
+    {
+        if (!m_useMtDecoding && !m_isRealTimeSource)
+            setMTDecoding(true);
+
+        bool ignoreVideo = videoData->flags & QnAbstractMediaData::MediaFlags_Ignore;
+        if (!ignoreVideo)
+        {
+            NX_MUTEX_LOCKER lock(&m_timeMutex);
+            m_lastDecodedTime = videoData->timestamp;
+        }
+
+        if (m_lastAudioPacketTime != m_syncAudioTime)
+        {
+            qint64 currentAudioTime =
+                m_lastAudioPacketTime - (quint64)m_audioDisplay->msInBuffer() * 1000 /*ms to us*/;
+            if (m_display[channel])
+                m_display[channel]->setCurrentTime(currentAudioTime);
+
+            // Sync audio time prevent stopping video, if audio track is disapearred.
+            m_syncAudioTime = m_lastAudioPacketTime;
+        }
+
+        if (!display(videoData, !ignoreVideo, speed))
+        {
+            restoreVideoQueue(incoming, videoData, videoData->channelNumber);
+            return false;  // Keep frame.
+        }
+
+        if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed && !m_afterJump)
+            m_singleShotQuantProcessed = true;
+    }
     return true;
 }
 

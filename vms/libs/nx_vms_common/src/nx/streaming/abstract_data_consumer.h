@@ -41,7 +41,6 @@ protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data) = 0;
     virtual void beforeRun();
     virtual void endOfRun();
-    void processDataCycle(const QnAbstractDataPacketPtr& data);
 private:
     void resumeDataQueue();
 protected:
