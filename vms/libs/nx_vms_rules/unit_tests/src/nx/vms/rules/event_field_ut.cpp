@@ -88,7 +88,8 @@ protected:
 
     nx::Uuid makeAndRegisterList(
         std::vector<QString> attributes = {},
-        std::vector<std::map<QString, QString>> entries = {})
+        std::vector<std::map<QString, QString>> entries = {},
+        bool isGeneric = true)
     {
         const auto id = nx::Uuid::createUuid();
 
@@ -96,6 +97,7 @@ protected:
         lookupList.id = id;
         lookupList.attributeNames = std::move(attributes);
         lookupList.entries = std::move(entries);
+        lookupList.objectTypeId = isGeneric ? QString() : "nx.test.type";
 
         systemContext()->lookupListManager()->initialize({std::move(lookupList)});
 
@@ -192,7 +194,7 @@ class ObjectLookupFieldTest: public LookupFieldTestBase
 
 TEST_F(ObjectLookupFieldTest, emptyLookupList)
 {
-    const auto listId = makeAndRegisterList();
+    const auto listId = makeAndRegisterList({}, {}, /* isGeneric */ false);
 
     ObjectLookupField field{systemContext(), &kDummyDescriptor};
     field.setValue(listId.toSimpleString());
@@ -224,7 +226,8 @@ TEST_F(ObjectLookupFieldTest, emptyListAttributeMatchAnyInputValue)
             // The entries accept any value for the 'foo' attribute.
             {{"foo", ""}, {"bar", "1"}},
             {{"bar", "1"}}
-        });
+        },
+        /* isGeneric */ false);
 
     ObjectLookupField field{systemContext(), &kDummyDescriptor};
     field.setValue(listId.toSimpleString());
@@ -261,13 +264,43 @@ TEST_F(ObjectLookupFieldTest, lookupWithAttributesWorksProperly)
     ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}, {"bar", "two"}})));
 }
 
+TEST_F(ObjectLookupFieldTest, lookupInGenericListWorksProperly)
+{
+    const auto listId = makeAndRegisterList({"Value"},
+        {
+            {{"Value", "1"}},
+            {{"Value", "one"}},
+            {{"Value", "0x1"}},
+        });
+    ObjectLookupField field{systemContext(), &kDummyDescriptor};
+    field.setValue(listId.toSimpleString());
+
+    field.setCheckType(ObjectLookupCheckType::inList);
+    // Check attributes lookup list contains.
+    ASSERT_TRUE(field.match(
+        QVariant::fromValue(Attributes{{"foo", "1"}, {"bar.baz", "one"}, {"bar.quux", "0x1"}})));
+
+    // Check attribute lookup list does not contain.
+    ASSERT_FALSE(field.match(
+        QVariant::fromValue(Attributes{{"foo", "3"}, {"bar.baz", "three"}, {"bar.quux", "0x3"}})));
+
+    field.setCheckType(ObjectLookupCheckType::notInList);
+    ASSERT_FALSE(field.match(
+        QVariant::fromValue(Attributes{{"foo", "1"}, {"bar.baz", "one"}, {"bar.quux", "0x1"}})));
+    ASSERT_FALSE(field.match(QVariant::fromValue(
+        Attributes{{"foo", "Value"}, {"bar.baz", "two"}, {"bar.quux", "0x1"}})));
+    ASSERT_TRUE(field.match(
+        QVariant::fromValue(Attributes{{"foo", "3"}, {"bar.baz", "three"}, {"bar.quux", "0x3"}})));
+}
+
 TEST_F(ObjectLookupFieldTest, lookupInListWorksProperly)
 {
     const auto listId = makeAndRegisterList({"foo", "bar.baz", "bar.quux"},
         {
             {{"foo", "1"}, {"bar.baz", "one"}, {"bar.quux", "0x1"}},
             {{"foo", "2"}, {"bar.baz", "two"}, {"bar.quux", "0x2"}}
-        });
+        },
+        /* isGeneric */ false);
 
     ObjectLookupField field{systemContext(), &kDummyDescriptor};
     field.setValue(listId.toSimpleString());

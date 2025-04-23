@@ -2,6 +2,8 @@
 
 #include "object_lookup_field.h"
 
+#include <ranges>
+
 #include <analytics/db/text_search_utils.h>
 #include <api/common_message_processor.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
@@ -14,12 +16,33 @@ namespace nx::vms::rules {
 
 namespace {
 
-/** Returns whether the list contains an entry that matches the given attributes. */
+/**
+ * Returns whether the list contains an entry that matches the given attributes.
+ * For a generic list, it checks that at least one value matches the attribute.
+ */
 bool checkForListEntries(
     const api::LookupListData& lookupList, const nx::common::metadata::Attributes& attributes)
 {
     if (attributes.empty())
         return false;
+
+    // Lookup list is Generic one.
+    if (lookupList.objectTypeId.isEmpty())
+    {
+        for (const auto& attribute: attributes)
+        {
+            bool hasAtLeastOneMatch = std::ranges::any_of(lookupList.entries,
+                [&](const std::map<QString, QString>& entry)
+                {
+                    return entry.begin()->second == attribute.value;
+                });
+
+            if (hasAtLeastOneMatch)
+                return true;
+        }
+
+        return false;
+    }
 
     for (const auto& entry: lookupList.entries)
     {

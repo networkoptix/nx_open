@@ -8,6 +8,8 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/lookup_list_data.h>
 
+namespace nx::analytics::taxonomy {class AbstractState;};
+
 namespace nx::vms::common {
 
 /**
@@ -31,6 +33,8 @@ public:
 
     nx::vms::api::LookupListData lookupList(const nx::Uuid& id) const;
     const nx::vms::api::LookupListDataList& lookupLists() const;
+    static bool typeCompatibleWithList(nx::analytics::taxonomy::AbstractState* state,
+        const nx::vms::api::LookupListData& lookupList, const QString& typeId);
 
     void addOrUpdate(nx::vms::api::LookupListData list);
     void remove(const nx::Uuid& id);

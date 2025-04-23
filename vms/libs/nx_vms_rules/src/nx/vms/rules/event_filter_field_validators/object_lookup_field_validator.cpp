@@ -45,9 +45,10 @@ ValidationResult ObjectLookupFieldValidator::validity(
                 Strings::fieldValueMustBeProvided(utils::kObjectTypeIdFieldName)};
         }
 
-        if (!nx::analytics::taxonomy::isTypeOrSubtypeOf(context->analyticsTaxonomyState().get(),
-                analyticsObjectTypeField->value(),
-                lookupList.objectTypeId))
+        if (!nx::vms::common::LookupListManager::typeCompatibleWithList(
+                context->analyticsTaxonomyState().get(),
+                lookupList,
+                analyticsObjectTypeField->value()))
         {
             return {
                 QValidator::State::Invalid,

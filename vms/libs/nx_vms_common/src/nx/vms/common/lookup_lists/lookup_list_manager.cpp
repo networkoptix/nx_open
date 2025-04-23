@@ -2,6 +2,8 @@
 
 #include "lookup_list_manager.h"
 
+#include <nx/analytics/taxonomy/abstract_state.h>
+#include <nx/analytics/taxonomy/helpers.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace nx::vms::common {
@@ -104,6 +106,14 @@ void LookupListManager::remove(const nx::Uuid& id)
     }
 
     emit removed(id);
+}
+
+bool LookupListManager::typeCompatibleWithList(nx::analytics::taxonomy::AbstractState* state,
+    const nx::vms::api::LookupListData& lookupList,
+    const QString& typeId)
+{
+    return lookupList.objectTypeId.isEmpty()
+        || isTypeOrSubtypeOf(state, typeId, lookupList.objectTypeId);
 }
 
 } // namespace nx::vms::common
