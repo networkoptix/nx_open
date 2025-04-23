@@ -189,7 +189,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(IOModule, loadIcon("tree/io.svg"));
     m_cache.insert(IOModule | Offline, loadIcon("tree/io_offline.svg"));
     m_cache.insert(IOModule | Unauthorized, loadIcon("tree/io_unauthorized.svg"));
-    m_cache.insert(IOModule | Incompatible, loadIcon("tree/camera_alert.svg"));
+    m_cache.insert(IOModule | Incompatible, loadIcon("tree/io_warning.svg"));
     m_cache.insert(Recorder, loadIcon("tree/encoder.svg"));
     m_cache.insert(MultisensorCamera, loadIcon("tree/multisensor.svg"));
 

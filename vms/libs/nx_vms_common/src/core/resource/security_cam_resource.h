@@ -661,7 +661,9 @@ private:
     nx::utils::CachedValue<nx::vms::api::DeviceCapabilities> m_cachedCameraCapabilities;
     nx::utils::CachedValue<bool> m_cachedIsDtsBased;
     nx::utils::CachedValue<MotionType> m_motionType;
+protected:
     nx::utils::CachedValue<bool> m_cachedIsIOModule;
+private:
     nx::utils::CachedValue<bool> m_cachedCanConfigureRemoteRecording;
     nx::utils::CachedValue<nx::vms::api::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     nx::utils::CachedValue<nx::vms::api::DeviceType> m_cachedExplicitDeviceType;

@@ -286,6 +286,7 @@ void QnVirtualCameraResource::emitPropertyChanged(
     }
     else if (key == ResourcePropertyKey::kIoConfigCapability)
     {
+        m_cachedIsIOModule.reset();
         emit isIOModuleChanged(::toSharedPointer(this));
     }
 
