@@ -214,10 +214,13 @@ struct TokenIntrospectionResponse
      * Present only if the request contained system_ids attribute.
      */
     std::optional<std::map<std::string /*systemId*/, std::vector<std::string> /*roleIds*/>> system_role_ids;
+
+    /**%apidoc May contain a hint why the requested token is not active.*/
+    std::string error;
 };
 
 NX_REFLECTION_INSTRUMENT(TokenIntrospectionResponse, (active)(client_id)(username)(scope)(exp) \
-    (expires_in)(time_since_password)(token_type)(system_role_ids))
+    (expires_in)(time_since_password)(token_type)(system_role_ids)(error))
 
 struct TokenIntrospectionResponseShort
 {
