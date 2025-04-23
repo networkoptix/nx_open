@@ -69,7 +69,7 @@ static void registerLoginRestHandlers(
      **%apidoc GET /rest/v{4-}/login/sessions
      * Retrieves all login sessions known to the Site for a given user.
      * <p>
-     * <b>ATTENTION:</b> If some of the Site servers are Offline of have unstable connection, the
+     * <b>ATTENTION:</b> If some of the Site servers are Offline or have unstable connection, the
      * result may be incomplete. Use `_strict` to catch connection problems. The result never
      * contains Cloud User sessions, they should be handled on the Cloud instead.
      * </p>
@@ -78,6 +78,7 @@ static void registerLoginRestHandlers(
      * %struct LoginSessionFilter
      * %param[unused] token
      * %param[unused] setCookie
+     * %param[unused] setSession
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Any User with a fresh session, only an administrator can read other User sessions.

@@ -100,6 +100,9 @@ struct NX_VMS_API LoginSessionFilter
     /**%apidoc[opt] Set HTTP cookie for automatic login by browser. */
     bool setCookie = false;
 
+    /**%apidoc[opt] Apply `token` to the current WebSocket connection. Useless for HTTP requests. */
+    bool setSession = false;
+
     // Only works for /rest/v4+.
     /**%apidoc[opt]
      * User to read sessions for (requires administrator permissions), empty means current user,
@@ -110,7 +113,7 @@ struct NX_VMS_API LoginSessionFilter
     /**%apidoc[opt] Target server, entire Site if not specified. */
     nx::Uuid serverId;
 };
-#define LoginSessionFilter_Fields (token)(setCookie)(username)(serverId)
+#define LoginSessionFilter_Fields (token)(setCookie)(setSession)(username)(serverId)
 NX_VMS_API_DECLARE_STRUCT_EX(LoginSessionFilter, (json))
 NX_REFLECTION_INSTRUMENT(LoginSessionFilter, LoginSessionFilter_Fields)
 
