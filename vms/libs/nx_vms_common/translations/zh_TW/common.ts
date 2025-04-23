@@ -102,7 +102,7 @@
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation type="unfinished">your Regional / License support</translation>
+      <translation>您的 區域/授權 技術支援</translation>
     </message>
   </context>
   <context>
@@ -1758,7 +1758,7 @@
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only</source>
-      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only</translation>
+      <translation>SMTP 設定。僅有進階使用者可以看到這些設定。</translation>
     </message>
   </context>
   <context>
