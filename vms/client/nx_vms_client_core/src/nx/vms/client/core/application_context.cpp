@@ -40,6 +40,7 @@
 #include <nx/vms/client/core/watchers/known_server_connections.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
+#include <utils/common/long_runable_cleanup.h>
 
 #include "application_context_qml_initializer.h"
 
@@ -448,7 +449,9 @@ void ApplicationContext::removeSystemContext(SystemContext* systemContext)
     auto iter = std::find(d->systemContexts.begin(), d->systemContexts.end(), systemContext);
     if (NX_ASSERT(iter != d->systemContexts.end()))
         d->systemContexts.erase(iter);
+
     emit systemContextRemoved(systemContext);
+    longRunableCleanup()->clearContextAsync(systemContext);
 }
 
 void ApplicationContext::addMainContext(SystemContext* mainContext)

@@ -63,6 +63,14 @@ using namespace std::chrono;
 static constexpr auto kUpdateConnectionInterval = 30s;
 static const nx::utils::SoftwareVersion kMinApiSupportedVersion(5, 1);
 
+struct ContextRemover
+{
+    void operator()(SystemContext* context)
+    {
+        appContext()->removeSystemContext(context);
+    }
+};
+
 } // namespace
 
 struct CloudCrossSystemContext::Private
@@ -73,9 +81,9 @@ struct CloudCrossSystemContext::Private
     {
         NX_VERBOSE(this, "Initialized");
 
-        systemContext = std::make_unique<SystemContext>(
+        systemContext.reset(new SystemContext(
             SystemContext::Mode::crossSystem,
-            appContext()->peerId());
+            appContext()->peerId()));
 
         cloudCrossSystemAccessController = static_cast<CloudCrossSystemAccessController*>(
             systemContext->accessController());
@@ -196,15 +204,14 @@ struct CloudCrossSystemContext::Private
         const auto resourcePool = systemContext->resourcePool();
         resourcePool->disconnect(q);
         resourcePool->removeResources(resources);
-
-        appContext()->removeSystemContext(systemContext.get());
     }
 
     CloudCrossSystemContext* const q;
     SystemDescriptionPtr const systemDescription;
     Status status = Status::uninitialized;
     core::RemoteConnectionFactory::ProcessPtr connectionProcess;
-    std::unique_ptr<SystemContext> systemContext;  //< Should be destroyed after dataLoader.
+    // Context should be destroyed after dataLoader.
+    std::unique_ptr<SystemContext, ContextRemover> systemContext;
     std::unique_ptr<CloudCrossSystemContextDataLoader> dataLoader;
     CloudCrossSystemAccessController* cloudCrossSystemAccessController = nullptr;
     core::UserResourcePtr user;

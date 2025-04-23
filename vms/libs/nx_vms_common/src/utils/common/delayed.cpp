@@ -96,7 +96,6 @@ QTimer* executeDelayedParented(Callback callback, std::chrono::milliseconds dela
     return executeDelayedImpl(std::move(callback), delay.count(), nullptr, parent);
 }
 
-
 QTimer* executeDelayedParented(Callback callback, QObject* parent)
 {
     return executeDelayedImpl(std::move(callback), kDefaultDelay, nullptr, parent);

@@ -795,8 +795,7 @@ ApplicationContext::~ApplicationContext()
     d->cloudLayoutsManager.reset();
 
     // Remote session must be fully destroyed while application context still exists.
-    removeSystemContext(d->mainSystemContext.get());
-    d->mainSystemContext.reset();
+    removeSystemContext(d->mainSystemContext.release());
 
     // Web Page icon cache uses application context.
     d->webPageDataCache.reset();

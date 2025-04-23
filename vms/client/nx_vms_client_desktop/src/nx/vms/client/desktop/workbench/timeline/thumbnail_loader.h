@@ -7,13 +7,12 @@
 #include <optional>
 
 #include <QtCore/QHash>
-#include <QtCore/QSharedPointer>
 #include <QtCore/QSize>
 #include <QtGui/QImage>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/media/ffmpeg/frame_info.h>
-#include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 #include <utils/common/aspect_ratio.h>
@@ -23,7 +22,7 @@
 
 namespace nx::vms::client::desktop::workbench::timeline {
 
-class ThumbnailLoader: public QObject
+class ThumbnailLoader: public QObject, public SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;

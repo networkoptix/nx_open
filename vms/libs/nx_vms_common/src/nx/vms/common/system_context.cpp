@@ -86,7 +86,6 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     }
 
     d->cameraNamesWatcher = std::make_unique<QnCameraNamesWatcher>((this));
-    d->longRunableCleanup = std::make_unique<QnLongRunableCleanup>();
 }
 
 SystemContext::~SystemContext()
@@ -314,16 +313,6 @@ QnCameraNamesWatcher* SystemContext::cameraNamesWatcher() const
 SystemContext::Mode SystemContext::mode() const
 {
     return d->mode;
-}
-
-QnLongRunableCleanup* SystemContext::longRunableCleanup() const
-{
-    return d->longRunableCleanup.get();
-}
-
-void SystemContext::stopLongRunnables()
-{
-    d->longRunableCleanup.reset();
 }
 
 } // namespace nx::vms::common

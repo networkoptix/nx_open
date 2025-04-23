@@ -268,9 +268,6 @@ public:
 
     QnCameraNamesWatcher* cameraNamesWatcher() const;
 
-    QnLongRunableCleanup* longRunableCleanup() const;
-    void stopLongRunnables();
-
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
 

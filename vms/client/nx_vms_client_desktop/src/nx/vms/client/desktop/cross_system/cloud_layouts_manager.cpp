@@ -105,7 +105,7 @@ struct CloudLayoutsManager::Private
 
     ~Private()
     {
-        appContext()->removeSystemContext(systemContext.get());
+        appContext()->removeSystemContext(systemContext.release());
     }
 
     Request makeRequest()

@@ -198,10 +198,11 @@ SystemContext* WindowContext::createSystemContext()
 
 void WindowContext::deleteSystemContext(SystemContext* context)
 {
-    d->systemContext->stopLongRunnables();
+    if (context == d->systemContext.get())
+        d->systemContext.release();
 
     appContext()->removeSystemContext(context);
-    d->systemContext.reset();
+
     emit mainSystemContextChanged();
 }
 

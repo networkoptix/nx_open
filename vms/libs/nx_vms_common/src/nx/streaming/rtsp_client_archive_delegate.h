@@ -180,7 +180,6 @@ private:
     quint8 m_sendedCSec = 0;
     qint64 m_lastSeekTime = DATETIME_INVALID;
     qint64 m_lastReceivedTime = DATETIME_INVALID;
-    std::atomic<bool> m_blockReopening = false;
     MediaQuality m_quality = MediaQuality::MEDIA_Quality_High;
     bool m_qualityFastSwitch = true;
     QSize m_resolution;

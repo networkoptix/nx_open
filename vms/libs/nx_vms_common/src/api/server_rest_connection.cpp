@@ -300,7 +300,7 @@ ServerConnection::ServerConnection(
     if (NX_ASSERT(certificateVerifier))
     {
         connect(certificateVerifier, &QObject::destroyed, this,
-            []() { NX_ASSERT(false, "Invalid destruction order"); });
+            [this]() { NX_ASSERT(false, "Invalid destruction order"); });
     }
 }
 

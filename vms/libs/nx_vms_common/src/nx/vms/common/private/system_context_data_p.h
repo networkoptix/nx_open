@@ -70,7 +70,6 @@ struct SystemContext::Private
     QPointer<nx::vms::discovery::Manager> moduleDiscoveryManager;
     nx::vms::rules::Engine* vmsRulesEngine = {};
     std::unique_ptr<QnCameraNamesWatcher> cameraNamesWatcher;
-    std::unique_ptr<QnLongRunableCleanup> longRunableCleanup;
 };
 
 } // namespace nx::vms::common
