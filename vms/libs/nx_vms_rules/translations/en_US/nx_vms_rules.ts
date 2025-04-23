@@ -288,6 +288,10 @@
         <source>Source</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Method</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
@@ -586,10 +590,6 @@
     </message>
     <message>
         <source>Content</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Method</source>
         <translation></translation>
     </message>
     <message>
@@ -1098,10 +1098,6 @@
     </message>
     <message>
         <source>Endpoint</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Method</source>
         <translation></translation>
     </message>
     <message>
