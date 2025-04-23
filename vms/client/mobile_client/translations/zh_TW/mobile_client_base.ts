@@ -79,7 +79,7 @@
     <message>
       <source>Expires in %1</source>
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
-      <translation type="unfinished">Expires in %1</translation>
+      <translation>於 %1 到期</translation>
     </message>
   </context>
   <context>

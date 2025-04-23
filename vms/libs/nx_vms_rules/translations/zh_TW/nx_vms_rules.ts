@@ -282,6 +282,10 @@
       <source>Source</source>
       <translation>來源</translation>
     </message>
+    <message>
+      <source>Method</source>
+      <translation>方式</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
@@ -465,12 +469,12 @@
     <message>
       <source>Device #%1: %2 (%3)</source>
       <comment>Device #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Device #%1: %2 (%3)</translation>
+      <translation>裝置#%1: %2 (%3)</translation>
     </message>
     <message>
       <source>Camera #%1: %2 (%3)</source>
       <comment>Camera #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Camera #%1: %2 (%3)</translation>
+      <translation>攝影機 #%1: %2 (%3)</translation>
     </message>
   </context>
   <context>
@@ -556,11 +560,11 @@
     </message>
     <message>
       <source>Related devices:</source>
-      <translation type="unfinished">Related devices:</translation>
+      <translation>相關裝置：</translation>
     </message>
     <message>
       <source>Related cameras:</source>
-      <translation type="unfinished">Related cameras:</translation>
+      <translation>相關攝影機：</translation>
     </message>
   </context>
   <context>
@@ -580,10 +584,6 @@
     <message>
       <source>Content</source>
       <translation>內容</translation>
-    </message>
-    <message>
-      <source>Method</source>
-      <translation>方式</translation>
     </message>
     <message>
       <source>HTTP authentication</source>
@@ -639,11 +639,11 @@
     </message>
     <message>
       <source>Integration Diagnostic at %1</source>
-      <translation type="unfinished">Integration Diagnostic at %1</translation>
+      <translation>整合服務診斷於%1</translation>
     </message>
     <message>
       <source>Integration Diagnostic</source>
-      <translation type="unfinished">Integration Diagnostic</translation>
+      <translation>整合服務診斷</translation>
     </message>
   </context>
   <context>
@@ -681,7 +681,7 @@
     </message>
     <message>
       <source>LDAP Sync Issue at %1</source>
-      <translation type="unfinished">LDAP Sync Issue at %1</translation>
+      <translation>LDAP 同步問題於 %1</translation>
     </message>
     <message>
       <source>LDAP Sync Issue</source>
@@ -697,15 +697,15 @@
     <message>
       <source>Not enough licenses on %1</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">Not enough licenses on %1</translation>
+      <translation>%1 授權數量不足</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Recording has been disabled on the following devices:</translation>
+      <translation>以下裝置的錄影已被停用：</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Recording has been disabled on the following cameras:</translation>
+      <translation>以下攝影機的錄影已被停用：</translation>
     </message>
   </context>
   <context>
@@ -977,7 +977,7 @@
     </message>
     <message>
       <source>Services Issue on %1</source>
-      <translation type="unfinished">Services Issue on %1</translation>
+      <translation>伺服器問題於%1</translation>
     </message>
   </context>
   <context>
@@ -1020,15 +1020,15 @@
     </message>
     <message>
       <source>Discovered a server with the same ID in the same local network</source>
-      <translation type="unfinished">Discovered a server with the same ID in the same local network</translation>
+      <translation>在同一個區域網路中發現相同 ID 的伺服器</translation>
     </message>
     <message>
       <source>Servers in the same local network have conflict on the following devices</source>
-      <translation type="unfinished">Servers in the same local network have conflict on the following devices</translation>
+      <translation>同一個區域網路的伺服器在以下裝置上有衝突</translation>
     </message>
     <message>
       <source>Server: %1</source>
-      <translation type="unfinished">Server: %1</translation>
+      <translation>伺服器：%1</translation>
     </message>
   </context>
   <context>
@@ -1085,10 +1085,6 @@
     <message>
       <source>Endpoint</source>
       <translation>端點</translation>
-    </message>
-    <message>
-      <source>Method</source>
-      <translation>方式</translation>
     </message>
     <message>
       <source>Content</source>
@@ -1195,7 +1191,7 @@
     </message>
     <message>
       <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
+      <translation>HDD/SSD/網路 速度速度不足以讓 %1錄影。</translation>
     </message>
   </context>
   <context>

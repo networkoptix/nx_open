@@ -122,14 +122,6 @@
     </message>
   </context>
   <context>
-    <name>CloudPanel</name>
-    <message>
-      <source>Log in to %1</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Log in to %1</translation>
-    </message>
-  </context>
-  <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Connect to Server</source>
@@ -370,6 +362,13 @@
     </message>
   </context>
   <context>
+    <name>LayoutSheet</name>
+    <message>
+      <source>Layouts</source>
+      <translation type="unfinished">Layouts</translation>
+    </message>
+  </context>
+  <context>
     <name>Login</name>
     <message>
       <source>Cannot connect to %1</source>
@@ -404,13 +403,6 @@
     <message>
       <source>CANCEL</source>
       <translation>BATAL</translation>
-    </message>
-  </context>
-  <context>
-    <name>OfflineDummy</name>
-    <message>
-      <source>You are not connected to any Site</source>
-      <translation>Anda tidak terkoneksi ke Site mana pun</translation>
     </message>
   </context>
   <context>
@@ -860,13 +852,6 @@
     </message>
   </context>
   <context>
-    <name>SideNavigation</name>
-    <message>
-      <source>New connection</source>
-      <translation>Koneksi baru</translation>
-    </message>
-  </context>
-  <context>
     <name>SiteList</name>
     <message>
       <source>Organizations</source>
@@ -938,17 +923,6 @@
     <message>
       <source>Channel Partner</source>
       <translation>Channel Partner</translation>
-    </message>
-  </context>
-  <context>
-    <name>SystemInformationBlock</name>
-    <message>
-      <source>New Server</source>
-      <translation>Server Baru</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>Tidak dikenal</translation>
     </message>
   </context>
   <context>

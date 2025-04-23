@@ -122,14 +122,6 @@
     </message>
   </context>
   <context>
-    <name>CloudPanel</name>
-    <message>
-      <source>Log in to %1</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>%1 にログイン</translation>
-    </message>
-  </context>
-  <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Connect to Server</source>
@@ -370,6 +362,13 @@
     </message>
   </context>
   <context>
+    <name>LayoutSheet</name>
+    <message>
+      <source>Layouts</source>
+      <translation type="unfinished">Layouts</translation>
+    </message>
+  </context>
+  <context>
     <name>Login</name>
     <message>
       <source>Cannot connect to %1</source>
@@ -404,13 +403,6 @@
     <message>
       <source>CANCEL</source>
       <translation>キャンセル</translation>
-    </message>
-  </context>
-  <context>
-    <name>OfflineDummy</name>
-    <message>
-      <source>You are not connected to any Site</source>
-      <translation>どのサイトにも接続されていません</translation>
     </message>
   </context>
   <context>
@@ -860,13 +852,6 @@
     </message>
   </context>
   <context>
-    <name>SideNavigation</name>
-    <message>
-      <source>New connection</source>
-      <translation>新規接続</translation>
-    </message>
-  </context>
-  <context>
     <name>SiteList</name>
     <message>
       <source>Organizations</source>
@@ -938,17 +923,6 @@
     <message>
       <source>Channel Partner</source>
       <translation>チャネルパートナー</translation>
-    </message>
-  </context>
-  <context>
-    <name>SystemInformationBlock</name>
-    <message>
-      <source>New Server</source>
-      <translation>新しいサーバー</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>不明</translation>
     </message>
   </context>
   <context>

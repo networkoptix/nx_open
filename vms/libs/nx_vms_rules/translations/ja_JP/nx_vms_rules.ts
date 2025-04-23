@@ -282,6 +282,10 @@
       <source>Source</source>
       <translation>ソース</translation>
     </message>
+    <message>
+      <source>Method</source>
+      <translation>メソッド</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
@@ -580,10 +584,6 @@
     <message>
       <source>Content</source>
       <translation>コンテンツ</translation>
-    </message>
-    <message>
-      <source>Method</source>
-      <translation>メソッド</translation>
     </message>
     <message>
       <source>HTTP authentication</source>
@@ -1085,10 +1085,6 @@
     <message>
       <source>Endpoint</source>
       <translation>エンドポイント</translation>
-    </message>
-    <message>
-      <source>Method</source>
-      <translation>メソッド</translation>
     </message>
     <message>
       <source>Content</source>

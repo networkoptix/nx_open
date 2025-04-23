@@ -300,6 +300,10 @@
       <source>Source</source>
       <translation>מקור</translation>
     </message>
+    <message>
+      <source>Method</source>
+      <translation>מתודה</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
@@ -601,10 +605,6 @@
     <message>
       <source>Content</source>
       <translation type="unfinished">Content</translation>
-    </message>
-    <message>
-      <source>Method</source>
-      <translation>מתודה</translation>
     </message>
     <message>
       <source>HTTP authentication</source>
@@ -1127,10 +1127,6 @@
     <message>
       <source>Endpoint</source>
       <translation type="unfinished">Endpoint</translation>
-    </message>
-    <message>
-      <source>Method</source>
-      <translation>מתודה</translation>
     </message>
     <message>
       <source>Content</source>

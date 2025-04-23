@@ -122,14 +122,6 @@
     </message>
   </context>
   <context>
-    <name>CloudPanel</name>
-    <message>
-      <source>Log in to %1</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Connexion à %1</translation>
-    </message>
-  </context>
-  <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Connect to Server</source>
@@ -371,6 +363,13 @@
     </message>
   </context>
   <context>
+    <name>LayoutSheet</name>
+    <message>
+      <source>Layouts</source>
+      <translation type="unfinished">Layouts</translation>
+    </message>
+  </context>
+  <context>
     <name>Login</name>
     <message>
       <source>Cannot connect to %1</source>
@@ -405,13 +404,6 @@
     <message>
       <source>CANCEL</source>
       <translation>ANNULER</translation>
-    </message>
-  </context>
-  <context>
-    <name>OfflineDummy</name>
-    <message>
-      <source>You are not connected to any Site</source>
-      <translation>Vous n'êtes connecté à aucun site</translation>
     </message>
   </context>
   <context>
@@ -861,13 +853,6 @@
     </message>
   </context>
   <context>
-    <name>SideNavigation</name>
-    <message>
-      <source>New connection</source>
-      <translation>Nouvelle connexion</translation>
-    </message>
-  </context>
-  <context>
     <name>SiteList</name>
     <message>
       <source>Organizations</source>
@@ -939,17 +924,6 @@
     <message>
       <source>Channel Partner</source>
       <translation>Partenaire de distribution</translation>
-    </message>
-  </context>
-  <context>
-    <name>SystemInformationBlock</name>
-    <message>
-      <source>New Server</source>
-      <translation>Nouveau serveur</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>Inconnue</translation>
     </message>
   </context>
   <context>

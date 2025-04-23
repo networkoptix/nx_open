@@ -122,14 +122,6 @@
     </message>
   </context>
   <context>
-    <name>CloudPanel</name>
-    <message>
-      <source>Log in to %1</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>登入到 %1</translation>
-    </message>
-  </context>
-  <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Connect to Server</source>
@@ -259,7 +251,7 @@
     <name>EventSearchItem</name>
     <message>
       <source>SHARED</source>
-      <translation type="unfinished">SHARED</translation>
+      <translation>共享</translation>
     </message>
   </context>
   <context>
@@ -370,6 +362,13 @@
     </message>
   </context>
   <context>
+    <name>LayoutSheet</name>
+    <message>
+      <source>Layouts</source>
+      <translation type="unfinished">Layouts</translation>
+    </message>
+  </context>
+  <context>
     <name>Login</name>
     <message>
       <source>Cannot connect to %1</source>
@@ -404,13 +403,6 @@
     <message>
       <source>CANCEL</source>
       <translation>取消</translation>
-    </message>
-  </context>
-  <context>
-    <name>OfflineDummy</name>
-    <message>
-      <source>You are not connected to any Site</source>
-      <translation>您尚未連接至任何站點</translation>
     </message>
   </context>
   <context>
@@ -804,7 +796,7 @@
     <name>ShareBookmarkSheet</name>
     <message>
       <source>New Bookmark</source>
-      <translation type="unfinished">New Bookmark</translation>
+      <translation>新書籤</translation>
     </message>
     <message>
       <source>Name</source>
@@ -820,7 +812,7 @@
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation type="unfinished">Protect with Password (optional)</translation>
+      <translation>使用密碼保護 (非必要)</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -828,11 +820,11 @@
     </message>
     <message>
       <source>Create &amp; Share</source>
-      <translation type="unfinished">Create &amp; Share</translation>
+      <translation>建立並分享</translation>
     </message>
     <message>
       <source>Save &amp; Share</source>
-      <translation type="unfinished">Save &amp; Share</translation>
+      <translation>儲存並分享</translation>
     </message>
     <message>
       <source>Stop Sharing</source>
@@ -856,14 +848,7 @@
     </message>
     <message>
       <source>Shared link options</source>
-      <translation type="unfinished">Shared link options</translation>
-    </message>
-  </context>
-  <context>
-    <name>SideNavigation</name>
-    <message>
-      <source>New connection</source>
-      <translation>建立新的連線</translation>
+      <translation>分享連結選擇</translation>
     </message>
   </context>
   <context>
@@ -938,17 +923,6 @@
     <message>
       <source>Channel Partner</source>
       <translation>通路夥伴</translation>
-    </message>
-  </context>
-  <context>
-    <name>SystemInformationBlock</name>
-    <message>
-      <source>New Server</source>
-      <translation>新的伺服器</translation>
-    </message>
-    <message>
-      <source>Unknown</source>
-      <translation>未知</translation>
     </message>
   </context>
   <context>

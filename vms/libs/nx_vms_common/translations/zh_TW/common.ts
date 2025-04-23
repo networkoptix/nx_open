@@ -67,7 +67,7 @@
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation type="unfinished">your Regional / License support</translation>
+      <translation>您的 區域/授權 技術支援</translation>
     </message>
   </context>
   <context>
@@ -873,19 +873,19 @@
     </message>
     <message>
       <source>Local recording service</source>
-      <translation type="unfinished">Local recording service</translation>
+      <translation>本地錄影服務</translation>
     </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
-      <translation type="unfinished">
-        <numerusform>%n Local recording services</numerusform>
+      <translation>
+        <numerusform>%n 個本地錄影服務</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Local recording services</numerusform>
+      <translation>
+        <numerusform>%n/%1 個本地錄影服務</numerusform>
       </translation>
     </message>
   </context>
@@ -1297,7 +1297,7 @@
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Contact your channel partner for assistance.</translation>
+      <translation>聯絡您的通路夥伴尋求協助。</translation>
     </message>
   </context>
   <context>
