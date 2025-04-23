@@ -82,6 +82,7 @@
 #include <nx/vms/utils/external_resources.h>
 #include <nx/vms/utils/translation/translation_manager.h>
 #include <platform/platform_abstraction.h>
+#include <utils/common/long_runable_cleanup.h>
 #include <utils/math/color_transformations.h>
 
 #if defined(Q_OS_MACOS)
@@ -767,7 +768,7 @@ ApplicationContext::~ApplicationContext()
     d->localResourcesContext.reset();
 
     // Remote session must be fully destroyed while application context still exists.
-    d->mainSystemContext.reset();
+    removeSystemContext(d->mainSystemContext.release());
     d->cloudLayoutsManager.reset();
 
     // Web Page icon cache uses application context.
@@ -820,7 +821,9 @@ void ApplicationContext::removeSystemContext(SystemContext* systemContext)
     auto iter = std::find(d->systemContexts.begin(), d->systemContexts.end(), systemContext);
     if (NX_ASSERT(iter != d->systemContexts.end()))
         d->systemContexts.erase(iter);
+
     emit systemContextRemoved(systemContext);
+    longRunableCleanup()->clearContextAsync(systemContext);
 }
 
 SystemContext* ApplicationContext::systemContextByCloudSystemId(const QString& cloudSystemId) const

@@ -419,6 +419,11 @@ ServerConnection::ServerConnection(
             .address = std::move(address),
             .credentials = std::move(credentials)}}})
 {
+    if (NX_ASSERT(certificateVerifier))
+    {
+        connect(certificateVerifier, &QObject::destroyed, this,
+            [this]() { NX_ASSERT(false, "Invalid destruction order"); });
+    }
 }
 
 ServerConnection::~ServerConnection()

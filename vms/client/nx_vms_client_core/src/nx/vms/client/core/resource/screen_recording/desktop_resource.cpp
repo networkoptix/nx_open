@@ -67,7 +67,8 @@ void DesktopResource::disconnectFromServer()
     if (!m_connection)
         return;
 
-    common::appContext()->longRunableCleanup()->cleanupAsync(std::move(m_connection));
+    common::appContext()->longRunableCleanup()->cleanupAsync(
+        std::move(m_connection), systemContext());
 }
 
 AudioLayoutConstPtr DesktopResource::getAudioLayout(

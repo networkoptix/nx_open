@@ -2,9 +2,11 @@
 
 #include "thumbnail_loader.h"
 
+#include <core/resource/media_resource.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/thread/long_runnable.h>
-#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <recording/time_period.h>
 #include <utils/common/long_runable_cleanup.h>
 #include <utils/common/synctime.h>
@@ -68,6 +70,7 @@ private:
 namespace nx::vms::client::desktop::workbench::timeline {
 
 ThumbnailLoader::ThumbnailLoader(const QnMediaResourcePtr& resource, Mode mode):
+    SystemContextAware(SystemContext::fromResource(resource)),
     m_mode(mode),
     m_frameExtractor(new ArchiveFrameExtractor(
         resource,
@@ -85,8 +88,8 @@ ThumbnailLoader::~ThumbnailLoader()
         std::make_unique<ArchiveFrameExtractorAsyncRelease>(std::move(m_frameExtractor));
     frameExtractorAsyncRelease->start();
 
-    nx::vms::common::appContext()->longRunableCleanup()->cleanupAsync(
-        std::move(frameExtractorAsyncRelease));
+    appContext()->longRunableCleanup()->cleanupAsync(
+        std::move(frameExtractorAsyncRelease), systemContext());
 }
 
 std::chrono::milliseconds ThumbnailLoader::timeStep() const

@@ -513,9 +513,6 @@ bool QnRtspClientArchiveDelegate::reopen()
 
     close();
 
-    if (m_blockReopening)
-        return false;
-
     if (m_reopenTimer.isValid() && m_reopenTimer.elapsed() < kReopenTimeoutMs)
     {
         for (int i = 0; i < (kReopenTimeoutMs - m_reopenTimer.elapsed()) / 10 && !m_closing; ++i)
@@ -558,7 +555,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
     while (!m_closing)
     {
         result = getNextDataInternal();
-        if (!result && !m_blockReopening && !m_closing)
+        if (!result && !m_closing)
             result = getNextDataInternal(); //< Try again in case of RTSP reconnect.
 
         static const int64_t kMaxGopSize = 1'000'000LL * 60;
@@ -742,7 +739,6 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
         m_camera);
 
     m_reopenPosition = 0;
-    m_blockReopening = false;
     m_lastSeekTime = m_position = time;
 
     QnMediaServerResourcePtr newServer = getServerOnTime(m_position);
@@ -920,7 +916,6 @@ void QnRtspClientArchiveDelegate::setSpeed(qint64 displayTime, double value)
     }
 
     bool fromLive = newReverseMode && m_position == DATETIME_NOW;
-    m_blockReopening = false;
 
     seek(displayTime, /* findIFrame */ true);
     if (fromLive)
@@ -1064,8 +1059,6 @@ void QnRtspClientArchiveDelegate::beforeChangeSpeed(double speed)
     {
         if (newReverseMode)
             beforeSeek(DATETIME_INVALID);
-        else
-            m_blockReopening = false;
     }
 }
 
@@ -1145,9 +1138,6 @@ bool QnRtspClientArchiveDelegate::hasVideo() const
 
 void QnRtspClientArchiveDelegate::pleaseStop()
 {
-    // TODO: #vbreus It should be done atomically under lock. To be fixed in 5.1 since there is no
-    // way to do it right without significant changes.
-    m_blockReopening = true;
     if (m_rtspSession->isOpened())
         m_rtspSession->shutdown();
 }

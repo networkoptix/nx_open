@@ -19,13 +19,34 @@ class QnLongRunnable;
 class NX_VMS_COMMON_API QnLongRunableCleanup: public QObject
 {
 public:
-    QnLongRunableCleanup();
-    virtual ~QnLongRunableCleanup();
+    using LongRunnablePtr = std::unique_ptr<QnLongRunnable>;
 
-    void cleanupAsync(std::unique_ptr<QnLongRunnable> threadUniquePtr);
-    void cleanupAsyncShared(std::shared_ptr<QnLongRunnable> threadSharedPtr);
+public:
+    QnLongRunableCleanup();
+    virtual ~QnLongRunableCleanup() override;
+
+    void cleanupAsync(LongRunnablePtr threadUniquePtr, QObject* context);
+    void clearContextAsync(QObject* context);
 
 private:
-    std::map<QnLongRunnable*, std::shared_ptr<QnLongRunnable>> m_threadsToStop;
+    struct ThreadData
+    {
+        LongRunnablePtr thread;
+        QObject* context = nullptr;
+    };
+
+    struct ContextData
+    {
+        int refCount = 0;
+        bool cleanup = false;
+    };
+
+private:
+    void tryClearContext(QObject* context);
+
+private:
     mutable nx::Mutex m_mutex;
+
+    std::map<QnLongRunnable*, ThreadData> m_threadsToStop;
+    std::map<QObject*, ContextData> m_contextsToStop;
 };
