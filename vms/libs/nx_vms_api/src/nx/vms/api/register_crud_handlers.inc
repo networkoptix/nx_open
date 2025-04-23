@@ -2725,7 +2725,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      */
     reg("rest/v{4-}/analytics/engines/:engineId/deviceAgents/:id?",
         GlobalPermission::powerUser,
-        std::make_unique<DeviceAgentManagementHandler>(serverModule->systemContext()));
+        std::make_unique<DeviceAgentManagementHandler>(serverModule, serverConnector));
 
     /**%apidoc GET /rest/v{4-}/analytics/engines/{engineId}/deviceAgents/{deviceId}/settings
      * Get settings values of the specified DeviceAgent

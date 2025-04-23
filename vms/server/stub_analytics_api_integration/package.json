@@ -12,7 +12,7 @@
   "dependencies": {
     "axios": "^1.5.1",
     "path": "^0.12.7",
-    "ws": "^8.18.0"
+    "ws": "^8.18.1"
   },
   "devDependencies": {
     "electron": "^34.0.0",
