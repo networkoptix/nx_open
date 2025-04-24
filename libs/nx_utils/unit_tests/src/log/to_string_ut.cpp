@@ -100,8 +100,8 @@ TEST(ToString, Qt)
     assertToString(QRectF(1.2, 3.4, 5.6, 7.8), "QRectF(1.2,3.4 5.6x7.8)");
     assertToString(QRectF(QPointF(1, 2), QSizeF(3, 4)), "QRectF(1,2 3x4)");
 
-    assertToString(Qt::Edge::TopEdge, "Qt::TopEdge");
-    assertToString(Qt::Edge::LeftEdge, "Qt::LeftEdge");
+    assertToString(Qt::Edge::TopEdge, "QFlags<Qt::Edge>(TopEdge)");
+    assertToString(Qt::Edge::LeftEdge, "QFlags<Qt::Edge>(LeftEdge)");
 
     assertToString(QAbstractSocket::AddressInUseError, "QAbstractSocket::AddressInUseError");
     assertToString(QAbstractSocket::NetworkError, "QAbstractSocket::NetworkError");
