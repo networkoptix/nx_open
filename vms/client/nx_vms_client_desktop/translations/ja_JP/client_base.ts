@@ -12963,7 +12963,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Start Tour</source>
-      <translation>ツアー開始</translation>
+      <translation>ツアーを開始</translation>
     </message>
     <message>
       <source>Start Showreel</source>

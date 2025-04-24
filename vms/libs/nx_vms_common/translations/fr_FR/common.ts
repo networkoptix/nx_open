@@ -1819,7 +1819,7 @@
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only</source>
-      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only</translation>
+      <translation>Paramètres SMTP. Ces paramètres sont réservés aux utilisateurs expérimentés.</translation>
     </message>
   </context>
   <context>

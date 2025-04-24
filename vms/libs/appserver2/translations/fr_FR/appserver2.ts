@@ -240,7 +240,7 @@
     </message>
     <message>
       <source>User &apos;%1(%2) is not permitted to create new User Groups.&apos;</source>
-      <translation type="unfinished">User &apos;%1(%2) is not permitted to create new User Groups.&apos;</translation>
+      <translation>L'utilisateur &apos;%1(%2) n'est pas autorisé à créer de nouveaux groupes d'utilisateurs.&apos;</translation>
     </message>
     <message>
       <source>Creation of a non-local (%1) User Group is forbidden for VMS.</source>
@@ -294,11 +294,11 @@
     </message>
     <message>
       <source>Removal of the User with readonly attribute is forbidden for VMS.</source>
-      <translation type="unfinished">Removal of the User with readonly attribute is forbidden for VMS.</translation>
+      <translation>La suppression de l'utilisateur avec l'attribut lecture seule est interdite pour VMS.</translation>
     </message>
     <message>
       <source>the User %1 doesn&apos;t have &apos;generateEvents&apos; permission</source>
-      <translation type="unfinished">the User %1 doesn&apos;t have &apos;generateEvents&apos; permission</translation>
+      <translation>L'utilisateur %1 n'a pas l'autorisation &apos;Générer des événements&apos;</translation>
     </message>
   </context>
 </TS>
