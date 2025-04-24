@@ -6,6 +6,7 @@
 #include <nx/network/rest/subscription.h>
 #include <nx/utils/crud_model.h>
 #include <nx/utils/elapsed_timer.h>
+#include <nx/utils/i18n/scoped_locale.h>
 #include <nx/utils/scope_guard.h>
 #include <transaction/transaction.h>
 
@@ -47,6 +48,14 @@ public:
     {
     }
 
+    [[nodiscard]]
+    nx::i18n::ScopedLocale installScopedLocale(const nx::network::rest::Request& request)
+    {
+        if (auto manager = this->m_translationManager)
+            return nx::i18n::ScopedLocale::install(manager, request.preferredResponseLocales());
+        return {};
+    }
+
     std::vector<Model> read(Filter filter, const nx::network::rest::Request& request)
     {
         using namespace details;
@@ -59,14 +68,15 @@ public:
         // `std::type_identity` (or similar) can be used to pass the read type info and avoid
         // useless `readType` object instantiation.
         const auto query =
-            [id = getId(filter), &processor](const auto& readType)
+            [this, &request, id = getId(filter), &processor](const auto& readType)
             {
                 using Arg = std::decay_t<decltype(readType)>;
                 using Output = std::conditional_t<nx::utils::Is<std::vector, Arg>(), Arg, std::vector<Arg>>;
                 return processor.template processQueryAsync<decltype(id), Output>(
                     getReadCommand<Output>(),
                     std::move(id),
-                    std::make_pair<Result, Output>);
+                    std::make_pair<Result, Output>,
+                    [this, &request]() { return installScopedLocale(request); });
             };
 
         const auto readFuture =
@@ -112,10 +122,14 @@ public:
         validateType(processor, id, m_objectType);
 
         std::promise<Result> promise;
-        processor.processUpdateAsync(
-            DeleteCommand,
-            std::move(id),
-            [&promise](Result result) { promise.set_value(std::move(result)); });
+        processor.processCustomUpdateAsync(
+            ApiCommand::CompositeSave,
+            [&promise](Result result) { promise.set_value(std::move(result)); },
+            [this, &request, id = std::move(id)](auto& p, auto* list) mutable
+            {
+                auto scopedLocale = installScopedLocale(request);
+                return p.processUpdateSync(DeleteCommand, std::move(id), list);
+            });
         if (Result result = promise.get_future().get(); !result)
             throwError(std::move(result));
     }
@@ -135,14 +149,15 @@ public:
             static_cast<const Derived*>(this)->prepareAuditRecord(request));
         if constexpr (toDbTypesExists<Model>::value)
         {
+            auto id = getId(data);
             auto items = std::move(data).toDbTypes();
             const auto& mainDbItem = std::get<0>(items);
             validateType(processor, mainDbItem, m_objectType);
             validateResourceTypeId(mainDbItem);
 
             using IgnoredDbType = std::decay_t<decltype(mainDbItem)>;
-            const auto update =
-                [id = getId(data)](auto&& x, auto& copy, auto* list)
+            auto update =
+                [id = std::move(id)](auto&& x, auto& copy, auto* list)
                 {
                     using DbType = std::decay_t<decltype(x)>;
                     Result result;
@@ -167,10 +182,12 @@ public:
             processor.processCustomUpdateAsync(
                 ApiCommand::CompositeSave,
                 [&promise](Result result) { promise.set_value(std::move(result)); },
-                [update, items = std::move(items)](auto& copy, auto* list)
+                [this, &request, update = std::move(update), items = std::move(items)](
+                    auto& copy, auto* list) mutable
                 {
+                    auto scopedLocale = installScopedLocale(request);
                     const auto updateItem =
-                        [update, &copy, list](auto&& item) -> Result
+                        [&update, &copy, list](auto&& item)
                         {
                             if constexpr (nx::utils::Is<std::optional, std::decay_t<decltype(item)>>())
                                 return item ? update(std::move(*item), copy, list) : Result();
@@ -179,7 +196,7 @@ public:
                         };
 
                     return std::apply(
-                        [updateItem](auto&&... items) -> Result
+                        [&updateItem](auto&&... items)
                         {
                             Result result{};
                             (... && (result = updateItem(std::forward<decltype(items)>(items))));
@@ -192,10 +209,14 @@ public:
         {
             validateType(processor, data, m_objectType);
             validateResourceTypeId(data);
-            processor.processUpdateAsync(
-                getUpdateCommand<Model>(),
-                data,
-                [&promise](Result result) { promise.set_value(std::move(result)); });
+            processor.processCustomUpdateAsync(
+                ApiCommand::CompositeSave,
+                [&promise](Result result) { promise.set_value(std::move(result)); },
+                [this, &request, data = std::move(data)](auto& p, auto* list) mutable
+                {
+                    auto scopedLocale = installScopedLocale(request);
+                    return p.processUpdateSync(getUpdateCommand<Model>(), std::move(data), list);
+                });
         }
         if (Result result = promise.get_future().get(); !result)
             throwError(std::move(result));

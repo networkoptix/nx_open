@@ -23,8 +23,7 @@ PreloadedTranslationReference::PreloadedTranslationReference(
 
 PreloadedTranslationReference::~PreloadedTranslationReference()
 {
-    if (m_manager)
-        m_manager->removePreloadedTranslationReference(m_locale);
+    reset();
 }
 
 PreloadedTranslationReference::PreloadedTranslationReference(
@@ -60,6 +59,14 @@ QString PreloadedTranslationReference::locale() const
 QPointer<TranslationManager> PreloadedTranslationReference::manager() const
 {
     return m_manager;
+}
+
+void PreloadedTranslationReference::reset()
+{
+    if (m_manager)
+        m_manager->removePreloadedTranslationReference(m_locale);
+    m_manager.clear();
+    m_locale.clear();
 }
 
 } // namespace nx::i18n

@@ -19,9 +19,12 @@ public:
 
     PreloadedTranslationReference(const PreloadedTranslationReference& other);
     PreloadedTranslationReference& operator=(const PreloadedTranslationReference& other);
+    PreloadedTranslationReference(PreloadedTranslationReference&&) = default;
+    PreloadedTranslationReference& operator=(PreloadedTranslationReference&&) = default;
 
     QString locale() const;
     QPointer<TranslationManager> manager() const;
+    void reset();
 
 private:
     PreloadedTranslationReference(TranslationManager* manager, const QString& locale);

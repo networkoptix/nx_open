@@ -35,7 +35,6 @@
 #include <nx/p2p/p2p_ini.h>
 #include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/external_resources.h>
-#include <nx/utils/i18n/translation_manager.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>

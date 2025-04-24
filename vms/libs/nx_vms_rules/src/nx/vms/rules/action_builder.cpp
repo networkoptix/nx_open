@@ -13,7 +13,6 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/i18n/scoped_locale.h>
-#include <nx/utils/i18n/translation_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qobject.h>
 #include <nx/vms/common/application_context.h>
@@ -276,21 +275,22 @@ QVariantMap makeOverride(UuidSelection users, QString emails)
     };
 }
 
-[[nodiscard]] nx::i18n::ScopedLocalePtr installScopedLocale(const QString& locale)
+[[nodiscard]] nx::i18n::ScopedLocale installScopedLocale(const QString& locale)
 {
     // User resource returns default locale if not set explicitly.
     if (!NX_ASSERT(!locale.isEmpty()))
         return {};
 
+    nx::i18n::TranslationManager* translationManager = nullptr;
+
     // Application context may be uninitialized in some unit tests.
     if (auto appContext = nx::vms::common::appContext())
     {
         // Some unit tests do not have translations manager.
-        if (auto translationManager = appContext->translationManager())
-            return translationManager->installScopedLocale(locale);
+        translationManager = appContext->translationManager();
     }
 
-    return {};
+    return nx::i18n::ScopedLocale::install(translationManager, {locale});
 }
 
 } // namespace

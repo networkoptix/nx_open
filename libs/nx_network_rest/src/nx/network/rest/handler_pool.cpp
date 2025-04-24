@@ -25,6 +25,8 @@ void HandlerPool::registerHandler(
         handler->setSchemas(m_crudSchemas);
     if (m_auditManager)
         handler->setAuditManager(m_auditManager);
+    if (m_translationManager)
+        handler->setTranslationManager(m_translationManager);
     m_crudHandlers[method].addHandler(path, std::move(handler));
 }
 

@@ -62,6 +62,10 @@ public:
 
     void setSchemas(std::shared_ptr<json::OpenApiSchemas> schemas);
     void setAuditManager(audit::Manager* auditManager) { m_auditManager = auditManager; }
+    void setTranslationManager(nx::i18n::TranslationManager* translationManager)
+    {
+        m_translationManager = translationManager;
+    }
 
     Handler* findHandler(
         const nx::network::http::Method& httpMethod, const QString& normalizedPath) const;
@@ -107,6 +111,7 @@ private:
     std::map<nx::network::http::Method, PathRouter> m_crudHandlers;
     std::shared_ptr<json::OpenApiSchemas> m_crudSchemas;
     audit::Manager* m_auditManager = nullptr;
+    nx::i18n::TranslationManager* m_translationManager = nullptr;
     std::map<std::pair<nx::network::http::Method, QString>, std::function<void()>>
         m_postprocessFunctions;
 };

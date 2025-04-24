@@ -181,32 +181,33 @@ PreloadedTranslationReference TranslationManager::preloadTranslation(
     return PreloadedTranslationReference(this, locale);
 }
 
-std::unique_ptr<ScopedLocale> TranslationManager::installScopedLocale(
-    const PreloadedTranslationReference& locale,
-    std::chrono::milliseconds maxWaitTime)
+ScopedLocale TranslationManager::installScopedLocale(
+    const PreloadedTranslationReference& locale, std::chrono::milliseconds maxWaitTime)
 {
-    return std::make_unique<ScopedLocale>(locale, maxWaitTime);
+    return {locale, maxWaitTime};
 }
 
-std::unique_ptr<ScopedLocale> TranslationManager::installScopedLocale(
+ScopedLocale TranslationManager::installScopedLocale(
     const QString& locale)
 {
     return installScopedLocale(std::vector<QString>{locale});
 }
 
-std::unique_ptr<ScopedLocale> TranslationManager::installScopedLocale(
-    const std::vector<QString>& preferredLocales)
+ScopedLocale TranslationManager::installScopedLocale(const std::vector<QString>& preferredLocales)
 {
     nx::utils::ElapsedTimer timer(nx::utils::ElapsedTimerState::started);
 
     if (d->loadTranslationCounter == 0) //< All translation consumers are stopped.
     {
         NX_VERBOSE(this, "Skip loading translations");
-        return std::make_unique<ScopedLocale>(PreloadedTranslationReference(), 0ms);
+        return {};
     }
 
     for (const auto& locale: preferredLocales)
     {
+        if (locale.isEmpty())
+            continue;
+
         // Load translation data.
         const auto translationRef = preloadTranslation(locale);
         if (!translationRef.locale().isEmpty())
@@ -215,14 +216,12 @@ std::unique_ptr<ScopedLocale> TranslationManager::installScopedLocale(
             // It's possible that translation loading itself would take more than maxWaitingTime.
             // In this case lets spend some more time trying to install the new locale, since we've already
             // failed to fit into the given interval.
-            return std::make_unique<ScopedLocale>(
-                translationRef,
-                qMax(d->maxWaitTime - timer.elapsed(), kMinInstallationTime));
+            return {translationRef, qMax(d->maxWaitTime - timer.elapsed(), kMinInstallationTime)};
         }
     }
 
     // Can't find a valid translation locale. Switch to default app language.
-    return std::make_unique<ScopedLocale>(PreloadedTranslationReference(), 0ms);
+    return {};
 }
 
 void TranslationManager::stopLoadingTranslations()

@@ -12,6 +12,7 @@
 #include "request.h"
 #include "response.h"
 
+namespace nx::i18n { class TranslationManager; }
 namespace nx::network { class AbstractStreamSocket; }
 
 namespace nx::network::rest {
@@ -83,6 +84,10 @@ public:
     void setPath(const QString& path);
     void setSchemas(std::shared_ptr<json::OpenApiSchemas> schemas);
     void setAuditManager(audit::Manager* auditManager) { m_auditManager = auditManager; }
+    void setTranslationManager(nx::i18n::TranslationManager* translationManager)
+    {
+        m_translationManager = translationManager;
+    }
 
     QString extractAction(const QString& path) const;
 
@@ -144,6 +149,7 @@ protected:
     //   schema file.
     std::shared_ptr<json::OpenApiSchemas> m_schemas;
     audit::Manager* m_auditManager = nullptr;
+    nx::i18n::TranslationManager* m_translationManager = nullptr;
 };
 
 } // namespace nx::network::rest
