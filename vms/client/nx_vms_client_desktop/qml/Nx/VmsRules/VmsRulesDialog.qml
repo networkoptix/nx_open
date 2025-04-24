@@ -41,7 +41,7 @@ Dialog
     topPadding: 0
     bottomPadding: 0
 
-    modality: Qt.ApplicationModal
+    modality: Qt.NonModal
 
     acceptShortcutEnabled: !tableView.selectionModel.hasSelection
 

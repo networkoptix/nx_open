@@ -54,20 +54,6 @@ Window
 
     property bool enabled: true //< Required for GUI autotesting.
 
-    Shortcut
-    {
-        enabled: rejectShortcutEnabled
-        sequence: "Esc"
-        onActivated: dialog.reject()
-    }
-
-    Shortcut
-    {
-        enabled: acceptShortcutEnabled
-        sequences: ["Enter", "Return"]
-        onActivated: dialog.accept()
-    }
-
     onContentItemChanged:
     {
         if (!contentItem)
@@ -80,6 +66,12 @@ Window
         contentItem.height = Qt.binding(() => availableHeight)
         contentItem.enabled = Qt.binding(() => enabled)
         contentItem.focus = true
+
+        // Changed from `Shortcut` to key press handling due to `Shortcuts` propagating shortcut
+        // events to the parent window if this window is not in focus.
+        contentItem.Keys.escapePressed.connect(onEscapeKeyPressed)
+        contentItem.Keys.enterPressed.connect(onEnterOrReturnKeyPressed)
+        contentItem.Keys.returnPressed.connect(onEnterOrReturnKeyPressed)
     }
 
     onButtonBoxChanged:
@@ -145,6 +137,18 @@ Window
         when: dialog.fixedHeight > 0
         property: "maximumHeight"
         value: dialog.fixedHeight
+    }
+
+    function onEscapeKeyPressed(event)
+    {
+        if (rejectShortcutEnabled)
+            dialog.reject()
+    }
+
+    function onEnterOrReturnKeyPressed(event)
+    {
+        if (acceptShortcutEnabled)
+            dialog.accept()
     }
 
     function accept()
