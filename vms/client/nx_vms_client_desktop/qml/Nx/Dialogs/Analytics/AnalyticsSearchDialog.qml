@@ -112,11 +112,11 @@ Window
 
         Repeater
         {
-            model: d.filterModel.engines
+            model: eventModel.analyticsFilterModel.engines
 
             onModelChanged:
             {
-                if (d.filterModel.engines.length > 0 && eventModel.analyticsSetup)
+                if (eventModel.analyticsFilterModel.engines.length > 0 && eventModel.analyticsSetup)
                     tabBar.selectEngine(eventModel.analyticsSetup.engine)
             }
 
@@ -213,7 +213,7 @@ Window
                         width: parent.width
                         bottomPadding: 16
 
-                        model: d.filterModel
+                        model: eventModel.analyticsFilterModel
                     }
                 }
             }
@@ -993,20 +993,16 @@ Window
 
         property var analyticsFiltersByEngine: ({})
 
-        property var filterModel: windowContext
-            ? windowContext.systemContext.taxonomyManager.createFilterModel(dialog)
-            : emptyFilterModel
-
         property AttributeDisplayManager tileViewAttributeManager:
             windowContext && eventModel.analyticsSetup
                 ? AttributeDisplayManagerFactory.create(
-                    AttributeDisplayManager.Mode.tileView, filterModel)
+                    AttributeDisplayManager.Mode.tileView, eventModel.analyticsFilterModel)
                 : null
 
         property AttributeDisplayManager tableViewAttributeManager:
             windowContext && eventModel.analyticsSetup
                 ? AttributeDisplayManagerFactory.create(
-                    AttributeDisplayManager.Mode.tableView, filterModel)
+                    AttributeDisplayManager.Mode.tableView, eventModel.analyticsFilterModel)
                 : null
 
         readonly property Analytics.Engine selectedAnalyticsEngine:
@@ -1014,12 +1010,10 @@ Window
 
         property var delayedAttributesFilter: []
 
-        readonly property bool pluginTabsShown: filterModel.engines.length > 1
+        readonly property bool pluginTabsShown: eventModel.analyticsFilterModel.engines.length > 1
 
         readonly property bool objectTypeSelected:
             analyticsFilters.selectedObjectTypeIds.length > 0
-
-        Analytics.FilterModel { id: emptyFilterModel }
 
         PropertyUpdateFilter on delayedAttributesFilter
         {
@@ -1035,7 +1029,7 @@ Window
 
         onSelectedAnalyticsEngineChanged:
         {
-            if (!filterModel || filterModel.engines.length === 0)
+            if (!eventModel.analyticsFilterModel || eventModel.analyticsFilterModel.engines.length === 0)
                 return
 
             storeCurrentEngineFilterState()
@@ -1056,15 +1050,6 @@ Window
                 return
 
             eventModel.analyticsSetup.attributeFilters = delayedAttributesFilter
-        }
-
-        Connections
-        {
-            target: eventModel.commonSetup
-            function onSelectedCamerasChanged()
-            {
-                d.filterModel.selectedDevices = eventModel.commonSetup.selectedCameras
-            }
         }
 
         Connections

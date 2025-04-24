@@ -23,6 +23,8 @@ namespace nx::analytics::db { struct ObjectTrack; }
 
 namespace nx::vms::client::core { class AnalyticsSearchSetup; }
 
+namespace nx::vms::client::core::analytics::taxonomy { class AnalyticsFilterModel; }
+
 namespace nx::vms::client::desktop {
 
 class CommonObjectSearchSetup;
@@ -50,6 +52,9 @@ class RightPanelModelsAdapter: public QIdentityProxyModel
 
     Q_PROPERTY(nx::vms::client::core::AnalyticsSearchSetup* analyticsSetup READ analyticsSetup
         NOTIFY analyticsSetupChanged)
+
+    Q_PROPERTY(nx::vms::client::core::analytics::taxonomy::AnalyticsFilterModel*
+        analyticsFilterModel READ analyticsFilterModel NOTIFY analyticsSetupChanged)
 
     Q_PROPERTY(nx::vms::client::desktop::DetectableObjectTypeModel*
         objectTypeModel READ objectTypeModel NOTIFY analyticsSetupChanged)
@@ -104,6 +109,7 @@ public:
     CommonObjectSearchSetup* commonSetup() const;
     core::AnalyticsSearchSetup* analyticsSetup() const;
 
+    nx::vms::client::core::analytics::taxonomy::AnalyticsFilterModel* analyticsFilterModel() const;
     DetectableObjectTypeModel* objectTypeModel() const;
 
     int itemCount() const;

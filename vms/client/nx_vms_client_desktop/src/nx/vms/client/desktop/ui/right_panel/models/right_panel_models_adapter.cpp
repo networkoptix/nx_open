@@ -369,6 +369,11 @@ DetectableObjectTypeModel* RightPanelModelsAdapter::objectTypeModel() const
     return d->objectTypeModel();
 }
 
+AnalyticsFilterModel* RightPanelModelsAdapter::analyticsFilterModel() const
+{
+    return d->objectTypeModel() ? d->objectTypeModel()->sourceModel() : nullptr;
+}
+
 QVariant RightPanelModelsAdapter::data(const QModelIndex& index, int role) const
 {
     if (!NX_ASSERT(checkIndex(index)))
