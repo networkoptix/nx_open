@@ -17,7 +17,8 @@ ModalDialog
 {
     id: dialog
 
-    required property Analytics.StateView taxonomy
+    required property SystemContext systemContext
+    property Analytics.StateView taxonomy : systemContext.taxonomyManager.createStateView(dialog)
 
     // Source model which is used when editing an exising list.
     property LookupListModel sourceModel
@@ -25,8 +26,6 @@ ModalDialog
 
     // Model working as backend of the dialog.
     property alias viewModel: model
-
-    property SystemContext systemContext: null
 
     property bool typeIsSelected: false
     property bool canAccept: model.isValid && typeIsSelected

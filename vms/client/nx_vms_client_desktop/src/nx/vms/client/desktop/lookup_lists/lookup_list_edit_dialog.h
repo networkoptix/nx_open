@@ -24,7 +24,6 @@ public:
     static void registerQmlTypes();
 
     LookupListEditDialog(SystemContext* systemContext,
-        core::analytics::taxonomy::StateView* taxonomy,
         LookupListModel* sourceModel, //< Model is used as source, but not edited in process.
         QWidget* parent = nullptr);
     virtual ~LookupListEditDialog() override;

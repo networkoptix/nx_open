@@ -144,10 +144,13 @@ taxonomy::AnalyticsFilterModel* TaxonomyManager::createFilterModel(QObject* pare
 
 taxonomy::StateView* TaxonomyManager::createStateView(QObject* parent) const
 {
-    return taxonomy::StateViewBuilder::stateView(
+    auto stateView = taxonomy::StateViewBuilder::stateView(
         currentTaxonomy(),
         /*filter*/ nullptr,
         parent);
+
+    QQmlEngine::setObjectOwnership(stateView, QQmlEngine::CppOwnership);
+    return stateView;
 }
 
 QVariant TaxonomyManager::objectTypeById(const QString& objectTypeId) const

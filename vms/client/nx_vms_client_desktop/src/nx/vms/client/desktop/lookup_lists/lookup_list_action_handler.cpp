@@ -367,10 +367,8 @@ void LookupListActionHandler::openLookupListEditDialog()
     data.id = nx::Uuid::createUuid();
     auto sourceModel = new LookupListModel(data);
 
-    auto taxonomy = systemContext()->taxonomyManager()->createStateView();
     const auto parentWidget = utils::extractParentWidget(params, mainWindowWidget());
     auto dialog = new LookupListEditDialog(systemContext(),
-        taxonomy,
         // If there is argument Qn::AnalyticsObjectTypeIdRole, open LookupListEditDialog with
         // specified type otherwise, any type of list is allowed.
         params.hasArgument(Qn::AnalyticsObjectTypeIdRole) ? sourceModel : nullptr,

@@ -19,13 +19,12 @@ void LookupListEditDialog::registerQmlTypes()
 }
 
 LookupListEditDialog::LookupListEditDialog(SystemContext* systemContext,
-    core::analytics::taxonomy::StateView* taxonomy,
     LookupListModel* sourceModel,
     QWidget* parent):
     base_type(appContext()->qmlEngine(),
         QUrl("Nx/LookupLists/EditLookupListDialog.qml"),
         /*initialProperties*/
-        {{"taxonomy", QVariant::fromValue(taxonomy)},
+        {{"systemContext", QVariant::fromValue(systemContext)},
             {"sourceModel", QVariant::fromValue(sourceModel)},
             {"deletionIsAllowed", false}},
         parent),
@@ -35,7 +34,6 @@ LookupListEditDialog::LookupListEditDialog(SystemContext* systemContext,
 
 LookupListEditDialog::~LookupListEditDialog()
 {
-    QmlProperty<QObject*>(rootObjectHolder(), "taxonomy") = nullptr;
     QmlProperty<QObject*>(rootObjectHolder(), "sourceModel") = nullptr;
 }
 

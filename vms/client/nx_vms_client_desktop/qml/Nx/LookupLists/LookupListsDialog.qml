@@ -19,6 +19,7 @@ Dialog
     id: control
 
     required property SystemContext systemContext
+    // The parent of the taxonomy object must be the QML dialog; otherwise, its children may be deleted unexpectedly.
     property Analytics.StateView taxonomy: systemContext.taxonomyManager.createStateView(control)
     // When comboBox is empty, currentValue is undefined. `??` used for suppressing warnings.
     property LookupListModel currentList: listComboBox.currentValue ?? null
@@ -179,6 +180,7 @@ Dialog
         EditLookupListDialog
         {
             transientParent: control.Window.window
+            systemContext: control.systemContext
             taxonomy: control.taxonomy
             visible: false
             onAccepted:

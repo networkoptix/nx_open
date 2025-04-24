@@ -19,6 +19,9 @@ StateView::StateView(std::vector<ObjectType*> objectTypes, QObject* parent):
 
 ObjectType* StateView::objectTypeById(const QString& objectTypeId) const
 {
+    if (objectTypeId.isEmpty())
+        return nullptr;
+
     std::unordered_set<ObjectType*> visitedObjects;
     std::function<ObjectType*(const std::vector<ObjectType*>&)> findObjectRecursivelyByFullName =
         [&](const std::vector<ObjectType*>& objectTypes) -> ObjectType*
