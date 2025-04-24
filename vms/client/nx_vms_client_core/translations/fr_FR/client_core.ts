@@ -344,7 +344,7 @@
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>Dossiers</translation>
     </message>
     <message>
       <source>Sites</source>

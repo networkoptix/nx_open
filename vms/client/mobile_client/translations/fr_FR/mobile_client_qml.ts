@@ -252,14 +252,14 @@
     <name>EventSearchItem</name>
     <message>
       <source>SHARED</source>
-      <translation type="unfinished">SHARED</translation>
+      <translation>PARTAGÉ</translation>
     </message>
   </context>
   <context>
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
-      <translation type="unfinished">Looking for</translation>
+      <translation>À la recherche de</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -366,7 +366,7 @@
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Mises en page</translation>
     </message>
   </context>
   <context>
@@ -388,7 +388,7 @@
     <name>MenuScreen</name>
     <message>
       <source>App Settings</source>
-      <translation type="unfinished">App Settings</translation>
+      <translation>Paramètres de l'application</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -428,19 +428,19 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Aucun site</translation>
     </message>
     <message>
       <source>We did not find any sites in this organization</source>
-      <translation type="unfinished">We did not find any sites in this organization</translation>
+      <translation>Nous n'avons trouvé aucun site dans cette organisation</translation>
     </message>
     <message>
       <source>We did not find any sites in this folder</source>
-      <translation type="unfinished">We did not find any sites in this folder</translation>
+      <translation>Nous n'avons trouvé aucun site dans ce dossier</translation>
     </message>
     <message>
       <source>How to connect sites?</source>
-      <translation type="unfinished">How to connect sites?</translation>
+      <translation>Comment connecter des sites ?</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -652,7 +652,7 @@
     </message>
     <message>
       <source>Host: Port</source>
-      <translation type="unfinished">Host: Port</translation>
+      <translation>Hôte : Port</translation>
     </message>
   </context>
   <context>
@@ -683,19 +683,19 @@
     </message>
     <message>
       <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation type="unfinished">We didn&apos;t find any organizations, try contacting support</translation>
+      <translation>Nous avons trouvé aucune organisation, essayez de contacter le support</translation>
     </message>
     <message>
       <source>No Sites Found</source>
-      <translation type="unfinished">No Sites Found</translation>
+      <translation>Aucun site trouvé</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</translation>
+      <translation>Nous n'avons trouvé aucun site sur votre réseau local, essayez d'ajouter des serveurs manuellement ou connectez-vous à votre compte cloud.</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually</translation>
+      <translation>Nous n'avons trouvé aucun site sur votre réseau local, essayez d'ajouter des serveurs manuellement.</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -797,7 +797,7 @@
     <name>ShareBookmarkSheet</name>
     <message>
       <source>New Bookmark</source>
-      <translation type="unfinished">New Bookmark</translation>
+      <translation>Nouveau signet</translation>
     </message>
     <message>
       <source>Name</source>
@@ -813,7 +813,7 @@
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation type="unfinished">Protect with Password (optional)</translation>
+      <translation>Protéger avec un mot de passe (facultatif)</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -821,11 +821,11 @@
     </message>
     <message>
       <source>Create &amp; Share</source>
-      <translation type="unfinished">Create &amp; Share</translation>
+      <translation>Créer et partager</translation>
     </message>
     <message>
       <source>Save &amp; Share</source>
-      <translation type="unfinished">Save &amp; Share</translation>
+      <translation>Enregistrer et partager</translation>
     </message>
     <message>
       <source>Stop Sharing</source>
@@ -849,7 +849,7 @@
     </message>
     <message>
       <source>Shared link options</source>
-      <translation type="unfinished">Shared link options</translation>
+      <translation>Options de liens partagés</translation>
     </message>
   </context>
   <context>
@@ -860,7 +860,7 @@
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>Dossiers</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -883,7 +883,7 @@
     </message>
     <message>
       <source>NEW</source>
-      <translation type="unfinished">NEW</translation>
+      <translation>NOUVEAU</translation>
     </message>
   </context>
   <context>
@@ -919,7 +919,7 @@
     <message>
       <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Open %1</translation>
+      <translation>Ouvrir %1</translation>
     </message>
     <message>
       <source>Channel Partner</source>

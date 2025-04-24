@@ -370,7 +370,7 @@
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Layouts</translation>
     </message>
   </context>
   <context>

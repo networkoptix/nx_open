@@ -368,7 +368,7 @@
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>פריסות</translation>
     </message>
   </context>
   <context>

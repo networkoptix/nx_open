@@ -135,7 +135,7 @@
     </message>
     <message>
       <source>Simultaneous Streams</source>
-      <translation type="unfinished">Simultaneous Streams</translation>
+      <translation>Flux simultanés</translation>
     </message>
   </context>
   <context>
@@ -606,7 +606,7 @@
     </message>
     <message>
       <source>Restreaming Link</source>
-      <translation type="unfinished">Restreaming Link</translation>
+      <translation>Lien de rediffusion</translation>
     </message>
   </context>
   <context>
@@ -1320,7 +1320,7 @@
     </message>
     <message>
       <source>User&apos;s local layouts</source>
-      <translation type="unfinished">User&apos;s local layouts</translation>
+      <translation>Mise en page locale de l'utilisateur</translation>
     </message>
   </context>
   <context>
@@ -1548,7 +1548,7 @@
     </message>
     <message>
       <source>Custom Background Image</source>
-      <translation type="unfinished">Custom Background Image</translation>
+      <translation>Image d'arrière-plan personnalisée</translation>
     </message>
   </context>
   <context>
@@ -2092,7 +2092,7 @@
     </message>
     <message>
       <source>Service Allocation</source>
-      <translation type="unfinished">Service Allocation</translation>
+      <translation>Allocation de service</translation>
     </message>
   </context>
   <context>

@@ -261,7 +261,7 @@
     <name>QnCameraAnalyticsObjectsPolicy</name>
     <message>
       <source>Analytics objects are not available for %1</source>
-      <translation type="unfinished">Analytics objects are not available for %1</translation>
+      <translation>Les objets d'analytique ne sont pas disponibles pour %1</translation>
     </message>
   </context>
   <context>
@@ -912,21 +912,21 @@
     </message>
     <message>
       <source>Local recording service</source>
-      <translation type="unfinished">Local recording service</translation>
+      <translation>Service d'enregistrement local</translation>
     </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
-      <translation type="unfinished">
-        <numerusform>%n Local recording services</numerusform>
-        <numerusform>%n Local recording services</numerusform>
+      <translation>
+        <numerusform>%n Service d'enregistrement local</numerusform>
+        <numerusform>%n Services d'enregistrement locaux</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Local recording services</numerusform>
-        <numerusform>%n/%1 Local recording services</numerusform>
+      <translation>
+        <numerusform>%n/%1 Service d'enregistrement local</numerusform>
+        <numerusform>%n/%1 Services d'enregistrement locaux</numerusform>
       </translation>
     </message>
   </context>
@@ -1364,7 +1364,7 @@
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Contact your channel partner for assistance.</translation>
+      <translation>Contactez votre partenaire de distribution pour obtenir de l'aide.</translation>
     </message>
   </context>
   <context>
@@ -1554,7 +1554,7 @@
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h).</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h).</translation>
+      <translation>Délai d'expiration de la connexion proxy (secondes, 1 s à 1 h).</translation>
     </message>
     <message>
       <source>Proxy connection access policy.</source>
@@ -1654,7 +1654,7 @@
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
-      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
+      <translation>Nombre maximum de signets. La valeur inférieure ou égale à 0 est infinie.</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption).</source>
@@ -1806,7 +1806,7 @@
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud).</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud).</translation>
+      <translation>Délai d'expiration du cache de jeton de session distante (autres serveurs et Cloud).</translation>
     </message>
     <message>
       <source>Default video codec.</source>
@@ -1910,7 +1910,7 @@
     </message>
     <message>
       <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
-      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
+      <translation>Activer les authentifications HTTP Basic et Digest obsolètes (non sécurisées).</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery.</source>
@@ -1926,7 +1926,7 @@
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
-      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+      <translation>Paramètres SMTP. Ces paramètres sont accessibles uniquement aux utilisateurs expérimentés.</translation>
     </message>
   </context>
 </TS>

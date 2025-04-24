@@ -366,7 +366,7 @@
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Elrendezések</translation>
     </message>
   </context>
   <context>

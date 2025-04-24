@@ -366,7 +366,7 @@
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Vyer</translation>
     </message>
   </context>
   <context>

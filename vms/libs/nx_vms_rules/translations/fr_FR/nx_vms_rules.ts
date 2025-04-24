@@ -13,7 +13,7 @@
     <message>
       <source>On %1 --&gt; %2</source>
       <comment>%1 is the event name, %2 is the action name</comment>
-      <translation type="unfinished">On %1 --&gt; %2</translation>
+      <translation>Sur %1 --&gt; %2</translation>
     </message>
   </context>
   <context>
@@ -258,7 +258,7 @@
     </message>
     <message>
       <source>Field &quot;%1&quot; should be an object</source>
-      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+      <translation>Le champ &quot;%1&quot; doit être un objet</translation>
     </message>
     <message>
       <source>Unable to deserialize properties for field: %1</source>
@@ -331,7 +331,7 @@
     </message>
     <message>
       <source>And attributes</source>
-      <translation type="unfinished">And attributes</translation>
+      <translation>Et les attributs</translation>
     </message>
   </context>
   <context>
@@ -476,12 +476,12 @@
     <message>
       <source>Device #%1: %2 (%3)</source>
       <comment>Device #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Device #%1: %2 (%3)</translation>
+      <translation>Appareil n°%1: %2 (%3)</translation>
     </message>
     <message>
       <source>Camera #%1: %2 (%3)</source>
       <comment>Camera #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Camera #%1: %2 (%3)</translation>
+      <translation>Caméra n°%1: %2 (%3)</translation>
     </message>
   </context>
   <context>
@@ -567,11 +567,11 @@
     </message>
     <message>
       <source>Related devices:</source>
-      <translation type="unfinished">Related devices:</translation>
+      <translation>Appareils associés :</translation>
     </message>
     <message>
       <source>Related cameras:</source>
-      <translation type="unfinished">Related cameras:</translation>
+      <translation>Caméras associées :</translation>
     </message>
   </context>
   <context>
@@ -598,7 +598,7 @@
     </message>
     <message>
       <source>Custom headers</source>
-      <translation type="unfinished">Custom headers</translation>
+      <translation>En-têtes personnalisés</translation>
     </message>
   </context>
   <context>
@@ -616,16 +616,16 @@
     <name>nx::vms::rules::HttpHeadersFieldValidator</name>
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
-      <translation type="unfinished">
-        <numerusform>Some of the headers are not valid</numerusform>
-        <numerusform>Some of the headers are not valid</numerusform>
+      <translation>
+        <numerusform>Certain en-tête n'est pas valide</numerusform>
+        <numerusform>Certains en-têtes ne sont pas valides</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
-      <translation type="unfinished">
-        <numerusform>All the headers are not valid</numerusform>
-        <numerusform>All the headers are not valid</numerusform>
+      <translation>
+        <numerusform>L'en-tête n'est pas valide</numerusform>
+        <numerusform>Tous les en-têtes ne sont pas valides</numerusform>
       </translation>
     </message>
   </context>
@@ -648,11 +648,11 @@
     </message>
     <message>
       <source>Integration Diagnostic at %1</source>
-      <translation type="unfinished">Integration Diagnostic at %1</translation>
+      <translation>Diagnostic d'intégration à %1</translation>
     </message>
     <message>
       <source>Integration Diagnostic</source>
-      <translation type="unfinished">Integration Diagnostic</translation>
+      <translation>Diagnostic d'intégration</translation>
     </message>
   </context>
   <context>
@@ -691,7 +691,7 @@
     </message>
     <message>
       <source>LDAP Sync Issue at %1</source>
-      <translation type="unfinished">LDAP Sync Issue at %1</translation>
+      <translation>Problème de synchronisation LDAP à %1</translation>
     </message>
     <message>
       <source>LDAP Sync Issue</source>
@@ -707,15 +707,15 @@
     <message>
       <source>Not enough licenses on %1</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">Not enough licenses on %1</translation>
+      <translation>Pas assez de licences sur %1</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Recording has been disabled on the following devices:</translation>
+      <translation>L'enregistrement a été désactivé sur les appareils suivants :</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Recording has been disabled on the following cameras:</translation>
+      <translation>L'enregistrement a été désactivé sur les caméras suivantes :</translation>
     </message>
   </context>
   <context>
@@ -991,7 +991,7 @@
     </message>
     <message>
       <source>Services Issue on %1</source>
-      <translation type="unfinished">Services Issue on %1</translation>
+      <translation>Problème de services sur %1</translation>
     </message>
   </context>
   <context>
@@ -1034,15 +1034,15 @@
     </message>
     <message>
       <source>Discovered a server with the same ID in the same local network</source>
-      <translation type="unfinished">Discovered a server with the same ID in the same local network</translation>
+      <translation>Découverte d'un serveur avec le même ID dans le même réseau local</translation>
     </message>
     <message>
       <source>Servers in the same local network have conflict on the following devices</source>
-      <translation type="unfinished">Servers in the same local network have conflict on the following devices</translation>
+      <translation>Les serveurs du même réseau local ont un conflit sur les périphériques suivants</translation>
     </message>
     <message>
       <source>Server: %1</source>
-      <translation type="unfinished">Server: %1</translation>
+      <translation>Serveur : %1</translation>
     </message>
   </context>
   <context>
@@ -1094,11 +1094,11 @@
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
       <source>Site HTTP(S) Request</source>
-      <translation type="unfinished">Site HTTP(S) Request</translation>
+      <translation>Requête HTTP(S) du site</translation>
     </message>
     <message>
       <source>Endpoint</source>
-      <translation type="unfinished">Endpoint</translation>
+      <translation>Endpoint</translation>
     </message>
     <message>
       <source>Content</source>
@@ -1205,7 +1205,7 @@
     </message>
     <message>
       <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
+      <translation>Pas assez de vitesse HDD/SSD/Réseau pour l'enregistrement vers %1.</translation>
     </message>
   </context>
   <context>
@@ -1242,7 +1242,7 @@
     </message>
     <message>
       <source>Invalid UUID string</source>
-      <translation type="unfinished">Invalid UUID string</translation>
+      <translation>Chaîne UUID invalide</translation>
     </message>
   </context>
   <context>
@@ -1276,11 +1276,11 @@
     </message>
     <message>
       <source>Endpoint cannot be empty</source>
-      <translation type="unfinished">Endpoint cannot be empty</translation>
+      <translation>Le point de terminaison ne peut pas être vide</translation>
     </message>
     <message>
       <source>Endpoint mustn&apos;t contains any space</source>
-      <translation type="unfinished">Endpoint mustn&apos;t contains any space</translation>
+      <translation>Le point de terminaison ne doit pas contenir d'espace</translation>
     </message>
   </context>
   <context>

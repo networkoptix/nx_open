@@ -238,11 +238,11 @@
     </message>
     <message>
       <source>Switch to table view</source>
-      <translation type="unfinished">Switch to table view</translation>
+      <translation>Passer à la vue tableau</translation>
     </message>
     <message>
       <source>Switch to card view</source>
-      <translation type="unfinished">Switch to card view</translation>
+      <translation>Passer à la vue carte</translation>
     </message>
   </context>
   <context>
@@ -647,7 +647,7 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     <name>CustomHttpHeadersDialog</name>
     <message>
       <source>Custom HTTP headers</source>
-      <translation type="unfinished">Custom HTTP headers</translation>
+      <translation>En-têtes HTTP personnalisés</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1167,12 +1167,12 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">BUILT-IN</translation>
+      <translation>INTÉGRÉ</translation>
     </message>
     <message>
       <source>CUSTOM</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">CUSTOM</translation>
+      <translation>PERSONNALISÉ</translation>
     </message>
   </context>
   <context>
@@ -2520,7 +2520,7 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     </message>
     <message>
       <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</translation>
+      <translation>L'activation des demandes d'enregistrement d'intégrations API permet à des tiers de soumettre des demandes d'approbation via l'intégration. Malgré des mesures de sécurité, une utilisation prolongée est déconseillée. Surveillez attentivement l'utilisation et désactivez cette option une fois toutes les intégrations nécessaires installées.</translation>
     </message>
   </context>
   <context>
