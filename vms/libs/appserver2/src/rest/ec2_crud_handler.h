@@ -11,10 +11,13 @@
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/ec2/ec_connection_notification_manager.h>
+#include <nx/vms/utils/translation/scoped_locale.h>
 #include <transaction/transaction.h>
 
 #include "details.h"
 #include "subscription.h"
+
+namespace nx::vms::utils { class TranslationManager; }
 
 namespace ec2 {
 
@@ -28,7 +31,9 @@ template<
 class CrudHandler: public SubscriptionHandler
 {
 public:
-    CrudHandler(QueryProcessor* queryProcessor):
+    CrudHandler(
+        QueryProcessor* queryProcessor, nx::vms::utils::TranslationManager* translationManager)
+        :
         SubscriptionHandler(
             [this]()
             {
@@ -39,8 +44,20 @@ public:
                 return nx::utils::Guard{
                     [this, guard = std::move(guard)]() { NX_VERBOSE(this, "Remove monitor"); }};
             }),
-        m_queryProcessor(queryProcessor)
+        m_queryProcessor(queryProcessor),
+        m_translationManager(translationManager)
     {
+    }
+
+    [[nodiscard]]
+    nx::vms::utils::ScopedLocale installScopedLocale(const nx::network::rest::Request& request)
+    {
+        if (m_translationManager)
+        {
+            return nx::vms::utils::ScopedLocale::install(
+                m_translationManager, request.preferredResponseLocales());
+        }
+        return {};
     }
 
     std::vector<Model> read(Filter filter, const nx::network::rest::Request& request)
@@ -53,14 +70,15 @@ public:
         // `std::type_identity` (or similar) can be used to pass the read type info and avoid
         // useless `readType` object instantiation.
         const auto query =
-            [id = filter.getId(), &processor](const auto& readType)
+            [this, &request, id = filter.getId(), &processor](const auto& readType)
             {
                 using Arg = std::decay_t<decltype(readType)>;
                 using Output = std::conditional_t<nx::utils::IsVector<Arg>::value, Arg, std::vector<Arg>>;
                 return processor.template processQueryAsync<decltype(id), Output>(
                     getReadCommand<Output>(),
                     std::move(id),
-                    std::make_pair<Result, Output>);
+                    std::make_pair<Result, Output>,
+                    [this, &request]() { return installScopedLocale(request); });
             };
 
         const auto readFuture =
@@ -105,10 +123,14 @@ public:
         validateType(processor, id, m_objectType);
 
         std::promise<Result> promise;
-        processor.processUpdateAsync(
-            DeleteCommand,
-            std::move(id),
-            [&promise](Result result) { promise.set_value(std::move(result)); });
+        processor.processCustomUpdateAsync(
+            ApiCommand::CompositeSave,
+            [&promise](Result result) { promise.set_value(std::move(result)); },
+            [this, &request, id = std::move(id)](auto& p, auto* list) mutable
+            {
+                auto scopedLocale = installScopedLocale(request);
+                return p.processUpdateSync(DeleteCommand, std::move(id), list);
+            });
         if (Result result = promise.get_future().get(); !result)
             throwError(std::move(result));
     }
@@ -126,6 +148,7 @@ public:
         auto processor = m_queryProcessor->getAccess(request.userSession);
         if constexpr (toDbTypesExists<Model>::value)
         {
+            auto id = data.getId();
             auto items = std::move(data).toDbTypes();
             const auto& mainDbItem = std::get<0>(items);
             validateType(processor, mainDbItem, m_objectType);
@@ -133,7 +156,7 @@ public:
 
             using IgnoredDbType = std::decay_t<decltype(mainDbItem)>;
             const auto update =
-                [id = data.getId()](auto&& x, auto& copy, auto* list)
+                [id = std::move(id)](auto&& x, auto& copy, auto* list)
                 {
                     using DbType = std::decay_t<decltype(x)>;
                     Result result;
@@ -158,10 +181,12 @@ public:
             processor.processCustomUpdateAsync(
                 ApiCommand::CompositeSave,
                 [&promise](Result result) { promise.set_value(std::move(result)); },
-                [update, items = std::move(items)](auto& copy, auto* list)
+                [this, &request, update = std::move(update), items = std::move(items)](
+                    auto& copy, auto* list) mutable
                 {
+                    auto scopedLocale = installScopedLocale(request);
                     const auto updateItem =
-                        [update, &copy, list](auto&& item) -> Result
+                        [&update, &copy, list](auto&& item)
                         {
                             if constexpr (nx::utils::IsOptional<std::decay_t<decltype(item)>>::value)
                                 return item ? update(std::move(*item), copy, list) : Result();
@@ -170,7 +195,7 @@ public:
                         };
 
                     return std::apply(
-                        [updateItem](auto&&... items) -> Result
+                        [&updateItem](auto&&... items)
                         {
                             Result result{};
                             (... && (result = updateItem(std::forward<decltype(items)>(items))));
@@ -183,10 +208,14 @@ public:
         {
             validateType(processor, data, m_objectType);
             validateResourceTypeId(data);
-            processor.processUpdateAsync(
-                getUpdateCommand<Model>(),
-                data,
-                [&promise](Result result) { promise.set_value(std::move(result)); });
+            processor.processCustomUpdateAsync(
+                ApiCommand::CompositeSave,
+                [&promise](Result result) { promise.set_value(std::move(result)); },
+                [this, &request, data = std::move(data)](auto& p, auto* list) mutable
+                {
+                    auto scopedLocale = installScopedLocale(request);
+                    return p.processUpdateSync(getUpdateCommand<Model>(), std::move(data), list);
+                });
         }
         if (Result result = promise.get_future().get(); !result)
             throwError(std::move(result));
@@ -214,6 +243,7 @@ public:
 
 protected:
     QueryProcessor* const m_queryProcessor;
+    nx::vms::utils::TranslationManager* const m_translationManager;
 
 private:
     bool isValidType(const nx::Uuid& id) const

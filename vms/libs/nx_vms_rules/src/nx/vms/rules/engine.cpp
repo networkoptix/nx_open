@@ -853,8 +853,7 @@ void Engine::processAcceptedEvent(const nx::Uuid& ruleId, const EventData& event
     {
         if (auto executor = m_executors.value(builder->actionType()))
         {
-            nx::vms::utils::ScopedLocalePtr scopedLocale = executor->translateAction(
-                builder->actionType());
+            auto scopedLocale = executor->translateAction(builder->actionType());
             builder->process(event);
         }
     }

@@ -64,7 +64,7 @@ public:
      * @return Scoped guard object.
      */
     [[nodiscard]]
-    std::unique_ptr<ScopedLocale> installScopedLocale(
+    ScopedLocale installScopedLocale(
         const PreloadedTranslationReference& locale,
         std::chrono::milliseconds maxWaitTime = 0ms);
 
@@ -86,8 +86,7 @@ public:
      * If locale is not found, default app language would be used.
      */
     [[nodiscard]]
-    std::unique_ptr<ScopedLocale> installScopedLocale(
-        const QString& locale,
+    ScopedLocale installScopedLocale(const QString& locale,
         std::chrono::milliseconds maxWaitTime = std::chrono::milliseconds(5));
 
     /**
@@ -97,8 +96,7 @@ public:
      * default app language is used.
      */
     [[nodiscard]]
-    std::unique_ptr<ScopedLocale> installScopedLocale(
-        const std::vector<QString>& preferredLocales,
+    ScopedLocale installScopedLocale(const std::vector<QString>& preferredLocales,
         std::chrono::milliseconds maxWaitTime = std::chrono::milliseconds(5));
 
     /**

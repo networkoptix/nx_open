@@ -25,11 +25,12 @@ public:
         QObject(parent)
     {}
 
-    virtual nx::vms::utils::ScopedLocalePtr translateAction(const QString& /*actionType*/)
+    virtual nx::vms::utils::ScopedLocale translateAction(const QString& /*actionType*/)
     {
-        return nullptr;
-    };
-    virtual void initialize(Engine* /*engine*/) {};
+        return {};
+    }
+
+    virtual void initialize(Engine* /*engine*/) {}
     virtual void execute(const ActionPtr& action) = 0;
 };
 

@@ -16,7 +16,7 @@ namespace nx::vms::utils {
 
 ScopedLocale::ScopedLocale(
     const PreloadedTranslationReference& translation,
-    milliseconds maxWaitTime)
+    std::chrono::milliseconds maxWaitTime)
     :
     m_translationRef(translation),
     m_newLocale(translation.locale())
@@ -34,6 +34,11 @@ ScopedLocale::ScopedLocale(
 
 ScopedLocale::~ScopedLocale()
 {
+    reset();
+}
+
+void ScopedLocale::reset()
+{
     if (const auto& manager = m_translationRef.manager())
     {
         const auto curLocale = manager->getCurrentThreadTranslationLocale();
@@ -46,6 +51,13 @@ ScopedLocale::~ScopedLocale()
         manager->setCurrentThreadTranslationLocale(m_oldLocale, 0ms);
         NX_VERBOSE(this, "Restored locale %1", m_oldLocale);
     }
+    m_translationRef.reset();
+}
+
+ScopedLocale ScopedLocale::install(
+    TranslationManager* manager, const std::vector<QString>& preferredLocales)
+{
+    return manager ? manager->installScopedLocale(preferredLocales) : ScopedLocale{};
 }
 
 } // namespace nx::vms::utils
