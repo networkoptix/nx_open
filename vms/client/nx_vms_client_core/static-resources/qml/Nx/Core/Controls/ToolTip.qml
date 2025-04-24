@@ -24,7 +24,7 @@ ToolTip
     property color color: ColorTheme.transparent(ColorTheme.colors.dark4, 0.35)
     property color textColor: ColorTheme.colors.dark4
 
-    contentWidth: Math.min(implicitContentWidth, Math.max(maxWidth - leftPadding - rightPadding, 0))
+    width: Math.min(contentWidth + leftPadding + rightPadding, Math.max(maxWidth, 0))
 
     background: Item
     {
