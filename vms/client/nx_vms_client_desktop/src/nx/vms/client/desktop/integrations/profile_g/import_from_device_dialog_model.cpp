@@ -141,9 +141,16 @@ QString ImportFromDeviceDialogModel::Private::getStatusText(const QModelIndex& i
         case StateCode::inProgress:
         {
             NX_ASSERT(iter != deviceData.end());
-            const auto timeLeftString = toDurationString(iter->second.importTimeLeft);
-
-            return ImportFromDeviceDialogModel::tr("In progress... (%1 left)").arg(timeLeftString);
+            // Zero time means that the value is not set.
+            if (iter->second.importTimeLeft > 0ms)
+            {
+                const auto timeLeftString = toDurationString(iter->second.importTimeLeft);
+                return ImportFromDeviceDialogModel::tr("In progress... (%1 left)").arg(timeLeftString);
+            }
+            else
+            {
+                return ImportFromDeviceDialogModel::tr("In progress...");
+            }
         }
         case StateCode::disabled:
         {
