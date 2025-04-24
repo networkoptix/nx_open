@@ -87,6 +87,30 @@ bool Uuid::isUuidString(const std::string_view& data)
         || data.size() == 38; //< {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
 }
 
+bool Uuid::isValidUuidString(const QByteArray& data)
+{
+    QUuid uuid(data);
+    return !uuid.isNull();
+}
+
+bool Uuid::isValidUuidString(const QString& data)
+{
+    QUuid uuid(data);
+    return !uuid.isNull();
+}
+
+bool Uuid::isValidUuidString(const std::string& data)
+{
+    QUuid uuid(data);
+    return !uuid.isNull();
+}
+
+bool Uuid::isValidUuidString(const std::string_view& data)
+{
+    QUuid uuid(data);
+    return !uuid.isNull();
+}
+
 const QUuid& Uuid::getQUuid() const
 {
     return m_uuid;

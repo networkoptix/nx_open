@@ -106,6 +106,11 @@ public:
     static bool isUuidString(const std::string& data);
     static bool isUuidString(const std::string_view& data);
 
+    static bool isValidUuidString(const QByteArray& data);
+    static bool isValidUuidString(const QString& data);
+    static bool isValidUuidString(const std::string& data);
+    static bool isValidUuidString(const std::string_view& data);
+
     static Uuid fromString(const std::string_view& str);
 
 private:
