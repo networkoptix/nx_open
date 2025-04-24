@@ -621,6 +621,7 @@ Window
                     ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
                     contentWidth: tableView.width - 8
                     clip: true
+                    implicitWidth: contentWidth
 
                     readonly property alias controller: controller
 
