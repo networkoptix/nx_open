@@ -3,10 +3,10 @@
 #include "common_object_search_setup.h"
 
 #include <core/resource/camera_resource.h>
-#include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/window_context.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -82,7 +82,7 @@ void CommonObjectSearchSetup::setWindowContext(WindowContext* windowContext)
 
 SystemContext* CommonObjectSearchSetup::systemContext() const
 {
-    return base_type::systemContext()->as<SystemContext>();
+    return qobject_cast<SystemContext*>(base_type::systemContext());
 }
 
 void CommonObjectSearchSetup::setSystemContext(SystemContext* systemContext)

@@ -14,6 +14,9 @@
 #include <nx/utils/counter.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/common/application_context.h>
+#include <nx/vms/common/system_context.h>
+#include <utils/common/long_runable_cleanup.h>
 #include <utils/common/util.h>
 
 using namespace nx::vms::client::desktop;
@@ -113,10 +116,14 @@ QnClientVideoCamera* QnResourceDisplay::camera() const
     return m_camera.data();
 }
 
-void QnResourceDisplay::cleanUp(QnLongRunnable *runnable) const {
-    if(runnable == nullptr)
+void QnResourceDisplay::cleanUp(QnLongRunnable* runnable) const
+{
+    if (runnable == nullptr)
         return;
-    runnable->pleaseStop();
+
+    auto context = m_resource ? m_resource->systemContext() : nullptr;
+    nx::vms::common::appContext()->longRunableCleanup()->cleanupAsync(
+        std::unique_ptr<QnLongRunnable>(runnable), context);
 }
 
 QnCamDisplay *QnResourceDisplay::camDisplay() const {

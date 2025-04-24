@@ -134,7 +134,10 @@ void AnalyticsFilterModel::setTaxonomyManager(TaxonomyManager* taxonomyManager)
     m_currentTaxonomyChangedConnection.reset();
     m_taxonomyManager = taxonomyManager;
     if (!taxonomyManager)
+    {
+        m_stateViewBuilder.reset();
         return;
+    }
 
     auto onTaxonomyChanged =
         [this]
