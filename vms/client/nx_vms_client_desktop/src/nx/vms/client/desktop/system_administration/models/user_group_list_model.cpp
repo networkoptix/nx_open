@@ -573,10 +573,20 @@ Qt::ItemFlags UserGroupListModel::flags(const QModelIndex& index) const
     if (!NX_ASSERT(checkIndex(index)))
         return Qt::NoItemFlags;
 
-    Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    Qt::ItemFlags flags = Qt::ItemIsSelectable;
 
     if (index.column() == CheckBoxColumn)
+    {
         flags |= Qt::ItemIsUserCheckable;
+        const auto& group = d->orderedGroups[index.row()];
+        const auto nonEditable = systemContext()->nonEditableUsersAndGroups();
+        if (!nonEditable->containsGroup(group.id))
+            flags |= Qt::ItemIsEnabled;
+    }
+    else
+    {
+        flags |= Qt::ItemIsEnabled;
+    }
 
     return flags;
 }
