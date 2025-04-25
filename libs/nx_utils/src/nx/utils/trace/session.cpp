@@ -41,7 +41,7 @@ std::unique_ptr<Session> Session::start(const QString& fileName)
         return {};
     }
 
-    session->tracingSession = perfetto::Tracing::NewTrace();
+    session->tracingSession = perfetto::Tracing::NewTrace(perfetto::kInProcessBackend);
     session->tracingSession->Setup(tracingConfig, session->tracingFile.handle());
     session->tracingSession->StartBlocking();
 
