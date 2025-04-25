@@ -12265,6 +12265,10 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
       <source>Enabled</source>
       <translation>Etkinleştir</translation>
     </message>
+    <message>
+      <source>In progress...</source>
+      <translation type="unfinished">In progress...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>

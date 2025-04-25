@@ -12270,6 +12270,10 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
       <source>Enabled</source>
       <translation>Ingeschakeld</translation>
     </message>
+    <message>
+      <source>In progress...</source>
+      <translation type="unfinished">In progress...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>

@@ -923,10 +923,6 @@
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Otwórz %1</translation>
     </message>
-    <message>
-      <source>Channel Partner</source>
-      <translation>Partner kanału</translation>
-    </message>
   </context>
   <context>
     <name>TextField</name>

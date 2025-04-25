@@ -12093,6 +12093,10 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <source>Enabled</source>
       <translation>Bật</translation>
     </message>
+    <message>
+      <source>In progress...</source>
+      <translation type="unfinished">In progress...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>

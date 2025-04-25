@@ -12269,6 +12269,10 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
       <source>Enabled</source>
       <translation type="unfinished">Enabled</translation>
     </message>
+    <message>
+      <source>In progress...</source>
+      <translation type="unfinished">In progress...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>

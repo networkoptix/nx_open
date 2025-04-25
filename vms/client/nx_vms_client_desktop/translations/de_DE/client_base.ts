@@ -12271,6 +12271,10 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
       <source>Enabled</source>
       <translation>Aktiviert</translation>
     </message>
+    <message>
+      <source>In progress...</source>
+      <translation type="unfinished">In progress...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>

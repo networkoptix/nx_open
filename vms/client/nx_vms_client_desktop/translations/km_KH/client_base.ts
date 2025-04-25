@@ -12093,6 +12093,10 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Enabled</source>
       <translation>Enabled</translation>
     </message>
+    <message>
+      <source>In progress...</source>
+      <translation type="unfinished">In progress...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>

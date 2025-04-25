@@ -78,7 +78,7 @@
     </message>
     <message>
       <source>Removal of the User with readonly attribute is forbidden for VMS</source>
-      <translation type="unfinished">Removal of the User with readonly attribute is forbidden for VMS</translation>
+      <translation>La suppression de l'utilisateur avec l'attribut lecture seule est interdite pour VMS</translation>
     </message>
     <message>
       <source>Removal of the User with Groups in an Organization is controlled by the %1</source>
@@ -133,7 +133,7 @@
     </message>
     <message>
       <source>Change of the User with readonly attribute is forbidden for VMS.</source>
-      <translation type="unfinished">Change of the User with readonly attribute is forbidden for VMS.</translation>
+      <translation>Le changement de l'utilisateur avec l'attribut de lecture seule est interdit pour le VMS.</translation>
     </message>
     <message>
       <source>Creation of the User with readonly attribute is forbidden for VMS.</source>

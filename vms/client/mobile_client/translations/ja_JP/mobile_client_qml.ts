@@ -920,10 +920,6 @@
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>%1 を開く</translation>
     </message>
-    <message>
-      <source>Channel Partner</source>
-      <translation>チャネルパートナー</translation>
-    </message>
   </context>
   <context>
     <name>TextField</name>

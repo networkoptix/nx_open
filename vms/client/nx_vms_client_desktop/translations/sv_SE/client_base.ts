@@ -6999,11 +6999,11 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
-      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+      <translation>För att undvika oåterkalleliga ändringar i arkivet, rekommenderas det att inaktivera &quot;Behåll kamerans tidsinställningar&quot; innan du aktiverar &quot;Importera video automatiskt&quot;.</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
-      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+      <translation>Aktivering av den här inställningen kan leda till oåterkalleliga ändringar i arkivet. Det rekommenderas inte att aktivera det medan &quot;Importera video automatiskt&quot; är aktiv</translation>
     </message>
   </context>
   <context>
@@ -12269,6 +12269,10 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Enabled</source>
       <translation>Aktiverad</translation>
+    </message>
+    <message>
+      <source>In progress...</source>
+      <translation type="unfinished">In progress...</translation>
     </message>
   </context>
   <context>
