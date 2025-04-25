@@ -1200,7 +1200,13 @@ struct SaveUserAccess
             }
         }
 
+        NX_ASSERT(resourcePool->getResourcesByIds<QnUserResource>(
+            param.resourceAccessRights, [](const auto& pair) { return pair.first; }).empty(),
+            "User should not be an accessible resource");
+
         const auto existingUser = resourcePool->getResourceById<QnUserResource>(param.id);
+        if (!existingUser)
+            return validateUserCreation(*systemContext, accessor, param);
 
         // `QnUserResource` accessors may not provide consistent information (due to data races)
         // regardless of having mutexes.
@@ -1214,34 +1220,12 @@ struct SaveUserAccess
                 return data;
             };
 
-        if (existingUser)
-        {
-            const auto existing = apiData(*existingUser);
-            if (existing == param)
-                return {};
+        const auto existing = apiData(*existingUser);
+        if (existing == param)
+            return {};
 
-            if (auto r = validateUserModifications(*systemContext, accessor, existing, param); !r)
-                return r;
-        }
-        else
-        {
-            if (auto r = validateUserCreation(*systemContext, accessor, param); !r)
-                return r;
-        }
-
-        // TODO: This should be handled by `forbidNonLocalModification`.
-        if (param.type == nx::vms::api::UserType::cloud
-            && ((existingUser && param.fullName != existingUser->fullName())
-                || (!existingUser && !param.fullName.isEmpty())))
-        {
-            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-                "User full name is controlled by the %1.", /*comment*/ "%1 is the short Cloud name"),
-                nx::branding::shortCloudName()));
-        }
-
-        NX_ASSERT(resourcePool->getResourcesByIds<QnUserResource>(
-            param.resourceAccessRights, [](const auto& pair) { return pair.first; }).empty(),
-            "User should not be an accessible resource");
+        if (auto r = validateUserModifications(*systemContext, accessor, existing, param); !r)
+            return r;
 
         return ModifyResourceAccess()(systemContext, accessData, param);
     }
@@ -1814,7 +1798,7 @@ struct ModifyResourceParamAccess
         helper.proposeChange(param.resourceId, newEngines);
         if (helper.isOverflow())
         {
-            return Result(ErrorCode::serverError, nx::format(ServerApiErrors::tr(
+            return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                 "Not enough integration licenses for camera %1."), param.resourceId));
         }
 

@@ -19,32 +19,28 @@ namespace rules { struct Rule; }
 
 namespace ec2 {
 
+template<typename RequestData>
+inline Result fixRequestDataIfNeeded(RequestData*) { return {}; }
+
+Result fixRequestDataIfNeeded(nx::vms::api::UserDataEx* userDataEx);
+Result fixRequestDataIfNeeded(nx::vms::api::ResourceParamData* paramData);
+Result fixRequestDataIfNeeded(nx::vms::api::StorageData* paramData);
+Result fixRequestDataIfNeeded(nx::vms::api::LayoutData* paramData);
+Result fixRequestDataIfNeeded(nx::vms::api::EventRuleData* paramData);
+Result fixRequestDataIfNeeded(nx::vms::api::rules::Rule* paramData);
+
 template<typename T>
-auto fixTransactionInputFromApi(const QnTransaction<T>& tran, Result* result)
+auto fixTransactionInputFromApi(const QnTransaction<T>& original, Result* result)
 {
-    *result = Result();
-    return tran;
+    auto fixedTransaction = original;
+    *result = fixRequestDataIfNeeded(&fixedTransaction.params);
+    return fixedTransaction;
 }
 
 QnTransaction<nx::vms::api::UserData> fixTransactionInputFromApi(
     const QnTransaction<nx::vms::api::UserDataEx>& originalTran, Result* result);
 
-QnTransaction<nx::vms::api::StorageData> fixTransactionInputFromApi(
-    const QnTransaction<nx::vms::api::StorageData>& originalTran, Result* result);
-
-QnTransaction<nx::vms::api::ResourceParamData> fixTransactionInputFromApi(
-    const QnTransaction<nx::vms::api::ResourceParamData>& originalTran, Result* result);
-
 QnTransaction<nx::vms::api::ResourceParamWithRefData> fixTransactionInputFromApi(
     const QnTransaction<nx::vms::api::ResourceParamWithRefData>& originalTran, Result* result);
-
-QnTransaction<nx::vms::api::EventRuleData> fixTransactionInputFromApi(
-    const QnTransaction<nx::vms::api::EventRuleData>& originalTran, Result* result);
-
-QnTransaction<nx::vms::api::rules::Rule> fixTransactionInputFromApi(
-    const QnTransaction<nx::vms::api::rules::Rule>& originalTran, Result* result);
-
-QnTransaction<nx::vms::api::LayoutData> fixTransactionInputFromApi(
-    const QnTransaction<nx::vms::api::LayoutData>& originalTran, Result* result);
 
 } // namespace ec2

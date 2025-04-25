@@ -16,6 +16,21 @@ MEMBER_CHECKER(kResourceTypeId);
 MEMBER_CHECKER(id);
 #undef MEMBER_CHECKER
 
+template<typename F, typename... Args, size_t... Is>
+Result applyFuncImpl(std::tuple<Args...>&& t, F&& f, std::index_sequence<Is...>)
+{
+    Result result;
+    (... && (result = f(std::get<sizeof...(Args) - Is - 1>(std::move(t)))));
+    return result;
+}
+
+template<typename F, typename... Args>
+Result applyFunc(std::tuple<Args...>&& t, F&& f)
+{
+    return applyFuncImpl(
+        std::move(t), std::forward<F>(f), std::make_index_sequence<sizeof...(Args)>{});
+}
+
 template<typename Data, typename Functor>
 auto invokeOnVector(Data&& data, Functor&& functor)
 {
@@ -82,11 +97,13 @@ inline void throwError(Result r)
     using Exception = nx::network::rest::Exception;
     switch (r.error)
     {
-        case ErrorCode::forbidden:
-            throw Exception::forbidden(std::move(r.message));
         case ErrorCode::badRequest:
         case ErrorCode::dbError:
+        case ErrorCode::notImplemented:
+        case ErrorCode::unsupported:
             throw Exception::badRequest(std::move(r.message));
+        case ErrorCode::forbidden:
+            throw Exception::forbidden(std::move(r.message));
         case ErrorCode::notFound:
             throw Exception::notFound(std::move(r.message));
         default:

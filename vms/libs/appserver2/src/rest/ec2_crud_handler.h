@@ -8,7 +8,8 @@
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/i18n/scoped_locale.h>
 #include <nx/utils/scope_guard.h>
-#include <transaction/transaction.h>
+#include <transaction/fix_transaction_input_from_api.h>
+#include <transaction/transaction_descriptor.h>
 
 #include "details.h"
 
@@ -142,71 +143,14 @@ public:
     void update(Model data, const nx::network::rest::Request& request)
     {
         using namespace details;
-        using nx::utils::model::getId;
-
-        std::promise<Result> promise;
-        auto processor = m_queryProcessor->getAccess(
-            static_cast<const Derived*>(this)->prepareAuditRecord(request));
         if constexpr (toDbTypesExists<Model>::value)
         {
-            auto id = getId(data);
-            auto items = std::move(data).toDbTypes();
-            const auto& mainDbItem = std::get<0>(items);
-            validateType(processor, mainDbItem, m_objectType);
-            validateResourceTypeId(mainDbItem);
-
-            using IgnoredDbType = std::decay_t<decltype(mainDbItem)>;
-            auto update =
-                [id = std::move(id)](auto&& x, auto& copy, auto* list)
-                {
-                    using DbType = std::decay_t<decltype(x)>;
-                    Result result;
-                    assertModelToDbTypesProducedValidResult<IgnoredDbType, DbType, Model>(x, id);
-                    if constexpr (nx::utils::Is<std::vector, DbType>())
-                    {
-                        const auto command = getUpdateCommand<std::decay_t<decltype(x[0])>>();
-                        result = copy.template processMultiUpdateSync<DbType>(
-                            parentUpdateCommand(command),
-                            command,
-                            TransactionType::Regular,
-                            std::move(x),
-                            list);
-                    }
-                    else
-                    {
-                        result =
-                            copy.processUpdateSync(getUpdateCommand<DbType>(), std::move(x), list);
-                    }
-                    return result;
-                };
-            processor.processCustomUpdateAsync(
-                ApiCommand::CompositeSave,
-                [&promise](Result result) { promise.set_value(std::move(result)); },
-                [this, &request, update = std::move(update), items = std::move(items)](
-                    auto& copy, auto* list) mutable
-                {
-                    auto scopedLocale = installScopedLocale(request);
-                    const auto updateItem =
-                        [&update, &copy, list](auto&& item)
-                        {
-                            if constexpr (nx::utils::Is<std::optional, std::decay_t<decltype(item)>>())
-                                return item ? update(std::move(*item), copy, list) : Result();
-                            else
-                                return update(std::move(item), copy, list);
-                        };
-
-                    return std::apply(
-                        [&updateItem](auto&&... items)
-                        {
-                            Result result{};
-                            (... && (result = updateItem(std::forward<decltype(items)>(items))));
-                            return result;
-                        },
-                        std::move(items));
-                });
+            updateDbTypes(std::move(data).toDbTypes(), request);
         }
         else
         {
+            std::promise<Result> promise;
+            auto processor = m_queryProcessor->getAccess(this->prepareAuditRecord(request));
             validateType(processor, data, m_objectType);
             validateResourceTypeId(data);
             processor.processCustomUpdateAsync(
@@ -217,9 +161,9 @@ public:
                     auto scopedLocale = installScopedLocale(request);
                     return p.processUpdateSync(getUpdateCommand<Model>(), std::move(data), list);
                 });
+            if (Result result = promise.get_future().get(); !result)
+                throwError(std::move(result));
         }
-        if (Result result = promise.get_future().get(); !result)
-            throwError(std::move(result));
     }
 
     QString getSubscriptionId(const nx::network::rest::Request& request)
@@ -253,6 +197,76 @@ public:
         {
             return *it;
         }
+    }
+
+    template<typename T>
+    void checkSavePermission(const nx::network::rest::UserAccessData& access, const T& data) const
+    {
+        using namespace details;
+        auto copy = data;
+        if (auto r = fixRequestDataIfNeeded(&copy); !r)
+            throwError(std::move(r));
+        using MainDbType = std::decay_t<decltype(std::get<0>(typename Model::DbReadTypes{}))>;
+        auto r = getActualTransactionDescriptorByValue<MainDbType>(getUpdateCommand<MainDbType>())
+            ->checkSavePermissionFunc(m_queryProcessor->systemContext(), access, copy);
+        if (!r)
+            throwError(std::move(r));
+    }
+
+protected:
+    template<typename T>
+    void updateDbTypes(T items, const nx::network::rest::Request& request)
+    {
+        using namespace details;
+        auto processor = m_queryProcessor->getAccess(this->prepareAuditRecord(request));
+        const auto& mainDbItem = std::get<0>(items);
+        validateType(processor, mainDbItem, m_objectType);
+        validateResourceTypeId(mainDbItem);
+        static_cast<Derived*>(this)->checkSavePermission(request.userSession.access, mainDbItem);
+        using IgnoredDbType = std::decay_t<decltype(mainDbItem)>;
+        auto update =
+            [id = nx::utils::model::getId(mainDbItem)](auto&& x, auto& copy, auto* list)
+            {
+                using DbType = std::decay_t<decltype(x)>;
+                Result result;
+                assertModelToDbTypesProducedValidResult<IgnoredDbType, DbType, Model>(x, id);
+                if constexpr (nx::utils::Is<std::vector, DbType>())
+                {
+                    const auto command = getUpdateCommand<std::decay_t<decltype(x[0])>>();
+                    result = copy.template processMultiUpdateSync<DbType>(
+                        parentUpdateCommand(command),
+                        command,
+                        TransactionType::Regular,
+                        std::move(x),
+                        list);
+                }
+                else
+                {
+                    result =
+                        copy.processUpdateSync(getUpdateCommand<DbType>(), std::move(x), list);
+                }
+                return result;
+            };
+        std::promise<Result> promise;
+        processor.processCustomUpdateAsync(
+            ApiCommand::CompositeSave,
+            [&promise](Result result) { promise.set_value(std::move(result)); },
+            [this, &request, update = std::move(update), items = std::move(items)](
+                auto& copy, auto* list) mutable
+            {
+                auto scopedLocale = installScopedLocale(request);
+                return applyFunc(
+                    std::move(items),
+                    [update = std::move(update), &copy, list](auto&& item)
+                    {
+                        if constexpr (nx::utils::Is<std::optional, std::decay_t<decltype(item)>>())
+                            return item ? update(std::move(*item), copy, list) : Result();
+                        else
+                            return update(std::move(item), copy, list);
+                    });
+            });
+        if (Result result = promise.get_future().get(); !result)
+            throwError(std::move(result));
     }
 
 protected:

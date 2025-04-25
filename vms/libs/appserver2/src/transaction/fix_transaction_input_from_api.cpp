@@ -16,14 +16,6 @@
 
 namespace ec2 {
 
-namespace {
-
-template<typename RequestData>
-inline Result fixRequestDataIfNeeded(RequestData* /*requestData*/)
-{
-    return Result();
-}
-
 Result fixRequestDataIfNeeded(nx::vms::api::UserDataEx* userDataEx)
 {
     if (userDataEx->type == nx::vms::api::UserType::temporaryLocal)
@@ -85,88 +77,35 @@ Result fixRequestDataIfNeeded(nx::vms::api::LayoutData* paramData)
     return Result();
 }
 
-template<typename Data>
-auto doFix(const QnTransaction<Data>& original, Result* result)
-{
-    auto fixedTransaction = original;
-    *result = fixRequestDataIfNeeded(&fixedTransaction.params);
-
-    return fixedTransaction;
-}
-
-} // namespace
-
-QnTransaction<nx::vms::api::UserData> fixTransactionInputFromApi(
-    const QnTransaction<nx::vms::api::UserDataEx>& originalTran, Result* result)
-{
-    auto originalParams = originalTran.params;
-    *result = fixRequestDataIfNeeded(&originalParams);
-
-    QnTransaction<nx::vms::api::UserData> resultTran(
-        static_cast<const QnAbstractTransaction&>(originalTran));
-    resultTran.params = nx::vms::api::UserData(originalParams);
-    return resultTran;
-}
-
-QnTransaction<nx::vms::api::StorageData> fixTransactionInputFromApi(
-    const QnTransaction<nx::vms::api::StorageData>& originalTran, Result* result)
-{
-    return doFix(originalTran, result);
-}
-
-QnTransaction<nx::vms::api::ResourceParamData> fixTransactionInputFromApi(
-    const QnTransaction<nx::vms::api::ResourceParamData>& originalTran, Result* result)
-{
-    return doFix(originalTran, result);
-}
-
-QnTransaction<nx::vms::api::ResourceParamWithRefData> fixTransactionInputFromApi(
-    const QnTransaction<nx::vms::api::ResourceParamWithRefData>& originalTran, Result* result)
-{
-    auto resultTran = originalTran;
-    *result = fixRequestDataIfNeeded(static_cast<nx::vms::api::ResourceParamData*>(&resultTran.params));
-
-    return resultTran;
-}
-
-QnTransaction<nx::vms::api::EventRuleData> fixTransactionInputFromApi(
-    const QnTransaction<nx::vms::api::EventRuleData>& originalTran, Result* result)
+Result fixRequestDataIfNeeded(nx::vms::api::EventRuleData* paramData)
 {
     nx::vms::event::ActionParameters params;
-    if (!QJson::deserialize(originalTran.params.actionParams, &params))
+    if (!QJson::deserialize(paramData->actionParams, &params))
     {
-        *result = Result(ErrorCode::badRequest,
-            NX_FMT("Failed to deserialize `actionParams`: %1", originalTran.params.actionParams));
-        return originalTran;
+        return Result(ErrorCode::badRequest,
+            NX_FMT("Failed to deserialize `actionParams`: %1", paramData->actionParams));
     }
 
     if (!params.httpMethod.isEmpty()
         && !nx::network::http::Method::isKnown(params.httpMethod.toStdString()))
     {
-        *result = Result(ErrorCode::badRequest,
+        return Result(ErrorCode::badRequest,
             NX_FMT("Unsupported `actionParams.httpMethod`: %1", params.httpMethod));
-        return originalTran;
     }
 
-    *result = Result();
     if (nx::utils::Url url = params.url; !url.password().isEmpty())
     {
         url.setPassword(nx::crypt::encodeHexStringFromStringAES128CBC(url.password()));
         params.url = url.toString();
-        QnTransaction<nx::vms::api::EventRuleData> fixedTransaction(originalTran);
-        fixedTransaction.params.actionParams = QJson::serialized(params);
-        return fixedTransaction;
+        paramData->actionParams = QJson::serialized(params);
     }
 
-    return originalTran;
+    return {};
 }
 
-QnTransaction<nx::vms::api::rules::Rule> fixTransactionInputFromApi(
-    const QnTransaction<nx::vms::api::rules::Rule>& originalTran, Result* result)
+Result fixRequestDataIfNeeded(nx::vms::api::rules::Rule* paramData)
 {
-    auto fixedTran = originalTran;
-
-    for (auto& builder: fixedTran.params.actionList)
+    for (auto& builder: paramData->actionList)
     {
         for (auto& [_, field]: builder.fields)
         {
@@ -180,14 +119,27 @@ QnTransaction<nx::vms::api::rules::Rule> fixTransactionInputFromApi(
             }
         }
     }
-    *result = Result();
-    return fixedTran;
+    return {};
 }
 
-QnTransaction<nx::vms::api::LayoutData> fixTransactionInputFromApi(
-    const QnTransaction<nx::vms::api::LayoutData>& originalTran, Result* result)
+QnTransaction<nx::vms::api::UserData> fixTransactionInputFromApi(
+    const QnTransaction<nx::vms::api::UserDataEx>& originalTran, Result* result)
 {
-    return doFix(originalTran, result);
+    auto originalParams = originalTran.params;
+    *result = fixRequestDataIfNeeded(&originalParams);
+
+    QnTransaction<nx::vms::api::UserData> resultTran(
+        static_cast<const QnAbstractTransaction&>(originalTran));
+    resultTran.params = nx::vms::api::UserData(originalParams);
+    return resultTran;
+}
+
+QnTransaction<nx::vms::api::ResourceParamWithRefData> fixTransactionInputFromApi(
+    const QnTransaction<nx::vms::api::ResourceParamWithRefData>& originalTran, Result* result)
+{
+    auto resultTran = originalTran;
+    *result = fixRequestDataIfNeeded(static_cast<nx::vms::api::ResourceParamData*>(&resultTran.params));
+    return resultTran;
 }
 
 } // namespace ec2
