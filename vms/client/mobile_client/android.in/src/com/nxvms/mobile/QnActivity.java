@@ -14,10 +14,17 @@ import android.hardware.SensorManager;
 import android.provider.Settings;
 import android.provider.Settings.System;
 import android.provider.Settings.SettingNotFoundException;
+import android.view.inputmethod.EditorInfo;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.OrientationEventListener;
 import android.database.ContentObserver;
 import java.io.File;
+import java.lang.reflect.Method;
+import java.lang.reflect.Field;
+
 import org.qtproject.qt.android.bindings.QtActivity;
 import com.nxvms.mobile.utils.Logger;
 import com.nxvms.mobile.utils.QnWindowUtils;
@@ -128,6 +135,64 @@ public class QnActivity extends QtActivity
             listener.enable();
         else
             listener = null;
+
+        initializeTextControlWorkaround();
+    }
+
+    /**
+     *  Workarounds QTBUG-134417.
+     *  This is a workaround preventing showing of overlapping fullscreen native
+     *  text field in landscape mode and leaving our custom control usage.
+     *  Native control looks bad, has wrong backgound and standard button style and
+     *  does not correspond to our UX.
+     */
+    private void initializeTextControlWorkaround()
+    {
+        final View rootView = getWindow().getDecorView();
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(
+            new ViewTreeObserver.OnGlobalLayoutListener()
+            {
+                @Override
+                public void onGlobalLayout()
+                {
+                    // Call on any view tree changes.
+                    tryDenyFullscreenTextControls(rootView);
+                }
+
+                private void tryDenyFullscreenTextControls(View view)
+                {
+                    if (view instanceof ViewGroup)
+                    {
+                        ViewGroup group = (ViewGroup) view;
+                        for (int i = 0; i < group.getChildCount(); i++)
+                            tryDenyFullscreenTextControls(group.getChildAt(i));
+
+                        return;
+                    }
+
+                    /**
+                     * QtEditText control is responsible for all text-management controls in Qt.
+                     * It has specific field and function which can be used to specify the desired
+                     * bahavior. If "view" does not have - it's ok, we just skip this object and
+                     * look further.
+                     */
+                    try
+                    {
+                        Field imeOptions = view.getClass().getDeclaredField("m_imeOptions");
+                        imeOptions.setAccessible(true);
+                        int flags = imeOptions.getInt(view);
+
+                        Method setImeOptions = view.getClass().getDeclaredMethod(
+                            "setImeOptions", int.class);
+                        setImeOptions.setAccessible(true);
+                        setImeOptions.invoke(view, flags | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+                    }
+                    catch (Exception e)
+                    {
+                        // Do nothing, that's expected situation.
+                    }
+                }
+            });
     }
 
     @Override
