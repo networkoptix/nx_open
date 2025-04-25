@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>Change of the User with readonly attribute is forbidden for VMS.</source>
-      <translation type="unfinished">Change of the User with readonly attribute is forbidden for VMS.</translation>
+      <translation>Le changement de l'utilisateur avec l'attribut de lecture seule est interdit pour le VMS.</translation>
     </message>
     <message>
       <source>Creation of the User with readonly attribute is forbidden for VMS.</source>

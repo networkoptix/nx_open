@@ -11316,7 +11316,7 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>Détails du certificat</translation>
     </message>
   </context>
   <context>
