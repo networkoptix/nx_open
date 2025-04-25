@@ -17,6 +17,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 
+#include <client/client_runtime_settings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/resource_type.h>
@@ -33,6 +34,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/settings/types/graphics_api.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
@@ -197,7 +199,10 @@ void QnAboutDialog::retranslateUi()
         ? quickWindow->rendererInterface()->graphicsApi()
         : QSGRendererInterface::OpenGL; //< Assume defaut.
 
-    if (graphicsApi == QSGRendererInterface::OpenGL)
+    const bool isLegacy = nx::vms::client::desktop::appContext()->runtimeSettings()->graphicsApi()
+        == GraphicsApi::legacyopengl;
+
+    if (isLegacy)
     {
         int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
 
@@ -230,8 +235,17 @@ void QnAboutDialog::retranslateUi()
 
     const QString platform = QGuiApplication::platformName();
     QPlatformNativeInterface* pni = QGuiApplication::platformNativeInterface();
-    const bool isEgl = pni->nativeResourceForIntegration(QByteArrayLiteral("egldisplay"));
-    gpu << nx::format("<b>%1</b>: %2.", tr("Platform"), platform + (isEgl ? " (EGL)" : ""));
+    QStringList platformInfoList;
+    if (pni->nativeResourceForIntegration(QByteArrayLiteral("egldisplay")))
+        platformInfoList << "EGL";
+    if (platform == "xcb" && !qgetenv("WAYLAND_DISPLAY").isEmpty())
+        platformInfoList << "Xwayland";
+
+    QString addInfo;
+    if (!platformInfoList.empty())
+        addInfo = " (" + platformInfoList.join(", ") + ")";
+
+    gpu << nx::format("<b>%1</b>: %2.", tr("Platform"), platform + addInfo);
 
     ui->gpuLabel->setText(gpu.join(html::kLineBreak));
 

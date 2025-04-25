@@ -89,6 +89,9 @@ set(nx_vms_client_desktop_conditional_dependencies)
 if(MACOSX)
     list(APPEND nx_vms_client_desktop_conditional_dependencies hidapi::hidapi)
 endif()
+if(LINUX)
+    list(APPEND nx_vms_client_desktop_conditional_dependencies EGL)
+endif()
 
 nx_add_target(nx_vms_client_desktop LIBRARY
     ADDITIONAL_SOURCES

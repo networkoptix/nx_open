@@ -93,7 +93,7 @@ bool QnGLCheckerInstrument::checkGLHardware()
 
     bool contextIsValid = true;
 
-    if (!info.version.contains("ES 2.0"))
+    if (!info.version.contains("ES 2.0") && !info.version.contains("ES 3."))
     {
         if (nx::utils::SoftwareVersion(info.version) < nx::utils::SoftwareVersion(2, 0))
         {
@@ -109,7 +109,8 @@ bool QnGLCheckerInstrument::checkGLHardware()
     QnMessageBox::warning(nullptr,
         tr("Video card drivers are outdated or not installed"),
         tr("%1 may not work properly.")
-            .arg(nx::branding::desktopClientDisplayName()));
+            .arg(nx::branding::desktopClientDisplayName())
+        + QString("<br><br>%1").arg(info.version));
 
     return false;
 }

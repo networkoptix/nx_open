@@ -6,11 +6,15 @@
 #include <QtCore/QList>
 #include <QtQuick/QSGRendererInterface>
 
+#include <nx/vms/client/desktop/settings/types/graphics_api.h>
+
 namespace nx::vms::client::desktop::gpu {
 
 struct DeviceInfo
 {
+    int index = -1;
     QString name;
+    QString additionalInfo;
     bool supportsVideoDecode = false;
 };
 
@@ -24,7 +28,7 @@ NX_VMS_CLIENT_DESKTOP_API bool isVulkanVideoSupported();
  * name. Otherwise first GPU capable of HW video decoding is selected.
  */
 NX_VMS_CLIENT_DESKTOP_API DeviceInfo selectDevice(
-    QSGRendererInterface::GraphicsApi api,
+    GraphicsApi api,
     const QString& name = {});
 
 } // nx::vms::client::desktop::gpu

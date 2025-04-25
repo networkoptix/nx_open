@@ -255,13 +255,21 @@ void setGraphicsSettingsEarly(const QnStartupParameters& startupParams)
 
     if (nx::build_info::isLinux())
     {
+        static const char* kXcbGlIntegration = "QT_XCB_GL_INTEGRATION";
+
         // EGL on arm64 causes issues with OpenGL on Nvidia - QML windows are rendered empty.
         if (graphicsApi != GraphicsApi::legacyopengl && !nx::build_info::isArm())
         {
             // HW decoding through VAAPI requires EGL.
-            static const char* kXcbGlIntegration = "QT_XCB_GL_INTEGRATION";
             if (qgetenv(kXcbGlIntegration).isEmpty())
                 qputenv(kXcbGlIntegration, "xcb_egl");
+        }
+
+        if (qgetenv(kXcbGlIntegration) == "xcb_egl")
+        {
+            // Try to select GPU via EGL here - we cannot do this after QApplication is created.
+            // We can decide to switch to Vulkan later.
+            gpu::selectDevice(GraphicsApi::opengl, ini().gpuName);
         }
 
         // Pass special env variables to enable vulkan video decoding.
@@ -319,10 +327,9 @@ void setGraphicsSettings()
             qputenv(kDisableNativePixmaps, "1");
     }
 
-    const auto selectedApi = nameToApi.value(graphicsApi, QSGRendererInterface::OpenGL);
-    const auto gpuInfo = gpu::selectDevice(selectedApi, ini().gpuName);
+    const auto gpuInfo = gpu::selectDevice(graphicsApi, ini().gpuName);
 
-    if (gpuInfo.name.toLower().contains("nvidia") && selectedApi == QSGRendererInterface::Vulkan)
+    if (gpuInfo.name.toLower().contains("nvidia") && graphicsApi == GraphicsApi::vulkan)
     {
         // Nvidia drivers cannot create more than 5 VK devices, so enable device sharing.
         static const char* kVkDeviceShared = "QT_VK_DEVICE_SHARED";
@@ -339,6 +346,15 @@ void setGraphicsSettings()
         }
     }
 
+    if (nx::build_info::isLinux()
+        && gpuInfo.name.toLower().contains("intel")
+        && appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::autoselect)
+    {
+        // Never autoselect Intel+Vulkan on Linux - vulkan video support is not reliable.
+        graphicsApi = GraphicsApi::opengl;
+    }
+
+    const auto selectedApi = nameToApi.value(graphicsApi, QSGRendererInterface::OpenGL);
     QQuickWindow::setGraphicsApi(selectedApi);
     appContext()->runtimeSettings()->setGraphicsApi(graphicsApi);
 
