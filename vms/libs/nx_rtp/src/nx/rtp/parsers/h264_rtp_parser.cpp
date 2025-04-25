@@ -108,9 +108,7 @@ QnCompressedVideoDataPtr H264Parser::createVideoData(const quint8* rtpBuffer, qu
             m_codecParameters = codecParameters;
     }
 
-
     result->context = m_codecParameters;
-
     clear();
     return result;
 }
@@ -365,10 +363,20 @@ Result H264Parser::processData(
                 if (fixNalHeader)
                     *curPtr = nalUnitType;
             }
-            m_chunks.addChunk(
-                (int) (curPtr - rtpBufferBase),
-                (quint16) (bufferEnd - curPtr),
-                m_packetPerNal == 0);
+            if (startUnit)
+            {
+                // Some cameras send SPS and PPS together with IDR NAL unit in one fragmentation
+                // unit. So Try to find NAL units inside first FU unit.
+                handleSingleNalunitPacket(
+                    rtpBufferBase, int(curPtr - rtpBufferBase), int(bufferEnd - curPtr));
+            }
+            else
+            {
+                m_chunks.addChunk(
+                    (int) (curPtr - rtpBufferBase),
+                    (quint16) (bufferEnd - curPtr),
+                    m_packetPerNal == 0);
+            }
             break;
         }
         case MTAP16_PACKET:
