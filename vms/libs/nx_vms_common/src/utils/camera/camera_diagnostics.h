@@ -111,6 +111,8 @@ public:
         const QString& param2 = QString());
 
     explicit operator bool() const;
+    bool isOk() const;
+    bool isUnauthorized() const;
     QString toString(QnResourcePool* resourcePool) const;
     QString toString(QnResourcePool* resourcePool, const QnVirtualCameraResourcePtr& device) const;
     nx::media::StreamEvent toMediaStreamEvent() const;

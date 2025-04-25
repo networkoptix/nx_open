@@ -362,7 +362,17 @@ Result::Result(
 
 Result::operator bool() const
 {
+    return isOk();
+}
+
+bool Result::isOk() const
+{
     return errorCode == ErrorCode::noError;
+}
+
+bool Result::isUnauthorized() const
+{
+    return errorCode == ErrorCode::notAuthorised;
 }
 
 QString Result::toString(
