@@ -285,7 +285,9 @@ void ConnectionBase::onHttpClientDone()
         return;
     }
 
-    m_remotePeer = remotePeer;
+    if (remotePeer.dataFormat == Qn::SerializationFormat::ubjson && m_localPeer.isServer())
+        m_localPeer.dataFormat = Qn::SerializationFormat::ubjson;
+    m_remotePeer = std::move(remotePeer);
 
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
 

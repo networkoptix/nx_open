@@ -478,12 +478,17 @@ vms::api::PeerDataEx deserializePeerData(
 
     vms::api::PeerDataEx peer(defaultPeerDataEx());
 
+    const auto base64 = nx::network::http::getHeaderValue(headers, Qn::EC2_PEER_DATA);
+    if (base64.empty())
+        return peer;
+
     bool success = false;
-    auto peerData = nx::utils::fromBase64(nx::network::http::getHeaderValue(headers, Qn::EC2_PEER_DATA));
+    auto peerData = nx::utils::fromBase64(base64);
     if (dataFormat == Qn::SerializationFormat::json)
         peer = QJson::deserialized(peerData, defaultPeerDataEx(), &success);
     else if (dataFormat == Qn::SerializationFormat::ubjson)
         peer = QnUbjson::deserialized(peerData, defaultPeerDataEx(), &success);
+    NX_ASSERT(success, "Failed to deserialize as %1 %2", dataFormat, base64);
 
     const auto guidHeaderIt = headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (guidHeaderIt != headers.cend())
@@ -536,7 +541,7 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
 
 void serializePeerData(
     network::http::HttpHeaders& headers,
-    vms::api::PeerDataEx localPeer,
+    const nx::vms::api::PeerDataEx& localPeer,
     Qn::SerializationFormat dataFormat)
 {
     QByteArray result;
@@ -552,7 +557,7 @@ void serializePeerData(
 
 void serializePeerData(
     network::http::Response& response,
-    vms::api::PeerDataEx peer,
+    const nx::vms::api::PeerDataEx& peer,
     Qn::SerializationFormat dataFormat)
 {
     serializePeerData(response.headers, peer, dataFormat);

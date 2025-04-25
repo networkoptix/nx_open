@@ -42,9 +42,9 @@ vms::api::PeerDataEx deserializePeerData(
     const network::http::HttpHeaders& headers, Qn::SerializationFormat dataFormat);
 vms::api::PeerDataEx deserializePeerData(const network::http::Request& request);
 void serializePeerData(network::http::HttpHeaders& headers,
-    vms::api::PeerDataEx peer, Qn::SerializationFormat dataFormat);
+    const nx::vms::api::PeerDataEx& peer, Qn::SerializationFormat dataFormat);
 void serializePeerData(network::http::Response& response,
-    vms::api::PeerDataEx peer, Qn::SerializationFormat dataFormat);
+    const nx::vms::api::PeerDataEx& peer, Qn::SerializationFormat dataFormat);
 
 } // namespace p2p
 } // namespace nx

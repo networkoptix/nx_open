@@ -14,6 +14,8 @@
 #include <nx/vms/common/system_settings.h>
 #include <nx_ec/abstract_ec_connection.h>
 
+#include "p2p_serialization.h"
+
 namespace nx {
 namespace p2p {
 
@@ -43,9 +45,7 @@ Connection::Connection(
     m_credentials(std::move(credentials))
 {
     nx::network::http::HttpHeaders headers;
-    const auto serializedPeer = localPeer.dataFormat == Qn::SerializationFormat::ubjson
-        ? QnUbjson::serialized(localPeer) : QJson::serialized(localPeer);
-    headers.emplace(Qn::EC2_PEER_DATA, serializedPeer.toBase64());
+    serializePeerData(headers, localPeer, localPeer.dataFormat);
     headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, localPeer.instanceId.toSimpleStdString());
 
     addAdditionalRequestHeaders(std::move(headers));
