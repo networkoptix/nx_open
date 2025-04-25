@@ -161,8 +161,9 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(WindowContext* context):
 {
     m_updateSliderTimer.restart();
 
-    connect(appContext(), &ApplicationContext::systemContextAdded, this,
-        &QnWorkbenchNavigator::connectToContext);
+    connect(appContext(), &ApplicationContext::systemContextAdded,
+        this, &QnWorkbenchNavigator::connectToContext);
+
     for (auto systemContext: appContext()->systemContexts())
         connectToContext(systemContext);
 
@@ -1726,7 +1727,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
                 ? qnSyncTime->currentMSecsSinceEpoch()
                 : endTimeUSec / 1000;
 
-            if(m_currentWidget->resource()->hasFlags(Qn::virtual_camera))
+            if (m_currentWidget->resource()->hasFlags(Qn::virtual_camera))
             {
                 bool onlyVirtualCameras = std::all_of(m_syncedWidgets.begin(), m_syncedWidgets.end(),
                     [](QnMediaResourceWidget* widget)

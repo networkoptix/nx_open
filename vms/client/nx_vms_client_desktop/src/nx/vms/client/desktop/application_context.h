@@ -248,10 +248,6 @@ public:
 
     const QnStartupParameters& startupParameters() const;
 
-signals:
-    void systemContextAdded(SystemContext* systemContext);
-    void systemContextRemoved(SystemContext* systemContext);
-
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
