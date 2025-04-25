@@ -12,12 +12,16 @@ class NX_VMS_RULES_API DeviceDisconnectedEvent: public BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "deviceDisconnected")
     FIELD(nx::Uuid, deviceId, setDeviceId)
+    FIELD(nx::Uuid, serverId, setServerId)
 
 public:
     DeviceDisconnectedEvent() = default;
-    DeviceDisconnectedEvent(std::chrono::microseconds timestamp, nx::Uuid deviceId);
+    DeviceDisconnectedEvent(
+        std::chrono::microseconds timestamp,
+        nx::Uuid deviceId,
+        nx::Uuid serverId);
 
-    virtual QString aggregationKey() const override { return m_deviceId.toSimpleString(); }
+    virtual QString aggregationKey() const override { return m_serverId.toSimpleString(); }
     virtual QVariantMap details(
         common::SystemContext* context,
         const nx::vms::api::rules::PropertyMap& aggregatedInfo,

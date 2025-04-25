@@ -18,10 +18,12 @@ namespace nx::vms::rules {
 
 DeviceDisconnectedEvent::DeviceDisconnectedEvent(
     std::chrono::microseconds timestamp,
-    nx::Uuid deviceId)
+    nx::Uuid deviceId,
+    nx::Uuid serverId)
     :
     BasicEvent(timestamp),
-    m_deviceId(deviceId)
+    m_deviceId(deviceId),
+    m_serverId(serverId)
 {
 }
 
@@ -31,13 +33,22 @@ QVariantMap DeviceDisconnectedEvent::details(
     Qn::ResourceInfoLevel detailLevel) const
 {
     auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
-    fillAggregationDetailsForDevice(result, context, deviceId(), detailLevel);
+    fillAggregationDetailsForServer(result, context, serverId(), detailLevel, /*useAsSource*/ false);
+
+    const auto deviceName = Strings::resource(context, deviceId(), detailLevel);
+    result[utils::kSourceResourcesTypeDetailName] = QVariant::fromValue(ResourceType::device);
+    result[utils::kSourceTextDetailName] = deviceName;
+    result[utils::kSourceResourcesIdsDetailName] = QVariant::fromValue(UuidList({deviceId()}));
 
     result[utils::kCaptionDetailName] = caption(context);
     result[utils::kNameDetailName] = name(context);
+
     utils::insertIcon(result, nx::vms::rules::Icon::resource);
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::cameraSettings);
+
+    result[utils::kDetailingDetailName] = deviceName;
+    result[utils::kHtmlDetailsName] = deviceName;
 
     return result;
 }
@@ -59,8 +70,17 @@ QString DeviceDisconnectedEvent::caption(common::SystemContext* context) const
 QString DeviceDisconnectedEvent::extendedCaption(common::SystemContext* context,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    const auto resourceName = Strings::resource(context, deviceId(), detailLevel);
-    return tr("%1 was disconnected", "Device name will be substituted").arg(resourceName);
+    const auto serverName = Strings::resource(context, serverId(), detailLevel);
+    const auto camera = context->resourcePool()->getResourceById<QnVirtualCameraResource>(
+        deviceId());
+
+    return QnDeviceDependentStrings::getNameFromSet(
+        context->resourcePool(),
+        QnCameraDeviceStringSet(
+            tr("Device was disconnected at %1", "%1 is a server name"),
+            tr("Camera was disconnected at %1", "%1 is a server name"),
+            tr("I/O Module was disconnected at %1", "%1 is a server name")),
+        camera).arg(serverName);
 }
 
 QString DeviceDisconnectedEvent::name(common::SystemContext* context) const
@@ -111,7 +131,9 @@ ItemDescriptor DeviceDisconnectedEvent::manifest(common::SystemContext* context)
                 }.toVariantMap()),
         },
         .resources = {
-            {utils::kDeviceIdFieldName, {ResourceType::device, Qn::ViewContentPermission}}}
+            {utils::kDeviceIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
+            {utils::kServerIdFieldName, {ResourceType::server}}
+        }
     };
     return kDescriptor;
 }

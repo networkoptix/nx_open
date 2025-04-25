@@ -18,11 +18,13 @@ namespace nx::vms::rules {
 NetworkIssueEvent::NetworkIssueEvent(
     std::chrono::microseconds timestamp,
     nx::Uuid deviceId,
+    nx::Uuid serverId,
     nx::vms::api::EventReason reason,
     const NetworkIssueInfo& info)
     :
     BasicEvent(timestamp),
     m_deviceId(deviceId),
+    m_serverId(serverId),
     m_reason(reason),
     m_info(info)
 {
@@ -34,16 +36,21 @@ QVariantMap NetworkIssueEvent::details(
     Qn::ResourceInfoLevel detailLevel) const
 {
     auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
-    fillAggregationDetailsForDevice(result, context, deviceId(), detailLevel);
+    fillAggregationDetailsForServer(result, context, serverId(), detailLevel, /*useAsSource*/ false);
 
+    result[utils::kSourceResourcesTypeDetailName] = QVariant::fromValue(ResourceType::device);
+    result[utils::kSourceTextDetailName] = Strings::resource(context, deviceId(), detailLevel);
+    result[utils::kSourceResourcesIdsDetailName] = QVariant::fromValue(UuidList({deviceId()}));
+
+    const QString deviceName = Strings::resource(context, deviceId(), detailLevel);
     const QString reason = reasonText(context);
 
     utils::insertLevel(result, nx::vms::event::Level::important);
     utils::insertIcon(result, nx::vms::rules::Icon::networkIssue);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::cameraSettings);
 
-    result[utils::kDetailingDetailName] = reason;
-    result[utils::kHtmlDetailsName] = reason;
+    result[utils::kDetailingDetailName] = QStringList{{deviceName, reason}};
+    result[utils::kHtmlDetailsName] = QStringList{{deviceName, reason}};;
 
     return result;
 }
@@ -51,8 +58,8 @@ QVariantMap NetworkIssueEvent::details(
 QString NetworkIssueEvent::extendedCaption(common::SystemContext* context,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    const auto resourceName = Strings::resource(context, deviceId(), detailLevel);
-    return tr("Network Issue at %1").arg(resourceName);
+    const auto resourceName = Strings::resource(context, serverId(), detailLevel);
+    return tr("Network Issue at %1", "%1 is a server name").arg(resourceName);
 }
 
 QString NetworkIssueEvent::reasonText(common::SystemContext* context) const
@@ -142,7 +149,9 @@ const ItemDescriptor& NetworkIssueEvent::manifest()
             "and packet loss is detected.",
         .flags = {ItemFlag::instant},
         .resources = {
-            {utils::kDeviceIdFieldName, { ResourceType::device, Qn::ViewContentPermission}}}
+            {utils::kDeviceIdFieldName, { ResourceType::device, Qn::ViewContentPermission}},
+            {utils::kServerIdFieldName, {ResourceType::server}}
+        }
     };
     return kDescriptor;
 }

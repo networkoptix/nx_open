@@ -17,6 +17,7 @@ class NX_VMS_RULES_API NetworkIssueEvent: public BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "networkIssue")
     FIELD(nx::Uuid, deviceId, setDeviceId)
+    FIELD(nx::Uuid, serverId, setServerId)
     FIELD(nx::vms::api::EventReason, reason, setReason)
     FIELD(nx::vms::rules::NetworkIssueInfo, info, setInfo)
 
@@ -25,10 +26,11 @@ public:
     NetworkIssueEvent(
         std::chrono::microseconds timestamp,
         nx::Uuid deviceId,
+        nx::Uuid serverId,
         nx::vms::api::EventReason reason,
         const NetworkIssueInfo& info);
 
-    virtual QString aggregationKey() const override { return m_deviceId.toSimpleString(); }
+    virtual QString aggregationKey() const override { return serverId().toSimpleString(); }
     virtual QVariantMap details(
         common::SystemContext* context,
         const nx::vms::api::rules::PropertyMap& aggregatedInfo,
