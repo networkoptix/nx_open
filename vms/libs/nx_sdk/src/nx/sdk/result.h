@@ -25,6 +25,8 @@ enum class ErrorCode: int
 class Error
 {
 public:
+    Error(const Error&) = default;
+
     Error(ErrorCode errorCode, const IString* errorMessage):
         m_errorCode(errorCode), m_errorMessage(errorMessage)
     {
