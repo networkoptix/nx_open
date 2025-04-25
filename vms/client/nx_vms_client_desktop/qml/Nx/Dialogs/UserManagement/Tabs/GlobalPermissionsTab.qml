@@ -62,7 +62,7 @@ Item
                         text: model.display
 
                         checkState: model.isChecked ? Qt.Checked : Qt.Unchecked
-                        onCheckStateChanged: model.isChecked = (checkState == Qt.Checked)
+                        onToggled: model.isChecked = (checkState == Qt.Checked)
 
                         Layout.alignment: Qt.AlignTop
                     }
