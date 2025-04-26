@@ -252,6 +252,7 @@ private:
     void updateHighlight();
     void createUnread(int first, int count);
     void allItemsDataChangeNotify(const QList<int>& roles);
+    void connectModelToAccessController(AnalyticsSearchListModel* analyticsModel, SystemContext* systemContext);
 
 private:
     CommonObjectSearchSetup* const m_commonSetup = new CommonObjectSearchSetup(this);
@@ -263,6 +264,7 @@ private:
 
     nx::utils::ScopedConnections m_contextConnections;
     nx::utils::ScopedConnections m_modelConnections;
+    nx::utils::ScopedConnection m_accessControllerConnection;
     nx::utils::ScopedConnection m_systemBecomeOfflineConnection;
 
     std::unique_ptr<AbstractSearchSynchronizer> m_synchronizer;
@@ -1077,6 +1079,8 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
                 analyticsModel, &AnalyticsSearchListModel::pluginActionRequested,
                 q, &RightPanelModelsAdapter::pluginActionRequested);
 
+            connectModelToAccessController(analyticsModel, m_context->system());
+
             if (nx::vms::client::core::ini().allowCslObjectSearch)
             {
                 initCslSupport(analyticsModel, analyticsFilterModel);
@@ -1186,12 +1190,17 @@ void RightPanelModelsAdapter::Private::initCslSupport(
                             taxonomyManager);
                     }
                 }
+
+                connectModelToAccessController(analyticsModel, cameraContext);
             }
 
             analyticsFilterModel->setTaxonomyManager(taxonomyManager);
 
             analyticsModel->setSystemContext(cameraContext);
             q->commonSetup()->setSystemContext(cameraContext);
+
+            if (cameraContext)
+                emit q->dataNeeded();
         };
 
     m_modelConnections << connect(
@@ -1490,6 +1499,33 @@ void RightPanelModelsAdapter::Private::allItemsDataChangeNotify(const QList<int>
         q->index(0, 0),
         q->index(q->rowCount() - 1, q->columnCount() - 1),
         roles);
+}
+
+void RightPanelModelsAdapter::Private::connectModelToAccessController(
+    AnalyticsSearchListModel* analyticsModel,
+    SystemContext* systemContext)
+{
+    m_accessControllerConnection.reset(
+        connect(systemContext->accessController(),
+            &nx::vms::client::core::AccessController::permissionsMaybeChanged,
+            this,
+            [this](const QnResourceList& resourcesHint)
+            {
+                if (!crossSiteMode())
+                    return;
+
+                if (!NX_ASSERT(m_commonSetup->cameraSelection()
+                    == nx::vms::client::core::EventSearch::CameraSelection::current))
+                {
+                    return;
+                }
+
+                const auto selectedCamera = m_commonSetup->singleCamera();
+                if (!selectedCamera || !resourcesHint.contains(selectedCamera))
+                    return;
+
+                q->dataNeeded();
+            }));
 }
 
 void RightPanelModelsAdapter::Private::fetchData(const core::FetchRequest& request,
