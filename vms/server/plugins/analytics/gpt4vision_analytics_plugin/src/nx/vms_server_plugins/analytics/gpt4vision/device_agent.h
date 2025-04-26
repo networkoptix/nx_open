@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <chrono>
+
 #include <nx/sdk/analytics/helpers/consuming_device_agent.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 

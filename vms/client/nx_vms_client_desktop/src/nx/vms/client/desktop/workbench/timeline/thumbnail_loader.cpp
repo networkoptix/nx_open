@@ -2,6 +2,8 @@
 
 #include "thumbnail_loader.h"
 
+#include <chrono>
+
 #include <core/resource/media_resource.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/thread/long_runnable.h>

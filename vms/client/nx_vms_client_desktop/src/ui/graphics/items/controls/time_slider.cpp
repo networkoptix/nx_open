@@ -5,6 +5,7 @@
 #include <array>
 #include <cmath>
 #include <limits>
+#include <chrono>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDateTime>
@@ -122,17 +123,14 @@ const auto kDateTextFontWeight = QFont::Medium;
 const qreal kMinDateSpanFraction = 0.15;
 const qreal kMinDateSpanPixels = 160;
 
-
 /* Lines bar. */
 
 /** Minimal color coefficient for the most noticeable chunk color in range */
 const qreal kLineBarMinNoticeableFraction = 0.5;
 
-
 /* Thumbnails bar. */
 
 const qreal kThumbnailHeightForDrawing = 10.0;
-
 
 /* Global */
 
@@ -440,7 +438,6 @@ private:
     std::array<QColor, Qn::TimePeriodContentCount + 1> m_colors;
 };
 
-
 // -------------------------------------------------------------------------- //
 // QnTimeSliderStepStorage
 // -------------------------------------------------------------------------- //
@@ -561,7 +558,6 @@ public:
             : kWindowScrollFriction);
     }
 };
-
 
 // -------------------------------------------------------------------------- //
 // QnTimeSlider
@@ -1807,7 +1803,6 @@ int QnTimeSlider::helpTopicAt(const QPointF& pos) const
     return HelpTopic::Id::MainWindow_Slider_Timeline;
 }
 
-
 // -------------------------------------------------------------------------- //
 // Updating
 // -------------------------------------------------------------------------- //
@@ -2800,7 +2795,6 @@ void QnTimeSlider::drawPeriodsBar(QPainter* painter, const QnTimePeriodList& rec
 
     chunkPainter.stop();
 }
-
 
 void QnTimeSlider::drawSolidBackground(QPainter* painter, const QRectF& rect)
 {

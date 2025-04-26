@@ -2,6 +2,8 @@
 
 #include "local_resources_directory_model.h"
 
+#include <chrono>
+
 #include <QtCore/QDir>
 #include <QtCore/QSet>
 

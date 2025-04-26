@@ -2,6 +2,8 @@
 
 #include "engine.h"
 
+#include <chrono>
+
 #include <nx/sdk/i_device_info.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/helpers/string.h>

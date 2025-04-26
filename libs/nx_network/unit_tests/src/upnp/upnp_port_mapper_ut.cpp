@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
+
 #include <nx/network/upnp/upnp_device_searcher.h>
 #include <nx/utils/test_support/sync_queue.h>
 

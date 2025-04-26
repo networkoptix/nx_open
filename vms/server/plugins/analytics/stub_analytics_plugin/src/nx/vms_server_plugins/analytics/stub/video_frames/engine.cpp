@@ -5,6 +5,8 @@
 #include "device_agent.h"
 #include "stub_analytics_plugin_video_frames_ini.h"
 
+#include <chrono>
+
 #undef NX_PRINT_PREFIX
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>

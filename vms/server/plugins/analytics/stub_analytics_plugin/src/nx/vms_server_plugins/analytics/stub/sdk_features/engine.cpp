@@ -2,6 +2,8 @@
 
 #include "engine.h"
 
+#include <chrono>
+
 #include "device_agent.h"
 #include "stub_analytics_plugin_sdk_features_ini.h"
 

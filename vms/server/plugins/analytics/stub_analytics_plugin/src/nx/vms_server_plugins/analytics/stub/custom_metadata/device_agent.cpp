@@ -2,6 +2,8 @@
 
 #include "device_agent.h"
 
+#include <chrono>
+
 #include <nx/kit/utils.h>
 
 #include "stub_analytics_plugin_custom_metadata_ini.h"

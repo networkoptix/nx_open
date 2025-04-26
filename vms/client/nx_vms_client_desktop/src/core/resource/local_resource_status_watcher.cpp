@@ -2,6 +2,8 @@
 
 #include "local_resource_status_watcher.h"
 
+#include <chrono>
+
 #include <QtCore/QFileInfo>
 
 #include <core/resource_management/resource_pool.h>

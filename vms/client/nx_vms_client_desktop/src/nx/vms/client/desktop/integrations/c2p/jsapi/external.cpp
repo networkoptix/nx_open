@@ -2,6 +2,8 @@
 
 #include "external.h"
 
+#include <chrono>
+
 #include <api/helpers/camera_id_helper.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource.h>

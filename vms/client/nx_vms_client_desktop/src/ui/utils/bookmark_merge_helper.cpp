@@ -3,6 +3,7 @@
 #include "bookmark_merge_helper.h"
 
 #include <optional>
+#include <chrono>
 
 #include <QtCore/QSharedPointer>
 
@@ -401,7 +402,6 @@ void QnBookmarkMergeHelper::removeBookmark(const QnCameraBookmark &bookmark)
     }
 }
 
-
 int QnBookmarkMergeHelperPrivate::detailLevel(milliseconds msecsPerDPix) const
 {
     for (int i = 1; i < detailLevels.size(); ++i)
@@ -521,7 +521,6 @@ BookmarkItemList QnBookmarkMergeHelperPrivate::childrenForItem(const BookmarkIte
 
     return result;
 }
-
 
 QnTimelineBookmarkItem BookmarkItem::toTimelineBookmarkItem() const
 {
