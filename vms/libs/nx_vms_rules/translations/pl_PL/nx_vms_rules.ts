@@ -458,9 +458,19 @@
       <translation>Kamera</translation>
     </message>
     <message>
-      <source>%1 was disconnected</source>
-      <comment>Device name will be substituted</comment>
-      <translation>%1 rozłączono</translation>
+      <source>Device was disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">Device was disconnected at %1</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">Camera was disconnected at %1</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">I/O Module was disconnected at %1</translation>
     </message>
   </context>
   <context>
@@ -752,10 +762,6 @@
   <context>
     <name>nx::vms::rules::NetworkIssueEvent</name>
     <message>
-      <source>Network Issue at %1</source>
-      <translation>Problem z siecią na %1</translation>
-    </message>
-    <message>
       <source>Network Issue</source>
       <translation>Problem z siecią</translation>
     </message>
@@ -821,6 +827,11 @@
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
       <translation>Nie udało się wymusić użycia czasu kamery, ponieważ jest on zbyt opóźniony. Zamiast tego zostanie użyty czas systemowy.</translation>
+    </message>
+    <message>
+      <source>Network Issue at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation>Problem z siecią na %1</translation>
     </message>
   </context>
   <context>

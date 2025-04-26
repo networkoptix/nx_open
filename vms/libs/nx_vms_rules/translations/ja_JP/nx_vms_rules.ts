@@ -437,9 +437,19 @@
       <translation>カメラ</translation>
     </message>
     <message>
-      <source>%1 was disconnected</source>
-      <comment>Device name will be substituted</comment>
-      <translation>%1 が切断されました</translation>
+      <source>Device was disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">Device was disconnected at %1</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">Camera was disconnected at %1</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">I/O Module was disconnected at %1</translation>
     </message>
   </context>
   <context>
@@ -722,10 +732,6 @@
   <context>
     <name>nx::vms::rules::NetworkIssueEvent</name>
     <message>
-      <source>Network Issue at %1</source>
-      <translation>%1 ネットワーク障害</translation>
-    </message>
-    <message>
       <source>Network Issue</source>
       <translation>ネットワーク障害</translation>
     </message>
@@ -788,6 +794,11 @@
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
       <translation>時刻ずれが大きすぎるため、カメラ時刻は使用できませんでした。代わりにサイト時刻が使用されます。</translation>
+    </message>
+    <message>
+      <source>Network Issue at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation>%1 ネットワーク障害</translation>
     </message>
   </context>
   <context>

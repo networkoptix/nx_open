@@ -437,9 +437,19 @@
       <translation>Camera</translation>
     </message>
     <message>
-      <source>%1 was disconnected</source>
-      <comment>Device name will be substituted</comment>
-      <translation>%1 đã bị ngắt kết nối</translation>
+      <source>Device was disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">Device was disconnected at %1</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">Camera was disconnected at %1</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">I/O Module was disconnected at %1</translation>
     </message>
   </context>
   <context>
@@ -722,10 +732,6 @@
   <context>
     <name>nx::vms::rules::NetworkIssueEvent</name>
     <message>
-      <source>Network Issue at %1</source>
-      <translation>Sự cố mạng tại %1</translation>
-    </message>
-    <message>
       <source>Network Issue</source>
       <translation>Lỗi mạng</translation>
     </message>
@@ -788,6 +794,11 @@
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
       <translation>Không thể buộc sử dụng thời gian camera vì nó bị trễ quá nhiều. Thay vào đó, thời gian Chi nhánh sẽ được sử dụng.</translation>
+    </message>
+    <message>
+      <source>Network Issue at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation>Sự cố mạng tại %1</translation>
     </message>
   </context>
   <context>

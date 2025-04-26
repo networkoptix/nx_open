@@ -1548,7 +1548,7 @@
     </message>
     <message>
       <source>Custom Background Image</source>
-      <translation type="unfinished">Custom Background Image</translation>
+      <translation>Egendefinert bakgrunnsbilde</translation>
     </message>
   </context>
   <context>

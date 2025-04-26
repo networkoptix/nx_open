@@ -444,9 +444,19 @@
       <translation>Càmera</translation>
     </message>
     <message>
-      <source>%1 was disconnected</source>
-      <comment>Device name will be substituted</comment>
-      <translation type="unfinished">%1 was disconnected</translation>
+      <source>Device was disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">Device was disconnected at %1</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">Camera was disconnected at %1</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">I/O Module was disconnected at %1</translation>
     </message>
   </context>
   <context>
@@ -732,10 +742,6 @@
   <context>
     <name>nx::vms::rules::NetworkIssueEvent</name>
     <message>
-      <source>Network Issue at %1</source>
-      <translation>Problema de xarxa a %1</translation>
-    </message>
-    <message>
       <source>Network Issue</source>
       <translation>Problema de xarxa</translation>
     </message>
@@ -799,6 +805,11 @@
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
       <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+    </message>
+    <message>
+      <source>Network Issue at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation>Problema de xarxa a %1</translation>
     </message>
   </context>
   <context>

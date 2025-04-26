@@ -12628,7 +12628,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>In progress...</source>
-      <translation type="unfinished">In progress...</translation>
+      <translation>Выполняется...</translation>
     </message>
   </context>
   <context>
