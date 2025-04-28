@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32">
+  <g class="32x32/Solid/site">
+    <path fill="#D3D8DE" fill-rule="evenodd" d="m16 5.145 13.733 14.79-1.465 1.36L16 8.085 3.733 21.294l-1.465-1.36L16 5.144Z" class="Primary" clip-rule="evenodd"/>
+    <path fill="#B0B9C4" d="M6 20.372 16 9.615l10 10.757V27.5a.5.5 0 0 1-.5.5h-19a.5.5 0 0 1-.5-.5v-7.128Z" class="Secondary"/>
+  </g>
+</svg>
