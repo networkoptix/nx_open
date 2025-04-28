@@ -35,6 +35,9 @@ protected:
     virtual void showEvent(QShowEvent* event) override;
 
 private:
+    void updateTabVisibility();
+
+private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };

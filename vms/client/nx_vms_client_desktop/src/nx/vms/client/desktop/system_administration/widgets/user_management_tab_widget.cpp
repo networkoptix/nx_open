@@ -70,12 +70,26 @@ UserManagementTabWidget::UserManagementTabWidget(
         connect(tab, &QnAbstractPreferencesWidget::hasChangesChanged, this,
             &QnAbstractPreferencesWidget::hasChangesChanged);
     }
+
+    connect(system()->saasServiceManager(),
+        &saas::ServiceManager::dataChanged,
+        this,
+        &UserManagementTabWidget::updateTabVisibility);
+
+    updateTabVisibility();
 }
 
 UserManagementTabWidget::~UserManagementTabWidget()
 {
     if (!NX_ASSERT(!isNetworkRequestRunning(), "Requests should already be completed."))
         discardChanges();
+}
+
+void UserManagementTabWidget::updateTabVisibility()
+{
+    const auto saas = system()->saasServiceManager();
+    d->tabWidget->setTabVisible(d->ldapTabIndex,
+        saas->hasFeature(nx::vms::api::SaasTierLimitName::ldapEnabled));
 }
 
 void UserManagementTabWidget::loadDataToUi()
