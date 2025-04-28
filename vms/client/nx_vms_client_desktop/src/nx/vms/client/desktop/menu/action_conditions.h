@@ -772,6 +772,11 @@ ConditionWrapper isWebPageOrIntegration();
  */
 ConditionWrapper homeTabIsNotActive(ActionVisibility defaultVisibility = InvisibleAction);
 
+/**
+ * Check if tier limits allow to merge sites.
+ */
+ConditionWrapper tierLimitsAllowMerge();
+
 ConditionWrapper screenRecordingSupported();
 
 /**

@@ -2547,6 +2547,19 @@ ConditionWrapper homeTabIsNotActive(ActionVisibility defaultVisibility)
         });
 }
 
+ConditionWrapper tierLimitsAllowMerge()
+{
+    return new CustomCondition(
+        [](const Parameters& /*parameters*/, WindowContext* context)
+        {
+            const auto saas = context->system()->saasServiceManager();
+            const auto tierLimit = saas->tierLimit(nx::vms::api::SaasTierLimitName::maxServers);
+            if (tierLimit.has_value() && *tierLimit <= 1)
+                return InvisibleAction;
+            return EnabledAction;
+        });
+}
+
 ConditionWrapper screenRecordingSupported()
 {
     return new CustomCondition(

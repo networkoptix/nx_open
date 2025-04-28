@@ -852,6 +852,7 @@ void initialize(Manager* manager, Action* root)
                 ResourceTree::NodeType::servers, ResourceTree::NodeType::camerasAndDevices})
             && ConditionWrapper(new RequiresAdministratorCondition())
             && condition::homeTabIsNotActive()
+            && condition::tierLimitsAllowMerge()
         );
 
     // TODO: Implement proxy actions to allow the same action to be shown in different locations.
