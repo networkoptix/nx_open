@@ -439,17 +439,17 @@
     <message>
       <source>Device was disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Device was disconnected at %1</translation>
+      <translation>%1 のデバイスが切断されました。</translation>
     </message>
     <message>
       <source>Camera was disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Camera was disconnected at %1</translation>
+      <translation>%1 のカメラが切断されました。</translation>
     </message>
     <message>
       <source>I/O Module was disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">I/O Module was disconnected at %1</translation>
+      <translation>%1 のI/Oモジュールが切断されました。</translation>
     </message>
   </context>
   <context>
