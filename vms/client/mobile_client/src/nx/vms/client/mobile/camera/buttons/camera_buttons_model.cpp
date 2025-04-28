@@ -12,6 +12,8 @@ namespace nx::vms::client::mobile {
 
 namespace {
 
+static const QString kDefaultIconName = "_bell_on";
+
 using CameraButtonData = core::CameraButtonData;
 using AbstractCameraButtonController = core::AbstractCameraButtonController;
 
@@ -26,8 +28,10 @@ enum Roles
     group
 };
 
-QString getIconPath(int group, const QString& iconName)
+QString getIconPath(int group, QString iconName)
 {
+    if (iconName.isEmpty())
+        iconName = kDefaultIconName;
     return group == static_cast<int>(CameraButtonController::ButtonGroup::ptz)
         ? iconName
         : QStringLiteral("qrc:///skin/soft_triggers/user_selectable/%1.svg").arg(iconName);
