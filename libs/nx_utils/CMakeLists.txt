@@ -2,6 +2,7 @@
 
 find_package(perfetto REQUIRED)
 nx_fix_target_interface_for_cuda(perfetto::perfetto)
+find_package(CPPTRACE REQUIRED)
 
 if(IOS)
     set(ios_sources "src/nx/utils/log/log_ios.mm")
@@ -16,6 +17,7 @@ nx_add_target(nx_utils LIBRARY
         ${ios_sources}
         ${aes_library_sources}
     PUBLIC_LIBS
+        CPPTRACE::CPPTRACE
         perfetto::perfetto
         Boost::headers
         OpenSSL::OpenSSL

@@ -8,23 +8,27 @@
 #include <set>
 #include <sstream>
 
-#if defined(__APPLE__) && !defined(_GNU_SOURCE)
-#define _GNU_SOURCE
-#endif
-
-#include <boost/stacktrace.hpp>
+#include <cpptrace/cpptrace.hpp>
 
 #include <nx/utils/log/assert.h>
 
 namespace nx::utils::debug {
 
 using AllocationsByCount =
-    std::multimap<int /*count*/, boost::stacktrace::stacktrace, std::greater<int>>;
+    std::multimap<int /*count*/, cpptrace::raw_trace, std::greater<int>>;
+
+struct compareRawTrace
+{
+    bool operator()(const cpptrace::raw_trace& a, const cpptrace::raw_trace& b) const
+    {
+        return a.frames < b.frames;
+    }
+};
 
 class InternalAllocationAnalyzer
 {
 public:
-    void recordObjectCreation(void* ptr, boost::stacktrace::stacktrace stack);
+    void recordObjectCreation(void* ptr, cpptrace::raw_trace stack);
     bool recordObjectDestruction(void* ptr);
     AllocationsByCount getAllocationsByCount() const;
 
@@ -34,11 +38,11 @@ private:
     // play. For example with SocketDelegate used as a base class. So we need to record
     // multiple creation stacks for the same pointer and remove them several times when the
     // object is destroyed as well.
-    std::map<void*, std::vector<boost::stacktrace::stacktrace>> m_ptrToStacks;
-    std::map<boost::stacktrace::stacktrace, int /*count*/> m_allocationCountPerStack;
+    std::map<void*, std::vector<cpptrace::raw_trace>> m_ptrToStacks;
+    std::map<cpptrace::raw_trace, int /*count*/, compareRawTrace> m_allocationCountPerStack;
 };
 
-void InternalAllocationAnalyzer::recordObjectCreation(void* ptr, boost::stacktrace::stacktrace stack)
+void InternalAllocationAnalyzer::recordObjectCreation(void* ptr, cpptrace::raw_trace stack)
 {
     std::lock_guard<decltype(m_mutex)> locker(m_mutex);
     m_ptrToStacks[ptr].push_back(stack);
@@ -98,7 +102,7 @@ AllocationAnalyzer::~AllocationAnalyzer() = default;
 void AllocationAnalyzer::recordObjectCreation([[maybe_unused]] void* ptr)
 {
     if (m_isEnabled)
-        m_impl->analyzer.recordObjectCreation(ptr, boost::stacktrace::stacktrace());
+        m_impl->analyzer.recordObjectCreation(ptr, cpptrace::generate_raw_trace());
 }
 
 void AllocationAnalyzer::recordObjectDestruction([[maybe_unused]] void* ptr)
@@ -110,7 +114,7 @@ void AllocationAnalyzer::recordObjectDestruction([[maybe_unused]] void* ptr)
 void AllocationAnalyzer::recordObjectMove([[maybe_unused]] void* ptr)
 {
     if (m_isEnabled && ptr && NX_ASSERT(m_impl->analyzer.recordObjectDestruction(ptr)))
-        m_impl->analyzer.recordObjectCreation(ptr, boost::stacktrace::stacktrace());
+        m_impl->analyzer.recordObjectCreation(ptr, cpptrace::generate_raw_trace());
 }
 
 std::optional<std::string> AllocationAnalyzer::generateReport() const
@@ -129,7 +133,7 @@ std::optional<std::string> AllocationAnalyzer::generateReport() const
         report << std::endl
             << number << "/" << allocations.size() << ". "
             << count << " allocations done by the following stack:"<< std::endl
-            << stack << std::endl;
+            << stack.resolve() << std::endl;
         ++number;
     }
     report << "ALLOCATION REPORT END" << std::endl;
