@@ -209,7 +209,7 @@ class NxOpenConan(ConanFile):
                 self.requires("intel-media-driver/23.4.3" "#9f52c4393479e16d22aaa6c6b57ecf99")
                 self.requires("nv-codec-headers/12.1.14.0" "#65e2d80efd67e46fc41f135f2468e3df")
 
-                self.requires("libmysqlclient/8.1.0" "#96475a9cb3a02bbe2626543d0b3d33b7")
+                self.requires("libmysqlclient/8.1.0" "#e762100664bad1c018ad71ecf702ea5e")
 
             if not self.isArm32:
                 self._os_deps_package = "os_deps_for_desktop_linux"
