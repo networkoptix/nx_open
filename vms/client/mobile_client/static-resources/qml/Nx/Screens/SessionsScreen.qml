@@ -46,7 +46,7 @@ Page
 
         anchors.centerIn: parent
 
-        icon.source: "image://skin/24x24/Outline/settings.svg?primary=light10"
+        icon.source: "image://skin/24x24/Outline/settings_2.svg?primary=light10"
         icon.width: 24
         icon.height: 24
 

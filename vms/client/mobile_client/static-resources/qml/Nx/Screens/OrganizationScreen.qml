@@ -61,7 +61,7 @@ Page
         anchors.centerIn: parent
 
         icon.source: searchField.visible
-            ? "image://skin/24x24/Outline/close.svg?primary=light10"
+            ? "image://skin/24x24/Outline/close_2.svg?primary=light10"
             : "image://skin/24x24/Outline/search.svg?primary=light10"
         icon.width: 24
         icon.height: 24

@@ -35,7 +35,7 @@ Page
                 "action": () => windowContext.sessionManager.stopSessionByUser()
             },
             {
-                "iconSource": "image://skin/24x24/Outline/settings.svg",
+                "iconSource": "image://skin/24x24/Outline/settings_2.svg",
                 "text": qsTr("App Settings"),
                 "action": () => Workflow.openSettingsScreen()
             },
