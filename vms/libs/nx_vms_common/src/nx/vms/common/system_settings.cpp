@@ -626,16 +626,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         "autoUpdateThumbnails", true, this, [] { return tr("Thumbnails auto-update."); });
 
     d->maxSceneItemsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        "maxSceneItems", 0,
-        [this](auto v)
-        {
-            using namespace nx::vms::api;
-            const auto saasManager = systemContext()->saasServiceManager();
-            const auto limit = saasManager->tierLimit(SaasTierLimitName::maxDevicesPerLayout);
-            return !limit.has_value() || (v > 0 && v <= *limit);
-        },
-        this,
-        [] { return tr("Max scene items (0 means default)."); });
+        "maxSceneItems", 0, this, [] { return tr("Max scene items (0 means default)"); });
 
     d->useTextEmailFormatAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "useTextEmailFormat", false, this, [] { return tr("Send plain-text emails."); });
