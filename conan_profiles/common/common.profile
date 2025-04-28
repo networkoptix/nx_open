@@ -43,6 +43,7 @@ opentelemetry-cpp/*:with_zipkin=False
 prometheus-cpp/*:with_pull=False
 prometheus-cpp/*:with_push=False
 sdk-gcc/*:with_sanitizer=False
+zstd/*:build_programs = False
 
 [tool_requires]
 boost/*:b2/4.10.1
