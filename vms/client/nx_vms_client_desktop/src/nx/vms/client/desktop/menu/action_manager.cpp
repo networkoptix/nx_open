@@ -27,14 +27,6 @@ namespace {
 
 const char* sourceActionPropertyName = "_qn_sourceAction";
 
-Action* qnAction(QAction* action)
-{
-    if (auto source = action->property(sourceActionPropertyName).value<Action*>())
-        return source;
-
-    return dynamic_cast<Action*>(action);
-}
-
 class QnMenu: public QMenu
 {
     typedef QMenu base_type;
@@ -340,7 +332,7 @@ QMenu* Manager::newMenuRecursive(
             QString replacedText;
             if (menu && menu->actions().size() == 1)
             {
-                Action* menuAction = qnAction(menu->actions()[0]);
+                Action* menuAction = sourceAction(menu->actions()[0]);
                 if (menuAction && (menuAction->flags() & Pullable))
                 {
                     delete menu;
@@ -441,13 +433,21 @@ bool Manager::isMenuVisible() const
     return false;
 }
 
+Action* Manager::sourceAction(QAction* action)
+{
+    if (auto source = action->property(sourceActionPropertyName).value<Action*>())
+        return source;
+
+    return dynamic_cast<Action*>(action);
+}
+
 bool Manager::redirectActionRecursive(QMenu* menu, IDType sourceId, QAction* targetAction)
 {
     QList<QAction*> actions = menu->actions();
 
     foreach(QAction* action, actions)
     {
-        Action* storedAction = qnAction(action);
+        Action* storedAction = sourceAction(action);
         if (storedAction && storedAction->id() == sourceId)
         {
             int index = actions.indexOf(action);

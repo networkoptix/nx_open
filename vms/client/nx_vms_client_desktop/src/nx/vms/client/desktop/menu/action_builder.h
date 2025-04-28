@@ -42,6 +42,7 @@ public:
     Builder toggledText(const QString& text);
     Builder pulledText(const QString& text);
     Builder toolTip(const QString& toolTip);
+    Builder disabledToolTip(const QString& toolTip);
     Builder toolTipFormat(const QString& toolTipFormat);
     Builder flags(ActionFlags flags);
     Builder mode(ClientModes mode);

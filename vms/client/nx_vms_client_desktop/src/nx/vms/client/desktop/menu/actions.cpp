@@ -1489,7 +1489,10 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Image Enhancement..."))
         .shortcut("Alt+J")
         .condition(ConditionWrapper(new AdjustVideoCondition())
-            && !condition::isShowreelReviewMode());
+            && !condition::isShowreelReviewMode()
+            && condition::hardwareVideoDecodingDisabled())
+        .disabledToolTip("Image Enhancement is not available when Hardware Video Decoding "
+            "(Local Settings) is turned on.");
 
     factory(CreateZoomWindowAction)
         .flags(SingleTarget | WidgetTarget)

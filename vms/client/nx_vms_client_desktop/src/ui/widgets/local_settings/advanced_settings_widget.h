@@ -59,6 +59,7 @@ private:
     void setCertificateValidationLevel(ServerCertificateValidationLevel value);
     void updateCertificateValidationLevelDescription();
     void updateLogsManagementWidgetsState();
+    void updateBannerVisibility();
 
 private:
     QScopedPointer<Ui::AdvancedSettingsWidget> ui;

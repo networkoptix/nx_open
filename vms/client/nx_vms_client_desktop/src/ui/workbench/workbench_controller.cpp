@@ -36,6 +36,7 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_target_provider.h>
 #include <nx/vms/client/desktop/menu/actions.h>
+#include <nx/vms/client/desktop/menu/menu_event_filter.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
@@ -679,6 +680,7 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos)
             if (menu->isEmpty())
                 return;
 
+            menu->installEventFilter(new menu::MenuEventFilter());
             const bool isWebWidget = std::all_of(
                 materializedItems.cbegin(),
                 materializedItems.cend(),

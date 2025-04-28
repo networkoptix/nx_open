@@ -224,13 +224,22 @@ QString Action::toolTipFormat() const
     return m_toolTipFormat.isEmpty() ? defaultToolTipFormat() : m_toolTipFormat;
 }
 
+QString Action::disabledToolTip() const
+{
+    return m_disabledToolTip;
+}
+
+void Action::setDisabledToolTip(const QString& toolTip)
+{
+    m_disabledToolTip = toolTip;
+}
+
 void Action::setToolTipFormat(const QString& toolTipFormat)
 {
     if (m_toolTipFormat == toolTipFormat)
         return;
 
     m_toolTipFormat = toolTipFormat;
-
     updateToolTip(true);
 }
 

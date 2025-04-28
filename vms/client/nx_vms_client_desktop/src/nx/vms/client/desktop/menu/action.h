@@ -133,6 +133,9 @@ public:
 
     void removeChild(Action* action);
 
+    QString disabledToolTip() const;
+    void setDisabledToolTip(const QString& toolTip);
+
     QString toolTipFormat() const;
     void setToolTipFormat(const QString& toolTipFormat);
 
@@ -179,6 +182,7 @@ private:
     GlobalPermission m_globalPermission;
     bool m_powerUserRequired = false;
     QString m_normalText, m_toggledText, m_pulledText;
+    QString m_disabledToolTip;
     QString m_toolTipFormat, m_toolTipMarker;
     ConditionWrapper m_condition;
     FactoryPtr m_childFactory;

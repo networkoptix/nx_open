@@ -138,6 +138,12 @@ Builder Builder::toolTip(const QString& toolTip)
     return *this;
 }
 
+Builder Builder::disabledToolTip(const QString& toolTip)
+{
+    m_action->setDisabledToolTip(toolTip);
+    return *this;
+}
+
 Builder Builder::toolTipFormat(const QString& toolTipFormat)
 {
     m_action->setToolTipFormat(toolTipFormat);
@@ -147,7 +153,6 @@ Builder Builder::toolTipFormat(const QString& toolTipFormat)
 Builder Builder::flags(ActionFlags flags)
 {
     m_action->setFlags(m_action->flags() | flags);
-
     return *this;
 }
 

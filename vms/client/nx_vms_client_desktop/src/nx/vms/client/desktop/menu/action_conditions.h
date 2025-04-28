@@ -784,6 +784,8 @@ ConditionWrapper screenRecordingSupported();
  */
 ConditionWrapper customCellSpacingIsSet();
 
+ConditionWrapper hardwareVideoDecodingDisabled();
+
 } // namespace condition
 
 } // namespace menu

@@ -2607,6 +2607,17 @@ ConditionWrapper customCellSpacingIsSet()
         });
 }
 
+ConditionWrapper hardwareVideoDecodingDisabled()
+{
+    return new CustomCondition(
+        [](const Parameters& /*parameters*/, WindowContext* /*context*/)
+        {
+            return appContext()->localSettings()->hardwareDecodingEnabled()
+                ? DisabledAction
+                : EnabledAction;
+        });
+}
+
 } // namespace condition
 } // namespace menu
 } // namespace nx::vms::client::desktop

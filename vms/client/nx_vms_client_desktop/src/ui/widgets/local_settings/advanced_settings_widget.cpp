@@ -246,8 +246,16 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
         };
     connect(ui->cancelLogsDownloadButton, &QPushButton::clicked, this, resetLogsDownloadState);
     connect(ui->logsDownloadDoneButton, &QPushButton::clicked, this, resetLogsDownloadState);
+    connect(this, &QnAbstractPreferencesWidget::hasChangesChanged,
+        this, &QnAdvancedSettingsWidget::updateBannerVisibility);
 
     ui->doubleBufferingWidget->setVisible(nx::build_info::isWindows() || ini().developerMode);
+    setPaletteColor(
+        ui->horizontalLine, QPalette::Shadow, nx::vms::client::core::colorTheme()->color("dark12"));
+    ui->alertLabel->setType(AlertLabel::Type::warning);
+    ui->alertLabel->setText(
+        tr("Note: Image Enhancement is not available when Hardware Video Decoding is turned on."));
+    updateBannerVisibility();
 }
 
 QnAdvancedSettingsWidget::~QnAdvancedSettingsWidget()
@@ -356,6 +364,7 @@ void QnAdvancedSettingsWidget::applyChanges()
             updateSecurityLevel();
         }
     }
+    updateBannerVisibility();
 }
 
 void QnAdvancedSettingsWidget::loadDataToUi()
@@ -583,4 +592,12 @@ void QnAdvancedSettingsWidget::updateLogsManagementWidgetsState()
         ? tr("Failed to save logs to the selected folder")
         : tr("Download complete!"));
     setWarningStyleOn(ui->logsDownloadStatusLabel, hasErrors);
+}
+
+void QnAdvancedSettingsWidget::updateBannerVisibility()
+{
+    bool visible = isHardwareDecodingEnabled()
+        && not appContext()->localSettings()->hardwareDecodingEnabled();
+    ui->horizontalLine->setVisible(visible);
+    ui->alertLabel->setVisible(visible);
 }

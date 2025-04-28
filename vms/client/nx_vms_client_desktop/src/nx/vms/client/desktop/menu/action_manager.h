@@ -159,6 +159,9 @@ public:
 
     /** Check if any menu is visible right now */
     bool isMenuVisible() const;
+
+    static Action* sourceAction(QAction* action);
+
 signals:
     void menuAboutToShow(QMenu* menu);
     void menuAboutToHide(QMenu* menu);
