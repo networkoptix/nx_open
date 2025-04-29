@@ -1629,10 +1629,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Max scene items (0 means default).</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Send plain-text emails.</source>
         <translation></translation>
     </message>
@@ -1926,6 +1922,10 @@
     </message>
     <message>
         <source>SMTP settings. These settings are visible for Power Users only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max scene items (0 means default)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
