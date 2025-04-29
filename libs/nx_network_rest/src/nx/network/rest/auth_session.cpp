@@ -5,10 +5,10 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QUrlQuery>
 
-#include <nx/network/http/http_types.h>
-#include <nx/network/http/custom_headers.h>
-#include <nx/network/socket_common.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/socket_common.h>
 
 namespace nx::network::rest {
 
@@ -49,12 +49,15 @@ AuthSession::AuthSession(
     nx::Uuid id_,
     const QString& userName,
     const nx::network::http::Request& request,
-    const nx::network::HostAddress& hostAddress)
+    const nx::network::HostAddress& hostAddress,
+    bool authHeaderTrusted)
     :
     id(std::move(id_)),
     userName(userName),
-    userHost(QString::fromStdString(
-        nx::network::http::getHeaderValue(request.headers, Qn::USER_HOST_HEADER_NAME)))
+    userHost(authHeaderTrusted
+        ? QString::fromStdString(
+            nx::network::http::getHeaderValue(request.headers, Qn::USER_HOST_HEADER_NAME))
+        : QString())
 {
     QString existSession = QString::fromStdString(
         nx::network::http::getHeaderValue(request.headers, Qn::AUTH_SESSION_HEADER_NAME));

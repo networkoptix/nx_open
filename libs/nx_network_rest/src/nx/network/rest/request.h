@@ -255,7 +255,7 @@ private:
     std::optional<Content> m_content;
     nx::network::http::HttpHeaders m_httpHeaders;
     nx::utils::Url m_url;
-    mutable QString m_decodedPath;
+    QString m_decodedPath;
     mutable std::optional<Params> m_paramsCache;
     mutable Qn::SerializationFormat m_responseFormat = Qn::SerializationFormat::unsupported;
     bool m_isConcreteIdProvided = false;

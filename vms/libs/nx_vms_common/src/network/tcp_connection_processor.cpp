@@ -559,6 +559,7 @@ QnTCPConnectionProcessor::ReadResult QnTCPConnectionProcessor::readRequest()
     d->clientRequest.clear();
     d->requestBody.clear();
     d->requestLogged = false;
+    d->requestAuthTrusted = false;
 
     qint64 maxTcpRequestSize = m_maxTcpRequestSize;
     std::optional<qint64> fullHttpMessageSize;
@@ -710,6 +711,7 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
     other.d_ptr->accessRights = d->accessRights;
     other.d_ptr->authenticatedOnce = d->authenticatedOnce;
     other.d_ptr->requestLogged = d->requestLogged;
+    other.d_ptr->requestAuthTrusted = d->requestAuthTrusted;
 }
 
 nx::utils::Url QnTCPConnectionProcessor::getDecodedUrl() const
@@ -818,7 +820,8 @@ nx::network::rest::AuthSession QnTCPConnectionProcessor::authSession(
         sessionId.empty() ? nx::Uuid{} : nx::Uuid::fromArbitraryData(sessionId),
         user ? user->getName() : QString(),
         d->request,
-        d->socket->getForeignAddress().address};
+        d->socket->getForeignAddress().address,
+        d->requestAuthTrusted};
 }
 
 void QnTCPConnectionProcessor::sendErrorResponse(

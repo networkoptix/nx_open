@@ -79,6 +79,33 @@ static std::tuple<http::Method, QString> methodAndPath(json_rpc::Context* contex
     return {context->subs ? http::Method::get : http::Method::post, path};
 }
 
+std::optional<size_t> parseApiVersion(const QString& path, bool withException = false)
+{
+    if (path.startsWith("/rest/"))
+    {
+        auto name = path.split('/')[2];
+        if (!name.startsWith('v'))
+        {
+            if (withException)
+                throw Exception::notFound(NX_FMT("API version '%1' is not supported", name));
+            return {};
+        }
+
+        bool isOk = false;
+        const auto number = name.mid(1).toInt(&isOk);
+        if (!isOk || number <= 0)
+        {
+            if (withException)
+                throw Exception::notFound(NX_FMT("API version '%1' is not supported", name));
+            return {};
+        }
+
+        return (size_t) number;
+    }
+
+    return {};
+}
+
 } // namespace
 
 Request::Request(
@@ -101,7 +128,8 @@ Request::Request(
     m_httpHeaders(httpRequest->headers),
     m_url(httpRequest->requestLine.url)
 {
-    setDecodedPathOrThrow(path());
+    m_decodedPath = path();
+    m_apiVersion = parseApiVersion(m_decodedPath);
 }
 
 Request::Request(
@@ -265,21 +293,7 @@ std::vector<QString> Request::preferredResponseLocales() const
 
 std::optional<size_t> Request::apiVersionOrThrow(const QString& path)
 {
-    if (path.startsWith("/rest/"))
-    {
-        auto name = path.split('/')[2];
-        if (!name.startsWith('v'))
-            throw Exception::notFound(NX_FMT("API version '%1' is not supported", name));
-
-        bool isOk = false;
-        const auto number = name.mid(1).toInt(&isOk);
-        if (!isOk || number <= 0)
-            throw Exception::notFound(NX_FMT("API version '%1' is not supported", name));
-
-        return (size_t) number;
-    }
-
-    return {};
+    return parseApiVersion(path, /*withException*/ true);
 }
 
 http::Method Request::calculateMethod() const

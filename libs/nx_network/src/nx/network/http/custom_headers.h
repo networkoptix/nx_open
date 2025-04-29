@@ -72,4 +72,6 @@ static constexpr char MERGE_ID_HEADER_NAME[] = "Nx-Merge-Id";
 
 /** Header is added to all requests produced by the VMS Rules Engine. Contains ID of the source Rule. */
 static constexpr char CREATED_BY_RULE_HEADER_NAME[] = "Nx-Created-By-Rule";
+
+static constexpr char kNxAuthSignHeaderName[] = "Nx-Auth-Sign";
 } // namespace Qn

@@ -121,6 +121,7 @@ public:
     SystemError::ErrorCode prevSocketError;
     bool authenticatedOnce;
     bool requestLogged;
+    bool requestAuthTrusted = false;
     QnTcpListener* owner;
     mutable nx::Mutex socketMutex;
     // TODO: #rvasilenko Fix socketMutex used for takeSocket() vs sockMutex used for send().

@@ -24,7 +24,8 @@ struct NX_NETWORK_REST_API AuthSession
         nx::Uuid id_,
         const QString& userName,
         const nx::network::http::Request& request,
-        const nx::network::HostAddress& hostAddress);
+        const nx::network::HostAddress& hostAddress,
+        bool authHeaderTrusted);
 
     bool operator==(const AuthSession& other) const = default;
     QString toString() const;
