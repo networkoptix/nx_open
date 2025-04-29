@@ -41,8 +41,7 @@ Item
 
             Layout.alignment: Qt.AlignHCenter
 
-            //TODO: #esobolev add link (see VMS-51876)
-            onLinkActivated: HelpHandler.openHelpTopic(HelpTopic.ServerSettings_General)
+            onLinkActivated: HelpHandler.openHelpTopic(HelpTopic.RemoteAccess)
         }
     }
 
@@ -109,7 +108,7 @@ Item
                             toolTipText: qsTr("Connect %1 client application to localhost:%2")
                                 .arg(title.text).arg(portLabel.text)
 
-                            helpTopic: HelpTopic.ServerSettings_General //TODO: #esobolev add link (see VMS-51876)
+                            helpTopic: HelpTopic.RemoteAccess
                         }
                     }
 

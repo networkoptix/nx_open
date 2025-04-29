@@ -234,8 +234,7 @@ SecuritySettingsWidget::SecuritySettingsWidget(
     connect(ui->additionalConfigurationLabel, &AlertLabel::linkActivated, this,
         []
         {
-            //TODO: #esobolev add link (see VMS-51876)
-            HelpHandler::openHelpTopic(HelpTopic::Id::ServerSettings_General);
+            HelpHandler::openHelpTopic(HelpTopic::Id::RemoteAccess);
         });
 
     connect(ui->digestAlertLabel, &AlertLabel::linkActivated, this,

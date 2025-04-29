@@ -149,6 +149,7 @@ public:
         PtzManagement_Tour,
         PtzPresets,
         Rapid_Review,
+        RemoteAccess,
         SaveLayout,
         SecureConnection,
         ServerSettings_ArchiveRestoring,

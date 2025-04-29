@@ -290,6 +290,8 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "saving_and_restoring_ptz_posit.html";
         case Id::Rapid_Review:
             return "rapid_review_export.html";
+        case Id::RemoteAccess:
+            return "providing_remote_access.html";
         case Id::SaveLayout:
             return "saving-locking-layouts.html";
         case Id::SecureConnection:
