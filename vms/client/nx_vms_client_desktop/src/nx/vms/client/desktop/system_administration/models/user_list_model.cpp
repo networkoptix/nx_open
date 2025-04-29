@@ -74,6 +74,8 @@ bool userLessThan(const QModelIndex& left, const QModelIndex& right, int sortCol
                 return leftType < rightType;
             else if (leftUser->isOrg() != rightUser->isOrg())
                 return leftUser->isOrg();
+            else if (leftUser->isChannelPartner() != rightUser->isChannelPartner())
+                return leftUser->isChannelPartner();
 
             return userLessThan(left, right, UserListModel::LoginColumn);
         }
@@ -396,6 +398,19 @@ void UserListModel::Private::resetUsers(const QnUserResourceList& value)
             if (user->isLdap())
                 ++m_ldapUserCount;
         }
+
+        connect(user.get(), &QnUserResource::attributesChanged,
+            [this](const QnResourcePtr& resource)
+            {
+                auto user = resource.dynamicCast<QnUserResource>();
+                if (!NX_ASSERT(user))
+                    return;
+
+                if (!user->attributes().testFlag(nx::vms::api::UserAttribute::hidden))
+                    addUser(user);
+                else
+                    removeUser(user);
+            });
     }
 
     for (const auto& user: users)
@@ -626,6 +641,9 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                     if (user->isOrg())
                         return tr("Organization user");
 
+                    if (user->isChannelPartner())
+                        return tr("Channel Partner user");
+
                     switch (user->userType())
                     {
                         case nx::vms::api::UserType::local:
@@ -696,9 +714,11 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                     switch (user->userType())
                     {
                         case nx::vms::api::UserType::cloud:
-                            return user->orgGroupIds().empty()
-                                ? QString("20x20/Solid/user_cloud.svg")
-                                : QString("20x20/Solid/user_organization.svg");
+                            if (user->isChannelPartner())
+                                return QString("20x20/Solid/user_cp.svg");
+                            if (user->isOrg())
+                                return QString("20x20/Solid/user_organization.svg");
+                            return QString("20x20/Solid/user_cloud.svg");
 
                         case nx::vms::api::UserType::ldap:
                             return QString("20x20/Solid/user_ldap.svg");

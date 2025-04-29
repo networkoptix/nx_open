@@ -78,6 +78,7 @@ Item
     {
         return control.userType == UserSettingsGlobal.CloudUser
             || control.userType == UserSettingsGlobal.OrganizationUser
+            || control.userType == UserSettingsGlobal.ChannelPartnerUser
     }
 
     function validate()
@@ -131,6 +132,8 @@ Item
                             return "image://skin/64x64/Solid/user_cloud.svg"
                         case UserSettingsGlobal.OrganizationUser:
                             return "image://skin/64x64/Solid/user_organization.svg"
+                        case UserSettingsGlobal.ChannelPartnerUser:
+                            return "image://skin/64x64/Solid/user_cp.svg"
                         case UserSettingsGlobal.LdapUser:
                             return "image://skin/64x64/Solid/user_ldap.svg"
                     }

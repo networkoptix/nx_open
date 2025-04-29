@@ -65,8 +65,6 @@ MembersCache::Info MembersCache::infoFromContext(
 
     if (const auto user = systemContext->resourcePool()->getResourceById<QnUserResource>(id))
     {
-        NX_ASSERT(!nx::vms::common::isUserHidden(user));
-
         return {
             .name = user->getName(),
             .description = user->fullName(),

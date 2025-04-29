@@ -59,6 +59,7 @@ public:
         LdapUser,
         TemporaryUser,
         OrganizationUser,
+        ChannelPartnerUser,
         Users,
         VideoWall,
         VideoWallItem,

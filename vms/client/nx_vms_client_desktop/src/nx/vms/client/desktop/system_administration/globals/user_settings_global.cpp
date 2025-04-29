@@ -100,6 +100,9 @@ UserSettingsGlobal::UserType UserSettingsGlobal::getUserType(const QnUserResourc
     if (user->isOrg())
         return UserSettingsGlobal::OrganizationUser;
 
+    if (user->isChannelPartner())
+        return UserSettingsGlobal::ChannelPartnerUser;
+
     return getUserType(user->userType());
 }
 
@@ -110,8 +113,11 @@ UserSettingsGlobal::UserType UserSettingsGlobal::getUserType(const nx::vms::api:
 
 nx::vms::api::UserType UserSettingsGlobal::getApiUserType(const UserType& userType)
 {
-    if (userType == UserSettingsGlobal::OrganizationUser)
+    if (userType == UserSettingsGlobal::OrganizationUser
+        || userType == UserSettingsGlobal::ChannelPartnerUser)
+    {
         return nx::vms::api::UserType::cloud;
+    }
 
     return (nx::vms::api::UserType) userType;
 }

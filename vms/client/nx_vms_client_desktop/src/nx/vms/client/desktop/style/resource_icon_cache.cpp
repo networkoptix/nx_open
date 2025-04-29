@@ -226,6 +226,8 @@ NX_DECLARE_COLORIZED_ICON(kUserTempIcon, "20x20/Solid/user_temp.svg",\
     kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kUserOrganizationIcon, "20x20/Solid/user_organization.svg",\
     kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kUserChannelPartnerIcon, "20x20/Solid/user_cp.svg",\
+    kTreeThemeSubstitutions)
 
 NX_DECLARE_COLORIZED_ICON(kWebpagesIcon, "20x20/Solid/webpages.svg",\
     kTreeThemeSubstitutions)
@@ -406,6 +408,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(LocalUser, IconWithDescription(kUserIcon));
     m_cache.insert(TemporaryUser, IconWithDescription(kUserTempIcon));
     m_cache.insert(OrganizationUser, IconWithDescription(kUserOrganizationIcon));
+    m_cache.insert(ChannelPartnerUser, IconWithDescription(kUserChannelPartnerIcon));
 
     // Videowalls.
     m_cache.insert(VideoWall, IconWithDescription(kVideowallIcon));
@@ -634,6 +637,9 @@ QnResourceIconCache::Key QnResourceIconCache::userKey(const QnUserResourcePtr& u
 
     if (user->isOrg())
         return OrganizationUser;
+
+    if (user->isChannelPartner())
+        return ChannelPartnerUser;
 
     if (user->isCloud())
         return CloudUser;

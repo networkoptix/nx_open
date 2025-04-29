@@ -192,13 +192,14 @@ public:
     template <typename T>
     void gatherRequests(std::vector<api::JsonRpcRequest>& requests, size_t maxRequests);
 
-    template <typename T>
-    void runRequests(
-        const std::vector<api::JsonRpcRequest>& requests,
-        std::function<void(const T&)> onSuccess);
+    template<typename Result, typename Callback>
+    void runRequests(const std::vector<api::JsonRpcRequest>& requests, Callback&& onSuccess);
 
     template <typename T, typename Result>
     std::function<void(const T&)> request(std::function<void(const Result&)> callback);
+
+    template <typename T>
+    std::function<void(const T&)> request(std::function<void()> callback);
 
     template <typename T>
     const T* getRequestData() const;
@@ -301,10 +302,9 @@ void UserGroupRequestChain::Private::gatherRequests(
     }
 }
 
-template <typename Result>
+template<typename Result, typename Callback>
 void UserGroupRequestChain::Private::runRequests(
-    const std::vector<api::JsonRpcRequest>& requests,
-    std::function<void(const Result&)> onSuccess)
+    const std::vector<api::JsonRpcRequest>& requests, Callback&& onSuccess)
 {
     if (!q->connectedServerApi())
     {
@@ -342,13 +342,6 @@ void UserGroupRequestChain::Private::runRequests(
                         if (!response.result)
                             continue;
 
-                        Result resultData;
-                        if (!nx::reflect::json::deserialize(
-                            nx::reflect::json::DeserializationContext{*response.result},
-                            &resultData))
-                        {
-                            continue;
-                        }
 
                         const auto replyIdRollback = nx::utils::makeScopedRollback(replyId);
 
@@ -358,7 +351,22 @@ void UserGroupRequestChain::Private::runRequests(
                                 replyId = *idPtr;
                         }
 
-                        onSuccess(resultData);
+                        if constexpr (!std::is_void_v<Result>)
+                        {
+                            Result resultData;
+                            if (!nx::reflect::json::deserialize(
+                                nx::reflect::json::DeserializationContext{*response.result},
+                                &resultData))
+                            {
+                                continue;
+                            }
+
+                            onSuccess(resultData);
+                        }
+                        else
+                        {
+                            onSuccess();
+                        }
                     }
                 }
                 else
@@ -398,6 +406,25 @@ std::function<void(const T&)> UserGroupRequestChain::Private::request(
         };
 }
 
+template <typename T>
+std::function<void(const T&)> UserGroupRequestChain::Private::request(
+    std::function<void()> callback)
+{
+    return
+        [this, callback = std::move(callback)](const T& t)
+        {
+            std::vector<api::JsonRpcRequest> requests;
+
+            gatherRequests<T>(requests, kMaxRequestsPerBatch);
+
+            runRequests<void>(requests,
+                [callback = std::move(callback)]
+                {
+                    callback();
+                });
+        };
+}
+
 void UserGroupRequestChain::makeRequest()
 {
     NX_ASSERT(d->currentRequest == 0);
@@ -423,19 +450,27 @@ void UserGroupRequestChain::makeRequest()
                 }
             }),
 
-        d->request<UserGroupRequest::RemoveUser, nx::vms::api::UserModelV3>(
-            [this](const nx::vms::api::UserModelV3& user)
+        d->request<UserGroupRequest::RemoveUser>(
+            [this]()
             {
-                // Remove if not already removed.
-                if (auto resource = systemContext()->resourcePool()->getResourceById(user.id))
-                    systemContext()->resourcePool()->removeResource(resource);
+                if (const auto data = d->getRequestData<UserGroupRequest::RemoveUser>())
+                {
+                    // Remove if not already removed.
+                    const auto user =
+                        systemContext()->resourcePool()->getResourceById<QnUserResource>(data->id);
+                    if (user && !user->isChannelPartner())
+                        systemContext()->resourcePool()->removeResource(user);
+                }
             }),
 
-        d->request<UserGroupRequest::RemoveGroup, nx::vms::api::UserGroupModel>(
-            [this](const nx::vms::api::UserGroupModel& group)
+        d->request<UserGroupRequest::RemoveGroup>(
+            [this]()
             {
-                // Remove if not already removed.
-                userGroupManager()->remove(group.id);
+                if (const auto data = d->getRequestData<UserGroupRequest::RemoveGroup>())
+                {
+                    // Remove if not already removed.
+                    userGroupManager()->remove(data->id);
+                }
             }),
 
         d->request<UserGroupRequest::UpdateUser, nx::vms::api::UserModelV3>(

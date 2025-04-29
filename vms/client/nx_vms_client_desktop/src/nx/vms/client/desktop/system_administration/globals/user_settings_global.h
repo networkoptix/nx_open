@@ -52,10 +52,11 @@ public:
         CloudUser = (int) nx::vms::api::UserType::cloud,
         LdapUser = (int) nx::vms::api::UserType::ldap,
         TemporaryUser = (int) nx::vms::api::UserType::temporaryLocal,
-        // Organization users are regular cloud users from server's perspective, so API does not
-        // provide a separate type for such users. However, on client side it is necessary to
-        // distinguish between cloud user and organization user.
+        // Organization/ChannelPartner users are regular cloud users from server's perspective, so
+        // API does not provide a separate type for such users. However, on client side it is
+        // necessary to distinguish between cloud user and Organization/ChannelPartner user.
         OrganizationUser,
+        ChannelPartnerUser
     };
     Q_ENUM(UserType)
 

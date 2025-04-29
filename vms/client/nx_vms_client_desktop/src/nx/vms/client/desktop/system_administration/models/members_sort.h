@@ -37,10 +37,12 @@ static inline int userTypeSortOrder(UserSettingsGlobal::UserType userType)
             return 1;
         case UserSettingsGlobal::OrganizationUser:
             return 2;
-        case UserSettingsGlobal::CloudUser:
+        case UserSettingsGlobal::ChannelPartnerUser:
             return 3;
-        case UserSettingsGlobal::LdapUser:
+        case UserSettingsGlobal::CloudUser:
             return 4;
+        case UserSettingsGlobal::LdapUser:
+            return 5;
     }
 
     NX_ASSERT(false, "Invalid user type %1", userType);

@@ -707,6 +707,9 @@ QString UserSettingsDialog::validateEmail(const QString& email, bool forCloud)
                 if (!user->isCloud())
                     continue;
 
+                if (user->isChannelPartner())
+                    continue;
+
                 if (user->getEmail().toLower() != email)
                     continue;
 
@@ -1158,8 +1161,8 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     state.localeEditable = permissions.testFlag(Qn::WriteLocalePermission);
     state.passwordEditable = permissions.testFlag(Qn::WritePasswordPermission);
     state.userEnabled = user->isEnabled();
-    state.userEnabledEditable =
-        permissions.testFlag(Qn::WriteAccessRightsPermission) && !user->isOrg();
+    state.userEnabledEditable = permissions.testFlag(Qn::WriteAccessRightsPermission)
+        && !user->isOrg() && !user->isChannelPartner();
     state.allowInsecure = user->shouldDigestAuthBeUsed();
     state.allowInsecureEditable = permissions.testFlag(Qn::WriteDigestPermission);
 
@@ -1292,8 +1295,36 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
 
     d->isSaving = true;
 
+    // There is a feature to grant additional VMS access rights to a hidden CP user.
+    // To do that, since the CP user is hidden and therefore not editable, a new user with the same
+    // email as the CP user and with desired VMS access rights should be created.
+    // But then, as it's actually editing of an existing CP user, a PATCH request should be issued,
+    // in response to it the server shall patch the CP user and remove its `hidden` attribute.
+
+    // So here we check if the "new" user is actually an existing CP user, and switch to
+    // patching it in that case.
+    const auto channelPartnerList = resourcePool()->getResources<QnUserResource>(
+        [&userData](const QnUserResourcePtr& user)
+        {
+            return user->isChannelPartner() && user->getEmail().toLower() == userData.email;
+        });
+
+    const bool isPatchForChannelPartnerUser = !channelPartnerList.empty();
+
+    if (isPatchForChannelPartnerUser)
+    {
+        const auto currentUser = channelPartnerList.front();
+        const auto userState = createState(currentUser);
+        auto currentUserData = d->apiDataFromState(userState);
+        currentUserData.permissions = userData.permissions;
+        currentUserData.groupIds = userData.groupIds;
+        if (!userState.localeEditable)
+            currentUserData.locale = currentUser->rawLocaleValue();
+        userData = currentUserData;
+    }
+
     d->currentRequest = connectedServerApi()->saveUserAsync(
-        /*newUser*/ d->dialogType == CreateUser,
+        /*newUser*/ d->dialogType == CreateUser && !isPatchForChannelPartnerUser,
         userData,
         sessionTokenHelper,
         nx::utils::guarded(this,

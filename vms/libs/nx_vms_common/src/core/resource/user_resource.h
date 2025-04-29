@@ -97,7 +97,11 @@ public:
     bool isCloud() const { return userType() == nx::vms::api::UserType::cloud; }
     bool isLocal() const { return userType() == nx::vms::api::UserType::local; }
     bool isTemporary() const { return userType() == nx::vms::api::UserType::temporaryLocal; }
-    bool isOrg() const { return !orgGroupIds().empty(); }
+    bool isOrg() const { return attributes().testFlag(nx::vms::api::UserAttribute::organization); }
+    bool isChannelPartner() const
+    {
+        return attributes().testFlag(nx::vms::api::UserAttribute::channelPartner);
+    }
 
     // Returns time span by the end of which the temporary user be expired. If the user is
     // not temporary returns null.

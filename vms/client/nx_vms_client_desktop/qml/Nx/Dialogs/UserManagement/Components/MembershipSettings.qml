@@ -64,6 +64,8 @@ Item
                     return "image://skin/20x20/Solid/user_ldap.svg"
                 case UserSettingsGlobal.OrganizationUser:
                     return "image://skin/20x20/Solid/user_organization.svg"
+                case UserSettingsGlobal.ChannelPartnerUser:
+                    return "image://skin/20x20/Solid/user_cp.svg"
                 default:
                     return ""
             }

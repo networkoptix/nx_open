@@ -104,7 +104,11 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
             {
                 NX_DEBUG(this, "About to remove resource %1", resource);
                 auto systemContext = SystemContext::fromResource(resource);
-                if (NX_ASSERT(systemContext))
+                // Deleted visible CP users are not really deleted by the server but become hidden and stay
+                // in the resource pool.
+                const auto user = resource.dynamicCast<QnUserResource>();
+                const auto canRemoveResourceFromPool = !(user && user->isChannelPartner());
+                if (NX_ASSERT(systemContext) && canRemoveResourceFromPool)
                     systemContext->resourcePool()->removeResource(resource);
             }
 

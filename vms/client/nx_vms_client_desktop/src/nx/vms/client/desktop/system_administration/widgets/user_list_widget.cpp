@@ -910,6 +910,8 @@ void UserListWidget::Private::editSelected(BatchEditSettings initialSettings)
 
             handleSelectedUsersEdited(usersToEdit, settings);
         });
+
+    batchUserEditDialog->open();
 }
 
 void UserListWidget::Private::editUser(const QnUserResourcePtr& user, bool raiseDialog)
