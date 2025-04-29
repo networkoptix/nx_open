@@ -48,7 +48,8 @@ NodePtr makeNode(NodeType nodeType, QWeakPointer<Node> parent, const QString& te
 template<typename EntityType>
 std::vector<ScopedEntity<EntityType>> resolveEntities(
     const std::shared_ptr<AbstractState>& state,
-    const AnalyticsEntitiesTreeBuilder::UnresolvedEntities& unresolvedIds)
+    const AnalyticsEntitiesTreeBuilder::UnresolvedEntities& unresolvedIds,
+    std::set<nx::Uuid> allowedEngines)
 {
     std::vector<ScopedEntity<EntityType>> result;
     for (const auto& unresolved: unresolvedIds)
@@ -67,6 +68,7 @@ std::vector<ScopedEntity<EntityType>> resolveEntities(
         {
             if (const auto engine = scope->engine();
                 engine
+                && allowedEngines.contains(nx::Uuid(engine->id()))
                 && (unresolved.engineId.isNull()
                     || engine->id() == unresolved.engineId.toString(QUuid::WithBraces)))
             {
@@ -293,8 +295,24 @@ NodePtr AnalyticsEntitiesTreeBuilder::eventTypesForRulesPurposes(
     if (!taxonomyState)
         return NodePtr();
 
+    /**
+     * Event rule stores only eventTypeId, but not engineId. That lead parameter
+     * 'additionalUnresolvedEventTypes' has empty engineId sometimes. Filter out incompatible
+     * engines to prevent 'resolveEntities' selects events for non-compatible engines with same
+     * eventTypeId.
+     */
+    using namespace nx::utils;
+    std::set<nx::Uuid> allowed;
+    for (size_t i = 0; i < devices.size(); ++i)
+    {
+        if (i == 0)
+            allowed = devices[i]->compatibleAnalyticsEngines();
+        else
+            allowed = set_intersection(allowed, devices[i]->compatibleAnalyticsEngines());
+    }
+
     std::vector<ScopedEntity<AbstractEventType>> additionalScopedEventTypes =
-        resolveEntities<AbstractEventType>(taxonomyState, additionalUnresolvedEventTypes);
+        resolveEntities<AbstractEventType>(taxonomyState, additionalUnresolvedEventTypes, allowed);
 
     StateHelper stateHelper(taxonomyState);
 
