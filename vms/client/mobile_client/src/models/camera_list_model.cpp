@@ -215,7 +215,7 @@ int QnCameraListModel::rowByResource(QnResource* rawResource) const
         : QnResourcePtr{};
 
     const auto index = d->model->indexByResourceId(resource->getId());
-    return !index.isValid()
+    return index.isValid()
         ? mapFromSource(index).row()
         : -1;
 }

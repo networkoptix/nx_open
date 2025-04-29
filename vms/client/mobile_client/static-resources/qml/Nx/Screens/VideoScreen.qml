@@ -687,7 +687,7 @@ Page
         if (controller.mediaPlayer.liveMode)
         {
             cameraSwitchAnimation.thumbnail = camerasModelAccessor.getData(
-                camerasModel.rowByResourceId(resource.id), "thumbnail")
+                camerasModel.rowByResource(resource), "thumbnail")
         }
         else
         {
