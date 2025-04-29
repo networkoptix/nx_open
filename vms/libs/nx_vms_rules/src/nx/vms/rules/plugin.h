@@ -105,7 +105,7 @@ protected:
     }
 
 protected:
-    Engine* m_engine;
+    Engine* m_engine = nullptr;
 };
 
 } // namespace nx::vms::rules
