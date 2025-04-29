@@ -15,6 +15,7 @@ NX_VMS_API extern const QString kFlavor;
 NX_VMS_API extern const QString kOsInfo;
 NX_VMS_API extern const QString kPhysicalMemory;
 NX_VMS_API extern const QString kGuidConflictDetected;
+NX_VMS_API extern const QString kDeploymentCode;
 // TODO: #rvasilenko Can we change the property text safely?
 NX_VMS_API extern const QString kBrand;
 NX_VMS_API extern const QString kFullVersion;

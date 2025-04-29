@@ -17,6 +17,7 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
 #include <nx/branding.h>
 #include <nx/cloud/db/client/data/auth_data.h>
 #include <nx/fusion/serialization/json.h>
@@ -1848,6 +1849,17 @@ struct ModifyResourceParamAccess
     {
         if (hasSystemAccess(accessData))
             return Result();
+
+        if (param.name == ResourcePropertyKey::Server::kDeploymentCode)
+        {
+            const auto value = systemContext->resourcePropertyDictionary()->value(
+                param.resourceId, param.name);
+            if (value != param.value)
+            {
+                return Result(ErrorCode::forbidden,
+                    ServerApiErrors::tr("It is forbidden to change Server deployment code"));
+            }
+        }
 
         const bool isNewApiCompoundTransaction =
             param.checkResourceExists != nx::vms::api::CheckResourceExists::yes;
