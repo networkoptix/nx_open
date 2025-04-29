@@ -45,9 +45,11 @@ QString UiMessages::factorySystemErrorText()
     return core::shortErrorDescription(core::RemoteConnectionErrorCode::factoryServer);
 }
 
-QString UiMessages::getConnectionErrorText(core::RemoteConnectionErrorCode errorCode)
+QString UiMessages::getConnectionErrorText(
+    core::RemoteConnectionErrorCode errorCode,
+    const nx::vms::api::ModuleInformation& moduleInformation)
 {
-    return core::shortErrorDescription(errorCode);
+    return core::errorDescription(errorCode, moduleInformation, {}).shortText;
 }
 
 } // namespace nx::vms::client::mobile

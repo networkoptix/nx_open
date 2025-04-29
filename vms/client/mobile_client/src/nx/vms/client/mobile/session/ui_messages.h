@@ -4,6 +4,7 @@
 
 #include <QtCore/QObject>
 
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/network/remote_connection_fwd.h>
 
 namespace nx::vms::client::mobile {
@@ -20,7 +21,8 @@ public:
     Q_INVOKABLE static QString tooOldServerErrorText();
     Q_INVOKABLE static QString factorySystemErrorText();
     Q_INVOKABLE static QString getConnectionErrorText(
-        core::RemoteConnectionErrorCode errorCode);
+        core::RemoteConnectionErrorCode errorCode,
+        const nx::vms::api::ModuleInformation& moduleInformation = {});
 };
 
 } // namespace nx::vms::client::mobile

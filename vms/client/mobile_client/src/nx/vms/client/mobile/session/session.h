@@ -10,6 +10,7 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/software_version.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/network/remote_connection_error.h>
 #include <nx/vms/client/mobile/system_context_aware.h>
 
@@ -163,7 +164,9 @@ signals:
      * Signalizes when session is stopped due to error in initial connection process
      * or due to unavailability to restore.
      */
-    void finishedWithError(core::RemoteConnectionErrorCode errorStatus);
+    void finishedWithError(
+        core::RemoteConnectionErrorCode errorStatus,
+        const nx::vms::api::ModuleInformation& moduleInformation);
 
     /** Signalizes that session parameters changed. */
     void parametersChanged(

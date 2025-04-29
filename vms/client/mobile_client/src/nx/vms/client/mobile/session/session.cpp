@@ -41,6 +41,7 @@
 #include <utils/common/delayed.h>
 
 using RemoteConnectionErrorCode = nx::vms::client::core::RemoteConnectionErrorCode;
+using ModuleInformation = nx::vms::api::ModuleInformation;
 
 namespace nx::vms::client::mobile {
 
@@ -91,7 +92,7 @@ bool hasBearerToken(const nx::Uuid& systemId, const std::string& userName)
 }
 
 void saveLastUsedConnection(
-    const nx::vms::api::ModuleInformation& moduleInfo,
+    const ModuleInformation& moduleInfo,
     const nx::vms::client::core::LogonData& logonData)
 {
     using namespace nx::vms::client::core;
@@ -183,7 +184,9 @@ public:
     void connectToKnownServer(nx::vms::client::core::RemoteConnectionPtr connection);
     void disconnectFromServer();
     void handleSuccessfullReply();
-    void handleErrorReply(RemoteConnectionErrorCode errorCode);
+    void handleErrorReply(
+        RemoteConnectionErrorCode errorCode,
+        const ModuleInformation& moduleInformation = {});
 
     ConnectionState connectionState() const;
     void updateConnectionState();
@@ -204,7 +207,9 @@ public:
     const ConnectionData& connectionData() const;
     const nx::utils::SoftwareVersion& connectionVersion() const;
 
-    void handleFatalErrorOccured(RemoteConnectionErrorCode errorCode);
+    void handleFatalErrorOccurred(
+        RemoteConnectionErrorCode errorCode,
+        const ModuleInformation& moduleInformatio = {});
 
     void gatherInitialConnectionInfo(int remainingTriesCount = 20);
 
@@ -317,20 +322,23 @@ void Session::Private::connectToServer(bool ignoreCachedData)
         [this](nx::vms::client::core::RemoteConnectionFactory::ConnectionOrError result)
         {
             NX_DEBUG(this, "connectToServer(): callback: received reply");
-            const auto version = m_connectionProcess->context->moduleInformation.version;
+            const auto moduleInformation = m_connectionProcess
+                ? m_connectionProcess->context->moduleInformation
+                : ModuleInformation{};
+
             m_connectionProcess.reset();
 
             if (const auto error =
                 std::get_if<nx::vms::client::core::RemoteConnectionError>(&result))
             {
                 NX_WARNING(this, "Connection failed: %1", error->toString());
-                handleErrorReply(error->code);
+                handleErrorReply(error->code, moduleInformation);
                 return;
             }
             else
             {
                 auto connection = std::get<nx::vms::client::core::RemoteConnectionPtr>(result);
-                setConnectionVersion(version);
+                setConnectionVersion(moduleInformation.version);
                 NX_DEBUG(this, "connectToServer(): callback: end");
                 connectToKnownServer(connection);
             }
@@ -355,7 +363,7 @@ void Session::Private::connectToKnownServer(nx::vms::client::core::RemoteConnect
     NX_DEBUG(this, "connectToKnownServer(): start, server id is <%1>",
         connection->moduleInformation().id);
 
-    nx::vms::api::ModuleInformation moduleInformation = connection->moduleInformation();
+    ModuleInformation moduleInformation = connection->moduleInformation();
     core::appContext()->knownServerConnectionsWatcher()->saveConnection(moduleInformation.id,
         connection->address());
     updateSystemName(moduleInformation.systemName);
@@ -439,7 +447,9 @@ void Session::Private::handleSuccessfullReply()
     m_reconnectHelper.reset();
 }
 
-void Session::Private::handleErrorReply(RemoteConnectionErrorCode errorCode)
+void Session::Private::handleErrorReply(
+    RemoteConnectionErrorCode errorCode,
+    const ModuleInformation& moduleInformation)
 {
     NX_DEBUG(this, "handleErrorReply(): result is <%1>", (int)errorCode);
 
@@ -450,7 +460,7 @@ void Session::Private::handleErrorReply(RemoteConnectionErrorCode errorCode)
 
     if (isFatalError(errorCode))
     {
-        handleFatalErrorOccured(errorCode);
+        handleFatalErrorOccurred(errorCode, moduleInformation);
         return;
     }
 
@@ -484,7 +494,7 @@ void Session::Private::handleErrorReply(RemoteConnectionErrorCode errorCode)
     }
 
     NX_DEBUG(this, "handleErrorReply(): Can't connect initially");
-    handleFatalErrorOccured(errorCode);
+    handleFatalErrorOccurred(errorCode, moduleInformation);
 }
 
 Session::ConnectionState Session::Private::connectionState() const
@@ -613,21 +623,23 @@ const nx::utils::SoftwareVersion& Session::Private::connectionVersion() const
     return m_connectionVersion;
 }
 
-void Session::Private::handleFatalErrorOccured(RemoteConnectionErrorCode errorCode)
+void Session::Private::handleFatalErrorOccurred(
+    RemoteConnectionErrorCode errorCode,
+    const ModuleInformation& moduleInformation)
 {
-    NX_DEBUG(this, "handleFatalErrorOccured(): called");
+    NX_DEBUG(this, "handleFatalErrorOccurred(): called");
 
     // Make sure fatal error handler is called outside the constructor of the session to
     // allow all signals be connectected and handled.
     const auto fatalErrorHandler = nx::utils::guarded(this,
-        [this, errorCode]()
+        [this, errorCode, moduleInformation]()
         {
-            NX_DEBUG(this, "handleFatalErrorOccured(): delayed callback: called");
+            NX_DEBUG(this, "handleFatalErrorOccurred(): delayed callback: called");
             m_connectionTimer.invalidate();
             m_reconnectHelper.reset();
 
             callInitialConnectionCallbackOnce(errorCode);
-            emit q->finishedWithError(errorCode);
+            emit q->finishedWithError(errorCode, moduleInformation);
         });
 
     executeLater(fatalErrorHandler, this);
@@ -637,7 +649,7 @@ void Session::Private::gatherInitialConnectionInfo(int remainingTriesCount)
 {
     if (remainingTriesCount <= 0)
     {
-        handleFatalErrorOccured(RemoteConnectionErrorCode::genericNetworkError);
+        handleFatalErrorOccurred(RemoteConnectionErrorCode::genericNetworkError);
         return;
     }
 
@@ -731,7 +743,7 @@ void Session::Private::gatherInitialConnectionInfo(int remainingTriesCount)
 
                     if (password.trimmed().isEmpty())
                     {
-                        handleFatalErrorOccured(RemoteConnectionErrorCode::unauthorized);
+                        handleFatalErrorOccurred(RemoteConnectionErrorCode::unauthorized);
                         return;
                     }
 

@@ -10,6 +10,7 @@
 #include <nx/utils/software_version.h>
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/network/remote_connection_error.h>
 #include <nx/vms/client/mobile/window_context_aware.h>
 
@@ -234,8 +235,8 @@ signals:
      * or due to unavailability to restore.
      */
     void sessionFinishedWithError(
-        const QString& systemName,
-        nx::vms::client::core::RemoteConnectionErrorCode status);
+        nx::vms::client::core::RemoteConnectionErrorCode status,
+        const nx::vms::api::ModuleInformation& moduleInformation);
 
     /** Signalizes that session parameters changed. */
     void sessionParametersChanged(

@@ -79,7 +79,9 @@ QnMobileClientUiController::QnMobileClientUiController(
     using Session = nx::vms::client::mobile::Session;
     using RemoteConnectionErrorCode = nx::vms::client::core::RemoteConnectionErrorCode;
     const auto handleSessionError =
-        [this](const QString& systemName, RemoteConnectionErrorCode status)
+        [this](
+            RemoteConnectionErrorCode errorCode,
+            const nx::vms::api::ModuleInformation& moduleInformation)
         {
             NX_DEBUG(this, "initialize(): sessionFinishedWithError: current screen is <%1>",
                 currentScreen());
@@ -91,8 +93,10 @@ QnMobileClientUiController::QnMobileClientUiController(
             nx::vms::client::core::appContext()->coreSettings()->lastConnection = {};
 
             using UiMessages = nx::vms::client::mobile::UiMessages;
-            const auto errorText = UiMessages::getConnectionErrorText(status);
-            uiController()->showConnectionErrorMessage(systemName, errorText);
+            const auto errorText =
+                UiMessages::getConnectionErrorText(errorCode, moduleInformation);
+
+            uiController()->showConnectionErrorMessage(moduleInformation.systemName, errorText);
         };
     connect(sessionManager(), &SessionManager::sessionFinishedWithError, this, handleSessionError);
 }

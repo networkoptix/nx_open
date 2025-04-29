@@ -100,11 +100,13 @@ void SessionManager::Private::startSession(
         q, &SessionManager::sessionRestored);
 
     connect(session.get(), &Session::finishedWithError, this,
-        [this](core::RemoteConnectionErrorCode errorCode)
+        [this](
+            core::RemoteConnectionErrorCode errorCode,
+            const nx::vms::api::ModuleInformation& moduleInformation)
         {
             nextResetActionId = nx::Uuid::createUuid();
             const auto resetSessionAction =
-                [this, errorCode, actionId = nextResetActionId]()
+                [this, errorCode, actionId = nextResetActionId, moduleInformation]()
                 {
                     if (actionId != nextResetActionId)
                     {
@@ -112,9 +114,8 @@ void SessionManager::Private::startSession(
                         return;
                     }
 
-                    const auto systemName = session->systemName();
                     resetSession();
-                    emit q->sessionFinishedWithError(systemName, errorCode);
+                    emit q->sessionFinishedWithError(errorCode, moduleInformation);
                 };
 
             executeLater(resetSessionAction, this);
