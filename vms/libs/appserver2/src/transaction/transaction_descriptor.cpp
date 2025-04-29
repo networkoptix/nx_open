@@ -1789,9 +1789,8 @@ struct ModifyResourceParamAccess
 
     ModifyResourceParamAccess(bool isRemove): isRemove(isRemove) {}
 
-    Result checkAnalyticsIntegrationAccess(SystemContext* systemContext,
-        const nx::network::rest::UserAccessData&,
-        const nx::vms::api::ResourceParamWithRefData& param)
+    Result checkAnalyticsIntegrationAccess(
+        SystemContext* systemContext, const nx::vms::api::ResourceParamWithRefData& param)
     {
         auto newEngines = QJson::deserialized<std::set<nx::Uuid>>(param.value.toUtf8());
         nx::vms::license::saas::IntegrationServiceUsageHelper helper(systemContext);
@@ -1806,9 +1805,7 @@ struct ModifyResourceParamAccess
     }
 
     Result checkMetadataStorageAccess(
-        SystemContext* systemContext,
-        const nx::network::rest::UserAccessData& /*accessData*/,
-        const nx::vms::api::ResourceParamWithRefData& param)
+        SystemContext* systemContext, const nx::vms::api::ResourceParamWithRefData& param)
     {
         const auto resPool = systemContext->resourcePool();
         const auto metadataStorageId = nx::Uuid::fromStringSafe(param.value);
@@ -1855,6 +1852,9 @@ struct ModifyResourceParamAccess
         const bool isNewApiCompoundTransaction =
             param.checkResourceExists != nx::vms::api::CheckResourceExists::yes;
 
+        const auto resPool = systemContext->resourcePool();
+        auto subject = resPool->getResourceById<QnUserResource>(accessData.userId);
+
         if (!isRemove
             && isNewApiCompoundTransaction
             && hasSameProperty(systemContext, param))
@@ -1868,11 +1868,11 @@ struct ModifyResourceParamAccess
         {
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                 "User '%1' with %2 permissions is not allowed to modify Resource parameter '%3'."),
-                userNameOrId(accessData, systemContext), accessData.access, param.name));
+                userNameOrId(subject, accessData), accessData.access, param.name));
         }
 
         const auto accessManager = systemContext->resourceAccessManager();
-        const auto hasPowerUserPermissions = accessManager->hasPowerUserPermissions(accessData);
+        const auto hasPowerUserPermissions = accessManager->hasPowerUserPermissions(subject);
 
         // System properties are stored in resource unrelated places and should be handled
         // differently.
@@ -1885,32 +1885,40 @@ struct ModifyResourceParamAccess
             // System settings are stored as admin user properties. Admin user is an owner and can not
             // be modified by anyone else.
             // TODO: Remove this check once global system settings are not admin properties.
-            if (param.resourceId == QnUserResource::kAdminGuid)
+            if (systemContext->globalSettings()->isGlobalSetting(param))
                 return Result();
         }
-
-        const auto resPool = systemContext->resourcePool();
-        const auto target = resPool->getResourceById(param.resourceId);
 
         if (!isRemove)
         {
             Result result;
             if (param.name == ResourcePropertyKey::Server::kMetadataStorageIdKey)
-                result = checkMetadataStorageAccess(systemContext, accessData, param);
+                result = checkMetadataStorageAccess(systemContext, param);
             if (param.name == QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty)
-                result = checkAnalyticsIntegrationAccess(systemContext, accessData, param);
+                result = checkAnalyticsIntegrationAccess(systemContext, param);
             if (result.error != ErrorCode::ok)
                 return result;
         }
 
-        if (isNewApiCompoundTransaction && hasPowerUserPermissions)
-            return Result();
+        const auto target = resPool->getResourceById(param.resourceId);
+
+        if (isNewApiCompoundTransaction && hasPowerUserPermissions && !target)
+            return {};
+
+        if (auto user = target ? target.dynamicCast<QnUserResource>() : QnUserResourcePtr();
+            user && subject && (
+                (accessData.userId == param.resourceId)
+                || (subject->isAdministrator() && !user->isAdministrator())
+                || (hasPowerUserPermissions && !accessManager->hasPowerUserPermissions(user))))
+        {
+            return {};
+        }
 
         Qn::Permissions permissions = Qn::SavePermission;
         if (param.name == api::kUserFullName)
             permissions |= Qn::WriteFullNamePermission;
 
-        return accessManager->hasPermission(accessData, target, permissions)
+        return accessManager->hasPermission(subject, target, permissions)
             ? Result()
             : Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                 "User '%1' with %2 permissions is not allowed to modify Resource parameter of %3."),
