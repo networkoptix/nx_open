@@ -206,6 +206,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<int>* cloudPollingIntervalAdaptor = nullptr;
 
     AdaptorList allAdaptors;
+    std::unordered_set<QString> settingNames;
 
     mutable nx::Mutex mutex;
     QnUserResourcePtr admin;
@@ -250,6 +251,9 @@ SystemSettings::SystemSettings(SystemContext* context, QObject* parent):
         &SystemSettings::at_resourcePool_resourceRemoved, Qt::DirectConnection);
 
     initialize();
+    d->settingNames.reserve(d->allAdaptors.size());
+    for (const auto& s: d->allAdaptors)
+        d->settingNames.emplace(s->key());
 }
 
 SystemSettings::~SystemSettings()
@@ -2297,7 +2301,7 @@ QList<const QnAbstractResourcePropertyAdaptor*> SystemSettings::allDefaultSettin
 
 bool SystemSettings::isGlobalSetting(const nx::vms::api::ResourceParamWithRefData& param)
 {
-    return QnUserResource::kAdminGuid == param.resourceId;
+    return QnUserResource::kAdminGuid == param.resourceId && d->settingNames.contains(param.name);
 }
 
 nx::vms::api::MetadataStorageChangePolicy SystemSettings::metadataStorageChangePolicy() const
