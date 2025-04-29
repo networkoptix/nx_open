@@ -22,7 +22,7 @@ namespace nx::cloud::oauth2::client {
  * Client for Oauth2 Service API.
  * For details see Oauth2 service documentation
  */
-class AbstractOauth2Client
+class NX_OAUTH2_CLIENT_API AbstractOauth2Client
 {
 public:
     virtual ~AbstractOauth2Client() = default;
@@ -99,7 +99,7 @@ public:
             handler) = 0;
 };
 
-class Oauth2Client:
+class NX_OAUTH2_CLIENT_API Oauth2Client:
     public AbstractOauth2Client,
     public nx::network::http::GenericApiClient<db::client::ResultCodeDescriptor>
 {
@@ -181,7 +181,8 @@ public:
 using Oauth2ClientFactoryFunc = std::unique_ptr<AbstractOauth2Client>(
     const nx::utils::Url&, const std::optional<nx::network::http::Credentials>&);
 
-class Oauth2ClientFactory: public nx::utils::BasicFactory<Oauth2ClientFactoryFunc>
+class NX_OAUTH2_CLIENT_API Oauth2ClientFactory:
+    public nx::utils::BasicFactory<Oauth2ClientFactoryFunc>
 {
     using base_type = nx::utils::BasicFactory<Oauth2ClientFactoryFunc>;
 

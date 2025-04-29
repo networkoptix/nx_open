@@ -29,6 +29,7 @@
             <Component><File Name="nx_vms_update.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_vms_utils.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_zip.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="oauth2_client.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="quazip.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="udt.dll" KeyPath="yes" DiskId="2"/></Component>
         </ComponentGroup>

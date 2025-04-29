@@ -6,9 +6,9 @@
 
 namespace nx::cloud::oauth2::client::test {
 
-// The class added to provide a convenient access to legacy cdb handlers moved to Oauth2 without
+// The class added to provide convenient access to legacy cdb handlers moved to Oauth2 without
 // adding them to public client
-class Oauth2ClientWithLegacyHandlers: public Oauth2Client
+class NX_OAUTH2_CLIENT_API Oauth2ClientWithLegacyHandlers: public Oauth2Client
 {
     using base_type = nx::network::http::GenericApiClient<db::client::ResultCodeDescriptor>;
 

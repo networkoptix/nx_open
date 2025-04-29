@@ -10,7 +10,7 @@
 
 namespace nx::cloud::oauth2::client::test {
 
-class Oauth2ClientMockManager
+class NX_OAUTH2_CLIENT_API Oauth2ClientMockManager
 {
 public:
     using RequestPath = std::pair<std::string /* Path */, std::string_view /* Method */>;
@@ -52,8 +52,7 @@ struct Oauth2MockResult
     std::string response;
 };
 
-
-class Oauth2ClientMock: public AbstractOauth2Client
+class NX_OAUTH2_CLIENT_API Oauth2ClientMock: public AbstractOauth2Client
 {
 public:
     Oauth2ClientMock(Oauth2ClientMockManager& manager);
