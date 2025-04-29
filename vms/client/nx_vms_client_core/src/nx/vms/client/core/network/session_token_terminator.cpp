@@ -4,8 +4,6 @@
 
 #include <chrono>
 
-#include <QtCore/QTimer>
-
 #include <api/server_rest_connection.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
@@ -19,7 +17,6 @@ namespace nx::vms::client::core {
 
 namespace {
 
-constexpr auto kCleanupInterval = 10s;
 constexpr auto kTerminateTimeout = 3s;
 constexpr auto kTerminateRefreshStep = 100ms;
 
@@ -28,22 +25,12 @@ constexpr auto kTerminateRefreshStep = 100ms;
 struct SessionTokenTerminator::Private
 {
     std::map<rest::Handle, RemoteConnectionPtr> runningRequests;
-    std::vector<RemoteConnectionPtr> completedRequests;
 };
 
 SessionTokenTerminator::SessionTokenTerminator(QObject* parent):
     QObject(parent),
     d(new Private())
 {
-    auto cleanupTimer = new QTimer(this);
-    cleanupTimer->setSingleShot(false);
-    cleanupTimer->setInterval(kCleanupInterval);
-    cleanupTimer->callOnTimeout(
-        [this]
-        {
-            d->completedRequests.clear();
-        });
-    cleanupTimer->start();
 }
 
 SessionTokenTerminator::~SessionTokenTerminator()
@@ -93,11 +80,7 @@ void SessionTokenTerminator::terminateToken(RemoteConnectionPtr connection)
 
             auto it = d->runningRequests.find(handle);
             if (it != d->runningRequests.cend())
-            {
-                // Make sure connection is not destroyed while we are in the callback.
-                d->completedRequests.push_back(it->second);
                 d->runningRequests.erase(it);
-            }
         });
 
     NX_DEBUG(this, "Terminate authentication token");
