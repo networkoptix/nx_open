@@ -84,8 +84,8 @@ public:
         return
             [operation, getter1 = value(firstI), getter2 = value(secondI)]
             {
-                const Value v1 = getter1();
-                const Value v2 = getter2();
+                Value v1 = getter1();
+                Value v2 = getter2();
                 if (v1.isNull() || v2.isNull())
                     throw NullValueError("At least one argument is missing");
 
