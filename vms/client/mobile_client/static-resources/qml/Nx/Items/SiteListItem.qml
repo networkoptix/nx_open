@@ -18,6 +18,8 @@ Item
     property bool cloudSystem: false
     property bool factorySystem: false
     property bool isSaas: false
+    property bool saasSuspended: false
+    property bool saasShutDown: false
     property bool needDigestCloudPassword: false
     property bool running: false
     property string ownerDescription
@@ -214,6 +216,12 @@ Item
 
                     color:
                     {
+                        if (control.saasSuspended)
+                            return ColorTheme.colors.yellow_core
+
+                        if (control.saasShutDown)
+                            return ColorTheme.colors.red_core
+
                         if (control.factorySystem)
                             return ColorTheme.colors.green_attention
 
@@ -243,6 +251,12 @@ Item
 
                         if (!reachable)
                             return qsTr("UNREACHABLE")
+
+                        if (control.saasSuspended)
+                            return qsTr("SUSPENDED")
+
+                        if (control.saasShutDown)
+                            return qsTr("SHUTDOWN")
 
                         return ""
                     }
