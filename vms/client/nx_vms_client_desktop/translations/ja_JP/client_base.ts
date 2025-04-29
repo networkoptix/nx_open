@@ -11119,7 +11119,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message numerus="yes">
       <source>I trust these servers</source>
       <translation>
-        <numerusform>このサーバーを信用する</numerusform>
+        <numerusform>これらのサーバーを信用する</numerusform>
       </translation>
     </message>
   </context>
