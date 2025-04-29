@@ -1559,10 +1559,6 @@
       <translation type="unfinished">Thumbnails auto-update.</translation>
     </message>
     <message>
-      <source>Max scene items (0 means default).</source>
-      <translation type="unfinished">Max scene items (0 means default).</translation>
-    </message>
-    <message>
       <source>Send plain-text emails.</source>
       <translation>发送纯文本电子邮件.</translation>
     </message>
@@ -1857,6 +1853,10 @@
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
       <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>最大场景项目（0表示默认）</translation>
     </message>
   </context>
 </TS>

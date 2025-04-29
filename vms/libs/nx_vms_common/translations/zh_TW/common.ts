@@ -1559,10 +1559,6 @@
       <translation>縮圖自動更新.</translation>
     </message>
     <message>
-      <source>Max scene items (0 means default).</source>
-      <translation>最大場景項目 (預設為0).</translation>
-    </message>
-    <message>
       <source>Send plain-text emails.</source>
       <translation>發送純文字電子郵件.</translation>
     </message>
@@ -1857,6 +1853,10 @@
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
       <translation>SMTP 設定。僅有進階使用者可以看到這些設定。</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>最大場景項目 (預設為0)</translation>
     </message>
   </context>
 </TS>

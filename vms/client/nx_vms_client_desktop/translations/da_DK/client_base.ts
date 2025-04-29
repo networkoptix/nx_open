@@ -2065,6 +2065,10 @@ Licensnøgle: %2</translation>
       <source>Download complete!</source>
       <translation type="unfinished">Download complete!</translation>
     </message>
+    <message>
+      <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
+      <translation type="unfinished">Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</translation>
+    </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>
@@ -6790,12 +6794,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Site shut down</translation>
     </message>
     <message>
-      <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the Site should be in active state. %1</translation>
+      <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
+      <translation type="unfinished">To perform backup to a cloud storage, the site should be in active state. %1</translation>
     </message>
     <message>
-      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
+      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
     </message>
   </context>
   <context>

@@ -2044,6 +2044,10 @@ License Key: %2</source>
       <source>Download complete!</source>
       <translation>下載已完成！</translation>
     </message>
+    <message>
+      <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
+      <translation type="unfinished">Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</translation>
+    </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>
@@ -6679,12 +6683,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>站點關閉</translation>
     </message>
     <message>
-      <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
-      <translation>系統必須處於活躍狀態才能執行至雲端備份。 %1</translation>
+      <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
+      <translation type="unfinished">To perform backup to a cloud storage, the site should be in active state. %1</translation>
     </message>
     <message>
-      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation>雲端備份仍在繼續，但站點目前已暫停。它必須處於活躍狀態才能修改裝置的 &quot;備份內容&quot; 和 &quot;品質&quot; 設定，或啟用雲端備份。您也可以停用雲端備份。 %1</translation>
+      <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
+      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
     </message>
   </context>
   <context>

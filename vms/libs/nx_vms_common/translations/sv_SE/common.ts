@@ -1629,10 +1629,6 @@
       <translation>Miniatyrer automatisk uppdatering.</translation>
     </message>
     <message>
-      <source>Max scene items (0 means default).</source>
-      <translation>Max scenobjekt (0 betyder standard).</translation>
-    </message>
-    <message>
       <source>Send plain-text emails.</source>
       <translation>Skicka e-post med vanlig text.</translation>
     </message>
@@ -1927,6 +1923,10 @@
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
       <translation>SMTP-inställningar. Dessa inställningar är endast synliga för avancerade användare.</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>Max scenobjekt (0 betyder standard)</translation>
     </message>
   </context>
 </TS>

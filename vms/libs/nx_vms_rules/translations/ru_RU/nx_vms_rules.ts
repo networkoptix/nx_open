@@ -460,12 +460,12 @@
     <message>
       <source>Device was disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Device was disconnected at %1</translation>
+      <translation>Устройство было отключено от %1</translation>
     </message>
     <message>
       <source>Camera was disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Camera was disconnected at %1</translation>
+      <translation>Устройство было отключено от %1</translation>
     </message>
     <message>
       <source>I/O Module was disconnected at %1</source>

@@ -1769,10 +1769,6 @@
       <translation type="unfinished">Thumbnails auto-update.</translation>
     </message>
     <message>
-      <source>Max scene items (0 means default).</source>
-      <translation>Максимальна кількість сюжетів (0 - за замовчуванням).</translation>
-    </message>
-    <message>
       <source>Send plain-text emails.</source>
       <translation>Відправка листів простим текстом.</translation>
     </message>
@@ -2067,6 +2063,10 @@
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
       <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>Максимальна кількість сюжетів (0 - за замовчуванням)</translation>
     </message>
   </context>
 </TS>

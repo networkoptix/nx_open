@@ -1769,10 +1769,6 @@
       <translation>Automatyczna aktualizacja miniatur.</translation>
     </message>
     <message>
-      <source>Max scene items (0 means default).</source>
-      <translation>Max liczba elementów sceny (0 oznacza domyślną).</translation>
-    </message>
-    <message>
       <source>Send plain-text emails.</source>
       <translation>Wysyłaj e-maile czystym tekstem.</translation>
     </message>
@@ -2067,6 +2063,10 @@
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
       <translation>Ustawienia SMTP. Te ustawienia są widoczne tylko dla użytkowników zaawansowanych.</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>Max liczba elementów sceny (0 oznacza domyślną)</translation>
     </message>
   </context>
 </TS>

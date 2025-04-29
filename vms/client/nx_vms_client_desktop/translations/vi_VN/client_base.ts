@@ -2044,6 +2044,10 @@ Khóa giấy phép: %2</translation>
       <source>Download complete!</source>
       <translation>Tải xuống hoàn tất!</translation>
     </message>
+    <message>
+      <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
+      <translation type="unfinished">Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</translation>
+    </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>
@@ -6679,12 +6683,12 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Chi nhánh đã đóng</translation>
     </message>
     <message>
-      <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
-      <translation>Để thực hiện sao lưu vào bộ nhớ đám mây, Chi nhánh phải ở trạng thái hoạt động. %1</translation>
+      <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
+      <translation type="unfinished">To perform backup to a cloud storage, the site should be in active state. %1</translation>
     </message>
     <message>
-      <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation>Sao lưu đám mây vẫn tiếp tục, nhưng Chi nhánh hiện đang bị tạm dừng. Phải kích hoạt để sửa đổi cài đặt &quot;Cái gì cần sao lưu&quot; và &quot;Chất lượng&quot; cho thiết bị hoặc để bật sao lưu đám mây. Bạn cũng có thể tắt nó. %1</translation>
+      <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
+      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
     </message>
   </context>
   <context>

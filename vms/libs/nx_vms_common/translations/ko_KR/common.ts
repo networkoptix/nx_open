@@ -1559,10 +1559,6 @@
       <translation>썸네일 자동 업데이트.</translation>
     </message>
     <message>
-      <source>Max scene items (0 means default).</source>
-      <translation>최대 장면수(기본값 0).</translation>
-    </message>
-    <message>
       <source>Send plain-text emails.</source>
       <translation>일반 텍스트로 이메일 보내기.</translation>
     </message>
@@ -1857,6 +1853,10 @@
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
       <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>최대 장면수(기본값 0)</translation>
     </message>
   </context>
 </TS>

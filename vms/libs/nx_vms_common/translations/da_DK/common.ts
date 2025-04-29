@@ -1629,10 +1629,6 @@
       <translation type="unfinished">Thumbnails auto-update.</translation>
     </message>
     <message>
-      <source>Max scene items (0 means default).</source>
-      <translation>Maks. sceneelementer (0 betyder standard).</translation>
-    </message>
-    <message>
       <source>Send plain-text emails.</source>
       <translation>Send almindelig tekst e-mails.</translation>
     </message>
@@ -1927,6 +1923,10 @@
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
       <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>Maks. sceneelementer (0 betyder standard)</translation>
     </message>
   </context>
 </TS>

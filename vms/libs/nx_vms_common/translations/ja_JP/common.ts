@@ -1559,10 +1559,6 @@
       <translation>サムネイルの自動更新を有効にする。</translation>
     </message>
     <message>
-      <source>Max scene items (0 means default).</source>
-      <translation>シーン内最大アイテム数 (0でデフォルト値を使用)。</translation>
-    </message>
-    <message>
       <source>Send plain-text emails.</source>
       <translation>プレーンテキストのメールを送信する。</translation>
     </message>
@@ -1857,6 +1853,10 @@
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
       <translation>SMTP設定。これらの設定はパワーユーザーにのみ表示されます。</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>シーン内最大アイテム数 (0でデフォルト値を使用)</translation>
     </message>
   </context>
 </TS>

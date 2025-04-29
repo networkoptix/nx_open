@@ -1559,10 +1559,6 @@
       <translation type="unfinished">Thumbnails auto-update.</translation>
     </message>
     <message>
-      <source>Max scene items (0 means default).</source>
-      <translation>รายการฉากมากที่สุด (0 หมายถึงค่าเริ่มต้น).</translation>
-    </message>
-    <message>
       <source>Send plain-text emails.</source>
       <translation>ส่งอีเมลแบบธรรมดา.</translation>
     </message>
@@ -1857,6 +1853,10 @@
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
       <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>รายการฉากมากที่สุด (0 หมายถึงค่าเริ่มต้น)</translation>
     </message>
   </context>
 </TS>

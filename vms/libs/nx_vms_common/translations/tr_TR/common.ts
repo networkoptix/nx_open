@@ -1629,10 +1629,6 @@
       <translation>Küçük resimler otomatik güncelleme.</translation>
     </message>
     <message>
-      <source>Max scene items (0 means default).</source>
-      <translation>Maksimum sahne öğeleri (0 varsayılan değerdir).</translation>
-    </message>
-    <message>
       <source>Send plain-text emails.</source>
       <translation>Düz metin e-postaları gönder.</translation>
     </message>
@@ -1927,6 +1923,10 @@
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
       <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>Maksimum sahne öğeleri (0 varsayılan değerdir)</translation>
     </message>
   </context>
 </TS>

@@ -1629,10 +1629,6 @@
       <translation>Automatisk oppdatering av miniatyrbilder.</translation>
     </message>
     <message>
-      <source>Max scene items (0 means default).</source>
-      <translation>Maks sceneelementer (0 betyr standard).</translation>
-    </message>
-    <message>
       <source>Send plain-text emails.</source>
       <translation>Send e-post med vanlig tekst.</translation>
     </message>
@@ -1927,6 +1923,10 @@
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
       <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>Maks sceneelementer (0 betyr standard)</translation>
     </message>
   </context>
 </TS>

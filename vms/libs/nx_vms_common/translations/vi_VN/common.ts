@@ -1559,10 +1559,6 @@
       <translation>Tự động cập nhật hình thu nhỏ.</translation>
     </message>
     <message>
-      <source>Max scene items (0 means default).</source>
-      <translation>Số lượng mục cảnh tối đa (0 nghĩa là mặc định).</translation>
-    </message>
-    <message>
       <source>Send plain-text emails.</source>
       <translation>Gửi email văn bản thuần túy.</translation>
     </message>
@@ -1857,6 +1853,10 @@
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
       <translation>Cài đặt SMTP. Những cài đặt này chỉ hiển thị cho Người dùng cấp cao.</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>Số lượng mục cảnh tối đa (0 nghĩa là mặc định)</translation>
     </message>
   </context>
 </TS>

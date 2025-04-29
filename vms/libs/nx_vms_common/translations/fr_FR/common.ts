@@ -1629,10 +1629,6 @@
       <translation>Mise à jour automatique des vignettes.</translation>
     </message>
     <message>
-      <source>Max scene items (0 means default).</source>
-      <translation>Max éléments de scène (0 signifie par défaut).</translation>
-    </message>
-    <message>
       <source>Send plain-text emails.</source>
       <translation>Envoyer des courriels en texte brut.</translation>
     </message>
@@ -1927,6 +1923,10 @@
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
       <translation>Paramètres SMTP. Ces paramètres sont accessibles uniquement aux utilisateurs expérimentés.</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>Max éléments de scène (0 signifie par défaut)</translation>
     </message>
   </context>
 </TS>

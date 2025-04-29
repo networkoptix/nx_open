@@ -1559,10 +1559,6 @@
       <translation>Pembaruan otomatis thumbnail.</translation>
     </message>
     <message>
-      <source>Max scene items (0 means default).</source>
-      <translation>Item scene maksimal (0 berarti default).</translation>
-    </message>
-    <message>
       <source>Send plain-text emails.</source>
       <translation>Kirim email teks biasa.</translation>
     </message>
@@ -1857,6 +1853,10 @@
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
       <translation>Pengaturan SMTP. Pengaturan ini hanya dapat dilihat oleh Power Users.</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>Item scene maksimal (0 berarti default)</translation>
     </message>
   </context>
 </TS>

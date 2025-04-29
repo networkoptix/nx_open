@@ -1629,10 +1629,6 @@
       <translation type="unfinished">Thumbnails auto-update.</translation>
     </message>
     <message>
-      <source>Max scene items (0 means default).</source>
-      <translation>Max kohteiden määrä (0 tarkoittaa oletus).</translation>
-    </message>
-    <message>
       <source>Send plain-text emails.</source>
       <translation>Lähettää tekstimuotoisia sähköposteja.</translation>
     </message>
@@ -1927,6 +1923,10 @@
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
       <translation>SMTP-asetukset. Nämä asetukset näkyvät vain tehokäyttäjille.</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>Max kohteiden määrä (0 tarkoittaa oletus)</translation>
     </message>
   </context>
 </TS>
