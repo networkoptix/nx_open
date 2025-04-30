@@ -3268,8 +3268,11 @@ int QnVirtualCameraResource::backupMegapixels(nx::vms::api::CameraBackupQuality 
         [&mediaStreams](StreamIndex stream)
         {
             const int streamIndex = (int) stream;
-            if (streamIndex < mediaStreams.size())
-                return mediaStreams[streamIndex].getResolution();
+            for(const auto& mediaStream: mediaStreams)
+            {
+                if (mediaStream.encoderIndex == streamIndex)
+                    return mediaStream.getResolution();
+            }
             return QSize();
         };
 
