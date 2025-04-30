@@ -73,9 +73,26 @@ file(GLOB_RECURSE QML_FILES CONFIGURE_DEPENDS static-resources/qml/*.qml static-
 
 set(resources)
 
+set(customization_icons_dir ${CMAKE_CURRENT_BINARY_DIR}/mobile_customization_icons)
+
+nx_copy(${customization_dir}/icons/all/logo.png
+    DESTINATION "${customization_icons_dir}/skin")
+
+set(mobile_client_external_resources_file
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mobile_client_external.dat)
+nx_add_external_resources_target(mobile_client_external_resources
+    TARGET_FILE
+        ${mobile_client_external_resources_file}
+    QRC_FILE
+        mobile_client_external
+    FILES
+        ${customization_icons_dir}
+)
+
 set(common_assets
     ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/bytedance_iconpark.dat
     ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/client_core_external.dat
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mobile_client_external.dat
 )
 
 file(GLOB_RECURSE font_files ${CMAKE_BINARY_DIR}/bin/fonts/*.ttf)

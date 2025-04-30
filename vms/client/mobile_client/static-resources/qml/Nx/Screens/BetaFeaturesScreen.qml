@@ -6,96 +6,74 @@ import Nx.Controls
 import Nx.Settings
 import Nx.Ui
 
-Page
+BaseSettingsScreen
 {
     id: betaFeaturesScreen
 
     objectName: "betaFeaturesScreen"
 
     title: qsTr("Beta Features")
-    onLeftButtonClicked: Workflow.popCurrentScreen()
 
-    Flickable
+    LabeledSwitch
     {
-        id: flickable
+        id: useDownloadVideoFeature
 
-        anchors.fill: parent
+        width: parent.width
 
-        contentWidth: width
-        contentHeight: content.height
-
-        Column
+        text: qsTr("Video Download")
+        extraText: qsTr("Ability to download video")
+        checkState: appContext.settings.useVideoDownloadFeature
+            ? Qt.Checked
+            : Qt.Unchecked
+        onCheckStateChanged:
         {
-            id: content
+            appContext.settings.useVideoDownloadFeature =
+                checkState !== Qt.Unchecked
+        }
+    }
 
-            width: flickable.width
-            spacing: 4
+    LabeledSwitch
+    {
+        id: useHolePunchingFeature
 
-            LabeledSwitch
-            {
-                id: useDownloadVideoFeature
+        width: parent.width
 
-                width: parent.width
+        text: qsTr("Speedup connections")
+        extraText: qsTr("Improve network performance")
+        checkState: appContext.settings.enableHolePunching
+            ? Qt.Checked
+            : Qt.Unchecked
+        onCheckStateChanged:
+        {
+            const value = checkState !== Qt.Unchecked
+            if (value === appContext.settings.enableHolePunching)
+                return
 
-                icon: lp("/images/download_setting.svg")
-                text: qsTr("Video Download")
-                extraText: qsTr("Ability to download video")
-                checkState: appContext.settings.useVideoDownloadFeature
-                    ? Qt.Checked
-                    : Qt.Unchecked
-                onCheckStateChanged:
-                {
-                    appContext.settings.useVideoDownloadFeature =
-                        checkState !== Qt.Unchecked
-                }
-            }
+            appContext.settings.enableHolePunching = value
+            d.openRestartDialog()
+        }
+    }
 
-            LabeledSwitch
-            {
-                id: useHolePunchingFeature
+    LabeledSwitch
+    {
+        id: useMaxHardwareDecodersCount
 
-                width: parent.width
+        width: parent.width
 
-                icon: lp("/images/speedup_connections.svg")
-                text: qsTr("Speedup connections")
-                extraText: qsTr("Improve network performance")
-                checkState: appContext.settings.enableHolePunching
-                    ? Qt.Checked
-                    : Qt.Unchecked
-                onCheckStateChanged:
-                {
-                    const value = checkState !== Qt.Unchecked
-                    if (value === appContext.settings.enableHolePunching)
-                        return
+        text: qsTr("Maximum decoders count")
+        extraText:
+            qsTr("Improve video decoding perfomance using maximum hardware decoders count")
+        checkState: appContext.settings.useMaxHardwareDecodersCount
+            ? Qt.Checked
+            : Qt.Unchecked
+        onCheckStateChanged:
+        {
+            const value = checkState !== Qt.Unchecked
+            if (value === appContext.settings.useMaxHardwareDecodersCount)
+                return
 
-                    appContext.settings.enableHolePunching = value
-                    d.openRestartDialog()
-                }
-            }
-
-            LabeledSwitch
-            {
-                id: useMaxHardwareDecodersCount
-
-                width: parent.width
-
-                icon: lp("/images/max_hardware_decoders_count.svg")
-                text: qsTr("Maximum decoders count")
-                extraText:
-                    qsTr("Improve video decoding perfomance using maximum hardware decoders count")
-                checkState: appContext.settings.useMaxHardwareDecodersCount
-                    ? Qt.Checked
-                    : Qt.Unchecked
-                onCheckStateChanged:
-                {
-                    const value = checkState !== Qt.Unchecked
-                    if (value === appContext.settings.useMaxHardwareDecodersCount)
-                        return
-
-                    appContext.settings.useMaxHardwareDecodersCount = value
-                    d.openRestartDialog()
-                }
-            }
+            appContext.settings.useMaxHardwareDecodersCount = value
+            d.openRestartDialog()
         }
     }
 

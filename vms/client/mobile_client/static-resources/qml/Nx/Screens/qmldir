@@ -12,3 +12,7 @@ BetaFeaturesScreen 1.0 BetaFeaturesScreen.qml
 VideoDummy 1.0 VideoDummy.qml
 EventSearchMenuScreen 1.0 EventSearchMenuScreen.qml
 OrganizationScreen 1.0 OrganizationScreen.qml
+PerformanceSettingsScreen 1.0 PerformanceSettingsScreen.qml
+InterfaceSettingsScreen 1.0 InterfaceSettingsScreen.qml
+BaseSettingsScreen 1.0 BaseSettingsScreen.qml
+AppInfoScreen 1.0 AppInfoScreen.qml

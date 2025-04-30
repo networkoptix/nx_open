@@ -12,6 +12,7 @@ class QnMobileAppInfo : public QObject
 public:
     explicit QnMobileAppInfo(QObject *parent = nullptr);
 
+    Q_INVOKABLE QString companyName() const;
     Q_INVOKABLE QString productName() const;
     Q_INVOKABLE QString version() const;
     Q_INVOKABLE QString cloudName() const;

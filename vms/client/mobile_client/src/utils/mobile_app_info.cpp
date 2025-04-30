@@ -14,6 +14,11 @@ QnMobileAppInfo::QnMobileAppInfo(QObject* parent)
 
 }
 
+QString QnMobileAppInfo::companyName() const
+{
+    return nx::branding::company();
+}
+
 QString QnMobileAppInfo::productName() const
 {
     return nx::branding::vmsName();

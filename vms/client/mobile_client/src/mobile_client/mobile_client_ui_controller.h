@@ -35,16 +35,22 @@ public:
         CustomConnectionScreen,
         ResourcesScreen,
         VideoScreen,
-        SettingsScreen,
-        PushExpertSettingsScreen,
         LoginToCloudScreen,
         DigestLoginToCloudScreen,
         CameraSettingsScreen,
-        BetaFeaturesScreen,
         DetailsScreen,
         EventSearchMenuScreen,
         EventSearchScreen,
-        MenuScreen
+        MenuScreen,
+
+        // Application settings related screens.
+        SettingsScreen,
+        SecuritySettingsScreen,
+        InterfaceSettingsScreen,
+        PerformanceSettingsScreen,
+        BetaFeaturesScreen,
+        PushExpertSettingsScreen,
+        AppInfoScreen
     };
 
     Q_ENUM(Screen)

@@ -191,7 +191,7 @@ ApplicationContext::ApplicationContext(
         api::PeerType::mobileClient,
         makeFeatures(),
         qnSettings->customCloudHost(),
-        /*customExternalResourceFile*/ {},
+        /*customExternalResourceFile*/ "mobile_client_external.dat",
         parent),
     d(new Private{
         .q = this,

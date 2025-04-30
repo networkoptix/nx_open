@@ -20,7 +20,6 @@ Control
     property bool interactive: true
     property bool manualStateChange: false
     property Item customArea: null
-    property Item customTextAreaItem: null
     property var customAreaClickHandler
 
     property alias extraText: extraTextItem.text
@@ -37,7 +36,6 @@ Control
 
     implicitWidth: textItem.implicitWidth + indicatorHolder.width + spacing
         + leftPadding + rightPadding
-        + d.customTextAreaWidth
     implicitHeight: topPadding + bottomPadding + centralArea.height
 
     background: Rectangle
@@ -111,11 +109,12 @@ Control
                 {
                     id: textItem
 
-                    width: Math.min(textItem.implicitWidth, parent.width - d.customTextAreaWidth)
-
                     color: ColorTheme.windowText
-                    font.pixelSize: 16
+                    font.pixelSize: 18
                     wrapMode: Text.Text.Wrap
+                    lineHeight: extraTextItem.visible ? font.pixelSize : 32
+                    lineHeightMode: Text.FixedHeight
+                    verticalAlignment: Text.AlignVCenter
                 }
             }
 
@@ -210,12 +209,7 @@ Control
 
         readonly property int kNormalContentHeight: 48
         readonly property int kContentWithExtraTextHeight: 68
-        readonly property int customTextAreaWidth: customTextAreaItem
-            ? customTextAreaItem.width + mainTextRow.spacing
-            : 0
     }
 
     onCustomAreaChanged: customArea.parent = customAreaHolder
-
-    onCustomTextAreaItemChanged: customTextAreaItem.parent = mainTextRow
 }

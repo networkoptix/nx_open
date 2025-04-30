@@ -295,3 +295,18 @@ function openStandardDialog(title, message = "", buttonsModel = ["OK"], disableA
         }
     )
 }
+
+function openInterfaceSettingsScreen()
+{
+    stackView.pushScreen(Qt.resolvedUrl("../Screens/InterfaceSettingsScreen.qml"))
+}
+
+function openPerformanceSettingsScreen()
+{
+    stackView.pushScreen(Qt.resolvedUrl("../Screens/PerformanceSettingsScreen.qml"))
+}
+
+function openAppInfoScreen()
+{
+    stackView.pushScreen(Qt.resolvedUrl("../Screens/AppInfoScreen.qml"))
+}
