@@ -36,7 +36,7 @@ protected:
     virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived() override;
 
 private:
-    nx::sdk::Uuid trackIdByTrackIndex(int trackIndex);
+    nx::sdk::Uuid trackIdByTrackType(const std::string& typeId);
 
     nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket> generateObjectMetadataPacket(
         int64_t frameTimestampUs);
@@ -47,7 +47,7 @@ private:
     int m_frameIndex = 0;
     int m_timestampShiftMs = 0;
     bool m_sendAttributes = true;
-    std::vector<nx::sdk::Uuid> m_trackIds;
+    std::map<std::string, nx::sdk::Uuid> m_trackIds;
     std::set<std::string> m_objectTypeIdsToGenerate;
 };
 

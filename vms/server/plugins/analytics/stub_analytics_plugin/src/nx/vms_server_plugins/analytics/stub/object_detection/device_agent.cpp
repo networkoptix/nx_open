@@ -86,7 +86,7 @@ Ptr<IMetadataPacket> DeviceAgent::generateObjectMetadataPacket(int64_t frameTime
     for (int i = 0; i < (int) objects.size(); ++i)
     {
         objects[i]->setBoundingBox(generateBoundingBox(m_frameIndex, i, objects.size()));
-        objects[i]->setTrackId(trackIdByTrackIndex(i));
+        objects[i]->setTrackId(trackIdByTrackType(objects[i]->typeId()));
 
         metadataPacket->addItem(objects[i]);
     }
@@ -144,12 +144,12 @@ nx::sdk::Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived
     return nullptr;
 }
 
-Uuid DeviceAgent::trackIdByTrackIndex(int trackIndex)
+Uuid DeviceAgent::trackIdByTrackType(const std::string& typeId)
 {
-    while (trackIndex >= m_trackIds.size())
-        m_trackIds.push_back(UuidHelper::randomUuid());
-
-    return m_trackIds[trackIndex];
+    auto& value = m_trackIds[typeId];
+    if (value.isNull())
+        value = UuidHelper::randomUuid();
+    return value;
 }
 
 } // namespace object_detection
