@@ -1245,6 +1245,11 @@ void QnStorageConfigWidget::atStorageViewClicked(const QModelIndex& index)
         {
             nx::vms::license::saas::CloudStorageServiceUsageHelper helper(
                 nx::vms::client::desktop::SystemContext::fromResource(m_server));
+            const auto storageResource =
+                resourcePool()->getResourceById<QnStorageResource>(record.id);
+            const auto cloudStorageUsedForWriting = storageResource
+                && storageResource->isCloudStorage() && storageResource->isUsedForWriting();
+
             if (helper.isOverflow())
             {
                 const auto errorText = tr("Cloud storage cannot be enabled.");
@@ -1257,7 +1262,7 @@ void QnStorageConfigWidget::atStorageViewClicked(const QModelIndex& index)
                 record.isUsed = false;
                 m_model->updateStorage(record);
             }
-            else if (system()->saasServiceManager()->saasSuspended())
+            else if (system()->saasServiceManager()->saasSuspended() && !cloudStorageUsedForWriting)
             {
                 record.isUsed = false;
                 m_model->updateStorage(record);

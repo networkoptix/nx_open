@@ -563,7 +563,7 @@ QVariant BackupSettingsDecoratorModel::data(const QModelIndex& index, int role) 
             break;
 
         case Qn::ItemMouseCursorRole:
-            if (column == SwitchColumn && !backupEnabled
+            if (column == SwitchColumn && !camera->isBackupEnabled()
                 && (insufficientServices || d->isCloudStorageInSuspendedState()))
             {
                 return QVariant::fromValue<int>(Qt::ForbiddenCursor);
@@ -748,14 +748,14 @@ void BackupSettingsDecoratorModel::setBackupEnabled(
             if (!NX_ASSERT(isBackupSupported(camera)))
                 continue;
 
-            if (enabled
+            if (enabled && !camera->isBackupEnabled()
                 && d->isCloudBackupStorage
                 && d->availableCloudStorageServices(camera) < 1)
             {
                 continue;
             }
 
-            if (enabled && d->isCloudStorageInSuspendedState())
+            if (enabled && !camera->isBackupEnabled() && d->isCloudStorageInSuspendedState())
                 continue;
 
             if (d->backupEnabled(camera) != enabled)
