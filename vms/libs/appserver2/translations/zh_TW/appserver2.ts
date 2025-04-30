@@ -98,11 +98,6 @@
       <translation>因為登入名稱重複，使用者 &apos;%1&apos; 將不會被儲存。</translation>
     </message>
     <message>
-      <source>User full name is controlled by the %1.</source>
-      <comment>%1 is the short Cloud name</comment>
-      <translation>使用者全名由 %1所控制。</translation>
-    </message>
-    <message>
       <source>Creating an Administrator user is not allowed.</source>
       <translation>不允許建立管理員使用者。</translation>
     </message>
@@ -339,6 +334,10 @@
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to create new User Groups.</source>
       <translation>使用者&apos;%1(%2)&apos; 無權新增使用者群組。</translation>
+    </message>
+    <message>
+      <source>It is forbidden to change Server deployment code</source>
+      <translation type="unfinished">It is forbidden to change Server deployment code</translation>
     </message>
   </context>
 </TS>

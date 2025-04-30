@@ -2046,7 +2046,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
-      <translation type="unfinished">Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</translation>
+      <translation>注意: ハードウェアビデオデコーディングが有効になっている場合、画像補正は利用できません。</translation>
     </message>
   </context>
   <context>
@@ -6685,11 +6685,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the site should be in active state. %1</translation>
+      <translation>クラウドストレージへのバックアップを実行するには、サイトがアクティブな状態である必要があります。 %1</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>クラウドバックアップは継続されますが、サイトは現在サスペンドされています。&quot;バックアップ対象&quot; および &quot;ストリーム品質&quot; 設定の変更や、クラウドバックアップの有効化を行う場合は、サイトがアクティブ状態である必要があります。無効化することは可能です。%1</translation>
     </message>
   </context>
   <context>

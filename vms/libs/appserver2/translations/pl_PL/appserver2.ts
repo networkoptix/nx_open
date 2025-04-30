@@ -98,11 +98,6 @@
       <translation>Użytkownik &apos;%1&apos; nie zostanie zapisany z powodu duplikacji logowania.</translation>
     </message>
     <message>
-      <source>User full name is controlled by the %1.</source>
-      <comment>%1 is the short Cloud name</comment>
-      <translation>Pełna nazwa użytkownika jest kontrolowana przez %1.</translation>
-    </message>
-    <message>
       <source>Creating an Administrator user is not allowed.</source>
       <translation>Utworzenie użytkownika Administrator jest niedozwolone.</translation>
     </message>
@@ -339,6 +334,10 @@
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to create new User Groups.</source>
       <translation>Użytkownik &apos;%1(%2)&apos; nie ma uprawnień do tworzenia nowych grup użytkowników.</translation>
+    </message>
+    <message>
+      <source>It is forbidden to change Server deployment code</source>
+      <translation type="unfinished">It is forbidden to change Server deployment code</translation>
     </message>
   </context>
 </TS>

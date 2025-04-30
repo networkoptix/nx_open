@@ -98,11 +98,6 @@
       <translation>Användare &apos;%1&apos; kommer inte att sparas på grund av dubbletten av inloggningen.</translation>
     </message>
     <message>
-      <source>User full name is controlled by the %1.</source>
-      <comment>%1 is the short Cloud name</comment>
-      <translation>Användarens fullständiga namn styrs av %1.</translation>
-    </message>
-    <message>
       <source>Creating an Administrator user is not allowed.</source>
       <translation>Det är inte tillåtet att skapa en administratörsanvändare.</translation>
     </message>
@@ -339,6 +334,10 @@
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to create new User Groups.</source>
       <translation>Användare &apos;%1(%2)&apos; är inte tillåten att skapa nya användargrupper.</translation>
+    </message>
+    <message>
+      <source>It is forbidden to change Server deployment code</source>
+      <translation type="unfinished">It is forbidden to change Server deployment code</translation>
     </message>
   </context>
 </TS>

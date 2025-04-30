@@ -2046,7 +2046,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
-      <translation type="unfinished">Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</translation>
+      <translation>Catatan: Peningkatan Gambar tidak tersedia saat Dekoding Video Perangkat Keras dihidupkan.</translation>
     </message>
   </context>
   <context>
@@ -6684,11 +6684,11 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the site should be in active state. %1</translation>
+      <translation>Untuk melakukan backup ke penyimpanan cloud, Site harus dalam keadaan aktif. %1</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>Backup cloud terus berlanjut, tetapi Site saat ini ditangguhkan. Backup Cloud harus aktif untuk mengubah pengaturan &quot;Apa yang akan dibackup&quot; dan &quot;Kualitas&quot; untuk perangkat, atau untuk mengaktifkan backup cloud. Anda juga dapat menonaktifkannya. %1</translation>
     </message>
   </context>
   <context>
@@ -12099,7 +12099,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>In progress...</source>
-      <translation type="unfinished">In progress...</translation>
+      <translation>Dalam proses...</translation>
     </message>
   </context>
   <context>

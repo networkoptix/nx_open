@@ -2067,7 +2067,7 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
-      <translation type="unfinished">Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</translation>
+      <translation>Obs! Bildförbättring är inte tillgängligt när hårdvaruavkodning av video är aktiverat.</translation>
     </message>
   </context>
   <context>
@@ -6795,11 +6795,11 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the site should be in active state. %1</translation>
+      <translation>För att säkerhetskopiera till molnlagring måste webbplatsen vara i aktivt tillstånd. %1</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>Säkerhetskopiering till molnet fortsätter, men webbplatsen är för närvarande avstängd. Det måste vara aktivt för att ändra &quot;Vad att säkerhetskopiera&quot; och &quot;Kvalitet&quot; inställningar för en enhet, eller för att aktivera molnsäkerhetskopiering. Du kan också inaktivera det. %1</translation>
     </message>
   </context>
   <context>

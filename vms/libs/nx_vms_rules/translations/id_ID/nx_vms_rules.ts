@@ -439,17 +439,17 @@
     <message>
       <source>Device was disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Device was disconnected at %1</translation>
+      <translation>Perangkat tidak terkoneksi pada %1</translation>
     </message>
     <message>
       <source>Camera was disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Camera was disconnected at %1</translation>
+      <translation>Kamera tidak terkoneksi pada %1</translation>
     </message>
     <message>
       <source>I/O Module was disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">I/O Module was disconnected at %1</translation>
+      <translation>Modul I/O tidak terkoneksi pada %1</translation>
     </message>
   </context>
   <context>
