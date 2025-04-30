@@ -177,10 +177,10 @@ function openVideoScreen(resource, screenshotUrl, xHint, yHint, timestamp, camer
             "initialScreenshot": screenshotUrl ?? "",
             "targetTimestamp": targetTimestamp
         }
+    if (camerasModel)
+        properties["camerasModel"] = camerasModel
     stackView.setScaleTransitionHint(xHint, yHint)
-    const screen = stackView.pushScreen(Qt.resolvedUrl("../Screens/VideoScreen.qml"), properties)
-    if (screen && camerasModel)
-        screen.camerasModel = camerasModel
+    stackView.pushScreen(Qt.resolvedUrl("../Screens/VideoScreen.qml"), properties)
 }
 
 function openSettingsScreen()

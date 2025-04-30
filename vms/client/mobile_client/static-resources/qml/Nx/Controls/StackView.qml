@@ -11,10 +11,9 @@ StackView
 
     property int transitionDuration: 200
 
-
     function pushScreen(url: url, properties: variant) : QtObject
     {
-        push(url, properties, StackView.Immediate)
+        return push(url, properties, StackView.Immediate)
     }
 
     onBusyChanged:
