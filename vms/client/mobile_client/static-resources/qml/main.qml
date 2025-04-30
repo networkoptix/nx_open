@@ -17,11 +17,6 @@ Controls.ApplicationWindow
 {
     id: mainWindow
 
-    readonly property var customMargins: windowContext.ui.measurements.customMargins
-    leftPadding: customMargins.left
-    rightPadding: customMargins.right
-    bottomPadding: customMargins.bottom
-
     readonly property bool hasNavigationBar:
         !!windowContext.ui.windowHelpers.navigationBarSize()
 
@@ -37,12 +32,8 @@ Controls.ApplicationWindow
             / (Qt.platform.os !== "ios" ? Screen.devicePixelRatio : 1)
         : 0
 
-    readonly property real availableWidth: width - rightPadding - leftPadding
-    readonly property real availableHeight: height - bottomPadding - topLevelWarning.height
 
     readonly property bool isPortraitLayout: width <= height
-
-    contentItem.x: leftPadding
 
     visible: true
     color: ColorTheme.colors.windowBackground ?? "transparent"
@@ -52,6 +43,30 @@ Controls.ApplicationWindow
         return "qrc://" + path
     }
 
+    // Workaround object for Qt bug. On iOS main window padding (which should be equal to
+    // SafeArea.margins) are not updated, but SafeArea works as expected.
+    QtObject
+    {
+        id: windowParams
+
+        readonly property int topMargin: mainWindow.SafeArea.margins.top
+        readonly property int bottomMargin: mainWindow.SafeArea.margins.bottom
+        readonly property int leftMargin: mainWindow.SafeArea.margins.left
+        readonly property int rightMargin: mainWindow.SafeArea.margins.right
+
+        readonly property real availableWidth: width - windowParams.leftMargin - windowParams.rightMargin
+        readonly property real availableHeight: height
+            - topLevelWarning.height
+            - windowParams.topMargin
+            - windowParams.bottomMargin
+    }
+
+    // For consistency explicitly set all paddings for the main window to our windowParams values.
+    Binding { target: mainWindow; property: "topPadding"; value: windowParams.topMargin }
+    Binding { target: mainWindow; property: "bottomPadding"; value: windowParams.bottomMargin }
+    Binding { target: mainWindow; property: "leftPadding"; value: windowParams.leftMargin }
+    Binding { target: mainWindow; property: "rightPadding"; value: windowParams.rightMargin }
+
     StackView
     {
         id: stackView
@@ -59,8 +74,8 @@ Controls.ApplicationWindow
         objectName: "mainStackView"
 
         y: topLevelWarning.height
-        width: mainWindow.availableWidth
-        height: mainWindow.availableHeight - keyboardHeight - screenNavigationBar.heightOffset
+        width: windowParams.availableWidth
+        height: windowParams.availableHeight - keyboardHeight - screenNavigationBar.heightOffset
 
         property real keyboardHeight: mainWindow.keyboardHeight
         Behavior on keyboardHeight
@@ -80,8 +95,6 @@ Controls.ApplicationWindow
             mainWindow.color = currentItem.hasOwnProperty("backgroundColor")
                 ? currentItem.backgroundColor
                 : ColorTheme.colors.windowBackground
-
-            windowContext.ui.measurements.updateCustomMargins()
         }
         onWidthChanged: autoScrollDelayTimer.restart()
         onHeightChanged: autoScrollDelayTimer.restart()
@@ -97,86 +110,15 @@ Controls.ApplicationWindow
         stackView: stackView
     }
 
-    Loader { id: testLoader }
-
     WarningPanel
     {
         id: topLevelWarning
 
-        y: windowContext.ui.measurements.deviceStatusBarHeight
-        x: -customMargins.left
-        width: mainWindow.availableWidth
-            + customMargins.left
-            + customMargins.right
+        x: -windowParams.leftMargin
+        width: parent.width
         text: d.warningText
         opened: text.length
     }
-
-    onSceneGraphInitialized: windowContext.ui.measurements.updateCustomMargins()
-
-    Screen.onPrimaryOrientationChanged: androidBarPositionWorkaround.updateBarPosition()
-
-    Timer
-    {
-        // We need periodically update paddings due to Qt does not emit signal
-        // screenOrientationChanged when we change it from normal to inverted.
-
-        // TODO: #ynikitenkov #future Check if we can get rid of navigation bar-related
-        // properties and just use custom margins.
-        // TODO: Update: use custom margins from insets when we drop android until 7.0. Take into
-        // consderation modern android cutout modes.
-
-        id: androidBarPositionWorkaround
-
-        interval: 200
-        repeat: true
-        running: Qt.platform.os == "android"
-
-        property int lastBarSize: -1
-        property int lastBarType: windowContext.ui.windowHelpers.navigationBarType()
-
-        onTriggered: tryUpdateBarPosition()
-
-        function tryUpdateBarPosition()
-        {
-            if (Qt.platform.os != "android")
-                return
-
-            var barSize = windowContext.ui.windowHelpers.navigationBarSize()
-            var barType = windowContext.ui.windowHelpers.navigationBarType()
-
-            if (barSize == lastBarSize && lastBarType == barType)
-                return
-
-            lastBarSize = barSize
-            lastBarType = barType
-
-            updateBarPosition()
-        }
-
-        function updateBarPosition()
-        {
-            if (Qt.platform.os != "android")
-                return
-
-            // TODO: #future #ynikitenkov Check if we can get rid of check for tablet device type.
-            if (!windowContext.ui.windowHelpers.isRunOnPhone()
-                || lastBarType == NavigationBar.BottomNavigationBar)
-            {
-                rightPadding = customMargins.right
-                leftPadding = customMargins.left
-                bottomPadding = customMargins.bottom + lastBarSize
-            }
-            else
-            {
-                var leftSideBar = lastBarType == NavigationBar.LeftNavigationBar
-                leftPadding = leftCustomMargin + (leftSideBar ? lastBarSize : 0)
-                rightPadding = rightCustomMargin + (leftSideBar ? 0 : lastBarSize)
-                bottomPadding = bottomCustomMargin
-            }
-        }
-    }
-
 
     onActiveFocusItemChanged:
     {
@@ -269,9 +211,6 @@ Controls.ApplicationWindow
     Component.onCompleted:
     {
         setupColorTheme()
-
-        windowContext.ui.measurements.updateCustomMargins()
-        androidBarPositionWorkaround.tryUpdateBarPosition()
 
         let startupHandler =
             function()

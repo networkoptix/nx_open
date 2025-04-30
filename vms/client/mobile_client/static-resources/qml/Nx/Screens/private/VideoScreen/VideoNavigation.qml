@@ -328,7 +328,7 @@ Item
 
                 anchors.bottom: parent.bottom
 
-                x: mainWindow.hasNavigationBar ? 0 : -mainWindow.leftPadding
+                x: mainWindow.hasNavigationBar ? 0 : -windowParams.leftMargin
                 width: mainWindow.hasNavigationBar ? parent.width : mainWindow.width
 
                 height: 96

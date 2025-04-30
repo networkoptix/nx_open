@@ -39,13 +39,11 @@ int WindowHelpers::navigationBarSize() const
 void WindowHelpers::enterFullscreen() const
 {
     hideSystemUi();
-    emit uiController()->measurements()->deviceStatusBarHeightChanged();
 }
 
 void WindowHelpers::exitFullscreen() const
 {
     showSystemUi();
-    emit uiController()->measurements()->deviceStatusBarHeightChanged();
 }
 
 void WindowHelpers::copyToClipboard(const QString &text)

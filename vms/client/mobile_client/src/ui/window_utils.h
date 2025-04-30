@@ -13,14 +13,11 @@ void prepareWindow();
 void hideSystemUi();
 void showSystemUi();
 
-int statusBarHeight();
 bool isPhone();
 
 void setKeepScreenOn(bool keepScreenOn);
 
 void setScreenOrientation(Qt::ScreenOrientation orientation);
-
-QMargins getCustomMargins();
 
 void makeShortVibration();
 

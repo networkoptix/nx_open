@@ -9,7 +9,6 @@ ToolBar
     id: toolBar
 
     property bool useGradientBackground: false
-    property real statusBarHeight: windowContext.ui.measurements.deviceStatusBarHeight
 
     signal clicked()
 
@@ -25,10 +24,9 @@ ToolBar
         sourceComponent: useGradientBackground
             ? gradientBackground
             : standardBackground
-        y: -toolBar.statusBarHeight
-        x: -mainWindow.leftPadding
-        width: mainWindow.width + mainWindow.leftPadding
-        height: parent.height + toolBar.statusBarHeight
+        x: -windowParams.leftMargin
+        width: mainWindow.width + windowParams.leftMargin
+        height: parent.height
     }
 
     Component
@@ -38,14 +36,6 @@ ToolBar
         Rectangle
         {
             color: ColorTheme.colors.windowBackground
-
-            Rectangle
-            {
-                width: parent.width
-                height: statusBarHeight
-                anchors.bottom: parent.top
-                color: parent.color
-            }
 
             Rectangle
             {

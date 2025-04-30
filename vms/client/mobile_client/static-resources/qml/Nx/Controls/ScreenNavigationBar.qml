@@ -27,7 +27,7 @@ Rectangle
              === windowContext.depricatedUiController.currentScreen
 
     x: 0
-    y: mainWindow.availableHeight - height
+    y: windowParams.availableHeight - height
     width: parent.width
     height:d.kBarSize
 

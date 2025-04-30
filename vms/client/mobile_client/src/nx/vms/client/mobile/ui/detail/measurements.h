@@ -20,14 +20,6 @@ class Measurements: public QObject
     Q_OBJECT
     using base_type = QObject;
 
-    Q_PROPERTY(QMargins customMargins
-        READ customMargins
-        NOTIFY customMarginsChanged)
-
-    Q_PROPERTY(int deviceStatusBarHeight
-        READ deviceStatusBarHeight
-        NOTIFY deviceStatusBarHeightChanged)
-
     /**
      * Workaround for the QTBUG-72472 - view is not changing size if there is Android WebView on the
      * scene. Also keyboard height is always 0 in this situation in Qt.
@@ -41,18 +33,11 @@ public:
     Measurements(QQuickWindow* window, QObject* parent = nullptr);
     virtual ~Measurements() override;
 
-    QMargins customMargins();
-    Q_INVOKABLE void updateCustomMargins();
-
-    int deviceStatusBarHeight() const;
-
     int androidKeyboardHeight() const;
 
     Q_INVOKABLE int getMaxTextureSize() const;
 
 signals:
-    void customMarginsChanged();
-    void deviceStatusBarHeightChanged();
     void androidKeyboardHeightChanged();
 
 private:

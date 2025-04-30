@@ -17,7 +17,7 @@ Popup
     implicitWidth: mainWindow.width
     implicitHeight: Math.min(
         flickable.contentHeight + control.topPadding + control.bottomPadding,
-        mainWindow.availableHeight - d.keyboardHeight)
+        windowParams.availableHeight - d.keyboardHeight)
 
     modal: true
     padding: 20

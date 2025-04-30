@@ -70,24 +70,6 @@ void setScreenOrientation(Qt::ScreenOrientation orientation)
     }
 }
 
-QMargins getCustomMargins()
-{
-    const auto windowId = getMainWindow()->winId();
-    const auto nativeView = reinterpret_cast<UIView*>(windowId);
-    if (!nativeView)
-        return QMargins();
-
-    if (@available(iOS 11, *))
-    {
-        auto safeInsets = [nativeView safeAreaInsets];
-        return QMargins(safeInsets.left, safeInsets.top, safeInsets.right, safeInsets.bottom);
-    }
-    else
-    {
-        return QMargins();
-    }
-}
-
 bool isPhone() {
     return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone;
 }

@@ -55,9 +55,8 @@ Page
         id: content
         enabled: !appContext.pushManager.userUpdateInProgress
 
-        y: windowContext.ui.measurements.deviceStatusBarHeight
         width: parent.width
-        height: parent.height - toolBar.statusBarHeight
+        height: parent.height
 
         Column
         {

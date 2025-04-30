@@ -265,7 +265,7 @@ Page
         id: video
 
         y: toolBar.visible ? -header.height : 0
-        x: -mainWindow.leftPadding
+        x: -windowParams.leftMargin
         width: mainWindow.width
         height: mainWindow.height
 
@@ -358,7 +358,7 @@ Page
             height: boundingSize.height
 
             y: (mainWindow.height - height) / 3
-            x: (mainWindow.width - width) / 2 - mainWindow.leftPadding
+            x: (mainWindow.width - width) / 2 - windowParams.leftMargin
             visible: false//status == Image.Ready && !dummyLoader.visible && source != ""
             opacity: d.cameraUiOpacity
         }
@@ -377,7 +377,7 @@ Page
             return navigator.buttonsPanelHeight + barSize
         }
 
-        x: -mainWindow.leftPadding
+        x: -windowParams.leftMargin
         width: mainWindow.width
         height: 96 + customHeight
         anchors.bottom: parent.bottom
@@ -400,8 +400,8 @@ Page
     {
         id: content
 
-        width: mainWindow.availableWidth
-        height: mainWindow.availableHeight - header.height
+        width: windowParams.availableWidth
+        height: windowParams.availableHeight - header.height
         y: header.visible ? 0 : header.height
 
         Loader
@@ -424,7 +424,7 @@ Page
             readonly property bool needOffset: item && item.onlyCompactTitleIsVisible
 
             y: needOffset ? -header.height : 0
-            x: -mainWindow.leftPadding
+            x: -windowParams.leftMargin
             width: mainWindow.width
             height: mainWindow.height - (needOffset ? 0 : header.height)
 
@@ -438,8 +438,8 @@ Page
                     readonly property bool onlyCompactTitleIsVisible:
                         compact && title != "" && description == "" && buttonText == ""
 
-                    rightPadding: 8 + mainWindow.rightPadding
-                    leftPadding: 8 + mainWindow.leftPadding
+                    rightPadding: 8 + windowParams.rightMargin
+                    leftPadding: 8 + windowParams.leftMargin
                     compact: videoScreen.height < 540
                     state: controller.dummyState
 
@@ -500,7 +500,7 @@ Page
         {
             id: moveOnTapOverlay
 
-            x: -mainWindow.leftPadding
+            x: -windowParams.leftMargin
             width: mainWindow.width
             height: mainWindow.height
             parent: videoScreen
@@ -600,7 +600,7 @@ Page
         visible: mainWindow.hasNavigationBar
         width: mainWindow.width - parent.width
         height: video.height
-        x: mainWindow.leftPadding ? -mainWindow.leftPadding : parent.width
+        x: windowParams.leftMargin ? -windowParams.leftMargin : parent.width
         anchors.top: video.top
         opacity: Math.min(navigator.opacity, d.cameraUiOpacity)
     }

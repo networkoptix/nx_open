@@ -107,7 +107,7 @@ Page
         y: !mainWindow.isPortraitLayout && header.visible
            ? -header.height
            : 0
-        x: -mainWindow.leftPadding
+        x: -windowParams.leftMargin
 
         width:
         {
@@ -339,7 +339,7 @@ Page
             return d.portrait ? 1 : 0.8
         }
 
-        x: mainWindow.hasNavigationBar ? 0 : -mainWindow.leftPadding
+        x: mainWindow.hasNavigationBar ? 0 : -windowParams.leftMargin
         y: parent.height - height + navigationHeight
         width: mainWindow.hasNavigationBar ? parent.width : mainWindow.width
         height: 76 + navigationHeight
@@ -444,7 +444,7 @@ Page
 
         visible: mainWindow.hasNavigationBar
 
-        x: mainWindow.leftPadding ? -mainWindow.leftPadding : parent.width
+        x: windowParams.leftMargin ? -windowParams.leftMargin : parent.width
         y: -toolBar.height
         width: mainWindow.width - parent.width
         height: eventDetailsScreen.height

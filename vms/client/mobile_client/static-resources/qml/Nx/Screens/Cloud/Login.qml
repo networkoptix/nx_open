@@ -77,7 +77,7 @@ Page
                     .arg(appContext.appInfo.cloudName())
             const message = appContext.pushManager.checkConnectionErrorText()
             const warning = Workflow.openStandardDialog(title, message,
-                /*buttonsModel*/ null, /*disableAutoClose*/ true)
+                ["OK"], /*disableAutoClose*/ true)
             warning.buttonClicked.connect(
                 function(buttonId)
                 {

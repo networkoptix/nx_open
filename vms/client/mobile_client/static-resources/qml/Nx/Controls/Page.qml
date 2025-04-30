@@ -46,7 +46,6 @@ QuickControls.Page
         {
             id: column
             width: parent.width
-            topPadding: toolBar.statusBarHeight
 
             ToolBar
             {

@@ -17,14 +17,6 @@ QWindow *getMainWindow()
     return windows.first();
 }
 
-#if !defined(Q_OS_IOS)
-    QMargins getCustomMargins()
-    {
-        return QMargins();
-    }
-
-#endif
-
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 
     void prepareWindow() {}
@@ -32,11 +24,6 @@ QWindow *getMainWindow()
     void hideSystemUi() {}
 
     void showSystemUi() {}
-
-    int statusBarHeight() {
-        return 0;
-    }
-
 
     bool isPhone() {
         return false;
