@@ -34,7 +34,7 @@ Item
 
         anchors.verticalCenterOffset: 0
 
-        Text
+        Label
         {
             textFormat: Text.RichText
             text: "<a href=#>%1</a>".arg(qsTr("Learn more"))
