@@ -453,6 +453,7 @@ if(NOT compilerMsvc)
             # TODO: #tszelei Replace with -Wno-missing-designated-field-initializers when that flag
             # becomes available. See: VMS-55191.
             -Wno-missing-field-initializers
+            -Wno-error=unused-private-field
         )
     endif()
 endif()

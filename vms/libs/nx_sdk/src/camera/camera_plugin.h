@@ -73,25 +73,22 @@ namespace nxcip
     struct CameraInfo
     {
         //!Camera model name in any human readable format. MUST NOT be empty
-        char modelName[256];
+        char modelName[256] = {};
         //!Firmware version in any human readable format. Optional
-        char firmware[256];
+        char firmware[256] = {};
         //!Camera's unique identifier. MAC address can be used. MUST NOT be empty
-        char uid[256];
+        char uid[256] = {};
         //!Camera management url. Can contain just address. MUST NOT be empty
-        char url[MAX_TEXT_LEN];
+        char url[MAX_TEXT_LEN] = {};
         //!Any data in implementation defined format (for internal plugin usage)
-        char auxiliaryData[256];
+        char auxiliaryData[256] = {};
         //!Plugin can specify default credentials to use with camera
-        char defaultLogin[256];
+        char defaultLogin[256] = {};
         //!Plugin can specify default credentials to use with camera
-        char defaultPassword[256];
+        char defaultPassword[256] = {};
 
         //!Initializes all values with zeros/empty strings
-        CameraInfo()
-        {
-            memset(this, 0, sizeof(CameraInfo));
-        }
+        CameraInfo() = default;
 
         CameraInfo(const CameraInfo& value)
         {

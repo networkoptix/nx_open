@@ -151,7 +151,7 @@ class NxOpenConan(ConanFile):
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:
-                self.build_requires("clang/18.1.6" "#60ad95b1d2a06384c6e9fed7ea032adb")
+                self.build_requires("clang/20.1.2" "#45a020e716ad31135c131b24734f0769")
             self.build_requires("sdk-gcc/9.5" "#4934f8197fb3e1d7812bd951b1cbae85")
 
         if self.isWindows:
@@ -196,7 +196,7 @@ class NxOpenConan(ConanFile):
         if self.isWindows or self.isLinux:
             self.requires("vulkan-headers/1.3.290.0" "#6a0d12455e50dca266c79b88fda818b3")
             if self.settings.arch == "x86_64":
-                self.requires("cuda-toolkit/12.5.1" "#0272783ab5f85d21ae421dd8366a3296")
+                self.requires("cuda-toolkit/12.5.1" "#895935cfab790040df87c288d2873f04")
                 self.requires("libvpl/2023.4.0" "#22d0df9697d26ecbb784e71a2c882e05")
                 self.requires("libpq/15.5" "#fa107fbe709db74faa6e2cb3cf18a5ae")
 

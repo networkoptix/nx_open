@@ -78,7 +78,7 @@ static void Resize(unsigned char *dpDst, unsigned char* dpDstUV, int nDstPitch, 
     cudaTextureObject_t texUv=0;
     ck(cudaCreateTextureObject(&texUv, &resDesc, &texDesc, NULL));
 
-    Resize<YuvUnitx2> << <dim3((nDstWidth + 31) / 32, (nDstHeight + 31) / 32), dim3(16, 16) >> >(texY, texUv, dpDst, dpDstUV,
+    Resize<YuvUnitx2> <<<dim3((nDstWidth + 31) / 32, (nDstHeight + 31) / 32), dim3(16, 16)>>> (texY, texUv, dpDst, dpDstUV,
         nDstPitch, nDstWidth, nDstHeight, 1.0f * nDstWidth / nSrcWidth, 1.0f * nDstHeight / nSrcHeight);
 
     cudaDestroyTextureObject(texY);
@@ -157,12 +157,12 @@ void ScaleKernelLaunch(unsigned char *dpDst, int nDstPitch, int nDstWidth, int n
 
     if (bUVPlane)
     {
-        Scale_uv << <gridSize, blockSize >> >(texSrc, dpDst,
+        Scale_uv<<<gridSize, blockSize>>>(texSrc, dpDst,
             nDstPitch, nDstWidth, nDstHeight, 1.0f * nSrcWidth / nDstWidth, 1.0f * nSrcHeight / nDstHeight);
     }
     else
     {
-        Scale << <gridSize, blockSize >> >(texSrc, dpDst,
+        Scale<<<gridSize, blockSize>>>(texSrc, dpDst,
             nDstPitch, nDstWidth, nDstHeight, 1.0f * nSrcWidth / nDstWidth, 1.0f * nSrcHeight / nDstHeight);
     }
 

@@ -28,11 +28,18 @@ if("$ENV{USE_CLANG}")
     set(CMAKE_CXX_FLAGS ${flags})
     set(CMAKE_SHARED_LINKER_FLAGS ${flags})
     set(CMAKE_EXE_LINKER_FLAGS ${flags})
+    set(CMAKE_CUDA_COMPILER "$ENV{CLANG_DIR}/bin/clang++")
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CXX_FLAGS} --cuda-path=$ENV{CUDA_PATH}")
+    set(CMAKE_CUDA_COMPILER_TOOLKIT_ROOT "$ENV{CUDA_PATH}")
+    # The following should be discovered by CMake, but it doesn't work with Clang.
+    set(CMAKE_CUDA_HOST_LINK_LAUNCHER "${CMAKE_CUDA_COMPILER}")
+    set(CMAKE_CUDA_COMPILER_ID Clang)
+    set(_CMAKE_CUDA_WHOLE_FLAG "-c")
 else()
     set(CMAKE_C_COMPILER "${cross_prefix}-gcc" CACHE INTERNAL "")
     set(CMAKE_CXX_COMPILER "${cross_prefix}-g++" CACHE INTERNAL "")
+    set(CMAKE_CUDA_FLAGS
+        "-allow-unsupported-compiler -forward-unknown-to-host-compiler ${CMAKE_CXX_FLAGS}")
 endif()
 
 set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
-set(CMAKE_CUDA_FLAGS
-    "-allow-unsupported-compiler -forward-unknown-to-host-compiler ${CMAKE_CXX_FLAGS}")
