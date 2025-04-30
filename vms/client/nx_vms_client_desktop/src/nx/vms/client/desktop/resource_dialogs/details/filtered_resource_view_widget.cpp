@@ -44,7 +44,7 @@ FilteredResourceViewWidget::FilteredResourceViewWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    ui->alertBar->init({.level = BarDescription::BarLevel::Warning});
+    initAlertBar({.level = BarDescription::BarLevel::Warning});
     ui->nothingFoundLabel->setFont(nothingFoundLabelFont());
 
     treeView()->setModel(m_filterProxyModel.get());
@@ -251,6 +251,11 @@ void FilteredResourceViewWidget::setInfoMessage(const QString& text)
 void FilteredResourceViewWidget::clearInfoMessage()
 {
     setInfoMessage(QString());
+}
+
+void FilteredResourceViewWidget::initAlertBar(const BarDescription& barDescription)
+{
+    ui->alertBar->init(barDescription);
 }
 
 TreeView* FilteredResourceViewWidget::treeView() const

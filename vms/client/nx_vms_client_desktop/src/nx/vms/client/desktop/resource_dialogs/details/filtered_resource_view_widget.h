@@ -22,6 +22,8 @@ class TreeView;
 class FilteredResourceProxyModel;
 class ItemViewHoverTracker;
 
+struct BarDescription;
+
 class FilteredResourceViewWidget: public QWidget
 {
     Q_OBJECT
@@ -231,6 +233,8 @@ public:
     QString infoMessage() const;
     void setInfoMessage(const QString& text);
     void clearInfoMessage();
+
+    void initAlertBar(const BarDescription& barDescription);
 
 signals:
 

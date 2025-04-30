@@ -15,6 +15,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/desktop/common/widgets/message_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/resource_dialogs/backup_settings_view_common.h>
@@ -106,6 +107,9 @@ BackupSettingsWidget::BackupSettingsWidget(ServerSettingsDialogStore* store, QWi
         this, &BackupSettingsWidget::hasChangesChanged);
 
     setHelpTopic(this, HelpTopic::Id::ServerSettings_Backup);
+
+    m_backupSettingsViewWidget->resourceViewWidget()->initAlertBar(
+        {.level = BarDescription::BarLevel::Warning, .isClosable = true});
 }
 
 BackupSettingsWidget::~BackupSettingsWidget()
@@ -198,6 +202,7 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
 
         const auto cloudBackupStorage = state.backupStoragesStatus.usesCloudBackupStorage;
         const auto saasState = state.saasProperties.saasState;
+        const auto servicesStatus = state.saasProperties.cloudStorageServicesStatus;
 
         if (ServiceManager::saasShutDown(saasState) && cloudBackupStorage)
         {
@@ -245,12 +250,18 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
                 "It must be active to modify the \"What to backup\" and \"Quality\" settings for a "
                 "device, or to enable cloud backup. You can also disable it. %1")
                     .arg(nx::vms::common::saas::StringsHelper::recommendedAction(saasState));
-            m_backupSettingsViewWidget->resourceViewWidget()->footerWidget()->setHidden(true);
         }
-        else
+        else if (cloudBackupStorage && servicesStatus.status == nx::vms::api::UseStatus::overUse)
         {
-            m_backupSettingsViewWidget->resourceViewWidget()->footerWidget()->setHidden(false);
+            alertBarMessage = tr("The number of devices selected for backup exceeds available "
+                "services. Add additional services or reduce the number of devices configured for "
+                "backup. On %1 the site will automatically limit the number of backed-up devices "
+                "to match the available services")
+                    .arg(servicesStatus.issueExpirationDate.toString());
         }
+
+        m_backupSettingsViewWidget->resourceViewWidget()->footerWidget()->setHidden(
+            !alertBarMessage.isEmpty());
         m_backupSettingsViewWidget->resourceViewWidget()->setInvalidMessage(alertBarMessage);
 
         m_backupSettingsViewWidget->resourceViewWidget()->makeRequiredItemsVisible();
