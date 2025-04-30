@@ -44,6 +44,9 @@ NX_REFLECTION_ENUM_CLASS(UserAttribute,
     /**%apidoc Cloud User is a member of a Channel Partner. */
     channelPartner = 1 << 3,
 
+    /**%apidoc This user belongs to an Integration. */
+    integration = 1 << 4,
+
     /**%apidoc[unused] The only possible action for such user is to recreate it. */
     removed = 1 << 30
 )
