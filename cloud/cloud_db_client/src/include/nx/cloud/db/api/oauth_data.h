@@ -108,6 +108,8 @@ struct TokenInfo
 
     /**%apidoc A session is identified by a refresh token. It is used to track 2fa state.*/
     std::string session;
+
+    bool operator==(const TokenInfo& other) const = default;
 };
 
 struct IssueTokenResponse: public TokenInfo
@@ -119,6 +121,8 @@ struct IssueTokenResponse: public TokenInfo
 
     /**%apidoc Error code.*/
     std::optional<std::string> error;
+
+    bool operator==(const IssueTokenResponse& other) const = default;
 };
 
 NX_REFLECTION_INSTRUMENT(

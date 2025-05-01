@@ -447,6 +447,7 @@ distrib_copyServerLibs() # additional_libs_to_copy...
         libnx_mediaserver_deployment_service_client
         libnx_aws_client
         libnx_merge_service_client
+        liboauth2_client
 
         # third-party
         libquazip

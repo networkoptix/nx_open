@@ -66,13 +66,27 @@ public:
     virtual const char* serverId() const = 0;
 };
 
+class ICloudTokenSubscriber: public Interface<ICloudTokenSubscriber>
+{
+public:
+    virtual void updated(const char* token) const = 0;
+};
+
 class IUtilityProvider3: public Interface<IUtilityProvider3, IUtilityProvider2>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider3"); }
 
-    virtual IString* cloudSystemId() const = 0;
-    virtual IString* cloudAuthKey() const = 0;
+    /**
+     * Always returns a valid string. In case if the token is not available,this string will be
+     * empty but still valid ("").
+     */
+    virtual const char* cloudToken() const = 0;
+
+    /**
+     * Each subscriber will be notified. Make sure not to subscribe multiple times per plugin.
+     */
+    virtual void subscribeForCloudTokenUpdate(ICloudTokenSubscriber* subscriber) = 0;
 };
 
 class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider3>
