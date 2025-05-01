@@ -77,7 +77,7 @@ RadioButton
 
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
-            color: ColorTheme.lighter(ColorTheme.windowText, 4)
+            color: ColorTheme.lighter(ColorTheme.colors.light16, 4)
 
             visible: control.logicalId != 0
 

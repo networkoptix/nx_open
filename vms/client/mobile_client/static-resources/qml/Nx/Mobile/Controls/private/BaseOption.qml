@@ -80,7 +80,7 @@ Control
                 text: control.text
 
                 width: parent.width
-                color: ColorTheme.windowText
+                color: ColorTheme.colors.light1
                 font.pixelSize: 16
                 wrapMode: Text.Wrap
                 elide: Text.ElideRight

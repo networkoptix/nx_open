@@ -20,7 +20,7 @@ Pane
 
     background: Rectangle
     {
-        color: ColorTheme.transparent(ColorTheme.colors.windowBackground, 0.6)
+        color: ColorTheme.transparent(ColorTheme.colors.dark4, 0.6)
     }
 
     QtObject

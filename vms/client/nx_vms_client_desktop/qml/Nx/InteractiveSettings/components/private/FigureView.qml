@@ -163,7 +163,7 @@ Item
             if (!mouseArea.containsMouse)
                 return "transparent"
 
-            const baseColor = ColorTheme.lighter(ColorTheme.mid, mouseArea.pressed ? 0 : 2)
+            const baseColor = ColorTheme.lighter(ColorTheme.colors.dark10, mouseArea.pressed ? 0 : 2)
             return ColorTheme.transparent(baseColor, 0.2)
         }
     }

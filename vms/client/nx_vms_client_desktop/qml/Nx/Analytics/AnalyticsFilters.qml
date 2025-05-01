@@ -22,7 +22,7 @@ Column
     property var engine: null
 
     readonly property var selectedObjectTypeIds:
-        model.getAnalyticsObjectTypeIds(impl.selectedObjectType)
+        model?.getAnalyticsObjectTypeIds(impl.selectedObjectType) ?? []
 
     readonly property var selectedAttributeFilters: objectTypeSelector.selectedObjectType
         ? impl.selectedAttributeFilters
@@ -65,6 +65,9 @@ Column
 
         function setup(engine, objectTypeIds, attributeValues)
         {
+            if (model == null)
+                return
+
             const focusState = objectAttributes.getFocusState()
 
             updating = true
@@ -202,7 +205,7 @@ Column
 
         width: analyticsFilters.width
         title: qsTr("Object Type")
-        visible: model.objectTypes.length > 0
+        visible: model?.objectTypes.length > 0 ?? false
     }
 
     ObjectAttributes

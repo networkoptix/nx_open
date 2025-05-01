@@ -48,7 +48,7 @@ Item
                 {
                     id: monthLabel
 
-                    color: ColorTheme.windowText
+                    color: ColorTheme.colors.light1
                     font.pixelSize: 18
                     font.weight: Font.DemiBold
                 }
@@ -57,7 +57,7 @@ Item
                 {
                     id: yearLabel
 
-                    color: ColorTheme.windowText
+                    color: ColorTheme.colors.light1
                     font.pixelSize: 18
                     font.weight: Font.DemiBold
                 }

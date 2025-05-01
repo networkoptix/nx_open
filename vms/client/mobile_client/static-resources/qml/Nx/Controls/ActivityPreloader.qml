@@ -9,7 +9,7 @@ Item
     id: control
 
     property real radius: 17
-    property color color: ColorTheme.brightText
+    property color color: ColorTheme.colors.light1
     property real lineWidth: 2
 
     implicitWidth: (radius + lineWidth) * 2

@@ -39,7 +39,7 @@ Item
                 x: 16
                 height: 24
                 verticalAlignment: Text.AlignVCenter
-                color: ColorTheme.windowText
+                color: ColorTheme.colors.light1
                 font.pixelSize: 16
                 font.weight: Font.DemiBold
             }
@@ -51,7 +51,7 @@ Item
                 x: 16
                 height: 32
                 verticalAlignment: Text.AlignVCenter
-                color: ColorTheme.windowText
+                color: ColorTheme.colors.light1
                 font.pixelSize: 24
                 font.weight: Font.DemiBold
             }

@@ -89,7 +89,7 @@ Item
                 width: parent.width
                 text: currentPlugin ? currentPlugin.description : ""
                 wrapMode: Text.Wrap
-                color: ColorTheme.windowText
+                color: ColorTheme.colors.light16
                 topPadding: 8
                 bottomPadding: 8
             }
@@ -112,7 +112,7 @@ Item
                         Text
                         {
                             text: modelData.name
-                            color: ColorTheme.windowText
+                            color: ColorTheme.colors.light16
                             height: 20
                         }
                     }
@@ -127,7 +127,7 @@ Item
                         Text
                         {
                             text: modelData.value
-                            color: ColorTheme.light
+                            color: ColorTheme.colors.light10
                             height: 20
                         }
                     }
@@ -143,7 +143,7 @@ Item
         anchors.centerIn: parent
         visible: online && !loading && !hasPlugins
         text: qsTr("No plugins installed")
-        color: ColorTheme.light
+        color: ColorTheme.colors.light10
         font.weight: Font.Light
         font.pixelSize: 20
     }
@@ -155,7 +155,7 @@ Item
         anchors.centerIn: parent
         visible: !online
         text: qsTr("Server is offline")
-        color: ColorTheme.light
+        color: ColorTheme.colors.light10
         font.weight: Font.Light
         font.pixelSize: 20
     }
@@ -166,6 +166,6 @@ Item
 
         running: online && loading
         anchors.centerIn: parent
-        color: ColorTheme.windowText
+        color: ColorTheme.colors.light16
     }
 }

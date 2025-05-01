@@ -32,7 +32,7 @@ GroupBox
             anchors.fill: parent
             radius: 2
             color: "transparent"
-            border.color: ColorTheme.mid
+            border.color: ColorTheme.colors.dark10
             visible: false
         }
 
@@ -77,6 +77,6 @@ GroupBox
         text: control.title
         font: control.font
         elide: Text.ElideRight
-        color: ColorTheme.darker(ColorTheme.windowText, 4)
+        color: ColorTheme.darker(ColorTheme.colors.light16, 4)
     }
 }

@@ -13,7 +13,7 @@ AbstractButton
     property bool flat: false
     property color color: ColorTheme.colors.dark9
     property color hoveredColor: Qt.lighter(color)
-    property color textColor: ColorTheme.windowText
+    property color textColor: ColorTheme.colors.light1
     property color pressedTextColor: textColor
     property color highlightColor: "#30ffffff"
     property real radius: 6

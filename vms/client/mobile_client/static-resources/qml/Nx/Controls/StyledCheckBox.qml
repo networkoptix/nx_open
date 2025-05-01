@@ -75,7 +75,7 @@ CheckBox
 
             text: control.text
             font: control.font
-            color: ColorTheme.windowText
+            color: ColorTheme.colors.light1
             width: parent.width - (icon.x + icon.width + indicator.width + 2 * control.spacing)
             wrapMode: Text.Wrap
         }

@@ -28,7 +28,7 @@ TextInput
     property bool selectionAllowed: true
     scrollByMouse: CoreUtils.isMobile()
     selectByMouse: !CoreUtils.isMobile()
-    color: showError ? ColorTheme.colors.red_core : ColorTheme.windowText
+    color: showError ? ColorTheme.colors.red_core : ColorTheme.colors.light1
 
     leftPadding: 8
     rightPadding: 8

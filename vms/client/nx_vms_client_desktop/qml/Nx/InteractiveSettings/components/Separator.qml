@@ -15,5 +15,5 @@ Rectangle
     property bool fillWidth: true
 
     implicitHeight: 1
-    color: ColorTheme.dark
+    color: ColorTheme.colors.dark9
 }

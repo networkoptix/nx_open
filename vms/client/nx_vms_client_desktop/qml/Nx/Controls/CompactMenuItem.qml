@@ -12,7 +12,7 @@ MenuItem
 {
     id: menuItem
 
-    property color textColor: highlighted ? ColorTheme.colors.brand_contrast : ColorTheme.text
+    property color textColor: highlighted ? ColorTheme.colors.brand_contrast : ColorTheme.colors.light4
 
     height: 24
 

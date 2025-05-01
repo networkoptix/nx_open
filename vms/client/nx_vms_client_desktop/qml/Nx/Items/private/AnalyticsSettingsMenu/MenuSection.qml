@@ -109,7 +109,7 @@ Column
             id: indicator
 
             font: parent.font
-            color: menuContent.collapsed ? ColorTheme.highlight : parent.color
+            color: menuContent.collapsed ? ColorTheme.colors.brand_core : parent.color
 
             anchors.right: parent.right
             anchors.baseline: parent.baseline

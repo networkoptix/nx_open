@@ -11,7 +11,7 @@ import nx.vms.client.core 1.0
 Rectangle
 {
     id: intro
-    color: ColorTheme.window
+    color: ColorTheme.colors.dark3
 
     property alias introResource: mediaPlayer.resource
     property alias aspectRatio: mediaPlayer.aspectRatio

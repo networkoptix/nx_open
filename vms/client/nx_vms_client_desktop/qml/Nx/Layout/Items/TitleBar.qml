@@ -60,7 +60,7 @@ Item
         font.pixelSize: FontConfig.large.pixelSize
         font.weight: Font.Bold
 
-        color: ColorTheme.brightText
+        color: ColorTheme.colors.light1
     }
 
     Row

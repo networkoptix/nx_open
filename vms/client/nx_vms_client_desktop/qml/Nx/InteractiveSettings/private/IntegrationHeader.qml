@@ -82,7 +82,7 @@ RowLayout
         id: name
 
         text: engineInfo ? engineInfo.name : ""
-        color: ColorTheme.text
+        color: ColorTheme.colors.light4
         font.pixelSize: 16
         font.weight: Font.Medium
         elide: Text.ElideRight

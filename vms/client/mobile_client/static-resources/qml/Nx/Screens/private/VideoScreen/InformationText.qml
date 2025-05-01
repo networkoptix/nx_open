@@ -5,7 +5,7 @@ import Nx.Core 1.0
 
 Text
 {
-    color: ColorTheme.transparent(ColorTheme.windowText, 0.8)
+    color: ColorTheme.transparent(ColorTheme.colors.light1, 0.8)
     font.pixelSize: 12
     width: Math.min(implicitWidth, 120)
     elide: Text.ElideRight

@@ -11,7 +11,7 @@ Item
     property bool checked: false
     property bool removeBorderWhenChecked: true
     property real borderWidth: 2
-    property color color: ColorTheme.windowText
+    property color color: ColorTheme.colors.light1
     property color checkedColor: ColorTheme.colors.brand_core
     property color checkColor: ColorTheme.colors.brand_contrast
     property color backgroundColor: "transparent"

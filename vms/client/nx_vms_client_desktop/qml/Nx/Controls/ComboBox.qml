@@ -155,7 +155,7 @@ ComboBox
                     anchors.fill: parent
                     anchors.margins: 1
                     visible: control.visualFocus
-                    color: control.isAccentButton ? ColorTheme.brightText : ColorTheme.highlight
+                    color: control.isAccentButton ? ColorTheme.colors.light1 : ColorTheme.colors.brand_core
                 }
             }
         }
@@ -177,9 +177,9 @@ ComboBox
 
         autoScroll: activeFocus
         selectByMouse: true
-        selectionColor: ColorTheme.highlight
+        selectionColor: ColorTheme.colors.brand_core
         font: control.font
-        color: ColorTheme.text
+        color: ColorTheme.colors.light4
         verticalAlignment: Text.AlignVCenter
 
         readOnly: !control.editable || control.down
@@ -207,7 +207,7 @@ ComboBox
             x: parent.leftPadding
             anchors.verticalCenter: parent.verticalCenter
 
-            color: ColorTheme.text
+            color: ColorTheme.colors.light4
             opacity: 0.5
             visible: !parent.text && !parent.activeFocus
         }
@@ -278,10 +278,10 @@ ComboBox
             color:
             {
                 if (control.pressed)
-                    return ColorTheme.lighter(ColorTheme.shadow, 1)
+                    return ColorTheme.lighter(ColorTheme.colors.dark5, 1)
 
                 if (hoverArea.containsMouse)
-                    return ColorTheme.lighter(ColorTheme.shadow, 2)
+                    return ColorTheme.lighter(ColorTheme.colors.dark5, 2)
 
                 return "transparent"
             }
@@ -292,7 +292,7 @@ ComboBox
         ArrowIcon
         {
             anchors.centerIn: parent
-            color: ColorTheme.text
+            color: ColorTheme.colors.light4
             rotation: popup.opened ? 180 : 0
         }
     }
@@ -310,7 +310,7 @@ ComboBox
 
         background: Rectangle
         {
-            color: highlightedIndex == index ? ColorTheme.colors.brand_core : ColorTheme.midlight
+            color: highlightedIndex == index ? ColorTheme.colors.brand_core : ColorTheme.colors.dark13
         }
 
         contentItem: Text
@@ -321,7 +321,7 @@ ComboBox
 
             rightPadding: 8
             elide: Text.ElideRight
-            color: highlightedIndex == index ? ColorTheme.colors.brand_contrast : ColorTheme.text
+            color: highlightedIndex == index ? ColorTheme.colors.brand_contrast : ColorTheme.colors.light4
             verticalAlignment: Text.AlignVCenter
             font: control.font
 
@@ -400,7 +400,7 @@ ComboBox
 
         background: Rectangle
         {
-            color: ColorTheme.midlight
+            color: ColorTheme.colors.dark13
             radius: 2
         }
 

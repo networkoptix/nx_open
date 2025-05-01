@@ -8,7 +8,7 @@ BasePreloader
 {
     id: control
 
-    property color color: ColorTheme.transparent(ColorTheme.windowText, 0.9)
+    property color color: ColorTheme.transparent(ColorTheme.colors.light1, 0.9)
     property real thickness: 4
     property int period: 1500
     property int figuresCount: 4

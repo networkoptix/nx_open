@@ -137,7 +137,7 @@ Item
                     visible: !!text
                     width: parent.width - 16
                     wrapMode: Text.WordWrap
-                    color: ColorTheme.windowText
+                    color: ColorTheme.colors.light16
                 }
             }
 

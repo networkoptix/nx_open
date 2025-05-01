@@ -277,7 +277,7 @@ Item
         {
             height: 36
             width: 96
-            color: ColorTheme.highlight
+            color: ColorTheme.colors.brand_core
         }
     }
 }

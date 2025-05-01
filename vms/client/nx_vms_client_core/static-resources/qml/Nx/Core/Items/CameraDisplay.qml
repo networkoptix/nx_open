@@ -12,7 +12,7 @@ import nx.vms.client.core 1.0
 Rectangle
 {
     id: cameraDisplay
-    color: ColorTheme.window
+    color: ColorTheme.colors.dark3
 
     property alias cameraResource: player.resource
     property bool audioEnabled: true

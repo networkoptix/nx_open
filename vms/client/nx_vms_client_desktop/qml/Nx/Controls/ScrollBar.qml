@@ -9,7 +9,7 @@ ScrollBar
 {
     id: control
 
-    property color thumbColor: ColorTheme.midlight
+    property color thumbColor: ColorTheme.colors.dark13
     padding: 0
 
     visible: policy === ScrollBar.AlwaysOn || (policy === ScrollBar.AsNeeded && size < 1.0)
@@ -32,7 +32,7 @@ ScrollBar
 
     background: Rectangle
     {
-        color: ColorTheme.dark
+        color: ColorTheme.colors.dark9
     }
 
     contentItem: Rectangle

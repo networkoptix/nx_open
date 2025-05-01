@@ -59,7 +59,7 @@ PanelBase
         Text
         {
             text: qsTr("Version")
-            color: ColorTheme.windowText
+            color: ColorTheme.colors.light16
             visible: version.visible
         }
 
@@ -67,14 +67,14 @@ PanelBase
         {
             id: version
             text: engineInfo ? engineInfo.version : ""
-            color: ColorTheme.light
+            color: ColorTheme.colors.light10
             visible: !!text
         }
 
         Text
         {
             text: qsTr("Vendor")
-            color: ColorTheme.windowText
+            color: ColorTheme.colors.light16
             visible: vendor.visible
         }
 
@@ -82,14 +82,14 @@ PanelBase
         {
             id: vendor
             text: engineInfo ? engineInfo.vendor : ""
-            color: ColorTheme.light
+            color: ColorTheme.colors.light10
             visible: !!text
         }
 
         Text
         {
             text: qsTr("Usage")
-            color: ColorTheme.windowText
+            color: ColorTheme.colors.light16
             visible: usage.visible
         }
 
@@ -99,7 +99,7 @@ PanelBase
             text: licenseSummary ? licenseSummary.inUse + "/" + licenseSummary.available : ""
             color: !!licenseSummary && licenseSummary.inUse > licenseSummary.available
                 ? ColorTheme.colors.red_core
-                : ColorTheme.light
+                : ColorTheme.colors.light10
             visible: !panel.checkable && !!text
         }
     }
@@ -124,7 +124,7 @@ PanelBase
             text: qsTr("Camera stream")
             horizontalAlignment: Text.AlignRight
             contextHintText: qsTr("Select video stream from the camera for analysis")
-            color: ColorTheme.windowText
+            color: ColorTheme.colors.light16
             width: mapFromItem(panel, panel.width * kLabelWidthFraction, 0).x
             y: streamComboBox.baselineOffset - baselineOffset
         }

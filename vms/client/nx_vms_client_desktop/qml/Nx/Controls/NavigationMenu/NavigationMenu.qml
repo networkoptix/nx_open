@@ -26,7 +26,7 @@ Scrollable
             x: parent.width
             width: 1
             height: parent.height
-            color: ColorTheme.shadow
+            color: ColorTheme.colors.dark5
         }
     }
 

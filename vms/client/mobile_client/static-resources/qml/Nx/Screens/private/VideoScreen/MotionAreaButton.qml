@@ -16,7 +16,7 @@ Rectangle
     signal clicked
 
     radius: height / 2
-    color: ColorTheme.brightText
+    color: ColorTheme.colors.light1
 
     implicitHeight: 36
     implicitWidth: contentRow.width

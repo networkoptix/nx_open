@@ -24,7 +24,7 @@ Control
     readonly property alias locked: layoutModel.locked
     readonly property alias isShowreelReview: layoutModel.isShowreelReview
 
-    background: Rectangle { color: ColorTheme.window }
+    background: Rectangle { color: ColorTheme.colors.dark3 }
 
     LayoutModel
     {

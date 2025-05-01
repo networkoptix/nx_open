@@ -26,7 +26,7 @@ Control
     {
         x: 8
         y: 6
-        color: ColorTheme.light
+        color: ColorTheme.colors.light10
     }
 
     Component

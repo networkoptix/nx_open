@@ -54,7 +54,7 @@ MenuItem
         elide: Text.ElideRight
         font: control.font
         opacity: enabled ? 1 : 0.3
-        color: ColorTheme.windowText
+        color: ColorTheme.colors.light1
         visible: enabled
     }
 

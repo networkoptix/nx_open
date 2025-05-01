@@ -63,8 +63,8 @@ FocusScope
         {
             id: fromInput
 
-            color: ColorTheme.brightText
-            placeholderTextColor: ColorTheme.windowText
+            color: ColorTheme.colors.light1
+            placeholderTextColor: ColorTheme.colors.light16
             placeholderText: selectedValue
                 ? CoreUtils.getValue(minimum, /*negative infinity*/ "-\u221E")
                 : qsTr("from")
@@ -92,8 +92,8 @@ FocusScope
         {
             id: toInput
 
-            color: ColorTheme.brightText
-            placeholderTextColor: ColorTheme.windowText
+            color: ColorTheme.colors.light1
+            placeholderTextColor: ColorTheme.colors.light16
             placeholderText: selectedValue
                 ? CoreUtils.getValue(maximum, /*infinity*/ "\u221E")
                 : qsTr("to")

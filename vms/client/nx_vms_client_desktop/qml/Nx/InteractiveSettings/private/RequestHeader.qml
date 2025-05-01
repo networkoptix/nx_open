@@ -33,7 +33,7 @@ RowLayout
 
             sourcePath: "image://skin/16x16/Solid/lock.svg"
             sourceSize: Qt.size(10, 14)
-            primaryColor: ColorTheme.highlight
+            primaryColor: ColorTheme.colors.brand_core
         }
 
         Text
@@ -45,7 +45,7 @@ RowLayout
             anchors.verticalCenter: image.verticalCenter
 
             font.pixelSize: 14
-            color: ColorTheme.highlight
+            color: ColorTheme.colors.brand_core
             visible: !!text
         }
     }
@@ -54,7 +54,7 @@ RowLayout
     {
         id: name
 
-        color: ColorTheme.text
+        color: ColorTheme.colors.light4
         font.pixelSize: 16
         font.weight: Font.Medium
         elide: Text.ElideRight
@@ -65,7 +65,7 @@ RowLayout
     {
         id: version
 
-        color: ColorTheme.windowText
+        color: ColorTheme.colors.light16
         font.pixelSize: 14
         visible: !!text
         elide: Text.ElideRight

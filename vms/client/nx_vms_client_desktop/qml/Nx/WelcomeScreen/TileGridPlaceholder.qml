@@ -65,7 +65,7 @@ Item
 
         font.pixelSize: 26
 
-        color: ColorTheme.windowText
+        color: ColorTheme.colors.light16
 
         text:
         {
@@ -93,7 +93,7 @@ Item
         anchors.topMargin: 8
         width: 380
 
-        color: ColorTheme.windowText
+        color: ColorTheme.colors.light16
 
         font.pixelSize: 14
 

@@ -69,7 +69,7 @@ Item
                     height: 40
                     radius: width / 2
                     visible: calendarDay.current
-                    color: ColorTheme.windowText
+                    color: ColorTheme.colors.light1
                 }
 
                 Text
@@ -81,7 +81,7 @@ Item
                         if (calendarDay.current)
                             return ColorTheme.colors.dark3
 
-                        return clickArea.enabled ? ColorTheme.windowText : ColorTheme.colors.dark15
+                        return clickArea.enabled ? ColorTheme.colors.light1 : ColorTheme.colors.dark15
                     }
 
                     font.pixelSize: 16

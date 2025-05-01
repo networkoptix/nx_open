@@ -17,7 +17,7 @@ AbstractButton
     property color tertiaryColor
 
     property color backgroundColor: hovered
-        ? ColorTheme.transparent(ColorTheme.windowText, 0.1)
+        ? ColorTheme.transparent(ColorTheme.colors.light16, 0.1)
         : (down || checked)
             ? ColorTheme.transparent(ColorTheme.colors.dark1, 0.1)
             : "transparent"
@@ -29,7 +29,7 @@ AbstractButton
     icon.width: 20
     icon.height: 20
 
-    icon.color: ColorTheme.windowText
+    icon.color: ColorTheme.colors.light16
 
     focusPolicy: Qt.TabFocus
     hoverEnabled: true

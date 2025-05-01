@@ -27,7 +27,7 @@ MouseArea
         anchors.centerIn: parent
         rotation: rotations[control.state] ?? rotations.up
         color: control.containsMouse && !control.pressed
-            ? ColorTheme.lighter(ColorTheme.light, 2)
-            : ColorTheme.light
+            ? ColorTheme.lighter(ColorTheme.colors.light10, 2)
+            : ColorTheme.colors.light10
     }
 }

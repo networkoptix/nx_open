@@ -112,7 +112,7 @@ Window
 
         Repeater
         {
-            model: eventModel.analyticsFilterModel.engines
+            model: eventModel.analyticsFilterModel?.engines
 
             onModelChanged:
             {
@@ -372,7 +372,7 @@ Window
                     icon.source: checked
                         ? "image://skin/20x20/Outline/table_view.svg"
                         : "image://skin/20x20/Outline/card_view.svg"
-                    borderColor: ColorTheme.button
+                    borderColor: ColorTheme.colors.dark11
 
                     GlobalToolTip.text: checked
                         ? qsTr("Switch to table view")
@@ -650,7 +650,7 @@ Window
                             id: tableModel
                             sourceModel: eventModel
                             attributeManager: d.tableViewAttributeManager
-                            objectTypeIds: analyticsFilters.selectedObjectTypeIds
+                            objectTypeIds: analyticsFilters.selectedObjectTypeIds ?? []
                         }
 
                         columnWidthProvider: function(index)
@@ -1011,10 +1011,11 @@ Window
 
         property var delayedAttributesFilter: []
 
-        readonly property bool pluginTabsShown: eventModel.analyticsFilterModel.engines.length > 1
+        readonly property bool pluginTabsShown:
+            eventModel.analyticsFilterModel?.engines.length > 1 ?? false
 
         readonly property bool objectTypeSelected:
-            analyticsFilters.selectedObjectTypeIds.length > 0
+            analyticsFilters.selectedObjectTypeIds?.length > 0 ?? false
 
         PropertyUpdateFilter on delayedAttributesFilter
         {

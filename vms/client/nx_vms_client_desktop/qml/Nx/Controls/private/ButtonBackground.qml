@@ -11,7 +11,7 @@ Rectangle
     property bool pressed: false
     property bool flat: false
 
-    property color backgroundColor: ColorTheme.button
+    property color backgroundColor: ColorTheme.colors.dark11
     property color hoveredColor: ColorTheme.lighter(backgroundColor, 1)
     property color pressedColor: ColorTheme.darker(backgroundColor, 1)
     property color outlineColor: ColorTheme.darker(backgroundColor, 2)

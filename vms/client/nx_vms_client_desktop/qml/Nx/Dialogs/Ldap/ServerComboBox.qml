@@ -98,7 +98,7 @@ ComboBox
 
         background: Rectangle
         {
-            color: highlightedIndex == index ? ColorTheme.colors.brand_core : ColorTheme.midlight
+            color: highlightedIndex == index ? ColorTheme.colors.brand_core : ColorTheme.colors.dark13
         }
 
         ServerItem

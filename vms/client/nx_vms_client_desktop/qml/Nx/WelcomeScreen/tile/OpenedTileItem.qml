@@ -137,7 +137,7 @@ Item
             {
                 height: 16
                 font.pixelSize: 14
-                color: ColorTheme.windowText
+                color: ColorTheme.colors.light16
 
                 text: qsTr("Address")
             }
@@ -205,7 +205,7 @@ Item
             {
                 height: 16
                 font.pixelSize: 14
-                color: ColorTheme.windowText
+                color: ColorTheme.colors.light16
 
                 text: qsTr("Login")
             }
@@ -248,7 +248,7 @@ Item
             {
                 height: 16
                 font.pixelSize: 14
-                color: ColorTheme.windowText
+                color: ColorTheme.colors.light16
 
                 text: qsTr("Password")
             }
@@ -390,7 +390,7 @@ Item
 
             NxDotPreloader
             {
-                color: ColorTheme.brightText
+                color: ColorTheme.colors.light1
                 running: openedTileItem.isConnecting
 
                 anchors.centerIn: parent

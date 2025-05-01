@@ -1,7 +1,5 @@
 module Nx.Core
 
-singleton ColorTheme 1.0 ColorTheme.qml
-
 NxObject 1.0 NxObject.qml
 ViewUpdateWatcher 1.0 ViewUpdateWatcher.qml
 

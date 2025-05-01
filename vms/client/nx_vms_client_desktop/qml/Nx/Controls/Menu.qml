@@ -62,7 +62,7 @@ Menu
             id: backgroundRect
 
             radius: 2
-            color: ColorTheme.midlight
+            color: ColorTheme.colors.dark13
             anchors.fill: parent
         }
 

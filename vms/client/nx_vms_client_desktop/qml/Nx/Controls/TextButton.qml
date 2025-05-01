@@ -13,7 +13,7 @@ AbstractButton
 {
     id: button
 
-    property color color: ColorTheme.windowText
+    property color color: ColorTheme.colors.light16
     property color hoveredColor: ColorTheme.lighter(color, 2)
     property color pressedColor: color
 

@@ -21,7 +21,7 @@ Button
     readonly property real leftPaddingWithIcon: 4
     readonly property real leftPaddingOnlyText: 16
     property color backgroundColor:
-        isAccentButton ? ColorTheme.colors.brand_core : ColorTheme.button
+        isAccentButton ? ColorTheme.colors.brand_core : ColorTheme.colors.dark11
 
     property color hoveredColor: ColorTheme.lighter(backgroundColor, 1)
     property color pressedColor:
@@ -29,7 +29,7 @@ Button
     property color outlineColor: ColorTheme.darker(backgroundColor, 2)
 
     property color textColor:
-        button.isAccentButton ? ColorTheme.colors.brand_contrast : ColorTheme.buttonText
+        button.isAccentButton ? ColorTheme.colors.brand_contrast : ColorTheme.colors.light4
 
     property real menuXOffset: 0
 
@@ -139,7 +139,7 @@ Button
             anchors.fill: parent
             anchors.margins: 1
             visible: button.visualFocus
-            color: button.isAccentButton ? ColorTheme.brightText : ColorTheme.highlight
+            color: button.isAccentButton ? ColorTheme.colors.light1 : ColorTheme.colors.brand_core
         }
     }
 

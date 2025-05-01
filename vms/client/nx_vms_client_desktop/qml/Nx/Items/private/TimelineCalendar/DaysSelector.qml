@@ -115,7 +115,7 @@ Item
                     border.color: mouseArea.containsMouse
                         ? ColorTheme.colors.light12
                         : calendarDay.current
-                            ? ColorTheme.highlight
+                            ? ColorTheme.colors.brand_core
                             : "transparent"
                 }
 
@@ -130,7 +130,7 @@ Item
                     color:
                     {
                         return (model.date.getMonth() === visibleMonth)
-                            ? ColorTheme.text : ColorTheme.colors.light16
+                            ? ColorTheme.colors.light4 : ColorTheme.colors.light16
                     }
 
                     topPadding: 1

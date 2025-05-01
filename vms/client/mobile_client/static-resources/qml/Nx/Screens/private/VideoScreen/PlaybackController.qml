@@ -10,7 +10,7 @@ AbstractButton
     id: control
 
     property bool loading: false
-    property color color: ColorTheme.windowText
+    property color color: ColorTheme.colors.light1
     property bool paused: false
     property color highlightColor: "#30ffffff"
 

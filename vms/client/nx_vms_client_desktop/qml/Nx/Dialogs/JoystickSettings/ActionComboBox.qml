@@ -28,7 +28,7 @@ ComboBox
 
         background: Rectangle
         {
-            color: highlightedIndex === index ? ColorTheme.colors.brand_core : ColorTheme.midlight
+            color: highlightedIndex === index ? ColorTheme.colors.brand_core : ColorTheme.colors.dark13
         }
 
         contentItem: Item
@@ -73,8 +73,8 @@ ComboBox
                     verticalAlignment: Text.AlignVCenter
                     elide: Text.ElideRight
                     color: highlightedIndex === index
-                        ? ColorTheme.highlightContrast
-                        : ColorTheme.text
+                        ? ColorTheme.colors.brand_Contrast
+                        : ColorTheme.colors.light4
                     opacity: isEnabled ? 1 : 0.3
 
                     readonly property real tab: control.tabRole ? itemData[control.tabRole] : 0
@@ -94,7 +94,7 @@ ComboBox
                     elide: Text.ElideRight
                     color: highlightedIndex === index
                         ? ColorTheme.colors.brand_contrast
-                        : ColorTheme.lighter(ColorTheme.windowText, 4)
+                        : ColorTheme.lighter(ColorTheme.colors.light16, 4)
                     opacity: isEnabled ? 1 : 0.3
 
                     readonly property real tab: control.tabRole ? itemData[control.tabRole] : 0

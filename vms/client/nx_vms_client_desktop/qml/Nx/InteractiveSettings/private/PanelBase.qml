@@ -83,7 +83,7 @@ FocusScope
                     id: description
 
                     font.pixelSize: 14
-                    color: ColorTheme.windowText
+                    color: ColorTheme.colors.light16
                     width: parent.width
                     visible: !!text
                     wrapMode: Text.Wrap
@@ -112,7 +112,7 @@ FocusScope
                 Text
                 {
                     text: qsTr("Integration pairing code")
-                    color: ColorTheme.light
+                    color: ColorTheme.colors.light10
                     font.pixelSize: 14
                 }
 

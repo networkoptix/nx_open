@@ -157,7 +157,7 @@ FocusScope
         {
             text: qsTr("Wrong pairing code")
             font: FontConfig.textEdit
-            color: items.count > 0 ? items.itemAt(0).borderColor : ColorTheme.windowText
+            color: items.count > 0 ? items.itemAt(0).borderColor : ColorTheme.colors.light16
             visible: control.warningState
         }
     }

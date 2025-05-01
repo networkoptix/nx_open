@@ -49,8 +49,8 @@ Flickable
 
                 color: "transparent"
                 textColor: index == currentPresetIndex
-                    ? ColorTheme.windowText
-                    : ColorTheme.transparent(ColorTheme.windowText, 0.2)
+                    ? ColorTheme.colors.light1
+                    : ColorTheme.transparent(ColorTheme.colors.light1, 0.2)
 
                 font.pixelSize: 16
                 font.weight: Font.DemiBold

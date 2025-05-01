@@ -40,7 +40,7 @@ Item
         verticalAlignment: Text.AlignVCenter
         leftPadding: 6
         height: motionAreaButton.height
-        color: ColorTheme.midlight
+        color: ColorTheme.colors.dark13
         visible: motionAreaButton.state === SelectableTextButton.Deactivated
     }
 }

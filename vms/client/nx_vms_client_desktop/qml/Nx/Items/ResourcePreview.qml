@@ -37,7 +37,7 @@ Item
     property int fontWeight: Font.Normal
 
     /** No data text and loading indicator foreground color. */
-    property color foregroundColor: ColorTheme.windowText
+    property color foregroundColor: ColorTheme.colors.light16
 
     /** Loading indicator dot diameter and spacing. */
     property real loadingIndicatorDotSize: 8
@@ -64,7 +64,7 @@ Item
 
     /** Obsolete preview marker background and text colors. */
     property color obsolescenceDimmerColor: ColorTheme.transparent(ColorTheme.colors.dark5, 0.3)
-    property color obsolescenceTextColor: ColorTheme.light
+    property color obsolescenceTextColor: ColorTheme.colors.light10
 
     /** Default implicit size. */
     implicitWidth: 190.0 * Math.sqrt(effectiveAspectRatio)

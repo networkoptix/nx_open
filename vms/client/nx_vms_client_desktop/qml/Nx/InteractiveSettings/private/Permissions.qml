@@ -33,14 +33,14 @@ Control
             {
                 text: qsTr("Required permission group")
                 font.pixelSize: 14
-                color: ColorTheme.light
+                color: ColorTheme.colors.light10
             }
 
             Text
             {
                 text: `  \u2022  ${permission}`
                 font.pixelSize: 14
-                color: highlighted ? ColorTheme.colors.yellow_d : ColorTheme.windowText
+                color: highlighted ? ColorTheme.colors.yellow_d : ColorTheme.colors.light16
             }
         }
 

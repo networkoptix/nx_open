@@ -24,7 +24,7 @@ Rectangle
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.horizontalCenterOffset: 4
 
-            color: ColorTheme.mid
+            color: ColorTheme.colors.dark10
             font.pixelSize: 36
             font.weight: Font.Light
 

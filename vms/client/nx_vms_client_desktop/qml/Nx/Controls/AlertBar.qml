@@ -38,7 +38,7 @@ Item
         anchors.verticalCenter: parent.verticalCenter
 
         wrapMode: Text.WordWrap
-        color: ColorTheme.text
+        color: ColorTheme.colors.light4
         font.pixelSize: FontConfig.normal.pixelSize
     }
 }

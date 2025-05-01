@@ -73,7 +73,7 @@ Dialog
             Text
             {
                 text: settingsModel && settingsModel.header || qsTr("Enter parameters")
-                color: ColorTheme.light
+                color: ColorTheme.colors.light10
                 font.pixelSize: FontConfig.large.pixelSize
                 font.weight: Font.Bold
 
@@ -86,7 +86,7 @@ Dialog
                 text: settingsModel && settingsModel.description
                     || qsTr("This action requires some parameters to be filled.")
 
-                color: ColorTheme.windowText
+                color: ColorTheme.colors.light16
                 font.pixelSize: FontConfig.normal.pixelSize
 
                 wrapMode: Text.Wrap
@@ -104,7 +104,7 @@ Dialog
         {
             width: parent.width
             height: 1
-            color: ColorTheme.shadow
+            color: ColorTheme.colors.dark5
         }
 
         Rectangle
@@ -112,7 +112,7 @@ Dialog
             width: parent.width
             height: 1
             y: 1
-            color: ColorTheme.dark
+            color: ColorTheme.colors.dark9
         }
     }
 

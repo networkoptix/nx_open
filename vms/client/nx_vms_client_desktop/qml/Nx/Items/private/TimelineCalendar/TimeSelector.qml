@@ -49,7 +49,7 @@ Item
             height: 32
             width: control.width / (grid.columns + 1)
             text: locale.amText
-            color: enabled ? ColorTheme.buttonText : ColorTheme.colors.light16
+            color: enabled ? ColorTheme.colors.light4 : ColorTheme.colors.light16
             font.pixelSize: 10
             font.weight: Font.Medium
             topPadding: 7
@@ -123,7 +123,7 @@ Item
                     font.pixelSize: 10
                     font.weight: Font.Medium
                     text: model.display
-                    color: enabled ? ColorTheme.buttonText : ColorTheme.colors.light16
+                    color: enabled ? ColorTheme.colors.light4 : ColorTheme.colors.light16
                 }
 
                 ArchiveIndicator

@@ -109,7 +109,7 @@ Control
                 {
                     id: textItem
 
-                    color: ColorTheme.windowText
+                    color: ColorTheme.colors.light1
                     font.pixelSize: 18
                     wrapMode: Text.Text.Wrap
                     lineHeight: extraTextItem.visible ? font.pixelSize : 32

@@ -12,5 +12,5 @@ import nx.vms.client.desktop
 ContextHintLabel
 {
     font.pixelSize: FontConfig.normal.pixelSize
-    color: ColorTheme.windowText
+    color: ColorTheme.colors.light16
 }

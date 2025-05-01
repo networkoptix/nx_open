@@ -649,7 +649,7 @@ QJSValue ColorTheme::iconImageCustomization(const QString& category,
 
 void ColorTheme::registerQmlType()
 {
-    qmlRegisterType<ColorTheme>("Nx.Core", 1, 0, "ColorThemeBase");
+    qmlRegisterSingletonInstance<ColorTheme>("Nx.Core", 1, 0, "ColorTheme", instance());
 }
 
 } // namespace nx::vms::client::desktop

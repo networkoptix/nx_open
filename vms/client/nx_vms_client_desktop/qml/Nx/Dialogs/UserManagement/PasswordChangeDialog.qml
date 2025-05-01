@@ -78,14 +78,14 @@ Dialog
             {
                 width: parent.width
                 height: 1
-                color: ColorTheme.shadow
+                color: ColorTheme.colors.dark5
             }
             Rectangle
             {
                 width: parent.width
                 height: 1
                 y: 1
-                color: ColorTheme.dark
+                color: ColorTheme.colors.dark9
             }
         }
     }

@@ -336,7 +336,7 @@ Button
             z: 2
             anchors.centerIn: parent
 
-            color: ColorTheme.windowText
+            color: ColorTheme.colors.light16
             visible: !tile.isExpanded && running
             running: tile.isConnecting
         }
@@ -687,7 +687,7 @@ Button
 
         visible: opacity > 0
         radius: 24
-        color: ColorTheme.shadow
+        color: ColorTheme.colors.dark5
         source: background
     }
 

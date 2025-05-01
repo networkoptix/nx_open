@@ -9,7 +9,7 @@ import nx.vms.client.desktop 1.0
 
 Text
 {
-    color: ColorTheme.windowText
+    color: ColorTheme.colors.light16
 
     font.pixelSize: FontConfig.normal.pixelSize
 

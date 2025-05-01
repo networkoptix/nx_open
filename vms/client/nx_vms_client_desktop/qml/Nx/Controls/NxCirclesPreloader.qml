@@ -9,7 +9,7 @@ BusyIndicator
 {
     id: control;
 
-    property color color: ColorTheme.mid;
+    property color color: ColorTheme.colors.dark10;
 
     implicitWidth: (repeater.count > 0 ? radiusByIndex(repeater.count - 1) * 2 : 30);
     implicitHeight: implicitWidth;

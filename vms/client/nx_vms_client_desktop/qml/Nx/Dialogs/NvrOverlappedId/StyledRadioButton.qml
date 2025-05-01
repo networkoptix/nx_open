@@ -23,7 +23,7 @@ RadioButton
         Rectangle
         {
             anchors.fill: parent
-            color: control.checked ? ColorTheme.highlight : "transparent"
+            color: control.checked ? ColorTheme.colors.brand_core : "transparent"
             opacity: control.checked ? 0.4 : 1
         }
 

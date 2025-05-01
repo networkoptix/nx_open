@@ -96,7 +96,7 @@ Control
 
                 flat: true
                 backgroundColor: "transparent"
-                textColor: hovered ? ColorTheme.text : ColorTheme.light
+                textColor: hovered ? ColorTheme.colors.light4 : ColorTheme.colors.light10
             }
 
             ArrowButton
@@ -158,7 +158,7 @@ Control
                 font.weight: Font.Medium
                 font.capitalization: Font.AllUppercase
                 color: yearMonthLabelMouseArea.containsMouse
-                    ? ColorTheme.brightText : ColorTheme.text
+                    ? ColorTheme.colors.light1 : ColorTheme.colors.light4
                 text: monthPickerVisible
                     ? visibleYear
                     : `${locale.standaloneMonthName(visibleMonth)} ${visibleYear}`
@@ -201,7 +201,7 @@ Control
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
                     color: locale.weekDays.indexOf(model.day) == -1
-                        ? ColorTheme.text : ColorTheme.windowText
+                        ? ColorTheme.colors.light4 : ColorTheme.colors.light16
                 }
             }
 

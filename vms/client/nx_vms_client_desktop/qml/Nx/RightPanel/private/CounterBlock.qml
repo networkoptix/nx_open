@@ -46,7 +46,7 @@ Control
 
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
-            color: ColorTheme.mid
+            color: ColorTheme.colors.dark10
         }
 
         Row

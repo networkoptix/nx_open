@@ -28,7 +28,7 @@ Popup
 
     Overlay.modal: Rectangle
     {
-        color: ColorTheme.colors.backgroundDimColor
+        color: ColorTheme.transparent(ColorTheme.colors.dark5, 0.4)
         Behavior on opacity { NumberAnimation { duration: 200 } }
     }
 

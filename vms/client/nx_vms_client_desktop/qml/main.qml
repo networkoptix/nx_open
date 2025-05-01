@@ -21,7 +21,7 @@ Control
     readonly property real panelDiscreteResizeEpsilon: 8
     property color resizeIndicatorColor: ColorTheme.transparent(ColorTheme.colors.dark10, 0.2)
 
-    background: Rectangle { color: ColorTheme.window }
+    background: Rectangle { color: ColorTheme.colors.dark3 }
 
     contentItem: Item
     {

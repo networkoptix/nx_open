@@ -84,7 +84,7 @@ Rectangle
         loader.sourceComponent = textComponent
         loader.item.text = text
         loader.item.prefix = prefixText
-        loader.item.textColor = ColorTheme.brightText
+        loader.item.textColor = ColorTheme.colors.light1
 
         activityPreloader.visible = false
 
@@ -116,7 +116,7 @@ Rectangle
 
         loader.sourceComponent = textComponent
         loader.item.text = text
-        loader.item.textColor = ColorTheme.brightText
+        loader.item.textColor = ColorTheme.colors.light1
         loader.item.prefix = ""
 
         visualDataLoader.sourceComponent = dotsPreloader
@@ -144,7 +144,7 @@ Rectangle
         hideTimer.restart()
 
         var customColor = success
-            ? ColorTheme.brightText
+            ? ColorTheme.colors.light1
             : ColorTheme.colors.red_l2
 
         activityPreloader.visible = false
@@ -248,7 +248,7 @@ Rectangle
                 height: 24
                 wrapMode: Text.NoWrap
                 verticalAlignment: Text.AlignVCenter
-                color: ColorTheme.brightText
+                color: ColorTheme.colors.light1
                 font.pixelSize: 14
                 font.weight: Font.Normal
             }
@@ -269,7 +269,7 @@ Rectangle
 
         NxDotPreloader
         {
-            color: ColorTheme.brightText
+            color: ColorTheme.colors.light1
             spacing: 3
             dotRadius: 4
         }

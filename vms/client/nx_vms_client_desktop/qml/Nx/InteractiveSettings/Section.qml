@@ -26,7 +26,7 @@ Column
         {
             id: header
 
-            color: ColorTheme.text
+            color: ColorTheme.colors.light4
             font.pixelSize: 16
             font.weight: Font.Medium
 
@@ -62,7 +62,7 @@ Column
         visible: !!text
 
         font.pixelSize: 14
-        color: ColorTheme.windowText
+        color: ColorTheme.colors.light16
         wrapMode: Text.Wrap
         width: parent.width
     }

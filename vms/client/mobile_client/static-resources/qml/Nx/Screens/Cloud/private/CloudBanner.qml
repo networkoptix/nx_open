@@ -24,7 +24,7 @@ Column
         width: parent.width
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        color: ColorTheme.windowText
+        color: ColorTheme.colors.light1
         height: 32
         font.pixelSize: 20
         font.weight: Font.Light

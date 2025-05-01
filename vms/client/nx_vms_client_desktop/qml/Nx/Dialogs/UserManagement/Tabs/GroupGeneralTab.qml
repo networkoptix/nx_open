@@ -112,7 +112,7 @@ Item
                 TextButton
                 {
                     icon.source: "image://skin/20x20/Outline/delete.svg"
-                    color: ColorTheme.windowText
+                    color: ColorTheme.colors.light16
                     icon.width: 12
                     icon.height: 14
                     spacing: 8

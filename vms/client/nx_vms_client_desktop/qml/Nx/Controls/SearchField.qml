@@ -23,8 +23,8 @@ TextField
 
     placeholderText: qsTr("Search")
     placeholderTextColor: searchField.activeFocus || searchField.hovered
-        ? ColorTheme.lighter(ColorTheme.windowText, 1)
-        : ColorTheme.windowText
+        ? ColorTheme.lighter(ColorTheme.colors.light16, 1)
+        : ColorTheme.colors.light16
 
     leftPadding: actionButton.visible ? (actionButton.x + actionButton.width + spacing) : 8
     rightPadding: enabled ? (width - clearButton.x) : 8

@@ -13,7 +13,7 @@ Text
 
     text: performanceInfo.text + `<br>Graphics: ${graphicsInfo}`
     textFormat: Text.RichText
-    color: ColorTheme.highlight
+    color: ColorTheme.colors.brand_core
     font.pixelSize: FontConfig.normal.pixelSize
 
     visible: performanceInfo.visible

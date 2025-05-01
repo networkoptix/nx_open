@@ -35,7 +35,7 @@ ToolBar
 
         Rectangle
         {
-            color: ColorTheme.colors.windowBackground
+            color: ColorTheme.colors.dark4
 
             Rectangle
             {

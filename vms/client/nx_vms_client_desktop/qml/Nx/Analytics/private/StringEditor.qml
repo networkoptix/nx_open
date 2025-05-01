@@ -12,9 +12,9 @@ TextField
     property var selectedValue: undefined
     readonly property bool hasTextFields: true
 
-    color: ColorTheme.brightText
+    color: ColorTheme.colors.light1
     placeholderText: qsTr("Min 3 characters")
-    placeholderTextColor: ColorTheme.windowText
+    placeholderTextColor: ColorTheme.colors.light16
 
     onTextChanged:
         selectedValue = text || undefined

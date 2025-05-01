@@ -14,7 +14,7 @@ Item
         width: parent.width
         height: 1
         y: 7
-        color: ColorTheme.shadow
+        color: ColorTheme.colors.dark5
     }
 
     Rectangle
@@ -22,6 +22,6 @@ Item
         width: parent.width
         height: 1
         y: 8
-        color: ColorTheme.mid
+        color: ColorTheme.colors.dark10
     }
 }

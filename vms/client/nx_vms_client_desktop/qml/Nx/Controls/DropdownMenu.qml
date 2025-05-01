@@ -18,7 +18,7 @@ Menu
 
         rightPadding: 28
 
-        textColor: action?.checked ? ColorTheme.colors.brand_contrast : ColorTheme.text
+        textColor: action?.checked ? ColorTheme.colors.brand_contrast : ColorTheme.colors.light4
 
         background: Rectangle
         {
@@ -28,11 +28,11 @@ Menu
                     return ColorTheme.colors.brand_core
 
                 if (menuItem.pressed)
-                    return ColorTheme.lighter(ColorTheme.midlight, 1)
+                    return ColorTheme.lighter(ColorTheme.colors.dark13, 1)
 
                 return menuItem.hovered || menuItem.activeFocus
-                    ? ColorTheme.lighter(ColorTheme.midlight, 2)
-                    : ColorTheme.midlight
+                    ? ColorTheme.lighter(ColorTheme.colors.dark13, 2)
+                    : ColorTheme.colors.dark13
             }
         }
     }

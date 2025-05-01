@@ -26,7 +26,7 @@ Button
         hovered: control.hovered
         pressed: control.pressed
         flat: control.flat
-        backgroundColor: ColorTheme.button
+        backgroundColor: ColorTheme.colors.dark11
 
         FocusFrame
         {
@@ -53,7 +53,7 @@ Button
 
             text: control.text
             font: control.font
-            color: ColorTheme.buttonText
+            color: ColorTheme.colors.light4
             elide: Text.ElideRight
         }
 

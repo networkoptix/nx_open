@@ -68,7 +68,7 @@ QuickControls.Page
     {
         id: backgroundRectangle
 
-        color: ColorTheme.colors.windowBackground
+        color: ColorTheme.colors.dark4
     }
 
     Keys.onPressed: (event) =>

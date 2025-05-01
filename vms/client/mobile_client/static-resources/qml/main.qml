@@ -36,7 +36,7 @@ Controls.ApplicationWindow
     readonly property bool isPortraitLayout: width <= height
 
     visible: true
-    color: ColorTheme.colors.windowBackground ?? "transparent"
+    color: ColorTheme.colors.dark4 ?? "transparent"
 
     function lp(path)
     {
@@ -94,7 +94,7 @@ Controls.ApplicationWindow
         {
             mainWindow.color = currentItem.hasOwnProperty("backgroundColor")
                 ? currentItem.backgroundColor
-                : ColorTheme.colors.windowBackground
+                : ColorTheme.colors.dark4
         }
         onWidthChanged: autoScrollDelayTimer.restart()
         onHeightChanged: autoScrollDelayTimer.restart()
@@ -192,13 +192,6 @@ Controls.ApplicationWindow
         workaroundParentItem: contentItem
     }
 
-    function setupColorTheme()
-    {
-        ColorTheme.colors["windowBackground"] = ColorTheme.colors.dark4
-        ColorTheme.colors["backgroundDimColor"] = ColorTheme.transparent(ColorTheme.colors.dark5, 0.4)
-        ColorTheme.windowText = ColorTheme.colors.light1
-    }
-
     onClosing:
         (close) =>
         {
@@ -210,8 +203,6 @@ Controls.ApplicationWindow
 
     Component.onCompleted:
     {
-        setupColorTheme()
-
         let startupHandler =
             function()
             {

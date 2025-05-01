@@ -32,7 +32,7 @@ ToolTip
         {
             id: backgroundRect
             anchors.fill: parent
-            color: ColorTheme.text
+            color: ColorTheme.colors.light4
             radius: 2
             visible: false
         }

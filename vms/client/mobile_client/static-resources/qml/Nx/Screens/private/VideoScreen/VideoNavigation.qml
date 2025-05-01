@@ -458,7 +458,7 @@ Item
                 font.pixelSize: 12
                 anchors.bottom: timeline.bottom
                 anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2 + 12
-                color: ColorTheme.windowText
+                color: ColorTheme.colors.light1
                 visible: d.liveMode && !d.hasArchive && videoNavigation.canViewArchive
                 opacity: 0.5 * timelineOpactiyMask.opacity
             }
@@ -701,7 +701,7 @@ Item
                     verticalAlignment: Text.AlignVCenter
 
                     text: timeHelper.fullDate
-                    color: ColorTheme.windowText
+                    color: ColorTheme.colors.light1
 
                     opacity: d.liveMode ? 0.0 : 1.0
                     Behavior on opacity { NumberAnimation { duration: 200 } }
@@ -737,7 +737,7 @@ Item
                         anchors.verticalCenter: parent.verticalCenter
                         font.pixelSize: 28
                         font.weight: Font.Normal
-                        color: ColorTheme.windowText
+                        color: ColorTheme.colors.light1
                         text: qsTr("LIVE")
                         visible: d.liveMode
                     }
@@ -754,7 +754,7 @@ Item
                 height: 56
                 font.pixelSize: 28
                 font.weight: Font.Normal
-                color: ColorTheme.windowText
+                color: ColorTheme.colors.light1
                 text: qsTr("LIVE")
                 visible: d.liveMode && !videoNavigation.canViewArchive
             }
@@ -804,7 +804,7 @@ Item
 
             Rectangle
             {
-                color: ColorTheme.windowText
+                color: ColorTheme.colors.light1
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 width: 2

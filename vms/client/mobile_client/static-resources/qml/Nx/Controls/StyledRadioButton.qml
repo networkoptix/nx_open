@@ -65,7 +65,7 @@ T.RadioButton
                 width: parent.width
                 text: control.text
                 font: control.font
-                color: ColorTheme.windowText
+                color: ColorTheme.colors.light1
                 wrapMode: Text.Wrap
             }
 

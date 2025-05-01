@@ -24,7 +24,7 @@ RadioButton
     {
         text: control.text
         font.pixelSize: 16
-        color: ColorTheme.windowText
+        color: ColorTheme.colors.light1
     }
 
     NxObject

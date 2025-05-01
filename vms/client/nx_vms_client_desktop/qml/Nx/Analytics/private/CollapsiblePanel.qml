@@ -89,7 +89,7 @@ Column
             {
                 id: valueText
 
-                color: ColorTheme.text
+                color: ColorTheme.colors.light4
                 elide: Text.ElideRight
 
                 text: panel.displayValue ? panel.value : ""

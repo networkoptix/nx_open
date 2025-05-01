@@ -72,7 +72,7 @@ MenuItem
 
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: FontConfig.normal.pixelSize
-                color: menuItem.highlighted ? ColorTheme.highlightContrast : ColorTheme.text
+                color: menuItem.highlighted ? ColorTheme.colors.brand_Contrast : ColorTheme.colors.light4
 
                 text: menuItem.text
             }
@@ -89,7 +89,7 @@ MenuItem
 
             color: menuItem.highlighted
                 ? ColorTheme.colors.brand_contrast
-                : ColorTheme.lighter(ColorTheme.windowText, 4)
+                : ColorTheme.lighter(ColorTheme.colors.light16, 4)
 
             verticalAlignment: Text.AlignVCenter
             font.pixelSize: FontConfig.normal.pixelSize
@@ -101,7 +101,7 @@ MenuItem
 
     background: Rectangle
     {
-        color: menuItem.highlighted ? ColorTheme.highlight : "transparent"
+        color: menuItem.highlighted ? ColorTheme.colors.brand_core : "transparent"
     }
 
     arrow: ColoredImage

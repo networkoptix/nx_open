@@ -122,7 +122,7 @@ FocusScope
             verticalAlignment: Qt.AlignVCenter
 
             font: textField.font
-            color: ColorTheme.windowText
+            color: ColorTheme.colors.light16
         }
 
         AbstractButton

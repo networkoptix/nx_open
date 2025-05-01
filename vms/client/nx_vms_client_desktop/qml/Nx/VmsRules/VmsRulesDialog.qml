@@ -72,7 +72,7 @@ Dialog
             {
                 visible: tableView.hasCheckedRows
                 text: qsTr("%1 selected:").arg(tableView.checkedRows.length)
-                color: ColorTheme.brightText
+                color: ColorTheme.colors.light1
                 font.pixelSize: FontConfig.large.pixelSize
             }
 

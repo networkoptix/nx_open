@@ -87,7 +87,7 @@ Item
         id: motionRegions
         anchors.fill: parent
         fillOpacity: kMotionRegionOpacity
-        borderColor: ColorTheme.window
+        borderColor: ColorTheme.colors.dark3
         labelsColor: ColorTheme.colors.dark1
     }
 }

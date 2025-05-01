@@ -76,7 +76,7 @@ Item
                     ? ColorTheme.colors.light6
                     : mouseArea.containsMouse
                         ? ColorTheme.colors.light1
-                        : ColorTheme.buttonText
+                        : ColorTheme.colors.light4
                 opacity: enabled ? 1 : 0.3
             }
 

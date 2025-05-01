@@ -65,10 +65,10 @@ SpinBox
         id: textInput
 
         z: 0
-        color: enabled ? ColorTheme.text : ColorTheme.transparent(ColorTheme.text, 0.3)
+        color: enabled ? ColorTheme.colors.light4 : ColorTheme.transparent(ColorTheme.colors.light4, 0.3)
         selectByMouse: true
-        selectedTextColor: ColorTheme.brightText
-        selectionColor: ColorTheme.highlight
+        selectedTextColor: ColorTheme.colors.light1
+        selectionColor: ColorTheme.colors.brand_core
         verticalAlignment: Text.AlignVCenter
         inputMethodHints: control.inputMethodHints
         validator: control.validator
@@ -145,7 +145,7 @@ SpinBox
         ArrowIcon
         {
             anchors.centerIn: parent
-            color: ColorTheme.text
+            color: ColorTheme.colors.light4
             opacity: enabled ? 1.0 : 0.3
             rotation: 180
         }
@@ -170,7 +170,7 @@ SpinBox
         ArrowIcon
         {
             anchors.centerIn: parent
-            color: ColorTheme.text
+            color: ColorTheme.colors.light4
             opacity: enabled ? 1.0 : 0.3
         }
     }

@@ -10,8 +10,8 @@ Item
 
     property bool hovered: false
 
-    property color uncheckedColor: ColorTheme.midlight
-    property color uncheckedIndicatorColor: ColorTheme.lighter(ColorTheme.midlight, 4)
+    property color uncheckedColor: ColorTheme.colors.dark13
+    property color uncheckedIndicatorColor: ColorTheme.lighter(ColorTheme.colors.dark13, 4)
     property color checkedColor: ColorTheme.colors.green_core
     property color checkedIndicatorColor: ColorTheme.colors.green_l2
     property color handleColor: "transparent"

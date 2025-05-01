@@ -12,20 +12,20 @@ Rectangle
 
     color:
     {
-        const color = ColorTheme.shadow
+        const color = ColorTheme.colors.dark5
 
         if (control && control.readOnly)
-            return ColorTheme.transparent(ColorTheme.shadow, 0.2)
+            return ColorTheme.transparent(ColorTheme.colors.dark5, 0.2)
 
         if (control && control.activeFocus)
             return ColorTheme.darker(color, 1)
 
-        return ColorTheme.shadow
+        return ColorTheme.colors.dark5
     }
 
     border.color:
     {
-        const color = ColorTheme.shadow
+        const color = ColorTheme.colors.dark5
 
         if (control)
         {

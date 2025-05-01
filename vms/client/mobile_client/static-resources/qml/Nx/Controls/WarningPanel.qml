@@ -55,7 +55,7 @@ Pane
         width: control.availableWidth
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
-        color: ColorTheme.windowText
+        color: ColorTheme.colors.light1
         elide: Text.ElideRight
         wrapMode: Text.WordWrap
     }

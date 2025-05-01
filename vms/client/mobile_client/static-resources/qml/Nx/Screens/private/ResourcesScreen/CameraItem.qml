@@ -70,7 +70,7 @@ Control
 
     background: Rectangle
     {
-        color: ColorTheme.colors.windowBackground
+        color: ColorTheme.colors.dark4
     }
 
     contentItem: Item
@@ -264,7 +264,7 @@ Control
                 maximumLineCount: 2
                 font.pixelSize: 14
                 font.weight: Font.Normal
-                color: ColorTheme.windowText
+                color: ColorTheme.colors.light1
             }
         }
     }

@@ -11,7 +11,7 @@ Text
     leftPadding: 16
     rightPadding: 16
     font.pixelSize: FontConfig.normal.pixelSize
-    color: ColorTheme.windowText
+    color: ColorTheme.colors.light16
     width: parent.width
     height: 24
     verticalAlignment: Text.AlignVCenter

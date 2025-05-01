@@ -64,7 +64,7 @@ Item
                     font.capitalization: Font.AllUppercase
 
                     color: (model.month === currentMonth)
-                        ? ColorTheme.highlight : ColorTheme.buttonText
+                        ? ColorTheme.colors.brand_core : ColorTheme.colors.light4
                 }
 
                 ArchiveIndicator

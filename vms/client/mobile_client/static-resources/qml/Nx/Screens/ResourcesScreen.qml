@@ -141,7 +141,7 @@ Page
                 NxGlobals.makeSearchRegExp(`*${searchToolBar.text}*`)
             onFilterRegExpChanged: camerasList.model.setFilterRegularExpression(filterRegExp)
 
-            color: ColorTheme.colors.windowBackground
+            color: ColorTheme.colors.dark4
 
             CamerasList
             {
@@ -191,7 +191,7 @@ Page
         id: loadingDummy
 
         anchors.fill: parent
-        color: ColorTheme.colors.windowBackground
+        color: ColorTheme.colors.dark4
         Behavior on opacity { NumberAnimation { duration: 200 } }
         visible: opacity > 0
         opacity: windowContext.sessionManager.hasActiveSession ? 0.0 : 1.0

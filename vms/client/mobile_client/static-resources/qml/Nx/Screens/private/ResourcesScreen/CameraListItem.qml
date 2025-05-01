@@ -5,7 +5,7 @@ import QtQuick.Controls
 import Nx.Core
 import Nx.Controls
 import Nx.Core.Items
-import Nx.Core.Controls 
+import Nx.Core.Controls
 import Nx.Items
 
 import nx.vms.api
@@ -109,7 +109,7 @@ Control
             font.pixelSize: 16
             font.weight: d.offline ? Font.DemiBold : Font.Normal
             elide: Text.ElideRight
-            color: d.offline ? ColorTheme.colors.dark11 : ColorTheme.windowText
+            color: d.offline ? ColorTheme.colors.dark11 : ColorTheme.colors.light1
         }
     }
 

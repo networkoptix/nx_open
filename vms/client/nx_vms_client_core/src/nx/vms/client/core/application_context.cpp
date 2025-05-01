@@ -224,14 +224,13 @@ ApplicationContext::ApplicationContext(
     initializeMetaTypes();
 
     d->initializeSettings();
+    d->colorTheme = std::make_unique<ColorTheme>();
 
     if (features.flags.testFlag(FeatureFlag::qml))
     {
         registerQmlTypes();
         d->initializeQmlEngine();
     }
-
-    d->colorTheme = std::make_unique<ColorTheme>();
 
     switch (mode)
     {

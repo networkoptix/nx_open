@@ -91,9 +91,9 @@ T.TextField
     font.pixelSize: 14
     passwordCharacter: "\u25cf"
     selectByMouse: true
-    color: enabled ? ColorTheme.text : ColorTheme.transparent(ColorTheme.text, 0.3)
-    selectionColor: ColorTheme.highlight
-    selectedTextColor: ColorTheme.brightText
+    color: enabled ? ColorTheme.colors.light4 : ColorTheme.transparent(ColorTheme.colors.light4, 0.3)
+    selectionColor: ColorTheme.colors.brand_core
+    selectedTextColor: ColorTheme.colors.light1
 
     background: TextFieldBackground
     {

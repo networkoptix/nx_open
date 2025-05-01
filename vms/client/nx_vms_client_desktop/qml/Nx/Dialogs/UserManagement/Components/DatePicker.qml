@@ -149,7 +149,7 @@ RowLayout
                         focusPolicy: Qt.NoFocus
 
                         background: null
-                        icon.color: hovered ? ColorTheme.text : ColorTheme.light
+                        icon.color: hovered ? ColorTheme.colors.light4 : ColorTheme.colors.light10
                     }
 
                     ArrowButton
@@ -182,7 +182,7 @@ RowLayout
                         font.pixelSize: 16
                         font.weight: Font.Medium
                         font.capitalization: Font.Capitalize
-                        color: ColorTheme.text
+                        color: ColorTheme.colors.light4
                         text: `${locale.standaloneMonthName(visibleMonth)} ${visibleYear}`
 
                         verticalAlignment: Text.AlignVCenter
@@ -224,8 +224,8 @@ RowLayout
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
                         color: control.locale.weekDays.indexOf(model.day) == -1
-                            ? ColorTheme.text
-                            : ColorTheme.windowText
+                            ? ColorTheme.colors.light4
+                            : ColorTheme.colors.light16
                     }
                 }
 
@@ -311,7 +311,7 @@ RowLayout
                                 ? ColorTheme.colors.brand_core
                                 : (isInPast || model.month !== monthGrid.month)
                                     ? ColorTheme.colors.light16
-                                    : ColorTheme.text
+                                    : ColorTheme.colors.light4
 
                             MouseArea
                             {

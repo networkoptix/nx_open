@@ -14,7 +14,7 @@ Item
     property string seconds
     property string suffix
 
-    property color color: ColorTheme.windowText
+    property color color: ColorTheme.colors.light1
 
     implicitHeight: contentRow.implicitHeight
     implicitWidth: contentRow.implicitWidth

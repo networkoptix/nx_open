@@ -57,7 +57,7 @@ Text
             if (!menuItem.current && !mouseArea.containsMouse)
                 return "transparent"
 
-            const color = menuItem.current ? ColorTheme.highlight : ColorTheme.colors.dark12
+            const color = menuItem.current ? ColorTheme.colors.brand_core : ColorTheme.colors.dark12
             const opacity = mouseArea.containsMouse ? 0.5 : 0.4
             return ColorTheme.transparent(color, opacity)
         }
@@ -66,11 +66,11 @@ Text
     color:
     {
         if (menuItem.current)
-            return ColorTheme.text
+            return ColorTheme.colors.light4
 
         if (!menuItem.active || !menuItem.enabled)
             return ColorTheme.colors.dark14
 
-        return ColorTheme.light
+        return ColorTheme.colors.light10
     }
 }
