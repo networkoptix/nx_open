@@ -6690,6 +6690,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
       <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
     </message>
+    <message>
+      <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
+      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupStatusWidget</name>
@@ -11359,6 +11363,10 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>Organization user</source>
       <translation>Người dùng tổ chức</translation>
+    </message>
+    <message>
+      <source>Channel Partner user</source>
+      <translation type="unfinished">Channel Partner user</translation>
     </message>
   </context>
   <context>

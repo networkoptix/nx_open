@@ -532,7 +532,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>New</source>
-      <translation>新規作成</translation>
+      <translation>新規</translation>
     </message>
   </context>
   <context>

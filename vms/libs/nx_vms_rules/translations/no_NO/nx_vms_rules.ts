@@ -456,7 +456,7 @@
     <message>
       <source>I/O Module was disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">I/O Module was disconnected at %1</translation>
+      <translation>I/O-modulen ble frakoblet klokken %1</translation>
     </message>
   </context>
   <context>

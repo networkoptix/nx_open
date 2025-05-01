@@ -6801,6 +6801,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
       <translation>Säkerhetskopiering till molnet fortsätter, men webbplatsen är för närvarande avstängd. Det måste vara aktivt för att ändra &quot;Vad att säkerhetskopiera&quot; och &quot;Kvalitet&quot; inställningar för en enhet, eller för att aktivera molnsäkerhetskopiering. Du kan också inaktivera det. %1</translation>
     </message>
+    <message>
+      <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
+      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupStatusWidget</name>
@@ -11524,6 +11528,10 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>Organization user</source>
       <translation>Organisationsanvändare</translation>
+    </message>
+    <message>
+      <source>Channel Partner user</source>
+      <translation type="unfinished">Channel Partner user</translation>
     </message>
   </context>
   <context>

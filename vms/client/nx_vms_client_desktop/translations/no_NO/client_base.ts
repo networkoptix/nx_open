@@ -6799,7 +6799,11 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>Cloud sikkerhetskopiering fortsetter, men nettstedet er for tiden suspendert. Det må være aktiv for å endre &quot;Hva du skal sikkerhetskopiere&quot; og &quot;Kvalitet&quot; for en enhet, eller for å aktivere cloud sikkerhetskopiering. Du kan også deaktivere den. %1</translation>
+    </message>
+    <message>
+      <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
+      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
     </message>
   </context>
   <context>
@@ -11522,6 +11526,10 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>Organization user</source>
       <translation type="unfinished">Organization user</translation>
+    </message>
+    <message>
+      <source>Channel Partner user</source>
+      <translation type="unfinished">Channel Partner user</translation>
     </message>
   </context>
   <context>

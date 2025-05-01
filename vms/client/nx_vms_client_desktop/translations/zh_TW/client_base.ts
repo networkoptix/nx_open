@@ -6690,6 +6690,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
       <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
     </message>
+    <message>
+      <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
+      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupStatusWidget</name>
@@ -11356,6 +11360,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Organization user</source>
       <translation>組織使用者</translation>
+    </message>
+    <message>
+      <source>Channel Partner user</source>
+      <translation type="unfinished">Channel Partner user</translation>
     </message>
   </context>
   <context>
