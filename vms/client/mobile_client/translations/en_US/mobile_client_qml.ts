@@ -885,6 +885,14 @@
         <source>NEW</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>SUSPENDED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SHUTDOWN</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SslCertificateDialog</name>
