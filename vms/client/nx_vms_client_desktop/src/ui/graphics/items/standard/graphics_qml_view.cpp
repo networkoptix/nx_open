@@ -505,7 +505,11 @@ void GraphicsQmlView::Private::initRenderTarget()
         return;
 
     const auto pixelRatio = quickWindow->effectiveDevicePixelRatio();
-    const QSize deviceSize = quickWindow->size() * pixelRatio;
+    QSize deviceSize = quickWindow->size() * pixelRatio;
+
+    const auto textureSizeMax = rhi->resourceLimit(QRhi::TextureSizeMax);
+
+    deviceSize = deviceSize.boundedTo(QSize(textureSizeMax, textureSizeMax));
 
     QRhiTexture::Flags textureFlags = QRhiTexture::RenderTarget;
     if (useTextureReadback)
@@ -513,8 +517,11 @@ void GraphicsQmlView::Private::initRenderTarget()
 
     rhiTexture.reset(rhi->newTexture(QRhiTexture::RGBA8, deviceSize, 1, textureFlags));
 
-    if (!rhiTexture->create())
+    if (!NX_ASSERT(rhiTexture->create(), "Failed to create texture %1", deviceSize))
+    {
+        rhiTexture.reset();
         return;
+    }
 
     rhiRenderTarget.reset(rhi->newTextureRenderTarget({rhiTexture.get()}));
     rp.reset(rhiRenderTarget->newCompatibleRenderPassDescriptor());
@@ -531,7 +538,17 @@ void GraphicsQmlView::Private::updateSizes()
     if (!rootItem || !quickWindow)
         return;
 
-    const QSize size = rounded(view->size());
+    QSize size = rounded(view->size());
+    if (quickWindow->rhi())
+    {
+        const auto textureSizeMax = quickWindow->rhi()->resourceLimit(QRhi::TextureSizeMax);
+        const auto windowSizeMax =
+            std::floor(textureSizeMax / quickWindow->effectiveDevicePixelRatio());
+
+        if (size.width() > windowSizeMax || size.height() > windowSizeMax)
+            size.scale(windowSizeMax, windowSizeMax, Qt::KeepAspectRatio);
+    }
+
     rootItem->setSize(size);
 
     QPoint offset;
@@ -623,6 +640,9 @@ bool GraphicsQmlView::Private::ensureOffscreen()
         connect(quickWindow.get(), &QQuickWindow::afterRendering, view,
             [this, rhi]()
             {
+                if (!rhiTexture)
+                    return;
+
                 QSGRendererInterface* rif = quickWindow->rendererInterface();
                 QRhiCommandBuffer* cb =
                     static_cast<QRhiCommandBuffer*>(
