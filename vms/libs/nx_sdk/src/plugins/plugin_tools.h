@@ -77,7 +77,7 @@ public:
     CommonRefManager(nxpl::PluginInterface* objToWatch):
         m_refCount(1),
         m_objToWatch(objToWatch),
-        m_refCountingDelegate(0)
+        m_refCountingDelegate(nullptr)
     {
     }
 
@@ -86,6 +86,8 @@ public:
      * NOTE: It does not increment refCountingDelegate reference counter.
      */
     CommonRefManager(CommonRefManager* refCountingDelegate):
+        m_refCount(0),
+        m_objToWatch(nullptr),
         m_refCountingDelegate(refCountingDelegate)
     {
     }
@@ -322,10 +324,10 @@ struct hash<nxpl::NX_GUID>
 {
     std::size_t operator()(const nxpl::NX_GUID& guid) const
     {
-        std::size_t h;
+        std::size_t h = 0;
 
         for (size_t i = 0; i < sizeof(guid.bytes); ++i)
-            h = (h + (324723947 + guid.bytes[i])) ^ 93485734985;
+            h = (h + (324'723'947ull + guid.bytes[i])) ^ 93'485'734'985ull;
 
         return h;
     }
