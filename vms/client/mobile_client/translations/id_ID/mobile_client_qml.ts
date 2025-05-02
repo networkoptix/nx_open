@@ -16,6 +16,13 @@
     </message>
   </context>
   <context>
+    <name>AppInfoScreen</name>
+    <message>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
+    </message>
+  </context>
+  <context>
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
@@ -362,6 +369,25 @@
     </message>
   </context>
   <context>
+    <name>InterfaceSettingsScreen</name>
+    <message>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
+    </message>
+    <message>
+      <source>Live previews</source>
+      <translation>Preview live</translation>
+    </message>
+    <message>
+      <source>Show previews in the cameras list</source>
+      <translation>Tampilkan preview di daftar kamera</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>Gunakan waktu server</translation>
+    </message>
+  </context>
+  <context>
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
@@ -459,6 +485,29 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Bidang kata sandi tidak boleh kosong</translation>
+    </message>
+  </context>
+  <context>
+    <name>PerformanceSettingsScreen</name>
+    <message>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>Aktifkan akselerasi hardware</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>Meningkatkan performa dan masa pakai baterai</translation>
+    </message>
+    <message>
+      <source>Enable software decoder fallback</source>
+      <translation>Aktifkan fallback dekoder software</translation>
+    </message>
+    <message>
+      <source>Decode some rare video formats using software decoder</source>
+      <translation>Dekode beberapa format video langka menggunakan dekoder software</translation>
     </message>
   </context>
   <context>
@@ -630,6 +679,26 @@
       <source>Connect only servers with public certificates</source>
       <translation>Koneksikan hanya server dengan sertifikat publik</translation>
     </message>
+    <message>
+      <source>Save passwords</source>
+      <translation>Simpan kata sandi</translation>
+    </message>
+    <message>
+      <source>Automatically log in to servers</source>
+      <translation>Secara otomatis masuk ke server</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>Apa yang harus dilakukan dengan kata sandi yang disimpan saat ini?</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Tetap</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Hapus</translation>
+    </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
@@ -708,34 +777,6 @@
       <translation>Pengaturan</translation>
     </message>
     <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Apa yang harus dilakukan dengan kata sandi yang disimpan saat ini?</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Delete</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>Tetap</translation>
-    </message>
-    <message>
-      <source>Use server time</source>
-      <translation>Gunakan waktu server</translation>
-    </message>
-    <message>
-      <source>Live previews</source>
-      <translation>Preview live</translation>
-    </message>
-    <message>
-      <source>Show previews in the cameras list</source>
-      <translation>Tampilkan preview di daftar kamera</translation>
-    </message>
-    <message>
-      <source>Save passwords</source>
-      <translation>Simpan kata sandi</translation>
-    </message>
-    <message>
       <source>Push notifications</source>
       <translation>Notifikasi push</translation>
     </message>
@@ -748,28 +789,8 @@
       <translation>Masuk ke cloud untuk menggunakan notifikasi push</translation>
     </message>
     <message>
-      <source>Automatically log in to servers</source>
-      <translation>Secara otomatis masuk ke server</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>Keamanan</translation>
-    </message>
-    <message>
-      <source>Recommended</source>
-      <translation>Direkomendasikan</translation>
-    </message>
-    <message>
-      <source>Strict</source>
-      <translation>Ketat</translation>
-    </message>
-    <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Aktifkan akselerasi hardware</translation>
-    </message>
-    <message>
-      <source>Increase performance and battery life</source>
-      <translation>Meningkatkan performa dan masa pakai baterai</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -784,12 +805,16 @@
       <translation>Akses awal ke fitur baru</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>Aktifkan fallback dekoder software</translation>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>Dekode beberapa format video langka menggunakan dekoder software</translation>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>AppInfo</source>
+      <translation type="unfinished">AppInfo</translation>
     </message>
   </context>
   <context>

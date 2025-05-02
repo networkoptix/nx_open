@@ -16,6 +16,13 @@
     </message>
   </context>
   <context>
+    <name>AppInfoScreen</name>
+    <message>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
+    </message>
+  </context>
+  <context>
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
@@ -363,6 +370,25 @@
     </message>
   </context>
   <context>
+    <name>InterfaceSettingsScreen</name>
+    <message>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
+    </message>
+    <message>
+      <source>Live previews</source>
+      <translation>Livevorschau</translation>
+    </message>
+    <message>
+      <source>Show previews in the cameras list</source>
+      <translation>Vorschau in der Kameraliste anzeigen</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>Serverzeit verwenden</translation>
+    </message>
+  </context>
+  <context>
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
@@ -460,6 +486,29 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Passwortfeld darf nicht leer sein</translation>
+    </message>
+  </context>
+  <context>
+    <name>PerformanceSettingsScreen</name>
+    <message>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>Hardwarebeschleunigung aktivieren</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>Leistung und Akkulaufzeit erhöhen</translation>
+    </message>
+    <message>
+      <source>Enable software decoder fallback</source>
+      <translation type="unfinished">Enable software decoder fallback</translation>
+    </message>
+    <message>
+      <source>Decode some rare video formats using software decoder</source>
+      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
     </message>
   </context>
   <context>
@@ -631,6 +680,26 @@
       <source>Connect only servers with public certificates</source>
       <translation>Nur Server mit öffentlichen Zertifikaten verbinden</translation>
     </message>
+    <message>
+      <source>Save passwords</source>
+      <translation>Passwörter speichern</translation>
+    </message>
+    <message>
+      <source>Automatically log in to servers</source>
+      <translation>Melden Sie sich automatisch bei Servern an</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>Was tun mit den aktuell gespeicherten Passwörtern?</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Behalten</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Löschen</translation>
+    </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
@@ -709,34 +778,6 @@
       <translation>Einstellungen</translation>
     </message>
     <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Was tun mit den aktuell gespeicherten Passwörtern?</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Löschen</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>Behalten</translation>
-    </message>
-    <message>
-      <source>Use server time</source>
-      <translation>Serverzeit verwenden</translation>
-    </message>
-    <message>
-      <source>Live previews</source>
-      <translation>Livevorschau</translation>
-    </message>
-    <message>
-      <source>Show previews in the cameras list</source>
-      <translation>Vorschau in der Kameraliste anzeigen</translation>
-    </message>
-    <message>
-      <source>Save passwords</source>
-      <translation>Passwörter speichern</translation>
-    </message>
-    <message>
       <source>Push notifications</source>
       <translation>Push-Benachrichtigungen</translation>
     </message>
@@ -749,28 +790,8 @@
       <translation>In der Cloud anmelden, um Push-Benachrichtigungen zu verwenden</translation>
     </message>
     <message>
-      <source>Automatically log in to servers</source>
-      <translation>Melden Sie sich automatisch bei Servern an</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>Sicherheit</translation>
-    </message>
-    <message>
-      <source>Recommended</source>
-      <translation>Empfohlen</translation>
-    </message>
-    <message>
-      <source>Strict</source>
-      <translation>Strikt</translation>
-    </message>
-    <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Hardwarebeschleunigung aktivieren</translation>
-    </message>
-    <message>
-      <source>Increase performance and battery life</source>
-      <translation>Leistung und Akkulaufzeit erhöhen</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -785,12 +806,16 @@
       <translation type="unfinished">Early access to new features</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>AppInfo</source>
+      <translation type="unfinished">AppInfo</translation>
     </message>
   </context>
   <context>

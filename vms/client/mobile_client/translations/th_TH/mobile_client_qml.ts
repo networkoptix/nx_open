@@ -16,6 +16,13 @@
     </message>
   </context>
   <context>
+    <name>AppInfoScreen</name>
+    <message>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
+    </message>
+  </context>
+  <context>
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
@@ -362,6 +369,25 @@
     </message>
   </context>
   <context>
+    <name>InterfaceSettingsScreen</name>
+    <message>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
+    </message>
+    <message>
+      <source>Live previews</source>
+      <translation>ตัวอย่างภาพปัจจุบัน</translation>
+    </message>
+    <message>
+      <source>Show previews in the cameras list</source>
+      <translation>แสดงตัวอย่างในรายการกล้อง</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>ใช้เวลาจากเซิร์ฟเวอร์</translation>
+    </message>
+  </context>
+  <context>
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
@@ -459,6 +485,29 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>ต้องระบุช่องรหัสผ่าน</translation>
+    </message>
+  </context>
+  <context>
+    <name>PerformanceSettingsScreen</name>
+    <message>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>เปิดใช้งานการเร่งด้วยฮาร์ดแวร์</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>เพิ่มประสิทธิภาพและอายุการใช้งานแบตเตอรี่</translation>
+    </message>
+    <message>
+      <source>Enable software decoder fallback</source>
+      <translation type="unfinished">Enable software decoder fallback</translation>
+    </message>
+    <message>
+      <source>Decode some rare video formats using software decoder</source>
+      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
     </message>
   </context>
   <context>
@@ -630,6 +679,26 @@
       <source>Connect only servers with public certificates</source>
       <translation>เชื่อมต่อเฉพาะเซิร์ฟเวอร์ที่มี public certificates</translation>
     </message>
+    <message>
+      <source>Save passwords</source>
+      <translation>บันทึกรหัสผ่าน</translation>
+    </message>
+    <message>
+      <source>Automatically log in to servers</source>
+      <translation>เข้าสู่โดยอัตโนมัติไปยังเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>จะทำอย่างไรกับรหัสผ่านที่บันทึกไว้ในปัจจุบัน</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>เก็บไว้</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>ลบ</translation>
+    </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
@@ -708,34 +777,6 @@
       <translation>การตั้งค่า</translation>
     </message>
     <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>จะทำอย่างไรกับรหัสผ่านที่บันทึกไว้ในปัจจุบัน</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>ลบ</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>เก็บไว้</translation>
-    </message>
-    <message>
-      <source>Use server time</source>
-      <translation>ใช้เวลาจากเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Live previews</source>
-      <translation>ตัวอย่างภาพปัจจุบัน</translation>
-    </message>
-    <message>
-      <source>Show previews in the cameras list</source>
-      <translation>แสดงตัวอย่างในรายการกล้อง</translation>
-    </message>
-    <message>
-      <source>Save passwords</source>
-      <translation>บันทึกรหัสผ่าน</translation>
-    </message>
-    <message>
       <source>Push notifications</source>
       <translation>การแจ้งเตือนแบบพุช</translation>
     </message>
@@ -748,28 +789,8 @@
       <translation>เข้าสู่ระบบคลาวด์เพื่อใช้การแจ้งเตือนแบบพุช</translation>
     </message>
     <message>
-      <source>Automatically log in to servers</source>
-      <translation>เข้าสู่โดยอัตโนมัติไปยังเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>ความปลอดภัย</translation>
-    </message>
-    <message>
-      <source>Recommended</source>
-      <translation>แนะนำ</translation>
-    </message>
-    <message>
-      <source>Strict</source>
-      <translation>เข้มงวด</translation>
-    </message>
-    <message>
-      <source>Enable hardware acceleration</source>
-      <translation>เปิดใช้งานการเร่งด้วยฮาร์ดแวร์</translation>
-    </message>
-    <message>
-      <source>Increase performance and battery life</source>
-      <translation>เพิ่มประสิทธิภาพและอายุการใช้งานแบตเตอรี่</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -784,12 +805,16 @@
       <translation type="unfinished">Early access to new features</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>AppInfo</source>
+      <translation type="unfinished">AppInfo</translation>
     </message>
   </context>
   <context>

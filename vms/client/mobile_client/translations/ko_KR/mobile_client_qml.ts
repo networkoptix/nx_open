@@ -16,6 +16,13 @@
     </message>
   </context>
   <context>
+    <name>AppInfoScreen</name>
+    <message>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
+    </message>
+  </context>
+  <context>
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
@@ -362,6 +369,25 @@
     </message>
   </context>
   <context>
+    <name>InterfaceSettingsScreen</name>
+    <message>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
+    </message>
+    <message>
+      <source>Live previews</source>
+      <translation>실시간 미리보기</translation>
+    </message>
+    <message>
+      <source>Show previews in the cameras list</source>
+      <translation>카메라 목록에서 미리보기 보여줌</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>서버 시간 사용</translation>
+    </message>
+  </context>
+  <context>
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
@@ -459,6 +485,29 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>비밀번호는 필수 정보입니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>PerformanceSettingsScreen</name>
+    <message>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>하드웨어 가속 활성화</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>성능과 배터리 수명 증가</translation>
+    </message>
+    <message>
+      <source>Enable software decoder fallback</source>
+      <translation type="unfinished">Enable software decoder fallback</translation>
+    </message>
+    <message>
+      <source>Decode some rare video formats using software decoder</source>
+      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
     </message>
   </context>
   <context>
@@ -630,6 +679,26 @@
       <source>Connect only servers with public certificates</source>
       <translation>공인인증서가 있는 서버만 연결</translation>
     </message>
+    <message>
+      <source>Save passwords</source>
+      <translation>패스워드 저장</translation>
+    </message>
+    <message>
+      <source>Automatically log in to servers</source>
+      <translation>서버에 자동 로그인</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>현재 저장된 암호로 무엇을해야합니까?</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>유지</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>삭제</translation>
+    </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
@@ -708,34 +777,6 @@
       <translation>설정</translation>
     </message>
     <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>현재 저장된 암호로 무엇을해야합니까?</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>삭제</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>유지</translation>
-    </message>
-    <message>
-      <source>Use server time</source>
-      <translation>서버 시간 사용</translation>
-    </message>
-    <message>
-      <source>Live previews</source>
-      <translation>실시간 미리보기</translation>
-    </message>
-    <message>
-      <source>Show previews in the cameras list</source>
-      <translation>카메라 목록에서 미리보기 보여줌</translation>
-    </message>
-    <message>
-      <source>Save passwords</source>
-      <translation>패스워드 저장</translation>
-    </message>
-    <message>
       <source>Push notifications</source>
       <translation>푸시 알림</translation>
     </message>
@@ -748,28 +789,8 @@
       <translation>푸시 알림을 사용하기 위해 클라우드에 로그인</translation>
     </message>
     <message>
-      <source>Automatically log in to servers</source>
-      <translation>서버에 자동 로그인</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>보안</translation>
-    </message>
-    <message>
-      <source>Recommended</source>
-      <translation>권장</translation>
-    </message>
-    <message>
-      <source>Strict</source>
-      <translation>엄격한</translation>
-    </message>
-    <message>
-      <source>Enable hardware acceleration</source>
-      <translation>하드웨어 가속 활성화</translation>
-    </message>
-    <message>
-      <source>Increase performance and battery life</source>
-      <translation>성능과 배터리 수명 증가</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -784,12 +805,16 @@
       <translation>새로운 기능 미리 보기</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>AppInfo</source>
+      <translation type="unfinished">AppInfo</translation>
     </message>
   </context>
   <context>

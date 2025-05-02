@@ -16,6 +16,13 @@
     </message>
   </context>
   <context>
+    <name>AppInfoScreen</name>
+    <message>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
+    </message>
+  </context>
+  <context>
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
@@ -362,6 +369,25 @@
     </message>
   </context>
   <context>
+    <name>InterfaceSettingsScreen</name>
+    <message>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
+    </message>
+    <message>
+      <source>Live previews</source>
+      <translation>Xem trước trực tiếp</translation>
+    </message>
+    <message>
+      <source>Show previews in the cameras list</source>
+      <translation>Hiển thị xem trước trong danh sách camera</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>Sử dụng thời gian máy chủ</translation>
+    </message>
+  </context>
+  <context>
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
@@ -459,6 +485,29 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Mật khẩu không được để trống</translation>
+    </message>
+  </context>
+  <context>
+    <name>PerformanceSettingsScreen</name>
+    <message>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>Kích hoạt Gia tốc Phần cứng</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>Tăng hiệu suất và tuổi thọ pin</translation>
+    </message>
+    <message>
+      <source>Enable software decoder fallback</source>
+      <translation>Bật chế độ dự phòng giải mã phần mềm</translation>
+    </message>
+    <message>
+      <source>Decode some rare video formats using software decoder</source>
+      <translation>Giải mã một số định dạng video hiếm bằng phần mềm giải mã</translation>
     </message>
   </context>
   <context>
@@ -630,6 +679,26 @@
       <source>Connect only servers with public certificates</source>
       <translation>Chỉ kết nối các máy chủ có chứng chỉ công khai</translation>
     </message>
+    <message>
+      <source>Save passwords</source>
+      <translation>Lưu mật khẩu</translation>
+    </message>
+    <message>
+      <source>Automatically log in to servers</source>
+      <translation>Tự động đăng nhập vào máy chủ</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>Phải làm gì với mật khẩu hiện đã lưu?</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Giữ</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Xóa bỏ</translation>
+    </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
@@ -708,34 +777,6 @@
       <translation>Cài đặt</translation>
     </message>
     <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Phải làm gì với mật khẩu hiện đã lưu?</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Xoá</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>Giữ</translation>
-    </message>
-    <message>
-      <source>Use server time</source>
-      <translation>Sử dụng thời gian máy chủ</translation>
-    </message>
-    <message>
-      <source>Live previews</source>
-      <translation>Xem trước trực tiếp</translation>
-    </message>
-    <message>
-      <source>Show previews in the cameras list</source>
-      <translation>Hiển thị xem trước trong danh sách camera</translation>
-    </message>
-    <message>
-      <source>Save passwords</source>
-      <translation>Lưu mật khẩu</translation>
-    </message>
-    <message>
       <source>Push notifications</source>
       <translation>Thông báo đẩy</translation>
     </message>
@@ -748,28 +789,8 @@
       <translation>Đăng nhập vào đám mây để sử dụng thông báo đẩy</translation>
     </message>
     <message>
-      <source>Automatically log in to servers</source>
-      <translation>Tự động đăng nhập vào máy chủ</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>Bảo mật</translation>
-    </message>
-    <message>
-      <source>Recommended</source>
-      <translation>Được khuyến nghị</translation>
-    </message>
-    <message>
-      <source>Strict</source>
-      <translation>Nghiêm ngặt</translation>
-    </message>
-    <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Kích hoạt Gia tốc Phần cứng</translation>
-    </message>
-    <message>
-      <source>Increase performance and battery life</source>
-      <translation>Tăng hiệu suất và tuổi thọ pin</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -784,12 +805,16 @@
       <translation>Quyền truy cập sớm vào các tính năng mới</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>Bật chế độ dự phòng giải mã phần mềm</translation>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>Giải mã một số định dạng video hiếm bằng phần mềm giải mã</translation>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>AppInfo</source>
+      <translation type="unfinished">AppInfo</translation>
     </message>
   </context>
   <context>

@@ -16,6 +16,13 @@
     </message>
   </context>
   <context>
+    <name>AppInfoScreen</name>
+    <message>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
+    </message>
+  </context>
+  <context>
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
@@ -362,6 +369,25 @@
     </message>
   </context>
   <context>
+    <name>InterfaceSettingsScreen</name>
+    <message>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
+    </message>
+    <message>
+      <source>Live previews</source>
+      <translation>ライブプレビュー</translation>
+    </message>
+    <message>
+      <source>Show previews in the cameras list</source>
+      <translation>カメラリストにプレビューを表示します</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>サーバー時刻を使用</translation>
+    </message>
+  </context>
+  <context>
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
@@ -459,6 +485,29 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>パスワード欄に入力してください</translation>
+    </message>
+  </context>
+  <context>
+    <name>PerformanceSettingsScreen</name>
+    <message>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>ハードウェアアクセラレーションを有効化</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>パフォーマンスとバッテリー効率を向上させます</translation>
+    </message>
+    <message>
+      <source>Enable software decoder fallback</source>
+      <translation>ソフトウェアデコーダーへのフォールバックを有効化</translation>
+    </message>
+    <message>
+      <source>Decode some rare video formats using software decoder</source>
+      <translation>一般的でない映像フォーマットのデコードに、ソフトウェアデコーダーを使用します</translation>
     </message>
   </context>
   <context>
@@ -630,6 +679,26 @@
       <source>Connect only servers with public certificates</source>
       <translation>正式な証明書を持つサーバーにのみ接続します</translation>
     </message>
+    <message>
+      <source>Save passwords</source>
+      <translation>パスワードを保存</translation>
+    </message>
+    <message>
+      <source>Automatically log in to servers</source>
+      <translation>サーバーへ自動的にログインします</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>現在保存されているパスワードはどうしますか？</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>維持</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>削除</translation>
+    </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
@@ -708,34 +777,6 @@
       <translation>設定</translation>
     </message>
     <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>現在保存されているパスワードはどうしますか？</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>削除</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>維持</translation>
-    </message>
-    <message>
-      <source>Use server time</source>
-      <translation>サーバー時刻を使用</translation>
-    </message>
-    <message>
-      <source>Live previews</source>
-      <translation>ライブプレビュー</translation>
-    </message>
-    <message>
-      <source>Show previews in the cameras list</source>
-      <translation>カメラリストにプレビューを表示します</translation>
-    </message>
-    <message>
-      <source>Save passwords</source>
-      <translation>パスワードを保存</translation>
-    </message>
-    <message>
       <source>Push notifications</source>
       <translation>プッシュ通知</translation>
     </message>
@@ -748,28 +789,8 @@
       <translation>プッシュ通知を使用するには、クラウドにログインしてください。</translation>
     </message>
     <message>
-      <source>Automatically log in to servers</source>
-      <translation>サーバーへ自動的にログインします</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>セキュリティ</translation>
-    </message>
-    <message>
-      <source>Recommended</source>
-      <translation>推奨</translation>
-    </message>
-    <message>
-      <source>Strict</source>
-      <translation>厳格</translation>
-    </message>
-    <message>
-      <source>Enable hardware acceleration</source>
-      <translation>ハードウェアアクセラレーションを有効化</translation>
-    </message>
-    <message>
-      <source>Increase performance and battery life</source>
-      <translation>パフォーマンスとバッテリー効率を向上させます</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -784,12 +805,16 @@
       <translation>新機能の早期公開</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>ソフトウェアデコーダーへのフォールバックを有効化</translation>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>一般的でない映像フォーマットのデコードに、ソフトウェアデコーダーを使用します</translation>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>AppInfo</source>
+      <translation type="unfinished">AppInfo</translation>
     </message>
   </context>
   <context>

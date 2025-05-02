@@ -16,6 +16,13 @@
     </message>
   </context>
   <context>
+    <name>AppInfoScreen</name>
+    <message>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
+    </message>
+  </context>
+  <context>
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
@@ -363,6 +370,25 @@
     </message>
   </context>
   <context>
+    <name>InterfaceSettingsScreen</name>
+    <message>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
+    </message>
+    <message>
+      <source>Live previews</source>
+      <translation>Aperçus en direct</translation>
+    </message>
+    <message>
+      <source>Show previews in the cameras list</source>
+      <translation>Afficher les aperçus dans la liste des caméras</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>Utiliser l'heure serveur</translation>
+    </message>
+  </context>
+  <context>
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
@@ -460,6 +486,29 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Le champ mot de passe ne peut pas être vide</translation>
+    </message>
+  </context>
+  <context>
+    <name>PerformanceSettingsScreen</name>
+    <message>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>Activer l'accélération matérielle</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>Augmente les performances et la durée de vie de la batterie</translation>
+    </message>
+    <message>
+      <source>Enable software decoder fallback</source>
+      <translation>Activer le décodeur logiciel de secours</translation>
+    </message>
+    <message>
+      <source>Decode some rare video formats using software decoder</source>
+      <translation>Décoder de rares formats vidéo à l'aide du décodeur logiciel</translation>
     </message>
   </context>
   <context>
@@ -631,6 +680,26 @@
       <source>Connect only servers with public certificates</source>
       <translation>Connecter uniquement les serveurs avec des certificats publics</translation>
     </message>
+    <message>
+      <source>Save passwords</source>
+      <translation>Enregistrer les mots de passe</translation>
+    </message>
+    <message>
+      <source>Automatically log in to servers</source>
+      <translation>Se connecter automatiquement aux serveurs</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>Que faire avec les mots de passe actuellement enregistrés ?</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Garder</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Supprimer</translation>
+    </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
@@ -709,34 +778,6 @@
       <translation>Paramètres</translation>
     </message>
     <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Que faire avec les mots de passe actuellement enregistrés ?</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Supprimer</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>Garder</translation>
-    </message>
-    <message>
-      <source>Use server time</source>
-      <translation>Utiliser l'heure serveur</translation>
-    </message>
-    <message>
-      <source>Live previews</source>
-      <translation>Aperçus en direct</translation>
-    </message>
-    <message>
-      <source>Show previews in the cameras list</source>
-      <translation>Afficher les aperçus dans la liste des caméras</translation>
-    </message>
-    <message>
-      <source>Save passwords</source>
-      <translation>Enregistrer les mots de passe</translation>
-    </message>
-    <message>
       <source>Push notifications</source>
       <translation>Notifications push</translation>
     </message>
@@ -749,28 +790,8 @@
       <translation>Connectez-vous au cloud pour utiliser les notifications push</translation>
     </message>
     <message>
-      <source>Automatically log in to servers</source>
-      <translation>Se connecter automatiquement aux serveurs</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>Sécurité</translation>
-    </message>
-    <message>
-      <source>Recommended</source>
-      <translation>Recommandé</translation>
-    </message>
-    <message>
-      <source>Strict</source>
-      <translation>Stricte</translation>
-    </message>
-    <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Activer l'accélération matérielle</translation>
-    </message>
-    <message>
-      <source>Increase performance and battery life</source>
-      <translation>Augmente les performances et la durée de vie de la batterie</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -785,12 +806,16 @@
       <translation>Accès anticipé aux nouvelles fonctionnalités</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>Activer le décodeur logiciel de secours</translation>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>Décoder de rares formats vidéo à l'aide du décodeur logiciel</translation>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>AppInfo</source>
+      <translation type="unfinished">AppInfo</translation>
     </message>
   </context>
   <context>

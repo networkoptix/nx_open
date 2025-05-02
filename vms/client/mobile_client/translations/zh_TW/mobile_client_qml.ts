@@ -16,6 +16,13 @@
     </message>
   </context>
   <context>
+    <name>AppInfoScreen</name>
+    <message>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
+    </message>
+  </context>
+  <context>
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
@@ -362,6 +369,25 @@
     </message>
   </context>
   <context>
+    <name>InterfaceSettingsScreen</name>
+    <message>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
+    </message>
+    <message>
+      <source>Live previews</source>
+      <translation>即時預覽</translation>
+    </message>
+    <message>
+      <source>Show previews in the cameras list</source>
+      <translation>於攝影機列表上顯示影像預覽</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>使用伺服器時間當作標準</translation>
+    </message>
+  </context>
+  <context>
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
@@ -459,6 +485,29 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>密碼欄位不能為空</translation>
+    </message>
+  </context>
+  <context>
+    <name>PerformanceSettingsScreen</name>
+    <message>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>啟用硬體加速</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>提高效能與電池壽命</translation>
+    </message>
+    <message>
+      <source>Enable software decoder fallback</source>
+      <translation>啟用退回軟體解碼器</translation>
+    </message>
+    <message>
+      <source>Decode some rare video formats using software decoder</source>
+      <translation>使用軟體解碼器來解碼罕見的影像格式</translation>
     </message>
   </context>
   <context>
@@ -630,6 +679,26 @@
       <source>Connect only servers with public certificates</source>
       <translation>僅允許連線至使用公開憑證的伺服器</translation>
     </message>
+    <message>
+      <source>Save passwords</source>
+      <translation>儲存使用者密碼</translation>
+    </message>
+    <message>
+      <source>Automatically log in to servers</source>
+      <translation>自動登入伺服器</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>如何處理目前保存中的密碼？</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>保留</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>刪除</translation>
+    </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
@@ -708,34 +777,6 @@
       <translation>設定</translation>
     </message>
     <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>如何處理目前保存中的密碼？</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>刪除</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>保留</translation>
-    </message>
-    <message>
-      <source>Use server time</source>
-      <translation>使用伺服器時間當作標準</translation>
-    </message>
-    <message>
-      <source>Live previews</source>
-      <translation>即時預覽</translation>
-    </message>
-    <message>
-      <source>Show previews in the cameras list</source>
-      <translation>於攝影機列表上顯示影像預覽</translation>
-    </message>
-    <message>
-      <source>Save passwords</source>
-      <translation>儲存使用者密碼</translation>
-    </message>
-    <message>
       <source>Push notifications</source>
       <translation>推播通知</translation>
     </message>
@@ -748,28 +789,8 @@
       <translation>登入雲端以使用推播通知</translation>
     </message>
     <message>
-      <source>Automatically log in to servers</source>
-      <translation>自動登入伺服器</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>安全性</translation>
-    </message>
-    <message>
-      <source>Recommended</source>
-      <translation>建議選項</translation>
-    </message>
-    <message>
-      <source>Strict</source>
-      <translation>嚴格</translation>
-    </message>
-    <message>
-      <source>Enable hardware acceleration</source>
-      <translation>啟用硬體加速</translation>
-    </message>
-    <message>
-      <source>Increase performance and battery life</source>
-      <translation>提高效能與電池壽命</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -784,12 +805,16 @@
       <translation>提前使用新功能</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation>啟用退回軟體解碼器</translation>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation>使用軟體解碼器來解碼罕見的影像格式</translation>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>AppInfo</source>
+      <translation type="unfinished">AppInfo</translation>
     </message>
   </context>
   <context>

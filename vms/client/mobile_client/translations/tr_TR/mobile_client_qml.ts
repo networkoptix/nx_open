@@ -16,6 +16,13 @@
     </message>
   </context>
   <context>
+    <name>AppInfoScreen</name>
+    <message>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
+    </message>
+  </context>
+  <context>
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
@@ -363,6 +370,25 @@
     </message>
   </context>
   <context>
+    <name>InterfaceSettingsScreen</name>
+    <message>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
+    </message>
+    <message>
+      <source>Live previews</source>
+      <translation>Canlı Önizleme</translation>
+    </message>
+    <message>
+      <source>Show previews in the cameras list</source>
+      <translation>Kamera listesinde canlı önizlemeyi göster</translation>
+    </message>
+    <message>
+      <source>Use server time</source>
+      <translation>Sunucu saatini kullan</translation>
+    </message>
+  </context>
+  <context>
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
@@ -460,6 +486,29 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Şifre alanı boş bırakılamaz</translation>
+    </message>
+  </context>
+  <context>
+    <name>PerformanceSettingsScreen</name>
+    <message>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>Donanım hızlandırmayı etkinleştir</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>Performansı ve pil ömrünü artırın</translation>
+    </message>
+    <message>
+      <source>Enable software decoder fallback</source>
+      <translation type="unfinished">Enable software decoder fallback</translation>
+    </message>
+    <message>
+      <source>Decode some rare video formats using software decoder</source>
+      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
     </message>
   </context>
   <context>
@@ -631,6 +680,26 @@
       <source>Connect only servers with public certificates</source>
       <translation>Yalnızca genel sertifikalara sahip sunucuları bağlayın</translation>
     </message>
+    <message>
+      <source>Save passwords</source>
+      <translation>Kaydedilen parolalar</translation>
+    </message>
+    <message>
+      <source>Automatically log in to servers</source>
+      <translation>Sunuculara otomatik olarak oturum aç</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation>Kayıtlı şifreler ne yapılsın?</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Tut</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Sil</translation>
+    </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
@@ -709,34 +778,6 @@
       <translation>Ayarlar</translation>
     </message>
     <message>
-      <source>What to do with currently saved passwords?</source>
-      <translation>Kayıtlı şifreler ne yapılsın?</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Sil</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>Tut</translation>
-    </message>
-    <message>
-      <source>Use server time</source>
-      <translation>Sunucu saatini kullan</translation>
-    </message>
-    <message>
-      <source>Live previews</source>
-      <translation>Canlı Önizleme</translation>
-    </message>
-    <message>
-      <source>Show previews in the cameras list</source>
-      <translation>Kamera listesinde canlı önizlemeyi göster</translation>
-    </message>
-    <message>
-      <source>Save passwords</source>
-      <translation>Kaydedilen parolalar</translation>
-    </message>
-    <message>
       <source>Push notifications</source>
       <translation>Push bildirimleri</translation>
     </message>
@@ -749,28 +790,8 @@
       <translation>Anlık bildirimleri kullanmak için bulutta oturum açın</translation>
     </message>
     <message>
-      <source>Automatically log in to servers</source>
-      <translation>Sunuculara otomatik olarak oturum aç</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>Güvenlik</translation>
-    </message>
-    <message>
-      <source>Recommended</source>
-      <translation>Önerilen</translation>
-    </message>
-    <message>
-      <source>Strict</source>
-      <translation>Sıkı</translation>
-    </message>
-    <message>
-      <source>Enable hardware acceleration</source>
-      <translation>Donanım hızlandırmayı etkinleştir</translation>
-    </message>
-    <message>
-      <source>Increase performance and battery life</source>
-      <translation>Performansı ve pil ömrünü artırın</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -785,12 +806,16 @@
       <translation>Yeni özelliklere erken erişim</translation>
     </message>
     <message>
-      <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <source>Interface</source>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
-      <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <source>Performance</source>
+      <translation type="unfinished">Performance</translation>
+    </message>
+    <message>
+      <source>AppInfo</source>
+      <translation type="unfinished">AppInfo</translation>
     </message>
   </context>
   <context>
