@@ -199,7 +199,7 @@ if(targetDevice STREQUAL "windows_x64")
 
     if(NOT openSourceBuild)
         # Use MSVC 2019 compiler for non-open-source builds only.
-        set(set_env_command ${CMAKE_COMMAND} -E env NX_FORCED_MSVC_VERSION="14.29")
+        set(set_env_command ${CMAKE_COMMAND} -E env NX_FORCED_VC_TOOLSET_VERSION="14.29")
     endif()
 else()
     set(compiling_options -DCONAN_SDK-GCC_ROOT=${CONAN_SDK-GCC_ROOT})
