@@ -129,18 +129,15 @@ public:
             if (!nx::network::SocketGlobals::isInitialized())
                 return;
 
-            static const char* kFailureMessage =
-                "You MUST cancel running async socket operation before "
-                "deleting socket if you delete socket from non-aio thread";
-            NX_CRITICAL(
-                !(m_addressResolverIsInUse.load() &&
-                    m_addressResolver->isRequestIdKnown(this)), kFailureMessage);
+            if (m_addressResolverIsInUse.load())
+                m_addressResolver->cancel(this);
 
             if (this->m_socket->impl()->aioThread->load())
             {
                 NX_CRITICAL(
                     !this->m_socket->impl()->aioThread->load()->isSocketBeingMonitored(this->m_socket),
-                    kFailureMessage);
+                    "You MUST cancel running async socket operation before "
+                    "deleting socket if you delete socket from non-aio thread");
             }
         }
     }
@@ -751,7 +748,8 @@ private:
      */
     void stopPollingSocket(const aio::EventType eventType)
     {
-        m_addressResolver->cancel(this); //< TODO: #akolesnikov Must not block here!
+        if (m_addressResolverIsInUse.load())
+            m_addressResolver->cancel(this);
 
         if (eventType == aio::EventType::etNone)
         {
