@@ -400,7 +400,8 @@ FocusScope
                 readonly property bool isEditable: treeView.editable
                     && (itemFlags & Qt.ItemIsEditable)
 
-                readonly property var modelData: model
+                readonly property var modelData: inUse ? model : undefined
+                //< We must release model resources in pooled delegates.
 
                 readonly property var modelIndex: inUse
                     ? linearizationListModel.index(index, 0)
@@ -412,6 +413,10 @@ FocusScope
                 readonly property int itemFlags: inUse ? itemFlagsWatcher.itemFlags : 0
                 readonly property bool isCurrent: ListView.isCurrentItem
                 readonly property alias isSelected: selectionHighlight.isItemSelected
+
+                readonly property int level: modelData?.level ?? 0
+                readonly property bool expanded: modelData?.expanded ?? false
+                readonly property bool hasChildren: modelData?.hasChildren ?? false
 
                 readonly property alias delegateItem: delegateLoader.item
 
@@ -439,7 +444,7 @@ FocusScope
                         delegateLoader.startEditing()
                 }
 
-                ContextHelp.topicId: (model && model.helpTopicId) || 0
+                ContextHelp.topicId: modelData?.helpTopicId ?? 0
 
                 ModelItemFlagsWatcher
                 {
@@ -531,23 +536,24 @@ FocusScope
                     id: button
 
                     width: listView.kExpandCollapseButtonWidth
-                    x: treeView.leftMargin + model.level * indentation
-                        - (rootIsDecorated ? 0 : width)
+                    x: treeView.leftMargin + listItem.level * treeView.indentation
+                        - (treeView.rootIsDecorated ? 0 : width)
 
                     height: listItem.height
                     fillMode: Image.Pad
                     verticalAlignment: Image.AlignVCenter
-                    visible: rootIsDecorated || model.level
+                    visible: treeView.rootIsDecorated || listItem.level
 
                     sourcePath:
                     {
-                        if (!model.hasChildren)
+                        if (!listItem.hasChildren)
                             return ""
 
-                        return model.expanded
+                        return listItem.expanded
                             ? "image://skin/20x20/Solid/arrow_open.svg"
                             : "image://skin/20x20/Solid/arrow_right.svg"
                     }
+
                     sourceSize: Qt.size(20, 20)
                     primaryColor: "dark17"
                 }
@@ -592,7 +598,7 @@ FocusScope
                         editingTimer.stop()
                         reselectOnRelease = false
 
-                        const toggleable = model && model.hasChildren
+                        const toggleable = listItem.hasChildren
                         if (toggleable && button.contains(mapToItem(button, mouse.x, mouse.y)))
                             return
 
@@ -602,8 +608,8 @@ FocusScope
                                     : !!treeView.expandsOnDoubleClick)
                         if (toggle)
                         {
-                            linearizationListModel.setExpanded(modelIndex, !model.expanded,
-                                /*recursively*/ mouse.modifiers & Qt.AltModifier)
+                            linearizationListModel.setExpanded(listItem.modelIndex,
+                                !listItem.expanded, /*recursively*/ mouse.modifiers & Qt.AltModifier)
                         }
                         else
                         {
@@ -618,13 +624,13 @@ FocusScope
                         listView.justGotFocus = !treeView.focus
                         treeView.focus = true
 
-                        const toggle = model && model.hasChildren
+                        const toggle = listItem.hasChildren
                             && button.contains(mapToItem(button, mouse.x, mouse.y))
 
                         if (toggle)
                         {
-                            linearizationListModel.setExpanded(modelIndex, !model.expanded,
-                                /*recursively*/ mouse.modifiers & Qt.AltModifier)
+                            linearizationListModel.setExpanded(listItem.modelIndex,
+                                !listItem.expanded, /*recursively*/ mouse.modifiers & Qt.AltModifier)
                             return
                         }
 

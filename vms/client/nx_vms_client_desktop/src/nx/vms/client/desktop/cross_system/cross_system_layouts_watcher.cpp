@@ -33,7 +33,7 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
                         && (crossSystemResourceSystemId(item.resource) == systemId))
                     {
                         layout->removeItem(item.uuid);
-                        if (context->systemContext()->resourcePool()
+                        if (context && context->systemContext()->resourcePool()
                             ->getResourceByDescriptor(item.resource))
                         {
                             layout->addItem(item);
@@ -63,6 +63,20 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
                     if (context->status() == CloudCrossSystemContext::Status::connected)
                         processLayouts(context, systemId);
                 });
+        });
+
+    // This can happen either if a system was removed from the cloud, or if we logged out from the
+    // cloud (and are about to get disconnected from the main system). In that case the system's
+    // system context was deleted right before this signal was sent.
+    // On contrary, if another system goes offline or unauthorized, it's not considered lost,
+    // and cloudCrossSystemManager keeps its system context intact.
+    connect(appContext()->cloudCrossSystemManager(),
+        &CloudCrossSystemManager::systemLost,
+        this,
+        [this, processLayouts](const QString& systemId)
+        {
+            NX_ASSERT(!appContext()->cloudCrossSystemManager()->systemContext(systemId));
+            processLayouts(nullptr, systemId);
         });
 
     if (ini().validateCloudLayouts)

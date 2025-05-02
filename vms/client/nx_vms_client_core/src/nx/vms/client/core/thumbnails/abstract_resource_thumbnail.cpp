@@ -524,7 +524,7 @@ void AbstractResourceThumbnail::Private::doUpdate()
     const bool forceRefreshRequested = forceRefresh;
     forceRefresh = false;
 
-    if (!resource || !active)
+    if (!resource || !active || !NX_ASSERT(!resource->hasFlags(Qn::removed)))
         return;
 
     NX_VERBOSE(q, "Update for %1 (%2), forceRefresh=%3", resource->getName(),
