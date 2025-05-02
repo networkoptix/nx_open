@@ -330,7 +330,6 @@ Page
     {
         id: playbackPanel
 
-        readonly property real navigationHeight: mainWindow.height - eventDetailsScreen.height
         visible: opacity > 0 && !preview.cannotDecryptMedia
         opacity:
         {
@@ -340,9 +339,9 @@ Page
         }
 
         x: mainWindow.hasNavigationBar ? 0 : -windowParams.leftMargin
-        y: parent.height - height + navigationHeight
+        y: parent.height - height
         width: mainWindow.hasNavigationBar ? parent.width : mainWindow.width
-        height: 76 + navigationHeight
+        height: 76
 
         color: ColorTheme.colors.dark1
 
@@ -436,6 +435,17 @@ Page
         color: ColorTheme.colors.light4
 
         text: EventSearchUtils.timestampText(slider.value, windowContext.mainSystemContext)
+    }
+
+    Rectangle
+    {
+        id: bottomNavigationArea
+
+        y: parent.height
+        x: -windowParams.leftMargin
+        height: windowParams.bottomMargin
+        width: parent.width + windowParams.leftMargin + windowParams.rightMargin
+        color: ColorTheme.colors.dark1
     }
 
     Rectangle
