@@ -1395,9 +1395,9 @@ ArchiveIndex DataManager::getArchive(
                 }
 
                 deviceArchiveIndex.chunksPerStream[mediaFileInfo.streamIndex].push_back(MediaChunk{
-                    .startPoint = mediaFileInfo.startTime,
-                    .durationMs = *mediaFileInfo.duration,
-                    .bucketId = m_bucketUrlToId.second});
+                    mediaFileInfo.startTime, /* startPoint */
+                    *mediaFileInfo.duration, /* durationMs */
+                    m_bucketUrlToId.second /* bucketId */});
             }
 
             result.deviceArchiveIndexList.push_back(deviceArchiveIndex);

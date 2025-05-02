@@ -152,8 +152,8 @@ void Engine::startAsyncTasks(const char* lastSequenceId)
                 }
 
                 BucketDescriptionList bucketDescriptionList({BucketDescription{
-                    .url = m_dataManager->bucketUrlAndId().first,
-                    .bucketId = m_dataManager->bucketUrlAndId().second}});
+                    m_dataManager->bucketUrlAndId().first, /* url */
+                    m_dataManager->bucketUrlAndId().second /* bucketId */}});
                 m_handler->onBucketDescriptionUpdated(m_integrationId.data(), &bucketDescriptionList);
 
                 // Real-life implementation should manage its free space by itself and
