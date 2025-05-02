@@ -37,8 +37,8 @@ echo on
 rmdir /S /Q "%BUILD_DIR%" 2>NUL
 @echo off
 
-cmake "%BASE_DIR%\samples" -B "%BUILD_DIR%" %GENERATOR_OPTIONS% %* || @exit /b
-cmake --build "%BUILD_DIR%" || @exit /b
+cmake "%BASE_DIR%\samples" -B "%BUILD_DIR%" %GENERATOR_OPTIONS% %* || goto :exit
+cmake --build "%BUILD_DIR%" || goto :exit
 
 :: Run unit tests if needed.
 if [%NX_SDK_NO_TESTS%] == [1] echo NOTE: Unit tests were not run. & goto :skip_tests
