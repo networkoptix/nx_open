@@ -89,9 +89,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     m_descriptionColumnIndex(-1)
 {
     ui->setupUi(this);
-    setWindowFlags(windowFlags()
-        | Qt::WindowMaximizeButtonHint
-        | Qt::MaximizeUsingFullscreenGeometryHint);
+    setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
 
     connect(windowContext(), &WindowContext::systemChanged, this,
         &QnAuditLogDialog::retranslateUi);

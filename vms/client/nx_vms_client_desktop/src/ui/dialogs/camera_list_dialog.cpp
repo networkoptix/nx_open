@@ -106,9 +106,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget* parent):
 {
     ui->setupUi(this);
 
-    setWindowFlags(windowFlags()
-        | Qt::WindowMaximizeButtonHint
-        | Qt::MaximizeUsingFullscreenGeometryHint);
+    setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
 
     const auto verticalScrollBar = new SnappedScrollBar(Qt::Vertical, ui->tableContainer);
     ui->camerasView->setVerticalScrollBar(verticalScrollBar->proxyScrollBar());

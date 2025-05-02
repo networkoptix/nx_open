@@ -175,9 +175,7 @@ EventLogDialog::EventLogDialog(QWidget* parent):
 {
     ui->setupUi(this);
 
-    setWindowFlags(windowFlags()
-        | Qt::WindowMaximizeButtonHint
-        | Qt::MaximizeUsingFullscreenGeometryHint);
+    setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
 
     setWarningStyle(ui->warningLabel);
 

@@ -14,7 +14,7 @@ void prepareWindow()
 {
     if (QWindow *window = getMainWindow())
     {
-        window->setFlags(window->flags() | Qt::MaximizeUsingFullscreenGeometryHint);
+        window->setFlags(window->flags() | Qt::ExpandedClientAreaHint);
         window->showMaximized();
     }
     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;

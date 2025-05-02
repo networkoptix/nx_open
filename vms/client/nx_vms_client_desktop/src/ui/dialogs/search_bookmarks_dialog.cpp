@@ -19,9 +19,7 @@ QnSearchBookmarksDialog::QnSearchBookmarksDialog(
 {
     setHelpTopic(this, HelpTopic::Id::Bookmarks_Search);
 
-    setWindowFlags(windowFlags()
-        | Qt::WindowMaximizeButtonHint
-        | Qt::MaximizeUsingFullscreenGeometryHint);
+    setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
 }
 
 QnSearchBookmarksDialog::~QnSearchBookmarksDialog()
