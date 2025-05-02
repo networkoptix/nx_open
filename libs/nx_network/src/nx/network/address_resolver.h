@@ -83,8 +83,9 @@ public:
 
     /**
      * Cancels request.
-     * If handler not provided the method will block until actual
-     *   cancellation is done.
+     * If handler not provided the method will block until actual cancellation is done.
+     * TODO: This method should not be blocking because it may commonly be used in AIO thread during
+     * stop operation.
      */
     void cancel(
         void* requestId,
