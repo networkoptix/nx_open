@@ -16,6 +16,13 @@
     </message>
 </context>
 <context>
+    <name>AppInfoScreen</name>
+    <message>
+        <source>App Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AttributeSetSelector</name>
     <message>
         <source>Present</source>
@@ -363,6 +370,25 @@
     </message>
 </context>
 <context>
+    <name>InterfaceSettingsScreen</name>
+    <message>
+        <source>Interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live previews</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show previews in the cameras list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use server time</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LayoutSheet</name>
     <message>
         <source>Layouts</source>
@@ -460,6 +486,29 @@
     <message>
         <source>Password field cannot be empty</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>PerformanceSettingsScreen</name>
+    <message>
+        <source>Performance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable hardware acceleration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase performance and battery life</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable software decoder fallback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decode some rare video formats using software decoder</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -631,6 +680,26 @@
         <source>Connect only servers with public certificates</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Save passwords</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically log in to servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What to do with currently saved passwords?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SessionCredentialsEditor</name>
@@ -709,34 +778,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>What to do with currently saved passwords?</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Keep</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Use server time</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Live previews</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show previews in the cameras list</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Save passwords</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Push notifications</source>
         <translation></translation>
     </message>
@@ -749,27 +790,7 @@
         <translation></translation>
     </message>
     <message>
-        <source>Automatically log in to servers</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Security</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Recommended</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Strict</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable hardware acceleration</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Increase performance and battery life</source>
         <translation></translation>
     </message>
     <message>
@@ -785,12 +806,16 @@
         <translation></translation>
     </message>
     <message>
-        <source>Enable software decoder fallback</source>
-        <translation></translation>
+        <source>Interface</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Decode some rare video formats using software decoder</source>
-        <translation></translation>
+        <source>Performance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AppInfo</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
