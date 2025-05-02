@@ -40,7 +40,7 @@ Controls.ApplicationWindow
 
     function lp(path)
     {
-        return "qrc://" + path
+        return "qrc:///" + path
     }
 
     // Workaround object for Qt bug. On iOS main window padding (which should be equal to
