@@ -185,6 +185,9 @@ if(ANDROID)
 else()
     nx_add_target(mobile_client EXECUTABLE ${target_args})
 endif()
+
+add_dependencies(mobile_client mobile_client_external_resources)
+
 nx_make_target_translatable(mobile_client COMPONENTS "mobile")
 
 target_compile_definitions(mobile_client PRIVATE MOBILE_CLIENT_EXPORT=${API_EXPORT_MACRO})
