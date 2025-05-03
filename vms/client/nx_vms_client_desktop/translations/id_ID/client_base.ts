@@ -6692,7 +6692,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
-      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
+      <translation>Jumlah perangkat yang dipilih untuk backup melebihi layanan yang tersedia. Tambahkan layanan tambahan atau kurangi jumlah perangkat yang dikonfigurasi untuk backup. Pada %1 site akan secara otomatis membatasi jumlah perangkat yang dibackup agar sesuai dengan layanan yang tersedia</translation>
     </message>
   </context>
   <context>
@@ -11366,7 +11366,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Channel Partner user</source>
-      <translation type="unfinished">Channel Partner user</translation>
+      <translation>Pengguna Channel Partner</translation>
     </message>
   </context>
   <context>

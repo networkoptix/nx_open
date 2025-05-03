@@ -373,7 +373,7 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Grænseflade</translation>
     </message>
     <message>
       <source>Live previews</source>
@@ -807,7 +807,7 @@
     </message>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Grænseflade</translation>
     </message>
     <message>
       <source>Performance</source>

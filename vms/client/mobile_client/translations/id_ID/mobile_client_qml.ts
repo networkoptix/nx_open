@@ -19,7 +19,7 @@
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>Info Aplikasi</translation>
     </message>
   </context>
   <context>
@@ -372,7 +372,7 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Interface</translation>
     </message>
     <message>
       <source>Live previews</source>
@@ -491,7 +491,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Performa</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -806,15 +806,15 @@
     </message>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Interface</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Performa</translation>
     </message>
     <message>
       <source>AppInfo</source>
-      <translation type="unfinished">AppInfo</translation>
+      <translation>InfoAplikasi</translation>
     </message>
   </context>
   <context>
@@ -911,11 +911,11 @@
     </message>
     <message>
       <source>SUSPENDED</source>
-      <translation type="unfinished">SUSPENDED</translation>
+      <translation>DITANGGUHKAN</translation>
     </message>
     <message>
       <source>SHUTDOWN</source>
-      <translation type="unfinished">SHUTDOWN</translation>
+      <translation>DITUTUP</translation>
     </message>
   </context>
   <context>

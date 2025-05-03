@@ -375,7 +375,7 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Wygląd</translation>
     </message>
     <message>
       <source>Live previews</source>
@@ -494,7 +494,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Wydajność</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -809,11 +809,11 @@
     </message>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Wygląd</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Wydajność</translation>
     </message>
     <message>
       <source>AppInfo</source>

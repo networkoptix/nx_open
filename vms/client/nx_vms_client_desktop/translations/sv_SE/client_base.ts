@@ -6803,7 +6803,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
-      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
+      <translation>Antalet enheter som valts för säkerhetskopiering överstiger tillgängliga tjänster. Lägg till ytterligare tjänster eller minska antalet enheter som är konfigurerade för säkerhetskopiering. På %1 kommer webbplatsen automatiskt att begränsa antalet säkerhetskopierade enheter så att de matchar de tillgängliga tjänsterna</translation>
     </message>
   </context>
   <context>
@@ -11531,7 +11531,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>Channel Partner user</source>
-      <translation type="unfinished">Channel Partner user</translation>
+      <translation>Kanalpartneranvändare</translation>
     </message>
   </context>
   <context>

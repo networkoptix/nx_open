@@ -491,7 +491,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Performance</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -810,7 +810,7 @@
     </message>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Performance</translation>
     </message>
     <message>
       <source>AppInfo</source>
