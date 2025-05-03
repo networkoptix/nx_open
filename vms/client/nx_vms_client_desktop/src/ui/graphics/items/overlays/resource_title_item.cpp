@@ -74,7 +74,11 @@ void QnResourceTitleItem::paint(QPainter* painter,
     const PainterTransformScaleStripper scaleStripper(painter);
     const auto paintRect = scaleStripper.mapRect(rect());
 
-    const auto paintSize = paintRect.size().toSize() * painter->device()->devicePixelRatio();
+    auto paintSize = paintRect.size().toSize() * painter->device()->devicePixelRatio();
+
+    static const auto kMaxSize = 4096;
+    if (paintSize.width() > kMaxSize || paintSize.height() > kMaxSize)
+        paintSize = paintSize.scaled(kMaxSize, kMaxSize, Qt::KeepAspectRatio);
 
     if (paintSize != m_backgroundCache.size())
     {
