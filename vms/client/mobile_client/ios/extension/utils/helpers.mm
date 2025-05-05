@@ -2,6 +2,8 @@
 
 #include "helpers.h"
 
+#include <chrono>
+
 #include <Foundation/NSURL.h>
 #include <Foundation/NSURLSession.h>
 
