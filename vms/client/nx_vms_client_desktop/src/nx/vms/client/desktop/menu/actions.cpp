@@ -360,6 +360,10 @@ void initialize(Manager* manager, Action* root)
         .checkable()
         .condition(condition::isWorkbenchVisible());
 
+    factory(ResetCurrenTabFiltersAndSelectNotificationsTabAction)
+        .flags(HotkeyOnly)
+        .condition(condition::isWorkbenchVisible());
+
     factory(OpenAdvancedSearchDialog)
         .flags(NoTarget)
         .mode(DesktopMode)

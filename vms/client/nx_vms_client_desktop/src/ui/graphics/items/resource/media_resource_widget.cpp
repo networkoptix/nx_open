@@ -1144,8 +1144,13 @@ void QnMediaResourceWidget::createButtons()
             const auto objectSearchButton = titleBar()->rightButtonsBar()->button(
                 Qn::ObjectSearchButton);
 
-            if (objectSearchButton->isClicked() && on)
-                selectThisWidget(true);
+            if (objectSearchButton->isClicked())
+            {
+                if (on)
+                    selectThisWidget(true);
+                else
+                    action(menu::ResetCurrenTabFiltersAndSelectNotificationsTabAction)->trigger();
+            }
 
             action(menu::ObjectSearchModeAction)->setChecked(on);
         });

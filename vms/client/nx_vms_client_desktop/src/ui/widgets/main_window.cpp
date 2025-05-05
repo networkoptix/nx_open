@@ -327,6 +327,7 @@ MainWindow::MainWindow(WindowContext* context, QWidget* parent, Qt::WindowFlags 
     addAction(action(menu::EventsTabAction));
     addAction(action(menu::ObjectsTabAction));
     addAction(action(menu::ObjectSearchModeAction));
+    addAction(action(menu::ResetCurrenTabFiltersAndSelectNotificationsTabAction));
     addAction(action(menu::NextLayoutAction));
     addAction(action(menu::PreviousLayoutAction));
     addAction(action(menu::SaveCurrentLayoutAction));

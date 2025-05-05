@@ -285,6 +285,14 @@ enum IDType
      */
     ObjectSearchModeAction,
 
+    /**
+      * Some right panel tabs filters should be reset to default state on another action
+      * checked state changed (for example, ObjectSearchModeAction).
+      * After that, current right panel's tab should be switched to Notifications tab.
+      * Due to connection of this behavior, the action do both things.
+      */
+    ResetCurrenTabFiltersAndSelectNotificationsTabAction,
+
     /* Main menu actions. */
 
     /**

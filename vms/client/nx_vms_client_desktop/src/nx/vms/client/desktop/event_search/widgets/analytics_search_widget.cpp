@@ -182,13 +182,6 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(WindowContext* context, QWidget* pa
     connect(model(), &core::AbstractSearchListModel::isOnlineChanged, this,
         &AnalyticsSearchWidget::updateAllowance);
 
-    connect(action(menu::ObjectSearchModeAction), &QAction::toggled, this,
-        [this](bool on)
-        {
-            if (!on && commonSetup()->cameraSelection() == core::EventSearch::CameraSelection::current)
-                resetFilters();
-        });
-
     d->updateAllowanceAndTaxonomy();
 
     HelpTopicAccessor::setHelpTopic(this, HelpTopic::Id::ObjectSearch);

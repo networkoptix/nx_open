@@ -286,6 +286,25 @@ EventPanel::Private::Private(EventPanel* q):
     connect(action(menu::ObjectsTabAction), &QAction::triggered, this,
         [this] { setCurrentTab(Tab::analytics); });
 
+    connect(action(menu::ResetCurrenTabFiltersAndSelectNotificationsTabAction), &QAction::triggered, this,
+        [this]
+        {
+            auto widget = qobject_cast<AbstractSearchWidget*>(m_tabs->currentWidget());
+            if (!widget)
+            {
+                if (auto overlappable = qobject_cast<OverlappableSearchWidget*>(m_tabs->currentWidget()))
+                    widget = overlappable->searchWidget();
+            }
+
+            if (widget)
+            {
+                widget->resetFilters();
+                setCurrentTab(Tab::notifications);
+            }
+        });
+
+    action(menu::ResetCurrenTabFiltersAndSelectNotificationsTabAction)->trigger();
+
     connect(m_notificationsTab, &NotificationListWidget::unreadCountChanged,
         this, &Private::updateUnreadCounter);
 
