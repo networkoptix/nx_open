@@ -1036,6 +1036,14 @@ bool QnVirtualCameraResource::hasVideo(const QnAbstractStreamDataProvider* /*dat
     return m_cachedHasVideo.get();
 }
 
+bool QnVirtualCameraResource::hasAudio() const
+{
+    // We're checking for both isAudioSupported AND isAudioEnabled here because it's technically
+    // possible to have a camera that has audio enabled but not supported. Enabled is just a flag
+    // in the database.
+    return audioInputDevice()->isAudioSupported() && isAudioEnabled();
+}
+
 Qn::LicenseType QnVirtualCameraResource::calculateLicenseType() const
 {
     using namespace nx::vms::api;

@@ -847,6 +847,10 @@ bool Player::Private::createArchiveReader()
         if (!NX_ASSERT(camera))
             return false;
 
+        const bool needRtsp = camera->hasVideo() || camera->hasAudio();
+        if (!needRtsp)
+            return false;
+
         const auto systemContext = camera->systemContext();
         if (!NX_ASSERT(systemContext))
             return false;

@@ -161,6 +161,11 @@ void DesktopCameraConnectionProcessor::processRequest()
         if (!d->dataProvider)
         {
             d->dataProvider = d->desktop->createDataProvider(Qn::CR_Default);
+            if (!NX_ASSERT(d->dataProvider))
+            {
+                NX_WARNING(this, "Desktop camera data provider was not initialized");
+                return;
+            }
             d->dataConsumer = new DesktopCameraConsumer(this);
             d->dataProvider->addDataProcessor(d->dataConsumer);
             d->dataConsumer->start();

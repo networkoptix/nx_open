@@ -64,6 +64,11 @@ void LiveAnalyticsReceiver::Private::setCamera(const QnVirtualCameraResourcePtr&
     if (!m_camera)
         return;
 
+    // Checking for audio just in case; probably there can be analytics object based on audio.
+    const bool needRtsp = m_camera->hasVideo() || m_camera->hasAudio();
+    if (!needRtsp)
+        return;
+
     m_reader.reset(new QnArchiveStreamReader(m_camera));
     m_reader->setArchiveDelegate(new QnRtspClientArchiveDelegate(
         m_reader.get(),

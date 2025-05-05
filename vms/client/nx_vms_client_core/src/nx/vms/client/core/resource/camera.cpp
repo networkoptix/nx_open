@@ -4,7 +4,8 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/status_dictionary.h>
-#include <nx/vms/common/system_context.h>
+#include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/system_context.h>
 
 namespace nx::vms::client::core {
 
@@ -62,6 +63,17 @@ void Camera::setParentId(const nx::Uuid& parent)
         if (!oldValue.isNull())
             emit statusChanged(toSharedPointer(this), Qn::StatusChangeReason::Local);
     }
+}
+
+bool Camera::hasAudio() const
+{
+    auto context = qobject_cast<SystemContext*>(systemContext());
+    if (!NX_ASSERT(context))
+        return false;
+
+    // If we don't have PlayAudioPermission for this camera then it effectively doesn't have audio.
+    return base_type::hasAudio()
+        && context->accessController()->hasPermissions(toSharedPointer(), Qn::PlayAudioPermission);
 }
 
 bool Camera::isPtzSupported() const

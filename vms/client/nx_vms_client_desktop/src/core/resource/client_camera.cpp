@@ -105,7 +105,10 @@ AudioLayoutConstPtr QnClientCameraResource::getAudioLayout(
 QnAbstractStreamDataProvider* QnClientCameraResource::createDataProvider(Qn::ConnectionRole role)
 {
     NX_ASSERT(role == Qn::CR_Default);
-    const auto camera = toSharedPointer(this);
+    const bool needRtsp = hasVideo() || hasAudio();
+    if (!needRtsp)
+        return {};
+
     auto context = dynamic_cast<nx::vms::client::core::SystemContext*>(systemContext());
     if (!NX_ASSERT(context))
         return nullptr;
@@ -114,6 +117,7 @@ QnAbstractStreamDataProvider* QnClientCameraResource::createDataProvider(Qn::Con
         ? context->connection()->credentials()
         : nx::network::http::Credentials();
 
+    const auto camera = toSharedPointer(this);
     QnArchiveStreamReader *result = new QnArchiveStreamReader(camera);
     auto delegate = new QnRtspClientArchiveDelegate(
         result,

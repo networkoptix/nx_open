@@ -31,6 +31,9 @@ public:
     virtual Qn::ResourceFlags flags() const override;
     virtual void setParentId(const nx::Uuid& parent) override;
 
+    /** Improved check which includes current user permissions validation. */
+    virtual bool hasAudio() const override;
+
     bool isPtzSupported() const;
     bool isPtzRedirected() const;
     CameraPtr ptzRedirectedTo() const;

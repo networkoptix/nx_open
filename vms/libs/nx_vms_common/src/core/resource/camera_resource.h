@@ -645,6 +645,9 @@ public:
 
     virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
 
+    /** Whether the camera has audio, concerning redirected audio input device if it is set. */
+    virtual bool hasAudio() const;
+
     /**
      * Update user password at the camera. This function is able to change password for existing user only.
      */

@@ -3531,16 +3531,8 @@ nx::vms::client::desktop::RewindOverlay* QnMediaResourceWidget::rewindOverlay() 
 
 bool QnMediaResourceWidget::hasAudio() const
 {
-    // We're checking for both isAudioSupported AND isAudioEnabled here because it's technically
-    // possible to have a camera that has audio enabled but not supported. Enabled is just a flag
-    // in the database.
-    // If we don't have PlayAudioPermission for this camera then it effectively doesn't have audio.
     if (d->camera)
-    {
-        return d->camera->audioInputDevice()->isAudioSupported()
-            && d->camera->isAudioEnabled()
-            && accessController()->hasPermissions(d->camera, Qn::PlayAudioPermission);
-    }
+        return d->camera->hasAudio();
 
     if (d->mediaResource) // Handle local files.
     {
