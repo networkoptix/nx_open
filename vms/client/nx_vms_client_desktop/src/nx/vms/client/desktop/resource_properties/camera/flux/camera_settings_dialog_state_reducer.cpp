@@ -519,8 +519,22 @@ bool isDefaultExpertSettings(const State& state)
         return false;
 
     {
-        const bool expected = QnVirtualCameraResource::kRemoteArchiveSynchronizationEnabledByDefault;
-        if (state.expert.remoteArchiveSynchronizationEnabled.valueOr(expected) != expected)
+        const std::optional<bool> allCamerasHaveCapability =
+            [&]() -> std::optional<bool>
+            {
+                if (state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::All)
+                    return true;
+                if (state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::None)
+                    return false;
+                return std::nullopt;
+            }();
+        const std::optional<bool> settingEnabledForAllCameras =
+            state.expert.remoteArchiveSynchronizationEnabled;
+
+        // The default value for the setting is to be the same as the camera capability. We ignore
+        // the case where both sides of the condition are nullopt, because that means that each
+        // camera should be checked individually, but we cannot do that here.
+        if (allCamerasHaveCapability != settingEnabledForAllCameras)
             return false;
     }
 

@@ -1704,8 +1704,9 @@ void QnVirtualCameraResource::setTrustCameraTime(bool value)
 
 bool QnVirtualCameraResource::keepCameraTimeSettings() const
 {
+    const bool defaultValue = !hasCameraCapabilities(nx::vms::api::DeviceCapability::remoteArchive);
     return QnLexical::deserialized<bool>(
-        getProperty(ResourcePropertyKey::kKeepCameraTimeSettings), true);
+        getProperty(ResourcePropertyKey::kKeepCameraTimeSettings), defaultValue);
 }
 
 void QnVirtualCameraResource::setKeepCameraTimeSettings(bool value)
@@ -1775,36 +1776,15 @@ nx::Uuid QnVirtualCameraResource::preferredServerId() const
 
 void QnVirtualCameraResource::setRemoteArchiveSynchronizationEnabled(bool value)
 {
-    const QString stored = value == kRemoteArchiveSynchronizationEnabledByDefault
-                           ? QString()
-                           : QnLexical::serialized(value);
+    const auto stored = QnLexical::serialized(value);
     setProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationEnabled, stored);
 }
 
 bool QnVirtualCameraResource::isRemoteArchiveSynchronizationEnabled() const
 {
-    bool isEnabled = kRemoteArchiveSynchronizationEnabledByDefault;
-    QnLexical::deserialize(
-        getProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationEnabled),
-        &isEnabled);
-
-    return isEnabled;
-}
-
-void QnVirtualCameraResource::setManualRemoteArchiveSynchronizationTriggered(bool isTriggered)
-{
-    QString value;
-    QnLexical::serialize(isTriggered, &value);
-    setProperty(ResourcePropertyKey::kManualRemoteArchiveSynchronizationTriggered, value);
-}
-
-bool QnVirtualCameraResource::isManualRemoteArchiveSynchronizationTriggered() const
-{
-    bool isTriggered = false;
-    QnLexical::deserialize(
-        getProperty(ResourcePropertyKey::kManualRemoteArchiveSynchronizationTriggered),
-        &isTriggered);
-    return isTriggered;
+    const bool defaultValue = hasCameraCapabilities(nx::vms::api::DeviceCapability::remoteArchive);
+    return QnLexical::deserialized<bool>(
+        getProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationEnabled), defaultValue);
 }
 
 void QnVirtualCameraResource::updatePreferredServerId()

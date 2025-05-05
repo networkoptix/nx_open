@@ -138,16 +138,6 @@ NX_VMS_COMMON_API extern const QString kDontRecordAudio;
  */
 NX_VMS_COMMON_API extern const QString kRemoteArchiveSynchronizationEnabled;
 
-/**
- * Whether manual remote archive import is triggered.
- */
-NX_VMS_COMMON_API extern const QString kManualRemoteArchiveSynchronizationTriggered;
-
-/**
- * Whether time sync has been enabled once due to activation of remote archive sync.
- */
-NX_VMS_COMMON_API extern const QString kTimeSyncEnabledOnceDueToRemoteArchiveSync;
-
 NX_VMS_COMMON_API extern const QString kNoVideoSupport;
 
 namespace Onvif {

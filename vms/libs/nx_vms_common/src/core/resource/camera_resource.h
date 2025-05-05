@@ -56,7 +56,6 @@ class NX_VMS_COMMON_API QnVirtualCameraResource:
 
 public:
     static constexpr int kDefaultMaxFps = 15;
-    static constexpr bool kRemoteArchiveSynchronizationEnabledByDefault = true;
     static nx::Uuid makeCameraIdFromPhysicalId(const QString& physicalId);
     static QString intercomSpecificPortName();
 
@@ -586,9 +585,6 @@ public:
 
     void setRemoteArchiveSynchronizationEnabled(bool value);
     bool isRemoteArchiveSynchronizationEnabled() const;
-
-    void setManualRemoteArchiveSynchronizationTriggered(bool isTriggered = true);
-    bool isManualRemoteArchiveSynchronizationTriggered() const;
 
     /** If preferred server is not set, assigns current server as preferred. */
     void updatePreferredServerId();
