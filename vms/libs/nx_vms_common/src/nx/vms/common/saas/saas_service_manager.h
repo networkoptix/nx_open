@@ -245,6 +245,7 @@ private:
     std::chrono::milliseconds calculateGracePeriodTime() const;
     void resetGracePeriodCache();
     std::optional<int> tierLimitUnsafe(nx::vms::api::SaasTierLimitName value) const;
+    int allRecordingServices(const nx::Uuid& serverId) const;
 
 private:
     mutable nx::Mutex m_mutex;

@@ -5,6 +5,7 @@
 #include <optional>
 
 #include <api/runtime_info_manager.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
@@ -467,15 +468,25 @@ std::optional<int> ServiceManager::tierLimitUnsafe(SaasTierLimitName value) cons
     return std::nullopt;
 }
 
+int ServiceManager::allRecordingServices(const nx::Uuid& serverId) const
+{
+    std::set<QString> cameraGroups;
+    for (const auto& camera: resourcePool()->getAllCameras(serverId, /*ignoreDesktopCameras*/true))
+    {
+        cameraGroups.insert(camera->isSharingLicenseInGroup()
+            ? camera->getGroupId()
+            : camera->getPhysicalId());
+    }
+    return cameraGroups.size();
+}
+
 std::optional<int> ServiceManager::camerasTierLimitLeft(const nx::Uuid& serverId)
 {
     const std::optional<int> limit = tierLimit(SaasTierLimitName::maxDevicesPerServer);
     if (!limit.has_value())
         return std::nullopt; // there is no limit
 
-    const int cameraCount = resourcePool()->getAllCameras(
-        serverId, /*ignoreDesktopCameras*/ true).size();
-    return *limit - cameraCount;
+    return *limit - allRecordingServices(serverId);
 }
 
 int ServiceManager::tierLimitUsed(SaasTierLimitName value) const
@@ -486,11 +497,7 @@ int ServiceManager::tierLimitUsed(SaasTierLimitName value) const
         {
             int result = 0;
             for (const auto& server: resourcePool()->servers())
-            {
-                int cameraCount = resourcePool()->getAllCameras(
-                    server, /*ignoreDesktopCameras*/ true).size();
-                result = std::max(result, cameraCount);
-            }
+                result = std::max(result, allRecordingServices(server->getId()));
             return result;
         }
         case SaasTierLimitName::maxServers:
