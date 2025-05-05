@@ -191,21 +191,6 @@ Item
                     text: control.counter >= 0 ? `${control.counter}` : ""
                 }
 
-                ColoredImage
-                {
-                    id: cloudIcon
-
-                    visible: control.cloudSystem && !control.isSaas
-
-                    width: 20
-                    height: 20
-
-                    sourceSize: Qt.size(width, height)
-                    sourcePath: "image://skin/20x20/Solid/cloud.svg"
-                    primaryColor: ColorTheme.colors.brand_core
-                    secondaryColor: ColorTheme.colors.brand_bg
-                }
-
                 IssueLabel
                 {
                     id: issueLabel
