@@ -1376,6 +1376,19 @@ Handle ServerConnection::engineAnalyticsActiveSettingsChanged(
         executor);
 }
 
+Handle ServerConnection::postMetadata(
+    const QString& path,
+    const QByteArray& messageBody,
+    PostCallback&& callback,
+    nx::utils::AsyncHandlerExecutor executor)
+{
+    return executePost(
+        path,
+        messageBody,
+        std::move(callback),
+        executor);
+}
+
 Handle ServerConnection::getDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,

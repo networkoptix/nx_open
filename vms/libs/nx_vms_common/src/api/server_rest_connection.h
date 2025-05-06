@@ -586,6 +586,12 @@ public:
         Callback<nx::vms::api::analytics::DeviceAgentActiveSettingChangedResponse>&& callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
+    Handle postMetadata(
+        const QString& path,
+        const QByteArray& messageBody,
+        PostCallback&& callback,
+        nx::utils::AsyncHandlerExecutor executor = {});
+
     Handle getPluginInformation(
         const nx::Uuid& serverId,
         GetCallback callback,
