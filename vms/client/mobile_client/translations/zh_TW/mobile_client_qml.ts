@@ -19,7 +19,7 @@
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>應用程式資訊</translation>
     </message>
   </context>
   <context>
@@ -814,7 +814,7 @@
     </message>
     <message>
       <source>AppInfo</source>
-      <translation type="unfinished">AppInfo</translation>
+      <translation>應用程式資訊</translation>
     </message>
   </context>
   <context>
@@ -911,11 +911,11 @@
     </message>
     <message>
       <source>SUSPENDED</source>
-      <translation type="unfinished">SUSPENDED</translation>
+      <translation>暫停</translation>
     </message>
     <message>
       <source>SHUTDOWN</source>
-      <translation type="unfinished">SHUTDOWN</translation>
+      <translation>關閉</translation>
     </message>
   </context>
   <context>

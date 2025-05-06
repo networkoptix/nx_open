@@ -2046,7 +2046,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
-      <translation type="unfinished">Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</translation>
+      <translation>注意：影像增強不可在開啟硬體影像解碼時使用。</translation>
     </message>
   </context>
   <context>
@@ -6684,15 +6684,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the site should be in active state. %1</translation>
+      <translation>站點必須處於活躍狀態才能執行至雲端備份。 %1</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>雲端備份仍在繼續，但站點目前已暫停。它必須處於活躍狀態才能修改裝置的 &quot;備份內容&quot; 和 &quot;品質&quot; 設定，或啟用雲端備份。您也可以停用雲端備份。 %1</translation>
     </message>
     <message>
       <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
-      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
+      <translation>選定的備份裝置數超出了可用的服務數量。請增加額外的服務或減少備份的裝置數量。在 %1 站點將自動限制備份裝置的數量以符合可用的服務數量。</translation>
     </message>
   </context>
   <context>
@@ -11363,7 +11363,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Channel Partner user</source>
-      <translation type="unfinished">Channel Partner user</translation>
+      <translation>通路夥伴使用者</translation>
     </message>
   </context>
   <context>
@@ -12102,7 +12102,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>In progress...</source>
-      <translation type="unfinished">In progress...</translation>
+      <translation>進行中...</translation>
     </message>
   </context>
   <context>

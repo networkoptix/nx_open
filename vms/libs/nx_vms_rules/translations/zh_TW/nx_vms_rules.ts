@@ -439,17 +439,17 @@
     <message>
       <source>Device was disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Device was disconnected at %1</translation>
+      <translation>裝置已於 %1 斷線</translation>
     </message>
     <message>
       <source>Camera was disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Camera was disconnected at %1</translation>
+      <translation>攝影機已於 %1 斷線</translation>
     </message>
     <message>
       <source>I/O Module was disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">I/O Module was disconnected at %1</translation>
+      <translation>I/O 模組已於 %1 斷線</translation>
     </message>
   </context>
   <context>
