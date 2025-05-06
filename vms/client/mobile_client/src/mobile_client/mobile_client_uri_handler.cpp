@@ -335,7 +335,7 @@ void QnMobileClientUriHandler::Private::connectToServerDirectly(const SystemUri&
             std::optional<RemoteConnectionErrorCode> errorCode)
         {
             const bool success = !errorCode;
-            NX_DEBUG(this, "connectToServerDirectly(): callback: successfull is <%1>", success);
+            NX_DEBUG(this, "connectToServerDirectly(): callback: successful is <%1>", success);
             if (success)
                 connectedCallback(uri);
             else if (!hasCloudSystem)

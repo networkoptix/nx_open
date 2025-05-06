@@ -16,7 +16,7 @@ namespace nx::vms::client::core {
 
 using namespace std::chrono;
 
-/** Removes duplcated items from the data using id. Returns number of removed elemnts. */
+/** Removes duplicated items from the data using id. Returns number of removed elements. */
 template<typename Facade, typename Container, typename ItemIterator>
 int removeDuplicateItems(Container& container,
     const ItemIterator& itBegin,
@@ -146,7 +146,7 @@ OptionalTimePeriod timeWindow(const Container& container)
 
 /**
  * Updates current data by a new one. Updates body items and inserts tail in the position according
- * to the specifeid direction. Emits all needed model signals.
+ * to the specified direction. Emits all needed model signals.
  */
 template<typename Facade,
     typename DataContainer,
@@ -227,7 +227,7 @@ void truncateFetchedData(
             const auto cutRanges =
                 [newCount, toRemove](Range& topRange, Range& bottomRange)
                 {
-                    topRange.offset = 0; // Top ranfe offset is always 0.
+                    topRange.offset = 0; // Top range offset is always 0.
                     topRange.length = std::min(topRange.length, newCount);
 
                     bottomRange.offset = std::min(bottomRange.offset, newCount);

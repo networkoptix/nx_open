@@ -105,7 +105,7 @@ LookupListImportProcessor::ImportExitCode LookupListImportProcessor::Private::ru
         }
     }
 
-    // Manually emiting signals from models.
+    // Manually emitting signals from models.
     if (model->fixupRequired())
     {
         emit model->fixupDataChanged();

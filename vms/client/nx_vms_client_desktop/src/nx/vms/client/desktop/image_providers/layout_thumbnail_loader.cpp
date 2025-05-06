@@ -289,7 +289,7 @@ struct LayoutThumbnailLoader::Private
             // with proper alignment to bounds of the cell.
             painter.drawImage(QPoint(0, 0), tile, sourceRect);
             QRectF adjustedSrcRect(QPoint(0, 0), sourceRect.size());
-            // Transfomin' like a boss!
+            // Transform' like a boss!
             item->outRect = painter.transform().mapRect(adjustedSrcRect).toRect();
 
             // Hint: the rect from QnGeometry:: encloseRotatedGeometry is not
@@ -550,7 +550,7 @@ void LayoutThumbnailLoader::doLoadAsync()
     if (bounding.isEmpty())
     {
         d->status = core::ThumbnailStatus::NoData;
-        // Dat proper event chain.
+        // Data proper event chain.
         emit sizeHintChanged(QSize());
         emit statusChanged(d->status);
         return;

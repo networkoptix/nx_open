@@ -10,7 +10,7 @@ class ShowOnceSettings;
 class MessageBarSettings;
 
 /**
- * Syncronizes local client settings between running client instances using provided IPC.
+ * Synchronizes local client settings between running client instances using provided IPC.
  */
 class IpcSettingsSynchronizer
 {

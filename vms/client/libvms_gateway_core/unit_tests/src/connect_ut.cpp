@@ -14,7 +14,6 @@ namespace cloud {
 namespace gateway {
 namespace test {
 
-
 const constexpr std::chrono::milliseconds kNetworkTimeout(5000);
 const QByteArray successResponse = "HTTP/1.1 200 OK";
 
@@ -51,7 +50,7 @@ public:
         // Send CONNECT request to proxy.
         ASSERT_EQ(socket->send(connectRequest.data(), connectRequest.size()), connectRequest.size());
 
-        // Checking that CONNECT was successfull.
+        // Checking that CONNECT was successful.
         QByteArray fullResponse;
         QByteArray responseReceiveBuffer;
         responseReceiveBuffer.resize(network::test::TestConnection::kReadBufferSize);
@@ -71,7 +70,6 @@ public:
 
     network::test::RandomDataTcpServer server;
 };
-
 
 TEST_F(VmsGatewayConnectTest, ConnectionClose)
 {

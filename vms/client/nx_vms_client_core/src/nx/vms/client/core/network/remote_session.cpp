@@ -577,7 +577,7 @@ void RemoteSession::onCloudSessionTokenExpiring()
         nx::format("cloudSystemId=%1", connection->moduleInformation().cloudSystemId).toStdString();
     request.refresh_token = qnCloudStatusWatcher->remoteConnectionCredentials().authToken.value;
 
-    NX_DEBUG(this, "Reissueing cloud access token");
+    NX_DEBUG(this, "Reissuing cloud access token");
     d->cloudTokenUpdater->issueToken(request, std::move(handler), this);
 }
 

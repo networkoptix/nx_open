@@ -347,7 +347,7 @@ void QnSortFilterListModelPrivate::handleSourceRowsInserted(
         return;
 
     /**
-     * Since we have new rows in the source model, we have to increase all indicies
+     * Since we have new rows in the source model, we have to increase all indices
      * after first by (last - first + 1) value.
      */
     const int difference = (last - first + 1);

@@ -14,7 +14,7 @@ class QQmlListReference;
 namespace nx::vms::client::desktop {
 
 /**
- * Client certificate selectioh dialog that will be automatically closed on client disconnect.
+ * Client certificate selection dialog that will be automatically closed on client disconnect.
  */
 class CertificateSelectionDialog: public QnSessionAwareButtonBoxDialog
 {

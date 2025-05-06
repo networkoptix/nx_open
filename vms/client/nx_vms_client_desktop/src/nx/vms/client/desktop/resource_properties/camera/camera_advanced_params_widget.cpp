@@ -263,7 +263,7 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(
     }
     else if (parameter.writeCmd == lit("custom_ptr"))
     {
-        // Expecting a value like "horisontal,vertical,rotation".
+        // Expecting a value like "horizontal,vertical,rotation".
         QStringList values = value.split(',');
 
         if (values.size() != 3)

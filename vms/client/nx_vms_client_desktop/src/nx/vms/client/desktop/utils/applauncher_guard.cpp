@@ -12,7 +12,7 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-// We hope applaucher will crash not so often
+// We hope applauncher will crash not so often
 static const int kCheckIntervalMs = 60 * 1000;
 
 } // namespace
@@ -25,7 +25,7 @@ ApplauncherGuard::ApplauncherGuard(QObject* parent): base_type(parent)
 
 void ApplauncherGuard::timerEvent(QTimerEvent* event)
 {
-    // Make sure activeX plugin will not start applaucher. Checking here because we don't know
+    // Make sure activeX plugin will not start applauncher. Checking here because we don't know
     // current client mode in the constructor.
     if (qnRuntime->isAcsMode())
     {

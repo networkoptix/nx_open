@@ -509,7 +509,7 @@ QVariant BackupSettingsDecoratorModel::data(const QModelIndex& index, int role) 
     if (camera.isNull())
         return base_type::data(index, role);
 
-    // Data for rows that contain camera resource which doesn't support backup, lile NVRs.
+    // Data for rows that contain camera resource which doesn't support backup, like NVRs.
     if (!isBackupSupported(camera) && column == ContentTypesColumn)
     {
         switch (role)

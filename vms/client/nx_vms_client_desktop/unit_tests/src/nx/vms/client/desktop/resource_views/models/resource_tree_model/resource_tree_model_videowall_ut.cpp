@@ -360,7 +360,7 @@ TEST_F(ResourceTreeModelTest, videoWallIsNotDisplayedIfNotLoggedIn)
     // Then no more nodes with corresponding display text found in the resource tree.
     ASSERT_TRUE(noneMatches(kUniqueVideoWallNameCondition));
 
-    // Then no more nodes with with videowall icon type found in the resource tree.
+    // Then no more nodes with videowall icon type found in the resource tree.
     ASSERT_TRUE(noneMatches(iconTypeMatch(QnResourceIconCache::VideoWall)));
 }
 

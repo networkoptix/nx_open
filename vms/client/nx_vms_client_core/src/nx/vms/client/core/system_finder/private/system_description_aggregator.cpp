@@ -156,7 +156,7 @@ void SystemDescriptionAggregator::mergeSystem(const SystemDescriptionAggregatorP
     for (auto [source, subsystem]: nx::utils::keyValueRange(system->m_systems))
     {
         if (NX_ASSERT(!m_systems.contains(source),
-            "Worflow failure, see SystemFinder::mergeSystemIntoExisting() method"))
+            "Workflow failure, see SystemFinder::mergeSystemIntoExisting() method"))
         {
             mergeSystem(source, subsystem);
         }
@@ -281,7 +281,6 @@ bool SystemDescriptionAggregator::isNewSystem() const
         [](const SystemDescriptionPtr& system) { return system->isNewSystem(); });
 }
 
-
 QString SystemDescriptionAggregator::ownerAccountEmail() const
 {
     return (isEmptyAggregator() ? QString() : m_systems.first()->ownerAccountEmail());
@@ -366,7 +365,7 @@ void SystemDescriptionAggregator::updateServers()
         emit serverAdded(server.id);
 
     /**
-     * Updates server host in case we remove cloud system but have accesible local one.
+     * Updates server host in case we remove cloud system but have accessible local one.
      * See VMS-5884.
      */
     for (const auto& server: subtractLists(newServers, toAdd))

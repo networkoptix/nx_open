@@ -17,7 +17,7 @@ enum CoreItemDataRole
     /** Zoom window. Value of type QRectF. */
     ItemZoomRectRole = 292,
 
-    FirstCoreItemDataRole = 10000, //< Initial big enougth value to avoid intersections with others.
+    FirstCoreItemDataRole = 10000, //< Initial big enough value to avoid intersections with others.
 
     TimestampRole,                  /**< Role for timestamp in microseconds since epoch (std::chrono::microseconds). */
     ResourceNameRole,               /**< Role for resource name. Value of type QString. */

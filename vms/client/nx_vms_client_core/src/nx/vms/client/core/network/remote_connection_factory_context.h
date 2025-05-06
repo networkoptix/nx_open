@@ -103,7 +103,7 @@ struct NX_VMS_CLIENT_CORE_API RemoteConnectionFactoryContext: public QObject
     }
 
     /**
-     * Forcefully override error with a new value. Used to detalize some situations for the user.
+     * Forcefully override error with a new value. Used to detail some situations for the user.
      */
     void rewriteError(RemoteConnectionError value) { m_error = value; }
 

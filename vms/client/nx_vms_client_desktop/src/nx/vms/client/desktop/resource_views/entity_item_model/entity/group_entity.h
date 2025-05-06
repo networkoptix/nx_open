@@ -61,7 +61,7 @@ public:
     /**
      * Sets nested entity to the group. If there was another one, it will be discarded.
      * Corresponding notifications will be generated if group has already to some model.
-     * @param  entity Valid unique pointer to the the entity. Ownership will be transferred to
+     * @param  entity Valid unique pointer to the entity. Ownership will be transferred to
      *     the group. Null input is acceptable, it will make group childless.
      */
     void setNestedEntity(AbstractEntityPtr entity);

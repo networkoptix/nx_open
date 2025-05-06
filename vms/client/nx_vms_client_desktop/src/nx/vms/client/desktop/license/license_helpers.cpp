@@ -174,8 +174,8 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
         };
 
     /**
-      * We have to use thread safe handler insted of queued connection
-      * becase of strong recoomendation in http client header
+      * We have to use thread safe handler instead of queued connection
+      * because of strong recommendation in http client header
       */
     const auto threadSafeHandler =
         [guard, handler, postHandler](nx::network::http::AsyncHttpClientPtr /*client*/)

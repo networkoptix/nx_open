@@ -70,7 +70,7 @@ private:
     int m_bitCount = 0; /**< log2(m_windowSize) */
     FFTComplex* m_fftData = nullptr;
     FFTContext* m_fftContext = nullptr;
-    int m_fftDataSize = 0; /**< Nmber of currently filled values in m_fftData. */
+    int m_fftDataSize = 0; /**< Number of currently filled values in m_fftData. */
     SpectrumData m_spectrumData;
     mutable nx::Mutex m_mutex;
 };

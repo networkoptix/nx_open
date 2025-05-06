@@ -9,7 +9,7 @@ namespace nx::vms::client::desktop {
 /**
  * Actual implementation watches all Layouts, containing cross-system Cameras, and when connection
  * to the cloud system is established, corresponding layout items are removed and added again. This
- * looks like the simpliest way to force both resource tree and workbench layout to re-create item.
+ * looks like the simplest way to force both resource tree and workbench layout to re-create item.
  *
  * For now all layouts in the current System Context are watched.
  * // TODO: @sivanov Switch to cloud-stored layouts.

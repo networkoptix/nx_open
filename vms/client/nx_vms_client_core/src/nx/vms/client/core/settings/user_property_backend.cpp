@@ -109,7 +109,7 @@ bool UserPropertyBackend::sync()
         return false;
     }
 
-    NX_VERBOSE(this, "Synching settings...");
+    NX_VERBOSE(this, "Syncing settings...");
 
     m_originalValues = loadJsonFromProperty();
 

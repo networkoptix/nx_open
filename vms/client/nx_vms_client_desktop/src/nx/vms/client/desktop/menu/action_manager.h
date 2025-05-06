@@ -22,7 +22,7 @@ namespace menu {
 
 /**
  * Manager of menu actions. Creates all actions, which are visible in all context menus (and also
- * some other, which are used for convinience). Provides interface to send action from a single
+ * some other, which are used for convenience). Provides interface to send action from a single
  * source to any number of receivers using QAction mechanism. Implements complex way of condition
  * checking for those actions.
  */
@@ -77,7 +77,6 @@ public:
      * \param parameters                Parameters to pass to action handler.
      */
     void trigger(IDType id, const Parameters& parameters = Parameters());
-
 
     /**
      * Triggers the action with the given id if possible

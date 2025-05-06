@@ -60,7 +60,7 @@ void LayoutWidgetHider::setVisible(QWidget* widget, bool visible)
         return;
 
     widget->setVisible(visible);
-    if (!m_valid) //< Provided minimal expected behaviour (QWidget::setVisible()) if not valid.
+    if (!m_valid) //< Provided minimal expected behavior (QWidget::setVisible()) if not valid.
         return;
 
     // Count visible and remove all widgets from layout

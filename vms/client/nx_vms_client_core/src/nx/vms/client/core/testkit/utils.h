@@ -9,7 +9,7 @@ class QWindow;
 
 namespace nx::vms::client::core::testkit::utils {
 
-/** Returns true if text from UI element (with/without shotcuts) matches with specified text. */
+/** Returns true if text from UI element (with/without shortcuts) matches with specified text. */
 NX_VMS_CLIENT_CORE_API bool textMatches(QString itemText, QString text);
 
 /** Returns true if object properties match with specified properties. */

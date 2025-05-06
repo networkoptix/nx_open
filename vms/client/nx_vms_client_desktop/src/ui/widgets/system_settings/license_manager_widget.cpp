@@ -326,7 +326,7 @@ void LicenseManagerWidget::updateLicenses()
                 {
                     messages.append(
                         tr("%1 are currently in use",
-                            "Text like '6 Profesional Licenses' will be substituted",
+                            "Text like '6 Professional Licenses' will be substituted",
                             used).arg(QnLicense::displayText(type, used)));
                 }
                 else
@@ -334,7 +334,7 @@ void LicenseManagerWidget::updateLicenses()
                     const int required = helper->requiredLicenses(type);
                     messages.append(setWarningStyleHtml(
                         tr("At least %1 are required",
-                            "Text like '6 Profesional Licenses' will be substituted",
+                            "Text like '6 Professional Licenses' will be substituted",
                             required).arg(QnLicense::displayText(type, required))));
                 }
             }
@@ -726,7 +726,6 @@ bool LicenseManagerWidget::activateLicense()
 
             ui->licenseWidget->setState(QnLicenseWidget::Normal);
         });
-
 
     if (auto api = connectedServerApi(); NX_ASSERT(api, "Connection must be established"))
     {

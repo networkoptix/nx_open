@@ -52,7 +52,7 @@ private:
     std::unique_ptr<CloudConnectionFactory> m_cloudConnectionFactory;
     std::unique_ptr<nx::cloud::db::api::Connection> m_cloudConnection;
     QTimer* m_timer = nullptr;
-    nx::utils::DeadlineTimer m_expirationTimer; //< Countdoun timer to the token update request.
+    nx::utils::DeadlineTimer m_expirationTimer; //< Countdown timer to the token update request.
     nx::utils::DeadlineTimer m_requestInProgressTimer; //< Means "update request in progress" until expired.
     bool m_wasSuspended = false;
 };

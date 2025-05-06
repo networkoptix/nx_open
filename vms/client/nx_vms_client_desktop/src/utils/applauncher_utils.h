@@ -9,7 +9,7 @@ namespace nx::vms::applauncher::api {
 
 /**
  * @returns true if required version is installed and can be launched.
- * Note application may be installed for all users and for current user only, so checking existance
+ * Note application may be installed for all users and for current user only, so checking existence
  * of directory with name equal to version is not enough.
 */
 ResultType isVersionInstalled(const nx::utils::SoftwareVersion& version, bool* const installed);
@@ -50,7 +50,6 @@ ResultType installZip(const nx::utils::SoftwareVersion& version, const QString& 
  * @return ResultType::ok if request has been performed successfully, otherwise - error code.
  */
 ResultType installZipAsync(const nx::utils::SoftwareVersion& version, const QString& zipFileName);
-
 
 struct InstallationProgress
 {

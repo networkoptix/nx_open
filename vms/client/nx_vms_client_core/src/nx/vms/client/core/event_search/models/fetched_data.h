@@ -109,7 +109,7 @@ FetchedData<Container> makeFetchedDataInternal(
     auto currentRefTimeIt = currentBeginIt;
     auto centralPoint = duration_cast<typename Facade::TimeType>(request.centralPointUs);
 
-    // Looking for the new real central point - for exmaple in case if initial item with central
+    // Looking for the new real central point - for example in case if initial item with central
     // point was deleted or moved somewhere. We have to find same items near the central point
     // (or find a new one) in both fetched and current data - that's gonna be a new central point.
     bool exactCentralPointExists = false;

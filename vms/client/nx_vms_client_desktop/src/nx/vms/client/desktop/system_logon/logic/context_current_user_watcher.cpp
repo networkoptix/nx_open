@@ -162,7 +162,7 @@ bool ContextCurrentUserWatcher::isReconnectRequired(const QnUserResourcePtr &use
         return false;   //we are not connected
 
     // TODO: #sivanov Actually reconnect on renaming is required when using digest auth only. But
-    // some functionality (like desktop camera) can stop working, so it's simplier to reconnect.
+    // some functionality (like desktop camera) can stop working, so it's simpler to reconnect.
     if (user->getName().toLower() != m_userName.toLower())
         return true;
 

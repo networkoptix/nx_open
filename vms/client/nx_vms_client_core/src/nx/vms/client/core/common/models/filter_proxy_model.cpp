@@ -445,7 +445,7 @@ void FilterProxyModel::Private::tidyMapping()
     // while an index that became invalid due to a model change has a not null internal data
     // pointer with an invalid model index stored there.
 
-    // We have no access to internal data pointers, but can look up the intially invalid index
+    // We have no access to internal data pointers, but can look up the initially invalid index
     // this way:
     const auto initiallyInvalidIndexIt = m_mapping.constFind(QPersistentModelIndex{});
 

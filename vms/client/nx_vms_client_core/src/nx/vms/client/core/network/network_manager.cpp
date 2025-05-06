@@ -120,7 +120,7 @@ void NetworkManager::pleaseStopSync()
         d->requests.erase(d->requests.begin());
         lk.unlock(); //< Must unlock mutex to avoid deadlock with http completion handler.
         context.client->pleaseStopSync();
-        // It is garanteed that no http event handler is running currently and no handler will
+        // It is guaranteed that no http event handler is running currently and no handler will
         // be called.
         lk.relock();
     }

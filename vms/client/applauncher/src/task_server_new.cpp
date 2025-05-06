@@ -36,7 +36,7 @@ bool TaskServerNew::listen(const QString& pipeName)
         wait();
     }
 
-    // On Windows multiple m_taskServer can listen a single pipe, on linux unix socket can hang
+    // On Windows multiple m_taskServer can listen a single pipe, on Linux/Unix socket can hang
     // after server crash (because of socket file not removed).
     const auto app = qobject_cast<QtSingleCoreApplication*>(QCoreApplication::instance());
     if (!NX_ASSERT(app))

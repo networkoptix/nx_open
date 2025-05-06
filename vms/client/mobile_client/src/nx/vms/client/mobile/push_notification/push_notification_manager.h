@@ -16,12 +16,12 @@ namespace nx::vms::client::mobile {
  *
  * To receive push notifications user should allow them in OS and turn them on in the mobile client
  * settings. Client tries to turn on push notifications automatically when user logs in first time.
- * All settings are stored locally. When user enables push notfications application sends local
+ * All settings are stored locally. When user enables push notifications application sends local
  * settings to the cloud.
  *
  * When notifications are turned on in client settings application sends subscription
  * request to the cloud instance. Within it client specifies requested systems and application
- * token. To disable notification client sends unsubscribe request with aplication token.
+ * token. To disable notification client sends unsubscribe request with application token.
  */
 class PushNotificationManager: public QObject
 {
@@ -75,7 +75,7 @@ public:
 
     /**
      * Tries to set enabled state for notifications. To enable push notifications application
-     * should register itself within the cloud instance by "subcribe" request.
+     * should register itself within the cloud instance by "subscribe" request.
      * If user tries to enable notifications and error occurs then state remains disabled.
      * If user tries to disable notifications and error occurs then state becomes disabled
      * anyway since we turn off pushes on the client side.
@@ -110,7 +110,7 @@ public:
     bool userUpdateInProgress() const;
 
     /**
-     * @return True if user logged in to the cloud and handled by push notificatioins manager.
+     * @return True if user logged in to the cloud and handled by push notifications manager.
      */
     bool loggedIn() const;
 
@@ -123,7 +123,7 @@ public:
     QStringList selectedSystems() const;
 
     /**
-     * Shows if user allows showing push notifcations in OS.
+     * Shows if user allows showing push notifications in OS.
      */
     bool hasOsPermission() const;
 

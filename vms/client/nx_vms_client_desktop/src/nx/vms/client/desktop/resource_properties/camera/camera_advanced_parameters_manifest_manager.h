@@ -14,7 +14,7 @@
 namespace nx::vms::client::desktop {
 
 /**
- * Camera advanced parameters are descibed in the manifest structure. It is persistent and does not
+ * Camera advanced parameters are described in the manifest structure. It is persistent and does not
  * depend on server, so can be loaded once per connection session. Manager loads these manifests on
  * request and notifies when loading is complete.
  */

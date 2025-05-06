@@ -60,7 +60,7 @@ public:
         /** Generic Desktop Client mode. */
         desktopClient,
 
-        /** Dekstop Client self-update mode (with admin permissions). */
+        /** Desktop Client self-update mode (with admin permissions). */
         selfUpdate,
 
         /** Unit tests mode. */

@@ -212,7 +212,7 @@ void MediaDownloadBackend::downloadVideo(qint64 startTimeMs,
 {
     // Download video process consist of the few next steps:
     // 1. Request relay for module information of currently available server to proxy the request
-    // 2. Create a one-time authorization ticket for exacly this server.
+    // 2. Create a one-time authorization ticket for exactly this server.
     // 3. Generate an url for media download with specified proxy server, ticket and other params.
     // 4. Open this url in the external default browser and let it download the media file.
 

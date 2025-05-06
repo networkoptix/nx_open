@@ -171,7 +171,7 @@ TEST_P(ResourceTreeModelTest, webPageIsNotDisplayedIfNotLoggedIn)
     // Then no more nodes with corresponding display text found in the resource tree.
     ASSERT_TRUE(noneMatches(displayFullMatch(kUniqueWebPageName)));
 
-    // Then no more nodes with with any possible web page icon found in the resource tree.
+    // Then no more nodes with any possible web page icon found in the resource tree.
     ASSERT_TRUE(noneMatches(iconTypeMatch(QnResourceIconCache::WebPage)));
 }
 

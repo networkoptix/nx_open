@@ -93,7 +93,7 @@ void sendKey(const QString& key)
         },
     });
 
-    if (HIBYTE(vk) == 1) //<Release if previouly pressed.
+    if (HIBYTE(vk) == 1) //<Release if previously pressed.
     {
         // Release Shift key.
         keyQueue.push_back({

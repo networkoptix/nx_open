@@ -197,7 +197,7 @@ void QnAboutDialog::retranslateUi()
         nx::vms::client::desktop::appContext()->mainWindowContext()->quickWindow();
     const auto graphicsApi = (quickWindow && quickWindow->rendererInterface())
         ? quickWindow->rendererInterface()->graphicsApi()
-        : QSGRendererInterface::OpenGL; //< Assume defaut.
+        : QSGRendererInterface::OpenGL; //< Assume default.
 
     const bool isLegacy = nx::vms::client::desktop::appContext()->runtimeSettings()->graphicsApi()
         == GraphicsApi::legacyopengl;

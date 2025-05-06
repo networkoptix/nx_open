@@ -15,7 +15,7 @@ namespace nx::vms::client::mobile::details {
 /**
  * Class manages remote push notification settings.
  * Since we store settings locally we need to updated them on the cloud only when they are changed.
- * Settings are considered confirmed when they are successfuly sent to the cloud instance.
+ * Settings are considered confirmed when they are successfully sent to the cloud instance.
  * Once set, we don't change settings between client restarts.
  */
 class PushSettingsRemoteController: public QObject

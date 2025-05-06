@@ -218,7 +218,7 @@ void TwoWayAudioStreamer::putData(const QnAbstractDataPacketPtr& data)
 
     if (!m_muxer && !initializeMuxer(audioData))
     {
-        NX_WARNING(this, "Failed to intialize audio muxer");
+        NX_WARNING(this, "Failed to initialize audio muxer");
         m_muxer.reset();
         return;
     }

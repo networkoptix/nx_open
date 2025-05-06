@@ -1,7 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 # Workaround for a Doxygen bug: we need to run python from Doxygen, and the CMake variable
-# PYTHON_EXECUTABLE may contaain spaces in its value, and Doxygen cannot properly handle it. So, we
+# PYTHON_EXECUTABLE may contain spaces in its value, and Doxygen cannot properly handle it. So, we
 # use a short python invocation command which depends on the platform.
 if(APPLE)
     set(PYTHON_EXECUTABLE_FOR_DOXYGEN "python3")

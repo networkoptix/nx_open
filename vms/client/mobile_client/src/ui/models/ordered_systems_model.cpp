@@ -28,7 +28,7 @@ bool QnOrderedSystemsModel::lessThan(
     const QModelIndex& right) const
 {
     /**
-     * Sort order should be the folloing:
+     * Sort order should be the following:
      * 1. Online localhost systems
      * 2. Online factory systems
      * 3. Online cloud systems

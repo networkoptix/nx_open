@@ -22,7 +22,6 @@
 #include "../stree/http_request_attr_reader.h"
 #include "../stree/socket_attr_reader.h"
 
-
 namespace nx {
 namespace cloud {
 namespace gateway {
@@ -124,7 +123,7 @@ void AuthenticationManager::serve(
                 std::move(*authHeader));
         };
 
-    //analyzing authSearchResult for password or ha1 pesence
+    // Analyzing authSearchResult for password or ha1 presence.
     if (auto foundHa1 = authTraversalResult.get<std::string>(attr::ha1))
     {
         if (validateHa1Func(*foundHa1))

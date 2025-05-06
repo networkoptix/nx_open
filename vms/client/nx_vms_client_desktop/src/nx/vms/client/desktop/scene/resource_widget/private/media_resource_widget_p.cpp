@@ -51,7 +51,7 @@ nx::media::AbstractMetadataConsumerPtr getMetadataConsumer(T* provider)
 
 /**
  * Since we have zoom windows which just use display from the source widget we can't turn on/off
- * anlytics objects for each widget independently. To have an ability to do this we introduce
+ * analytics objects for each widget independently. To have an ability to do this we introduce
  * this watcher. Watcher observes if there is at least one widget which wants to show analytics
  * objects and calculates if metadata stream should be enabled or disabled for the source display.
  */

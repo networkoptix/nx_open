@@ -615,7 +615,7 @@ int OrganizationsModel::rowCount(const QModelIndex& parent) const
     if (!parentNode)
         return 0;
 
-    // Do not use d->proxyModel->rowCount() directly as it requires specias handling during model
+    // Do not use d->proxyModel->rowCount() directly as it requires special handling during model
     // reset.
     if (parentNode->type == OrganizationsModel::SitesNode)
         return d->proxyModelCount;

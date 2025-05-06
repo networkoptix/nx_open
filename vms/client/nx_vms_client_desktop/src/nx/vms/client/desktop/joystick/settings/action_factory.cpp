@@ -305,7 +305,7 @@ struct ActionFactory::Private
         sumX += dX;
         sumY += dY;
 
-        // Together with timer interval defines stick sensivity.
+        // Together with timer interval defines stick sensitivity.
         const double kStep = 2.5;
         while (sumX >= kStep)
         {

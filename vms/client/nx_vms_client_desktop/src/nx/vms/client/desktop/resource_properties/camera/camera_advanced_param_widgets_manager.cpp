@@ -57,7 +57,6 @@ void CameraAdvancedParamWidgetsManager::clear()
         delete m_contentsWidget->widget(0);
 }
 
-
 void CameraAdvancedParamWidgetsManager::resetManifest(const QnCameraAdvancedParams& manifest)
 {
     NX_VERBOSE(this, "Reset manifest; %1 groups", manifest.groups.size());
@@ -229,7 +228,6 @@ bool CameraAdvancedParamWidgetsManager::hasValidValues(
         [this](const QnCameraAdvancedParamGroup &group) { return hasValidValues(group); });
 }
 
-
 void CameraAdvancedParamWidgetsManager::createGroupWidgets(
     const QnCameraAdvancedParamGroup& group, QTreeWidgetItem* parentItem, bool* availableInOffline)
 {
@@ -366,7 +364,7 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
             }
             else
             {
-                // Adding a widget to existing contaner for compact control group.
+                // Adding a widget to existing container for compact control group.
                 compactLayout->addWidget(widget, 0, Qt::AlignRight);
             }
         }

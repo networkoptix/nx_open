@@ -61,7 +61,7 @@ QString QnPingDialog::responseToString(const QnPingUtility::PingResponse &respon
                 arg(response.ttl).
                 arg(response.time, 0, 'f', 3);
     case ICMP_UNREACH:
-        return QString(QString("Destination host unreacheable"));
+        return QString(QString("Destination host unreachable"));
 #endif
     default:
         break;

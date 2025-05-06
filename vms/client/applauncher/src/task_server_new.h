@@ -38,7 +38,7 @@ public:
         failedToDeserialize,
     };
 
-    /** Channel for a single comamnd type. Incoming packets are dispatched to this channels. */
+    /** Channel for a single command type. Incoming packets are dispatched to this channels. */
     struct Channel
     {
         QByteArray name;

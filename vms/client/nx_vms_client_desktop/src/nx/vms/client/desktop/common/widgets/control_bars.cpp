@@ -109,7 +109,6 @@ ControlBar::~ControlBar()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-
 QHBoxLayout* ControlBar::mainLayout() const
 {
     return d->mainLayout;

@@ -48,8 +48,8 @@ public:
         void notifyProperties();
 
         /**
-         * Registers property to be notifyed when the object is changed.
-         * Called from the correspodinf constructor of BaseQmlProperty.
+         * Registers property to be notified when the object is changed.
+         * Called from the corresponding constructor of BaseQmlProperty.
          */
         void addProperty(QmlPropertyBase* property);
 

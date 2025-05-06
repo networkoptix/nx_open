@@ -15,7 +15,7 @@ namespace nx::vms::client::core {
  * 1. Required permissions change handling - needed permissions can be specified as a parameter.
  * 2. Buttons additions/removals - buttons lists management.
  * 3. Basic action state change implementations - current active actions management, etc.
- * 4. Button group setting - can be soecified at creation and automatically set for each button.
+ * 4. Button group setting - can be specified at creation and automatically set for each button.
  */
 class NX_VMS_CLIENT_CORE_API BaseCameraButtonController: public AbstractCameraButtonController
 {

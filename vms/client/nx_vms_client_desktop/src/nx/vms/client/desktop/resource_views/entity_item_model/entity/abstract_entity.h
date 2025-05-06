@@ -84,7 +84,7 @@ public:
     /**
      * Query if this entity is pure planar, i.e it never have children, not only at the moment
      *     of method call. Implementing this method in subclasses makes sense performance wise.
-     *     Planar entities implicitly provide Qt::ItemNeverHasChildren flag and ommited from
+     *     Planar entities implicitly provide Qt::ItemNeverHasChildren flag and omitted from
      *     any children entities lookups.
      * @returns True if entity cannot have children, or, at least won't have children during
      *     instance lifetime.
@@ -167,7 +167,7 @@ protected:
      * Claim that previously assigned entity is no longer part of the composition. That mean that
      * there are no notifications from it will be translated. Passed entity may be safely released
      * or rearranged by the will of caller.
-     * @param Valid pointer to the entity entity assigned earlier as part of composition.
+     * @param Valid pointer to the entity assigned earlier as part of composition.
      */
     void unassignEntity(const AbstractEntity* entity);
 

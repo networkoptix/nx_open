@@ -18,7 +18,7 @@ namespace CameraDiagnostics
 
         Diagnostics stops with success if media stream can be successfully received from camera
 
-        Signals are emmitted in following order:\n
+        Signals are emitted in following order:\n
         - diagnosticsStarted
         - diagnosticsStepStarted
         - diagnosticsStepResult

@@ -166,7 +166,7 @@ LogSettingsDialog::LogSettingsDialog(QWidget* parent):
     ui->splitBySizeHint->addHintLine(
         tr("Must be less than or equal to the value set for Limit Max Volume"));
 
-    using T = long long; // Fix ambigous type cast from long to QVariant.
+    using T = long long; // Fix ambiguous type cast from long to QVariant.
     ui->splitByTimeUnits->addItem(
         QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Minutes), (T)kMinute.count());
     ui->splitByTimeUnits->addItem(

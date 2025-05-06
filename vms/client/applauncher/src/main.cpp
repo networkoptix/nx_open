@@ -66,7 +66,7 @@ static bool initLogsFromConfigFile(const QString& logsDirectory)
 
 QStringList getClientArguments(QStringList arguments)
 {
-    // Application name goes first, we do not need to pass it furher.
+    // Application name goes first, we do not need to pass it further.
     if (arguments.size() > 0)
         arguments.removeFirst();
 

@@ -100,7 +100,7 @@ public:
         CertificateType certType);
 
     /**
-     * Updates cached certificate in memory. If the cached certificate matched a pinned certiifcate
+     * Updates cached certificate in memory. If the cached certificate matched a pinned certificate
      * of the server before the call, updates the pinned certificate too.
      */
     void updateCertificate(

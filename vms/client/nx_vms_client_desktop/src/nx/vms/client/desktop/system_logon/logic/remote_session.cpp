@@ -121,7 +121,7 @@ void RemoteSession::autoTerminateIfNeeded()
 bool RemoteSession::keepCurrentServerOnError(RemoteConnectionErrorCode error)
 {
     // Session token can be updated using shared memory.
-    // Cloud acccess token may be reacquired from the refresh token.
+    // Cloud access token may be reacquired from the refresh token.
     if (error == RemoteConnectionErrorCode::unauthorized
         || error == RemoteConnectionErrorCode::sessionExpired
         || error == RemoteConnectionErrorCode::cloudSessionExpired)
@@ -131,6 +131,5 @@ bool RemoteSession::keepCurrentServerOnError(RemoteConnectionErrorCode error)
 
     return base_type::keepCurrentServerOnError(error);
 }
-
 
 } // namespace nx::vms::client::desktop

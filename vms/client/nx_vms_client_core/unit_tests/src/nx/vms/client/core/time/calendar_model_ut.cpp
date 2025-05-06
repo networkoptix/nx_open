@@ -51,7 +51,7 @@ TEST_F(CalendarModelTestFixture, MonthPropertyCheck)
     model.setMonth(calendar_utils::kMinMonth - 1);
     ASSERT_EQ(model.month(), calendar_utils::kMinMonth);
 
-    // Checks if maximum month valueis constrained.
+    // Checks if maximum month values constrained.
     model.setMonth(calendar_utils::kMaxMonth + 1);
     ASSERT_EQ(model.month(), calendar_utils::kMaxMonth);
 }

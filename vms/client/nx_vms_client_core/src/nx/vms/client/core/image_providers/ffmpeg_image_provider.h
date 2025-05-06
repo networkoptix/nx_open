@@ -17,7 +17,7 @@ class FfmpegImageProvider: public ImageProvider
     using base_type = ImageProvider;
 
 public:
-    // This one retrives screenshot in the middle of the file.
+    // This one retrieves screenshot in the middle of the file.
     explicit FfmpegImageProvider(const QnResourcePtr& resource, const QSize& maximumSize = QSize(),
         QObject* parent = nullptr);
 

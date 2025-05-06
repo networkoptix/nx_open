@@ -202,7 +202,7 @@ void PushSettingsRemoteController::Private::tryUpdateRemoteSettings(
         nx::utils::guarded(this,
         [this, value, callback](bool /*success*/)
         {
-            // Unsbuscription is optional, so it is always successful.
+            // Unsubscription is optional, so it is always successful.
             q->replaceConfirmedSettings(value);
             if (callback)
                 callback(true);
@@ -371,13 +371,12 @@ void PushSettingsRemoteController::logIn(
     if (d->credentials == credentials)
         return;
 
-
     if (d->credentials.username != credentials.username)
         logOut();
 
     d->setCredentials(credentials);
     d->settings = adoptSettingsForProviderMigration(confirmedSettings, d->tokenManager.get());
-    d->resetCurrentRequest(); // We cancel previos request anyway.
+    d->resetCurrentRequest(); // We cancel previous request anyway.
 
     if (!d->settings)
     {

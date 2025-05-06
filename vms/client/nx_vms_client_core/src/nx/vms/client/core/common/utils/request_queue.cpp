@@ -20,7 +20,7 @@ struct hash<QUuid>
     }
 };
 
-} // namesapce std
+} // namespace std
 
 namespace nx::vms::client::core {
 

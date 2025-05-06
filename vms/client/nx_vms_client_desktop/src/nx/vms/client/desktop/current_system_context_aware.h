@@ -8,7 +8,7 @@
 namespace nx::vms::client::desktop {
 
 /**
- * Convinience class for access to both Window Context and System Context. Can inherit access from
+ * Convenience class for access to both Window Context and System Context. Can inherit access from
  * the QObject parentship chain. It strongly depends on both contexts and must be destroyed before
  * any of contexts is.
  */

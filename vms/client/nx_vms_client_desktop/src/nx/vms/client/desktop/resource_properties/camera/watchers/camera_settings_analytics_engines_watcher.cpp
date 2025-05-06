@@ -99,7 +99,7 @@ QList<core::AnalyticsEngineInfo> CameraSettingsAnalyticsEnginesWatcher::Private:
 void CameraSettingsAnalyticsEnginesWatcher::Private::at_initialResourcesReceived()
 {
     // In certain rare cases this function can be called while m_online is true.
-    // This happens in scenarions like this:
+    // This happens in scenarios like this:
     //   - connection opened
     //   - connection closed
     //   - connection opened

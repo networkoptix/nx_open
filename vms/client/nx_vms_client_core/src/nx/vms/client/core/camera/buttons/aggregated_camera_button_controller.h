@@ -9,7 +9,7 @@
 namespace nx::vms::client::core {
 
 /**
- * Aggregating camera button controller containing all avaliable buttons from the all suitable
+ * Aggregating camera button controller containing all available buttons from the all suitable
  * controllers.
  */
 class NX_VMS_CLIENT_CORE_API AggregatedCameraButtonController:

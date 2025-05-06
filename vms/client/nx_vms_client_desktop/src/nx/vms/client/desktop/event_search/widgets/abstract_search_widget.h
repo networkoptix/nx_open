@@ -54,7 +54,7 @@ public:
     /** Whether the search widget should be visible. */
     bool isAllowed() const;
 
-    /** Rewind to live. Discards loaded archive if neccessary. */
+    /** Rewind to live. Discards loaded archive if necessary. */
     virtual void goToLive();
 
     /** Relevant controls in the tab. Irrelevant controls are hidden. */

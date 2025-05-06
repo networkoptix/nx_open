@@ -39,7 +39,7 @@ public:
         /** Use QSettings backend to read old settings during the migration procedure. */
         bool useQSettingsBackend = false;
 
-        /** An optional predefined securty key. Used for settings migration. */
+        /** An optional predefined security key. Used for settings migration. */
         QByteArray securityKey;
     };
 

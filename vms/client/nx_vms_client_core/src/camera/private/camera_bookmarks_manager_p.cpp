@@ -117,7 +117,7 @@ struct CheckResultData
 };
 
 /**
- * Checks if fetched data contains enouth tail. Used in bookmarks requests to old servers (with
+ * Checks if fetched data contains enough tail. Used in bookmarks requests to old servers (with
  * version less than 6.0) where we don't have central point parameter. Thus we have to request data
  * sequentially and check if results have enough tail and body.
  */
@@ -199,7 +199,6 @@ QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo(
 {
 }
 
-
 /************************************************************************/
 /* QueryInfo                                                            */
 /************************************************************************/
@@ -217,7 +216,6 @@ QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo(const QnCameraBookmarksQue
 {
 }
 
-
 /************************************************************************/
 /* PendingInfo                                                          */
 /************************************************************************/
@@ -234,7 +232,6 @@ QnCameraBookmarksManagerPrivate::PendingInfo::PendingInfo(const nx::Uuid &bookma
     bookmark.guid = bookmarkId;
     discardTimer.invalidate();
 }
-
 
 /************************************************************************/
 /* QnCameraBookmarksManagerPrivate                                      */

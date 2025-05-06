@@ -98,7 +98,6 @@ static const QString kApplicationInternalName = nx::branding::company() + " vms_
 
 } // namespace
 
-
 namespace nx {
 namespace cloud {
 namespace gateway {
@@ -196,7 +195,7 @@ void Settings::loadSettings()
         QString varDirName = settings().value("varDir", defVarDirName).toString();
         m_general.dataDir = varDirName;
 #else
-        //TODO #akolesnikov get rid of QStandardPaths::standardLocations call here since it requies QApplication instance
+        //TODO #akolesnikov get rid of QStandardPaths::standardLocations call here since it requires QApplication instance
         const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);
         m_general.dataDir = dataDirList.isEmpty() ? QString() : dataDirList[0];
 #endif

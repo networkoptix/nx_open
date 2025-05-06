@@ -8,7 +8,7 @@ namespace nx::vms::client::mobile::detail {
 
 /**
  *  Helper class which waits for the qml code execution and then for the specific signal "gotResult"
- *  to retreive the string result of some operation. Locks cretion thread until result is ready:
+ *  to retrieve the string result of some operation. Locks creation thread until result is ready:
  *  runs event loop at creation and quits it on result update.
  */
 class QmlResultWait: public QObject

@@ -68,7 +68,7 @@ QString getTargetFontFamiliy(const QString& defaultFontName, const QString& appl
 
     // In Android Qt chooses a fallback font for some languages according to the value of
     // `QLocale::system()`. As we can have situations when the system locale differs from the
-    // mobile client locale, we need to exlicitly set a font which supports the correct character
+    // mobile client locale, we need to explicitly set a font which supports the correct character
     // set.
 
     struct FontData

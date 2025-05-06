@@ -355,7 +355,7 @@ struct ApplicationContext::Private
     // UI Skin parts.
     std::unique_ptr<CustomCursors> customCursors;
 
-    // Miscelaneous modules.
+    // Miscellaneous modules.
     std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
     std::unique_ptr<PerformanceMonitor> performanceMonitor;
 

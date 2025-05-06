@@ -10,7 +10,7 @@ namespace nx::vms::client::desktop {
 class DialogUtils
 {
 public:
-    /** Sets parent for dialog and preservs window flags. Overwise, dialog will be placed as widget */
+    /** Sets parent for dialog and preserves window flags. Otherwise, dialog will be placed as widget */
     static void setDialogParent(QDialog* dialog, QWidget* parent);
 };
 

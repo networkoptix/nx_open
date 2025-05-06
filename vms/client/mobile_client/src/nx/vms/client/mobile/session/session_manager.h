@@ -22,7 +22,7 @@ class WindowContext;
 
 /**
  * Responsible for connection sessions management. Only one session should exist at each moment of
- * time. Resets current session if initial connection is failed or some fatal error is occured.
+ * time. Resets current session if initial connection is failed or some fatal error is occurred.
  */
 class SessionManager:
     public QObject,
@@ -76,7 +76,7 @@ class SessionManager:
         READ isCloudSession
         NOTIFY sessionHostChanged)
 
-    /** Reresents system name of the current session. */
+    /** Represents system name of the current session. */
     Q_PROPERTY(QString systemName
         READ systemName
         NOTIFY systemNameChanged)
@@ -172,7 +172,7 @@ public:
      * @param supposedSystemName Represents supposed system name which in some cases we are able
      * to predict before connection is done.
      * @param callback Callback to signalize to the QML part if initial connection
-     * is successfull or not.
+     * is successful or not.
      */
     Q_INVOKABLE void startSession(
         const nx::utils::Url& url,
@@ -184,7 +184,7 @@ public:
     /**
      * Start new session using specified url.
      * @param url Url of the target server. Should contain user name and password for authentication.
-     * @param callback Callback to signalize if initial connection is successfull or not.
+     * @param callback Callback to signalize if initial connection is successful or not.
      */
     void startSessionByUrl(
         const nx::utils::Url& url,
@@ -224,7 +224,7 @@ signals:
     /** Signalizes once if session started successfully. */
     void sessionStartedSuccessfully();
 
-    /** Signalizes when session is stoped by the user (called stopSession). */
+    /** Signalizes when session is stooped by the user (called stopSession). */
     void sessionStoppedManually();
 
     /** Signalizes that session successfully restored after connection loss. */

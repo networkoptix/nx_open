@@ -1001,7 +1001,7 @@ struct RemoteConnectionFactory::Private
                     const auto chain = nx::network::ssl::Certificate::parse(pem);
 
                     if (chain.empty())
-                        return; //< The pem value is inavlid.
+                        return; //< The pem value is invalid.
 
                     const auto currentKey = chain[0].publicKey();
                     const auto pinnedKey = certificateVerifier->pinnedCertificate(serverId, type);
@@ -1060,7 +1060,7 @@ struct RemoteConnectionFactory::Private
             tokenExpired = nowTime >= expirationTime;
         }
 
-        // Request cloud token asyncronously, as this request may go in parallel with Server api.
+        // Request cloud token asynchronously, as this request may go in parallel with Server api.
         // This requires to know System ID and version, so method will do nothing if we do not have
         // them yet.
         if (tokenExpired)
@@ -1172,7 +1172,7 @@ struct RemoteConnectionFactory::Private
             }
         }
 
-        // For the older systems (before user rights redesign) expliticly request current user
+        // For the older systems (before user rights redesign) explicitly request current user
         // permissions.
         if (isOldPermissionsModelUsed(context()))
         {

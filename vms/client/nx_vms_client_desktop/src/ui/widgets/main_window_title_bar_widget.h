@@ -81,7 +81,7 @@ private:
         nx::vms::client::desktop::menu::IDType actionId,
         const QSize& fixedSize = QSize());
 
-    /** Creates Screen Recording indicator. Returns nullptr if the recording is not avaliable. */
+    /** Creates Screen Recording indicator. Returns nullptr if the recording is not available. */
     QWidget* newRecordingIndicator(const QSize& fixedSize = QSize());
 
     void initSystemNavigation();

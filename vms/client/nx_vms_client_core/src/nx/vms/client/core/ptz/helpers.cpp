@@ -47,7 +47,7 @@ QnPtzPresetList sortedPresets(const QnResourcePtr& resource, QnPtzPresetList pre
         {
             /**
              * Since we have only digit hotkeys (0-9) we suppose that invalid preset number is
-             * large enought to make sorting easer: each preset with hotkey is always less than
+             * large enough to make sorting easer: each preset with hotkey is always less than
              * preset without it.
              */
             static const int kNoPresetNumberValue = 10;

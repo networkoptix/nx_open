@@ -14,8 +14,8 @@
 namespace nx::vms::client::mobile::details {
 
 /**
- * Incapsulates device token management for push notification purposes.
- * Device token is an unique devce identifier used by push notification management system to
+ * Encapsulates device token management for push notification purposes.
+ * Device token is an unique device identifier used by push notification management system to
  * identify device and route notifications. We need to have device token and send it with each
  * subscribe/unsubscribe request to our cloud instance.
  */

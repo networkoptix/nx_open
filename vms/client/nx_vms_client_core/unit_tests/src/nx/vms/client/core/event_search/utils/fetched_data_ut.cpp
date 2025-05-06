@@ -166,7 +166,7 @@ TEST(FetchedData, sameFetchedDataWithRemovedPoint)
 }
 
 /**
- * We treat any new item inside the current data (if separeted by other old items from the new
+ * We treat any new item inside the current data (if separated by other old items from the new
  * data)as a part of the body, so we expect to have only a body in all tests below.
  */
 TEST(FetchedData, sameFetchedDataWithAddedItemInCurrentData)
@@ -270,7 +270,7 @@ TEST(FetchedData, noCentralPointAtAll)
         ASSERT_EQ(result.data[result.ranges.tail.offset + 1].timestamp, milliseconds(50));
     }
 
-    // Newer reuqest check
+    // Newer request check
     {
         /**
          * Current({id} ms)  Fetched({id} ms)      Expected
@@ -333,7 +333,7 @@ TEST(FetchedData, allFetchedInBoundsOfCurrentData)
 }
 
 /**
- * Expecting only tail when fetched data cosist of new items and split to the two parts which both
+ * Expecting only tail when fetched data consist of new items and split to the two parts which both
  * outside current data.
  */
 TEST(FetchedData, fetchedDataOutOfBoundsFromBothSides)

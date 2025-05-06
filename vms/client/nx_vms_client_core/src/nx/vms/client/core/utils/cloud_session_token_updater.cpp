@@ -105,7 +105,7 @@ void CloudSessionTokenUpdater::onTokenUpdated(microseconds expirationTime)
         expirationTime, m_expirationTimer.hasExpired());
 
     // Access token lifetime can't exceed the lifespan of the refresh token. Therefore, we can
-    // receive a new token which already expires. In that case it's wortheless to update it again.
+    // receive a new token which already expires. In that case it's worthless to update it again.
     if (tokenDuration > kMaxTokenUpdateRequestTime)
     {
         // Adjust timer interval. For tokens with a very short lifespan, the token will be checked

@@ -39,7 +39,7 @@ RunParameters getRunParameters(
 
     // When we try to run MacOs client it runs global launcher of the application.
     // Global launcher looks for the newest applauncher and redirects request to it to
-    // run the newset (or some specified) version. Up to 4.2 applauncher run client
+    // run the newest (or some specified) version. Up to 4.2 applauncher run client
     // by the direct executable call. The chain was user->initial client->applauncher->
     // final client. Because of that final client used settings from the initial one.
     // From 4.3 applauncher runs 4.3+ clients as a bundle which fixes settings usage.

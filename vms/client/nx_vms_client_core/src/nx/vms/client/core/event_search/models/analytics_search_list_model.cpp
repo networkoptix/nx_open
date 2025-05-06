@@ -124,7 +124,7 @@ public:
         QHash<QnVirtualCameraResourcePtr, QList<QnAbstractCompressedMetadataPtr>>;
 
     /**
-     * Temporary storage for the data which can't be applied now becuase view stream data from the
+     * Temporary storage for the data which can't be applied now because view stream data from the
      * camera is late.
      */
     MetadataByCamera deferredMetadata;
@@ -687,7 +687,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
     MetadataByCamera currentMetadata;
     currentMetadata.swap(deferredMetadata);
 
-    // Adds all new availble packages to the temporary metadata.
+    // Adds all new available packages to the temporary metadata.
     for (const auto& receiver: metadataReceivers)
         currentMetadata[receiver->camera()].append(receiver->takeData());
 
@@ -1345,7 +1345,7 @@ void AnalyticsSearchListModel::commitAvailableNewTracks()
                 continue; //< We can have it when there is a race between metadata and api request.
             }
 
-            // We have milliseconds precision in our DB and microseconds precisiong in the objects
+            // We have milliseconds precision in our DB and microseconds precision in the objects
             // stream. So we cut microseconds to milliseconds here to avoid different timestamps,
             // exactly like in object track searcher.
             item.firstAppearanceTimeUs = (item.firstAppearanceTimeUs / 1000) * 1000;
@@ -1542,8 +1542,8 @@ bool AnalyticsSearchListModel::requestFetch(
         return false;
     }
 
-    // We suppose we have the actual data for the moment of requst fetch call. So, as we can't have
-    // analitics data removed and the data is actual we can just add new data to the curent one.
+    // We suppose we have the actual data for the moment of request fetch call. So, as we can't have
+    // analytic data removed and the data is actual we can just add new data to the current one.
     const auto dataReceived =
         [this, request, completionHandler, currentItems = d->data.items]
             (bool success, rest::Handle requestId, LookupResult&& data)

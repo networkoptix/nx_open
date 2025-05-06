@@ -9,7 +9,7 @@ namespace nx::vms::client::mobile::details {
 
 /**
  * Helper class for storing interprocess data. Uses secured storage which is available
- * both for the mobile application and notification service process/extention. In Android it is
+ * both for the mobile application and notification service process/extension. In Android it is
  * encrypted shared properties, in iOS it is keychain storage.
  */
 struct PushIpcData
@@ -31,7 +31,7 @@ struct PushIpcData
         const std::string& cloudRefreshToken,
         const std::string& password);
 
-    /** Retrives data from the secured storage. */
+    /** Retrieves data from the secured storage. */
     static bool load(
         std::string& user,
         std::string& cloudRefreshToken,

@@ -15,7 +15,7 @@ class RemoteSession;
 class RemoteConnectionFactory;
 
 /**
- * Single storage place for all network-related classes intances in the client core.
+ * Single storage place for all network-related classes instances in the client core.
  * Maintains their lifetime, internal dependencies and construction / destruction order.
  */
 class NX_VMS_CLIENT_CORE_API NetworkModule: public QObject
