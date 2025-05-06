@@ -9,7 +9,6 @@
 #include <nx/branding.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
-#include <nx/network/jose/jwt.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
@@ -60,22 +59,6 @@ nx::utils::Url connectionUrl(const SystemUri& uri)
     }
 
     return result;
-}
-
-static constexpr std::string_view kTokenPrefix = "nxcdb-";
-
-std::string decodeUsername(const QString& authCode)
-{
-    const std::string code = authCode.toStdString();
-    std::string_view token = code;
-
-    if (token.starts_with(kTokenPrefix))
-        token.remove_prefix(kTokenPrefix.size());
-
-    if (auto result = nx::network::jws::decodeToken<nx::network::jwt::ClaimSet>(token))
-        return result->payload.sub().value_or("");
-
-    return {};
 }
 
 } // namespace
@@ -194,7 +177,7 @@ bool QnMobileClientUriHandler::Private::loginToCloud(const SystemUri& uri)
 
     if (username.empty())
     {
-        username = decodeUsername(uri.authCode);
+        username = nx::vms::client::core::usernameFromToken(uri.authCode.toStdString());
         NX_DEBUG(this, "loginToCloud(): uri username is empty, decoded from token: %1", username);
     }
 

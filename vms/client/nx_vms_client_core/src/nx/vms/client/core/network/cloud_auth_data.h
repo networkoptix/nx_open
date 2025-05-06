@@ -50,4 +50,7 @@ struct CloudTokens
     QString refreshToken;
 };
 
+/** Decode username from cloud bearer token value. Returns empty string in case of error. */
+NX_VMS_CLIENT_CORE_API std::string usernameFromToken(const std::string& value);
+
 } // namespace nx::vms::client::core

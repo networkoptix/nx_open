@@ -19,6 +19,7 @@
 #include <nx/vms/api/data/login.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/common/resource/server_host_priority.h>
 #include <nx_ec/ec_api_fwd.h>
@@ -128,6 +129,16 @@ nx::utils::Url mainServerUrl(const QSet<QString>& remoteAddresses, int port)
             using namespace nx::vms::common;
             return serverHostPriority(l.host()) < serverHostPriority(r.host());
         });
+}
+
+void tryUpdateUsernameIfEmpty(nx::network::http::Credentials& credentials)
+{
+    if (!credentials.username.empty() || !credentials.authToken.isBearerToken())
+        return;
+
+    credentials.username = usernameFromToken(credentials.authToken.value);
+
+    NX_DEBUG(NX_SCOPE_TAG, "Username is empty, decoded from token: %1", credentials.username);
 }
 
 } // namespace
@@ -1059,6 +1070,9 @@ struct RemoteConnectionFactory::Private
             const microseconds expirationTime = ctx->sessionTokenExpirationTime.value_or(0s);
             tokenExpired = nowTime >= expirationTime;
         }
+
+        if (auto ctx = context())
+            tryUpdateUsernameIfEmpty(ctx->logonData.credentials);
 
         // Request cloud token asynchronously, as this request may go in parallel with Server api.
         // This requires to know System ID and version, so method will do nothing if we do not have
