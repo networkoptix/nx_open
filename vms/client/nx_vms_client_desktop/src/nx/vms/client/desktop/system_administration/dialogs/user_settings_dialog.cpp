@@ -708,7 +708,14 @@ QString UserSettingsDialog::validateEmail(const QString& email, bool forCloud)
                     continue;
 
                 if (user->isChannelPartner())
-                    continue;
+                {
+                    if(!user->isAdministrator())
+                        continue;
+
+                    return ValidationResult(
+                        tr("The user with the specified email already has Administrator access via "
+                           "the Channel Partner"));
+                }
 
                 if (user->getEmail().toLower() != email)
                     continue;
