@@ -1325,6 +1325,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
         auto currentUserData = d->apiDataFromState(userState);
         currentUserData.permissions = userData.permissions;
         currentUserData.groupIds = userData.groupIds;
+        currentUserData.resourceAccessRights = userData.resourceAccessRights;
         if (!userState.localeEditable)
             currentUserData.locale = currentUser->rawLocaleValue();
         userData = currentUserData;
