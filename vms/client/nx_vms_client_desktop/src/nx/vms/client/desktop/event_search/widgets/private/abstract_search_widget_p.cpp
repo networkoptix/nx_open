@@ -39,6 +39,7 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
@@ -588,8 +589,13 @@ void AbstractSearchWidget::Private::setupCameraSelection()
     connect(ui->cameraSelectionButton, &SelectableTextButton::stateChanged, this,
         [this](SelectableTextButton::State state)
         {
-            if (state == SelectableTextButton::State::deactivated)
+            const auto currentLayout = q->windowContext()->workbench()->currentLayoutResource();
+
+            if (state == SelectableTextButton::State::deactivated
+                && !currentLayout->flags().testFlag(Qn::cross_system))
+            {
                 m_cameraSelectionActions[core::EventSearch::CameraSelection::all]->trigger();
+            }
         });
 
     ui->cameraSelectionButton->setMenu(cameraMenu);
