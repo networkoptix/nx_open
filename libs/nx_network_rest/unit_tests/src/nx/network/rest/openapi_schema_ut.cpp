@@ -462,7 +462,7 @@ TEST_P(OpenApiSchemaTest, ArrayOrdererVariant)
         QJsonValue json;
         QJson::serialize(data, &json);
         postprocessResponse(*request, &json);
-        auto sorted{getArray(getObject(asObject(json), "map"), "key")};
+        auto sorted = getArray(getObject(asObject(json), "map"), "key");
         ASSERT_EQ(sorted.size(), 2);
         ASSERT_EQ(getDouble(asObject(sorted[0]), "id"), 1);
         ASSERT_EQ(getDouble(asObject(sorted[1]), "id"), 2);
@@ -492,7 +492,7 @@ TEST_P(OpenApiSchemaTest, ArrayOrdererVariantNested)
         QJsonValue json;
         QJson::serialize(data, &json);
         postprocessResponse(*request, &json);
-        auto sorted{getArray(getObject(asObject(json), "map"), "key")};
+        auto sorted = getArray(getObject(asObject(json), "map"), "key");
         ASSERT_EQ(sorted.size(), 2);
         ASSERT_EQ(getString(getObject(asObject(sorted[0]), "id"), "name"), "1");
         ASSERT_EQ(getString(getObject(asObject(sorted[1]), "id"), "name"), "2");
