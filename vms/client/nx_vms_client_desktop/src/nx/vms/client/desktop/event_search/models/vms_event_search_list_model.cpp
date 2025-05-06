@@ -472,6 +472,7 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue(event->timestamp()); //< Microseconds.
 
         case core::TimestampTextRole:
+        case core::TimestampMsRole:
             return base_type::data(index, role);
 
         case core::ObjectTrackIdRole:
