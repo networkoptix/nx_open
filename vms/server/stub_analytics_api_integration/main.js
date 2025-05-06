@@ -332,6 +332,7 @@ const initializeRpcClient = async () => {
                     frameCount: 0,
                     pdeFromEngine: true, //< True - from Engine, false - from DeviceAgent.
                     pushDataInfo: { timestampMs: 1 },
+                    connected: true
                 };
             }
         }
@@ -592,6 +593,10 @@ const initializeNotifications = () => {
         if (appContext.viewModel.connectionState == "connected")
         {
             console.log("Disconnecting.");
+            if (appContext.integrationContext.deviceAgentPushDataContext)
+            {
+                appContext.integrationContext.deviceAgentPushDataContext.connected = false;
+            }
             // Disconnect without executing the onClose handler.
             // When the onClose handler is executed, it will try to reconnect, but we don't need
             // to reconnect when the user explicitly disconnects by pressing a button, we only
@@ -619,6 +624,11 @@ const initializeNotifications = () => {
             appContext.rpcClient = await initializeRpcClient();
 
             await authorizeIntegrationAndConnect();
+
+            if (appContext.integrationContext.deviceAgentPushDataContext)
+            {
+                appContext.integrationContext.deviceAgentPushDataContext.connected = true;
+            }
         }
     });
 
@@ -851,7 +861,7 @@ const initializeNotifications = () => {
         console.log("Update timestamp: ", timestampMs);
 
         let pushDataContext = appContext.integrationContext.deviceAgentPushDataContext;
-        if (pushDataContext)
+        if (pushDataContext && pushDataContext.connected)
         {
             pushDataContext.pushDataInfo.timestampMs = timestampMs;
 

@@ -67,6 +67,17 @@ const resolveJsonRpcCallPromises = (jsonRpcResponse, pendingCallPromises) => {
     delete pendingCallPromises[jsonRpcResponse.id];
 }
 
+const safeSend = (websocket, data) => {
+    if (websocket.readyState === WebSocket.OPEN)
+    {
+        websocket.send(data);
+    }
+    else
+    {
+        console.log("WebSocket is not open. Unable to send data.");
+    }
+}
+
 class JsonRpcClient {
     webSocket = null;
     pendingCallPromises = {};
@@ -112,12 +123,11 @@ class JsonRpcClient {
 
                             let response = makeJsonRpcResponse(result, message.id);
                             console.log("RESULT", JSON.stringify(response, null, 4));
-                            this.webSocket.send(JSON.stringify(response));
+                            safeSend(this.webSocket, JSON.stringify(response));
                         })
                         .catch((error) => {
                             console.log("ERROR", error, makeJsonRpcErrorResponse(error, message.id));
-                            this.webSocket.send(
-                                JSON.stringify(makeJsonRpcErrorResponse(error, message.id)));
+                            safeSend(this.webSocket, JSON.stringify(makeJsonRpcErrorResponse(error, message.id)));
                         });
                 }
             }
@@ -149,14 +159,14 @@ class JsonRpcClient {
             };
         });
 
-        this.webSocket.send(JSON.stringify(request));
+        safeSend(this.webSocket, JSON.stringify(request));
         return promise;
     }
 
     notify(method, data) {
         let request = makeJsonRpcRequest(method, data);
         console.log("JsonRpcClient: Sending notification: ", JSON.stringify(request, null, 4));
-        this.webSocket.send(JSON.stringify(request));
+        safeSend(this.webSocket, JSON.stringify(request));
     }
 
     on(method, handler) {
