@@ -736,20 +736,23 @@ void UserListWidget::Private::modelUpdated()
 void UserListWidget::Private::updateSelection()
 {
     Qt::CheckState selectionState = Qt::Unchecked;
-
-    if (!m_visibleUsers.selected().empty())
+    const auto selectedUsers = m_visibleUsers.selected();
+    if (!selectedUsers.empty())
     {
-        const auto selectedOrDisabledCount =
-            m_visibleUsers.selected().size() + m_visibleUsers.disabledCount();
+        const auto selectedOrDisabledCount = selectedUsers.size() + m_visibleUsers.disabledCount();
         selectionState = selectedOrDisabledCount == sortModel->rowCount()
             ? Qt::Checked
             : Qt::PartiallyChecked;
     }
 
-    deleteButton->setVisible(!m_visibleUsers.selectedDeletable().isEmpty());
-    editButton->setVisible(!m_visibleUsers.selectedEditable().isEmpty());
+    const auto hasChannelPartnerUser = std::any_of(selectedUsers.begin(),
+        selectedUsers.end(),
+        [](const auto& user) { return user->isChannelPartner(); });
 
-    selectionControls->setDisplayed(m_visibleUsers.hasSelectedModifiable());
+    deleteButton->setVisible(!m_visibleUsers.selectedDeletable().isEmpty());
+    editButton->setVisible(!hasChannelPartnerUser && !m_visibleUsers.selectedEditable().isEmpty());
+
+    selectionControls->setDisplayed(m_visibleUsers.hasSelectedModifiable() || hasChannelPartnerUser);
     header->setCheckState(selectionState);
 
     emit q->selectionUpdated();
