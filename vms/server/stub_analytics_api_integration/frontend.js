@@ -155,7 +155,7 @@ function reconnect(position, config) {
           + (dewarpingPanofactor != null ? ('&dewarpingPanofactor=' + dewarpingPanofactor) : '')
           + (zoom != null ? ('&zoom=' + zoom) : '')
           + (panoramic != null ? ('&panoramic=' + panoramic) : '')
-          + '&sendTimestampIntervalMs=0';
+          + '&sendTimestampIntervalMs=100';
 
         console.log('Url: ' + url);
 
