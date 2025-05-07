@@ -388,12 +388,13 @@ void QnUniversalRtpEncoder::setMtu(int mtu)
     m_transcoder.muxer().setRtpMtu(mtu);
 }
 
-QString QnUniversalRtpEncoder::getSdpMedia(bool isVideo, int trackId, int port)
+QString QnUniversalRtpEncoder::getSdpMedia(bool isVideo, int trackId, int port, bool ssl)
 {
     static const QString kEndl = "\r\n";
     QString sdpMedia;
     QTextStream stream(&sdpMedia);
-    stream << "m=" << (isVideo ? "video " : "audio ") << port << " RTP/AVP " << m_payloadType;
+    stream << "m=" << (isVideo ? "video " : "audio ") << port <<
+        (ssl ? " UDP/TLS/RTP/SAVPF " : " RTP/AVP ") << m_payloadType;
     if (m_useSecondaryPayloadType)
         stream << ' ' << kSecondaryStreamPayloadType;
     stream << kEndl;

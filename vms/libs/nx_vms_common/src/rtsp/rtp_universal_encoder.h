@@ -40,7 +40,7 @@ public:
 
     bool open(const AVCodecParameters* codecParameters);
 
-    virtual QString getSdpMedia(bool isVideo, int trackId, int port = 0) override;
+    virtual QString getSdpMedia(bool isVideo, int trackId, int port = 0, bool ssl = false) override;
 
     virtual void setDataPacket(QnConstAbstractMediaDataPtr media) override;
     virtual bool getNextPacket(nx::utils::ByteArray& sendBuffer) override;
