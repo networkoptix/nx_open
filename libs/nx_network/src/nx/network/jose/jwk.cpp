@@ -66,7 +66,7 @@ void Key::setKid(const std::string& value)
 }
 
 //--------------------------------------------------------------------------------------------------
-// RS256 assymetric key signing and verification.
+// RS256 asymmetric key signing and verification.
 
 static std::string bnToBase64Url(const BIGNUM* bn)
 {
@@ -366,7 +366,7 @@ bool verify(
 }
 
 //-------------------------------------------------------------------------------------------------
-// RS256 asymetric key signing and verification.
+// RS256 asymmetric key signing and verification.
 
 nx::utils::expected<SignResult, std::string /*error*/> rs256Sign(
     const std::string_view message,
@@ -407,7 +407,7 @@ bool rs256Verify(
 }
 
 //--------------------------------------------------------------------------------------------------
-// HS256 symetric key signing and verification.
+// HS256 symmetric key signing and verification.
 
 nx::utils::expected<SignResult, std::string /*error*/> hs256Sign(
     const std::string_view message,

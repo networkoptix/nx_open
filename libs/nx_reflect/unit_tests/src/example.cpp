@@ -17,7 +17,7 @@ struct Address
     int zip = -1;
 };
 
-// Intrumenting must happen in the same namespace as the instrumented type.
+// Instrumenting must happen in the same namespace as the instrumented type.
 NX_REFLECTION_INSTRUMENT(Address, (city)(streetAddress)(zip))
 
 //-------------------------------------------------------------------------------------------------

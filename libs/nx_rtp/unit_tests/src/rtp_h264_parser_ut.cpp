@@ -7,7 +7,7 @@
 TEST (H264RtpParser, ZeroPacketSize)
 {
     uint8_t rtpData[] = {
-        0x7c, 0x85, // H264 FU_A + IDR pictrure NAL unit type(without nal unit data)
+        0x7c, 0x85, // H264 FU_A + IDR picture NAL unit type(without nal unit data)
     };
 
     nx::rtp::RtpHeader header;
@@ -20,7 +20,6 @@ TEST (H264RtpParser, ZeroPacketSize)
         header, rtpData, /*offset*/ 0, /*bytesRead*/ sizeof(rtpData), gotData);
     ASSERT_EQ(result.success, true);
 }
-
 
 TEST (H264RtpParser, SpsPpsInsideFragmentationUnit)
 {

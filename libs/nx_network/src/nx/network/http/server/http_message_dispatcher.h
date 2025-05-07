@@ -160,7 +160,7 @@ public:
         std::optional<std::chrono::milliseconds> timeout = std::nullopt);
 
     /**
-     * Get the frequency per minute with which each HTTP Status code is occuring.
+     * Get the frequency per minute with which each HTTP Status code is occurring.
      */
     std::map<int /*http status*/, int /*count*/> statusCodesReported() const;
 

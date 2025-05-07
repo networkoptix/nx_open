@@ -11,7 +11,7 @@
 
 namespace nx::utils {
 
-/** Performs tasks in several threads parallelly.
+/** Performs tasks in several threads in parallel.
  */
 class NX_UTILS_API TaskRunner: public SimpleActiveObject
 {

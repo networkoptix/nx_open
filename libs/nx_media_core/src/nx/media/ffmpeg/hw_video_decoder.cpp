@@ -84,7 +84,7 @@ bool HwVideoDecoder::initialize(const QnConstCompressedVideoDataPtr& data)
 {
     if (!initializeHardware(data))
     {
-        NX_DEBUG(this, "Failed to initialize hardware video decoder, try to use sofware version");
+        NX_DEBUG(this, "Failed to initialize hardware video decoder, try to use software version");
         return initializeSoftware(data);
     }
     return true;

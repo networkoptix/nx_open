@@ -60,7 +60,7 @@ struct NX_UTILS_API Ini: nx::kit::IniConfig
 
     NX_INI_INT(1024, logReservedVolumeSizeMB,
         "Clean up logs if the volume free space is less than this value.\n"
-        "If the value is bigger than the size determened by logReservedVolumePercentage\n"
+        "If the value is bigger than the size determined by logReservedVolumePercentage\n"
         "the latter will be used\n"
         "If the value is zero then the check is disabled");
 

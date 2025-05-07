@@ -233,7 +233,7 @@ void TranslationManager::stopLoadingTranslations()
 
 void TranslationManager::startLoadingTranslations()
 {
-    NX_DEBUG(this, "start loading tanslations");
+    NX_DEBUG(this, "start loading translations");
     ++d->loadTranslationCounter;
 }
 

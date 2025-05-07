@@ -44,7 +44,7 @@ public:
 
     /**
      * Checks for timed out queries and calls the timeout handler for each of them within this
-     * fuction. Does not block.
+     * function. Does not block.
      */
     void reportTimedOutQueries();
 

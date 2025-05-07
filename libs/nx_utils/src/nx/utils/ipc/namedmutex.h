@@ -58,7 +58,7 @@ public:
     NamedMutex(const QString& name);
     ~NamedMutex();
 
-    /** @return true, if mutex has been succesfully opened in constructor. */
+    /** @return true, if mutex has been successfully opened in constructor. */
     bool isValid() const;
     bool lock();
     bool unlock();

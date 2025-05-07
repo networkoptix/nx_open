@@ -2,7 +2,7 @@
 
 #pragma once
 
-// Windows network headers mut be included in a certain order to function properly.
+// Windows network headers must be included in a certain order to function properly.
 #if defined(_WIN32)
     #if !defined(FD_SETSIZE)
         #define FD_SETSIZE 2048

@@ -53,7 +53,7 @@ QnAbstractMediaDataPtr Demuxer::getNextData()
 {
     if (!m_formatContext)
     {
-        NX_ERROR(this, "Invalid usage of uninitilized demuxer");
+        NX_ERROR(this, "Invalid usage of uninitialized demuxer");
         return nullptr;
     }
 

@@ -380,7 +380,7 @@ void RhiPaintEngine::drawTexture(
     m_data->append(PaintTexture{
         .dst = dst,
         .texture = texture,
-        .src = QRectF(0, 0, size.width(), size.height()), //< Currently unsused.
+        .src = QRectF(0, 0, size.width(), size.height()), //< Currently unused.
         .transform = state->transform(),
         .opacity = painter()->opacity(),
         .mirrorY = mirrorY

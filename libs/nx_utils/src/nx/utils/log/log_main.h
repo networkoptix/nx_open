@@ -30,7 +30,7 @@ NX_UTILS_API std::shared_ptr<AbstractLogger> getLogger(const Tag& tag);
 /** @return AbstractLogger by exact tag, nullptr otherwise. */
 NX_UTILS_API std::shared_ptr<AbstractLogger> getExactLogger(const Tag& tag);
 
-/** Removes specific loggers for filters, so such messagess will go to main log. */
+/** Removes specific loggers for filters, so such messages will go to main log. */
 NX_UTILS_API void removeLoggers(const std::set<Filter>& filters);
 
 /** Get the maximum log level currently used by any logger registered via addLogger(). */

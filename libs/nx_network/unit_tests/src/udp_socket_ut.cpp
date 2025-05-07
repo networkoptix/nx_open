@@ -360,11 +360,11 @@ TEST_F(UdpSocket, DISABLED_Performance)
             const auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - startTime);
 
-            NX_INFO(this, nx::format("Resieve ended (%1): %2")
+            NX_INFO(this, nx::format("Receive ended (%1): %2")
                 .args(recv, SystemError::getLastOSErrorText()));
 
             const auto bytesPerS = double(transferSize) * 1000 / durationMs.count();
-            NX_INFO(this, nx::format("Resieved size=%1b, count=%2, average=%3, duration=%4, speed=%5bps")
+            NX_INFO(this, nx::format("Received size=%1b, count=%2, average=%3, duration=%4, speed=%5bps")
                 .args(nx::utils::bytesToString(transferSize), transferCount,
                     nx::utils::bytesToString(transferSize / transferCount),
                     durationMs, nx::utils::bytesToString((uint64_t) bytesPerS)));

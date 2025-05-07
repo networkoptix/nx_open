@@ -39,7 +39,7 @@ struct CorsConfiguration
 };
 
 /**
- * Adds CORS support to the HTTP server. I.e., adds neccessary CORS headers to the reply and
+ * Adds CORS support to the HTTP server. I.e., adds necessary CORS headers to the reply and
  * implements OPTIONS request.
  * Should be registered as the first request handler in the request processing chain.
  * If the request does not contain the "Origin" header, then the request is just forwarded to

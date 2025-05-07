@@ -9,7 +9,7 @@ namespace nx::network::upnp {
 // Basic UPnP device type.
 static const QString kBasicDeviceType = "Basic";
 
-//Helper formaters "urn:schemas-upnp-org:service:ID:VERSION"
+//Helper formatters "urn:schemas-upnp-org:service:ID:VERSION"
 QString NX_NETWORK_API toUpnpUrn(const QString& id, const QString& suffix, int version = 1);
 QString NX_NETWORK_API fromUpnpUrn(const QString& urn, const QString& suffix, int version = 1);
 

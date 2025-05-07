@@ -231,7 +231,7 @@ std::string DbStructureUpdater::fixSqlDialect(
 namespace {
 
 /**
- * Replaces each occurence of token in text with subsequent element of args.
+ * Replaces each occurrence of token in text with subsequent element of args.
  * Example:
  * substituteArgs("? ? ?", "?", "one", "two", "three")
  * provides

@@ -755,7 +755,7 @@ TEST_F(
     for (int i = 0; i < count; ++i)
         givenSchemaWithNumericVersion(nx::format("schema_%1", i).toStdString(), 3 + 1);
 
-    // Running schema updaters on all schemes.
+    // Running schema updaters on all schemas.
     for (int i = 0; i < count; ++i)
     {
         const auto schemaName = nx::format("schema_%1", i).toStdString();

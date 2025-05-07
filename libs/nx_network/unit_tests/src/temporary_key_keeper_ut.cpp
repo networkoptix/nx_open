@@ -38,7 +38,7 @@ TEST(TemporaryKeyKeeper, MakeExpiration)
     timeShift.applyRelativeShift(3min);
     ASSERT_EQ(1, keeper.size());
     ASSERT_FALSE((bool) keeper.get(key0));
-    ASSERT_EQ(kUser1, keeper.get(key1)); //< Still accesible.
+    ASSERT_EQ(kUser1, keeper.get(key1)); //< Still accessible.
 
     timeShift.applyRelativeShift(3min);
     ASSERT_EQ(0, keeper.size());
@@ -117,12 +117,12 @@ TEST(TemporaryKeyKeeper, Options)
     const auto key2 = keeper.make(*kUser2);
 
     timeShift.applyRelativeShift(3min);
-    ASSERT_EQ(kUser1, keeper.get(key1)); //< Still accesible.
+    ASSERT_EQ(kUser1, keeper.get(key1)); //< Still accessible.
     ASSERT_EQ(kUser2, keeper.get(key2));
 
     keeper.setOptions(TemporaryKeyOptions{10min, /*prolongLifeOnUse*/ false});
     timeShift.applyRelativeShift(3min);
-    ASSERT_EQ(kUser1, keeper.get(key1)); //< Still accesible with new life time.
+    ASSERT_EQ(kUser1, keeper.get(key1)); //< Still accessible with new life time.
     ASSERT_EQ(kUser2, keeper.get(key2));
 
     keeper.setOptions(TemporaryKeyOptions{10min, /*prolongLifeOnUse*/ true});

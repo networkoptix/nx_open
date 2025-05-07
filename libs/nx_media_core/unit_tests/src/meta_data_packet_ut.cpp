@@ -16,7 +16,7 @@ TEST(MetaData, serialization)
     // Serialize.
     auto data = packet.serialize();
 
-    // Deserilize.
+    // Deserialize.
     QnMetaDataV1Light motionData;
     ASSERT_EQ(data.size(), sizeof(motionData));
     memcpy(&motionData, data.data(), sizeof(motionData));

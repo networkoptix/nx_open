@@ -27,7 +27,7 @@ public:
     {
     }
 
-    // The name of the property set in the constructur. Can be different from the member-variable name.
+    // The name of the property set in the constructor. Can be different from the member-variable name.
     constexpr const char* name() const { return m_name; }
 
     // Set the wrapped member-variable value of the object obj to arg.
@@ -188,7 +188,7 @@ constexpr DummyVisitor dummyVisitor;
 } // namespace detail
 
 /**
- * Checks whether the T is instrumented by checking the presense of `nxReflectVisitAllFields(T*)`
+ * Checks whether the T is instrumented by checking the presence of `nxReflectVisitAllFields(T*)`
  * declaration. Usage example:
  * if constexpr (nx::reflect::IsInstrumented<Foo>::value) ...
  */

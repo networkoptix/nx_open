@@ -316,7 +316,7 @@ QString containerString(
     for (auto it = begin; it != end; ++it)
         strings << nx::toString(*it);
 
-    // QString::operator+= works much faster than template subsitution.
+    // QString::operator+= works much faster than template substitution.
     QString result = prefix;
     result += strings.join(delimiter);
     result += suffix;

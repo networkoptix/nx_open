@@ -46,7 +46,7 @@ struct Context
     std::weak_ptr<nx::json_rpc::WebSocketConnection> connection;
     bool subscribed = false;
 
-    // Next fields are filled by Request contructor.
+    // Next fields are filled by Request constructor.
     std::optional<Crud> crud;
     std::optional<Subs> subs;
 };

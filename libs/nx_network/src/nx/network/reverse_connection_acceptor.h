@@ -329,7 +329,7 @@ public:
     }
 
     /**
-     * Intall a handler to be called each time a connection experiences an error. This can be while
+     * Install a handler to be called each time a connection experiences an error. This can be while
      * establishing a connection or while waiting for the originator to activate the connection.
      * This is a dedicated channel that reports all connection errors independent of acceptAsync.
      * Must be called before start and acceptAsync.

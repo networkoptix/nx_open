@@ -42,7 +42,7 @@ TEST_F(CharconvFromChars, integers)
     assertConverted("-1234567890123456", -1234567890123456ll, 10);
 }
 
-// TODO: #akolesnikov It appears that gcc implemenation has a bug and does not pass the following test.
+// TODO: #akolesnikov It appears that gcc implementation has a bug and does not pass the following test.
 // TEST_F(CharconvFromChars, skips_preceding_spaces)
 // {
 //     assertConverted("   1234567890123456", 1234567890123456ull, 10);

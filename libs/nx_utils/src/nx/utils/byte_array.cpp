@@ -15,7 +15,7 @@ ByteArray::ByteArray(
     m_alignment(alignment),
     m_padding(padding)
 {
-    NX_ASSERT(m_alignment != 0, "Aligment could not be zero!");
+    NX_ASSERT(m_alignment != 0, "Alignment could not be zero!");
     if (capacity > 0)
         reallocate(capacity);
 }

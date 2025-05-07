@@ -48,7 +48,7 @@ struct CloudConnectListenerStatusReport
      */
     std::vector<Error<nx::hpm::api::Result>> mediatorErrors;
 
-    /** Errors reported by the the connection acceptors (relays). */
+    /** Errors reported by the connection acceptors (relays). */
     std::vector<AcceptorError> acceptorErrors;
 };
 

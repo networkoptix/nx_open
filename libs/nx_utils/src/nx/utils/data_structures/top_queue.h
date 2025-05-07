@@ -105,7 +105,7 @@ typename TopQueue<T, Comp>::size_type TopQueue<T, Comp>::size() const
 template<typename T, typename Comp>
 void TopQueue<T, Comp>::reset()
 {
-    // TODO: if the stacks are reimplemted as std::vector, they can be cleared efficiently
+    // TODO: if the stacks are reimplemented as std::vector, they can be cleared efficiently
     m_pushStack = decltype(m_pushStack){};
     m_popStack = decltype(m_popStack){};
 }

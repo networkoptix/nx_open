@@ -198,7 +198,7 @@ protected:
     {
         const auto minChunkSize = testData.size() / 10;
 
-        // Randomly partioning test data.
+        // Random partitioning of test data.
         std::vector<nx::Buffer> partitionedData;
         auto bytesLeft = testData.size();
         std::size_t testDataPos = 0;

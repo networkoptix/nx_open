@@ -44,7 +44,7 @@ struct CanAssignIdField<T,
 
 /**
  * Customization point for use in generic template functions.
- * It allowes to simplify Crud Data type declarations:
+ * It allows to simplify Crud Data type declarations:
  * it allows to simply specify `.id` member, or declare `getId() const` member function that will
  * be used to disambiguate the id, if there are multiple id-like members. `getId()` has a higher
  * priority.
@@ -77,7 +77,7 @@ decltype(auto) getId(const T& t)
 
 /**
  * Customization point for use in generic template functions.
- * It allowes to simplify Crud Data type declarations:
+ * It allows to simplify Crud Data type declarations:
  * it allows to simply specify `.id` member, or declare `setId(Model, Id)` member function that
  * will be used to disambiguate the id, if there are multiple id-like members. `setId()` has a
  * higher priority.
@@ -125,7 +125,7 @@ struct CanSetIdWithArg<T, Arg, std::void_t<decltype(setId(std::declval<T&>(), st
 };
 
 /**
- * Customisation point to enable/disable model's Id generation by CrudHandler upon a POST request.
+ * Customization point to enable/disable model's Id generation by CrudHandler upon a POST request.
  *
  * By default CrudHandler's implementation determines the possibility to generate Id using
  * `HasGetId<Model> && CanSetIdWithArg<Model, nx::Uuid>`, which can:
@@ -167,7 +167,7 @@ constexpr bool isIdGenerationEnabled = decltype(enableIdGeneration(std::declval<
  *
  * struct UserDefinedModel
  * {
- *    // `id` can be a "*", and will be initialized to `nx::Uuig()` resulting in `missingParameter`
+ *    // `id` can be a "*", and will be initialized to `nx::Uuid()` resulting in `missingParameter`
  *    nx::Uuid id;
  * };
  *

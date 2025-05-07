@@ -76,7 +76,7 @@ NX_NETWORK_API nx::utils::expected<KeyPair, std::string /*error*/>
 
 struct SignResult
 {
-    // Crypographic algorithm used to generate the signature.
+    // Cryptographic algorithm used to generate the signature.
     std::string alg;
 
     // Base64URL-encoded signature.

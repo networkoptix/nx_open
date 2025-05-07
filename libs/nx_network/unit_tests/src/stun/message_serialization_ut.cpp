@@ -94,7 +94,7 @@ TEST(StunMessageSerialization, BindingResponse)
     Message parsed;
     MessageParser parser;
     parser.setMessage(&parsed);
-    partialParse(parser, serializedMessage, 2); // parse by 2 byte chanks
+    partialParse(parser, serializedMessage, 2); // parse by 2 byte chunks
 
     ASSERT_EQ((size_t)serializedMessage.size(), serializedSize);
     ASSERT_EQ(parsed.header.messageClass, MessageClass::successResponse);
@@ -124,7 +124,7 @@ TEST(StunMessageSerialization, BindingError)
         nx::network::server::SerializerState::done);
 
     static const auto MESSAGE = Buffer(
-        "0111" "0014" "2112A442"    // reponse: binding, lenght=20, magic cookie
+        "0111" "0014" "2112A442"    // response: binding, length=20, magic cookie
     ) + DEFAULT_TID + Buffer(
         "0009" "0010" "00000401"    // error code 0x3 0x77
     ) + nx::utils::toHex(Buffer("Unauthorized"));
@@ -135,7 +135,7 @@ TEST(StunMessageSerialization, BindingError)
     Message parsed;
     MessageParser parser;
     parser.setMessage(&parsed);
-    partialParse(parser, serializedMessage, 3); // parse by 3 byte chanks
+    partialParse(parser, serializedMessage, 3); // parse by 3 byte chunks
 
     ASSERT_EQ((size_t)serializedMessage.size(), serializedSize);
     ASSERT_EQ(parsed.header.messageClass, MessageClass::errorResponse);
@@ -168,7 +168,7 @@ TEST(StunMessageSerialization, CustomIndication)
         nx::network::server::SerializerState::done);
 
     static const auto MESSAGE = Buffer(
-        "00B1" "0018" "2112A442"        // indication 3, lenght=12, magic cookie
+        "00B1" "0018" "2112A442"        // indication 3, length=12, magic cookie
     ) + DEFAULT_TID
         + Buffer("9001" "0006") + nx::utils::toHex(Buffer("ua1val")) + Buffer("0000")
         + Buffer("9002" "0006") + nx::utils::toHex(Buffer("ua2val")) + Buffer("0000");
@@ -179,7 +179,7 @@ TEST(StunMessageSerialization, CustomIndication)
     Message parsed;
     MessageParser parser;
     parser.setMessage(&parsed);
-    partialParse(parser, serializedMessage, 4); // parse by 4 byte chanks
+    partialParse(parser, serializedMessage, 4); // parse by 4 byte chunks
 
     ASSERT_EQ((size_t)serializedMessage.size(), serializedSize);
     ASSERT_EQ(parsed.header.messageClass, MessageClass::indication);
@@ -253,7 +253,6 @@ TEST(StunMessageSerialization, serialization3)
     ASSERT_EQ(
         nx::network::server::SerializerState::done,
         serializer1.serialize(&serializedMessage, &bytesWritten));
-
 
     MessageParser parser;
     Message checkMessage;

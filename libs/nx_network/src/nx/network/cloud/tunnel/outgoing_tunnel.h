@@ -36,7 +36,7 @@ public:
      * Establish new connection.
      * @param timeout Zero means no timeout.
      * @param socketAttributes attribute values to apply to a newly-created socket.
-     * NOTE: This method is re-enterable. So, it can be called in different threads simultaneously.
+     * NOTE: This method is reentrant. So, it can be called in different threads simultaneously.
      */
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,

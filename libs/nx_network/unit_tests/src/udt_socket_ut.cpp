@@ -309,7 +309,7 @@ TEST_F(SocketUdtRendezvous, reusing_rendezvous_connection_stress_test)
 
     setConnectTimeout(kConnectTimeout);
 
-    //creating two sockets, performing randezvous connect
+    //creating two sockets, performing rendezvous connect
     const auto connectorSocket = createRendezvousUdtSocket();
     const auto acceptorSocket = createRendezvousUdtSocket();
 
@@ -346,7 +346,7 @@ TEST_F(SocketUdtRendezvous, reusing_rendezvous_connection_stress_test)
     ASSERT_EQ(SystemError::noError, acceptorResultCode)
         << SystemError::toString(acceptorResultCode);
 
-    //after successfull connect starting listener on one side and connector on the other one
+    //after successful connect starting listener on one side and connector on the other one
     setUdtSocketFunctions();
 
     RandomDataTcpServer server(

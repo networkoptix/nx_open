@@ -713,7 +713,7 @@ void RhiPaintDeviceRenderer::prepareAtlas(const RhiPaintEngineSyncData::Entries&
                 QPainter painter(&image);
                 painter.drawPixmap(QPointF(kPadding, kPadding) / pixmap.devicePixelRatio(), pixmap);
 
-                // Fill the paddings to avoid texture bleading.
+                // Fill the paddings to avoid texture bleeding.
                 constexpr int bytesPerPixel = 4;
                 const int imageWidth = image.width();
                 const int imageHeight = image.height();

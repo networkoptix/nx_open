@@ -1089,7 +1089,7 @@ protected:
     void assertAcceptedConnectionReceivedEof()
     {
         char buf[16];
-        // Sometimes, connection will report connection break, not gaceful shutdown. But it's ok.
+        // Sometimes, connection will report connection break, not graceful shutdown. But it's ok.
         int bytesRead = std::get<1>(m_prevAcceptResult)->recv(buf, sizeof(buf));
         ASSERT_LE(bytesRead, 0);
     }
@@ -2206,7 +2206,7 @@ TYPED_TEST_P(
     this->thenEveryConnectionIsAccepted();
 }
 
-// TODO: #akolesnikov Following test is not relevant for Macosx since server socket there
+// TODO: #akolesnikov Following test is not relevant for MacosX since server socket there
 // has a queue of connect requests, not connections with fulfilled handshake.
 // Adapt for Mac or erase.
 TYPED_TEST_P(StreamSocketAcceptance, DISABLED_server_socket_listen_queue_size_is_used)

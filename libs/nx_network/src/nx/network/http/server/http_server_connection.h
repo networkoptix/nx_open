@@ -187,7 +187,7 @@ private:
     bool m_persistentConnectionEnabled = true;
     HttpHeaders m_extraSuccessResponseHeaders;
     std::deque<std::unique_ptr<ResponseMessageContext>> m_responseQueue;
-    // The TCP connection originator endpoint or client endpoint taked from Forwarded-For or
+    // The TCP connection originator endpoint or client endpoint taken from Forwarded-For or
     // X-Forwarded-For headers.
     std::optional<SocketAddress> m_clientEndpoint;
     std::atomic<std::int64_t> m_lastRequestSequence{0};

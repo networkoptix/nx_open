@@ -81,7 +81,7 @@ TYPED_TEST_P(HttpTunneling, server_destructor_blocks_until_all_callbacks_have_re
     auto promise = this->blockServerTunnelHandler();
     this->whenRequestTunnel();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    // With some probablity, tunnelling server is blocked in the "new tunnel" handler now.
+    // With some probability, tunnelling server is blocked in the "new tunnel" handler now.
 
     auto done = std::async([promise = std::move(promise)]() mutable {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));

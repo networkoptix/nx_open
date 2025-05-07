@@ -382,4 +382,4 @@ TEST_F(PaintEngineTest, pathWithHoleOnTop)
 
 } // namespace test
 
-} // namespace namespace nx::pathkit
+} // namespace nx::pathkit

@@ -165,7 +165,7 @@ void QueryQueue::moveFromPreliminaryToMainQueue()
 
     NX_MUTEX_LOCKER lock(&m_mainQueueMutex);
 
-    // Enqueuing tasks.
+    // Enqueueing tasks.
     for (auto& task: lightQueue)
     {
         const auto priority = getPriority(*task.value);

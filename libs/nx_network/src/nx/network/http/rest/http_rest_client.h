@@ -10,7 +10,7 @@
 namespace nx::network::http::rest {
 
 /**
- * Replaces the first occurance of "{<any_token>}" in the path with the given value
+ * Replaces the first occurrence of "{<any_token>}" in the path with the given value
  * @return true if replaced a token. false if nothing was found.
  */
 template<typename ArgumentType>
@@ -65,7 +65,7 @@ std::string substituteParameters(
 
 /**
  * Convenience function to convert a REST HTTP path template, e.g.
- * /accounts/{accountId}/systems/{systemId} to a regex string, replacing all occurences of
+ * /accounts/{accountId}/systems/{systemId} to a regex string, replacing all occurrences of
  * {variable} in pathTemplate with ".*".
  */
 inline std::string toRegex(std::string pathTemplate)

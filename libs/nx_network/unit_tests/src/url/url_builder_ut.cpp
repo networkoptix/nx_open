@@ -61,7 +61,7 @@ static std::vector<std::string> kIPv6HostNames{
     "::",
     "::1",
     "2001::",
-    // Zeroes in the notation.
+    // Zeros in the notation.
     "[2001:0000:11a3:09d7:1f34:8a2e:07a0:765d]",
     "2001:0000:11a3:09d7:1f34:8a2e:07a0:765d",
     // Single zero in the notation.

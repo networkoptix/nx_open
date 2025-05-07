@@ -734,7 +734,7 @@ public:
 
     /**
      * @return true if encodingName is present in header and
-     *   returns corresponding qvalue in *q (if not null).
+     *   returns corresponding q value in *q (if not null).
      */
     bool encodingIsAllowed(
         const std::string& encodingName,
@@ -1031,7 +1031,7 @@ public:
 
     /**
      * @return bytes read from buf. -1 in case of parse error.
-     * NOTE: In case of parse error object state is indefined.
+     * NOTE: In case of parse error object state is undefined.
      */
     int parse(const ConstBufferRefType& buf);
 

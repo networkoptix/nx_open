@@ -28,7 +28,7 @@ class HarEntry;
 
 /**
  * Accumulates HTTP client options. Should be used to provide HTTP options in classes that use
- * nx::network::http::AsyncClient internaly without providing direct access to it.
+ * nx::network::http::AsyncClient internally without providing direct access to it.
  */
 class NX_NETWORK_API ClientOptions
 {

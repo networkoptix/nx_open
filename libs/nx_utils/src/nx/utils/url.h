@@ -59,7 +59,7 @@ public:
         QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
 
     /**
-     * WARNING! URL string created by this method is not complient with RFC3986#section-4.1. This
+     * WARNING! URL string created by this method is not compliant with RFC3986#section-4.1. This
      * is a dirty work-around to fix some problems with web client. Please, think twice before
      * using it!
      *
