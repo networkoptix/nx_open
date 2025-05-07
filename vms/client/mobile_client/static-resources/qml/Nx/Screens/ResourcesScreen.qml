@@ -53,6 +53,12 @@ Page
     {
         id: layout
         resource: windowContext.depricatedUiController.layout
+
+        onResourceChanged:
+        {
+            if (resource?.crossSystem)
+                resource.makeSystemConnectionsWithUserInteraction()
+        }
     }
 
     Binding

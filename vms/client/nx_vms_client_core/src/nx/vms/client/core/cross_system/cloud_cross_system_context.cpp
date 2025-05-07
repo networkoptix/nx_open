@@ -120,56 +120,6 @@ struct CloudCrossSystemContext::Private
                     createThumbCameraResources(resources.filtered<CrossSystemLayoutResource>());
             });
 
-        auto timer = new QTimer(q);
-        timer->setInterval(kUpdateConnectionInterval);
-        timer->callOnTimeout([this]() { ensureConnection(); });
-        timer->start();
-
-        connect(qnCloudStatusWatcher, &core::CloudStatusWatcher::statusChanged, q,
-            [this]
-            {
-                NX_VERBOSE(this, "Cloud status became %1", qnCloudStatusWatcher->status());
-                ensureConnection();
-            });
-        connect(systemDescription.get(), &SystemDescription::reachableStateChanged, q,
-            [this]
-            {
-                NX_VERBOSE(
-                    this,
-                    "System became %1",
-                    this->systemDescription->isReachable() ? "reachable" : "unreachable");
-                ensureConnection();
-            });
-        connect(systemDescription.get(), &SystemDescription::onlineStateChanged, q,
-            [this]
-            {
-                const bool isOnline = this->systemDescription->isOnline();
-                NX_VERBOSE(this, "System became %1", isOnline ? "online" : "offline");
-                ensureConnection();
-            });
-        connect(systemDescription.get(), &SystemDescription::system2faEnabledChanged, q,
-            [this]
-            {
-                NX_VERBOSE(
-                    this,
-                    "System 2fa support became %1",
-                    this->systemDescription->is2FaEnabled() ? "enabled" : "disabled");
-
-                if (status == Status::connected && !is2FaCompatible())
-                    updateStatus(Status::unsupportedTemporary);
-                else
-                    ensureConnection();
-            });
-        connect(systemDescription.get(), &SystemDescription::oauthSupportedChanged, q,
-            [this]
-            {
-                NX_VERBOSE(
-                    this,
-                    "System OAuth became %1",
-                    this->systemDescription->isOauthSupported() ? "supported" : "unsupported");
-                ensureConnection();
-            });
-
         if (!systemDescription->version().isNull()
             && systemDescription->version() < kMinApiSupportedVersion)
         {
@@ -178,7 +128,11 @@ struct CloudCrossSystemContext::Private
             return;
         }
 
-        ensureConnection();
+        if (appContext()->cloudCrossSystemManager()->connectingAutomatically())
+        {
+            ensureConnection();
+            setupAutomaticReconnection();
+        }
 
         tokenUpdater = std::make_unique<core::CloudSessionTokenUpdater>(q);
         connect(
@@ -210,8 +164,71 @@ struct CloudCrossSystemContext::Private
     core::UserResourcePtr user;
     core::CrossSystemServerResourcePtr server;
     std::unique_ptr<core::CloudSessionTokenUpdater> tokenUpdater;
+    bool automaticReconnection = false;
     bool needsCloudAuthorization = false;
     int retryCount = 0;
+
+    void setupAutomaticReconnection()
+    {
+        if (status == Status::unsupportedPermanently)
+            return;
+
+        auto timer = new QTimer(q);
+        timer->setInterval(kUpdateConnectionInterval);
+        timer->callOnTimeout([this]() { ensureConnection(); });
+        timer->start();
+
+        automaticReconnection = true;
+
+        connect(qnCloudStatusWatcher, &core::CloudStatusWatcher::statusChanged, q,
+            [this]
+            {
+                NX_VERBOSE(this, "Cloud status became %1", qnCloudStatusWatcher->status());
+                ensureConnection();
+            });
+
+        connect(systemDescription.get(), &SystemDescription::reachableStateChanged, q,
+            [this]
+            {
+                NX_VERBOSE(
+                    this,
+                    "System became %1",
+                    this->systemDescription->isReachable() ? "reachable" : "unreachable");
+                ensureConnection();
+            });
+
+        connect(systemDescription.get(), &SystemDescription::onlineStateChanged, q,
+            [this]
+            {
+                const bool isOnline = this->systemDescription->isOnline();
+                NX_VERBOSE(this, "System became %1", isOnline ? "online" : "offline");
+                ensureConnection();
+            });
+
+        connect(systemDescription.get(), &SystemDescription::system2faEnabledChanged, q,
+            [this]
+            {
+                NX_VERBOSE(
+                    this,
+                    "System 2fa support became %1",
+                    this->systemDescription->is2FaEnabled() ? "enabled" : "disabled");
+
+                if (status == Status::connected && !is2FaCompatible())
+                    updateStatus(Status::unsupportedTemporary);
+                else
+                    ensureConnection();
+            });
+
+        connect(systemDescription.get(), &SystemDescription::oauthSupportedChanged, q,
+            [this]
+            {
+                NX_VERBOSE(
+                    this,
+                    "System OAuth became %1",
+                    this->systemDescription->isOauthSupported() ? "supported" : "unsupported");
+                ensureConnection();
+            });
+    }
 
     void updateTokenUpdater()
     {
@@ -270,6 +287,9 @@ struct CloudCrossSystemContext::Private
         const auto oldStatus = status;
         status = value;
 
+        if (!automaticReconnection && status != Status::connecting)
+            setupAutomaticReconnection();
+
         emit q->statusChanged(oldStatus);
     }
 
@@ -307,6 +327,7 @@ struct CloudCrossSystemContext::Private
             NX_VERBOSE(this, "Endpoint was not found");
             return false;
         }
+
         logonData->purpose = core::LogonData::Purpose::connectInCrossSystemMode;
         logonData->userInteractionAllowed = allowUserInteraction;
 

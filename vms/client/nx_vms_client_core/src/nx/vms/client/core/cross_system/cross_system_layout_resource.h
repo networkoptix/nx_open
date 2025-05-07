@@ -25,6 +25,8 @@ public:
         const QString& value,
         bool markDirty = true) override;
 
+    Q_INVOKABLE void makeSystemConnectionsWithUserInteraction();
+
 protected:
     /** Virtual constructor for cloning. */
     virtual LayoutResourcePtr create() const override;

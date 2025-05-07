@@ -559,6 +559,9 @@ struct ApplicationContext::Private
     {
         q->core::ApplicationContext::initializeCrossSystemModules();
 
+        // TODO: To be removed in VMS-54744.
+        q->cloudCrossSystemManager()->setConnectingAutomatically(true);
+
         registerDebugAction("Cross-site contexts reset",
             [this](auto)
             {

@@ -5,7 +5,10 @@
 #include <nx/vms/api/data/resource_property_key.h>
 #include <nx/vms/client/core/cross_system/cross_system_layout_data.h>
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 
 namespace nx::vms::client::core {
 
@@ -56,6 +59,26 @@ bool CrossSystemLayoutResource::setProperty(
     }
 
     return base_type::setProperty(key, value, markDirty);
+}
+
+void CrossSystemLayoutResource::makeSystemConnectionsWithUserInteraction()
+{
+    QSet<QString> systemIds;
+
+    const auto items = getItems();
+    for (const auto& item: items)
+    {
+        const auto systemId = crossSystemResourceSystemId(item.resource);
+        if (!systemId.isEmpty())
+            systemIds.insert(systemId);
+    }
+
+    const auto manager = appContext()->cloudCrossSystemManager();
+    for (const auto& systemId: systemIds)
+    {
+        if (auto crossSystem = manager->systemContext(systemId))
+            crossSystem->initializeConnectionWithUserInteraction();
+    }
 }
 
 LayoutResourcePtr CrossSystemLayoutResource::create() const

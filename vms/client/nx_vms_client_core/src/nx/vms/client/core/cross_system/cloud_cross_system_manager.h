@@ -25,6 +25,11 @@ public:
     QStringList cloudSystems() const;
     CloudCrossSystemContext* systemContext(const QString& systemId) const;
 
+    /** Whether connections with all systems are immediately initiated. */
+    // TODO: To be removed in VMS-54744.
+    bool connectingAutomatically() const;
+    void setConnectingAutomatically(bool value);
+
     void debugResetCloudSystems(bool enableCloudSystems);
 
 signals:

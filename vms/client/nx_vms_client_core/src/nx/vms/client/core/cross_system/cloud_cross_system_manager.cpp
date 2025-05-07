@@ -20,6 +20,7 @@ struct CloudCrossSystemManager::Private
     CloudCrossSystemManager* const q;
     nx::utils::ScopedConnections connections;
     std::map<QString, CloudCrossSystemContextPtr> cloudSystems;
+    bool connectingAutomatically = false;
 
     void setCloudSystems(const QnCloudSystemList& currentCloudSystems);
     void requestCloudAuthorization();
@@ -78,6 +79,16 @@ CloudCrossSystemContext* CloudCrossSystemManager::systemContext(const QString& s
     return iter == d->cloudSystems.cend()
         ? nullptr
         : iter->second.get();
+}
+
+bool CloudCrossSystemManager::connectingAutomatically() const
+{
+    return d->connectingAutomatically;
+}
+
+void CloudCrossSystemManager::setConnectingAutomatically(bool value)
+{
+    d->connectingAutomatically = value;
 }
 
 void CloudCrossSystemManager::debugResetCloudSystems(bool enableCloudSystems)
