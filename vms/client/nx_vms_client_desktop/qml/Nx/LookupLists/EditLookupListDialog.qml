@@ -266,7 +266,8 @@ ModalDialog
             AlignedLabel
             {
                 text: qsTr("Attributes")
-                visible: !model.isGeneric && attributesModel.count
+                // Ensure the item occupies layout space even when hidden
+                opacity: !model.isGeneric && attributesModel.count
                 Layout.alignment: Qt.AlignRight | Qt.AlignTop
                 Layout.topMargin: 14
             }
@@ -276,7 +277,8 @@ ModalDialog
                 id: attributesSelector
 
                 Layout.fillWidth: true
-                visible: !model.isGeneric && attributesModel.count
+                // Ensure the item occupies layout space even when hidden
+                opacity: !model.isGeneric && attributesModel.count
                 model: attributesModel
                 onSelectionChanged: updateSelectedAttributes()
             }
