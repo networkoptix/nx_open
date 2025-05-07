@@ -566,7 +566,6 @@ void CloudStatusWatcher::Private::onAccessTokenIssued(
         {
             m_authData = {};
             setStatus(CloudStatusWatcher::LoggedOut, CloudStatusWatcher::InvalidPassword);
-            emit q->loggedOutWithError();
         }
         else
         {
