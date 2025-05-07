@@ -44,8 +44,6 @@ public:
      */
     void waitAll();
 
-    static QnLongRunnablePool* instance();
-
 private:
     friend class QnLongRunnable;
     QSharedPointer<QnLongRunnablePoolPrivate> d;

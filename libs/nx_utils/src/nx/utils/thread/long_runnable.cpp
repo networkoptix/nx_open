@@ -180,8 +180,3 @@ void QnLongRunnablePool::waitAll()
 {
     d->waitAll();
 }
-
-QnLongRunnablePool* QnLongRunnablePool::instance()
-{
-    return s_poolInstance;
-}

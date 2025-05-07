@@ -99,7 +99,6 @@ public:
         return qobject_cast<ContextType*>(this);
     }
 
-protected:
     void stopAll();
 
 private:

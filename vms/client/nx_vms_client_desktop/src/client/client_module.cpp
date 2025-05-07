@@ -115,10 +115,6 @@ QnClientModule::QnClientModule(
 
 QnClientModule::~QnClientModule()
 {
-    // Stop all long runnables before deinitializing singletons. Pool may not exist in update mode.
-    if (auto longRunnablePool = QnLongRunnablePool::instance())
-        longRunnablePool->stopAll();
-
     // Restoring default message handler.
     nx::disableQtMessageAsserts();
 
