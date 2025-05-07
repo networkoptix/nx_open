@@ -119,7 +119,7 @@ RemoteSession::RemoteSession(
     SystemContextAware(systemContext),
     d(new Private{.q = this})
 {
-    d->remoteConnectionFactory = networkModule()->connectionFactory();
+    d->remoteConnectionFactory = appContext()->networkModule()->connectionFactory();
 
     d->messageProcessor = systemContext->clientMessageProcessor();
     connect(d->messageProcessor.data(), &QnCommonMessageProcessor::connectionOpened, this,

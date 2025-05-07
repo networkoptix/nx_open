@@ -14,7 +14,6 @@
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
-#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/rules/client_router.h>
 #include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/core/utils/video_cache.h>
@@ -326,11 +325,6 @@ AnalyticsEventsSearchTreeBuilder* SystemContext::analyticsEventsSearchTreeBuilde
 IoPortsCompatibilityInterface* SystemContext::ioPortsInterface() const
 {
     return d->ioPortsInterface.get();
-}
-
-NetworkModule* SystemContext::networkModule() const
-{
-    return appContext()->networkModule();
 }
 
 RemoteSessionTimeoutWatcher* SystemContext::sessionTimeoutWatcher() const

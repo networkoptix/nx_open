@@ -1705,7 +1705,7 @@ ActionVisibility ReachableServerCondition::check(
     if (!server)
         return InvisibleAction;
 
-    const auto currentSession = appContext()->currentSystemContext()->networkModule()->session();
+    const auto currentSession = appContext()->networkModule()->session();
 
     if (!currentSession || server->getId() == currentSession->connection()->moduleInformation().id)
         return InvisibleAction;

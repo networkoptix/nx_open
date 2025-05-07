@@ -107,7 +107,7 @@ void initializeConnectionUserInteractionDelegate(SystemContext* systemContext)
 
     auto delegate = std::make_unique<Delegate>(
         systemContext, validateToken, askToAcceptCertificates, showCertificateError);
-    systemContext->networkModule()->connectionFactory()->setUserInteractionDelegate(std::move(delegate));
+    appContext()->networkModule()->connectionFactory()->setUserInteractionDelegate(std::move(delegate));
 }
 
 } // namespace

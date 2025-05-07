@@ -42,7 +42,6 @@ class UserWatcher;
 class VideoCache;
 class RemoteSessionTimeoutWatcher;
 class WatermarkWatcher;
-class NetworkModule;
 
 namespace analytics {
 class AttributeHelper;
@@ -190,8 +189,6 @@ public:
     AnalyticsEventsSearchTreeBuilder* analyticsEventsSearchTreeBuilder() const;
 
     IoPortsCompatibilityInterface* ioPortsInterface() const;
-
-    NetworkModule* networkModule() const;
 
     RemoteSessionTimeoutWatcher* sessionTimeoutWatcher() const;
 

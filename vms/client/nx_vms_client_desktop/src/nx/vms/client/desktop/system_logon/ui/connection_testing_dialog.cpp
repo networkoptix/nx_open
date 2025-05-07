@@ -258,8 +258,7 @@ void ConnectionTestingDialog::testConnection(
             d->connectionProcess.reset();
         });
 
-    auto remoteConnectionFactory =
-        appContext()->currentSystemContext()->networkModule()->connectionFactory();
+    auto remoteConnectionFactory = appContext()->networkModule()->connectionFactory();
     const core::LogonData info{address, credentials, nx::vms::api::UserType::local};
     d->connectionProcess = remoteConnectionFactory->connect(info,
         callback,

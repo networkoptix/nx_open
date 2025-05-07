@@ -146,13 +146,13 @@ public:
         const auto updateTokenInfoForDebugInfo =
             [this]()
             {
-                const auto session = q->networkModule()->session();
+                const auto session = appContext()->networkModule()->session();
                 const auto token = session->connection()->credentials().authToken;
                 processToken(token, "Token: ", kTokenDebugInfoKey);
             };
 
         // When a new session appears, this old connection will be destroyed.
-        connect(q->networkModule()->session().get(),
+        connect(appContext()->networkModule()->session().get(),
             &RemoteSession::credentialsChanged,
             q,
             updateTokenInfoForDebugInfo);

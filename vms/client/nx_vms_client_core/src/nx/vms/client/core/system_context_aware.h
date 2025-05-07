@@ -29,7 +29,6 @@ class ServerTimeWatcher;
 class SystemContext;
 class UserWatcher;
 class RemoteSessionTimeoutWatcher;
-class NetworkModule;
 
 class NX_VMS_CLIENT_CORE_API SystemContextAware: public nx::vms::common::SystemContextAware
 {
@@ -62,8 +61,6 @@ public:
     ServerTimeWatcher* serverTimeWatcher() const;
 
     QnCameraBookmarksManager* cameraBookmarksManager() const;
-
-    NetworkModule* networkModule() const;
 
     nx::network::http::Credentials connectionCredentials() const;
 

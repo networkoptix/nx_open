@@ -904,7 +904,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                 session->sessionId(), serverModuleInformation, logonData));
     }
     system()->setSession(session);
-    system()->networkModule()->setSession(session);
+    appContext()->networkModule()->setSession(session);
     const auto welcomeScreen = mainWindow()->welcomeScreen();
     if (welcomeScreen) // Welcome Screen exists in the desktop mode only.
         welcomeScreen->connectionToSystemEstablished(systemId);
@@ -1108,7 +1108,7 @@ void ConnectActionsHandler::connectToServerInNonDesktopMode(const LogonData& log
         });
 
     NX_VERBOSE(this, "Connecting in non-desktop mode to the %1", logonData.address);
-    auto remoteConnectionFactory = system()->networkModule()->connectionFactory();
+    auto remoteConnectionFactory = appContext()->networkModule()->connectionFactory();
     d->currentConnectionProcess =
         remoteConnectionFactory->connect(logonData, callback, system());
 }
@@ -1203,7 +1203,7 @@ void ConnectActionsHandler::connectToCloudSystem(
         });
 
     NX_VERBOSE(this, "Connecting to cloud site: %1", connectionInfo->address);
-    auto remoteConnectionFactory = system()->networkModule()->connectionFactory();
+    auto remoteConnectionFactory = appContext()->networkModule()->connectionFactory();
 
     d->currentConnectionProcess =
         remoteConnectionFactory->connect(*connectionInfo, callback, system());
@@ -1388,7 +1388,7 @@ void ConnectActionsHandler::at_reconnectAction_triggered()
             }
         });
 
-    auto remoteConnectionFactory = system()->networkModule()->connectionFactory();
+    auto remoteConnectionFactory = appContext()->networkModule()->connectionFactory();
     d->currentConnectionProcess = remoteConnectionFactory->connect(logonData, callback, system());
 }
 
@@ -1460,7 +1460,7 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
         logonData.address.address = helpers::serverCloudHost(systemId, serverId);
     }
 
-    auto remoteConnectionFactory = system()->networkModule()->connectionFactory();
+    auto remoteConnectionFactory = appContext()->networkModule()->connectionFactory();
 
     if (d->switchServerDialog)
         delete d->switchServerDialog.data();
@@ -1585,7 +1585,7 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
 
     d->currentConnectionProcess.reset();
     statisticsModule()->certificates()->resetScenario();
-    system()->networkModule()->setSession({});
+    appContext()->networkModule()->setSession({});
     system()->setSession({});
 
     // Get ready for the next connection.
@@ -1694,7 +1694,7 @@ void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptio
             }
         });
 
-    auto remoteConnectionFactory = system()->networkModule()->connectionFactory();
+    auto remoteConnectionFactory = appContext()->networkModule()->connectionFactory();
     d->currentConnectionProcess = remoteConnectionFactory->connect(logonData, callback, system());
 }
 

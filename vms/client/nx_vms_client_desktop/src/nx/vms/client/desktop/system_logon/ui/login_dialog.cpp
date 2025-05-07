@@ -265,7 +265,7 @@ void LoginDialog::sendTestConnectionRequest()
             updateUsability();
         });
 
-    auto remoteConnectionFactory = networkModule()->connectionFactory();
+    auto remoteConnectionFactory = appContext()->networkModule()->connectionFactory();
 
     // User type will be verified during the connection.
     const core::LogonData logonData{

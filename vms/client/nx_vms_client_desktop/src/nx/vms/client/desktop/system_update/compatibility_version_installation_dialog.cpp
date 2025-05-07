@@ -112,8 +112,7 @@ void CompatibilityVersionInstallationDialog::reject()
 int CompatibilityVersionInstallationDialog::exec()
 {
     NX_VERBOSE(this, "Connecting to the Site %1...", m_private->logonData.address);
-    const auto remoteConnectionFactory =
-        appContext()->currentSystemContext()->networkModule()->connectionFactory();
+    const auto remoteConnectionFactory = appContext()->networkModule()->connectionFactory();
     m_private->connectionProcess = remoteConnectionFactory->connect(
         m_private->logonData,
         nx::utils::AsyncHandlerExecutor(this).bind(

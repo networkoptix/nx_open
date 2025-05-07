@@ -382,7 +382,7 @@ struct CloudCrossSystemContext::Private
 
         NX_VERBOSE(this, "Initialize new connection");
 
-        connectionProcess = systemContext->networkModule()->connectionFactory()->connect(
+        connectionProcess = appContext()->networkModule()->connectionFactory()->connect(
             *logonData, handleConnection, systemContext.get());
 
         return true;

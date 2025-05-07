@@ -344,7 +344,7 @@ void Session::Private::connectToServer(bool ignoreCachedData)
             }
         });
 
-    const auto factory = q->networkModule()->connectionFactory();
+    const auto factory = core::appContext()->networkModule()->connectionFactory();
     m_connectionProcess = factory->connect(
         m_logonData.value(), callback, q->systemContext(), {}, ignoreCachedData);
 
@@ -392,7 +392,7 @@ void Session::Private::connectToKnownServer(nx::vms::client::core::RemoteConnect
             executeLater([this](){ connectToServer(/* ignoreCachedData */ true); }, this);
         });
 
-    q->networkModule()->setSession(session);
+    core::appContext()->networkModule()->setSession(session);
     q->systemContext()->setSession(session);
 
     const auto userName = QString::fromStdString(connection->credentials().username);
@@ -426,7 +426,7 @@ void Session::Private::resetCurrentConnection()
 {
     m_connectionProcess.reset();
     q->systemContext()->setSession({});
-    q->networkModule()->setSession({});
+    core::appContext()->networkModule()->setSession({});
 
     updateConnectionState();
 }
@@ -854,7 +854,7 @@ Session::~Session()
 {
     NX_DEBUG(this, "~Session(): start: destroying session");
 
-    if (const auto remoteSession = networkModule()->session())
+    if (const auto remoteSession = core::appContext()->networkModule()->session())
     {
         const auto& localSystemId = d->localSystemId();
         const auto& userName = d->logonData().credentials.username;
