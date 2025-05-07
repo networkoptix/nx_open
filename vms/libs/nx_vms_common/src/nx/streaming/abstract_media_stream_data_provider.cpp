@@ -67,7 +67,7 @@ QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(
     connect(resource.data(), &QnResource::propertyChanged, this,
         [this](const QnResourcePtr& /*resource*/, const QString& propertyName)
         {
-            if (propertyName == ResourcePropertyKey::kVideoLayout)
+            if (propertyName == nx::vms::api::device_properties::kVideoLayout)
                 m_numberOfChannels.reset();
         });
 }

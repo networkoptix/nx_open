@@ -89,7 +89,7 @@ public:
         camerasListener->addOnPropertyChangedHandler(
             [this](const QnVirtualCameraResourcePtr& camera, const QString& key)
             {
-                if (key == ResourcePropertyKey::kIoSettings && Private::isIntercom(camera))
+                if (key == nx::vms::api::device_properties::kIoSettings && Private::isIntercom(camera))
                     tryCreateLayouts({camera});
             });
 

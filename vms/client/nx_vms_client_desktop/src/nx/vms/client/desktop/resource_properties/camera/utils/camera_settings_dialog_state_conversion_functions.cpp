@@ -200,7 +200,7 @@ void setUseBitratePerGOP(bool value, const Cameras& cameras)
 {
     const auto valueStr = boolToPropertyStr(value);
     for (const auto& camera: cameras)
-        camera->setProperty(ResourcePropertyKey::kBitratePerGOP, valueStr);
+        camera->setProperty(nx::vms::api::device_properties::kBitratePerGOP, valueStr);
 }
 
 void setUseMedia2ToFetchProfiles(nx::core::resource::UsingOnvifMedia2Type value, const Cameras& cameras)
@@ -208,10 +208,10 @@ void setUseMedia2ToFetchProfiles(nx::core::resource::UsingOnvifMedia2Type value,
     for (const auto& camera: cameras)
     {
         const auto previousValue = nx::reflect::fromString(
-            camera->getProperty(ResourcePropertyKey::kUseMedia2ToFetchProfiles).toStdString(),
+            camera->getProperty(nx::vms::api::device_properties::kUseMedia2ToFetchProfiles).toStdString(),
             nx::core::resource::UsingOnvifMedia2Type::autoSelect);
 
-        camera->setProperty(ResourcePropertyKey::kUseMedia2ToFetchProfiles,
+        camera->setProperty(nx::vms::api::device_properties::kUseMedia2ToFetchProfiles,
             QString::fromStdString(nx::reflect::toString(value)));
 
         if (previousValue != value)
@@ -577,7 +577,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
         if (camera->isIOModule() && state.devicesDescription.isIoModule == CombinedValue::All)
         {
-            camera->setProperty(ResourcePropertyKey::kIoOverlayStyle,
+            camera->setProperty(nx::vms::api::device_properties::kIoOverlayStyle,
                 QString::fromStdString(
                     nx::reflect::toString(state.singleIoModuleSettings.visualStyle())));
 

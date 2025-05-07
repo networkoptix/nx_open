@@ -117,17 +117,17 @@ InvalidRecordingScheduleWatcher::InvalidRecordingScheduleWatcher(
     camerasListener->addOnPropertyChangedHandler(
         [handleCameraChanged]
             (const QnVirtualCameraResourcePtr& camera, const QString& key)
-        {
-            if (key == ResourcePropertyKey::kStreamUrls
-                || key == ResourcePropertyKey::kMediaStreams
-                || key == ResourcePropertyKey::kMotionStreamKey
-                || key == ResourcePropertyKey::kForcedMotionDetectionKey
-                || key == ResourcePropertyKey::kDontRecordSecondaryStreamKey
-                )
             {
-                handleCameraChanged(camera);
-            }
-        });
+                if (key == nx::vms::api::device_properties::kStreamUrls
+                    || key == nx::vms::api::device_properties::kMediaStreams
+                    || key == nx::vms::api::device_properties::kMotionStreamKey
+                    || key == nx::vms::api::device_properties::kForcedMotionDetectionKey
+                    || key == nx::vms::api::device_properties::kDontRecordSecondaryStreamKey
+                    )
+                {
+                    handleCameraChanged(camera);
+                }
+            });
 
     camerasListener->start();
 }

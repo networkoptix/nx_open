@@ -205,7 +205,7 @@ public:
     void setStreams(
         const std::optional<QSize>& highResolution, const std::optional<QSize>& lowResolution)
     {
-        setProperty(ResourcePropertyKey::kMediaStreams, QString());
+        setProperty(nx::vms::api::device_properties::kMediaStreams, QString());
 
         // For mock camera, use a codec that will never match any reasonable transcoding codec.
         static const int kCodec = /*102400*/ AV_CODEC_ID_PROBE;
@@ -221,7 +221,7 @@ public:
         const QString separator = (lowStr.isEmpty() || highStr.isEmpty()) ? "" : ", ";
         const QString json = "{\"streams\":[" + lowStr + separator + highStr + "]}";
 
-        setProperty(ResourcePropertyKey::kMediaStreams, json);
+        setProperty(nx::vms::api::device_properties::kMediaStreams, json);
 
         const int expectedStreamsCount =
             (int) lowResolution.has_value() + (int) highResolution.has_value();

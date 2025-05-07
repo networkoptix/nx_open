@@ -46,7 +46,7 @@ CameraResourceStub::CameraResourceStub(
     if (secondaryResolution.isValid())
         mediaStreams.streams.push_back({StreamIndex::secondary, secondaryResolution});
 
-    setProperty(ResourcePropertyKey::kMediaStreams,
+    setProperty(nx::vms::api::device_properties::kMediaStreams,
         QString::fromUtf8(QJson::serialized(mediaStreams)));
 
     setHasDualStreaming(secondaryResolution.isValid());
@@ -123,7 +123,7 @@ void CameraResourceStub::setStreamResolution(
     }
 
     auto mediaStreams = QJson::deserialized<CameraMediaStreams>(
-        getProperty(ResourcePropertyKey::kMediaStreams).toUtf8());
+        getProperty(nx::vms::api::device_properties::kMediaStreams).toUtf8());
 
     const auto iter = std::find_if(mediaStreams.streams.begin(), mediaStreams.streams.end(),
         [index](const CameraMediaStreamInfo& item) { return item.getEncoderIndex() == index; });
@@ -133,7 +133,7 @@ void CameraResourceStub::setStreamResolution(
     else
         mediaStreams.streams.push_back({index, resolution});
 
-    setProperty(ResourcePropertyKey::kMediaStreams,
+    setProperty(nx::vms::api::device_properties::kMediaStreams,
         QString::fromUtf8(QJson::serialized(mediaStreams)));
 }
 

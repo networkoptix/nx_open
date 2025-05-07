@@ -3,6 +3,7 @@
 #pragma once
 
 #include <atomic>
+#include <string_view>
 
 #include <common/common_globals.h>
 #include <utils/common/from_this_to_shared.h>

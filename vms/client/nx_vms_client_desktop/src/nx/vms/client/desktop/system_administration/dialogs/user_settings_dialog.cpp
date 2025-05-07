@@ -1203,7 +1203,7 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
             d->updateUiFromTemporaryToken(*hash.temporaryToken);
 
             const auto firstLoginTimeStr =
-                user->getProperty(ResourcePropertyKey::kTemporaryUserFirstLoginTime);
+                user->getProperty(nx::vms::api::user_properties::kTemporaryUserFirstLoginTime);
 
             d->firstLoginTime = firstLoginTimeStr.isEmpty()
                 ? QDateTime{}

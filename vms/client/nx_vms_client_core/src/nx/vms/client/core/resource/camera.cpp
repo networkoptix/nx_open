@@ -85,12 +85,12 @@ bool Camera::isPtzSupported() const
 
 bool Camera::isPtzRedirected() const
 {
-    return !getProperty(ResourcePropertyKey::kPtzTargetId).isEmpty();
+    return !getProperty(nx::vms::api::device_properties::kPtzTargetId).isEmpty();
 }
 
 CameraPtr Camera::ptzRedirectedTo() const
 {
-    const auto redirectId = getProperty(ResourcePropertyKey::kPtzTargetId);
+    const auto redirectId = getProperty(nx::vms::api::device_properties::kPtzTargetId);
     if (redirectId.isEmpty() || !resourcePool())
         return {};
 

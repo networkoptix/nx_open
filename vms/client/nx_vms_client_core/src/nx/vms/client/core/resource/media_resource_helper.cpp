@@ -160,7 +160,7 @@ void MediaResourceHelper::Private::handlePropertyChanged(
         emit q->customAspectRatioChanged();
         emit q->aspectRatioChanged();
     }
-    else if (key == ResourcePropertyKey::kMediaStreams)
+    else if (key == nx::vms::api::device_properties::kMediaStreams)
     {
         emit q->livePreviewVideoQualityChanged();
         emit q->aspectRatioChanged();

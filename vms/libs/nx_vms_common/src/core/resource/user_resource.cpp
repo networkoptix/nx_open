@@ -288,7 +288,7 @@ std::optional<std::chrono::seconds> QnUserResource::temporarySessionExpiresIn() 
     if (tmpToken.expiresAfterLoginS > 0s)
     {
         const auto firstLoginTimeStr =
-            getProperty(ResourcePropertyKey::kTemporaryUserFirstLoginTime);
+            getProperty(nx::vms::api::user_properties::kTemporaryUserFirstLoginTime);
 
         if (!firstLoginTimeStr.isEmpty())
         {

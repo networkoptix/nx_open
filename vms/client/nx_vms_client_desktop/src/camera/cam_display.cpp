@@ -210,8 +210,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
             {
                 if (m_streamsChangedCallback)
                 {
-                    if (propertyName == ResourcePropertyKey::kMediaCapabilities
-                        || propertyName == ResourcePropertyKey::kStreamUrls)
+                    if (propertyName == nx::vms::api::device_properties::kMediaCapabilities
+                        || propertyName == nx::vms::api::device_properties::kStreamUrls)
                     {
                         m_streamsChangedCallback();
                     }

@@ -64,7 +64,7 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(
             return providerLayout;
     }
 
-    QString strVal = getProperty(ResourcePropertyKey::kVideoLayout);
+    QString strVal = getProperty(nx::vms::api::device_properties::kVideoLayout);
     if (strVal.isEmpty())
     {
         return defaultVideoLayout;

@@ -62,7 +62,7 @@ qint64 estimatedExportVideoSizeMb(const QnMediaResourcePtr& mediaResource, qint6
     {
         //TODO: #sivanov Cache bitrates in resource.
         auto bitrateInfos = QJson::deserialized<CameraBitrates>(
-            camera->getProperty(ResourcePropertyKey::kBitrateInfos).toUtf8());
+            camera->getProperty(nx::vms::api::device_properties::kBitrateInfos).toUtf8());
 
         if (!bitrateInfos.streams.empty())
         {

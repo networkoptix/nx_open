@@ -2031,7 +2031,7 @@ TEST_F(PermissionDependenciesTest, cameraLicenseTypeChanging)
 {
     const auto camera = addCamera();
     CHECK_NO_DEPENDENCY_NOTIFICATIONS();
-    camera->setProperty(ResourcePropertyKey::kForcedLicenseType,
+    camera->setProperty(nx::vms::api::device_properties::kForcedLicenseType,
         QString::fromStdString(nx::reflect::toString(Qn::LC_Bridge)));
     CHECK_DEPENDENCY_NOTIFICATION({camera});
 }

@@ -25,8 +25,8 @@ QString hidePasswordIfCredentialsPropety(const QString& key, const QString& valu
     if (nx::log::showPasswords())
         return value;
 
-    if (key == ResourcePropertyKey::kCredentials
-        || key == ResourcePropertyKey::kDefaultCredentials)
+    if (key == nx::vms::api::device_properties::kCredentials
+        || key == nx::vms::api::device_properties::kDefaultCredentials)
     {
         return value.left(value.indexOf(':')) + ":" + nx::utils::Url::kMaskedPassword;
     }
@@ -391,7 +391,7 @@ bool QnResource::setProperty(const QString& key, const QString& value, bool mark
 void QnResource::emitPropertyChanged(
     const QString& key, const QString& prevValue, const QString& newValue)
 {
-    if (key == ResourcePropertyKey::kVideoLayout)
+    if (key == nx::vms::api::device_properties::kVideoLayout)
         emit videoLayoutChanged(::toSharedPointer(this));
 
     NX_VERBOSE(this,

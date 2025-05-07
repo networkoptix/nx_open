@@ -14,12 +14,12 @@
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/vms/api/data/device_media_stream_info.h>
 #include <nx/vms/api/data/media_stream_capability.h>
+#include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/types/device_type.h>
 #include <nx/vms/api/types/ptz_types.h>
-
-#include "camera_attributes_data.h"
-#include "camera_data.h"
-#include "credentials.h"
+#include <nx/vms/api/data/camera_data.h>
+#include <nx/vms/api/data/credentials.h>
+#include <nx/vms/api/data/device_profile.h>
 
 namespace nx::vms::api {
 
@@ -155,11 +155,39 @@ struct DeviceOptions
 
     /**%apidoc[opt] */
     BackupPolicy backupPolicy = BackupPolicy::byDefault;
+
+    std::optional<nx::Uuid> audioOutputDeviceId;
+
+    // TODO: #skolesnik `std::vector<CameraBitrateInfo>` defined in ::common
+    std::optional<QString> bitrateInfos;
+
+    std::optional<bool> useBitratePerGop;
+
+    std::optional<bool> cameraHotspotsEnabled;
+
+    std::optional<bool> dontRecordSecondaryStream;
+
+    std::optional<bool> forcedMotionDetection;
+
+    std::optional<IoModuleVisualStyle> ioOverlayStyle;
+
+    // TODO: #skolesnik rename `QnVirtualCameraResource::motionStreamIndexInternal()`
+    std::optional<StreamIndex> motionStream;
+
+    // TODO: #skolesnik `std::vector<QnIOPortData>`
+    std::optional<QString> ioSettings;
+
+    std::optional<int> mediaPort;
+
+    /**%apidoc[readonly] */
+    std::optional<bool> hasRtspSettings;
 };
 #define DeviceOptions_Fields \
     (isControlEnabled)(isAudioEnabled)(isDualStreamingDisabled) \
     (dewarpingParams)(preferredServerId)(failoverPriority)(backupQuality)(backupContentType) \
-    (backupPolicy)
+    (backupPolicy)(audioOutputDeviceId)(bitrateInfos)(useBitratePerGop) \
+    (cameraHotspotsEnabled)(dontRecordSecondaryStream)(forcedMotionDetection) \
+    (ioOverlayStyle)(motionStream)(ioSettings)(mediaPort)(hasRtspSettings)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceOptions, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceOptions, DeviceOptions_Fields);
 
@@ -425,7 +453,8 @@ struct NX_VMS_API DeviceModelV4: DeviceModelV3Base
     DbUpdateTypes toDbTypes() &&;
     static std::vector<DeviceModelV4> fromDbTypes(DbListTypes data);
 };
-#define DeviceModelV4_Fields DeviceModelV3Base_Fields (ptz)
+#define DeviceModelV4_Fields DeviceModelV3Base_Fields \
+    (ptz)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceModelV4, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceModelV4, DeviceModelV4_Fields);
 

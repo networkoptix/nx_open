@@ -31,7 +31,7 @@ void CameraSettingsPtzCapabilitiesWatcher::Private::handlePropertyChanged(
     const QnResourcePtr& /*resource*/,
     const QString& key) const
 {
-    if (store && key == ResourcePropertyKey::kPtzCapabilitiesUserIsAllowedToModify)
+    if (store && key == nx::vms::api::device_properties::kPtzCapabilitiesUserIsAllowedToModify)
         store->updatePtzSettings(cameras.values());
 }
 

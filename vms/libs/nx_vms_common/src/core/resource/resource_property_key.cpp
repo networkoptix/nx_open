@@ -3,86 +3,6 @@
 #include "resource_property_key.h"
 
 namespace ResourcePropertyKey {
-
-const QString kAnalog("analog");
-const QString kIsAudioSupported("isAudioSupported");
-const QString kForcedIsAudioSupported("forcedIsAudioSupported");
-const QString kStreamFpsSharing("streamFpsSharing");
-const QString kDts("dts");
-
-const QString kMaxFps("MaxFPS");
-
-const QString kMediaCapabilities("mediaCapabilities");
-const QString kMotionWindowCnt("motionWindowCnt");
-const QString kMotionMaskWindowCnt("motionMaskWindowCnt");
-const QString kMotionSensWindowCnt("motionSensWindowCnt");
-
-const QString kSupportedMotion("supportedMotion");
-
-const QString kTrustCameraTime("trustCameraTime");
-const QString kKeepCameraTimeSettings("keepCameraTimeSettings");
-const QString kCredentials("credentials");
-const QString kDefaultCredentials("defaultCredentials");
-const QString kCameraCapabilities("cameraCapabilities");
-const QString kMediaStreams("mediaStreams");
-const QString kBitrateInfos("bitrateInfos");
-const QString kStreamUrls("streamUrls");
-const QString kAudioCodec("audioCodec");
-const QString kPtzTargetId("ptzTargetId");
-const QString kTemporaryUserFirstLoginTime("temporaryUserFirstLoginTimeS");
-
-const QString kForcedAudioStream("forcedAudioStream");
-
-const QString kAvailableProfiles("availableProfiles");
-const QString kForcedPrimaryProfile("forcedPrimaryProfile");
-const QString kForcedSecondaryProfile("forcedSecondaryProfile");
-
-const QString kGroupPlayParamName("groupplay");
-const QString kNoRecordingParams("noRecordingParams");
-
-const QString kCanConfigureRemoteRecording("canConfigureRemoteRecording");
-
-const QString kFirmware("firmware");
-const QString kCameraSerialNumber("serialNumber");
-const QString kDeviceType("deviceType");
-const QString kIoConfigCapability("ioConfigCapability");
-
-const QString kIoDisplayName("ioDisplayName");
-
-const QString kIoOverlayStyle("ioOverlayStyle");
-
-const QString kBitratePerGOP("bitratePerGOP");
-const QString kUseMedia2ToFetchProfiles("useMedia2ToFetchProfiles");
-const QString kIoSettings("ioSettings");
-
-const QString kPrimaryStreamConfiguration("primaryStreamConfiguration");
-const QString kSecondaryStreamConfiguration("secondaryStreamConfiguration");
-
-const QString kVideoLayout("VideoLayout");
-
-const QString kMotionStreamKey("motionStream");
-const QString kForcedMotionDetectionKey("forcedMotionDetection");
-
-const QString kForcedLicenseType("forcedLicenseType");
-
-const QString kTwoWayAudioEnabled("twoWayAudioEnabled");
-const QString kAudioInputDeviceId("audioInputDeviceId");
-const QString kAudioOutputDeviceId("audioOutputDeviceId");
-const QString kCameraHotspotsEnabled("cameraHotspotsEnabled");
-const QString kCameraHotspotsData("cameraHotspotsData");
-
-const QString kDontRecordPrimaryStreamKey("dontRecordPrimaryStream");
-const QString kDontRecordSecondaryStreamKey("dontRecordSecondaryStream");
-const QString kDontRecordAudio("dontRecordAudio");
-
-const QString kRemoteArchiveSynchronizationEnabled("remoteArchiveSynchronizationEnabled");
-
-const QString kNoVideoSupport("noVideoSupport");
-
-const QString kStorageInfo("storageInfo");
-
-const QString kHasRtspSettings("hasRtspSettings");
-
 namespace Onvif {
 
 const QString kMediaUrl("MediaUrl");
@@ -98,8 +18,8 @@ const QString kSubtypeKey("subtype");
 } // namespace WebPage
 
 const std::set<QString> kWriteOnlyNames{
-    kCredentials,
-    kDefaultCredentials,
+    nx::vms::api::device_properties::kCredentials,
+    nx::vms::api::device_properties::kDefaultCredentials,
 };
 
 // Storage

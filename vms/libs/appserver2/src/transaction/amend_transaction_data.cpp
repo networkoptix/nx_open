@@ -91,8 +91,8 @@ bool amendOutputDataIfNeeded(
         {
             paramData->value = nx::crypt::decodeStringFromHexStringAES128CBC(paramData->value);
         }
-        else if (paramData->name == ResourcePropertyKey::kCredentials
-            || paramData->name == ResourcePropertyKey::kDefaultCredentials)
+        else if (paramData->name == nx::vms::api::device_properties::kCredentials
+            || paramData->name == nx::vms::api::device_properties::kDefaultCredentials)
         {
             const bool hidePassword = !accessManager->globalSettings()->exposeDeviceCredentials()
                 || !accessManager->hasPowerUserPermissions(accessData);

@@ -204,8 +204,8 @@ void ResourceStatusHelper::Private::setResource(QnResource* value)
             [this](const QnResourcePtr& /*resource*/, const QString& key)
             {
                 static const QSet<QString> kHandledProperties = {
-                    ResourcePropertyKey::kCameraCapabilities,
-                    ResourcePropertyKey::kDts };
+                    nx::vms::api::device_properties::kCameraCapabilities,
+                    nx::vms::api::device_properties::kDts };
 
                 if (kHandledProperties.contains(key))
                     updateStatus();

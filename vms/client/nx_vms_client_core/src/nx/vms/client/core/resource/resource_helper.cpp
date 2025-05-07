@@ -68,9 +68,9 @@ void ResourceHelper::setResource(const QnResourcePtr& value)
                 const QString& /*prevValue*/,
                 const QString& /*newValue*/)
             {
-                if (key == ResourcePropertyKey::kMediaCapabilities)
+                if (key == nx::vms::api::device_properties::kMediaCapabilities)
                     emit audioSupportedChanged();
-                else if (key == ResourcePropertyKey::kIoConfigCapability)
+                else if (key == nx::vms::api::device_properties::kIoConfigCapability)
                     emit isIoModuleChanged();
             });
     }

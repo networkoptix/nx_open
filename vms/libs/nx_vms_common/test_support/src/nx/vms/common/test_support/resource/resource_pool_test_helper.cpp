@@ -142,7 +142,7 @@ void QnResourcePoolTestHelper::toIntercom(nx::CameraResourceStubPtr camera)
     intercomFeaturePort.outputName = QnVirtualCameraResource::intercomSpecificPortName();
 
     camera->setProperty(
-        ResourcePropertyKey::kIoSettings,
+        nx::vms::api::device_properties::kIoSettings,
         QString::fromStdString(nx::reflect::json::serialize(
             QnIOPortDataList{intercomFeaturePort})));
 }

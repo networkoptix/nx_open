@@ -98,15 +98,15 @@ private:
         if (!store)
             return;
 
-        if (key == ResourcePropertyKey::kStreamUrls)
+        if (key == nx::vms::api::device_properties::kStreamUrls)
             store->handleStreamUrlsChanged(cameras);
-        else if (key == ResourcePropertyKey::kMediaStreams)
+        else if (key == nx::vms::api::device_properties::kMediaStreams)
             store->handleMediaStreamsChanged(cameras);
-        else if (key == ResourcePropertyKey::kMotionStreamKey)
+        else if (key == nx::vms::api::device_properties::kMotionStreamKey)
             store->handleMotionStreamChanged(cameras);
-        else if (key == ResourcePropertyKey::kForcedMotionDetectionKey)
+        else if (key == nx::vms::api::device_properties::kForcedMotionDetectionKey)
             store->handleMotionForcedChanged(cameras);
-        else if (key == ResourcePropertyKey::kMediaCapabilities)
+        else if (key == nx::vms::api::device_properties::kMediaCapabilities)
             store->handleMediaCapabilitiesChanged(cameras);
     }
 

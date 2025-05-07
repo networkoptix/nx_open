@@ -240,7 +240,7 @@ protected:
                 QSize(1000 * megapixels, 1000));
         }
         camera->setProperty(
-            ResourcePropertyKey::kMediaStreams, QString::fromUtf8(QJson::serialized(streams)));
+            nx::vms::api::device_properties::kMediaStreams, QString::fromUtf8(QJson::serialized(streams)));
         camera->saveProperties();
 
         return camera;
@@ -370,9 +370,9 @@ TEST_F(SaasServiceUsageHelperTest, backupMegapixels)
     QnLiveStreamParams targetParams;
     targetParams.resolution = QSize(1'000'000, 3);
     camera->setProperty(
-        ResourcePropertyKey::kPrimaryStreamConfiguration, QJson::serialized(targetParams));
+        nx::vms::api::device_properties::kPrimaryStreamConfiguration, QJson::serialized(targetParams));
     camera->setProperty(
-        ResourcePropertyKey::kSecondaryStreamConfiguration, QJson::serialized(targetParams));
+        nx::vms::api::device_properties::kSecondaryStreamConfiguration, QJson::serialized(targetParams));
     camera->saveProperties();
     ASSERT_EQ(3, camera->backupMegapixels());
 }

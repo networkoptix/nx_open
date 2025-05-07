@@ -298,7 +298,7 @@ TEST_F(AccessControllerTest, cameraPermisionUpdatesBasedOnLicenseType)
     const Qn::Permissions viewPermissions = Qn::ViewLivePermission | Qn::ViewFootagePermission;
     CHECK_HAS_PERMISSIONS(camera, viewPermissions);
 
-    camera->setProperty(ResourcePropertyKey::kForcedLicenseType,
+    camera->setProperty(nx::vms::api::device_properties::kForcedLicenseType,
         QString::fromStdString(nx::reflect::toString(Qn::LC_VMAX)));
 
     CHECK_DOESNT_HAVE_PERMISSIONS(camera, viewPermissions);

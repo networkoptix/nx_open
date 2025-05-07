@@ -925,7 +925,7 @@ State loadSingleCameraProperties(
     {
         state.singleIoModuleSettings.visualStyle.setBase(
             nx::reflect::fromString<vms::api::IoModuleVisualStyle>(
-                singleCamera->getProperty(ResourcePropertyKey::kIoOverlayStyle).toStdString(),
+                singleCamera->getProperty(nx::vms::api::device_properties::kIoOverlayStyle).toStdString(),
                 {}));
 
         state.singleIoModuleSettings.ioPortsData.setBase(
@@ -1305,7 +1305,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.devicesDescription.hasRtspSettings = combinedValue(cameras,
         [](const Camera& camera)
         {
-            return !camera->getProperty(ResourcePropertyKey::kHasRtspSettings).isEmpty();
+            return !camera->getProperty(nx::vms::api::device_properties::kHasRtspSettings).isEmpty();
         });
 
     state.devicesDescription.isVirtualCamera = combinedValue(cameras,
@@ -1346,7 +1346,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.devicesDescription.streamCapabilitiesInitialized = combinedValue(cameras,
         [](const Camera& camera)
         {
-            return !camera->getProperty(ResourcePropertyKey::kMediaCapabilities).isEmpty();
+            return !camera->getProperty(nx::vms::api::device_properties::kMediaCapabilities).isEmpty();
         });
 
     state.devicesDescription.hasRemoteArchiveCapability = combinedValue(cameras,

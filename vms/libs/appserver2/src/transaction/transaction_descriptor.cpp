@@ -1941,7 +1941,7 @@ struct ModifyResourceParamAccess
 };
 
 const std::set<QString> ModifyResourceParamAccess::kSystemAccessOnlyProperties = {
-    ResourcePropertyKey::kForcedLicenseType
+    nx::vms::api::device_properties::kForcedLicenseType
 };
 
 struct ReadFootageDataAccess

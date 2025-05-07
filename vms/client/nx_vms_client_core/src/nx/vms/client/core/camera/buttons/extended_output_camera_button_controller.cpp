@@ -226,10 +226,10 @@ void ExtendedOutputCameraButtonController::setResourceInternal(const QnResourceP
             const QString& /*prevValue*/,
             const QString& /*newValue*/)
         {
-            if (key == ResourcePropertyKey::kCameraCapabilities
-                || key == ResourcePropertyKey::kTwoWayAudioEnabled
-                || key == ResourcePropertyKey::kAudioOutputDeviceId
-                || key == ResourcePropertyKey::kIoSettings)
+            if (key == nx::vms::api::device_properties::kCameraCapabilities
+                || key == nx::vms::api::device_properties::kTwoWayAudioEnabled
+                || key == nx::vms::api::device_properties::kAudioOutputDeviceId
+                || key == nx::vms::api::device_properties::kIoSettings)
             {
                 d->updateOutputs();
                 d->updateSupportAutoTrackingHandling();

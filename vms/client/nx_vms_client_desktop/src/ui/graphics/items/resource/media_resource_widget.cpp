@@ -2819,11 +2819,11 @@ void QnMediaResourceWidget::at_resource_propertyChanged(
     {
         updateCustomAspectRatio();
     }
-    else if (key == ResourcePropertyKey::kMediaStreams)
+    else if (key == nx::vms::api::device_properties::kMediaStreams)
     {
         updateAspectRatio();
     }
-    else if (key == ResourcePropertyKey::kCameraHotspotsEnabled)
+    else if (key == nx::vms::api::device_properties::kCameraHotspotsEnabled)
     {
         updateButtonsVisibility();
     }

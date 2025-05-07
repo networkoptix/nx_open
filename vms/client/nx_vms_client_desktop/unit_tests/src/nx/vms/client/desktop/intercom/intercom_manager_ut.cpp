@@ -95,7 +95,7 @@ protected:
         else //< As on the client side.
         {
             camera->setProperty(
-                ResourcePropertyKey::kIoSettings,
+                nx::vms::api::device_properties::kIoSettings,
                 QString::fromStdString(nx::reflect::json::serialize(
                     QnIOPortDataList{intercomFeaturePort})));
         }

@@ -309,7 +309,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, alwaysScheduleBrushIsValidAfterLoad
     const auto camera = createCamera();
     camera->setMaxFps(kDefaultFps);
     camera->setMotionType(nx::vms::api::MotionType::none);
-    camera->setProperty(ResourcePropertyKey::kSupportedMotion, QString());
+    camera->setProperty(nx::vms::api::device_properties::kSupportedMotion, QString());
 
     State initial = Reducer::loadCameras({}, {camera});
     ASSERT_EQ(initial.devicesDescription.maxFps, kDefaultFps);
@@ -625,7 +625,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, tooHighResolutionCheck)
     State enableDeviceOptimization = Reducer::setSettingsOptimizationEnabled({}, true);
 
     const auto camera = createCamera();
-    camera->setProperty(ResourcePropertyKey::kSupportedMotion, QStringLiteral("softwaregrid"));
+    camera->setProperty(nx::vms::api::device_properties::kSupportedMotion, QStringLiteral("softwaregrid"));
     State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), {camera});
     ASSERT_TRUE(initial.motion.supportsSoftwareDetection);
     ASSERT_EQ(initial.motion.streamAlert, std::nullopt);
@@ -643,7 +643,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, tooHighResolutionHardwareDetectionC
     State enableDeviceOptimization = Reducer::setSettingsOptimizationEnabled({}, true);
 
     const auto camera = createCamera();
-    camera->setProperty(ResourcePropertyKey::kSupportedMotion, QStringLiteral("hardwaregrid"));
+    camera->setProperty(nx::vms::api::device_properties::kSupportedMotion, QStringLiteral("hardwaregrid"));
     State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), {camera});
     ASSERT_FALSE(initial.motion.supportsSoftwareDetection);
     ASSERT_EQ(initial.motion.streamAlert, std::nullopt);

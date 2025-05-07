@@ -57,7 +57,7 @@ QString getConfiguredVideoLayout(const QnVirtualCameraResourcePtr& device)
     }
 
     if (QnResourceTypePtr resType = qnResTypePool->getResourceType(device->getTypeId()))
-        return resType->defaultValue(ResourcePropertyKey::kVideoLayout);
+        return resType->defaultValue(nx::vms::api::device_properties::kVideoLayout);
 
     return {};
 }
@@ -1250,7 +1250,7 @@ void RtspResourceStreamProvider::at_numberOfVideoChannelsChanged()
 
         newVideoLayout = m_customVideoLayout->toString();
         if (m_role == Qn::CR_LiveVideo &&
-            m_resource->setProperty(ResourcePropertyKey::kVideoLayout, newVideoLayout))
+            m_resource->setProperty(nx::vms::api::device_properties::kVideoLayout, newVideoLayout))
         {
             m_resource->saveProperties();
         }

@@ -51,8 +51,8 @@ void ControllerPool::registerResource(const QnResourcePtr &resource)
             if (!NX_ASSERT(camera))
                 return;
 
-            if (key == ResourcePropertyKey::kUserPreferredPtzPresetType
-                || key == ResourcePropertyKey::kDefaultPreferredPtzPresetType)
+            if (key == nx::vms::api::device_properties::kUserPreferredPtzPresetType
+                || key == nx::vms::api::device_properties::kDefaultPreferredPtzPresetType)
             {
                 cacheCameraPresets(camera);
             }

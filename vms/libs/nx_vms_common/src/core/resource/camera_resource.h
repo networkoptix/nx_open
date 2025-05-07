@@ -312,9 +312,6 @@ public:
     /** @return True if recording schedule can be configured for this device. */
     bool supportsSchedule() const;
 
-    /** Returns true if it is a analog device */
-    bool isAnalog() const;
-
     /** Returns true if it is a analog encoder (described in resource_data.json) */
     bool isAnalogEncoder() const;
 
@@ -921,6 +918,10 @@ signals:
     void cameraHotspotsEnabledChanged(const QnVirtualCameraResourcePtr& camera);
     void cameraHotspotsChanged(const QnVirtualCameraResourcePtr& camera);
     void ioPortDescriptionsChanged(const QnVirtualCameraResourcePtr& camera);
+
+protected:
+    /** Returns true if it is a analog device */
+    bool isAnalog() const;
 
 protected slots:
     virtual void at_motionRegionChanged();

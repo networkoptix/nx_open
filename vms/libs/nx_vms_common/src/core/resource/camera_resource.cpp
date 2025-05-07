@@ -73,8 +73,6 @@ static const QMap<StreamFpsSharingMethod, QString> kFpsSharingMethodToString{
     {StreamFpsSharingMethod::none, "noSharing"},
 };
 
-static const QString kRemoteArchiveMotionDetectionKey("remoteArchiveMotionDetection");
-
 QString boolToPropertyStr(bool value)
 {
     return value ? lit("1") : lit("0");
@@ -97,8 +95,6 @@ bool storeUrlForRole(Qn::ConnectionRole role)
     }
     return false;
 }
-
-static const QString kMediaPortParamName = "mediaPort";
 
 QString calculateHostAddress(const QString& url)
 {
@@ -125,7 +121,7 @@ AnalyticsEntitiesByEngine calculateSupportedEntities(ManifestItemIdsFetcher fetc
 QPointF storedPtzPanTiltSensitivity(const QnVirtualCameraResource& camera)
 {
     return QJson::deserialized<QPointF>(
-        camera.getProperty(ResourcePropertyKey::kPtzPanTiltSensitivity).toLatin1(),
+        camera.getProperty(nx::vms::api::device_properties::kPtzPanTiltSensitivity).toLatin1(),
         QPointF(Ptz::kDefaultSensitivity, 0.0 /*uniformity flag*/));
 }
 
@@ -256,7 +252,7 @@ QnVirtualCameraResource::QnVirtualCameraResource():
             if (auto context = systemContext())
             {
                 return context->resourcePropertyDictionary()->hasProperty(
-                    ResourcePropertyKey::kAudioInputDeviceId, getId().toSimpleString());
+                    nx::vms::api::device_properties::kAudioInputDeviceId, getId().toSimpleString());
             }
 
             return false;
@@ -275,7 +271,7 @@ QnVirtualCameraResource::QnVirtualCameraResource():
             if (!hasVideo())
                 return nx::vms::api::MotionType::none;
 
-            QString val = getProperty(ResourcePropertyKey::kSupportedMotion);
+            QString val = getProperty(nx::vms::api::device_properties::kSupportedMotion);
             if (val.isEmpty())
                 return nx::vms::api::MotionType::software;
 
@@ -297,10 +293,10 @@ QnVirtualCameraResource::QnVirtualCameraResource():
         [this]
         {
             return static_cast<nx::vms::api::DeviceCapabilities>(
-                getProperty(ResourcePropertyKey::kCameraCapabilities).toInt());
+                getProperty(nx::vms::api::device_properties::kCameraCapabilities).toInt());
         }),
     m_cachedIsDtsBased(
-        [this] { return getProperty(ResourcePropertyKey::kDts).toInt() > 0; }),
+        [this] { return getProperty(nx::vms::api::device_properties::kDts).toInt() > 0; }),
     m_motionType(
         [this]
         {
@@ -317,20 +313,20 @@ QnVirtualCameraResource::QnVirtualCameraResource():
             return m_userAttributes.motionType;
         }),
     m_cachedIsIOModule(
-        [this] { return getProperty(ResourcePropertyKey::kIoConfigCapability).toInt() > 0; }),
+        [this] { return getProperty(nx::vms::api::device_properties::kIoConfigCapability).toInt() > 0; }),
     m_cachedCanConfigureRemoteRecording(
-        [this]{ return getProperty(ResourcePropertyKey::kCanConfigureRemoteRecording).toInt() > 0; }),
+        [this]{ return getProperty(nx::vms::api::device_properties::kCanConfigureRemoteRecording).toInt() > 0; }),
     m_cachedCameraMediaCapabilities(
         [this]
         {
             return QJson::deserialized<nx::vms::api::CameraMediaCapability>(
-                getProperty(ResourcePropertyKey::kMediaCapabilities).toUtf8());
+                getProperty(nx::vms::api::device_properties::kMediaCapabilities).toUtf8());
         }),
     m_cachedExplicitDeviceType(
         [this]
         {
             return nx::reflect::fromString(
-                getProperty(ResourcePropertyKey::kDeviceType).toStdString(),
+                getProperty(nx::vms::api::device_properties::kDeviceType).toStdString(),
                 nx::vms::api::DeviceType::unknown);
         }),
     m_cachedMotionStreamIndex(
@@ -350,12 +346,12 @@ QnVirtualCameraResource::QnVirtualCameraResource():
         [this]
         {
             return std::get<0>(nx::reflect::json::deserialize<QnIOPortDataList>(
-                nx::toBufferView(getProperty(ResourcePropertyKey::kIoSettings).toUtf8())));
+                nx::toBufferView(getProperty(nx::vms::api::device_properties::kIoSettings).toUtf8())));
         }),
     m_cachedHasVideo(
         [this]
         {
-            auto result = getProperty(ResourcePropertyKey::kNoVideoSupport);
+            auto result = getProperty(nx::vms::api::device_properties::kNoVideoSupport);
             if (!result.isEmpty())
                 return result.toInt() == 0;
 
@@ -365,7 +361,7 @@ QnVirtualCameraResource::QnVirtualCameraResource():
         [this]
         {
             const std::string ioSettings =
-                getProperty(ResourcePropertyKey::kIoSettings).toStdString();
+                getProperty(nx::vms::api::device_properties::kIoSettings).toStdString();
             const auto [portDescriptions, _] =
                 nx::reflect::json::deserialize<QnIOPortDataList>(ioSettings);
 
@@ -447,7 +443,7 @@ QnVirtualCameraResource::QnVirtualCameraResource():
     m_cachedMediaStreams(
         [this]
         {
-            const QString& mediaStreamsStr = getProperty(ResourcePropertyKey::kMediaStreams);
+            const QString& mediaStreamsStr = getProperty(nx::vms::api::device_properties::kMediaStreams);
             CameraMediaStreams supportedMediaStreams =
                 QJson::deserialized<CameraMediaStreams>(mediaStreamsStr.toLatin1());
 
@@ -467,13 +463,13 @@ QnVirtualCameraResource::QnVirtualCameraResource():
         [this]
         {
             return QJson::deserialized<QnLiveStreamParams>(
-                getProperty(ResourcePropertyKey::kPrimaryStreamConfiguration).toUtf8());
+                getProperty(nx::vms::api::device_properties::kPrimaryStreamConfiguration).toUtf8());
         }),
     m_secondaryStreamConfiguration(
         [this]
         {
             return QJson::deserialized<QnLiveStreamParams>(
-                getProperty(ResourcePropertyKey::kSecondaryStreamConfiguration).toUtf8());
+                getProperty(nx::vms::api::device_properties::kSecondaryStreamConfiguration).toUtf8());
         })
 {
     NX_VERBOSE(this, "Creating");
@@ -506,7 +502,7 @@ QnVirtualCameraResource::QnVirtualCameraResource():
             const QString& prevValue,
             const QString& newValue)
         {
-            if (key == ResourcePropertyKey::kAudioOutputDeviceId)
+            if (key == nx::vms::api::device_properties::kAudioOutputDeviceId)
             {
                 updateAudioRequiredOnDevice(prevValue);
                 updateAudioRequiredOnDevice(newValue);
@@ -527,27 +523,27 @@ QnVirtualCameraResource::QnVirtualCameraResource():
             const QString& /*oldValue*/,
             const QString& /*newValue*/)
         {
-            if (key == ResourcePropertyKey::kCameraCapabilities)
+            if (key == nx::vms::api::device_properties::kCameraCapabilities)
             {
                 emit capabilitiesChanged(toSharedPointer());
             }
-            else if (key == ResourcePropertyKey::kForcedLicenseType)
+            else if (key == nx::vms::api::device_properties::kForcedLicenseType)
             {
                 emit licenseTypeChanged(toSharedPointer(this));
             }
-            else if (key == ResourcePropertyKey::kAudioInputDeviceId)
+            else if (key == nx::vms::api::device_properties::kAudioInputDeviceId)
             {
                 emit audioInputDeviceIdChanged(toSharedPointer(this));
             }
-            else if (key == ResourcePropertyKey::kTwoWayAudioEnabled)
+            else if (key == nx::vms::api::device_properties::kTwoWayAudioEnabled)
             {
                 emit twoWayAudioEnabledChanged(toSharedPointer(this));
             }
-            else if (key == ResourcePropertyKey::kAudioOutputDeviceId)
+            else if (key == nx::vms::api::device_properties::kAudioOutputDeviceId)
             {
                 emit audioOutputDeviceIdChanged(toSharedPointer(this));
             }
-            else if (key == ResourcePropertyKey::kSupportedMotion)
+            else if (key == nx::vms::api::device_properties::kSupportedMotion)
             {
                 m_cachedSupportedMotionTypes.update();
             }
@@ -555,16 +551,16 @@ QnVirtualCameraResource::QnVirtualCameraResource():
             {
                 emit rotationChanged();
             }
-            else if (key == ResourcePropertyKey::kMediaCapabilities)
+            else if (key == nx::vms::api::device_properties::kMediaCapabilities)
             {
                 m_cachedCameraMediaCapabilities.reset();
                 emit mediaCapabilitiesChanged(toSharedPointer(this));
             }
-            else if (key == ResourcePropertyKey::kCameraHotspotsEnabled)
+            else if (key == nx::vms::api::device_properties::kCameraHotspotsEnabled)
             {
                 emit cameraHotspotsEnabledChanged(toSharedPointer(this));
             }
-            else if (key == ResourcePropertyKey::kCameraHotspotsData)
+            else if (key == nx::vms::api::device_properties::kCameraHotspotsData)
             {
                 emit cameraHotspotsChanged(toSharedPointer(this));
             }
@@ -774,28 +770,28 @@ void QnVirtualCameraResource::setPhysicalId(const QString &physicalId)
 
 void QnVirtualCameraResource::setAuth(const QAuthenticator &auth)
 {
-    setProperty(ResourcePropertyKey::kCredentials,
+    setProperty(nx::vms::api::device_properties::kCredentials,
         QString("%1:%2").arg(auth.user()) .arg(auth.password()));
 }
 
 void QnVirtualCameraResource::setDefaultAuth(const QAuthenticator &auth)
 {
-    setProperty(ResourcePropertyKey::kDefaultCredentials,
+    setProperty(nx::vms::api::device_properties::kDefaultCredentials,
         QString("%1:%2").arg(auth.user()).arg(auth.password()));
 }
 
 QAuthenticator QnVirtualCameraResource::getAuth() const
 {
-    QString value = getProperty(ResourcePropertyKey::kCredentials);
+    QString value = getProperty(nx::vms::api::device_properties::kCredentials);
     if (value.isNull())
-        value = getProperty(ResourcePropertyKey::kDefaultCredentials);
+        value = getProperty(nx::vms::api::device_properties::kDefaultCredentials);
 
     return parseAuth(value);
 }
 
 QAuthenticator QnVirtualCameraResource::getDefaultAuth() const
 {
-    QString value = getProperty(ResourcePropertyKey::kDefaultCredentials);
+    QString value = getProperty(nx::vms::api::device_properties::kDefaultCredentials);
     return parseAuth(value);
 }
 
@@ -824,7 +820,7 @@ void QnVirtualCameraResource::setHttpPort(std::uint16_t newPort)
 
 QString QnVirtualCameraResource::mediaPortKey()
 {
-    return kMediaPortParamName;
+    return nx::vms::api::device_properties::kMediaPort;
 }
 
 int QnVirtualCameraResource::mediaPort() const
@@ -911,7 +907,7 @@ bool QnVirtualCameraResource::isGroupPlayOnly() const
 {
     // This parameter can never be overridden. Just read the Resource type info.
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(getTypeId());
-    return resourceType && resourceType->hasParam(ResourcePropertyKey::kGroupPlayParamName);
+    return resourceType && resourceType->hasParam(nx::vms::api::device_properties::kGroupPlayParamName);
 }
 
 bool QnVirtualCameraResource::needsToChangeDefaultPassword() const
@@ -991,7 +987,7 @@ int QnVirtualCameraResource::getMaxFps(nx::vms::api::StreamIndex streamIndex) co
     }
 
     // Compatibility with version < 3.1.2
-    QString value = getProperty(ResourcePropertyKey::kMaxFps);
+    QString value = getProperty(nx::vms::api::device_properties::kMaxFps);
     return value.isNull() ? kDefaultMaxFps : value.toInt();
 }
 
@@ -1047,7 +1043,7 @@ bool QnVirtualCameraResource::hasAudio() const
 Qn::LicenseType QnVirtualCameraResource::calculateLicenseType() const
 {
     using namespace nx::vms::api;
-    const auto licenseType = getProperty(ResourcePropertyKey::kForcedLicenseType);
+    const auto licenseType = getProperty(nx::vms::api::device_properties::kForcedLicenseType);
     Qn::LicenseType result = nx::reflect::fromString(licenseType.toStdString(), Qn::LC_Professional);
     const auto context = systemContext();
 
@@ -1068,37 +1064,37 @@ QnVirtualCameraResource::MotionStreamIndex QnVirtualCameraResource::motionStream
 QnVirtualCameraResource::MotionStreamIndex QnVirtualCameraResource::motionStreamIndexInternal() const
 {
     const auto motionStream = nx::reflect::fromString<nx::vms::api::StreamIndex>(
-        getProperty(ResourcePropertyKey::kMotionStreamKey).toLower().toStdString(),
+        getProperty(nx::vms::api::device_properties::kMotionStreamKey).toLower().toStdString(),
         nx::vms::api::StreamIndex::undefined);
 
     if (motionStream == nx::vms::api::StreamIndex::undefined)
         return {nx::vms::api::StreamIndex::undefined, /*isForced*/ false};
 
     const bool forcedMotionDetection = QnLexical::deserialized<bool>(
-        getProperty(ResourcePropertyKey::kForcedMotionDetectionKey).toLower(), true);
+        getProperty(nx::vms::api::device_properties::kForcedMotionDetectionKey).toLower(), true);
 
     return {motionStream, forcedMotionDetection};
 }
 
 void QnVirtualCameraResource::setMotionStreamIndex(MotionStreamIndex value)
 {
-    setProperty(ResourcePropertyKey::kMotionStreamKey,
+    setProperty(nx::vms::api::device_properties::kMotionStreamKey,
         QString::fromStdString(nx::reflect::toString(value.index)));
     setProperty(
-        ResourcePropertyKey::kForcedMotionDetectionKey, QnLexical::serialized(value.isForced));
+        nx::vms::api::device_properties::kForcedMotionDetectionKey, QnLexical::serialized(value.isForced));
     m_cachedMotionStreamIndex.reset();
 }
 
 bool QnVirtualCameraResource::isRemoteArchiveMotionDetectionEnabled() const
 {
-    const QString valueStr = getProperty(kRemoteArchiveMotionDetectionKey);
+    const QString valueStr = getProperty(nx::vms::api::device_properties::kRemoteArchiveMotionDetectionKey);
     return valueStr.isEmpty() || QnLexical::deserialized<bool>(valueStr, true);
 }
 
 void QnVirtualCameraResource::setRemoteArchiveMotionDetectionEnabled(bool value)
 {
     const QString valueStr = value ? QString() : QnLexical::serialized(value);
-    setProperty(kRemoteArchiveMotionDetectionKey, valueStr);
+    setProperty(nx::vms::api::device_properties::kRemoteArchiveMotionDetectionKey, valueStr);
 }
 
 QnMotionRegion QnVirtualCameraResource::getMotionRegion() const
@@ -1167,7 +1163,7 @@ nx::vms::api::CameraMediaCapability QnVirtualCameraResource::cameraMediaCapabili
 void QnVirtualCameraResource::setCameraMediaCapability(const nx::vms::api::CameraMediaCapability& value)
 {
     setProperty(
-        ResourcePropertyKey::kMediaCapabilities, QString::fromLatin1(QJson::serialized(value)));
+        nx::vms::api::device_properties::kMediaCapabilities, QString::fromLatin1(QJson::serialized(value)));
     m_cachedCameraMediaCapabilities.reset();
 }
 
@@ -1189,7 +1185,7 @@ bool QnVirtualCameraResource::supportsSchedule() const
 
 bool QnVirtualCameraResource::isAnalog() const
 {
-    QString val = getProperty(ResourcePropertyKey::kAnalog);
+    QString val = getProperty(nx::vms::api::device_properties::kAnalog);
     return val.toInt() > 0;
 }
 
@@ -1239,7 +1235,7 @@ void QnVirtualCameraResource::setDeviceType(nx::vms::api::DeviceType deviceType)
 {
     m_cachedExplicitDeviceType.reset();
     m_cachedLicenseType.reset();
-    setProperty(ResourcePropertyKey::kDeviceType,
+    setProperty(nx::vms::api::device_properties::kDeviceType,
         QString::fromStdString(nx::reflect::toString(deviceType)));
 }
 
@@ -1250,13 +1246,13 @@ Qn::LicenseType QnVirtualCameraResource::licenseType() const
 
 StreamFpsSharingMethod QnVirtualCameraResource::streamFpsSharingMethod() const
 {
-    const QString value = getProperty(ResourcePropertyKey::kStreamFpsSharing);
+    const QString value = getProperty(nx::vms::api::device_properties::kStreamFpsSharing);
     return kFpsSharingMethodToString.key(value, kDefaultStreamFpsSharingMethod);
 }
 
 void QnVirtualCameraResource::setStreamFpsSharingMethod(StreamFpsSharingMethod value)
 {
-    setProperty(ResourcePropertyKey::kStreamFpsSharing, kFpsSharingMethodToString[value]);
+    setProperty(nx::vms::api::device_properties::kStreamFpsSharing, kFpsSharingMethodToString[value]);
 }
 
 bool QnVirtualCameraResource::setIoPortDescriptions(QnIOPortDataList newPorts, bool needMerge)
@@ -1293,7 +1289,7 @@ bool QnVirtualCameraResource::setIoPortDescriptions(QnIOPortDataList newPorts, b
     }
 
     setProperty(
-        ResourcePropertyKey::kIoSettings,
+        nx::vms::api::device_properties::kIoSettings,
         QString::fromStdString(nx::reflect::json::serialize(newPorts)));
     setCameraCapability(nx::vms::api::DeviceCapability::inputPort, hasInputs);
     setCameraCapability(nx::vms::api::DeviceCapability::outputPort, hasOutputs);
@@ -1333,19 +1329,19 @@ void QnVirtualCameraResource::at_motionRegionChanged()
 
 int QnVirtualCameraResource::motionWindowCount() const
 {
-    QString val = getProperty(ResourcePropertyKey::kMotionWindowCnt);
+    QString val = getProperty(nx::vms::api::device_properties::kMotionWindowCnt);
     return val.toInt();
 }
 
 int QnVirtualCameraResource::motionMaskWindowCount() const
 {
-    QString val = getProperty(ResourcePropertyKey::kMotionMaskWindowCnt);
+    QString val = getProperty(nx::vms::api::device_properties::kMotionMaskWindowCnt);
     return val.toInt();
 }
 
 int QnVirtualCameraResource::motionSensWindowCount() const
 {
-    QString val = getProperty(ResourcePropertyKey::kMotionSensWindowCnt);
+    QString val = getProperty(nx::vms::api::device_properties::kMotionSensWindowCnt);
     return val.toInt();
 }
 
@@ -1364,10 +1360,10 @@ Ptz::Capabilities QnVirtualCameraResource::getPtzCapabilities(ptz::Type ptzType)
     switch (ptzType)
     {
         case ptz::Type::operational:
-            return capsFromProperty(ResourcePropertyKey::kPtzCapabilities);
+            return capsFromProperty(nx::vms::api::device_properties::kPtzCapabilities);
 
         case ptz::Type::configurational:
-            return capsFromProperty(ResourcePropertyKey::kConfigurationalPtzCapabilities);
+            return capsFromProperty(nx::vms::api::device_properties::kConfigurationalPtzCapabilities);
 
         default:
             NX_ASSERT(false, "Wrong ptz type, we should never be here");
@@ -1396,10 +1392,10 @@ void QnVirtualCameraResource::setPtzCapabilities(
     switch (ptzType)
     {
         case ptz::Type::operational:
-            capsToProperty(ResourcePropertyKey::kPtzCapabilities);
+            capsToProperty(nx::vms::api::device_properties::kPtzCapabilities);
             return;
         case ptz::Type::configurational:
-            capsToProperty(ResourcePropertyKey::kConfigurationalPtzCapabilities);
+            capsToProperty(nx::vms::api::device_properties::kConfigurationalPtzCapabilities);
             return;
     }
     NX_ASSERT(false, "Wrong ptz type, we should never be here");
@@ -1437,7 +1433,7 @@ bool QnVirtualCameraResource::isAudioSupported() const
         return true;
 
     // Compatibility with version < 3.1.2
-    QString val = getProperty(ResourcePropertyKey::kIsAudioSupported);
+    QString val = getProperty(nx::vms::api::device_properties::kIsAudioSupported);
     return val.toInt() > 0;
 }
 
@@ -1566,7 +1562,7 @@ bool QnVirtualCameraResource::hasCameraCapabilities(
 void QnVirtualCameraResource::setCameraCapabilities(nx::vms::api::DeviceCapabilities capabilities)
 {
     // TODO: #sivanov Change capabilities storage type to serialized lexical.
-    setProperty(ResourcePropertyKey::kCameraCapabilities, QString::number((int) capabilities));
+    setProperty(nx::vms::api::device_properties::kCameraCapabilities, QString::number((int) capabilities));
     m_cachedCameraCapabilities.reset();
 }
 
@@ -1668,7 +1664,7 @@ void QnVirtualCameraResource::setModel(const QString &model)
 
 QString QnVirtualCameraResource::getFirmware() const
 {
-    return getProperty(ResourcePropertyKey::kFirmware);
+    return getProperty(nx::vms::api::device_properties::kFirmware);
 }
 
 void QnVirtualCameraResource::setFirmware(const QString &firmware)
@@ -1679,39 +1675,39 @@ void QnVirtualCameraResource::setFirmware(const QString &firmware)
         if (symbol.isPrint())
             fixedFirmware.append(symbol);
     }
-    setProperty(ResourcePropertyKey::kFirmware, fixedFirmware);
+    setProperty(nx::vms::api::device_properties::kFirmware, fixedFirmware);
 }
 
 QString QnVirtualCameraResource::getSerialNumber() const
 {
-    return getProperty(ResourcePropertyKey::kCameraSerialNumber);
+    return getProperty(nx::vms::api::device_properties::kCameraSerialNumber);
 }
 
 void QnVirtualCameraResource::setSerialNumber(const QString& serialNumber)
 {
-    setProperty(ResourcePropertyKey::kCameraSerialNumber, serialNumber);
+    setProperty(nx::vms::api::device_properties::kCameraSerialNumber, serialNumber);
 }
 
 bool QnVirtualCameraResource::trustCameraTime() const
 {
-    return QnLexical::deserialized<bool>(getProperty(ResourcePropertyKey::kTrustCameraTime));
+    return QnLexical::deserialized<bool>(getProperty(nx::vms::api::device_properties::kTrustCameraTime));
 }
 
 void QnVirtualCameraResource::setTrustCameraTime(bool value)
 {
-    setProperty(ResourcePropertyKey::kTrustCameraTime, boolToPropertyStr(value));
+    setProperty(nx::vms::api::device_properties::kTrustCameraTime, boolToPropertyStr(value));
 }
 
 bool QnVirtualCameraResource::keepCameraTimeSettings() const
 {
     const bool defaultValue = !hasCameraCapabilities(nx::vms::api::DeviceCapability::remoteArchive);
     return QnLexical::deserialized<bool>(
-        getProperty(ResourcePropertyKey::kKeepCameraTimeSettings), defaultValue);
+        getProperty(nx::vms::api::device_properties::kKeepCameraTimeSettings), defaultValue);
 }
 
 void QnVirtualCameraResource::setKeepCameraTimeSettings(bool value)
 {
-    setProperty(ResourcePropertyKey::kKeepCameraTimeSettings, boolToPropertyStr(value));
+    setProperty(nx::vms::api::device_properties::kKeepCameraTimeSettings, boolToPropertyStr(value));
 }
 
 QString QnVirtualCameraResource::getVendor() const
@@ -1777,14 +1773,15 @@ nx::Uuid QnVirtualCameraResource::preferredServerId() const
 void QnVirtualCameraResource::setRemoteArchiveSynchronizationEnabled(bool value)
 {
     const auto stored = QnLexical::serialized(value);
-    setProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationEnabled, stored);
+    setProperty(nx::vms::api::device_properties::kRemoteArchiveSynchronizationEnabled, stored);
 }
 
 bool QnVirtualCameraResource::isRemoteArchiveSynchronizationEnabled() const
 {
     const bool defaultValue = hasCameraCapabilities(nx::vms::api::DeviceCapability::remoteArchive);
     return QnLexical::deserialized<bool>(
-        getProperty(ResourcePropertyKey::kRemoteArchiveSynchronizationEnabled), defaultValue);
+        getProperty(nx::vms::api::device_properties::kRemoteArchiveSynchronizationEnabled),
+        defaultValue);
 }
 
 void QnVirtualCameraResource::updatePreferredServerId()
@@ -1872,7 +1869,7 @@ bool QnVirtualCameraResource::isAudioRequired() const
 
 bool QnVirtualCameraResource::isAudioForced() const
 {
-    return getProperty(ResourcePropertyKey::kForcedAudioStream).toInt() > 0;
+    return getProperty(nx::vms::api::device_properties::kForcedAudioStream).toInt() > 0;
 }
 
 bool QnVirtualCameraResource::isAudioEnabled() const
@@ -1917,7 +1914,7 @@ void QnVirtualCameraResource::setAudioEnabled(bool enabled)
 
 nx::Uuid QnVirtualCameraResource::audioInputDeviceId() const
 {
-    return nx::Uuid::fromStringSafe(getProperty(ResourcePropertyKey::kAudioInputDeviceId));
+    return nx::Uuid::fromStringSafe(getProperty(nx::vms::api::device_properties::kAudioInputDeviceId));
 }
 
 QnVirtualCameraResourcePtr QnVirtualCameraResource::audioInputDevice() const
@@ -1949,17 +1946,17 @@ void QnVirtualCameraResource::setAudioInputDeviceId(const nx::Uuid& deviceId)
     {
         // Null QString is always stored instead of string representation of null nx::Uuid to
         // prevent false property change notifications.
-        setProperty(ResourcePropertyKey::kAudioInputDeviceId, QString());
+        setProperty(nx::vms::api::device_properties::kAudioInputDeviceId, QString());
         return;
     }
 
-    setProperty(ResourcePropertyKey::kAudioInputDeviceId, deviceId.toSimpleString());
+    setProperty(nx::vms::api::device_properties::kAudioInputDeviceId, deviceId.toSimpleString());
 }
 
 bool QnVirtualCameraResource::isTwoWayAudioEnabled() const
 {
     const auto enabled = QnLexical::deserialized(
-        getProperty(ResourcePropertyKey::kTwoWayAudioEnabled), hasTwoWayAudio());
+        getProperty(nx::vms::api::device_properties::kTwoWayAudioEnabled), hasTwoWayAudio());
 
     // If has audio output device, but it is not exists any more use default value.
     auto audioOutputDeviceId = this->audioOutputDeviceId();
@@ -1979,12 +1976,12 @@ void QnVirtualCameraResource::setTwoWayAudioEnabled(bool enabled)
         setAudioOutputDeviceId({});
 
     if (enabled != isTwoWayAudioEnabled())
-        setProperty(ResourcePropertyKey::kTwoWayAudioEnabled, QnLexical::serialized(enabled));
+        setProperty(nx::vms::api::device_properties::kTwoWayAudioEnabled, QnLexical::serialized(enabled));
 }
 
 nx::Uuid QnVirtualCameraResource::audioOutputDeviceId() const
 {
-    return nx::Uuid::fromStringSafe(getProperty(ResourcePropertyKey::kAudioOutputDeviceId));
+    return nx::Uuid::fromStringSafe(getProperty(nx::vms::api::device_properties::kAudioOutputDeviceId));
 }
 
 QnVirtualCameraResourcePtr QnVirtualCameraResource::audioOutputDevice() const
@@ -2016,11 +2013,11 @@ void QnVirtualCameraResource::setAudioOutputDeviceId(const nx::Uuid& deviceId)
     {
         // Null QString is always stored instead of string representation of null nx::Uuid to prevent
         // false property change notifications.
-        setProperty(ResourcePropertyKey::kAudioOutputDeviceId, QString());
+        setProperty(nx::vms::api::device_properties::kAudioOutputDeviceId, QString());
         return;
     }
 
-    setProperty(ResourcePropertyKey::kAudioOutputDeviceId, deviceId.toSimpleString());
+    setProperty(nx::vms::api::device_properties::kAudioOutputDeviceId, deviceId.toSimpleString());
 }
 
 bool QnVirtualCameraResource::isManuallyAdded() const
@@ -2068,7 +2065,7 @@ nx::vms::api::CameraBackupQuality QnVirtualCameraResource::getActualBackupQualit
 
 bool QnVirtualCameraResource::cameraHotspotsEnabled() const
 {
-    const auto propertyValue = getProperty(ResourcePropertyKey::kCameraHotspotsEnabled);
+    const auto propertyValue = getProperty(nx::vms::api::device_properties::kCameraHotspotsEnabled);
     if (propertyValue.isEmpty())
         return false;
 
@@ -2078,12 +2075,12 @@ bool QnVirtualCameraResource::cameraHotspotsEnabled() const
 void QnVirtualCameraResource::setCameraHotspotsEnabled(bool enabled)
 {
     if (enabled != cameraHotspotsEnabled())
-        setProperty(ResourcePropertyKey::kCameraHotspotsEnabled, QnLexical::serialized(enabled));
+        setProperty(nx::vms::api::device_properties::kCameraHotspotsEnabled, QnLexical::serialized(enabled));
 }
 
 nx::vms::common::CameraHotspotDataList QnVirtualCameraResource::cameraHotspots() const
 {
-    const auto hotspotsPropertyValue = getProperty(ResourcePropertyKey::kCameraHotspotsData);
+    const auto hotspotsPropertyValue = getProperty(nx::vms::api::device_properties::kCameraHotspotsData);
     if (hotspotsPropertyValue.isEmpty())
         return {};
 
@@ -2108,7 +2105,7 @@ void QnVirtualCameraResource::setCameraHotspots(
     for (auto& hotspot: savedHotspots)
         hotspot.fixupData();
 
-    setProperty(ResourcePropertyKey::kCameraHotspotsData, !savedHotspots.empty()
+    setProperty(nx::vms::api::device_properties::kCameraHotspotsData, !savedHotspots.empty()
                                                           ? QString::fromStdString(nx::reflect::json::serialize(savedHotspots))
                                                           : QString());
 }
@@ -2136,27 +2133,27 @@ void QnVirtualCameraResource::setDisableDualStreaming(bool value)
 bool QnVirtualCameraResource::isPrimaryStreamRecorded() const
 {
     const bool forbidden =
-        getProperty(ResourcePropertyKey::kDontRecordPrimaryStreamKey).toInt() > 0;
+        getProperty(nx::vms::api::device_properties::kDontRecordPrimaryStreamKey).toInt() > 0;
     return !forbidden;
 }
 
 void QnVirtualCameraResource::setPrimaryStreamRecorded(bool value)
 {
     const QString valueStr = value ? "" : "1";
-    setProperty(ResourcePropertyKey::kDontRecordPrimaryStreamKey, valueStr);
+    setProperty(nx::vms::api::device_properties::kDontRecordPrimaryStreamKey, valueStr);
 }
 
 bool QnVirtualCameraResource::isAudioRecorded() const
 {
     const bool forbidden =
-        getProperty(ResourcePropertyKey::kDontRecordAudio).toInt() > 0;
+        getProperty(nx::vms::api::device_properties::kDontRecordAudio).toInt() > 0;
     return !forbidden;
 }
 
 void QnVirtualCameraResource::setRecordAudio(bool value)
 {
     const QString valueStr = value ? "" : "1";
-    setProperty(ResourcePropertyKey::kDontRecordAudio, valueStr);
+    setProperty(nx::vms::api::device_properties::kDontRecordAudio, valueStr);
 }
 
 bool QnVirtualCameraResource::isSecondaryStreamRecorded() const
@@ -2165,7 +2162,7 @@ bool QnVirtualCameraResource::isSecondaryStreamRecorded() const
         return false;
 
     const bool forbidden =
-        getProperty(ResourcePropertyKey::kDontRecordSecondaryStreamKey).toInt() > 0;
+        getProperty(nx::vms::api::device_properties::kDontRecordSecondaryStreamKey).toInt() > 0;
     return !forbidden;
 }
 
@@ -2175,7 +2172,7 @@ void QnVirtualCameraResource::setSecondaryStreamRecorded(bool value)
         return;
 
     const QString valueStr = value ? "" : "1";
-    setProperty(ResourcePropertyKey::kDontRecordSecondaryStreamKey, valueStr);
+    setProperty(nx::vms::api::device_properties::kDontRecordSecondaryStreamKey, valueStr);
 }
 
 void QnVirtualCameraResource::setCameraControlDisabled(bool value)
@@ -2363,7 +2360,7 @@ void QnVirtualCameraResource::resetCachedValues()
 
 bool QnVirtualCameraResource::useBitratePerGop() const
 {
-    auto result = getProperty(ResourcePropertyKey::kBitratePerGOP);
+    auto result = getProperty(nx::vms::api::device_properties::kBitratePerGOP);
     if (!result.isEmpty())
         return result.toInt() > 0;
 
@@ -2373,7 +2370,7 @@ bool QnVirtualCameraResource::useBitratePerGop() const
 nx::core::resource::UsingOnvifMedia2Type QnVirtualCameraResource::useMedia2ToFetchProfiles() const
 {
     const auto usingMedia2Type = nx::reflect::fromString(
-        getProperty(ResourcePropertyKey::kUseMedia2ToFetchProfiles).toStdString(),
+        getProperty(nx::vms::api::device_properties::kUseMedia2ToFetchProfiles).toStdString(),
         nx::core::resource::UsingOnvifMedia2Type::autoSelect);
 
     return usingMedia2Type;
@@ -2425,13 +2422,13 @@ nx::vms::api::ptz::PresetType QnVirtualCameraResource::preferredPtzPresetType() 
 nx::vms::api::ptz::PresetType QnVirtualCameraResource::userPreferredPtzPresetType() const
 {
     return nx::reflect::fromString(
-        getProperty(ResourcePropertyKey::kUserPreferredPtzPresetType).toStdString(),
+        getProperty(nx::vms::api::device_properties::kUserPreferredPtzPresetType).toStdString(),
         nx::vms::api::ptz::PresetType::undefined);
 }
 
 void QnVirtualCameraResource::setUserPreferredPtzPresetType(nx::vms::api::ptz::PresetType presetType)
 {
-    setProperty(ResourcePropertyKey::kUserPreferredPtzPresetType,
+    setProperty(nx::vms::api::device_properties::kUserPreferredPtzPresetType,
         presetType == nx::vms::api::ptz::PresetType::undefined
         ? QString()
         : QString::fromStdString(nx::reflect::toString(presetType)));
@@ -2440,20 +2437,20 @@ void QnVirtualCameraResource::setUserPreferredPtzPresetType(nx::vms::api::ptz::P
 nx::vms::api::ptz::PresetType QnVirtualCameraResource::defaultPreferredPtzPresetType() const
 {
     return nx::reflect::fromString(
-        getProperty(ResourcePropertyKey::kDefaultPreferredPtzPresetType).toStdString(),
+        getProperty(nx::vms::api::device_properties::kDefaultPreferredPtzPresetType).toStdString(),
         nx::vms::api::ptz::PresetType::native);
 }
 
 void QnVirtualCameraResource::setDefaultPreferredPtzPresetType(nx::vms::api::ptz::PresetType presetType)
 {
-    setProperty(ResourcePropertyKey::kDefaultPreferredPtzPresetType,
+    setProperty(nx::vms::api::device_properties::kDefaultPreferredPtzPresetType,
         QString::fromStdString(nx::reflect::toString(presetType)));
 }
 
 Ptz::Capabilities QnVirtualCameraResource::ptzCapabilitiesUserIsAllowedToModify() const
 {
     return nx::reflect::fromString(
-        getProperty(ResourcePropertyKey::kPtzCapabilitiesUserIsAllowedToModify).toStdString(),
+        getProperty(nx::vms::api::device_properties::kPtzCapabilitiesUserIsAllowedToModify).toStdString(),
         Ptz::Capabilities(Ptz::Capability::none));
 }
 
@@ -2461,21 +2458,21 @@ void QnVirtualCameraResource::setPtzCapabilitesUserIsAllowedToModify(Ptz::Capabi
 {
     // Property was moved to DeviceModelV4, and we switched database type from lexical to int.
     setProperty(
-        ResourcePropertyKey::kPtzCapabilitiesUserIsAllowedToModify,
+        nx::vms::api::device_properties::kPtzCapabilitiesUserIsAllowedToModify,
         QString::number(static_cast<int>(capabilities)));
 }
 
 Ptz::Capabilities QnVirtualCameraResource::ptzCapabilitiesAddedByUser() const
 {
     return nx::reflect::fromString<Ptz::Capabilities>(
-        getProperty(ResourcePropertyKey::kPtzCapabilitiesAddedByUser).toStdString(),
+        getProperty(nx::vms::api::device_properties::kPtzCapabilitiesAddedByUser).toStdString(),
         Ptz::Capability::none);
 }
 
 void QnVirtualCameraResource::setPtzCapabilitiesAddedByUser(Ptz::Capabilities capabilities)
 {
     // Property was moved to DeviceModelV4, and we switched database type from lexical to int.
-    setProperty(ResourcePropertyKey::kPtzCapabilitiesAddedByUser,
+    setProperty(nx::vms::api::device_properties::kPtzCapabilitiesAddedByUser,
         QString::number(static_cast<int>(capabilities)));
 }
 
@@ -2494,7 +2491,7 @@ bool QnVirtualCameraResource::isPtzPanTiltSensitivityUniform() const
 
 void QnVirtualCameraResource::setPtzPanTiltSensitivity(const QPointF& value)
 {
-    setProperty(ResourcePropertyKey::kPtzPanTiltSensitivity, QString(QJson::serialized(QPointF(
+    setProperty(nx::vms::api::device_properties::kPtzPanTiltSensitivity, QString(QJson::serialized(QPointF(
         std::clamp(value.x(), Ptz::kMinimumSensitivity, Ptz::kMaximumSensitivity),
         value.y() > 0.0
         ? std::clamp(value.y(), Ptz::kMinimumSensitivity, Ptz::kMaximumSensitivity)
@@ -2513,7 +2510,7 @@ bool QnVirtualCameraResource::isVideoQualityAdjustable() const
         {
           // This parameter can never be overridden. Just read the Resource type info.
           QnResourceTypePtr resourceType = qnResTypePool->getResourceType(getTypeId());
-          return resourceType && resourceType->hasParam(ResourcePropertyKey::kNoRecordingParams);
+          return resourceType && resourceType->hasParam(nx::vms::api::device_properties::kNoRecordingParams);
         };
 
     return hasVideo()
@@ -2665,7 +2662,7 @@ bool QnVirtualCameraResource::isRtspMetatadaRequired() const
 }
 bool QnVirtualCameraResource::isForcedAudioSupported() const
 {
-    QString val = getProperty(ResourcePropertyKey::kForcedIsAudioSupported);
+    QString val = getProperty(nx::vms::api::device_properties::kForcedIsAudioSupported);
     return val.toUInt() > 0;
 }
 
@@ -2673,7 +2670,7 @@ void QnVirtualCameraResource::forceEnableAudio()
 {
     if (isForcedAudioSupported())
         return;
-    setProperty(ResourcePropertyKey::kForcedIsAudioSupported, "1");
+    setProperty(nx::vms::api::device_properties::kForcedIsAudioSupported, "1");
     saveProperties();
 }
 
@@ -2681,13 +2678,13 @@ void QnVirtualCameraResource::forceDisableAudio()
 {
     if (!isForcedAudioSupported())
         return;
-    setProperty(ResourcePropertyKey::kForcedIsAudioSupported, "0");
+    setProperty(nx::vms::api::device_properties::kForcedIsAudioSupported, "0");
     saveProperties();
 }
 
 void QnVirtualCameraResource::updateDefaultAuthIfEmpty(const QString& login, const QString& password)
 {
-    auto credentials = getProperty(ResourcePropertyKey::kDefaultCredentials);
+    auto credentials = getProperty(nx::vms::api::device_properties::kDefaultCredentials);
 
     if (credentials.isEmpty() || credentials == ":")
     {
@@ -2702,7 +2699,7 @@ QString QnVirtualCameraResource::sourceUrl(Qn::ConnectionRole role) const
         return QString();
 
     QJsonObject streamUrls =
-        QJsonDocument::fromJson(getProperty(ResourcePropertyKey::kStreamUrls).toUtf8()).object();
+        QJsonDocument::fromJson(getProperty(nx::vms::api::device_properties::kStreamUrls).toUtf8()).object();
     const auto roleStr = QString::number(role);
     return streamUrls[roleStr].toString();
 }
@@ -2724,9 +2721,9 @@ void QnVirtualCameraResource::updateSourceUrl(const nx::utils::Url& tempUrl,
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
         QJsonObject streamUrls = QJsonDocument::fromJson(
-            getProperty(ResourcePropertyKey::kStreamUrls).toUtf8()).object();
+            getProperty(nx::vms::api::device_properties::kStreamUrls).toUtf8()).object();
         streamUrls[roleStr] = url;
-        urlChanged = setProperty(ResourcePropertyKey::kStreamUrls,
+        urlChanged = setProperty(nx::vms::api::device_properties::kStreamUrls,
             QString::fromUtf8(QJsonDocument(streamUrls).toJson()));
     }
 
@@ -2808,23 +2805,23 @@ QnAspectRatio QnVirtualCameraResource::aspectRatioRotated() const
 void QnVirtualCameraResource::emitPropertyChanged(
     const QString& key, const QString& prevValue, const QString& newValue)
 {
-    if (key == ResourcePropertyKey::kIoSettings)
+    if (key == nx::vms::api::device_properties::kIoSettings)
     {
         m_isIntercom.reset();
         emit ioPortDescriptionsChanged(::toSharedPointer(this));
     }
-    else if (key == ResourcePropertyKey::kNoVideoSupport)
+    else if (key == nx::vms::api::device_properties::kNoVideoSupport)
     {
         m_cachedHasVideo.reset();
         m_cachedSupportedMotionTypes.reset();
         m_motionType.reset();
         emit motionTypeChanged(::toSharedPointer(this));
     }
-    else if (key == ResourcePropertyKey::kPtzCapabilities)
+    else if (key == nx::vms::api::device_properties::kPtzCapabilities)
     {
         emit ptzCapabilitiesChanged(::toSharedPointer(this));
     }
-    else if (key == ResourcePropertyKey::kNoVideoSupport)
+    else if (key == nx::vms::api::device_properties::kNoVideoSupport)
     {
         m_cachedSupportedObjectTypes.reset();
         emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
@@ -2856,22 +2853,22 @@ void QnVirtualCameraResource::emitPropertyChanged(
         emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
         emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
     }
-    else if (key == ResourcePropertyKey::kIoConfigCapability)
+    else if (key == nx::vms::api::device_properties::kIoConfigCapability)
     {
         m_cachedIsIOModule.reset();
         emit isIOModuleChanged(::toSharedPointer(this));
     }
-    else if (key == ResourcePropertyKey::kMediaStreams)
+    else if (key == nx::vms::api::device_properties::kMediaStreams)
     {
         m_cachedMediaStreams.reset();
         m_cachedBackupMegapixels.reset();
     }
-    else if (key == ResourcePropertyKey::kPrimaryStreamConfiguration)
+    else if (key == nx::vms::api::device_properties::kPrimaryStreamConfiguration)
     {
         m_primaryStreamConfiguration.reset();
         m_cachedBackupMegapixels.reset();
     }
-    else if (key == ResourcePropertyKey::kSecondaryStreamConfiguration)
+    else if (key == nx::vms::api::device_properties::kSecondaryStreamConfiguration)
     {
         m_secondaryStreamConfiguration.reset();
         m_cachedBackupMegapixels.reset();
@@ -3188,13 +3185,13 @@ bool QnVirtualCameraResource::canApplySchedule(const QnScheduleTaskList& schedul
 
 void QnVirtualCameraResource::setAvailableProfiles(const nx::vms::api::DeviceProfiles& value)
 {
-    setProperty(ResourcePropertyKey::kAvailableProfiles,
+    setProperty(nx::vms::api::device_properties::kAvailableProfiles,
         QString::fromStdString(nx::reflect::json::serialize(value)));
 }
 
 nx::vms::api::DeviceProfiles QnVirtualCameraResource::availableProfiles() const
 {
-    const auto data = getProperty(ResourcePropertyKey::kAvailableProfiles).toStdString();
+    const auto data = getProperty(nx::vms::api::device_properties::kAvailableProfiles).toStdString();
     if (data.empty())
         return {};
 
@@ -3211,17 +3208,16 @@ void QnVirtualCameraResource::setForcedProfile(const QString& token, nx::vms::ap
 {
     using namespace nx::vms::api;
     setProperty(index == StreamIndex::primary
-        ? ResourcePropertyKey::kForcedPrimaryProfile
-        : ResourcePropertyKey::kForcedSecondaryProfile,
+            ? nx::vms::api::device_properties::kForcedPrimaryProfile
+            : nx::vms::api::device_properties::kForcedSecondaryProfile,
         token);
 }
 
 QString QnVirtualCameraResource::forcedProfile(nx::vms::api::StreamIndex index) const
 {
-    return getProperty(
-        index == nx::vms::api::StreamIndex::primary
-        ? ResourcePropertyKey::kForcedPrimaryProfile
-        : ResourcePropertyKey::kForcedSecondaryProfile);
+    return getProperty(index == nx::vms::api::StreamIndex::primary
+        ? nx::vms::api::device_properties::kForcedPrimaryProfile
+        : nx::vms::api::device_properties::kForcedSecondaryProfile);
 }
 
 int QnVirtualCameraResource::backupMegapixels() const
