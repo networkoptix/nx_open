@@ -73,12 +73,12 @@
         <item>
          <layout class="QGridLayout" name="checkboxesLayout">
           <property name="spacing">
-           <number>8</number>
+           <number>0</number>
           </property>
           <item row="1" column="0">
            <widget class="QCheckBox" name="checkBoxUsers">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -86,7 +86,7 @@
             <property name="minimumSize">
              <size>
               <width>150</width>
-              <height>0</height>
+              <height>22</height>
              </size>
             </property>
             <property name="text">
@@ -100,7 +100,7 @@
           <item row="0" column="6">
            <widget class="QCheckBox" name="selectAllCheckBox">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -116,7 +116,7 @@
           <item row="1" column="3">
            <widget class="QCheckBox" name="checkBoxServers">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -124,7 +124,7 @@
             <property name="minimumSize">
              <size>
               <width>150</width>
-              <height>0</height>
+              <height>22</height>
              </size>
             </property>
             <property name="text">
@@ -138,7 +138,7 @@
           <item row="0" column="4">
            <widget class="QCheckBox" name="checkBoxBRules">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -146,7 +146,7 @@
             <property name="minimumSize">
              <size>
               <width>150</width>
-              <height>0</height>
+              <height>22</height>
              </size>
             </property>
             <property name="text">
@@ -160,7 +160,7 @@
           <item row="0" column="2">
            <widget class="QCheckBox" name="checkBoxExport">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -168,7 +168,7 @@
             <property name="minimumSize">
              <size>
               <width>150</width>
-              <height>0</height>
+              <height>22</height>
              </size>
             </property>
             <property name="text">
@@ -182,7 +182,7 @@
           <item row="1" column="2">
            <widget class="QCheckBox" name="checkBoxCameras">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -190,7 +190,7 @@
             <property name="minimumSize">
              <size>
               <width>150</width>
-              <height>0</height>
+              <height>22</height>
              </size>
             </property>
             <property name="text">
@@ -204,7 +204,7 @@
           <item row="0" column="3">
            <widget class="QCheckBox" name="checkBoxSystem">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -212,7 +212,7 @@
             <property name="minimumSize">
              <size>
               <width>150</width>
-              <height>0</height>
+              <height>22</height>
              </size>
             </property>
             <property name="text">
@@ -226,7 +226,7 @@
           <item row="1" column="1">
            <widget class="QCheckBox" name="checkBoxArchive">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -234,7 +234,7 @@
             <property name="minimumSize">
              <size>
               <width>150</width>
-              <height>0</height>
+              <height>22</height>
              </size>
             </property>
             <property name="text">
@@ -248,7 +248,7 @@
           <item row="0" column="1">
            <widget class="QCheckBox" name="checkBoxLive">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -256,7 +256,7 @@
             <property name="minimumSize">
              <size>
               <width>150</width>
-              <height>0</height>
+              <height>22</height>
              </size>
             </property>
             <property name="text">
@@ -289,7 +289,7 @@
           <item row="0" column="0">
            <widget class="QCheckBox" name="checkBoxLogin">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -297,7 +297,7 @@
             <property name="minimumSize">
              <size>
               <width>150</width>
-              <height>0</height>
+              <height>22</height>
              </size>
             </property>
             <property name="text">
@@ -311,7 +311,7 @@
           <item row="1" column="4">
            <widget class="QCheckBox" name="checkBoxEmail">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -319,7 +319,7 @@
             <property name="minimumSize">
              <size>
               <width>150</width>
-              <height>0</height>
+              <height>22</height>
              </size>
             </property>
             <property name="text">
