@@ -28,6 +28,12 @@ bool same(Iterator first, Iterator last, Getter getter, Elem* data = nullptr)
     return true;
 }
 
+template<class Container, class Getter, class Elem> inline
+bool same(const Container& container, Getter getter, Elem* data = nullptr)
+{
+    return same(container.cbegin(), container.cend(), getter, data);
+}
+
 // Returns value from getter if it is the same for all elements. Otherwise returns defaultValue.
 template<class Type, class Iterator, class Getter> inline
 Type sameValue(Iterator first, Iterator last, Getter getter, const Type& defaultValue)

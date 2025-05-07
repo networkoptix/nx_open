@@ -484,6 +484,7 @@ public:
 
     bool keepCameraTimeSettings() const;
     void setKeepCameraTimeSettings(bool value);
+    bool defaultKeepCameraTimeSettingsState() const;
 
     QString getVendor() const;
     void setVendor(const QString &value);
@@ -580,8 +581,9 @@ public:
     void setPreferredServerId(const nx::Uuid& value);
     nx::Uuid preferredServerId() const;
 
-    void setRemoteArchiveSynchronizationEnabled(bool value);
     bool isRemoteArchiveSynchronizationEnabled() const;
+    void setRemoteArchiveSynchronizationEnabled(bool value);
+    bool defaultRemoteArchiveSynchronizationState() const;
 
     /** If preferred server is not set, assigns current server as preferred. */
     void updatePreferredServerId();

@@ -145,6 +145,7 @@ public:
     static State setIoModuleVisualStyle(State state, nx::vms::api::IoModuleVisualStyle value);
     static State setCameraControlDisabled(State state, bool value);
     static State setKeepCameraTimeSettings(State state, bool value);
+    static State resetKeepCameraTimeSettingsToDefault(State state);
 
     /** User enabled or disabled dual streaming using "Expert settings". */
     static State setDualStreamingDisabled(State state, bool value);
@@ -162,6 +163,7 @@ public:
     static State setForcedPrimaryProfile(State state, const QString& value);
     static State setForcedSecondaryProfile(State state, const QString& value);
     static State setRemoteArchiveSynchronizationEnabled(State state, bool value);
+    static State resetRemoteArchiveSynchronizationToDefault(State state);
     static State setCustomMediaPortUsed(State state, bool value);
     static State setCustomMediaPort(State state, int value);
     static State setCustomWebPagePort(State state, int value);

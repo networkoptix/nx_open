@@ -730,8 +730,15 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
             setCameraControlDisabled(state.expert.cameraControlDisabled(), cameras);
         }
 
-        if (state.expert.keepCameraTimeSettings.hasValue())
+        if (state.expert.isKeepCameraTimeSettingsDefault)
+        {
+            for (const auto& camera: cameras)
+                camera->setKeepCameraTimeSettings(camera->defaultKeepCameraTimeSettingsState());
+        }
+        else if (state.expert.keepCameraTimeSettings.hasValue())
+        {
             setKeepCameraTimeSettings(state.expert.keepCameraTimeSettings(), cameras);
+        }
     }
 
     if (state.expert.dualStreamingDisabled.hasValue())
@@ -784,7 +791,15 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
     if (state.expert.forcedSecondaryProfile.hasValue())
         setForcedSecondaryProfile(state.expert.forcedSecondaryProfile(), cameras);
 
-    if (state.expert.remoteArchiveSynchronizationEnabled.hasValue())
+    if (state.expert.isRemoteArchiveSynchronizationDefault)
+    {
+        for (const auto& camera: cameras)
+        {
+            camera->setRemoteArchiveSynchronizationEnabled(
+                camera->defaultRemoteArchiveSynchronizationState());
+        }
+    }
+    else if (state.expert.remoteArchiveSynchronizationEnabled.hasValue())
     {
         setRemoteArchiveSynchronizationEnabled(
             state.expert.remoteArchiveSynchronizationEnabled(),

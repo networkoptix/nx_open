@@ -1700,14 +1700,22 @@ void QnVirtualCameraResource::setTrustCameraTime(bool value)
 
 bool QnVirtualCameraResource::keepCameraTimeSettings() const
 {
-    const bool defaultValue = !hasCameraCapabilities(nx::vms::api::DeviceCapability::remoteArchive);
     return QnLexical::deserialized<bool>(
-        getProperty(nx::vms::api::device_properties::kKeepCameraTimeSettings), defaultValue);
+        getProperty(nx::vms::api::device_properties::kKeepCameraTimeSettings),
+        defaultKeepCameraTimeSettingsState());
 }
 
 void QnVirtualCameraResource::setKeepCameraTimeSettings(bool value)
 {
-    setProperty(nx::vms::api::device_properties::kKeepCameraTimeSettings, boolToPropertyStr(value));
+    setProperty(nx::vms::api::device_properties::kKeepCameraTimeSettings,
+        value == defaultKeepCameraTimeSettingsState()
+            ? QString()
+            : boolToPropertyStr(value));
+}
+
+bool QnVirtualCameraResource::defaultKeepCameraTimeSettingsState() const
+{
+    return !hasCameraCapabilities(nx::vms::api::DeviceCapability::remoteArchive);
 }
 
 QString QnVirtualCameraResource::getVendor() const
@@ -1770,18 +1778,28 @@ nx::Uuid QnVirtualCameraResource::preferredServerId() const
     return m_userAttributes.preferredServerId;
 }
 
+bool QnVirtualCameraResource::isRemoteArchiveSynchronizationEnabled() const
+{
+    if (!hasCameraCapabilities(nx::vms::api::DeviceCapability::remoteArchive))
+        return false;
+
+    return QnLexical::deserialized<bool>(
+        getProperty(nx::vms::api::device_properties::kRemoteArchiveSynchronizationEnabled),
+        defaultRemoteArchiveSynchronizationState());
+}
+
 void QnVirtualCameraResource::setRemoteArchiveSynchronizationEnabled(bool value)
 {
+    if (!hasCameraCapabilities(nx::vms::api::DeviceCapability::remoteArchive))
+        return;
+
     const auto stored = QnLexical::serialized(value);
     setProperty(nx::vms::api::device_properties::kRemoteArchiveSynchronizationEnabled, stored);
 }
 
-bool QnVirtualCameraResource::isRemoteArchiveSynchronizationEnabled() const
+bool QnVirtualCameraResource::defaultRemoteArchiveSynchronizationState() const
 {
-    const bool defaultValue = hasCameraCapabilities(nx::vms::api::DeviceCapability::remoteArchive);
-    return QnLexical::deserialized<bool>(
-        getProperty(nx::vms::api::device_properties::kRemoteArchiveSynchronizationEnabled),
-        defaultValue);
+    return hasCameraCapabilities(nx::vms::api::DeviceCapability::remoteArchive);
 }
 
 void QnVirtualCameraResource::updatePreferredServerId()

@@ -450,10 +450,23 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     // Hide certain fields for RTSP/HTTP links.
     const bool isNetworkLink = state.isSingleCamera() && state.singleCameraProperties.networkLink;
     ui->timeSettingsGroupBox->setHidden(!state.settingsOptimizationEnabled || isNetworkLink);
-    check_box_utils::setupTristateCheckbox(ui->keepCameraTimeSettingsCheckBox,
-        state.expert.keepCameraTimeSettings.hasValue() || !state.settingsOptimizationEnabled,
-        !state.settingsOptimizationEnabled
-            || state.expert.keepCameraTimeSettings.valueOr(true));
+
+    if (state.expert.isKeepCameraTimeSettingsDefault)
+    {
+        ui->keepCameraTimeSettingsCheckBox->setCheckState(
+            !state.expert.defaultKeepCameraTimeSettingsState.has_value()
+                ? Qt::PartiallyChecked
+                : state.expert.defaultKeepCameraTimeSettingsState.value()
+                    ? Qt::Checked
+                    : Qt::Unchecked);
+    }
+    else
+    {
+        check_box_utils::setupTristateCheckbox(ui->keepCameraTimeSettingsCheckBox,
+            state.expert.keepCameraTimeSettings.hasValue() || !state.settingsOptimizationEnabled,
+            !state.settingsOptimizationEnabled
+                || state.expert.keepCameraTimeSettings.valueOr(true));
+    }
 
     check_box_utils::setupTristateCheckbox(ui->bitratePerGopCheckBox,
         state.expert.useBitratePerGOP);

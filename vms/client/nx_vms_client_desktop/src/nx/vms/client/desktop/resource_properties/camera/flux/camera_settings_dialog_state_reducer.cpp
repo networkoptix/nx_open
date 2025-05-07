@@ -464,7 +464,7 @@ bool isDefaultExpertSettings(const State& state)
             return false;
         }
 
-        if (!state.expert.keepCameraTimeSettings.valueOr(false))
+        if (!state.expert.isKeepCameraTimeSettingsDefault)
             return false;
     }
 
@@ -518,25 +518,8 @@ bool isDefaultExpertSettings(const State& state)
     if (!state.expert.forcedSecondaryProfile.valueOr({}).isEmpty())
         return false;
 
-    {
-        const std::optional<bool> allCamerasHaveCapability =
-            [&]() -> std::optional<bool>
-            {
-                if (state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::All)
-                    return true;
-                if (state.devicesDescription.hasRemoteArchiveCapability == CombinedValue::None)
-                    return false;
-                return std::nullopt;
-            }();
-        const std::optional<bool> settingEnabledForAllCameras =
-            state.expert.remoteArchiveSynchronizationEnabled;
-
-        // The default value for the setting is to be the same as the camera capability. We ignore
-        // the case where both sides of the condition are nullopt, because that means that each
-        // camera should be checked individually, but we cannot do that here.
-        if (allCamerasHaveCapability != settingEnabledForAllCameras)
-            return false;
-    }
+    if (!state.expert.isRemoteArchiveSynchronizationDefault)
+        return false;
 
     return state.expert.rtpTransportType.hasValue()
         && state.expert.rtpTransportType() == vms::api::RtpTransportType::automatic;
@@ -982,6 +965,46 @@ State loadSingleCameraProperties(
     return state;
 }
 
+void initDefaultStates(
+    const QnVirtualCameraResourceList& cameras,
+	std::function<bool(const Camera&)> defaultStateGetter,
+	std::function<bool(const Camera&)> stateGetter,
+    bool* isDefault,
+    std::optional<bool>* defaultState)
+{
+    *isDefault =
+        std::all_of(cameras.begin(), cameras.end(),
+            [defaultStateGetter, stateGetter](const auto& camera)
+            {
+                return defaultStateGetter(camera) == stateGetter(camera);
+            });
+
+    defaultState->reset();
+    for (const auto& camera: cameras)
+    {
+        if (!defaultState->has_value())
+        {
+            *defaultState = defaultStateGetter(camera);
+        }
+        else if (defaultState->value())
+        {
+            if (!defaultStateGetter(camera))
+            {
+                defaultState->reset();
+                break;
+            }
+        }
+        else // if (defaultState->value() == false)
+        {
+            if (defaultStateGetter(camera))
+            {
+                defaultState->reset();
+                break;
+            }
+        }
+    }
+}
+
 } // namespace
 
 State CameraSettingsDialogStateReducer::setSelectedTab(State state, CameraSettingsTab value)
@@ -1407,6 +1430,13 @@ State CameraSettingsDialogStateReducer::loadCameras(
         cameras,
         [](const Camera& camera) { return camera->keepCameraTimeSettings(); });
 
+    initDefaultStates(
+        cameras,
+        [](const Camera& camera) { return camera->defaultKeepCameraTimeSettingsState(); },
+        [](const Camera& camera) { return camera->keepCameraTimeSettings(); },
+        &state.expert.isKeepCameraTimeSettingsDefault,
+        &state.expert.defaultKeepCameraTimeSettingsState);
+
     fetchFromCameras<bool>(state.expert.useBitratePerGOP, cameras,
         [](const Camera& camera) { return camera->useBitratePerGop(); });
 
@@ -1452,6 +1482,13 @@ State CameraSettingsDialogStateReducer::loadCameras(
         {
             return camera->isRemoteArchiveSynchronizationEnabled();
         });
+
+    initDefaultStates(
+        cameras,
+        [](const Camera& camera) { return camera->defaultRemoteArchiveSynchronizationState(); },
+        [](const Camera& camera) { return camera->isRemoteArchiveSynchronizationEnabled(); },
+        &state.expert.isRemoteArchiveSynchronizationDefault,
+        &state.expert.defaultRemoteArchiveSynchronizationState);
 
     if (state.expert.areOnvifSettingsApplicable)
     {
@@ -2458,20 +2495,56 @@ State CameraSettingsDialogStateReducer::setCameraControlDisabled(State state, bo
 }
 
 CameraSettingsDialogStateReducer::State
-    CameraSettingsDialogStateReducer::setKeepCameraTimeSettings(State state, bool value)
+    CameraSettingsDialogStateReducer::setKeepCameraTimeSettings(
+        State state, bool value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
     if (!state.settingsOptimizationEnabled)
         return state;
 
+    state.expert.isKeepCameraTimeSettingsDefault =
+        (state.expert.defaultKeepCameraTimeSettingsState == value);
+
     state.expert.keepCameraTimeSettings.setUser(value);
+
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
 
+    NX_ASSERT(state.expert.keepCameraTimeSettings.hasValue());
     state.expertAlerts.setFlag(State::ExpertAlert::timeSettingsChangedWarning,
-        value && state.expert.remoteArchiveSynchronizationEnabled.valueOr(false));
+        state.expert.keepCameraTimeSettings.valueOr(true)
+        && state.expert.remoteArchiveSynchronizationEnabled.valueOr(true));
     state.expertAlerts.setFlag(State::ExpertAlert::importVideoChangedWarning, false);
+
+    return state;
+}
+
+CameraSettingsDialogStateReducer::State
+    CameraSettingsDialogStateReducer::resetKeepCameraTimeSettingsToDefault(State state)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__);
+
+    if (!state.settingsOptimizationEnabled)
+        return state;
+
+    state.expert.isKeepCameraTimeSettingsDefault = true;
+
+    if (!state.expert.defaultKeepCameraTimeSettingsState.has_value())
+    {
+        state.expert.keepCameraTimeSettings.resetUser();
+    }
+    else
+    {
+        state.expert.keepCameraTimeSettings.setUser(
+            state.expert.defaultKeepCameraTimeSettingsState.value());
+    }
+
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+
+    state.expertAlerts.setFlag(State::ExpertAlert::importVideoChangedWarning, false);
+    state.expertAlerts.setFlag(State::ExpertAlert::timeSettingsChangedWarning, false);
 
     return state;
 }
@@ -2637,17 +2710,55 @@ State CameraSettingsDialogStateReducer::setForcedSecondaryProfile(
 }
 
 State CameraSettingsDialogStateReducer::setRemoteArchiveSynchronizationEnabled(
-    State state,
-    bool value)
+    State state, bool value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1", __func__);
 
+    if (!state.expert.defaultRemoteArchiveSynchronizationState.has_value())
+    {
+        state.expert.isRemoteArchiveSynchronizationDefault = false;
+    }
+    else
+    {
+        state.expert.isRemoteArchiveSynchronizationDefault =
+            state.expert.defaultRemoteArchiveSynchronizationState.value() == value;
+    }
+
     state.expert.remoteArchiveSynchronizationEnabled.setUser(value);
+
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
 
+    NX_ASSERT(state.expert.remoteArchiveSynchronizationEnabled.hasValue());
     state.expertAlerts.setFlag(State::ExpertAlert::importVideoChangedWarning,
-        value && state.expert.keepCameraTimeSettings.valueOr(false));
+        state.expert.remoteArchiveSynchronizationEnabled.valueOr(true)
+        && state.expert.keepCameraTimeSettings.valueOr(true));
+    state.expertAlerts.setFlag(State::ExpertAlert::timeSettingsChangedWarning, false);
+
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::resetRemoteArchiveSynchronizationToDefault(State state)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1", __func__);
+
+    state.expert.isRemoteArchiveSynchronizationDefault = true;
+
+    if (!state.expert.defaultRemoteArchiveSynchronizationState.has_value())
+    {
+        state.expert.remoteArchiveSynchronizationEnabled.resetBase();
+        state.expert.remoteArchiveSynchronizationEnabled.resetUser();
+    }
+    else
+    {
+        state.expert.remoteArchiveSynchronizationEnabled.setUser(
+            state.expert.defaultRemoteArchiveSynchronizationState.value());
+    }
+
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+
+    state.expertAlerts.setFlag(State::ExpertAlert::importVideoChangedWarning, false);
     state.expertAlerts.setFlag(State::ExpertAlert::timeSettingsChangedWarning, false);
 
     return state;
@@ -2772,7 +2883,7 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
         return state;
 
     state = setCameraControlDisabled(std::move(state), false);
-    state = setKeepCameraTimeSettings(std::move(state), true);
+    state = resetKeepCameraTimeSettingsToDefault(std::move(state));
     state = setDualStreamingDisabled(std::move(state), false);
     state = setUseBitratePerGOP(std::move(state), false);
     state = setUseMedia2ToFetchProfiles(std::move(state), UsingOnvifMedia2Type::autoSelect);
@@ -2786,7 +2897,7 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setRtpTransportType(std::move(state), nx::vms::api::RtpTransportType::automatic);
     state = setForcedPrimaryProfile(std::move(state), QString());
     state = setForcedSecondaryProfile(std::move(state), QString());
-    state = setRemoteArchiveSynchronizationEnabled(std::move(state), false);
+    state = resetRemoteArchiveSynchronizationToDefault(std::move(state));
     state = setCustomWebPagePort(std::move(state), 0);
     state = setCustomMediaPortUsed(std::move(state), false);
     state = setTrustCameraTime(std::move(state), false);

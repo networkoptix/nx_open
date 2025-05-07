@@ -317,7 +317,12 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     {
         UserEditableMultiple<bool> dualStreamingDisabled;
         UserEditableMultiple<bool> cameraControlDisabled;
+
         UserEditableMultiple<bool> keepCameraTimeSettings;
+        bool isKeepCameraTimeSettingsDefault = false;
+        // If it is not set, it means that selected cameras have different default values.
+        std::optional<bool> defaultKeepCameraTimeSettingsState;
+
         UserEditableMultiple<bool> useBitratePerGOP;
         UserEditableMultiple<nx::core::resource::UsingOnvifMedia2Type> useMedia2ToFetchProfiles;
         UserEditableMultiple<bool> primaryRecordingDisabled;
@@ -341,7 +346,10 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         UserEditableMultiple<QString> forcedPrimaryProfile;
         UserEditableMultiple<QString> forcedSecondaryProfile;
         nx::vms::api::DeviceProfiles availableProfiles;
+
         UserEditableMultiple<bool> remoteArchiveSynchronizationEnabled;
+        bool isRemoteArchiveSynchronizationDefault = false;
+        std::optional<bool> defaultRemoteArchiveSynchronizationState;
     };
     ExpertSettings expert;
     bool isDefaultExpertSettings = false;

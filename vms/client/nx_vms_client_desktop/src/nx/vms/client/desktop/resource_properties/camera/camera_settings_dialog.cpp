@@ -93,6 +93,7 @@ struct CameraSettingsDialog::Private: public QObject
     QPointer<nx::vms::license::CamLicenseUsageHelper> licenseUsageHelper;
     QPointer<CameraAdvancedParamsWidget> advancedSettingsWidget;
     QPointer<CameraMotionSettingsWidget> motionSettingsWidget;
+    QPointer<CameraExpertSettingsWidget> cameraExpertSettingsWidget;
     QPointer<DeviceAgentSettingsAdapter> deviceAgentSettingsAdapter;
     QPointer<FisheyePreviewController> fisheyePreviewController;
     QPointer<QPushButton> fixupScheduleButton;
@@ -400,9 +401,10 @@ CameraSettingsDialog::CameraSettingsDialog(SystemContext* systemContext, QWidget
             ? tr("Integrations")
             : tr("Plugins"));
 
+    d->cameraExpertSettingsWidget = new CameraExpertSettingsWidget(d->store, ui->tabWidget);
     GenericTabbedDialog::addPage(
         int(CameraSettingsTab::expert),
-        new CameraExpertSettingsWidget(d->store, ui->tabWidget),
+        d->cameraExpertSettingsWidget,
         tr("Expert"));
 
     autoResizePagesToContents(ui->tabWidget, QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred),
