@@ -16,9 +16,16 @@ class QRhi;
 
 namespace nx::media {
 
-class VideoApiDecoderData {
+class VideoApiDecoderData
+{
 public:
+    VideoApiDecoderData(QRhi* rhi): m_rhi(rhi) {}
     virtual ~VideoApiDecoderData() = default;
+
+    QRhi* rhi() const { return m_rhi; }
+
+private:
+    QRhi* const m_rhi;
 };
 
 class VideoApiRegistry

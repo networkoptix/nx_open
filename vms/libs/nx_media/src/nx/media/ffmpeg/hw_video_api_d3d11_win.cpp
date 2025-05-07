@@ -196,8 +196,10 @@ private:
 
 class DecoderData: public VideoApiDecoderData
 {
+    using base_type = VideoApiDecoderData;
+
 public:
-    DecoderData(QRhi* rhi): m_texturePool(rhi)
+    DecoderData(QRhi* rhi): base_type(rhi), m_texturePool(rhi)
     {
     }
 
@@ -320,6 +322,7 @@ public:
         {
             m_sharedTexture = decoderData->copyFrameTexture(
                 avDeviceCtx, ffmpegTex, index, frameSize);
+            m_rhi = decoderData->rhi();
         }
         catch (const _com_error& e)
         {
@@ -351,6 +354,9 @@ public:
         if (!m_sharedTexture)
             return {};
 
+        if (&rhi != m_rhi)
+            return {};
+
         std::unique_ptr<VideoFrameTextures> textures(new VideoFrameTextures(m_sharedTexture));
 
         const QVideoFrameFormat frameFormat = format();
@@ -378,6 +384,7 @@ public:
 
 private:
     const AVFrame* m_frame = nullptr;
+    QRhi* m_rhi = nullptr;
     std::shared_ptr<SharedTexture> m_sharedTexture;
 };
 
