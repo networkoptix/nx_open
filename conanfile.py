@@ -171,7 +171,7 @@ class NxOpenConan(ConanFile):
             self.tool_requires("openjdk-jre/17.0.12" "#ceed4d8b4fdfbd3f680688f67488dc27")
 
     def requirements(self):
-        self.requires("cpptrace/0.8.2" "#97f96d31753c909e5c0822c91841fdc2")
+        self.requires("cpptrace/0.8.3" "#336ded531d0cad8ec579eb05079591e0")
         self.requires("libsrtp/2.6.0" "#248ee72d7d91db948f5651b7fe4905ea")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#cf9c0c761f39805e5a258dc39daff2bd")

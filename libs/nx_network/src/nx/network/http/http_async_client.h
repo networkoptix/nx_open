@@ -24,6 +24,8 @@
 
 namespace nx::network::http {
 
+class HarEntry;
+
 /**
  * Accumulates HTTP client options. Should be used to provide HTTP options in classes that use
  * nx::network::http::AsyncClient internaly without providing direct access to it.
@@ -431,6 +433,7 @@ private:
     nx::Buffer m_responseMessageBody;
     std::unique_ptr<AbstractStreamSocket> m_socket;
     std::unique_ptr<AsyncMessagePipeline> m_messagePipeline;
+    std::unique_ptr<HarEntry> m_harEntry;
     nx::utils::Url m_requestUrl;
     nx::utils::Url m_contentLocationUrl;
     bool m_authorizationTried = false;

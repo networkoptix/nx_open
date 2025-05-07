@@ -33,6 +33,7 @@ extern "C" {
 #include <nx/media/decoder_registrar.h>
 #include <nx/media/media_fwd.h>
 #include <nx/media/video_decoder_registry.h>
+#include <nx/network/http/log/har.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/ios_device_info.h>
@@ -278,6 +279,16 @@ bool initializeLogging(const QnMobileClientStartupParameters& startupParameters)
     return true;
 }
 
+static void initializeNetworkLogging()
+{
+    if (QString harFile = nx::mobile_client::ini().harFile; !harFile.isEmpty())
+    {
+        nx::network::http::Har::instance()->setFileName(
+            QDir(nx::kit::IniConfig::iniFilesDir()).absoluteFilePath(harFile));
+        NX_INFO(NX_SCOPE_TAG, "HAR logging is enabled: %1", harFile);
+    }
+}
+
 void processStartupParams(const QnMobileClientStartupParameters& startupParameters)
 {
     if (startupParameters.url.isValid())
@@ -348,6 +359,7 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
 
     ini().reload();
     bool loggingIsInitialized = initializeLogging(startupParams);
+    initializeNetworkLogging(); //< Should be initialized before ApplicationContext.
 
     QnMobileClientSettings settings;
     const auto applicationContext = std::make_unique<mobile::ApplicationContext>(startupParams);

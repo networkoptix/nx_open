@@ -12,6 +12,8 @@ struct Ini: public nx::kit::IniConfig
     Ini(): IniConfig("mobile_client.ini") {}
 
     NX_INI_STRING("", logFile, "Path without .log. If empty, log goes to mobile_client.log next to this .ini, or Android logcat.");
+    NX_INI_STRING("", harFile, "Path to HAR file. If empty, HAR logging is disabled. "
+        "The file will be created in the same directory as this .ini file.");
     NX_INI_FLAG(0, enableLog, "Enable mobile_client log (DEBUG2 level by default) as defined by logFile.");
     NX_INI_STRING("", logLevel, "Overrides (if defined) log level passed via command line.");
     NX_INI_FLAG(0, execAtGlThreadOnBeforeSynchronizing, "Connect lambda execution to the event.");

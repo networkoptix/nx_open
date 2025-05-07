@@ -32,6 +32,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
+#include <nx/network/http/log/har.h>
 #include <nx/p2p/p2p_ini.h>
 #include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/external_resources.h>
@@ -508,6 +509,19 @@ struct ApplicationContext::Private
                 qApp->applicationFilePath()));
     }
 
+    void initializeNetworkLogging()
+    {
+        const auto logDir =
+            QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/log";
+
+        if (QString harFile = ini().harFile; !harFile.isEmpty())
+        {
+            nx::network::http::Har::instance()->setFileName(
+                QDir(logDir).absoluteFilePath(harFile));
+            NX_INFO(NX_SCOPE_TAG, "HAR logging is enabled: %1", harFile);
+        }
+    }
+
     void initializePlatformAbstraction()
     {
         platformAbstraction = std::make_unique<QnPlatformAbstraction>();
@@ -744,6 +758,7 @@ ApplicationContext::ApplicationContext(
         {
             d->initializeStateModules();
             d->initializeLogging(startupParameters); //< Depends on state modules.
+            d->initializeNetworkLogging();
             initializeTranslations(coreSettings()->locale());
             d->initializePlatformAbstraction();
             d->performanceMonitor = std::make_unique<PerformanceMonitor>();

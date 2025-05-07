@@ -3,6 +3,7 @@
 #include "http_async_client.h"
 
 #include <nx/network/buffered_stream_socket.h>
+#include <nx/network/http/log/har.h>
 #include <nx/network/nx_network_ini.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/socket_global.h>
@@ -321,6 +322,8 @@ const std::unique_ptr<AbstractStreamSocket>& AsyncClient::socket()
 std::unique_ptr<AbstractStreamSocket> AsyncClient::takeSocket()
 {
     NX_ASSERT(isInSelfAioThread());
+
+    m_harEntry.reset();
 
     if (m_socket)
     {
@@ -648,6 +651,18 @@ void AsyncClient::doRequest(
     if (m_customRequestPrepareFunc)
         m_customRequestPrepareFunc(&m_request);
 
+    m_harEntry = Har::instance()->log();
+    if (m_harEntry)
+    {
+        m_harEntry->setRequest(
+            method,
+            url.toString(),
+            m_request.headers);
+
+        if (method == Method::post || method == Method::put)
+            m_harEntry->setRequestBody(m_request.messageBody);
+    }
+
     initiateHttpMessageDelivery();
 }
 
@@ -708,6 +723,11 @@ std::unique_ptr<AbstractMsgBodySource> AsyncClient::takeResponseBodySource()
         m_contentLocationUrl);
 
     m_state = State::sDone;
+    if (m_harEntry)
+    {
+        m_harEntry->setError("Taken");
+        m_harEntry.reset();
+    }
 
     // Removing this from "connection closed" event receivers.
     m_messagePipeline->removeCloseHandler(m_closeHandlerId);
@@ -751,6 +771,14 @@ void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
         m_contentLocationUrl, proxyEndpoint() ? " via proxy " + proxyEndpoint()->toString() : "",
         errorCode);
 
+    if (m_harEntry)
+    {
+        m_harEntry->markConnectDone();
+        m_harEntry->setServerAddress(
+            m_socket->getForeignAddress().address.toString(),
+            m_socket->getForeignAddress().port);
+    }
+
     initializeMessagePipeline();
 
     if (errorCode == SystemError::noError)
@@ -785,6 +813,15 @@ void AsyncClient::reportConnectionFailure(SystemError::ErrorCode err)
 {
     m_lastSysErrorCode = err;
 
+    if (m_harEntry)
+    {
+        auto errorText = SystemError::toString(err);
+        if (errorText.empty())
+            errorText = nx::format("Connection failed with unknown error %1", err).toStdString();
+        m_harEntry->setError(errorText);
+        m_harEntry.reset();
+    }
+
     m_state = State::sFailed;
     if (emitDone() != Result::proceed)
         return;
@@ -799,8 +836,16 @@ void AsyncClient::onRequestSent(SystemError::ErrorCode errorCode)
     {
         NX_DEBUG(this, "Error sending (1) HTTP request to %1. %2",
             m_contentLocationUrl, SystemError::toString(errorCode));
+        if (m_harEntry)
+        {
+            m_harEntry->setError(SystemError::toString(errorCode));
+            m_harEntry.reset();
+        }
         return;
     }
+
+    if (m_harEntry)
+        m_harEntry->markRequestSent();
 
     NX_VERBOSE(this, "Request has been successfully sent to %1 from %2. %3",
         m_contentLocationUrl, m_messagePipeline->socket()->getLocalAddress(),
@@ -855,6 +900,11 @@ void AsyncClient::onMessageReceived(Message message)
         NX_DEBUG(this, "Received unexpected message of type %1 from %2 while expecting response! "
             "Ignoring...", message.type, m_contentLocationUrl);
         m_state = State::sFailed;
+        if (m_harEntry)
+        {
+            m_harEntry->setError("Unexpected message type");
+            m_harEntry.reset();
+        }
         emitDone();
         return;
     }
@@ -868,6 +918,11 @@ void AsyncClient::onMessageReceived(Message message)
     if (isMalformed(*m_response.response))
     {
         m_state = State::sFailed;
+        if (m_harEntry)
+        {
+            m_harEntry->setError("Malformed response");
+            m_harEntry.reset();
+        }
         emitDone();
         return;
     }
@@ -885,6 +940,13 @@ void AsyncClient::onMessageReceived(Message message)
         {
             responseText += ", body: " + m_response.response->messageBody.toString();
         }
+    }
+
+    if (m_harEntry)
+    {
+        m_harEntry->setResponseHeaders(
+            m_response.response->statusLine,
+            m_response.response->headers);
     }
 
     NX_VERBOSE(this, "Response headers from %1 has been successfully read: %2",
@@ -949,6 +1011,12 @@ void AsyncClient::onMessageEnd()
 
     m_state = State::sDone;
 
+    if (m_harEntry)
+    {
+        m_harEntry->setResponseBody(m_responseMessageBody);
+        m_harEntry.reset();
+    }
+
     const auto handlerInvokationResult = emitDone();
     if (handlerInvokationResult != Result::proceed)
         return;
@@ -965,6 +1033,12 @@ void AsyncClient::onConnectionClosed(SystemError::ErrorCode errorCode)
         toString(m_state), m_contentLocationUrl, SystemError::toString(errorCode));
 
     m_lastSysErrorCode = errorCode;
+
+    if (m_harEntry)
+    {
+        m_harEntry->setError(SystemError::toString(errorCode));
+        m_harEntry.reset();
+    }
 
     if (m_state == State::sDone)
         return;
@@ -1145,6 +1219,8 @@ void AsyncClient::initiateTcpConnection()
         return post([this, err = SystemError::getLastOSErrorCode()]() { asyncConnectDone(err); });
 
     m_state = State::sWaitingConnectToHost;
+    if (m_harEntry)
+        m_harEntry->markConnectStart();
 
     m_socket->connectAsync(
         remoteAddress,

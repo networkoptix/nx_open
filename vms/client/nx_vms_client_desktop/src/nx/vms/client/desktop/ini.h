@@ -239,6 +239,10 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "Fields can be combined using space, comma or any other separator."
     );
 
+    NX_INI_STRING("", harFile,
+        "[Dev] Path to HAR file. If empty, HAR logging is disabled. "
+        "The file will be created in the same directory as log files.");
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.
