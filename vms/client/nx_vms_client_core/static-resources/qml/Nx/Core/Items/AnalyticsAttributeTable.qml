@@ -2,25 +2,17 @@
 
 import Nx.Core.Controls
 
-import nx.vms.client.desktop.analytics as Analytics
+import nx.vms.client.core.analytics
 
 /**
  * A name-value table accepting a list of `nx::vms::client::core::analytics::Attribute` as items.
  */
 NameValueTable
 {
-    property alias /*list<DisplayedAttribute>*/ attributes: attributeFilter.attributes
-    property alias /*AttributeDisplayManager*/ attributeManager: attributeFilter.manager
-    property alias /*bool*/ filter: attributeFilter.filter
-    property alias /*bool*/ sort: attributeFilter.sort
+    property list<DisplayedAttribute> attributes
 
-    items: attributeFilter.displayedAttributes
+    items: attributes
     nameRole: "displayedName"
     valuesRole: "displayedValues"
     colorsRole: "colorValues"
-
-    Analytics.AttributeFilter
-    {
-        id: attributeFilter
-    }
 }

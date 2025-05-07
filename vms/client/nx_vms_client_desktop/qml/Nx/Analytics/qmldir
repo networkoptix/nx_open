@@ -1,5 +1,6 @@
 module Nx.Analytics
 
+AnalyticsAttributeTable 1.0 AnalyticsAttributeTable.qml
 AnalyticsEventSelector 1.0 AnalyticsEventSelector.qml
 AnalyticsFilters 1.0 AnalyticsFilters.qml
 GenericTypeSelector 1.0 GenericTypeSelector.qml

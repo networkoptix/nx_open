@@ -3,9 +3,9 @@
 import QtQuick
 import QtQuick.Layouts
 
+import Nx.Analytics
 import Nx.Core
 import Nx.Core.Controls
-import Nx.Core.Items
 import Nx.Controls
 import Nx.Effects
 import Nx.Items

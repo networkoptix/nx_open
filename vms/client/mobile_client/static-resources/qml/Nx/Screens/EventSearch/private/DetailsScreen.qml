@@ -312,16 +312,17 @@ Page
                 visible: !!text
             }
 
-            NameValueTable
+            AnalyticsAttributeTable
             {
                 width: parent.width
+
+                attributes: d.accessor.getData(currentEventIndex, "analyticsAttributes") ?? []
 
                 nameFont.pixelSize: 16
                 nameColor: ColorTheme.colors.light16
                 valueFont.pixelSize: 16
                 valueColor: ColorTheme.colors.light4
                 valueFont.weight: Font.Medium
-                items: d.accessor.getData(currentEventIndex, "attributes") ?? []
             }
         }
     }
