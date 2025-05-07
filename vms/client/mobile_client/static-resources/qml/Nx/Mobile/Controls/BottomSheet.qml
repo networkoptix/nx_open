@@ -27,7 +27,7 @@ BaseBottomSheet
             id: titleTextItem
 
             anchors.verticalCenter: parent.verticalCenter
-            width: parent.width - customArea.width
+            width: parent.width - customArea.width - spacing
             font.pixelSize: 24
             font.weight: 500
             color: ColorTheme.colors.light4

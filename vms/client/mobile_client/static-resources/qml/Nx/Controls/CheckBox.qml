@@ -24,7 +24,7 @@ CheckBox
 
         text: control.text
         font: control.font
-        color: ColorTheme.colors.brand_contrast
+        color: ColorTheme.colors.light16
         elide: Text.ElideRight
         visible: control.text
         horizontalAlignment: Text.AlignLeft
@@ -37,10 +37,10 @@ CheckBox
         anchors.verticalCenter: parent.verticalCenter
         removeBorderWhenChecked: false
         checked: control.checked
-        color: ColorTheme.colors.dark5
+        color: ColorTheme.colors.dark13
         checkColor: ColorTheme.colors.brand_core
         checkedColor: ColorTheme.colors.dark7
-        backgroundColor: ColorTheme.colors.dark9
+        backgroundColor: ColorTheme.colors.dark11
         borderWidth: 1
         lineWidth: 1.5
         checkMarkScale: 1.2

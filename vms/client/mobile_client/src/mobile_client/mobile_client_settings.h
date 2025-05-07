@@ -59,6 +59,7 @@ public:
         UseMaxHardwareDecodersCount,
 
         EnableSoftwareDecoderFallback,
+        ShowHowShareWorksNotification,
 
         VariableCount
     };
@@ -89,6 +90,11 @@ private:
             bool,
             showCameraInfo, setShowCameraInfo,
             ShowCameraInfo, false)
+        QN_DECLARE_RW_PROPERTY(bool,
+            showHowShareWorksNotification,
+            setShowHowShareWorksNotification,
+            ShowHowShareWorksNotification,
+            true)
         QN_DECLARE_RW_PROPERTY(
             bool,
             liveVideoPreviews, setLiveVideoPreviews,

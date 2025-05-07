@@ -65,6 +65,9 @@ QmlSettingsAdaptor::QmlSettingsAdaptor(QObject* parent):
                 case QnMobileClientSettings::ShowCameraInfo:
                     emit showCameraInfoChanged();
 
+                case QnMobileClientSettings::ShowHowShareWorksNotification:
+                    emit showHowShareWorksNotificationChanged();
+
                 default:
                     break;
             }
@@ -218,6 +221,17 @@ bool QmlSettingsAdaptor::showCameraInfo() const
 void QmlSettingsAdaptor::setShowCameraInfo(bool value)
 {
     qnSettings->setShowCameraInfo(value);
+    qnSettings->save();
+}
+
+bool QmlSettingsAdaptor::showHowShareWorksNotification() const
+{
+    return qnSettings->showHowShareWorksNotification();
+}
+
+void QmlSettingsAdaptor::setShowHowShareWorksNotification(bool value)
+{
+    qnSettings->setShowHowShareWorksNotification(value);
     qnSettings->save();
 }
 

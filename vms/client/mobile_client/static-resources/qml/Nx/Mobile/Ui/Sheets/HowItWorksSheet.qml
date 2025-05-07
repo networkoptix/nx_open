@@ -3,6 +3,7 @@
 import QtQuick
 
 import Nx.Core
+import Nx.Controls
 import Nx.Mobile.Controls
 
 BottomSheet
@@ -10,7 +11,8 @@ BottomSheet
     id: control
 
     property alias description: descriptionTextItem.text
-    property string continueButtonText
+    property alias doNotShowAgain: doNotShowAgainCheckBox.checked
+    property string continueButtonText: qsTr("Continue")
     title: qsTr("How it works")
 
     signal cancelled()
@@ -25,6 +27,14 @@ BottomSheet
 
         font.pixelSize: 16
         color: ColorTheme.colors.light10
+    }
+
+    CheckBox
+    {
+        id: doNotShowAgainCheckBox
+
+        width: parent.width
+        text: qsTr("Do not show this window again")
     }
 
     ButtonBox

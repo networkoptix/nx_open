@@ -15,9 +15,29 @@ BottomSheet
     property bool isAnalyticsItemMode: false
     property ShareBookmarkBackend backend
 
+    signal showHowItWorks()
+
     title: isAnalyticsItemMode
         ? qsTr("New Bookmark")
         : d.kShareOptionTextString
+
+
+    IconButton
+    {
+        id: infoButton
+
+        parent: sheet.titleCustomArea
+        padding: 0
+        icon.source: "image://skin/20x20/Solid/info.svg?primary=light10"
+        icon.width: 20
+        icon.height: icon.width
+
+        onClicked:
+        {
+            sheet.close()
+            sheet.showHowItWorks()
+        }
+    }
 
     TextInput
     {

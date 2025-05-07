@@ -70,6 +70,11 @@ class QmlSettingsAdaptor: public QObject
         WRITE setShowCameraInfo
         NOTIFY showCameraInfoChanged)
 
+    Q_PROPERTY(bool showHowShareWorksNotification
+        READ showHowShareWorksNotification
+        WRITE setShowHowShareWorksNotification
+        NOTIFY showHowShareWorksNotificationChanged)
+
     // Beta features.
     Q_PROPERTY(bool enableHolePunching
         READ enableHolePunching
@@ -131,6 +136,9 @@ public:
     bool showCameraInfo() const;
     void setShowCameraInfo(bool value);
 
+    bool showHowShareWorksNotification() const;
+    void setShowHowShareWorksNotification(bool value);
+
     bool useVideoDownloadFeature() const;
     void setUseVideoDownloadFeature(bool value);
 
@@ -153,6 +161,7 @@ signals:
     void localeChanged();
     void serverTimeModeChanged();
     void showCameraInfoChanged();
+    void showHowShareWorksNotificationChanged();
     void useVideoDownloadFeatureChanged();
     void useMaxHardwareDecodersCountChanged();
     void enableSoftwareDecoderFallbackChanged();

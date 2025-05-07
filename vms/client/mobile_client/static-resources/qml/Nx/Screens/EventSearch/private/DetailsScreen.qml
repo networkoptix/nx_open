@@ -15,6 +15,7 @@ import Nx.Mobile.Controls as MobileControls
 import Nx.Mobile.Ui.Sheets
 import Nx.Models
 import Nx.Screens
+import Nx.Settings
 import Nx.Ui
 
 import nx.vms.client.core
@@ -68,9 +69,31 @@ Page
 
                 modelIndex: eventSearchModel.index(currentEventIndex, 0)
             }
+
+            onShowHowItWorks: howItWorksSheet.open()
         }
 
-        onClicked: shareBookmarkSheet.open()
+        HowItWorksSheet
+        {
+            id: howItWorksSheet
+
+            description: qsTr("Sharing opens the new bookmark dialog to generate a playback link" +
+                " after setting the sharing options")
+            doNotShowAgain: !appContext.settings.showHowshareWorksNotification
+            onContinued:
+            {
+                appContext.settings.showHowShareWorksNotification = !doNotShowAgain
+                shareBookmarkSheet.open()
+            }
+        }
+
+        onClicked:
+        {
+            if (appContext.settings.showHowShareWorksNotification)
+                howItWorksSheet.open()
+            else
+                shareBookmarkSheet.open()
+        }
     }
 
     toolBar.contentItem.clip: false
