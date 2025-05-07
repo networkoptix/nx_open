@@ -3,6 +3,7 @@
 import QtQuick
 
 import Nx.Controls
+import Nx.Core
 import Nx.Core.Controls
 import Nx.Mobile.Controls
 
@@ -10,17 +11,19 @@ Row
 {
     id: control
 
-    property string secretValue
+    property bool hasSecretValue: true
     property alias backgroundMode: textInput.backgroundMode
     property alias labelText: textInput.labelText
     property alias text: textInput.text
 
     spacing: 8
 
-    function resetState()
+    function resetState(hasSecretValue)
     {
-        textInput.clear()
-        textInput.text = secretValue
+        control.hasSecretValue = hasSecretValue
+        textInput.text = hasSecretValue
+            ? d.kMaskText
+            : ""
     }
 
     TextInput
@@ -28,23 +31,22 @@ Row
         id: textInput
 
         property bool maskedMode: true
-
-        showActionButton: !control.secretValue && textInput.focus && textInput.text
+        passwordCharacter: "*"
+        showActionButton: !control.hasSecretValue && textInput.focus && textInput.text
         actionButtonImage.sourcePath: maskedMode
             ? "image://skin/20x20/Outline/eye_closed.svg?primary=light10"
             : "image://skin/20x20/Outline/eye_open.svg?primary=light10"
         actionButtonImage.sourceSize: Qt.size(20, 20)
         actionButtonAction: () => { maskedMode = !maskedMode }
-        echoMode: control.secretValue || maskedMode
+        echoMode: control.hasSecretValue || maskedMode
             ? TextInput.Password
             : TextInput.Normal
-
+        text: d.kMaskText
         width: parent.width - (clearSecretButton.visible ? clearSecretButton.width + control.spacing : 0)
-        text: control.secretValue
 
         onActiveFocusChanged:
         {
-            if (activeFocus && control.secretValue.length)
+            if (activeFocus && !control.hasSecretValue)
                 textInput.selectAll()
         }
 
@@ -52,22 +54,17 @@ Row
             (event)=>
             {
                 // Clear "secret" on any valuable input.
-                if (event.text.length > 0 && control.secretValue.length)
-                {
-                    control.secretValue = ""
-                    textInput.clear()
-                }
+                if (event.text.length > 0 && control.hasSecretValue)
+                    control.resetState(/*hasSecretValue*/ false)
             }
     }
-
-    onSecretValueChanged: textInput.text = control.secretValue
 
     // TODO #ynikitenkov Add Nx.Mobile.IconButton
     Rectangle
     {
         id: clearSecretButton
 
-        visible: control.secretValue.length
+        visible: control.hasSecretValue
         color: textInput.background.color
         width: 56
         height: 56
@@ -85,8 +82,7 @@ Row
             anchors.fill: parent
             onClicked:
             {
-                control.secretValue = ""
-                textInput.clear()
+                control.resetState(/*hasSecretValue*/ false)
                 textInput.forceActiveFocus()
             }
         }
@@ -98,5 +94,12 @@ Row
             mouseArea: mouseArea
             rippleColor: "transparent"
         }
+    }
+
+    NxObject
+    {
+        id: d
+
+        readonly property string kMaskText: "*************"
     }
 }

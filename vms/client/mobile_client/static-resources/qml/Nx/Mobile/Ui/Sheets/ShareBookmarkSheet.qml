@@ -108,7 +108,6 @@ BottomSheet
         enabled: enableSharingToggle.checkState === Qt.Checked
 
         labelText: qsTr("Protect with Password (optional)")
-        secretValue: backend.bookmarkDigest
     }
 
     ButtonBox
@@ -147,8 +146,8 @@ BottomSheet
                         backend.bookmarkName = bookmarkNameInput.text
                         backend.bookmarkDescription = bookmarkDescriptionTextArea.text
 
-                        const bookmarkPassword = sharePasswordInput.secretValue
-                            ? sharePasswordInput.secretValue
+                        const bookmarkPassword = sharePasswordInput.hasSecretValue
+                            ? backend.bookmarkDigest
                             : sharePasswordInput.text
                         backend.share(
                             lifetimeComboBox.model[lifetimeComboBox.currentIndex].expires,
@@ -194,8 +193,7 @@ BottomSheet
         lifetimeComboBox.model = expiresInModel
         lifetimeComboBox.currentIndex = currentIndex
 
-        sharePasswordInput.secretValue = backend.bookmarkDigest;
-        sharePasswordInput.resetState()
+        sharePasswordInput.resetState(/*hasSecretValue*/ !!backend.bookmarkDigest);
     }
 
     NxObject
