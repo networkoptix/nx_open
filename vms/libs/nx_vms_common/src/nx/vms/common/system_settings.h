@@ -618,6 +618,7 @@ signals:
     void cloudPollingIntervalChanged();
     void allowRegisteringIntegrationsChanged();
     void lastMergeIdChanged();
+    void insecureDeprecatedAuthEnabledChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;

@@ -164,6 +164,17 @@ struct LdapSettingsWidget::Private
                 mergeUpdate(localizedSettings(q->globalSettings()));
             });
 
+        connect(parent->globalSettings(),
+            &common::SystemSettings::insecureDeprecatedAuthEnabledChanged,
+            q,
+            [this]()
+            {
+                auto state = LdapState::objectToState(quickWidget->rootObject());
+                state.insecureAuthEnabledBySiteSettings =
+                    q->globalSettings()->isInsecureDeprecatedAuthEnabled();
+                LdapState::stateToObject(state, quickWidget->rootObject());
+            });
+
         connect(q->systemContext()->ldapStatusWatcher(), &LdapStatusWatcher::refreshFinished, q,
             [this]() { handleLdapStatusUpdate(); });
     }

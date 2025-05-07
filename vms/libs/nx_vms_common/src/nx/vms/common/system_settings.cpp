@@ -1306,6 +1306,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         &SystemSettings::allowRegisteringIntegrationsChanged,
         Qt::QueuedConnection);
 
+    connect(
+        d->insecureDeprecatedAuthEnabledAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::insecureDeprecatedAuthEnabledChanged,
+        Qt::DirectConnection);
+
     AdaptorList result;
     result
         << d->systemNameAdaptor
