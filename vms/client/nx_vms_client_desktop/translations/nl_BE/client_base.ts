@@ -8869,22 +8869,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Exporteer</translation>
     </message>
     <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 zijn momenteel in gebruik</numerusform>
-        <numerusform>%1 zijn momenteel in gebruik</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Ten minste %1 zijn vereist</numerusform>
-        <numerusform>Ten minste %1 zijn vereist</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation>
         <numerusform>%n resterende deactiveringen.</numerusform>
@@ -8909,6 +8893,22 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Remove</source>
       <translation>Verwijderen</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 zijn momenteel in gebruik</numerusform>
+        <numerusform>%1 zijn momenteel in gebruik</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>Ten minste %1 zijn vereist</numerusform>
+        <numerusform>Ten minste %1 zijn vereist</numerusform>
+      </translation>
     </message>
   </context>
   <context>

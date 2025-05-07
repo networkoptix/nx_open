@@ -9136,26 +9136,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Eksportuj</translation>
     </message>
     <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 jest aktualnie w użyciu</numerusform>
-        <numerusform>%1 są aktualnie w użyciu</numerusform>
-        <numerusform>%1 jest aktualnie w użyciu</numerusform>
-        <numerusform>%1 jest aktualnie w użyciu</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Przynajmniej %1 jest wymagana</numerusform>
-        <numerusform>Przynajmniej %1 są wymagane</numerusform>
-        <numerusform>Przynajmniej %1 jest wymaganych</numerusform>
-        <numerusform>Przynajmniej %1 jest wymaganych</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation>
         <numerusform>Pozostała %n dezaktywacja.</numerusform>
@@ -9184,6 +9164,26 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Remove</source>
       <translation>Usuń</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 jest aktualnie w użyciu</numerusform>
+        <numerusform>%1 są aktualnie w użyciu</numerusform>
+        <numerusform>%1 jest aktualnie w użyciu</numerusform>
+        <numerusform>%1 jest aktualnie w użyciu</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>Przynajmniej %1 jest wymagana</numerusform>
+        <numerusform>Przynajmniej %1 są wymagane</numerusform>
+        <numerusform>Przynajmniej %1 jest wymaganych</numerusform>
+        <numerusform>Przynajmniej %1 jest wymaganych</numerusform>
+      </translation>
     </message>
   </context>
   <context>

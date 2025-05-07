@@ -2046,7 +2046,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
-      <translation type="unfinished">Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</translation>
+      <translation>Lưu ý: Tính năng cải thiện hình ảnh không khả dụng khi Giải mã video bằng phần cứng được bật.</translation>
     </message>
   </context>
   <context>
@@ -6684,15 +6684,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the site should be in active state. %1</translation>
+      <translation>Để thực hiện sao lưu vào bộ lưu trữ đám mây, Chi nhánh phải ở trạng thái hoạt động. %1</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>Sao lưu đám mây vẫn tiếp tục, nhưng Chi nhánh hiện đang bị tạm dừng. Phải kích hoạt để sửa đổi cài đặt &quot;Cái gì cần sao lưu&quot; và &quot;Chất lượng&quot; cho thiết bị hoặc để bật sao lưu đám mây. Bạn cũng có thể tắt nó. %1</translation>
     </message>
     <message>
       <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
-      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
+      <translation>Số lượng thiết bị được chọn để sao lưu vượt quá các dịch vụ khả dụng. Thêm các dịch vụ bổ sung hoặc giảm số lượng thiết bị được cấu hình để sao lưu. Vào %1, Chi nhánh sẽ tự động giới hạn số lượng thiết bị được sao lưu để phù hợp với các dịch vụ khả dụng</translation>
     </message>
   </context>
   <context>
@@ -8735,20 +8735,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Xuất</translation>
     </message>
     <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 hiện đang được sử dụng</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Cần có tối thiểu %1</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation>
         <numerusform>%n số lần hủy kích hoạt còn lại.</numerusform>
@@ -8771,6 +8757,20 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Remove</source>
       <translation>Gỡ bỏ</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 hiện đang được sử dụng</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>Cần có tối thiểu %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -11366,7 +11366,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Channel Partner user</source>
-      <translation type="unfinished">Channel Partner user</translation>
+      <translation>Người dùng Đối tác kênh</translation>
     </message>
   </context>
   <context>
@@ -12107,7 +12107,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>In progress...</source>
-      <translation type="unfinished">In progress...</translation>
+      <translation>Đang tiến hành...</translation>
     </message>
   </context>
   <context>

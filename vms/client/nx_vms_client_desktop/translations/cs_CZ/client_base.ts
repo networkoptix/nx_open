@@ -9137,26 +9137,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Export</translation>
     </message>
     <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 jsou aktuálně používány</numerusform>
-        <numerusform>%1 jsou aktuálně používány</numerusform>
-        <numerusform>%1 jsou aktuálně používány</numerusform>
-        <numerusform>%1 jsou aktuálně používány</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Alespoň %1 jsou požadovány</numerusform>
-        <numerusform>Alespoň %1 jsou požadovány</numerusform>
-        <numerusform>Alespoň %1 jsou požadovány</numerusform>
-        <numerusform>Alespoň %1 jsou požadovány</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation>
         <numerusform>Zbývá %n deaktivací.</numerusform>
@@ -9185,6 +9165,26 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>Remove</source>
       <translation>Odstranit</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 jsou aktuálně používány</numerusform>
+        <numerusform>%1 jsou aktuálně používány</numerusform>
+        <numerusform>%1 jsou aktuálně používány</numerusform>
+        <numerusform>%1 jsou aktuálně používány</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>Alespoň %1 jsou požadovány</numerusform>
+        <numerusform>Alespoň %1 jsou požadovány</numerusform>
+        <numerusform>Alespoň %1 jsou požadovány</numerusform>
+        <numerusform>Alespoň %1 jsou požadovány</numerusform>
+      </translation>
     </message>
   </context>
   <context>

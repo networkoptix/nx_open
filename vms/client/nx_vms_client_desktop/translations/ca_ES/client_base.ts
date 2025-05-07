@@ -8869,22 +8869,6 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
       <translation>Exporta</translation>
     </message>
     <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 estan actualment en ús</numerusform>
-        <numerusform>%1 estan actualment en ús</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Es requereixen almenys %1</numerusform>
-        <numerusform>Es requereixen almenys %1</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation>
         <numerusform>%n desactivacions restants.</numerusform>
@@ -8909,6 +8893,22 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message>
       <source>Remove</source>
       <translation>Suprimeix</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 estan actualment en ús</numerusform>
+        <numerusform>%1 estan actualment en ús</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>Es requereixen almenys %1</numerusform>
+        <numerusform>Es requereixen almenys %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>

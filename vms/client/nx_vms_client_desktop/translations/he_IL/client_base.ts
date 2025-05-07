@@ -9137,26 +9137,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>יצא</translation>
     </message>
     <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
-        <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
-        <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
-        <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>לפחות %1 נדרשים</numerusform>
-        <numerusform>לפחות %1 נדרשים</numerusform>
-        <numerusform>לפחות %1 נדרשים</numerusform>
-        <numerusform>לפחות %1 נדרשים</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation>
         <numerusform>נותרו %n ביטולים.</numerusform>
@@ -9185,6 +9165,26 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Remove</source>
       <translation>הסרה</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
+        <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
+        <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
+        <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>לפחות %1 נדרשים</numerusform>
+        <numerusform>לפחות %1 נדרשים</numerusform>
+        <numerusform>לפחות %1 נדרשים</numerusform>
+        <numerusform>לפחות %1 נדרשים</numerusform>
+      </translation>
     </message>
   </context>
   <context>

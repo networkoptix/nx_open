@@ -8735,20 +8735,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>내보내기</translation>
     </message>
     <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1는(가) 현재 사용 중 입니다</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>적어도 %1 개가 필요합니다</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation>
         <numerusform>비활성화 %n개 남음</numerusform>
@@ -8771,6 +8757,20 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Remove</source>
       <translation>제거</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1는(가) 현재 사용 중 입니다</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>적어도 %1 개가 필요합니다</numerusform>
+      </translation>
     </message>
   </context>
   <context>

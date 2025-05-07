@@ -19,7 +19,7 @@
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>Thông tin ứng dụng</translation>
     </message>
   </context>
   <context>
@@ -491,7 +491,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>Hiệu suất cao</translation>
+      <translation>Hiệu suất</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -810,11 +810,11 @@
     </message>
     <message>
       <source>Performance</source>
-      <translation>Hiệu suất cao</translation>
+      <translation>Hiệu suất</translation>
     </message>
     <message>
       <source>AppInfo</source>
-      <translation type="unfinished">AppInfo</translation>
+      <translation>Thông tin ứng dụng</translation>
     </message>
   </context>
   <context>
@@ -911,11 +911,11 @@
     </message>
     <message>
       <source>SUSPENDED</source>
-      <translation type="unfinished">SUSPENDED</translation>
+      <translation>ĐÌNH CHỈ</translation>
     </message>
     <message>
       <source>SHUTDOWN</source>
-      <translation type="unfinished">SHUTDOWN</translation>
+      <translation>TẮT</translation>
     </message>
   </context>
   <context>

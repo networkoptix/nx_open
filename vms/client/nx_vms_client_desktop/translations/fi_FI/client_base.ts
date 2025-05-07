@@ -8869,22 +8869,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <translation>Vie</translation>
     </message>
     <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 ovat käytössä</numerusform>
-        <numerusform>%1 ovat käytössä</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Tarvitaan vähintään %1</numerusform>
-        <numerusform>Tarvitaan vähintään %1</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation type="unfinished">
         <numerusform>%n deactivations remaining.</numerusform>
@@ -8909,6 +8893,22 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>Remove</source>
       <translation>Poista</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 ovat käytössä</numerusform>
+        <numerusform>%1 ovat käytössä</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>Tarvitaan vähintään %1</numerusform>
+        <numerusform>Tarvitaan vähintään %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>

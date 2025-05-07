@@ -8736,20 +8736,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>エクスポート</translation>
     </message>
     <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 を使用中</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>少なくとも %1 が必要です</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation>
         <numerusform>残り無効化回数は %n 回です。</numerusform>
@@ -8772,6 +8758,20 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Remove</source>
       <translation>削除</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 を使用中</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>少なくとも %1 が必要です</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -11367,7 +11367,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Channel Partner user</source>
-      <translation type="unfinished">Channel Partner user</translation>
+      <translation>チャネルパートナーのユーザー</translation>
     </message>
   </context>
   <context>

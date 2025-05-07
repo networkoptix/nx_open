@@ -8868,22 +8868,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Dışa Aktar</translation>
     </message>
     <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 şu anda kullanımda</numerusform>
-        <numerusform>%1 şu anda kullanımda</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Için en az %1 gerekli</numerusform>
-        <numerusform>Için en az %1 gerekli</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation>
         <numerusform>%n deaktivasyon kaldı.</numerusform>
@@ -8908,6 +8892,22 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Remove</source>
       <translation>Kaldır</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 şu anda kullanımda</numerusform>
+        <numerusform>%1 şu anda kullanımda</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>Için en az %1 gerekli</numerusform>
+        <numerusform>Için en az %1 gerekli</numerusform>
+      </translation>
     </message>
   </context>
   <context>

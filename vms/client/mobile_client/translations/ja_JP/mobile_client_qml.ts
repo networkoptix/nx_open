@@ -19,7 +19,7 @@
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>アプリ情報</translation>
     </message>
   </context>
   <context>
@@ -491,7 +491,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>パフォーマンス優先</translation>
+      <translation>パフォーマンス</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -810,11 +810,11 @@
     </message>
     <message>
       <source>Performance</source>
-      <translation>パフォーマンス優先</translation>
+      <translation>パフォーマンス</translation>
     </message>
     <message>
       <source>AppInfo</source>
-      <translation type="unfinished">AppInfo</translation>
+      <translation>アプリ情報</translation>
     </message>
   </context>
   <context>
@@ -911,11 +911,11 @@
     </message>
     <message>
       <source>SUSPENDED</source>
-      <translation type="unfinished">SUSPENDED</translation>
+      <translation>サスペンド</translation>
     </message>
     <message>
       <source>SHUTDOWN</source>
-      <translation type="unfinished">SHUTDOWN</translation>
+      <translation>シャットダウン</translation>
     </message>
   </context>
   <context>

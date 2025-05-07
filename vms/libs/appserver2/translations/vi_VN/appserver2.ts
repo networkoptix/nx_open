@@ -337,7 +337,7 @@
     </message>
     <message>
       <source>It is forbidden to change Server deployment code</source>
-      <translation type="unfinished">It is forbidden to change Server deployment code</translation>
+      <translation>Không được phép thay đổi mã triển khai Máy chủ</translation>
     </message>
   </context>
 </TS>

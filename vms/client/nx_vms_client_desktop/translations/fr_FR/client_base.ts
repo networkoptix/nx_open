@@ -8869,22 +8869,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Exporter</translation>
     </message>
     <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 est actuellement en cours d’utilisation</numerusform>
-        <numerusform>%1 sont actuellement en cours d’utilisation</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Au moins %1 est nécessaire</numerusform>
-        <numerusform>Au moins %1 sont nécessaires</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation>
         <numerusform>%n désactivation restante.</numerusform>
@@ -8909,6 +8893,22 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Remove</source>
       <translation>Supprimer</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 est actuellement en cours d’utilisation</numerusform>
+        <numerusform>%1 sont actuellement en cours d’utilisation</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>Au moins %1 est nécessaire</numerusform>
+        <numerusform>Au moins %1 sont nécessaires</numerusform>
+      </translation>
     </message>
   </context>
   <context>

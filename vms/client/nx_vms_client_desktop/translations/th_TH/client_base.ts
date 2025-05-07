@@ -8735,20 +8735,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ส่งออก</translation>
     </message>
     <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 มีใช้อยู่ในปัจจุบัน</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>จำเป็นต้องกรอกอย่างน้อยหนึ่งหน่วย %1</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation>
         <numerusform>%n การยกเลิกการทำงานที่เหลืออยู่</numerusform>
@@ -8771,6 +8757,20 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Remove</source>
       <translation>ลบออก</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 มีใช้อยู่ในปัจจุบัน</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>จำเป็นต้องกรอกอย่างน้อยหนึ่งหน่วย %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
