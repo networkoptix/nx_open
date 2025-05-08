@@ -826,6 +826,12 @@ ApplicationContext::~ApplicationContext()
     // For now it depends on a System Context, later it will be moved to the Local System Context.
     d->desktopResourceSearcher.reset();
 
+    // Local resources context temporary implementation depends on main system context.
+    d->localResourcesContext.reset();
+
+    // Web Page icon cache uses application context.
+    d->webPageDataCache.reset();
+
     // Main system context does not exist in self-update mode.
     if (d->mainSystemContext)
     {
@@ -834,16 +840,10 @@ ApplicationContext::~ApplicationContext()
         d->mainSystemContext->setSession({});
         if (d->mainSystemContext->messageProcessor())
             d->mainSystemContext->deleteMessageProcessor();
+
+        // Remote session must be fully destroyed while application context still exists.
+        removeSystemContext(d->mainSystemContext.release());
     }
-
-    // Local resources context temporary implementation depends on main system context.
-    d->localResourcesContext.reset();
-
-    // Remote session must be fully destroyed while application context still exists.
-    removeSystemContext(d->mainSystemContext.release());
-
-    // Web Page icon cache uses application context.
-    d->webPageDataCache.reset();
 }
 
 core::SystemContext* ApplicationContext::createSystemContext(
