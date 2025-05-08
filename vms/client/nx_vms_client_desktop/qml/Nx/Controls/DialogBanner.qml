@@ -39,6 +39,7 @@ Rectangle
                     "color": ColorTheme.colors.light4,
                     "background": ColorTheme.colors.dark10,
                     "icon": "image://skin/20x20/Solid/info.svg",
+                    "iconColor": ColorTheme.colors.blue_l,
                 }
         }
     }
