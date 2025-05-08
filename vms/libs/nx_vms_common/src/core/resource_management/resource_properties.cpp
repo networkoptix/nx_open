@@ -35,6 +35,12 @@ bool QnResourcePropertyDictionary::saveParams(const nx::Uuid& resourceId)
         return true;
 
     ec2::AbstractECConnectionPtr conn = messageBusConnection();
+    if (!conn)
+    {
+        NX_WARNING(this, "%1: No connection", __func__);
+        return false;
+    }
+
     ec2::ErrorCode rez = conn->getResourceManager(nx::network::rest::kSystemSession)->saveSync(params);
 
     if (rez != ec2::ErrorCode::ok)
@@ -43,6 +49,7 @@ bool QnResourcePropertyDictionary::saveParams(const nx::Uuid& resourceId)
             resourceId, ec2::toString(rez));
         return false;
     }
+
     return true;
 }
 
