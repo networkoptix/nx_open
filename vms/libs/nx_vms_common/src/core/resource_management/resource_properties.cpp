@@ -35,14 +35,20 @@ bool QnResourcePropertyDictionary::saveParams(const nx::Uuid& resourceId)
         return true;
 
     ec2::AbstractECConnectionPtr conn = messageBusConnection();
-    ec2::ErrorCode rez = conn->getResourceManager(Qn::kSystemAccess)->saveSync(params);
+    if (!conn)
+    {
+        NX_WARNING(this, "%1: No connection", __func__);
+        return false;
+    }
 
+    ec2::ErrorCode rez = conn->getResourceManager(Qn::kSystemAccess)->saveSync(params);
     if (rez != ec2::ErrorCode::ok)
     {
         NX_WARNING(this, "Can't save resource params. Resource: %1. Error: %2",
             resourceId, ec2::toString(rez));
         return false;
     }
+
     return true;
 }
 
