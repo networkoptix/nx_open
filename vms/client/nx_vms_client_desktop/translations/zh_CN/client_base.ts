@@ -11511,6 +11511,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>This will instantly remove an access to the site for this user</source>
       <translation type="unfinished">This will instantly remove an access to the site for this user</translation>
     </message>
+    <message>
+      <source>The user with the specified email already has Administrator access via the Channel Partner</source>
+      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>

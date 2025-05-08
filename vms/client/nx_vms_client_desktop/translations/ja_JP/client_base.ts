@@ -6693,7 +6693,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
-      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
+      <translation>バックアップ対象として選択したデバイスの数が、利用可能なサービス数を超えています。サービスを追加するか、バックアップ対象のデバイス数を減らしてください。サイトは %1 に、利用可能なサービス数に合わせてバックアップ対象デバイス数を自動的に制限します。</translation>
     </message>
   </context>
   <context>
@@ -10879,11 +10879,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::ShowreelExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>キーボードの矢印キー押下でレイアウトを手動切替します。Escキー押下でシーケンシャル表示を終了します。</translation>
+      <translation>キーボードの矢印キーでレイアウトを手動切替、Escキーでシーケンシャル表示を終了</translation>
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
-      <translation>Escキー押下でツアーを停止します。</translation>
+      <translation>ツアーを停止するには、Escキーを押下してください。</translation>
     </message>
   </context>
   <context>
@@ -11514,6 +11514,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>This will instantly remove an access to the site for this user</source>
       <translation>これにより、このユーザーのサイトへのアクセス権が即座に削除されます。</translation>
+    </message>
+    <message>
+      <source>The user with the specified email already has Administrator access via the Channel Partner</source>
+      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
     </message>
   </context>
   <context>

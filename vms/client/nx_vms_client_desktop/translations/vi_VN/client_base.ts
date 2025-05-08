@@ -11514,6 +11514,10 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <source>This will instantly remove an access to the site for this user</source>
       <translation>Điều này sẽ ngay lập tức xóa quyền truy cập vào trang web của người dùng này</translation>
     </message>
+    <message>
+      <source>The user with the specified email already has Administrator access via the Channel Partner</source>
+      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>

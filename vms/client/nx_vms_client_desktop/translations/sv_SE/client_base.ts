@@ -11679,6 +11679,10 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <source>This will instantly remove an access to the site for this user</source>
       <translation>Detta kommer omedelbart att ta bort en åtkomst till platsen för denna användare</translation>
     </message>
+    <message>
+      <source>The user with the specified email already has Administrator access via the Channel Partner</source>
+      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>

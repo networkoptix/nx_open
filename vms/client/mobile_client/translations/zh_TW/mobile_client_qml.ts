@@ -174,6 +174,10 @@
       <source>Show on Camera</source>
       <translation>在攝影機上顯示</translation>
     </message>
+    <message>
+      <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
+      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+    </message>
   </context>
   <context>
     <name>DeveloperSettingsScreen</name>
@@ -333,6 +337,14 @@
     <message>
       <source>Cancel</source>
       <translation>取消</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation type="unfinished">Continue</translation>
+    </message>
+    <message>
+      <source>Do not show this window again</source>
+      <translation type="unfinished">Do not show this window again</translation>
     </message>
   </context>
   <context>
