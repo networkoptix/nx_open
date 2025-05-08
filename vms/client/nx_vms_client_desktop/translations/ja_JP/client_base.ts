@@ -11357,11 +11357,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::ShowreelExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>キーボードの矢印キー押下でレイアウトを手動切替します。Escキー押下でシーケンシャル表示を終了します。</translation>
+      <translation>キーボードの矢印キーでレイアウトを手動切替、Escキーでシーケンシャル表示を終了</translation>
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
-      <translation>Escキー押下でツアーを停止します。</translation>
+      <translation>ツアーを停止するには、Escキーを押下してください。</translation>
     </message>
   </context>
   <context>
