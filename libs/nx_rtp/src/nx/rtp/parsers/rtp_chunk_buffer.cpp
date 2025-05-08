@@ -28,7 +28,7 @@ void RtpChunkBuffer::addChunk(int bufferOffset, uint16_t size, bool nalStart)
 {
     m_chunks.emplace_back(bufferOffset, size, nalStart);
     if (nalStart)
-        m_videoFrameSize += sizeof(nx::media::nal::kNalUnitSizeLength);
+        m_videoFrameSize += nx::media::nal::kNalUnitSizeLength;
     m_videoFrameSize += size;
 }
 
