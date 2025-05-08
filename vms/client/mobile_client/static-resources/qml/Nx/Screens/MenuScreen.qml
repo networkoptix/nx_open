@@ -6,6 +6,8 @@ import Nx.Core
 import Nx.Controls
 import Nx.Ui
 
+import nx.vms.client.core
+
 Page
 {
     id: menuScreen
@@ -63,16 +65,42 @@ Page
     {
         id: disconnectButtonCustomArea
 
-        Text
+        Column
         {
             width: parent.width
-            height: 24
-            elide: Text.ElideRight
 
-            text: qsTr("Disconnect")
-            font.pixelSize: 16
-            color: ColorTheme.colors.red
-            verticalAlignment: Text.AlignVCenter
+            spacing: 12
+
+            Text
+            {
+                id: loggedAsText
+
+                width: parent.width
+                elide: Text.ElideRight
+
+                text: qsTr("Logged in as %1", "%1 is a user name")
+                    .arg(windowContext.sessionManager.isCloudSession
+                        ? cloudUserProfileWatcher.fullName
+                        : (windowContext.mainSystemContext?.userWatcher.userName ?? ""))
+                font.pixelSize: 14
+                font.weight: 400
+                color: ColorTheme.colors.light14
+            }
+
+            Text
+            {
+                id: disconnectText
+
+                width: parent.width
+                height: 24
+                elide: Text.ElideRight
+
+                text: qsTr("Disconnect")
+                font.pixelSize: 16
+                font.weight: 500
+                color: ColorTheme.colors.red
+                verticalAlignment: Text.AlignVCenter
+            }
         }
     }
 }
