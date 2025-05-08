@@ -6,6 +6,8 @@ import QtQuick.Templates as T
 import Nx.Core
 import Nx.Core.Controls
 
+import nx.vms.client.mobile
+
 import "private"
 
 // TODO #ynikitenkov Add "support text" functionality support.
@@ -70,4 +72,6 @@ T.TextField
     }
 
     onEnabledChanged: focus = false
+
+    Component.onCompleted: TextInputWorkaround.setup(control)
 }

@@ -642,7 +642,7 @@ Page
 
         function updateGestureExclusionArea()
         {
-            windowContext.windowHeleprs.setGestureExclusionArea(
+            windowContext.ui.windowHelpers.setGestureExclusionArea(
                 d.exclusionAreaY, slider.height * Screen.devicePixelRatio)
         }
 

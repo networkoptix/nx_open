@@ -37,6 +37,7 @@
 #include <nx/vms/client/mobile/utils/navigation_bar_utils.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <nx/vms/client/mobile/workaround/back_gesture_workaround.h>
+#include <nx/vms/client/mobile/workaround/text_input_workaround.h>
 #include <private/qqmlvaluetype_p.h>
 #include <resources/camera_access_rights_helper.h>
 #include <settings/qml_settings_adaptor.h>
@@ -87,6 +88,7 @@ void registerQmlTypes()
 
     qmlRegisterType<BackGestureWorkaround>(
         "Nx.Mobile", 1, 0, "Android10BackGestureWorkaround");
+    TextInputWorkaround::registerQmlType();
 
     // Ptz related classes
     qmlRegisterUncreatableType<Ptz>("Nx.Mobile", 1, 0, "Ptz",

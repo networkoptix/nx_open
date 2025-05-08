@@ -29,16 +29,23 @@ class Measurements: public QObject
         READ androidKeyboardHeight
         NOTIFY androidKeyboardHeightChanged)
 
+    Q_PROPERTY(int deviceStatusBarHeight
+        READ deviceStatusBarHeight
+        NOTIFY deviceStatusBarHeightChanged)
+
 public:
     Measurements(QQuickWindow* window, QObject* parent = nullptr);
     virtual ~Measurements() override;
 
     int androidKeyboardHeight() const;
 
+    int deviceStatusBarHeight() const;
+
     Q_INVOKABLE int getMaxTextureSize() const;
 
 signals:
     void androidKeyboardHeightChanged();
+    void deviceStatusBarHeightChanged();
 
 private:
     struct Private;

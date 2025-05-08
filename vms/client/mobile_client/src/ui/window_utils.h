@@ -23,6 +23,8 @@ void makeShortVibration();
 
 bool is24HoursTimeFormat();
 
+int statusBarHeight();
+
 /**
  * Workaround for the QTBUG-72472 - view is not changing size if there is Android WebView on the
  * scene. Also keyboard height is always 0 in this situation in Qt.

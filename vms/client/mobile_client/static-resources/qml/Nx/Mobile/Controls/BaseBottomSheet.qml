@@ -11,18 +11,31 @@ Popup
 
     default property alias data: contentColumn.data
 
-    parent: mainWindow.contentItem
+    parent: Overlay.overlay
 
-    y: mainWindow.height - height - d.keyboardHeight
-    implicitWidth: mainWindow.width
-    implicitHeight: Math.min(
-        flickable.contentHeight + control.topPadding + control.bottomPadding,
-        windowParams.availableHeight - d.keyboardHeight)
+    y: parent.height - height - d.keyboardHeight
+    width: parent.width
+    height:
+    {
+        const maxHeight = Math.min(
+            flickable.contentHeight + control.topPadding + control.bottomPadding,
+            parent.height - windowContext.ui.measurements.deviceStatusBarHeight - d.keyboardHeight)
+        return maxHeight
+    }
 
     modal: true
-    padding: 20
-    topPadding: 22
-    bottomPadding: 32
+
+    leftPadding: 0
+    rightPadding: 0
+
+    topPadding: 22 + 8
+    bottomPadding:
+    {
+        const customPadding = d.keyboardHeight > 0
+            ? 0
+            : windowParams.bottomMargin
+        return 20 + customPadding
+    }
 
     background: Item
     {
@@ -67,14 +80,58 @@ Popup
         clip: true
         contentHeight: contentColumn.height
 
-        Column
+        Item
         {
-            id: contentColumn
+            id: scrollableContent
 
-            spacing: control.spacing
+            height: contentColumn.height
             width: parent.width
+
+            Column
+            {
+                id: contentColumn
+
+                readonly property int leftPadding: 20 + windowParams.leftMargin
+                readonly property int rightPadding: 20 + windowParams.rightMargin
+
+                spacing: control.spacing
+                x: leftPadding
+                width: parent.width - leftPadding - rightPadding
+            }
+        }
+
+        readonly property Item focusedItem:
+        {
+            let item = ApplicationWindow.activeFocusControl
+            while (item && item.parent !== contentColumn)
+                item = item.parent
+
+            return item
+                ? ApplicationWindow.activeFocusControl
+                : null
+        }
+
+        onFocusedItemChanged: ensureVisible(focusedItem)
+
+        function ensureVisible(item)
+        {
+            if (!item || moving || dragging)
+                return
+
+            const ypos = item.mapToItem(contentItem, 0, 0).y
+            const ext = item.height + ypos
+            if (ypos < contentY
+                || ypos > contentY + height
+                || ext < contentY
+                || ext > contentY + height)
+            {
+                contentY = Math.max(0,
+                    Math.min(ypos - height + item.height, contentHeight - height))
+            }
         }
     }
+
+    onHeightChanged: flickable.ensureVisible(flickable.focusedItem)
 
     NxObject
     {
@@ -82,8 +139,8 @@ Popup
 
         // Temporary solution. Will be fixed properly after UI refactor.
         readonly property real keyboardHeight: Qt.platform.os === "android"
-            ? androidKeyboardHeight
-            : 0
+            ? windowContext.ui.measurements.androidKeyboardHeight
+            : (Qt.inputMethod.visible ? Qt.inputMethod.keyboardRectangle.height : 0)
 
     }
 }

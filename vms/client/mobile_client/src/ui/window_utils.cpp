@@ -25,11 +25,18 @@ QWindow *getMainWindow()
 
     void showSystemUi() {}
 
-    bool isPhone() {
+    int statusBarHeight()
+    {
+        return 0;
+    }
+
+    bool isPhone()
+    {
         return false;
     }
 
-    void setKeepScreenOn(bool keepScreenOn) {
+    void setKeepScreenOn(bool keepScreenOn)
+    {
         Q_UNUSED(keepScreenOn)
     }
 

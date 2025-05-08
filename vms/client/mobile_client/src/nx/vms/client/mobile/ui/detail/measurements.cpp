@@ -7,7 +7,6 @@
 #include <QtWidgets/QApplication>
 
 #include <nx/build_info.h>
-#include <nx/utils/guarded_callback.h>
 #include <ui/texture_size_helper.h>
 #include <ui/window_utils.h>
 #include <utils/common/delayed.h>
@@ -38,13 +37,38 @@ Measurements::Measurements(QQuickWindow* window, QObject* parent):
         connect(timer, &QTimer::timeout, timer,
             [this]()
             {
-                const int value = androidKeyboardHeight();
+                const int value = ::androidKeyboardHeight();
                 if (value == d->androidKeyboardHeight)
                     return;
 
                 d->androidKeyboardHeight = value;
                 emit androidKeyboardHeightChanged();
             });
+        timer->start();
+    }
+
+    // Device status bar height stuff.
+    const auto screen = qApp->primaryScreen();
+    connect(screen, &QScreen::orientationChanged, this,
+        [this]()
+        {
+            const auto kAnimationDelayMs = std::chrono::milliseconds(300);
+            executeDelayedParented(
+                [this]() { emit deviceStatusBarHeightChanged(); },
+                kAnimationDelayMs,
+                this);
+        });
+
+
+    if (nx::build_info::isIos())
+    {
+        /**
+         * Workaround for iOS 16.x - there are no screen orientation change update when we
+         * force rotation.
+         */
+        const auto timer = new QTimer(this);
+        timer->setInterval(std::chrono::milliseconds(500));
+        connect(timer, &QTimer::timeout, this, &Measurements::deviceStatusBarHeightChanged);
         timer->start();
     }
 }
@@ -56,6 +80,11 @@ Measurements::~Measurements()
 int Measurements::androidKeyboardHeight() const
 {
     return d->androidKeyboardHeight;
+}
+
+int Measurements::deviceStatusBarHeight() const
+{
+    return ::statusBarHeight();
 }
 
 int Measurements::getMaxTextureSize() const

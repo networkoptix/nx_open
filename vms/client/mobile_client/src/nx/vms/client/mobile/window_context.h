@@ -27,7 +27,6 @@ class SessionManager;
 class SystemContext;
 class RemoteLogManager;
 class UiController;
-class WindowHelpers;
 
 class WindowContext: public core::WindowContext
 {

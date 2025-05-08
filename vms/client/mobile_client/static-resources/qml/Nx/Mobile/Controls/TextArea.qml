@@ -5,6 +5,8 @@ import QtQuick.Controls
 
 import Nx.Core
 
+import nx.vms.client.mobile
+
 Flickable
 {
     id: control
@@ -66,6 +68,8 @@ Flickable
             else if (control.contentY <= minY) // Cursor is below bottom position.
                 control.contentY = minY
         }
+
+        Component.onCompleted: TextInputWorkaround.setup(textArea)
     }
 
     // Update bounds to avoid QTBUG-60296 when initial position of text is wrong and shifted

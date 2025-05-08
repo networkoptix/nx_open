@@ -43,7 +43,7 @@ Page
                     webView.height = Qt.binding(()=>
                     {
                         const minimalOffset = Qt.platform.os === "android"
-                            ? screen.header.height + androidKeyboardHeight
+                            ? screen.header.height + windowContext.ui.measurements.androidKeyboardHeight
                             : 0
                         return screen.height - minimalOffset
                     })

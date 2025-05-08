@@ -20,18 +20,6 @@ Controls.ApplicationWindow
     readonly property bool hasNavigationBar:
         !!windowContext.ui.windowHelpers.navigationBarSize()
 
-    // Qt bug workaround. For some reason on the new devices with iOS 12+
-    // Qt.inputMethod.visible hangs with wrong value. It is "true" even if
-    // keyboard is hidden. But Qt.inputMethod.anchorRectangle always has corret value
-    // and is presented if keyboard is visible (otherwise it is empty).
-    // So we use it as workaround in the iOS and check with "visible" property together.
-    readonly property bool inputHasAnchorRectangle: Qt.platform.os === "ios"
-        && (Qt.inputMethod.anchorRectangle.width != 0 || Qt.inputMethod.anchorRectangle.height != 0)
-    readonly property real keyboardHeight: Qt.inputMethod.visible && inputHasAnchorRectangle
-        ? Qt.inputMethod.keyboardRectangle.height
-            / (Qt.platform.os !== "ios" ? Screen.devicePixelRatio : 1)
-        : 0
-
 
     readonly property bool isPortraitLayout: width <= height
 
@@ -75,14 +63,7 @@ Controls.ApplicationWindow
 
         y: topLevelWarning.height
         width: windowParams.availableWidth
-        height: windowParams.availableHeight - keyboardHeight - screenNavigationBar.heightOffset
-
-        property real keyboardHeight: mainWindow.keyboardHeight
-        Behavior on keyboardHeight
-        {
-            enabled: Qt.platform.os === "android"
-            NumberAnimation { duration: 200; easing.type: Easing.InCubic }
-        }
+        height: windowParams.availableHeight - screenNavigationBar.heightOffset
 
         function restoreActiveFocus()
         {
