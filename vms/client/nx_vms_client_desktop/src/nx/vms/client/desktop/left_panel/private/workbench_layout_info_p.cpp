@@ -134,12 +134,12 @@ bool WorkbenchLayoutInfo::isLocked() const
 
 bool WorkbenchLayoutInfo::isPreviewSearchLayout() const
 {
-    return workbench()->currentLayoutResource()->isPreviewSearchLayout();
+    return workbench()->currentLayout()->isPreviewSearchLayout();
 }
 
 bool WorkbenchLayoutInfo::isShowreelReviewLayout() const
 {
-    return workbench()->currentLayoutResource()->isShowreelReviewLayout();
+    return workbench()->currentLayout()->isShowreelReviewLayout();
 }
 
 } // namespace nx::vms::client::desktop

@@ -6,10 +6,10 @@
 #include <core/resource/layout_item_data.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/desktop/condition/generic_condition.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 
 namespace nx::vms::client::desktop {
 
@@ -20,8 +20,8 @@ bool isRadassSupportedInternal(const common::LayoutItemData& item)
     if (!item.zoomRect.isNull())
         return false;
 
-    return isRadassSupported(
-        getResourceByDescriptor(item.resource).dynamicCast<QnVirtualCameraResource>());
+    return isRadassSupported(nx::vms::client::core::getResourceByDescriptor(
+        item.resource).dynamicCast<QnVirtualCameraResource>());
 }
 
 } // namespace

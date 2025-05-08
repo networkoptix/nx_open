@@ -7,11 +7,11 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/core/system_context.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
-CrossSystemServerResource::CrossSystemServerResource(core::SystemContext* systemContext)
+CrossSystemServerResource::CrossSystemServerResource(SystemContext* systemContext)
 {
     NX_CRITICAL(systemContext);
 
@@ -23,7 +23,7 @@ CrossSystemServerResource::CrossSystemServerResource(core::SystemContext* system
 CrossSystemServerResource::CrossSystemServerResource(
     const nx::Uuid& id,
     nx::network::SocketAddress endpoint,
-    core::SystemContext* systemContext)
+    SystemContext* systemContext)
 {
     NX_CRITICAL(systemContext);
 
@@ -47,4 +47,4 @@ QString CrossSystemServerResource::rtspUrl() const
         .toUrl().toString();
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

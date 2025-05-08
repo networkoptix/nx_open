@@ -16,9 +16,6 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
-#include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
-#include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
@@ -38,7 +35,6 @@ public:
     Qn::Permissions permissionsForCamera(const QnVirtualCameraResourcePtr& camera) const;
     Qn::Permissions permissionsForFileLayout(const QnFileLayoutResourcePtr& layout) const;
     Qn::Permissions permissionsForRemoteLayout(const LayoutResourcePtr& layout) const;
-    Qn::Permissions permissionsForCloudLayout(const CrossSystemLayoutResourcePtr& layout) const;
     Qn::Permissions permissionsForUser(const QnUserResourcePtr& user) const;
 
 private:
@@ -97,19 +93,8 @@ Qn::Permissions AccessController::calculatePermissions(const QnResourcePtr& targ
     if (const auto archive = targetResource.objectCast<QnAbstractArchiveResource>())
         return d->permissionsForArchive(archive);
 
-    if (const auto cloudLayout = targetResource.objectCast<CrossSystemLayoutResource>())
-        return d->permissionsForCloudLayout(cloudLayout);
-
-    // If a system the resource belongs to isn't connected yet, user must be able to view thumbnails
-    // with the appropriate informations.
-    if (const auto crossSystemCamera = targetResource.objectCast<CrossSystemCameraResource>())
-    {
-        const auto systemId = crossSystemCamera->systemId();
-        const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
-
-        if (context && !context->isSystemReadyToUse())
-            return Qn::ViewContentPermission;
-    }
+    if (!NX_ASSERT(!targetResource->hasFlags(Qn::cross_system)))
+        return Qn::NoPermissions;
 
     if (const auto fileLayout = targetResource.objectCast<QnFileLayoutResource>())
         return d->permissionsForFileLayout(fileLayout);
@@ -275,15 +260,6 @@ Qn::Permissions AccessController::Private::permissionsForRemoteLayout(
         return Qn::NoPermissions;
 
     return q->base_type::calculatePermissions(layout);
-}
-
-Qn::Permissions AccessController::Private::permissionsForCloudLayout(
-    const CrossSystemLayoutResourcePtr& layout) const
-{
-    // User can fully control his Cloud Layouts.
-    return layout->locked()
-        ? (Qn::FullLayoutPermissions & ~(Qn::AddRemoveItemsPermission | Qn::WriteNamePermission))
-        : Qn::FullLayoutPermissions;
 }
 
 Qn::Permissions AccessController::Private::permissionsForUser(const QnUserResourcePtr& user) const

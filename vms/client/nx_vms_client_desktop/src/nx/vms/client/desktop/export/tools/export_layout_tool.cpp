@@ -6,8 +6,8 @@
 #include <QtCore/QEventLoop>
 #include <QtCore/QTimer>
 
-#include <camera/camera_data_manager.h>
 #include <camera/client_video_camera.h>
+#include <client/client_globals.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/file_layout_resource.h>
@@ -22,12 +22,13 @@
 #include <nx/reflect/json/serializer.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/export/data/nov_metadata.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
@@ -207,7 +208,7 @@ NovMetadata ExportLayoutTool::prepareLayoutAndMetadata()
 
     for (const auto& item: d->layout->getItems())
     {
-        const auto resource = getResourceByDescriptor(item.resource);
+        const auto resource = core::getResourceByDescriptor(item.resource);
         const auto mediaResource = resource.dynamicCast<QnMediaResource>();
         // We only export video files or cameras; no still images, web pages etc.
         const bool skip = !mediaResource || resource->hasFlags(Qn::still_image);

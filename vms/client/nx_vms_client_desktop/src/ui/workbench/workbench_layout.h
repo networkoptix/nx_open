@@ -7,10 +7,10 @@
 #include <QtCore/QSet>
 #include <QtGui/QIcon>
 
-#include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
@@ -54,7 +54,7 @@ class QnWorkbenchLayout: public QObject,
 public:
     using LayoutResourcePtr = nx::vms::client::desktop::LayoutResourcePtr;
     using StreamSynchronizationState = nx::vms::client::desktop::StreamSynchronizationState;
-    static constexpr auto kDefaultCellSpacing = Qn::CellSpacing::Small;
+    static constexpr auto kDefaultCellSpacing = nx::vms::client::core::CellSpacing::Small;
 
     /**
      * @return Layout associated with the given resource, if any.

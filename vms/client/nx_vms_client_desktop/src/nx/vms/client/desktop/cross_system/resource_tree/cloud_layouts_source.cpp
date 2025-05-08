@@ -4,11 +4,10 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
+#include <nx/vms/client/core/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
-
-#include "../cloud_layouts_manager.h"
-#include "../cross_system_layout_resource.h"
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -20,14 +19,14 @@ CloudLayoutsSource::CloudLayoutsSource()
     connect(resourcePool, &QnResourcePool::resourcesAdded, this,
         [this](const QnResourceList& resources)
         {
-            for (const auto& layout: resources.filtered<CrossSystemLayoutResource>())
+            for (const auto& layout: resources.filtered<core::CrossSystemLayoutResource>())
                 emit resourceAdded(layout);
         });
 
     connect(resourcePool, &QnResourcePool::resourcesRemoved, this,
         [this](const QnResourceList& resources)
         {
-            for (const auto& layout: resources.filtered<CrossSystemLayoutResource>())
+            for (const auto& layout: resources.filtered<core::CrossSystemLayoutResource>())
                 emit resourceRemoved(layout);
         });
 }
@@ -37,7 +36,7 @@ QVector<QnResourcePtr> CloudLayoutsSource::getResources()
     const auto resourcePool = appContext()->cloudLayoutsManager()->systemContext()->resourcePool();
 
     QVector<QnResourcePtr> result;
-    for (const auto& layout: resourcePool->getResources<CrossSystemLayoutResource>())
+    for (const auto& layout: resourcePool->getResources<core::CrossSystemLayoutResource>())
         result.push_back(layout);
 
     return result;

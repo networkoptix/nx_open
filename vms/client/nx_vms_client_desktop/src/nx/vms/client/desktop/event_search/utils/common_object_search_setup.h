@@ -27,9 +27,6 @@ public:
     WindowContext* windowContext() const;
     void setWindowContext(WindowContext* value);
 
-    SystemContext* systemContext() const;
-    void setSystemContext(SystemContext* systemContext);
-
     virtual bool selectCameras(UuidSet& selectedCameras) override;
     virtual QnVirtualCameraResourcePtr currentResource() const override;
     virtual QnVirtualCameraResourceSet currentLayoutCameras() const override;

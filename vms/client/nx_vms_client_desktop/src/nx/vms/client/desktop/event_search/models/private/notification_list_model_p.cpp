@@ -14,18 +14,18 @@
 #include <nx/utils/metatypes.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/event_search/utils/event_data.h>
 #include <nx/vms/client/desktop/help/rules_help.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/menu/actions.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
@@ -174,10 +174,10 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     auto processNewSystem = [this](const QString& systemId)
     {
         connect(appContext()->cloudCrossSystemManager()->systemContext(systemId),
-            &CloudCrossSystemContext::statusChanged, this,
-            [this, systemId](CloudCrossSystemContext::Status oldStatus)
+            &core::CloudCrossSystemContext::statusChanged, this,
+            [this, systemId](core::CloudCrossSystemContext::Status oldStatus)
             {
-                if (oldStatus == CloudCrossSystemContext::Status::connected)
+                if (oldStatus == core::CloudCrossSystemContext::Status::connected)
                     removeCloudItems(systemId);
                 else
                     updateCloudItems(systemId);
@@ -187,10 +187,11 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     for (const auto& systemId: appContext()->cloudCrossSystemManager()->cloudSystems())
         processNewSystem(systemId);
 
-    connect(appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemFound,
+    connect(appContext()->cloudCrossSystemManager(), &core::CloudCrossSystemManager::systemFound,
         this, processNewSystem);
 
-    connect(appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemLost, this,
+    connect(appContext()->cloudCrossSystemManager(), &core::CloudCrossSystemManager::systemLost,
+        this,
         [this](const QString& systemId)
         {
             removeCloudItems(systemId);
@@ -335,7 +336,7 @@ void NotificationListModel::Private::onNotificationAction(
 
     if (!cloudSystemId.isEmpty())
     {
-        using Status = CloudCrossSystemContext::Status;
+        using Status = core::CloudCrossSystemContext::Status;
 
         const auto context = appContext()->cloudCrossSystemManager()->systemContext(cloudSystemId);
         const auto status = context ? context->status() : Status::uninitialized;

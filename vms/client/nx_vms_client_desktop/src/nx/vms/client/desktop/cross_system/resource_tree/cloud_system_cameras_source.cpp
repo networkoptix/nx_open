@@ -6,10 +6,10 @@
 
 #include <core/resource/camera_resource.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -24,7 +24,7 @@ struct CloudSystemCamerasSource::Private
 
     CloudSystemCamerasSource* const q;
     const QString systemId;
-    QPointer<CloudCrossSystemContext> systemContext;
+    QPointer<core::CloudCrossSystemContext> systemContext;
     nx::utils::ScopedConnections connections;
 
     void connectToContext()
@@ -36,7 +36,7 @@ struct CloudSystemCamerasSource::Private
         NX_VERBOSE(this, "Connect to %1", *systemContext);
 
         connections << QObject::connect(systemContext,
-            &CloudCrossSystemContext::camerasAdded,
+            &core::CloudCrossSystemContext::camerasAdded,
             [this](const QnVirtualCameraResourceList& cameras)
             {
                 NX_VERBOSE(this, "%1 cameras added to %2", cameras.size(), *systemContext);
@@ -50,7 +50,7 @@ struct CloudSystemCamerasSource::Private
             });
 
         connections << QObject::connect(systemContext,
-            &CloudCrossSystemContext::camerasRemoved,
+            &core::CloudCrossSystemContext::camerasRemoved,
             [this](const QnVirtualCameraResourceList& cameras)
             {
                 NX_VERBOSE(this, "%1 cameras removed from %2", cameras.size(), *systemContext);
@@ -84,7 +84,7 @@ struct CloudSystemCamerasSource::Private
 
         connections << QObject::connect(
             systemContext,
-            &CloudCrossSystemContext::statusChanged,
+            &core::CloudCrossSystemContext::statusChanged,
             handleSystemStateChanges);
 
         auto cameras = systemContext->cameras();

@@ -19,7 +19,6 @@
 #include <api/common_message_processor.h>
 #include <api/server_rest_connection.h>
 #include <camera/cam_display.h>
-#include <camera/camera_data_manager.h>
 #include <camera/resource_display.h>
 #include <client/client_globals.h>
 #include <client/client_module.h>
@@ -51,11 +50,16 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/property_storage/property.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/core/camera/recording_status_helper.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
 #include <nx/vms/client/core/media/consuming_motion_metadata_provider.h>
 #include <nx/vms/client/core/motion/motion_grid.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h> //< TODO: #sivanov Remove this dependency.
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -63,9 +67,6 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/audio_dispatcher.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
-#include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -76,7 +77,6 @@
 #include <nx/vms/client/desktop/opengl/opengl_renderer.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
@@ -365,7 +365,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
 {
     NX_ASSERT(d->mediaResource, "Media resource widget was created with a non-media resource.");
     d->isExportedLayout = layoutResource()->isFile();
-    d->isPreviewSearchLayout = layoutResource()->isPreviewSearchLayout();
+    d->isPreviewSearchLayout = isPreviewSearchLayout(layoutResource());
 
     if (d->isExportedLayout)
     {
@@ -789,7 +789,7 @@ void QnMediaResourceWidget::initStatusOverlayController()
                     processEncryptedArchiveUnlockRequst();
                     break;
                 case Qn::ResourceOverlayButton::Authorize:
-                    if (d->camera.dynamicCast<CrossSystemCameraResource>())
+                    if (d->camera.dynamicCast<nx::vms::client::core::CrossSystemCameraResource>())
                         processCloudAuthorizationRequest();
                     else
                         processAuthorizationRequest();
@@ -3144,7 +3144,7 @@ void QnMediaResourceWidget::processAuthorizationRequest()
 
 void QnMediaResourceWidget::processCloudAuthorizationRequest()
 {
-    const auto camera = d->camera.dynamicCast<CrossSystemCameraResource>();
+    const auto camera = d->camera.dynamicCast<nx::vms::client::core::CrossSystemCameraResource>();
     if (!camera)
     {
         NX_ASSERT(false, tr("Cloud authorization request should only be performed "

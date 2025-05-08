@@ -24,6 +24,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/ptz/hotkey_resource_property_adaptor.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -40,7 +41,6 @@
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_widget.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -1371,7 +1371,7 @@ void QnWorkbenchController::at_zoomTargetChanged(
     // Create new layout item inplace of existing one.
     nx::vms::common::LayoutItemData data = existing;
     data.uuid = nx::Uuid::createUuid();
-    data.resource = descriptor(resource);
+    data.resource = nx::vms::client::core::descriptor(resource);
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;

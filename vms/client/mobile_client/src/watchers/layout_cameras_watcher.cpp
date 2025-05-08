@@ -5,7 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/core/system_context_accessor.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 
 namespace nx {
 namespace client {
@@ -47,25 +47,38 @@ void LayoutCamerasWatcher::setLayout(const QnLayoutResourcePtr& layout)
     if (!layout)
         return;
 
-    for (const auto& item: layout->getItems())
-    {
-        const auto pool = layout->resourcePool();
-        if (const auto camera = pool->getResourceById<QnVirtualCameraResource>(item.resource.id))
-            addCamera(camera);
-    }
-
-    connect(layout.get(), &QnLayoutResource::itemAdded, this,
+    const auto handleItemAdded =
         [this](const QnLayoutResourcePtr& layout, const nx::vms::common::LayoutItemData& item)
         {
-            const auto pool = vms::client::core::SystemContextAccessor(layout).resourcePool();
-            const auto resourceId = item.resource.id;
-            if (const auto camera = pool->getResourceById<QnVirtualCameraResource>(resourceId))
+            if (const auto camera = nx::vms::client::core::getResourceByDescriptor(
+                item.resource).dynamicCast<QnVirtualCameraResource>())
+            {
                 addCamera(camera);
-        });
-    connect(layout.get(), &QnLayoutResource::itemRemoved, this,
+            }
+        };
+
+    const auto handleItemRemoved =
         [this](const QnLayoutResourcePtr&, const nx::vms::common::LayoutItemData& item)
         {
             removeCamera(item.resource.id);
+        };
+
+    for (const auto& item: layout->getItems())
+        handleItemAdded(layout, item);
+
+    connect(layout.get(), &QnLayoutResource::itemAdded, this, handleItemAdded);
+    connect(layout.get(), &QnLayoutResource::itemRemoved, this, handleItemRemoved);
+
+    connect(layout.get(), &QnLayoutResource::itemChanged, this,
+        [=](const QnLayoutResourcePtr&,
+            const nx::vms::common::LayoutItemData& item,
+            const nx::vms::common::LayoutItemData& oldItem)
+        {
+            if (item.resource == oldItem.resource)
+                return;
+
+            handleItemRemoved(layout, oldItem);
+            handleItemAdded(layout, item);
         });
 }
 

@@ -56,7 +56,7 @@ ObjectTrackingInstrument::ObjectTrackingInstrument(QObject* parent):
             QPointF relatedPos = calculateRelativePosition(info.scenePos, item);
             nx::vms::api::ResolutionData targetLockResolutionData{relatedPos.x(), relatedPos.y()};
 
-            auto systemContext = camera->systemContext()->as<SystemContext>();
+            auto systemContext = camera->systemContext()->as<nx::vms::client::core::SystemContext>();
 
             if (!systemContext->ioPortsInterface())
                 return;

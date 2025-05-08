@@ -72,7 +72,7 @@ void SessionManager::Private::startSession(
     resetSession();
 
     // TODO: #sivanov Make this class SystemContextAware.
-    session = Session::create(q->windowContext()->createSystemContext(),
+    session = Session::create(core::appContext()->currentSystemContext()->as<SystemContext>(),
         data,
         supposedSystemName,
         std::move(connectionCallback));
@@ -132,7 +132,6 @@ void SessionManager::Private::resetSession()
         return;
 
     session.reset();
-    q->windowContext()->deleteSystemContext(q->windowContext()->mainSystemContext());
     handleSessionChanged();
 }
 

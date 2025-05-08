@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 struct CrossSystemLayoutData;
 
-class CrossSystemLayoutResource: public LayoutResource
+class NX_VMS_CLIENT_CORE_API CrossSystemLayoutResource: public LayoutResource
 {
     Q_OBJECT
     using base_type = LayoutResource;
@@ -35,7 +35,4 @@ private:
     QString m_customGroupId;
 };
 
-using CrossSystemLayoutResourcePtr = QnSharedResourcePointer<CrossSystemLayoutResource>;
-using CrossSystemLayoutResourceList = QnSharedResourcePointerList<CrossSystemLayoutResource>;
-
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

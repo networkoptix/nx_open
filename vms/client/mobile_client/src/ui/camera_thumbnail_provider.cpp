@@ -2,29 +2,45 @@
 
 #include "camera_thumbnail_provider.h"
 
+#include <nx/utils/log/assert.h>
+
 #include "camera/thumbnail_cache_base.h"
 
-QnCameraThumbnailProvider::QnCameraThumbnailProvider()
-    : QQuickImageProvider(QQuickImageProvider::Pixmap)
-    , m_thumbnailCache(nullptr)
+QnCameraThumbnailProvider::QnCameraThumbnailProvider():
+    QQuickImageProvider(QQuickImageProvider::Pixmap)
 {
 }
 
-QPixmap QnCameraThumbnailProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize) {
-    if (!m_thumbnailCache)
-        return QPixmap();
+QPixmap QnCameraThumbnailProvider::requestPixmap(
+    const QString& id, QSize* size, const QSize& requestedSize)
+{
+    if (m_cacheById.empty())
+        return {};
 
-    QPixmap thumbnail = m_thumbnailCache->getThumbnail(id);
-    if (requestedSize.isEmpty()) {
-        *size = thumbnail.size();
-    } else {
+    const auto parts = id.split("/");
+    if (!NX_ASSERT(parts.size() == 2))
+        return {};
+
+    const auto cache = m_cacheById.value(parts[0]);
+    if (!cache)
+        return {};
+
+    QPixmap thumbnail = cache->getThumbnail(parts[1]);
+    if (!requestedSize.isEmpty())
         thumbnail = thumbnail.scaled(requestedSize, Qt::KeepAspectRatio);
-        *size = thumbnail.size();
-    }
 
+    *size = thumbnail.size();
     return thumbnail;
 }
 
-void QnCameraThumbnailProvider::setThumbnailCache(QnThumbnailCacheBase *thumbnailCache) {
-    m_thumbnailCache = thumbnailCache;
+void QnCameraThumbnailProvider::addThumbnailCache(QnThumbnailCacheBase* thumbnailCache)
+{
+    if (NX_ASSERT(thumbnailCache))
+        m_cacheById[thumbnailCache->cacheId()] = thumbnailCache;
+}
+
+void QnCameraThumbnailProvider::removeThumbnailCache(QnThumbnailCacheBase* thumbnailCache)
+{
+    if (NX_ASSERT(thumbnailCache))
+        m_cacheById.remove(thumbnailCache->cacheId());
 }

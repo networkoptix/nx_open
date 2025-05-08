@@ -6,6 +6,7 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/serialization/format.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/common/application_context.h>
 
 Q_MOC_INCLUDE("nx/vms/client/core/network/cloud_status_watcher.h")
@@ -14,6 +15,7 @@ class QQmlEngine;
 
 class QnAbstractStreamDataProvider;
 class QnClientCoreSettings;
+class QnResourcePool;
 
 namespace nx::i18n { class TranslationManager; }
 namespace nx::vms::discovery { class Manager; }
@@ -21,12 +23,13 @@ namespace nx::vms::discovery { class Manager; }
 namespace nx::vms::client::core {
 
 class ColorTheme;
+class CloudCrossSystemManager;
+class CloudLayoutsManager;
 class CloudStatusWatcher;
 class FontConfig;
 class NetworkModule;
 class Skin;
 class Settings;
-class SystemContext;
 class SystemFinder;
 class ThreadPool;
 class UnifiedResourcePool;
@@ -59,6 +62,7 @@ public:
     {
         none = 0,
         qml = 1 << 0,
+        cross_site = 1 << 1,
 
         all = -1
     };
@@ -111,8 +115,15 @@ public:
 
     /**
      * Initialize network-related modules.
+     * Not called from the constructor, should be explicitly called from descendants instead.
      */
     void initializeNetworkModules();
+
+    /**
+     * Initialize cross-system-related modules.
+     * Not called from the constructor, should be explicitly called from descendants instead.
+     */
+    void initializeCrossSystemModules();
 
     QQmlEngine* qmlEngine() const;
 
@@ -137,6 +148,9 @@ public:
      */
     UnifiedResourcePool* unifiedResourcePool() const;
 
+    virtual SystemContext* createSystemContext(
+        SystemContext::Mode mode, QObject* parent = nullptr);
+
     /**
      * Context of the System we are currently connected to. Also contains local files.
      */
@@ -155,12 +169,38 @@ public:
      */
     void addSystemContext(SystemContext* systemContext);
 
+    // Temporary workaround: needed until we have a single main SystemContext for all connections.
+    void addMainContext(SystemContext* mainContext);
+
     /**
      * Unregister existing system context before destroying.
      */
     void removeSystemContext(SystemContext* systemContext);
 
+    /**
+     * Find existing System Context by its cloud system id.
+     */
+    SystemContext* systemContextByCloudSystemId(const QString& cloudSystemId) const;
+
+    /**
+     * Monitors available Cloud Systems and manages corresponding cross-system Contexts.
+     */
+    CloudCrossSystemManager* cloudCrossSystemManager() const;
+
+    /**
+     * Monitors available Cloud Layouts.
+     */
+    CloudLayoutsManager* cloudLayoutsManager() const;
+
+    /**
+     * System context, containing Cloud Layouts.
+     */
+    SystemContext* cloudLayoutsSystemContext() const;
+    QnResourcePool* cloudLayoutsPool() const;
+
     FontConfig* fontConfig() const;
+
+    virtual nx::Uuid peerId() const;
 
     /**
      * Obtain a named thread pool.
@@ -178,9 +218,6 @@ public:
     virtual std::unique_ptr<QnAbstractStreamDataProvider> createAudioInputProvider() const;
 
     NetworkModule* networkModule() const;
-
-    // Temporary workaround: needed until we have a single main SystemContext for all connections.
-    void addMainContext(SystemContext* mainContext);
 
 signals:
     void systemContextAdded(SystemContext* systemContext);

@@ -15,8 +15,8 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
@@ -188,7 +188,7 @@ struct MimeData::Private
                 nx::vms::common::ResourceDescriptor descriptor;
                 stream >> descriptor.id >> descriptor.path >> descriptor.name;
 
-                auto resource = getResourceByDescriptor(descriptor);
+                auto resource = core::getResourceByDescriptor(descriptor);
                 if (!resource && createResourceCallback)
                     resource = createResourceCallback(descriptor);
 
@@ -241,7 +241,7 @@ struct MimeData::Private
         stream << static_cast<quint32>(resources.size());
         for (const auto& resource: resources)
         {
-            auto d = descriptor(resource);
+            auto d = core::descriptor(resource);
             stream << d.id << d.path << d.name;
         }
 

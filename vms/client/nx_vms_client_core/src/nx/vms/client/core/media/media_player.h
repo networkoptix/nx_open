@@ -26,7 +26,7 @@ class NX_VMS_CLIENT_CORE_API MediaPlayer: public nx::media::Player
 
 public:
     MediaPlayer(QObject* parent = nullptr);
-    ~MediaPlayer();
+    virtual ~MediaPlayer() override;
 
     Q_INVOKABLE void playLive();
 
@@ -43,6 +43,10 @@ signals:
     void playingChanged();
     void failedChanged();
     void noVideoStreamsChanged();
+
+protected:
+    virtual nx::network::http::Credentials connectionCredentials(
+        nx::vms::common::SystemContext* systemContext) const override;
 
 private:
     QnResource* rawResource() const;

@@ -10,9 +10,9 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/flat_map.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -238,7 +238,7 @@ QnResourceList ParameterTypes::resources(const LayoutItemIndexList& layoutItems)
             continue;
 
         common::LayoutItemData data = index.layout()->getItem(index.uuid());
-        if (auto resource = getResourceByDescriptor(data.resource))
+        if (auto resource = core::getResourceByDescriptor(data.resource))
             result.push_back(resource);
     }
 

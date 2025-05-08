@@ -7,6 +7,8 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/id.h>
 
+namespace nx::vms::client::mobile { class SystemContext; }
+
 class QnAvailableCameraListModelPrivate;
 class QnAvailableCameraListModel: public QAbstractListModel
 {
@@ -28,6 +30,10 @@ public:
     void setLayout(const QnLayoutResourcePtr& layout);
 
     QModelIndex indexByResourceId(const nx::Uuid& resourceId) const;
+
+signals:
+    void systemContextAdded(nx::vms::client::mobile::SystemContext* systemContext);
+    void systemContextRemoved(nx::vms::client::mobile::SystemContext* systemContext);
 
 protected:
     virtual bool filterAcceptsResource(const QnResourcePtr& resource) const;

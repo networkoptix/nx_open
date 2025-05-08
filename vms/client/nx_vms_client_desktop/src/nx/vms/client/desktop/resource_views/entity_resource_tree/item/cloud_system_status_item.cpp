@@ -6,11 +6,11 @@
 
 #include <client/client_globals.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/common/system_context.h>
 
@@ -21,6 +21,7 @@ namespace nx::vms::client::desktop::entity_resource_tree {
 struct CloudSystemStatusItem::Private
 {
     Q_DECLARE_TR_FUNCTIONS(CloudSystemStatusItem::Private)
+    using CloudCrossSystemContext = nx::vms::client::core::CloudCrossSystemContext;
 
 public:
     const QString systemId;
@@ -106,7 +107,7 @@ CloudSystemStatusItem::CloudSystemStatusItem(const QString& systemId):
 
     d->crossSystemContextConnection.reset(QObject::connect(
         d->crossSystemContext,
-        &CloudCrossSystemContext::statusChanged,
+        &core::CloudCrossSystemContext::statusChanged,
         notifyChanged));
 
     d->systemDescriptionConnection.reset(QObject::connect(

@@ -15,12 +15,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -261,8 +261,9 @@ bool QnWorkbenchLayout::update(const LayoutResourcePtr& resource)
         auto item = this->item(data.uuid);
         if (!item)
         {
-            if (const auto resource = getResourceByDescriptor(data.resource); resource
-                && ResourceAccessManager::hasPermissions(resource, Qn::ViewContentPermission))
+            if (const auto resource = nx::vms::client::core::getResourceByDescriptor(data.resource);
+                resource
+                    && ResourceAccessManager::hasPermissions(resource, Qn::ViewContentPermission))
             {
                 auto workbenchItem = new QnWorkbenchItem(resource, data, this);
                 // Each item must either be pinned or queued to be pinned.
@@ -908,7 +909,7 @@ QIcon QnWorkbenchLayout::calculateIcon() const
     if (d->resource->hasFlags(Qn::cross_system))
         return qnSkin->icon(kLayoutCloudIcon);
 
-    if (d->resource->isPreviewSearchLayout())
+    if (isPreviewSearchLayout())
         return qnSkin->icon(kSearchIcon);
 
     return d->resource->data(Qn::LayoutIconRole).value<QIcon>();
@@ -939,17 +940,17 @@ void QnWorkbenchLayout::centralizeItems()
 
 bool QnWorkbenchLayout::isPreviewSearchLayout() const
 {
-    return resource()->isPreviewSearchLayout();
+    return ::isPreviewSearchLayout(resource());
 }
 
 bool QnWorkbenchLayout::isShowreelReviewLayout() const
 {
-    return resource()->isShowreelReviewLayout();
+    return ::isShowreelReviewLayout(resource());
 }
 
 bool QnWorkbenchLayout::isVideoWallReviewLayout() const
 {
-    return resource()->isVideoWallReviewLayout();
+    return ::isVideoWallReviewLayout(resource());
 }
 
 QString QnWorkbenchLayout::toString() const

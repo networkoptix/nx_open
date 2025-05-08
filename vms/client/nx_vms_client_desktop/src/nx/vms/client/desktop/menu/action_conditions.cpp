@@ -4,7 +4,6 @@
 
 #include <QtGui/QAction>
 
-#include <camera/camera_data_manager.h>
 #include <camera/resource_display.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
@@ -29,18 +28,20 @@
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/client/core/camera/camera_data_manager.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/condition/generic_condition.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
-#include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
 #include <nx/vms/client/desktop/menu/action.h>
@@ -48,7 +49,6 @@
 #include <nx/vms/client/desktop/radass/radass_support.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -1332,7 +1332,7 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
         if (!item.zoomTargetUuid.isNull())
             continue;
 
-        auto resource = getResourceByDescriptor(item.resource);
+        auto resource = core::getResourceByDescriptor(item.resource);
         // Filter our non-camera items and I/O modules.
         if (auto camera = resource.dynamicCast<QnVirtualCameraResource>();
             camera && camera->hasVideo())
@@ -2407,7 +2407,7 @@ ConditionWrapper isCloudSystemConnectionUserInteractionRequired()
                 appContext()->cloudCrossSystemManager()->systemContext(systemId);
 
             return cloudContext && cloudContext->status()
-                == CloudCrossSystemContext::Status::connectionFailure;
+                == core::CloudCrossSystemContext::Status::connectionFailure;
         }
     );
 }
@@ -2600,10 +2600,10 @@ ConditionWrapper customCellSpacingIsSet()
             const auto layout = context->workbench()->currentLayout();
             const auto cellSpacing = layout->cellSpacing();
 
-            return !LayoutResource::isEqualCellSpacing(Qn::CellSpacing::None, cellSpacing)
-                && !LayoutResource::isEqualCellSpacing(Qn::CellSpacing::Small, cellSpacing)
-                && !LayoutResource::isEqualCellSpacing(Qn::CellSpacing::Medium, cellSpacing)
-                && !LayoutResource::isEqualCellSpacing(Qn::CellSpacing::Large, cellSpacing);
+            return !LayoutResource::isEqualCellSpacing(core::CellSpacing::None, cellSpacing)
+                && !LayoutResource::isEqualCellSpacing(core::CellSpacing::Small, cellSpacing)
+                && !LayoutResource::isEqualCellSpacing(core::CellSpacing::Medium, cellSpacing)
+                && !LayoutResource::isEqualCellSpacing(core::CellSpacing::Large, cellSpacing);
         });
 }
 

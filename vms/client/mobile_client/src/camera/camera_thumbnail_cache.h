@@ -12,7 +12,7 @@
 #include <nx/vms/client/mobile/system_context_aware.h>
 #include <utils/common/id.h>
 
-class QnCameraThumbnailCache: public QObject,
+class QnCameraThumbnailCache:
     public QnThumbnailCacheBase,
     public nx::vms::client::mobile::SystemContextAware
 {
@@ -32,24 +32,25 @@ public:
     };
 
     explicit QnCameraThumbnailCache(nx::vms::client::mobile::SystemContext* context,
-        QObject *parent = 0);
-    ~QnCameraThumbnailCache();
+        QObject* parent = nullptr);
+    virtual ~QnCameraThumbnailCache() override;
 
     void start();
     void stop();
 
-    virtual QPixmap getThumbnail(const QString &thumbnailId) const override;
-    QString thumbnailId(const nx::Uuid &resourceId) const;
+    virtual QString cacheId() const override;
+    virtual QPixmap getThumbnail(const QString& thumbnailId) const override;
+    QString thumbnailId(const nx::Uuid& resourceId) const;
 
-    void refreshThumbnails(const QList<nx::Uuid> &resourceIds);
-    void refreshThumbnail(const nx::Uuid &id);
+    void refreshThumbnails(const QList<nx::Uuid>& resourceIds);
+    void refreshThumbnail(const nx::Uuid& id);
 
 signals:
-    void thumbnailUpdated(const nx::Uuid &resourceId, const QString &thumbnailId);
+    void thumbnailUpdated(const nx::Uuid& resourceId, const QString& thumbnailId);
 
 private slots:
-    void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
-    void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
+    void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
+    void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
 
 private:
     mutable nx::Mutex m_mutex;
@@ -57,5 +58,5 @@ private:
     QHash<nx::Uuid, ThumbnailData> m_thumbnailByResourceId;
     QHash<QString, QPixmap> m_pixmaps;
     nx::api::CameraImageRequest m_request;
-    QThread *m_decompressThread;
+    QThread* const m_decompressThread;
 };

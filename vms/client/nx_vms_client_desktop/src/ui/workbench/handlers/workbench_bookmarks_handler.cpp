@@ -8,7 +8,6 @@
 
 #include <api/common_message_processor.h>
 #include <camera/camera_bookmarks_manager.h>
-#include <camera/camera_data_manager.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
@@ -17,6 +16,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/build_info.h>
+#include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/bookmarks/bookmark_tags_watcher.h>

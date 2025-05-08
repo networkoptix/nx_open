@@ -35,14 +35,14 @@
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/api/analytics/analytics_actions.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action.h>

@@ -6,8 +6,8 @@
 #include <core/resource/resource_media_layout.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 
 namespace nx::vms::client::desktop {
 
@@ -17,7 +17,7 @@ nx::vms::common::LayoutItemData layoutItemFromResource(
     nx::vms::common::LayoutItemData data;
 
     data.uuid = nx::Uuid::createUuid();
-    data.resource = descriptor(resource, forceCloud);
+    data.resource = core::descriptor(resource, forceCloud);
 
     if (auto mediaResource = resource.dynamicCast<QnMediaResource>())
         data.rotation = mediaResource->forcedRotation().value_or(0);
@@ -74,7 +74,7 @@ QSet<QnResourcePtr> layoutResources(const QnLayoutResourcePtr& layout)
         if (item.uuid.isNull())
             continue;
 
-        if (auto resource = getResourceByDescriptor(item.resource))
+        if (auto resource = core::getResourceByDescriptor(item.resource))
             result.insert(resource);
     }
     return result;

@@ -18,8 +18,9 @@ class QnLayoutsModel : public QSortFilterProxyModel,
 public:
     enum class ItemType
     {
-        AllCameras,
-        Layout
+        AllCameras, //< All cameras of currently connected site.
+        Layout,
+        CloudLayout
     };
     Q_ENUM(ItemType)
 

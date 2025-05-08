@@ -2,6 +2,7 @@
 
 #include "resource_access_manager.h"
 
+#include <client/client_globals.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>

@@ -2,16 +2,13 @@
 
 #pragma once
 
-#include <core/resource/client_camera.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/camera_data_ex.h>
-#include <nx/vms/common/resource/resource_descriptor.h>
+#include <nx/vms/client/core/resource/camera.h>
 
-#include "cloud_cross_system_context.h"
+namespace nx::vms::client::core {
 
-namespace nx::vms::client::desktop {
-
-class CrossSystemCameraResource: public QnClientCameraResource
+class NX_VMS_CLIENT_CORE_API CrossSystemCameraResource: public Camera
 {
     Q_OBJECT
 
@@ -26,7 +23,8 @@ public:
         const QString& systemId,
         const nx::Uuid& id,
         const QString& name);
-    ~CrossSystemCameraResource() override;
+
+    virtual ~CrossSystemCameraResource() override;
 
     void update(nx::vms::api::CameraDataEx data);
 
@@ -40,7 +38,4 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-using CrossSystemCameraResourcePtr = QnSharedResourcePointer<CrossSystemCameraResource>;
-using CrossSystemCameraResourceList = QnSharedResourcePointerList<CrossSystemCameraResource>;
-
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

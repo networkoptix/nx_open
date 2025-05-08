@@ -312,7 +312,7 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
     newState.isActive = !newState.isActive;
     contents->stateChanged(it->config, newState);
 
-    const auto systemContext = module->systemContext()->as<SystemContext>();
+    const auto systemContext = module->systemContext()->as<nx::vms::client::core::SystemContext>();
     if (!NX_ASSERT(systemContext))
         return;
 

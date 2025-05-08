@@ -3,13 +3,8 @@
 #include "cross_system_camera_resource.h"
 
 #include <nx/vms/client/core/system_finder/system_description.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
-#include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/common/system_context.h>
 
-#include "cloud_cross_system_context.h"
-
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 namespace {
 
@@ -75,7 +70,10 @@ CrossSystemCameraResource::CrossSystemCameraResource(
     addFlags(Qn::cross_system | Qn::fake);
 }
 
-CrossSystemCameraResource::~CrossSystemCameraResource() = default;
+CrossSystemCameraResource::~CrossSystemCameraResource()
+{
+    // Required here for forward-declared scoped pointer destruction.
+}
 
 void CrossSystemCameraResource::update(nx::vms::api::CameraDataEx data)
 {
@@ -147,4 +145,4 @@ const std::optional<api::CameraDataEx>& CrossSystemCameraResource::source() cons
     return d->source;
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

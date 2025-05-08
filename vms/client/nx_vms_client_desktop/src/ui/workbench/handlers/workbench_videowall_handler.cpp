@@ -41,6 +41,7 @@
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -51,7 +52,6 @@
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
@@ -237,7 +237,7 @@ public:
     {
         addFlags(Qn::local);
         setName(videowall->getName());
-        setPredefinedCellSpacing(Qn::CellSpacing::Medium);
+        setPredefinedCellSpacing(core::CellSpacing::Medium);
         setCellAspectRatio(defaultReviewAR);
         setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission | Qn::WritePermission));
         setData(Qn::VideoWallResourceRole, QVariant::fromValue(videowall));
@@ -328,7 +328,7 @@ nx::utils::Url serverUrl(const QnResourcePtr& resource)
 {
     if (const auto context = resource->systemContext())
     {
-        if (const auto connection = context->as<SystemContext>()->connection())
+        if (const auto connection = context->as<nx::vms::client::core::SystemContext>()->connection())
             return serverUrl(connection);
     }
 
@@ -2110,7 +2110,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
 void QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered()
 {
     auto layout = workbench()->currentLayoutResource();
-    if (!NX_ASSERT(layout->isVideoWallReviewLayout()))
+    if (!NX_ASSERT(isVideoWallReviewLayout(layout)))
         return;
 
     auto videowall = layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();

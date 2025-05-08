@@ -20,6 +20,7 @@ class QnTimePeriodList;
 // for tests
 class QnArchiveStreamReader;
 
+namespace nx::network::http { class Credentials; }
 namespace nx::vms::common { class SystemContext; }
 
 namespace nx::media {
@@ -349,6 +350,8 @@ signals:
 
 protected:
     virtual void setResourceInternal(const QnResourcePtr& resource);
+    virtual nx::network::http::Credentials connectionCredentials(
+        nx::vms::common::SystemContext* systemContext) const;
 
     //Function for tests.
     void testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader);

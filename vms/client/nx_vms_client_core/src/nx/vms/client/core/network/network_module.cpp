@@ -38,6 +38,8 @@ struct NetworkModule::Private
     std::unique_ptr<ServerCertificateWatcher> serverCertificateWatcher;
     std::shared_ptr<RemoteSession> session;
 
+    QPointer<SystemContext> mainSystemContext;
+
     mutable nx::Mutex mutex;
 };
 
@@ -87,8 +89,14 @@ NetworkModule::NetworkModule(
         &ApplicationContext::systemContextAdded,
         [this](SystemContext* systemContext)
         {
-            if (appContext()->systemContexts().size() != 1)
+            if ((systemContext->mode() != SystemContext::Mode::client
+                && systemContext->mode() != SystemContext::Mode::unitTests)
+                    || !NX_ASSERT(!d->mainSystemContext))
+            {
                 return;
+            }
+
+            d->mainSystemContext = systemContext;
 
             systemContext->enableNetworking(d->certificateVerifier.get());
             d->serverCertificateWatcher = std::make_unique<ServerCertificateWatcher>(
@@ -99,8 +107,10 @@ NetworkModule::NetworkModule(
         &ApplicationContext::systemContextRemoved,
         [this](SystemContext* systemContext)
         {
-            if (appContext()->systemContexts().size() != 0)
+            if (d->mainSystemContext != systemContext)
                 return;
+
+            d->mainSystemContext.clear();
 
             d->connectionFactory->setUserInteractionDelegate(nullptr);
             setSession(nullptr);

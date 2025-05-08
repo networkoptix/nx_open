@@ -23,8 +23,6 @@ namespace nx::vms::client::core { class ObjectDisplaySettings; }
 namespace nx::vms::client::desktop {
 
 class ClientStateHandler;
-class CloudCrossSystemManager;
-class CloudLayoutsManager;
 class ContextStatisticsModule;
 class FontConfig;
 class LocalSettings;
@@ -70,8 +68,7 @@ public:
     enum class FeatureFlag
     {
         none = 0,
-        cross_site = 1 << 0,
-
+        // No additional features currently.
         all = -1
     };
     Q_DECLARE_FLAGS(FeatureFlags, FeatureFlag)
@@ -115,6 +112,9 @@ public:
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
 
+    virtual core::SystemContext* createSystemContext(
+        core::SystemContext::Mode mode, QObject* parent = nullptr) override;
+
     /**
      * Version of the application. Can be overridden with command-line parameters.
      */
@@ -124,11 +124,6 @@ public:
      * Context of the System we are currently connected to. Also contains local files.
      */
     SystemContext* currentSystemContext() const;
-
-    /**
-     * Find existing System Context by it's cloud system id.
-     */
-    SystemContext* systemContextByCloudSystemId(const QString& cloudSystemId) const;
 
     /**
      * Main Window context.
@@ -160,7 +155,7 @@ public:
      *     stored persistent id and on the number of the running client instance, so different
      *     Client windows have different peer ids.
      */
-    nx::Uuid peerId() const;
+    virtual nx::Uuid peerId() const override;
 
     /**
      * @return Id of the current Video Wall instance if the client was run in the Video Wall mode.
@@ -202,22 +197,6 @@ public:
     void setSharedMemoryManager(std::unique_ptr<SharedMemoryManager> value);
 
     RunningInstancesManager* runningInstancesManager() const;
-
-    /**
-     * Monitors available Cloud Systems and manages corresponding cross-system Contexts.
-     */
-    CloudCrossSystemManager* cloudCrossSystemManager() const;
-
-    /**
-     * Monitors available Cloud Layouts.
-     */
-    CloudLayoutsManager* cloudLayoutsManager() const;
-
-    /**
-     * System context, containing Cloud Layouts.
-     */
-    SystemContext* cloudLayoutsSystemContext() const;
-    QnResourcePool* cloudLayoutsPool() const;
 
     /**
      * Monitors system resources usage: CPU, memory, GPU, etc, in its own separate thread.

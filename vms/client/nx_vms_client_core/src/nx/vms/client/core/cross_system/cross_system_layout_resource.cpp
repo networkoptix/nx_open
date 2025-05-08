@@ -2,37 +2,36 @@
 
 #include "cross_system_layout_resource.h"
 
-#include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
-#include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
+#include <nx/vms/api/data/resource_property_key.h>
+#include <nx/vms/client/core/cross_system/cross_system_layout_data.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
 
-#include "cross_system_layout_data.h"
-
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 CrossSystemLayoutResource::CrossSystemLayoutResource()
 {
     addFlags(Qn::cross_system);
 }
 
-void CrossSystemLayoutResource::update(const CrossSystemLayoutData& layoutData)
+void CrossSystemLayoutResource::update(const core::CrossSystemLayoutData& layoutData)
 {
     if (!NX_ASSERT(layoutData.id == this->getId()))
         return;
 
     CrossSystemLayoutResourcePtr copy(new CrossSystemLayoutResource());
-    fromDataToResource(layoutData, copy);
+    core::fromDataToResource(layoutData, copy);
     copy->setFlags(flags()); //< Do not update current resource flags.
     QnResource::update(copy);
 
     setProperty(
-        entity_resource_tree::resource_grouping::kCustomGroupIdPropertyKey,
+        api::resource_properties::kCustomGroupIdPropertyKey,
         layoutData.customGroupId);
 }
 
 QString CrossSystemLayoutResource::getProperty(const QString& key) const
 {
-    if (key == entity_resource_tree::resource_grouping::kCustomGroupIdPropertyKey)
+    if (key == api::resource_properties::kCustomGroupIdPropertyKey)
         return m_customGroupId;
 
     return base_type::getProperty(key);
@@ -43,7 +42,7 @@ bool CrossSystemLayoutResource::setProperty(
     const QString& value,
     bool markDirty)
 {
-    if (key == entity_resource_tree::resource_grouping::kCustomGroupIdPropertyKey)
+    if (key == api::resource_properties::kCustomGroupIdPropertyKey)
     {
         if (value.toLower() == m_customGroupId.toLower())
             return false;

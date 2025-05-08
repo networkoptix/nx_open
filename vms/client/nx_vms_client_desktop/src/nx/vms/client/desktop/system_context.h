@@ -9,7 +9,6 @@
 
 #include "system_context_aware.h" //< Forward declarations.
 
-class QnCameraDataManager;
 class QnMediaServerStatisticsManager;
 
 namespace nx::vms::client::core { class AnalyticsEventsSearchTreeBuilder; }
@@ -83,7 +82,6 @@ public:
     VideoWallOnlineScreensWatcher* videoWallOnlineScreensWatcher() const;
     LdapStatusWatcher* ldapStatusWatcher() const;
     NonEditableUsersAndGroups* nonEditableUsersAndGroups() const;
-    QnCameraDataManager* cameraDataManager() const;
     VirtualCameraManager* virtualCameraManager() const;
     ShowreelStateManager* showreelStateManager() const;
     LogsManagementWatcher* logsManagementWatcher() const;

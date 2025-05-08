@@ -64,6 +64,9 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         "[Support] Prohibits showing live analytics before the corresponding frame appears on\n"
         "the camera if the camera is playing live");
 
+    NX_INI_FLAG(0, disableChunksLoading,
+        "[Dev] Completely disable camera chunks loading to simplify memory leaks detection.");
+
     NX_INI_FLAG(false, showDebugTimeInformationInEventSearchData,
         "[Dev] Whether to show extra timestamp information in the event search data.");
 
@@ -105,7 +108,16 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(false, debugChecksEnabled,
         "[Dev] Whether to enable extra debug checks in client core code.");
-    };
+
+    NX_INI_FLAG(false, disableCrossSiteConnections,
+        "[Dev] Disable cross-site connects to simplify debug and logs collection.");
+
+    NX_INI_STRING("", cloudLayoutsEndpointOverride,
+        "[Dev] Override url to cloud layouts endpoint (e.g. \"localhost::8000\").");
+
+    NX_INI_FLAG(true, validateCloudLayouts,
+        "[Dev] Additional cloud layouts validation.");
+};
 
 NX_VMS_CLIENT_CORE_API Ini& ini();
 

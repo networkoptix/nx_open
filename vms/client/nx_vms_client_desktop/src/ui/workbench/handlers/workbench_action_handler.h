@@ -137,7 +137,7 @@ protected:
 
     void rotateItems(int degrees);
 
-    void setCurrentLayoutCellSpacing(Qn::CellSpacing spacing);
+    void setCurrentLayoutCellSpacing(core::CellSpacing spacing);
 
     QnCameraListDialog *cameraListDialog() const;
 

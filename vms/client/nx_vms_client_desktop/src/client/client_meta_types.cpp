@@ -46,7 +46,6 @@
 #include <nx/vms/client/desktop/lookup_lists/lookup_lists_dialog.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/menu/actions.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_status_helper.h>
 #include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_model_adapter.h>
@@ -181,7 +180,6 @@ void initializeMetatypesInternal()
     qRegisterMetaType<Qt::KeyboardModifiers>();
     qRegisterMetaType<QVector<QColor> >();
     qRegisterMetaType<QValidator::State>();
-    qRegisterMetaType<LayoutResourcePtr>();
     qRegisterMetaType<ResourceTree::NodeType>();
     qRegisterMetaType<Qn::ItemRole>();
     qRegisterMetaType<Qn::ItemDataRole>();
@@ -208,7 +206,6 @@ void initializeMetatypesInternal()
     qRegisterMetaType<UpdateContents>();
     qRegisterMetaType<ArchiveFrameExtractor::Result>();
     qRegisterMetaType<RecordScheduleCellData>();
-    qRegisterMetaType<QnClientCameraResource>();
 
     QMetaType::registerConverter<QVariantMap, QnTimePeriod>(variantMapToTimePeriod);
     QMetaType::registerConverter<QString, QnResourcePtr>(stringToResource);

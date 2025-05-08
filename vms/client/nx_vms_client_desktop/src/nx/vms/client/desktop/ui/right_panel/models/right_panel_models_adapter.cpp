@@ -34,6 +34,8 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/core/event_search/models/visible_item_data_decorator_model.h>
 #include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
@@ -48,8 +50,6 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/models/bookmark_search_list_model.h>
@@ -1204,11 +1204,11 @@ void RightPanelModelsAdapter::Private::initCslSupport(
         };
 
     m_modelConnections << connect(
-        appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemAboutToBeLost,
+        appContext()->cloudCrossSystemManager(), &core::CloudCrossSystemManager::systemAboutToBeLost,
         this,
         [this, setSystemContextToModels](const QString& systemId)
         {
-            CloudCrossSystemContext* crossSystemContext =
+            core::CloudCrossSystemContext* crossSystemContext =
                 appContext()->cloudCrossSystemManager()->systemContext(systemId);
 
             if (crossSystemContext->systemContext() != q->commonSetup()->systemContext())

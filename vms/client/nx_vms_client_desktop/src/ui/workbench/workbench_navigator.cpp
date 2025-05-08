@@ -16,7 +16,6 @@
 #include <camera/cam_display.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
-#include <camera/camera_data_manager.h>
 #include <camera/client_video_camera.h>
 #include <camera/resource_display.h>
 #include <client/client_runtime_settings.h>
@@ -35,6 +34,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
@@ -941,7 +941,7 @@ void QnWorkbenchNavigator::updateItemDataFromSlider(QnResourceWidget *widget) co
         Qn::ItemSliderWindowRole,
         QVariant::fromValue<QnTimePeriod>(window));
 
-    if (layout->isPreviewSearchLayout())
+    if (isPreviewSearchLayout(layout))
         return;
 
     QnTimePeriod selection;
@@ -1624,10 +1624,11 @@ bool QnWorkbenchNavigator::isCurrentWidgetSynced() const
 void QnWorkbenchNavigator::connectToContext(core::SystemContext* systemContext)
 {
     // Cloud layouts context does not have camera data.
-    if (auto cameraDataManager = systemContext->as<SystemContext>()->cameraDataManager())
+    if (auto cameraDataManager =
+        systemContext->as<nx::vms::client::core::SystemContext>()->cameraDataManager())
     {
         connect(cameraDataManager,
-            &QnCameraDataManager::periodsChanged,
+            &nx::vms::client::core::CameraDataManager::periodsChanged,
             this,
             &QnWorkbenchNavigator::updatePeriods);
     }

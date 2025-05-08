@@ -73,10 +73,14 @@ Sheet
                             if (model.itemType === QnLayoutsModel.AllCameras)
                                 return "image://skin/20x20/Solid/cameras.svg"
 
+                            if (model.itemType == QnLayoutsModel.CloudLayout)
+                                return "image://skin/20x20/Solid/layout_cloud.svg"
+
                             return model.shared
                                 ? "image://skin/20x20/Solid/layout_shared.svg"
                                 : "image://skin/20x20/Solid/layout.svg"
                         }
+
                         sourceSize: Qt.size(20, 20)
                     }
 

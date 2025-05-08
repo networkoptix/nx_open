@@ -5,8 +5,8 @@
 #include <QtGui/QAction>
 #include <QtGui/QActionGroup>
 
-#include <camera/camera_data_manager.h>
 #include <nx/vms/api/types/storage_location.h>
+#include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/camera/storage_location_camera_controller.h>
 #include <nx/vms/client/desktop/system_context.h>

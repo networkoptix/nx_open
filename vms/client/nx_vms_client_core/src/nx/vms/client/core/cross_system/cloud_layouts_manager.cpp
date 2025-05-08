@@ -2,11 +2,11 @@
 
 #include "cloud_layouts_manager.h"
 
+#include <QtCore/QDir>
 #include <QtCore/QTimer>
 
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/avi/filetypesupport.h>
-#include <core/resource/resource_directory_browser.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -25,23 +25,22 @@
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/cross_system/cross_system_layout_data.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_manager.h>
-#include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
-#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/delayed.h>
 
-#include "cross_system_layout_data.h"
 #include "cross_system_layout_resource.h"
 
 using namespace std::chrono;
 using namespace nx::network::http;
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 namespace {
 
@@ -87,9 +86,8 @@ struct CloudLayoutsManager::Private
     CloudLayoutsManager* const q;
     QPointer<core::CloudStatusWatcher> cloudStatusWatcher = appContext()->cloudStatusWatcher();
     CloudStatus status = CloudStatus::Offline;
-    std::unique_ptr<SystemContext> systemContext = std::make_unique<SystemContext>(
-        SystemContext::Mode::cloudLayouts,
-        appContext()->peerId());
+    std::unique_ptr<SystemContext> systemContext{appContext()->createSystemContext(
+        SystemContext::Mode::cloudLayouts)};
     const nx::utils::Url endpoint = actualLayoutsEndpoint();
     std::unique_ptr<NetworkManager> networkManager = std::make_unique<NetworkManager>();
     std::unique_ptr<QTimer> timer = std::make_unique<QTimer>();
@@ -120,7 +118,7 @@ struct CloudLayoutsManager::Private
         return request;
     }
 
-    void addLayoutsToResourcePool(std::vector<CrossSystemLayoutData> layouts)
+    void addLayoutsToResourcePool(std::vector<core::CrossSystemLayoutData> layouts)
     {
         auto resourcePool = systemContext->resourcePool();
         const auto layoutsList = resourcePool->getResources().filtered<CrossSystemLayoutResource>(
@@ -168,7 +166,8 @@ struct CloudLayoutsManager::Private
         createResourcesFromLayout(layouts);
     }
 
-    void createResourcesFromLayout(const std::vector<CrossSystemLayoutData>& crossSystemLayoutsList)
+    void createResourcesFromLayout(
+        const std::vector<core::CrossSystemLayoutData>& crossSystemLayoutsList)
     {
         QnResourceList newlyCreatedResources;
         auto resourcePool = systemContext->resourcePool();
@@ -198,8 +197,8 @@ struct CloudLayoutsManager::Private
                 else if (FileTypeSupport::isMovieFileExt(item.resourcePath)
                     || FileTypeSupport::isImageFileExt(item.resourcePath))
                 {
-                    resource = ResourceDirectoryBrowser::createArchiveResource(
-                        item.resourcePath, resourcePool);
+                    resource = QnResourcePtr(new QnAviResource(
+                        QDir::fromNativeSeparators(item.resourcePath)));
                 }
                 else
                 {
@@ -261,7 +260,7 @@ struct CloudLayoutsManager::Private
                         return;
                     }
 
-                    std::vector<CrossSystemLayoutData> updatedLayouts;
+                    std::vector<core::CrossSystemLayoutData> updatedLayouts;
                     const bool parsed = nx::reflect::json::deserialize(response.messageBody,
                         &updatedLayouts);
                     if (NX_ASSERT(parsed, "Actual response is:\n%1", response.messageBody))
@@ -278,7 +277,7 @@ struct CloudLayoutsManager::Private
     }
 
     void sendSaveLayoutRequest(
-        const CrossSystemLayoutData& layout,
+        const core::CrossSystemLayoutData& layout,
         SaveCallback callback,
         bool isNewLayout)
     {
@@ -371,11 +370,11 @@ struct CloudLayoutsManager::Private
         common::LayoutItemDataMap items;
         for (auto [id, item]: cloudLayout->getItems().asKeyValueRange()) //< Copy is intended.
         {
-            const auto resource = getResourceByDescriptor(item.resource);
+            const auto resource = core::getResourceByDescriptor(item.resource);
             if (!resource)
                 continue;
 
-            item.resource = descriptor(resource, /*forceCloud*/ true);
+            item.resource = core::descriptor(resource, /*forceCloud*/ true);
             items[id] = item;
         }
 
@@ -402,8 +401,8 @@ struct CloudLayoutsManager::Private
                     callback(success);
             };
 
-        CrossSystemLayoutData layoutData;
-        fromResourceToData(layout, layoutData);
+        core::CrossSystemLayoutData layoutData;
+        core::fromResourceToData(layout, layoutData);
 
         sendSaveLayoutRequest(
             layoutData,
@@ -494,4 +493,4 @@ SystemContext* CloudLayoutsManager::systemContext() const
     return d->systemContext.get();
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

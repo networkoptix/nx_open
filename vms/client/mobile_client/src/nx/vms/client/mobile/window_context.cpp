@@ -12,11 +12,9 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
-#include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
-#include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/maintenance/remote_log_manager.h>
@@ -32,10 +30,8 @@ namespace nx::vms::client::mobile {
 struct WindowContext::Private
 {
     WindowContext* const q;
-    const nx::Uuid peerId = nx::Uuid::createUuid();
     const std::unique_ptr<SessionManager> sessionManager;
 
-    std::unique_ptr<SystemContext> systemContext;
     std::unique_ptr<RemoteLogManager> remoteLogManager;
     std::unique_ptr<UiController> uiController;
 
@@ -45,6 +41,8 @@ struct WindowContext::Private
     QPointer<QQuickWindow> mainWindow;
 
     std::unique_ptr<QnMobileClientUiController> depricatedUiController;
+
+    QPointer<SystemContext> mainSystemContext;
 
     void initializeDepricatedClasses();
     void initializeMainWindow();
@@ -111,7 +109,8 @@ WindowContext::WindowContext(QObject* parent):
     base_type(parent),
     d{new Private{.q = this, .sessionManager = std::make_unique<SessionManager>(this)}}
 {
-    nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("mc", d->peerId);
+    nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId(
+        "mc", appContext()->peerId());
 
     d->remoteLogManager = std::make_unique<RemoteLogManager>();
     d->initializeDepricatedClasses();
@@ -137,9 +136,18 @@ QQuickWindow* WindowContext::mainWindow() const
     return d->mainWindow.get();
 }
 
-SystemContext* WindowContext::mainSystemContext()
+void WindowContext::setMainSystemContext(SystemContext* context)
 {
-    return d->systemContext.get();
+    if (d->mainSystemContext == context)
+        return;
+
+    d->mainSystemContext = context;
+    emit mainSystemContextChanged();
+}
+
+SystemContext* WindowContext::mainSystemContext() const
+{
+    return d->mainSystemContext;
 }
 
 UiController* WindowContext::uiController() const
@@ -165,45 +173,6 @@ RemoteLogManager* WindowContext::logManager() const
 QnMobileClientUiController* WindowContext::depricatedUiController() const
 {
     return d->depricatedUiController.get();
-}
-
-SystemContext* WindowContext::createSystemContext()
-{
-    NX_ASSERT(!d->systemContext);
-    d->systemContext = std::make_unique<SystemContext>(
-        this,
-        core::SystemContext::Mode::client,
-        d->peerId);
-    appContext()->addSystemContext(d->systemContext.get());
-
-    connect(d->systemContext->sessionTimeoutWatcher(),
-        &core::RemoteSessionTimeoutWatcher::sessionExpired,
-        this,
-        nx::utils::guarded(this,
-            [this](core::RemoteSessionTimeoutWatcher::SessionExpirationReason)
-            {
-                const auto manager = sessionManager();
-                if (!manager)
-                    return;
-
-                manager->stopSessionByUser();
-    //                emit m_context->showMessage(
-    //                    tr("Your session has expired"),
-    //                    tr("Session duration limit can be changed by the site administrators"));
-            }));
-
-    emit mainSystemContextChanged();
-    return d->systemContext.get();
-}
-
-void WindowContext::deleteSystemContext(SystemContext* context)
-{
-    if (context == d->systemContext.get())
-        d->systemContext.release();
-
-    appContext()->removeSystemContext(context);
-
-    emit mainSystemContextChanged();
 }
 
 } // namespace nx::vms::client::mobile

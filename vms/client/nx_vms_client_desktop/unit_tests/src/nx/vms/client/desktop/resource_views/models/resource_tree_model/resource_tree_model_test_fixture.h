@@ -35,7 +35,8 @@ struct WithCrossSiteFeatures
     static ApplicationContext::Features features()
     {
         auto result = ApplicationContext::Features::none();
-        result.flags.setFlag(ApplicationContext::FeatureFlag::cross_site);
+        result.core.base.flags.setFlag(common::ApplicationContext::FeatureFlag::networking);
+        result.core.flags.setFlag(core::ApplicationContext::FeatureFlag::cross_site);
         return result;
     }
 };

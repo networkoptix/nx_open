@@ -4,10 +4,10 @@
 
 #include <client/client_message_processor.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/videowall/desktop_camera_preloader_resource.h>
 #include <utils/common/id.h>
@@ -68,7 +68,7 @@ void DesktopCameraStubController::atResourcesAdded(const QnResourceList& resourc
 
         const auto& item = *items.begin();
 
-        if (!isDesktopCameraResource(item.resource))
+        if (!core::isDesktopCameraResource(item.resource))
             continue;
 
         NX_VERBOSE(this, "New desktop camera layout has been found");
@@ -81,7 +81,7 @@ void DesktopCameraStubController::atResourcesAdded(const QnResourceList& resourc
                 [this, layoutId](const QnLayoutResourcePtr& resource,
                     const nx::vms::common::LayoutItemData& item)
                 {
-                    if (!isDesktopCameraResource(item.resource))
+                    if (!core::isDesktopCameraResource(item.resource))
                         return;
 
                     NX_VERBOSE(this, "Desktop camera item removed from desktop camera layout");
@@ -96,7 +96,7 @@ void DesktopCameraStubController::atResourcesAdded(const QnResourceList& resourc
 
         desktopCameraStub.reset(new DesktopCameraPreloaderResource(
             item.resource.id,
-            getDesktopCameraPhysicalId(item.resource)));
+            core::getDesktopCameraPhysicalId(item.resource)));
 
         NX_VERBOSE(this, "Desktop camera stub has been created for added layout");
 
@@ -125,7 +125,7 @@ void DesktopCameraStubController::atResourcesRemoved(const QnResourceList& resou
 
         const auto& item = *items.begin();
 
-        if (!isDesktopCameraResource(item.resource))
+        if (!core::isDesktopCameraResource(item.resource))
             continue;
 
         NX_VERBOSE(this, "Desktop camera layout has been removed");

@@ -7,9 +7,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/system_context_accessor.h>
+#include <utils/common/counter_hash.h>
 #include <watchers/available_cameras_watcher.h>
 
 using namespace nx::vms::client::core;
@@ -41,6 +43,9 @@ public:
     void at_layout_itemRemoved(
         const QnLayoutResourcePtr& resource, const nx::vms::common::LayoutItemData& item);
     void handleResourceChanged(const QnResourcePtr& resource);
+
+private:
+    QnCounterHash<SystemContext*> systemContexts;
 };
 
 QnAvailableCameraListModel::QnAvailableCameraListModel(QObject* parent) :
@@ -182,11 +187,10 @@ void QnAvailableCameraListModelPrivate::resetResources()
 
     if (layout)
     {
-        const auto layoutPool = MobileContextAccessor(layout).resourcePool();
         for (const auto& item: layout->getItems())
         {
-            if (const auto camera =
-                layoutPool->getResourceById<QnVirtualCameraResource>(item.resource.id))
+            if (const auto camera = nx::vms::client::core::getResourceByDescriptor(
+                item.resource).dynamicCast<QnVirtualCameraResource>())
             {
                 addCamera(camera, true);
             }
@@ -206,9 +210,17 @@ void QnAvailableCameraListModelPrivate::resetResources()
         disconnect(camerasWatcher, nullptr, this, nullptr);
 
         connect(layout.get(), &QnLayoutResource::itemAdded,
-                this, &QnAvailableCameraListModelPrivate::at_layout_itemAdded);
+            this, &QnAvailableCameraListModelPrivate::at_layout_itemAdded);
         connect(layout.get(), &QnLayoutResource::itemRemoved,
-                this, &QnAvailableCameraListModelPrivate::at_layout_itemRemoved);
+            this, &QnAvailableCameraListModelPrivate::at_layout_itemRemoved);
+        connect(layout.get(), &QnLayoutResource::itemChanged, this,
+            [this](const QnLayoutResourcePtr& layout, const auto& item, const auto& oldItem)
+            {
+                if (item.resource == oldItem.resource)
+                    return;
+                at_layout_itemRemoved(layout, oldItem);
+                at_layout_itemAdded(layout, item);
+            });
     }
     else
     {
@@ -229,7 +241,6 @@ void QnAvailableCameraListModelPrivate::addCamera(const QnResourcePtr& resource,
     if (!q->filterAcceptsResource(resource))
         return;
 
-
     connect(resource.get(), &QnResource::resourceChanged,
         this, &QnAvailableCameraListModelPrivate::handleResourceChanged);
     connect(resource.get(), &QnResource::propertyChanged,
@@ -248,6 +259,13 @@ void QnAvailableCameraListModelPrivate::addCamera(const QnResourcePtr& resource,
 
     if (!silent)
         q->endInsertRows();
+
+    if (auto systemContext = resource->systemContext()->as<nx::vms::client::mobile::SystemContext>();
+        NX_ASSERT(systemContext))
+    {
+        if (systemContexts.insert(systemContext))
+            emit q->systemContextAdded(systemContext);
+    }
 }
 
 void QnAvailableCameraListModelPrivate::removeCamera(const QnResourcePtr& resource, bool silent)
@@ -259,6 +277,13 @@ void QnAvailableCameraListModelPrivate::removeCamera(const QnResourcePtr& resour
         return;
 
     disconnect(resource.get(), nullptr, this, nullptr);
+
+    if (auto systemContext = resource->systemContext()->as<nx::vms::client::mobile::SystemContext>();
+        NX_ASSERT(systemContext))
+    {
+        if (systemContexts.remove(systemContext))
+            emit q->systemContextAdded(systemContext);
+    }
 
     if (!silent)
         q->beginRemoveRows(QModelIndex(), row, row);

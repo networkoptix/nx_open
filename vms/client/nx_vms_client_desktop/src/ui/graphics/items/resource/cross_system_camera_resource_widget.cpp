@@ -5,12 +5,12 @@
 #include <qt_graphics_items/graphics_label.h>
 
 #include <core/resource/user_resource.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
-#include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
@@ -23,18 +23,18 @@ using namespace nx::vms::client::desktop;
 
 struct QnCrossSystemCameraWidget::Private
 {
-    CrossSystemCameraResourcePtr crossSystemCamera;
-    CloudCrossSystemContext* context;
+    nx::vms::client::core::CrossSystemCameraResourcePtr crossSystemCamera;
+    nx::vms::client::core::CloudCrossSystemContext* context;
 
     Qn::ResourceStatusOverlay calculateStatusOverlay() const
     {
         if (NX_ASSERT(context) && context->systemDescription()->isOnline())
         {
             const auto status = context->status();
-            if (status == CloudCrossSystemContext::Status::connecting)
+            if (status == nx::vms::client::core::CloudCrossSystemContext::Status::connecting)
                 return Qn::ResourceStatusOverlay::LoadingOverlay;
 
-            if (status == CloudCrossSystemContext::Status::connectionFailure)
+            if (status == nx::vms::client::core::CloudCrossSystemContext::Status::connectionFailure)
                 return Qn::ResourceStatusOverlay::UnauthorizedOverlay;
 
             return Qn::ResourceStatusOverlay::InformationRequiredOverlay;
@@ -51,7 +51,8 @@ QnCrossSystemCameraWidget::QnCrossSystemCameraWidget(
     QGraphicsItem* parent)
     :
     QnMediaResourceWidget(systemContext, windowContext, item, parent),
-    d(new Private{QnMediaResourceWidget::resource().dynamicCast<CrossSystemCameraResource>()})
+    d(new Private{QnMediaResourceWidget::resource().dynamicCast<
+        nx::vms::client::core::CrossSystemCameraResource>()})
 {
     NX_ASSERT(d->crossSystemCamera);
     const auto systemId = d->crossSystemCamera->systemId();

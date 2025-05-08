@@ -60,15 +60,12 @@ public:
 
     QQuickWindow* mainWindow() const;
 
-    // Returns current system context. Can be nullptr if there is no connection to the system.
-    SystemContext* mainSystemContext();
+    void setMainSystemContext(SystemContext* context);
+    SystemContext* mainSystemContext() const;
 
     UiController* uiController() const;
 
     QQuickWindow* window() const;
-
-    SystemContext* createSystemContext();
-    void deleteSystemContext(SystemContext* context);
 
     SessionManager* sessionManager() const;
 

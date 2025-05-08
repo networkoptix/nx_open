@@ -7,22 +7,20 @@
 #include <core/resource/shared_resource_pointer.h>
 #include <core/resource/shared_resource_pointer_list.h>
 
+#include <nx/vms/client/core/resource/resource_fwd.h>
+
 namespace nx::vms::client::desktop {
 
 class ServerResource;
 using ServerResourcePtr = QnSharedResourcePointer<ServerResource>;
 using ServerResourceList = QnSharedResourcePointerList<ServerResource>;
 
-class LayoutResource;
-using LayoutResourcePtr = QnSharedResourcePointer<LayoutResource>;
-using LayoutResourceList = QnSharedResourcePointerList<LayoutResource>;
+using LayoutResource = core::LayoutResource;
+using LayoutResourcePtr = core::LayoutResourcePtr;
+using LayoutResourceList = core::LayoutResourceList;
 
 class LayoutItemIndex;
 using LayoutItemIndexList = QList<LayoutItemIndex>;
-
-class CrossSystemLayoutResource;
-using CrossSystemLayoutResourcePtr = QnSharedResourcePointer<CrossSystemLayoutResource>;
-using CrossSystemLayoutResourceList = QnSharedResourcePointerList<CrossSystemLayoutResource>;
 
 class DesktopCameraPreloaderResource;
 using DesktopCameraPreloaderResourcePtr = QnSharedResourcePointer<DesktopCameraPreloaderResource>;

@@ -16,12 +16,12 @@
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/client/core/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
@@ -732,7 +732,7 @@ void Workbench::update(const WorkbenchState& state)
         }
 
         if (const auto layout = appContext()->cloudLayoutsPool()->
-            getResourceById<CrossSystemLayoutResource>(id))
+            getResourceById<core::CrossSystemLayoutResource>(id))
         {
             if (!activeItemId.isNull())
                 layout->setData(Qn::LayoutActiveItemRole, QVariant::fromValue(activeItemId));
@@ -775,7 +775,9 @@ void Workbench::update(const WorkbenchState& state)
                     getResourceById<LayoutResource>(stateLayout.id);
                 if (!layoutResource)
                 {
-                    layoutResource.reset(new CrossSystemLayoutResource());
+                    // TODO: #vkutin Figure out what's done here.
+                    // Why is CloudLayoutsManager not involved?
+                    layoutResource.reset(new core::CrossSystemLayoutResource());
                     initialFillLayoutFromState(layoutResource, stateLayout);
                     appContext()->cloudLayoutsPool()->addResource(layoutResource);
                 }
@@ -858,10 +860,10 @@ void Workbench::submit(WorkbenchState& state)
     auto isLayoutSupported = [](const LayoutResourcePtr& layout, bool allowLocals)
     {
         // Support showreels.
-        if (layout->isShowreelReviewLayout())
+        if (isShowreelReviewLayout(layout))
             return true;
 
-        if (layout->data().contains(Qn::VideoWallResourceRole))
+        if (isVideoWallReviewLayout(layout))
             return true;
 
         // Ignore other service layouts, e.g. videowall control layouts.

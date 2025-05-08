@@ -43,7 +43,10 @@
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/analytics/object_display_settings.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/core/resource/resource_processor.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource_searcher.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
@@ -53,11 +56,10 @@
 #include <nx/vms/client/core/skin/font_config.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/font_loader.h>
+#include <nx/vms/client/desktop/menu/actions.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/common/widgets/loading_indicator.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
-#include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
-#include <nx/vms/client/desktop/cross_system/cross_system_layouts_watcher.h>
+#include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
@@ -88,6 +90,7 @@
 #include <nx/vms/client/desktop/utils/local_proxy_server.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
 #include <nx/vms/client/desktop/webpage/web_page_data_cache.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <platform/platform_abstraction.h>
 #include <ui/workaround/qtbug_workaround.h>
@@ -374,9 +377,6 @@ struct ApplicationContext::Private
     std::unique_ptr<nx::vms::client::desktop::AudioVideoInput> audioVideoInput;
 
     // Network modules
-    std::unique_ptr<CloudCrossSystemManager> cloudCrossSystemManager;
-    std::unique_ptr<CloudLayoutsManager> cloudLayoutsManager;
-    std::unique_ptr<CrossSystemLayoutsWatcher> crossSystemLayoutsWatcher;
     std::unique_ptr<nx::cloud::gateway::VmsGatewayEmbeddable> cloudGateway;
     std::unique_ptr<LocalProxyServer> localProxyServer;
 
@@ -557,12 +557,28 @@ struct ApplicationContext::Private
 
     void initializeCrossSystemModules()
     {
-        // Cross-system cameras should process cloud status changes after cloudLayoutsManager. This
-        // makes "Logout from Cloud" scenario much more smooth. If layouts are closed before camera
-        // resources are removed, we do not need process widgets one by one.
-        cloudLayoutsManager = std::make_unique<CloudLayoutsManager>();
-        cloudCrossSystemManager = std::make_unique<CloudCrossSystemManager>();
-        crossSystemLayoutsWatcher = std::make_unique<CrossSystemLayoutsWatcher>();
+        q->core::ApplicationContext::initializeCrossSystemModules();
+
+        registerDebugAction("Cross-site contexts reset",
+            [this](auto)
+            {
+                q->cloudCrossSystemManager()->debugResetCloudSystems(/*enableCloudSystems*/ false);
+            });
+
+        registerDebugAction("Cross-site contexts restore",
+            [this](auto)
+            {
+                q->cloudCrossSystemManager()->debugResetCloudSystems(/*enableCloudSystems*/ true);
+            });
+
+        // TODO: FIXME! #vkutin Add the same in mobile context.
+        connect(q->cloudCrossSystemManager(),
+            &core::CloudCrossSystemManager::cloudAuthorizationRequested,
+            q,
+            [this]()
+            {
+                q->mainWindowContext()->menu()->trigger(menu::LoginToCloud);
+            });
     }
 
     void initializeSystemContext()
@@ -572,11 +588,10 @@ struct ApplicationContext::Private
             : q->peerId();
         NX_ASSERT(!peerId.isNull());
 
-        mainSystemContext = std::make_unique<SystemContext>(
+        mainSystemContext.reset(q->createSystemContext(
             mode == Mode::unitTests
                 ? SystemContext::Mode::unitTests
-                : SystemContext::Mode::client,
-            peerId);
+                : SystemContext::Mode::client)->as<SystemContext>());
 
         q->addMainContext(mainSystemContext.get());
 
@@ -736,8 +751,8 @@ ApplicationContext::ApplicationContext(
         case Mode::unitTests:
         {
             d->initializeSystemContext();
-            if (features.flags.testFlag(FeatureFlag::cross_site))
-                d->initializeCrossSystemModules(); //< For the resources tree tests.
+            if (features.core.flags.testFlag(CoreFeatureFlag::cross_site))
+                d->initializeCrossSystemModules();
             d->updateVersionIfNeeded();
             if (features.core.flags.testFlag(CoreFeatureFlag::qml))
                 d->initializeQml();
@@ -766,7 +781,8 @@ ApplicationContext::ApplicationContext(
             d->initializeNetworkModules();
             d->sharedMemoryManager->connectToCloudStatusWatcher(); //< Depends on CloudStatusWatcher.
             d->initializeSystemContext();
-            d->initializeCrossSystemModules();
+            if (features.core.flags.testFlag(CoreFeatureFlag::cross_site))
+                d->initializeCrossSystemModules();
             d->mainSystemContext->startModuleDiscovery(moduleDiscoveryManager());
             d->updateVersionIfNeeded();
             d->initializeQml();
@@ -786,11 +802,11 @@ ApplicationContext::ApplicationContext(
 
             QObject::connect(d->sharedMemoryManager.get(),
                 &SharedMemoryManager::clientCommandRequested,
-                d->cloudLayoutsManager.get(),
+                cloudLayoutsManager(),
                 [this](SharedMemoryData::Command command, const QByteArray& /*data*/)
                 {
                     if (command == SharedMemoryData::Command::updateCloudLayouts)
-                        d->cloudLayoutsManager->updateLayouts();
+                        cloudLayoutsManager()->updateLayouts();
                 });
 
             break;
@@ -807,9 +823,6 @@ ApplicationContext::~ApplicationContext()
     // For now it depends on a System Context, later it will be moved to the Local System Context.
     d->desktopResourceSearcher.reset();
 
-    // Cross system manager should be destroyed before the network module.
-    d->cloudCrossSystemManager.reset();
-
     // Main system context does not exist in self-update mode.
     if (d->mainSystemContext)
     {
@@ -823,8 +836,6 @@ ApplicationContext::~ApplicationContext()
     // Local resources context temporary implementation depends on main system context.
     d->localResourcesContext.reset();
 
-    d->cloudLayoutsManager.reset();
-
     // Remote session must be fully destroyed while application context still exists.
     removeSystemContext(d->mainSystemContext.release());
 
@@ -832,19 +843,17 @@ ApplicationContext::~ApplicationContext()
     d->webPageDataCache.reset();
 }
 
+core::SystemContext* ApplicationContext::createSystemContext(
+    SystemContext::Mode mode, QObject* parent)
+{
+    return new SystemContext(mode, peerId(), parent);
+}
+
 nx::utils::SoftwareVersion ApplicationContext::version() const
 {
     return d->overriddenVersion
         ? *d->overriddenVersion
         : nx::utils::SoftwareVersion(nx::build_info::vmsVersion());
-}
-
-SystemContext* ApplicationContext::systemContextByCloudSystemId(const QString& cloudSystemId) const
-{
-    if (const auto cloudContext = d->cloudCrossSystemManager->systemContext(cloudSystemId))
-        return cloudContext->systemContext();
-
-    return nullptr;
 }
 
 WindowContext* ApplicationContext::mainWindowContext() const
@@ -882,9 +891,10 @@ void ApplicationContext::initializeDesktopCamera([[maybe_unused]] QOpenGLWidget*
 
 nx::Uuid ApplicationContext::peerId() const
 {
-    return d->runningInstancesManager
-        ? d->runningInstancesManager->currentInstanceGuid()
-        : nx::Uuid();
+    if (d->runningInstancesManager)
+        return d->runningInstancesManager->currentInstanceGuid();
+
+    return base_type::peerId();
 }
 
 nx::Uuid ApplicationContext::videoWallInstanceId() const
@@ -894,7 +904,9 @@ nx::Uuid ApplicationContext::videoWallInstanceId() const
 
 SystemContext* ApplicationContext::currentSystemContext() const
 {
-    return base_type::currentSystemContext()->as<SystemContext>();
+    return base_type::currentSystemContext()
+        ? base_type::currentSystemContext()->as<SystemContext>()
+        : nullptr;
 }
 
 ContextStatisticsModule* ApplicationContext::statisticsModule() const
@@ -950,29 +962,6 @@ void ApplicationContext::setSharedMemoryManager(std::unique_ptr<SharedMemoryMana
 RunningInstancesManager* ApplicationContext::runningInstancesManager() const
 {
     return d->runningInstancesManager.get();
-}
-
-CloudCrossSystemManager* ApplicationContext::cloudCrossSystemManager() const
-{
-    return d->cloudCrossSystemManager.get();
-}
-
-CloudLayoutsManager* ApplicationContext::cloudLayoutsManager() const
-{
-    return d->cloudLayoutsManager.get();
-}
-
-SystemContext* ApplicationContext::cloudLayoutsSystemContext() const
-{
-    if (NX_ASSERT(d->cloudLayoutsManager))
-        return d->cloudLayoutsManager->systemContext();
-
-    return {};
-}
-
-QnResourcePool* ApplicationContext::cloudLayoutsPool() const
-{
-    return cloudLayoutsSystemContext()->resourcePool();
 }
 
 PerformanceMonitor* ApplicationContext::performanceMonitor() const

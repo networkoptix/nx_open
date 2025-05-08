@@ -4,25 +4,24 @@
 
 #include <chrono>
 
+#include <QtCore/QHash>
 #include <QtCore/QTimer>
 
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/client_camera.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/resource/camera.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
-#include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/core/system_context.h>
 #include <storage/server_storage_manager.h>
 
 using namespace std::chrono;
-using namespace nx::vms::client;
-using namespace nx::vms::client::desktop;
 
 using StorageLocation = nx::vms::api::StorageLocation;
 
@@ -32,20 +31,20 @@ constexpr auto kDiscardCacheInterval = 1h;
 
 } // namespace
 
-struct QnCameraDataManager::Private
+namespace nx::vms::client::core {
+
+struct CameraDataManager::Private
 {
-    QHash<QnMediaResourcePtr, core::CachingCameraDataLoaderPtr> loaderByResource;
+    QHash<QnMediaResourcePtr, CachingCameraDataLoaderPtr> loaderByResource;
     StorageLocation storageLocation = StorageLocation::both;
 };
 
-QnCameraDataManager::QnCameraDataManager(SystemContext* systemContext, QObject* parent):
+CameraDataManager::CameraDataManager(SystemContext* systemContext, QObject* parent):
     QObject(parent),
     SystemContextAware(systemContext),
     d(new Private())
 {
-    connect(systemContext->resourcePool(),
-        &QnResourcePool::resourcesRemoved,
-        this,
+    connect(systemContext->resourcePool(), &QnResourcePool::resourcesRemoved, this,
         [this](const QnResourceList& resources)
         {
             for (const auto& resource: resources)
@@ -58,9 +57,7 @@ QnCameraDataManager::QnCameraDataManager(SystemContext* systemContext, QObject* 
             }
         });
 
-    connect(cameraHistoryPool(),
-        &QnCameraHistoryPool::cameraFootageChanged,
-        this,
+    connect(cameraHistoryPool(), &QnCameraHistoryPool::cameraFootageChanged, this,
         [this](const QnVirtualCameraResourcePtr& camera)
         {
             if (const auto loader = this->loader(camera, /*createIfNotExists*/ false))
@@ -70,14 +67,10 @@ QnCameraDataManager::QnCameraDataManager(SystemContext* systemContext, QObject* 
     // Cross-system contexts do not have Server Storage Manager.
     if (auto serverStorageManager = systemContext->serverStorageManager())
     {
-        connect(serverStorageManager,
-            &QnServerStorageManager::serverRebuildArchiveFinished,
-            this,
-            &QnCameraDataManager::clearCache);
+        connect(serverStorageManager, &QnServerStorageManager::serverRebuildArchiveFinished,
+            this, &CameraDataManager::clearCache);
 
-        connect(serverStorageManager,
-            &QnServerStorageManager::activeMetadataStorageChanged,
-            this,
+        connect(serverStorageManager, &QnServerStorageManager::activeMetadataStorageChanged, this,
             [this](const QnMediaServerResourcePtr& server)
             {
                 const auto serverFootageCameras =
@@ -93,9 +86,8 @@ QnCameraDataManager::QnCameraDataManager(SystemContext* systemContext, QObject* 
     // Cross-system contexts do not support runtime events.
     if (auto serverRuntimeEventConnector = systemContext->serverRuntimeEventConnector())
     {
-        connect(serverRuntimeEventConnector,
-            &core::ServerRuntimeEventConnector::deviceFootageChanged,
-            this,
+        connect(
+            serverRuntimeEventConnector, &ServerRuntimeEventConnector::deviceFootageChanged, this,
             [this](const std::vector<nx::Uuid>& deviceIds)
             {
                 const auto devices =
@@ -113,13 +105,13 @@ QnCameraDataManager::QnCameraDataManager(SystemContext* systemContext, QObject* 
     auto discardCacheTimer = new QTimer(this);
     discardCacheTimer->setInterval(kDiscardCacheInterval);
     discardCacheTimer->setSingleShot(false);
-    connect(discardCacheTimer, &QTimer::timeout, this, &QnCameraDataManager::clearCache);
+    connect(discardCacheTimer, &QTimer::timeout, this, &CameraDataManager::clearCache);
     discardCacheTimer->start();
 }
 
-QnCameraDataManager::~QnCameraDataManager() {}
+CameraDataManager::~CameraDataManager() {}
 
-core::CachingCameraDataLoaderPtr QnCameraDataManager::loader(
+CachingCameraDataLoaderPtr CameraDataManager::loader(
     const QnMediaResourcePtr& resource,
     bool createIfNotExists)
 {
@@ -133,22 +125,22 @@ core::CachingCameraDataLoaderPtr QnCameraDataManager::loader(
     if (!createIfNotExists)
         return {};
 
-    if (!core::CachingCameraDataLoader::supportedResource(resource))
+    if (!CachingCameraDataLoader::supportedResource(resource))
         return {};
 
     NX_ASSERT(resource->systemContext() == systemContext(),
         "Resource belongs to another System Context");
 
-    core::CachingCameraDataLoaderPtr loader(new core::CachingCameraDataLoader(resource));
+    CachingCameraDataLoaderPtr loader(new CachingCameraDataLoader(resource));
 
     const auto camera = resource.dynamicCast<QnClientCameraResource>();
     if (camera)
     {
         connect(camera.get(), &QnClientCameraResource::footageAdded,
-            loader.data(), &core::CachingCameraDataLoader::discardCachedData);
+            loader.data(), &CachingCameraDataLoader::discardCachedData);
     }
 
-    connect(loader.data(), &core::CachingCameraDataLoader::periodsChanged, this,
+    connect(loader.data(), &CachingCameraDataLoader::periodsChanged, this,
         [this, resource](Qn::TimePeriodContent type, qint64 startTimeMs)
         {
             emit periodsChanged(resource, type, startTimeMs);
@@ -158,7 +150,7 @@ core::CachingCameraDataLoaderPtr QnCameraDataManager::loader(
     return loader;
 }
 
-void QnCameraDataManager::clearCache()
+void CameraDataManager::clearCache()
 {
     for (auto loader: d->loaderByResource)
     {
@@ -167,12 +159,12 @@ void QnCameraDataManager::clearCache()
     }
 }
 
-StorageLocation QnCameraDataManager::storageLocation() const
+StorageLocation CameraDataManager::storageLocation() const
 {
     return d->storageLocation;
 }
 
-void QnCameraDataManager::setStorageLocation(StorageLocation value)
+void CameraDataManager::setStorageLocation(StorageLocation value)
 {
     if (d->storageLocation == value)
         return;
@@ -184,3 +176,5 @@ void QnCameraDataManager::setStorageLocation(StorageLocation value)
             loader->setStorageLocation(value);
     }
 }
+
+} // namespace nx::vms::client::core

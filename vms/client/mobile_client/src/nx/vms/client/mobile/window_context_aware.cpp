@@ -38,14 +38,4 @@ UiController* WindowContextAware::uiController() const
     return windowContext()->uiController();
 }
 
-SystemContext* WindowContextAware::createSystemContext()
-{
-    return windowContext()->createSystemContext();
-}
-
-void WindowContextAware::deleteSystemContext(SystemContext* context)
-{
-    windowContext()->deleteSystemContext(context);
-}
-
 } // namespace nx::vms::client::mobile

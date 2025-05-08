@@ -26,9 +26,6 @@ public:
     SessionManager* sessionManager() const;
 
     UiController* uiController() const;
-
-    SystemContext* createSystemContext();
-    void deleteSystemContext(SystemContext* context);
 };
 
 } // namespace nx::vms::client::mobile

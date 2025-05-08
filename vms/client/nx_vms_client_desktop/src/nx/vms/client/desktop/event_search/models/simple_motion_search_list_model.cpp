@@ -8,7 +8,6 @@
 // It might be refactored later to avoid using QtWidgets at all.
 #include <QtWidgets/QMenu>
 
-#include <camera/camera_data_manager.h>
 #include <core/resource/camera_resource.h>
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/utils/datetime.h>
@@ -18,6 +17,7 @@
 #include <nx/vms/client/core/event_search/models/fetched_data.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>

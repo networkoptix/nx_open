@@ -13,11 +13,11 @@
 #include <nx/vms/client/core/resource/resource_fwd.h>
 #include <nx/vms/client/core/system_finder/system_description_fwd.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 class SystemContext;
 
-class CloudCrossSystemContext: public QObject
+class NX_VMS_CLIENT_CORE_API CloudCrossSystemContext: public QObject
 {
     Q_OBJECT
 
@@ -80,14 +80,15 @@ signals:
     void statusChanged(Status oldStatus);
     void camerasAdded(const QnVirtualCameraResourceList& cameras);
     void camerasRemoved(const QnVirtualCameraResourceList& cameras);
+    void cloudAuthorizationRequested(QPrivateSignal);
 
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };
 
-QString toString(CloudCrossSystemContext::Status status);
+NX_VMS_CLIENT_CORE_API QString toString(CloudCrossSystemContext::Status status);
 
 using CloudCrossSystemContextPtr = std::shared_ptr<CloudCrossSystemContext>;
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

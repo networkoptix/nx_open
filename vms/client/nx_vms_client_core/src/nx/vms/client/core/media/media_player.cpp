@@ -5,6 +5,7 @@
 #include <QtQml/QtQml>
 
 #include <core/resource/resource.h>
+#include <nx/vms/client/core/system_context.h>
 
 #include "media_player_channel_adapter.h"
 
@@ -55,6 +56,15 @@ MediaPlayer::MediaPlayer(QObject* parent):
 
 MediaPlayer::~MediaPlayer()
 {
+}
+
+nx::network::http::Credentials MediaPlayer::connectionCredentials(
+    nx::vms::common::SystemContext* systemContext) const
+{
+    if (!systemContext)
+        return {};
+
+    return systemContext->as<SystemContext>()->connectionCredentials();
 }
 
 QnResource* MediaPlayer::rawResource() const

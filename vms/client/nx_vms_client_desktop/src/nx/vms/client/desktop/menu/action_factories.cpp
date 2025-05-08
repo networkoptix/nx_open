@@ -95,7 +95,7 @@ Factory::ActionList OpenCurrentUserLayoutFactory::newActions(const Parameters& /
             continue;
 
         // TODO: #sivanov Do not add preview search layouts to the resource pool.
-        if (layout->isPreviewSearchLayout())
+        if (isPreviewSearchLayout(layout))
         {
             if (!workbench()->layout(layout))
                 continue; /* Not opened. */

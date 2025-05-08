@@ -17,6 +17,7 @@
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/image_providers/resource_thumbnail_provider.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -24,7 +25,6 @@
 #include <nx/vms/client/desktop/common/widgets/scalable_image_widget.h>
 #include <nx/vms/client/desktop/image_providers/layout_background_image_provider.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/watermark/watermark_painter.h>
@@ -527,7 +527,7 @@ void LayoutThumbnailLoader::doLoadAsync()
         if (!itemRect.isValid()) // TODO: #sivanov Some items can be not placed yet.
             continue;
 
-        const auto resource = getResourceByDescriptor(iter->resource);
+        const auto resource = core::getResourceByDescriptor(iter->resource);
         if (!resource)
             continue;
 

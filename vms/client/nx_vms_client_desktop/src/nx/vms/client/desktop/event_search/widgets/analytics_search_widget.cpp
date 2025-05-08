@@ -44,6 +44,8 @@
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/core/analytics/taxonomy/object_type.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -56,8 +58,6 @@
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/item_model_menu.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
@@ -339,11 +339,11 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
         };
 
      connect(
-        appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemAboutToBeLost,
+        appContext()->cloudCrossSystemManager(), &core::CloudCrossSystemManager::systemAboutToBeLost,
         this,
         [this, q, setSystemContextToModels](const QString& systemId)
         {
-            CloudCrossSystemContext* crossSystemContext =
+            core::CloudCrossSystemContext* crossSystemContext =
                 appContext()->cloudCrossSystemManager()->systemContext(systemId);
 
             if (crossSystemContext->systemContext() != q->commonSetup()->systemContext())

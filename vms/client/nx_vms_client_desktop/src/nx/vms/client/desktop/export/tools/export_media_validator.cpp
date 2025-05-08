@@ -2,7 +2,6 @@
 
 #include "export_media_validator.h"
 
-#include <camera/camera_data_manager.h>
 #include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -10,12 +9,13 @@
 #include <nx/core/transcoding/filters/filter_chain.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
 #include <nx/vms/client/desktop/export/data/export_layout_settings.h>
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
@@ -175,7 +175,7 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
 
     for (const auto& item: layout->getItems())
     {
-        const auto resource = getResourceByDescriptor(item.resource);
+        const auto resource = core::getResourceByDescriptor(item.resource);
         if (!resource)
             continue;
 

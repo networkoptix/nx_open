@@ -5,7 +5,6 @@
 #include <QtGui/QAction>
 #include <QtWidgets/QPushButton>
 
-#include <camera/camera_data_manager.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/avi/avi_resource.h>
@@ -20,7 +19,9 @@
 #include <nx/build_info.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/utils/grid_walker.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
@@ -39,7 +40,6 @@
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
@@ -96,7 +96,7 @@ LayoutResourcePtr layoutFromBookmarks(const QnCameraBookmarkList& bookmarks, QnR
 {
     LayoutResourcePtr layout(new LayoutResource());
     layout->setName(WorkbenchExportHandler::tr("%n bookmarks", "", bookmarks.size()));
-    layout->setPredefinedCellSpacing(Qn::CellSpacing::Small);
+    layout->setPredefinedCellSpacing(core::CellSpacing::Small);
 
     // First we must count unique cameras to get the matrix size.
     QnVirtualCameraResourceList cameras;
@@ -814,7 +814,7 @@ bool WorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr& layout
 
     for (const common::LayoutItemData& item: layout->getItems())
     {
-        QnResourcePtr resource = getResourceByDescriptor(item.resource);
+        QnResourcePtr resource = core::getResourceByDescriptor(item.resource);
         if (!resource)
             continue;
         if (resource->getParentResource() == layout)

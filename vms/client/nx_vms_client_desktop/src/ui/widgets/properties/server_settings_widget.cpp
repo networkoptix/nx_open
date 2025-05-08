@@ -14,7 +14,6 @@
 
 #include <api/model/legacy_audit_record.h>
 #include <api/server_rest_connection.h>
-#include <camera/camera_data_manager.h>
 #include <client/client_globals.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
@@ -26,6 +25,7 @@
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/unicode_chars.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/core/network/helpers.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>

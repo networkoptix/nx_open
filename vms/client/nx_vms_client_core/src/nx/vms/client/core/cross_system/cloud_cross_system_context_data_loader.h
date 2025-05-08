@@ -21,7 +21,7 @@ using ServerConnectionPtr = std::shared_ptr<ServerConnection>;
 
 } // namespace rest
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 /**
  * Loads full set of data required for the cross-system cameras to work.
@@ -29,7 +29,7 @@ namespace nx::vms::client::desktop {
  * Does not require additional control (create-and-forget). Emits `ready()` on first full dataset,
  * then `camerasUpdated()` when cameras are updated.
  */
-class CloudCrossSystemContextDataLoader: public QObject
+class NX_VMS_CLIENT_CORE_API CloudCrossSystemContextDataLoader: public QObject
 {
     Q_OBJECT
 
@@ -62,4 +62,4 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

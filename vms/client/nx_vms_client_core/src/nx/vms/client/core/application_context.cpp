@@ -18,6 +18,10 @@
 #include <nx/utils/i18n/translation_manager.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/common/utils/private/thread_pool_manager_p.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
+#include <nx/vms/client/core/cross_system/cross_system_layouts_watcher.h>
 #include <nx/vms/client/core/event_search/models/visible_item_data_decorator_model.h>
 #include <nx/vms/client/core/media/voice_spectrum_analyzer.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
@@ -191,6 +195,9 @@ struct ApplicationContext::Private
     std::unique_ptr<SessionTokenTerminator> sessionTokenTerminator;
     std::unique_ptr<NetworkModule> networkModule;
     std::unique_ptr<SystemsVisibilityManager> systemsVisibilityManager;
+    std::unique_ptr<CloudCrossSystemManager> cloudCrossSystemManager;
+    std::unique_ptr<CloudLayoutsManager> cloudLayoutsManager;
+    std::unique_ptr<CrossSystemLayoutsWatcher> crossSystemLayoutsWatcher;
 
     QString customExternalResourceFile;
 };
@@ -262,7 +269,8 @@ ApplicationContext::ApplicationContext(
     if (features.base.flags.testFlag(CommonFeatureFlag::networking))
         d->initializeNetworkModule();
 
-    ApplicationContextQmlInitializer::storeToQmlContext(this);
+    if (features.flags.testFlag(FeatureFlag::qml))
+        ApplicationContextQmlInitializer::storeToQmlContext(this);
 }
 
 ApplicationContext::~ApplicationContext()
@@ -306,6 +314,19 @@ void ApplicationContext::initializeNetworkModules()
 
     if (d->knownServerConnectionsWatcher)
         d->knownServerConnectionsWatcher->start();
+}
+
+void ApplicationContext::initializeCrossSystemModules()
+{
+    NX_ASSERT(d->features.base.flags.testFlag(CommonFeatureFlag::networking));
+    NX_ASSERT(d->features.flags.testFlag(FeatureFlag::cross_site));
+
+    // Cross-system cameras should process cloud status changes after cloudLayoutsManager. This
+    // makes "Logout from Cloud" scenario much more smooth. If layouts are closed before camera
+    // resources are removed, we do not need process widgets one by one.
+    d->cloudLayoutsManager = std::make_unique<CloudLayoutsManager>();
+    d->cloudCrossSystemManager = std::make_unique<CloudCrossSystemManager>();
+    d->crossSystemLayoutsWatcher = std::make_unique<CrossSystemLayoutsWatcher>();
 }
 
 void ApplicationContext::initializeTranslations(const QString& targetLocale)
@@ -392,6 +413,17 @@ FontConfig* ApplicationContext::fontConfig() const
     return d->fontConfig.get();
 }
 
+nx::Uuid ApplicationContext::peerId() const
+{
+    if (d->mode == Mode::unitTests)
+    {
+        static const nx::Uuid id = nx::Uuid::createUuid();
+        return id;
+    }
+
+    return nx::Uuid{};
+}
+
 void ApplicationContext::resetEngine()
 {
     d->qmlEngine->rootContext()->setContextObject(nullptr);
@@ -416,6 +448,11 @@ ColorTheme* ApplicationContext::colorTheme() const
 UnifiedResourcePool* ApplicationContext::unifiedResourcePool() const
 {
     return d->unifiedResourcePool.get();
+}
+
+SystemContext* ApplicationContext::createSystemContext(SystemContext::Mode mode, QObject* parent)
+{
+    return new SystemContext(mode, peerId(), parent);
 }
 
 SystemContext* ApplicationContext::currentSystemContext() const
@@ -451,6 +488,37 @@ void ApplicationContext::removeSystemContext(SystemContext* systemContext)
 
     emit systemContextRemoved(systemContext);
     longRunableCleanup()->clearContextAsync(systemContext);
+}
+
+SystemContext* ApplicationContext::systemContextByCloudSystemId(const QString& cloudSystemId) const
+{
+    if (const auto cloudContext = d->cloudCrossSystemManager->systemContext(cloudSystemId))
+        return cloudContext->systemContext();
+
+    return nullptr;
+}
+
+CloudCrossSystemManager* ApplicationContext::cloudCrossSystemManager() const
+{
+    return d->cloudCrossSystemManager.get();
+}
+
+CloudLayoutsManager* ApplicationContext::cloudLayoutsManager() const
+{
+    return d->cloudLayoutsManager.get();
+}
+
+SystemContext* ApplicationContext::cloudLayoutsSystemContext() const
+{
+    if (NX_ASSERT(d->cloudLayoutsManager))
+        return d->cloudLayoutsManager->systemContext();
+
+    return {};
+}
+
+QnResourcePool* ApplicationContext::cloudLayoutsPool() const
+{
+    return cloudLayoutsSystemContext()->resourcePool();
 }
 
 void ApplicationContext::addMainContext(SystemContext* mainContext)

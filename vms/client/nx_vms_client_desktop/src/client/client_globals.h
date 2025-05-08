@@ -442,14 +442,6 @@ namespace Qn
     Q_DECLARE_FLAGS(MarginTypes, MarginType)
     Q_DECLARE_OPERATORS_FOR_FLAGS(MarginTypes)
 
-    enum class CellSpacing
-    {
-        None,
-        Small,
-        Medium,
-        Large
-    };
-
     /**
      * Time display mode.
      */

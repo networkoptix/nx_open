@@ -6,6 +6,9 @@
 
 #include "resource_fwd.h"
 
+class QAuthenticator;
+class QnAbstractStreamDataProvider;
+
 namespace nx::vms::client::core {
 
 class NX_VMS_CLIENT_CORE_API Camera: public QnVirtualCameraResource
@@ -34,12 +37,48 @@ public:
     /** Improved check which includes current user permissions validation. */
     virtual bool hasAudio() const override;
 
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout(
+        const QnAbstractStreamDataProvider* dataProvider = nullptr) override;
+    virtual AudioLayoutConstPtr getAudioLayout(
+        const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
+
+    QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role);
+
     bool isPtzSupported() const;
     bool isPtzRedirected() const;
     CameraPtr ptzRedirectedTo() const;
 
+    /**
+     * Whether client should automatically send PTZ Stop command when camera loses focus.
+     * Enabled by default, can be disabled by setting a special resource property.
+     */
+    bool autoSendPtzStopCommand() const;
+    void setAutoSendPtzStopCommand(bool value);
+
+    static void setAuthToCameraGroup(
+        const QnVirtualCameraResourcePtr& camera,
+        const QAuthenticator& authenticator);
+
+    /**
+     * Debug log representation. Used by toString(const T*).
+     */
+    virtual QString idForToStringFromPtr() const override;
+
+signals:
+    void dataDropped();
+    void footageAdded();
+
 protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
+
+protected slots:
+    virtual void resetCachedValues() override;
+
+private:
+    Qn::ResourceFlags calculateFlags() const;
+
+private:
+    mutable std::atomic<Qn::ResourceFlags> m_cachedFlags{};
 };
 
 } // namespace nx::vms::client::core

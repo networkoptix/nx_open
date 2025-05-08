@@ -10,8 +10,9 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/api/data/resource_property_key.h>
+#include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 namespace {
@@ -119,7 +120,7 @@ QString resourceCustomGroupId(const QnResourcePtr& resource)
         return {};
     }
 
-    return resource->getProperty(kCustomGroupIdPropertyKey).trimmed();
+    return resource->getProperty(api::resource_properties::kCustomGroupIdPropertyKey).trimmed();
 }
 
 void setResourceCustomGroupId(const QnResourcePtr& resource, const QString& newCompositeId)
@@ -130,7 +131,7 @@ void setResourceCustomGroupId(const QnResourcePtr& resource, const QString& newC
         return;
     }
 
-    resource->setProperty(kCustomGroupIdPropertyKey, newCompositeId);
+    resource->setProperty(api::resource_properties::kCustomGroupIdPropertyKey, newCompositeId);
 }
 
 bool isValidSubId(const QString& subId)

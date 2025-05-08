@@ -14,6 +14,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <nx/vms/api/data/resource_property_key.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/server.h>
@@ -407,7 +408,7 @@ void ResourceItem::initCustomGroupIdNotifications()
     m_connectionsGuard.add(m_resource->connect(m_resource.get(), &QnResource::propertyChanged,
         [this](const QnResourcePtr&, const QString& key)
         {
-            if (key == resource_grouping::kCustomGroupIdPropertyKey)
+            if (key == api::resource_properties::kCustomGroupIdPropertyKey)
                 discardCache(m_customGroupIdCache, {Qn::ResourceTreeCustomGroupIdRole});
         }));
 }

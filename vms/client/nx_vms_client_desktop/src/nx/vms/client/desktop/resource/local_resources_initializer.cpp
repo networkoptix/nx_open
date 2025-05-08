@@ -7,7 +7,7 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 
 namespace nx::vms::client::desktop {
 
@@ -35,10 +35,13 @@ void LocalResourcesInitializer::onResourcesAdded(const QnResourceList& resources
 
         for (auto& data: layout->getItems())
         {
-            if (isCrossSystemResource(data.resource) || isDesktopCameraResource(data.resource))
+            if (core::isCrossSystemResource(data.resource)
+                || core::isDesktopCameraResource(data.resource))
+            {
                 continue;
+            }
 
-            QnResourcePtr resource = getResourceByDescriptor(data.resource);
+            QnResourcePtr resource = core::getResourceByDescriptor(data.resource);
 
             if (!resource
                 && !data.resource.path.isEmpty()
@@ -51,7 +54,7 @@ void LocalResourcesInitializer::onResourcesAdded(const QnResourceList& resources
 
             if (resource)
             {
-                data.resource = descriptor(resource);
+                data.resource = core::descriptor(resource);
                 layout->updateItem(data);
             }
             else

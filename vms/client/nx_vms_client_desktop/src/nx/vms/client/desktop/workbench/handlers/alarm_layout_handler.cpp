@@ -19,13 +19,13 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/state/running_instances_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -199,7 +199,7 @@ void AlarmLayoutHandler::adjustLayoutCellAspectRatio(QnWorkbenchLayout* layout)
             // If the layout is not opened yet, calculate aspect ratio based on cameras.
             for (const auto& item: layout->resource()->getItems())
             {
-                if (auto resource = getResourceByDescriptor(item.resource))
+                if (auto resource = core::getResourceByDescriptor(item.resource))
                 {
                     if (auto camera = resource.objectCast<QnVirtualCameraResource>())
                     {
@@ -283,7 +283,7 @@ QnWorkbenchLayout* AlarmLayoutHandler::findOrCreateAlarmLayout()
         d->alarmLayout->addFlags(Qn::local);
         d->alarmLayout->setIdUnsafe(nx::Uuid::createUuid());
         d->alarmLayout->setName(tr("Alarms"));
-        d->alarmLayout->setPredefinedCellSpacing(Qn::CellSpacing::Small);
+        d->alarmLayout->setPredefinedCellSpacing(core::CellSpacing::Small);
         d->alarmLayout->setData(Qn::LayoutIconRole, qnSkin->icon(kAlarmIcon));
         d->alarmLayout->setData(Qn::LayoutPermissionsRole,
             static_cast<int>(Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission));

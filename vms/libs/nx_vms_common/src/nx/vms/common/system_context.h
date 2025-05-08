@@ -86,6 +86,8 @@ public:
     SystemContext(Mode mode, nx::Uuid peerId, QObject* parent = nullptr);
     virtual ~SystemContext();
 
+    Mode mode() const;
+
     template<typename Target>
     Target* as()
     {
@@ -270,8 +272,6 @@ public:
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
-
-    Mode mode() const;
 
 private:
     AbstractCertificateVerifier* verifier() const;

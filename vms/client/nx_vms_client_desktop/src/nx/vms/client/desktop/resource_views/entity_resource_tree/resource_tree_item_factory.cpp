@@ -9,11 +9,12 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/api/data/resource_property_key.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
@@ -33,7 +34,9 @@ namespace {
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::entity_item_model;
 using namespace nx::vms::client::desktop::entity_resource_tree;
+
 using nx::vms::common::SystemSettings;
+using nx::vms::client::core::CloudCrossSystemContext;
 
 //-------------------------------------------------------------------------------------------------
 // Provider and invalidator pair factory functions for the header system name name generic item.
@@ -343,7 +346,7 @@ InvalidatorPtr cloudLayoutGroupIdInvalidator(const QnLayoutResourcePtr& layout)
         &QnLayoutResource::propertyChanged,
         [invalidator = result.get()](const QnResourcePtr&, const QString& key)
         {
-            if (key == resource_grouping::kCustomGroupIdPropertyKey)
+            if (key == nx::vms::api::resource_properties::kCustomGroupIdPropertyKey)
                 invalidator->invalidate();
         }));
 

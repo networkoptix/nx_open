@@ -15,7 +15,6 @@ namespace resource_grouping {
 inline constexpr int kUserDefinedGroupingDepth = 8;
 inline constexpr int kMaxSubIdLength = 80;
 inline constexpr QChar kSubIdDelimiter = QChar::LineFeed;
-static const QString kCustomGroupIdPropertyKey("customGroupId");
 
 /**
  * @returns Unique name (comparison is case insensitive) for the newly created group from the

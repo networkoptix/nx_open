@@ -62,7 +62,6 @@ using ResourceParamDataList = std::vector<ResourceParamData>;
  */
 class NX_VMS_COMMON_API QnResource: public QObject, public QnFromThisToShared<QnResource>
 {
-    using ResourceStatus = nx::vms::api::ResourceStatus;
     Q_OBJECT
 
     Q_FLAGS(Qn::ResourceFlags)
@@ -71,6 +70,9 @@ class NX_VMS_COMMON_API QnResource: public QObject, public QnFromThisToShared<Qn
     Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
     Q_PROPERTY(nx::vms::api::ResourceStatus status READ getStatus WRITE setStatus
         NOTIFY statusChanged)
+
+protected:
+    using ResourceStatus = nx::vms::api::ResourceStatus;
 
 public:
     //---------------------------------------------------------------------------------------------

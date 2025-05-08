@@ -18,7 +18,7 @@
 using namespace std::chrono;
 using namespace nx::vms::api;
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 namespace {
 
@@ -496,4 +496,4 @@ LicenseDataList CloudCrossSystemContextDataLoader::licenses() const
     return d->licenses.value_or(LicenseDataList());
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

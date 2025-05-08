@@ -250,7 +250,7 @@ bool LayoutModel::locked() const
 
 bool LayoutModel::isShowreelReview() const
 {
-    return d->layout && d->layout->isShowreelReviewLayout();
+    return isShowreelReviewLayout(d->layout);
 }
 
 void LayoutModel::registerQmlType()

@@ -24,12 +24,13 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
+#include <nx/vms/client/core/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
-#include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -41,7 +42,6 @@
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -148,8 +148,8 @@ bool hasCrossSystemItems(const LayoutResourcePtr& layout)
     return std::any_of(items.cbegin(), items.cend(),
         [currentCloudSystemId](const common::LayoutItemData& item)
         {
-            return isCrossSystemResource(item.resource)
-                && crossSystemResourceSystemId(item.resource) != currentCloudSystemId;
+            return core::isCrossSystemResource(item.resource)
+                && core::crossSystemResourceSystemId(item.resource) != currentCloudSystemId;
         });
 }
 
@@ -686,7 +686,7 @@ void LayoutActionHandler::removeLayoutItems(const LayoutItemIndexList& items, bo
     if (items.size() > 1)
     {
         const auto layout = items.first().layout();
-        const bool isShowreel = layout->isShowreelReviewLayout();
+        const bool isShowreel = isShowreelReviewLayout(layout);
         const auto resources = menu::ParameterTypes::resources(items);
 
         const bool confirm = isShowreel
@@ -1179,7 +1179,7 @@ void LayoutActionHandler::at_openInNewTabAction_triggered()
         [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::cross_system); });
 
     auto layout = hasCrossSystemResources
-        ? LayoutResourcePtr(new CrossSystemLayoutResource())
+        ? LayoutResourcePtr(new core::CrossSystemLayoutResource())
         : LayoutResourcePtr(new LayoutResource());
     layout->setIdUnsafe(nx::Uuid::createUuid());
     layout->addFlags(Qn::local);

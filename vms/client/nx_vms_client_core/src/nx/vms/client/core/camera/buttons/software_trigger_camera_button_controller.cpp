@@ -203,7 +203,8 @@ bool isVmsRulesSupported(SystemContext* context)
 {
     static constexpr auto kVmsRulesVersion = nx::utils::SoftwareVersion(6, 1);
 
-    return context->moduleInformation().version >= kVmsRulesVersion;
+    return context->moduleInformation().version >= kVmsRulesVersion
+        && context->vmsRulesEngine(); //< Cross-system contexts currently don't have it.
 }
 
 } // namespace

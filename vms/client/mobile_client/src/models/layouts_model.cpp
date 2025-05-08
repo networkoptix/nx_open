@@ -13,6 +13,7 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/string.h>
+#include <nx/utils/scoped_model_operations.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
@@ -46,9 +47,12 @@ struct ModelItem
 
     QnLayoutsModel::ItemType type() const
     {
-        if (layout)
-            return QnLayoutsModel::ItemType::Layout;
-        return QnLayoutsModel::ItemType::AllCameras;
+        if (!layout)
+            return QnLayoutsModel::ItemType::AllCameras;
+
+        return layout->hasFlags(Qn::cross_system)
+            ? QnLayoutsModel::ItemType::CloudLayout
+            : QnLayoutsModel::ItemType::Layout;
     }
 
     QnResourcePtr resource() const
@@ -70,12 +74,11 @@ struct ModelItem
 } // anonymous namespace
 
 class QnLayoutsModelUnsorted:
-    public QAbstractListModel,
+    public ScopedModelOperations<QAbstractListModel>,
     public nx::vms::client::mobile::SystemContextAware
 {
     Q_DECLARE_TR_FUNCTIONS(QnLayoutsModelUnsorted)
-
-    using base_type = QAbstractListModel;
+    using base_type = ScopedModelOperations<QAbstractListModel>;
 
 public:
     enum Roles
@@ -104,7 +107,7 @@ private:
 
     int itemRow(const nx::Uuid& id) const;
     void updateItem(const nx::Uuid& id);
-    void addLayout(const QnLayoutResourcePtr& layout);
+    void addLayout(const QnLayoutResourcePtr& layout, bool duringReset = false);
     void removeLayout(const QnLayoutResourcePtr& layout);
 
     QList<ModelItem> m_itemsList;
@@ -141,13 +144,18 @@ QnLayoutsModelUnsorted::QnLayoutsModelUnsorted(nx::vms::client::mobile::SystemCo
     connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, &QnLayoutsModelUnsorted::at_resourceRemoved);
 
+    connect(appContext()->cloudLayoutsPool(), &QnResourcePool::resourceAdded,
+        this, &QnLayoutsModelUnsorted::at_resourceAdded);
+    connect(appContext()->cloudLayoutsPool(), &QnResourcePool::resourceRemoved,
+        this, &QnLayoutsModelUnsorted::at_resourceRemoved);
+
     const auto handleAccessChanged =
         [this]()
-    {
-        const auto layouts = resourcePool()->getResources<QnLayoutResource>();
-        for (const auto& layout: layouts)
-            handleResourceAccessibilityChanged(layout);
-    };
+        {
+            const auto layouts = resourcePool()->getResources<QnLayoutResource>();
+            for (const auto& layout: layouts)
+                handleResourceAccessibilityChanged(layout);
+        };
 
     connect(resourceAccessManager(), &QnResourceAccessManager::resourceAccessReset,
         this, handleAccessChanged);
@@ -215,6 +223,7 @@ QVariant QnLayoutsModelUnsorted::data(const QModelIndex& index, int role) const
                     return m_allCamerasCount;
 
                 case QnLayoutsModel::ItemType::Layout:
+                case QnLayoutsModel::ItemType::CloudLayout:
                 {
                     const auto watcher = m_layoutCameraWatcherById.value(item.id);
                     return watcher ? watcher->count() : 0;
@@ -236,25 +245,25 @@ QVariant QnLayoutsModelUnsorted::data(const QModelIndex& index, int role) const
 
 void QnLayoutsModelUnsorted::resetModel()
 {
-    beginResetModel();
+    const ScopedReset resetModel(this);
 
     m_itemsList.clear();
 
     m_itemsList.append(ModelItem());
 
     const auto layouts = resourcePool()->getResources<QnLayoutResource>();
-    for (const auto& layout : layouts)
+    for (const auto& layout: layouts)
     {
         connect(layout.get(), &QnLayoutResource::parentIdChanged,
                 this, &QnLayoutsModelUnsorted::handleResourceAccessibilityChanged);
 
-        if (!isLayoutSuitable(layout))
-            continue;
-
-        addLayout(layout);
+        if (isLayoutSuitable(layout))
+            addLayout(layout, /*duringReset*/ true);
     }
 
-    endResetModel();
+    const auto cloudLayouts = appContext()->cloudLayoutsPool()->getResources<QnLayoutResource>();
+    for (const auto& cloudLayout: cloudLayouts)
+        addLayout(cloudLayout, /*duringReset*/ true);
 }
 
 bool QnLayoutsModelUnsorted::isLayoutSuitable(const QnLayoutResourcePtr& layout) const
@@ -284,13 +293,18 @@ void QnLayoutsModelUnsorted::at_resourceAdded(const QnResourcePtr& resource)
     if (!layout)
         return;
 
-    connect(layout.get(), &QnLayoutResource::parentIdChanged,
-        this, &QnLayoutsModelUnsorted::handleResourceAccessibilityChanged);
+    if (layout->hasFlags(Qn::cross_system))
+    {
+        addLayout(layout);
+    }
+    else
+    {
+        connect(layout.get(), &QnLayoutResource::parentIdChanged,
+            this, &QnLayoutsModelUnsorted::handleResourceAccessibilityChanged);
 
-    if (!isLayoutSuitable(layout))
-        return;
-
-    addLayout(layout);
+        if (isLayoutSuitable(layout))
+            addLayout(layout);
+    }
 }
 
 void QnLayoutsModelUnsorted::at_resourceRemoved(const QnResourcePtr& resource)
@@ -300,7 +314,6 @@ void QnLayoutsModelUnsorted::at_resourceRemoved(const QnResourcePtr& resource)
         return;
 
     layout->disconnect(this);
-
     removeLayout(layout);
 }
 
@@ -343,21 +356,22 @@ void QnLayoutsModelUnsorted::updateItem(const nx::Uuid& id)
     emit dataChanged(idx, idx);
 }
 
-void QnLayoutsModelUnsorted::addLayout(const QnLayoutResourcePtr& layout)
+void QnLayoutsModelUnsorted::addLayout(const QnLayoutResourcePtr& layout, bool duringReset)
 {
     const auto layoutId = layout->getId();
 
     if (const bool layoutExists = itemRow(layoutId) >= 0)
         return;
 
+    const auto row = m_itemsList.size();
+
+    const ScopedInsertRows insertRows(this, row, row, !duringReset);
+
     const auto watcher = QSharedPointer<LayoutCamerasWatcher>(new LayoutCamerasWatcher(this));
     watcher->setLayout(layout);
     m_layoutCameraWatcherById[layoutId] = watcher;
 
-    const auto row = m_itemsList.size();
-    beginInsertRows(QModelIndex(), row, row);
     m_itemsList.append(layout);
-    endInsertRows();
 
     connect(layout.get(), &QnLayoutResource::nameChanged, this,
         [this, layoutId]() { updateItem(layoutId); });
@@ -372,10 +386,10 @@ void QnLayoutsModelUnsorted::removeLayout(const QnLayoutResourcePtr& layout)
     if (row < 0)
         return;
 
-    beginRemoveRows(QModelIndex(), row, row);
+    const ScopedRemoveRows removeRows(this, row, row);
+
     m_itemsList.removeAt(row);
     m_layoutCameraWatcherById.remove(layout->getId());
-    endRemoveRows();
 
     disconnect(layout.get(), &QnLayoutResource::nameChanged, this, nullptr);
 }
@@ -395,8 +409,6 @@ bool QnLayoutsModel::lessThan(const QModelIndex& left, const QModelIndex& right)
     if (leftType != rightType)
         return leftType < rightType;
 
-    // TODO: #dklychkov: Investigate why "return true" leads to "bad comparator":
-    // debugging shows that in this case both leftType and rightType equal AllCameras.
     if (leftType == ItemType::AllCameras)
         return false;
 

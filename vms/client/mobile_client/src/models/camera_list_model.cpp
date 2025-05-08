@@ -15,6 +15,7 @@
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/system_context_accessor.h>
 #include <nx/vms/client/mobile/window_context.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/string.h>
 #include <nx/utils/qt_helpers.h>
 
@@ -42,8 +43,7 @@ int getRow(int currentRow, int rowCount, Step step)
 }
 } // namespace
 
-using namespace nx::vms::client::core;
-using MobileContextAccessor = nx::vms::client::mobile::SystemContextAccessor;
+using namespace nx::vms::client;
 
 struct QnCameraListModel::Private: public QObject
 {
@@ -51,24 +51,36 @@ struct QnCameraListModel::Private: public QObject
 
     void handleThumbnailUpdated(const nx::Uuid& resourceId, const QString& thumbnailId);
     QModelIndex indexByResourceId(const nx::Uuid& resourceId) const;
-    void updateSystemContext();
 
     QnCameraListModel* const q;
     std::unique_ptr<QnAvailableCameraListModel> model;
+    std::map<mobile::SystemContext*, nx::utils::ScopedConnection> systemContextConnections;
     QSet<nx::Uuid> filterIds;
     QSet<nx::Uuid> selectedIds;
-    QPointer<nx::vms::client::mobile::SystemContext> currentContext;
 };
 
 QnCameraListModel::Private::Private(QnCameraListModel* q):
     q(q),
     model(std::make_unique<QnAvailableCameraListModel>())
 {
+    connect(model.get(), &QnAvailableCameraListModel::systemContextAdded, this,
+        [this](mobile::SystemContext* systemContext)
+        {
+            systemContextConnections[systemContext].reset(connect(
+                systemContext->cameraThumbnailCache(), &QnCameraThumbnailCache::thumbnailUpdated,
+                this, &QnCameraListModel::Private::handleThumbnailUpdated));
+        });
+
+    connect(model.get(), &QnAvailableCameraListModel::systemContextRemoved, this,
+        [this](mobile::SystemContext* systemContext)
+        {
+            systemContextConnections.erase(systemContext);
+        });
 }
 
 QnCameraListModel::QnCameraListModel(QObject* parent):
     base_type(parent),
-    nx::vms::client::mobile::WindowContextAware(WindowContext::fromQmlContext(this)),
+    mobile::WindowContextAware(core::WindowContext::fromQmlContext(this)),
     d(new Private(this))
 {
     setSourceModel(d->model.get());
@@ -88,7 +100,7 @@ QnCameraListModel::~QnCameraListModel()
 QHash<int, QByteArray> QnCameraListModel::roleNames() const
 {
     auto roleNames = base_type::roleNames();
-    roleNames.insert(clientCoreRoleNames());
+    roleNames.insert(core::clientCoreRoleNames());
     roleNames.insert(Qt::CheckStateRole, "checkState");
     return roleNames;
 }
@@ -107,11 +119,11 @@ QVariant QnCameraListModel::data(const QModelIndex& index, int role) const
             : Qt::Unchecked;
     }
 
-    if (role != ThumbnailRole)
+    if (role != core::ThumbnailRole)
         return base_type::data(index, role);
 
 
-    const MobileContextAccessor accessor(index);
+    const mobile::SystemContextAccessor accessor(index);
     const auto cache = accessor.cameraThumbnailCache();
     if (!NX_ASSERT(cache))
         return {};
@@ -119,7 +131,7 @@ QVariant QnCameraListModel::data(const QModelIndex& index, int role) const
     const auto thumbnailId = cache->thumbnailId(accessor.rawResource()->getId());
     return thumbnailId.isEmpty()
         ? QUrl{}
-        : QUrl("image://thumbnail/" + thumbnailId);
+        : QUrl("image://thumbnail/" + cache->cacheId() + "/" + thumbnailId);
 }
 
 QnLayoutResource* QnCameraListModel::rawLayout() const
@@ -225,7 +237,7 @@ nx::Uuid QnCameraListModel::resourceIdByRow(int row) const
     if (!hasIndex(row, 0))
         return {};
 
-    return data(index(row, 0), UuidRole).value<nx::Uuid>();
+    return data(index(row, 0), core::UuidRole).value<nx::Uuid>();
 }
 
 QnResource* QnCameraListModel::nextResource(QnResource* resource) const
@@ -234,7 +246,7 @@ QnResource* QnCameraListModel::nextResource(QnResource* resource) const
         return nullptr;
 
     const int row = getRow(rowByResource(resource), rowCount(), Step::nextRow);
-    return data(index(row, 0), RawResourceRole).value<QnResource*>();
+    return data(index(row, 0), core::RawResourceRole).value<QnResource*>();
 }
 
 QnResource* QnCameraListModel::previousResource(QnResource* resource) const
@@ -243,7 +255,7 @@ QnResource* QnCameraListModel::previousResource(QnResource* resource) const
         return nullptr;
 
     const int row = getRow(rowByResource(resource), rowCount(), Step::prevRow);
-    return data(index(row, 0), RawResourceRole).value<QnResource*>();
+    return data(index(row, 0), core::RawResourceRole).value<QnResource*>();
 }
 
 void QnCameraListModel::refreshThumbnail(int row)
@@ -251,8 +263,11 @@ void QnCameraListModel::refreshThumbnail(int row)
     if (!hasIndex(row, 0))
         return;
 
-    if (const MobileContextAccessor accessor(index(row, 0)); NX_ASSERT(accessor.systemContext()))
+    if (const mobile::SystemContextAccessor accessor(index(row, 0));
+        NX_ASSERT(accessor.systemContext()))
+    {
         accessor.cameraThumbnailCache()->refreshThumbnail(accessor.rawResource()->getId());
+    }
 }
 
 void QnCameraListModel::refreshThumbnails(int from, int to)
@@ -275,22 +290,22 @@ void QnCameraListModel::refreshThumbnails(int from, int to)
 
 bool QnCameraListModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
-    const auto leftName = left.data(ResourceNameRole).toString();
-    const auto rightName = right.data(ResourceNameRole).toString();
+    const auto leftName = left.data(core::ResourceNameRole).toString();
+    const auto rightName = right.data(core::ResourceNameRole).toString();
 
     int res = nx::utils::naturalStringCompare(leftName, rightName, Qt::CaseInsensitive);
     if (res != 0)
         return res < 0;
 
-    const auto leftAddress = left.data(IpAddressRole).toString();
-    const auto rightAddress = right.data(IpAddressRole).toString();
+    const auto leftAddress = left.data(core::IpAddressRole).toString();
+    const auto rightAddress = right.data(core::IpAddressRole).toString();
 
     res = nx::utils::naturalStringCompare(leftAddress, rightAddress);
     if (res != 0)
         return res < 0;
 
-    const auto leftId = left.data(UuidRole).toString();
-    const auto rightId = right.data(UuidRole).toString();
+    const auto leftId = left.data(core::UuidRole).toString();
+    const auto rightId = right.data(core::UuidRole).toString();
 
     return leftId < rightId;
 }
@@ -298,23 +313,23 @@ bool QnCameraListModel::lessThan(const QModelIndex& left, const QModelIndex& rig
 bool QnCameraListModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
 {
     const auto index = sourceModel()->index(sourceRow, 0, sourceParent);
-    const auto name = index.data(ResourceNameRole).toString();
+    const auto name = index.data(core::ResourceNameRole).toString();
     if (!filterRegularExpression().match(name).hasMatch())
         return false;
 
     if (d->filterIds.isEmpty())
         return true;
 
-    const auto id = index.data(UuidRole).value<nx::Uuid>();
+    const auto id = index.data(core::UuidRole).value<nx::Uuid>();
     return d->filterIds.contains(id);
 }
 
 void QnCameraListModel::Private::handleThumbnailUpdated(
     const nx::Uuid& resourceId, const QString& /*thumbnailId*/)
 {
-    const auto pool = SystemContextAccessor(indexByResourceId(resourceId)).resourcePool();
+    const auto pool = mobile::SystemContextAccessor(indexByResourceId(resourceId)).resourcePool();
     if (NX_ASSERT(pool))
-        model->refreshResource(pool->getResourceById(resourceId), ThumbnailRole);
+        model->refreshResource(pool->getResourceById(resourceId), core::ThumbnailRole);
 }
 
 QModelIndex QnCameraListModel::Private::indexByResourceId(const nx::Uuid& resourceId) const
@@ -324,34 +339,4 @@ QModelIndex QnCameraListModel::Private::indexByResourceId(const nx::Uuid& resour
         return {};
 
     return q->mapFromSource(sourceIndex);
-}
-
-void QnCameraListModel::Private::updateSystemContext()
-{
-    QPointer<nx::vms::client::mobile::SystemContext> targetContext(
-        MobileContextAccessor(model->layout()).mobileSystemContext());
-
-    if (!targetContext)
-        targetContext = q->windowContext()->mainSystemContext();
-
-    if (targetContext == currentContext)
-        return;
-
-    if (currentContext)
-        currentContext->cameraThumbnailCache()->disconnect(this);
-
-    currentContext = targetContext;
-
-    if (targetContext)
-    {
-        connect(currentContext->cameraThumbnailCache(), &QnCameraThumbnailCache::thumbnailUpdated,
-            this, &QnCameraListModel::Private::handleThumbnailUpdated);
-    }
-}
-
-void QnCameraListModel::onContextReady()
-{
-    connect(windowContext(), &nx::vms::client::mobile::WindowContext::mainSystemContextChanged,
-        d.get(), &Private::updateSystemContext);
-    d->updateSystemContext();
 }

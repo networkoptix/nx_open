@@ -6,18 +6,17 @@
 
 #include <QtCore/QObject>
 
-#include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/desktop/resource/resource_fwd.h>
+#include <nx/vms/client/core/resource/resource_fwd.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 class SystemContext;
 
 /**
  * Monitors available Cloud Layouts. Contains corresponding system context.
  */
-class CloudLayoutsManager: public QObject
+class NX_VMS_CLIENT_CORE_API CloudLayoutsManager: public QObject
 {
     Q_OBJECT
 
@@ -43,4 +42,4 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

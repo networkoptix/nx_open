@@ -121,9 +121,8 @@ class RemoteConnectionFactoryTest: public ::testing::Test
 public:
     RemoteConnectionFactoryTest()
     {
-        systemContext = std::make_unique<SystemContext>(
-            SystemContext::Mode::unitTests,
-            nx::Uuid::createUuid());
+        systemContext.reset(appContext.createSystemContext(
+            SystemContext::Mode::unitTests));
         appContext.addSystemContext(systemContext.get());
 
         requestsManager = std::make_shared<RemoteConnectionFactoryRequestsManager>();

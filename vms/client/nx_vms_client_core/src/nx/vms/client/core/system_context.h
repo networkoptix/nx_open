@@ -35,6 +35,7 @@ namespace nx::vms::client::core {
 
 class AccessController;
 class AnalyticsEventsSearchTreeBuilder;
+class CameraDataManager;
 class IoPortsCompatibilityInterface;
 class ServerRuntimeEventConnector;
 class UserWatcher;
@@ -164,6 +165,8 @@ public:
     ServerTimeWatcher* serverTimeWatcher() const;
 
     QnCameraBookmarksManager* cameraBookmarksManager() const;
+
+    CameraDataManager* cameraDataManager() const;
 
     nx::vms::api::SystemSettings* systemSettings() const;
 

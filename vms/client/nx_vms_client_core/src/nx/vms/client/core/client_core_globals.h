@@ -88,4 +88,12 @@ NX_REFLECTION_ENUM_CLASS(ThumbnailStatus,
     Refreshing
     )
 
+enum class CellSpacing
+{
+    None,
+    Small,
+    Medium,
+    Large
+};
+
 } // nx::vms::client::core

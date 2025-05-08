@@ -871,6 +871,10 @@ Session::~Session()
     d->resetAddress();
     d->setSuspended(true); //< Disconnects from current server and prevents reconnecting.
 
+    const auto pool = resourcePool();
+    const auto remoteResources = pool->getResourcesWithFlag(Qn::remote);
+    pool->removeResources(remoteResources);
+
     NX_DEBUG(this, "~Session(): end");
 }
 

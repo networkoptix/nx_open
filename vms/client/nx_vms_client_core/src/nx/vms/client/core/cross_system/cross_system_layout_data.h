@@ -2,11 +2,11 @@
 
 #pragma once
 
+#include <core/resource/resource_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/vms/api/data/layout_data.h>
-#include <nx/vms/client/desktop/resource/resource_fwd.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 struct CrossSystemLayoutItemData: nx::vms::api::LayoutItemData
 {
@@ -15,7 +15,7 @@ struct CrossSystemLayoutItemData: nx::vms::api::LayoutItemData
 #define CrossSystemLayoutItemData_Fields LayoutItemData_Fields (name)
 NX_REFLECTION_INSTRUMENT(CrossSystemLayoutItemData, CrossSystemLayoutItemData_Fields)
 
-struct CrossSystemLayoutData
+struct NX_VMS_CLIENT_CORE_API CrossSystemLayoutData
 {
     nx::Uuid id;
     QString name;
@@ -31,12 +31,12 @@ struct CrossSystemLayoutData
     (locked)(fixedWidth)(fixedHeight)(items)(customGroupId)
 NX_REFLECTION_INSTRUMENT(CrossSystemLayoutData, CrossSystemLayoutData_Fields)
 
-void fromDataToResource(
+NX_VMS_CLIENT_CORE_API void fromDataToResource(
     const CrossSystemLayoutData& data,
-    const CrossSystemLayoutResourcePtr& resource);
+    const QnLayoutResourcePtr& resource);
 
-void fromResourceToData(
-    const CrossSystemLayoutResourcePtr& resource,
+NX_VMS_CLIENT_CORE_API void fromResourceToData(
+    const QnLayoutResourcePtr& resource,
     CrossSystemLayoutData& data);
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

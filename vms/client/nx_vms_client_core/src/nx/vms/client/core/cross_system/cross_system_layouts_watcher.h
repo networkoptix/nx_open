@@ -4,7 +4,7 @@
 
 #include <QtCore/QObject>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 /**
  * Actual implementation watches all Layouts, containing cross-system Cameras, and when connection
@@ -22,4 +22,4 @@ public:
     explicit CrossSystemLayoutsWatcher(QObject* parent = nullptr);
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

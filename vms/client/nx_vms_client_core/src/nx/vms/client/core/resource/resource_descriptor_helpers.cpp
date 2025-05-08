@@ -1,27 +1,22 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "resource_descriptor.h"
+#include "resource_descriptor_helpers.h"
 
 #include <core/resource/resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
-#include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
-#include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/cross_system/cross_system_camera_resource.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/common/system_settings.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 namespace {
 
 static const QString kCloudScheme = "cloud://";
 
 static const QString kDesktopCameraMark = "desktopCamera://";
-
-/** System Id placeholder for resources, not bound to any System (e.g. cloud layouts). */
-static const QString kGenericCloudSystemId = nx::Uuid().toSimpleString();
 
 QString resourcePath(const nx::Uuid& resourceId, const QString& cloudSystemId)
 {
@@ -42,10 +37,10 @@ QString resourcePath(const QnResourcePtr& resource, bool forceCloud)
     if (resource->hasFlags(Qn::web_page))
         return resource->getUrl();
 
-    if (resource.dynamicCast<CrossSystemLayoutResource>())
-        return resourcePath(resource->getId(), kGenericCloudSystemId);
+    if (resource.dynamicCast<QnLayoutResource>() && resource->hasFlags(Qn::cross_system))
+        return resourcePath(resource->getId(), genericCloudSystemId());
 
-    if (const auto camera = resource.dynamicCast<CrossSystemCameraResource>())
+    if (const auto camera = resource.dynamicCast<core::CrossSystemCameraResource>())
         return resourcePath(camera->getId(), camera->systemId());
 
     if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
@@ -97,11 +92,7 @@ QnResourcePtr getResourceByDescriptor(const nx::vms::common::ResourceDescriptor&
     if (isCrossSystemResource(descriptor))
     {
         const QString cloudSystemId = crossSystemResourceSystemId(descriptor);
-        // TODO: #sivanov Probably it worth improve systemContextByCloudSystemId instead.
-        if (cloudSystemId == kGenericCloudSystemId)
-            systemContext = appContext()->cloudLayoutsSystemContext();
-        else
-            systemContext = appContext()->systemContextByCloudSystemId(cloudSystemId);
+        systemContext = appContext()->systemContextByCloudSystemId(cloudSystemId);
     }
 
     if (!systemContext)
@@ -118,7 +109,7 @@ QnResourcePtr getResourceByDescriptor(const nx::vms::common::ResourceDescriptor&
     // There are resources that are not cross-system resources but exist together with cloud
     // layouts. Therefore, it is necessary to check for the presence of such resources in cloud
     // layout system context resource pool. For example web pages and local files.
-    systemContext = appContext()->cloudLayoutsSystemContext();
+    systemContext = appContext()->systemContextByCloudSystemId(genericCloudSystemId());
     if (systemContext)
         return systemContext->resourcePool()->getResourceByDescriptor(descriptor);
 
@@ -155,4 +146,10 @@ QString getDesktopCameraPhysicalId(const nx::vms::common::ResourceDescriptor& de
     return descriptor.path.mid(kDesktopCameraMark.size());
 }
 
-} // namespace nx::vms::client::desktop
+QString genericCloudSystemId()
+{
+    static const QString kGenericCloudSystemId = nx::Uuid().toSimpleString();
+    return kGenericCloudSystemId;
+}
+
+} // namespace nx::vms::client::core

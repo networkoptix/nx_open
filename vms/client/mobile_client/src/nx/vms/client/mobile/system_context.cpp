@@ -133,6 +133,26 @@ SystemContext::SystemContext(WindowContext* context,
     WindowContextAware(context),
     d{new Private{}}
 {
+    if (mode == Mode::cloudLayouts)
+        return;
+
+    d->thumbnailsCache = std::make_unique<QnCameraThumbnailCache>(this);
+
+    connect(sessionManager(), &SessionManager::stateChanged, this,
+        [this]()
+        {
+            if (sessionManager()->hasConnectedSession())
+                d->thumbnailsCache->start();
+            else
+                d->thumbnailsCache->stop();
+        });
+
+    if (auto thumbnailProvider = appContext()->cameraThumbnailProvider())
+        thumbnailProvider->addThumbnailCache(d->thumbnailsCache.get());
+
+    if (mode == Mode::crossSystem)
+        return;
+
     createMessageProcessor<QnMobileClientMessageProcessor>(this);
 
     startModuleDiscovery(core::appContext()->moduleDiscoveryManager());
@@ -224,37 +244,13 @@ SystemContext::SystemContext(WindowContext* context,
 
     d->eventRulesWatcher = std::make_unique<nx::client::mobile::EventRulesWatcher>(this);
 
-    d->thumbnailsCache = std::make_unique<QnCameraThumbnailCache>(this);
-    connect(sessionManager(), &SessionManager::stateChanged, this,
-        [this]()
-        {
-            if (sessionManager()->hasConnectedSession())
-                d->thumbnailsCache->start();
-            else
-                d->thumbnailsCache->stop();
-        });
-
-    //
-
-    QnCameraThumbnailProvider *thumbnailProvider = new QnCameraThumbnailProvider();
-    thumbnailProvider->setThumbnailCache(d->thumbnailsCache.get());
-
-    QnCameraThumbnailProvider *activeCameraThumbnailProvider = new QnCameraThumbnailProvider();
-
-    const auto engine = appContext()->qmlEngine();
-    engine->addImageProvider("thumbnail", thumbnailProvider);
-    engine->addImageProvider("active", activeCameraThumbnailProvider);
-
     initializeConnectionUserInteractionDelegate(this);
 }
 
 SystemContext::~SystemContext()
 {
-    if (const auto engine = appContext()->qmlEngine())
-    {
-        engine->removeImageProvider("thumbnail");
-        engine->removeImageProvider("active");
-    }
+    if (auto thumbnailProvider = appContext()->cameraThumbnailProvider())
+        thumbnailProvider->removeThumbnailCache(d->thumbnailsCache.get());
 
     setSession({});
     if (messageProcessor())

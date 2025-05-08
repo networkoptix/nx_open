@@ -17,6 +17,9 @@
 #include <core/resource/webpage_resource.h>
 #include <network/system_helpers.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -24,9 +27,6 @@
 #include <nx/vms/client/core/skin/svg_loader.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
-#include <nx/vms/client/desktop/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -38,6 +38,8 @@
 #include <nx_ec/abstract_ec_connection.h>
 
 using namespace nx::vms::client::desktop;
+
+using nx::vms::client::core::CloudCrossSystemContext;
 
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
@@ -726,10 +728,10 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
     Key status = calculateStatus(key, resource);
 
-    if (auto crossSystemCamera = resource.dynamicCast<CrossSystemCameraResource>();
-        crossSystemCamera && flags.testFlag(Qn::fake))
+    if (auto csCamera = resource.dynamicCast<nx::vms::client::core::CrossSystemCameraResource>();
+        csCamera && flags.testFlag(Qn::fake))
     {
-        const auto systemId = crossSystemCamera->systemId();
+        const auto systemId = csCamera->systemId();
         const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
         if (NX_ASSERT(context))
         {
@@ -748,9 +750,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     }
     else if (const auto layout = resource.dynamicCast<LayoutResource>())
     {
-        const bool isVideoWallReviewLayout = layout->isVideoWallReviewLayout();
-
-        if (isVideoWallReviewLayout)
+        if (isVideoWallReviewLayout(layout))
             key = VideoWall;
         else if (layout->layoutType() == LayoutResource::LayoutType::intercom)
             key = IntercomLayout;

@@ -9,12 +9,14 @@
 #include <core/resource/mobile_client_resource_factory.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <nx/build_info.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/serialization/format.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/vms/client/core/media/watermark_image_provider.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/mobile/mobile_client_meta_types.h>
 #include <nx/vms/client/mobile/system_context.h>
@@ -25,6 +27,7 @@
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/time/formatter.h>
 #include <settings/qml_settings_adaptor.h>
+#include <ui/camera_thumbnail_provider.h>
 #include <utils/mobile_app_info.h>
 
 namespace nx::vms::client::mobile {
@@ -43,19 +46,24 @@ core::ApplicationContext::Features makeFeatures()
 struct ApplicationContext::Private
 {
     ApplicationContext* const q;
+    const nx::Uuid peerId = nx::Uuid::createUuid();
     std::unique_ptr<QnMobileClientResourceFactory> resourceFactory =
         std::make_unique<QnMobileClientResourceFactory>();
     std::unique_ptr<nx::client::mobile::QmlSettingsAdaptor> settingsAdaptor;
     std::unique_ptr<WindowContext> windowContext;
+    std::unique_ptr<SystemContext> mainSystemContext;
     std::unique_ptr<QnMobileAppInfo> appInfo = std::make_unique<QnMobileAppInfo>();
     std::unique_ptr<PushNotificationManager> pushManager;
     std::unique_ptr<detail::CredentialsHelper> credentialsHelper;
+    std::unique_ptr<QnCameraThumbnailProvider> cameraThumbnailProvider{
+        new QnCameraThumbnailProvider()};
 
     void initializeHolePunching();
     void initializeTranslations();
     void initializePushManager();
     void initializeEngine(const QnMobileClientStartupParameters& params);
     void initializeMainWindowContext();
+    void initializeMainSystemContext();
     void initializeTrafficLogginOptionHandling();
     void initOsSpecificStuff();
 };
@@ -147,12 +155,38 @@ void ApplicationContext::Private::initializeEngine(
 
     for (const QString& path: params.qmlImportPaths)
         engine->addImportPath(path);
+
+    engine->addImageProvider("thumbnail", cameraThumbnailProvider.get());
 }
 
 void ApplicationContext::Private::initializeMainWindowContext()
 {
     settingsAdaptor = std::make_unique<nx::client::mobile::QmlSettingsAdaptor>();
     windowContext = std::make_unique<WindowContext>(q);
+}
+
+void ApplicationContext::Private::initializeMainSystemContext()
+{
+    mainSystemContext.reset(appContext()->createSystemContext(
+        core::SystemContext::Mode::client)->as<SystemContext>());
+
+    q->addSystemContext(mainSystemContext.get());
+
+    connect(mainSystemContext->sessionTimeoutWatcher(),
+        &core::RemoteSessionTimeoutWatcher::sessionExpired,
+        q,
+        nx::utils::guarded(q,
+            [this](core::RemoteSessionTimeoutWatcher::SessionExpirationReason)
+            {
+                const auto manager = appContext()->mainWindowContext()->sessionManager();
+                if (!manager)
+                    return;
+
+                manager->stopSessionByUser();
+                //                emit m_context->showMessage(
+                //                    tr("Your session has expired"),
+                //                    tr("Session duration limit can be changed by the site administrators"));
+            }));
 }
 
 void ApplicationContext::Private::initializeTrafficLogginOptionHandling()
@@ -204,12 +238,18 @@ ApplicationContext::ApplicationContext(
     d->initializeEngine(startupParams);
     d->initializePushManager();
     d->initializeMainWindowContext();
+    d->initializeMainSystemContext();
     d->initializeTrafficLogginOptionHandling();
     d->initOsSpecificStuff();
+    initializeCrossSystemModules();
+    d->windowContext->setMainSystemContext(d->mainSystemContext.get());
 }
 
 ApplicationContext::~ApplicationContext()
 {
+    removeSystemContext(d->mainSystemContext.release());
+
+    qmlEngine()->removeImageProvider("thumbnail");
     resetEngine(); // Frees all systems contexts of the QML objects.
 
     // DesktopCameraConnection is a SystemContextAware object, so it should be deleted before the
@@ -217,9 +257,20 @@ ApplicationContext::~ApplicationContext()
     common::ApplicationContext::stopAll();
 }
 
+core::SystemContext* ApplicationContext::createSystemContext(
+    SystemContext::Mode mode, QObject* parent)
+{
+    return new SystemContext(mainWindowContext(), mode, peerId(), parent);
+}
+
+nx::Uuid ApplicationContext::peerId() const
+{
+    return d->peerId;
+}
+
 SystemContext* ApplicationContext::currentSystemContext() const
 {
-    return mainWindowContext()->system()->as<SystemContext>();
+    return d->mainSystemContext.get();
 }
 
 WindowContext* ApplicationContext::mainWindowContext() const
@@ -256,6 +307,11 @@ detail::CredentialsHelper* ApplicationContext::credentialsHelper() const
 nx::client::mobile::QmlSettingsAdaptor* ApplicationContext::settings() const
 {
     return d->settingsAdaptor.get();
+}
+
+QnCameraThumbnailProvider* ApplicationContext::cameraThumbnailProvider() const
+{
+    return d->cameraThumbnailProvider.get();
 }
 
 } // namespace nx::vms::client::mobile

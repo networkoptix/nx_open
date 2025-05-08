@@ -22,7 +22,6 @@
 #include <api/network_proxy_factory.h>
 #include <api/server_rest_connection.h>
 #include <camera/cam_display.h>
-#include <camera/camera_data_manager.h>
 #include <camera/resource_display.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
@@ -67,6 +66,8 @@
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/storage_flags.h>
+#include <nx/vms/client/core/camera/camera_data_manager.h>
+#include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -76,7 +77,6 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
-#include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/event_search/widgets/advanced_search_dialog.h>
 #include <nx/vms/client/desktop/help/help_handler.h>
@@ -412,25 +412,25 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(menu::SetCurrentLayoutItemSpacingNoneAction), &QAction::triggered, this,
         [this]
         {
-            setCurrentLayoutCellSpacing(Qn::CellSpacing::None);
+            setCurrentLayoutCellSpacing(core::CellSpacing::None);
         });
 
     connect(action(menu::SetCurrentLayoutItemSpacingSmallAction), &QAction::triggered, this,
         [this]
         {
-            setCurrentLayoutCellSpacing(Qn::CellSpacing::Small);
+            setCurrentLayoutCellSpacing(core::CellSpacing::Small);
         });
 
     connect(action(menu::SetCurrentLayoutItemSpacingMediumAction), &QAction::triggered, this,
         [this]
         {
-            setCurrentLayoutCellSpacing(Qn::CellSpacing::Medium);
+            setCurrentLayoutCellSpacing(core::CellSpacing::Medium);
         });
 
     connect(action(menu::SetCurrentLayoutItemSpacingLargeAction), &QAction::triggered, this,
         [this]
         {
-            setCurrentLayoutCellSpacing(Qn::CellSpacing::Large);
+            setCurrentLayoutCellSpacing(core::CellSpacing::Large);
         });
 
     connect(action(menu::RotateToAction), &QAction::triggered, this,
@@ -685,10 +685,6 @@ void ActionHandler::openResourcesInNewWindow(const QnResourceList &resources)
     if (resources.isEmpty())
         return;
 
-    const bool hasCrossSystemResources = std::any_of(
-        resources.cbegin(), resources.cend(),
-        [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::cross_system); });
-
     MimeData data;
     data.setResources(resources);
 
@@ -709,7 +705,7 @@ void ActionHandler::rotateItems(int degrees) {
     }
 }
 
-void ActionHandler::setCurrentLayoutCellSpacing(Qn::CellSpacing spacing)
+void ActionHandler::setCurrentLayoutCellSpacing(core::CellSpacing spacing)
 {
     // TODO: #sivanov move out these actions to separate CurrentLayoutHandler.
     // Then at_workbench_cellSpacingChanged will also use this method.
@@ -717,13 +713,13 @@ void ActionHandler::setCurrentLayoutCellSpacing(Qn::CellSpacing spacing)
         {
             switch (spacing)
             {
-                case Qn::CellSpacing::None:
+                case core::CellSpacing::None:
                     return menu::SetCurrentLayoutItemSpacingNoneAction;
-                case Qn::CellSpacing::Small:
+                case core::CellSpacing::Small:
                     return menu::SetCurrentLayoutItemSpacingSmallAction;
-                case Qn::CellSpacing::Medium:
+                case core::CellSpacing::Medium:
                     return menu::SetCurrentLayoutItemSpacingMediumAction;
-                case Qn::CellSpacing::Large:
+                case core::CellSpacing::Large:
                     return menu::SetCurrentLayoutItemSpacingLargeAction;
             }
             NX_ASSERT(false);
@@ -760,13 +756,13 @@ void ActionHandler::at_workbench_cellSpacingChanged()
 {
     qreal value = workbench()->currentLayout()->cellSpacing();
 
-    if (LayoutResource::isEqualCellSpacing(Qn::CellSpacing::None, value))
+    if (LayoutResource::isEqualCellSpacing(core::CellSpacing::None, value))
         action(menu::SetCurrentLayoutItemSpacingNoneAction)->setChecked(true);
-    else if (LayoutResource::isEqualCellSpacing(Qn::CellSpacing::Small, value))
+    else if (LayoutResource::isEqualCellSpacing(core::CellSpacing::Small, value))
         action(menu::SetCurrentLayoutItemSpacingSmallAction)->setChecked(true);
-    else if (LayoutResource::isEqualCellSpacing(Qn::CellSpacing::Medium, value))
+    else if (LayoutResource::isEqualCellSpacing(core::CellSpacing::Medium, value))
         action(menu::SetCurrentLayoutItemSpacingMediumAction)->setChecked(true);
-    else if (LayoutResource::isEqualCellSpacing(Qn::CellSpacing::Large, value))
+    else if (LayoutResource::isEqualCellSpacing(core::CellSpacing::Large, value))
         action(menu::SetCurrentLayoutItemSpacingLargeAction)->setChecked(true);
     else
         action(menu::CurrentLayoutItemSpacingCustomMenuItem)->setChecked(true);
@@ -2389,7 +2385,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     layout->setData(Qn::LayoutCellAspectRatioRole, desiredCellAspectRatio);
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
-    NX_ASSERT(layout->isPreviewSearchLayout());
+
     menu()->trigger(menu::OpenInNewTabAction, menu::Parameters(layout)
         .withArgument(Qn::LayoutSyncStateRole,
             QVariant::fromValue<StreamSynchronizationState>(StreamSynchronizationState::disabled()))

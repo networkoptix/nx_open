@@ -12,12 +12,12 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/base_notification_observer.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/composition_entity.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/flattening_group_entity.h>
@@ -145,7 +145,8 @@ LayoutItemCreator layoutItemCreator(
         {
             const auto itemData = layout->getItem(itemId);
 
-            const auto itemResource = getResourceByDescriptor(itemData.resource);
+            const auto itemResource =
+                nx::vms::client::core::getResourceByDescriptor(itemData.resource);
             const auto permSummary = permissionsSummary(user, itemResource);
             if (permSummary.permissions == Qn::NoPermissions)
                 return {};

@@ -42,4 +42,10 @@ namespace device_properties {
 
 } // namespace device_properties
 
+namespace resource_properties {
+
+const QString kCustomGroupIdPropertyKey("customGroupId");
+
+} // namespace resource_properties
+
 } // namespace nx::vms::api

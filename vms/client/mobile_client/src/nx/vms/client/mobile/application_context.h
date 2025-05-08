@@ -9,6 +9,7 @@ Q_MOC_INCLUDE("nx/vms/client/mobile/ui/detail/credentials_helper.h")
 Q_MOC_INCLUDE("settings/qml_settings_adaptor.h")
 Q_MOC_INCLUDE("utils/mobile_app_info.h")
 
+class QnCameraThumbnailProvider;
 class QnMobileAppInfo;
 struct QnMobileClientStartupParameters;
 
@@ -48,6 +49,11 @@ public:
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
 
+    virtual core::SystemContext* createSystemContext(
+        core::SystemContext::Mode mode, QObject* parent = nullptr) override;
+
+    virtual nx::Uuid peerId() const override;
+
     SystemContext* currentSystemContext() const;
 
     WindowContext* mainWindowContext() const;
@@ -61,6 +67,8 @@ public:
     detail::CredentialsHelper* credentialsHelper() const;
 
     nx::client::mobile::QmlSettingsAdaptor* settings() const;
+
+    QnCameraThumbnailProvider* cameraThumbnailProvider() const;
 
 private:
     struct Private;

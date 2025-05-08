@@ -3,9 +3,9 @@
 #include "workbench_item_helper.h"
 
 #include <core/resource/camera_resource.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 
-using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::core;
 
 namespace helpers {
 

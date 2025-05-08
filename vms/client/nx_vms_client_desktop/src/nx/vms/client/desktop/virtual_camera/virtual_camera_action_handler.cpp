@@ -7,13 +7,13 @@
 
 #include <api/model/virtual_camera_reply.h>
 #include <api/server_rest_connection.h>
-#include <camera/camera_data_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/string.h>
 #include <nx/utils/unicode_chars.h>
+#include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>

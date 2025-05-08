@@ -289,4 +289,10 @@ inline const QString kVideoLayout = "VideoLayout";
 
 } // namespace device_properties
 
+namespace resource_properties {
+
+NX_VMS_API extern const QString kCustomGroupIdPropertyKey;
+
+} // namespace resource_properties
+
 } // namespace nx::vms::api

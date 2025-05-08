@@ -5,13 +5,12 @@
 #include <QtCore/QVector>
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
-
-#include "../cloud_cross_system_manager.h"
 
 namespace nx::vms::client::desktop {
 namespace entity_resource_tree {
@@ -54,7 +53,7 @@ CloudSystemsSource::CloudSystemsSource()
                 return;
 
             m_connectionsGuard.add(QObject::connect(
-                cloudSystemsManager, &CloudCrossSystemManager::systemFound,
+                cloudSystemsManager, &core::CloudCrossSystemManager::systemFound,
                     [this, cloudSystemsManager](const QString& systemId)
                     {
                         const auto systemContext = cloudSystemsManager->systemContext(systemId);
@@ -68,7 +67,7 @@ CloudSystemsSource::CloudSystemsSource()
                     }));
 
             m_connectionsGuard.add(QObject::connect(
-                cloudSystemsManager, &CloudCrossSystemManager::systemLost,
+                cloudSystemsManager, &core::CloudCrossSystemManager::systemLost,
                     [this](const QString& systemId)
                     {
                         NX_VERBOSE(this, "Cloud system lost: %1", systemId);

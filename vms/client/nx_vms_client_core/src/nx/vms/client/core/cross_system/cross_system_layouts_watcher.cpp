@@ -4,16 +4,16 @@
 
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
-#include <nx/vms/client/desktop/system_context.h>
+#include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/cross_system/cross_system_layout_resource.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
+#include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/system_context.h>
 
-#include "cloud_cross_system_context.h"
-#include "cloud_cross_system_manager.h"
-#include "cross_system_layout_resource.h"
-
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
     QObject(parent)
@@ -118,4 +118,4 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
     }
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

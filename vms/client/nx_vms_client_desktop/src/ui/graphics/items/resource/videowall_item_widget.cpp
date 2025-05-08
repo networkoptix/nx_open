@@ -22,13 +22,13 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/image_providers/camera_thumbnail_manager.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/animation/opacity_animator.h>
@@ -515,7 +515,7 @@ void QnVideowallItemWidget::reloadDesktopCameraThumbnailIfNeeded()
     if (items.size() != 1)
         return;
 
-    const auto resource = getResourceByDescriptor(items.begin()->resource);
+    const auto resource = nx::vms::client::core::getResourceByDescriptor(items.begin()->resource);
     if (!resource || !resource->hasFlags(Qn::desktop_camera))
         return;
 

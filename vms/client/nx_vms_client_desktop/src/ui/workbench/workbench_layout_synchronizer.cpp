@@ -3,9 +3,9 @@
 #include "workbench_layout_synchronizer.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delayed.h>
@@ -177,7 +177,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(
     if (m_layout->item(itemData.uuid))
         return;
 
-    const auto resource = getResourceByDescriptor(itemData.resource);
+    const auto resource = nx::vms::client::core::getResourceByDescriptor(itemData.resource);
     if (!resource || !ResourceAccessManager::hasPermissions(resource, Qn::ViewContentPermission))
         return;
 

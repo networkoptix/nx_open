@@ -5,7 +5,6 @@
 #include <QtCore/QTimer>
 
 #include <api/server_rest_connection.h>
-#include <camera/camera_data_manager.h>
 #include <core/resource/camera_history.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_management/resource_data_pool.h>
@@ -18,24 +17,22 @@
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_model.h>
-#include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/camera/camera_data_manager.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/cross_system/cross_system_access_controller.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/logon_data_helpers.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/user.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
-#include <nx/vms/client/desktop/access/cloud_cross_system_access_controller.h>
-#include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/menu/actions.h>
-#include <nx/vms/client/desktop/resource/resource_descriptor.h>
-#include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/discovery/manager.h>
@@ -49,12 +46,10 @@
 #include "cross_system_layout_resource.h"
 #include "cross_system_server_resource.h"
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 using namespace nx::network::http;
 using namespace nx::cloud::db::api;
-using core::SystemDescription;
-using core::SystemDescriptionPtr;
 
 namespace {
 
@@ -81,11 +76,9 @@ struct CloudCrossSystemContext::Private
     {
         NX_VERBOSE(this, "Initialized");
 
-        systemContext.reset(new SystemContext(
-            SystemContext::Mode::crossSystem,
-            appContext()->peerId()));
+        systemContext.reset(appContext()->createSystemContext(SystemContext::Mode::crossSystem));
 
-        cloudCrossSystemAccessController = static_cast<CloudCrossSystemAccessController*>(
+        crossSystemAccessController = static_cast<CrossSystemAccessController*>(
             systemContext->accessController());
 
         systemContext->startModuleDiscovery(
@@ -213,9 +206,9 @@ struct CloudCrossSystemContext::Private
     // Context should be destroyed after dataLoader.
     std::unique_ptr<SystemContext, ContextRemover> systemContext;
     std::unique_ptr<CloudCrossSystemContextDataLoader> dataLoader;
-    CloudCrossSystemAccessController* cloudCrossSystemAccessController = nullptr;
+    CrossSystemAccessController* crossSystemAccessController = nullptr;
     core::UserResourcePtr user;
-    CrossSystemServerResourcePtr server;
+    core::CrossSystemServerResourcePtr server;
     std::unique_ptr<core::CloudSessionTokenUpdater> tokenUpdater;
     bool needsCloudAuthorization = false;
     int retryCount = 0;
@@ -331,7 +324,7 @@ struct CloudCrossSystemContext::Private
                         && allowUserInteraction && retryCount == 0)
                     {
                         connectionProcess.reset();
-                        issueRefreshToken();
+                        emit q->cloudAuthorizationRequested(QPrivateSignal{});
                         ensureConnection(true);
                         retryCount++;
                         return;
@@ -384,7 +377,8 @@ struct CloudCrossSystemContext::Private
         }
 
         const nx::Uuid serverId = connection->moduleInformation().id;
-        server = CrossSystemServerResourcePtr(new CrossSystemServerResource(systemContext.get()));
+        server = core::CrossSystemServerResourcePtr(
+            new core::CrossSystemServerResource(systemContext.get()));
         server->setIdUnsafe(serverId);
         server->setName(connection->moduleInformation().name);
 
@@ -442,11 +436,6 @@ struct CloudCrossSystemContext::Private
             });
 
         dataLoader->start(/*requestUser*/ !user);
-    }
-
-    void issueRefreshToken()
-    {
-        appContext()->mainWindowContext()->menu()->trigger(menu::LoginToCloud);
     }
 
     void issueAccessToken()
@@ -516,10 +505,10 @@ struct CloudCrossSystemContext::Private
                 continue;
             }
 
-            CrossSystemServerResourcePtr newServer(new CrossSystemServerResource(
+            core::CrossSystemServerResourcePtr newServer(new core::CrossSystemServerResource(
                 server.id, cloudSystemId.toStdString(), systemContext.get()));
-            newServer->setName(server.name);
 
+            newServer->setName(server.name);
             newServers.push_back(newServer);
         }
 
@@ -564,7 +553,7 @@ struct CloudCrossSystemContext::Private
 
         for (const auto& cameraData: cameras)
         {
-            if (auto existingCamera = resourcePool->getResourceById<CrossSystemCameraResource>(
+            if (auto existingCamera = resourcePool->getResourceById<core::CrossSystemCameraResource>(
                 cameraData.id))
             {
                 camerasToRemove.removeOne(existingCamera);
@@ -572,8 +561,8 @@ struct CloudCrossSystemContext::Private
             }
             else
             {
-                auto camera = CrossSystemCameraResourcePtr(
-                    new CrossSystemCameraResource(systemDescription->id(), cameraData));
+                auto camera = core::CrossSystemCameraResourcePtr(
+                    new core::CrossSystemCameraResource(systemDescription->id(), cameraData));
                 newlyCreatedCameras.push_back(camera);
             }
         }
@@ -585,7 +574,7 @@ struct CloudCrossSystemContext::Private
 
         for (const auto& cameraData: cameras)
         {
-            auto camera = resourcePool->getResourceById<CrossSystemCameraResource>(
+            auto camera = resourcePool->getResourceById<core::CrossSystemCameraResource>(
                 cameraData.id);
 
             if (!NX_ASSERT(camera))
@@ -636,7 +625,7 @@ struct CloudCrossSystemContext::Private
         {
             for (const auto& item: layout->getItems())
             {
-                if (crossSystemResourceSystemId(item.resource) != systemDescription->id())
+                if (core::crossSystemResourceSystemId(item.resource) != systemDescription->id())
                     continue;
 
                 createThumbCameraResource(item.resource.id, item.resource.name);
@@ -646,8 +635,8 @@ struct CloudCrossSystemContext::Private
 
     QnVirtualCameraResourcePtr createThumbCameraResource(const nx::Uuid& id, const QString& name)
     {
-        const auto camera = CrossSystemCameraResourcePtr(
-            new CrossSystemCameraResource(systemDescription->id(), id, name));
+        const auto camera = core::CrossSystemCameraResourcePtr(
+            new core::CrossSystemCameraResource(systemDescription->id(), id, name));
         systemContext->resourcePool()->addResource(camera);
 
         return camera;
@@ -662,7 +651,7 @@ struct CloudCrossSystemContext::Private
                 : api::ResourceStatus::offline;
 
         for (const auto& camera:
-            systemContext->resourcePool()->getResources<CrossSystemCameraResource>())
+            systemContext->resourcePool()->getResources<core::CrossSystemCameraResource>())
         {
             if (systemIsReadyToUse)
             {
@@ -725,7 +714,7 @@ CloudCrossSystemContext::CloudCrossSystemContext(
         [this]()
         {
             d->updateCameras();
-            d->cloudCrossSystemAccessController->updateAllPermissions();
+            d->crossSystemAccessController->updateAllPermissions();
         };
 
     connect(this, &CloudCrossSystemContext::statusChanged, this, update);
@@ -817,7 +806,7 @@ void CloudCrossSystemContext::cloudAuthorize()
         return;
     }
 
-    d->issueRefreshToken();
+    emit cloudAuthorizationRequested(QPrivateSignal{});
     d->issueAccessToken();
 }
 
@@ -848,4 +837,4 @@ QString toString(CloudCrossSystemContext::Status status)
     }
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

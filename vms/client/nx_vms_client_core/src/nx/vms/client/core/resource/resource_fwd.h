@@ -24,6 +24,21 @@ using ServerResourcePtr = QnSharedResourcePointer<ServerResource>;
 class UserResource;
 using UserResourcePtr = QnSharedResourcePointer<UserResource>;
 
+class LayoutResource;
+using LayoutResourcePtr = QnSharedResourcePointer<LayoutResource>;
+using LayoutResourceList = QnSharedResourcePointerList<LayoutResource>;
+
+class CrossSystemLayoutResource;
+using CrossSystemLayoutResourcePtr = QnSharedResourcePointer<CrossSystemLayoutResource>;
+using CrossSystemLayoutResourceList = QnSharedResourcePointerList<CrossSystemLayoutResource>;
+
+class CrossSystemCameraResource;
+using CrossSystemCameraResourcePtr = QnSharedResourcePointer<CrossSystemCameraResource>;
+using CrossSystemCameraResourceList = QnSharedResourcePointerList<CrossSystemCameraResource>;
+
+class CrossSystemServerResource;
+using CrossSystemServerResourcePtr = QnSharedResourcePointer<CrossSystemServerResource>;
+
 } // namespace nx::vms::client::core
 
 class QnClientStorageResource;
@@ -33,7 +48,7 @@ typedef QnSharedResourcePointerList<QnClientStorageResource> QnClientStorageReso
 class QnFakeMediaServerResource;
 using QnFakeMediaServerResourcePtr = QnSharedResourcePointer<QnFakeMediaServerResource>;
 
-class QnClientCameraResource;
+using QnClientCameraResource = nx::vms::client::core::Camera;
 using QnClientCameraResourcePtr = QnSharedResourcePointer<QnClientCameraResource>;
 using QnClientCameraResourceList = QnSharedResourcePointerList<QnClientCameraResource>;
 

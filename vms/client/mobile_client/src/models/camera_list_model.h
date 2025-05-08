@@ -30,12 +30,14 @@ class QnCameraListModel: public QSortFilterProxyModel,
     Q_PROPERTY(QnLayoutResource* layout
         READ rawLayout
         WRITE setRawLayout
-        NOTIFY layoutChanged)    Q_PROPERTY(int count READ count NOTIFY countChanged)
+        NOTIFY layoutChanged)
+    Q_PROPERTY(int count
+        READ count
+        NOTIFY countChanged)
     Q_PROPERTY(UuidList selectedIds
         READ selectedIds
         WRITE setSelectedIds
         NOTIFY selectedIdsChagned)
-
 
 public:
     QnCameraListModel(QObject* parent = nullptr);
@@ -75,9 +77,6 @@ signals:
 protected:
     virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
-
-private:
-    virtual void onContextReady() override;
 
 private:
     struct Private;

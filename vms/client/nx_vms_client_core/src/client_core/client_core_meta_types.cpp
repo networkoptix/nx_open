@@ -62,6 +62,7 @@
 #include <nx/vms/client/core/qml/positioners/grid_positioner.h>
 #include <nx/vms/client/core/qml/qml_test_helper.h>
 #include <nx/vms/client/core/resource/access_helper.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/media_dewarping_params.h>
 #include <nx/vms/client/core/resource/media_resource_helper.h>
 #include <nx/vms/client/core/resource/resource_helper.h>
@@ -99,6 +100,8 @@ void initializeMetatypesInternal()
 {
     common::initializeMetaTypes();
     nx::vms::rules::Metatypes::initialize();
+
+    qRegisterMetaType<LayoutResourcePtr>();
 
     QnJsonSerializer::registerSerializer<EncodedCredentials>();
 

@@ -80,20 +80,13 @@ void CommonObjectSearchSetup::setWindowContext(WindowContext* windowContext)
             this, camerasUpdaterFor(core::EventSearch::CameraSelection::layout));
 }
 
-SystemContext* CommonObjectSearchSetup::systemContext() const
-{
-    return qobject_cast<SystemContext*>(base_type::systemContext());
-}
-
-void CommonObjectSearchSetup::setSystemContext(SystemContext* systemContext)
-{
-    base_type::setSystemContext(systemContext);
-}
-
 bool CommonObjectSearchSetup::selectCameras(UuidSet& selectedCameras)
 {
+    if (!NX_ASSERT(systemContext()->mode() == SystemContext::Mode::client))
+        return false;
+
     return d->windowContext && CameraSelectionDialog::selectCameras<CameraSelectionDialog::DummyPolicy>(
-        systemContext(), selectedCameras, d->windowContext->mainWindowWidget());
+        systemContext()->as<SystemContext>(), selectedCameras, d->windowContext->mainWindowWidget());
 }
 
 QnVirtualCameraResourcePtr CommonObjectSearchSetup::currentResource() const

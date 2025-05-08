@@ -8,6 +8,7 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/analytics/analytics_entities_tree.h>
+#include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/core/io_ports/io_ports_compatibility_interface.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -42,6 +43,7 @@ struct SystemContext::Private
     std::unique_ptr<QnServerStorageManager> serverStorageManager;
     std::unique_ptr<ServerRuntimeEventConnector> serverRuntimeEventConnector;
     std::unique_ptr<QnCameraBookmarksManager> cameraBookmarksManager;
+    std::unique_ptr<CameraDataManager> cameraDataManager;
     std::unique_ptr<ServerPrimaryInterfaceWatcher> serverPrimaryInterfaceWatcher;
     std::unique_ptr<nx::vms::rules::EngineHolder> vmsRulesEngineHolder;
     std::unique_ptr<core::analytics::AttributeHelper> analyticsAttributeHelper;

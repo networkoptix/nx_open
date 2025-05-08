@@ -6,7 +6,6 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/cross_system/resource_tree/cloud_layouts_source.h>
 #include <nx/vms/client/desktop/cross_system/resource_tree/cloud_system_cameras_source.h>
 #include <nx/vms/client/desktop/cross_system/resource_tree/cloud_systems_source.h>

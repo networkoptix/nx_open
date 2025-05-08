@@ -10,6 +10,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/cross_system/cross_system_access_controller.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
@@ -49,6 +50,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
         {
             d->serverRuntimeEventConnector = std::make_unique<ServerRuntimeEventConnector>();
             d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
+            d->cameraDataManager = std::make_unique<CameraDataManager>(this);
             d->ptzControllerPool = std::make_unique<ptz::ControllerPool>(this);
             d->userWatcher = std::make_unique<UserWatcher>(this);
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
@@ -64,12 +66,14 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
                 std::make_unique<RemoteSessionTimeoutWatcher>(globalSettings());
             break;
         }
+
         case Mode::crossSystem:
         {
             d->videoCache = std::make_unique<VideoCache>(this);
             d->ptzControllerPool = std::make_unique<CrossSystemPtzControllerPool>(this);
             d->userWatcher = std::make_unique<UserWatcher>(this);
             d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
+            d->cameraDataManager = std::make_unique<CameraDataManager>(this);
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
             if (ini().allowCslObjectSearch)
                 d->taxonomyManager = std::make_unique<analytics::TaxonomyManager>(this);
@@ -79,12 +83,16 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
         case Mode::cloudLayouts:
         case Mode::unitTests:
             break;
+
         case Mode::server:
             NX_CRITICAL(mode != Mode::server, "Client context cannot be of server type");
             break;
     }
 
-    resetAccessController(new AccessController(this));
+    if (mode == Mode::crossSystem)
+        resetAccessController(new CrossSystemAccessController(this));
+    else
+        resetAccessController(new AccessController(this));
 
     if (d->userWatcher)
     {
@@ -328,6 +336,11 @@ NetworkModule* SystemContext::networkModule() const
 RemoteSessionTimeoutWatcher* SystemContext::sessionTimeoutWatcher() const
 {
     return d->sessionTimeoutWatcher.get();
+}
+
+CameraDataManager* SystemContext::cameraDataManager() const
+{
+    return d->cameraDataManager.get();
 }
 
 void SystemContext::resetAccessController(AccessController* accessController)

@@ -322,7 +322,9 @@ TEST_F(AccessControllerTest, cameraRestrictionsWithDefaultPassword)
     CHECK_HAS_PERMISSIONS(camera, Qn::ViewLivePermission);
 }
 
-TEST_F(AccessControllerTest, crossSystemCameraRestrictions)
+// Currently only CrossSystemAccessController is allowed to handle resources with Qn::cross_system
+// flag, while normal AccessController has an assertion failure on it. So this test is disabled.
+TEST_F(AccessControllerTest, DISABLED_crossSystemCameraRestrictions)
 {
     loginAs(api::kAdministratorsGroupId);
     const auto camera = addCamera();
