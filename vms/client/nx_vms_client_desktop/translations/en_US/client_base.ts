@@ -1242,7 +1242,7 @@
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1969,7 +1969,7 @@ License Key: %2</source>
     </message>
     <message>
         <source>Developer Build</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2066,7 +2066,7 @@ License Key: %2</source>
     </message>
     <message>
         <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4396,7 +4396,7 @@ License Key: %2</source>
     </message>
     <message>
         <source>NOT ACTIVATED</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4589,27 +4589,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site suspended</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -5515,7 +5515,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Cannot find compatible client version: %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6313,17 +6313,17 @@ If you intended to move analytics data to another storage location, please conta
     <name>WorkbenchExportHandler::Private</name>
     <message>
         <source>Cannot write file</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 filename length is more than %2 characters.</source>
         <comment>%1 is file name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 is in use by another export.</source>
         <comment>%1 is file name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6698,7 +6698,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Site is currently suspended</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6793,15 +6793,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7005,11 +7005,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7275,11 +7275,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8658,11 +8658,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::IntegrationSettingsWatcher</name>
     <message>
         <source>API Integrations approval requests are permitted</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8895,7 +8895,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
         <source>%1 are currently in use</source>
         <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%1 is currently in use</numerusform>
             <numerusform>%1 are currently in use</numerusform>
         </translation>
@@ -8903,7 +8903,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
         <source>At least %1 are required</source>
         <comment>Text like &apos;6 Professional Licenses&apos; will be substituted</comment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>At least %1 is required</numerusform>
             <numerusform>At least %1 are required</numerusform>
         </translation>
@@ -9231,11 +9231,11 @@ Site performance is degraded.</source>
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
         <source>This group has been assigned at organization level and can be managed only at organization level</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10809,7 +10809,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>Certificate details</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11512,11 +11512,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>Organization user</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Channel Partner user</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11666,7 +11666,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
         <source>The user with the specified email already has Administrator access via the Channel Partner</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12263,11 +12263,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>In progress...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12790,15 +12790,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
         <source>Delete rule error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Save rule error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Reset rules error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12828,12 +12828,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>On %1, the system will automatically disable the service on some devices.</source>
         <comment>%1 will be substituted with date and time</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
