@@ -24,6 +24,12 @@ if(NOT developerBuild)
     list(APPEND _additional_conan_parameters "-o installRuntimeDependencies=False")
 endif()
 
+# withAnalyticsServer enabled by default on some platforms, but it will be defined after this code (and the order
+# can't be changed easily). So we can't just use withAnalyticsServer option here.
+if(DEFINED withAnalyticsServer AND NOT withAnalyticsServer)
+    list(APPEND _additional_conan_parameters "-o withAnalyticsServer=False")
+endif()
+
 if(targetDevice MATCHES "windows")
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(build_type "Debug")

@@ -62,12 +62,14 @@ class NxOpenConan(ConanFile):
         "useClang": (True, False),
         "customization": "ANY",
         "installRuntimeDependencies": (True, False),
+        "withAnalyticsServer": (True, False),
     }
     default_options = {
         "targetDevice": None,
         "useClang": False,
         "customization": "metavms",
         "installRuntimeDependencies": True,
+        "withAnalyticsServer": True,
         "quick_start_guide:format": "pdf",
         "mobile_user_manual:format": "pdf",
     }
@@ -400,7 +402,7 @@ class NxOpenConan(ConanFile):
 
     @property
     def haveAnalyticsServer(self):
-        return self.isLinux and self.settings.arch == "x86_64"
+        return self.options.withAnalyticsServer and self.isLinux and self.settings.arch == "x86_64"
 
     @property
     def _lib_path(self):
