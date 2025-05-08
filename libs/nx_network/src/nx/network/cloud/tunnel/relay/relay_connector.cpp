@@ -129,6 +129,12 @@ void Connector::onStartRelaySessionResponse(
             m_connectSessionId, response.sessionId);
         m_connectSessionId = response.sessionId;
     }
+    if (response.actualRelayUrl != m_relayUrl.toString().toStdString())
+    {
+        NX_VERBOSE(this, "%1. Switching to relay %2", m_connectSessionId, response.actualRelayUrl);
+        m_relayClient.reset();
+        m_relayClient = std::make_unique<nx::cloud::relay::api::Client>(response.actualRelayUrl);
+    }
     if (cloudConnectVersion >=
         nx::hpm::api::CloudConnectVersion::clientSupportsRelayConnectionTesting)
     {
