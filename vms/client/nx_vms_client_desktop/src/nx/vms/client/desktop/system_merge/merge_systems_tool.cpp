@@ -124,14 +124,13 @@ nx::Uuid MergeSystemsTool::pingSystem(
         };
 
     auto certificateSaveFunc =
-        [this, ctxId](
-            const nx::network::ssl::CertificateChainView& chain)
+        [this, ctxId](auto chain)
         {
             if (auto ctx = findContext(ctxId); ctx && !chain.empty())
             {
                 ctx->targetHandshakeChain.clear();
-                for (const auto& view: chain)
-                    ctx->targetHandshakeChain.emplace_back(view);
+                for (auto&& view: chain)
+                    ctx->targetHandshakeChain.emplace_back(std::move(view));
                 return true;
             }
             return false;

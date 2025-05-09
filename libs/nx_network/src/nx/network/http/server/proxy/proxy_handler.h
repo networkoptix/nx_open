@@ -113,7 +113,7 @@ private:
     std::optional<std::chrono::milliseconds> m_sslHandshakeTimeout;
     std::chrono::milliseconds m_connectionSendTimeout = network::kNoTimeout;
     std::unique_ptr<AbstractEncryptedStreamSocket> m_encryptedConnection;
-    ssl::VerifyCertificateAsyncFunc m_certificateChainVerificationCallback = acceptAllCertificates;
+    ssl::VerifyCertificateAsyncFunc m_certificateChainVerificationCallback;
 
     void fixRequestHeaders();
 
@@ -142,8 +142,7 @@ private:
     void processSslHandshakeResult(SystemError::ErrorCode handshakeResult);
 
     static void acceptAllCertificates(
-        const ssl::CertificateChainView&,
-        nx::utils::MoveOnlyFunc<void(bool)>);
+        ssl::CertificateChainView, nx::utils::MoveOnlyFunc<void(bool)>);
 };
 
 //-------------------------------------------------------------------------------------------------
