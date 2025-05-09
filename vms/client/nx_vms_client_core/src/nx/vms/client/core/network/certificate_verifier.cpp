@@ -195,7 +195,7 @@ nx::network::ssl::AdapterFunc CertificateVerifier::makeGeneralAdapterFunc(
         return nx::network::ssl::kAcceptAnyCertificate;
 
     return nx::network::ssl::makeAdapterFunc(
-        [expectedKey, expectedHost](const nx::network::ssl::CertificateChainView& chain)
+        [expectedKey, expectedHost](auto chain)
         {
             return verifyBySystemCertificates(chain, expectedHost)
                 || NX_ASSERT(!chain.empty()) && (chain[0].publicKey() == expectedKey);
@@ -209,7 +209,7 @@ nx::network::ssl::AdapterFunc CertificateVerifier::makeRestrictedAdapterFunc(
         return nx::network::ssl::kAcceptAnyCertificate;
 
     return nx::network::ssl::makeAdapterFunc(
-        [expectedKey](const nx::network::ssl::CertificateChainView& chain)
+        [expectedKey](auto chain)
         {
             return NX_ASSERT(!chain.empty()) && (chain[0].publicKey() == expectedKey);
         });
@@ -226,8 +226,7 @@ nx::network::ssl::AdapterFunc CertificateVerifier::makeAdapterFunc(
 
     return NX_ASSERT(cache)
         ? cache->makeAdapterFunc(serverId, url)
-        : nx::network::ssl::makeAdapterFunc(
-            [](const nx::network::ssl::CertificateChainView& /*chain*/){ return false; });
+        : nx::network::ssl::makeAdapterFunc([](auto&&...) { return false; });
 }
 
 CertificateVerifier::Status CertificateVerifier::verifyCertificate(
@@ -458,8 +457,7 @@ nx::network::ssl::AdapterFunc CertificateCache::makeAdapterFunc(
         return nx::network::ssl::kAcceptAnyCertificate;
 
     return nx::network::ssl::makeAdapterFunc(
-        [ptr=std::weak_ptr<Private>(d), serverId, url](
-            const nx::network::ssl::CertificateChainView& chain)
+        [ptr = std::weak_ptr<Private>(d), serverId, url](auto chain)
         {
             // In some weird scenarios someone can try to establish connection when the certificate
             // cache is deleted already.

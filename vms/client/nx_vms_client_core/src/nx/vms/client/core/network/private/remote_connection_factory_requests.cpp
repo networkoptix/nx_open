@@ -131,10 +131,10 @@ nx::network::ssl::AdapterFunc makeStoreCertificateFunc(
     nx::network::ssl::CertificateChain& outCertificateChain)
 {
     auto storeCertificateFunction =
-        [&outCertificateChain](const nx::network::ssl::CertificateChainView& chain)
+        [&outCertificateChain](auto chain)
         {
-            for (const auto& view: chain)
-                outCertificateChain.emplace_back(view);
+            for (auto&& view: chain)
+                outCertificateChain.emplace_back(std::move(view));
             return true;
         };
 

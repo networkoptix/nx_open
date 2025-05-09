@@ -3,9 +3,11 @@
 #include "proxy_handler.h"
 
 #include <nx/network/aio/stream_socket_connector.h>
-#include <nx/network/socket_factory.h>
-#include <nx/network/url/url_parse_helper.h>
 #include <nx/network/http/global_context.h>
+#include <nx/network/socket_factory.h>
+#include <nx/network/ssl/certificate.h>
+#include <nx/network/ssl/helpers.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/log/log.h>
 
@@ -18,7 +20,8 @@ TargetHost::TargetHost(network::SocketAddress target):
 
 //-------------------------------------------------------------------------------------------------
 
-AbstractProxyHandler::AbstractProxyHandler()
+AbstractProxyHandler::AbstractProxyHandler():
+    m_certificateChainVerificationCallback(acceptAllCertificates)
 {
     setRequestBodyDeliveryType(MessageBodyDeliveryType::stream);
 }
@@ -305,8 +308,7 @@ void AbstractProxyHandler::processSslHandshakeResult(
 }
 
 void AbstractProxyHandler::acceptAllCertificates(
-    const ssl::CertificateChainView&,
-    nx::utils::MoveOnlyFunc<void(bool)> cb)
+    ssl::CertificateChainView, nx::utils::MoveOnlyFunc<void(bool)> cb)
 {
     cb(true);
 }

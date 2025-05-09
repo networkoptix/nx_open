@@ -27,9 +27,7 @@ auto toOpenSSL(const Chain& chain)
 
 namespace nx::network::ssl {
 
-static bool defaultVerificatation(
-    const CertificateChainView& chain,
-    StreamSocket* socket)
+static bool defaultVerificatation(CertificateChainView chain, StreamSocket* socket)
 {
     const auto serverName = socket->serverName();
     const bool isServerNameUuid =
@@ -55,12 +53,12 @@ static void setVerifyCertificateCallback(
         {
             if (verifyCertificateFunc)
             {
-                if (verifyCertificateFunc(chain))
+                if (verifyCertificateFunc(std::move(chain)))
                     return true;
             }
             else
             {
-                return defaultVerificatation(chain, socket);
+                return defaultVerificatation(std::move(chain), socket);
             }
 
             return false;
@@ -79,11 +77,11 @@ static void setVerifyCertificateAsyncCallback(
         {
             if (verifyCertificateFunc)
             {
-                verifyCertificateFunc(chain, std::move(completionHandler));
+                verifyCertificateFunc(std::move(chain), std::move(completionHandler));
             }
             else
             {
-                completionHandler(defaultVerificatation(chain, socket));
+                completionHandler(defaultVerificatation(std::move(chain), socket));
             }
         });
 }
@@ -120,7 +118,7 @@ AdapterFunc makeAdapterFunc(
 {
     return
         [verifyCertificateFunc = std::move(verifyCertificateFunc),
-        serverName = std::move(serverName)](auto socket)
+            serverName = std::move(serverName)](auto socket)
         {
             auto secureSocket = std::make_unique<ClientStreamSocket>(
                 Context::instance(), std::move(socket), kAcceptAnyCertificateCallback);
@@ -138,14 +136,14 @@ NX_NETWORK_API AdapterFunc makeAsyncAdapterFunc(
     return
         [verifyCertificateFunc = std::move(verifyCertificateFunc),
             serverName = std::move(serverName)](auto socket)
-    {
-        auto secureSocket = std::make_unique<ClientStreamSocket>(
-            Context::instance(), std::move(socket), kAcceptAnyCertificateCallback);
-        setVerifyCertificateAsyncCallback(secureSocket.get(), std::move(verifyCertificateFunc));
-        if (serverName)
-            secureSocket->setServerName(*serverName);
-        return secureSocket;
-    };
+        {
+            auto secureSocket = std::make_unique<ClientStreamSocket>(
+                Context::instance(), std::move(socket), kAcceptAnyCertificateCallback);
+            setVerifyCertificateAsyncCallback(secureSocket.get(), std::move(verifyCertificateFunc));
+            if (serverName)
+                secureSocket->setServerName(*serverName);
+            return secureSocket;
+        };
 }
 
 } // namespace nx::network::ssl
