@@ -75,6 +75,9 @@ CameraResourceStubPtr CameraSettingsTestFixture::givenCamera(CameraFeatures feat
         camera->setUserEnabledAnalyticsEngines({id});
     }
 
+    if (features.testFlag(CameraFeature::remoteArchive))
+        camera->setCameraCapabilities(nx::vms::api::DeviceCapability::remoteArchive);
+
     systemContext()->resourcePool()->addResource(camera);
     d->cameras.push_back(camera);
 

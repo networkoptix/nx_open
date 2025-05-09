@@ -29,6 +29,7 @@ protected:
         none = 0,
         motion = 1 << 0,
         objects = 1 << 1,
+        remoteArchive = 1 << 2,
     };
     Q_DECLARE_FLAGS(CameraFeatures, CameraFeature)
 
