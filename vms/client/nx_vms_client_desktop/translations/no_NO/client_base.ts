@@ -7632,34 +7632,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
-    <message>
-      <source>Inaccessible</source>
-      <translation>Utilgjengelig</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Laster...</translation>
-    </message>
-    <message>
-      <source>Click to Show Cameras</source>
-      <translation>Klikk for å vise kameraer</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CloudLayoutsManager</name>
-    <message>
-      <source>%1 (Copy)</source>
-      <comment>Original name will be substituted</comment>
-      <translation>%1 (kopi)</translation>
-    </message>
-    <message>
-      <source>%1 (Copy %2)</source>
-      <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation>%1 (Kopi %2)</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CommonMessageBar</name>
     <message>
       <source>Close</source>
@@ -7862,13 +7834,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Recording will not be enabled on some cameras.</source>
       <translation>Opptak vil ikke være aktivert på enkelte kameraer.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
-    <message>
-      <source>Unknown camera</source>
-      <translation>Ukjent kamera</translation>
     </message>
   </context>
   <context>

@@ -7632,34 +7632,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
-    <message>
-      <source>Inaccessible</source>
-      <translation>Otillgänglig</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Laddar...</translation>
-    </message>
-    <message>
-      <source>Click to Show Cameras</source>
-      <translation>Klicka för att visa kameror</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CloudLayoutsManager</name>
-    <message>
-      <source>%1 (Copy)</source>
-      <comment>Original name will be substituted</comment>
-      <translation>%1 (Kopiera)</translation>
-    </message>
-    <message>
-      <source>%1 (Copy %2)</source>
-      <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation>%1 (Kopiera %2)</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CommonMessageBar</name>
     <message>
       <source>Close</source>
@@ -7862,13 +7834,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Recording will not be enabled on some cameras.</source>
       <translation>Inspelning kommer inte att aktiveras på vissa kameror.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
-    <message>
-      <source>Unknown camera</source>
-      <translation>Okänd kamera</translation>
     </message>
   </context>
   <context>
@@ -11681,7 +11646,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>
-      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+      <translation>Användaren med den angivna e-postadressen har redan administratörsåtkomst via Kanalpartnern</translation>
     </message>
   </context>
   <context>

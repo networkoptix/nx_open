@@ -7509,34 +7509,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
-    <message>
-      <source>Inaccessible</source>
-      <translation>アクセス不可</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>ロード中...</translation>
-    </message>
-    <message>
-      <source>Click to Show Cameras</source>
-      <translation>クリックしてカメラを表示</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CloudLayoutsManager</name>
-    <message>
-      <source>%1 (Copy)</source>
-      <comment>Original name will be substituted</comment>
-      <translation>%1 (コピー)</translation>
-    </message>
-    <message>
-      <source>%1 (Copy %2)</source>
-      <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation>%1 (コピー %2)</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CommonMessageBar</name>
     <message>
       <source>Close</source>
@@ -7739,13 +7711,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Recording will not be enabled on some cameras.</source>
       <translation>一部のカメラでは録画が有効になりません。</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
-    <message>
-      <source>Unknown camera</source>
-      <translation>不明なカメラ</translation>
     </message>
   </context>
   <context>
@@ -11394,7 +11359,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>指定されたメールアドレスを持つ%1 ユーザーはすでに存在します。</translation>
+      <translation>指定されたメールアドレスを持つ %1 ユーザーはすでに存在します。</translation>
     </message>
     <message>
       <source>Save user</source>
@@ -11517,7 +11482,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>
-      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+      <translation>指定されたメールアドレスを持つユーザーは、すでにチャネルパートナー経由で管理者アクセス権限を持っています。</translation>
     </message>
   </context>
   <context>

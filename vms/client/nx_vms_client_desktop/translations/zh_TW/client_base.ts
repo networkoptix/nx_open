@@ -7508,34 +7508,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
-    <message>
-      <source>Inaccessible</source>
-      <translation>無法存取</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>載入...</translation>
-    </message>
-    <message>
-      <source>Click to Show Cameras</source>
-      <translation>點擊以顯示攝影機</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CloudLayoutsManager</name>
-    <message>
-      <source>%1 (Copy)</source>
-      <comment>Original name will be substituted</comment>
-      <translation>%1 (副本)</translation>
-    </message>
-    <message>
-      <source>%1 (Copy %2)</source>
-      <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation>%1 (副本 %2)</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CommonMessageBar</name>
     <message>
       <source>Close</source>
@@ -7738,13 +7710,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Recording will not be enabled on some cameras.</source>
       <translation>某些攝影機不會啟用錄影。</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
-    <message>
-      <source>Unknown camera</source>
-      <translation>未知的攝影機</translation>
     </message>
   </context>
   <context>

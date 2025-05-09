@@ -7632,34 +7632,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
-    <message>
-      <source>Inaccessible</source>
-      <translation>Inaccesible</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Cargando...</translation>
-    </message>
-    <message>
-      <source>Click to Show Cameras</source>
-      <translation type="unfinished">Click to Show Cameras</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CloudLayoutsManager</name>
-    <message>
-      <source>%1 (Copy)</source>
-      <comment>Original name will be substituted</comment>
-      <translation>%1 (Copiar)</translation>
-    </message>
-    <message>
-      <source>%1 (Copy %2)</source>
-      <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation>%1 (Copia %2)</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CommonMessageBar</name>
     <message>
       <source>Close</source>
@@ -7862,13 +7834,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Recording will not be enabled on some cameras.</source>
       <translation>La grabación no estará habilitada en algunas cámaras.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
-    <message>
-      <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
     </message>
   </context>
   <context>

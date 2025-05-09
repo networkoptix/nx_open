@@ -176,7 +176,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>共有オプションの設定後、再生リンクを生成するための新しいブックマークダイアログが開きます。</translation>
     </message>
   </context>
   <context>
@@ -340,11 +340,11 @@
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>続行</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>今後このウィンドウを表示しない</translation>
     </message>
   </context>
   <context>
@@ -430,6 +430,11 @@
     <message>
       <source>Disconnect</source>
       <translation>切断</translation>
+    </message>
+    <message>
+      <source>Logged in as %1</source>
+      <comment>%1 is a user name</comment>
+      <translation type="unfinished">Logged in as %1</translation>
     </message>
   </context>
   <context>

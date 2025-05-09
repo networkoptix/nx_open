@@ -340,7 +340,7 @@
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>继续</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
@@ -430,6 +430,11 @@
     <message>
       <source>Disconnect</source>
       <translation>断开连接</translation>
+    </message>
+    <message>
+      <source>Logged in as %1</source>
+      <comment>%1 is a user name</comment>
+      <translation type="unfinished">Logged in as %1</translation>
     </message>
   </context>
   <context>

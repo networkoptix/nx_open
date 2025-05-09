@@ -176,7 +176,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>Delning öppnar den nya bokmärkesdialogrutan för att generera en uppspelningslänk efter att delningsalternativen har ställts in</translation>
     </message>
   </context>
   <context>
@@ -341,11 +341,11 @@
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Fortsätt</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>Visa inte det här fönstret igen</translation>
     </message>
   </context>
   <context>
@@ -431,6 +431,11 @@
     <message>
       <source>Disconnect</source>
       <translation>Koppla från</translation>
+    </message>
+    <message>
+      <source>Logged in as %1</source>
+      <comment>%1 is a user name</comment>
+      <translation type="unfinished">Logged in as %1</translation>
     </message>
   </context>
   <context>

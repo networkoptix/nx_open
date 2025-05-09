@@ -340,11 +340,11 @@
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>계속</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>다시는 이 창을 표시하지 않음</translation>
     </message>
   </context>
   <context>
@@ -430,6 +430,11 @@
     <message>
       <source>Disconnect</source>
       <translation>연결 끊기</translation>
+    </message>
+    <message>
+      <source>Logged in as %1</source>
+      <comment>%1 is a user name</comment>
+      <translation type="unfinished">Logged in as %1</translation>
     </message>
   </context>
   <context>
