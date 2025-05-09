@@ -432,6 +432,11 @@
         <source>Disconnect</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Logged in as %1</source>
+        <comment>%1 is a user name</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MoveOnTapOverlay</name>

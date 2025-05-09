@@ -7630,34 +7630,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
-    <message>
-        <source>Inaccessible</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Loading...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Click to Show Cameras</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::CloudLayoutsManager</name>
-    <message>
-        <source>%1 (Copy)</source>
-        <comment>Original name will be substituted</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 (Copy %2)</source>
-        <comment>Original name will be substituted as %1, counter as %2</comment>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::CommonMessageBar</name>
     <message>
         <source>Close</source>
@@ -7859,13 +7831,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Recording will not be enabled on some cameras.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
-    <message>
-        <source>Unknown camera</source>
         <translation></translation>
     </message>
 </context>
