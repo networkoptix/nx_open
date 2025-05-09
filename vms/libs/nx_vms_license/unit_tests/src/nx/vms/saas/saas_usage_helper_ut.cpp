@@ -676,7 +676,7 @@ TEST_F(SaasServiceUsageHelperTest, liveServiceUsage)
     // Switch system from saas to oldLicenseMode
     manager->loadSaasDataAsync("");
     liveDetails = m_liveHelper->info();
-    ASSERT_EQ(25, liveDetails.exceedDevices.size()); //< Thre is no recording licenses now.
+    ASSERT_EQ(25, liveDetails.exceedDevices.size()); //< There is no recording licenses now.
 
     nx::vms::license::setFakeLicenseCount(10, Qn::LicenseType::LC_Professional);
     liveDetails = m_liveHelper->info();

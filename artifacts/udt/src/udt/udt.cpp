@@ -277,7 +277,7 @@ int epoll_wait2(
     SYSSOCKET* lrfds, int* lrnum,
     SYSSOCKET* lwfds, int* lwnum)
 {
-    // This API is an alternative format for epoll_wait, created for compatability with other languages.
+    // This API is an alternative format for epoll_wait, created for compatibility with other languages.
     // Users need to pass in an array for holding the returned sockets, with the maximum array length
     // stored in *rnum, etc., which will be updated with returned number of sockets.
 

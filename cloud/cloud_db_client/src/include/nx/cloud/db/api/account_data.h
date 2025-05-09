@@ -120,7 +120,7 @@ struct AccountData
     bool account2faEnabled = false;
 
     /**%apidoc[readonly] Shows if two-factor authentication key was generated for the account.
-     * Set in crosservice requests only
+     * Set in cross-service requests only
      */
     std::optional<bool> mfaKeyGenerated;
 

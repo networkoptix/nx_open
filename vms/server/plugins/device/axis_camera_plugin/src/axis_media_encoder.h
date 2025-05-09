@@ -11,7 +11,7 @@ class AxisCameraManager;
 
 //!Implementation of \a nxcip::CameraMediaEncoder
 /*!
-    \note Delegates reference counting to \a AxisCameraManager instance (i.e., increments \a AxisCameraManager reference counter on initialiation and decrements on destruction)
+    \note Delegates reference counting to \a AxisCameraManager instance (i.e., increments \a AxisCameraManager reference counter on initialization and decrements on destruction)
 */
 class AxisMediaEncoder
 :
@@ -25,11 +25,11 @@ public:
     AxisMediaEncoder( AxisCameraManager* const cameraManager );
     virtual ~AxisMediaEncoder();
 
-    //!Implementaion of nxpl::PluginInterface::queryInterface
+    //!Implementation of nxpl::PluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    //!Implementaion of nxpl::PluginInterface::addRef
+    //!Implementation of nxpl::PluginInterface::addRef
     virtual int addRef() const override;
-    //!Implementaion of nxpl::PluginInterface::releaseRef
+    //!Implementation of nxpl::PluginInterface::releaseRef
     virtual int releaseRef() const override;
 
     //!Implementation of nxcip::CameraMediaEncoder::getMediaUrl

@@ -566,11 +566,11 @@ TEST_F(NxMediaPlayerTest, SetQuality)
     T.channels(4).noTrans()
                .low(320, 240).high(1920, 1080).max(1920, 1080).req(high) >> low;
 
-    // Panoramic camera: transcoding is not supported, but maximum resoltion is not limited.
+    // Panoramic camera: transcoding is not supported, but maximum resolution is not limited.
     T.channels(4).noTrans() // so we must return the source stream.
                .low(320, 240).high(1920, 1080).max(-1, -1).req(high) >> high;
 
-    // Panoramic camera: transcoding is supported, but maximum resoltion is not limited.
+    // Panoramic camera: transcoding is supported, but maximum resolution is not limited.
     T.channels(4) // so we still must return the source stream.
                .low(320, 240).high(1920, 1080).max(-1, -1).req(high) >> high;
 

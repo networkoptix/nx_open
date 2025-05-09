@@ -1089,7 +1089,7 @@ int ftplib::Site(const char *cmd)
 }
 
 /*
- * FtpRaw - send a raw string string
+ * FtpRaw - send a raw string
  *
  * return 1 if command successful, 0 otherwise
  */
@@ -1356,7 +1356,6 @@ int ftplib::Put(const char *inputfile, const char *path, transfermode mode, off6
 	else return FtpXfer(inputfile, path, mp_ftphandle, ftplib::filewriteappend, mode);
 }
 
-
 int ftplib::Rename(const char *src, const char *dst)
 {
 	char cmd[256];
@@ -1390,7 +1389,7 @@ int ftplib::Quit()
 	if (mp_ftphandle->dir != FTPLIB_CONTROL) return 0;
 	if (mp_ftphandle->handle == 0)
 	{
-		strcpy(mp_ftphandle->response, "error: no anwser from server\n");
+		strcpy(mp_ftphandle->response, "error: no answer from server\n");
 		return 0;
 	}
 	if (!FtpSendCmd("QUIT",'2',mp_ftphandle))
@@ -1527,7 +1526,7 @@ int ftplib::Fxp(ftplib* src, ftplib* dst, const char *pathSrc, const char *pathD
 			return 0;
 		}
 
-		// wait til its finished!
+		// wait till its finished!
 
 		retval = (src->readresp('2', src->mp_ftphandle)) & (dst->readresp('2', dst->mp_ftphandle));
 

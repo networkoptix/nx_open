@@ -22,7 +22,7 @@ class AbstractVideoDecoder;
 
 /**
  * Mechanism which decides which video quality to apply to a stream reader based on user-preferred
- * quality and client/server trancoding/codec capabilities and available camera streams.
+ * quality and client/server transcoding/codec capabilities and available camera streams.
  */
 namespace media_player_quality_chooser {
 

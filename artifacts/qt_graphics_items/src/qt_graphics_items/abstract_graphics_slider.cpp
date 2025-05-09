@@ -62,7 +62,6 @@ void AbstractGraphicsSliderPrivate::setSteps(qint64 single, qint64 page)
         emit q->pageStepChanged(pageStep);
 }
 
-
 AbstractGraphicsSlider::AbstractGraphicsSlider(QGraphicsItem* parent):
     base_type(*new AbstractGraphicsSliderPrivate, parent)
 {

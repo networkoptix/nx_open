@@ -27,7 +27,7 @@ NX_VMS_RULES_API const FieldDescriptor* fieldByType(
 NX_VMS_RULES_API bool isLoggingAllowed(const Engine* engine, nx::Uuid ruleId);
 
 /**
- * Returns whether whether an event with the given descriptor is compatible with an action
+ * Returns whether an event with the given descriptor is compatible with an action
  * with the given descriptor.
  */
 NX_VMS_RULES_API bool isCompatible(

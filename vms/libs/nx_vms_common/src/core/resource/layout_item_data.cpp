@@ -10,8 +10,8 @@ bool LayoutItemData::operator==(const LayoutItemData& other) const
 {
     return resource.id == other.resource.id
         && resource.path == other.resource.path
-        // ResourceDescriptor::name comparision skipped intensionally as it is a temporary solution
-        // for the cross system layouts which must not affects on LayoutItemData items comparision.
+        // ResourceDescriptor::name comparison skipped intensionally as it is a temporary solution
+        // for the cross system layouts which must not affects on LayoutItemData items comparison.
         // TODO: #mmalofeev remove this workaround when cross-system layouts will not
         // require this property any more.
         && uuid == other.uuid

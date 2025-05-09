@@ -200,7 +200,7 @@ QByteArray QnUserHash::hashPassword(const QString& password) const
             }
 
         case Type::temporary:
-            NX_ASSERT(false, "Temporary users won't use passswords");
+            NX_ASSERT(false, "Temporary users won't use passwords");
             return "";
     };
 

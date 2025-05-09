@@ -20,7 +20,7 @@
  *     (sometimes quite long) timeout, for example, removeDir(). But the Server calls all of them
  *     in time, so every function should be implemented correctly.
  * - For some storages types, for example FTP, it may be impossible to 'honestly' implement such
- *     fuctions as getTotalSpace() and getFreeSpace(). In this case these functions are allowed to
+ *     functions as getTotalSpace() and getFreeSpace(). In this case these functions are allowed to
  *     return some sensible constant value. Keep in mind that getTotalSpace() is used mainly in
  *     determining "best" storage algorithm. For example if some storage total space is far smaller
  *     than others this storage won't be selected for writing. Or if some storage is twice larger
@@ -104,8 +104,8 @@ class FtpLibWrapper;
 
     using FtpImplPtr = std::shared_ptr<aux::FtpLibWrapper>;
     class FtpStorage;
-    // At construction phase we synchronise remote file with local one.
-    // During destruction synchronisation attempt is repeated.
+    // At construction phase we synchronize remote file with local one.
+    // During destruction synchronization attempt is repeated.
     // All intermediate actions (read/write/seek) are made with the local copy.
     class FtpIODevice
         : public IODevice,
@@ -143,7 +143,7 @@ class FtpLibWrapper;
         virtual int releaseRef() const override;
 
     private:
-        // synchronize localfile with remote one
+        // synchronize local file with remote one
         void flush();
         // delete only via releaseRef()
         ~FtpIODevice();

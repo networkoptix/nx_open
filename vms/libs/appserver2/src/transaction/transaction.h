@@ -72,7 +72,7 @@ struct NotDefinedApiData
  *     // Filter the requested list by the specified checker. The warning below MUST be fulfilled.
  *     FilterListByAccess<ShowreelAccess>(),
  *
- *     // Actual only for persistent transactions. Desides if the remote peer has enough rights to
+ *     // Actual only for persistent transactions. Decides if the remote peer has enough rights to
  *     // receive this transaction during the proxy transaction stage.
  *     AllowForAllAccessOut(),
  *

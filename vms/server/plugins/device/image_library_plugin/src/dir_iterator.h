@@ -18,8 +18,6 @@ namespace FsEntryType
     const char* toString( Value val );
 }
 
-
-
 class DirIteratorImpl;
 
 //!Iterates through contents of specified directory
@@ -61,7 +59,7 @@ public:
 
     //!Moves iterator to the next entry
     /*!
-        \return true, if next found, false - if no entries satisfuying search criteria
+        \return true, if next found, false - if no entries satisfying search criteria
     */
     bool next();
 

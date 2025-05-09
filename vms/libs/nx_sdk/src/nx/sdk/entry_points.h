@@ -9,7 +9,7 @@
  *
  * Note that there are additional entry point functions declared and implemented in
  * nx/sdk/helpers/lib_context.h. They give the Integration some useful capabilities, and require no
- * special efforts from the Integration creator besides encorporating that header and its .cpp.
+ * special efforts from the Integration creator besides incorporating that header and its .cpp.
  *
  * Note that there is an old-SDK entry point function defined in plugins/plugin_api.h - it can be
  * used for creating Integrations of old-SDK types (namely, Video Source and Storage).

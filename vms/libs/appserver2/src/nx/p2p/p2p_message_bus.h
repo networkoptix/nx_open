@@ -189,7 +189,7 @@ private:
      * In P2P mode a Client gets transactions only, without any protocol related system messages.
      * It causes client do not receive peerFound/peerLost signals from messageBus any more.
      * This function sends removeRuntimeInfoData transactions to the all connected clients or
-     * neighbour servers about disconnected clients.
+     * neighbor servers about disconnected clients.
      */
     void sendRuntimeInfoRemoved(const vms::api::PeerData& peer);
 private slots:

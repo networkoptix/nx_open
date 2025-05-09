@@ -44,7 +44,7 @@ public:
     void setVolume(float value);
 
     /**
-     * @return True if audio is mutted.
+     * @return True if audio is muted.
      */
     bool isMute() const;
 

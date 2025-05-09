@@ -1029,7 +1029,7 @@ void MessageBus::sendTransactionImpl(
     {
         if (!descriptor->isPersistent)
         {
-            NX_VERBOSE(this, "Cloud %1 is not iterested in non-persistent transactions", peerName(remotePeer.id));
+            NX_VERBOSE(this, "Cloud %1 is not interested in non-persistent transactions", peerName(remotePeer.id));
             return;
         }
 

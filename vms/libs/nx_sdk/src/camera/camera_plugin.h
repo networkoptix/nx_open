@@ -372,7 +372,7 @@ namespace nxcip
             stU8P, ///< unsigned 8 bits, planar
             stS16P, ///< signed 16 bits, planar
             stS32P, ///< signed 32 bits, planar
-            stFLTP, ///< float, pl`anar
+            stFLTP, ///< float, planar
             stDBLP, ///< double, planar
             stS64, ///< signed 64 bits
             stS64P, ///< signed 64 bits, planar

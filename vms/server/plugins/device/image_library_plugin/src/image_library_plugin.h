@@ -17,7 +17,7 @@ class DiscoveryManager;
  *
  * Usage:
  *
- * To use this plugin, launch client aplication and use manual camera search ("Add Camera(s)..." in
+ * To use this plugin, launch client application and use manual camera search ("Add Camera(s)..." in
  * media server menu) filling "Camera Address" field with absolute path to local directory,
  * containing jpeg file(s). Specified directory will be found as camera with archive and appear in
  * tree menu.
@@ -34,7 +34,7 @@ class DiscoveryManager;
  * - Plugin entry point is createNXPluginInstance function.
  * - All classes implementing `nxcip::` interfaces delegate reference counting (by using
  *     CommonRefManager(CommonRefManager*) constructor) to factory class instance (e.g.
- *     CameraManager is a factory for MediaEncoder). This garantees that CameraManager instance
+ *     CameraManager is a factory for MediaEncoder). This guarantees that CameraManager instance
  *     is removed later than MediaEncoder instance.
  * - All factory classes (except for CameraDiscoveryManager) hold pointer to child class object
  *     (e.g. MediaEncoder is a child for CameraManager) and delete all children on destruction.

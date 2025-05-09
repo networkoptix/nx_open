@@ -419,7 +419,7 @@ struct SystemSharing: ShareSystemRequest
     // Internal attribute. Gives a hint to the UI whether to show the user in the list or not.
     std::optional<bool> hidden;
 
-    /**%apidoc List of roles assigned to user by organisation
+    /**%apidoc List of roles assigned to user by organization
      * This field is presented only in cdb/v2/systems API
      */
     std::vector<std::string> orgRoleIds;
@@ -504,7 +504,6 @@ struct SystemSharingEx: SystemSharing
 };
 
 NX_REFLECTION_INSTRUMENT(SystemSharingEx, (account2faEnabled)(httpDigestAuthEnabled)(accountNotificationFilterSettings))
-
 
 using SystemSharingExList = std::vector<SystemSharingEx>;
 
@@ -889,11 +888,11 @@ struct CreateBatchRequest
 };
 
 /**
- * Create batch response with request traking id assigned.
+ * Create batch response with request tracking id assigned.
 */
 struct CreateBatchResponse
 {
-    /**%apidoc Batch traking id*/
+    /**%apidoc Batch tracking id*/
     std::string batchId;
 };
 
@@ -914,7 +913,7 @@ enum class BatchStatus
 *  Batch state response.
 *  Contains number of operations by status: pending, failed, complete
 *  Batch has been processed completely if pending operations is zero
-*  Batch hase been processed without errors if failed operations is zero
+*  Batch has been processed without errors if failed operations is zero
 */
 struct BatchState
 {
@@ -925,7 +924,7 @@ struct BatchState
 };
 
 /**
-*  Failed to prcess batch item with error description.
+*  Failed to process batch item with error description.
 */
 struct BatchItemErrorInfo
 {
@@ -941,7 +940,7 @@ struct BatchItemErrorInfo
 */
 struct BatchErrorInfo
 {
-    /**%apidoc Uncommited batch items */
+    /**%apidoc Uncommitted batch items */
     std::vector<BatchItemErrorInfo> uncommitted;
 };
 

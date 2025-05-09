@@ -248,7 +248,7 @@ Result QnNxRtpParser::processData(
             {
                 if (context)
                 {
-                    NX_WARNING(this, "Unsupported codec or packet type %1, data typa: %2",
+                    NX_WARNING(this, "Unsupported codec or packet type %1, data type: %2",
                         context->getCodecType(), dataType);
                 }
                 else if (dataType == QnAbstractMediaData::AUDIO)

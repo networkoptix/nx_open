@@ -23,12 +23,10 @@ ECB-AES128
     43b1cd7f598ece23881b00e3ed030688
     7b0c785e27e8ad3f8223207104725dd4
 
-
 NOTE:   String length must be evenly divisible by 16byte (str_len % 16 == 0)
         You should pad the end of the string with zeros if this is not the case.
 
 */
-
 
 /*****************************************************************************/
 /* Includes:                                                                 */
@@ -36,7 +34,6 @@ NOTE:   String length must be evenly divisible by 16byte (str_len % 16 == 0)
 #include <stdint.h>
 #include <string.h> // CBC mode, for memset
 #include "aes.h"
-
 
 /*****************************************************************************/
 /* Defines:                                                                  */
@@ -56,7 +53,6 @@ NOTE:   String length must be evenly divisible by 16byte (str_len % 16 == 0)
 #ifndef MULTIPLY_AS_A_FUNCTION
   #define MULTIPLY_AS_A_FUNCTION 0
 #endif
-
 
 /*****************************************************************************/
 /* Private variables:                                                        */
@@ -116,7 +112,6 @@ static const uint8_t rsbox[256] =
   0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61,
   0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d};
 
-
 // The round constant word array, Rcon[i], contains the values given by
 // x to th e power (i-1) being powers of x (x is denoted as {02}) in the field GF(2^8)
 // Note that i starts at 1, not 0).
@@ -137,7 +132,6 @@ static const uint8_t Rcon[255] = {
   0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63,
   0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd,
   0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb};
-
 
 /*****************************************************************************/
 /* Private functions:                                                        */
@@ -326,7 +320,6 @@ static void InvMixColumns(void)
     }
 }
 
-
 // The SubBytes Function Substitutes the values in the
 // state matrix with values in an S-box.
 static void InvSubBytes(void)
@@ -368,7 +361,6 @@ static void InvShiftRows(void)
     (*state)[2][3] = (*state)[3][3];
     (*state)[3][3] = temp;
 }
-
 
 // Cipher is the main function that encrypts the PlainText.
 static void Cipher(void)
@@ -430,13 +422,10 @@ static void BlockCopy(uint8_t* output, const uint8_t* input)
     }
 }
 
-
-
 /*****************************************************************************/
 /* Public functions:                                                         */
 /*****************************************************************************/
 #if defined(ECB) && ECB
-
 
 void AES128_ECB_encrypt(const uint8_t* input, const uint8_t* key, uint8_t* output)
 {
@@ -464,13 +453,9 @@ void AES128_ECB_decrypt(const uint8_t* input, const uint8_t* key, uint8_t *outpu
     InvCipher();
 }
 
-
 #endif // #if defined(ECB) && ECB
 
-
-
 #if defined(CBC) && CBC
-
 
 static void XorWithIv(uint8_t* buf)
 {
@@ -561,6 +546,5 @@ void AES128_CBC_decrypt_buffer(uint8_t* output, uint8_t* input, uint32_t length,
         InvCipher();
     }
 }
-
 
 #endif // #if defined(CBC) && CBC

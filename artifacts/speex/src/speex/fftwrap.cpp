@@ -205,7 +205,6 @@ void spx_fft_destroy(void *table)
   av_free(table);
 }
 
-
 void spx_fft(void *table, spx_word16_t *in, spx_word16_t *out)
 {
   int i;
@@ -305,17 +304,14 @@ void spx_ifft(void *table, spx_word16_t *in, spx_word16_t *out)
    kiss_fftri2(t->backward, in, out);
 }
 
-
 #else
 
 #error No other FFT implemented
 
 #endif
 
-
 #ifdef FIXED_POINT
 /*#include "smallft.h"*/
-
 
 void spx_fft_float(void *table, float *in, float *out)
 {

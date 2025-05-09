@@ -163,7 +163,7 @@ public:
 };
 
 /**
- * A command to chesk status of installation of a zip package.
+ * A command to check status of installation of a zip package.
  */
 class NX_VMS_APPLAUNCHER_API_API InstallZipCheckStatus: public BaseTask
 {
@@ -291,6 +291,5 @@ public:
     virtual QByteArray serialize() const override;
     virtual bool deserialize(const QByteArray& data) override;
 };
-
 
 } // namespace nx::vms::applauncher::api

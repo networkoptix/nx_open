@@ -171,7 +171,7 @@ int AxisMediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
 
 int AxisMediaEncoder::fetchCameraResolutionList() const
 {
-    // determin camera max resolution
+    // determine camera max resolution
     SyncHttpClient http(
         AxisCameraPlugin::instance()->networkAccessManager(),
         m_cameraManager->cameraInfo().url,

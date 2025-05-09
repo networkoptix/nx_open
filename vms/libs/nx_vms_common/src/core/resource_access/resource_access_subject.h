@@ -46,4 +46,4 @@ struct hash<QnResourceAccessSubject>
     size_t operator()(const QnResourceAccessSubject& s) const { return hash<nx::Uuid>()(s.id()); }
 };
 
-} // namepsace std
+} // namespace std

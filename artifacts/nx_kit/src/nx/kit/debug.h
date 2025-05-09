@@ -34,7 +34,7 @@ namespace debug {
 NX_KIT_API std::string srcFileRelativePath(const std::string& file);
 
 /**
- * Extracts the basa name without extension from the supplied __FILE__.
+ * Extracts the base name without extension from the supplied __FILE__.
  */
 NX_KIT_API std::string srcFileBaseNameWithoutExt(const std::string& file);
 

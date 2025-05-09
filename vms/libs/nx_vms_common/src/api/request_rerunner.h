@@ -9,11 +9,11 @@
 namespace nx::vms::common {
 
 // A helper class to rerun requests that require a fresh authorization token.
-// For security reasons, some priviledged API requests can be executed only with a recently
+// For security reasons, some privileged API requests can be executed only with a recently
 // issued authorization token. If the token is not fresh enough, such request will fail,
 // returning an error, and the user should be asked to enter his password and authorize again.
 // After that the request is resend with a new authorization token. Since the Client can send
-// several priviledged request simultaneously, they all could fail at once. Only one
+// several privileged request simultaneously, they all could fail at once. Only one
 // authorization dialog should be shown in that case. Also it's possible that responses for
 // some failed requests will be delivered after this dialog has been closed (e.g. because of a
 // slow internet connection), and another dialog should not be shown in that case.

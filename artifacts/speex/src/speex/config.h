@@ -29,14 +29,14 @@ static inline void speex_warning(const char *str)
 #ifndef DISABLE_WARNINGS
     fprintf (stderr, "warning: %s\n", str);
 #endif
-} 
+}
 
 static inline void speex_warning_int(const char *str, int val)
 {
 #ifndef DISABLE_WARNINGS
     fprintf (stderr, "warning: %s %d\n", str, val);
 #endif
-} 
+}
 
 #ifdef _MSC_VER
 #    pragma warning(disable: 4244) /* C4244: '?' : conversion from '?' to '?', possible loss of data. */

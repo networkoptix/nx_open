@@ -65,7 +65,7 @@ public:
      *   - intersection of https://example.com/ and /some/path will be https://example.com/some/path.
      *     Note that /some/path is considered to be valid for any host.
      *
-     * Intersection of attributes is a subset of name=value pairs that is prsent in both scopes.
+     * Intersection of attributes is a subset of name=value pairs that is present in both scopes.
      */
     AccessScope intersectScopes(const AccessScope& otherScope) const;
 

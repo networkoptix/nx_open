@@ -46,9 +46,9 @@ public:
         Supports cast to nxcip::CameraDiscoveryManager interface
     */
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    //!Implementaion of nxpl::PluginInterface::addRef
+    //!Implementation of nxpl::PluginInterface::addRef
     virtual int addRef() const override;
-    //!Implementaion of nxpl::PluginInterface::releaseRef
+    //!Implementation of nxpl::PluginInterface::releaseRef
     virtual int releaseRef() const override;
 
     nxpt::CommonRefManager* refManager();

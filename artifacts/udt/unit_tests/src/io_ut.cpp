@@ -116,7 +116,6 @@ private:
 
 TYPED_TEST_SUITE_P(Io);
 
-
 //-------------------------------------------------------------------------------------------------
 
 struct CommonConfig
@@ -167,7 +166,7 @@ TYPED_TEST_P(Io, the_data_is_received_after_sending_socket_closure_async)
     if (this->GetParamType() == typeid(ReorderedPacketsConfig))
     {
         /* Not supported.
-         * UDT does't reorder 'close' control packet, also this test emulate reordered packet inaccurate
+         * UDT doesn't reorder 'close' control packet, also this test emulate reordered packet inaccurate
          * It is not same real network: it just doesn't send data packet after closing sender socket.
          */
 

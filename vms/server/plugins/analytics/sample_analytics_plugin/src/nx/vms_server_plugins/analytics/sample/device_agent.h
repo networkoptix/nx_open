@@ -35,7 +35,7 @@ private:
     const std::string kHelloWorldObjectType = "nx.sample.helloWorld";
     const std::string kNewTrackEventType = "nx.sample.newTrack";
 
-    /** Lenght of the the track (in frames). The value was chosen arbitrarily. */
+    /** Length of the track (in frames). The value was chosen arbitrarily. */
     static constexpr int kTrackFrameCount = 256;
 
 private:

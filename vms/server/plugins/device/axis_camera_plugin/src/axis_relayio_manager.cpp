@@ -227,7 +227,7 @@ void AxisRelayIOManager::startInputPortMonitoringPriv( int asyncCallID )
             continue;   //port already monitored
         lk.unlock();
 
-        //it is safe to proceed futher with no lock because stopInputMonitoring can be only called from current thread
+        //it is safe to proceed further with no lock because stopInputMonitoring can be only called from current thread
             //and forgetHttpClient cannot be called before doGet call
 
         //requestUrl.setPath( QString::fromLatin1("/axis-cgi/io/port.cgi?monitor=%1").arg(it->second) );

@@ -103,7 +103,7 @@ bool NvidiaVideoDecoderOldPlayer::hardwareDecoder() const
 
 double NvidiaVideoDecoderOldPlayer::getSampleAspectRatio() const
 {
-    //TODO #lbusygin: Implement sample acpect ratio parsing
+    //TODO #lbusygin: Implement sample aspect ratio parsing
     return 1.0;
 }
 
