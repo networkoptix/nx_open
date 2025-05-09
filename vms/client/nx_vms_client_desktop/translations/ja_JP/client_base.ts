@@ -11828,7 +11828,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>指定されたメールアドレスを持つ%1 ユーザーはすでに存在します。</translation>
+      <translation>指定されたメールアドレスを持つ %1 ユーザーはすでに存在します。</translation>
     </message>
     <message>
       <source>Save user</source>
