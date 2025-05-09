@@ -5,6 +5,7 @@
 #include <functional>
 #include <string>
 
+#include "organization_data.h"
 #include "result_code.h"
 #include "system_data.h"
 
@@ -17,6 +18,14 @@ class OrganizationManager
 {
 public:
     virtual ~OrganizationManager() = default;
+
+    /**
+     * Update organization data.
+     */
+    virtual void updateOrganization(
+        const std::string& organizationId,
+        const api::OrganizationUpdateData& data,
+        std::function<void(ResultCode)> completionHandler) = 0;
 
     /**
      * Get the list of system offers either for the organization or by the organization.

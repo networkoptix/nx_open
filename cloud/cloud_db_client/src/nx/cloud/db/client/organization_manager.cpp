@@ -16,6 +16,19 @@ OrganizationManager::OrganizationManager(ApiRequestsExecutor* requestsExecutor):
 {
 }
 
+void OrganizationManager::updateOrganization(
+        const std::string& organizationId,
+        const api::OrganizationUpdateData& data,
+        std::function<void(api::ResultCode)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall<void>(
+        Method::put,
+        rest::substituteParameters(kOrganizationInternalPath, {organizationId}),
+        {}, //query
+        data,
+        std::move(completionHandler));
+}
+
 void OrganizationManager::getSystemOffers(
     const std::string& organizationId,
     std::function<void(api::ResultCode, std::vector<api::SystemOffer>)> completionHandler)

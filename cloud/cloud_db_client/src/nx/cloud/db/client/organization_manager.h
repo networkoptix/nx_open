@@ -13,6 +13,11 @@ class OrganizationManager:
 public:
     OrganizationManager(ApiRequestsExecutor* requestsExecutor);
 
+    virtual void updateOrganization(
+        const std::string& organizationId,
+        const api::OrganizationUpdateData& data,
+        std::function<void(api::ResultCode)> completionHandler) override;
+
     virtual void getSystemOffers(
         const std::string& organizationId,
         std::function<void(api::ResultCode, std::vector<api::SystemOffer>)> completionHandler) override;
