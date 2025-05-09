@@ -54,8 +54,11 @@ struct NX_VMS_API WebRtcTrackerSettings: public MediaSettings
      * frame.
      */
     std::chrono::milliseconds sendTimestampIntervalMs{1000};
+
+    /**%apidoc[opt] If specified, metadata will be sent via data channel in JSON format. */
+    bool enableMetadata = false;
 };
-#define WebRtcTrackerSettings_Fields MediaSettings_Fields(id)(speed)(deliveryMethod)(unreliableTransport)(mseFormat)(sendTimestampIntervalMs)
+#define WebRtcTrackerSettings_Fields MediaSettings_Fields(id)(speed)(deliveryMethod)(unreliableTransport)(mseFormat)(sendTimestampIntervalMs)(enableMetadata)
 QN_FUSION_DECLARE_FUNCTIONS(WebRtcTrackerSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(WebRtcTrackerSettings, WebRtcTrackerSettings_Fields)
 
