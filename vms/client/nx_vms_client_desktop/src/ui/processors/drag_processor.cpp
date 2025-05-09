@@ -31,8 +31,13 @@ DragProcessor::DragProcessor(QObject *parent):
     m_firstDragSent(false)
 {}
 
-DragProcessor::~DragProcessor() {
-    setHandler(nullptr);
+DragProcessor::~DragProcessor()
+{
+    // Avoid reset(): it emits a signal and may trigger an assert in parent object.
+    if (m_handler)
+        m_handler->m_processor = nullptr;
+
+    m_handler = nullptr;
 }
 
 void DragProcessor::reset() {
