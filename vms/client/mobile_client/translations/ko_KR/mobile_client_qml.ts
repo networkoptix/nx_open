@@ -434,7 +434,7 @@
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>%1 로 로그인됨</translation>
     </message>
   </context>
   <context>

@@ -435,7 +435,7 @@
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>%1 olarak oturum açıldı</translation>
     </message>
   </context>
   <context>

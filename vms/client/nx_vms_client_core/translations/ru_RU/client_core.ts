@@ -262,11 +262,11 @@
     <name>nx::vms::client::core::CloudCrossSystemContext</name>
     <message>
       <source>Inaccessible</source>
-      <translation type="unfinished">Inaccessible</translation>
+      <translation>Недоступно</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Загрузка...</translation>
     </message>
     <message>
       <source>Click to Show Cameras</source>

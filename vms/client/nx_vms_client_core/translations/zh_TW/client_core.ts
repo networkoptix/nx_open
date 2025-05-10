@@ -259,15 +259,15 @@
     <name>nx::vms::client::core::CloudCrossSystemContext</name>
     <message>
       <source>Inaccessible</source>
-      <translation type="unfinished">Inaccessible</translation>
+      <translation>無法存取</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>讀取中...</translation>
     </message>
     <message>
       <source>Click to Show Cameras</source>
-      <translation type="unfinished">Click to Show Cameras</translation>
+      <translation>點擊以顯示攝影機</translation>
     </message>
   </context>
   <context>
@@ -275,19 +275,19 @@
     <message>
       <source>%1 (Copy)</source>
       <comment>Original name will be substituted</comment>
-      <translation type="unfinished">%1 (Copy)</translation>
+      <translation>%1 (副本)</translation>
     </message>
     <message>
       <source>%1 (Copy %2)</source>
       <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation type="unfinished">%1 (Copy %2)</translation>
+      <translation>%1 (副本 %2)</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::CrossSystemCameraResource</name>
     <message>
       <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
+      <translation>未知的攝影機</translation>
     </message>
   </context>
   <context>
