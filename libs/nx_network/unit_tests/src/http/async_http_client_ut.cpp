@@ -664,7 +664,7 @@ TEST_F(HttpClientAsyncCustom, DISABLED_cameraThumbnail)
 
     static const std::string kRequestQuery =
         "ec2/cameraThumbnail?format=ubjson&cameraId=%7B38c5e727-b304-d188-0733-8619d09baae5%7D"
-            "&time=latest&rotate=-1&height=184&widht=0&imageFormat=jpeg&method=after";
+            "&time=latest&rotate=-1&height=184&width=0&imageFormat=jpeg&method=after";
 
     static const nx::network::http::HttpHeaders kRequestHeaders =
     {
