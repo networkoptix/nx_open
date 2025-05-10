@@ -32,6 +32,11 @@ protected:
         dispatch(Reducer::setRemoteArchiveSynchronizationEnabled, value);
     }
 
+    void thenKeepCameraTimeSettingsIsDefault(bool isDefault)
+    {
+        EXPECT_EQ(state().expert.isKeepCameraTimeSettingsDefault, isDefault);
+    }
+
     void thenSettingsOptimizationEnabled(bool value)
     {
         EXPECT_EQ(state().settingsOptimizationEnabled, value);
@@ -101,16 +106,19 @@ TEST_F(CameraSettingsDialogExpertTest, resetDefaultKeepCameraTimeSettings)
     whenOptimizationEnabled(false); // set and reset do nothing.
     thenKeepCameraTimeSettings(true);
     thenFirstCameraKeepCameraTimeSettings(true);
+    thenKeepCameraTimeSettingsIsDefault(true);
 
     whenKeepCameraTimeSettings(false);
     thenKeepCameraTimeSettings(true);
     whenChangesAreSaved();
     thenFirstCameraKeepCameraTimeSettings(true);
+    thenKeepCameraTimeSettingsIsDefault(true);
 
     dispatch(Reducer::resetExpertSettings);
     thenKeepCameraTimeSettings(true);
     whenChangesAreSaved();
     thenFirstCameraKeepCameraTimeSettings(true);
+    thenKeepCameraTimeSettingsIsDefault(true);
 }
 
 TEST_F(CameraSettingsDialogExpertTest, resetDefaultKeepCameraTimeSettingsWithOptimization)
@@ -119,16 +127,19 @@ TEST_F(CameraSettingsDialogExpertTest, resetDefaultKeepCameraTimeSettingsWithOpt
     whenOptimizationEnabled(true); // set and reset work as expected.
     thenKeepCameraTimeSettings(true);
     thenFirstCameraKeepCameraTimeSettings(true);
+    thenKeepCameraTimeSettingsIsDefault(true);
 
     whenKeepCameraTimeSettings(false);
     thenKeepCameraTimeSettings(false);
     whenChangesAreSaved();
     thenFirstCameraKeepCameraTimeSettings(false);
+    thenKeepCameraTimeSettingsIsDefault(false);
 
     dispatch(Reducer::resetExpertSettings);
     thenKeepCameraTimeSettings(true);
     whenChangesAreSaved();
     thenFirstCameraKeepCameraTimeSettings(true);
+    thenKeepCameraTimeSettingsIsDefault(true);
 }
 
 // keepCameraTimeSettings, camera has RemoteArchive capability
@@ -139,16 +150,19 @@ TEST_F(CameraSettingsDialogExpertTest, resetDefaultKeepCameraTimeSettingsWithRem
     whenOptimizationEnabled(false); // set and reset do nothing.
     thenKeepCameraTimeSettings(false);
     thenFirstCameraKeepCameraTimeSettings(false);
+    thenKeepCameraTimeSettingsIsDefault(true);
 
     whenKeepCameraTimeSettings(true);
     thenKeepCameraTimeSettings(false);
     whenChangesAreSaved();
     thenFirstCameraKeepCameraTimeSettings(false);
+    thenKeepCameraTimeSettingsIsDefault(true);
 
     dispatch(Reducer::resetExpertSettings);
     thenKeepCameraTimeSettings(false);
     whenChangesAreSaved();
     thenFirstCameraKeepCameraTimeSettings(false);
+    thenKeepCameraTimeSettingsIsDefault(true);
 }
 
 TEST_F(CameraSettingsDialogExpertTest, resetDefaultKeepCameraTimeSettingsWithOptimizationWithRemoteArchive)
@@ -157,16 +171,19 @@ TEST_F(CameraSettingsDialogExpertTest, resetDefaultKeepCameraTimeSettingsWithOpt
     whenOptimizationEnabled(true); // set and reset work as expected.
     thenKeepCameraTimeSettings(false);
     thenFirstCameraKeepCameraTimeSettings(false);
+    thenKeepCameraTimeSettingsIsDefault(true);
 
     whenKeepCameraTimeSettings(true);
     thenKeepCameraTimeSettings(true);
     whenChangesAreSaved();
     thenFirstCameraKeepCameraTimeSettings(true);
+    thenKeepCameraTimeSettingsIsDefault(false);
 
     dispatch(Reducer::resetExpertSettings);
-    thenKeepCameraTimeSettings(true);
+    thenKeepCameraTimeSettings(false);
     whenChangesAreSaved();
-    thenFirstCameraKeepCameraTimeSettings(true);
+    thenFirstCameraKeepCameraTimeSettings(false);
+    thenKeepCameraTimeSettingsIsDefault(true);
 }
 
 // keepCameraTimeSettings, 2 cameras
@@ -179,18 +196,21 @@ TEST_F(CameraSettingsDialogExpertTest, resetDefaultKeepCameraTimeSettings2Camera
     thenKeepCameraTimeSettingsDoesNotHaveValue();
     thenFirstCameraKeepCameraTimeSettings(true);
     thenSecondCameraKeepCameraTimeSettings(false);
+    thenKeepCameraTimeSettingsIsDefault(true);
 
     whenKeepCameraTimeSettings(false);
     thenKeepCameraTimeSettingsDoesNotHaveValue();
     whenChangesAreSaved();
     thenFirstCameraKeepCameraTimeSettings(true);
     thenSecondCameraKeepCameraTimeSettings(false);
+    thenKeepCameraTimeSettingsIsDefault(true);
 
     dispatch(Reducer::resetExpertSettings);
     thenKeepCameraTimeSettingsDoesNotHaveValue();
     whenChangesAreSaved();
     thenFirstCameraKeepCameraTimeSettings(true);
     thenSecondCameraKeepCameraTimeSettings(false);
+    thenKeepCameraTimeSettingsIsDefault(true);
 }
 
 TEST_F(CameraSettingsDialogExpertTest, resetDefaultKeepCameraTimeSettingsWithOptimization2Cameras)
@@ -201,18 +221,21 @@ TEST_F(CameraSettingsDialogExpertTest, resetDefaultKeepCameraTimeSettingsWithOpt
     thenKeepCameraTimeSettingsDoesNotHaveValue();
     thenFirstCameraKeepCameraTimeSettings(true);
     thenSecondCameraKeepCameraTimeSettings(false);
+    thenKeepCameraTimeSettingsIsDefault(true);
 
     whenKeepCameraTimeSettings(true);
     thenKeepCameraTimeSettings(true);
     whenChangesAreSaved();
     thenFirstCameraKeepCameraTimeSettings(true);
     thenSecondCameraKeepCameraTimeSettings(true);
+    thenKeepCameraTimeSettingsIsDefault(false);
 
     dispatch(Reducer::resetExpertSettings);
-    thenKeepCameraTimeSettings(true);
+    thenKeepCameraTimeSettingsDoesNotHaveValue();
     whenChangesAreSaved();
     thenFirstCameraKeepCameraTimeSettings(true);
-    thenSecondCameraKeepCameraTimeSettings(true);
+    thenSecondCameraKeepCameraTimeSettings(false);
+    thenKeepCameraTimeSettingsIsDefault(true);
 }
 
 //remoteArchiveSynchronizationEnabled
@@ -226,7 +249,7 @@ TEST_F(CameraSettingsDialogExpertTest, resetDefaultRemoteArchiveSynchronizationE
     whenRemoteArchiveSynchronizationEnable(true);
     thenRemoteArchiveSynchronizationEnable(true);
     whenChangesAreSaved();
-    thenFirstCameraRemoteArchiveSynchronizationEnable(true);
+    thenFirstCameraRemoteArchiveSynchronizationEnable(false);
 
     whenRemoteArchiveSynchronizationEnable(false);
     thenRemoteArchiveSynchronizationEnable(false);
@@ -260,9 +283,9 @@ TEST_F(CameraSettingsDialogExpertTest, resetDefaultRemoteArchiveSynchronizationE
     whenRemoteArchiveSynchronizationEnable(false);
     thenRemoteArchiveSynchronizationEnable(false);
     dispatch(Reducer::resetExpertSettings);
-    thenRemoteArchiveSynchronizationEnable(false);
+    thenRemoteArchiveSynchronizationEnable(true);
     whenChangesAreSaved();
-    thenFirstCameraRemoteArchiveSynchronizationEnable(false);
+    thenFirstCameraRemoteArchiveSynchronizationEnable(true);
 }
 
 // remoteArchiveSynchronizationEnabled, 2 cameras
@@ -278,7 +301,7 @@ TEST_F(CameraSettingsDialogExpertTest, resetDefaultRemoteArchiveSynchronizationE
     whenRemoteArchiveSynchronizationEnable(true);
     thenRemoteArchiveSynchronizationEnable(true);
     whenChangesAreSaved();
-    thenFirstCameraRemoteArchiveSynchronizationEnable(true);
+    thenFirstCameraRemoteArchiveSynchronizationEnable(false);
     thenSecondCameraRemoteArchiveSynchronizationEnable(true);
 
     whenRemoteArchiveSynchronizationEnable(false);
@@ -288,10 +311,10 @@ TEST_F(CameraSettingsDialogExpertTest, resetDefaultRemoteArchiveSynchronizationE
     thenSecondCameraRemoteArchiveSynchronizationEnable(false);
 
     dispatch(Reducer::resetExpertSettings);
-    thenRemoteArchiveSynchronizationEnable(false);
+    thenRemoteArchiveSynchronizationEnableDoesNotHaveValue();
     whenChangesAreSaved();
     thenFirstCameraRemoteArchiveSynchronizationEnable(false);
-    thenSecondCameraRemoteArchiveSynchronizationEnable(false);
+    thenSecondCameraRemoteArchiveSynchronizationEnable(true);
 }
 
 } // namespace nx::vms::client::desktop::test
