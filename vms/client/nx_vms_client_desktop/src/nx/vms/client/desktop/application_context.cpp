@@ -580,7 +580,7 @@ struct ApplicationContext::Private
             q,
             [this]()
             {
-                q->mainWindowContext()->menu()->trigger(menu::LoginToCloud);
+                q->mainWindowContext()->menu()->trigger(menu::LoginToCloud, {Qn::ForceRole, true});
             });
     }
 

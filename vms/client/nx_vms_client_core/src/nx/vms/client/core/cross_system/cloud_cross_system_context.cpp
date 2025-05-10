@@ -827,8 +827,13 @@ void CloudCrossSystemContext::cloudAuthorize()
         return;
     }
 
+    // Unsuccessful cloud re-authorization can cause deletion of this context.
+    const QPointer guard(this);
+
     emit cloudAuthorizationRequested(QPrivateSignal{});
-    d->issueAccessToken();
+
+    if (guard)
+        d->issueAccessToken();
 }
 
 nx::Uuid  CloudCrossSystemContext::organizationId() const

@@ -100,8 +100,13 @@ void CloudActionsHandler::at_loginToCloudAction_triggered()
         core::OauthClientType::loginCloud,
         /*sessionAware*/ false);
 
+    const auto actionParameters = menu()->currentParameters(sender());
+    const auto authMode = actionParameters.argument(Qn::ForceRole).toBool()
+        ? core::CloudStatusWatcher::AuthMode::forced
+        : core::CloudStatusWatcher::AuthMode::login;
+
     if (!authData.empty())
-        qnCloudStatusWatcher->setAuthData(authData, core::CloudStatusWatcher::AuthMode::login);
+        qnCloudStatusWatcher->setAuthData(authData, authMode);
 }
 
 void CloudActionsHandler::at_logoutFromCloudAction_triggered()
