@@ -14,7 +14,7 @@ class NX_VMS_COMMON_API AbstractRtspEncoder
 public:
     virtual ~AbstractRtspEncoder() {}
 
-    virtual QString getSdpMedia(bool isVideo, int trackId, int port = 0) = 0;
+    virtual QString getSdpMedia(bool isVideo, int trackId, int port = 0, bool ssl = false) = 0;
 
     /*
      * Set media packet to encode

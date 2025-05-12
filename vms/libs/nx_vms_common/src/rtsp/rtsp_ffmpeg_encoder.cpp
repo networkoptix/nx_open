@@ -204,7 +204,7 @@ bool QnRtspFfmpegEncoder::getNextPacket(nx::utils::ByteArray& sendBuffer)
     return true;
 }
 
-QString QnRtspFfmpegEncoder::getSdpMedia(bool isVideo, int trackId, int port)
+QString QnRtspFfmpegEncoder::getSdpMedia(bool isVideo, int trackId, int port, bool /*ssl*/)
 {
     QString sdpMedia;
     QTextStream stream(&sdpMedia);
