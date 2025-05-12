@@ -256,8 +256,7 @@ struct ConnectActionsHandler::Private
             tr("Channel Partner users' access is managed at the Organization level, "
                 "and they are not visible in site user management."
                 "<br/><br/><a href=\"%1\">Learn more</a>")
-            //TODO: #dfisenko add link (see VMS-57189)
-            .arg(HelpTopic::relativeUrlForTopic(HelpTopic::Id::ServerSettings_General)),
+            .arg(HelpTopic::relativeUrlForTopic(HelpTopic::Id::ChannelPartnerUser)),
             /*cancellable*/ true);
         notificationsManager->setIconPath(
             channelPartnerNotificationId, "20x20/Outline/warning.svg");

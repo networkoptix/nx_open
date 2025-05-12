@@ -78,6 +78,8 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "using-the-specific-onvif-profi.html";
         case Id::CertificateValidation:
             return "certificate-validation.html";
+        case Id::ChannelPartnerUser:
+            return "partner-access-to-sites.html";
         case Id::CloudLayoutsIntroduction:
             return "adding-items-to-layout.html";
         case Id::CloudLayoutsIntroductionAssign:

@@ -43,6 +43,7 @@ public:
         CameraSettings_SecondStream,
         CameraSettings_Onvif,
         CertificateValidation,
+        ChannelPartnerUser,
         CloudLayoutsIntroduction,
         CloudLayoutsIntroductionAssign,
         ConnectToCamerasOverOnlyHttps,
