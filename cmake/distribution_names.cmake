@@ -95,6 +95,8 @@ function(set_distribution_names)
         "${prefix}-vms_benchmark-${releaseVersion.full}-${vmsBenchmarkSuffix}" PARENT_SCOPE)
     set(ssc_analytics_plugin_distribution_name
         "${prefix}-ssc_analytics_plugin-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(server_plugin_sdk_samples_distribution_name
+        "${prefix}-server_plugin_sdk_samples-${releaseVersion.full}-${targetDevice}" PARENT_SCOPE)
 
     if(net2Version)
         set(paxton_plugin_distribution_name

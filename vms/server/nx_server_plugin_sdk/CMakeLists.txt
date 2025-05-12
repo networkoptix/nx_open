@@ -145,12 +145,14 @@ message(STATUS "Generating files for Nx SDK")
 
 set(sdk_name server_plugin_sdk)
 set(zip_file ${distribution_output_dir}/${server_plugin_sdk_distribution_name}.zip)
+set(samples_zip_file ${distribution_output_dir}/${server_plugin_sdk_samples_distribution_name}.zip)
 set(sdk_dir ${CMAKE_CURRENT_BINARY_DIR}/${sdk_name})
 set(sdk_build_dir "${sdk_dir}-build")
 set(logs_dir ${CMAKE_BINARY_DIR}/build_logs)
 set(sample_build_log ${logs_dir}/${sdk_name}_sample_build.log)
 set(doxygen_log ${logs_dir}/${sdk_name}_doxygen.log)
 set(zip_log ${logs_dir}/${sdk_name}_zip.log)
+set(samples_zip_log ${logs_dir}/${sdk_name}_samples_zip.log)
 
 _collect_nx_sdk_file_names()
 
@@ -259,6 +261,22 @@ nx_add_custom_command(
 )
 add_custom_target(nx_server_plugin_sdk ALL DEPENDS ${zip_file})
 set_target_properties(nx_server_plugin_sdk PROPERTIES FOLDER sdk)
+
+set(samples_archiver_script "${CMAKE_CURRENT_SOURCE_DIR}/build_samples_archive.py")
+add_custom_command(
+    DEPENDS nx_server_plugin_sdk ${samples_archiver_script}
+
+    COMMENT "Zipping built SDK samples - see ${samples_zip_log}"
+    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR}
+        ${PYTHON_EXECUTABLE} ${samples_archiver_script}
+            "${sdk_build_dir}/samples" "${samples_zip_file}" >${samples_zip_log}
+
+    OUTPUT ${samples_zip_file}
+)
+
+add_custom_target(nx_server_plugin_sdk_samples ALL DEPENDS ${samples_zip_file})
+set_target_properties(nx_server_plugin_sdk_samples PROPERTIES FOLDER sdk)
+
 
 # Save SDK build directory for usage in other places (e.g. building of the unit test distribution
 # archive).
