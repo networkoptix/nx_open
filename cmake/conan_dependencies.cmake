@@ -30,6 +30,11 @@ if(DEFINED withAnalyticsServer AND NOT withAnalyticsServer)
     list(APPEND _additional_conan_parameters "-o withAnalyticsServer=False")
 endif()
 
+string(JOIN "," flavors ${distribution_flavor_list})
+if(NOT openSourceBuild)
+    list(APPEND _additional_conan_parameters "-o flavors=${flavors}")
+endif()
+
 if(targetDevice MATCHES "windows")
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(build_type "Debug")
