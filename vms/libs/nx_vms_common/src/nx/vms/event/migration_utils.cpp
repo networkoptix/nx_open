@@ -30,7 +30,6 @@ static const std::pair<EventType, QString> eventTypes[] = {
     {EventType::serverFailureEvent, QStringLiteral("nx.events.serverFailure")},
     {EventType::storageFailureEvent, QStringLiteral("nx.events.storageIssue")},
     {EventType::serverStartEvent, QStringLiteral("nx.events.serverStarted")},
-    {EventType::backupFinishedEvent, QStringLiteral("nx.events.archiveBackupFinished")},
 };
 
 } // namespace

@@ -240,7 +240,6 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
 
     testEventRegistration<AnalyticsEvent>();
     testEventRegistration<AnalyticsObjectEvent>();
-    testEventRegistration<BackupFinishedEvent>();
     testEventRegistration<CameraInputEvent>();
     testEventRegistration<DebugEvent>();
     testEventRegistration<DeviceDisconnectedEvent>();

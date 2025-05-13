@@ -4,7 +4,6 @@
 
 #include "analytics_event.h"
 #include "analytics_object_event.h"
-#include "backup_finished_event.h"
 #include "camera_input_event.h"
 #include "debug_event.h"
 #include "device_disconnected_event.h"
