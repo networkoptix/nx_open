@@ -53,7 +53,7 @@ private:
     QByteArray m_messageBody;
     RequestState m_requestState;
 
-private slots:
+private:
     /*!
         \note Can be called from object's thread only
     */

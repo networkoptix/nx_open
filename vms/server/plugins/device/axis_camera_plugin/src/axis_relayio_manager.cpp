@@ -139,14 +139,14 @@ int AxisRelayIOManager::startInputPortMonitoring()
         //so performing asynchronous call and waiting for its completion
 
     int result = 0;
-    callSlotFromOwningThread( "startInputPortMonitoringPriv", &result );
+    callSlotFromOwningThread( &AxisRelayIOManager::startInputPortMonitoringPriv, &result );
     return result;
 }
 
 void AxisRelayIOManager::stopInputPortMonitoring()
 {
     //performing async call, see notes in startInputPortMonitoring for details
-    callSlotFromOwningThread( "stopInputPortMonitoringPriv" );
+    callSlotFromOwningThread( &AxisRelayIOManager::stopInputPortMonitoringPriv );
 }
 
 void AxisRelayIOManager::registerEventHandler( nxcip::CameraInputEventHandler* handler )
@@ -189,12 +189,13 @@ void AxisRelayIOManager::copyPortList(
     }
 }
 
-void AxisRelayIOManager::callSlotFromOwningThread( const char* slotName, int* const resultCode )
+void AxisRelayIOManager::callSlotFromOwningThread(
+        PortMonitoringSlotPtr slotPtr, int* const resultCode )
 {
     QMutexLocker lk( &m_mutex );
 
     const int asyncCallID = m_asyncCallCounter.fetchAndAddOrdered(1);
-    QMetaObject::invokeMethod( this, slotName, Qt::QueuedConnection, Q_ARG(int, asyncCallID) );
+    QMetaObject::invokeMethod( this, slotPtr, Qt::QueuedConnection, asyncCallID );
     std::map<int, AsyncCallContext>::iterator asyncCallIter = m_awaitedAsyncCallIDs.insert( std::make_pair( asyncCallID, AsyncCallContext() ) ).first;
     //waiting for call to complete
     while( !asyncCallIter->second.done )
@@ -207,8 +208,10 @@ void AxisRelayIOManager::callSlotFromOwningThread( const char* slotName, int* co
 void AxisRelayIOManager::startInputPortMonitoringPriv( int asyncCallID )
 {
     connect(
-        AxisCameraPlugin::instance()->networkAccessManager(), SIGNAL(finished(QNetworkReply*)),
-        this, SLOT(onConnectionFinished(QNetworkReply*)) );
+        AxisCameraPlugin::instance()->networkAccessManager(),
+        &QNetworkAccessManager::finished,
+        this,
+        &AxisRelayIOManager::onConnectionFinished);
 
     const QAuthenticator& auth = m_cameraManager->credentials();
     QUrl requestUrl;
@@ -242,7 +245,11 @@ void AxisRelayIOManager::startInputPortMonitoringPriv( int asyncCallID )
         request.setUrl( requestUrl );
 
         p.first->second = AxisCameraPlugin::instance()->networkAccessManager()->get( request );
-        connect( p.first->second, SIGNAL(readyRead()), this, SLOT(onMonitorDataAvailable()) );
+        connect(
+            p.first->second,
+            &QIODevice::readyRead,
+            this,
+            &AxisRelayIOManager::onMonitorDataAvailable);
     }
 
     //return nxcip::NX_NO_ERROR;
@@ -269,7 +276,11 @@ void AxisRelayIOManager::stopInputPortMonitoringPriv( int asyncCallID )
         lk.relock();
     }
 
-    disconnect( AxisCameraPlugin::instance()->networkAccessManager(), SIGNAL(finished(QNetworkReply*)), this, SLOT(onConnectionFinished(QNetworkReply*)) );
+    disconnect(
+        AxisCameraPlugin::instance()->networkAccessManager(),
+        &QNetworkAccessManager::finished,
+        this,
+        &AxisRelayIOManager::onConnectionFinished);
 
     std::map<int, AsyncCallContext>::iterator asyncCallIter = m_awaitedAsyncCallIDs.find( asyncCallID );
     assert( asyncCallIter != m_awaitedAsyncCallIDs.end() );

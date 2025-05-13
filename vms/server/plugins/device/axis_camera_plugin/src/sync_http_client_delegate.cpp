@@ -17,12 +17,20 @@ SyncHttpClientDelegate::SyncHttpClientDelegate( QNetworkAccessManager* networkAc
     m_reply( NULL ),
     m_requestState( rsInit )
 {
-    connect( m_networkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onConnectionFinished(QNetworkReply*)) );
+    connect(
+        m_networkAccessManager,
+        &QNetworkAccessManager::finished,
+        this,
+        &SyncHttpClientDelegate::onConnectionFinished );
 }
 
 SyncHttpClientDelegate::~SyncHttpClientDelegate()
 {
-    disconnect( m_networkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onConnectionFinished(QNetworkReply*)) );
+    disconnect(
+        m_networkAccessManager,
+        &QNetworkAccessManager::finished,
+        this,
+        &SyncHttpClientDelegate::onConnectionFinished );
 }
 
 void SyncHttpClientDelegate::get( const QNetworkRequest& request )
@@ -41,9 +49,9 @@ void SyncHttpClientDelegate::get( const QNetworkRequest& request )
 
     QMetaObject::invokeMethod(
         this,
-        "getPriv",
+        &SyncHttpClientDelegate::getPriv,
         Qt::QueuedConnection,
-        Q_ARG(QNetworkRequest, request) );
+        request );
 
     while( m_requestState <= rsWaitingResponse )
         m_cond.wait( lk.mutex() );
@@ -56,7 +64,8 @@ QByteArray SyncHttpClientDelegate::readWholeMessageBody()
     if( m_requestState > rsReadingMessageBody )
         return QByteArray();
 
-    QMetaObject::invokeMethod( this, "readWholeMessageBodyPriv", Qt::QueuedConnection );
+    QMetaObject::invokeMethod(
+        this, &SyncHttpClientDelegate::readWholeMessageBodyPriv, Qt::QueuedConnection );
 
     QMutexLocker lk( &m_mutex );
     while( m_requestState <= rsReadingMessageBody )
@@ -89,7 +98,7 @@ void SyncHttpClientDelegate::getPriv( const QNetworkRequest& request )
     if( m_reply )
         m_reply->deleteLater();
     m_reply = m_networkAccessManager->get( request );
-    connect( m_reply, SIGNAL(readyRead()), this, SLOT(onReplyReadyRead()) );
+    connect( m_reply, &QIODevice::readyRead, this, &SyncHttpClientDelegate::onReplyReadyRead );
 
     m_requestState = rsWaitingResponse;
 }

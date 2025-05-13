@@ -67,6 +67,8 @@ public:
     virtual void getLastErrorString( char* errorString ) const override;
 
 private:
+    using  PortMonitoringSlotPtr = void(AxisRelayIOManager::*)(int);
+
     struct AsyncCallContext
     {
         AsyncCallContext()
@@ -107,10 +109,10 @@ private:
         char** idList,
         int* idNum,
         const std::map<QString, unsigned int>& portNameToIndex ) const;
-    void callSlotFromOwningThread( const char* slotName, int* const resultCode = NULL );
+    void callSlotFromOwningThread( PortMonitoringSlotPtr slotPtr, int* const resultCode = NULL );
     void readAxisRelayPortNotification( const QByteArray& line );
 
-private slots:
+private:
     void startInputPortMonitoringPriv( int asyncCallID );
     void stopInputPortMonitoringPriv( int asyncCallID );
     void onMonitorDataAvailable();
