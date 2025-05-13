@@ -47,6 +47,7 @@ public:
     enum NodeType
     {
         None,
+        ChannelPartner,
         Organization,
         Folder,
         System,
@@ -66,13 +67,18 @@ public:
     Q_PROPERTY(QModelIndex sitesRoot
         READ sitesRoot
         NOTIFY sitesRootChanged)
-    Q_PROPERTY(nx::Uuid channelPartner
-        READ channelPartner
-        WRITE setChannelPartner
-        NOTIFY channelPartnerChanged)
-    Q_PROPERTY(bool channelPartnerLoading
-        READ channelPartnerLoading
-        NOTIFY channelPartnerLoadingChanged)
+
+    Q_PROPERTY(bool topLevelLoading
+        READ topLevelLoading
+        NOTIFY topLevelLoadingChanged)
+
+    Q_PROPERTY(bool hasChannelPartners
+        READ hasChannelPartners
+        NOTIFY hasChannelPartnersChanged)
+
+    Q_PROPERTY(bool hasOrganizations
+        READ hasOrganizations
+        NOTIFY hasOrganizationsChanged)
 
 public:
     OrganizationsModel(QObject* parent = nullptr);
@@ -99,17 +105,17 @@ public:
 
     QModelIndex sitesRoot() const;
 
-    nx::Uuid channelPartner() const;
-    void setChannelPartner(nx::Uuid channelPartner);
-
-    bool channelPartnerLoading() const;
+    bool topLevelLoading() const;
+    bool hasChannelPartners() const;
+    bool hasOrganizations() const;
 
 signals:
     void statusWatcherChanged();
     void systemsModelChanged();
     void sitesRootChanged();
-    void channelPartnerChanged();
-    void channelPartnerLoadingChanged();
+    void topLevelLoadingChanged();
+    void hasChannelPartnersChanged();
+    void hasOrganizationsChanged();
 
 private:
     struct Private;
@@ -128,6 +134,11 @@ class OrganizationsFilterModel: public QSortFilterProxyModel
         WRITE setHideOrgSystemsFromSites
         NOTIFY hideOrgSystemsFromSitesChanged)
 
+    Q_PROPERTY(QList<OrganizationsModel::NodeType> showOnly
+        READ showOnly
+        WRITE setShowOnly
+        NOTIFY showOnlyChanged)
+
 public:
     OrganizationsFilterModel(QObject* parent = nullptr);
     bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
@@ -136,11 +147,16 @@ public:
     bool hideOrgSystemsFromSites() const { return m_hideOrgSystemsFromSites; }
     void setHideOrgSystemsFromSites(bool value);
 
+    void setShowOnly(const QList<OrganizationsModel::NodeType>& types);
+    QList<OrganizationsModel::NodeType> showOnly() const { return m_showOnly.values(); }
+
 signals:
     void hideOrgSystemsFromSitesChanged();
+    void showOnlyChanged();
 
 private:
     bool m_hideOrgSystemsFromSites = false;
+    QSet<OrganizationsModel::NodeType> m_showOnly;
 };
 
 } // namespace nx::vms::client::core

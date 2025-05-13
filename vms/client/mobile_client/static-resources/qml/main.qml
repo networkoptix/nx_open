@@ -124,7 +124,7 @@ Controls.ApplicationWindow
         statusWatcher: appContext.cloudStatusWatcher
         readonly property bool isOrgUser:
             appContext.cloudStatusWatcher.status != CloudStatusWatcher.LoggedOut
-            && channelPartnerList && channelPartnerList.length
+            && accountBelongsToOrganization
     }
 
     NxObject

@@ -73,32 +73,9 @@ QString CloudUserProfileWatcher::fullName() const
     return m_fullName;
 }
 
-QVariantList CloudUserProfileWatcher::channelPartnerList() const
+bool CloudUserProfileWatcher::accountBelongsToOrganization() const
 {
-    QVariantList result;
-    for (const auto& partner: m_channelPartnerList.results)
-    {
-        QVariantMap map;
-        map["id"] = QVariant::fromValue(partner.id);
-        map["name"] = QString::fromStdString(partner.name);
-        map["partnerCount"] = partner.partnerCount;
-        result.append(map);
-    }
-    return result;
-}
-
-nx::Uuid CloudUserProfileWatcher::channelPartner() const
-{
-    return m_channelPartner;
-}
-
-void CloudUserProfileWatcher::setChannelPartner(nx::Uuid channelPartner)
-{
-    if (channelPartner != m_channelPartner)
-    {
-        m_channelPartner = channelPartner;
-        emit channelPartnerChanged();
-    }
+    return m_accountBelongsToOrganization;
 }
 
 QUrl CloudUserProfileWatcher::avatarUrl() const
@@ -159,40 +136,6 @@ nx::coro::FireAndForget CloudUserProfileWatcher::run()
                 m_statusWatcher,
                 "/partners/api/v2/channel_partners/"));
 
-        if (accountData && m_fullName != accountData->fullName)
-        {
-            m_fullName = QString::fromStdString(accountData->fullName);
-            emit fullNameChanged();
-            emit avatarUrlChanged();
-        }
-
-        if (channelPartnerList)
-        {
-            if (m_channelPartnerList != *channelPartnerList)
-            {
-                m_channelPartnerList = *channelPartnerList;
-                emit channelPartnerListChanged();
-            }
-
-            // Update selected channel partner
-            auto it = std::find_if(
-                m_channelPartnerList.results.begin(),
-                m_channelPartnerList.results.end(),
-                [this](const auto& partner) { return partner.id == m_channelPartner; });
-
-            if (it == m_channelPartnerList.results.end())
-            {
-                setChannelPartner(
-                    m_channelPartnerList.results.empty()
-                        ? nx::Uuid{}
-                        : m_channelPartnerList.results.front().id);
-            }
-            else
-            {
-                setChannelPartner(it->id);
-            }
-        }
-
         if (!accountData)
         {
             NX_WARNING(this,
@@ -202,13 +145,18 @@ nx::coro::FireAndForget CloudUserProfileWatcher::run()
             continue;
         }
 
-        if (!channelPartnerList)
+        if (m_fullName != accountData->fullName)
         {
-            NX_WARNING(this,
-                "Error getting channel partners: %1",
-                cloud::db::api::toString(channelPartnerList.error()));
-            co_await nx::coro::qtTimer(kErrorRetryDelay);
-            continue;
+            m_fullName = QString::fromStdString(accountData->fullName);
+            emit fullNameChanged();
+            emit avatarUrlChanged();
+        }
+
+        if (accountData->accountBelongsToOrganization
+            && m_accountBelongsToOrganization != *accountData->accountBelongsToOrganization)
+        {
+            m_accountBelongsToOrganization = *accountData->accountBelongsToOrganization;
+            emit accountBelongsToOrganizationChanged();
         }
 
         co_await nx::coro::qtTimer(kUpdateDelay);

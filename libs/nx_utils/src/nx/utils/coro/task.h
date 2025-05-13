@@ -143,6 +143,8 @@ public:
 
         void return_value(T&& v) { value = std::move(v); }
 
+        void return_value(const T& v) { value = v; }
+
         T&& result() { return std::move(*value); }
 
         std::optional<T> value; // Allow non-default-constructible T (eg. std::expected).

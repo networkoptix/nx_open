@@ -12,6 +12,7 @@ ListView
 
     property alias siteModel: filterModel.sourceModel
     property alias hideOrgSystemsFromSites: filterModel.hideOrgSystemsFromSites
+    property alias showOnly: filterModel.showOnly
 
     property var organizationsModel: siteModel.sourceModel
 

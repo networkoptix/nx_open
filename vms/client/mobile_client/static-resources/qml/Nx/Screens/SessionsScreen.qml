@@ -91,7 +91,7 @@ Page
         height: visible ? implicitHeight : 0
         z: 1
 
-        visible: !sessionsScreen.searching && !organizationsModel.channelPartnerLoading
+        visible: !sessionsScreen.searching && !organizationsModel.topLevelLoading
             && cloudUserProfileWatcher.isOrgUser
 
         ButtonGroup
@@ -133,8 +133,14 @@ Page
 
             TabButton
             {
+                id: partnersTabButton
+                text: qsTr("Partners")
+                visible: organizationsModel.hasChannelPartners
+            }
+
+            TabButton
+            {
                 id: organizationsTabButton
-                checked: true
                 text: qsTr("Organizations")
             }
 
@@ -143,6 +149,31 @@ Page
                 id: sitesTabButton
                 text: qsTr("Sites")
             }
+        }
+
+        function updateCheckedState()
+        {
+            if (organizationsModel.topLevelLoading)
+                return
+
+            if (!cloudUserProfileWatcher.isOrgUser)
+                sitesTabButton.checked = true
+            else if (organizationsModel.hasChannelPartners)
+                partnersTabButton.checked = true
+            else
+                organizationsTabButton.checked = true
+        }
+
+        Connections
+        {
+            target: organizationsModel
+            function onTopLevelLoadingChanged() { systemTabs.updateCheckedState() }
+        }
+
+        Connections
+        {
+            target: cloudUserProfileWatcher
+            function onIsOrgUserChanged() { systemTabs.updateCheckedState() }
         }
     }
 
@@ -157,7 +188,6 @@ Page
 
         statusWatcher: cloudUserProfileWatcher.statusWatcher
         systemsModel: systemsModel
-        channelPartner: cloudUserProfileWatcher.channelPartner
 
         signal systemOpened(var current)
 
@@ -205,7 +235,7 @@ Page
         id: noOrganizationPlaceholder
 
         visible: !sessionsScreen.searching && siteList.count == 0 && organizationsTabButton.checked
-            && !organizationsModel.channelPartnerLoading && cloudUserProfileWatcher.isOrgUser
+            && !organizationsModel.topLevelLoading && cloudUserProfileWatcher.isOrgUser
 
         anchors.centerIn: parent
         anchors.verticalCenterOffset: -header.height / 2
@@ -219,7 +249,7 @@ Page
         id: noSitesPlaceholder
 
         visible: !sessionsScreen.searching && siteList.count == 0
-            && !organizationsModel.channelPartnerLoading && localSitesVisible
+            && !organizationsModel.topLevelLoading && localSitesVisible
 
         z: 1
 
@@ -247,9 +277,22 @@ Page
         height: parent.height - systemTabs.height
         y: systemTabs.height
 
-        visible: !organizationsModel.channelPartnerLoading
+        visible: !organizationsModel.topLevelLoading
         siteModel: linearizationListModel
         hideOrgSystemsFromSites: cloudUserProfileWatcher.isOrgUser
+        showOnly:
+        {
+            if (!systemTabsRow.visible)
+                return []
+
+            if (partnersTabButton.checked)
+                return [OrganizationsModel.ChannelPartner]
+
+            if (organizationsTabButton.checked)
+                return [OrganizationsModel.Organization]
+
+            return []
+        }
 
         PropertyUpdateFilter on searchText
         {
@@ -309,7 +352,7 @@ Page
     {
         anchors.fill: parent
 
-        visible: organizationsModel.channelPartnerLoading
+        visible: organizationsModel.topLevelLoading
 
         component MaskItem: Rectangle
         {

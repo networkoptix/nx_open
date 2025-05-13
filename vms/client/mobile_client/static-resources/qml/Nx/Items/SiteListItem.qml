@@ -111,6 +111,8 @@ Item
                             return ColorTheme.colors.brand_core
                         case OrganizationsModel.Organization:
                             return ColorTheme.colors.light6
+                        case OrganizationsModel.ChannelPartner:
+                            return ColorTheme.colors.light6
                         default:
                             return
                     }
@@ -121,6 +123,8 @@ Item
                         case OrganizationsModel.Folder:
                             return ColorTheme.colors.brand_d1
                         case OrganizationsModel.Organization:
+                            return ColorTheme.colors.light10
+                        case OrganizationsModel.ChannelPartner:
                             return ColorTheme.colors.light10
                         default:
                             return
@@ -133,6 +137,8 @@ Item
                             return "image://skin/32x32/Solid/folder.svg"
                         case OrganizationsModel.Organization:
                             return "image://skin/32x32/Solid/organization.svg"
+                        case OrganizationsModel.ChannelPartner:
+                            return "image://skin/32x32/Solid/partner.svg"
                         default:
                             return ""
                     }

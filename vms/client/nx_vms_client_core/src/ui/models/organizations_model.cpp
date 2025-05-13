@@ -39,6 +39,16 @@ struct TreeNode
         idToNode.insert({id, this});
     }
 
+    TreeNode(Map& idToNode, ChannelPartner cp)
+        : TreeNode(
+            idToNode,
+            cp.id,
+            QString::fromStdString(cp.name),
+            OrganizationsModel::ChannelPartner)
+    {
+        loading = true;
+    }
+
     TreeNode(Map& idToNode, Organization org)
         : TreeNode(
             idToNode,
@@ -166,13 +176,17 @@ struct OrganizationsModel::Private
     int proxyModelCount = 0;
     nx::utils::ScopedConnections connections;
 
-    nx::Uuid channelPartner;
+    bool hasChannelPartners = false;
+    bool hasOrganizations = false;
 
     TreeNode::Registry nodes; //< Should be destroyed after root.
     std::unique_ptr<TreeNode> root;
 
-    bool channelPartnerLoading = false;
+    bool topLevelLoading = false;
     uint64_t updateGeneration = 0;
+
+    nx::utils::ScopedConnection statusConnection;
+    CloudStatusWatcher::Status prevStatus = CloudStatusWatcher::LoggedOut;
 
     Private(OrganizationsModel* q): q(q)
     {
@@ -232,10 +246,53 @@ struct OrganizationsModel::Private
         q->endRemoveRows();
     }
 
-    void setChannelPartnerOrgs(const OrganizationList& data)
+    void setChannelPartners(const ChannelPartnerList& data)
     {
         std::unordered_set<nx::Uuid> prevIds;
         for (const auto& node: root->allChildren())
+        {
+            if (node->type == OrganizationsModel::ChannelPartner)
+                prevIds.insert(node->id);
+        }
+
+        // Add or update channel partners.
+        for (const auto& partner: data.results)
+        {
+            if (!prevIds.contains(partner.id))
+            {
+                insert(
+                    root->allChildren().size(),
+                    nodes.create(partner),
+                    root.get());
+                continue;
+            }
+            prevIds.erase(partner.id);
+            auto node = nodes.find(partner.id);
+            if (node->name != QString::fromStdString(partner.name))
+            {
+                node->name = QString::fromStdString(partner.name);
+                auto cpIndex = q->createIndex(node->row(), 0, node);
+                q->dataChanged(cpIndex, cpIndex);
+            }
+        }
+
+        // Remove channel partners that are not present here.
+        for (const auto& id: prevIds)
+        {
+            if (auto node = nodes.find(id))
+                remove(node->row(), node->parentNode());
+        }
+    }
+
+    void setOrganizations(const OrganizationList& data, nx::Uuid parentId)
+    {
+        // Either channel partner or root node.
+        auto parent = nodes.find(parentId);
+        if (!parent)
+            return;
+
+        std::unordered_set<nx::Uuid> prevIds;
+        for (const auto& node: parent->allChildren())
         {
             if (node->type == OrganizationsModel::Organization)
                 prevIds.insert(node->id);
@@ -247,19 +304,21 @@ struct OrganizationsModel::Private
             if (!prevIds.contains(org.id))
             {
                 insert(
-                    root->allChildren().size(),
+                    parent->allChildren().size(),
                     nodes.create(org),
-                    root.get());
+                    parent);
                 continue;
             }
             prevIds.erase(org.id);
             auto node = nodes.find(org.id);
+            if (!node)
+                continue;
             if (node->name != QString::fromStdString(org.name)
                 || node->systemCount != org.systemCount)
             {
                 node->name = QString::fromStdString(org.name);
                 node->systemCount = org.systemCount;
-                auto orgIndex = q->createIndex(node->row(), 0, node->parentNode());
+                auto orgIndex = q->createIndex(node->row(), 0, node);
                 q->dataChanged(orgIndex, orgIndex);
             }
         }
@@ -296,7 +355,7 @@ struct OrganizationsModel::Private
                     {
                         node->name = QString::fromStdString(group.name);
                         node->systemCount = group.systemCount;
-                        auto groupIndex = q->createIndex(node->row(), 0, parent);
+                        auto groupIndex = q->createIndex(node->row(), 0, node);
                         q->dataChanged(groupIndex, groupIndex);
                     }
                     setNodeGroups(node, group.children);
@@ -416,15 +475,13 @@ struct OrganizationsModel::Private
         return proxyModel->index(index.row(), index.column());
     }
 
-    nx::coro::FireAndForget loadOrgs(nx::Uuid cpId);
-
-    void setChannelPartnerLoading(bool loading)
+    void setTopLevelLoading(bool loading)
     {
-        if (channelPartnerLoading == loading)
+        if (topLevelLoading == loading)
             return;
 
-        channelPartnerLoading = loading;
-        emit q->channelPartnerLoadingChanged();
+        topLevelLoading = loading;
+        emit q->topLevelLoadingChanged();
     }
 
     void beginSitesReset()
@@ -448,122 +505,15 @@ struct OrganizationsModel::Private
         proxyModelCount = newRowCount;
         q->endInsertRows();
     }
+
+    void setHasChannelPartners(bool value);
+    void setHasOrganizations(bool value);
+
+    coro::FireAndForget startPolling();
+    coro::Task<bool> loadOrgAsync(struct Organization org);
+    coro::Task<bool> loadOrgListAsync(OrganizationList orgList);
+    coro::Task<bool> loadChannelPartnerOrgsAsync(ChannelPartnerList cpList);
 };
-
-nx::coro::FireAndForget OrganizationsModel::Private::loadOrgs(nx::Uuid cpId)
-{
-    co_await nx::coro::cancelIf(
-        [thisGeneration = updateGeneration, self = QPointer(q)]()
-        {
-            NX_ASSERT(qApp->thread() == QThread::currentThread());
-            return !self || thisGeneration != self->d->updateGeneration;
-        });
-
-    setChannelPartnerLoading(true);
-    auto g = nx::utils::ScopeGuard(
-        nx::utils::guarded(q, [this]() { setChannelPartnerLoading(false); }));
-
-    for (;;)
-    {
-        if (!NX_ASSERT(statusWatcher))
-            co_return;
-
-        co_await coro::whenProperty(
-            statusWatcher,
-            "status",
-            [](auto value) { return value == CloudStatusWatcher::Online; });
-
-        auto orgsPath = nx::format(
-            "/partners/api/v2/channel_partners/%1/organizations/",
-            cpId.toSimpleStdString()).toStdString();
-        auto orgList = co_await cloudGet<OrganizationList>(
-            statusWatcher,
-            orgsPath);
-
-        if (!orgList)
-        {
-            NX_WARNING(this,
-                "Error getting organizations of %1: %2",
-                cpId,
-                cloud::db::api::toString(orgList.error()));
-            co_await coro::qtTimer(kErrorRetryDelay);
-            continue;
-        }
-
-        setChannelPartnerOrgs(*orgList);
-        setChannelPartnerLoading(false);
-
-        std::vector<nx::coro::Task<bool>> loadTasks;
-        loadTasks.reserve(orgList->results.size());
-
-        for (const auto& org: orgList->results)
-        {
-            loadTasks.push_back(
-                [](auto self, auto org) -> nx::coro::Task<bool>
-                {
-                    auto groupsPath = nx::format(
-                        "/partners/api/v2/organizations/%1/groups_structure/",
-                        org.id.toSimpleStdString()).toStdString();
-                    auto systemsPath = nx::format(
-                        "/partners/api/v2/organizations/%1/cloud_systems/user_systems/",
-                        org.id.toSimpleStdString()).toStdString();
-
-                    auto [groupStructure, systems] = co_await nx::coro::whenAll(
-                        cloudGet<std::vector<GroupStructure>>(
-                            self->statusWatcher,
-                            groupsPath),
-                        cloudGet<SystemList>(
-                            self->statusWatcher,
-                            systemsPath,
-                            nx::UrlQuery().addQueryItem("rootOnly", "false")));
-
-                    if (!groupStructure || !systems)
-                    {
-                        if (!groupStructure)
-                        {
-                            NX_WARNING(self,
-                                "Error getting group structure for %1: %2",
-                                org.name,
-                                cloud::db::api::toString(groupStructure.error()));
-                        }
-                        if (!systems)
-                        {
-                            NX_WARNING(self,
-                                "Error getting systems for %1: %2",
-                                org.name,
-                                cloud::db::api::toString(systems.error()));
-                        }
-                        co_return false;
-                    }
-
-                    self->setOrgStructure(org.id, *groupStructure);
-                    self->setOrgSystems(org.id, systems->results);
-
-                    if (auto node = self->nodes.find(org.id); node->loading)
-                    {
-                        node->loading = false;
-                        auto orgIndex = self->q->createIndex(node->row(), 0, node->parentNode());
-                        self->q->dataChanged(
-                            orgIndex, orgIndex, {OrganizationsModel::IsLoadingRole});
-                    }
-
-                    co_return true;
-                }(this, org));
-        }
-
-        auto results = co_await nx::coro::runAll(std::move(loadTasks), kMaxConcurrentRequests);
-
-        if (std::any_of(results.begin(), results.end(), [](auto result) { return !result; }))
-        {
-            NX_WARNING(this, "Organizations are not fully loaded");
-            co_await coro::qtTimer(kErrorRetryDelay);
-            continue;
-        }
-
-        // Delay before next update.
-        co_await coro::qtTimer(kUpdateDelay);
-    }
-}
 
 OrganizationsModel::OrganizationsModel(QObject* parent):
     base_type(parent),
@@ -630,6 +580,7 @@ int OrganizationsModel::columnCount(const QModelIndex&) const
 
 QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
 {
+    static const QString kChannelPartners = tr("Partners");
     static const QString kOrganizations = tr("Organizations");
     static const QString kFolders = tr("Folders");
     static const QString kSites = tr("Sites");
@@ -689,13 +640,20 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
         case TypeRole:
             return QVariant::fromValue(node->type);
         case SectionRole:
-            if (node->type == OrganizationsModel::Organization)
-                return kOrganizations;
-            if (node->type == OrganizationsModel::Folder)
-                return kFolders;
-            if (node->type == OrganizationsModel::System)
-                return kSites;
-            return "";
+            switch (node->type)
+            {
+                case OrganizationsModel::ChannelPartner:
+                    return kChannelPartners;
+                case OrganizationsModel::Organization:
+                    return kOrganizations;
+                case OrganizationsModel::Folder:
+                    return kFolders;
+                case OrganizationsModel::System:
+                    return kSites;
+                default:
+                    return "";
+            }
+            break;
         case IsLoadingRole:
             return node->loading;
         case IsFromSitesRole:
@@ -804,8 +762,35 @@ void OrganizationsModel::setStatusWatcher(CloudStatusWatcher* statusWatcher)
     if (d->statusWatcher == statusWatcher)
         return;
 
+    d->statusConnection.reset();
     d->statusWatcher = statusWatcher;
     emit statusWatcherChanged();
+
+    if (!d->statusWatcher)
+        return;
+
+    // Set topLevelLoading = true when status changes from LoggedOut to any other status.
+    d->statusConnection.reset(connect(d->statusWatcher, &CloudStatusWatcher::statusChanged, this,
+        [this]()
+        {
+            auto newStatus = d->statusWatcher->status();
+            if (d->prevStatus == CloudStatusWatcher::LoggedOut
+                && newStatus != CloudStatusWatcher::LoggedOut)
+            {
+                d->startPolling();
+            }
+            else if (newStatus == CloudStatusWatcher::LoggedOut)
+            {
+                d->setTopLevelLoading(false);
+            }
+            d->prevStatus = newStatus;
+        },
+        Qt::QueuedConnection));
+
+    d->prevStatus = d->statusWatcher->status();
+
+    if (d->prevStatus != CloudStatusWatcher::LoggedOut)
+        d->startPolling();
 }
 
 QAbstractProxyModel* OrganizationsModel::systemsModel() const
@@ -813,27 +798,209 @@ QAbstractProxyModel* OrganizationsModel::systemsModel() const
     return d->proxyModel;
 }
 
-nx::Uuid OrganizationsModel::channelPartner() const
+coro::Task<bool> OrganizationsModel::Private::loadOrgAsync(struct Organization org)
 {
-    return d->channelPartner;
+    auto groupsPath = nx::format(
+        "/partners/api/v3/organizations/%1/groups_structure/",
+        org.id.toSimpleStdString()).toStdString();
+    auto systemsPath = nx::format(
+        "/partners/api/v3/organizations/%1/cloud_systems/user_systems/",
+        org.id.toSimpleStdString()).toStdString();
+
+    auto [groupStructure, systems] = co_await nx::coro::whenAll(
+        cloudGet<std::vector<GroupStructure>>(
+            statusWatcher,
+            groupsPath),
+        cloudGet<SystemList>(
+            statusWatcher,
+            systemsPath,
+            nx::UrlQuery().addQueryItem("rootOnly", "false")));
+
+    if (!groupStructure || !systems)
+    {
+        NX_WARNING(this,
+            "Error getting group structure for %1: %2",
+            org.name,
+            cloud::db::api::toString(groupStructure.error()));
+        co_return false;
+    }
+
+    setOrgStructure(org.id, *groupStructure);
+    setOrgSystems(org.id, systems->results);
+
+    if (auto node = nodes.find(org.id); node && node->loading)
+    {
+        node->loading = false;
+        auto orgIndex = q->createIndex(node->row(), 0, node);
+        q->dataChanged(orgIndex, orgIndex, {OrganizationsModel::IsLoadingRole});
+    }
+
+    co_return true;
 }
 
-void OrganizationsModel::setChannelPartner(nx::Uuid channelPartner)
+coro::Task<bool> OrganizationsModel::Private::loadOrgListAsync(OrganizationList orgList)
 {
-    if (d->channelPartner == channelPartner)
+    std::vector<nx::coro::Task<bool>> loadTasks;
+    loadTasks.reserve(orgList.results.size());
+
+    for (const auto& org: orgList.results)
+        loadTasks.push_back(loadOrgAsync(org));
+
+    auto results = co_await nx::coro::runAll(std::move(loadTasks), kMaxConcurrentRequests);
+    if (std::any_of(results.begin(), results.end(), [](auto result) { return !result; }))
+    {
+        NX_WARNING(this, "Organizations are not fully loaded");
+        co_return false;
+    }
+
+    co_return true;
+}
+
+coro::Task<bool> OrganizationsModel::Private::loadChannelPartnerOrgsAsync(ChannelPartnerList cpList)
+{
+    std::vector<nx::coro::Task<bool>> loadOrgTasks;
+
+    for (const auto& cp: cpList.results)
+    {
+        loadOrgTasks.push_back(
+            [](auto self, auto cpId) -> coro::Task<bool>
+            {
+                auto cpOrgList = co_await cloudGet<OrganizationList>(
+                    self->statusWatcher,
+                    nx::format(
+                        "/partners/api/v3/channel_partners/%1/organizations/",
+                        cpId.toSimpleStdString()).toStdString());
+
+                if (!cpOrgList)
+                {
+                    NX_WARNING(self,
+                        "Error getting organizations of %1: %2",
+                        cpId,
+                        cloud::db::api::toString(cpOrgList.error()));
+                    co_return false;
+                }
+
+                self->setOrganizations(*cpOrgList, cpId);
+
+                const bool result = co_await self->loadOrgListAsync(std::move(*cpOrgList));
+
+                if (auto node = self->nodes.find(cpId); node && node->loading)
+                {
+                    node->loading = false;
+                    auto orgIndex = self->q->createIndex(node->row(), 0, node);
+                    self->q->dataChanged(
+                        orgIndex, orgIndex, {OrganizationsModel::IsLoadingRole});
+                }
+
+                co_return result;
+            }(this, cp.id));
+    }
+
+    auto results = co_await nx::coro::runAll(std::move(loadOrgTasks), kMaxConcurrentRequests);
+
+    co_return true;
+}
+
+coro::FireAndForget OrganizationsModel::Private::startPolling()
+{
+    ++updateGeneration;
+
+    co_await nx::coro::cancelIf(
+        [thisGeneration = updateGeneration, self = QPointer(q)]()
+        {
+            NX_ASSERT(qApp->thread() == QThread::currentThread());
+            return !self || thisGeneration != self->d->updateGeneration;
+        });
+
+    setTopLevelLoading(statusWatcher->status() != CloudStatusWatcher::LoggedOut);
+    const auto guard = nx::utils::ScopeGuard(
+        nx::utils::guarded(
+            q,
+            [thisGeneration = updateGeneration, self = QPointer(q)]()
+            {
+                if (self && thisGeneration == self->d->updateGeneration)
+                    self->d->setTopLevelLoading(false);
+            }));
+
+    for (;;)
+    {
+        if (!NX_ASSERT(statusWatcher))
+            co_return;
+
+        co_await coro::whenProperty(
+            statusWatcher,
+            "status",
+            [](auto value) { return value == CloudStatusWatcher::Online; });
+
+        auto channelPartnerList = co_await cloudGet<ChannelPartnerList>(
+            statusWatcher,
+            "/partners/api/v3/channel_partners/");
+
+        if (!channelPartnerList)
+        {
+            NX_WARNING(this,
+                "Error getting channel partners: %1",
+                cloud::db::api::toString(channelPartnerList.error()));
+            co_await coro::qtTimer(kErrorRetryDelay);
+            continue;
+        }
+
+        setHasChannelPartners(!channelPartnerList->results.empty());
+        setChannelPartners(*channelPartnerList);
+
+        if (!channelPartnerList->results.empty())
+            co_await loadChannelPartnerOrgsAsync(std::move(*channelPartnerList));
+
+        auto orgList = co_await cloudGet<OrganizationList>(
+            statusWatcher,
+            "/partners/api/v3/organizations/");
+
+        if (!orgList)
+        {
+            NX_WARNING(this,
+                "Error getting organizations: %1",
+                cloud::db::api::toString(orgList.error()));
+            co_await coro::qtTimer(kErrorRetryDelay);
+            continue;
+        }
+
+        setOrganizations(*orgList, root->id);
+        setHasOrganizations(!orgList->results.empty());
+        setTopLevelLoading(false);
+
+        co_await loadOrgListAsync(std::move(*orgList));
+
+        // Delay before next update.
+        co_await coro::qtTimer(kUpdateDelay);
+    }
+}
+
+bool OrganizationsModel::hasChannelPartners() const
+{
+    return d->hasChannelPartners;
+}
+
+void OrganizationsModel::Private::setHasChannelPartners(bool value)
+{
+    if (hasChannelPartners == value)
         return;
 
-    d->channelPartner = channelPartner;
-    emit channelPartnerChanged();
+    hasChannelPartners = value;
+    emit q->hasChannelPartnersChanged();
+}
 
-    d->updateGeneration++;
+bool OrganizationsModel::hasOrganizations() const
+{
+    return d->hasOrganizations;
+}
 
-    // Remove all top level nodes (organizations) except the 'Sites' node.
-    while (d->root->allChildren().size() > 1)
-        d->remove(1, d->root.get());
+void OrganizationsModel::Private::setHasOrganizations(bool value)
+{
+    if (hasOrganizations == value)
+        return;
 
-    if (!channelPartner.isNull())
-        d->loadOrgs(channelPartner);
+    hasOrganizations = value;
+    emit q->hasOrganizationsChanged();
 }
 
 QModelIndex OrganizationsModel::sitesRoot() const
@@ -841,9 +1008,9 @@ QModelIndex OrganizationsModel::sitesRoot() const
     return d->sitesRoot();
 }
 
-bool OrganizationsModel::channelPartnerLoading() const
+bool OrganizationsModel::topLevelLoading() const
 {
-    return d->channelPartnerLoading;
+    return d->topLevelLoading;
 }
 
 void OrganizationsModel::setSystemsModel(QAbstractProxyModel* systemsModel)
@@ -995,11 +1162,15 @@ bool OrganizationsFilterModel::filterAcceptsRow(
         return base_type::filterAcceptsRow(sourceRow, sourceParent);
 
     const auto sourceIndex = sourceModel()->index(sourceRow, 0);
-    if (sourceIndex.data(OrganizationsModel::TypeRole).value<OrganizationsModel::NodeType>()
-        == OrganizationsModel::SitesNode)
-    {
+
+    const auto nodeType =
+        sourceIndex.data(OrganizationsModel::TypeRole).value<OrganizationsModel::NodeType>();
+
+    if (nodeType == OrganizationsModel::SitesNode)
         return false;
-    }
+
+    if (!m_showOnly.empty() && !m_showOnly.contains(nodeType))
+        return false;
 
     if (m_hideOrgSystemsFromSites
         && sourceIndex.data(OrganizationsModel::IsFromSitesRole).toBool()
@@ -1039,6 +1210,18 @@ void OrganizationsFilterModel::setHideOrgSystemsFromSites(bool value)
     m_hideOrgSystemsFromSites = value;
     invalidateFilter();
     emit hideOrgSystemsFromSitesChanged();
+}
+
+void OrganizationsFilterModel::setShowOnly(const QList<OrganizationsModel::NodeType>& types)
+{
+    QSet<OrganizationsModel::NodeType> typesSet{types.begin(), types.end()};
+    if (m_showOnly == typesSet)
+        return;
+
+    m_showOnly = typesSet;
+
+    invalidateFilter();
+    emit showOnlyChanged();
 }
 
 } // nx::vms::client::core
