@@ -89,6 +89,7 @@ public:
      */
     Q_INVOKABLE bool share(qint64 expirationTime, const QString& password);
     Q_INVOKABLE bool stopSharing();
+    Q_INVOKABLE void resetBookmarkData();
 
 signals:
     void modelIndexChanged();

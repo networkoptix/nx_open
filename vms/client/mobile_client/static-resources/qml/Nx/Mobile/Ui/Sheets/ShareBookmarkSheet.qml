@@ -69,7 +69,6 @@ BottomSheet
         visible: sheet.isAnalyticsItemMode
 
         labelText: qsTr("Description")
-        text: backend.bookmarkDescription
     }
 
     TagView
@@ -89,8 +88,6 @@ BottomSheet
 
         visible: sheet.isAnalyticsItemMode
         width: parent.width
-
-        text: d.kShareOptionTextString
 
         color: ColorTheme.colors.light4
         font.weight: 500
@@ -119,8 +116,6 @@ BottomSheet
         labelText: qsTr("Lifetime")
 
         textRole: "text"
-
-        currentIndex: 0
     }
 
     PasswordInput
@@ -189,6 +184,8 @@ BottomSheet
 
     onOpened:
     {
+        backend.resetBookmarkData()
+
         const currentAnimationDuration = enableSharingToggle.animationDuration
         enableSharingToggle.animationDuration = 0
         enableSharingToggle.checkState = Qt.Checked
@@ -217,6 +214,9 @@ BottomSheet
 
         lifetimeComboBox.model = expiresInModel
         lifetimeComboBox.currentIndex = currentIndex
+
+        bookmarkDescriptionTextArea.text = backend.bookmarkDescription
+        shareLinkOptionsText.text = d.kShareOptionTextString
 
         sharePasswordInput.resetState(/*hasSecretValue*/ !!backend.bookmarkDigest);
     }
