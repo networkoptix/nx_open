@@ -2276,7 +2276,9 @@ static void registerDeviceHandlers(
      * %caption Device HTTP Stream
      * %ingroup Device Media
      * %struct MediaStreamSettings
-     *     %param[unused] format
+     * %param[unused] format
+     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
      * %param[ref] _local,_strict,_ticket
      * %permissions View live or Archive on selected Device.
      * %return Media Stream.
@@ -2289,6 +2291,8 @@ static void registerDeviceHandlers(
      * %caption Device HTTP Stream (format)
      * %ingroup Device Media
      * %struct MediaStreamSettings
+     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
      * %param[ref] _local,_strict,_ticket
      * %permissions View live or Archive on selected Device.
      * %return Media Stream.
