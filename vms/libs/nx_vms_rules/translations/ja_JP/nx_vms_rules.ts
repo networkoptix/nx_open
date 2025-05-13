@@ -286,6 +286,18 @@
       <source>Method</source>
       <translation>メソッド</translation>
     </message>
+    <message>
+      <source>Select Integration Action</source>
+      <translation type="unfinished">Select Integration Action</translation>
+    </message>
+    <message>
+      <source>Integration not found for Integration Action %1</source>
+      <translation type="unfinished">Integration not found for Integration Action %1</translation>
+    </message>
+    <message>
+      <source>Unsupported JSON value type in key %1</source>
+      <translation type="unfinished">Unsupported JSON value type in key %1</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
@@ -635,6 +647,17 @@
     <message>
       <source>HTTP Method should be known</source>
       <translation>HTTP メソッドは既知である必要があります</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::IntegrationAction</name>
+    <message>
+      <source>Integration Action</source>
+      <translation type="unfinished">Integration Action</translation>
+    </message>
+    <message>
+      <source>Integration Action Parameters</source>
+      <translation type="unfinished">Integration Action Parameters</translation>
     </message>
   </context>
   <context>

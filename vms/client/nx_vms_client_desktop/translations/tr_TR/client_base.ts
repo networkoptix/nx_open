@@ -12576,6 +12576,21 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
+    <message>
+      <source>No settings model</source>
+      <translation type="unfinished">No settings model</translation>
+    </message>
+    <message>
+      <source>No parameters</source>
+      <translation type="unfinished">No parameters</translation>
+    </message>
+    <message>
+      <source>Parameters set</source>
+      <translation type="unfinished">Parameters set</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
