@@ -568,7 +568,7 @@
                    <item>
                     <widget class="QLabel" name="presetTypeLimitationsLabel">
                      <property name="text">
-                      <string>Native camera presets will not be avaliable.</string>
+                      <string>Native camera presets will not be available.</string>
                      </property>
                     </widget>
                    </item>
