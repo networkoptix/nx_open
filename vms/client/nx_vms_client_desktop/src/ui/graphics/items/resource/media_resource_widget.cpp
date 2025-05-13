@@ -3768,11 +3768,8 @@ bool QnMediaResourceWidget::isTitleUnderMouse() const
 
 bool QnMediaResourceWidget::hasAudio() const
 {
-    // We're checking for both isAudioSupported AND isAudioEnabled here because it's technically
-    // possible to have a camera that has audio enabled but not supported. Enabled is just a flag
-    // in the database.
     if (d->camera)
-        return d->camera->isAudioSupported() && d->camera->isAudioEnabled();
+        return d->camera->hasAudio();
 
     if (d->mediaResource) // Handle local files.
     {

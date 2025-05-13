@@ -48,6 +48,12 @@ public:
 public:
     QnVirtualCameraResource();
 
+    /** @return Redirected audio input (if any) or self. */
+    QnVirtualCameraResourcePtr audioInputDevice() const;
+
+    /** Whether the camera has audio, concerning redirected audio input device if it is set. */
+    virtual bool hasAudio() const;
+
     void forceEnableAudio();
     void forceDisableAudio();
     bool isForcedAudioSupported() const;

@@ -534,6 +534,25 @@ std::optional<nx::vms::api::StreamIndex>
     return std::nullopt;
 }
 
+QnVirtualCameraResourcePtr QnVirtualCameraResource::audioInputDevice() const
+{
+    const auto redirectedInputCamera =
+        resourcePool()->getResourceById<QnVirtualCameraResource>(audioInputDeviceId());
+
+    if (redirectedInputCamera)
+        return redirectedInputCamera;
+
+    return toSharedPointer(this);
+}
+
+bool QnVirtualCameraResource::hasAudio() const
+{
+    // We're checking for both isAudioSupported AND isAudioEnabled here because it's technically
+    // possible to have a camera that has audio enabled but not supported. Enabled is just a flag
+    // in the database.
+    return audioInputDevice()->isAudioSupported() && isAudioEnabled();
+}
+
 nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(nx::Uuid engineId) const
 {
     auto cachedAnalyzedStreamIndex = m_cachedAnalyzedStreamIndex.lock();
