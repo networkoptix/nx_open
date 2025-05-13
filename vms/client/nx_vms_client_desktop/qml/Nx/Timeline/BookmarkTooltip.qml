@@ -20,7 +20,8 @@ Page
     property bool allowExport: true
     property bool readOnly: false
 
-    readonly property int kMaxHeight: 300
+    width: bookmarks.length > 1 ? 300 : undefined
+    height: bookmarks.length > 1 ? 300 : undefined
 
     padding: 0
     background: Rectangle
@@ -30,50 +31,41 @@ Page
         radius: 2
     }
 
-    function updateHeight()
+    contentItem: Item
     {
-        height = footer.height + bookmarksStackLayout.children[bookmarksStackLayout.currentIndex].height
-    }
+        implicitWidth: Math.min(bookmarkLoader.implicitWidth, 300 - footer.implicitWidth)
+        implicitHeight: Math.min(bookmarkLoader.implicitHeight, 300 - footer.implicitHeight)
 
-    StackLayout
-    {
-        id: bookmarksStackLayout
-        currentIndex: pageController.current - 1
-        clip: true
-
-        Repeater
+        Loader
         {
-            model: root.bookmarks
+            id: bookmarkLoader
+            active: false
+            anchors.fill: parent
 
-            BookmarkView
+            sourceComponent: Component
             {
-                property bool isCurrent: StackLayout.isCurrentItem
-
-                Layout.fillWidth: true
-                Layout.maximumWidth: 300
-                Layout.minimumWidth: 180
-
-                Layout.fillHeight: false
-                Layout.maximumHeight: 250
-
-                bookmark: modelData
-
-                function updateRootHeight()
+                BookmarkView
                 {
-                    // Bookmark tooltip height must be equal to the current bookmark content height
-                    // plus root item footer height. The given workaround is required as height
-                    // is recalculated multiple time during layout population and changing
-                    // current item.
-                    if (isCurrent)
-                        Qt.callLater(root.updateHeight)
+                    id: bookmarkView
+                    width: bookmarkLoader.width
+                    height: bookmarkLoader.height
+                    bookmark: root.bookmarks[pageController.current - 1]
+
+                    onTagClicked: function(tag)
+                    {
+                        root.self.tagClicked(tag)
+                    }
                 }
+            }
 
-                onIsCurrentChanged: updateRootHeight()
-                onHeightChanged: updateRootHeight()
-
-                onTagClicked: function(tag)
+            Connections
+            {
+                target: pageController
+                function onCurrentChanged()
                 {
-                    root.self.tagClicked(tag)
+                    bookmarkLoader.active = false;
+                    if (bookmarks.length > 0)
+                        bookmarkLoader.active = true;
                 }
             }
         }
@@ -81,6 +73,7 @@ Page
 
     footer: Control
     {
+        id: footer
         padding: 16
         contentItem: ColumnLayout
         {
@@ -103,7 +96,7 @@ Page
                     icon.height: 20
                     icon.color: ColorTheme.colors.light4
 
-                    onClicked: root.self.onPlayClicked(bookmarksStackLayout.currentIndex)
+                    onClicked: root.self.onPlayClicked(pageController.current - 1)
                 }
 
                 ImageButton
@@ -116,7 +109,7 @@ Page
                     icon.color: ColorTheme.colors.light4
                     visible: !root.readOnly
 
-                    onClicked: root.self.onEditClicked(bookmarksStackLayout.currentIndex)
+                    onClicked: root.self.onEditClicked(pageController.current - 1)
                 }
 
                 ImageButton
@@ -129,7 +122,7 @@ Page
                     icon.color: ColorTheme.colors.light4
                     visible: root.allowExport
 
-                    onClicked: root.self.onExportClicked(bookmarksStackLayout.currentIndex)
+                    onClicked: root.self.onExportClicked(pageController.current - 1)
                 }
 
                 Item
@@ -147,7 +140,7 @@ Page
                     icon.color: ColorTheme.colors.light4
                     visible: !root.readOnly
 
-                    onClicked: root.self.onDeleteClicked(bookmarksStackLayout.currentIndex)
+                    onClicked: root.self.onDeleteClicked(pageController.current - 1)
                 }
             }
 
