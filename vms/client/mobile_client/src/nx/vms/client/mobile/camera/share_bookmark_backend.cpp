@@ -46,7 +46,8 @@ struct ShareBookmarkBackend::Private: public SystemContextAccessor
     Private(ShareBookmarkBackend* q);
 
     void shareBookmarkLink(const QString& bookmarkId) const;
-    bool updateShareParams(const common::BookmarkShareableParams& shareParams);
+    bool updateShareParams(const common::BookmarkShareableParams& shareParams,
+        bool showNativeShareSheet = false);
 };
 
 ShareBookmarkBackend::Private::Private(ShareBookmarkBackend* q):
@@ -77,7 +78,8 @@ void ShareBookmarkBackend::Private::shareBookmarkLink(const QString& bookmarkFul
 }
 
 bool ShareBookmarkBackend::Private::updateShareParams(
-    const common::BookmarkShareableParams& shareParams)
+    const common::BookmarkShareableParams& shareParams,
+    bool showNativeShareSheet)
 {
     const auto context = systemContext();
     if (!NX_ASSERT(context))
@@ -108,6 +110,7 @@ bool ShareBookmarkBackend::Private::updateShareParams(
             if (success)
             {
                 bookmark = common::bookmarkFromApi(updatedBookmark);
+
                 fullId = updatedBookmark.id;
             }
 
@@ -126,7 +129,7 @@ bool ShareBookmarkBackend::Private::updateShareParams(
     // As we created or updated bookmark - there is no need to create it next time.
     bookmarkOperation = QnCameraBookmarksManager::BookmarkOperation::update;
 
-    if (bookmark.shareable() && NX_ASSERT(!fullId.isEmpty()))
+    if (showNativeShareSheet && bookmark.shareable() && NX_ASSERT(!fullId.isEmpty()))
         shareBookmarkLink(fullId);
 
     emit q->bookmarkChanged();
@@ -244,7 +247,7 @@ bool ShareBookmarkBackend::isAvailable()
 
 bool ShareBookmarkBackend::isShared() const
 {
-    return isSharedNow();
+    return d->modelIndex.data(core::IsSharedBookmark).toBool();
 }
 
 QString ShareBookmarkBackend::bookmarkName() const
@@ -287,9 +290,10 @@ QString ShareBookmarkBackend::bookmarkDigest() const
         : QString{};
 }
 
-bool ShareBookmarkBackend::isSharedNow() const
+bool ShareBookmarkBackend::isExpired() const
 {
-    return d->modelIndex.data(core::IsSharedBookmark).toBool();
+    return d->bookmark.shareable() && d->bookmark.bookmarkMatchesFilter(
+        api::BookmarkShareFilter::shared | api::BookmarkShareFilter::expired);
 }
 
 bool ShareBookmarkBackend::isNeverExpires() const
@@ -321,7 +325,9 @@ QString ShareBookmarkBackend::expiresInText() const
         : tr("Expires in %1", "%1 is time text like '48 minutes'").arg(timeString);
 }
 
-bool ShareBookmarkBackend::share(qint64 expirationTime, const QString& password)
+bool ShareBookmarkBackend::share(qint64 expirationTime,
+    const QString& password,
+    bool showNativeShareSheet)
 {
     milliseconds expirationTimeMs = {};
     switch (expirationTime)
@@ -355,13 +361,16 @@ bool ShareBookmarkBackend::share(qint64 expirationTime, const QString& password)
             : password
     };
 
-    return d->updateShareParams(shareParams);
+    return d->updateShareParams(shareParams, showNativeShareSheet);
 }
 
 bool ShareBookmarkBackend::stopSharing()
 {
     return NX_ASSERT(d->bookmarkOperation != QnCameraBookmarksManager::BookmarkOperation::create)
-        && d->updateShareParams({.shareable = false, .expirationTimeMs = 0ms, .digest = ""});
+        && d->updateShareParams({
+            .shareable = false,
+            .expirationTimeMs = 0ms,
+            .digest = ""});
 }
 
 void ShareBookmarkBackend::resetBookmarkData()

@@ -78,7 +78,7 @@ public:
 
     qint64 expirationTimeMs() const;
 
-    Q_INVOKABLE bool isSharedNow() const;
+    Q_INVOKABLE bool isExpired() const; //< Returns true if shared and expired, otherwise false.
     Q_INVOKABLE bool isNeverExpires() const;
     Q_INVOKABLE QString expiresInText() const;
 
@@ -87,7 +87,9 @@ public:
      * @param expirationTime Either ExpiresIn enum constant or actual "expires in" value.
      * @param password
      */
-    Q_INVOKABLE bool share(qint64 expirationTime, const QString& password);
+    Q_INVOKABLE bool share(qint64 expirationTime,
+        const QString& password,
+        bool showNativeShareSheet);
     Q_INVOKABLE bool stopSharing();
     Q_INVOKABLE void resetBookmarkData();
 
