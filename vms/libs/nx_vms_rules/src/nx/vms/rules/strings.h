@@ -114,6 +114,9 @@ public:
     /** "Source" or "Source: value". */
     static QString source(const QString& value = {});
 
+    /** "Total number of events" or "Total number of events: value". */
+    static QString totalNumberOfEvents(const QString& value = {});
+
     static TranslatableString at();
     static TranslatableString to();
     static TranslatableString toUsers();

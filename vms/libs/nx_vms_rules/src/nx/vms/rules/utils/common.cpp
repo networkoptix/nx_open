@@ -30,7 +30,7 @@ std::optional<FieldDescriptor> fieldByName(
 const FieldDescriptor* fieldByType(const QString& type, const ItemDescriptor& descriptor)
 {
     auto it = std::ranges::find_if(
-        descriptor.fields, [&type](const auto& field) { return field.id == type; });
+        descriptor.fields, [&type](const auto& field) { return field.type == type; });
 
     return it == descriptor.fields.end() ? nullptr : &*it;
 }

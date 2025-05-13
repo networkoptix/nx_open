@@ -21,15 +21,16 @@ ServerCertificateErrorEvent::ServerCertificateErrorEvent(
 
 QVariantMap ServerCertificateErrorEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    auto result = BasicEvent::details(context, detailLevel);
     fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
 
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertIcon(result, nx::vms::rules::Icon::server);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::serverSettings);
+
+    result[utils::kCaptionDetailName] = manifest().displayName();
 
     return result;
 }

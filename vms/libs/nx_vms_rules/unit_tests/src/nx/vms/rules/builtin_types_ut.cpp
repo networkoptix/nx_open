@@ -15,12 +15,30 @@
 #include <nx/vms/rules/group.h>
 #include <nx/vms/rules/plugin.h>
 #include <nx/vms/rules/utils/common.h>
+#include <nx/vms/rules/utils/event_details.h>
 #include <nx/vms/rules/utils/serialization.h>
 
 #include "test_event.h"
 #include "test_router.h"
 
 namespace nx::vms::rules::test {
+
+namespace {
+
+using namespace nx::vms::rules::utils;
+
+/** These details are expected to be filled for every built-in event. */
+static const QStringList kRequiredDetails{{
+    kAggregationKeyDetailName,
+    kAggregationKeyIconDetailName,
+    kCaptionDetailName,
+    kExtendedCaptionDetailName,
+    kIconDetailName,
+    kLevelDetailName,
+    kSourceTextDetailName,
+}};
+
+} // namespace
 
 class BuiltinTypesTest:
     public EngineBasedTest,
@@ -71,10 +89,10 @@ public:
         for (const auto& field: manifest.fields)
         {
             SCOPED_TRACE(
-                nx::format("Field name: %1, type %2", field.fieldName, field.id).toStdString());
+                nx::format("Field name: %1, type %2", field.fieldName, field.type).toStdString());
             fieldNames.insert(field.fieldName);
 
-            EXPECT_FALSE(field.id.isEmpty());
+            EXPECT_FALSE(field.type.isEmpty());
             EXPECT_FALSE(field.fieldName.isEmpty());
 
             const auto propIndex = meta.indexOfProperty(field.fieldName.toUtf8().data());
@@ -119,7 +137,7 @@ public:
                 if (needField)
                 {
                     if (const auto field = rules::utils::fieldByName(propName, manifest);
-                        !field || field->id.contains("event"))
+                        !field || field->type.contains("event"))
                     {
                         continue;
                     }
@@ -208,7 +226,7 @@ public:
             [args...](const FieldDescriptor* descriptor){ return new T(args..., descriptor); }));
 
         // Check for serialization assertions.
-        const FieldDescriptor tmpDescriptor{.id = fieldMetatype<T>()};
+        const FieldDescriptor tmpDescriptor{.type = fieldMetatype<T>()};
         const auto field = m_engine->buildEventField(&tmpDescriptor);
         const auto data = serializeProperties(field.get(), nx::utils::propertyNames(field.get()));
         deserializeProperties(data, field.get());
@@ -230,8 +248,8 @@ public:
         // Check if all fields are registered.
         for (const auto& field : manifest.fields)
         {
-            SCOPED_TRACE(nx::format("Event field id: %1", field.id).toStdString());
-            EXPECT_TRUE(engine->isEventFieldRegistered(field.id));
+            SCOPED_TRACE(nx::format("Event field type: %1", field.type).toStdString());
+            EXPECT_TRUE(engine->isEventFieldRegistered(field.type));
         }
 
         ASSERT_TRUE(registerEvent<T>(args...));
@@ -248,6 +266,10 @@ public:
 
         const auto data = serializeProperties(event.get(), nx::utils::propertyNames(event.get()));
         deserializeProperties(data, event.get());
+
+        const QVariantMap details = event->details(engine->systemContext(), Qn::RI_NameOnly);
+        for (auto detailName: kRequiredDetails)
+            EXPECT_TRUE(details.value(detailName).isValid()) << detailName.toStdString();
     }
 
     template<class T>
@@ -263,8 +285,8 @@ public:
         // Check if all fields are registered.
         for (const auto& field : manifest.fields)
         {
-            SCOPED_TRACE(nx::format("Action field id: %1", field.id).toStdString());
-            EXPECT_TRUE(engine->isActionFieldRegistered(field.id));
+            SCOPED_TRACE(nx::format("Action field type: %1", field.type).toStdString());
+            EXPECT_TRUE(engine->isActionFieldRegistered(field.type));
 
             // Check if prolonged actions are running on client.
             if (field.fieldName == rules::utils::kUsersFieldName

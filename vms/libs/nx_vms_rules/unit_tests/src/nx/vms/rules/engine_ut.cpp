@@ -39,8 +39,8 @@ const QString kTestActionId = "testAction";
 const QString kTestEventFieldId = fieldMetatype<TestEventField>();
 const QString kTestActionFieldId = fieldMetatype<TestActionField>();
 
-const FieldDescriptor kTestEventFieldDescriptor{.id = kTestEventFieldId};
-const FieldDescriptor kTestActionFieldDescriptor{.id = kTestActionFieldId};
+const FieldDescriptor kTestEventFieldDescriptor{.type = kTestEventFieldId};
+const FieldDescriptor kTestActionFieldDescriptor{.type = kTestActionFieldId};
 
 const TranslatableString kDisplayName("Display Name");
 const TranslatableString kEventName("Event Name");
@@ -173,7 +173,7 @@ TEST_F(EngineTest, descriptorMustNotBeRegisteredIfSomeOfTheFieldsNotRegistered)
         .description = {},
         .fields = {
             FieldDescriptor {
-                .id = "nx.field.test",
+                .type = "nx.field.test",
                 .fieldName = "testField",
                 .displayName = kDisplayName,
             }
@@ -213,7 +213,7 @@ TEST_F(EngineTest, eventFilterBuiltWithCorrectType)
         .description = {},
         .fields = {
             FieldDescriptor {
-                .id = kTestEventFieldId,
+                .type = kTestEventFieldId,
                 .fieldName = testFieldName,
                 .displayName = kDisplayName,
             }
@@ -284,7 +284,7 @@ TEST_F(EngineTest, actionBuilderBuiltWithCorrectTypeAndCorrectFields)
         .description = {},
         .fields = {
             FieldDescriptor {
-                .id = kTestActionFieldId,
+                .type = kTestActionFieldId,
                 .fieldName = fieldName,
                 .displayName = kDisplayName,
             }

@@ -30,10 +30,24 @@ static constexpr auto kAggregationKeyDetailsDetailName = "aggregationKeyDetails"
 static constexpr auto kAggregationKeyIconDetailName = "aggregationKeyIcon";
 
 static constexpr auto kAnalyticsEventTypeDetailName = "analyticsEventType";
-static constexpr auto kAnalyticsObjectTypeDetailName = "analyticsObjectType";
+
+/**
+ * Caption of the event. Will be displayed on a tile for the NotificationAction and as the title
+ * text for the PushNotificationAction. In case of aggregated event only the first event is used.
+ * Only minimal required details set is included. Some event types use user-provided caption.
+ * Example: "Input Port: Port_1".
+ */
 static constexpr auto kCaptionDetailName = "caption";
+
 static constexpr auto kClientActionDetailName = "clientAction";
 static constexpr auto kCustomIconDetailName = "customIcon";
+
+/**
+ * Description of the event. Will be displayed on a tile for the NotificationAction and as a full
+ * text for the PushNotificationAction. In case of aggregated event only the first event is used.
+ * Only minimal required details set is included. Some event types use user-provided description.
+ * Example: "Input Port: Port_1".
+ */
 static constexpr auto kDescriptionDetailName = "description";
 
 /** Url or email destination. Actual for the HttpAction and SendEmailAction only. */
@@ -41,14 +55,13 @@ static constexpr auto kDestinationDetailName = "destination";
 
 /**
  * Extended event caption with resource name. Used as email subject or bookmark name.
- * Example: "MyCamera was disconnected".
+ * Example: "Camera was disconnected at Server1".
  */
 static constexpr auto kExtendedCaptionDetailName = "extendedCaption";
 
 /**
- * Verbose event details. Used as bookmark description and text overlay text. Also are a main part
- * of the eventDetails() method result, so are displayed in the Event Log and on the right panel
- * event tile tooltips.
+ * Verbose event details. Used as bookmark description, as text overlay text and as a tooltip in
+ * the desktop notification tiles. Also displayed in the Event Log.
  */
 static constexpr auto kDetailingDetailName = "detailing";
 
@@ -57,12 +70,6 @@ static constexpr auto kHtmlDetailsName = "htmlDetails";
 
 static constexpr auto kIconDetailName = "icon";
 static constexpr auto kLevelDetailName = "level";
-
-/**
- * Event type name, taking into account site specifics. Example: "Camera Disconnected" (which can
- * also be "Device Disconnected" on some sites.
- */
-static constexpr auto kNameDetailName = "name";
 
 /**
  * List of source resources ids for the event. Used in "Source" column of the Event Log to show

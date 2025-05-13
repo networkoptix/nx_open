@@ -143,7 +143,7 @@ public:
     void addIntervalField(const QSharedPointer<TestActionBuilder>& builder, std::chrono::microseconds interval)
     {
         static const FieldDescriptor kIntervalFieldDescriptor{
-            .id = fieldMetatype<OptionalTimeField>(),
+            .type = fieldMetatype<OptionalTimeField>(),
             .fieldName = utils::kIntervalFieldName};
 
         auto intervalField = std::make_unique<OptionalTimeField>(&kIntervalFieldDescriptor);
@@ -155,7 +155,7 @@ public:
     void addDurationField(const QSharedPointer<TestActionBuilder>& builder, std::chrono::microseconds duration)
     {
         static const FieldDescriptor kDurationFieldDescriptor{
-            .id = fieldMetatype<OptionalTimeField>(),
+            .type = fieldMetatype<OptionalTimeField>(),
             .fieldName = utils::kDurationFieldName};
 
         auto durationField = std::make_unique<OptionalTimeField>(&kDurationFieldDescriptor);

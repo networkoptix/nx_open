@@ -66,13 +66,10 @@ QString BasicEvent::cacheKey() const
 
 QVariantMap BasicEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& /*aggregatedInfo*/,
     Qn::ResourceInfoLevel detailLevel) const
 {
     QVariantMap result;
-    utils::insertIfNotEmpty(result, utils::kNameDetailName, name(context));
-    utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName,
-        extendedCaption(context, detailLevel));
+    result[utils::kExtendedCaptionDetailName] = extendedCaption(context, detailLevel);
     return result;
 }
 

@@ -70,6 +70,9 @@ private:
     nx::Uuid m_ruleId;
     std::optional<nx::vms::api::rules::PropertyMap> m_aggregatedInfo;
 
+    /** Cache of the details method call. */
+    mutable std::map<Qn::ResourceInfoLevel, QVariantMap> m_detailsCache;
+
     AggregatedEvent() = default;
 };
 

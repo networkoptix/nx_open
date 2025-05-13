@@ -59,12 +59,19 @@ public:
     TextWithFields(common::SystemContext* context, const FieldDescriptor* descriptor);
     virtual ~TextWithFields() override;
 
-    virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
+    virtual QVariant build(const AggregatedEventPtr& event) const override;
 
     QString text() const;
     void setText(const QString& text);
 
     static QJsonObject openApiDescriptor(const QVariantMap& properties);
+
+    /**
+     * Set custom limit of events. Substitutions which require full list of the events (like
+     * {event.extendedDescription}) will use half of this number first and half of this number last
+     * events only. Zero or negative value means no limit.
+     */
+    void setSubstitutionEventsLimit(int value);
 
     TextWithFieldsFieldProperties properties() const;
 
@@ -77,6 +84,7 @@ signals:
 private:
     QString m_rawText;
     utils::TextTokenList m_tokenizedText;
+    int m_substitutionEventsLimit = 10;
 };
 
 } // namespace nx::vms::rules

@@ -93,6 +93,7 @@ public:
         return ItemDescriptor{
             .id = utils::type<TestEvent>(),
             .displayName = TranslatableString("Test event with permissions"),
+            .description = TranslatableString{"Test Event Description."},
             .flags = {ItemFlag::instant, ItemFlag::prolonged},
             .resources = {
                 {rules::utils::kDeviceIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
@@ -117,10 +118,9 @@ public:
 
     virtual QVariantMap details(
         common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
         Qn::ResourceInfoLevel detailLevel) const override
     {
-        auto result = base_type::details(context, aggregatedInfo, detailLevel);
+        auto result = base_type::details(context, detailLevel);
         result[utils::kSourceTextDetailName] = "Test resource";
         nx::vms::rules::utils::insertLevel(result, level);
         nx::vms::rules::utils::insertIcon(result, nx::vms::rules::Icon::alert);

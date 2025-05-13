@@ -25,7 +25,8 @@ FieldDescriptor makeInvisibleFieldDescriptor(const QString& fieldName,
     QVariantMap properties)
 {
     properties["visible"] = false;
-    return FieldDescriptor{.id = fieldMetatype<T>(),
+    return FieldDescriptor{
+        .type = fieldMetatype<T>(),
         .fieldName = fieldName,
         .displayName = displayName,
         .description = description,
@@ -152,7 +153,7 @@ FieldDescriptor makeNotificationTextWithFieldsDescriptor(const QString& fieldNam
     }
     else if (fieldName == kDescriptionFieldName)
     {
-        defaultText = defaultText.isEmpty() ? QString("{event.details}") : defaultText;
+        defaultText = defaultText.isEmpty() ? QString("{event.description}") : defaultText;
         displayName = displayName.empty() ? NX_DYNAMIC_TRANSLATABLE(Strings::description())
                                           : displayName;
         description = QString("Description, displayed on the event tile.");

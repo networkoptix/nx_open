@@ -24,7 +24,7 @@ FieldDescriptor makeFieldDescriptor(
     const QVariantMap& properties = {})
 {
     return FieldDescriptor{
-        .id = fieldMetatype<T>(),
+        .type = fieldMetatype<T>(),
         .fieldName = fieldName,
         .displayName = displayName,
         .description = description,

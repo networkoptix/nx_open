@@ -29,10 +29,9 @@ DeviceDisconnectedEvent::DeviceDisconnectedEvent(
 
 QVariantMap DeviceDisconnectedEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    auto result = BasicEvent::details(context, detailLevel);
     fillAggregationDetailsForServer(result, context, serverId(), detailLevel, /*useAsSource*/ false);
 
     const auto deviceName = Strings::resource(context, deviceId(), detailLevel);
@@ -41,7 +40,6 @@ QVariantMap DeviceDisconnectedEvent::details(
     result[utils::kSourceResourcesIdsDetailName] = QVariant::fromValue(UuidList({deviceId()}));
 
     result[utils::kCaptionDetailName] = caption(context);
-    result[utils::kNameDetailName] = name(context);
 
     utils::insertIcon(result, nx::vms::rules::Icon::resource);
     utils::insertLevel(result, nx::vms::event::Level::critical);
@@ -49,6 +47,7 @@ QVariantMap DeviceDisconnectedEvent::details(
 
     result[utils::kDetailingDetailName] = deviceName;
     result[utils::kHtmlDetailsName] = deviceName;
+    result[utils::kDescriptionDetailName] = deviceName;
 
     return result;
 }

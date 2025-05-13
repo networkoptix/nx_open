@@ -194,7 +194,7 @@ PickerWidget* createEventFieldWidget(
     SystemContext* context,
     ParamsWidget* parent)
 {
-    const auto fieldId = field->descriptor()->id;
+    const auto fieldId = field->descriptor()->type;
 
     if (fieldId == fieldMetatype<vms::rules::AnalyticsEventLevelField>())
     {
@@ -264,7 +264,7 @@ PickerWidget* createActionFieldWidget(
     SystemContext* context,
     ParamsWidget* parent)
 {
-    const auto fieldId = field->descriptor()->id;
+    const auto fieldId = field->descriptor()->type;
 
     if (fieldId == fieldMetatype<nx::vms::rules::ActionFlagField>())
         return createPickerImpl<FlagPicker<nx::vms::rules::ActionFlagField>>(field, context, parent);
@@ -348,7 +348,7 @@ PickerWidget* PickerFactory::createWidget(
     SystemContext* context,
     ParamsWidget* parent)
 {
-    const auto fieldId = field->descriptor()->id;
+    const auto fieldId = field->descriptor()->type;
 
     if (dynamic_cast<nx::vms::rules::ActionBuilderField*>(field))
         return createActionFieldWidget(field, context, parent);

@@ -424,6 +424,11 @@ QString Strings::source(const QString& value)
     return nameAndValue(tr("Source"), value);
 }
 
+QString Strings::totalNumberOfEvents(const QString& value)
+{
+    return nameAndValue(tr("Total number of events"), value);
+}
+
 QString Strings::selectIntegrationAction()
 {
     return tr("Select Integration Action");

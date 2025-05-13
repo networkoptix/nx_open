@@ -296,52 +296,58 @@ TEST_F(ActionFieldTest, EventDotType)
         field.build(AggregatedEventPtr::create(makeAnalyticsEvent())).toString());
 }
 
+/** {event.name} always uses name from the manifest. */
 TEST_F(ActionFieldTest, EventDotName)
 {
     TextWithFields field(systemContext(), &kDummyDescriptor);
     field.setText("{event.name}");
-    EXPECT_EQ(
-        TestEvent::manifest().displayName,
-        field.build(AggregatedEventPtr::create(makeEvent())).toString());
+
+    { // Test Event.
+        EXPECT_EQ(
+            TestEvent::manifest().displayName,
+            field.build(AggregatedEventPtr::create(makeEvent())).toString());
+    }
+    { // Event with custom caption.
+        auto event = makeAnalyticsEvent();
+        event->setProperty("caption", "Test caption");
+        EXPECT_EQ(AnalyticsEvent::manifest().displayName,
+            field.build(AggregatedEventPtr::create(event)).toString());
+    }
 }
 
-TEST_F(ActionFieldTest, EventDotNameAnalyticsEvent)
-{
-    TextWithFields field(systemContext(), &kDummyDescriptor);
-    field.setText("{event.name}");
-    EXPECT_EQ(
-        AnalyticsEvent::manifest().displayName,
-        field.build(AggregatedEventPtr::create(makeAnalyticsEvent())).toString());
-}
-
+/**
+ * {event.caption} uses user-provided caption, and if it is absent - name from the manifest. There
+ * is an exception for the Analytics Event, which can also use taxonomy, but this is not validated
+ * in scope of this test.
+ */
 TEST_F(ActionFieldTest, EventDotCaption)
 {
     auto event = makeAnalyticsEvent();
     TextWithFields field(systemContext(), &kDummyDescriptor);
-    auto eventAggregator = AggregatedEventPtr::create(event);
 
     field.setText("{event.caption}");
-    EXPECT_EQ(AnalyticsEvent::manifest().displayName, field.build(eventAggregator).toString());
+    EXPECT_EQ(AnalyticsEvent::manifest().displayName,
+        field.build(AggregatedEventPtr::create(event)).toString());
 
-    constexpr auto kEventCaption = "Test caption";
+    static const QString kEventCaption = "Test caption";
     event->setProperty("caption", kEventCaption);
 
-    EXPECT_EQ(kEventCaption, field.build(eventAggregator).toString());
+    EXPECT_EQ(kEventCaption, field.build(AggregatedEventPtr::create(event)).toString());
 }
 
+/** {event.description} uses only user-provided description in any case. */
 TEST_F(ActionFieldTest, EventDotDescription)
 {
     TextWithFields field(systemContext(), &kDummyDescriptor);
-    auto event = makeEvent();
-    auto eventAggregator = AggregatedEventPtr::create(event);
+    auto event = makeAnalyticsEvent();
 
     field.setText("{event.description}");
-    EXPECT_EQ(TestEvent::manifest().description, field.build(eventAggregator).toString());
+    EXPECT_EQ(QString(), field.build(AggregatedEventPtr::create(event)).toString());
 
-    constexpr auto kEventDescription = "Test description override";
+    static const QString kEventDescription = "Test description override";
     event->setProperty("description", kEventDescription);
 
-    EXPECT_EQ(kEventDescription, field.build(eventAggregator).toString());
+    EXPECT_EQ(kEventDescription, field.build(AggregatedEventPtr::create(event)).toString());
 }
 
 TEST_F(ActionFieldTest, EventDotSource)

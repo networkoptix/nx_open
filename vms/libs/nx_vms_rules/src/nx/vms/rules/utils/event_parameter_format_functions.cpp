@@ -3,6 +3,7 @@
 #include "event_parameter_format_functions.h"
 
 #include <chrono>
+#include <ranges>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -30,8 +31,6 @@ namespace nx::vms::rules::utils {
 namespace {
 
 constexpr auto kDelimiter = QLatin1StringView(", ");
-
-constexpr auto kDefaultSubstitutionDetailLevel = Qn::RI_WithUrl;
 
 QString detailToString(const QVariantMap& details, const QString& key)
 {
@@ -94,84 +93,6 @@ QString eventType(SubstitutionContext* substitution, common::SystemContext* cont
     return substitution->event->type();
 }
 
-QString eventCaption(SubstitutionContext* substitution, common::SystemContext* context)
-{
-    QString result = propertyToString(substitution->event, kCaptionFieldName);
-    if (!result.isEmpty())
-        return result;
-
-    const auto details = substitution->event->details(context, kDefaultSubstitutionDetailLevel);
-    result = detailToString(details, kCaptionDetailName);
-
-    if (result.isEmpty())
-        result = detailToString(details, kNameDetailName);
-
-    NX_ASSERT(!result.isEmpty(), "An event should have a caption");
-    return result;
-}
-
-QString eventName(SubstitutionContext* substitution, common::SystemContext* context)
-{
-    const auto details = substitution->event->details(context, kDefaultSubstitutionDetailLevel);
-
-    auto result = detailToString(details, kAnalyticsEventTypeDetailName);
-
-    if (result.isEmpty())
-        result = detailToString(details, kNameDetailName);
-
-    return result;
-}
-
-QString eventDescription(SubstitutionContext* substitution, common::SystemContext* context)
-{
-    auto result = detailToString(substitution->event->details(context, kDefaultSubstitutionDetailLevel),
-        kDescriptionDetailName);
-
-    if (result.isEmpty())
-        result = propertyToString(substitution->event, kDescriptionFieldName);
-
-    return result;
-}
-
-QString eventDetails(SubstitutionContext* substitution, common::SystemContext* context)
-{
-    return Strings::eventDetails(substitution->event->details(context, kDefaultSubstitutionDetailLevel))
-        .join(common::html::kLineBreak);
-}
-
-// As of now the only place this function is used is the event tile tooltip.
-QString extendedEventDescription(
-    SubstitutionContext* substitution, common::SystemContext* context)
-{
-    const auto eventDetails = substitution->event->details(context, kDefaultSubstitutionDetailLevel);
-
-    QStringList extendedDescription;
-    //if (const auto it = eventDetails.find(utils::kNameDetailName); it != eventDetails.end())
-    //    extendedDescription << QString("Event: %1").arg(it->toString());
-
-    //if (const auto it = eventDetails.find(utils::kSourceNameDetailName); it != eventDetails.end())
-    //    extendedDescription << QString("Source: %1").arg(it->toString());
-
-    //if (const auto it = eventDetails.find(kPluginIdDetailName); it != eventDetails.end())
-    //{
-    //    extendedDescription << QString("Plugin: %1")
-    //        .arg(Strings::plugin(context, it->value<nx::Uuid>()));
-    //}
-
-    // Extra Caption was calculated as:
-    // `(!m_caption.isEmpty() && !m_description.startsWith(m_caption)) ? m_caption : QString();`
-    //if (const auto it = eventDetails.find(kExtraCaptionDetailName); it != eventDetails.end())
-    //    extendedDescription << QString("Caption: %1").arg(it->toString());
-
-    //extendedDescription << Strings::timestamp(
-    //    substitution->event->initialEvent()->timestamp(),
-    //    static_cast<int>(substitution->event->count()));
-
-    extendedDescription << Strings::eventDetails(eventDetails);
-
-    return extendedDescription.join(common::html::kLineBreak);
-}
-
 QString eventTime(SubstitutionContext* substitution, common::SystemContext* /*context*/)
 {
     return nx::utils::timestampToISO8601(substitution->event->timestamp());
@@ -205,6 +126,50 @@ QString eventTimeEnd(SubstitutionContext* substitution, common::SystemContext* c
 QString eventSourceName(SubstitutionContext* substitution, common::SystemContext* context)
 {
     return eventSourceText(substitution->event, context, Qn::RI_NameOnly);
+}
+
+QString eventExtendedDescription(SubstitutionContext* substitution,
+    common::SystemContext* context)
+{
+    constexpr auto kDetailLevel = Qn::RI_NameOnly;
+
+    QStringList result;
+
+    auto details = substitution->event->details(context, kDetailLevel);
+    result.push_back(details[utils::kExtendedCaptionDetailName].toString());
+
+    auto addEvents =
+        [context, &result](const auto& events)
+        {
+            for (const auto& event: events)
+            {
+                result.push_back(Strings::timestampTime(event->timestamp()));
+                auto eventDetails = event->details(context, kDetailLevel);
+                auto detailing = eventDetails[utils::kDetailingDetailName]
+                    .template value<QStringList>();
+                for (const auto& line: detailing)
+                    result.push_back("  " + line);
+            }
+        };
+
+    const std::vector<EventPtr>& events = substitution->event->aggregatedEvents();
+
+    const int eventsLimit = substitution->extraParameters.value("eventsLimit").toInt();
+    if (eventsLimit <= 0 || events.size() <= (size_t) eventsLimit)
+    {
+        addEvents(events);
+    }
+    else
+    {
+        const size_t firstEvents = eventsLimit / 2;
+        const size_t lastEvents = eventsLimit - firstEvents;
+        addEvents(std::views::take(events, firstEvents));
+        result.push_back("...");
+        addEvents(events | std::views::drop(events.size() - lastEvents));
+        result.push_back({}); //< Add an empty line.
+        result.push_back(Strings::totalNumberOfEvents(QString::number(events.size())));
+    }
+    return result.join('\n');
 }
 
 QString deviceIp(SubstitutionContext* substitution, common::SystemContext* context)

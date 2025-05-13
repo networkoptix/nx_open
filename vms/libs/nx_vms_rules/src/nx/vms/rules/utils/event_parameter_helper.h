@@ -1,8 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #pragma once
-#include <QString>
+
 #include <set>
+
+#include <QtCore/QString>
+#include <QtCore/QVariant>
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/string/comparator.h>
@@ -41,13 +44,19 @@ public:
         const QString& objectTypeField,
         State eventState = State::none,
         const QStringList& externallyCalculatedAttributes = {});
+
     /**
      * Generates eventParameter's replacement for specific event, if it is applicable.
+     * @param context System context.
+     * @param event Aggregated event.
+     * @param name Name of the parameter to be substituted.
+     * @param extraParameters Custom parameters which will be passed to the substitution function.
      */
     QString evaluateEventParameter(
         common::SystemContext* context,
-        const AggregatedEventPtr& eventAggregator,
-        const QString& eventParameter) const;
+        const AggregatedEventPtr& event,
+        const QString& name,
+        const QVariantMap& extraParameters = {}) const;
 
     /**
      * Generates html table with description of available event parameters.

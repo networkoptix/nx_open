@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <QList>
-#include <QString>
+#include <QtCore/QList>
+#include <QtCore/QString>
+#include <QtCore/QVariant>
 
 #include "../rules_fwd.h"
 #include "event_parameter_helper.h"
@@ -44,6 +45,7 @@ TextTokenList tokenizeText(QString text);
 QString composeTextFromTokenList(
     const TextTokenList& tokens,
     common::SystemContext* systemContext,
-    const AggregatedEventPtr& eventAggregator);
+    const AggregatedEventPtr& event,
+    const QVariantMap& extraParameters = {});
 
 } // namespace nx::vms::rules::utils

@@ -117,8 +117,8 @@ NX_REFLECTION_INSTRUMENT(ResourceDescriptor, nx_vms_rules_ResourceDescriptor_Fie
 /** Description of event or action field. */
 struct FieldDescriptor
 {
-    /**%apidoc Field unique id. */
-    QString id;
+    /**%apidoc Type of the field. */
+    QString type;
 
     /**%apidoc
      * Field name to find the corresponding data.
@@ -136,7 +136,7 @@ struct FieldDescriptor
     /**%apidoc[opt]:object Optional properties corresponding to the actual field id. */
     QVariantMap properties; //< TODO: #mmalofeev should properties required for the field initialisation be separated from the supportive properties?
 };
-#define nx_vms_rules_FieldDescriptor_Fields (id)(fieldName)(displayName)(description)(properties)
+#define nx_vms_rules_FieldDescriptor_Fields (type)(fieldName)(displayName)(description)(properties)
 NX_VMS_RULES_API void serialize(
     QnJsonContext* ctx, const FieldDescriptor& value, QJsonValue* target);
 NX_REFLECTION_INSTRUMENT(FieldDescriptor, nx_vms_rules_FieldDescriptor_Fields)

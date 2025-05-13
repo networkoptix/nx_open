@@ -43,7 +43,6 @@ public:
     virtual QString sequenceKey() const override;
     virtual QVariantMap details(
         common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
         Qn::ResourceInfoLevel detailLevel) const override;
 
     static const ItemDescriptor& manifest();

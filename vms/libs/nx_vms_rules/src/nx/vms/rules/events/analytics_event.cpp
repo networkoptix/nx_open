@@ -63,10 +63,9 @@ QString AnalyticsEvent::sequenceKey() const
 
 QVariantMap AnalyticsEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    auto result = BasicEvent::details(context, detailLevel);
     fillAggregationDetailsForDevice(result, context, deviceId(), detailLevel);
 
     result[utils::kCaptionDetailName] = m_caption.isEmpty()

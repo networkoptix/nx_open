@@ -34,18 +34,19 @@ QString CameraInputEvent::sequenceKey() const
 
 QVariantMap CameraInputEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    auto result = BasicEvent::details(context, detailLevel);
     fillAggregationDetailsForDevice(result, context, deviceId(), detailLevel);
 
-    result.insert("inputPort", m_inputPortId);
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::inputSignal);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCamera);
 
-    result[utils::kDetailingDetailName] = detailing();
+    result[utils::kCaptionDetailName] = manifest(context).displayName();
+    const QString description = detailing();
+    result[utils::kDescriptionDetailName] = description;
+    result[utils::kDetailingDetailName] = description;
     result[utils::kHtmlDetailsName] = m_inputPortId;
 
     return result;

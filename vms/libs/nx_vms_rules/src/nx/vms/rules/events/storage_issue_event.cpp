@@ -25,17 +25,19 @@ StorageIssueEvent::StorageIssueEvent(
 
 QVariantMap StorageIssueEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    auto result = BasicEvent::details(context, detailLevel);
     fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
 
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertIcon(result, nx::vms::rules::Icon::storage);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::serverSettings);
 
+    result[utils::kCaptionDetailName] = manifest().displayName();
+
     const QString detailing = extendedReasonText();
+    result[utils::kDescriptionDetailName] = detailing;
     result[utils::kDetailingDetailName] = detailing;
     result[utils::kHtmlDetailsName] = detailing;
 
@@ -90,6 +92,9 @@ QString StorageIssueEvent::extendedReasonText() const
 
         case EventReason::backupFailedSourceFileError:
             return tr("Archive backup failed. Failed to backup file %1.").arg(m_reasonText);
+
+        case EventReason::none: //< Special case for unit tests.
+            return {};
 
         default:
             NX_ASSERT(0, "Unexpected reason");

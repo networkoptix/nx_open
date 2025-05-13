@@ -1,5 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#pragma once
+
 #include <QString>
 
 #include <nx/vms/rules/aggregated_event.h>
@@ -11,13 +13,19 @@ namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::rules::utils {
 
+constexpr auto kDefaultSubstitutionDetailLevel = Qn::RI_WithUrl;
+
 /** Data required for substitution evaluation or filtering. */
 struct SubstitutionContext
 {
+    /** Name of the parameter to be substituted. */
     QString name;
 
     AggregatedEventPtr event;
     std::optional<ItemDescriptor> manifest;
+
+    /** Custom parameters which will be passed to the substitution function. */
+    QVariantMap extraParameters;
 
     nx::vms::rules::State state;
     QString objectTypeId;
@@ -30,15 +38,6 @@ constexpr auto kEventFieldsPrefix = QLatin1StringView("event.fields.");
 constexpr auto kEventDetailsPrefix = QLatin1StringView("event.details.");
 
 QString eventType(SubstitutionContext* substitution, common::SystemContext* context);
-QString eventCaption(SubstitutionContext* substitution, common::SystemContext* context);
-QString eventName(SubstitutionContext* substitution, common::SystemContext* context);
-QString eventDescription(
-    SubstitutionContext* substitution, common::SystemContext* context);
-
-QString extendedEventDescription(
-    SubstitutionContext* substitution, common::SystemContext* context);
-QString eventDetails(
-    SubstitutionContext* substitution, common::SystemContext* context);
 
 QString eventTime(SubstitutionContext* substitution, common::SystemContext* context);
 QString eventTimeStart(SubstitutionContext* substitution, common::SystemContext* context);
@@ -55,6 +54,20 @@ QString eventTimestamp(SubstitutionContext* substitution, common::SystemContext*
  * produced. Generic event may overwrite it.
  */
 QString eventSourceName(SubstitutionContext* substitution, common::SystemContext* context);
+
+/**
+ * Extended event description with all details for the aggregated event. Used in the notifications
+ * tooltip. Has {event.extendedCaption} as the first line, and then {event.details.detailing}.
+ *
+ * Example:
+ * Camera was disconnected at Server1
+ * 15:46:29
+ *   Camera1
+ * 15:48:30
+ *   Camera2
+ */
+QString eventExtendedDescription(SubstitutionContext* substitution,
+    common::SystemContext* context);
 
 QString eventAttribute(SubstitutionContext* substitution, common::SystemContext* context);
 QString eventAttributeName(SubstitutionContext* substitution);

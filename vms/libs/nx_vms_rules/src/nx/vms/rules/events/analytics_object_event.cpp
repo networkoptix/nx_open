@@ -64,16 +64,12 @@ nx::analytics::taxonomy::AbstractObjectType* AnalyticsObjectEvent::objectTypeByI
 
 QVariantMap AnalyticsObjectEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    auto result = BasicEvent::details(context, detailLevel);
     fillAggregationDetailsForDevice(result, context, deviceId(), detailLevel);
 
     result.insert(utils::kCaptionDetailName, analyticsObjectCaption(context));
-
-    // TODO: #sivanov Do we need to repeat this as a separate property?
-    result.insert(utils::kAnalyticsObjectTypeDetailName, analyticsObjectCaption(context));
 
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::analyticsObjectDetected);

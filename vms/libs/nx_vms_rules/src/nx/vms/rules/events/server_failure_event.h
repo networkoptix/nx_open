@@ -26,7 +26,6 @@ public:
     virtual QString aggregationKey() const override { return m_serverId.toSimpleString(); }
     virtual QVariantMap details(
         common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
         Qn::ResourceInfoLevel detailLevel) const override;
 
     static const ItemDescriptor& manifest();

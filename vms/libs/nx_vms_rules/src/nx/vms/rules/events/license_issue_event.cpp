@@ -30,15 +30,16 @@ LicenseIssueEvent::LicenseIssueEvent(
 
 QVariantMap LicenseIssueEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    auto result = BasicEvent::details(context, detailLevel);
     fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
 
     utils::insertLevel(result, nx::vms::event::Level::critical);
     utils::insertIcon(result, nx::vms::rules::Icon::license);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::licensesSettings);
+
+    result[utils::kCaptionDetailName] = manifest().displayName();
 
     auto [text, devices] = detailing(context);
 
@@ -47,6 +48,7 @@ QVariantMap LicenseIssueEvent::details(
     for (const auto& device: devices)
         details.push_back(kRow.arg(device));
     result[utils::kDetailingDetailName] = details;
+    result[utils::kDescriptionDetailName] = details.join('\n');
 
     result[utils::kHtmlDetailsName] = QStringList{{
         text,

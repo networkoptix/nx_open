@@ -20,15 +20,16 @@ MotionEvent::MotionEvent(std::chrono::microseconds timestamp, State state, nx::U
 
 QVariantMap MotionEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    auto result = BasicEvent::details(context, detailLevel);
     fillAggregationDetailsForDevice(result, context, deviceId(), detailLevel);
 
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, nx::vms::rules::Icon::motion);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCameraOnTime);
+
+    result[utils::kCaptionDetailName] = manifest().displayName();
 
     return result;
 }

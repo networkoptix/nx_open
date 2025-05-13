@@ -62,10 +62,9 @@ QString IntegrationDiagnosticEvent::aggregationKey() const
 
 QVariantMap IntegrationDiagnosticEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    auto result = BasicEvent::details(context, detailLevel);
     if (!m_deviceId.isNull())
     {
         fillAggregationDetailsForDevice(result, context, deviceId(), detailLevel);
@@ -88,8 +87,8 @@ QVariantMap IntegrationDiagnosticEvent::details(
     result[utils::kCaptionDetailName] = m_caption.isEmpty()
         ? manifest().displayName
         : m_caption;
-
     utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, m_description);
+
     utils::insertLevel(result, calculateLevel(level()));
     utils::insertIcon(result, nx::vms::rules::Icon::integrationDiagnostic);
 

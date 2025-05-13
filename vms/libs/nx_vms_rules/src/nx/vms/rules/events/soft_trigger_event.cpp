@@ -38,12 +38,10 @@ SoftTriggerEvent::SoftTriggerEvent(
 
 QVariantMap SoftTriggerEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    auto result = BasicEvent::details(context, detailLevel);
 
-    result.insert(utils::kCaptionDetailName, caption());
     utils::insertIfValid(result, utils::kUserIdDetailName, QVariant::fromValue(m_userId));
 
     utils::insertLevel(result, nx::vms::event::Level::common);
@@ -58,24 +56,24 @@ QVariantMap SoftTriggerEvent::details(
     result[utils::kSourceResourcesTypeDetailName] = QVariant::fromValue(ResourceType::device);
     result[utils::kSourceResourcesIdsDetailName] = QVariant::fromValue(UuidList{deviceId()});
 
-    result[utils::kDetailingDetailName] = detailing(context);
+    result[utils::kCaptionDetailName] = m_triggerName;
+
+    const QStringList detailing = this->detailing(context, detailLevel);
+    result[utils::kDescriptionDetailName] = detailing.join('\n');
+    result[utils::kDetailingDetailName] = detailing;
     result[utils::kHtmlDetailsName] = QStringList{{
-        Strings::resource(context, deviceId(), Qn::RI_WithUrl),
+        Strings::resource(context, deviceId(), detailLevel),
         Strings::resource(context, m_userId)
     }};
 
     return result;
 }
 
-QString SoftTriggerEvent::caption() const
-{
-    return QString("%1 %2").arg(manifest().displayName).arg(m_triggerName);
-}
-
-QStringList SoftTriggerEvent::detailing(common::SystemContext* context) const
+QStringList SoftTriggerEvent::detailing(common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel) const
 {
     QStringList result;
-    result << Strings::source(Strings::resource(context, deviceId(), Qn::RI_WithUrl));
+    result << Strings::source(Strings::resource(context, deviceId(), detailLevel));
     result << tr("User: %1").arg(Strings::resource(context, m_userId));
     return result;
 }
@@ -83,7 +81,7 @@ QStringList SoftTriggerEvent::detailing(common::SystemContext* context) const
 QString SoftTriggerEvent::extendedCaption(common::SystemContext* /*context*/,
     Qn::ResourceInfoLevel /*detailLevel*/) const
 {
-    return caption();
+    return nx::format("%1 %2", manifest().displayName, m_triggerName);
 }
 
 const ItemDescriptor& SoftTriggerEvent::manifest()

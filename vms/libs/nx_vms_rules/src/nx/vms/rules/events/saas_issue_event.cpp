@@ -49,15 +49,16 @@ SaasIssueEvent::SaasIssueEvent(
 
 QVariantMap SaasIssueEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    auto result = BasicEvent::details(context, detailLevel);
     fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
 
     utils::insertLevel(result, nx::vms::event::Level::important);
     utils::insertIcon(result, nx::vms::rules::Icon::license);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::licensesSettings);
+
+    result[utils::kCaptionDetailName] = manifest().displayName();
 
     auto [reasonText, devices] = detailing(context);
 
@@ -65,8 +66,8 @@ QVariantMap SaasIssueEvent::details(
     static const QString kRow = "- %1";
     for (const auto& device: devices)
         details.push_back(kRow.arg(device));
+    result[utils::kDescriptionDetailName] = details.join('\n');
     result[utils::kDetailingDetailName] = details;
-
     result[utils::kHtmlDetailsName] = QStringList{{
         reasonText,
         devices.join(common::html::kLineBreak)
@@ -114,6 +115,7 @@ bool SaasIssueEvent::isLicenseMigrationIssue(nx::vms::api::EventReason reason)
         case EventReason::notEnoughLocalRecordingServices:
         case EventReason::notEnoughCloudRecordingServices:
         case EventReason::notEnoughIntegrationServices:
+        case EventReason::none: //< Special case for unit tests.
             return false;
 
         default:
@@ -161,6 +163,9 @@ std::pair<QString, QStringList> SaasIssueEvent::detailing(
 QString SaasIssueEvent::serviceDisabledReason(nx::vms::common::SystemContext* context) const
 {
     using namespace nx::vms::api;
+
+    if (m_reason == EventReason::none) //< Special case for unit tests.
+        return {};
 
     const auto devices =
         context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(m_deviceIds);

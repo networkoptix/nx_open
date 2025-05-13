@@ -40,10 +40,9 @@ PoeOverBudgetEvent::PoeOverBudgetEvent(
 
 QVariantMap PoeOverBudgetEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    auto result = BasicEvent::details(context, detailLevel);
     fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
 
     utils::insertIfNotEmpty(result, utils::kDescriptionDetailName, description());
@@ -51,7 +50,10 @@ QVariantMap PoeOverBudgetEvent::details(
     utils::insertClientAction(result, nx::vms::rules::ClientAction::poeSettings);
     utils::insertIcon(result, nx::vms::rules::Icon::networkIssue);
 
+    result[utils::kCaptionDetailName] = manifest().displayName();
+
     const QStringList details(detailing());
+    result[utils::kDescriptionDetailName] = details.join('\n');
     result[utils::kDetailingDetailName] = details;
     result[utils::kHtmlDetailsName] = details;
 

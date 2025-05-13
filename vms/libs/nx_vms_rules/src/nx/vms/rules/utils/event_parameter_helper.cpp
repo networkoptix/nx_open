@@ -14,6 +14,7 @@
 #include "../aggregated_event.h"
 #include "../engine.h"
 #include "../group.h"
+#include "event_details.h"
 #include "event_parameter_format_functions.h"
 #include "field.h"
 #include "resource.h"
@@ -70,16 +71,6 @@ const QString kDefaultDeviceNameExample = "Hallway camera";
 const SubstitutionDoc kDefaultDeviceNameDoc = {.text = kDefaultDeviceNameText,
     .resultExample = kDefaultDeviceNameExample,
     .filterText = kDeviceFilterText};
-
-const SubstitutionDoc kDefaultEventNameDoc = {
-    .text = "Name of the event, that is used in Event rules, Event logs, etc."
-            "<ul><li>For the Analytics Event this substituted "
-            "with the <code>{event.type}</code> (Line Crossing, People Detection).</li>"
-            "<li>For the Generic Event, this substituted with the event caption.</li></ul>",
-    .resultExample = "Camera disconnected"};
-
-const SubstitutionDoc kDefaultEventTypeDoc = {
-    .text = "The analytics event types.", .resultExample = "Line Crossing"};
 
 EventParameterHelper::EventParametersNames getAttributesParameters(
     common::SystemContext*,
@@ -188,6 +179,19 @@ struct EventParameterHelper::Private
 
 void EventParameterHelper::Private::initFormatFunctions()
 {
+    auto extractDetailFunction =
+        [this](const QString& detailName, Qn::ResourceInfoLevel level)
+        {
+            return
+                [this, detailName, level]
+                    (SubstitutionContext* substitution, common::SystemContext* context)
+                {
+                    return substitution->event->details(context, level)
+                        .value(detailName).toString();
+                };
+        };
+
+
     registerFormatFunction(kEventAttributesPrefix,
         {
             .formatFunction = eventAttribute,
@@ -315,7 +319,7 @@ void EventParameterHelper::Private::initFormatFunctions()
 
     registerFormatFunction("event.caption",
         {
-            .formatFunction = &eventCaption,
+            .formatFunction = extractDetailFunction(kCaptionDetailName, Qn::RI_NameOnly),
             .documentation =
             {
                 .text = "Generic event or analytics event caption (used in notifications). "
@@ -326,7 +330,7 @@ void EventParameterHelper::Private::initFormatFunctions()
 
     registerFormatFunction("event.description",
         {
-            .formatFunction = &eventDescription,
+            .formatFunction = extractDetailFunction(kDescriptionDetailName, Qn::RI_NameOnly),
             .documentation =
             {
                 .text = "Generic event or analytics event description"
@@ -337,26 +341,35 @@ void EventParameterHelper::Private::initFormatFunctions()
 
     registerFormatFunction("event.eventName",
         {
-            .formatFunction = &eventName,
-            .visible = false,
-            .documentation = kDefaultEventNameDoc
+            .formatFunction = extractDetailFunction(kCaptionDetailName, Qn::RI_NameOnly),
+            .visible = false
         });
 
     registerFormatFunction("event.eventType",
         {
             .formatFunction = &eventType,
-            .visible = false,
-            .documentation = kDefaultEventTypeDoc
+            .visible = false
         });
 
     registerFormatFunction("event.extendedDescription",
-        {.formatFunction = &extendedEventDescription, .visible = false});
+        {
+            .formatFunction = &eventExtendedDescription,
+            .visible = false
+        });
 
-    registerFormatFunction("event.details",
-        {.formatFunction = &eventDetails, .visible = false});
-
-    registerFormatFunction(
-        "event.name", {.formatFunction = &eventName, .documentation = kDefaultEventNameDoc});
+    registerFormatFunction("event.name",
+        {
+            .formatFunction =
+                [](auto substitution, auto context)
+                {
+                    return Strings::eventName(context, substitution->event->type());
+                },
+            .documentation =
+            {
+                .text = "Name of the event, that is used in Event rules, Event logs, etc.",
+                .resultExample = "Camera disconnected"
+            }
+        });
 
     registerFormatFunction("event.source",
         {
@@ -433,8 +446,15 @@ void EventParameterHelper::Private::initFormatFunctions()
             }
         });
 
-    registerFormatFunction(
-        "event.type", {.formatFunction = &eventType, .documentation = kDefaultEventTypeDoc});
+    registerFormatFunction("event.type",
+        {
+            .formatFunction = &eventType,
+            .documentation =
+            {
+                .text = "The analytics event types.",
+                .resultExample = "Line Crossing"
+            }
+        });
 
     registerFormatFunction("server.name",
         {
@@ -562,12 +582,14 @@ EventParameterHelper::EventParametersNames EventParameterHelper::getVisibleEvent
 QString EventParameterHelper::evaluateEventParameter(
     common::SystemContext* context,
     const AggregatedEventPtr& event,
-    const QString& eventParameter) const
+    const QString& name,
+    const QVariantMap& extraParameters) const
 {
     auto substitution = SubstitutionContext{
-        .name = eventParameter,
+        .name = name,
         .event = event,
         .manifest = context->vmsRulesEngine()->eventDescriptor(event->type()),
+        .extraParameters = extraParameters,
         .state = event->state(),
     };
 
@@ -575,7 +597,7 @@ QString EventParameterHelper::evaluateEventParameter(
         return function(&substitution, context);
 
     // Event parameter not found. Just add placeholder name to the result text.
-    return addBrackets(eventParameter);
+    return addBrackets(name);
 }
 
 QString EventParameterHelper::addBrackets(const QString& text)

@@ -36,15 +36,18 @@ DeviceIpConflictEvent::DeviceIpConflictEvent(
 
 QVariantMap DeviceIpConflictEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    auto result = BasicEvent::details(context, detailLevel);
     fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
 
-    result.insert(utils::kCaptionDetailName, caption(context));
-    result.insert(utils::kNameDetailName, name(context));
-    result.insert(utils::kUrlDetailName, m_ipAddress);
+    result[utils::kCaptionDetailName] = caption(context);
+
+    const QStringList detailing = this->detailing(context);
+    result[utils::kDescriptionDetailName] = detailing.join('\n');
+    result[utils::kDetailingDetailName] = detailing;
+
+    result[utils::kUrlDetailName] = m_ipAddress;
     utils::insertLevel(result, nx::vms::event::Level::important);
     utils::insertIcon(result, nx::vms::rules::Icon::resource);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::browseUrl);
@@ -53,7 +56,6 @@ QVariantMap DeviceIpConflictEvent::details(
     for (const auto& id: m_deviceIds)
         devices.push_back(Strings::resource(context, id, detailLevel));
 
-    result[utils::kDetailingDetailName] = detailing(context);
     result[utils::kHtmlDetailsName] = QStringList{{
         m_ipAddress,
         devices.join(common::html::kLineBreak),

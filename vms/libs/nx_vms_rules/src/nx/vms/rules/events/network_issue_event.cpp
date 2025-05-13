@@ -32,10 +32,9 @@ NetworkIssueEvent::NetworkIssueEvent(
 
 QVariantMap NetworkIssueEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    auto result = BasicEvent::details(context, detailLevel);
     fillAggregationDetailsForServer(result, context, serverId(), detailLevel, /*useAsSource*/ false);
 
     result[utils::kSourceResourcesTypeDetailName] = QVariant::fromValue(ResourceType::device);
@@ -49,8 +48,12 @@ QVariantMap NetworkIssueEvent::details(
     utils::insertIcon(result, nx::vms::rules::Icon::networkIssue);
     utils::insertClientAction(result, nx::vms::rules::ClientAction::cameraSettings);
 
-    result[utils::kDetailingDetailName] = QStringList{{deviceName, reason}};
-    result[utils::kHtmlDetailsName] = QStringList{{deviceName, reason}};;
+    result[utils::kCaptionDetailName] = manifest().displayName();
+
+    const QStringList detailing{{deviceName, reason}};
+    result[utils::kDescriptionDetailName] = detailing.join('\n');
+    result[utils::kDetailingDetailName] = detailing;
+    result[utils::kHtmlDetailsName] = detailing;
 
     return result;
 }

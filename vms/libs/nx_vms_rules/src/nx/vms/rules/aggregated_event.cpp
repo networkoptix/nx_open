@@ -63,15 +63,13 @@ QVariantMap AggregatedEvent::details(
     if (m_aggregatedEvents.empty())
         return {};
 
-    auto aggregatedInfo = m_aggregatedInfo
-        ? *m_aggregatedInfo
-        : initialEvent()->aggregatedInfo(*this);
+    auto cachedValue = m_detailsCache.find(detailLevel);
+    if (cachedValue != m_detailsCache.cend())
+        return cachedValue->second;
 
-    auto eventDetails = initialEvent()->details(
-        context,
-        aggregatedInfo,
-        detailLevel);
-    return eventDetails;
+    auto result = initialEvent()->details(context, detailLevel);
+    m_detailsCache[detailLevel] = result;
+    return result;
 }
 
 AggregatedEventPtr AggregatedEvent::filtered(const Filter& filter) const

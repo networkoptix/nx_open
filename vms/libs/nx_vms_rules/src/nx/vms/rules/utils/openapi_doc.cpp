@@ -249,7 +249,7 @@ static void collectOpenApiInfo(
 
             if (!NX_ASSERT(!fieldObject.isEmpty(),
                     "Lack of documentation for the type: %1. In item %2",
-                    field.id,
+                    field.type,
                     item.id))
             {
                 continue;
@@ -257,7 +257,7 @@ static void collectOpenApiInfo(
 
             appendFieldDescription(fieldObject, field);
 
-            const auto apiFieldName = toApiFieldName(field.fieldName, field.id);
+            const auto apiFieldName = toApiFieldName(field.fieldName, field.type);
             properties[apiFieldName] = fieldObject;
 
             auto optionalIt = field.properties.find(FieldProperties::kIsOptionalFieldPropertyName);

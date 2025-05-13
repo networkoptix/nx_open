@@ -76,14 +76,10 @@ public:
      *     be substituted to action fields. Also they are used by default in some built-in actions
      *     like Notification or Email actions to make the actual content.
      * @param context System Context to get all required resources data.
-     * @param aggregatedInfo Aggregation info from the database. This info is stored when the
-     *     aggregated event is processed, and can be used to show additional details if the only
-     *     sample event is accessible (e.g. in the Event Log).
      * @param detailLevel Detail level of the resource name string representation.
      */
     virtual QVariantMap details(
         common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
         Qn::ResourceInfoLevel detailLevel) const;
 
     virtual nx::vms::api::rules::PropertyMap aggregatedInfo(

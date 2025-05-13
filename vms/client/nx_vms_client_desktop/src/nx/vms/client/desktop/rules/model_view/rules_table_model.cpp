@@ -72,16 +72,17 @@ bool isRuleValid(const RulesTableModel::ConstRulePtr& rule)
 
 bool hasLookupList(const vms::rules::ItemDescriptor& eventDescriptor)
 {
-    static const auto kTextLookupFieldId = vms::rules::fieldMetatype<vms::rules::TextLookupField>();
-    static const auto kObjectLookupFieldId =
+    static const auto kTextLookupFieldType =
+        vms::rules::fieldMetatype<vms::rules::TextLookupField>();
+    static const auto kObjectLookupFieldType =
         vms::rules::fieldMetatype<vms::rules::ObjectLookupField>();
 
     return std::ranges::any_of(
         eventDescriptor.fields,
         [](const vms::rules::FieldDescriptor& fieldDescriptor)
         {
-            return fieldDescriptor.id == kTextLookupFieldId
-                || fieldDescriptor.id == kObjectLookupFieldId;
+            return fieldDescriptor.type == kTextLookupFieldType
+                || fieldDescriptor.type == kObjectLookupFieldType;
         });
 }
 

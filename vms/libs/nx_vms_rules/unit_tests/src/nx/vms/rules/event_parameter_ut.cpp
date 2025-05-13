@@ -199,7 +199,7 @@ TEST_F(EventParameterTest, fields)
 TEST_F(EventParameterTest, details)
 {
     auto event = testEvent();
-    const auto details = event->details(systemContext(), {}, Qn::RI_WithUrl);
+    const auto details = event->details(systemContext(), Qn::RI_WithUrl);
 
     EXPECT_EQ(details.value("url").toString(), evaluate(event, "event.details.url"));
     EXPECT_EQ(details.value("number").toString(), evaluate(event, "event.details.number"));

@@ -29,14 +29,15 @@ ServerConflictEvent::ServerConflictEvent(
 
 QVariantMap ServerConflictEvent::details(
     common::SystemContext* context,
-    const nx::vms::api::rules::PropertyMap& aggregatedInfo,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    auto result = BasicEvent::details(context, aggregatedInfo, detailLevel);
+    auto result = BasicEvent::details(context, detailLevel);
     fillAggregationDetailsForServer(result, context, serverId(), detailLevel);
 
     utils::insertLevel(result, nx::vms::event::Level::important);
     utils::insertIcon(result, nx::vms::rules::Icon::server);
+
+    result[utils::kCaptionDetailName] = manifest().displayName();
 
     const bool isServerIdConflict = m_conflicts.camerasByServer.empty();
 
@@ -78,6 +79,7 @@ QVariantMap ServerConflictEvent::details(
         htmlDetails.push_back(htmlRows.join(common::html::kLineBreak));
     }
 
+    result[utils::kDescriptionDetailName] = detailing.join('\n');
     result[utils::kDetailingDetailName] = detailing;
     result[utils::kHtmlDetailsName] = htmlDetails;
 

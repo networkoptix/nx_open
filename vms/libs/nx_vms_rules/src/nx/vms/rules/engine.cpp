@@ -256,7 +256,7 @@ bool Engine::registerEvent(const ItemDescriptor& descriptor, const EventConstruc
         descriptor.fields.cend(),
         [this](const FieldDescriptor& fieldDescriptor)
         {
-            return isEventFieldRegistered(fieldDescriptor.id);
+            return isEventFieldRegistered(fieldDescriptor.type);
         });
 
     if (hasUnregisteredFields)
@@ -375,14 +375,14 @@ bool Engine::registerAction(const ItemDescriptor& descriptor, const ActionConstr
 
     for (const auto& field: descriptor.fields)
     {
-        if (isActionFieldRegistered(field.id))
+        if (isActionFieldRegistered(field.type))
             continue;
 
         NX_ERROR(
             this,
             "Register action failed: %1, descriptor has unregistered field: %2",
             descriptor.id,
-            field.id);
+            field.type);
 
         return false;
     }
@@ -565,7 +565,7 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(const api::EventFilter& se
         std::unique_ptr<EventFilterField> field;
         const auto serializedFieldIt = serialized.fields.find(fieldDescriptor.fieldName);
         if (serializedFieldIt != serialized.fields.end()
-            && serializedFieldIt->second.type == fieldDescriptor.id)
+            && serializedFieldIt->second.type == fieldDescriptor.type)
         {
             field = buildEventField(serializedFieldIt->second, &fieldDescriptor);
         }
@@ -611,7 +611,7 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(const ItemDescriptor& desc
             NX_ERROR(
                 this,
                 "Failed to build event filter as an event field for the %1 type was not built",
-                fieldDescriptor.id);
+                fieldDescriptor.type);
 
             return nullptr;
         }
@@ -648,7 +648,7 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const api::ActionBuild
         const auto serializedFieldIt = serialized.fields.find(fieldDescriptor.fieldName);
         if (serializedFieldIt != serialized.fields.end())
         {
-            NX_ASSERT(serializedFieldIt->second.type == fieldDescriptor.id);
+            NX_ASSERT(serializedFieldIt->second.type == fieldDescriptor.type);
             field = buildActionField(serializedFieldIt->second, &fieldDescriptor);
         }
         else //< As the field isn't present in the received serialized builder, make a default one.
@@ -729,7 +729,7 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const ItemDescriptor& 
             NX_ERROR(
                 this,
                 "Failed to build action builder as an action field for the %1 type was not built",
-                fieldDescriptor.id);
+                fieldDescriptor.type);
 
             return nullptr;
         }
@@ -770,20 +770,20 @@ std::unique_ptr<EventFilterField> Engine::buildEventField(
 std::unique_ptr<EventFilterField> Engine::buildEventField(
     const FieldDescriptor* fieldDescriptor) const
 {
-    const auto& constructor = m_eventFields.value(fieldDescriptor->id);
+    const auto& constructor = m_eventFields.value(fieldDescriptor->type);
     if (!constructor)
     {
         NX_ERROR(
             this,
             "Failed to build event field as an event field for the %1 type is not registered",
-            fieldDescriptor->id);
+            fieldDescriptor->type);
 
         return nullptr;
     }
 
     std::unique_ptr<EventFilterField> field(constructor(fieldDescriptor));
 
-    if (NX_ASSERT(field, "Field constructor returns nullptr: %1", fieldDescriptor->id))
+    if (NX_ASSERT(field, "Field constructor returns nullptr: %1", fieldDescriptor->type))
         field->moveToThread(thread());
 
     return field;
@@ -801,20 +801,20 @@ std::unique_ptr<ActionBuilderField> Engine::buildActionField(
 std::unique_ptr<ActionBuilderField> Engine::buildActionField(
     const FieldDescriptor* descriptor) const
 {
-    const auto it = m_actionFields.find(descriptor->id);
+    const auto it = m_actionFields.find(descriptor->type);
     if (it == m_actionFields.end())
     {
         NX_ERROR(
             this,
             "Failed to build action field as an action field for the %1 type is not registered",
-            descriptor->id);
+            descriptor->type);
 
         return {};
     }
 
     std::unique_ptr<ActionBuilderField> field(it->constructor(descriptor));
 
-    if (NX_ASSERT(field, "Field constructor returns nullptr: %1", descriptor->id))
+    if (NX_ASSERT(field, "Field constructor returns nullptr: %1", descriptor->type))
         field->moveToThread(thread());
 
     return field;

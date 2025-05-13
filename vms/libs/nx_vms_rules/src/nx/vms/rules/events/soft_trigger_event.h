@@ -33,7 +33,6 @@ public:
     virtual QString aggregationKey() const override { return m_triggerId.toSimpleString(); }
     virtual QVariantMap details(
         common::SystemContext* context,
-        const nx::vms::api::rules::PropertyMap& aggregatedInfo,
         Qn::ResourceInfoLevel detailLevel) const override;
 
     static const ItemDescriptor& manifest();
@@ -44,8 +43,7 @@ protected:
         Qn::ResourceInfoLevel detailLevel) const override;
 
 private:
-    QString caption() const;
-    QStringList detailing(common::SystemContext* context) const;
+    QStringList detailing(common::SystemContext* context, Qn::ResourceInfoLevel detailLevel) const;
 };
 
 } // namespace nx::vms::rules
