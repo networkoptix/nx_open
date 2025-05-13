@@ -91,6 +91,7 @@ TwoWayAudioStreamer::~TwoWayAudioStreamer()
 
 void TwoWayAudioStreamer::stop()
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
     if (m_provider)
     {
         auto provider = dynamic_cast<DesktopDataProviderBase*>(m_provider.get());
@@ -100,10 +101,15 @@ void TwoWayAudioStreamer::stop()
         m_provider->removeDataProcessor(this);
         m_provider.reset();
     }
+    m_stop = true;
 }
 
 void TwoWayAudioStreamer::onHttpRequest()
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_stop)
+        return;
+
     auto socket = m_httpClient->takeSocket();
     if (!socket)
     {
@@ -119,6 +125,10 @@ void TwoWayAudioStreamer::onHttpRequest()
 
 void TwoWayAudioStreamer::onUpgradeHttpClient()
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_stop)
+        return;
+
     if (m_httpClient->failed()
         || (m_useWebsocket && m_httpClient->response()->statusLine.statusCode
         != nx::network::http::StatusCode::switchingProtocols))

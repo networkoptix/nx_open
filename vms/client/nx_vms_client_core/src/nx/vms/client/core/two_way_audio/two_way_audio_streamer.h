@@ -54,6 +54,8 @@ private:
     nx::network::aio::AsyncChannelPtr m_streamChannel;
     std::unique_ptr<QnAbstractStreamDataProvider> m_provider;
     std::atomic<bool> m_sendInProcess = false;
+    mutable nx::Mutex m_mutex;
+    bool m_stop = false;
 };
 
 } // namespace nx::vms::client::core
