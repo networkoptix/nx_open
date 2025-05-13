@@ -115,7 +115,11 @@ bool unregisterExternalResourceDirectory(const QString& directory)
             const auto r = assetsDirectory.absoluteFilePath(filename);
             bool result = QResource::unregisterResource(r);
             if (!result)
-                NX_ERROR(NX_SCOPE_TAG, "Unable to unregister asset: %1", r);
+            {
+                // Looks like the issue is in the TranslationOverlay destructor. Translators are
+                // released but not destroyed yet as it happens in a queued connection.
+                NX_WARNING(NX_SCOPE_TAG, "Unable to unregister asset: %1", r);
+            }
             return result;
         });
 
