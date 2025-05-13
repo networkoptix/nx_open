@@ -128,6 +128,7 @@ def create_mobile_client_archive(config, output_file):
 
         zip.write(binaries_dir / 'client_core_external.dat', 'client_core_external.dat')
         zip.write(binaries_dir / 'bytedance_iconpark.dat', 'bytedance_iconpark.dat')
+        zip.write(binaries_dir / 'mobile_client_external.dat', 'mobile_client_external.dat')
 
         translations_dir = binaries_dir / 'translations'
         for file in config['mobile_client_translation_files'].split(';'):
