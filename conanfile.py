@@ -171,7 +171,7 @@ class NxOpenConan(ConanFile):
         self.requires("qt/6.5.3" "#57520cb654b97f08c36063bc6cd8c5ae")
         self.requires("roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123")
         self.requires("boost/1.78.0" "#298dce0adb40278309cc5f76fc92b47a")
-        self.requires("rapidjson/cci.20230929" "#624c0094d741e6a3749d2e44d834b96c")
+        self.requires("rapidjson/cci.20230929" "#751fc0dfc70af706c708706450fc2ab7")
         self.requires("perfetto/47.0" "#fefcb910df242e7dca2a309cac9396cb")
 
         if self.isWindows or self.isLinux:
