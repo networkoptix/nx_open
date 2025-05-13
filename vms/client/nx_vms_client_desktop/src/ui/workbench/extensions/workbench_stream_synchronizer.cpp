@@ -132,6 +132,9 @@ void QnWorkbenchStreamSynchronizer::setState(QnResourceWidget* widget, bool useW
     if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
     {
         const auto display = mediaWidget->display();
+        if (!NX_ASSERT(display->camDisplay(), "Widgets without cam display must not be handled"))
+            return;
+
         state.isSyncOn = true;
         state.timeUs = display->currentTimeUSec();
         state.speed = useWidgetPausedState && display->isPaused()
@@ -163,7 +166,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
     if(!mediaWidget)
         return;
 
-    disconnect(mediaWidget->resource().get(), nullptr, this, nullptr);
+    mediaWidget->resource()->disconnect(this);
 
     m_queuedWidgets.remove(mediaWidget);
     if (m_syncedWidgets.contains(mediaWidget))
@@ -214,7 +217,8 @@ void QnWorkbenchStreamSynchronizer::handleWidget(QnMediaResourceWidget* widget)
     NX_ASSERT(!(m_syncedWidgets.contains(widget) && m_queuedWidgets.contains(widget)));
 
     const auto resource = widget->resource();
-    const bool hasArchiveReader = widget->display()->archiveReader() != nullptr;
+    const bool hasArchiveReader = widget->camDisplay()
+        && widget->display()->archiveReader(); //< Having camDisplay ensures having display().
     const bool hasToBeSynced = hasArchiveReader && resource->hasFlags(Qn::sync);
     const bool isSyncedAlready = m_syncedWidgets.contains(widget);
 

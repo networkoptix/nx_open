@@ -210,6 +210,13 @@ QnResourceDisplayPtr MediaResourceWidgetPrivate::display() const
     return m_display;
 }
 
+QnCamDisplay* MediaResourceWidgetPrivate::camDisplay() const
+{
+    return m_display
+        ? m_display->camDisplay()
+        : nullptr;
+}
+
 void MediaResourceWidgetPrivate::setDisplay(const QnResourceDisplayPtr& display)
 {
     // TODO: #dklychkov Make QnMediaResourceWidget::setDisplay work with the previous
@@ -223,17 +230,17 @@ void MediaResourceWidgetPrivate::setDisplay(const QnResourceDisplayPtr& display)
     if (anlyticsEnabledForWidget)
         AnalyticsAvailabilityWatcher::instance().setAnalyticsEnabled(m_display, this, false);
 
-    if (m_display)
-        m_display->camDisplay()->disconnect(this);
+    if (camDisplay())
+        camDisplay()->disconnect(this);
 
     m_display = display;
 
     if (anlyticsEnabledForWidget)
         AnalyticsAvailabilityWatcher::instance().setAnalyticsEnabled(m_display, this, true);
 
-    if (m_display)
+    if (camDisplay())
     {
-        connect(m_display->camDisplay(), &QnCamDisplay::liveMode, this,
+        connect(camDisplay(), &QnCamDisplay::liveMode, this,
             &MediaResourceWidgetPrivate::updateIsPlayingLive);
     }
 
@@ -392,7 +399,7 @@ qreal MediaResourceWidgetPrivate::getStatisticsFps(int channelCount) const
 
 void MediaResourceWidgetPrivate::updateIsPlayingLive()
 {
-    setIsPlayingLive(m_display && m_display->camDisplay()->isRealTimeSource());
+    setIsPlayingLive(camDisplay() && camDisplay()->isRealTimeSource());
 }
 
 void MediaResourceWidgetPrivate::setIsPlayingLive(bool value)
@@ -507,10 +514,10 @@ void MediaResourceWidgetPrivate::setStreamDataFilters(StreamDataFilters filters)
     if (!reader->setStreamDataFilter(filters))
         return;
 
-    if (display()->camDisplay()->isRealTimeSource())
+    if (!camDisplay() || camDisplay()->isRealTimeSource())
         return;
 
-    const auto positionUsec = display()->camDisplay()->getExternalTime();
+    const auto positionUsec = camDisplay()->getExternalTime();
     if (positionUsec == AV_NOPTS_VALUE || positionUsec == DATETIME_NOW)
         return;
 

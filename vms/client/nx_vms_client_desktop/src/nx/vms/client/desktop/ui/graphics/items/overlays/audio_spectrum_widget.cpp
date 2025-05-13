@@ -66,7 +66,7 @@ AudioSpectrumWidget::AudioSpectrumWidget(
         .inactiveColor = core::colorTheme()->color("camera.audioOnly.visualizer.inactive")
     })
 {
-    NX_ASSERT(display);
+    NX_ASSERT(display && display->camDisplay());
 
     // Init pixmaps.
     QSize pixmapSize = core::Geometry::eroded(kLeftGeometry, kLeftInternalMargins).size();
@@ -130,7 +130,8 @@ void AudioSpectrumWidget::paint(
 
     // Draw spectrum.
     QRectF spectrumRect = core::Geometry::eroded(rightRect, kRightInternalMargins);
-    d->painter.update(d->timer.elapsed(), d->display->camDisplay()->audioSpectrum().data);
+    if (d->display && d->display->camDisplay())
+        d->painter.update(d->timer.elapsed(), d->display->camDisplay()->audioSpectrum().data);
     d->painter.options.visualizerLineOffset = spectrumRect.width() / 30;
     d->painter.options.color = isMuted() ? d->inactiveColor : d->activeColor;
     d->painter.paint(painter, spectrumRect);

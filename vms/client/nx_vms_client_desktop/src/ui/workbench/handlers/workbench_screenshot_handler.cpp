@@ -56,9 +56,10 @@ const int minProgressDisplayTime = 1000; // 1 sec
 std::chrono::milliseconds widgetUtcTime(QnMediaResourceWidget *widget)
 {
     // TODO: #sivanov Investigate whether widget->position() can be used.
-    QnResourceDisplayPtr display = widget->display();
+    if (!NX_ASSERT(widget->camDisplay()))
+        return nx::api::ImageRequest::kLatestThumbnail;
 
-    qint64 timeUsec = display->camDisplay()->getCurrentTime();
+    qint64 timeUsec = widget->camDisplay()->getCurrentTime();
     if (timeUsec == qint64(AV_NOPTS_VALUE))
         return nx::api::ImageRequest::kLatestThumbnail;
 
@@ -245,6 +246,9 @@ QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
 ImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaResourceWidget *widget,
     const QnScreenshotParameters &parameters, bool forced) const
 {
+    if (!NX_ASSERT(widget->camDisplay()))
+        return nullptr;
+
     QnResourceDisplayPtr display = widget->display();
 
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
@@ -257,7 +261,7 @@ ImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaR
     // Either tiling (pano cameras) and crop rect are handled here, so it isn't passed to image processing params
 
     QnLegacyTranscodingSettings imageProcessingParams;
-    imageProcessingParams.resource = display->mediaResource();
+    imageProcessingParams.resource = widget->resource();
     imageProcessingParams.zoomWindow = parameters.zoomRect;
     imageProcessingParams.contrastParams = parameters.imageCorrectionParams;
     imageProcessingParams.itemDewarpingParams = parameters.itemDewarpingParams;
@@ -421,7 +425,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     QString filename = actionParameters.argument<QString>(Qn::FileNameRole);
 
     QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(actionParameters.widget());
-    if (!widget)
+    if (!widget || !NX_ASSERT(widget->camDisplay()))
         return;
 
     QnResourceDisplayPtr display = widget->display();

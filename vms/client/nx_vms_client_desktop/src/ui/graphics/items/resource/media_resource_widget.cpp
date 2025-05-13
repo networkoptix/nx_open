@@ -1285,6 +1285,11 @@ QnResourceDisplayPtr QnMediaResourceWidget::display() const
     return d->display();
 }
 
+QnCamDisplay* QnMediaResourceWidget::camDisplay() const
+{
+    return d->camDisplay();
+}
+
 QnResourceWidgetRenderer* QnMediaResourceWidget::renderer() const
 {
     return m_renderer;
@@ -1325,12 +1330,18 @@ QPointF QnMediaResourceWidget::mapFromMotionGrid(const QPoint &gridPos)
 
 QSize QnMediaResourceWidget::motionGridSize() const
 {
+    if (!channelLayout())
+        return QSize(MotionGrid::kWidth, MotionGrid::kHeight);
+
     return Geometry::cwiseMul(
         channelLayout()->size(), QSize(MotionGrid::kWidth, MotionGrid::kHeight));
 }
 
 QPoint QnMediaResourceWidget::channelGridOffset(int channel) const
 {
+    if (!channelLayout())
+        return QPoint(0, 0);
+
     return Geometry::cwiseMul(
         channelLayout()->position(channel), QSize(MotionGrid::kWidth, MotionGrid::kHeight));
 }
@@ -1531,9 +1542,12 @@ bool QnMediaResourceWidget::animationAllowed() const
 
 void QnMediaResourceWidget::resumeHomePtzController()
 {
+    if (!NX_ASSERT(camDisplay()))
+        return;
+
     if (auto homePtzController = findPtzController<QnFisheyeHomePtzController>(m_ptzController))
     {
-        if (options().testFlag(DisplayDewarped) && display()->camDisplay()->isRealTimeSource())
+        if (options().testFlag(DisplayDewarped) && camDisplay()->isRealTimeSource())
             homePtzController->resume();
     }
 }
@@ -1544,10 +1558,7 @@ bool QnMediaResourceWidget::forceShowPosition() const
     if (!qnRuntime->isVideoWallMode())
         return false;
 
-    const bool isPlayingArchive = d->display()
-        && d->display()->camDisplay()
-        && !d->display()->camDisplay()->isRealTimeSource();
-
+    const bool isPlayingArchive = camDisplay() && !camDisplay()->isRealTimeSource();
     return isPlayingArchive;
 }
 
@@ -1672,11 +1683,14 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr& display)
 
     if (display)
     {
-        connect(display->camDisplay(), &QnCamDisplay::stillImageChanged, this,
-            &QnMediaResourceWidget::updateButtonsVisibility);
+        if (const auto camDisplay = display->camDisplay())
+        {
+            connect(camDisplay, &QnCamDisplay::stillImageChanged, this,
+                &QnMediaResourceWidget::updateButtonsVisibility);
 
-        connect(display->camDisplay(), &QnCamDisplay::liveMode, this,
-            &QnMediaResourceWidget::at_camDisplay_liveChanged);
+            connect(camDisplay, &QnCamDisplay::liveMode, this,
+                &QnMediaResourceWidget::at_camDisplay_liveChanged);
+        }
         connect(d->resource.get(), &QnResource::videoLayoutChanged, this,
             &QnMediaResourceWidget::at_videoLayoutChanged);
 
@@ -1689,13 +1703,13 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr& display)
         }
 
         setChannelLayout(display->videoLayout());
-        m_renderer->setChannelCount(display->videoLayout()->channelCount());
+        m_renderer->setChannelCount(channelCount());
         display->addRenderer(m_renderer);
         updateCustomAspectRatio();
     }
     else
     {
-        setChannelLayout(QnConstResourceVideoLayoutPtr(new QnDefaultResourceVideoLayout()));
+        setChannelLayout({});
         m_renderer->setChannelCount(0);
     }
 
@@ -2333,9 +2347,9 @@ QString QnMediaResourceWidget::calculateDetailsText() const
             }
         };
 
-    if (hasVideo())
+    if (hasVideo() && NX_ASSERT(camDisplay()))
     {
-        const QSize channelResolution = d->display()->camDisplay()->getRawDataSize();
+        const QSize channelResolution = camDisplay()->getRawDataSize();
         const QSize videoLayout = d->mediaResource->getVideoLayout()->size();
         const QSize actualResolution = Geometry::cwiseMul(channelResolution, videoLayout);
 
@@ -2420,7 +2434,7 @@ void QnMediaResourceWidget::updateCurrentUtcPosMs()
 QString QnMediaResourceWidget::calculatePositionText() const
 {
     /* Do not show time for regular media files. */
-    if (!d->resource->flags().testFlag(Qn::utc))
+    if (!d->resource->flags().testFlag(Qn::utc) || !camDisplay())
         return QString();
 
     const auto extractTime =
@@ -2442,7 +2456,7 @@ QString QnMediaResourceWidget::calculatePositionText() const
         };
 
     const bool showLiveText = !appContext()->localSettings()->showTimestampOnLiveCamera()
-        && d->display()->camDisplay()->isRealTimeSource();
+        && camDisplay()->isRealTimeSource();
 
     const QString timeString = showLiveText
             ? tr("LIVE")
@@ -2621,18 +2635,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         if (!NX_ASSERT(d->camera) || !d->camera->isScheduleEnabled())
             return Qn::IoModuleDisabledOverlay;
 
-        const auto hasArchive = [this](const QnVirtualCameraResourcePtr& camera)
-        {
-            auto systemContext = SystemContext::fromResource(camera);
-            if (!NX_ASSERT(systemContext))
-                return false;
-
-            auto loader = systemContext->cameraDataManager()->loader(d->mediaResource,
-                /*createIfNotExists*/ false);
-            return loader && loader->periods(Qn::RecordingContent).containTime(
-                d->display()->camDisplay()->getExternalTime() / 1000);
-        };
-
         if (d->isPlayingLive())
         {
             return d->accessController()->
@@ -2668,7 +2670,12 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         }
     }
 
-    const auto mediaEvent = d->display()->camDisplay()->lastMediaEvent();
+    const auto camDisplay = this->camDisplay();
+
+    const nx::media::StreamEventPacket mediaEvent = camDisplay
+        ? camDisplay->lastMediaEvent()
+        : nx::media::StreamEventPacket();
+
     if (mediaEvent.code == nx::media::StreamEvent::tooManyOpenedConnections)
         return Qn::TooManyOpenedConnectionsOverlay;
 
@@ -2676,7 +2683,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     // audio/metadata-only devices (like speakers) to be in this state (e.g., no data in the audio
     // stream or even no audio stream at all). This is OK, we should not show the loading overlay
     // for such devices. No need to check for IO modules, it had already been done beforehand.
-    if (d->hasVideo && d->display()->camDisplay()->isEOFReached())
+    if (d->hasVideo && camDisplay && camDisplay->isEOFReached())
     {
         // No need to check status: offline and unauthorized are checked first.
         return d->isPlayingLive()
@@ -2701,12 +2708,12 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             return shouldShowAudioSpectrum() ? Qn::EmptyOverlay : Qn::NoDataOverlay;
     }
 
-    if (d->display()->camDisplay()->isLongWaiting())
+    if (camDisplay && camDisplay->isLongWaiting())
     {
         auto loader = systemContext()->cameraDataManager()->loader(d->mediaResource,
             /*createIfNotExists*/ false);
-        if (loader && loader->periods(Qn::RecordingContent)
-            .containTime(d->display()->camDisplay()->getExternalTime() / 1000))
+        if (loader && loader->periods(Qn::RecordingContent).containTime(
+            camDisplay->getExternalTime() / 1000))
         {
             return base_type::calculateStatusOverlay(nx::vms::api::ResourceStatus::online,
                 d->hasVideo, shouldShowAudioSpectrum());
@@ -2716,13 +2723,13 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     }
 
     if (mediaEvent.code == nx::media::StreamEvent::cannotDecryptMedia
-        && !d->display()->camDisplay()->isBuffering())
+        && !camDisplay->isBuffering())
     {
         m_encryptedArchiveData = mediaEvent.extraData;
         return Qn::CannotDecryptMediaOverlay;
     }
 
-    if (d->display()->isPaused())
+    if (d->display() && d->display()->isPaused())
     {
         if (!d->hasVideo)
             return shouldShowAudioSpectrum() ? Qn::EmptyOverlay : Qn::NoDataOverlay;
@@ -2850,15 +2857,21 @@ void QnMediaResourceWidget::updateAspectRatio()
     NX_ASSERT(!qFuzzyIsNull(baseAspectRatio));
     if (baseAspectRatio <= 0.0)
     {
-        setAspectRatio(baseAspectRatio); /* No aspect ratio. */
+        setAspectRatio(baseAspectRatio); //< No aspect ratio.
         return;
     }
 
-    qreal aspectRatio = baseAspectRatio *
-        Geometry::aspectRatio(channelLayout()->size()) *
-        (zoomRect().isNull() ? 1.0 : Geometry::aspectRatio(zoomRect()));
-
-    setAspectRatio(aspectRatio);
+    if (NX_ASSERT(channelLayout()))
+    {
+        qreal aspectRatio = baseAspectRatio *
+            Geometry::aspectRatio(channelLayout()->size()) *
+            (zoomRect().isNull() ? 1.0 : Geometry::aspectRatio(zoomRect()));
+        setAspectRatio(aspectRatio);
+    }
+    else
+    {
+        setAspectRatio(baseAspectRatio); //< No aspect ratio.
+    }
 }
 
 bool QnMediaResourceWidget::isPlayingLive() const
@@ -2868,7 +2881,10 @@ bool QnMediaResourceWidget::isPlayingLive() const
 
 void QnMediaResourceWidget::at_camDisplay_liveChanged()
 {
-    const bool isPlayingLive = d->display()->camDisplay()->isRealTimeSource();
+    if (!camDisplay())
+        return;
+
+    const bool isPlayingLive = camDisplay()->isRealTimeSource();
 
     if (isPlayingLive)
     {
@@ -3006,8 +3022,8 @@ void QnMediaResourceWidget::updateFisheye()
     item()->setData(Qn::ItemFlipRole, flip);
 
     updateAspectRatio();
-    if (display() && display()->camDisplay())
-        display()->camDisplay()->setFisheyeEnabled(fisheyeEnabled);
+    if (camDisplay())
+        camDisplay()->setFisheyeEnabled(fisheyeEnabled);
 
     emit fisheyeChanged();
 
@@ -3020,10 +3036,8 @@ void QnMediaResourceWidget::updateFisheye()
 
 void QnMediaResourceWidget::updateCustomAspectRatio()
 {
-    if (!d->display())
-        return;
-
-    d->display()->camDisplay()->setOverridenAspectRatio(d->mediaResource->customAspectRatio());
+    if (camDisplay())
+        camDisplay()->setOverridenAspectRatio(d->mediaResource->customAspectRatio());
 }
 
 void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
@@ -3165,8 +3179,7 @@ void QnMediaResourceWidget::updateCompositeOverlayMode()
     if (!m_compositeOverlay || d->camera.isNull())
         return;
 
-    const bool isLive = (d->display() && d->display()->camDisplay()
-        ? d->display()->camDisplay()->isRealTimeSource() : false);
+    const bool isLive = camDisplay() ? camDisplay()->isRealTimeSource() : true;
 
     const bool bookmarksEnabled = !isLive
         && navigator()->bookmarksModeEnabled();
@@ -3193,17 +3206,18 @@ void QnMediaResourceWidget::updateCompositeOverlayMode()
 
 qint64 QnMediaResourceWidget::getUtcCurrentTimeUsec() const
 {
+    if (!camDisplay())
+        return 0;
+
     // get timestamp from the first channel that was painted
     int channel = std::distance(m_paintedChannels.cbegin(),
         std::find_if(m_paintedChannels.cbegin(), m_paintedChannels.cend(), [](bool value) { return value; }));
     if (channel >= channelCount())
         channel = 0;
 
-    qint64 timestampUsec = hasVideo()
+    return hasVideo()
         ? m_renderer->getTimestampOfNextFrameToRender(channel).count()
-        : display()->camDisplay()->getCurrentTime();
-
-    return timestampUsec;
+        : camDisplay()->getCurrentTime();
 }
 
 qint64 QnMediaResourceWidget::getUtcCurrentTimeMs() const
@@ -3572,7 +3586,7 @@ void QnMediaResourceWidget::setMuted(bool muted)
 
 void QnMediaResourceWidget::updateAudioPlaybackState()
 {
-    auto camDisplay = display()->camDisplay();
+    auto camDisplay = this->camDisplay();
     if (!camDisplay)
         return;
 

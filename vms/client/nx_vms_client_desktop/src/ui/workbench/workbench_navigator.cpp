@@ -612,14 +612,17 @@ bool QnWorkbenchNavigator::setPlaying(bool playing)
     m_pausedOverride = false;
     m_autoPaused = false;
 
-    QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader();
-    QnCamDisplay *camDisplay = m_currentMediaWidget->display()->camDisplay();
+    auto reader = m_currentMediaWidget->display()->archiveReader();
+    auto camDisplay = m_currentMediaWidget->camDisplay();
+    if (!NX_ASSERT(reader) || !NX_ASSERT(camDisplay))
+        return false;
+
     if (playing)
     {
         if (reader->isRealTimeSource())
         {
             /* Media was paused while on live. Jump to archive when resumed. */
-            qint64 time = m_currentMediaWidget->display()->camDisplay()->getExternalTime();
+            qint64 time = camDisplay->getExternalTime();
             reader->resumeMedia();
             if (time != (qint64)AV_NOPTS_VALUE && !reader->isReverseMode())
                 reader->directJumpToNonKeyFrame(time + 1);
@@ -770,10 +773,10 @@ qreal QnWorkbenchNavigator::maximalSpeed() const
 
 qint64 QnWorkbenchNavigator::positionUsec() const
 {
-    if (!m_currentMediaWidget)
+    if (!m_currentMediaWidget || !m_currentMediaWidget->camDisplay())
         return 0;
 
-    return m_currentMediaWidget->display()->camDisplay()->getExternalTime();
+    return m_currentMediaWidget->camDisplay()->getExternalTime();
 }
 
 void QnWorkbenchNavigator::setPosition(qint64 positionUsec)
@@ -1216,7 +1219,7 @@ void QnWorkbenchNavigator::rewind(bool canJumpToPrevious)
 
 void QnWorkbenchNavigator::stepBackward()
 {
-    if (!m_currentMediaWidget)
+    if (!m_currentMediaWidget || !m_currentMediaWidget->camDisplay())
         return;
 
     QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader();
@@ -1226,11 +1229,11 @@ void QnWorkbenchNavigator::stepBackward()
     m_pausedOverride = false;
 
     /* Here we want to know real reader time. */
-    qint64 currentTime = m_currentMediaWidget->display()->camDisplay()->getExternalTime();
+    qint64 currentTime = m_currentMediaWidget->camDisplay()->getExternalTime();
 
     if (!reader->isSkippingFrames()
         && currentTime > reader->startTime()
-        && !m_currentMediaWidget->display()->camDisplay()->isBuffering())
+        && !m_currentMediaWidget->camDisplay()->isBuffering())
     {
 
         reader->previousFrame(currentTime);
@@ -1780,7 +1783,10 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
         // TODO: #sivanov #vkutin Refactor logic.
         auto usecTimeForWidget = [isSearch, this](QnMediaResourceWidget *mediaWidget) -> qint64
         {
-            if (mediaWidget->display()->camDisplay()->isRealTimeSource())
+            if (!mediaWidget->camDisplay())
+                return 0;
+
+            if (mediaWidget->camDisplay()->isRealTimeSource())
                 return DATETIME_NOW;
 
             const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
@@ -1793,7 +1799,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             }
             else
             {
-                timeUSec = mediaWidget->display()->camDisplay()->getExternalTime();
+                timeUSec = mediaWidget->camDisplay()->getExternalTime();
                 NX_VERBOSE(this, "External time for the widget %1 is %2", mediaWidget,
                     nx::utils::timestampToDebugString(timeUSec));
             }
@@ -2386,12 +2392,12 @@ void QnWorkbenchNavigator::updateThumbnailsLoader()
             if (!widget)
                 return false;
 
-            // Thumbnails are disabled for panoramic cameras.
-            if (widget->channelLayout()->channelCount() > 1)
-                return false;
-
             // Thumbnails are disabled for a media other than video.
             if (!widget->hasVideo())
+                return false;
+
+            // Thumbnails are disabled for panoramic cameras.
+            if (widget->channelCount() > 1)
                 return false;
 
             if (const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>())

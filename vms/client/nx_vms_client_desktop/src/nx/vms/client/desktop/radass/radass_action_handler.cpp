@@ -122,8 +122,9 @@ void RadassActionHandler::handleItemModeChanged(const LayoutItemIndex& item, Rad
     auto widget = display()->widget(item.uuid());
     if (auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget))
     {
-        auto camDisplay = mediaWidget->display()->camDisplay();
-        d->controller->setMode(camDisplay, mode);
+        auto camDisplay = mediaWidget->camDisplay();
+        if (NX_ASSERT(camDisplay))
+            d->controller->setMode(camDisplay, mode);
     }
 }
 
@@ -151,8 +152,9 @@ void RadassActionHandler::handleCurrentLayoutChanged()
         auto widget = display()->widget(index.uuid());
         if (auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget))
         {
-            auto camDisplay = mediaWidget->display()->camDisplay();
-            d->controller->setMode(camDisplay, d->manager->mode(index));
+            auto camDisplay = mediaWidget->camDisplay();
+            if (NX_ASSERT(camDisplay))
+                d->controller->setMode(camDisplay, d->manager->mode(index));
         }
     }
 
@@ -188,8 +190,9 @@ void RadassActionHandler::handleItemAdded(QnWorkbenchItem *item)
     QnResourceWidget* widget = display()->widget(index.uuid());
     if (auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget))
     {
-        if (auto display = mediaWidget->display()->camDisplay();
-            display->isRadassSupported() && !mediaWidget->isZoomWindow())
+        if (auto display = mediaWidget->camDisplay();
+            display && display->isRadassSupported()
+            && !mediaWidget->isZoomWindow())
         {
             d->controller->setMode(display, d->manager->mode(index));
         }

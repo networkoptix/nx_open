@@ -866,14 +866,18 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
             /* Update media quality. */
             if (QnMediaResourceWidget *oldMediaWidget = dynamic_cast<QnMediaResourceWidget *>(oldWidget))
             {
-                oldMediaWidget->display()->camDisplay()->setFullScreen(false);
+                if (auto camDisplay = oldMediaWidget->camDisplay())
+                    camDisplay->setFullScreen(false);
             }
             if (QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget))
             {
-                newMediaWidget->display()->camDisplay()->setFullScreen(true);
-                if (newMediaWidget->display()->archiveReader())
+                if (auto camDisplay = newMediaWidget->camDisplay())
+                    camDisplay->setFullScreen(true);
+
+                if (newMediaWidget->display())
                 {
-                    newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
+                    if (auto archiveReader = newMediaWidget->display()->archiveReader())
+                        archiveReader->setQuality(MEDIA_Quality_High, true);
                 }
             }
 
@@ -1291,10 +1295,10 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
             // Zoom windows must not be controlled by radass or storage location controller.
             if (!mediaWidget->isZoomWindow())
             {
-                appContext()->radassController()->registerConsumer(
-                    mediaWidget->display()->camDisplay());
-                context()->instance<StorageLocationCameraController>()->registerConsumer(
-                    mediaWidget->display());
+                if (auto camDisplay = mediaWidget->camDisplay())
+                    appContext()->radassController()->registerConsumer(camDisplay);
+                if (auto display = mediaWidget->display())
+                    context()->instance<StorageLocationCameraController>()->registerConsumer(display);
             }
 
         }
@@ -1353,10 +1357,10 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item)
     const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
     if (mediaWidget && !mediaWidget->isZoomWindow())
     {
-        appContext()->radassController()->unregisterConsumer(
-            mediaWidget->display()->camDisplay());
-        context()->instance<StorageLocationCameraController>()->unregisterConsumer(
-            mediaWidget->display());
+        if (auto camDisplay = mediaWidget->camDisplay())
+            appContext()->radassController()->unregisterConsumer(camDisplay);
+        if (auto display = mediaWidget->display())
+            context()->instance<StorageLocationCameraController>()->unregisterConsumer(display);
     }
 
     delete widget;
@@ -1920,25 +1924,37 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate)
     QSize size;
     if (item->layout()->items().size() == 1)
     {
-        /* Layout containing only one item (current) is supposed to have the same AR as the item.
-         * So we just set item size to its video layout size. */
-        size = widget->channelLayout()->size();
-        if (QnAspectRatio::isRotated90(item->rotation()))
-            size = size.transposed();
+        // Layout containing only one item (current) is supposed to have the same AR as the item.
+        // So we just set item size to its video layout size.
+        if (widget->channelLayout())
+        {
+            size = widget->channelLayout()->size();
+            if (QnAspectRatio::isRotated90(item->rotation()))
+                size = size.transposed();
+        }
+        else // Default value for widgets without video.
+        {
+            size = QSize(1, 1);
+        }
     }
     else
     {
         qreal widgetAspectRatio = widget->visualAspectRatio();
         if (widgetAspectRatio <= 0)
         {
-            QnConstResourceVideoLayoutPtr videoLayout = widget->channelLayout();
-            /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
-            widgetAspectRatio = Geometry::aspectRatio(
-                videoLayout->size())
-                    * (item->zoomRect().isNull() ? 1.0 : Geometry::aspectRatio(item->zoomRect()))
-                    * (4.0 / 3.0);
-            if (QnAspectRatio::isRotated90(item->rotation()))
-                widgetAspectRatio = 1 / widgetAspectRatio;
+            if (auto videoLayout = widget->channelLayout())
+            {
+                // Assume 4:3 AR of a single channel. In most cases, it will work fine.
+                widgetAspectRatio = Geometry::aspectRatio(videoLayout->size())
+                        * (item->zoomRect().isNull() ? 1.0 : Geometry::aspectRatio(item->zoomRect()))
+                        * (4.0 / 3.0);
+                if (QnAspectRatio::isRotated90(item->rotation()))
+                    widgetAspectRatio = 1 / widgetAspectRatio;
+            }
+            else // Default value for widgets without video.
+            {
+                widgetAspectRatio = (4.0 / 3.0);
+            }
         }
         const QRectF combinedGeometry = item->combinedGeometry();
         const int boundingValue =
@@ -2077,19 +2093,24 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
             mediaWidget->beforeDestroy();
 
             auto item = mediaWidget->item();
-            qint64 timeUSec = mediaWidget->display()->camDisplay()->getExternalTime();
-            if (timeUSec != AV_NOPTS_VALUE)
+
+            if (auto camDisplay = mediaWidget->camDisplay())
             {
-                const qint64 actualTime = mediaWidget->display()->camDisplay()->isRealTimeSource()
-                    ? DATETIME_NOW
-                    : timeUSec / 1000;
-                item->setData(Qn::ItemTimeRole, actualTime);
+                qint64 timeUSec = camDisplay->getExternalTime();
+                if (timeUSec != AV_NOPTS_VALUE)
+                {
+                    const qint64 actualTime = camDisplay->isRealTimeSource()
+                        ? DATETIME_NOW
+                        : timeUSec / 1000;
+                    item->setData(Qn::ItemTimeRole, actualTime);
+                }
             }
 
-            item->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
-
             if (const auto reader = mediaWidget->display()->archiveReader())
+            {
+                item->setData(Qn::ItemPausedRole, reader->isMediaPaused());
                 item->setData(Qn::ItemSpeedRole, reader->getSpeed());
+            }
 
             if (mediaWidget->isMuted())
             {
@@ -2261,11 +2282,11 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
                 archiveReader->setSpeed(0.0); // TODO: #vasilenko check that this call doesn't break anything.
             }
 
-            if (isPreviewSearchLayout && timeMs)
+            auto camDisplay = mediaResourceWidget->camDisplay();
+            if (isPreviewSearchLayout && timeMs && NX_ASSERT(camDisplay))
             {
                 NX_VERBOSE(this, "Navigate %1 to preview position %2",
                     mediaResourceWidget, nx::utils::timestampToDebugString(*timeMs));
-                const auto camDisplay = mediaResourceWidget->display()->camDisplay();
                 camDisplay->setMTDecoding(false);
                 camDisplay->start();
                 archiveReader->startPaused(timeMs.value() * 1000);
@@ -2517,8 +2538,11 @@ void QnWorkbenchDisplay::showSplashOnResource(
         if (widget->zoomTargetWidget())
             continue; /* Don't draw notification on zoom widgets. */
 
-        QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
-        if (mediaWidget && !mediaWidget->display()->camDisplay()->isRealTimeSource())
+        auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(widget);
+        if (!mediaWidget || !mediaWidget->camDisplay())
+            continue;
+
+        if (!mediaWidget->camDisplay()->isRealTimeSource())
             continue;
 
         QRectF rect = widget->rect();

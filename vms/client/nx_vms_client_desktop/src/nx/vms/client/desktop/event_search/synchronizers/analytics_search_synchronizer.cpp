@@ -104,7 +104,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
                 if (!NX_ASSERT(mediaWidget))
                     continue;
 
-                const auto camDisplay = mediaWidget->display()->camDisplay();
+                const auto camDisplay = mediaWidget->camDisplay();
                 if (camDisplay && camDisplay->isRealTimeSource())
                 {
                     const auto timestampUs = camDisplay->getDisplayedTime();

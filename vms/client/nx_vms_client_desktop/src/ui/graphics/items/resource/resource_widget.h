@@ -11,7 +11,7 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <core/resource/resource_media_layout.h>
+#include <core/resource/resource_media_layout_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
@@ -29,7 +29,6 @@ class QGraphicsLinearLayout;
 class QGraphicsScene;
 
 class QnViewportBoundWidget;
-class QnResourceVideoLayout;
 class QnWorkbenchItem;
 class QnStatusOverlayController;
 class QnImageButtonWidget;
@@ -157,11 +156,14 @@ public:
     QnWorkbenchItem *item() const;
 
     /**
-     * \returns                         Layout of channels in this widget. Never returns nullptr.
+     * Layout of channels in this widget. May be empty for non-video widgets.
      */
     QnConstResourceVideoLayoutPtr channelLayout() const {
         return m_channelsLayout;
     }
+
+    /** Total count of channels in video layout (if exists). */
+    int channelCount() const;
 
     const QRectF &zoomRect() const;
     void setZoomRect(const QRectF &zoomRect);
@@ -393,7 +395,6 @@ protected:
 
     virtual void optionsChangedNotify(Options changedFlags);
 
-    int channelCount() const;
     QRectF channelRect(int channel) const;
     QRectF exposedRect(int channel, bool accountForViewport = true, bool accountForVisibility = true, bool useRelativeCoordinates = false);
 

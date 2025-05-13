@@ -6,6 +6,7 @@
 
 #include <core/resource/layout_item_data.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/resource_media_layout.h>
 #include <nx/utils/random.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -883,7 +884,7 @@ void ZoomWindowInstrument::startDrag(DragInfo* /*info*/)
 
 void ZoomWindowInstrument::dragMove(DragInfo* info)
 {
-    if (!target())
+    if (!target() || !target()->channelLayout())
     {
         reset();
         return;

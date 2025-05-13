@@ -104,9 +104,6 @@ const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION_MS * 3;
 
 const float noAspectRatio = -1.0;
 
-// TODO: #sivanov get rid of this
-QnResourceVideoLayoutPtr qn_resourceWidget_defaultContentLayout(new QnDefaultResourceVideoLayout());
-
 void splitFormat(const QString &format, QString *left, QString *right)
 {
     int index = format.indexOf(QLatin1Char('\t'));
@@ -207,8 +204,6 @@ QnResourceWidget::QnResourceWidget(
     setupOverlayButtonsHandlers();
 
     addOverlayWidget(m_statusOverlay, {Invisible, OverlayFlag::autoRotate, StatusLayer});
-
-    setChannelLayout(qn_resourceWidget_defaultContentLayout);
 
     m_aspectRatio = defaultAspectRatio();
 
@@ -993,6 +988,9 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
 
 QRectF QnResourceWidget::channelRect(int channel) const
 {
+    if (!m_channelsLayout)
+        return {};
+
     /* Channel rect is handled at shader level if dewarping is enabled. */
     QRectF rect = ((m_options & DisplayDewarped) || zoomRect().isNull())
         ? this->rect()
@@ -1268,7 +1266,9 @@ void QnResourceWidget::setChannelLayout(QnConstResourceVideoLayoutPtr channelLay
 
 int QnResourceWidget::channelCount() const
 {
-    return m_channelsLayout->channelCount();
+    return m_channelsLayout
+        ? m_channelsLayout->channelCount()
+        : 0;
 }
 
 bool QnResourceWidget::forceShowPosition() const
@@ -1351,7 +1351,8 @@ void QnResourceWidget::paint(QPainter* painter,
     QnScopedPainterFontRollback fontRollback(painter);
 
     /* Update screen size of a single channel. */
-    setChannelScreenSize(painter->combinedTransform().mapRect(channelRect(0)).size().toSize());
+    if (m_channelsLayout)
+        setChannelScreenSize(painter->combinedTransform().mapRect(channelRect(0)).size().toSize());
 
     Qn::RenderStatus renderStatus = Qn::NothingRendered;
 

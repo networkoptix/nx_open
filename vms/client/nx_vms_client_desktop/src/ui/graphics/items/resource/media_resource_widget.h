@@ -59,6 +59,7 @@ class BlurMask;
 
 } // namespace nx::vms::client::desktop
 
+class QnCamDisplay;
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 class QnIoModuleOverlayWidget;
@@ -109,6 +110,9 @@ public:
      * @return Display associated with this widget.
      */
     QnResourceDisplayPtr display() const;
+
+    /** CamDisplay for the widget display (if exists). */
+    QnCamDisplay* camDisplay() const;
 
     QnResourceWidgetRenderer* renderer() const;
 

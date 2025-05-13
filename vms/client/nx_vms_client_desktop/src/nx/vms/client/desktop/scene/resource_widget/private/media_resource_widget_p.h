@@ -17,6 +17,8 @@
 
 #include "motion_skip_mask.h"
 
+class QnCamDisplay;
+
 namespace nx::analytics { class MetadataLogParser; }
 namespace nx::analytics::db { struct Filter; }
 namespace nx::vms::client::core { class ConsumingMotionMetadataProvider; }
@@ -76,6 +78,9 @@ public:
 
     QnResourceDisplayPtr display() const;
     void setDisplay(const QnResourceDisplayPtr& display);
+
+    /** CamDisplay for the widget display (if exists). */
+    QnCamDisplay* camDisplay() const;
 
     AccessController* accessController() const;
 

@@ -977,11 +977,11 @@ ActionVisibility PreviewCondition::check(const Parameters& parameters, WindowCon
 
     if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        if (camera->isDtsBased())
+        if (camera->isDtsBased() || !camera->hasVideo())
             return InvisibleAction;
     }
 
-    const bool isPanoramic = media->getVideoLayout() && media->getVideoLayout()->channelCount() > 1;
+    const bool isPanoramic = media->getVideoLayout()->channelCount() > 1;
     if (isPanoramic)
         return InvisibleAction;
 
