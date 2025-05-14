@@ -12,6 +12,8 @@
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/unique_id_field.h>
 #include <nx/vms/rules/utils/api.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/workbench/workbench_context.h>
 
 #include "edit_vms_rule_dialog.h"
 #include "model_view/rules_table_model.h"
@@ -35,11 +37,6 @@ VmsRulesDialog::VmsRulesDialog(QWidget* parent):
 VmsRulesDialog::~VmsRulesDialog()
 {
     QmlProperty<QObject*>(rootObjectHolder(), "dialog") = nullptr;
-}
-
-void VmsRulesDialog::setError(const QString& error)
-{
-    QmlProperty<QString>(rootObjectHolder(), "errorString") = error;
 }
 
 void VmsRulesDialog::setFilter(const QString& filter)
@@ -79,7 +76,7 @@ void VmsRulesDialog::editSchedule(const UuidList& ids)
 
         clone->setSchedule(schedule);
 
-        saveRuleImpl(clone);
+        saveRuleImpl(clone.get());
     }
 }
 
@@ -95,7 +92,7 @@ void VmsRulesDialog::duplicateRule(nx::Uuid id)
     if (auto uniqueIdField = clone->eventFilters().at(0)->fieldByType<vms::rules::UniqueIdField>())
         uniqueIdField->setId(nx::Uuid::createUuid()); //< Fix field uniqueness after cloning. TODO: #mmalofeev fix this workaround.
 
-    showEditRuleDialog(clone, /*isNew*/ false);
+    showEditRuleDialog(std::move(clone), /*isNew*/ false);
 }
 
 void VmsRulesDialog::editRule(nx::Uuid id)
@@ -106,7 +103,7 @@ void VmsRulesDialog::editRule(nx::Uuid id)
     if (!NX_ASSERT(clone))
         return;
 
-    showEditRuleDialog(clone, /*isNew*/ false);
+    showEditRuleDialog(std::move(clone), /*isNew*/ false);
 }
 
 void VmsRulesDialog::deleteRules(const UuidList& ids)
@@ -119,15 +116,47 @@ void VmsRulesDialog::setRulesState(const UuidList& ids, bool isEnabled)
 {
     auto engine = systemContext()->vmsRulesEngine();
 
+    int invalidRules{};
     for (auto id: ids)
     {
-        auto clone = engine->cloneRule(id);
+        const auto rule = engine->rule(id);
+        if (!rule || rule->enabled() == isEnabled)
+            continue;
+
+        auto clone = engine->cloneRule(rule.get());
         if (!NX_ASSERT(clone))
-            return;
+        {
+            ++invalidRules;
+            continue;
+        }
 
         clone->setEnabled(isEnabled);
+        if (clone->validity(systemContext()).isInvalid())
+        {
+            ++invalidRules;
+            continue;
+        }
 
-        saveRuleImpl(clone);
+        saveRuleImpl(clone.get());
+    }
+
+    if (invalidRules != 0)
+    {
+        auto messageBox = new QnSessionAware<QnMessageBox>{context()->mainWindowWidget()};
+        messageBox->setIcon(QnMessageBox::Icon::Warning);
+        messageBox->setText(tr("Some of the rules were not enabled",
+            "Form depends on invalid rule count",
+            invalidRules));
+        messageBox->setInformativeText(
+            tr("Some of the selected rules can not be enabled as they have wrong parameters. "
+                "Fix them and enable the rule again.",
+                "Form depends on invalid rule count",
+                invalidRules));
+        messageBox->setStandardButtons(QDialogButtonBox::Ok);
+        messageBox->setDefaultButton(QDialogButtonBox::NoButton);
+        messageBox->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
+        messageBox->setWindowModality(Qt::WindowModality::ApplicationModal);
+        messageBox->show();
     }
 }
 
@@ -167,20 +196,19 @@ void VmsRulesDialog::deleteRulesImpl(const UuidList& ids)
                 const auto& errorString = response.error().errorString;
                 NX_WARNING(this, "Delete rule request %1 failed: %2", requestId, errorString);
 
-                setError(tr("Delete rule error: %1").arg(errorString));
+                emit error(tr("Delete rule error: %1").arg(errorString));
             },
             this);
     }
 }
 
-void VmsRulesDialog::saveRuleImpl(const std::shared_ptr<vms::rules::Rule>& rule)
+void VmsRulesDialog::saveRuleImpl(const vms::rules::Rule* rule)
 {
     const auto api = systemContext()->connectedServerApi();
     if (!api)
         return;
 
-    const auto apiRule = vms::rules::toApi(
-        systemContext()->vmsRulesEngine(), serialize(rule.get()));
+    const auto apiRule = vms::rules::toApi(systemContext()->vmsRulesEngine(), serialize(rule));
 
     api->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
         /*helper*/ nullptr,
@@ -199,7 +227,7 @@ void VmsRulesDialog::saveRuleImpl(const std::shared_ptr<vms::rules::Rule>& rule)
             const auto& errorString = response.error().errorString;
             NX_WARNING(this, "Create rule request %1 failed: %2", requestId, errorString);
 
-            setError(tr("Save rule error: %1").arg(errorString));
+            emit error(tr("Save rule error: %1").arg(errorString));
         },
         this);
 }
@@ -227,7 +255,7 @@ void VmsRulesDialog::resetToDefaultsImpl()
             const auto& errorString = response.error().errorString;
             NX_WARNING(this, "Reset rules request %1 failed: %2", requestId, errorString);
 
-            setError(tr("Reset rules error: %1").arg(errorString));
+            emit error(tr("Reset rules error: %1").arg(errorString));
         },
         this);
 }
@@ -249,7 +277,10 @@ void VmsRulesDialog::showEditRuleDialog(const std::shared_ptr<vms::rules::Rule>&
         });
 
     connect(
-        editVmsRuleDialog, &EditVmsRuleDialog::accepted, this, [this, rule]() { saveRuleImpl(rule); });
+        editVmsRuleDialog,
+        &EditVmsRuleDialog::accepted,
+        this,
+        [this, rule]() { saveRuleImpl(rule.get()); });
 
     connect(
         editVmsRuleDialog,
@@ -258,7 +289,7 @@ void VmsRulesDialog::showEditRuleDialog(const std::shared_ptr<vms::rules::Rule>&
         [this, editVmsRuleDialog, rule](int result)
         {
             if (result == QDialogButtonBox::Ok && editVmsRuleDialog->hasChanges())
-                saveRuleImpl(rule);
+                saveRuleImpl(rule.get());
             else if (result == QDialogButtonBox::Reset)
                 deleteRulesImpl({rule->id()}); //< Reset means user requested to delete the rule.
 

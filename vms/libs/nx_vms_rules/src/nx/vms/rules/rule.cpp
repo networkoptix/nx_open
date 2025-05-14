@@ -248,6 +248,10 @@ ValidationResult Rule::validity(
             tr("The given filter is not compatible with the given builder")};
     }
 
+    // Do not check disabled rule validity. Required to be able to disable invalid rules.
+    if (!m_enabled)
+        return {};
+
     ValidationResult result;
     QStringList eventFilterAlerts;
     for (const auto& eventFilter: m_filters)

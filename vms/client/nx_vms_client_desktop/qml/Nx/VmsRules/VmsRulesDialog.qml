@@ -18,7 +18,6 @@ Dialog
     id: root
 
     property alias rulesTableModel: rulesSortFilterModel.sourceModel
-    property alias errorString: alertBar.text
     property var dialog: null
     property alias filterText: searchField.text
 
@@ -28,6 +27,38 @@ Dialog
             return
 
         dialog.deleteRules(rulesSortFilterModel.getRuleIds(tableView.checkedRows))
+    }
+
+    function updateEnableAndDisableButtonsVisibility()
+    {
+        if (!tableView.hasCheckedRows)
+        {
+            enableButton.visible = false
+            disableButton.visible = false
+
+            return
+        }
+
+        const checkState = rulesSortFilterModel.getRuleCheckStates(tableView.checkedRows)
+        switch (checkState)
+        {
+            case Qt.Unchecked: //< All the rules disabled.
+                enableButton.visible = true
+                disableButton.visible = false
+                break
+            case Qt.Checked: //< All the selected rules enabled.
+                enableButton.visible = false
+                disableButton.visible = true
+                break
+            case Qt.PartiallyChecked:
+                enableButton.visible = true
+                disableButton.visible = true
+                break
+            default:
+                enableButton.visible = false
+                disableButton.visible = false
+                break;
+        }
     }
 
     title: qsTr("Event Rules")
@@ -91,6 +122,34 @@ Dialog
 
             TextButton
             {
+                id: enableButton
+                text: qsTr("Enable")
+                icon.source: "image://skin/20x20/Outline/checkmark.svg"
+                visible: false
+
+                onClicked:
+                {
+                    root.dialog.setRulesState(
+                        rulesSortFilterModel.getRuleIds(tableView.checkedRows), true)
+                }
+            }
+
+            TextButton
+            {
+                id: disableButton
+                text: qsTr("Disable")
+                icon.source: "image://skin/20x20/Outline/disable.svg"
+                visible: false
+
+                onClicked:
+                {
+                    root.dialog.setRulesState(
+                        rulesSortFilterModel.getRuleIds(tableView.checkedRows), false)
+                }
+            }
+
+            TextButton
+            {
                 text: qsTr("Duplicate")
                 icon.source: "image://skin/20x20/Outline/copy.svg"
                 visible: tableView.checkedRows.length === 1
@@ -111,41 +170,6 @@ Dialog
                 onClicked:
                 {
                     root.deleteCheckedRules()
-                }
-            }
-
-            Switch
-            {
-                id: ruleStateSwitch
-                Layout.alignment: Qt.AlignVCenter
-                text: qsTr("State")
-                visible: LocalSettings.iniConfigValue("developerMode")
-                    && tableView.checkedRows.length > 0
-                onToggled:
-                {
-                    root.dialog.setRulesState(
-                        rulesSortFilterModel.getRuleIds(tableView.checkedRows), checked)
-                }
-
-                Connections
-                {
-                    target: tableView
-                    function onCheckedRowsChanged()
-                    {
-                        ruleStateSwitch.checkState =
-                            rulesSortFilterModel.getRuleCheckStates(tableView.checkedRows)
-                    }
-                }
-
-                Connections
-                {
-                    target: rulesSortFilterModel
-                    enabled: tableView.checkedRows.length > 0
-                    function onDataChanged(topLeft, bottomRight, roles)
-                    {
-                        ruleStateSwitch.checkState =
-                            rulesSortFilterModel.getRuleCheckStates(tableView.checkedRows)
-                    }
                 }
             }
 
@@ -246,15 +270,66 @@ Dialog
         }
     }
 
-    DialogBanner
+    Column
     {
-        id: alertBar
-
+        id: alertsColumn
         anchors.bottom: buttonBox.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        style: DialogBanner.Style.Error
-        visible: text
+        spacing: 2
+
+        Repeater
+        {
+            model: ListModel
+            {
+                id: errorsListModel
+            }
+
+            delegate: DialogBanner
+            {
+                width: root.width
+                text: model.text
+                style: model.style
+                visible: true
+                closeable: true
+
+                onCloseClicked:
+                {
+                    errorsListModel.remove(index)
+                }
+            }
+        }
+    }
+
+    Connections
+    {
+        target: tableView
+        function onCheckedRowsChanged()
+        {
+            root.updateEnableAndDisableButtonsVisibility()
+        }
+    }
+
+    Connections
+    {
+        target: rulesSortFilterModel
+        enabled: tableView.checkedRows.length > 0
+        function onDataChanged(topLeft, bottomRight, roles)
+        {
+            root.updateEnableAndDisableButtonsVisibility()
+        }
+    }
+
+    Connections
+    {
+        target: root.dialog
+        function onError(error)
+        {
+            errorsListModel.append({"text": error, "style": DialogBanner.Style.Error})
+        }
+
+        function onWarning(warning)
+        {
+            errorsListModel.append({"text": warning, "style": DialogBanner.Style.Warning})
+        }
     }
 
     Control

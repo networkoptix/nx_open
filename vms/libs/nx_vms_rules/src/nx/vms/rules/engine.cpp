@@ -179,7 +179,7 @@ ConstRulePtr Engine::rule(nx::Uuid id) const
     return {};
 }
 
-RulePtr Engine::cloneRule(nx::Uuid id) const
+std::unique_ptr<Rule> Engine::cloneRule(nx::Uuid id) const
 {
     auto rule = this->rule(id);
     if (!rule)

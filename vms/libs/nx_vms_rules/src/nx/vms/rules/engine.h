@@ -80,7 +80,8 @@ public:
     ConstRulePtr rule(nx::Uuid id) const;
 
     /** Returns a copy of the rule with the given id or nullptr. */
-    RulePtr cloneRule(nx::Uuid id) const;
+    std::unique_ptr<Rule> cloneRule(nx::Uuid id) const;
+    std::unique_ptr<Rule> cloneRule(const Rule* rule) const;
 
     /** Emits corresponding signal. */
     void updateRule(const api::Rule& ruleData);
@@ -211,8 +212,6 @@ private:
     // Check whether the given event should be processed. The method is checking if the event is
     // not cached, and if the event is prolonged, it checks that it has a valid state.
     bool checkRunningEvent(nx::Uuid ruleId, const EventPtr& event);
-
-    std::unique_ptr<Rule> cloneRule(const Rule* rule) const;
 
     void onEventReceived(const EventPtr& event, const std::vector<ConstRulePtr>& triggeredRules);
     void processAcceptedEvent(const EventPtr& event, const ConstRulePtr& rule);

@@ -34,7 +34,6 @@ public:
     {
         RuleIdRole = Qt::UserRole,
         ResourceIdsRole,
-        IsRuleValidRole,
         IsSystemRuleRole,
         SortDataRole
     };

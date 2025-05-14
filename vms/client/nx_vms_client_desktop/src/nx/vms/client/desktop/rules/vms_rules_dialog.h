@@ -18,7 +18,6 @@ public:
     explicit VmsRulesDialog(QWidget* parent);
     ~VmsRulesDialog() override;
 
-    void setError(const QString& error);
     void setFilter(const QString& filter);
 
     Q_INVOKABLE void addRule();
@@ -30,12 +29,16 @@ public:
     Q_INVOKABLE void resetToDefaults();
     Q_INVOKABLE void openEventLogDialog();
 
+signals:
+    void error(const QString& error);
+    void warning(const QString& warning);
+
 private:
     QWidget* m_parentWidget{nullptr};
     RulesTableModel* m_rulesTableModel{nullptr};
 
     void deleteRulesImpl(const UuidList& ids);
-    void saveRuleImpl(const std::shared_ptr<vms::rules::Rule>& rule);
+    void saveRuleImpl(const vms::rules::Rule* rule);
     void resetToDefaultsImpl();
     void showEditRuleDialog(const std::shared_ptr<vms::rules::Rule>& rule, bool isNew);
 };

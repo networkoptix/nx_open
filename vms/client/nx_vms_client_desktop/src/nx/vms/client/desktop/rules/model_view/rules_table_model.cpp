@@ -63,11 +63,16 @@ QString iconPath(QnResourceIconCache::Key iconKey, bool enabled)
         .arg(enabled ? kEnabledForegroundColor : kDisabledForegroundColor);
 }
 
+// Returns whether the given rule has Acceptable or Intermediate state.
 bool isRuleValid(const RulesTableModel::ConstRulePtr& rule)
 {
-    return rule->isCompatible()
-        && vms::rules::utils::visibleFieldsValidity(
-            rule.get(), appContext()->currentSystemContext()).isValid();
+    if (!rule->isCompatible())
+        return false;
+
+    const auto validity = vms::rules::utils::visibleFieldsValidity(
+        rule.get(), appContext()->currentSystemContext());
+
+    return validity.validity > QValidator::State::Invalid;
 }
 
 bool hasLookupList(const vms::rules::ItemDescriptor& eventDescriptor)
@@ -279,13 +284,13 @@ QVariant RulesTableModel::data(const QModelIndex& index, int role) const
 
     if (effectiveRole == Qt::ForegroundRole)
     {
+        if (!isRuleValid(rule))
+            return core::colorTheme()->color(kDisabledForegroundColor);
+
         return rule->enabled()
             ? core::colorTheme()->color(kEnabledForegroundColor)
             : core::colorTheme()->color(kDisabledForegroundColor);
     }
-
-    if (effectiveRole == IsRuleValidRole)
-        return isRuleValid(rule);
 
     if (effectiveRole == IsSystemRuleRole)
         return rule->isInternal();
@@ -356,7 +361,6 @@ QHash<int, QByteArray> RulesTableModel::roleNames() const
     roles[Qt::ForegroundRole] = "foregroundColor";
 
     roles[RuleIdRole] = "ruleId";
-    roles[IsRuleValidRole] = "isValid";
     roles[SortDataRole] = "sortData";
 
     return roles;
@@ -517,12 +521,15 @@ QVariant RulesTableModel::sourceCameraData(const ConstRulePtr& rule, int role) c
             return kAttentionIconPath;
 
         if (sourceCameraField->acceptAll() || resources.size() > 1)
-            return iconPath(QnResourceIconCache::Cameras, rule->enabled());
+            return iconPath(QnResourceIconCache::Cameras, rule->enabled() && isRuleValid(rule));
 
         if (resources.size() == 1)
-            return iconPath(qnResIconCache->key(resources.first()), rule->enabled());
+        {
+            return iconPath(
+                qnResIconCache->key(resources.first()), rule->enabled() && isRuleValid(rule));
+        }
 
-        return iconPath(QnResourceIconCache::Camera, rule->enabled());
+        return iconPath(QnResourceIconCache::Camera, rule->enabled() && isRuleValid(rule));
     }
 
     return {};
@@ -572,12 +579,15 @@ QVariant RulesTableModel::sourceServerData(const ConstRulePtr& rule, int role) c
             return kAttentionIconPath;
 
         if (sourceServerField->acceptAll() || resources.size() > 1)
-            return iconPath(QnResourceIconCache::Servers, rule->enabled());
+            return iconPath(QnResourceIconCache::Servers, rule->enabled() && isRuleValid(rule));
 
         if (resources.size() == 1)
-            return iconPath(qnResIconCache->key(resources.first()), rule->enabled());
+        {
+            return iconPath(
+                qnResIconCache->key(resources.first()), rule->enabled() && isRuleValid(rule));
+        }
 
-        return iconPath(QnResourceIconCache::Server, rule->enabled());
+        return iconPath(QnResourceIconCache::Server, rule->enabled() && isRuleValid(rule));
     }
 
     return {};
@@ -724,10 +734,10 @@ QVariant RulesTableModel::targetCameraData(const ConstRulePtr& rule, int role) c
         const auto targetCamerasCount = resources.size() + (useSource ? 1 : 0);
 
         if (acceptAll || targetCamerasCount > 1)
-            return iconPath(QnResourceIconCache::Cameras, rule->enabled());
+            return iconPath(QnResourceIconCache::Cameras, rule->enabled() && isRuleValid(rule));
 
         if (targetCamerasCount == 1)
-            return iconPath(QnResourceIconCache::Camera, rule->enabled());
+            return iconPath(QnResourceIconCache::Camera, rule->enabled() && isRuleValid(rule));
 
         return {};
     }
@@ -788,8 +798,8 @@ QVariant RulesTableModel::targetLayoutData(const ConstRulePtr& rule, int role) c
             return kAttentionIconPath;
 
         return layouts.size() > 1
-            ? iconPath(QnResourceIconCache::Layouts, rule->enabled())
-            : iconPath(QnResourceIconCache::Layout, rule->enabled());
+            ? iconPath(QnResourceIconCache::Layouts, rule->enabled() && isRuleValid(rule))
+            : iconPath(QnResourceIconCache::Layout, rule->enabled() && isRuleValid(rule));
     }
 
     return {};
@@ -853,8 +863,8 @@ QVariant RulesTableModel::targetUserData(const ConstRulePtr& rule, int role) con
         const auto totalRecipientsCount = users.size() + additionalRecipients.size();
 
         return (targetUserField->acceptAll() || totalRecipientsCount > 1 || !groups.empty())
-            ? iconPath(QnResourceIconCache::Users, rule->enabled())
-            : iconPath(QnResourceIconCache::User, rule->enabled());
+            ? iconPath(QnResourceIconCache::Users, rule->enabled() && isRuleValid(rule))
+            : iconPath(QnResourceIconCache::User, rule->enabled() && isRuleValid(rule));
     }
 
     return {};
@@ -906,8 +916,8 @@ QVariant RulesTableModel::targetServerData(const ConstRulePtr& rule, int role) c
         const auto targetServerCount =
                 targetServers.size() + (targetServerField->useSource() ? 1 : 0);
         return targetServerField->acceptAll() || targetServerCount > 1
-            ? iconPath(QnResourceIconCache::Servers, rule->enabled())
-            : iconPath(QnResourceIconCache::Server, rule->enabled());
+            ? iconPath(QnResourceIconCache::Servers, rule->enabled() && isRuleValid(rule))
+            : iconPath(QnResourceIconCache::Server, rule->enabled() && isRuleValid(rule));
     }
 
     return {};
@@ -919,7 +929,7 @@ QVariant RulesTableModel::systemData(const ConstRulePtr& rule, int role) const
         return tr("Site");
 
     if (role == Qt::DecorationRole)
-        return iconPath(QnResourceIconCache::CurrentSystem, rule->enabled());
+        return iconPath(QnResourceIconCache::CurrentSystem, rule->enabled() && isRuleValid(rule));
 
     return {};
 }

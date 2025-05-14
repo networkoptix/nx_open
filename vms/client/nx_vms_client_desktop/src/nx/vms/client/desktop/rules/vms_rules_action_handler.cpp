@@ -39,7 +39,7 @@ struct VmsRulesActionHandler::Private
     void handleError(const QString& text)
     {
         if (rulesDialog)
-            rulesDialog->setError(text);
+            emit rulesDialog->error(text);
     }
 
     void setFilter(const QnVirtualCameraResourceList& cameras)

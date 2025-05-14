@@ -17,6 +17,7 @@ struct ValidationResult
     QVariant additionalData; //< Additional data, which can be used in pickers.
 
     bool isValid() const { return validity == QValidator::State::Acceptable; }
+    bool isInvalid() const { return validity == QValidator::State::Invalid; }
 
     bool operator==(QValidator::State state) const { return validity == state; };
 };
