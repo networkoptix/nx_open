@@ -13,7 +13,6 @@
 #include <client/client_module.h>
 #include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/client_camera.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource_management/resource_data_pool.h>
@@ -28,6 +27,7 @@
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/client/core/analytics/analytics_settings_manager.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
@@ -1181,7 +1181,7 @@ State CameraSettingsDialogStateReducer::updatePtzSettings(
         fetchFromCameras<bool>(state.expert.doNotSendStopPtzCommand, cameras,
             [](const Camera& camera)
             {
-                const auto clientCamera = camera.dynamicCast<QnClientCameraResource>();
+                const auto clientCamera = camera.dynamicCast<core::CameraResource>();
                 return !(clientCamera && clientCamera->autoSendPtzStopCommand());
             });
     }

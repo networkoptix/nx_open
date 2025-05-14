@@ -15,8 +15,8 @@
 
 namespace nx::vms::client::core {
 
-class Camera;
-using CameraPtr = QnSharedResourcePointer<Camera>;
+class CameraResource;
+using CameraResourcePtr = QnSharedResourcePointer<CameraResource>;
 class DesktopResource;
 using DesktopResourcePtr = QnSharedResourcePointer<DesktopResource>;
 class ServerResource;
@@ -47,10 +47,6 @@ typedef QnSharedResourcePointerList<QnClientStorageResource> QnClientStorageReso
 
 class QnFakeMediaServerResource;
 using QnFakeMediaServerResourcePtr = QnSharedResourcePointer<QnFakeMediaServerResource>;
-
-using QnClientCameraResource = nx::vms::client::core::Camera;
-using QnClientCameraResourcePtr = QnSharedResourcePointer<QnClientCameraResource>;
-using QnClientCameraResourceList = QnSharedResourcePointerList<QnClientCameraResource>;
 
 class QnFileLayoutResource;
 using QnFileLayoutResourcePtr = QnSharedResourcePointer<QnFileLayoutResource>;

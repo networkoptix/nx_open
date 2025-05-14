@@ -13,7 +13,7 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/core/resource/camera.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/common/intercom/utils.h>
@@ -488,7 +488,7 @@ LayoutResource::LayoutType LayoutResource::calculateLayoutType() const
     if (const auto parentVideoWall = parentResource.objectCast<QnVideoWallResource>())
         return LayoutType::videoWall;
 
-    if (const auto parentCamera = parentResource.objectCast<QnClientCameraResource>())
+    if (const auto parentCamera = parentResource.objectCast<CameraResource>())
     {
         return NX_ASSERT(parentCamera->isIntercom())
             ? LayoutType::intercom

@@ -5,7 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/core/resource/camera.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <utils/common/delete_later.h>
 
 #include "caching_ptz_controller.h"
@@ -65,7 +65,7 @@ void ControllerPool::unregisterResource(const QnResourcePtr &resource) {
 
 QnPtzControllerPtr ControllerPool::createController(const QnResourcePtr &resource) const
 {
-    const auto camera = resource.dynamicCast<nx::vms::client::core::Camera>();
+    const auto camera = resource.dynamicCast<nx::vms::client::core::CameraResource>();
     if (!camera || !camera->isPtzSupported())
         return {};
 
@@ -76,7 +76,7 @@ QnPtzControllerPtr ControllerPool::createController(const QnResourcePtr &resourc
 
 void ControllerPool::cacheCameraPresets(const QnResourcePtr &resource)
 {
-    const auto camera = resource.dynamicCast<nx::vms::client::core::Camera>();
+    const auto camera = resource.dynamicCast<nx::vms::client::core::CameraResource>();
     if (!camera || !camera->isPtzSupported() || !camera->isOnline())
         return;
 

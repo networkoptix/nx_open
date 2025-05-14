@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <core/resource/client_camera.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 
 namespace nx::vms::client::desktop::test {
 
-class ClientCameraResourceStub: public QnClientCameraResource
+class ClientCameraResourceStub: public core::CameraResource
 {
-    using base_type = QnClientCameraResource;
+    using base_type = core::CameraResource;
     using StreamIndex = nx::vms::api::StreamIndex;
 
 public:

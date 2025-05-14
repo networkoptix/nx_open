@@ -16,7 +16,6 @@
 #include <api/network_proxy_factory.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/avi/avi_resource.h>
-#include <core/resource/client_camera.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/build_info.h>

@@ -367,7 +367,7 @@ protected:
 
     virtual void atItemDataChanged(int role) override;
 
-    QnClientCameraResourcePtr camera() const;
+    nx::vms::client::core::CameraResourcePtr camera() const;
 
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr& resource, const QString& key);

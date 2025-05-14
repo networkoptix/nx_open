@@ -10,7 +10,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/ptz/client_ptz_controller_pool.h>
-#include <nx/vms/client/core/resource/camera.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 
@@ -29,7 +29,7 @@ namespace client {
 namespace mobile {
 
 PtzAvailabilityWatcher::PtzAvailabilityWatcher(
-    const nx::vms::client::core::CameraPtr& camera,
+    const nx::vms::client::core::CameraResourcePtr& camera,
     QObject* parent)
     :
     base_type(parent),
@@ -58,11 +58,11 @@ PtzAvailabilityWatcher::PtzAvailabilityWatcher(
     connect(systemContext->resourceAccessManager(), &QnResourceAccessManager::resourceAccessReset,
         this, &PtzAvailabilityWatcher::updateAvailability);
 
-    connect(m_camera.get(), &nx::vms::client::core::Camera::statusChanged,
+    connect(m_camera.get(), &nx::vms::client::core::CameraResource::statusChanged,
         this, &PtzAvailabilityWatcher::updateAvailability);
-    connect(m_camera.get(), &nx::vms::client::core::Camera::mediaDewarpingParamsChanged,
+    connect(m_camera.get(), &nx::vms::client::core::CameraResource::mediaDewarpingParamsChanged,
         this, &PtzAvailabilityWatcher::updateAvailability);
-    connect(m_camera.get(), &nx::vms::client::core::Camera::propertyChanged,
+    connect(m_camera.get(), &nx::vms::client::core::CameraResource::propertyChanged,
         this, &PtzAvailabilityWatcher::updateAvailability);
 }
 

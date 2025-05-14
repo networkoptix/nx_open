@@ -6,7 +6,6 @@
 #include <QtCore/QFileInfo>
 
 #include <core/resource/camera_resource.h>
-#include <core/resource/client_camera.h>
 #include <nx/branding.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/media/config.h>
@@ -15,6 +14,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/media/queued_voice_spectrum_analyzer.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
@@ -182,9 +182,9 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     int expectedPrebuferSize = m_isRealTimeSource ? REALTIME_AUDIO_PREBUFFER : DEFAULT_AUDIO_BUFF_SIZE/2;
     setAudioBufferSize(expectedBufferSize, expectedPrebuferSize);
 
-    if (auto clientCam = resource.dynamicCast<QnClientCameraResource>())
+    if (auto clientCam = resource.dynamicCast<nx::vms::client::core::CameraResource>())
     {
-        connect(clientCam.data(), &QnClientCameraResource::dataDropped, this,
+        connect(clientCam.data(), &nx::vms::client::core::CameraResource::dataDropped, this,
             [this] { appContext()->radassController()->onSlowStream(this); });
     }
 
@@ -226,7 +226,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
 
 QnCamDisplay::~QnCamDisplay()
 {
-    if (auto clientCam = m_resource.dynamicCast<QnClientCameraResource>())
+    if (auto clientCam = m_resource.dynamicCast<nx::vms::client::core::CameraResource>())
         clientCam->disconnect(this); // disconnecting radassController()->onSlowStream.
 
     appContext()->radassController()->unregisterConsumer(this);

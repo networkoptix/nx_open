@@ -7,7 +7,6 @@
 
 #include <core/ptz/ptz_preset.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/client_camera.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource_management/resource_pool.h>
@@ -17,6 +16,7 @@
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/client/core/motion/motion_grid.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/common/utils/camera_hotspots_support.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/views/resource_list_view.h>
@@ -252,7 +252,7 @@ void setPreferredPtzPresetType(nx::core::ptz::PresetType value, const Cameras& c
 
 void setDoNotSendStopPtzCommand(bool value, const Cameras& cameras)
 {
-    for (const auto& camera: cameras.filtered<QnClientCameraResource>())
+    for (const auto& camera: cameras.filtered<core::CameraResource>())
         camera->setAutoSendPtzStopCommand(!value);
 }
 
@@ -497,7 +497,7 @@ void setCameraHotspots(
 void setCredentials(const QnVirtualCameraResourcePtr& camera, const QAuthenticator& authenticator)
 {
     if ((camera->isMultiSensorCamera() || camera->isNvr()) && !camera->getGroupId().isEmpty())
-        QnClientCameraResource::setAuthToCameraGroup(camera, authenticator);
+        core::CameraResource::setAuthToCameraGroup(camera, authenticator);
     else
         camera->setAuth(authenticator);
 }

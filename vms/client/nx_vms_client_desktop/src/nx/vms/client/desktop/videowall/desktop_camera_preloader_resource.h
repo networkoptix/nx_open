@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <core/resource/client_camera.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 
 namespace nx::vms::client::desktop {
 
@@ -13,9 +13,10 @@ namespace nx::vms::client::desktop {
  * When the server creates desktop camera, it updates correspondent DesktopCameraPreloaderResource,
  * and it loses its Qn::fake flag.
  */
-class DesktopCameraPreloaderResource: public QnClientCameraResource
+class DesktopCameraPreloaderResource: public core::CameraResource
 {
     Q_OBJECT
+    using base_type = core::CameraResource;
 
 public:
     DesktopCameraPreloaderResource(const nx::Uuid& id, const QString& physicalId);

@@ -8,7 +8,6 @@
 #include <api/server_rest_connection.h>
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
-#include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/motion_window.h>
 #include <core/resource_access/resource_access_filter.h>
@@ -18,6 +17,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/analytics/analytics_metadata_provider_factory.h>
 #include <nx/vms/client/core/media/consuming_motion_metadata_provider.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
@@ -133,7 +133,7 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
     base_type(parent),
     resource(resource),
     mediaResource(resource.dynamicCast<QnMediaResource>()),
-    camera(resource.dynamicCast<QnClientCameraResource>()),
+    camera(resource.dynamicCast<core::CameraResource>()),
     hasVideo(mediaResource->hasVideo(nullptr)),
     isIoModule(camera && camera->hasFlags(Qn::io_module)),
     motionMetadataProvider(new client::core::ConsumingMotionMetadataProvider()),

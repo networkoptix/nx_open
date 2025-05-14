@@ -34,7 +34,6 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/client_camera.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -59,6 +58,7 @@
 #include <nx/vms/client/core/media/consuming_motion_metadata_provider.h>
 #include <nx/vms/client/core/motion/motion_grid.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h> //< TODO: #sivanov Remove this dependency.
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -818,7 +818,7 @@ void QnMediaResourceWidget::initCameraHotspotsOverlay()
     if (!canDisplayHotspots())
         return;
 
-    connect(d->camera.get(), &QnClientCameraResource::cameraHotspotsEnabledChanged,
+    connect(d->camera.get(), &nx::vms::client::core::CameraResource::cameraHotspotsEnabledChanged,
         this, &QnMediaResourceWidget::updateHotspotsState);
 
     m_cameraHotspotsOverlayWidget = new CameraHotspotsOverlayWidget(this);
@@ -3436,7 +3436,7 @@ void QnMediaResourceWidget::atItemDataChanged(int role)
     }
 }
 
-QnClientCameraResourcePtr QnMediaResourceWidget::camera() const
+nx::vms::client::core::CameraResourcePtr QnMediaResourceWidget::camera() const
 {
     return d->camera;
 }

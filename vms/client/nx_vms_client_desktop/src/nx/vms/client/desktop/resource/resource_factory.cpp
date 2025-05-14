@@ -2,7 +2,7 @@
 
 #include "resource_factory.h"
 
-#include <core/resource/client_camera.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/core/resource/client_storage_resource.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/media_server_data.h>
@@ -37,7 +37,7 @@ QnResourcePtr ResourceFactory::createResource(
     if (resourceTypeId == api::AnalyticsEngineData::kResourceTypeId)
         return AnalyticsEngineResourcePtr(new AnalyticsEngineResource());
 
-    return QnResourcePtr(new QnClientCameraResource(resourceTypeId));
+    return QnResourcePtr(new nx::vms::client::core::CameraResource(resourceTypeId));
 }
 
 QnLayoutResourcePtr ResourceFactory::createLayout() const

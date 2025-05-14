@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <nx/vms/client/core/resource/camera.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 
-class QnMobileClientCamera: public nx::vms::client::core::Camera
+class QnMobileClientCamera: public nx::vms::client::core::CameraResource
 {
     Q_OBJECT
-    using base_type = nx::vms::client::core::Camera;
+    using base_type = nx::vms::client::core::CameraResource;
 
 public:
     explicit QnMobileClientCamera(const nx::Uuid& resourceTypeId);

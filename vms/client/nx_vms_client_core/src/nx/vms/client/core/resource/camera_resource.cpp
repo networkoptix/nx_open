@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "camera.h"
+#include "camera_resource.h"
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/status_dictionary.h>
@@ -21,7 +21,7 @@ const QString kAutoSendPtzStopCommandProperty("autoSendPtzStopCommand");
 
 } // namespace
 
-Camera::Camera(const nx::Uuid& resourceTypeId)
+CameraResource::CameraResource(const nx::Uuid& resourceTypeId)
 {
     setTypeId(resourceTypeId);
     addFlags(Qn::server_live_cam);
@@ -31,12 +31,12 @@ Camera::Camera(const nx::Uuid& resourceTypeId)
         [this]() { m_cachedFlags.store(calculateFlags()); }, Qt::DirectConnection);
 }
 
-QString Camera::getName() const
+QString CameraResource::getName() const
 {
     return getUserDefinedName();
 }
 
-void Camera::setName(const QString& name)
+void CameraResource::setName(const QString& name)
 {
     {
         NX_MUTEX_LOCKER lock(&m_attributesMutex);
@@ -47,7 +47,7 @@ void Camera::setName(const QString& name)
     emit nameChanged(toSharedPointer(this));
 }
 
-Qn::ResourceFlags Camera::calculateFlags() const
+Qn::ResourceFlags CameraResource::calculateFlags() const
 {
     Qn::ResourceFlags result = base_type::flags();
     if (isIOModule())
@@ -59,7 +59,7 @@ Qn::ResourceFlags Camera::calculateFlags() const
     return result;
 }
 
-Qn::ResourceFlags Camera::flags() const
+Qn::ResourceFlags CameraResource::flags() const
 {
     if (m_cachedFlags.load() == Qn::ResourceFlags())
         m_cachedFlags.store(calculateFlags());
@@ -67,13 +67,13 @@ Qn::ResourceFlags Camera::flags() const
     return m_cachedFlags;
 }
 
-void Camera::resetCachedValues()
+void CameraResource::resetCachedValues()
 {
     base_type::resetCachedValues();
     m_cachedFlags.store(calculateFlags());
 }
 
-ResourceStatus Camera::getStatus() const
+ResourceStatus CameraResource::getStatus() const
 {
     if (auto context = systemContext())
     {
@@ -88,7 +88,7 @@ ResourceStatus Camera::getStatus() const
     return QnResource::getStatus();
 }
 
-void Camera::setParentId(const nx::Uuid& parent)
+void CameraResource::setParentId(const nx::Uuid& parent)
 {
     nx::Uuid oldValue = getParentId();
     if (oldValue != parent)
@@ -99,7 +99,7 @@ void Camera::setParentId(const nx::Uuid& parent)
     }
 }
 
-bool Camera::hasAudio() const
+bool CameraResource::hasAudio() const
 {
     auto context = qobject_cast<SystemContext*>(systemContext());
     if (!NX_ASSERT(context))
@@ -110,13 +110,13 @@ bool Camera::hasAudio() const
         && context->accessController()->hasPermissions(toSharedPointer(), Qn::PlayAudioPermission);
 }
 
-QnConstResourceVideoLayoutPtr Camera::getVideoLayout(
+QnConstResourceVideoLayoutPtr CameraResource::getVideoLayout(
     const QnAbstractStreamDataProvider* dataProvider)
 {
     return QnVirtualCameraResource::getVideoLayout(dataProvider);
 }
 
-AudioLayoutConstPtr Camera::getAudioLayout(
+AudioLayoutConstPtr CameraResource::getAudioLayout(
     const QnAbstractStreamDataProvider* dataProvider) const
 {
     if (const auto archive = dynamic_cast<const QnArchiveStreamReader*>(dataProvider))
@@ -125,7 +125,7 @@ AudioLayoutConstPtr Camera::getAudioLayout(
     return QnMediaResource::getAudioLayout();
 }
 
-QnAbstractStreamDataProvider* Camera::createDataProvider(Qn::ConnectionRole role)
+QnAbstractStreamDataProvider* CameraResource::createDataProvider(Qn::ConnectionRole role)
 {
     NX_ASSERT(role == Qn::CR_Default);
     const bool needRtsp = hasVideo() || hasAudio();
@@ -148,10 +148,10 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(Qn::ConnectionRole role
     result->setArchiveDelegate(delegate);
 
     connect(delegate, &QnRtspClientArchiveDelegate::dataDropped,
-        this, &Camera::dataDropped);
+        this, &CameraResource::dataDropped);
 
     connect(delegate, &QnRtspClientArchiveDelegate::needUpdateTimeLine,
-        this, &Camera::footageAdded);
+        this, &CameraResource::footageAdded);
 
     if (auto connection = context->connection())
     {
@@ -167,7 +167,7 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(Qn::ConnectionRole role
     return result;
 }
 
-bool Camera::isPtzSupported() const
+bool CameraResource::isPtzSupported() const
 {
     // Camera must have at least one ptz control capability but fisheye must be disabled.
     return hasAnyOfPtzCapabilities(
@@ -175,31 +175,31 @@ bool Camera::isPtzSupported() const
         && !hasAnyOfPtzCapabilities(Ptz::Capability::virtual_);
 }
 
-bool Camera::isPtzRedirected() const
+bool CameraResource::isPtzRedirected() const
 {
     return !getProperty(nx::vms::api::device_properties::kPtzTargetId).isEmpty();
 }
 
-CameraPtr Camera::ptzRedirectedTo() const
+CameraResourcePtr CameraResource::ptzRedirectedTo() const
 {
     const auto redirectId = getProperty(nx::vms::api::device_properties::kPtzTargetId);
     if (redirectId.isEmpty() || !resourcePool())
         return {};
 
-    return resourcePool()->getResourceByPhysicalId<Camera>(redirectId);
+    return resourcePool()->getResourceByPhysicalId<CameraResource>(redirectId);
 }
 
-bool Camera::autoSendPtzStopCommand() const
+bool CameraResource::autoSendPtzStopCommand() const
 {
     return getProperty(kAutoSendPtzStopCommandProperty).isEmpty();
 }
 
-void Camera::setAutoSendPtzStopCommand(bool value)
+void CameraResource::setAutoSendPtzStopCommand(bool value)
 {
     setProperty(kAutoSendPtzStopCommandProperty, value ? QString() : QString("0"));
 }
 
-void Camera::updateInternal(const QnResourcePtr& source, NotifierList& notifiers)
+void CameraResource::updateInternal(const QnResourcePtr& source, NotifierList& notifiers)
 {
     if (source->getParentId() != m_parentId)
     {
@@ -212,12 +212,12 @@ void Camera::updateInternal(const QnResourcePtr& source, NotifierList& notifiers
     base_type::updateInternal(source, notifiers);
 }
 
-QString Camera::idForToStringFromPtr() const
+QString CameraResource::idForToStringFromPtr() const
 {
     return QnResource::idForToStringFromPtr();
 }
 
-void Camera::setAuthToCameraGroup(
+void CameraResource::setAuthToCameraGroup(
     const QnVirtualCameraResourcePtr& camera,
     const QAuthenticator& authenticator)
 {

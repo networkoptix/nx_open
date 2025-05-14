@@ -8,7 +8,7 @@
 #include <nx/client/mobile/ptz/ptz_availability_watcher.h>
 #include <nx/vms/client/core/ptz/client_ptz_controller_pool.h>
 #include <nx/vms/client/core/ptz/helpers.h>
-#include <nx/vms/client/core/resource/camera.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/core/system_context.h>
 
 namespace nx {
@@ -68,7 +68,7 @@ void ResourcePtzController::setRawResource(QnResource* value)
     setBaseController(controller);
 
     m_availabilityWatcher.reset();
-    if (auto camera = resource.dynamicCast<nx::vms::client::core::Camera>())
+    if (auto camera = resource.dynamicCast<nx::vms::client::core::CameraResource>())
     {
         m_availabilityWatcher.reset(new PtzAvailabilityWatcher(camera));
         connect(m_availabilityWatcher.get(), &PtzAvailabilityWatcher::availabilityChanged, this,

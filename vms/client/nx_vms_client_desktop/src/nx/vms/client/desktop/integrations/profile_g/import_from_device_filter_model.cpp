@@ -4,7 +4,7 @@
 
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
-#include <nx/vms/client/core/resource/camera.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 
 namespace nx::vms::client::desktop::integrations {
 

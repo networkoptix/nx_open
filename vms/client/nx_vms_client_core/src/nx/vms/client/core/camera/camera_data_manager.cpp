@@ -15,7 +15,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
-#include <nx/vms/client/core/resource/camera.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/core/system_context.h>
@@ -133,10 +133,10 @@ CachingCameraDataLoaderPtr CameraDataManager::loader(
 
     CachingCameraDataLoaderPtr loader(new CachingCameraDataLoader(resource));
 
-    const auto camera = resource.dynamicCast<QnClientCameraResource>();
+    const auto camera = resource.dynamicCast<CameraResource>();
     if (camera)
     {
-        connect(camera.get(), &QnClientCameraResource::footageAdded,
+        connect(camera.get(), &CameraResource::footageAdded,
             loader.data(), &CachingCameraDataLoader::discardCachedData);
     }
 

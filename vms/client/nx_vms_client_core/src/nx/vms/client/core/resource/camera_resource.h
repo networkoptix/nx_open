@@ -11,13 +11,13 @@ class QnAbstractStreamDataProvider;
 
 namespace nx::vms::client::core {
 
-class NX_VMS_CLIENT_CORE_API Camera: public QnVirtualCameraResource
+class NX_VMS_CLIENT_CORE_API CameraResource: public QnVirtualCameraResource
 {
     Q_OBJECT
     using base_type = QnVirtualCameraResource;
 
 public:
-    explicit Camera(const nx::Uuid& resourceTypeId);
+    explicit CameraResource(const nx::Uuid& resourceTypeId);
 
     /**
      * @return User-defined camera name if it is present, default name otherwise.
@@ -46,7 +46,7 @@ public:
 
     bool isPtzSupported() const;
     bool isPtzRedirected() const;
-    CameraPtr ptzRedirectedTo() const;
+    CameraResourcePtr ptzRedirectedTo() const;
 
     /**
      * Whether client should automatically send PTZ Stop command when camera loses focus.

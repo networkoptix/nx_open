@@ -18,7 +18,7 @@ DesktopCameraPreloaderResource::DesktopCameraPreloaderResource(
     const nx::Uuid& id,
     const QString& physicalId)
     :
-    QnClientCameraResource(kDesktopCameraPreloaderResourceTypeId)
+    base_type(kDesktopCameraPreloaderResourceTypeId)
 {
     setIdUnsafe(id);
     setPhysicalId(physicalId);

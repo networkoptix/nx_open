@@ -9,7 +9,7 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/ptz/client_ptz_controller_pool.h>
-#include <nx/vms/client/core/resource/camera.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/core/system_context.h>
 
 namespace nx::vms::client::mobile {
@@ -22,7 +22,7 @@ core::OptionalCameraButtonData buttonFromCamera(
     core::SystemContext* context,
     const QnVirtualCameraResourcePtr& currentCamera)
 {
-    const auto camera = currentCamera.dynamicCast<core::Camera>();
+    const auto camera = currentCamera.dynamicCast<core::CameraResource>();
     if (!NX_ASSERT(camera))
         return {};
 

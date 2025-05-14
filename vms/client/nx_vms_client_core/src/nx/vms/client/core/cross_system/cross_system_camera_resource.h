@@ -4,13 +4,14 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/api/data/camera_data_ex.h>
-#include <nx/vms/client/core/resource/camera.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 
 namespace nx::vms::client::core {
 
-class NX_VMS_CLIENT_CORE_API CrossSystemCameraResource: public Camera
+class NX_VMS_CLIENT_CORE_API CrossSystemCameraResource: public CameraResource
 {
     Q_OBJECT
+    using base_type = CameraResource;
 
 public:
     /** Generic constructor called when full camera data is available. */

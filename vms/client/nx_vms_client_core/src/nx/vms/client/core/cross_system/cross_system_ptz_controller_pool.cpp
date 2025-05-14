@@ -5,7 +5,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/ptz/caching_ptz_controller.h>
 #include <nx/vms/client/core/ptz/remote_ptz_controller.h>
-#include <nx/vms/client/core/resource/camera.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <utils/common/delete_later.h>
 
 namespace nx::vms::client::core {
@@ -33,7 +33,7 @@ void CrossSystemPtzControllerPool::createControllerIfNeeded(const QnResourcePtr&
 QnPtzControllerPtr CrossSystemPtzControllerPool::createController(
     const QnResourcePtr& resource) const
 {
-    const auto camera = resource.dynamicCast<nx::vms::client::core::Camera>();
+    const auto camera = resource.dynamicCast<nx::vms::client::core::CameraResource>();
     if (!camera || !camera->isPtzSupported())
         return {};
 

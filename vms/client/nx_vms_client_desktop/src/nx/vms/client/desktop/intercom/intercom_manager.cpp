@@ -5,10 +5,10 @@
 #include <api/model/api_ioport_data.h>
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/client_camera.h>
 #include <core/resource/resource_property_key.h>
 #include <core/resource/user_resource.h>
 #include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -98,7 +98,7 @@ public:
 
     static bool isIntercom(const QnVirtualCameraResourcePtr& camera)
     {
-        const auto clientCamera = camera.dynamicCast<QnClientCameraResource>();
+        const auto clientCamera = camera.dynamicCast<core::CameraResource>();
         return NX_ASSERT(clientCamera) && clientCamera->isIntercom();
     }
 

@@ -10,12 +10,12 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 
-#include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/math/math.h>
 #include <nx/vms/api/data/dewarping_data.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -529,7 +529,7 @@ void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
 
 void PtzInstrument::handlePtzRedirect(QnMediaResourceWidget* widget)
 {
-    const auto camera = widget->resource().dynamicCast<QnClientCameraResource>();
+    const auto camera = widget->resource().dynamicCast<nx::vms::client::core::CameraResource>();
     if (!camera || !camera->isPtzRedirected())
         return;
 
@@ -1025,7 +1025,7 @@ void PtzInstrument::processPtzDoubleClick()
         return;
 
     // Ptz unzoom is not supported on redirected ptz.
-    const auto camera = target()->resource().dynamicCast<QnClientCameraResource>();
+    const auto camera = target()->resource().dynamicCast<nx::vms::client::core::CameraResource>();
     if (camera && camera->isPtzRedirected())
     {
         emit doubleClicked(target());
@@ -1293,8 +1293,11 @@ void PtzInstrument::dragMove(DragInfo* info)
             QPointF sensitivity(1.0, 1.0);
             if (!target()->dewarpingParams().enabled)
             {
-                if (const auto camera = target()->resource().dynamicCast<QnClientCameraResource>())
+                if (const auto camera =
+                    target()->resource().dynamicCast<nx::vms::client::core::CameraResource>())
+                {
                     sensitivity = camera->ptzPanTiltSensitivity();
+                }
             }
 
             const QPointF delta = currentPos - startPos;
@@ -1635,7 +1638,8 @@ void PtzInstrument::at_display_widgetAboutToBeChanged(Qn::ItemRole role)
         // Forcefully stop ptz movement on a camera.
         if (mediaWidget->item()->layout())
         {
-            if (const auto camera = mediaWidget->resource().dynamicCast<QnClientCameraResource>();
+            if (const auto camera =
+                    mediaWidget->resource().dynamicCast<nx::vms::client::core::CameraResource>();
                 camera && camera->autoSendPtzStopCommand())
             {
                 menu()->triggerIfPossible(menu::PtzContinuousMoveAction, menu::Parameters()

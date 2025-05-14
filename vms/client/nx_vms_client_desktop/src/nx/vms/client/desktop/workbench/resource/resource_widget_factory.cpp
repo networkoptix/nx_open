@@ -2,13 +2,13 @@
 
 #include "resource_widget_factory.h"
 
-#include <core/resource/client_camera.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/intercom/intercom_resource_widget.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -75,7 +75,7 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchItem* item)
     if (resource->hasFlags(Qn::cross_system))
         return new QnCrossSystemCameraWidget(systemContext, windowContext, item);
 
-    if (auto camera = resource.dynamicCast<QnClientCameraResource>();
+    if (auto camera = resource.dynamicCast<core::CameraResource>();
         itemIsIntercomLayout && camera && camera->isIntercom())
     {
         return new IntercomResourceWidget(systemContext, windowContext, item);

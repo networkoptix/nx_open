@@ -21,7 +21,7 @@ class PtzAvailabilityWatcher: public QObject
 
 public:
     PtzAvailabilityWatcher(
-        const nx::vms::client::core::CameraPtr& camera,
+        const nx::vms::client::core::CameraResourcePtr& camera,
         QObject* parent = nullptr);
 
     bool available() const;
@@ -34,7 +34,7 @@ private:
     void updateAvailability();
 
 private:
-    const nx::vms::client::core::CameraPtr m_camera;
+    const nx::vms::client::core::CameraResourcePtr m_camera;
     bool m_available = false;
 };
 

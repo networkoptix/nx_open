@@ -23,7 +23,7 @@ CrossSystemCameraResource::CrossSystemCameraResource(
     const QString& systemId,
     const nx::vms::api::CameraDataEx& source)
     :
-    QnClientCameraResource(source.typeId),
+    base_type(source.typeId),
     d(new Private{
         .q = this,
         .systemId = systemId,
@@ -57,7 +57,7 @@ CrossSystemCameraResource::CrossSystemCameraResource(
     const nx::Uuid& id,
     const QString& name)
     :
-    QnClientCameraResource(kThumbCameraTypeId),
+    base_type(kThumbCameraTypeId),
     d(new Private{
         .q = this,
         .systemId = systemId

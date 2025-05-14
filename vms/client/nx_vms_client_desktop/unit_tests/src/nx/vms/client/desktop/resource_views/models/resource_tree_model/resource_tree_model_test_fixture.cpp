@@ -370,7 +370,7 @@ QnVirtualCameraResourcePtr ResourceTreeModelTest::addIntercomCamera(
     const nx::Uuid& parentId,
     const QString& hostAddress) const
 {
-    QnClientCameraResourcePtr camera(new ClientCameraResourceStub());
+    nx::vms::client::core::CameraResourcePtr camera(new ClientCameraResourceStub());
     camera->setName(name);
     camera->setIdUnsafe(nx::Uuid::createUuid());
     camera->setParentId(parentId);

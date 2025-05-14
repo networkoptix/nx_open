@@ -29,7 +29,6 @@
 #include <client/desktop_client_message_processor.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/client_camera.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/file_processor.h>
@@ -70,6 +69,7 @@
 #include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -1254,7 +1254,7 @@ void ActionHandler::cameraAuthenticationActionTriggered()
 
                 if (camera->isMultiSensorCamera() || camera->isNvr())
                 {
-                    QnClientCameraResource::setAuthToCameraGroup(camera, auth);
+                    nx::vms::client::core::CameraResource::setAuthToCameraGroup(camera, auth);
                 }
                 else
                 {

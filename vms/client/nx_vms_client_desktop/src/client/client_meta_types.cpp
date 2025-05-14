@@ -10,7 +10,6 @@
 #include <client/client_globals.h>
 #include <client_core/client_core_meta_types.h>
 #include <core/resource/camera_bookmark.h>
-#include <core/resource/client_camera.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>

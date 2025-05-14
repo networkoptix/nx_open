@@ -45,7 +45,7 @@ class MediaResourceWidgetPrivate: public QObject
 public:
     const QnResourcePtr resource;
     const QnMediaResourcePtr mediaResource;
-    const QnClientCameraResourcePtr camera;
+    const core::CameraResourcePtr camera;
     const bool hasVideo;
     const bool isIoModule;
     bool isExportedLayout = false;
