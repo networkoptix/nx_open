@@ -67,6 +67,8 @@ static const int kShareFpsDefaultReservedSecondStreamFps = 2;
 static const int kSharePixelsDefaultReservedSecondStreamFps = 0;
 static const StreamFpsSharingMethod kDefaultStreamFpsSharingMethod = StreamFpsSharingMethod::pixels;
 
+static const bool kDefaultRemoteArchiveSynchronizationEnabledValue = true;
+
 static const QMap<StreamFpsSharingMethod, QString> kFpsSharingMethodToString{
     {StreamFpsSharingMethod::basic, "shareFps"},
     {StreamFpsSharingMethod::pixels, "sharePixels"},
@@ -1785,7 +1787,7 @@ bool QnVirtualCameraResource::isRemoteArchiveSynchronizationEnabled() const
 
     return QnLexical::deserialized<bool>(
         getProperty(nx::vms::api::device_properties::kRemoteArchiveSynchronizationEnabled),
-        defaultRemoteArchiveSynchronizationState());
+        kDefaultRemoteArchiveSynchronizationEnabledValue);
 }
 
 void QnVirtualCameraResource::setRemoteArchiveSynchronizationEnabled(bool value)
@@ -1793,13 +1795,10 @@ void QnVirtualCameraResource::setRemoteArchiveSynchronizationEnabled(bool value)
     if (!hasCameraCapabilities(nx::vms::api::DeviceCapability::remoteArchive))
         return;
 
-    const auto stored = QnLexical::serialized(value);
-    setProperty(nx::vms::api::device_properties::kRemoteArchiveSynchronizationEnabled, stored);
-}
-
-bool QnVirtualCameraResource::defaultRemoteArchiveSynchronizationState() const
-{
-    return hasCameraCapabilities(nx::vms::api::DeviceCapability::remoteArchive);
+    setProperty(nx::vms::api::device_properties::kRemoteArchiveSynchronizationEnabled,
+        value == kDefaultRemoteArchiveSynchronizationEnabledValue
+            ? QString()
+            : boolToPropertyStr(value));
 }
 
 void QnVirtualCameraResource::updatePreferredServerId()

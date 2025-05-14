@@ -259,7 +259,7 @@ TEST_F(CameraSettingsDialogExpertTest, resetDefaultRemoteArchiveSynchronizationE
     whenRemoteArchiveSynchronizationEnable(true);
     thenRemoteArchiveSynchronizationEnable(true);
     dispatch(Reducer::resetExpertSettings);
-    thenRemoteArchiveSynchronizationEnable(false);
+    thenRemoteArchiveSynchronizationEnable(true);
     whenChangesAreSaved();
     thenFirstCameraRemoteArchiveSynchronizationEnable(false);
 }
@@ -311,7 +311,7 @@ TEST_F(CameraSettingsDialogExpertTest, resetDefaultRemoteArchiveSynchronizationE
     thenSecondCameraRemoteArchiveSynchronizationEnable(false);
 
     dispatch(Reducer::resetExpertSettings);
-    thenRemoteArchiveSynchronizationEnableDoesNotHaveValue();
+    thenRemoteArchiveSynchronizationEnable(true);
     whenChangesAreSaved();
     thenFirstCameraRemoteArchiveSynchronizationEnable(false);
     thenSecondCameraRemoteArchiveSynchronizationEnable(true);

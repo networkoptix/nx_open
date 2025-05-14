@@ -348,8 +348,6 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         nx::vms::api::DeviceProfiles availableProfiles;
 
         UserEditableMultiple<bool> remoteArchiveSynchronizationEnabled;
-        bool isRemoteArchiveSynchronizationDefault = false;
-        std::optional<bool> defaultRemoteArchiveSynchronizationState;
     };
     ExpertSettings expert;
     bool isDefaultExpertSettings = false;

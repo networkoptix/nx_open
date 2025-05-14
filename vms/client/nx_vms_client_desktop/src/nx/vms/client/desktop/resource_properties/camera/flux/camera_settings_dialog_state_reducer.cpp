@@ -518,7 +518,7 @@ bool isDefaultExpertSettings(const State& state)
     if (!state.expert.forcedSecondaryProfile.valueOr({}).isEmpty())
         return false;
 
-    if (!state.expert.isRemoteArchiveSynchronizationDefault)
+    if (!state.expert.remoteArchiveSynchronizationEnabled.valueOr(false))
         return false;
 
     return state.expert.rtpTransportType.hasValue()
@@ -965,44 +965,27 @@ State loadSingleCameraProperties(
     return state;
 }
 
-void initDefaultStates(
+void initKeepCameraTimeSettingsDefaultStates(
     const QnVirtualCameraResourceList& cameras,
-	std::function<bool(const Camera&)> defaultStateGetter,
-	std::function<bool(const Camera&)> stateGetter,
-    bool* isDefault,
-    std::optional<bool>* defaultState)
+    State* state)
 {
-    *isDefault =
-        std::all_of(cameras.begin(), cameras.end(),
-            [defaultStateGetter, stateGetter](const auto& camera)
-            {
-                return defaultStateGetter(camera) == stateGetter(camera);
-            });
+    state->expert.isKeepCameraTimeSettingsDefault = std::ranges::all_of(cameras,
+        [](const auto& camera)
+        {
+            return camera->defaultKeepCameraTimeSettingsState()
+                == camera->keepCameraTimeSettings();
+        });
 
-    defaultState->reset();
-    for (const auto& camera: cameras)
-    {
-        if (!defaultState->has_value())
-        {
-            *defaultState = defaultStateGetter(camera);
-        }
-        else if (defaultState->value())
-        {
-            if (!defaultStateGetter(camera))
-            {
-                defaultState->reset();
-                break;
-            }
-        }
-        else // if (defaultState->value() == false)
-        {
-            if (defaultStateGetter(camera))
-            {
-                defaultState->reset();
-                break;
-            }
-        }
-    }
+    bool value;
+    const bool defaultKeepCameraTimeSettingsStatesAreSame = nx::utils::algorithm::same(
+        cameras,
+        [](auto camera) { return camera->defaultKeepCameraTimeSettingsState(); },
+        &value);
+
+    if (defaultKeepCameraTimeSettingsStatesAreSame)
+        state->expert.defaultKeepCameraTimeSettingsState = value;
+    else
+        state->expert.defaultKeepCameraTimeSettingsState.reset();
 }
 
 } // namespace
@@ -1430,12 +1413,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         cameras,
         [](const Camera& camera) { return camera->keepCameraTimeSettings(); });
 
-    initDefaultStates(
-        cameras,
-        [](const Camera& camera) { return camera->defaultKeepCameraTimeSettingsState(); },
-        [](const Camera& camera) { return camera->keepCameraTimeSettings(); },
-        &state.expert.isKeepCameraTimeSettingsDefault,
-        &state.expert.defaultKeepCameraTimeSettingsState);
+    initKeepCameraTimeSettingsDefaultStates(cameras, &state);
 
     fetchFromCameras<bool>(state.expert.useBitratePerGOP, cameras,
         [](const Camera& camera) { return camera->useBitratePerGop(); });
@@ -1482,13 +1460,6 @@ State CameraSettingsDialogStateReducer::loadCameras(
         {
             return camera->isRemoteArchiveSynchronizationEnabled();
         });
-
-    initDefaultStates(
-        cameras,
-        [](const Camera& camera) { return camera->defaultRemoteArchiveSynchronizationState(); },
-        [](const Camera& camera) { return camera->isRemoteArchiveSynchronizationEnabled(); },
-        &state.expert.isRemoteArchiveSynchronizationDefault,
-        &state.expert.defaultRemoteArchiveSynchronizationState);
 
     if (state.expert.areOnvifSettingsApplicable)
     {
@@ -2714,16 +2685,6 @@ State CameraSettingsDialogStateReducer::setRemoteArchiveSynchronizationEnabled(
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1", __func__);
 
-    if (!state.expert.defaultRemoteArchiveSynchronizationState.has_value())
-    {
-        state.expert.isRemoteArchiveSynchronizationDefault = false;
-    }
-    else
-    {
-        state.expert.isRemoteArchiveSynchronizationDefault =
-            state.expert.defaultRemoteArchiveSynchronizationState.value() == value;
-    }
-
     state.expert.remoteArchiveSynchronizationEnabled.setUser(value);
 
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
@@ -2733,32 +2694,6 @@ State CameraSettingsDialogStateReducer::setRemoteArchiveSynchronizationEnabled(
     state.expertAlerts.setFlag(State::ExpertAlert::importVideoChangedWarning,
         state.expert.remoteArchiveSynchronizationEnabled.valueOr(true)
         && state.expert.keepCameraTimeSettings.valueOr(true));
-    state.expertAlerts.setFlag(State::ExpertAlert::timeSettingsChangedWarning, false);
-
-    return state;
-}
-
-State CameraSettingsDialogStateReducer::resetRemoteArchiveSynchronizationToDefault(State state)
-{
-    NX_VERBOSE(NX_SCOPE_TAG, "%1", __func__);
-
-    state.expert.isRemoteArchiveSynchronizationDefault = true;
-
-    if (!state.expert.defaultRemoteArchiveSynchronizationState.has_value())
-    {
-        state.expert.remoteArchiveSynchronizationEnabled.resetBase();
-        state.expert.remoteArchiveSynchronizationEnabled.resetUser();
-    }
-    else
-    {
-        state.expert.remoteArchiveSynchronizationEnabled.setUser(
-            state.expert.defaultRemoteArchiveSynchronizationState.value());
-    }
-
-    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
-    state.hasChanges = true;
-
-    state.expertAlerts.setFlag(State::ExpertAlert::importVideoChangedWarning, false);
     state.expertAlerts.setFlag(State::ExpertAlert::timeSettingsChangedWarning, false);
 
     return state;
@@ -2897,7 +2832,7 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setRtpTransportType(std::move(state), nx::vms::api::RtpTransportType::automatic);
     state = setForcedPrimaryProfile(std::move(state), QString());
     state = setForcedSecondaryProfile(std::move(state), QString());
-    state = resetRemoteArchiveSynchronizationToDefault(std::move(state));
+    state = setRemoteArchiveSynchronizationEnabled(std::move(state), true);
     state = setCustomWebPagePort(std::move(state), 0);
     state = setCustomMediaPortUsed(std::move(state), false);
     state = setTrustCameraTime(std::move(state), false);

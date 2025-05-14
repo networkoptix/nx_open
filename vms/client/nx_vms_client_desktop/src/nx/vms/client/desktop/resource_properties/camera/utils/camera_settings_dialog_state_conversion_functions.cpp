@@ -791,19 +791,10 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
     if (state.expert.forcedSecondaryProfile.hasValue())
         setForcedSecondaryProfile(state.expert.forcedSecondaryProfile(), cameras);
 
-    if (state.expert.isRemoteArchiveSynchronizationDefault)
-    {
-        for (const auto& camera: cameras)
-        {
-            camera->setRemoteArchiveSynchronizationEnabled(
-                camera->defaultRemoteArchiveSynchronizationState());
-        }
-    }
-    else if (state.expert.remoteArchiveSynchronizationEnabled.hasValue())
+    if (state.expert.remoteArchiveSynchronizationEnabled.hasValue())
     {
         setRemoteArchiveSynchronizationEnabled(
-            state.expert.remoteArchiveSynchronizationEnabled(),
-            cameras);
+            state.expert.remoteArchiveSynchronizationEnabled(), cameras);
     }
 
     if (state.expert.customWebPagePort.hasValue())

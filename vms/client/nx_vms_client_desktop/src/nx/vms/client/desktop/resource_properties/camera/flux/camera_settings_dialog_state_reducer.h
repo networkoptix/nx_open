@@ -163,7 +163,6 @@ public:
     static State setForcedPrimaryProfile(State state, const QString& value);
     static State setForcedSecondaryProfile(State state, const QString& value);
     static State setRemoteArchiveSynchronizationEnabled(State state, bool value);
-    static State resetRemoteArchiveSynchronizationToDefault(State state);
     static State setCustomMediaPortUsed(State state, bool value);
     static State setCustomMediaPort(State state, int value);
     static State setCustomWebPagePort(State state, int value);
