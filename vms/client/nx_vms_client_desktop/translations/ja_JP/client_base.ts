@@ -387,11 +387,11 @@
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation>新しいタブで開く</translation>
+      <translation>新規タブで開く</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
-      <translation>モニターを新しいタブで開く</translation>
+      <translation>モニターを新規タブで開く</translation>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
@@ -7549,7 +7549,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Camera in new Tab</source>
-      <translation>新しいタブでカメラを開く</translation>
+      <translation>カメラを新規タブで開く</translation>
     </message>
     <message>
       <source>Open Camera in place</source>
@@ -11519,7 +11519,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
       <translation>
-        <numerusform>現在のレイアウトにカメラを追加するにはダブルクリック、新しいタブで開くには Ctrl + クリックしてください</numerusform>
+        <numerusform>現在のレイアウトにカメラを追加するにはダブルクリック、新規タブで開くには Ctrl + クリックしてください</numerusform>
       </translation>
     </message>
     <message>
@@ -11568,7 +11568,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation>新しいタブで開く</translation>
+      <translation>新規タブで開く</translation>
     </message>
     <message>
       <source>This action is not supported for notifications from other Systems</source>

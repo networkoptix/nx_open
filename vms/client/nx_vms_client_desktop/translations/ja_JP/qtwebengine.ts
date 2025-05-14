@@ -330,7 +330,7 @@
     </message>
     <message>
       <source>Open link in new tab</source>
-      <translation>新しいタブでリンクを開く</translation>
+      <translation>リンクを新規タブで開く</translation>
     </message>
     <message>
       <source>Copy link address</source>
