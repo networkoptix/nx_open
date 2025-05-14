@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+import QtQuick.Layouts
 
 import Nx.Core
 import Nx.Mobile.Controls
@@ -17,7 +18,7 @@ BaseBottomSheet
 
     spacing: 14
 
-    Row
+    RowLayout
     {
         spacing: 8
         width: parent.width
@@ -26,8 +27,7 @@ BaseBottomSheet
         {
             id: titleTextItem
 
-            anchors.verticalCenter: parent.verticalCenter
-            width: parent.width - customArea.width - spacing
+            Layout.fillWidth: true
             font.pixelSize: 24
             font.weight: 500
             color: ColorTheme.colors.light4
@@ -37,8 +37,6 @@ BaseBottomSheet
         Row
         {
             id: customArea
-
-            anchors.verticalCenter: parent.verticalCenter
         }
     }
 

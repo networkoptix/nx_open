@@ -89,7 +89,7 @@ Page
 
         onClicked:
         {
-            if (appContext.settings.showHowShareWorksNotification)
+            if (appContext.settings.showHowShareWorksNotification && isAnalyticsDetails)
                 howItWorksSheet.open()
             else
                 shareBookmarkSheet.open()

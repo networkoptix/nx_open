@@ -21,16 +21,20 @@ BottomSheet
         ? qsTr("New Bookmark")
         : d.kShareOptionTextString
 
-
     IconButton
     {
         id: infoButton
 
+        visible: sheet.isAnalyticsItemMode
         parent: sheet.titleCustomArea
         padding: 0
         icon.source: "image://skin/20x20/Solid/info.svg?primary=light10"
         icon.width: 20
         icon.height: icon.width
+        transform: Translate
+        {
+            x: (infoButton.width - infoButton.icon.width) / 2
+        }
 
         onClicked:
         {
