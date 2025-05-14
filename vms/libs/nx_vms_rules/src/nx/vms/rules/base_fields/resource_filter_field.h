@@ -55,8 +55,8 @@ struct ResourceFilterFieldProperties
     }
 };
 
-template<class T>
-class NX_VMS_RULES_API ResourceFilterFieldBase
+template<class T, class B>
+class NX_VMS_RULES_API ResourceFilterFieldBase : public B
 {
 public:
     bool acceptAll() const { return m_acceptAll; }
@@ -92,7 +92,7 @@ public:
 
 protected:
     // This field type should be used as base class only.
-    ResourceFilterFieldBase() = default;
+    explicit ResourceFilterFieldBase(const FieldDescriptor* descriptor): B(descriptor) {}
 
 private:
     QSet<nx::Uuid> m_ids;
@@ -100,8 +100,7 @@ private:
 };
 
 class NX_VMS_RULES_API ResourceFilterEventField:
-    public EventFilterField,
-    public ResourceFilterFieldBase<ResourceFilterEventField>
+    public ResourceFilterFieldBase<ResourceFilterEventField, EventFilterField>
 {
     Q_OBJECT
 
@@ -113,9 +112,13 @@ signals:
     void idsChanged();
 
 public:
-    using EventFilterField::EventFilterField;
-    using ResourceFilterFieldBase<ResourceFilterEventField>::properties;
-    using ResourceFilterFieldBase<ResourceFilterEventField>::openApiDescriptor;
+    explicit ResourceFilterEventField(const FieldDescriptor* descriptor):
+    ResourceFilterFieldBase<ResourceFilterEventField, EventFilterField>(descriptor)
+    {
+    }
+
+    using ResourceFilterFieldBase<ResourceFilterEventField, EventFilterField>::properties;
+    using ResourceFilterFieldBase<ResourceFilterEventField, EventFilterField>::openApiDescriptor;
 
     virtual bool match(const QVariant& value) const override;
 
@@ -124,8 +127,7 @@ public:
 
 // TODO: #amalov Remove this base class, acceptAll flag used by users field only.
 class NX_VMS_RULES_API ResourceFilterActionField:
-    public ActionBuilderField,
-    public ResourceFilterFieldBase<ResourceFilterActionField>
+    public ResourceFilterFieldBase<ResourceFilterActionField, ActionBuilderField>
 {
     Q_OBJECT
 
@@ -136,9 +138,13 @@ signals:
     void idsChanged();
 
 public:
-    using ActionBuilderField::ActionBuilderField;
-    using ResourceFilterFieldBase<ResourceFilterActionField>::properties;
-    using ResourceFilterFieldBase<ResourceFilterActionField>::openApiDescriptor;
+    explicit ResourceFilterActionField(const FieldDescriptor* descriptor):
+        ResourceFilterFieldBase<ResourceFilterActionField, ActionBuilderField>(descriptor)
+    {
+    }
+
+    using ResourceFilterFieldBase<ResourceFilterActionField, ActionBuilderField>::properties;
+    using ResourceFilterFieldBase<ResourceFilterActionField, ActionBuilderField>::openApiDescriptor;
 
     virtual QVariant build(const AggregatedEventPtr& eventAggregator) const override;
 
