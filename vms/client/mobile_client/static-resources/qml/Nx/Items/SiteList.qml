@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+import QtQuick.Layouts
 
 import Nx.Core
 import Nx.Models
@@ -13,6 +14,8 @@ ListView
     property alias siteModel: filterModel.sourceModel
     property alias hideOrgSystemsFromSites: filterModel.hideOrgSystemsFromSites
     property alias showOnly: filterModel.showOnly
+
+    property alias currentRoot: filterModel.currentRoot
 
     property var organizationsModel: siteModel.sourceModel
 
@@ -42,29 +45,14 @@ ListView
 
     header: Item
     {
-        property real sectionHeight:
-            12 + Math.ceil(textMetrics.height) + (siteList.cellsInRow == 1 ? 10 : 12)
         width: parent.width
-        readonly property real systemTabsHeight: 48
-        height: 16 + (!!currentSearchRegExp ? (systemTabsHeight - sectionHeight) : 0)
-        onHeightChanged:
-        {
-            // Avoids delegates re-creation during component construction.
-            Qt.callLater(() => siteList.positionViewAtBeginning())
-        }
+        height: 16
     }
 
     footer: Item
     {
         width: parent.width
         height: 16
-    }
-
-    TextMetrics
-    {
-        id: textMetrics
-        font.pixelSize: 14
-        text: qsTr("Organizations") + qsTr("Folders") + qsTr("Sites")
     }
 
     property string searchText: ""
@@ -93,18 +81,49 @@ ListView
 
     section.property: currentSearchRegExp ? "section" : ""
     section.criteria: ViewSection.FullString
-    section.delegate: Item
+    section.delegate: ColumnLayout
     {
+        readonly property var sectionTextParts: section.split("\n")
+
+        readonly property string sectionTitle: sectionTextParts.length > 1
+            ? sectionTextParts[0]
+            : ""
+        readonly property string sectionDescription: sectionTextParts.length > 1
+            ? sectionTextParts[1]
+            : sectionTextParts[0]
+
         width: parent.width
-        height: 12 + sectionText.height + (siteList.cellsInRow == 1 ? 10 : 12)
+        spacing: 12
+
         Text
         {
-            id: sectionText
+            id: titleText
+
+            Layout.topMargin: 24
+            Layout.fillWidth: true
+
+            color: ColorTheme.colors.light4
+            text: sectionTitle
+            visible: text
+            font.pixelSize: 16
+            font.weight: Font.Medium
+            horizontalAlignment: Text.AlignLeft
+            elide: Text.ElideMiddle
+        }
+
+        Text
+        {
+            id: descriptionText
+
+            Layout.topMargin: titleText.visible ? 0 : (siteList.cellsInRow == 1 ? 16 : 24)
+            Layout.bottomMargin: 8
+            Layout.fillWidth: true
+
             color: ColorTheme.colors.light16
-            text: section
+            text: sectionDescription
             font.pixelSize: 14
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 12
+            horizontalAlignment: Text.AlignLeft
+            elide: Text.ElideMiddle
         }
     }
 

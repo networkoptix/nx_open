@@ -32,7 +32,7 @@ Page
     property var model
     property var rootIndex
 
-    property bool searching: !!siteList.searchText
+    readonly property bool searching: !!siteList.searchText
 
     LinearizationListModel
     {
@@ -91,15 +91,14 @@ Page
         }
     ]
 
-    property var prevRootId: null
-
     function startSearch()
     {
         if (searchField.visible)
             return
 
-        prevRootId = accessor.getData(subtreeModel.sourceRoot, "nodeId")
-        subtreeModel.sourceRoot = currentOrgIndex()
+        siteList.currentRoot = subtreeModel.sourceRoot
+        subtreeModel.sourceRoot = Qt.binding(
+            () => searching ? NxGlobals.invalidModelIndex() : siteList.currentRoot)
         searchField.visible = true
         searchField.forceActiveFocus()
     }
@@ -109,24 +108,21 @@ Page
         if (!searchField.visible)
             return
 
-        let index = model.indexFromNodeId(prevRootId)
-        if (index.row != -1)
-            subtreeModel.sourceRoot = index
-        prevRootId = null
+        subtreeModel.sourceRoot = siteList.currentRoot
         searchField.visible = false
         searchField.clear()
         searchField.resetFocus()
         siteList.positionViewAtBeginning()
     }
 
-    function currentOrgIndex()
+    function currentTopLevelIndex()
     {
-        let org = null
+        let orgOrPartner = null
 
         for (let node = rootIndex; node && node.row != -1; node = node.parent)
-            org = node
+            orgOrPartner = node
 
-        return org
+        return orgOrPartner
     }
 
     function goBack()
@@ -140,9 +136,14 @@ Page
         const newIndex = subtreeModel.sourceRoot && subtreeModel.sourceRoot.parent
 
         if (newIndex.row == -1)
+        {
             Workflow.popCurrentScreen()
+        }
         else
+        {
             subtreeModel.sourceRoot = newIndex
+            siteList.currentRoot = newIndex
+        }
     }
 
     function goInto(current)

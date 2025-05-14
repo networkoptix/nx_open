@@ -9,6 +9,7 @@
 #include <nx/utils/coro/when_all.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/common/models/linearization_list_model.h>
 #include <nx/vms/client/core/network/cloud_api.h>
 
 namespace nx::vms::client::core {
@@ -187,6 +188,8 @@ struct OrganizationsModel::Private
 
     nx::utils::ScopedConnection statusConnection;
     CloudStatusWatcher::Status prevStatus = CloudStatusWatcher::LoggedOut;
+
+    QPersistentModelIndex currentRoot;
 
     Private(OrganizationsModel* q): q(q)
     {
@@ -1184,6 +1187,11 @@ bool OrganizationsFilterModel::filterAcceptsRow(
 
 bool OrganizationsFilterModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
+    const bool leftInCurrentRoot = isInCurrentRoot(left);
+    const bool rightInCurrentRoot = isInCurrentRoot(right);
+    if (leftInCurrentRoot != rightInCurrentRoot)
+        return leftInCurrentRoot;
+
     QVariant leftParentType = left.parent().data(OrganizationsModel::TypeRole);
     QVariant rightParentType = right.parent().data(OrganizationsModel::TypeRole);
 
@@ -1222,6 +1230,122 @@ void OrganizationsFilterModel::setShowOnly(const QList<OrganizationsModel::NodeT
 
     invalidateFilter();
     emit showOnlyChanged();
+}
+
+void OrganizationsFilterModel::setCurrentRoot(const QModelIndex& index)
+{
+    if (m_currentRoot == index)
+        return;
+
+    if (!m_currentRootWatcher)
+    {
+        m_currentRootWatcher = std::make_unique<PersistentIndexWatcher>();
+        connect(m_currentRootWatcher.get(), &PersistentIndexWatcher::indexChanged,
+            this, &OrganizationsFilterModel::invalidate);
+        connect(m_currentRootWatcher.get(), &PersistentIndexWatcher::indexChanged,
+            this, &OrganizationsFilterModel::currentRootChanged);
+    }
+
+    m_currentRoot = index;
+    m_currentRootWatcher->setIndex(index);
+}
+
+QModelIndex OrganizationsFilterModel::currentRoot() const
+{
+    return m_currentRoot;
+}
+
+bool OrganizationsFilterModel::isInCurrentRoot(const QModelIndex& index) const
+{
+    if (!m_currentRoot.isValid())
+        return true;
+
+    if (!sourceModel())
+        return true;
+
+    auto listModel = qobject_cast<LinearizationListModel*>(sourceModel());
+    if (!NX_ASSERT(listModel))
+        return true;
+
+    auto treeIndex = listModel->mapToSource(index.model() == this ? mapToSource(index) : index);
+
+    if (treeIndex == m_currentRoot)
+        return false;
+
+    for (auto parent = treeIndex.parent(); parent.isValid(); parent = parent.parent())
+    {
+        if (parent == m_currentRoot)
+            return true;
+    }
+
+    return false;
+}
+
+QVariant OrganizationsFilterModel::data(const QModelIndex& index, int role) const
+{
+    if (!sourceModel())
+        return base_type::data(index, role);
+
+    if (role != OrganizationsModel::SectionRole)
+        return base_type::data(index, role);
+
+    auto listModel = qobject_cast<LinearizationListModel*>(sourceModel());
+    if (!NX_ASSERT(listModel))
+        return {};
+
+    auto treeIndex = listModel->mapToSource(mapToSource(index));
+
+    QList<QModelIndex> parents;
+
+    for (auto parent = treeIndex.parent(); parent.isValid(); parent = parent.parent())
+        parents.push_back(parent);
+
+    std::reverse(parents.begin(), parents.end());
+
+    if (!m_currentRoot.isValid() || parents.contains(m_currentRoot))
+        return base_type::data(index, role).toString();
+
+    // The first section which items are not under m_currentRoot should have additional title
+    // "Other results".
+    bool otherResults = false;
+
+    const auto sectionName = mapToSource(index).data(OrganizationsModel::SectionRole).toString();
+
+    if (index.row() == 0)
+        otherResults = true;
+
+    for (int row = index.row() - 1; row >= 0; --row)
+    {
+        auto sibling = index.siblingAtRow(row);
+
+        const bool inCurrentRoot = isInCurrentRoot(sibling);
+
+        const bool sameSection =
+            mapToSource(sibling).data(OrganizationsModel::SectionRole).toString() == sectionName;
+
+        if (sameSection && !inCurrentRoot)
+        {
+            if (row != 0)
+                continue;
+        }
+
+        // We either found an item in the current root or we are at the first item.
+        // Anyway if its the same section then it should be marked as "Other results".
+        otherResults = inCurrentRoot || (row == 0 && sameSection);
+        break;
+    }
+
+    const QString prefix = otherResults
+        ? (tr("Other results") + "\n") //< QML will split this on "\n".
+        : QString{};
+
+    if (parents.isEmpty())
+        return prefix + base_type::data(index, role).toString();
+
+    QStringList sectionNameParts;
+    for (const auto& parent: parents)
+        sectionNameParts << parent.data(Qt::DisplayRole).toString();
+    return prefix + sectionNameParts.join(" / ");
 }
 
 } // nx::vms::client::core

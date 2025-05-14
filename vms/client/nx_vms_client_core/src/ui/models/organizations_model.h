@@ -9,6 +9,7 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/utils/persistent_index_watcher.h>
 #include <ui/models/systems_model.h>
 
 class AbstractSystemsController;
@@ -139,6 +140,11 @@ class OrganizationsFilterModel: public QSortFilterProxyModel
         WRITE setShowOnly
         NOTIFY showOnlyChanged)
 
+    Q_PROPERTY(QModelIndex currentRoot
+        READ currentRoot
+        WRITE setCurrentRoot
+        NOTIFY currentRootChanged);
+
 public:
     OrganizationsFilterModel(QObject* parent = nullptr);
     bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
@@ -150,13 +156,24 @@ public:
     void setShowOnly(const QList<OrganizationsModel::NodeType>& types);
     QList<OrganizationsModel::NodeType> showOnly() const { return m_showOnly.values(); }
 
+    void setCurrentRoot(const QModelIndex& index);
+    QModelIndex currentRoot() const;
+
+    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+
 signals:
     void hideOrgSystemsFromSitesChanged();
     void showOnlyChanged();
+    void currentRootChanged();
+
+private:
+    bool isInCurrentRoot(const QModelIndex& index) const;
 
 private:
     bool m_hideOrgSystemsFromSites = false;
     QSet<OrganizationsModel::NodeType> m_showOnly;
+    QPersistentModelIndex m_currentRoot;
+    std::unique_ptr<PersistentIndexWatcher> m_currentRootWatcher;
 };
 
 } // namespace nx::vms::client::core
