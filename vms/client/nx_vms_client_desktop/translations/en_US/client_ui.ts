@@ -431,10 +431,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Native camera presets will not be avaliable.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>This camera supports pan and tilt</source>
         <translation></translation>
     </message>
@@ -533,6 +529,10 @@
     <message>
         <source>Use site presets</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Native camera presets will not be available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
