@@ -15,26 +15,25 @@ QnButtonBoxDialog::QnButtonBoxDialog(QWidget *parent, Qt::WindowFlags windowFlag
 {
 }
 
-QnButtonBoxDialog::~QnButtonBoxDialog() {
-    return;
+QnButtonBoxDialog::~QnButtonBoxDialog()
+{
 }
 
 void QnButtonBoxDialog::setButtonBox(QDialogButtonBox *buttonBox) {
     if(m_buttonBox.data() == buttonBox)
         return;
 
-    if(m_buttonBox) {
-        disconnect(m_buttonBox, SIGNAL(clicked(QAbstractButton *)), this, SLOT(at_buttonBox_clicked(QAbstractButton *)));
-        disconnect(m_buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-        disconnect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    }
+    if(m_buttonBox)
+        m_buttonBox->disconnect(this);
 
     m_buttonBox = buttonBox;
 
-    if(m_buttonBox) {
-        connect(m_buttonBox, SIGNAL(clicked(QAbstractButton *)), this, SLOT(at_buttonBox_clicked(QAbstractButton *)));
-        connect(m_buttonBox, SIGNAL(accepted()),                 this, SLOT(accept()));
-        connect(m_buttonBox, SIGNAL(rejected()),                 this, SLOT(reject()));
+    if(m_buttonBox)
+    {
+        connect(
+            m_buttonBox, &QDialogButtonBox::clicked, this, &QnButtonBoxDialog::atButtonBoxClicked);
+        connect(m_buttonBox, &QDialogButtonBox::accepted, this, &QnButtonBoxDialog::accept);
+        connect(m_buttonBox, &QDialogButtonBox::rejected, this, &QnButtonBoxDialog::reject);
 
         if (QAbstractButton *okButton = m_buttonBox->button(QDialogButtonBox::Ok))
             setAccentStyle(okButton);
@@ -71,7 +70,7 @@ void QnButtonBoxDialog::initializeButtonBox() {
     setButtonBox(buttonBoxes[0]);
 }
 
-void QnButtonBoxDialog::at_buttonBox_clicked(QAbstractButton* button)
+void QnButtonBoxDialog::atButtonBoxClicked(QAbstractButton* button)
 {
     if (m_buttonBox)
         m_clickedButton = m_buttonBox.data()->standardButton(button);

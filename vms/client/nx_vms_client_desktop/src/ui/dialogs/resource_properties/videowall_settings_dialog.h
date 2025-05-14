@@ -4,17 +4,17 @@
 #define VIDEOWALL_SETTINGS_DIALOG_H
 
 #include <core/resource/resource_fwd.h>
-#include <ui/dialogs/common/button_box_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui {
 class QnVideowallSettingsDialog;
 }
 
-class QnVideowallSettingsDialog: public QnButtonBoxDialog
+class QnVideowallSettingsDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
 
-    using base_type = QnButtonBoxDialog;
+    using base_type = QnSessionAwareButtonBoxDialog;
 public:
     explicit QnVideowallSettingsDialog(QWidget* parent);
     ~QnVideowallSettingsDialog();

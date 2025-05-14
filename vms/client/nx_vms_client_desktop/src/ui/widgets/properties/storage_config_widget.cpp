@@ -975,36 +975,43 @@ void QnStorageConfigWidget::atAddExtStorage(bool addToMain)
         return;
 
     auto storageManager = systemContext()->serverStorageManager();
-    QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, storageManager, this));
+    auto dialog = createSelfDestructingDialog<QnStorageUrlDialog>(m_server, storageManager, this);
     QSet<QString> protocols;
     for (const auto& p: storageManager->protocols(m_server))
         protocols.insert(QString::fromStdString(p));
     dialog->setProtocols(protocols);
     dialog->setCurrentServerStorages(m_model->storages());
-    if (!dialog->exec())
-        return;
 
-    QnStorageModelInfo item = dialog->storage();
-    // Check if somebody have added this storage right now.
-    if (item.id.isNull())
-    {
-        // New storages has tested and ready to add
-        const auto credentials = dialog->credentials();
-        QUrl url(item.url);
-        if (!url.scheme().isEmpty() && !credentials.isEmpty())
+    connect(
+        dialog,
+        &QnStorageUrlDialog::accepted,
+        this,
+        [this, dialog, addToMain]
         {
-            url.setUserName(credentials.user);
-            url.setPassword(credentials.password);
-            item.url = url.toString();
-        }
-        item.id = QnStorageResource::fillID(m_server->getId(), item.url);
-        item.isBackup = !addToMain;
-        item.isUsed = true;
-        item.isOnline = true;
-    }
+            QnStorageModelInfo item = dialog->storage();
+            // Check if somebody have added this storage right now.
+            if (item.id.isNull())
+            {
+                // New storages has tested and ready to add
+                const auto credentials = dialog->credentials();
+                QUrl url(item.url);
+                if (!url.scheme().isEmpty() && !credentials.isEmpty())
+                {
+                    url.setUserName(credentials.user);
+                    url.setPassword(credentials.password);
+                    item.url = url.toString();
+                }
+                item.id = QnStorageResource::fillID(m_server->getId(), item.url);
+                item.isBackup = !addToMain;
+                item.isUsed = true;
+                item.isOnline = true;
+            }
 
-    m_model->addStorage(item); //< Adds or updates storage model data.
-    emit hasChangesChanged();
+            m_model->addStorage(item); //< Adds or updates storage model data.
+            emit hasChangesChanged();
+        });
+
+    dialog->show();
 }
 
 bool QnStorageConfigWidget::cloudStorageToggledOn() const

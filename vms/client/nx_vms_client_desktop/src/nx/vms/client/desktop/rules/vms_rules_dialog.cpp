@@ -62,22 +62,30 @@ void VmsRulesDialog::editSchedule(const UuidList& ids)
     for (auto id: ids)
         schedules.push_back(engine->rule(id)->schedule());
 
-    WeekTimeScheduleDialog dialog(m_parentWidget, /*isEmptyAllowed*/ false);
-    dialog.setSchedules(schedules);
-    if (dialog.exec() != QDialog::Accepted)
-        return;
+    auto dialog = createSelfDestructingDialog<WeekTimeScheduleDialog>(
+        m_parentWidget, /*isEmptyAllowed*/ false);
+    dialog->setSchedules(schedules);
 
-    const auto schedule = dialog.schedule();
-    for (auto id: ids)
-    {
-        auto clone = engine->cloneRule(id);
-        if (!NX_ASSERT(clone))
-            return;
+    connect(
+        dialog,
+        &WeekTimeScheduleDialog::accepted,
+        this,
+        [this, dialog, ids, engine]
+        {
+            const auto schedule = dialog->schedule();
+            for (auto id: ids)
+            {
+                auto clone = engine->cloneRule(id);
+                if (!NX_ASSERT(clone))
+                    return;
 
-        clone->setSchedule(schedule);
+                clone->setSchedule(schedule);
 
-        saveRuleImpl(clone.get());
-    }
+                saveRuleImpl(clone.get());
+            }
+        });
+
+    dialog->show();
 }
 
 void VmsRulesDialog::duplicateRule(nx::Uuid id)

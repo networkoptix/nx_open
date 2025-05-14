@@ -28,8 +28,8 @@ void PaletteDialog::registerAction()
         "Palette",
         [](QnWorkbenchContext* context)
         {
-            auto dialog = std::make_unique<PaletteDialog>(context->mainWindowWidget());
-            dialog->exec();
+            createSelfDestructingDialog<PaletteDialog>(
+                context->mainWindowWidget())->show();
         });
 }
 

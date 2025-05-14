@@ -28,7 +28,8 @@ SingleTargetLayoutPicker::SingleTargetLayoutPicker(
 
 void SingleTargetLayoutPicker::onSelectButtonClicked()
 {
-    LayoutSelectionDialog dialog(/*singlePick*/ true, this);
+    auto dialog = createSelfDestructingDialog<LayoutSelectionDialog>(
+        /*singlePick*/ true, this);
 
     LayoutSelectionDialog::LocalLayoutSelection selectionMode = LayoutSelectionDialog::ModeFull;
 
@@ -45,15 +46,15 @@ void SingleTargetLayoutPicker::onSelectButtonClicked()
     }
 
     connect(
-        &dialog,
+        dialog,
         &LayoutSelectionDialog::layoutsChanged,
         this,
-        [&dialog, &users, this]
+        [dialog, users, this]
         {
-            const auto selectedLayouts = dialog.checkedLayouts();
+            const auto selectedLayouts = dialog->checkedLayouts();
             if (selectedLayouts.empty())
             {
-                dialog.showAlert({});
+                dialog->showAlert({});
                 return;
             }
 
@@ -62,7 +63,7 @@ void SingleTargetLayoutPicker::onSelectButtonClicked()
             const auto selectionValidity =
                 vms::rules::utils::layoutValidity(systemContext(), layout, users);
 
-            dialog.showAlert(selectionValidity.description);
+            dialog->showAlert(selectionValidity.description);
         });
 
     // Gather local layouts. Specification is this tricky.
@@ -100,11 +101,11 @@ void SingleTargetLayoutPicker::onSelectButtonClicked()
     }
     else
     {
-        dialog.showInfo(tr("Looking for a local layout? Select only one user from the \"Show to\" "
+        dialog->showInfo(tr("Looking for a local layout? Select only one user from the \"Show to\" "
             "list to display their local layouts as an option here."));
         selectionMode = LayoutSelectionDialog::ModeHideLocal;
     }
-    dialog.setLocalLayouts(localLayouts, selection, selectionMode);
+    dialog->setLocalLayouts(localLayouts, selection, selectionMode);
 
     // Gather shared layouts. No trickery is here.
     QnResourceList sharedLayouts = resourcePool()->getResources<QnLayoutResource>(
@@ -113,15 +114,24 @@ void SingleTargetLayoutPicker::onSelectButtonClicked()
             return layout->hasFlags(Qn::remote) && layout->isShared();
         });
 
-    dialog.setSharedLayouts(sharedLayouts, selection);
+    dialog->setSharedLayouts(sharedLayouts, selection);
 
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        const auto selectedLayouts = dialog.checkedLayouts();
-        m_field->setValue(selectedLayouts.empty() ? nx::Uuid{} : *selectedLayouts.begin());
-    }
+    connect(
+        dialog,
+        &LayoutSelectionDialog::finished,
+        this,
+        [this, dialog](int result)
+        {
+            if (result == QDialog::Accepted)
+            {
+                const auto selectedLayouts = dialog->checkedLayouts();
+                m_field->setValue(selectedLayouts.empty() ? nx::Uuid{} : *selectedLayouts.begin());
+            }
 
-    ResourcePickerWidgetBase<vms::rules::TargetLayoutField>::onSelectButtonClicked();
+            setEdited();
+        });
+
+    dialog->show();
 }
 
 } // namespace nx::vms::client::desktop::rules

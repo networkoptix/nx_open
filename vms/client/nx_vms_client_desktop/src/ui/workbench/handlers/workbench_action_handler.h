@@ -259,7 +259,11 @@ private:
     void changeDefaultPasswords(
         const QString& previousPassword,
         const QnVirtualCameraResourceList& cameras,
-        bool showSingleCamera);
+        bool forceShowCamerasList);
+    void onDefaultPasswordChanged(
+        const QString& password,
+        const QnVirtualCameraResourceList& cameras,
+        bool forceShowCamerasList);
 
     void notifyAboutUpdate();
 

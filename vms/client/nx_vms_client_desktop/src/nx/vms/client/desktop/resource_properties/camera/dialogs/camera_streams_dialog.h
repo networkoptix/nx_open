@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <ui/dialogs/common/button_box_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 #include "../data/camera_stream_urls.h"
 
@@ -10,13 +10,13 @@ namespace Ui { class CameraStreamsDialog; }
 
 namespace nx::vms::client::desktop {
 
-class CameraStreamsDialog: public QnButtonBoxDialog
+class CameraStreamsDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
-    using base_type = QnButtonBoxDialog;
+    using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    explicit CameraStreamsDialog(QWidget* parent = nullptr);
+    explicit CameraStreamsDialog(QWidget* parent);
     virtual ~CameraStreamsDialog() override;
 
     CameraStreamUrls streams() const;

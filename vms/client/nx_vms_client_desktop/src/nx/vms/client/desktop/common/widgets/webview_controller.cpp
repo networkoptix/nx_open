@@ -402,15 +402,24 @@ struct WebViewController::Private: public QObject
             text = url.toString(QUrl::RemovePassword | QUrl::RemovePath | QUrl::RemoveQuery);
         }
 
-        PasswordDialog dialog(widget());
-        dialog.setText(text);
+        auto dialog = createSelfDestructingDialog<PasswordDialog>(widget());
+        dialog->setText(text);
         if (!credentials.isNull())
-            dialog.setUsername(credentials.user());
+            dialog->setUsername(credentials.user());
 
-        if (dialog.exec() == QDialog::Accepted)
-            acceptAuth(dialog.username(), dialog.password());
-        else
-            rejectAuth();
+        connect(
+            dialog,
+            &PasswordDialog::finished,
+            this,
+            [this, dialog](int result)
+            {
+                if (result == QDialog::Accepted)
+                    acceptAuth(dialog->username(), dialog->password());
+                else
+                    rejectAuth();
+            });
+
+        dialog->show();
     }
 
     QList<QAction*> getAdditionalActions(QObject* parent) const
@@ -1250,15 +1259,24 @@ void WebViewController::requestColorDialog(QObject* request)
 
 void WebViewController::requestCertificateDialog(QObject* selection)
 {
-    CertificateSelectionDialog dialog(
+    auto dialog = createSelfDestructingDialog<CertificateSelectionDialog>(
         d->widget(),
         selection->property("host").toUrl(),
         QQmlListReference(selection, "certificates"));
 
-    if (dialog.exec() == QDialog::Accepted)
-        QMetaObject::invokeMethod(selection, "select", Q_ARG(int, dialog.selectedIndex()));
-    else
-        QMetaObject::invokeMethod(selection, "selectNone");
+    connect(
+        dialog,
+        &CertificateSelectionDialog::finished,
+        this,
+        [dialog, selection](int result)
+        {
+            if (result == QDialog::Accepted)
+                QMetaObject::invokeMethod(selection, "select", Q_ARG(int, dialog->selectedIndex()));
+            else
+                QMetaObject::invokeMethod(selection, "selectNone");
+        });
+
+    dialog->show();
 }
 
 bool WebViewController::verifyCertificate(const QVariant& error)

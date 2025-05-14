@@ -87,38 +87,44 @@ void ImageOverlaySettingsWidget::browseForFile()
     // TODO: #vkutin Implement image selection common dialog.
     // Currently there's code duplication with QnLayoutSettingsDialog
 
-    QnSessionAwareFileDialog dialog(
+    auto dialog = createSelfDestructingDialog<QnSessionAwareFileDialog>(
         this,
         tr("Select file..."),
         m_lastImageDir,
         QnCustomFileDialog::createFilter(QnCustomFileDialog::picturesFilter()));
 
-    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog->setFileMode(QFileDialog::ExistingFile);
 
-    if (!dialog.exec())
-        return;
+    connect(
+        dialog,
+        &QnCustomFileDialog::accepted,
+        this,
+        [this, dialog]
+        {
+            QString fileName = dialog->selectedFile();
+            if (fileName.isEmpty())
+                return;
 
-    QString fileName = dialog.selectedFile();
-    if (fileName.isEmpty())
-        return;
+            QFileInfo fileInfo(fileName);
+            m_lastImageDir = fileInfo.path();
 
-    QFileInfo fileInfo(fileName);
-    m_lastImageDir = fileInfo.path();
+            QImage image;
+            if (!image.load(fileName))
+            {
+                QnMessageBox::warning(this, tr("Error"), tr("Image cannot be loaded."));
+                return;
+            }
 
-    QImage image;
-    if (!image.load(fileName))
-    {
-        QnMessageBox::warning(this, tr("Error"), tr("Image cannot be loaded."));
-        return;
-    }
+            m_data.image = image;
+            m_data.name = fileInfo.fileName();
+            m_data.opacity = 1.0;
+            m_data.overlayWidth = qMin(image.width(), maximumWidth());
+            updateControls();
 
-    m_data.image = image;
-    m_data.name = fileInfo.fileName();
-    m_data.opacity = 1.0;
-    m_data.overlayWidth = qMin(image.width(), maximumWidth());
-    updateControls();
+            emit dataChanged(m_data);
+        });
 
-    emit dataChanged(m_data);
+    dialog->show();
 }
 
 void ImageOverlaySettingsWidget::updateControls()

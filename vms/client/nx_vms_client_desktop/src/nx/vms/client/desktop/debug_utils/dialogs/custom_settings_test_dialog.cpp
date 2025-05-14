@@ -52,8 +52,8 @@ void CustomSettingsTestDialog::registerAction()
         "Custom Settings",
         [](QnWorkbenchContext* context)
         {
-            auto dialog = std::make_unique<CustomSettingsTestDialog>(context->mainWindowWidget());
-            dialog->exec();
+            createSelfDestructingDialog<CustomSettingsTestDialog>(
+                context->mainWindowWidget())->show();
         });
 }
 

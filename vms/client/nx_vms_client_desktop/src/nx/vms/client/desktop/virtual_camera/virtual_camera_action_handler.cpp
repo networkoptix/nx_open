@@ -149,32 +149,38 @@ void VirtualCameraActionHandler::at_newVirtualCameraAction_triggered()
     const auto params = menu()->currentParameters(sender());
     const auto selectedServer = params.resource().dynamicCast<QnMediaServerResource>();
 
-    std::unique_ptr<QnNewVirtualCameraDialog> dialog
-        = std::make_unique<QnNewVirtualCameraDialog>(mainWindowWidget(), selectedServer);
+    auto dialog = createSelfDestructingDialog<QnNewVirtualCameraDialog>(
+        mainWindowWidget(), selectedServer);
 
-    if (dialog->exec() != QDialog::Accepted)
-        return;
-
-    QString name = dialog->name();
-    QnMediaServerResourcePtr server = dialog->server();
-
-    const auto callback = nx::utils::guarded(this,
-        [this, server](bool success, rest::Handle, const nx::network::rest::JsonResult& reply)
+    connect(
+        dialog,
+        &QnNewVirtualCameraDialog::accepted,
+        this,
+        [this, dialog]
         {
-            if (!success)
-            {
-                QnMessageBox::critical(
-                    mainWindowWidget(),
-                    tr("Failed to add virtual camera")
-                );
-                return;
-            }
+            QString name = dialog->name();
+            QnMediaServerResourcePtr server = dialog->server();
 
-            m_currentCameraUuid = reply.deserialized<QnVirtualCameraReply>().id;
-            maybeOpenCurrentSettings();
+            const auto callback = nx::utils::guarded(this,
+                [this, server](bool success, rest::Handle, const nx::network::rest::JsonResult& reply)
+                {
+                    if (!success)
+                    {
+                        QnMessageBox::critical(
+                            mainWindowWidget(),
+                            tr("Failed to add virtual camera")
+                        );
+                        return;
+                    }
+
+                    m_currentCameraUuid = reply.deserialized<QnVirtualCameraReply>().id;
+                    maybeOpenCurrentSettings();
+                });
+
+            system()->connectedServerApi()->addVirtualCamera(server->getId(), name, callback, thread());
         });
 
-    system()->connectedServerApi()->addVirtualCamera(server->getId(), name, callback, thread());
+    dialog->show();
 }
 
 void VirtualCameraActionHandler::at_uploadVirtualCameraFileAction_triggered()

@@ -833,18 +833,32 @@ void ActionHandler::changeDefaultPasswords(
     if (!NX_ASSERT(connection()))
         return;
 
-    QnCameraPasswordChangeDialog dialog(
+    auto dialog = createSelfDestructingDialog<QnCameraPasswordChangeDialog>(
         previousPassword, cameras, forceShowCamerasList, mainWindowWidget());
-    if (dialog.exec() != QDialog::Accepted)
-        return;
 
+    connect(
+        dialog,
+        &QnCameraPasswordChangeDialog::accepted,
+        this,
+        [this, dialog, cameras, forceShowCamerasList]
+        {
+            onDefaultPasswordChanged(dialog->password(), cameras, forceShowCamerasList);
+        });
+
+    dialog->show();
+}
+
+void ActionHandler::onDefaultPasswordChanged(
+    const QString& password,
+    const QnVirtualCameraResourceList& cameras,
+    bool forceShowCamerasList)
+{
     using PasswordChangeResult = QPair<QnVirtualCameraResourcePtr, nx::network::rest::Result>;
     using PasswordChangeResultList = QList<PasswordChangeResult>;
 
     const auto errorResultsStorage = QSharedPointer<PasswordChangeResultList>(
         new PasswordChangeResultList());
 
-    const auto password = dialog.password();
     const auto completionGuard = nx::utils::makeSharedGuard(nx::utils::guarded(this,
         [this, cameras, errorResultsStorage, password, forceShowCamerasList]()
         {
@@ -1222,29 +1236,35 @@ void ActionHandler::cameraAuthenticationActionTriggered()
     if (multipleLoginValues)
         displayedLogin.reset();
 
-    QScopedPointer<CameraCredentialsDialog> dialog(new CameraCredentialsDialog(mainWindowWidget()));
+    auto dialog = createSelfDestructingDialog<CameraCredentialsDialog>(mainWindowWidget());
     dialog->setLogin(displayedLogin);
     dialog->setHasRemotePassword(true);
 
-    if (dialog->exec() != QDialog::Accepted || dialog->hasRemotePassword())
-        return;
-
-    for (const auto& camera: cameras)
-    {
-        QAuthenticator auth;
-        auth.setUser(dialog->login().value_or(camera->getAuth().user()));
-        auth.setPassword(dialog->password().value());
-
-        if (camera->isMultiSensorCamera() || camera->isNvr())
+    connect(
+        dialog,
+        &CameraCredentialsDialog::accepted,
+        this,
+        [dialog, cameras]
         {
-            QnClientCameraResource::setAuthToCameraGroup(camera, auth);
-        }
-        else
-        {
-            camera->setAuth(auth);
-            camera->savePropertiesAsync();
-        }
-    }
+            for (const auto& camera: cameras)
+            {
+                QAuthenticator auth;
+                auth.setUser(dialog->login().value_or(camera->getAuth().user()));
+                auth.setPassword(dialog->password().value());
+
+                if (camera->isMultiSensorCamera() || camera->isNvr())
+                {
+                    QnClientCameraResource::setAuthToCameraGroup(camera, auth);
+                }
+                else
+                {
+                    camera->setAuth(auth);
+                    camera->savePropertiesAsync();
+                }
+            }
+        });
+
+    dialog->show();
 }
 
 void ActionHandler::at_openInCurrentLayoutAction_triggered()
@@ -1807,9 +1827,7 @@ void ActionHandler::at_openFolderAction_triggered() {
 }
 
 void ActionHandler::openFailoverPriorityDialog() {
-    QScopedPointer<FailoverPriorityDialog> dialog(new FailoverPriorityDialog(mainWindowWidget()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    createSelfDestructingDialog<FailoverPriorityDialog>(mainWindowWidget())->show();
 }
 
 void ActionHandler::at_systemAdministrationAction_triggered()
@@ -1960,15 +1978,13 @@ void ActionHandler::openSystemAdministrationDialog(int page, const QUrl& url)
 
 void ActionHandler::openLocalSettingsDialog(int page)
 {
-    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindowWidget()));
+    auto dialog = createSelfDestructingDialog<QnLocalSettingsDialog>(mainWindowWidget());
     dialog->setCurrentPage(page);
-    dialog->exec();
+    dialog->show();
 }
 
 void ActionHandler::at_aboutAction_triggered() {
-    QScopedPointer<QnAboutDialog> dialog(new QnAboutDialog(mainWindowWidget()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    createSelfDestructingDialog<QnAboutDialog>(mainWindowWidget())->show();
 }
 
 void ActionHandler::at_webClientAction_triggered()
@@ -2401,23 +2417,37 @@ void ActionHandler::at_mediaFileSettingsAction_triggered() {
     if (!media)
         return;
 
-    QScopedPointer<MediaFileSettingsDialog> dialog;
+    MediaFileSettingsDialog* dialog{};
     if (resource->hasFlags(Qn::remote))
-        dialog.reset(new QnSessionAware<MediaFileSettingsDialog>(mainWindowWidget()));
+    {
+        dialog = createSelfDestructingDialog<QnSessionAware<MediaFileSettingsDialog>>(
+            mainWindowWidget());
+    }
     else
-        dialog.reset(new MediaFileSettingsDialog(mainWindowWidget()));
+    {
+        dialog = createSelfDestructingDialog<MediaFileSettingsDialog>(mainWindowWidget());
+    }
+
+    connect(
+        dialog,
+        &MediaFileSettingsDialog::finished,
+        this,
+        [this, dialog, media](int result)
+        {
+            if (result == QnDialog::Accepted)
+            {
+                dialog->submitToResource(media);
+            }
+            else
+            {
+                auto centralWidget = display()->widget(Qn::CentralRole);
+                if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget))
+                    mediaWidget->setDewarpingParams(media->getDewarpingParams());
+            }
+        });
 
     dialog->updateFromResource(media);
-    if (dialog->exec())
-    {
-        dialog->submitToResource(media);
-    }
-    else
-    {
-        auto centralWidget = display()->widget(Qn::CentralRole);
-        if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget))
-            mediaWidget->setDewarpingParams(media->getDewarpingParams());
-    }
+    dialog->show();
 }
 
 void ActionHandler::replaceCameraActionTriggered()
@@ -2500,14 +2530,15 @@ void ActionHandler::at_cameraIssuesAction_triggered()
 }
 
 void ActionHandler::at_cameraDiagnosticsAction_triggered() {
-    QnVirtualCameraResourcePtr resource = menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
+    QnVirtualCameraResourcePtr resource =
+        menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
     if (!resource)
         return;
 
-    QScopedPointer<QnCameraDiagnosticsDialog> dialog(new QnCameraDiagnosticsDialog(mainWindowWidget()));
+    auto dialog = createSelfDestructingDialog<QnCameraDiagnosticsDialog>(mainWindowWidget());
     dialog->setResource(resource);
     dialog->restart();
-    dialog->exec();
+    dialog->show();
 }
 
 void ActionHandler::at_serverLogsAction_triggered()
@@ -2950,11 +2981,10 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
     if (!checkCondition())
         return;
 
-    QScopedPointer<ProgressDialog> progressDialog(new ProgressDialog(mainWindowWidget()));
+    QPointer<ProgressDialog> progressDialog = createSelfDestructingDialog<ProgressDialog>(mainWindowWidget());
     progressDialog->setWindowTitle(tr("Updating Background..."));
     progressDialog->setText(tr("Image processing may take a few moments. Please be patient."));
     progressDialog->setInfiniteMode();
-    progressDialog->setModal(true);
 
     const auto parameters = menu()->currentParameters(sender());
 
@@ -2962,12 +2992,13 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
     cache->setProperty(uploadingImageARPropertyName, parameters.widget()->aspectRatio());
     connect(cache, &ServerImageCache::fileUploaded, cache, &QObject::deleteLater);
     connect(cache, &ServerImageCache::fileUploaded, this,
-        [this, checkCondition, dialog = progressDialog.get()]
+        [this, checkCondition, progressDialog]
             (const QString &filename, ServerFileCache::OperationResult status)
         {
-            if (dialog->wasCanceled())
+            if (!progressDialog || progressDialog->wasCanceled())
                 return;
-            dialog->accept();
+
+            progressDialog->accept();
 
             if (!checkCondition())
                 return;
@@ -2979,11 +3010,10 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
             }
 
             setCurrentLayoutBackground(filename);
-
         });
 
     cache->storeImage(parameters.resource()->getUrl());
-    progressDialog->exec();
+    progressDialog->show();
 }
 
 void ActionHandler::setCurrentLayoutBackground(const QString& filename)

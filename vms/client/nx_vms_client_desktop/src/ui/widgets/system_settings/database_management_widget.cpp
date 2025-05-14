@@ -88,16 +88,28 @@ void QnDatabaseManagementWidget::backupDb()
 {
     NX_ASSERT(m_currentRequest == 0);
 
-    QScopedPointer<QnCustomFileDialog> fileDialog(new QnCustomFileDialog(
+    auto fileDialog = createSelfDestructingDialog<QnCustomFileDialog>(
         this,
         tr("Save Database Backup..."),
         appContext()->localSettings()->lastDatabaseBackupDir(),
-        kDbFilesFilter));
-    fileDialog->setAcceptMode(QFileDialog::AcceptSave);
-    if (!fileDialog->exec())
-        return;
+        kDbFilesFilter);
 
-    QString fileName = fileDialog->selectedFile();
+    fileDialog->setAcceptMode(QFileDialog::AcceptSave);
+
+    connect(
+        fileDialog,
+        &QnCustomFileDialog::accepted,
+        this,
+        [this, fileDialog]
+        {
+            onBackupFileSelected(fileDialog->selectedFile());
+        });
+
+    fileDialog->show();
+}
+
+void QnDatabaseManagementWidget::onBackupFileSelected(QString fileName)
+{
     if (fileName.isEmpty())
         return;
 

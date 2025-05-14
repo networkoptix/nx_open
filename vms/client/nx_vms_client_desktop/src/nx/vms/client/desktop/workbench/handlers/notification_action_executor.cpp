@@ -141,55 +141,63 @@ void NotificationActionExecutor::handleAcknowledgeAction()
     if (!bookmark.isValid())
         return;
 
-    const QScopedPointer<QnCameraBookmarkDialog> bookmarksDialog(
-        new QnCameraBookmarkDialog(true /*mandatoryDescription*/, mainWindowWidget()));
+    auto bookmarksDialog = createSelfDestructingDialog<QnCameraBookmarkDialog>(
+        /*mandatoryDescription*/ true , mainWindowWidget());
 
     bookmark.description.clear(); //< Force user to fill description out.
     bookmarksDialog->setTags(this->systemContext()->bookmarkTagWatcher()->tags());
     bookmarksDialog->loadData(bookmark);
-    if (bookmarksDialog->exec() != QDialog::Accepted)
-        return;
 
-    bookmarksDialog->submitData(bookmark);
-
-    bookmark.creatorId = context()->user()->getId();
-    bookmark.creationTimeStampMs = qnSyncTime->value();
-
-    auto acknowledgeBookmark =
-        nx::vms::common::bookmarkToApi<nx::vms::api::rules::AcknowledgeBookmark>(
-            std::move(bookmark), notification->originPeerId());
-    acknowledgeBookmark.actionId = notification->id();
-    acknowledgeBookmark.actionServerId = notification->originPeerId();
-
-    auto callback = nx::utils::guarded(
+    connect(
+        bookmarksDialog,
+        &QnCameraBookmarkDialog::accepted,
         this,
-        [this, id = notification->id(), camera](
-            rest::Handle,
-            bool /*success*/,
-            rest::ErrorOrData<nx::vms::api::BookmarkV3>&& bookmark)
+        [this, bookmarksDialog, notification, camera, bookmark = std::move(bookmark)]() mutable
         {
-            if (!bookmark)
-            {
-                NX_WARNING(this, "Can't acknowledge action id: %1, code: %2, error: %3",
-                    id, bookmark.error().errorId, bookmark.error().errorString);
-                return;
-            }
+            bookmarksDialog->submitData(bookmark);
 
-            NX_VERBOSE(this, "Acknowledged action id: %1, bookmark id: %2", id, bookmark->id);
+            bookmark.creatorId = context()->user()->getId();
+            bookmark.creationTimeStampMs = qnSyncTime->value();
 
-            const auto systemContext = SystemContext::fromResource(camera);
-            systemContext->cameraBookmarksManager()->addExistingBookmark(
-                nx::vms::common::bookmarkFromApi(std::move(*bookmark)));
+            auto acknowledgeBookmark =
+                nx::vms::common::bookmarkToApi<nx::vms::api::rules::AcknowledgeBookmark>(
+                    std::move(bookmark), notification->originPeerId());
+            acknowledgeBookmark.actionId = notification->id();
+            acknowledgeBookmark.actionServerId = notification->originPeerId();
+
+            auto callback = nx::utils::guarded(
+                this,
+                [this, id = notification->id(), camera](
+                    rest::Handle,
+                    bool /*success*/,
+                    rest::ErrorOrData<nx::vms::api::BookmarkV3>&& bookmark)
+                {
+                    if (!bookmark)
+                    {
+                        NX_WARNING(this, "Can't acknowledge action id: %1, code: %2, error: %3",
+                            id, bookmark.error().errorId, bookmark.error().errorString);
+                        return;
+                    }
+
+                    NX_VERBOSE(this, "Acknowledged action id: %1, bookmark id: %2", id, bookmark->id);
+
+                    const auto systemContext = SystemContext::fromResource(camera);
+                    systemContext->cameraBookmarksManager()->addExistingBookmark(
+                        nx::vms::common::bookmarkFromApi(std::move(*bookmark)));
+                });
+
+            auto systemContext = SystemContext::fromResource(camera);
+            const auto handle = systemContext->connectedServerApi()->acknowledge(
+                acknowledgeBookmark,
+                std::move(callback),
+                this->thread());
+
+            // Hiding notification instantly to keep UX smooth.
+            if (handle)
+                removeNotification(notification);
         });
 
-    const auto handle = systemContext->connectedServerApi()->acknowledge(
-        acknowledgeBookmark,
-        std::move(callback),
-        this->thread());
-
-    // Hiding notification instantly to keep UX smooth.
-    if (handle)
-        removeNotification(notification);
+    bookmarksDialog->show();
 }
 
 void NotificationActionExecutor::reinitializeCrossSystemNotificationsListener()

@@ -512,13 +512,21 @@ void EditVmsRuleDialog::onDeleteClicked()
 
 void EditVmsRuleDialog::onScheduleClicked()
 {
-    WeekTimeScheduleDialog dialog(this, /*isEmptyAllowed*/ false);
-    dialog.setSchedule(m_rule->schedule());
+    auto dialog = createSelfDestructingDialog<WeekTimeScheduleDialog>(
+        this, /*isEmptyAllowed*/ false);
+    dialog->setSchedule(m_rule->schedule());
     setHasChanges(true);
-    if (dialog.exec() != QDialog::Accepted)
-        return;
 
-    m_rule->setSchedule(dialog.schedule());
+    connect(
+        dialog,
+        &WeekTimeScheduleDialog::accepted,
+        this,
+        [this, dialog]
+        {
+            m_rule->setSchedule(dialog->schedule());
+        });
+
+    dialog->show();
 }
 
 void EditVmsRuleDialog::onEnabledButtonClicked(bool checked)

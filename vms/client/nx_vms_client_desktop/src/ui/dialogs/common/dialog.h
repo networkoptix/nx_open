@@ -4,6 +4,16 @@
 
 #include <QtWidgets/QDialog>
 
+template<class T, Qt::WindowModality modality = Qt::ApplicationModal, class... Args>
+T* createSelfDestructingDialog(Args... args)
+{
+    T* dialog = new T{std::forward<Args>(args)...};
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->setWindowModality(modality);
+
+    return dialog;
+}
+
 /// @brief Base dialog class. Fixes dialog hang on when dragging items on show.
 /// Cancels drag event before showing dialog.
 class QnDialog : public QDialog
@@ -19,7 +29,7 @@ public:
     /// @brief Shows dialog and cancels drag action to prevent hang on
     void show();
 
-    int exec() override;
+    [[deprecated]] int exec() override;
 
     Qt::Orientations resizeToContentsMode() const;
     void setResizeToContentsMode(Qt::Orientations mode);

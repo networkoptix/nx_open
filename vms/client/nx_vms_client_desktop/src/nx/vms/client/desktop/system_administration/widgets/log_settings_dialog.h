@@ -8,7 +8,7 @@
 #include <nx/utils/log/log_level.h>
 #include <nx/vms/api/data/log_settings.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
-#include <ui/dialogs/common/dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui { class LogSettingsDialog; }
 
@@ -38,13 +38,13 @@ struct ConfigurableLogSettings
     Qt::CheckState splitByTimeState = Qt::Unchecked;
 };
 
-class LogSettingsDialog: public QnDialog
+class LogSettingsDialog: public QnSessionAwareDialog
 {
     Q_OBJECT
-    using base_type = QnDialog;
+    using base_type = QnSessionAwareDialog;
 
 public:
-    explicit LogSettingsDialog(QWidget* parent = nullptr);
+    explicit LogSettingsDialog(QWidget* parent);
     virtual ~LogSettingsDialog();
 
     void init(const QList<LogsManagementUnitPtr>& units);

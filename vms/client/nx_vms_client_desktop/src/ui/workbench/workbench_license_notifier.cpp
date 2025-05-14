@@ -121,11 +121,18 @@ void QnWorkbenchLicenseNotifier::checkLicenses() const
 
     if (warn && mainWindowWidget())
     {
-        QScopedPointer<QnLicenseNotificationDialog> dialog(
-            new QnLicenseNotificationDialog(mainWindowWidget()));
+        auto dialog = createSelfDestructingDialog<QnLicenseNotificationDialog>(mainWindowWidget());
         dialog->setLicenses(licenses);
-        dialog->exec();
 
-        systemContext()->localSettings()->licenseLastWarningTime = licenseLastWarningTime;
+        connect(
+            dialog,
+            &QnLicenseNotificationDialog::finished,
+            this,
+            [this, licenseLastWarningTime]
+            {
+                systemContext()->localSettings()->licenseLastWarningTime = licenseLastWarningTime;
+            });
+
+        dialog->show();
     }
 }

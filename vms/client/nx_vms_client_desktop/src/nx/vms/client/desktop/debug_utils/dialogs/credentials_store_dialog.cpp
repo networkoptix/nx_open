@@ -121,8 +121,8 @@ void CredentialsStoreDialog::registerAction()
         "Credentials",
         [](QnWorkbenchContext* context)
         {
-            auto dialog = std::make_unique<CredentialsStoreDialog>(context->mainWindowWidget());
-            dialog->exec();
+            createSelfDestructingDialog<CredentialsStoreDialog>(
+                context->mainWindowWidget())->show();
         });
 }
 

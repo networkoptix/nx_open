@@ -42,7 +42,7 @@ protected:
     virtual void setReadOnlyInternal();
 
 private:
-    Q_SLOT void at_buttonBox_clicked(QAbstractButton *button);
+    void atButtonBoxClicked(QAbstractButton *button);
 
 private:
     QDialogButtonBox::StandardButton m_clickedButton;

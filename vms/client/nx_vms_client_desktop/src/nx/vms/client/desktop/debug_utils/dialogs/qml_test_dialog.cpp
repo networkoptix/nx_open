@@ -160,15 +160,22 @@ QmlTestDialog::QmlTestDialog(QWidget* parent):
     connect(d->setPropertyButton, &QPushButton::clicked, this,
         [this]()
         {
-            EditPropertyDialog dialog;
-            if (dialog.exec() == QDialog::Rejected)
-                return;
+            auto dialog = createSelfDestructingDialog<EditPropertyDialog>();
 
-            if (!d->qmlWidget->rootObject()->setProperty(
-                dialog.propertyName().toLatin1(), dialog.propertyValue()))
-            {
-                QnMessageBox::critical(this, "Failed to set property value");
-            }
+            connect(
+                dialog,
+                &EditPropertyDialog::accepted,
+                this,
+                [this, dialog]
+                {
+                    if (!d->qmlWidget->rootObject()->setProperty(
+                        dialog->propertyName().toLatin1(), dialog->propertyValue()))
+                    {
+                        QnMessageBox::critical(this, "Failed to set property value");
+                    }
+                });
+
+            dialog->show();
         });
 
     connect(d->qmlWidget, &QQuickWidget::statusChanged, this,
@@ -206,8 +213,7 @@ void QmlTestDialog::registerAction()
         "QML Components",
         [](QnWorkbenchContext* context)
         {
-            auto dialog = std::make_unique<QmlTestDialog>(context->mainWindowWidget());
-            dialog->exec();
+            createSelfDestructingDialog<QmlTestDialog>(context->mainWindowWidget())->show();
         });
 
     registerDebugAction(

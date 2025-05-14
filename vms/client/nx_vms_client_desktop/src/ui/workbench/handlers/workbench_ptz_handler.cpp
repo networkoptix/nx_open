@@ -41,12 +41,12 @@ const seconds kPtzNotSupportedMessageTimeout = 3s;
 
 } // namespace
 
-class QnSingleCameraPtzHotkeysDelegate: public QnAbstractPtzHotkeyDelegate, public QnWorkbenchContextAware
+class QnSingleCameraPtzHotkeysDelegate: public QnAbstractPtzHotkeyDelegate, public QnWorkbenchContextAware, public QObject
 {
 public:
     QnSingleCameraPtzHotkeysDelegate(QWidget* parent, const QnResourcePtr &resource, QnWorkbenchContext *context):
         QnWorkbenchContextAware(context),
-        m_parent(parent),
+        QObject(parent),
         m_camera(resource.dynamicCast<QnVirtualCameraResource>()),
         m_resourceId(resource->getId()),
         m_propertyHandler(new QnJsonResourcePropertyHandler<PresetIdByHotkey>())
@@ -89,7 +89,6 @@ public:
     }
 
 private:
-    QWidget* m_parent;
     QnVirtualCameraResourcePtr m_camera;
     nx::Uuid m_resourceId;
     std::unique_ptr<QnJsonResourcePropertyHandler<PresetIdByHotkey>> m_propertyHandler;
@@ -355,12 +354,11 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
         return;
     }
 
-    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindowWidget()));
+    auto dialog = createSelfDestructingDialog<QnPtzPresetDialog>(mainWindowWidget());
     dialog->setController(widget->ptzController());
-    QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(
-        new QnSingleCameraPtzHotkeysDelegate(dialog.data(), resource, context()));
-    dialog->setHotkeysDelegate(hotkeysDelegate.data());
-    dialog->exec();
+    auto hotkeysDelegate = new QnSingleCameraPtzHotkeysDelegate(dialog, resource, context());
+    dialog->setHotkeysDelegate(hotkeysDelegate);
+    dialog->show();
 }
 
 void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
@@ -486,9 +484,7 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered()
         return;
 
     auto res = widget->resource();
-    auto hotkeysDelegate =
-        new QnSingleCameraPtzHotkeysDelegate(dialog, res, context());
-
+    auto hotkeysDelegate = new QnSingleCameraPtzHotkeysDelegate(dialog, res, context());
     dialog->setWidget(widget);
     dialog->setHotkeysDelegate(hotkeysDelegate);
     dialog->show();

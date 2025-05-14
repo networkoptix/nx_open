@@ -33,18 +33,27 @@ SourceUserPicker::SourceUserPicker(
 
 void SourceUserPicker::onSelectButtonClicked()
 {
-    ui::SubjectSelectionDialog dialog(this);
-    dialog.setCheckedSubjects(m_field->ids());
-    dialog.setAllUsers(m_field->acceptAll());
-    dialog.setValidationPolicy(m_validationPolicy.get());
+    auto dialog = createSelfDestructingDialog<ui::SubjectSelectionDialog>(this);
+    dialog->setCheckedSubjects(m_field->ids());
+    dialog->setAllUsers(m_field->acceptAll());
+    dialog->setValidationPolicy(m_validationPolicy.get());
 
-    if (dialog.exec() == QDialog::Rejected)
-        return;
+    connect(
+        dialog,
+        &ui::SubjectSelectionDialog::finished,
+        this,
+        [this, dialog](int result)
+        {
+            if (result == QDialog::Accepted)
+            {
+                m_field->setAcceptAll(dialog->allUsers());
+                m_field->setIds(dialog->checkedSubjects());
+            }
 
-    m_field->setAcceptAll(dialog.allUsers());
-    m_field->setIds(dialog.checkedSubjects());
+            setEdited();
+        });
 
-    ResourcePickerWidgetBase<vms::rules::SourceUserField>::onSelectButtonClicked();
+    dialog->show();
 }
 
 } // namespace nx::vms::client::desktop::rules

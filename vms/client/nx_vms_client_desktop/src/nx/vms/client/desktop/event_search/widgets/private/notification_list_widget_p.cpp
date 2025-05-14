@@ -348,7 +348,7 @@ void NotificationListWidget::Private::onSystemNotificationsActionTriggered()
 void NotificationListWidget::Private::onChooseTypesActionTriggered()
 {
     if (NX_ASSERT(m_notificationSettingsDialog))
-        m_notificationSettingsDialog->exec();
+        m_notificationSettingsDialog->show();
 }
 
 void NotificationListWidget::Private::onFilterNotificationsButtonStateChanged()

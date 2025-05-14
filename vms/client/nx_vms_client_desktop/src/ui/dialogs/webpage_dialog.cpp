@@ -483,4 +483,16 @@ void QnWebpageDialog::accept()
     base_type::accept();
 }
 
+void QnWebpageDialog::submitData(const QnWebPageResourcePtr& webPageResource) const
+{
+    webPageResource->setUrl(url().toString());
+    webPageResource->setName(name());
+    webPageResource->setProxyId(proxyId());
+    webPageResource->setSubtype(subtype());
+    webPageResource->setProxyDomainAllowList(proxyDomainAllowList());
+    webPageResource->setCertificateCheckEnabled(isCertificateCheckEnabled());
+    webPageResource->setRefreshInterval(refreshInterval());
+    webPageResource->setOpenInWindow(isOpenInWindow());
+}
+
 } // namespace nx::vms::client::desktop

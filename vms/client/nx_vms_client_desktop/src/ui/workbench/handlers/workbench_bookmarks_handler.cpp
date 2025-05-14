@@ -142,22 +142,30 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     bookmark.durationMs = period.duration();
     bookmark.cameraId = camera->getId();
 
-    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindowWidget()));
+    auto dialog = createSelfDestructingDialog<QnCameraBookmarkDialog>(false, mainWindowWidget());
     dialog->setTags(systemContext()->bookmarkTagWatcher()->tags());
     dialog->loadData(bookmark);
-    if (!dialog->exec())
-        return;
 
-    bookmark.creatorId = context()->user()->getId();
-    bookmark.creationTimeStampMs = qnSyncTime->value();
-    dialog->submitData(bookmark);
-    if (!NX_ASSERT(bookmark.isValid(), "Dialog must not allow to create invalid bookmarks"))
-        return;
+    connect(
+        dialog,
+        &QnCameraBookmarkDialog::accepted,
+        this,
+        [this, dialog, bookmark = std::move(bookmark)]() mutable
+        {
+            const auto context = dialog->context();
 
-    const auto context = nx::vms::client::core::SystemContext::fromResource(camera);
-    context->cameraBookmarksManager()->addCameraBookmark(bookmark);
+            bookmark.creatorId = context->user()->getId();
+            bookmark.creationTimeStampMs = qnSyncTime->value();
+            dialog->submitData(bookmark);
+            if (!NX_ASSERT(bookmark.isValid(), "Dialog must not allow to create invalid bookmarks"))
+                return;
 
-    action(menu::BookmarksModeAction)->setChecked(true);
+            context->system()->cameraBookmarksManager()->addCameraBookmark(bookmark);
+
+            action(menu::BookmarksModeAction)->setChecked(true);
+        });
+
+    dialog->show();
 }
 
 void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
@@ -181,15 +189,22 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
         return;
     }
 
-    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindowWidget()));
+    auto dialog = createSelfDestructingDialog<QnCameraBookmarkDialog>(false, mainWindowWidget());
+
     dialog->setTags(systemContext()->bookmarkTagWatcher()->tags());
     dialog->loadData(bookmark);
-    if (!dialog->exec())
-        return;
-    dialog->submitData(bookmark);
 
-    const auto context = nx::vms::client::core::SystemContext::fromResource(camera);
-    context->cameraBookmarksManager()->updateCameraBookmark(bookmark);
+    connect(
+        dialog,
+        &QnCameraBookmarkDialog::accepted,
+        this,
+        [dialog, bookmark = std::move(bookmark)]() mutable
+        {
+            dialog->submitData(bookmark);
+            dialog->context()->system()->cameraBookmarksManager()->updateCameraBookmark(bookmark);
+        });
+
+    dialog->show();
 }
 
 void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()

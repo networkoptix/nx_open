@@ -3,19 +3,19 @@
 #pragma once
 
 #include <nx/utils/std/optional.h>
-#include <ui/dialogs/common/button_box_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui { class CameraCredentialsDialog; }
 
 namespace nx::vms::client::desktop {
 
-class CameraCredentialsDialog: public QnButtonBoxDialog
+class CameraCredentialsDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
-    using base_type = QnButtonBoxDialog;
+    using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    explicit CameraCredentialsDialog(QWidget* parent = nullptr);
+    explicit CameraCredentialsDialog(QWidget* parent);
     virtual ~CameraCredentialsDialog() override;
 
     /**

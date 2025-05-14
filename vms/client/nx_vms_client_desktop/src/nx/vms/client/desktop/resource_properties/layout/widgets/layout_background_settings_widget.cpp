@@ -355,42 +355,47 @@ void LayoutBackgroundSettingsWidget::viewFile()
     if (QDesktopServices::openUrl(QUrl(path)))
         return;
 
-    QnImagePreviewDialog dialog(this);
-    dialog.openImage(state.background.imageSourcePath);
-    dialog.exec();
+    auto dialog = createSelfDestructingDialog<QnImagePreviewDialog>(this);
+    dialog->openImage(state.background.imageSourcePath);
+    dialog->show();
 }
 
 void LayoutBackgroundSettingsWidget::selectFile()
 {
-    QScopedPointer<QnCustomFileDialog> dialog(
-        new QnCustomFileDialog(
-            this,
-            tr("Select file..."),
-            appContext()->localSettings()->backgroundsFolder(),
-            QnCustomFileDialog::createFilter(QnCustomFileDialog::picturesFilter())));
+    auto dialog = createSelfDestructingDialog<QnCustomFileDialog>(
+        this,
+        tr("Select file..."),
+        appContext()->localSettings()->backgroundsFolder(),
+        QnCustomFileDialog::createFilter(QnCustomFileDialog::picturesFilter()));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
-    if (!dialog->exec())
-        return;
+    connect(
+        dialog,
+        &QnCustomFileDialog::accepted,
+        this,
+        [this, dialog]
+        {
+            QString fileName = dialog->selectedFile();
+            if (fileName.isEmpty())
+                return;
 
-    QString fileName = dialog->selectedFile();
-    if (fileName.isEmpty())
-        return;
+            appContext()->localSettings()->backgroundsFolder = QFileInfo(fileName).absolutePath();
 
-    appContext()->localSettings()->backgroundsFolder = QFileInfo(fileName).absolutePath();
+            QFileInfo fileInfo(fileName);
+            if (fileInfo.size() == 0)
+            {
+                m_store->setBackgroundImageError(tr("Picture cannot be read"));
+                return;
+            }
 
-    QFileInfo fileInfo(fileName);
-    if (fileInfo.size() == 0)
-    {
-        m_store->setBackgroundImageError(tr("Picture cannot be read"));
-        return;
-    }
+            //// Check if we were disconnected (server shut down) while the dialog was open.
+            //if (!d->layout->isFile() && !context()->user())
+            //    return;
+            m_store->imageSelected(fileName);
+            loadPreview();
+        });
 
-    //// Check if we were disconnected (server shut down) while the dialog was open.
-    //if (!d->layout->isFile() && !context()->user())
-    //    return;
-    m_store->imageSelected(fileName);
-    loadPreview();
+    dialog->show();
 }
 
 void LayoutBackgroundSettingsWidget::setPreview(const QImage& image)

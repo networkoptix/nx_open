@@ -19,6 +19,7 @@ NotificationSettingsDialog::NotificationSettingsDialog(QWidget* parent):
     setWindowTitle(tr("Select Notification Types"));
 
     setModal(true);
+    setWindowModality(Qt::ApplicationModal);
 
     auto layout = new QVBoxLayout{this};
     layout->setSpacing(0);

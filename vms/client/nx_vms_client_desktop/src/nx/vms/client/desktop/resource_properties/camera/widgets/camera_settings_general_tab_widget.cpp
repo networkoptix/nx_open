@@ -171,7 +171,7 @@ void CameraSettingsGeneralTabWidget::editCredentials(CameraSettingsDialogStore* 
     if (!store)
         return;
 
-    QScopedPointer<CameraCredentialsDialog> dialog(new CameraCredentialsDialog(this));
+    auto dialog = createSelfDestructingDialog<CameraCredentialsDialog>(this);
 
     const auto& credentials = store->state().credentials;
     dialog->setLogin(credentials.login);
@@ -188,8 +188,17 @@ void CameraSettingsGeneralTabWidget::editCredentials(CameraSettingsDialogStore* 
             dialog->setPassword(std::nullopt); //< "Multiple values" placeholder.
     }
 
-    if (dialog->exec() == QDialog::Accepted && !dialog->hasRemotePassword())
-        store->setCredentials(dialog->login(), dialog->password());
+    connect(
+        dialog,
+        &CameraCredentialsDialog::accepted,
+        this,
+        [dialog, store]
+        {
+            if (dialog->hasRemotePassword())
+                return;
+
+            store->setCredentials(dialog->login(), dialog->password());
+        });
 }
 
 void CameraSettingsGeneralTabWidget::editCameraStreams(CameraSettingsDialogStore* store)
@@ -197,15 +206,21 @@ void CameraSettingsGeneralTabWidget::editCameraStreams(CameraSettingsDialogStore
     if (!store)
         return;
 
-    QScopedPointer<CameraStreamsDialog> dialog(new CameraStreamsDialog(this));
+    auto dialog = createSelfDestructingDialog<CameraStreamsDialog>(this);
     dialog->setStreams({store->state().singleCameraSettings.primaryStream(),
         store->state().singleCameraSettings.secondaryStream()});
 
-    if (dialog->exec() == QDialog::Accepted)
-    {
-        const auto streams = dialog->streams();
-        store->setStreamUrls(streams.primaryStreamUrl, streams.secondaryStreamUrl);
-    }
+    connect(
+        dialog,
+        &CameraStreamsDialog::accepted,
+        this,
+        [dialog, store]
+        {
+            const auto streams = dialog->streams();
+            store->setStreamUrls(streams.primaryStreamUrl, streams.secondaryStreamUrl);
+        });
+
+    dialog->show();
 }
 
 } // namespace nx::vms::client::desktop

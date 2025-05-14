@@ -81,12 +81,19 @@ void SoundPicker::onCurrentIndexChanged(int index)
 
 void SoundPicker::onManageButtonClicked()
 {
-    QnNotificationSoundManagerDialog dialog(this);
-    if (dialog.exec() != QDialog::Accepted)
-        return;
+    auto dialog = createSelfDestructingDialog<QnNotificationSoundManagerDialog>(this);
 
-    auto soundModel = m_serverNotificationCache->persistentGuiModel();
-    m_comboBox->setCurrentIndex(soundModel->rowByFilename(m_field->value()));
+    connect(
+        dialog,
+        &QnNotificationSoundManagerDialog::accepted,
+        this,
+        [this]
+        {
+            auto soundModel = m_serverNotificationCache->persistentGuiModel();
+            m_comboBox->setCurrentIndex(soundModel->rowByFilename(m_field->value()));
+        });
+
+    dialog->show();
 }
 
 } // namespace nx::vms::client::desktop::rules

@@ -577,41 +577,49 @@ void LayoutActionHandler::saveLayoutAsCloud(const LayoutResourcePtr& layout)
 
     NX_ASSERT(!layout->isCrossSystem());
 
-    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(
-        QDialogButtonBox::Save | QDialogButtonBox::Cancel,
-        mainWindowWidget()));
+    auto dialog = createSelfDestructingDialog<QnLayoutNameDialog>(
+        QDialogButtonBox::Save | QDialogButtonBox::Cancel, mainWindowWidget());
     dialog->setWindowTitle(tr("Save Layout As Cloud"));
     dialog->setText(tr("Enter Layout Name:"));
 
     const QString proposedName = layout->getName();
     dialog->setName(proposedName);
 
-    if (!dialog->exec() || dialog->clickedButton() != QDialogButtonBox::Save)
-        return;
-
-    const QString name = dialog->name();
-
-    auto cloudResourcesPool = appContext()->cloudLayoutsSystemContext()->resourcePool();
-
-    LayoutResourceList existing = cloudResourcesPool->getResources<LayoutResource>(
-        [suggestedName = name.toLower()](const LayoutResourcePtr& layout)
+    connect(
+        dialog,
+        &QnLayoutNameDialog::accepted,
+        this,
+        [this, dialog, layout]
         {
-            return suggestedName == layout->getName().toLower();
+            if (dialog->clickedButton() != QDialogButtonBox::Save)
+                return;
+
+            const QString name = dialog->name();
+
+            auto cloudResourcesPool = appContext()->cloudLayoutsSystemContext()->resourcePool();
+
+            LayoutResourceList existing = cloudResourcesPool->getResources<LayoutResource>(
+                [suggestedName = name.toLower()](const LayoutResourcePtr& layout)
+                {
+                    return suggestedName == layout->getName().toLower();
+                });
+
+            if (!existing.isEmpty())
+            {
+                if (!ui::messages::Resources::overrideLayout(mainWindowWidget()))
+                    return;
+
+                removeLayouts(existing);
+            }
+
+            // Convert common layout to cloud one.
+            auto cloudLayout = appContext()->cloudLayoutsManager()->convertLocalLayout(layout);
+            cloudLayout->setName(name);
+            saveLayout(cloudLayout);
+            workbench()->replaceLayout(layout, cloudLayout);
         });
 
-    if (!existing.isEmpty())
-    {
-        if (!ui::messages::Resources::overrideLayout(mainWindowWidget()))
-            return;
-
-        removeLayouts(existing);
-    }
-
-    // Convert common layout to cloud one.
-    auto cloudLayout = appContext()->cloudLayoutsManager()->convertLocalLayout(layout);
-    cloudLayout->setName(name);
-    saveLayout(cloudLayout);
-    workbench()->replaceLayout(layout, cloudLayout);
+    dialog->show();
 }
 
 void LayoutActionHandler::saveCloudLayoutAs(const LayoutResourcePtr& layout)
@@ -619,50 +627,59 @@ void LayoutActionHandler::saveCloudLayoutAs(const LayoutResourcePtr& layout)
     if (!NX_ASSERT(layout->isCrossSystem()))
         return;
 
-    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(
-        QDialogButtonBox::Save | QDialogButtonBox::Cancel,
-        mainWindowWidget()));
+    auto dialog = createSelfDestructingDialog<QnLayoutNameDialog>(
+        QDialogButtonBox::Save | QDialogButtonBox::Cancel, mainWindowWidget());
+
     dialog->setWindowTitle(tr("Save Layout As"));
     dialog->setText(tr("Enter Layout Name:"));
 
     const QString proposedName = layout->getName();
     dialog->setName(proposedName);
 
-    if (!dialog->exec() || dialog->clickedButton() != QDialogButtonBox::Save)
-        return;
-
-    const QString name = dialog->name();
-
-    // User press "Save As" and enters the same name as this layout already has.
-    if (name == proposedName)
-    {
-        saveLayout(layout);
-        return;
-    }
-
-    auto cloudResourcesPool = appContext()->cloudLayoutsSystemContext()->resourcePool();
-
-    LayoutResourceList existing = cloudResourcesPool->getResources<LayoutResource>(
-        [suggestedName = name.toLower()](const LayoutResourcePtr& layout)
+    connect(
+        dialog,
+        &QnLayoutNameDialog::accepted,
+        this,
+        [this, dialog, proposedName, layout]
         {
-            return suggestedName == layout->getName().toLower();
+            if (dialog->clickedButton() != QDialogButtonBox::Save)
+                return;
+
+            const QString name = dialog->name();
+
+            // User press "Save As" and enters the same name as this layout already has.
+            if (name == proposedName)
+            {
+                saveLayout(layout);
+                return;
+            }
+
+            auto cloudResourcesPool = appContext()->cloudLayoutsSystemContext()->resourcePool();
+
+            LayoutResourceList existing = cloudResourcesPool->getResources<LayoutResource>(
+                [suggestedName = name.toLower()](const LayoutResourcePtr& layout)
+                {
+                    return suggestedName == layout->getName().toLower();
+                });
+
+            if (!existing.isEmpty())
+            {
+                if (!ui::messages::Resources::overrideLayout(mainWindowWidget()))
+                    return;
+
+                removeLayouts(existing);
+            }
+
+            auto cloudLayout = layout->clone();
+            NX_ASSERT(layout->isCrossSystem());
+            cloudLayout->addFlags(Qn::local);
+            cloudLayout->setName(name);
+            appContext()->cloudLayoutsSystemContext()->resourcePool()->addResource(cloudLayout);
+            saveLayout(cloudLayout);
+            workbench()->replaceLayout(layout, cloudLayout);
         });
 
-    if (!existing.isEmpty())
-    {
-        if (!ui::messages::Resources::overrideLayout(mainWindowWidget()))
-            return;
-
-        removeLayouts(existing);
-    }
-
-    auto cloudLayout = layout->clone();
-    NX_ASSERT(layout->isCrossSystem());
-    cloudLayout->addFlags(Qn::local);
-    cloudLayout->setName(name);
-    appContext()->cloudLayoutsSystemContext()->resourcePool()->addResource(cloudLayout);
-    saveLayout(cloudLayout);
-    workbench()->replaceLayout(layout, cloudLayout);
+    dialog->show();
 }
 
 void LayoutActionHandler::convertLayoutToShared(const LayoutResourcePtr& layout)
@@ -938,48 +955,22 @@ void LayoutActionHandler::at_newUserLayoutAction_triggered()
     if (!user)
         return;
 
-    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindowWidget()));
+    auto dialog = createSelfDestructingDialog<QnLayoutNameDialog>(
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindowWidget());
     dialog->setWindowTitle(tr("New Layout"));
     dialog->setText(tr("Enter the name of the layout to create:"));
     dialog->setName(generateUniqueLayoutName(user));
-    dialog->setWindowModality(Qt::ApplicationModal);
 
-    if (!dialog->exec())
-        return;
+    connect(
+        dialog,
+        &QnLayoutNameDialog::accepted,
+        this,
+        [this, dialog, user]
+        {
+            onNewUserLayoutNameChoosen(dialog->name(), user);
+        });
 
-    LayoutResourceList existing = alreadyExistingLayouts(
-        system()->resourcePool(),
-        dialog->name(),
-        user->getId());
-    if (!canRemoveLayouts(existing))
-    {
-        ui::messages::Resources::layoutAlreadyExists(mainWindowWidget());
-        return;
-    }
-
-    if (!existing.isEmpty())
-    {
-        bool allAreLocal = std::all_of(existing.cbegin(), existing.cend(),
-            [](const LayoutResourcePtr& layout)
-            {
-                return layout->hasFlags(Qn::local);
-            });
-
-        if (!allAreLocal && !ui::messages::Resources::overrideLayout(mainWindowWidget()))
-            return;
-
-        removeLayouts(existing);
-    }
-
-    LayoutResourcePtr layout(new LayoutResource());
-    layout->setIdUnsafe(nx::Uuid::createUuid());
-    layout->setName(dialog->name());
-    layout->setParentId(user->getId());
-    system()->resourcePool()->addResource(layout);
-
-    layout->saveAsync();
-
-    menu()->trigger(menu::OpenInNewTabAction, layout);
+    dialog->show();
 }
 
 void LayoutActionHandler::at_closeLayoutAction_triggered()
@@ -1053,6 +1044,45 @@ void LayoutActionHandler::onRenameResourceAction()
 
         renameLayout(layout, name);
     }
+}
+
+void LayoutActionHandler::onNewUserLayoutNameChoosen(
+    const QString& name, const QnUserResourcePtr& user)
+{
+    LayoutResourceList existing = alreadyExistingLayouts(
+        system()->resourcePool(),
+        name,
+        user->getId());
+
+    if (!canRemoveLayouts(existing))
+    {
+        ui::messages::Resources::layoutAlreadyExists(mainWindowWidget());
+        return;
+    }
+
+    if (!existing.isEmpty())
+    {
+        bool allAreLocal = std::all_of(existing.cbegin(), existing.cend(),
+            [](const LayoutResourcePtr& layout)
+            {
+                return layout->hasFlags(Qn::local);
+            });
+
+        if (!allAreLocal && !ui::messages::Resources::overrideLayout(mainWindowWidget()))
+            return;
+
+        removeLayouts(existing);
+    }
+
+    LayoutResourcePtr layout(new LayoutResource());
+    layout->setIdUnsafe(nx::Uuid::createUuid());
+    layout->setName(name);
+    layout->setParentId(user->getId());
+    system()->resourcePool()->addResource(layout);
+
+    layout->saveAsync();
+
+    menu()->trigger(menu::OpenInNewTabAction, layout);
 }
 
 void LayoutActionHandler::at_openNewTabAction_triggered()

@@ -1698,8 +1698,8 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
     auto widget = widgets.at(0);
     if(widget->resource()->flags() & Qn::network)
         return;
-    QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource(), mainWindowWidget()));
-    dialog->exec();
+
+    createSelfDestructingDialog<SignDialog>(widget->resource(), mainWindowWidget())->show();
 }
 
 void QnWorkbenchController::at_nextItemAction_triggered()

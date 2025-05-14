@@ -105,9 +105,8 @@ void InteractiveSettingsTestDialog::registerAction()
         "Interactive Settings",
         [](QnWorkbenchContext* context)
         {
-            auto dialog = std::make_unique<InteractiveSettingsTestDialog>(
-                context->mainWindowWidget());
-            dialog->exec();
+            createSelfDestructingDialog<InteractiveSettingsTestDialog>(
+                context->mainWindowWidget())->show();
         });
 }
 

@@ -43,6 +43,7 @@ private:
     };
 
     void backupDb();
+    void onBackupFileSelected(QString fileName);
     void restoreDb();
     void updateState(State state, bool operationSuccess = true);
 

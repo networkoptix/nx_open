@@ -136,8 +136,8 @@ void AnimationsControlDialog::registerAction()
         "Animations",
         [](QnWorkbenchContext* context)
         {
-            auto dialog = std::make_unique<AnimationsControlDialog>(context->mainWindowWidget());
-            dialog->exec();
+            createSelfDestructingDialog<AnimationsControlDialog>(
+                context->mainWindowWidget())->show();
         });
 }
 

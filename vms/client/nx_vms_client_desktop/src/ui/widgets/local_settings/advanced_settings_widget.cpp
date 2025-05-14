@@ -218,16 +218,22 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
             if (!NX_ASSERT(watcher))
                 return;
 
-            auto dialog = QScopedPointer(new LogSettingsDialog());
+            auto dialog = createSelfDestructingDialog<LogSettingsDialog>(mainWindowWidget());
             dialog->init({watcher->clientUnit()});
 
-            if (dialog->exec() == QDialog::Rejected)
-                return;
+            connect(
+                dialog,
+                &LogSettingsDialog::accepted,
+                this,
+                [dialog, watcher]
+                {
+                    if (!dialog->hasChanges())
+                        return;
 
-            if (!dialog->hasChanges())
-                return;
+                    watcher->storeClientSettings(dialog->changes());
+                });
 
-            watcher->storeClientSettings(dialog->changes());
+            dialog->show();
         });
     connect(ui->openLogsFolderButton, &QPushButton::clicked, this,
         [this]

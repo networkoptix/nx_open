@@ -62,7 +62,7 @@ TargetUserPicker::TargetUserPicker(
 
 void TargetUserPicker::onSelectButtonClicked()
 {
-    ui::SubjectSelectionDialog dialog(this);
+    auto dialog = createSelfDestructingDialog<ui::SubjectSelectionDialog>(this);
 
     bool isValidationPolicyRequired = true;
     if (auto acknowledgeField =
@@ -74,7 +74,7 @@ void TargetUserPicker::onSelectButtonClicked()
 
     if (isValidationPolicyRequired)
     {
-        dialog.setValidationPolicy(m_policy.get());
+        dialog->setValidationPolicy(m_policy.get());
 
         const auto validationPolicy = m_field->properties().validationPolicy;
         if (validationPolicy == vms::rules::kLayoutAccessValidationPolicy)
@@ -106,16 +106,25 @@ void TargetUserPicker::onSelectButtonClicked()
         }
     }
 
-    dialog.setCheckedSubjects(m_field->ids());
-    dialog.setAllUsers(m_field->acceptAll());
+    dialog->setCheckedSubjects(m_field->ids());
+    dialog->setAllUsers(m_field->acceptAll());
 
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        m_field->setIds(dialog.checkedSubjects());
-        m_field->setAcceptAll(dialog.allUsers());
-    }
+    connect(
+        dialog,
+        &ui::SubjectSelectionDialog::finished,
+        this,
+        [this, dialog](int result)
+        {
+            if (result == QDialog::Accepted)
+            {
+                m_field->setIds(dialog->checkedSubjects());
+                m_field->setAcceptAll(dialog->allUsers());
+            }
 
-    ResourcePickerWidgetBase<vms::rules::TargetUsersField>::onSelectButtonClicked();
+            setEdited();
+        });
+
+    dialog->show();
 }
 
 } // namespace nx::vms::client::desktop::rules

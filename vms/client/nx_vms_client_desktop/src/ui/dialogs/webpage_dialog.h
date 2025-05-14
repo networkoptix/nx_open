@@ -62,6 +62,8 @@ public:
 
     virtual void accept() override;
 
+    void submitData(const QnWebPageResourcePtr& webPageResource) const;
+
 private:
     void updateTitle();
     void updateText();

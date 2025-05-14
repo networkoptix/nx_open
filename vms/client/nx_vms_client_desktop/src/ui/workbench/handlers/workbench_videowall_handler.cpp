@@ -1786,15 +1786,21 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered()
     if (videoWall.isNull())
         return;
 
-    QScopedPointer<QnAttachToVideowallDialog> dialog(
-        new QnAttachToVideowallDialog(mainWindowWidget()));
+    auto dialog = createSelfDestructingDialog<QnAttachToVideowallDialog>(mainWindowWidget());
     dialog->loadFromResource(videoWall);
-    if (!dialog->exec())
-        return;
 
-    dialog->submitToResource(videoWall);
-    qnResourcesChangesManager->saveVideoWall(videoWall);
-    menu()->trigger(menu::OpenVideoWallReviewAction, videoWall);
+    connect(
+        dialog,
+        &QnAttachToVideowallDialog::accepted,
+        this,
+        [this, dialog, videoWall]
+        {
+            dialog->submitToResource(videoWall);
+            qnResourcesChangesManager->saveVideoWall(videoWall);
+            menu()->trigger(menu::OpenVideoWallReviewAction, videoWall);
+        });
+
+    dialog->show();
 }
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
@@ -2355,14 +2361,20 @@ void QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered()
     if (!videowall)
         return;
 
-    QScopedPointer<QnVideowallSettingsDialog> dialog(new QnVideowallSettingsDialog(mainWindowWidget()));
+    auto dialog = createSelfDestructingDialog<QnVideowallSettingsDialog>(mainWindowWidget());
     dialog->loadFromResource(videowall);
 
-    if (!dialog->exec())
-        return;
+    connect(
+        dialog,
+        &QnVideowallSettingsDialog::accepted,
+        this,
+        [this, dialog, videowall]
+        {
+            dialog->submitToResource(videowall);
+            saveVideowall(videowall);
+        });
 
-    dialog->submitToResource(videowall);
-    saveVideowall(videowall);
+    dialog->show();
 }
 
 void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered()

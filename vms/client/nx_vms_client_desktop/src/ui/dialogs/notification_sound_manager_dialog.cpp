@@ -76,36 +76,45 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked()
         tr("Sound Files"),
         {"wav", "mp3", "ogg", "wma"});
 
-    QScopedPointer<QnSessionAwareFileDialog> dialog(
-        new QnSessionAwareFileDialog(
-            this,
-            tr("Select File..."),
-            appContext()->localSettings()->mediaFolders().isEmpty()
-                ? QString()
-                : appContext()->localSettings()->mediaFolders().first(),
-            supportedFormats));
+    auto dialog = createSelfDestructingDialog<QnSessionAwareFileDialog>(
+        this,
+        tr("Select File..."),
+        appContext()->localSettings()->mediaFolders().isEmpty()
+            ? QString()
+            : appContext()->localSettings()->mediaFolders().first(),
+        supportedFormats);
     dialog->setFileMode(QFileDialog::ExistingFile);
 
     const int maxValueSec = appContext()->localSettings()->maxMp3FileDurationSec();
-    int cropSoundSecs = maxValueSec / 2;
-    QString title;
+    auto cropSoundSecs = std::make_unique<int>(maxValueSec / 2);
+    auto title = std::make_unique<QString>();
 
     dialog->addSpinBox(tr("Clip sound up to %1 seconds")
-        .arg(QnCustomFileDialog::spinBoxPlaceholder()), 1, maxValueSec, &cropSoundSecs);
-    dialog->addLineEdit(tr("Custom title:"), &title);
-    if (!dialog->exec())
-        return;
+        .arg(QnCustomFileDialog::spinBoxPlaceholder()), 1, maxValueSec, cropSoundSecs.get());
+    dialog->addLineEdit(tr("Custom title:"), title.get());
 
-    /* Check if we were disconnected (server shut down) while the dialog was open. */
-    if (!system()->user())
-        return;
+    connect(
+        dialog,
+        &QnCustomFileDialog::accepted,
+        this,
+        [this, dialog, cropSoundSecs = std::move(cropSoundSecs), title = std::move(title)]
+        {
+            /* Check if we were disconnected (server shut down) while the dialog was open. */
+            if (!system()->user())
+                return;
 
-    QString fileName = dialog->selectedFile();
-    if (fileName.isEmpty())
-        return;
+            QString fileName = dialog->selectedFile();
+            if (fileName.isEmpty())
+                return;
 
-    if (!system()->serverNotificationCache()->storeSound(fileName, cropSoundSecs * 1000, title))
-        QnMessageBox::warning(this, tr("Failed to add file"));
+            if (!system()->serverNotificationCache()->storeSound(
+                fileName, *cropSoundSecs * 1000, *title))
+            {
+                QnMessageBox::warning(this, tr("Failed to add file"));
+            }
+        });
+
+    dialog->show();
 }
 
 void QnNotificationSoundManagerDialog::at_renameButton_clicked()

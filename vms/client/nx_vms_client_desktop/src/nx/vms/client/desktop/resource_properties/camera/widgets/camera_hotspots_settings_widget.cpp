@@ -67,8 +67,7 @@ struct CameraHotspotsSettingsWidget::Private
 
     void setupUi() const;
 
-    const std::unique_ptr<CameraSelectionDialog> createHotspotTargetSelectionDialog(
-        int hotspotIndex) const;
+    CameraSelectionDialog* createHotspotTargetSelectionDialog(int hotspotIndex) const;
 
     CameraSelectionDialog::ResourceFilter hotspotTargetSelectionResourceFilter(
         int hotspotIndex) const;
@@ -136,11 +135,10 @@ void CameraHotspotsSettingsWidget::Private::setupUi() const
         CameraHotspotsItemModel::DeleteButtonColumn, QHeaderView::ResizeToContents);
 }
 
-const std::unique_ptr<CameraSelectionDialog>
-    CameraHotspotsSettingsWidget::Private::createHotspotTargetSelectionDialog(
+CameraSelectionDialog* CameraHotspotsSettingsWidget::Private::createHotspotTargetSelectionDialog(
         int hotspotIndex) const
 {
-    auto targetSelectionDialog = std::make_unique<CameraSelectionDialog>(
+    auto targetSelectionDialog = createSelfDestructingDialog<CameraSelectionDialog>(
         hotspotTargetSelectionResourceFilter(hotspotIndex),
         CameraSelectionDialog::ResourceValidator(),
         CameraSelectionDialog::AlertTextProvider(),
@@ -200,15 +198,22 @@ CameraSelectionDialog::ResourceFilter
 
 void CameraHotspotsSettingsWidget::Private::selectTargetForHotspot(int hotspotIndex) const
 {
-    const auto cameraSelectionDialog = createHotspotTargetSelectionDialog(hotspotIndex);
-    if (cameraSelectionDialog->exec() != QDialog::Accepted)
-        return;
+    auto cameraSelectionDialog = createHotspotTargetSelectionDialog(hotspotIndex);
 
-    auto hotspotData = ui->hotspotsEditorWidget->hotspotAt(hotspotIndex);
-    hotspotData.targetResourceId =
-        cameraSelectionDialog->resourceSelectionWidget()->selectedResourceId();
+    connect(
+        cameraSelectionDialog,
+        &CameraSelectionDialog::accepted,
+        q,
+        [this, cameraSelectionDialog, hotspotIndex]
+        {
+            auto hotspotData = ui->hotspotsEditorWidget->hotspotAt(hotspotIndex);
+            hotspotData.targetResourceId =
+                cameraSelectionDialog->resourceSelectionWidget()->selectedResourceId();
 
-    ui->hotspotsEditorWidget->setHotspotAt(hotspotData, hotspotIndex);
+            ui->hotspotsEditorWidget->setHotspotAt(hotspotData, hotspotIndex);
+        });
+
+    cameraSelectionDialog->show();
 }
 
 void CameraHotspotsSettingsWidget::Private::selectHotspotsViewRow(std::optional<int> row)

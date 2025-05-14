@@ -323,19 +323,25 @@ void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
     if (!ResourceAccessManager::hasPermissions(layout, Qn::EditLayoutSettingsPermission))
         return;
 
-    QScopedPointer<LayoutSettingsDialog> dialog(new LayoutSettingsDialog(mainWindowWidget()));
-    dialog->setWindowModality(Qt::ApplicationModal);
+    auto dialog = createSelfDestructingDialog<QnSessionAware<LayoutSettingsDialog>>(mainWindowWidget());
     dialog->setLayout(layout);
 
     const bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
-    if (!dialog->exec())
-        return;
 
-    // Move layout items to grid center to best fit the background.
-    if (backgroundWasEmpty && !layout->backgroundImageFilename().isEmpty())
-    {
-        if (auto wlayout = workbench()->layout(layout))
-            wlayout->centralizeItems();
-    }
-    menu()->triggerIfPossible(menu::SaveLayoutAction, layout);
+    connect(
+        dialog,
+        &LayoutSettingsDialog::accepted,
+        this,
+        [this, backgroundWasEmpty, layout]
+        {
+            // Move layout items to grid center to best fit the background.
+            if (backgroundWasEmpty && !layout->backgroundImageFilename().isEmpty())
+            {
+                if (auto wlayout = workbench()->layout(layout))
+                    wlayout->centralizeItems();
+            }
+            menu()->triggerIfPossible(menu::SaveLayoutAction, layout);
+        });
+
+    dialog->show();
 }

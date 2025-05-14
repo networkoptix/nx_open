@@ -38,6 +38,7 @@ private:
     void setupBackgroundUi();
 
     void selectBackgroundImage();
+    void onBackgroundImageSelected(const QString& fileName);
 
     bool backgroundAllowed() const;
 

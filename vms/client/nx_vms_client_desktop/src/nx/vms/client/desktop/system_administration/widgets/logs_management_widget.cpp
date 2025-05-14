@@ -16,6 +16,7 @@
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
 #include <nx/vms/client/desktop/common/widgets/obtain_button.h>
 #include <nx/vms/client/desktop/common/widgets/search_line_edit.h>
@@ -28,6 +29,7 @@
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <ui/common/palette.h>
 
 namespace nx::vms::client::desktop {
@@ -280,16 +282,23 @@ void LogsManagementWidget::setupUi()
             if (!NX_ASSERT(m_watcher))
                 return;
 
-            auto dialog = QScopedPointer(new LogSettingsDialog());
+            auto dialog = createSelfDestructingDialog<LogSettingsDialog>(
+                appContext()->mainWindowContext()->mainWindowWidget());
             dialog->init(m_watcher->checkedItems());
 
-            if (dialog->exec() == QDialog::Rejected)
-                return;
+            connect(
+                dialog,
+                &LogSettingsDialog::accepted,
+                this,
+                [this, dialog]
+                {
+                    if (!dialog->hasChanges())
+                        return;
 
-            if (!dialog->hasChanges())
-                return;
+                    m_watcher->applySettings(dialog->changes(), this);
+                });
 
-            m_watcher->applySettings(dialog->changes(), this);
+            dialog->show();
         });
 
     connect(ui->resetButton, &QPushButton::clicked, this,

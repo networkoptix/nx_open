@@ -56,8 +56,7 @@ void WebEngineDialog::registerAction()
         "WebEngine",
         [](QnWorkbenchContext* context)
         {
-            auto dialog = std::make_unique<WebEngineDialog>(context->mainWindowWidget());
-            dialog->exec();
+            createSelfDestructingDialog<WebEngineDialog>(context->mainWindowWidget())->show();
         });
 }
 

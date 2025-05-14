@@ -140,8 +140,8 @@ QnWorkbenchWebPageHandler::~QnWorkbenchWebPageHandler()
 
 void QnWorkbenchWebPageHandler::addNewWebPage(nx::vms::api::WebPageSubtype subtype)
 {
-    QScopedPointer<QnWebpageDialog> dialog(
-        new QnWebpageDialog(systemContext(), mainWindowWidget(), QnWebpageDialog::AddPage));
+    auto dialog = createSelfDestructingDialog<QnWebpageDialog>(
+        systemContext(), mainWindowWidget(), QnWebpageDialog::AddPage);
 
     const auto params = menu()->currentParameters(sender());
     if (params.size() > 0)
@@ -152,32 +152,33 @@ void QnWorkbenchWebPageHandler::addNewWebPage(nx::vms::api::WebPageSubtype subty
 
     dialog->setSubtype(subtype);
 
-    if (!dialog->exec())
-        return;
+    connect(
+        dialog,
+        &QnWebpageDialog::accepted,
+        this,
+        [this, dialog]
+        {
+            QnWebPageResourcePtr webPage(new QnWebPageResource());
+            webPage->setIdUnsafe(nx::Uuid::createUuid());
+            webPage->setUrl(dialog->url().toString());
+            webPage->setName(dialog->name());
+            resourcePool()->addResource(webPage);
 
-    QnWebPageResourcePtr webPage(new QnWebPageResource());
-    webPage->setIdUnsafe(nx::Uuid::createUuid());
-    webPage->setUrl(dialog->url().toString());
-    webPage->setName(dialog->name());
-    resourcePool()->addResource(webPage);
+            // Properties can be set only after Resource is added to the Resource Pool.
+            dialog->submitData(webPage);
 
-    // Properties can be set only after Resource is added to the Resource Pool.
-    webPage->setSubtype(dialog->subtype());
-    webPage->setProxyId(dialog->proxyId());
-    webPage->setProxyDomainAllowList(dialog->proxyDomainAllowList());
-    webPage->setCertificateCheckEnabled(dialog->isCertificateCheckEnabled());
-    webPage->setRefreshInterval(dialog->refreshInterval());
-    webPage->setOpenInWindow(dialog->isOpenInWindow());
+            qnResourcesChangesManager->saveWebPage(webPage);
+            menu()->trigger(menu::SelectNewItemAction, webPage);
 
-    qnResourcesChangesManager->saveWebPage(webPage);
-    menu()->trigger(menu::SelectNewItemAction, webPage);
+            if (dialog->isOpenInWindow())
+                menu()->trigger(menu::OpenInDedicatedWindowAction, webPage);
+            else
+                menu()->trigger(menu::DropResourcesAction, webPage);
 
-    if (dialog->isOpenInWindow())
-        menu()->trigger(menu::OpenInDedicatedWindowAction, webPage);
-    else
-        menu()->trigger(menu::DropResourcesAction, webPage);
+            appContext()->webPageDataCache()->refresh(webPage->getUrl());
+        });
 
-    appContext()->webPageDataCache()->refresh(webPage->getUrl());
+    dialog->show();
 }
 
 void QnWorkbenchWebPageHandler::editWebPage()
@@ -197,9 +198,8 @@ void QnWorkbenchWebPageHandler::editWebPage()
     const auto oldRefreshInterval = webPage->refreshInterval();
     const auto oldIsOpenInWindow = webPage->isOpenInWindow();
 
-    QScopedPointer<QnWebpageDialog> dialog(
-        new QnWebpageDialog(systemContext(), mainWindowWidget(), QnWebpageDialog::EditPage));
-
+    auto dialog = createSelfDestructingDialog<QnWebpageDialog>(
+        systemContext(), mainWindowWidget(), QnWebpageDialog::EditPage);
     dialog->setName(oldName);
     dialog->setUrl(oldUrl);
     dialog->setProxyId(oldProxy);
@@ -208,43 +208,41 @@ void QnWorkbenchWebPageHandler::editWebPage()
     dialog->setCertificateCheckEnabled(oldCertCheck);
     dialog->setRefreshInterval(oldRefreshInterval);
     dialog->setOpenInWindow(oldIsOpenInWindow);
-
     dialog->setResourceId(webPage->getId());
 
-    if (!dialog->exec())
-        return;
+    connect(
+        dialog,
+        &QnWebpageDialog::accepted,
+        this,
+        [=]
+        {
+            const auto url = dialog->url();
+            const auto name = dialog->name();
+            const auto proxy = dialog->proxyId();
+            const auto subtype = dialog->subtype();
+            const auto proxyDomainAllowList = dialog->proxyDomainAllowList();
+            const auto certCheck = dialog->isCertificateCheckEnabled();
+            const auto refreshInterval = dialog->refreshInterval();
+            const auto isOpenInWindow = dialog->isOpenInWindow();
 
-    const auto url = dialog->url();
-    const auto name = dialog->name();
-    const auto proxy = dialog->proxyId();
-    const auto subtype = dialog->subtype();
-    const auto proxyDomainAllowList = dialog->proxyDomainAllowList();
-    const auto certCheck = dialog->isCertificateCheckEnabled();
-    const auto refreshInterval = dialog->refreshInterval();
-    const auto isOpenInWindow = dialog->isOpenInWindow();
+            if (oldName == name
+                && oldUrl == url.toString()
+                && oldProxy == proxy
+                && oldSubType == subtype
+                && proxyDomainAllowList == oldProxyDomainAllowList
+                && oldCertCheck == certCheck
+                && oldRefreshInterval == refreshInterval
+                && oldIsOpenInWindow == isOpenInWindow)
+            {
+                return;
+            }
 
-    if (oldName == name
-        && oldUrl == url.toString()
-        && oldProxy == proxy
-        && oldSubType == subtype
-        && proxyDomainAllowList == oldProxyDomainAllowList
-        && oldCertCheck == certCheck
-        && oldRefreshInterval == refreshInterval
-        && oldIsOpenInWindow == isOpenInWindow)
-    {
-        return;
-    }
+            dialog->submitData(webPage);
 
-    webPage->setUrl(url.toString());
-    webPage->setName(name);
-    webPage->setProxyId(proxy);
-    webPage->setSubtype(subtype);
-    webPage->setProxyDomainAllowList(proxyDomainAllowList);
-    webPage->setCertificateCheckEnabled(certCheck);
-    webPage->setRefreshInterval(refreshInterval);
-    webPage->setOpenInWindow(isOpenInWindow);
+            qnResourcesChangesManager->saveWebPage(webPage);
+        });
 
-    qnResourcesChangesManager->saveWebPage(webPage);
+    dialog->show();
 }
 
 void QnWorkbenchWebPageHandler::openInDedicatedWindow(const QnWebPageResourcePtr& webPage)

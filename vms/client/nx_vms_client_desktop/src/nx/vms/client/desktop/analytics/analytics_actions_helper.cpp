@@ -39,8 +39,8 @@ void AnalyticsActionsHelper::processResult(
         if (result.useDeviceCredentials && !authenticator)
             NX_WARNING(NX_SCOPE_TAG, "Can not authenticate %1", result.actionUrl);
 
-        QnSessionAware<WebViewDialog> webDialog(parent);
-        webDialog.init(
+        auto webDialog = createSelfDestructingDialog<QnSessionAware<WebViewDialog>>(parent);
+        webDialog->init(
             result.actionUrl,
             /*enableClientApi*/ true,
             context,
@@ -48,7 +48,7 @@ void AnalyticsActionsHelper::processResult(
             result.useDeviceCredentials ? authenticator : nullptr,
             /*checkCertificate*/ !result.useDeviceCredentials);
 
-        webDialog.exec();
+        webDialog->show();
     }
 }
 

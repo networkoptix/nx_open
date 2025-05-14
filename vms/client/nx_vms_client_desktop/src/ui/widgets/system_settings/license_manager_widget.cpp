@@ -356,8 +356,7 @@ void LicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license)
     if (!NX_ASSERT(license))
         return;
 
-    QScopedPointer<QnLicenseDetailsDialog> dialog(new QnLicenseDetailsDialog(license, this));
-    dialog->exec();
+    createSelfDestructingDialog<QnLicenseDetailsDialog>(license, this)->show();
 }
 
 QnLicenseList LicenseManagerWidget::selectedLicenses() const

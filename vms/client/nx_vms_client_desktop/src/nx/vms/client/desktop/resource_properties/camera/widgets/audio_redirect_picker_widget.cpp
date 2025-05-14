@@ -191,7 +191,7 @@ void AudioRedirectPickerWidget::selectAudioRedirectDevice()
             return QString();
         };
 
-    auto cameraSelectionDialog = std::make_unique<CameraSelectionDialog>(
+    auto cameraSelectionDialog = createSelfDestructingDialog<CameraSelectionDialog>(
         resourceFilter,
         resourceValidator,
         alertTextProvider,
@@ -206,14 +206,21 @@ void AudioRedirectPickerWidget::selectAudioRedirectDevice()
     resourceSelectionWidget->setSelectedResourceId(m_audioRedirectDeviceId);
     resourceSelectionWidget->setShowRecordingIndicator(true);
 
-    if (cameraSelectionDialog->exec() != QDialog::Accepted)
-        return;
+    connect(
+        cameraSelectionDialog,
+        &CameraSelectionDialog::accepted,
+        this,
+        [this, cameraSelectionDialog]
+        {
+            const auto resourceSelectionWidget = cameraSelectionDialog->resourceSelectionWidget();
+            if (m_audioRedirectDeviceId == resourceSelectionWidget->selectedResourceId())
+                return;
 
-    if (m_audioRedirectDeviceId == resourceSelectionWidget->selectedResourceId())
-        return;
+            m_audioRedirectDeviceId = resourceSelectionWidget->selectedResourceId();
+            emit audioRedirectDeviceIdChanged(m_audioRedirectDeviceId);
+        });
 
-    m_audioRedirectDeviceId = resourceSelectionWidget->selectedResourceId();
-    emit audioRedirectDeviceIdChanged(m_audioRedirectDeviceId);
+    cameraSelectionDialog->show();
 }
 
 bool AudioRedirectPickerWidget::capabilityCheck(const QnResourcePtr& resource) const

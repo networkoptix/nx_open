@@ -1036,13 +1036,20 @@ void MultiServerUpdatesWidget::pickLocalFile()
 
 void MultiServerUpdatesWidget::pickSpecificBuild()
 {
-    VersionSelectionDialog dialog(this);
-    if (dialog.exec() != QDialog::Accepted)
-        return;
+    auto dialog = createSelfDestructingDialog<VersionSelectionDialog>(this);
 
-    m_updateSourceMode = UpdateSourceType::internetSpecific;
-    m_pickedSpecificBuild = dialog.version();
-    recheckSpecificBuild();
+    connect(
+        dialog,
+        &VersionSelectionDialog::accepted,
+        this,
+        [this, dialog]
+        {
+            m_updateSourceMode = UpdateSourceType::internetSpecific;
+            m_pickedSpecificBuild = dialog->version();
+            recheckSpecificBuild();
+        });
+
+    dialog->show();
 }
 
 void MultiServerUpdatesWidget::recheckSpecificBuild()

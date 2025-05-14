@@ -188,56 +188,71 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
 
     const QString previousCachedName = appContext()->localSettings()->backgroundImage().imagePath();
 
-    QScopedPointer<QnCustomFileDialog> dialog(
-        new QnCustomFileDialog(
-            this, tr("Select File..."),
-            folder,
-            QnCustomFileDialog::createFilter(QnCustomFileDialog::picturesFilter())
-        )
-    );
+    auto dialog = createSelfDestructingDialog<QnCustomFileDialog>(
+        this,
+        tr("Select File..."),
+        folder,
+        QnCustomFileDialog::createFilter(QnCustomFileDialog::picturesFilter()));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
-    if (!dialog->exec())
+    connect(
+        dialog,
+        &QnCustomFileDialog::accepted,
+        this,
+        [this, dialog]
+        {
+            onBackgroundImageSelected(dialog->selectedFile());
+        });
+
+    dialog->show();
+}
+
+void QnLookAndFeelPreferencesWidget::onBackgroundImageSelected(const QString& fileName)
+{
+    if (fileName.isEmpty())
         return;
 
-    QString originalFileName = dialog->selectedFile();
-    if (originalFileName.isEmpty())
-        return;
+    appContext()->localSettings()->backgroundsFolder = QFileInfo(fileName).absolutePath();
 
-    appContext()->localSettings()->backgroundsFolder = QFileInfo(originalFileName).absolutePath();
-
-    QString cachedName = ServerImageCache::cachedImageFilename(originalFileName);
+    const QString previousCachedName = appContext()->localSettings()->backgroundImage().imagePath();
+    QString cachedName = ServerImageCache::cachedImageFilename(fileName);
     if (previousCachedName == cachedName ||
         QDir::toNativeSeparators(previousCachedName).toLower() ==
-        QDir::toNativeSeparators(originalFileName).toLower())
+        QDir::toNativeSeparators(fileName).toLower())
         return;
 
-    auto progressDialog = new ProgressDialog(this);
+    QPointer<ProgressDialog> progressDialog = createSelfDestructingDialog<ProgressDialog>(this);
     progressDialog->setWindowTitle(tr("Preparing Image..."));
     progressDialog->setText(tr("Please wait while image is being prepared..."));
     progressDialog->setInfiniteMode();
-    progressDialog->setModal(true);
 
     auto imgCache = new LocalFileCache(appContext()->currentSystemContext(), this);
-    connect(imgCache, &ServerFileCache::fileUploaded, this,
-        [this, imgCache, progressDialog, originalFileName](const QString &storedFileName)
+    connect(
+        imgCache,
+        &ServerFileCache::fileUploaded,
+        this,
+        [this, imgCache, progressDialog, fileName](const QString& storedFileName)
         {
-            if (!progressDialog->wasCanceled())
+            if (progressDialog)
             {
-                BackgroundImage background = appContext()->localSettings()->backgroundImage();
-                background.name = storedFileName;
-                background.originalName = originalFileName;
-                appContext()->localSettings()->backgroundImage = background;
-                ui->imageNameLineEdit->setText(QFileInfo(originalFileName).fileName());
-                emit hasChangesChanged();
+                if (!progressDialog->wasCanceled())
+                {
+                    BackgroundImage background = appContext()->localSettings()->backgroundImage();
+                    background.name = storedFileName;
+                    background.originalName = fileName;
+                    appContext()->localSettings()->backgroundImage = background;
+                    ui->imageNameLineEdit->setText(QFileInfo(fileName).fileName());
+                    emit hasChangesChanged();
+                }
+
+                progressDialog->close();
             }
+
             imgCache->deleteLater();
-            progressDialog->hide();
-            progressDialog->deleteLater();
         });
 
-    imgCache->storeImage(originalFileName);
-    progressDialog->exec();
+    imgCache->storeImage(fileName);
+    progressDialog->show();
 }
 
 bool QnLookAndFeelPreferencesWidget::backgroundAllowed() const

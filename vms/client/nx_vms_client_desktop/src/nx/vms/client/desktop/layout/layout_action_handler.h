@@ -40,6 +40,7 @@ private:
     void at_openInNewTabAction_triggered();
 
     void onRenameResourceAction();
+    void onNewUserLayoutNameChoosen(const QString& name, const QnUserResourcePtr& user);
 
 private:
     /**

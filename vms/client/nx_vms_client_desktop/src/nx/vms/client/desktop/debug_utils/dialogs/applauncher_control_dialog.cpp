@@ -54,8 +54,8 @@ void ApplauncherControlDialog::registerAction()
         "Applauncher",
         [](QnWorkbenchContext* context)
         {
-            auto dialog = std::make_unique<ApplauncherControlDialog>(context->mainWindowWidget());
-            dialog->exec();
+            createSelfDestructingDialog<ApplauncherControlDialog>(
+                context->mainWindowWidget())->show();
         });
 }
 
