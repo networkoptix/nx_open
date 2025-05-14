@@ -1814,7 +1814,7 @@
     </message>
     <message>
       <source>Tour cycle</source>
-      <translation>Tour cycle</translation>
+      <translation>Durée d’affichage</translation>
     </message>
     <message>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
