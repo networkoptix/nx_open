@@ -418,6 +418,7 @@ static void registerSystemRestHandlers(
     /**%apidoc GET /rest/v{4-}/metrics/rules
      * Retrieves the rules to calculate the final manifest and raise alarms. See metrics.md for
      * details.
+     * %jsonrpc[result] all
      * %caption Get Metrics rules
      * %ingroup Metrics
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
@@ -445,6 +446,7 @@ static void registerSystemRestHandlers(
 
     /**%apidoc GET /rest/v{4-}/metrics/values
      * Retrieves the current state of the Metrics values.
+     * %jsonrpc[result] all
      * %caption Get Metrics values
      * %ingroup Metrics
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
@@ -472,6 +474,7 @@ static void registerSystemRestHandlers(
 
     /**%apidoc GET /rest/v{4-}/metrics/alarms
      * Retrieves the currently active Metrics alarms.
+     * %jsonrpc[result] all
      * %caption Get Metrics alarms
      * %ingroup Metrics
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
@@ -1386,7 +1389,6 @@ static void registerServerRestHandlers(
 
     /**%apidoc GET /rest/v{2-3}/servers/{id}/storageForecast
      * Retrieves the Server Storage forecast.
-     * %jsonrpc[result] one
      * %caption Get Server Storage forecast
      * %ingroup Server Data
      * %struct StorageForecastData
@@ -1397,7 +1399,6 @@ static void registerServerRestHandlers(
      *
      **%apidoc GET /rest/v{2-3}/servers/%2A/storageForecast
      * Retrieves all Storage forecasts for all Servers.
-     * %jsonrpc[result] all
      * %caption Get Servers' Storage forecasts
      * %ingroup Server Data
      * %struct StorageForecastData
