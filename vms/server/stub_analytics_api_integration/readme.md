@@ -27,10 +27,6 @@ npm install ws
 
 # How to run the application
 
-- Create the config file `analytics_api.ini` in the .ini directory (see the description of the
-    IniConfig mechanism in the Nx Server Plugin SDK, `nx/kit/ini_config.h`). Add the following line
-    to the file:
-
 - Launch VMS Server and the Client.
 
 - Edit the Stub Analytics API Integration config file `config.json`. It's located in the

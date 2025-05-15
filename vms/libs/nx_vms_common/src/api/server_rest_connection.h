@@ -587,6 +587,7 @@ public:
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle postMetadata(
+        const std::string& integrationUserSessionToken,
         const QString& path,
         const QByteArray& messageBody,
         PostCallback&& callback,
