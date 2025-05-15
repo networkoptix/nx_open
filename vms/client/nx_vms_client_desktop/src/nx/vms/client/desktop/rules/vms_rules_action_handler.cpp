@@ -139,7 +139,15 @@ void VmsRulesActionHandler::openVmsRulesDialog()
     const auto parameters = menu()->currentParameters(sender());
     d->setFilter(parameters.resources().filtered<QnVirtualCameraResource>());
 
-    d->rulesDialog->open();
+    if (d->rulesDialog->window()->isVisible()
+        && QGuiApplication::focusWindow() != d->rulesDialog->window())
+    {
+        d->rulesDialog->raise();
+    }
+    else
+    {
+        d->rulesDialog->open();
+    }
 }
 
 void VmsRulesActionHandler::openEventLogDialog()
