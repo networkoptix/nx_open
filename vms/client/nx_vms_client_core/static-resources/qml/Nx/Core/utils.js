@@ -85,6 +85,22 @@ function keyIsBack(key)
     return key == Qt.Key_Back || key == Qt.Key_Escape
 }
 
+function isCharKeyPressed(event)
+{
+    if (!event.text.length)
+        return false
+
+    switch(event.key)
+    {
+        case Qt.Key_Tab: //< Fallthrough.
+        case Qt.Key_Backtab: //< Fallthrough.
+        case Qt.Key_Return:
+            return false
+        default:
+            return true
+    }
+}
+
 function isRotated90(angle)
 {
     return angle % 90 == 0 && angle % 180 != 0

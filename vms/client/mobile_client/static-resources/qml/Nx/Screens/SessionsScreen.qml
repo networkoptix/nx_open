@@ -10,6 +10,7 @@ import Nx.Controls
 import Nx.Items
 import Nx.Mobile
 import Nx.Models
+import Nx.Mobile.Ui.Sheets
 import Nx.Ui
 
 import nx.vms.client.core
@@ -274,15 +275,6 @@ Page
 
             sessionsScreen.openSystem(current)
         }
-
-        onItemEditClicked: (nodeId, systemId) =>
-        {
-            if (nodeId)
-                return
-
-            let current = organizationsModel.indexFromSystemId(systemId)
-            sessionsScreen.editSystem(current)
-        }
     }
 
     IconButton
@@ -303,7 +295,7 @@ Page
 
         TapHandler
         {
-            onTapped: Workflow.openNewSessionScreen()
+            onTapped: siteConnectionSheet.connectToSite()
         }
 
         background: Rectangle
@@ -378,17 +370,9 @@ Page
 
     Component.onCompleted: resetSearch()
 
-    AuthenticationDataModel
+    SiteConnectionSheet
     {
-        id: authenticationDataModel
-
-        readonly property bool hasData: !!defaultCredentials.user
-        readonly property bool hasStoredPassword: defaultCredentials.isPasswordSaved
-    }
-
-    SystemHostsModel
-    {
-        id: hostsModel
+        id: siteConnectionSheet
     }
 
     function openSystem(current)
@@ -421,90 +405,15 @@ Page
         }
 
         const systemId = accessor.getData(current, "systemId")
-
         const isCloudSystem = accessor.getData(current, "isCloudSystem")
         if (!isCloudSystem)
         {
             const localId = accessor.getData(current, "localId")
-            authenticationDataModel.localSystemId = localId
-
-            hostsModel.systemId = systemId
-            hostsModel.localSystemId = localId
-            const defaultAddress = hostsModel.rowCount() > 0
-                ? NxGlobals.modelData(hostsModel.index(0, 0), "url-internal")
-                : NxGlobals.emptyUrl()
-
-            if (authenticationDataModel.hasData)
-            {
-                let connectionStarted = false
-                if (authenticationDataModel.hasStoredPassword)
-                {
-                    const callback =
-                        function(connectionStatus, errorMessage)
-                        {
-                            if (connectionStatus !== SessionManager.LocalSessionExiredStatus)
-                                return
-
-                            Workflow.openSessionsScreen() //< Resets connection state/preloader.
-                            removeSavedAuth(
-                                localId, authenticationDataModel.defaultCredentials.user)
-                            openSavedSession(
-                                systemId, localId, systemName, defaultAddress, errorMessage)
-                        }
-
-                    connectionStarted =
-                        windowContext.sessionManager.startSessionWithStoredCredentials(
-                            defaultAddress,
-                            NxGlobals.uuid(localId),
-                            authenticationDataModel.defaultCredentials.user,
-                            callback)
-                }
-
-                if (!connectionStarted)
-                    openSavedSession(systemId, localId, systemName, defaultAddress)
-            }
-            else
-            {
-                Workflow.openDiscoveredSession(
-                    systemId, localId, systemName, defaultAddress.displayAddress())
-            }
+                siteConnectionSheet.connectToSite(systemName, systemId, localId)
         }
-        else if (!hostsModel.isEmpty)
+        else if (!siteConnectionSheet.hostsModel.isEmpty)
         {
             windowContext.sessionManager.startCloudSession(systemId, systemName)
         }
-    }
-
-    function editSystem(current)
-    {
-        const systemId = accessor.getData(current, "systemId")
-        const localId = accessor.getData(current, "localId")
-        authenticationDataModel.localSystemId = localId
-        hostsModel.systemId = systemId
-        hostsModel.localSystemId = localId
-        const defaultAddress = hostsModel.rowCount() > 0
-            ? NxGlobals.modelData(hostsModel.index(0, 0), "url-internal")
-            : NxGlobals.emptyUrl()
-        const systemName = accessor.getData(current, "display")
-        if (authenticationDataModel.hasData)
-        {
-            openSavedSession(systemId, localId, systemName, defaultAddress)
-        }
-        else
-        {
-            Workflow.openDiscoveredSession(
-                systemId, localId, systemName, defaultAddress.displayAddress())
-        }
-    }
-
-    function openSavedSession(systemId, localId, systemName, defaultAddress, errorMessage)
-    {
-        Workflow.openSavedSession(
-            systemId,
-            localId,
-            systemName,
-            defaultAddress.displayAddress(),
-            authenticationDataModel.defaultCredentials.user,
-            errorMessage)
     }
 }

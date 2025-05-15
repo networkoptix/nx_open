@@ -115,6 +115,7 @@ BottomSheet
 
         enabled: enableSharingToggle.checkState === Qt.Checked
 
+        popupTitle: qsTr("Select Lifetime")
         labelText: qsTr("Lifetime")
 
         textRole: "text"

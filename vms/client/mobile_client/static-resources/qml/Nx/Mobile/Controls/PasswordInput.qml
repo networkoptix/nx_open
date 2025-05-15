@@ -7,7 +7,7 @@ import Nx.Core
 import Nx.Core.Controls
 import Nx.Mobile.Controls
 
-Row
+FocusScope
 {
     id: control
 
@@ -15,8 +15,8 @@ Row
     property alias backgroundMode: textInput.backgroundMode
     property alias labelText: textInput.labelText
     property alias text: textInput.text
-
-    spacing: 8
+    property alias supportText: textInput.supportText
+    property alias errorText: textInput.errorText
 
     function resetState(hasSecretValue)
     {
@@ -26,80 +26,99 @@ Row
             : ""
     }
 
-    TextInput
+    implicitWidth: row.width
+    implicitHeight: row.height
+
+    signal accepted()
+
+    Row
     {
-        id: textInput
+        id: row
 
-        property bool maskedMode: true
-        passwordCharacter: "*"
-        showActionButton: !control.hasSecretValue && textInput.focus && textInput.text
-        actionButtonImage.sourcePath: maskedMode
-            ? "image://skin/20x20/Outline/eye_closed.svg?primary=light10"
-            : "image://skin/20x20/Outline/eye_open.svg?primary=light10"
-        actionButtonImage.sourceSize: Qt.size(20, 20)
-        actionButtonAction: () => { maskedMode = !maskedMode }
-        echoMode: control.hasSecretValue || maskedMode
-            ? TextInput.Password
-            : TextInput.Normal
-        text: d.kMaskText
-        width: parent.width - (clearSecretButton.visible ? clearSecretButton.width + control.spacing : 0)
+        spacing: 8
 
-        onActiveFocusChanged:
+        TextInput
         {
-            if (activeFocus && !control.hasSecretValue)
-                textInput.selectAll()
+            id: textInput
+
+            property bool maskedMode: true
+
+            focus: true
+            passwordCharacter: "*"
+            showActionButton: !control.hasSecretValue && textInput.focus && textInput.text
+            actionButtonImage.sourcePath: maskedMode
+                ? "image://skin/20x20/Outline/eye_closed.svg?primary=light10"
+                : "image://skin/20x20/Outline/eye_open.svg?primary=light10"
+            actionButtonImage.sourceSize: Qt.size(20, 20)
+            actionButtonAction: () => { maskedMode = !maskedMode }
+            echoMode: control.hasSecretValue || maskedMode
+                ? TextInput.Password
+                : TextInput.Normal
+            text: d.kMaskText
+            width: control.width
+                - (clearSecretButton.visible ? clearSecretButton.width + row.spacing : 0)
+
+            onActiveFocusChanged:
+            {
+                if (activeFocus && !control.hasSecretValue)
+                    textInput.selectAll()
+            }
+
+            Keys.onPressed:
+                (event)=>
+                {
+                    // Clear "secret" on any valuable input.
+                    if (CoreUtils.isCharKeyPressed(event) && control.hasSecretValue)
+                        control.resetState(/*hasSecretValue*/ false)
+                }
+
+            onAccepted: control.accepted()
         }
 
-        Keys.onPressed:
-            (event)=>
+        // TODO #ynikitenkov Add Nx.Mobile.IconButton
+        Rectangle
+        {
+            id: clearSecretButton
+
+            visible: control.hasSecretValue
+            color: textInput.background.color
+            width: 56
+            height: 56
+
+            ColoredImage
             {
-                // Clear "secret" on any valuable input.
-                if (event.text.length > 0 && control.hasSecretValue)
+                anchors.centerIn: parent
+                sourcePath: "image://skin/20x20/Outline/close_medium.svg?primary=light10"
+                sourceSize: Qt.size(20, 20)
+            }
+
+            MouseArea
+            {
+                id: mouseArea
+
+                anchors.fill: parent
+                onClicked:
+                {
                     control.resetState(/*hasSecretValue*/ false)
+                    textInput.errorText = ""
+                    textInput.forceActiveFocus()
+                }
             }
-    }
 
-    // TODO #ynikitenkov Add Nx.Mobile.IconButton
-    Rectangle
-    {
-        id: clearSecretButton
-
-        visible: control.hasSecretValue
-        color: textInput.background.color
-        width: 56
-        height: 56
-
-        ColoredImage
-        {
-            anchors.centerIn: parent
-            sourcePath: "image://skin/20x20/Outline/close_medium.svg?primary=light10"
-            sourceSize: Qt.size(20, 20)
-        }
-
-        MouseArea
-        {
-            id: mouseArea
-            anchors.fill: parent
-            onClicked:
+            MaterialEffect
             {
-                control.resetState(/*hasSecretValue*/ false)
-                textInput.forceActiveFocus()
+                anchors.fill: parent
+                rounded: true
+                mouseArea: mouseArea
+                rippleColor: "transparent"
             }
         }
 
-        MaterialEffect
+        NxObject
         {
-            anchors.fill: parent
-            rounded: true
-            mouseArea: mouseArea
-            rippleColor: "transparent"
+            id: d
+
+            readonly property string kMaskText: "*************"
         }
-    }
-
-    NxObject
-    {
-        id: d
-
-        readonly property string kMaskText: "*************"
     }
 }

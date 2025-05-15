@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Templates as T
 
 import Nx.Core
+import Nx.Core.Controls
 
 T.AbstractButton
 {
@@ -20,6 +21,7 @@ T.AbstractButton
         // Transparent
     }
 
+    property bool showBusyIndicator: false
     property int type: Button.Type.Interface
 
     implicitHeight: 44
@@ -47,6 +49,8 @@ T.AbstractButton
         {
             id: textItem
 
+            visible: !control.showBusyIndicator
+
             anchors.centerIn: parent
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -59,6 +63,15 @@ T.AbstractButton
             font.pixelSize: 16
             font.weight: 500
             color: d.parameters[control.type].textColors[control.state]
+        }
+
+        SpinnerBusyIndicator
+        {
+            visible: control.showBusyIndicator
+
+            anchors.centerIn: parent
+            radius: 16
+            running: true
         }
     }
 

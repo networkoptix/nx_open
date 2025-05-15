@@ -11,6 +11,8 @@ Popup
 
     default property alias data: contentColumn.data
 
+    property bool closeAutomatically: true
+
     parent: Overlay.overlay
 
     y: parent.height - height - d.keyboardHeight
@@ -22,6 +24,10 @@ Popup
             parent.height - windowContext.ui.measurements.deviceStatusBarHeight - d.keyboardHeight)
         return maxHeight
     }
+
+    closePolicy: closeAutomatically
+        ? Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
+        : Popup.NoAutoClose
 
     modal: true
 

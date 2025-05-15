@@ -70,6 +70,13 @@ private:
         READ operationManager
         CONSTANT)
 
+    // Temporary solution to block connection errors and screen changed during connection,
+    // until we refactor UI classes.
+    Q_PROPERTY(bool avoidHandlingConnectionStuff
+        READ avoidHandlingConnectionStuff
+        WRITE setAvoidHandlingConnectionStuff
+        NOTIFY avoidHandlingConnectionStuffChanged)
+
     using ResourceIdList = QList<nx::Uuid>;
     using SessionManager = nx::vms::client::mobile::SessionManager;
 
@@ -89,6 +96,9 @@ public:
     QnLayoutResource* rawLayout() const;
     void setRawLayout(QnLayoutResource* value);
 
+    bool avoidHandlingConnectionStuff() const;
+    void setAvoidHandlingConnectionStuff(bool value);
+
     nx::vms::client::mobile::OperationManager* operationManager() const;
 
 public:
@@ -104,6 +114,7 @@ signals:
     void resourcesScreenRequested(const QVariant& filterIds);
     void videoScreenRequested(QnResource* cameraResource, qint64 timestamp);
     void sessionsScreenRequested();
+    void avoidHandlingConnectionStuffChanged();
 
     void connectToServerScreenRequested(
         const QString& host,

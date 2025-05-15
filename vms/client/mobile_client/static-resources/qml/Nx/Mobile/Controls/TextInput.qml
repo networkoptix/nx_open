@@ -17,6 +17,8 @@ T.TextField
 
     property alias backgroundMode: fieldBackground.mode
     property alias labelText: fieldBackground.labelText
+    property alias supportText: fieldBackground.supportText
+    property alias errorText: fieldBackground.errorText
 
     property alias showActionButton: actionButton.visible
     property alias actionButtonImage: actionButton
@@ -24,13 +26,13 @@ T.TextField
         () =>
         {
             control.clear()
+            control.errorText = ""
             control.forceActiveFocus()
         }
 
     implicitWidth: 268
     implicitHeight: 56
 
-    clip: true
     topPadding: 30
     leftPadding: 12
     rightPadding: actionButton.visible
@@ -49,6 +51,8 @@ T.TextField
 
         owner: control
     }
+
+    Keys.onPressed: (event) => fieldBackground.handleKeyPressedEvent(event)
 
     // TODO #ynikitenkov Add Nx.Mobile.IconButton
     ColoredImage

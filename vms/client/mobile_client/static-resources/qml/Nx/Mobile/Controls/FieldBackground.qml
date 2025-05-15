@@ -16,10 +16,20 @@ Rectangle
         Dark
     }
 
-    property int mode: FieldBackground.Mode.Dark
-    property alias labelText: label.text
     property Item owner: parent
+
+    property alias labelText: label.text
+    property string supportText
+    property string errorText
+
+    property int mode: FieldBackground.Mode.Dark
     property bool compactLabelMode: owner.activeFocus || !!owner.text
+
+    function handleKeyPressedEvent(event)
+    {
+        if (CoreUtils.isCharKeyPressed(event))
+            control.errorText = ""
+    }
 
     opacity: enabled ? 1 : 0.3
 
@@ -39,9 +49,14 @@ Rectangle
     }
 
     border.width: 2
-    border.color: owner.activeFocus
-        ? ColorTheme.colors.brand_core
-        : color
+    border.color:
+    {
+        if (owner.errorText)
+            return ColorTheme.colors.red_core
+        return owner.activeFocus
+            ? ColorTheme.colors.brand_core
+            : color
+    }
 
     Text
     {
@@ -54,7 +69,31 @@ Rectangle
         opacity: enabled ? 1 : 0.3
 
         font.pixelSize: compactLabelMode ? 12 : 16
+        font.weight: 400
         color: ColorTheme.colors.light16
+        elide: Text.ElideRight
+    }
+
+    Text
+    {
+        id: bottomText
+
+        text: control.errorText
+            ? control.errorText
+            : control.supportText
+
+        x: owner.leftPadding
+        y: parent.height + 4
+        width: owner.width - 2 * x
+
+        opacity: enabled ? 1 : 0.3
+
+        font.pixelSize: 12
+        font.weight: 400
+        color: control.errorText
+            ? ColorTheme.colors.red_core
+            : ColorTheme.colors.light10
+        visible: !!text
         elide: Text.ElideRight
     }
 }

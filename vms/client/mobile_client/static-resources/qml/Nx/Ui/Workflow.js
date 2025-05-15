@@ -64,13 +64,6 @@ function openSessionsScreenWithWarning(systemName, errorText)
         showConnectionErrorMessage(systemName, errorText)
 }
 
-function openNewSessionScreen()
-{
-    var item = stackView.pushScreen(Qt.resolvedUrl("../Screens/CustomConnectionScreen.qml"))
-    if (item)
-        item.focusHostField()
-}
-
 function openOrganizationScreen(model, rootIndex)
 {
     stackView.pushScreen(
@@ -100,47 +93,6 @@ function openConnectToServerScreen(host, user, password, operationId)
             "passowrd": password,
             "operationId": operationId
         })
-
-    if (item)
-        item.focusCredentialsField()
-}
-
-function openDiscoveredSession(systemId, localSystemId, systemName, address)
-{
-    var item = stackView.pushScreen(
-            Qt.resolvedUrl("../Screens/CustomConnectionScreen.qml"),
-            {
-                "systemId": systemId,
-                "localSystemId": localSystemId,
-                "systemName": systemName,
-                "address": address
-            }
-    )
-    if (item)
-        item.focusCredentialsField()
-}
-
-function openSavedSession(
-    systemId,
-    localSystemId,
-    systemName,
-    address,
-    login,
-    passwordErrorText)
-{
-
-    var item = stackView.pushScreen(
-        Qt.resolvedUrl("../Screens/CustomConnectionScreen.qml"),
-        {
-            "systemId": systemId,
-            "localSystemId": localSystemId,
-            "systemName": systemName,
-            "address": address,
-            "login": login,
-            "saved": true,
-            "passwordErrorText": passwordErrorText
-        }
-    )
 
     if (item)
         item.focusCredentialsField()

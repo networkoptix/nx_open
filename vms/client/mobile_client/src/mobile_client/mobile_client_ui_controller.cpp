@@ -21,6 +21,7 @@ class QnMobileClientUiControllerPrivate
 public:
     std::unique_ptr<nx::vms::client::mobile::OperationManager> operationManager;
     QnLayoutResourcePtr layout;
+    bool avoidHandlingConnectionStuff = false;
     QnMobileClientUiController::Screen currentScreen =
         QnMobileClientUiController::Screen::UnknownScreen;
 };
@@ -44,8 +45,7 @@ QnMobileClientUiController::QnMobileClientUiController(
 
             const auto screen = currentScreen();
 
-            // Custom connection screen manages session presence itself.
-            if (screen == Screen::CustomConnectionScreen)
+            if (avoidHandlingConnectionStuff())
                 return;
 
             if (sessionManager()->hasSession())
@@ -55,7 +55,7 @@ QnMobileClientUiController::QnMobileClientUiController(
             else
             {
                 setRawLayout({});
-                if (screen != Screen::DigestLoginToCloudScreen)
+                if (currentScreen() != Screen::DigestLoginToCloudScreen)
                     openSessionsScreen();
             }
         });
@@ -86,8 +86,7 @@ QnMobileClientUiController::QnMobileClientUiController(
             NX_DEBUG(this, "initialize(): sessionFinishedWithError: current screen is <%1>",
                 currentScreen());
 
-            // Custom connection screen manages session errors itself.
-            if (currentScreen() == Screen::CustomConnectionScreen)
+            if (avoidHandlingConnectionStuff())
                 return;
 
             nx::vms::client::core::appContext()->coreSettings()->lastConnection = {};
@@ -140,6 +139,22 @@ void QnMobileClientUiController::setRawLayout(QnLayoutResource* value)
 
     d->layout = layout;
     emit layoutChanged();
+}
+
+bool QnMobileClientUiController::avoidHandlingConnectionStuff() const
+{
+    Q_D(const QnMobileClientUiController);
+    return d->avoidHandlingConnectionStuff;
+}
+
+void QnMobileClientUiController::setAvoidHandlingConnectionStuff(bool value)
+{
+    Q_D(QnMobileClientUiController);
+    if (d->avoidHandlingConnectionStuff == value)
+        return;
+
+    d->avoidHandlingConnectionStuff = value;
+    emit avoidHandlingConnectionStuffChanged();
 }
 
 nx::vms::client::mobile::OperationManager* QnMobileClientUiController::operationManager() const

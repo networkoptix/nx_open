@@ -8,10 +8,22 @@ Row
 
     property alias model: repeater.model
 
-    signal clicked(string id)
-
     width: parent.width
     spacing: repeater.count ? 12 : 0
+
+    signal clicked(string id)
+
+    function buttonById(id)
+    {
+        for (let i = 0; i !== repeater.count; ++i)
+        {
+            const button = repeater.itemAt(i)
+            if (button.buttonId === id)
+                return button
+        }
+
+        return null
+    }
 
     Repeater
     {
@@ -19,6 +31,8 @@ Row
 
         delegate: Button
         {
+            readonly property string buttonId: modelData.id
+
             type: modelData.type
             width: (parent.width + control.spacing) / repeater.count - control.spacing
             text: modelData.text

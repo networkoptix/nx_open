@@ -152,14 +152,4 @@ ListView
     highlightMoveDuration: 0
 
     focus: false
-
-    Keys.onPressed:
-    {
-        // TODO: #dklychkov Implement transparent navigation to the footer item.
-        if (event.key == Qt.Key_C)
-        {
-            Workflow.openNewSessionScreen()
-            event.accepted = true
-        }
-    }
 }
