@@ -405,7 +405,8 @@ bool canAddNvidia(
     [[maybe_unused]] bool reverseMode)
 {
     #if NX_MEDIA_NVIDIA_DECODER_SUPPORTED
-        return isNvidia()
+        return appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::legacyopengl
+            && isNvidia()
             && appContext()->localSettings()->hardwareDecodingEnabled()
             && !reverseMode
             && NvidiaVideoDecoderOldPlayer::instanceCount()
@@ -421,7 +422,8 @@ bool canAddIntel(
     [[maybe_unused]] bool reverseMode)
 {
     #if NX_MEDIA_QUICK_SYNC_DECODER_SUPPORTED
-        return isIntel()
+        return appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::legacyopengl
+            && isIntel()
             && appContext()->localSettings()->hardwareDecodingEnabled()
             && !reverseMode
             && QuickSyncVideoDecoderOldPlayer::instanceCount()
