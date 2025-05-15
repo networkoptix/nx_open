@@ -112,6 +112,7 @@ struct CombinedProperties
     CombinedValue isUdpMulticastTransportAllowed = CombinedValue::None;
     CombinedValue streamCapabilitiesInitialized = CombinedValue::None;
     CombinedValue hasRtspSettings = CombinedValue::None;
+    CombinedValue defaultKeepCameraTimeSettingsState = CombinedValue::None;
 
     int maxFps = 0;
 };
@@ -123,7 +124,7 @@ NX_REFLECTION_INSTRUMENT(CombinedProperties,
     (canForceZoomCapability)(hasStoppablePtz)(canAdjustPtzSensitivity)
     (hasCustomMediaPortCapability)
     (hasCustomMediaPort)(supportsSchedule)(isUdpMulticastTransportAllowed)
-    (streamCapabilitiesInitialized)(hasRtspSettings)(maxFps))
+    (streamCapabilitiesInitialized)(hasRtspSettings)(defaultKeepCameraTimeSettingsState)(maxFps))
 
 struct MotionConstraints
 {
@@ -320,8 +321,6 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
 
         UserEditableMultiple<bool> keepCameraTimeSettings;
         bool isKeepCameraTimeSettingsDefault = false;
-        // If it is not set, it means that selected cameras have different default values.
-        std::optional<bool> defaultKeepCameraTimeSettingsState;
 
         UserEditableMultiple<bool> useBitratePerGOP;
         UserEditableMultiple<nx::core::resource::UsingOnvifMedia2Type> useMedia2ToFetchProfiles;

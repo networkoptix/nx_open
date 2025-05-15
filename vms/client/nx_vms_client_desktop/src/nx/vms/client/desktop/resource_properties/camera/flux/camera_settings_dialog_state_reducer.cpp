@@ -976,16 +976,9 @@ void initKeepCameraTimeSettingsDefaultStates(
                 == camera->keepCameraTimeSettings();
         });
 
-    bool value;
-    const bool defaultKeepCameraTimeSettingsStatesAreSame = nx::utils::algorithm::same(
+    state->devicesDescription.defaultKeepCameraTimeSettingsState = combinedValue(
         cameras,
-        [](auto camera) { return camera->defaultKeepCameraTimeSettingsState(); },
-        &value);
-
-    if (defaultKeepCameraTimeSettingsStatesAreSame)
-        state->expert.defaultKeepCameraTimeSettingsState = value;
-    else
-        state->expert.defaultKeepCameraTimeSettingsState.reset();
+        [](const auto& camera) { return camera->defaultKeepCameraTimeSettingsState(); });
 }
 
 } // namespace
@@ -2475,7 +2468,8 @@ CameraSettingsDialogStateReducer::State
         return state;
 
     state.expert.isKeepCameraTimeSettingsDefault =
-        (state.expert.defaultKeepCameraTimeSettingsState == value);
+        (state.devicesDescription.defaultKeepCameraTimeSettingsState
+            == (value ? CombinedValue::All : CombinedValue::None));
 
     state.expert.keepCameraTimeSettings.setUser(value);
 
@@ -2501,14 +2495,14 @@ CameraSettingsDialogStateReducer::State
 
     state.expert.isKeepCameraTimeSettingsDefault = true;
 
-    if (!state.expert.defaultKeepCameraTimeSettingsState.has_value())
+    if (state.devicesDescription.defaultKeepCameraTimeSettingsState == CombinedValue::Some)
     {
         state.expert.keepCameraTimeSettings.resetUser();
     }
     else
     {
         state.expert.keepCameraTimeSettings.setUser(
-            state.expert.defaultKeepCameraTimeSettingsState.value());
+            state.devicesDescription.defaultKeepCameraTimeSettingsState == CombinedValue::All);
     }
 
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);

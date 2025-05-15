@@ -451,21 +451,24 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     const bool isNetworkLink = state.isSingleCamera() && state.singleCameraProperties.networkLink;
     ui->timeSettingsGroupBox->setHidden(!state.settingsOptimizationEnabled || isNetworkLink);
 
-    if (state.expert.isKeepCameraTimeSettingsDefault)
+    if (!state.settingsOptimizationEnabled)
+    {
+        ui->keepCameraTimeSettingsCheckBox->setCheckState(Qt::Checked);
+    }
+    else if (state.expert.isKeepCameraTimeSettingsDefault)
     {
         ui->keepCameraTimeSettingsCheckBox->setCheckState(
-            !state.expert.defaultKeepCameraTimeSettingsState.has_value()
+            state.devicesDescription.defaultKeepCameraTimeSettingsState == CombinedValue::Some
                 ? Qt::PartiallyChecked
-                : state.expert.defaultKeepCameraTimeSettingsState.value()
+                : state.devicesDescription.defaultKeepCameraTimeSettingsState == CombinedValue::All
                     ? Qt::Checked
                     : Qt::Unchecked);
     }
     else
     {
         check_box_utils::setupTristateCheckbox(ui->keepCameraTimeSettingsCheckBox,
-            state.expert.keepCameraTimeSettings.hasValue() || !state.settingsOptimizationEnabled,
-            !state.settingsOptimizationEnabled
-                || state.expert.keepCameraTimeSettings.valueOr(true));
+            state.expert.keepCameraTimeSettings.hasValue(),
+            state.expert.keepCameraTimeSettings.valueOr(true));
     }
 
     check_box_utils::setupTristateCheckbox(ui->bitratePerGopCheckBox,
