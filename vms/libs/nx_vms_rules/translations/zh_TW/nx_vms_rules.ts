@@ -84,17 +84,6 @@
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::BackupFinishedEvent</name>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>伺服器 &quot;%1&quot; 已完成錄影資料備份</translation>
-    </message>
-    <message>
-      <source>Backup Finished</source>
-      <translation>備份完成</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::rules::BasicEvent</name>
     <message>
       <source>%1 event has occurred</source>
