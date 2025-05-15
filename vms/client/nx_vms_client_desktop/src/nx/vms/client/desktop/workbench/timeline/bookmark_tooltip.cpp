@@ -94,25 +94,9 @@ void BookmarkTooltip::resizeEvent(QResizeEvent* event)
     {
         const auto yShift = event->size().height() - event->oldSize().height();
         move(x(), y() - yShift);
-
-        // The resize event occurs when a user flips a bookmark. The bookmark flip leads to a mouse
-        // leave event, which closes the tooltip. This workaround avoids this.
-        installEventFilter(this);
     }
 
     base_type::resizeEvent(event);
-}
-
-bool BookmarkTooltip::eventFilter(QObject *obj, QEvent *event)
-{
-    if (event->type() == QEvent::Leave)
-    {
-        // Filter was installed in the BookmarkTooltip::resizeEvent.
-        removeEventFilter(this);
-        return true;
-    }
-
-    return base_type::eventFilter(obj, event);
 }
 
 } // namespace nx::vms::client::desktop::workbench::timeline
