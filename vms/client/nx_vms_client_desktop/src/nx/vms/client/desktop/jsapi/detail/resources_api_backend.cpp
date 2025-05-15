@@ -91,10 +91,8 @@ ParameterResult ResourcesApiBackend::parameter(
     if (value.isNull())
         return {Error::invalidArguments(tr("Parameter not found"))};
 
-    if (auto [object, ok] = nx::reflect::json::deserialize<QJsonObject>(value.toStdString()); ok)
-        return {Error::success(), object};
-    if (auto [array, ok] = nx::reflect::json::deserialize<QJsonArray>(value.toStdString()); ok)
-        return {Error::success(), array};
+    if (auto [result, ok] = nx::reflect::json::deserialize<QJsonValue>(value.toStdString()); ok)
+        return {Error::success(), result};
 
     return {Error::success(), value};
 }
@@ -120,7 +118,7 @@ Error ResourcesApiBackend::setParameter(
     if (!resource)
         return resourceNotFound();
 
-    if (ResourceAccessManager::hasPermissions(resource, Qn::ReadWriteSavePermission))
+    if (!ResourceAccessManager::hasPermissions(resource, Qn::ReadWriteSavePermission))
         return Error::denied();
 
     resource->setProperty(name, QString::fromStdString(nx::reflect::json::serialize(value)));
