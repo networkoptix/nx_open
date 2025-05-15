@@ -12584,15 +12584,15 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
     <message>
       <source>No settings model</source>
-      <translation type="unfinished">No settings model</translation>
+      <translation>Modelo sin configuraciones</translation>
     </message>
     <message>
       <source>No parameters</source>
-      <translation type="unfinished">No parameters</translation>
+      <translation>Sin parámetros</translation>
     </message>
     <message>
       <source>Parameters set</source>
-      <translation type="unfinished">Parameters set</translation>
+      <translation>Parámetros establecidos</translation>
     </message>
   </context>
   <context>
@@ -12800,6 +12800,22 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <message>
       <source>Reset rules error: %1</source>
       <translation type="unfinished">Reset rules error: %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>Some of the rules were not enabled</source>
+      <comment>Form depends on invalid rule count</comment>
+      <translation type="unfinished">
+        <numerusform>Some of the rules were not enabled</numerusform>
+        <numerusform>Some of the rules were not enabled</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
+      <comment>Form depends on invalid rule count</comment>
+      <translation type="unfinished">
+        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      </translation>
     </message>
   </context>
   <context>

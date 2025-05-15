@@ -431,10 +431,6 @@
       <translation>Faire confiance à l'horodatage de la caméra</translation>
     </message>
     <message>
-      <source>Native camera presets will not be avaliable.</source>
-      <translation>Les préréglages natifs de la caméra ne seront pas disponibles.</translation>
-    </message>
-    <message>
       <source>This camera supports pan and tilt</source>
       <translation>Cette caméra prend en charge le panoramique et l'inclinaison</translation>
     </message>
@@ -533,6 +529,10 @@
     <message>
       <source>Use site presets</source>
       <translation>Utiliser les préréglages du site</translation>
+    </message>
+    <message>
+      <source>Native camera presets will not be available.</source>
+      <translation type="unfinished">Native camera presets will not be available.</translation>
     </message>
   </context>
   <context>
@@ -1532,7 +1532,7 @@
     </message>
     <message>
       <source>Tour cycle</source>
-      <translation>Tour cycle</translation>
+      <translation>Durée d’affichage</translation>
     </message>
     <message>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>

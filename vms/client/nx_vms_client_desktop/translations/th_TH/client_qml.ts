@@ -3081,8 +3081,12 @@ Press Alt + Click to follow object</source>
       <translation>ตารางบันทึก</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>สถานะ</translation>
+      <source>Enable</source>
+      <translation>เปิดใช้งาน</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

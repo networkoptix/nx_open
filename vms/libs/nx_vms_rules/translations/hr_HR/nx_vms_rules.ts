@@ -310,6 +310,10 @@
       <source>Unsupported JSON value type in key %1</source>
       <translation type="unfinished">Unsupported JSON value type in key %1</translation>
     </message>
+    <message>
+      <source>Total number of events</source>
+      <translation type="unfinished">Total number of events</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
@@ -568,12 +572,12 @@
   <context>
     <name>nx::vms::rules::FanErrorEvent</name>
     <message>
-      <source>Fan error at %1</source>
-      <translation type="unfinished">Fan error at %1</translation>
-    </message>
-    <message>
       <source>Fan Failure</source>
       <translation type="unfinished">Fan Failure</translation>
+    </message>
+    <message>
+      <source>Fan failure at %1</source>
+      <translation type="unfinished">Fan failure at %1</translation>
     </message>
   </context>
   <context>

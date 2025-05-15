@@ -3081,8 +3081,12 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
       <translation>Lịch trình</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Tình trạng</translation>
+      <source>Enable</source>
+      <translation>Cho phép</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

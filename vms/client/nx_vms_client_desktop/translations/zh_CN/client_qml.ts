@@ -3081,8 +3081,12 @@ Press Alt + Click to follow object</translation>
       <translation>录像计划</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>状态</translation>
+      <source>Enable</source>
+      <translation>启用</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

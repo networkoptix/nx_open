@@ -3093,8 +3093,12 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
       <translation>Takvim</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Durum</translation>
+      <source>Enable</source>
+      <translation>Etkinleştir</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

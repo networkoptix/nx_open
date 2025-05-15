@@ -431,10 +431,6 @@
       <translation>信任摄像机的时间戳记</translation>
     </message>
     <message>
-      <source>Native camera presets will not be avaliable.</source>
-      <translation>摄像机预置点将无法使用。</translation>
-    </message>
-    <message>
       <source>This camera supports pan and tilt</source>
       <translation>此摄相机支援水平和垂直摇摄</translation>
     </message>
@@ -533,6 +529,10 @@
     <message>
       <source>Use site presets</source>
       <translation type="unfinished">Use site presets</translation>
+    </message>
+    <message>
+      <source>Native camera presets will not be available.</source>
+      <translation type="unfinished">Native camera presets will not be available.</translation>
     </message>
   </context>
   <context>

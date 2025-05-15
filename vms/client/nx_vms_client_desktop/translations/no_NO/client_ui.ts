@@ -431,10 +431,6 @@
       <translation>Stol på kameraets tidsstempel</translation>
     </message>
     <message>
-      <source>Native camera presets will not be avaliable.</source>
-      <translation>Presets lagret i kamera vil ikke være tilgjengelige.</translation>
-    </message>
-    <message>
       <source>This camera supports pan and tilt</source>
       <translation>Dette kameraet støtter pan og tilt</translation>
     </message>
@@ -533,6 +529,10 @@
     <message>
       <source>Use site presets</source>
       <translation type="unfinished">Use site presets</translation>
+    </message>
+    <message>
+      <source>Native camera presets will not be available.</source>
+      <translation>Presets lagret i kamera vil ikke være tilgjengelige.</translation>
     </message>
   </context>
   <context>

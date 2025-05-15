@@ -431,10 +431,6 @@
       <translation>Lita på kameratidsstämpeln</translation>
     </message>
     <message>
-      <source>Native camera presets will not be avaliable.</source>
-      <translation>Varning! Ursprungliga förinställningar i kameran kommer inte vara tillgängliga.</translation>
-    </message>
-    <message>
       <source>This camera supports pan and tilt</source>
       <translation>Denna kamera stöder pan och tilt</translation>
     </message>
@@ -533,6 +529,10 @@
     <message>
       <source>Use site presets</source>
       <translation>Använd webbplatsens förinställningar</translation>
+    </message>
+    <message>
+      <source>Native camera presets will not be available.</source>
+      <translation type="unfinished">Native camera presets will not be available.</translation>
     </message>
   </context>
   <context>

@@ -3096,8 +3096,12 @@ Press Alt + Click to follow object</translation>
       <translation>Agendamento</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Estado</translation>
+      <source>Enable</source>
+      <translation>Habilitar</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

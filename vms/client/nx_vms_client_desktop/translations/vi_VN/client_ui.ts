@@ -431,10 +431,6 @@
       <translation>Tin dấu thời gian camera</translation>
     </message>
     <message>
-      <source>Native camera presets will not be avaliable.</source>
-      <translation>Cài đặt gốc của camera sẽ không có sẵn.</translation>
-    </message>
-    <message>
       <source>This camera supports pan and tilt</source>
       <translation>Camera này hỗ trợ quay ngang và nghiêng</translation>
     </message>
@@ -533,6 +529,10 @@
     <message>
       <source>Use site presets</source>
       <translation>Sử dụng cài đặt trước của Chi nhánh</translation>
+    </message>
+    <message>
+      <source>Native camera presets will not be available.</source>
+      <translation type="unfinished">Native camera presets will not be available.</translation>
     </message>
   </context>
   <context>

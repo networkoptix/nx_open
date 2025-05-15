@@ -3126,8 +3126,12 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
       <translation>Harmonogram</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Stan</translation>
+      <source>Enable</source>
+      <translation>Włącz</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

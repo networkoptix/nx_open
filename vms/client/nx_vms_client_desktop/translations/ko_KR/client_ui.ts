@@ -431,10 +431,6 @@
       <translation>트러스트 카메라 타임 스탬프</translation>
     </message>
     <message>
-      <source>Native camera presets will not be avaliable.</source>
-      <translation>카메라 자체 사전 설정은 사용할 수 없습니다.</translation>
-    </message>
-    <message>
       <source>This camera supports pan and tilt</source>
       <translation>이 카메라는 팬 과 틸트를 지원합니다.</translation>
     </message>
@@ -533,6 +529,10 @@
     <message>
       <source>Use site presets</source>
       <translation type="unfinished">Use site presets</translation>
+    </message>
+    <message>
+      <source>Native camera presets will not be available.</source>
+      <translation type="unfinished">Native camera presets will not be available.</translation>
     </message>
   </context>
   <context>

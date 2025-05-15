@@ -1180,7 +1180,7 @@
     <message>
       <source>New Tab</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation>新しいタブ</translation>
+      <translation>新規タブ</translation>
     </message>
     <message>
       <source>New Window</source>
@@ -1226,7 +1226,7 @@
     </message>
     <message>
       <source>Monitor in New Tab</source>
-      <translation>モニターを新しいタブで開く</translation>
+      <translation>モニターを新規タブで開く</translation>
     </message>
     <message>
       <source>Monitor in New Window</source>
@@ -6908,7 +6908,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Camera in new Tab</source>
-      <translation>新しいタブでカメラを開く</translation>
+      <translation>カメラを新規タブで開く</translation>
     </message>
     <message>
       <source>Open Camera in place</source>
@@ -11002,7 +11002,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
       <translation>
-        <numerusform>現在のレイアウトにカメラを追加するにはダブルクリック、新しいタブで開くには Ctrl + クリックしてください</numerusform>
+        <numerusform>現在のレイアウトにカメラを追加するにはダブルクリック、新規タブで開くには Ctrl + クリックしてください</numerusform>
       </translation>
     </message>
     <message>
@@ -11051,7 +11051,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation>新しいタブで開く</translation>
+      <translation>新規タブで開く</translation>
     </message>
     <message>
       <source>This action is not supported for notifications from other Sites</source>
@@ -12405,15 +12405,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
     <message>
       <source>No settings model</source>
-      <translation type="unfinished">No settings model</translation>
+      <translation>設定モデルなし</translation>
     </message>
     <message>
       <source>No parameters</source>
-      <translation type="unfinished">No parameters</translation>
+      <translation>パラメーターなし</translation>
     </message>
     <message>
       <source>Parameters set</source>
-      <translation type="unfinished">Parameters set</translation>
+      <translation>パラメーター設定済み</translation>
     </message>
   </context>
   <context>
@@ -12618,6 +12618,20 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Reset rules error: %1</source>
       <translation>ルールリセット時エラー: %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>Some of the rules were not enabled</source>
+      <comment>Form depends on invalid rule count</comment>
+      <translation type="unfinished">
+        <numerusform>Some of the rules were not enabled</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
+      <comment>Form depends on invalid rule count</comment>
+      <translation type="unfinished">
+        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      </translation>
     </message>
   </context>
   <context>

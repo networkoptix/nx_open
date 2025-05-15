@@ -3126,8 +3126,12 @@ Press Alt + Click to follow object</translation>
       <translation>לוח זמנים</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>מצב</translation>
+      <source>Enable</source>
+      <translation>אפשר</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

@@ -3081,8 +3081,12 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
       <translation>Jadwal</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Negara</translation>
+      <source>Enable</source>
+      <translation>Enable</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

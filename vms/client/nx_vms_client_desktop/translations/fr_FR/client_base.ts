@@ -12803,6 +12803,22 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       <source>Reset rules error: %1</source>
       <translation>Erreur de réinitialisation des règles : %1</translation>
     </message>
+    <message numerus="yes">
+      <source>Some of the rules were not enabled</source>
+      <comment>Form depends on invalid rule count</comment>
+      <translation type="unfinished">
+        <numerusform>Some of the rules were not enabled</numerusform>
+        <numerusform>Some of the rules were not enabled</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
+      <comment>Form depends on invalid rule count</comment>
+      <translation type="unfinished">
+        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::VolumePicker</name>

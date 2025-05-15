@@ -11481,7 +11481,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>
-      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+      <translation>Pengguna dengan email yang ditentukan sudah memiliki akses Administrator melalui Channel Partner</translation>
     </message>
   </context>
   <context>
@@ -12406,15 +12406,15 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
     <message>
       <source>No settings model</source>
-      <translation type="unfinished">No settings model</translation>
+      <translation>Tidak ada pengaturan model</translation>
     </message>
     <message>
       <source>No parameters</source>
-      <translation type="unfinished">No parameters</translation>
+      <translation>Tidak ada parameter</translation>
     </message>
     <message>
       <source>Parameters set</source>
-      <translation type="unfinished">Parameters set</translation>
+      <translation>Parameter ditetapkan</translation>
     </message>
   </context>
   <context>
@@ -12619,6 +12619,20 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>Reset rules error: %1</source>
       <translation>Reset aturan error: %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>Some of the rules were not enabled</source>
+      <comment>Form depends on invalid rule count</comment>
+      <translation type="unfinished">
+        <numerusform>Some of the rules were not enabled</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
+      <comment>Form depends on invalid rule count</comment>
+      <translation type="unfinished">
+        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      </translation>
     </message>
   </context>
   <context>

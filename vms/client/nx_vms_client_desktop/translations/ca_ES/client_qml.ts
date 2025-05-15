@@ -3096,8 +3096,12 @@ Press Alt + Click to follow object</translation>
       <translation>Calendari</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Estat</translation>
+      <source>Enable</source>
+      <translation>Activa</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

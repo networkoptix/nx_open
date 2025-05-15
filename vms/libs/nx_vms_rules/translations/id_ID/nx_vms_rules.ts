@@ -288,15 +288,19 @@
     </message>
     <message>
       <source>Select Integration Action</source>
-      <translation type="unfinished">Select Integration Action</translation>
+      <translation>Pilih Aksi Integrasi</translation>
     </message>
     <message>
       <source>Integration not found for Integration Action %1</source>
-      <translation type="unfinished">Integration not found for Integration Action %1</translation>
+      <translation>Integrasi tidak ditemukan untuk Aksi Integrasi %1</translation>
     </message>
     <message>
       <source>Unsupported JSON value type in key %1</source>
-      <translation type="unfinished">Unsupported JSON value type in key %1</translation>
+      <translation>Tipe nilai JSON tidak didukung dalam kunci %1</translation>
+    </message>
+    <message>
+      <source>Total number of events</source>
+      <translation>Jumlah total event</translation>
     </message>
   </context>
   <context>
@@ -554,12 +558,12 @@
   <context>
     <name>nx::vms::rules::FanErrorEvent</name>
     <message>
-      <source>Fan error at %1</source>
-      <translation>Error kipas pada %1</translation>
-    </message>
-    <message>
       <source>Fan Failure</source>
       <translation>Kegagalan Kipas</translation>
+    </message>
+    <message>
+      <source>Fan failure at %1</source>
+      <translation type="unfinished">Fan failure at %1</translation>
     </message>
   </context>
   <context>
@@ -653,11 +657,11 @@
     <name>nx::vms::rules::IntegrationAction</name>
     <message>
       <source>Integration Action</source>
-      <translation type="unfinished">Integration Action</translation>
+      <translation>Aksi Integrasi</translation>
     </message>
     <message>
       <source>Integration Action Parameters</source>
-      <translation type="unfinished">Integration Action Parameters</translation>
+      <translation>Parameter Aksi Integrasi</translation>
     </message>
   </context>
   <context>

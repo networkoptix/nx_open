@@ -3096,8 +3096,12 @@ Press Alt + Click to follow object</translation>
       <translation>Ütemzés</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Állapot</translation>
+      <source>Enable</source>
+      <translation>Engedélyezés</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

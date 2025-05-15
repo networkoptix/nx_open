@@ -3078,8 +3078,12 @@ Press Alt + Click to follow object</source>
       <translation>排程</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>狀態</translation>
+      <source>Enable</source>
+      <translation>啟用</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

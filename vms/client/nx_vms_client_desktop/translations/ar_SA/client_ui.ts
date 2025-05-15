@@ -431,10 +431,6 @@
       <translation>إعتمد الطابع الزمني للكاميرا</translation>
     </message>
     <message>
-      <source>Native camera presets will not be avaliable.</source>
-      <translation>لن تكون إعدادات الاتجاه المسبقة للكاميرا متاحة.</translation>
-    </message>
-    <message>
       <source>This camera supports pan and tilt</source>
       <translation>تدعم هذه الكاميرا الحركه والإمالة</translation>
     </message>
@@ -533,6 +529,10 @@
     <message>
       <source>Use site presets</source>
       <translation type="unfinished">Use site presets</translation>
+    </message>
+    <message>
+      <source>Native camera presets will not be available.</source>
+      <translation type="unfinished">Native camera presets will not be available.</translation>
     </message>
   </context>
   <context>

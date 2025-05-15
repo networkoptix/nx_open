@@ -3076,8 +3076,12 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
       <translation>일정</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>시/도</translation>
+      <source>Enable</source>
+      <translation>사용</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

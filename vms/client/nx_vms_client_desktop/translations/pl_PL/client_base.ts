@@ -13162,6 +13162,26 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
       <source>Reset rules error: %1</source>
       <translation>Błąd resetowania reguł: %1</translation>
     </message>
+    <message numerus="yes">
+      <source>Some of the rules were not enabled</source>
+      <comment>Form depends on invalid rule count</comment>
+      <translation type="unfinished">
+        <numerusform>Some of the rules were not enabled</numerusform>
+        <numerusform>Some of the rules were not enabled</numerusform>
+        <numerusform>Some of the rules were not enabled</numerusform>
+        <numerusform>Some of the rules were not enabled</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
+      <comment>Form depends on invalid rule count</comment>
+      <translation type="unfinished">
+        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::VolumePicker</name>

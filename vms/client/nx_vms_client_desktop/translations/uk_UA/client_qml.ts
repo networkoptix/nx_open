@@ -3126,8 +3126,12 @@ Press Alt + Click to follow object</translation>
       <translation>Розклад</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Стан</translation>
+      <source>Enable</source>
+      <translation>Увімкнути</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

@@ -3096,8 +3096,12 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
       <translation>Horaire</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>État</translation>
+      <source>Enable</source>
+      <translation>Activer</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

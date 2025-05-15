@@ -3096,8 +3096,12 @@ Press Alt + Click to follow object</translation>
       <translation type="unfinished">Schedule</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Status</translation>
+      <source>Enable</source>
+      <translation>Aktivér</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

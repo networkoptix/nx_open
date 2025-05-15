@@ -288,15 +288,19 @@
     </message>
     <message>
       <source>Select Integration Action</source>
-      <translation type="unfinished">Select Integration Action</translation>
+      <translation>インテグレーションアクションを選択してください</translation>
     </message>
     <message>
       <source>Integration not found for Integration Action %1</source>
-      <translation type="unfinished">Integration not found for Integration Action %1</translation>
+      <translation>インテグレーションアクション %1 のインテグレーションが見つかりません。</translation>
     </message>
     <message>
       <source>Unsupported JSON value type in key %1</source>
-      <translation type="unfinished">Unsupported JSON value type in key %1</translation>
+      <translation>キー %1 の値は、JSON 値としてサポートされません。</translation>
+    </message>
+    <message>
+      <source>Total number of events</source>
+      <translation>イベント総数</translation>
     </message>
   </context>
   <context>
@@ -554,12 +558,12 @@
   <context>
     <name>nx::vms::rules::FanErrorEvent</name>
     <message>
-      <source>Fan error at %1</source>
-      <translation>%1ファンエラー</translation>
-    </message>
-    <message>
       <source>Fan Failure</source>
       <translation>ファン故障</translation>
+    </message>
+    <message>
+      <source>Fan failure at %1</source>
+      <translation>%1 のファンが故障しました。</translation>
     </message>
   </context>
   <context>
@@ -653,11 +657,11 @@
     <name>nx::vms::rules::IntegrationAction</name>
     <message>
       <source>Integration Action</source>
-      <translation type="unfinished">Integration Action</translation>
+      <translation>インテグレーションアクション</translation>
     </message>
     <message>
       <source>Integration Action Parameters</source>
-      <translation type="unfinished">Integration Action Parameters</translation>
+      <translation>インテグレーションアクションのパラメーター</translation>
     </message>
   </context>
   <context>

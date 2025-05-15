@@ -431,10 +431,6 @@
       <translation>カメラのタイムスタンプを信頼する</translation>
     </message>
     <message>
-      <source>Native camera presets will not be avaliable.</source>
-      <translation>カメラのネイティブプリセットは利用できません。</translation>
-    </message>
-    <message>
       <source>This camera supports pan and tilt</source>
       <translation>このカメラはパンとチルトを使うことが出来ます</translation>
     </message>
@@ -533,6 +529,10 @@
     <message>
       <source>Use site presets</source>
       <translation>サイトプリセットを使用</translation>
+    </message>
+    <message>
+      <source>Native camera presets will not be available.</source>
+      <translation>カメラのネイティブプリセットは利用できません。</translation>
     </message>
   </context>
   <context>

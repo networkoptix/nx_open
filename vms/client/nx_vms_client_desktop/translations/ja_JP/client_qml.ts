@@ -3085,8 +3085,12 @@ Alt + クリックを使用してください。</translation>
       <translation>スケジュール</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>状態</translation>
+      <source>Enable</source>
+      <translation>有効化</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

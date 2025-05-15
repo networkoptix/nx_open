@@ -3096,8 +3096,12 @@ Tryck på Alt + Klicka för att följa objektet</translation>
       <translation>Schema</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Stat</translation>
+      <source>Enable</source>
+      <translation>Aktivera</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

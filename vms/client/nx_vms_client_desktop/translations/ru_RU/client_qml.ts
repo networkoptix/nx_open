@@ -3126,8 +3126,12 @@ Press Alt + Click to follow object</translation>
       <translation>Расписание</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Штат</translation>
+      <source>Enable</source>
+      <translation>Включить</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

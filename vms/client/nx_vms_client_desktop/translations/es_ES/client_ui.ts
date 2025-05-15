@@ -431,10 +431,6 @@
       <translation>Confiar en la marca de tiempo de la cámara</translation>
     </message>
     <message>
-      <source>Native camera presets will not be avaliable.</source>
-      <translation>Los ajustes preestablecidos de cámara nativos no estarán disponibles.</translation>
-    </message>
-    <message>
       <source>This camera supports pan and tilt</source>
       <translation>Esta cámara soporta movimiento vertical y horizontal</translation>
     </message>
@@ -533,6 +529,10 @@
     <message>
       <source>Use site presets</source>
       <translation type="unfinished">Use site presets</translation>
+    </message>
+    <message>
+      <source>Native camera presets will not be available.</source>
+      <translation type="unfinished">Native camera presets will not be available.</translation>
     </message>
   </context>
   <context>

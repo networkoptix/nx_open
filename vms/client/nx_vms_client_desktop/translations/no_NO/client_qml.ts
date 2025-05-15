@@ -3096,8 +3096,12 @@ Trykk Alt + Klikk for å følge objektet</translation>
       <translation>Tidsplan</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Tilstand</translation>
+      <source>Enable</source>
+      <translation>Aktiver</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

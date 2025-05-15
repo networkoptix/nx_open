@@ -3096,8 +3096,12 @@ Press Alt + Click to follow object</translation>
       <translation>Aikataulu</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Tila</translation>
+      <source>Enable</source>
+      <translation>Ota käyttöön</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation type="unfinished">Disable</translation>
     </message>
   </context>
   <context>

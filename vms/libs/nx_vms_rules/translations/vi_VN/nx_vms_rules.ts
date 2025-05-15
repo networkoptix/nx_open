@@ -298,6 +298,10 @@
       <source>Unsupported JSON value type in key %1</source>
       <translation type="unfinished">Unsupported JSON value type in key %1</translation>
     </message>
+    <message>
+      <source>Total number of events</source>
+      <translation>Tổng số sự kiện</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
@@ -554,12 +558,12 @@
   <context>
     <name>nx::vms::rules::FanErrorEvent</name>
     <message>
-      <source>Fan error at %1</source>
-      <translation>Lỗi quạt tại %1</translation>
-    </message>
-    <message>
       <source>Fan Failure</source>
       <translation>Lỗi quạt</translation>
+    </message>
+    <message>
+      <source>Fan failure at %1</source>
+      <translation type="unfinished">Fan failure at %1</translation>
     </message>
   </context>
   <context>

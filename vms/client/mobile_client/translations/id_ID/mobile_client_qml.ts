@@ -176,7 +176,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>Berbagi membuka dialog bookmark baru untuk menghasilkan link playback setelah mengatur opsi berbagi</translation>
     </message>
   </context>
   <context>
