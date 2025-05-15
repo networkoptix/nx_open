@@ -304,7 +304,12 @@ void CompatibilityManager::replaceActionBuilder(
     auto oldActionBuilder = m_rule->takeActionBuilder(0);
 
     if (auto targetDeviceField = oldActionBuilder->fieldByType<vms::rules::TargetDeviceField>())
-        m_lastActionCamerasSelection = {targetDeviceField->id()};
+    {
+        if (targetDeviceField->id().isNull())
+            m_lastActionCamerasSelection = {UuidSet{}};
+        else
+            m_lastActionCamerasSelection = {targetDeviceField->id()};
+    }
 
     if (auto targetDevicesField = oldActionBuilder->fieldByType<vms::rules::TargetDevicesField>())
         m_lastActionCamerasSelection = targetDevicesField->ids();
