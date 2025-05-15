@@ -35,21 +35,18 @@ public:
         m_sendThread.join();
     }
 
-    virtual Result<int> sendto(const detail::SocketAddress& addr, CPacket packet) override
+    virtual Result<int> sendto(const detail::SocketAddress& addr, std::unique_ptr<CPacket> packet) override
     {
         static constexpr auto kMaxDelay = std::chrono::milliseconds(999);
 
         std::lock_guard<std::mutex> lock(m_mutex);
 
-        if (packet.getFlag() == PacketFlag::Control)
+        if (packet->getFlag() == PacketFlag::Control)
             return base_type::sendto(addr, std::move(packet));
 
         // Delaying every data packet to force FIN before the last data.
 
-        const auto [ioBufs, count] = packet.ioBufs();
-        const auto packetSize = std::accumulate(
-            ioBufs, ioBufs + count, 0,
-            [](auto one, auto two) { return one + two.size(); });
+        const auto packetSize = packet->bufferSize();
 
         m_sendTasks.emplace(
             std::chrono::steady_clock::now() + kMaxDelay,
@@ -64,7 +61,7 @@ private:
     struct SendTask
     {
         detail::SocketAddress addr;
-        CPacket packet;
+        std::unique_ptr<CPacket> packet;
     };
 
     std::mutex m_mutex;

@@ -134,11 +134,14 @@ enum class PacketFlag
 using PacketHeader = uint32_t[4];
 
 static constexpr int kPacketHeaderSize = sizeof(PacketHeader);
+static constexpr int kMaxPayloadSize = UDT::kMSSMax - kPacketHeaderSize;
 
 class UDT_API CPacket
 {
 private:
     PacketHeader m_nHeader;
+    uint8_t m_payload[kMaxPayloadSize];
+    int m_payloadSize = 0;
 
 public:
     int32_t& m_iSeqNo;                   // alias: sequence number
@@ -146,23 +149,20 @@ public:
     int32_t& m_iTimeStamp;               // alias: timestamp
     int32_t& m_iID;                      // alias: socket ID
 
-    const Buffer& payload() const { return m_payload; }
-    Buffer& payload() { return m_payload; }
+    const uint8_t* payload() const { return m_payload; }
+    uint8_t* payload() { return m_payload; }
 
-    void setPayload(Buffer buffer) { m_payload = std::move(buffer); }
+    void setPayload(const uint8_t* buffer, int size)
+    {
+        memcpy(m_payload, buffer, size);
+        m_payloadSize = size;
+    }
 
 public:
     CPacket();
     ~CPacket();
 
-    CPacket(const CPacket&);
-    CPacket(CPacket&&);
-
-    // TODO: #akolesnikov Remove this. Replace usages with payload().size().
     int getLength() const;
-
-    // TODO: #akolesnikov Remove this function. Replace usages with payload().resize() or
-    // corresponding error reporting.
     void setLength(int len);
 
     // Functionality:
@@ -177,6 +177,9 @@ public:
     //    None.
 
     void pack(ControlPacketType pkttype, void* lparam = NULL, int payloadSize = 0);
+
+    char* buffer() { return (char*) &m_nHeader; }
+    constexpr int bufferSize() const { return kPacketHeaderSize + sizeof(m_payload); }
 
     // Functionality:
     //    Read the packet flag.
@@ -247,19 +250,7 @@ public:
     const uint32_t* header() const { return m_nHeader; }
     uint32_t* header() { return m_nHeader; }
 
-    std::tuple<const IoBuf*, std::size_t> ioBufs() const;
-    std::tuple<IoBuf*, std::size_t> ioBufs();
-
 private:
-    const int32_t __pad = 0;
-    // TODO: #akolesnikov Remove mutable.
-    mutable Buffer m_payload;
-    // TODO: #akolesnikov Remove mutable.
-    mutable BufArray<2> m_PacketVector;          // The 2-dimension vector of UDT packet [header, data]
-
-    // TODO: #akolesnikov Remove const.
-    void preparePacketVector() const;
-
     CPacket& operator=(const CPacket&) = delete;
     CPacket& operator=(CPacket&&) = delete;
 };

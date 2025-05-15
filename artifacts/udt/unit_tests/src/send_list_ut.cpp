@@ -18,7 +18,6 @@ public:
         m_multiplexer = std::make_shared<Multiplexer>(
             AF_INET,
             /*payloadSize*/ 4*1024,
-            /*mss*/ 64*1024,
             /*reuseAddr*/ true,
             /*id*/ 1);
     }
@@ -52,8 +51,7 @@ TEST_F(CSndUList, no_recursive_lock_when_CSndUList_gets_CUDT_ownership)
                 threadStarted.set_value();
 
                 detail::SocketAddress addr;
-                CPacket pkt;
-                m_multiplexer->sendQueue().sndUList().pop(addr, pkt);
+                m_multiplexer->sendQueue().sndUList().pop(addr);
             });
 
         threadStarted.get_future().wait();

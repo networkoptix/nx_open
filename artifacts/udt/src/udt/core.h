@@ -75,7 +75,7 @@ public:
     /**
      * If packet does not contain connection request, non-zero is returned.
      */
-    int processConnectionRequest(const detail::SocketAddress& addr, const CPacket& packet);
+    int processConnectionRequest(const detail::SocketAddress& addr, const CPacket* packet);
 
     void addEPoll(const int eid);
     void removeEPoll(const int eid);
@@ -259,7 +259,7 @@ public: // internal API
     // Parameters:
     //    0) [in] pkt: handshake packet.
 
-    Result<ConnectState> connect(const CPacket& pkt);
+    Result<ConnectState> connect(const CPacket* pkt);
 
     // Functionality:
     //    Connect to a UDT entity listening at address "peer", which has sent "hs" request.
@@ -366,8 +366,8 @@ public: // internal API
 
     // Generation and processing of packets
     void sendCtrl(ControlPacketType pkttype, void* lparam = NULL, void* rparam = NULL, int size = 0);
-    void processCtrl(CPacket& ctrlpkt);
-    int packData(CPacket& packet, std::chrono::microseconds& ts);
+    void processCtrl(const CPacket* ctrlpkt);
+    int packData(CPacket* packet, std::chrono::microseconds& ts);
     Result<> processData(Unit unit);
 
     void checkTimers(bool forceAck);

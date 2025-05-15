@@ -216,3 +216,11 @@ std::shared_ptr<ValueType> BasicBuffer<ValueType>::allocate(size_type size)
 
 // NOTE: Disabling implicit sharing to see if it resolves the problem VMS-18365.
 using Buffer = std::string;
+
+struct BufferRef
+{
+    const char* data = 0;
+    int size = 0;
+
+    const bool empty() const { return size == 0; }
+};

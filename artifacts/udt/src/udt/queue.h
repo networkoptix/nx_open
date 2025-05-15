@@ -99,11 +99,10 @@ public:
     //    Retrieve the next packet and peer address from the first entry, and reschedule it in the queue.
     // Parameters:
     //    0) [out] addr: destination address of the next packet
-    //    1) [out] pkt: the next packet to be sent
     // Returned value:
-    //    1 if successfully retrieved, -1 if no packet found.
+    //    pkt: the next packet to be sent
 
-    int pop(detail::SocketAddress& addr, CPacket& pkt);
+    std::unique_ptr<CPacket> pop(detail::SocketAddress& addr);
 
     // Functionality:
     //    Remove UDT instance from the list.
@@ -251,6 +250,8 @@ public:
 
     Result<> start();
 
+    void stop();
+
     // Functionality:
     //    Send out a packet to a given address.
     // Parameters:
@@ -259,7 +260,7 @@ public:
     // Returned value:
     //    Size of data sent out.
 
-    int sendto(const detail::SocketAddress& addr, CPacket packet);
+    void sendto(const detail::SocketAddress& addr, std::unique_ptr<CPacket> packet);
 
     // List of UDT instances for data sending.
     CSndUList& sndUList() { return *m_pSndUList; }
@@ -269,15 +270,15 @@ public:
 private:
     void worker();
 
-    int sendPacket(const detail::SocketAddress& addr, CPacket packet);
-    void postPacket(const detail::SocketAddress& addr, CPacket packet);
+    void sendPacket(const detail::SocketAddress& addr, std::unique_ptr<CPacket> packet);
+    void postPacket(const detail::SocketAddress& addr, std::unique_ptr<CPacket> packet);
     void sendPostedPackets();
 
 private:
     struct SendTask
     {
         detail::SocketAddress addr;
-        CPacket packet;
+        std::unique_ptr<CPacket> packet;
     };
 
     // List of UDT instances for data sending
@@ -310,7 +311,6 @@ public:
      */
     CRcvQueue(
         int size,
-        int payload,
         int ipVersion,
         AbstractUdpChannel* c,
         CTimer* t);
@@ -329,11 +329,9 @@ public:
     //    2) [out] packet: received packet
     // Returned value:
     //    Data size of the packet
-    // TODO: #akolesnikov Refactor this function to return packet, not copy it.
 
-    int recvfrom(
+    std::unique_ptr<CPacket> recvfrom(
         int32_t id,
-        CPacket& packet,
         std::chrono::microseconds timeout = kDefaultRecvTimeout);
 
     bool setListener(std::weak_ptr<ServerSideConnectionAcceptor> listener);
@@ -374,9 +372,6 @@ private:
     // shared timer with the snd queue
     CTimer* m_timer = nullptr;
     const int m_iIPversion;
-
-    // packet payload size
-    int m_iPayloadSize = 0;
 
     // closing the workder
     volatile bool m_bClosing = false;

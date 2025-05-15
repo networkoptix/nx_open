@@ -71,7 +71,9 @@ public:
     // Returned value:
     //    Actual size of data sent.
     // TODO: #akolesnikov Should accept "const CPacket&".
-    virtual Result<int> sendto(const detail::SocketAddress& addr, CPacket packet) = 0;
+    virtual Result<int> sendto(
+        const detail::SocketAddress& addr,
+        std::unique_ptr<CPacket> packet) = 0;
 
     // Functionality:
     //    Receive a packet from the channel and record the source address.
@@ -80,7 +82,8 @@ public:
     //    1) [in] packet: reference to a CPacket entity.
     // Returned value:
     //    Actual size of data received.
-    virtual Result<int> recvfrom(detail::SocketAddress& addr, CPacket& packet) = 0;
+    virtual std::optional<detail::SocketAddress> recvfrom(
+        CPacket* packet) = 0;
 
     virtual Result<> shutdown() = 0;
 };
@@ -122,8 +125,11 @@ public:
     virtual void setSndBufSize(int size) override;
     virtual void setRcvBufSize(int size) override;
     virtual detail::SocketAddress getSockAddr() const override;
-    virtual Result<int> sendto(const detail::SocketAddress& addr, CPacket packet) override;
-    virtual Result<int> recvfrom(detail::SocketAddress& addr, CPacket& packet) override;
+    virtual Result<int> sendto(
+        const detail::SocketAddress& addr,
+        std::unique_ptr<CPacket> packet) override;
+    virtual std::optional<detail::SocketAddress> recvfrom(
+        CPacket* packet) override;
     virtual Result<> shutdown() override;
 
 private:

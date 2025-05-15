@@ -17,7 +17,6 @@ class UDT_API Multiplexer
 public:
     Multiplexer(
         int ipVersion,
-        int payloadSize,
         int maximumSegmentSize,
         bool reusable,
         int id);

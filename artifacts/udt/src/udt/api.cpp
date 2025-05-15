@@ -1220,7 +1220,6 @@ Result<> CUDTUnited::updateMux(
     // a new multiplexer is needed
     auto multiplexer = std::make_shared<Multiplexer>(
         s->m_pUDT->ipVersion(),
-        s->m_pUDT->payloadSize(),
         s->m_pUDT->mss(),
         s->m_pUDT->reuseAddr(),
         s->m_SocketId);

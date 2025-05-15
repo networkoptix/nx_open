@@ -22,7 +22,7 @@ struct UDT_API Unit
     Unit(Unit&&) = default;
     ~Unit();
 
-    CPacket& packet();
+    std::unique_ptr<CPacket>& packet();
 
     void setFlag(Flag val);
     Flag flag() const;
@@ -43,7 +43,7 @@ private:
 class UDT_API UnitQueue
 {
 public:
-    UnitQueue(int initialQueueSize, int bufferSize);
+    UnitQueue(int initialQueueSize);
     ~UnitQueue();
 
     UnitQueue(const UnitQueue&) = delete;

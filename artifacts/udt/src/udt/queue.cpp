@@ -195,7 +195,7 @@ void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
     insert_(std::chrono::microseconds(1), n);
 }
 
-int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
+std::unique_ptr<CPacket> CSndUList::pop(detail::SocketAddress& addr)
 {
     // When this method destroyes CUDT, it must do it with no mutex lock.
     std::shared_ptr<CUDT> u;
@@ -203,24 +203,26 @@ int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
     std::lock_guard<std::mutex> lock(m_mutex);
 
     if (-1 == m_iLastEntry)
-        return -1;
+        return nullptr;
 
     auto n = m_nodeHeap[0];
 
     // no pop until the next scheduled time
     auto ts = CTimer::getTime();
     if (ts < n->timestamp)
-        return -1;
+        return nullptr;
 
     u = n->socket.lock();
     remove_(n);
 
     if (!u || !u->connected() || u->broken())
-        return -1;
+        return nullptr;
+
+    auto pkt = std::make_unique<CPacket>();
 
     // pack a packet from the socket
-    if (u->packData(pkt, ts) <= 0)
-        return -1;
+    if (u->packData(pkt.get(), ts) <= 0)
+        return nullptr;
 
     addr = u->peerAddr();
 
@@ -228,7 +230,7 @@ int CSndUList::pop(detail::SocketAddress& addr, CPacket& pkt)
     if (ts > std::chrono::microseconds::zero())
         insert_(ts, n);
 
-    return 1;
+    return pkt;
 }
 
 void CSndUList::remove(CUDT* u)
@@ -347,6 +349,11 @@ CSndQueue::CSndQueue(AbstractUdpChannel* c, CTimer* t):
 
 CSndQueue::~CSndQueue()
 {
+    stop();
+}
+
+void CSndQueue::stop()
+{
     m_bClosing = true;
 
     {
@@ -402,8 +409,8 @@ void CSndQueue::worker()
 
             // it is time to send the next pkt
             detail::SocketAddress addr;
-            CPacket pkt;
-            if (m_pSndUList->pop(addr, pkt) < 0)
+            auto pkt = m_pSndUList->pop(addr);
+            if (!pkt)
                 continue;
 
 #ifdef DEBUG_RECORD_PACKET_HISTORY
@@ -423,11 +430,9 @@ void CSndQueue::worker()
     }
 }
 
-int CSndQueue::sendto(const detail::SocketAddress& addr, CPacket packet)
+void CSndQueue::sendto(const detail::SocketAddress& addr, std::unique_ptr<CPacket> packet)
 {
-    const auto packetLength = packet.getLength();
     postPacket(addr, std::move(packet));
-    return packetLength;
 }
 
 detail::SocketAddress CSndQueue::getLocalAddr() const
@@ -435,24 +440,22 @@ detail::SocketAddress CSndQueue::getLocalAddr() const
     return m_channel->getSockAddr();
 }
 
-int CSndQueue::sendPacket(const detail::SocketAddress& addr, CPacket packet)
+void CSndQueue::sendPacket(const detail::SocketAddress& addr, std::unique_ptr<CPacket> packet)
 {
 #ifdef DEBUG_RECORD_PACKET_HISTORY
     packetVerifier.beforeSendingPacket(packet);
 #endif // DEBUG_RECORD_PACKET_HISTORY
 
     // send out the packet immediately (high priority), this is a control packet
-    const auto packetLength = packet.getLength();
 
 #ifdef TRACE_PACKETS
     tracePacket("send", m_channel->getSockAddr(), addr, packet);
 #endif
 
     m_channel->sendto(addr, std::move(packet));
-    return packetLength;
 }
 
-void CSndQueue::postPacket(const detail::SocketAddress& addr, CPacket packet)
+void CSndQueue::postPacket(const detail::SocketAddress& addr, std::unique_ptr<CPacket> packet)
 {
     {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -620,13 +623,13 @@ void CRendezvousQueue::updateConnStatus()
                 continue;
             }
 
-            CPacket request;
-            request.pack(ControlPacketType::Handshake, nullptr, udtSocket->payloadSize());
+            auto request = std::make_unique<CPacket>();
+            request->pack(ControlPacketType::Handshake, nullptr, udtSocket->payloadSize());
             // ID = 0, connection request
-            request.m_iID = !udtSocket->rendezvous() ? 0 : udtSocket->connRes().m_iID;
+            request->m_iID = !udtSocket->rendezvous() ? 0 : udtSocket->connRes().m_iID;
             int hs_size = udtSocket->payloadSize();
-            udtSocket->connReq().serialize(request.payload().data(), hs_size);
-            request.setLength(hs_size);
+            udtSocket->connReq().serialize((char*) request->payload(), hs_size);
+            request->setLength(hs_size);
             udtSocket->sndQueue().sendto(i->peerAddr, std::move(request));
             udtSocket->setLastReqTime(CTimer::getTime());
         }
@@ -638,20 +641,17 @@ void CRendezvousQueue::updateConnStatus()
 
 CRcvQueue::CRcvQueue(
     int size,
-    int payload,
     int ipVersion,
     AbstractUdpChannel* c,
     CTimer* t)
     :
-    m_UnitQueue(size, payload),
+    m_UnitQueue(size),
     m_channel(c),
     m_timer(t),
     m_iIPversion(ipVersion),
-    m_iPayloadSize(payload),
     m_bClosing(false),
     m_pRendezvousQueue(std::make_unique<CRendezvousQueue>())
 {
-    assert(m_iPayloadSize > 0);
 }
 
 CRcvQueue::~CRcvQueue()
@@ -685,8 +685,6 @@ void CRcvQueue::worker()
 {
     setCurrentThreadName(typeid(*this).name());
 
-    detail::SocketAddress addr(m_iIPversion);
-
     while (!m_bClosing)
     {
 #ifdef NO_BUSY_WAITING
@@ -702,22 +700,16 @@ void CRcvQueue::worker()
 
         // find next available slot for incoming packet
         auto unit = m_UnitQueue.takeNextAvailUnit();
-        unit.packet().payload().resize(m_iPayloadSize);
 
-        // Reading next incoming packet, recvfrom returns -1 if nothing has been received.
-        if (!m_channel->recvfrom(addr, unit.packet()).ok())
-        {
-            timerCheck();
-            continue;
-        }
-
-#ifdef TRACE_PACKETS
-        tracePacket("recv", addr, m_channel->getSockAddr(), unit->packet());
-#endif
-
-        processUnit(std::move(unit), addr);
+        // Reading next incoming packet, recvfrom returns empty addr if nothing has been received.
         // Ignoring error since the socket could be removed before connect finished.
-
+        if (const auto addr = m_channel->recvfrom(unit.packet().get()))
+        {
+            #ifdef TRACE_PACKETS
+                tracePacket("recv", addr, m_channel->getSockAddr(), unit->packet());
+            #endif
+            processUnit(std::move(unit), *addr);
+        }
         timerCheck();
     }
 }
@@ -753,23 +745,23 @@ void CRcvQueue::timerCheck()
 
 Result<> CRcvQueue::processUnit(Unit unit, const detail::SocketAddress& addr)
 {
-    int32_t id = unit.packet().m_iID;
+    int32_t id = unit.packet()->m_iID;
 
     // ID 0 is for connection request, which should be passed to the listening socket or rendezvous sockets
     if (0 == id)
     {
         if (auto listener = m_listener.lock())
         {
-            listener->processConnectionRequest(addr, unit.packet());
+            listener->processConnectionRequest(addr, unit.packet().get());
         }
         else if (auto u = m_pRendezvousQueue->getByAddr(addr, id))
         {
             // asynchronous connect: call connect here
             // otherwise wait for the UDT socket to retrieve this packet
             if (!u->synRecving())
-                u->connect(unit.packet()); // TODO: #akolesnikov The result code is ignored here.
+                u->connect(unit.packet().get()); // TODO: #akolesnikov The result code is ignored here.
             else
-                storePkt(id, unit.packet().clone());
+                storePkt(id, unit.packet()->clone());
         }
     }
     else if (id > 0)
@@ -784,10 +776,10 @@ Result<> CRcvQueue::processUnit(Unit unit, const detail::SocketAddress& addr)
             {
                 if (u->connected() && !u->broken() && !u->isClosing())
                 {
-                    if (unit.packet().getFlag() == PacketFlag::Data)
+                    if (unit.packet()->getFlag() == PacketFlag::Data)
                         u->processData(std::move(unit)); // TODO: #akolesnikov It is unclear why the result is ignored.
                     else
-                        u->processCtrl(unit.packet());
+                        u->processCtrl(unit.packet().get());
 
                     u->checkTimers(false);
                     m_rcvUList.sink(id);
@@ -797,18 +789,17 @@ Result<> CRcvQueue::processUnit(Unit unit, const detail::SocketAddress& addr)
         else if (auto u = m_pRendezvousQueue->getByAddr(addr, id))
         {
             if (!u->synRecving())
-                u->connect(unit.packet()); // TODO: #akolesnikov The result code is ignored here.
+                u->connect(unit.packet().get()); // TODO: #akolesnikov The result code is ignored here.
             else
-                storePkt(id, unit.packet().clone());
+                storePkt(id, unit.packet()->clone());
         }
     }
 
     return success();
 }
 
-int CRcvQueue::recvfrom(
+std::unique_ptr<CPacket> CRcvQueue::recvfrom(
     int32_t id,
-    CPacket& packet,
     std::chrono::microseconds timeout)
 {
     std::unique_lock<std::mutex> lock(m_mutex);
@@ -821,24 +812,11 @@ int CRcvQueue::recvfrom(
 
         i = m_packets.find(id);
         if (i == m_packets.end())
-        {
-            packet.setLength(-1);
-            return -1;
-        }
+            return {};
     }
 
     // retrieve the earliest packet
-    auto& newpkt = i->second.front();
-
-    if (packet.getLength() < newpkt->getLength())
-    {
-        packet.setLength(-1);
-        return -1;
-    }
-
-    // copy packet content
-    memcpy(packet.header(), newpkt->header(), kPacketHeaderSize);
-    packet.setPayload(newpkt->payload());
+    auto packet = std::move(i->second.front());
 
     // remove this message from queue,
     // if no more messages left for this socket, release its data structure
@@ -846,7 +824,7 @@ int CRcvQueue::recvfrom(
     if (i->second.empty())
         m_packets.erase(i);
 
-    return packet.getLength();
+    return packet;
 }
 
 bool CRcvQueue::setListener(std::weak_ptr<ServerSideConnectionAcceptor> listener)

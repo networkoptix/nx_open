@@ -24,9 +24,9 @@ protected:
 
     void whenSend()
     {
-        CPacket packet;
-        packet.setLength(128);
-        m_lastSendResult = m_channel->sendto(m_channel->getSockAddr(), packet);
+        auto packet = std::make_unique<CPacket>();
+        packet->setLength(128);
+        m_lastSendResult = m_channel->sendto(m_channel->getSockAddr(), std::move(packet));
     }
 
     void thenSendFailed()
@@ -36,15 +36,14 @@ protected:
 
     void whenRecv()
     {
-        detail::SocketAddress addr;
-        CPacket packet;
-        packet.setLength(128);
-        m_lastRecvResult = m_channel->recvfrom(addr, packet);
+        auto packet = std::make_unique<CPacket>();
+        packet->setLength(128);
+        m_lastRecvResult = m_channel->recvfrom(packet.get());
     }
 
     void thenRecvFailed()
     {
-        ASSERT_FALSE(m_lastRecvResult->ok());
+        ASSERT_FALSE(m_lastRecvResult);
     }
 
     void createUdpSocket()
@@ -67,7 +66,7 @@ protected:
 
 private:
     std::optional<Result<int>> m_lastSendResult;
-    std::optional<Result<int>> m_lastRecvResult;
+    std::optional<detail::SocketAddress> m_lastRecvResult;
     std::unique_ptr<::UdpChannel> m_channel;
     UDPSOCKET m_udpSocket = INVALID_UDP_SOCKET;
 };

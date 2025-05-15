@@ -202,7 +202,7 @@ int SendBuffer::addBufferFromFile(fstream& ifs, int len)
     return total;
 }
 
-std::optional<Buffer> SendBuffer::readData(int32_t& msgno)
+std::optional<BufferRef> SendBuffer::readData(int32_t& msgno)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -210,10 +210,10 @@ std::optional<Buffer> SendBuffer::readData(int32_t& msgno)
     if (m_pCurrBlock == m_pLastBlock)
         return std::nullopt;
 
-    std::optional<Buffer> data;
+    std::optional<BufferRef> data;
     // TODO: #akolesnikov Avoid copying here by switching Block::m_pcData to Buffer.
     if (m_pCurrBlock->m_iLength >= 0)
-        data = Buffer(m_pCurrBlock->m_pcData, m_pCurrBlock->m_iLength);
+        data = BufferRef{m_pCurrBlock->m_pcData, m_pCurrBlock->m_iLength};
 
     msgno = m_pCurrBlock->m_iMsgNo;
 
@@ -222,7 +222,7 @@ std::optional<Buffer> SendBuffer::readData(int32_t& msgno)
     return data;
 }
 
-std::optional<Buffer> SendBuffer::readData(const int offset, int32_t& msgno, int& msglen)
+std::optional<BufferRef> SendBuffer::readData(const int offset, int32_t& msgno, int& msglen)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -253,7 +253,7 @@ std::optional<Buffer> SendBuffer::readData(const int offset, int32_t& msgno, int
     }
 
     // TODO: #akolesnikov Avoid copying here by switching Block::m_pcData to Buffer.
-    auto data = Buffer(p->m_pcData, p->m_iLength);
+    auto data = BufferRef{p->m_pcData, p->m_iLength};
     msgno = p->m_iMsgNo;
 
     return data;
@@ -361,14 +361,14 @@ int ReceiveBuffer::readBuffer(char* data, int len)
 
     while ((p != lastack) && (rs > 0) && m_pUnit[p])
     {
-        int unitsize = m_pUnit[p]->packet().getLength() - m_iNotch;
+        int unitsize = m_pUnit[p]->packet()->getLength() - m_iNotch;
         if (unitsize > rs)
             unitsize = rs;
 
-        memcpy(data, m_pUnit[p]->packet().payload().data() + m_iNotch, unitsize);
+        memcpy(data, m_pUnit[p]->packet()->payload() + m_iNotch, unitsize);
         data += unitsize;
 
-        if ((rs > unitsize) || (rs == m_pUnit[p]->packet().getLength() - m_iNotch))
+        if ((rs > unitsize) || (rs == m_pUnit[p]->packet()->getLength() - m_iNotch))
         {
             m_pUnit[p].reset();
 
@@ -397,15 +397,15 @@ int ReceiveBuffer::readBufferToFile(fstream& ofs, int len)
 
     while ((p != lastack) && (rs > 0) && m_pUnit[p])
     {
-        int unitsize = m_pUnit[p]->packet().getLength() - m_iNotch;
+        int unitsize = m_pUnit[p]->packet()->getLength() - m_iNotch;
         if (unitsize > rs)
             unitsize = rs;
 
-        ofs.write(m_pUnit[p]->packet().payload().data() + m_iNotch, unitsize);
+        ofs.write((const char*) m_pUnit[p]->packet()->payload() + m_iNotch, unitsize);
         if (ofs.fail())
             break;
 
-        if ((rs > unitsize) || (rs == m_pUnit[p]->packet().getLength() - m_iNotch))
+        if ((rs > unitsize) || (rs == m_pUnit[p]->packet()->getLength() - m_iNotch))
         {
             m_pUnit[p].reset();
 
@@ -464,7 +464,7 @@ void ReceiveBuffer::dropMsg(int32_t msgno)
     std::lock_guard<std::mutex> lock(m_mutex);
 
     for (int i = m_iStartPos, n = (m_iLastAckPos + m_iMaxPos) % m_iSize; i != n; i = (i + 1) % m_iSize)
-        if (m_pUnit[i] && (msgno == m_pUnit[i]->packet().m_iMsgNo))
+        if (m_pUnit[i] && (msgno == m_pUnit[i]->packet()->m_iMsgNo))
             m_pUnit[i]->setFlag(Unit::Flag::msgDropped);
 }
 
@@ -480,13 +480,13 @@ int ReceiveBuffer::readMsg(char* data, int len)
     int rs = len;
     while ((p != (q + 1) % m_iSize) && m_pUnit[p])
     {
-        int unitsize = m_pUnit[p]->packet().getLength();
+        int unitsize = m_pUnit[p]->packet()->getLength();
         if ((rs >= 0) && (unitsize > rs))
             unitsize = rs;
 
         if (unitsize > 0)
         {
-            memcpy(data, m_pUnit[p]->packet().payload().data(), unitsize);
+            memcpy(data, m_pUnit[p]->packet()->payload(), unitsize);
             data += unitsize;
             rs -= unitsize;
         }
@@ -533,7 +533,7 @@ bool ReceiveBuffer::scanMsg(
             continue;
         }
 
-        if ((Unit::Flag::occupied == m_pUnit[m_iStartPos]->flag()) && (m_pUnit[m_iStartPos]->packet().getMsgBoundary() > 1))
+        if ((Unit::Flag::occupied == m_pUnit[m_iStartPos]->flag()) && (m_pUnit[m_iStartPos]->packet()->getMsgBoundary() > 1))
         {
             bool good = true;
 
@@ -546,7 +546,7 @@ bool ReceiveBuffer::scanMsg(
                     break;
                 }
 
-                if ((m_pUnit[i]->packet().getMsgBoundary() == 1) || (m_pUnit[i]->packet().getMsgBoundary() == 3))
+                if ((m_pUnit[i]->packet()->getMsgBoundary() == 1) || (m_pUnit[i]->packet()->getMsgBoundary() == 3))
                     break;
 
                 if (++i == m_iSize)
@@ -573,7 +573,7 @@ bool ReceiveBuffer::scanMsg(
     {
         if (m_pUnit[q] && (m_pUnit[q]->flag() == Unit::Flag::occupied))
         {
-            switch (m_pUnit[q]->packet().getMsgBoundary())
+            switch (m_pUnit[q]->packet()->getMsgBoundary())
             {
                 case 3: // 11
                     p = q;
@@ -598,7 +598,7 @@ bool ReceiveBuffer::scanMsg(
         if (found)
         {
             // the msg has to be ack'ed or it is allowed to read out of order, and was not read before
-            if (!passack || !m_pUnit[q]->packet().getMsgOrderFlag())
+            if (!passack || !m_pUnit[q]->packet()->getMsgOrderFlag())
                 break;
 
             found = false;

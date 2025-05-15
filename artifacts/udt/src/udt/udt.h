@@ -220,7 +220,7 @@ static constexpr int kDefaultRecvWindowSize = 25600;
 
 static constexpr int kDefaultMSS = 1400;
 
-static constexpr int kMSSMax = 16 * 1024;
+static constexpr int kMSSMax = 4 * 1024;
 
 static constexpr int kVersion = 4;
 
@@ -256,7 +256,8 @@ public:
     Errno osError() const;
     ProtocolError protocolError() const;
 
-private:
+protected:
+
     Errno m_osError;
     ProtocolError m_protocolError;
 };
