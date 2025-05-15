@@ -12780,6 +12780,22 @@ We recommend you not to open this web page. If you understand the risks, you can
         <source>Reset rules error: %1</source>
         <translation></translation>
     </message>
+    <message numerus="yes">
+        <source>Some of the rules were not enabled</source>
+        <comment>Form depends on invalid rule count</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
+        <comment>Form depends on invalid rule count</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::rules::VolumePicker</name>

@@ -3085,8 +3085,12 @@ Press Alt + Click to follow object</source>
         <translation></translation>
     </message>
     <message>
-        <source>State</source>
-        <translation></translation>
+        <source>Enable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
