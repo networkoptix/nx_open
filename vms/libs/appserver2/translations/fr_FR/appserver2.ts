@@ -87,7 +87,7 @@
     <message>
       <source>User full name is controlled by the %1.</source>
       <comment>%1 is the short Cloud name</comment>
-      <translation type="unfinished">User full name is controlled by the %1.</translation>
+      <translation>Le nom complet de l'utilisateur est contrôlé par %1.</translation>
     </message>
     <message>
       <source>Creating an Administrator user is not allowed.</source>
