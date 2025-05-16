@@ -53,6 +53,9 @@ public:
         QObject* parent = nullptr);
     virtual ~RemoteSession() override;
 
+    /** Disconnect signals before destruction. */
+    void close();
+
     void updatePassword(const QString& newPassword);
     void updateBearerToken(std::string token);
     void updateCloudSessionToken();

@@ -145,12 +145,10 @@ RemoteSession::RemoteSession(
 
 RemoteSession::~RemoteSession()
 {
-    NX_VERBOSE(this, "Shutdown current session");
+    NX_VERBOSE(this, "Destroy current session");
 
-    if (d->messageProcessor)
-        d->messageProcessor->disconnect(this);
+    close();
 
-    stopReconnecting();
     d->terminateServerSessionIfNeeded();
     if (d->messageProcessor)
         d->messageProcessor->init({});
@@ -159,6 +157,19 @@ RemoteSession::~RemoteSession()
 
     NX_MUTEX_LOCKER lock(&d->mutex);
     d->connection.reset();
+}
+
+void RemoteSession::close()
+{
+    NX_VERBOSE(this, "Close current session");
+
+    if (d->messageProcessor)
+        d->messageProcessor->disconnect(this);
+
+    if (auto connection = this->connection())
+        connection->messageBusConnection()->messageBus()->disconnect(this);
+
+    stopReconnecting();
 }
 
 void RemoteSession::updatePassword(const QString& newPassword)
