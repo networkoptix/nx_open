@@ -28,6 +28,7 @@ NX_REFLECTION_ENUM_CLASS(EventReason,
     // Server Failure event
     serverTerminated = 4,
     serverStarted = 5,
+    localDbFailure = 900,
 
     // Storage Failure event
     storageIoError = 6,

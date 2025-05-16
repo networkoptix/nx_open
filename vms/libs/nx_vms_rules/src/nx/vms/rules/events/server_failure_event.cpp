@@ -61,6 +61,14 @@ QString ServerFailureEvent::reason(common::SystemContext* /*context*/) const
         case EventReason::serverStarted: //< TODO: #sivanov Change the enum value name.
             return tr("Server stopped unexpectedly.");
 
+        case EventReason::localDbFailure:
+        {
+            return tr(
+                "The local database was found to be corrupted and could not be recovered. "
+                "A new empty database has been initialized. A backup copy of the corrupted "
+                "database has been saved for reference.");
+        }
+
         case EventReason::none: //< Special case for unit tests.
             return {};
 
