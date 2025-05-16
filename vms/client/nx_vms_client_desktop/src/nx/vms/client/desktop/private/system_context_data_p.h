@@ -6,6 +6,7 @@
 #include <camera/camera_bookmarks_manager.h>
 #include <nx/vms/client/desktop/bookmarks/bookmark_tags_watcher.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
+#include <nx/vms/client/desktop/network/server_port_watcher.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/resource/local_resources_initializer.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
@@ -64,6 +65,7 @@ struct SystemContext::Private
     std::unique_ptr<ServerImageCache> serverImageCache;
     std::unique_ptr<ServerNotificationCache> serverNotificationCache;
     std::unique_ptr<ServerRemoteAccessWatcher> serverRemoteAccessWatcher;
+    std::unique_ptr<ServerPortWatcher> serverPortWatcher;
     std::unique_ptr<UserNotificationSettingsManager> userNotificationSettingsManager;
 };
 

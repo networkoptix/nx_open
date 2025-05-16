@@ -2,10 +2,10 @@
 
 #include "main_window.h"
 
+#include <QtCore/QEvent>
 #include <QtCore/QFile>
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QAction>
-#include <QtCore/QEvent>
 #include <QtGui/QFileOpenEvent>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QWindowStateChangeEvent>
@@ -85,7 +85,6 @@
 #include <ui/workbench/watchers/workbench_item_bookmarks_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
 #include <ui/workbench/watchers/workbench_resources_changes_watcher.h>
-#include <ui/workbench/watchers/workbench_server_port_watcher.h>
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_controller.h>
@@ -297,7 +296,6 @@ MainWindow::MainWindow(WindowContext* context, QWidget* parent, Qt::WindowFlags 
     workbenchContext()->instance<QnWorkbenchResourcesChangesWatcher>();
     workbenchContext()->instance<QnWorkbenchItemBookmarksWatcher>();
     workbenchContext()->instance<QnTimelineBookmarksWatcher>();
-    workbenchContext()->instance<QnWorkbenchServerPortWatcher>();
 
     /* Set up watchers. */
     workbenchContext()->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);

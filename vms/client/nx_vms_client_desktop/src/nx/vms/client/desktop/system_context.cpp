@@ -287,6 +287,7 @@ void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcess
     d->systemHealthState = std::make_unique<SystemHealthState>(this);
     d->desktopCameraStubController = std::make_unique<DesktopCameraStubController>(this);
     d->bookmarkTagWatcher = std::make_unique<BookmarkTagsWatcher>(this);
+    d->serverPortWatcher = std::make_unique<ServerPortWatcher>(this);
 
     // Desktop camera must work in the normal mode only.
     if (appContext()->runtimeSettings()->isDesktopMode())
