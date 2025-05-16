@@ -129,6 +129,13 @@
     </message>
 </context>
 <context>
+    <name>ComboBox</name>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CustomConnectionScreen</name>
     <message>
         <source>Connect to Server</source>
@@ -870,10 +877,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Stop Sharing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Expires in an hour</source>
         <translation type="unfinished"></translation>
     </message>
@@ -891,6 +894,61 @@
     </message>
     <message>
         <source>Shared link options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sharing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Lifetime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Share Link</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SiteConnectionSheet</name>
+    <message>
+        <source>Connect to Site</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log in as</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter server address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login field cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password field cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
