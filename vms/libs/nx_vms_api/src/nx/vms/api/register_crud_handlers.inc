@@ -2648,6 +2648,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %ingroup Analytics
      * %struct RequestAvailableAnalyticsActions
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _local
      * %permissions Power User.
      * %return:{std::map<nx::Uuid, AvailableAnalyticsActions>} Map of Available Actions by Engine Id
      *
@@ -2659,6 +2660,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %struct RequestAvailableAnalyticsActions
      * %param:string engineId
      * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _local
      * %permissions Power User.
      * %return:{AvailableAnalyticsActions} Available Actions
      */
@@ -2672,7 +2674,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %caption Execute Analytics Action
      * %ingroup Analytics
      * %struct AnalyticsAction
-     * %param[ref] _strict,_ticket
+     * %param[ref] _strict,_ticket,_local
      * %permissions Power User.
      * %return:{AnalyticsActionResult}
      */
@@ -2686,6 +2688,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %ingroup Analytics
      * %param:uuid id Engine's id
      * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _local
      * %permissions Power User.
      * %return:{AnalyticsEngineSettings}
      *
@@ -2694,7 +2697,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %caption Analytics Engine's Settings
      * %ingroup Analytics
      * %struct AnalyticsEngineSettings
-     * %param[ref] _strict,_ticket
+     * %param[ref] _strict,_ticket,_local
      * %permissions Power User.
      * %return:{AnalyticsEngineSettings}
      */
@@ -2708,6 +2711,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %ingroup Analytics
      * %param:uuid engineId
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _local
      * %permissions Power User.
      * %return:{std::vector<DeviceAgentState>}
      *
@@ -2717,6 +2721,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %ingroup Analytics
      * %struct DeviceAgentId
      * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _local
      * %permissions Power User.
      * %return:{DeviceAgentState}
      *
@@ -2725,7 +2730,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %caption Enable/disable Device Agent
      * %ingroup Analytics
      * %struct DeviceAgentState
-     * %param[ref] _strict,_ticket
+     * %param[ref] _strict,_ticket,_local
      * %permissions Power User.
      * %return:{DeviceAgentState}
      */
@@ -2931,7 +2936,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %caption Push Engine manifest
      * %ingroup Analytics
      * %struct PushEngineManifestData
-     * %param[ref] _strict,_ticket
+     * %param[ref] _strict,_ticket,_local
      * %permissions Power User.
      */
     reg("rest/v{4-}/analytics/engines/:id/manifest",
@@ -2943,7 +2948,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %caption Push Device Agent Manifest
      * %ingroup Analytics
      * %struct PushDeviceAgentManifestData
-     * %param[ref] _strict,_ticket
+     * %param[ref] _strict,_ticket,_local
      * %permissions Power User.
      */
     reg("rest/v{4-}/analytics/engines/:id/deviceAgents/:deviceId/manifest",
@@ -2955,7 +2960,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %caption Push Diagnostic Event
      * %ingroup Analytics
      * %struct EngineIntegrationDiagnosticEvent
-     * %param[ref] _strict,_ticket
+     * %param[ref] _strict,_ticket,_local
      * %permissions Power User.
      */
     reg("rest/v{4-}/analytics/engines/:id/integrationDiagnosticEvent",
@@ -2967,7 +2972,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %caption Push Diagnostic Event
      * %ingroup Analytics
      * %struct DeviceAgentIntegrationDiagnosticEvent
-     * %param[ref] _strict,_ticket
+     * %param[ref] _strict,_ticket,_local
      * %permissions Power User.
      */
     reg("rest/v{4-}/analytics/engines/:id/deviceAgents/:deviceId/integrationDiagnosticEvent",
