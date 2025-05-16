@@ -3090,7 +3090,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>無効化</translation>
     </message>
   </context>
   <context>

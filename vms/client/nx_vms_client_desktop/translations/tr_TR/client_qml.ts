@@ -3098,7 +3098,7 @@ Nesneyi takip etmek için Alt + Tıklama tuşlarına basın</translation>
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Devredışı</translation>
     </message>
   </context>
   <context>

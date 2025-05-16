@@ -19,7 +19,7 @@
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>Infos sur l'application</translation>
     </message>
   </context>
   <context>
@@ -129,6 +129,13 @@
     </message>
   </context>
   <context>
+    <name>ComboBox</name>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuler</translation>
+    </message>
+  </context>
+  <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Connect to Server</source>
@@ -176,7 +183,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>Le partage ouvre la nouvelle boîte de dialogue de signet pour générer un lien de lecture après avoir défini les options de partage</translation>
     </message>
   </context>
   <context>
@@ -832,7 +839,7 @@
     </message>
     <message>
       <source>AppInfo</source>
-      <translation type="unfinished">AppInfo</translation>
+      <translation>Infos de l'application</translation>
     </message>
   </context>
   <context>
@@ -870,10 +877,6 @@
       <translation>Enregistrer et partager</translation>
     </message>
     <message>
-      <source>Stop Sharing</source>
-      <translation>Arrêter le partage</translation>
-    </message>
-    <message>
       <source>Expires in an hour</source>
       <translation>Expire dans une heure</translation>
     </message>
@@ -892,6 +895,61 @@
     <message>
       <source>Shared link options</source>
       <translation>Options de liens partagés</translation>
+    </message>
+    <message>
+      <source>Sharing</source>
+      <translation type="unfinished">Sharing</translation>
+    </message>
+    <message>
+      <source>Select Lifetime</source>
+      <translation type="unfinished">Select Lifetime</translation>
+    </message>
+    <message>
+      <source>Share Link</source>
+      <translation type="unfinished">Share Link</translation>
+    </message>
+  </context>
+  <context>
+    <name>SiteConnectionSheet</name>
+    <message>
+      <source>Connect to Site</source>
+      <translation type="unfinished">Connect to Site</translation>
+    </message>
+    <message>
+      <source>Address</source>
+      <translation type="unfinished">Address</translation>
+    </message>
+    <message>
+      <source>Log in as</source>
+      <translation type="unfinished">Log in as</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Identifiant</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Mot de passe</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuler</translation>
+    </message>
+    <message>
+      <source>Connect</source>
+      <translation>Connecter</translation>
+    </message>
+    <message>
+      <source>Enter server address</source>
+      <translation>Entrez l’adresse serveur</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation>Le champ Identifiant ne peut pas être vide</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>Le champ mot de passe ne peut pas être vide</translation>
     </message>
   </context>
   <context>
@@ -929,11 +987,11 @@
     </message>
     <message>
       <source>SUSPENDED</source>
-      <translation type="unfinished">SUSPENDED</translation>
+      <translation>SUSPENDU</translation>
     </message>
     <message>
       <source>SHUTDOWN</source>
-      <translation type="unfinished">SHUTDOWN</translation>
+      <translation>ARRETER</translation>
     </message>
   </context>
   <context>

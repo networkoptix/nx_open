@@ -3131,7 +3131,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>השבת</translation>
     </message>
   </context>
   <context>

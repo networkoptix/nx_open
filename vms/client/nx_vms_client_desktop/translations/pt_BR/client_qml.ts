@@ -3101,7 +3101,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Desabilitar</translation>
     </message>
   </context>
   <context>

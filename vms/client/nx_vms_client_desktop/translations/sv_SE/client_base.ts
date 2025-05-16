@@ -12584,15 +12584,15 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
     <message>
       <source>No settings model</source>
-      <translation type="unfinished">No settings model</translation>
+      <translation>Ingen inställningsmodell</translation>
     </message>
     <message>
       <source>No parameters</source>
-      <translation type="unfinished">No parameters</translation>
+      <translation>Ingen parameter</translation>
     </message>
     <message>
       <source>Parameters set</source>
-      <translation type="unfinished">Parameters set</translation>
+      <translation>Parametrar inställda</translation>
     </message>
   </context>
   <context>
@@ -12804,17 +12804,17 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message numerus="yes">
       <source>Some of the rules were not enabled</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the rules were not enabled</numerusform>
-        <numerusform>Some of the rules were not enabled</numerusform>
+      <translation>
+        <numerusform>Vissa regler var inte aktiverade</numerusform>
+        <numerusform>Vissa regler var inte aktiverade</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      <translation>
+        <numerusform>Vissa av de valda reglerna kan inte aktiveras eftersom de har fel parametrar. Fixa dem och aktivera regeln igen.</numerusform>
+        <numerusform>Vissa av de valda reglerna kan inte aktiveras eftersom de har fel parametrar. Fixa dem och aktivera regeln igen.</numerusform>
       </translation>
     </message>
   </context>

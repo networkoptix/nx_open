@@ -3081,7 +3081,7 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>비활성화</translation>
     </message>
   </context>
   <context>

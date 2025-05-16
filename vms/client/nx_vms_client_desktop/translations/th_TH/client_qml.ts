@@ -3086,7 +3086,7 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>ปิดการใช้งาน</translation>
     </message>
   </context>
   <context>

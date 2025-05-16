@@ -294,15 +294,15 @@
     </message>
     <message>
       <source>Select Integration Action</source>
-      <translation type="unfinished">Select Integration Action</translation>
+      <translation>Välj integrationsåtgärd</translation>
     </message>
     <message>
       <source>Integration not found for Integration Action %1</source>
-      <translation type="unfinished">Integration not found for Integration Action %1</translation>
+      <translation>Integration hittades inte för Integrationsåtgärd %1</translation>
     </message>
     <message>
       <source>Unsupported JSON value type in key %1</source>
-      <translation type="unfinished">Unsupported JSON value type in key %1</translation>
+      <translation>JSON-värdestyp stöds inte i nyckel %1</translation>
     </message>
     <message>
       <source>Total number of events</source>
@@ -570,7 +570,7 @@
     </message>
     <message>
       <source>Fan failure at %1</source>
-      <translation type="unfinished">Fan failure at %1</translation>
+      <translation>Fläktfel på %1</translation>
     </message>
   </context>
   <context>
@@ -666,11 +666,11 @@
     <name>nx::vms::rules::IntegrationAction</name>
     <message>
       <source>Integration Action</source>
-      <translation type="unfinished">Integration Action</translation>
+      <translation>Integrationsåtgärd</translation>
     </message>
     <message>
       <source>Integration Action Parameters</source>
-      <translation type="unfinished">Integration Action Parameters</translation>
+      <translation>Parametrar för integrationsåtgärder</translation>
     </message>
   </context>
   <context>

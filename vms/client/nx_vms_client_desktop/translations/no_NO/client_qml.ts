@@ -3101,7 +3101,7 @@ Trykk Alt + Klikk for å følge objektet</translation>
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Deaktiver</translation>
     </message>
   </context>
   <context>

@@ -129,6 +129,13 @@
     </message>
   </context>
   <context>
+    <name>ComboBox</name>
+    <message>
+      <source>Cancel</source>
+      <translation>Hủy bỏ</translation>
+    </message>
+  </context>
+  <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Connect to Server</source>
@@ -869,10 +876,6 @@
       <translation>Lưu &amp; Chia sẻ</translation>
     </message>
     <message>
-      <source>Stop Sharing</source>
-      <translation>Ngừng chia sẻ</translation>
-    </message>
-    <message>
       <source>Expires in an hour</source>
       <translation>Hết hạn sau một giờ</translation>
     </message>
@@ -891,6 +894,61 @@
     <message>
       <source>Shared link options</source>
       <translation>Tùy chọn liên kết chia sẻ</translation>
+    </message>
+    <message>
+      <source>Sharing</source>
+      <translation type="unfinished">Sharing</translation>
+    </message>
+    <message>
+      <source>Select Lifetime</source>
+      <translation type="unfinished">Select Lifetime</translation>
+    </message>
+    <message>
+      <source>Share Link</source>
+      <translation type="unfinished">Share Link</translation>
+    </message>
+  </context>
+  <context>
+    <name>SiteConnectionSheet</name>
+    <message>
+      <source>Connect to Site</source>
+      <translation type="unfinished">Connect to Site</translation>
+    </message>
+    <message>
+      <source>Address</source>
+      <translation type="unfinished">Address</translation>
+    </message>
+    <message>
+      <source>Log in as</source>
+      <translation type="unfinished">Log in as</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Đăng nhập</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Mật khẩu</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Hủy bỏ</translation>
+    </message>
+    <message>
+      <source>Connect</source>
+      <translation>Kết nối</translation>
+    </message>
+    <message>
+      <source>Enter server address</source>
+      <translation>Nhập địa chỉ máy chủ</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation>Trường đăng nhập không được để trống</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>Mật khẩu không được để trống</translation>
     </message>
   </context>
   <context>

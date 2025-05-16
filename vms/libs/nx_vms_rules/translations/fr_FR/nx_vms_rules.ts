@@ -294,15 +294,15 @@
     </message>
     <message>
       <source>Select Integration Action</source>
-      <translation type="unfinished">Select Integration Action</translation>
+      <translation>Sélectionner une action d'intégration</translation>
     </message>
     <message>
       <source>Integration not found for Integration Action %1</source>
-      <translation type="unfinished">Integration not found for Integration Action %1</translation>
+      <translation>Intégration non trouvée pour l'action d'intégration %1</translation>
     </message>
     <message>
       <source>Unsupported JSON value type in key %1</source>
-      <translation type="unfinished">Unsupported JSON value type in key %1</translation>
+      <translation>Type de valeur JSON non pris en charge dans la clé %1</translation>
     </message>
     <message>
       <source>Total number of events</source>
@@ -462,17 +462,17 @@
     <message>
       <source>Device was disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Device was disconnected at %1</translation>
+      <translation>L'appareil a été déconnecté à %1</translation>
     </message>
     <message>
       <source>Camera was disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Camera was disconnected at %1</translation>
+      <translation>La caméra a été déconnectée à %1</translation>
     </message>
     <message>
       <source>I/O Module was disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">I/O Module was disconnected at %1</translation>
+      <translation>Le module d'E/S a été déconnecté à %1</translation>
     </message>
   </context>
   <context>
@@ -570,7 +570,7 @@
     </message>
     <message>
       <source>Fan failure at %1</source>
-      <translation type="unfinished">Fan failure at %1</translation>
+      <translation>Panne de ventilateur à %1</translation>
     </message>
   </context>
   <context>
@@ -666,11 +666,11 @@
     <name>nx::vms::rules::IntegrationAction</name>
     <message>
       <source>Integration Action</source>
-      <translation type="unfinished">Integration Action</translation>
+      <translation>Action d'intégration</translation>
     </message>
     <message>
       <source>Integration Action Parameters</source>
-      <translation type="unfinished">Integration Action Parameters</translation>
+      <translation>Paramètres d'action d'intégration</translation>
     </message>
   </context>
   <context>

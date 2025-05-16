@@ -129,6 +129,13 @@
     </message>
   </context>
   <context>
+    <name>ComboBox</name>
+    <message>
+      <source>Cancel</source>
+      <translation>Anuluj</translation>
+    </message>
+  </context>
+  <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Connect to Server</source>
@@ -872,10 +879,6 @@
       <translation>Zapisz i udostępnij</translation>
     </message>
     <message>
-      <source>Stop Sharing</source>
-      <translation>Przestań udostępniać</translation>
-    </message>
-    <message>
       <source>Expires in an hour</source>
       <translation>Wygasa za godzinę</translation>
     </message>
@@ -894,6 +897,61 @@
     <message>
       <source>Shared link options</source>
       <translation>Opcje udostępnionego linku</translation>
+    </message>
+    <message>
+      <source>Sharing</source>
+      <translation type="unfinished">Sharing</translation>
+    </message>
+    <message>
+      <source>Select Lifetime</source>
+      <translation type="unfinished">Select Lifetime</translation>
+    </message>
+    <message>
+      <source>Share Link</source>
+      <translation type="unfinished">Share Link</translation>
+    </message>
+  </context>
+  <context>
+    <name>SiteConnectionSheet</name>
+    <message>
+      <source>Connect to Site</source>
+      <translation type="unfinished">Connect to Site</translation>
+    </message>
+    <message>
+      <source>Address</source>
+      <translation type="unfinished">Address</translation>
+    </message>
+    <message>
+      <source>Log in as</source>
+      <translation type="unfinished">Log in as</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Login</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Hasło</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Anuluj</translation>
+    </message>
+    <message>
+      <source>Connect</source>
+      <translation>Połącz</translation>
+    </message>
+    <message>
+      <source>Enter server address</source>
+      <translation>Wprowadź adres serwera</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation>Pole Login nie może być puste</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>Pole Hasło nie może być puste</translation>
     </message>
   </context>
   <context>

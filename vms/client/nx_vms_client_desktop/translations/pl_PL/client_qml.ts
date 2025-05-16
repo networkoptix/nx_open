@@ -3131,7 +3131,7 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Wyłącz</translation>
     </message>
   </context>
   <context>

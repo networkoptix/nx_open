@@ -129,6 +129,13 @@
     </message>
   </context>
   <context>
+    <name>ComboBox</name>
+    <message>
+      <source>Cancel</source>
+      <translation>Batal</translation>
+    </message>
+  </context>
+  <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Connect to Server</source>
@@ -869,10 +876,6 @@
       <translation>Simpan &amp; Bagikan</translation>
     </message>
     <message>
-      <source>Stop Sharing</source>
-      <translation>Berhenti Berbagi</translation>
-    </message>
-    <message>
       <source>Expires in an hour</source>
       <translation>Habis masa berlaku dalam satu jam</translation>
     </message>
@@ -891,6 +894,61 @@
     <message>
       <source>Shared link options</source>
       <translation>Opsi link yang dibagikan</translation>
+    </message>
+    <message>
+      <source>Sharing</source>
+      <translation type="unfinished">Sharing</translation>
+    </message>
+    <message>
+      <source>Select Lifetime</source>
+      <translation type="unfinished">Select Lifetime</translation>
+    </message>
+    <message>
+      <source>Share Link</source>
+      <translation type="unfinished">Share Link</translation>
+    </message>
+  </context>
+  <context>
+    <name>SiteConnectionSheet</name>
+    <message>
+      <source>Connect to Site</source>
+      <translation type="unfinished">Connect to Site</translation>
+    </message>
+    <message>
+      <source>Address</source>
+      <translation type="unfinished">Address</translation>
+    </message>
+    <message>
+      <source>Log in as</source>
+      <translation type="unfinished">Log in as</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Masuk</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Kata Sandi</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Batal</translation>
+    </message>
+    <message>
+      <source>Connect</source>
+      <translation>Koneksikan</translation>
+    </message>
+    <message>
+      <source>Enter server address</source>
+      <translation>Masukkan alamat server</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation>Bidang login tidak boleh kosong</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>Bidang kata sandi tidak boleh kosong</translation>
     </message>
   </context>
   <context>

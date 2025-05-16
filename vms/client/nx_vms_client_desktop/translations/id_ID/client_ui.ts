@@ -532,7 +532,7 @@
     </message>
     <message>
       <source>Native camera presets will not be available.</source>
-      <translation type="unfinished">Native camera presets will not be available.</translation>
+      <translation>Preset kamera asli tidak akan tersedia.</translation>
     </message>
   </context>
   <context>

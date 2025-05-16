@@ -12622,15 +12622,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Some of the rules were not enabled</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the rules were not enabled</numerusform>
+      <translation>
+        <numerusform>一部のルールは有効化できませんでした。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      <translation>
+        <numerusform>選択したルールの一部は、パラメーターが間違っているため有効化できません。修正してルールを再度有効化してください。</numerusform>
       </translation>
     </message>
   </context>

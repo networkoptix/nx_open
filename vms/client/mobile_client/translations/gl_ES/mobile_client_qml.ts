@@ -129,6 +129,13 @@
     </message>
   </context>
   <context>
+    <name>ComboBox</name>
+    <message>
+      <source>Cancel</source>
+      <translation>Cancelar</translation>
+    </message>
+  </context>
+  <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Connect to Server</source>
@@ -870,10 +877,6 @@
       <translation type="unfinished">Save &amp; Share</translation>
     </message>
     <message>
-      <source>Stop Sharing</source>
-      <translation>Deixar de compartir</translation>
-    </message>
-    <message>
       <source>Expires in an hour</source>
       <translation>Caduca nunha hora</translation>
     </message>
@@ -892,6 +895,61 @@
     <message>
       <source>Shared link options</source>
       <translation type="unfinished">Shared link options</translation>
+    </message>
+    <message>
+      <source>Sharing</source>
+      <translation type="unfinished">Sharing</translation>
+    </message>
+    <message>
+      <source>Select Lifetime</source>
+      <translation type="unfinished">Select Lifetime</translation>
+    </message>
+    <message>
+      <source>Share Link</source>
+      <translation type="unfinished">Share Link</translation>
+    </message>
+  </context>
+  <context>
+    <name>SiteConnectionSheet</name>
+    <message>
+      <source>Connect to Site</source>
+      <translation type="unfinished">Connect to Site</translation>
+    </message>
+    <message>
+      <source>Address</source>
+      <translation type="unfinished">Address</translation>
+    </message>
+    <message>
+      <source>Log in as</source>
+      <translation type="unfinished">Log in as</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Acceder</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Contrasinal</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Cancelar</translation>
+    </message>
+    <message>
+      <source>Connect</source>
+      <translation>Conectar</translation>
+    </message>
+    <message>
+      <source>Enter server address</source>
+      <translation>Introducir o enderezo do servidor</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation>O campo de inicio de sesión non pode estar baleiro</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>O campo de contrasinal non pode estar baleiro</translation>
     </message>
   </context>
   <context>

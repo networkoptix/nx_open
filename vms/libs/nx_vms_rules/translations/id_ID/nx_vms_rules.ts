@@ -563,7 +563,7 @@
     </message>
     <message>
       <source>Fan failure at %1</source>
-      <translation type="unfinished">Fan failure at %1</translation>
+      <translation>Kegagalan kipas pada %1</translation>
     </message>
   </context>
   <context>

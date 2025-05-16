@@ -11478,7 +11478,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>
-      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+      <translation>指定Email的使用者已透過通路夥伴擁有管理員存取權限</translation>
     </message>
   </context>
   <context>
@@ -12405,7 +12405,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No parameters</source>
-      <translation type="unfinished">No parameters</translation>
+      <translation>沒有參數</translation>
     </message>
     <message>
       <source>Parameters set</source>
@@ -12618,15 +12618,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Some of the rules were not enabled</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the rules were not enabled</numerusform>
+      <translation>
+        <numerusform>部分規則未啟用</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      <translation>
+        <numerusform>某些選定的規則由於參數錯誤而無法啟用，請修正它們並再次啟用規則。</numerusform>
       </translation>
     </message>
   </context>

@@ -2067,7 +2067,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
-      <translation type="unfinished">Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</translation>
+      <translation>Remarque : L'amélioration de l'image n'est pas disponible lorsque le décodage matériel vidéo est activé.</translation>
     </message>
   </context>
   <context>
@@ -6795,15 +6795,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the site should be in active state. %1</translation>
+      <translation>Pour effectuer une sauvegarde sur un stockage cloud, le site doit être dans un état actif. %1</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>La sauvegarde dans le cloud continue, mais le site est actuellement suspendu. Il doit être actif pour modifier les paramètres &quot;Quoi sauvegarder&quot; et &quot;Qualité&quot; d'un appareil, ou pour activer la sauvegarde dans le cloud. Vous pouvez également la désactiver. %1</translation>
     </message>
     <message>
       <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
-      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
+      <translation>Le nombre d'appareils sélectionnés pour la sauvegarde dépasse les services disponibles. Ajoutez des services supplémentaires ou réduisez le nombre d'appareils configurés pour la sauvegarde. À partir de %1 , le site limitera automatiquement le nombre d'appareils sauvegardés en fonction des services disponibles.</translation>
     </message>
   </context>
   <context>
@@ -11498,7 +11498,7 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
     <message>
       <source>Channel Partner user</source>
-      <translation type="unfinished">Channel Partner user</translation>
+      <translation>Utilisateur partenaire de distribution</translation>
     </message>
   </context>
   <context>
@@ -11648,7 +11648,7 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>
-      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+      <translation>L'utilisateur avec l'e-mail spécifié dispose déjà d'un accès administrateur via le partenaire de distribution</translation>
     </message>
   </context>
   <context>
@@ -12255,7 +12255,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>In progress...</source>
-      <translation type="unfinished">In progress...</translation>
+      <translation>En cours...</translation>
     </message>
   </context>
   <context>
@@ -12586,15 +12586,15 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
     <message>
       <source>No settings model</source>
-      <translation type="unfinished">No settings model</translation>
+      <translation>Aucun modèle de paramètres</translation>
     </message>
     <message>
       <source>No parameters</source>
-      <translation type="unfinished">No parameters</translation>
+      <translation>Aucun paramètre</translation>
     </message>
     <message>
       <source>Parameters set</source>
-      <translation type="unfinished">Parameters set</translation>
+      <translation>Paramètres définis</translation>
     </message>
   </context>
   <context>
@@ -12806,17 +12806,17 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message numerus="yes">
       <source>Some of the rules were not enabled</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the rules were not enabled</numerusform>
-        <numerusform>Some of the rules were not enabled</numerusform>
+      <translation>
+        <numerusform>Une règle n'a pas été activée</numerusform>
+        <numerusform>Certaines règles n'ont pas été activées</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      <translation>
+        <numerusform>La règles sélectionnée ne peut pas être activée car ces paramètres sont incorrects. Corrigez-les et réactivez la règle.</numerusform>
+        <numerusform>Certaines règles sélectionnées ne peuvent pas être activées car leurs paramètres sont incorrects. Corrigez-les et réactivez la règle.</numerusform>
       </translation>
     </message>
   </context>
