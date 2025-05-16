@@ -355,6 +355,7 @@ void AioTaskQueue::processPostedCalls()
     while (!m_postedCalls.empty())
     {
         auto postHandler = std::move(m_postedCalls.begin()->postHandler);
+        auto span = m_postedCalls.begin()->telemetrySpan;
         NX_ASSERT(!m_postedCalls.front().socket ||
             m_postedCalls.front().socket->isInSelfAioThread());
         m_postedCalls.erase(m_postedCalls.begin());
@@ -363,6 +364,8 @@ void AioTaskQueue::processPostedCalls()
         // But, new calls cannot be added there (they are added via m_pollSetModificationQueue).
 
         nx::Unlocker<nx::Mutex> unlock(&lock);
+
+        auto spanScope = span.activate();
 
         callAndReportAbnormalProcessingTime(
             [&]() { postHandler(); },

@@ -7,6 +7,7 @@
 #include <memory>
 #include <optional>
 
+#include <nx/telemetry/span.h>
 #include <nx/utils/math/abnormal_value_detector.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -69,6 +70,7 @@ public:
     std::atomic<int>* taskCompletionEvent;
     nx::utils::MoveOnlyFunc<void()> postHandler;
     nx::utils::MoveOnlyFunc<void()> taskCompletionHandler;
+    nx::telemetry::Span telemetrySpan;
 
     /**
      * @param taskCompletionEvent if not NULL, set to 1 after processing task.
@@ -89,7 +91,8 @@ public:
         eventHandler(_eventHandler),
         timeout(_timeout),
         taskCompletionEvent(_taskCompletionEvent),
-        taskCompletionHandler(std::move(_taskCompletionHandler))
+        taskCompletionHandler(std::move(_taskCompletionHandler)),
+        telemetrySpan(nx::telemetry::Span::activeSpan())
     {
     }
 

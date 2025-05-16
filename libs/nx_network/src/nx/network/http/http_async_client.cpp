@@ -17,7 +17,6 @@
 
 #include "auth_cache.h"
 #include "auth_tools.h"
-#include "buffer_source.h"
 #include "custom_headers.h"
 #include "http_client_message_body_source.h"
 #include "nonce_cache.h"
@@ -663,6 +662,10 @@ void AsyncClient::doRequest(
             m_harEntry->setRequestBody(m_request.messageBody);
     }
 
+    m_telemetrySpan = telemetry::HttpSpan::clientSpan(
+        method.toString(), url.path().toStdString(), m_request.headers);
+    auto spanScope = m_telemetrySpan.activate();
+
     initiateHttpMessageDelivery();
 }
 
@@ -909,6 +912,8 @@ void AsyncClient::onMessageReceived(Message message)
         return;
     }
 
+    auto spanScope = m_telemetrySpan.activate();
+
     m_response = std::move(message);
 
     m_isPersistentConnection =
@@ -926,6 +931,8 @@ void AsyncClient::onMessageReceived(Message message)
         emitDone();
         return;
     }
+
+    m_telemetrySpan.setStatusCode(m_response.response->statusLine.statusCode);
 
     std::string responseText;
     if (logTraffic())
@@ -1017,8 +1024,8 @@ void AsyncClient::onMessageEnd()
         m_harEntry.reset();
     }
 
-    const auto handlerInvokationResult = emitDone();
-    if (handlerInvokationResult != Result::proceed)
+    const auto handlerInvocationResult = emitDone();
+    if (handlerInvocationResult != Result::proceed)
         return;
 
     ++m_currentMessageNumber;
@@ -1101,6 +1108,8 @@ void AsyncClient::initiateHttpMessageDelivery()
     dispatch(
         [this, connectionReusePolicy]()
         {
+            auto spanScope = m_telemetrySpan.activate();
+
             switch (connectionReusePolicy)
             {
                 case ConnectionReusePolicy::establishedPipeline:
@@ -1777,7 +1786,14 @@ const char* AsyncClient::toString(State state)
 AsyncClient::Result AsyncClient::emitDone()
 {
     m_lastReportedMessageNumber = m_currentMessageNumber;
-    return invokeHandler(m_onDone);
+
+    auto span = m_telemetrySpan; //< AsyncClient may be destroyed during `invokeHandler`.
+
+    const auto result = invokeHandler(m_onDone);
+
+    span.end();
+
+    return result;
 }
 
 AsyncClient::Result AsyncClient::emitRequestHasBeenSent(bool authorizationTried)
@@ -1803,19 +1819,31 @@ AsyncClient::Result AsyncClient::invokeHandler(
     if (!handler)
         return Result::proceed;
 
+    auto span = m_telemetrySpan;
+    auto spanScope = span.activate();
+
     const auto requestSequenceBak = m_requestSequence;
     nx::utils::InterruptionFlag::Watcher objectDestructionWatcher(&m_objectDestructionFlag);
 
     handler(args...);
 
     if (objectDestructionWatcher.interrupted())
+    {
+        span.end();
         return Result::thisDestroyed;
+    }
 
     if (m_requestSequence != requestSequenceBak)
+    {
+        span.end();
         return Result::newRequestScheduled;
+    }
 
     if (!m_socket && !m_messagePipeline)
+    {
+        span.end();
         return Result::cancelled;
+    }
 
     return Result::proceed;
 }

@@ -76,7 +76,8 @@ RequestContext::RequestContext(
     attrs(std::move(attrs)),
     request(std::move(request)),
     body(std::move(body)),
-    traceContext(parseTraceContext(this->request.headers))
+    traceContext(parseTraceContext(this->request.headers)),
+    telemetrySpan(telemetry::HttpSpan::activeSpan())
 {
 }
 

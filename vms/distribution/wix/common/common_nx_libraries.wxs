@@ -20,6 +20,7 @@
             <Component><File Name="nx_monitoring.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_network.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_network_rest.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_telemetry.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_reflect.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_rtp.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="nx_utils.dll" KeyPath="yes" DiskId="2"/></Component>

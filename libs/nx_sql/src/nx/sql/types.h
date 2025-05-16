@@ -124,11 +124,10 @@ NX_REFLECTION_INSTRUMENT(ConnectionOptions, (driverType)(hostName)(port)(dbName)
     (maxPeriodQueryWaitsForAvailableConnection)(maxErrorsInARowBeforeClosingConnection) \
     (failOnDbTuneError)(concurrentModificationQueryLimit))
 
-enum class QueryType
-{
+NX_REFLECTION_ENUM_CLASS(QueryType,
     lookup,
-    modification,
-};
+    modification
+)
 
 //-------------------------------------------------------------------------------------------------
 

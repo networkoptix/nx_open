@@ -15,6 +15,7 @@ nx_add_target(nx_network LIBRARY NO_MOC
         nx_kit
         nx_utils
         nx_reflect
+        nx_telemetry
     PRIVATE_LIBS
         udt
     FOLDER common/libs

@@ -3,9 +3,9 @@
 #pragma once
 
 #include <memory>
-#include <unordered_map>
 
 #include <nx/network/http/http_types.h>
+#include <nx/telemetry/http_span.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/stree/attribute_dictionary.h>
 #include <nx/utils/string.h>
@@ -68,6 +68,11 @@ struct NX_NETWORK_API RequestContext
     std::unique_ptr<AbstractMsgBodySourceWithCache> body;
 
     /**
+     * Request handler path like /object_type/{objectId}/sub_object_type/{subObjectId}.
+     */
+    std::string pathTemplate;
+
+    /**
      * Parameters, taken from request path.
      * E.g., if handler was registered with path /object_type/{objectId}/sub_object_type/{subObjectId},
      * and request /object_type/id1/sub_object_type/id2 was received.
@@ -77,6 +82,8 @@ struct NX_NETWORK_API RequestContext
 
     /** Request tracing context. */
     std::optional<TraceContext> traceContext;
+
+    nx::telemetry::HttpSpan telemetrySpan;
 
     RequestContext();
 

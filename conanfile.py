@@ -174,6 +174,16 @@ class NxOpenConan(ConanFile):
 
     def requirements(self):
         self.requires("cpptrace/0.8.3" "#336ded531d0cad8ec579eb05079591e0")
+
+        self.requires("opentelemetry-cpp/1.17.0" "#feb089e3fbaef23a752681d2b96379bd")
+        # OpenTelemetry dependencies.
+        self.requires("c-ares/1.34.3" "#1f1b2f929424608c837837ea6379ae15")
+        self.requires("protobuf/5.27.0" "#56d591557e0fc6a4356fc1dbc6ffbe56")
+        self.requires("grpc/1.67.1" "#af343deb43728d9f31d2a7c9fc0728f5")
+        self.requires("abseil/20240116.2" "#129b9a5c87da55d656811cb53e915b41")
+        self.requires("re2/20230301" "#5504bfc6731b5c7a12ff524a6b2205c1")
+        self.requires("opentelemetry-proto/1.3.2" "#14665af6359f2a239e81925285e5b654")
+
         self.requires("libsrtp/2.6.0" "#248ee72d7d91db948f5651b7fe4905ea")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#cf9c0c761f39805e5a258dc39daff2bd")

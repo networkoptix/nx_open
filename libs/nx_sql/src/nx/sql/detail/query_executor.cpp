@@ -19,8 +19,14 @@ BaseExecutor::BaseExecutor(
     m_creationTime(nx::utils::monotonicTime()),
     m_queryExecuted(false),
     m_queryType(queryType),
-    m_queryAggregationKey(queryAggregationKey)
+    m_queryAggregationKey(queryAggregationKey),
+    m_completionHandlerTelemetrySpan(nx::telemetry::Span::activeSpan())
 {
+    if (m_completionHandlerTelemetrySpan.isValid())
+    {
+        m_telemetrySpan = nx::telemetry::Span("db", m_completionHandlerTelemetrySpan);
+        m_telemetrySpan.setAttribute("query-type", nx::reflect::enumeration::toString(queryType));
+    }
 }
 
 BaseExecutor::~BaseExecutor()
@@ -54,6 +60,15 @@ DBResult BaseExecutor::execute(AbstractDbConnection* const connection)
 
     m_queryStatistics.executionDuration =
         duration_cast<milliseconds>(nx::utils::monotonicTime() - executionStartTime);
+
+    m_telemetrySpan.setStatus(
+        m_queryStatistics.result->ok()
+            ? nx::telemetry::Span::Status::ok
+            : nx::telemetry::Span::Status::error,
+        m_queryStatistics.result->toString());
+
+    m_telemetrySpan.end();
+
     return *m_queryStatistics.result;
 }
 
@@ -122,12 +137,16 @@ DBResult SelectExecutor::executeQuery(AbstractDbConnection* const connection)
     QueryContext queryContext(connection, nullptr);
     auto result = invokeDbQueryFunc(m_dbSelectFunc, &queryContext);
     if (completionHandler)
+    {
+        auto spanScope = m_completionHandlerTelemetrySpan.activate();
         completionHandler(result);
+    }
     return result;
 }
 
 void SelectExecutor::reportErrorWithoutExecution(DBResult errorCode)
 {
+    auto spanScope = m_completionHandlerTelemetrySpan.activate();
     m_completionHandler(errorCode);
 }
 

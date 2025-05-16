@@ -5,6 +5,7 @@ nx_add_target(nx_sql LIBRARY NO_MOC
         Qt6::Core
         Qt6::Sql
         nx_kit
+        nx_telemetry
         nx_utils
     PRIVATE_LIBS
         nx_fusion

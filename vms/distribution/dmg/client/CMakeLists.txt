@@ -136,6 +136,7 @@ if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
         set(libs_debug_dependencies
             nx_network
             nx_network_rest
+            nx_telemetry
             nx_pathkit
             nx_utils
             nx_fusion

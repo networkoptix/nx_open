@@ -57,7 +57,6 @@ class GenericApiClient:
 {
     using base_type = Base;
     using ResultType = typename ApiResultCodeDescriptor::ResultCode;
-
 public:
     GenericApiClient(const nx::utils::Url& baseApiUrl, ssl::AdapterFunc adapterFunc);
     ~GenericApiClient();
@@ -128,7 +127,6 @@ protected:
         const std::string& requestPath,
         const nx::utils::UrlQuery& urlQuery,
         Handler handler);
-
     template<typename Output, typename InputTuple, typename Handler,
         typename SerializationLibWrapper = detail::NxReflectWrapper, typename... ResponseFetchers>
     void makeAsyncCallWithRetries(
@@ -377,6 +375,8 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCallWithRe
     unsigned attemptNum,
     Handler handler)
 {
+    HttpHeaders headers;
+
     auto request = std::apply(
         [this, &requestPath, &urlQuery](auto&&... inputArgs)
         {

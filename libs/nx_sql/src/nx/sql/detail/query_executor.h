@@ -6,6 +6,7 @@
 #include <functional>
 #include <tuple>
 
+#include <nx/telemetry/span.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/optional.h>
@@ -57,6 +58,8 @@ protected:
     template<typename Func, typename... Args>
     DBResult invokeDbQueryFunc(Func& func, const Args&... args)
     {
+        auto spanScope = m_telemetrySpan.activate();
+
         DBResult dbResult;
         try
         {
@@ -86,6 +89,10 @@ private:
     nx::utils::MoveOnlyFunc<void()> m_onBeforeDestructionHandler;
     QueryType m_queryType;
     const std::string m_queryAggregationKey;
+
+protected:
+    nx::telemetry::Span m_completionHandlerTelemetrySpan;
+    nx::telemetry::Span m_telemetrySpan;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -122,6 +129,8 @@ public:
 
     virtual DBResult executeQuery(AbstractDbConnection* const connection) override
     {
+        m_telemetryQueryScope = m_telemetrySpan.activate();
+
         if (m_externalTransaction)
         {
             if (*m_externalTransaction)
@@ -158,6 +167,9 @@ protected:
         DBResult resultCode,
         CompletionHandlerArgs... args)
     {
+        m_telemetryQueryScope.exit();
+        auto spanScope = m_completionHandlerTelemetrySpan.activate();
+
         CompletionHandler completionHandler;
         completionHandler.swap(m_completionHandler);
 
@@ -171,6 +183,7 @@ protected:
 private:
     CompletionHandler m_completionHandler;
     std::optional<Transaction*> m_externalTransaction;
+    nx::telemetry::Span::Scope m_telemetryQueryScope;
 
     DBResult executeQueryUnderNewTransaction(AbstractDbConnection* const connection)
     {
@@ -203,6 +216,9 @@ private:
 
     void invokeCompletionHandlerWithDefaultValues(DBResult errorCode)
     {
+        m_telemetryQueryScope.exit();
+        auto spanScope = m_completionHandlerTelemetrySpan.activate();
+
         CompletionHandler completionHandler;
         completionHandler.swap(m_completionHandler);
 
@@ -239,6 +255,7 @@ private:
             return result;
         }
 
+        m_telemetryQueryScope.exit();
         reportSuccess();
 
         return DBResultCode::ok;
@@ -246,6 +263,8 @@ private:
 
     void reportQueryResult(AbstractDbConnection* connection, DBResult dbResult)
     {
+        m_telemetryQueryScope.exit();
+
         if (dbResult == DBResultCode::ok)
         {
             // In case of transaction success (query succeeded & committed).

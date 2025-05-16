@@ -135,6 +135,7 @@ copyLibs()
         nx_media_core
         nx_network
         nx_network_rest
+        nx_telemetry
         nx_pathkit
         nx_rtp
         nx_vms_api
