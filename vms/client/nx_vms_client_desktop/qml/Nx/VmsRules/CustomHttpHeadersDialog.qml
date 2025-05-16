@@ -84,7 +84,7 @@ Dialog
                 column: 0
                 BasicSelectableTableCheckableCellDelegate
                 {
-                    enabled: !TableView.view.editing
+                    enabled: !headersTableView.editing
                 }
             }
 
@@ -105,15 +105,22 @@ Dialog
 
                         Component.onCompleted:
                         {
-                            TableView.view.editing = true
+                            headersTableView.editing = true
                             selectAll()
                         }
 
                         Component.onDestruction:
                         {
                             edit = text
-                            TableView.view.editing = false
+                            headersTableView.editing = false
                         }
+                    }
+
+                    Component.onCompleted:
+                    {
+                        // This workaround is caused by the qt bug described here
+                        // https://bugreports.qt.io/browse/QTBUG-136658
+                        tableView = headersTableView
                     }
                 }
             }

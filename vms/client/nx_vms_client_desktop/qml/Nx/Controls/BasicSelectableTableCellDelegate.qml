@@ -16,8 +16,9 @@ Rectangle
 
     required property bool selected
     readonly property string decorationPath: model.decoration ?? ""
-    property bool hovered: TableView.view ? TableView.view.hoveredRow === row : false
-    property var flags: TableView.view.model.flags(TableView.view.model.index(row, column))
+    property var tableView: TableView.view
+    property bool hovered: tableView ? tableView.hoveredRow === row : false
+    property var flags: tableView ? tableView.model.flags(tableView.model.index(row, column)) : 0
 
     signal clicked()
     signal doubleClicked()
@@ -79,19 +80,19 @@ Rectangle
         anchors.fill: parent
         onClicked:
         {
-            control.TableView.view.closeEditor()
+            control.tableView.closeEditor()
 
-            if (control.TableView.view.selectionBehavior === TableView.SelectRows)
+            if (control.tableView.selectionBehavior === TableView.SelectRows)
             {
-                control.TableView.view.selectionModel.select(
-                    control.TableView.view.index(row, column),
+                control.tableView.selectionModel.select(
+                    control.tableView.index(row, column),
                     ItemSelectionModel.ClearAndSelect | ItemSelectionModel.Rows)
             }
 
-            if ((control.TableView.view.editTriggers & TableView.SingleTapped)
+            if ((control.tableView.editTriggers & TableView.SingleTapped)
                 && (control.flags & Qt.ItemIsEditable))
             {
-                control.TableView.view.edit(control.TableView.view.index(row, column))
+                control.tableView.edit(control.tableView.index(row, column))
             }
 
             control.clicked()
@@ -99,12 +100,12 @@ Rectangle
 
         onDoubleClicked:
         {
-            control.TableView.view.closeEditor()
+            control.tableView.closeEditor()
 
-            if ((control.TableView.view.editTriggers & TableView.DoubleTapped)
+            if ((control.tableView.editTriggers & TableView.DoubleTapped)
                 && (control.flags & Qt.ItemIsEditable))
             {
-                control.TableView.view.edit(control.TableView.view.index(row, column))
+                control.tableView.edit(control.tableView.index(row, column))
             }
 
             control.doubleClicked()
