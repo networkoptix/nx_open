@@ -101,14 +101,27 @@ BottomSheet
 
         visible: !isAnalyticsItemMode
         parent: sheet.titleCustomArea
-        checkState: backend.isShared ? Qt.Checked : Qt.Unchecked
+
+        toggleOnClick: false
 
         onClicked:
         {
-            if (backend.isShared)
-                d.stopSharing()
-            else
-                d.share()
+            if (enableSharingToggle.checkState === Qt.PartiallyChecked)
+                return
+
+            const intermediateSuccess = backend.isShared
+                ? d.stopSharing()
+                : d.share()
+
+            if (intermediateSuccess)
+                enableSharingToggle.checkState = Qt.PartiallyChecked
+        }
+
+        Binding
+        {
+            target: enableSharingToggle
+            property: "checkState"
+            value: backend.isShared ? Qt.Checked : Qt.Unchecked
         }
     }
 
@@ -180,7 +193,7 @@ BottomSheet
             {
                 if (id == "share")
                 {
-                    if (backend.isExpired())
+                    if (backend.isExpired)
                         lifetimeComboBox.currentIndex = 0
                     d.share(/*showNativeShareSheet*/true)
                 }
@@ -197,10 +210,7 @@ BottomSheet
         backend.resetBookmarkData()
 
         const currentAnimationDuration = enableSharingToggle.animationDuration
-        enableSharingToggle.visible = backend.isShared || backend.isExpired()
-        enableSharingToggle.animationDuration = 0
-        enableSharingToggle.checkState = backend.isShared ? Qt.Checked : Qt.Unchecked
-        enableSharingToggle.animationDuration = currentAnimationDuration
+        enableSharingToggle.visible = backend.isShared || backend.isExpired
 
         let expiresInModel = [
             {text: qsTr("Expires in an hour"), expires: ShareBookmarkBackend.ExpiresIn.Hour},
@@ -254,7 +264,7 @@ BottomSheet
                 ? backend.bookmarkDigest
                 : sharePasswordInput.text
 
-            backend.share(
+            return backend.share(
                 lifetimeComboBox.model[lifetimeComboBox.currentIndex].expires,
                 bookmarkPassword.trim(),
                 showNativeShareSheet)
@@ -262,12 +272,13 @@ BottomSheet
 
         function stopSharing()
         {
-            backend.stopSharing()
 
             d.updating = true
             sharePasswordInput.text = ""
             sharePasswordInput.resetState(/*hasSecretValue*/false)
             d.updating = false
+
+            return backend.stopSharing()
         }
 
         function setHasChanges(value)

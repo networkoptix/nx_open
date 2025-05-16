@@ -28,6 +28,10 @@ class ShareBookmarkBackend: public QObject
         READ isShared
         NOTIFY bookmarkChanged)
 
+    Q_PROPERTY(bool isExpired //< Is true if shared and expired, otherwise false.
+        READ isExpired
+        NOTIFY bookmarkChanged)
+
     Q_PROPERTY(QString bookmarkName
         READ bookmarkName
         WRITE setBookmarkName
@@ -68,6 +72,7 @@ public:
     bool isAvailable();
 
     bool isShared() const;
+    bool isExpired() const;
     QString bookmarkName() const;
     void setBookmarkName(const QString& value);
 
@@ -78,7 +83,6 @@ public:
 
     qint64 expirationTimeMs() const;
 
-    Q_INVOKABLE bool isExpired() const; //< Returns true if shared and expired, otherwise false.
     Q_INVOKABLE bool isNeverExpires() const;
     Q_INVOKABLE QString expiresInText() const;
 

@@ -88,8 +88,12 @@ bool QnCameraBookmarksManager::changeBookmarkRest(BookmarkOperation operation,
     if (!bookmark.isValid())
         return false;
 
+    const auto serverId = d->getServerForBookmark(bookmark);
+    if (!serverId)
+        return false;
+
     const auto model = nx::vms::common::bookmarkToApi<nx::vms::api::BookmarkV3>(
-        bookmark, d->getServerForBookmark(bookmark).value_or(nx::Uuid{}), /*includeDigest*/ true);
+        bookmark, *serverId, /*includeDigest*/ true);
     const auto path = operation == BookmarkOperation::create
         ? nx::format("rest/v4/devices/%1/bookmarks", model.deviceId).toQString()
         : nx::format("rest/v4/devices/%1/bookmarks/%2", model.deviceId, model.id).toQString();
@@ -116,7 +120,6 @@ bool QnCameraBookmarksManager::changeBookmarkRest(BookmarkOperation operation,
                 emit bookmarkAdded(bookmark);
             else
                 emit bookmarkUpdated(bookmark);
-
         };
 
     return d->sendRestRequest(path, model, method, std::move(localCallback)) != -1;

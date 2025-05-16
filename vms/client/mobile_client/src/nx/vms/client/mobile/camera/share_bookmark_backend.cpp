@@ -14,6 +14,7 @@
 #include <nx/branding.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/math/math.h>
 #include <nx/vms/api/data/bookmark_models.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
@@ -24,8 +25,10 @@
 #include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/ui/share_link_helper.h>
+#include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <nx/vms/common/api/helpers/bookmark_api_converter.h>
 #include <nx/vms/text/human_readable.h>
+#include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
 #include "details/bookmark_constants.h"
@@ -40,7 +43,7 @@ struct ShareBookmarkBackend::Private: public SystemContextAccessor
     QPersistentModelIndex modelIndex;
 
     bool isAvailable = false;
-    QnCameraBookmarksManager::BookmarkOperation bookmarkOperation;
+    QnCameraBookmarksManager::BookmarkOperation operation;
     common::CameraBookmark bookmark;
 
     Private(ShareBookmarkBackend* q);
@@ -48,6 +51,7 @@ struct ShareBookmarkBackend::Private: public SystemContextAccessor
     void shareBookmarkLink(const QString& bookmarkId) const;
     bool updateShareParams(const common::BookmarkShareableParams& shareParams,
         bool showNativeShareSheet = false);
+    void showErrorMessage() const;
 };
 
 ShareBookmarkBackend::Private::Private(ShareBookmarkBackend* q):
@@ -89,52 +93,53 @@ bool ShareBookmarkBackend::Private::updateShareParams(
     if (!NX_ASSERT(manager))
         return false;
 
-    bool result = false;
-    const auto rollbackIfError =
-        [this, &result, backupShareParams = bookmark.share]()
+    const auto handleResult =
+        [this, backupShareParams = bookmark.share](const bool result)
         {
             if (result)
-                return false;
+                return true;
 
             bookmark.share = backupShareParams;
-            return true;
+            emit q->bookmarkChanged();
+
+            executeLater([this]() { showErrorMessage(); }, q);
+
+            return false;
         };
 
-    QString fullId;
     bookmark.share = shareParams;
 
-    QEventLoop loop;
-    result = manager->changeBookmarkRest(bookmarkOperation, bookmark, nx::utils::guarded(q,
-        [this, &result, &loop, &fullId](bool success, const api::BookmarkV3& updatedBookmark)
+    auto callback = nx::utils::guarded(q,
+        [this, handleResult, showNativeShareSheet](bool result, const api::BookmarkV3& bookmarkV3)
         {
-            if (success)
-            {
-                bookmark = common::bookmarkFromApi(updatedBookmark);
+            if (!handleResult(result))
+                return;
 
-                fullId = updatedBookmark.id;
-            }
+            // As we created or updated bookmark - there is no need to create it next time.
+            operation = QnCameraBookmarksManager::BookmarkOperation::update;
 
-            result = success;
-            loop.quit();
-        }));
+            bookmark = common::bookmarkFromApi(bookmarkV3);
 
-    if (rollbackIfError())
-        return false;
+            if (showNativeShareSheet && bookmark.shareable() && NX_ASSERT(!bookmarkV3.id.isEmpty()))
+                shareBookmarkLink(bookmarkV3.id);
 
-    loop.exec();
+            emit q->bookmarkChanged();
+        });
 
-    if (rollbackIfError())
-        return false;
+    return handleResult(manager->changeBookmarkRest(operation, bookmark, std::move(callback)));
+}
 
-    // As we created or updated bookmark - there is no need to create it next time.
-    bookmarkOperation = QnCameraBookmarksManager::BookmarkOperation::update;
-
-    if (showNativeShareSheet && bookmark.shareable() && NX_ASSERT(!fullId.isEmpty()))
-        shareBookmarkLink(fullId);
-
-    emit q->bookmarkChanged();
-
-    return true;
+void ShareBookmarkBackend::Private::showErrorMessage() const
+{
+    if (const auto context = mobileSystemContext())
+    {
+        if (const auto windowContext = context->windowContext())
+        {
+            windowContext->uiController()->showMessage(
+                ShareBookmarkBackend::tr("Error"),
+                ShareBookmarkBackend::tr("Cannot share bookmark."));
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -233,8 +238,26 @@ void ShareBookmarkBackend::setModelIndex(const QModelIndex& value)
     if (d->modelIndex == value)
         return;
 
+    if (d->modelIndex.isValid())
+        d->modelIndex.model()->disconnect(this);
+
     d->modelIndex = value;
 
+    if (d->modelIndex.isValid())
+    {
+        connect(d->modelIndex.model(), &QAbstractItemModel::dataChanged, this,
+            [this](const auto& topLeft, const auto& bottomRight, const auto& /*roles*/)
+            {
+                const int column = d->modelIndex.column();
+                const int row = d->modelIndex.row();
+
+                if (qBetween(topLeft.column(), column, bottomRight.column() + 1)
+                    && qBetween(topLeft.row(), row, bottomRight.row() + 1))
+                {
+                    emit bookmarkChanged();
+                }
+            });
+    }
     resetBookmarkData();
 
     emit modelIndexChanged();
@@ -366,7 +389,7 @@ bool ShareBookmarkBackend::share(qint64 expirationTime,
 
 bool ShareBookmarkBackend::stopSharing()
 {
-    return NX_ASSERT(d->bookmarkOperation != QnCameraBookmarksManager::BookmarkOperation::create)
+    return NX_ASSERT(d->operation != QnCameraBookmarksManager::BookmarkOperation::create)
         && d->updateShareParams({
             .shareable = false,
             .expirationTimeMs = 0ms,
@@ -389,7 +412,7 @@ void ShareBookmarkBackend::resetBookmarkData()
     if (d->modelIndex.data(core::CameraBookmarkRole).isValid())
     {
         // Update bookmark from bookmarks model index.
-        d->bookmarkOperation = QnCameraBookmarksManager::BookmarkOperation::update;
+        d->operation = QnCameraBookmarksManager::BookmarkOperation::update;
         d->bookmark = d->modelIndex.data(core::CameraBookmarkRole).value<common::CameraBookmark>();
         emit bookmarkChanged();
         return;
@@ -397,7 +420,7 @@ void ShareBookmarkBackend::resetBookmarkData()
 
     // Construct bookmark from analytics object model index.
 
-    d->bookmarkOperation = QnCameraBookmarksManager::BookmarkOperation::create;
+    d->operation = QnCameraBookmarksManager::BookmarkOperation::create;
 
     const auto camera = d->modelIndex.data(core::ResourceRole)
         .value<QnResourcePtr>().dynamicCast<QnMediaResource>();

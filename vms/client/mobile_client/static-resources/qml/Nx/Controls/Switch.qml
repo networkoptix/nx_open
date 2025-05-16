@@ -12,7 +12,7 @@ Control
 
     property alias checkState: indicator.checkState
     property alias animationDuration: indicator.animationDuration
-
+    property bool toggleOnClick: true
     signal clicked()
 
     padding: 6
@@ -34,7 +34,9 @@ Control
         anchors.fill: parent
         onClicked:
         {
-            indicator.toggle()
+            if (control.toggleOnClick)
+                indicator.toggle()
+
             control.clicked()
         }
     }
