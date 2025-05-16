@@ -110,8 +110,15 @@ bool AuthMethodRestrictionList::Rule::matches(const Request& request) const
         return false;
 
     using namespace std;
-    if (filter.path && !regex_match(request.requestLine.url.path().toUtf8().data(), pathRegexp))
+    try
+    {
+        if (filter.path && !regex_match(request.requestLine.url.path().toUtf8().data(), pathRegexp))
+            return false;
+    }
+    catch (const std::exception&)
+    {
         return false;
+    }
 
     return true;
 }
