@@ -37,6 +37,9 @@ Item
     property font nameFont: control.font
     property font valueFont: control.font
 
+    onNameFontChanged: widthCalculator.updateColumnWidths()
+    onValueFontChanged: widthCalculator.updateColumnWidths()
+
     // Default: 30% to label, 70% to value. This isn't strict proportion and uses only if there
     // is not enough space for labels or values.
     property real labelFraction: 0.3

@@ -122,6 +122,26 @@ Dialog
                     }
                 }
 
+                Label
+                {
+                    text: "Font size:"
+                }
+
+                SpinBox
+                {
+                    id: fontSizeSpinBox
+
+                    from: 4
+                    to: 128
+                    editable: true
+                    value: nameValueTable.nameFont.pixelSize
+
+                    onValueModified:
+                    {
+                        nameValueTable.nameFont.pixelSize = fontSizeSpinBox.value
+                        nameValueTable.valueFont.pixelSize = fontSizeSpinBox.value
+                    }
+                }
             }
         }
 

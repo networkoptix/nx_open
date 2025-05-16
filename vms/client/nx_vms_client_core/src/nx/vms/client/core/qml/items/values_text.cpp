@@ -41,7 +41,7 @@ struct ValuesText::Private
         QFontMetricsF fm(document.defaultFont());
         if (colorValues.isEmpty())
         {
-            implicitWidth = fm.horizontalAdvance(values.join(separator));
+            implicitWidth = fm.size(0, values.join(separator)).width();
         }
         else
         {
@@ -51,7 +51,7 @@ struct ValuesText::Private
                     implicitWidth += spacing;
                 if (colorValues.count() > i)
                     implicitWidth += ColorSquareTextObject::sLength + spacing;
-                implicitWidth += fm.horizontalAdvance(values.at(i));
+                implicitWidth += fm.size(0, values.at(i)).width();
             }
         }
         q->setImplicitWidth(implicitWidth);
@@ -59,7 +59,9 @@ struct ValuesText::Private
 
     QString appendixText() const
     {
-        const int moreItemsCount = values.count() - visibleValues.count();
+        const int moreItemsCount = colorValues.count() > 0
+            ? qMin(colorValues.count(), values.count()) - visibleValues.count()
+            : values.count() - visibleValues.count();
         return moreItemsCount > 0
             ? QString("+%1").arg(moreItemsCount)
             : "";
@@ -72,7 +74,7 @@ struct ValuesText::Private
             return 0;
 
         QFontMetricsF fm(document.defaultFont());
-        return fm.horizontalAdvance(text);
+        return fm.size(0, text).width();
     }
 };
 
@@ -345,11 +347,11 @@ void ValuesText::updateTextRow()
             const QTextLine nextLine = layout.lineAt(i + 1);
             text.append(layout.text().mid(nextLine.textStart(), nextLine.textLength()));
             text = fm.elidedText(text, Qt::ElideRight, floor(availableWidth), Qt::TextSingleLine);
-            effectiveWidth = qMax(effectiveWidth, fm.horizontalAdvance(text));
+            effectiveWidth = qMax(effectiveWidth, fm.size(0, text).width());
             cursor.insertText(text);
             break;
         }
-        effectiveWidth = qMax(effectiveWidth, fm.horizontalAdvance(text));
+        effectiveWidth = qMax(effectiveWidth, fm.size(0, text).width());
         cursor.insertText(text);
     }
 
@@ -367,7 +369,7 @@ void ValuesText::updateTextRow()
 
         effectiveWidth += appendixWidth + d->spacing;
     }
-    setEffectiveWidth(ceil(effectiveWidth));
+    setEffectiveWidth(effectiveWidth);
 }
 
 void ValuesText::updateColorRow()
@@ -393,7 +395,7 @@ void ValuesText::updateColorRow()
                 valuesWidth += d->spacing;
             if (d->colorValues.count() > i)
                 valuesWidth += ColorSquareTextObject::sLength + d->spacing;
-            valuesWidth += fm.horizontalAdvance(d->visibleValues.at(i));
+            valuesWidth += fm.size(0, d->visibleValues.at(i)).width();
         }
         if (d->visibleValues.count() == 1 || valuesWidth <= availableWidth)
             break;
@@ -447,12 +449,15 @@ void ValuesText::updateColorRow()
         }
         cursor.insertText(text);
     }
-    auto cell = table->cellAt(0, constraints.count() - 1);
-    cursor = cell.firstCursorPosition();
-    textFormat.setForeground(d->appendixColor);
-    cursor.setCharFormat(textFormat);
-    cursor.insertText(appendix);
-    setEffectiveWidth(ceil(valuesWidth + (appendixWidth > 0 ? appendixWidth + d->spacing : 0)));
+    if (appendixWidth > 0)
+    {
+        auto cell = table->cellAt(0, constraints.count() - 1);
+        cursor = cell.firstCursorPosition();
+        textFormat.setForeground(d->appendixColor);
+        cursor.setCharFormat(textFormat);
+        cursor.insertText(appendix);
+    }
+    setEffectiveWidth(valuesWidth + (appendixWidth > 0 ? appendixWidth + d->spacing : 0));
 }
 
 void ValuesText::registerQmlType()
