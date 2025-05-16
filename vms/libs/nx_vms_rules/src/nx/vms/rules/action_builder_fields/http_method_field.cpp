@@ -5,32 +5,46 @@
 #include <QtCore/QJsonArray>
 
 #include <nx/network/http/http_types.h>
+#include <nx/vms/rules/manifest.h>
 
 namespace nx::vms::rules {
 
-const QSet<QString>& HttpMethodField::allowedValues()
+QSet<QString> HttpMethodField::allowedValues(bool allowAuto)
 {
-    static const QSet kAllowedValues = {
+    QSet allowedValues = {
         QString(network::http::Method::get.data()),
         QString(network::http::Method::post.data()),
         QString(network::http::Method::put.data()),
         QString(network::http::Method::patch.data()),
-        QString(network::http::Method::delete_.data()),
-        QString{} //< An empty value means that the method will be calculated automatically.
+        QString(network::http::Method::delete_.data())
     };
 
-    return kAllowedValues;
+    if (allowAuto)
+    {
+        static const QString kAutoMethod; //< An empty value means that the method will be calculated automatically.
+        allowedValues.insert(kAutoMethod);
+    }
+
+    return allowedValues;
 }
 
-QJsonObject HttpMethodField::openApiDescriptor(const QVariantMap&)
+QJsonObject HttpMethodField::openApiDescriptor(const QVariantMap& properties)
 {
     auto descriptor = SimpleTypeActionField::openApiDescriptor({});
     QJsonArray enums;
-    for (const auto& value: allowedValues())
+    const auto allowed =
+        allowedValues(HttpMethodFieldProperties::fromVariantMap(properties).allowAuto);
+    for (const auto& value: allowed)
         enums.append(value);
+
     descriptor[utils::kEnumProperty] = enums;
     descriptor[utils::kExampleProperty] = QString(network::http::Method::post.data());
     return descriptor;
+}
+
+HttpMethodFieldProperties HttpMethodField::properties() const
+{
+    return HttpMethodFieldProperties::fromVariantMap(descriptor()->properties);
 }
 
 } // namespace nx::vms::rules

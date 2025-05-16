@@ -17,15 +17,15 @@ ValidationResult HttpMethodFieldValidator::validity(
         return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
     const auto method = httpMethodField->value().trimmed().toUpper();
+    if (!HttpMethodField::allowedValues(httpMethodField->properties().allowAuto).contains(method))
+    {
+        return {
+            QValidator::State::Invalid,
+            tr("Not allowed HTTP method")
+        };
+    }
 
-    // Empty string is 'Auto' method type.
-    if (method.isEmpty() || HttpMethodField::allowedValues().contains(method))
-        return {};
-
-    return {
-        QValidator::State::Invalid,
-        tr("HTTP Method should be known")
-    };
+    return {};
 }
 
 } // namespace nx::vms::rules

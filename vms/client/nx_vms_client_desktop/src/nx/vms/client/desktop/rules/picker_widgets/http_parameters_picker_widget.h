@@ -26,8 +26,11 @@ protected:
     {
         DropdownTextPickerWidgetBase<F>::updateUi();
 
-        const auto fieldValue = m_field->value();
-        m_comboBox->setCurrentText(!fieldValue.isEmpty() ? fieldValue : Strings::autoValue());
+        auto currentText = m_field->value();
+        if (currentText.isEmpty())
+            currentText = Strings::autoValue();
+
+        m_comboBox->setCurrentIndex(m_comboBox->findText(currentText));
     }
 
     void onActivated() override
@@ -68,7 +71,10 @@ public:
         :
         HttpParametersPickerBase<vms::rules::HttpMethodField>(field, context, parent)
     {
-        m_comboBox->addItem(Strings::autoValue());
+        const auto fieldProperties = field->properties();
+        if (fieldProperties.allowAuto)
+            m_comboBox->addItem(Strings::autoValue());
+
         m_comboBox->addItem(network::http::Method::get.data());
         m_comboBox->addItem(network::http::Method::post.data());
         m_comboBox->addItem(network::http::Method::put.data());

@@ -6,6 +6,34 @@
 
 namespace nx::vms::rules {
 
+struct HttpMethodFieldProperties
+{
+    QString value;
+
+    /** Whether auto runtime http method selection allowed. */
+    bool allowAuto{true};
+
+    QVariantMap toVariantMap() const
+    {
+        QVariantMap result;
+
+        result.insert("value", value);
+        result.insert("allowAuto", allowAuto);
+
+        return result;
+    }
+
+    static HttpMethodFieldProperties fromVariantMap(const QVariantMap& properties)
+    {
+        HttpMethodFieldProperties result;
+
+        result.value = properties.value("value").toString();
+        result.allowAuto = properties.value("allowAuto", true).toBool();
+
+        return result;
+    }
+};
+
 /** Stores HTTP method as a string. */
 class NX_VMS_RULES_API HttpMethodField: public SimpleTypeActionField<QString, HttpMethodField>
 {
@@ -16,8 +44,10 @@ class NX_VMS_RULES_API HttpMethodField: public SimpleTypeActionField<QString, Ht
 
 public:
     using SimpleTypeActionField<QString, HttpMethodField>::SimpleTypeActionField;
-    static const QSet<QString>& allowedValues();
+    static QSet<QString> allowedValues(bool allowAuto);
     static QJsonObject openApiDescriptor(const QVariantMap& properties);
+
+    HttpMethodFieldProperties properties() const;
 
 signals:
     void valueChanged();

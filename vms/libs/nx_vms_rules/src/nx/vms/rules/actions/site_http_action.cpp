@@ -31,7 +31,9 @@ const ItemDescriptor& SiteHttpAction::manifest()
                     .validationPolicy = kSiteEndpointValidationPolicy}.toVariantMap()),
             makeFieldDescriptor<HttpMethodField>(utils::kMethodFieldName,
                 Strings::method(),
-                {"If not set, it will be calculated automatically."}),
+                {},
+                HttpMethodFieldProperties{
+                    .value = network::http::Method::post.data(), .allowAuto = false}.toVariantMap()),
             makeFieldDescriptor<TextWithFields>(utils::kContentFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Content")),
                 {},
