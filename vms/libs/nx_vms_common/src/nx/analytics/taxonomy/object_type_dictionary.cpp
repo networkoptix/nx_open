@@ -2,6 +2,7 @@
 
 #include "object_type_dictionary.h"
 #include "abstract_state_watcher.h"
+#include "event_type.h"
 
 namespace nx::analytics::taxonomy {
 

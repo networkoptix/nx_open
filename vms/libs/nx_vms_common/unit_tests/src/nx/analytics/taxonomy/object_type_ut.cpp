@@ -110,7 +110,7 @@ protected:
                 supportedAttributesByTypeId[descriptorId].insert(attributeName);
         }
 
-        for (const AbstractObjectType* objectType : m_result.state->objectTypes())
+        for (const ObjectType* objectType : m_result.state->objectTypes())
             verifySupportedAttributesAreCorrect(objectType, supportedAttributesByTypeId);
     }
 
@@ -147,24 +147,24 @@ protected:
 
         ASSERT_FALSE(expectedData.empty());
 
-        const std::vector<AbstractObjectType*> objectTypes = m_result.state->objectTypes();
+        const std::vector<ObjectType*> objectTypes = m_result.state->objectTypes();
 
         ASSERT_EQ(objectTypes.size(), expectedData.size());
-        for (const AbstractObjectType* objectType: objectTypes)
+        for (const ObjectType* objectType: objectTypes)
         {
             const InheritanceTestExpectedData& expected = expectedData[objectType->id()];
             ASSERT_EQ(expected.id, objectType->id());
             ASSERT_EQ(expected.name, objectType->name());
 
-            const AbstractObjectType* base = objectType->base();
+            const ObjectType* base = objectType->base();
             if (!expected.base.isEmpty())
                 ASSERT_EQ(expected.base, base->id());
             else
                 ASSERT_EQ(base, nullptr);
 
-            const std::vector<AbstractObjectType*> directDerivedTypes = objectType->derivedTypes();
+            const std::vector<ObjectType*> directDerivedTypes = objectType->derivedTypes();
             std::set<QString> directDerivedTypeIds;
-            for (const AbstractObjectType* directDerivedType:  directDerivedTypes)
+            for (const ObjectType* directDerivedType:  directDerivedTypes)
                 directDerivedTypeIds.insert(directDerivedType->id());
 
             ASSERT_EQ(directDerivedTypeIds, expected.directDerivedTypes);
@@ -192,18 +192,18 @@ protected:
 
         ASSERT_FALSE(expectedData.empty());
 
-        const std::vector<AbstractObjectType*> objectTypes = m_result.state->objectTypes();
+        const std::vector<ObjectType*> objectTypes = m_result.state->objectTypes();
 
         ASSERT_EQ(objectTypes.size(), expectedData.size());
-        for (const AbstractObjectType* objectType: objectTypes)
+        for (const ObjectType* objectType: objectTypes)
         {
             const ScopeTestExpectedData& expected = expectedData[objectType->id()];
             ASSERT_EQ(expected.id, objectType->id());
             ASSERT_EQ(expected.name, objectType->name());
 
-            const std::vector<AbstractScope*> scopes = objectType->scopes();
+            const auto& scopes = objectType->scopes();
             ASSERT_EQ(scopes.size(), expected.scopeInfo.size());
-            for (const AbstractScope* scope: scopes)
+            for (const auto& scope: scopes)
             {
                 ScopeInfo scopeInfo;
                 const AbstractEngine* engine = scope->engine();
@@ -261,10 +261,10 @@ protected:
 
         ASSERT_FALSE(expectedData.empty());
 
-        const std::vector<AbstractObjectType*> objectTypes = m_result.state->objectTypes();
+        const std::vector<ObjectType*> objectTypes = m_result.state->objectTypes();
 
         ASSERT_EQ(objectTypes.size(), expectedData.size());
-        for (const AbstractObjectType* objectType: objectTypes)
+        for (const ObjectType* objectType: objectTypes)
         {
             const FlagTestExpectedData& expected = expectedData[objectType->id()];
             ASSERT_EQ(objectType->id(), expected.id);
@@ -276,7 +276,7 @@ protected:
 
 private:
     void verifySupportedAttributesAreCorrect(
-        const AbstractObjectType* objectType,
+        const ObjectType* objectType,
         const std::map<QString, std::set<QString>> supportedAttributesByTypeId)
     {
         const auto it = supportedAttributesByTypeId.find(objectType->id());
@@ -286,7 +286,7 @@ private:
     }
 
     std::set<QString> allAttributePaths(
-        const AbstractObjectType* objectType,
+        const ObjectType* objectType,
         const QString& prefix = QString())
     {
         std::set<QString> result;
@@ -309,7 +309,7 @@ private:
     std::set<QString> nonReachableTypeIds(const std::shared_ptr<AbstractState>& state)
     {
         std::set<QString> result;
-        for (const AbstractObjectType* objectType : state->objectTypes())
+        for (const ObjectType* objectType : state->objectTypes())
         {
             if (!objectType->isReachable())
                 result.insert(objectType->id());

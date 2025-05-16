@@ -10,8 +10,6 @@
 
 namespace nx::analytics::taxonomy {
 
-class ObjectType;
-
 class State: public AbstractState
 {
 public:
@@ -26,21 +24,21 @@ public:
 
     virtual std::vector<AbstractGroup*> groups() const override;
 
-    virtual std::vector<AbstractObjectType*> objectTypes() const override;
+    virtual std::vector<ObjectType*> objectTypes() const override;
 
-    virtual std::vector<AbstractEventType*> eventTypes() const override;
+    virtual std::vector<EventType*> eventTypes() const override;
 
     virtual std::vector<AbstractEnumType*> enumTypes() const override;
 
     virtual std::vector<AbstractColorType*> colorTypes() const override;
 
-    virtual std::vector<AbstractObjectType*> rootObjectTypes() const override;
+    virtual std::vector<ObjectType*> rootObjectTypes() const override;
 
-    virtual std::vector<AbstractEventType*> rootEventTypes() const override;
+    virtual std::vector<EventType*> rootEventTypes() const override;
 
-    virtual AbstractObjectType* objectTypeById(const QString& objectTypeId) const override;
+    virtual ObjectType* objectTypeById(const QString& objectTypeId) const override;
 
-    virtual AbstractEventType* eventTypeById(const QString& eventTypeById) const override;
+    virtual EventType* eventTypeById(const QString& eventTypeById) const override;
 
     virtual AbstractIntegration* integrationById(const QString& integrationId) const override;
 
@@ -68,11 +66,11 @@ private:
     mutable std::vector<AbstractEngine*> m_cachedEngines;
     mutable std::vector<AbstractGroup*> m_cachedGroups;
 
-    mutable std::vector<AbstractObjectType*> m_cachedObjectType;
-    mutable std::vector<AbstractObjectType*> m_cachedRootObjectType;
+    mutable std::vector<ObjectType*> m_cachedObjectType;
+    mutable std::vector<ObjectType*> m_cachedRootObjectType;
 
-    mutable std::vector<AbstractEventType*> m_cachedEventType;
-    mutable std::vector<AbstractEventType*> m_cachedRootEventType;
+    mutable std::vector<EventType*> m_cachedEventType;
+    mutable std::vector<EventType*> m_cachedRootEventType;
 
     mutable std::vector<AbstractEnumType*> m_cachedEnumTypes;
     mutable std::vector<AbstractColorType*> m_cachedColorTypes;

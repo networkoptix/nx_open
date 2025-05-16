@@ -12,8 +12,8 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/analytics/taxonomy/object_type.h>
 #include <nx/analytics/taxonomy/object_type_dictionary.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
@@ -150,7 +150,7 @@ public:
     void updateAttributes(nx::analytics::db::ObjectTrack& track,
         const nx::common::metadata::Attributes attributes);
 
-    const nx::analytics::taxonomy::AbstractObjectType*
+    const nx::analytics::taxonomy::ObjectType*
         objectTypeById(const QString& objectTypeId) const;
 
     QString iconPath(const QString& objectTypeId) const;
@@ -339,7 +339,7 @@ void AnalyticsSearchListModel::Private::updateAttributes(nx::analytics::db::Obje
     }
 }
 
-const nx::analytics::taxonomy::AbstractObjectType*
+const nx::analytics::taxonomy::ObjectType*
     AnalyticsSearchListModel::Private::objectTypeById(const QString& objectTypeId) const
 {
     if (!NX_ASSERT(q->systemContext()))

@@ -7,7 +7,7 @@
 #include "../basic_event.h"
 #include "../data_macros.h"
 
-namespace nx::analytics::taxonomy { class AbstractObjectType; }
+namespace nx::analytics::taxonomy { class ObjectType; }
 
 namespace nx::vms::rules {
 
@@ -49,7 +49,7 @@ protected:
 
 private:
     QString analyticsObjectCaption(common::SystemContext* context) const;
-    nx::analytics::taxonomy::AbstractObjectType* objectTypeById(
+    nx::analytics::taxonomy::ObjectType* objectTypeById(
         common::SystemContext* context) const;
 };
 

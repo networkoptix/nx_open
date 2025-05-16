@@ -11,7 +11,7 @@ namespace nx::vms::client::core::analytics::taxonomy {
 struct AttributeSet::Private
 {
     const AbstractStateViewFilter* const filter;
-    std::vector<const nx::analytics::taxonomy::AbstractObjectType*> objectTypes;
+    std::vector<const nx::analytics::taxonomy::ObjectType*> objectTypes;
     mutable std::optional<std::vector<Attribute*>> cachedAttributes;
 };
 
@@ -34,7 +34,7 @@ std::vector<Attribute*> AttributeSet::attributes() const
     return *d->cachedAttributes;
 }
 
-void AttributeSet::addObjectType(nx::analytics::taxonomy::AbstractObjectType* objectType)
+void AttributeSet::addObjectType(nx::analytics::taxonomy::ObjectType* objectType)
 {
     d->objectTypes.push_back(objectType);
     d->cachedAttributes.reset();

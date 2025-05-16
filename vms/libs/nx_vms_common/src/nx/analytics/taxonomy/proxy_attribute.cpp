@@ -73,7 +73,7 @@ AbstractEnumType* ProxyAttribute::enumType() const
     return nullptr;
 }
 
-AbstractObjectType* ProxyAttribute::objectType() const
+ObjectType* ProxyAttribute::objectType() const
 {
     if (m_proxyObjectType)
        return m_proxyObjectType;

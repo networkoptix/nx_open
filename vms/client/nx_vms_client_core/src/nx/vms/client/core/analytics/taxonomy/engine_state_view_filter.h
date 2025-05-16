@@ -32,7 +32,7 @@ public:
      * the Engine is in the list of the Object type scopes).
      */
     virtual bool matches(
-        const nx::analytics::taxonomy::AbstractObjectType* objectType) const override;
+        const nx::analytics::taxonomy::ObjectType* objectType) const override;
 
     /** @return True if attribute belongs to an Object type that matches the filter. */
     virtual bool matches(

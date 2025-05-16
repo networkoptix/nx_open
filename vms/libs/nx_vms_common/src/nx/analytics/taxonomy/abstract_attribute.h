@@ -8,11 +8,11 @@
 #include <nx/analytics/taxonomy/abstract_color_type.h>
 #include <nx/analytics/taxonomy/abstract_enum_type.h>
 
-Q_MOC_INCLUDE("nx/analytics/taxonomy/abstract_object_type.h")
+Q_MOC_INCLUDE("nx/analytics/taxonomy/object_type.h")
 
 namespace nx::analytics::taxonomy {
 
-class AbstractObjectType;
+class ObjectType;
 
 class NX_VMS_COMMON_API AbstractAttribute: public QObject
 {
@@ -21,7 +21,7 @@ class NX_VMS_COMMON_API AbstractAttribute: public QObject
     Q_PROPERTY(Type type READ type CONSTANT)
     Q_PROPERTY(QString subtype READ subtype CONSTANT)
     Q_PROPERTY(nx::analytics::taxonomy::AbstractEnumType* enumType READ enumType CONSTANT)
-    Q_PROPERTY(nx::analytics::taxonomy::AbstractObjectType* objectType READ objectType CONSTANT)
+    Q_PROPERTY(nx::analytics::taxonomy::ObjectType* objectType READ objectType CONSTANT)
     Q_PROPERTY(nx::analytics::taxonomy::AbstractColorType* colorType READ colorType CONSTANT)
     Q_PROPERTY(QString unit READ unit CONSTANT)
     Q_PROPERTY(QVariant minValue READ minValue CONSTANT)
@@ -56,7 +56,7 @@ public:
 
     virtual AbstractEnumType* enumType() const = 0;
 
-    virtual AbstractObjectType* objectType() const = 0;
+    virtual ObjectType* objectType() const = 0;
 
     virtual AbstractColorType* colorType() const = 0;
 

@@ -6,7 +6,7 @@
 
 #include <QtCore/QObject>
 
-#include <nx/analytics/taxonomy/abstract_object_type.h>
+#include <nx/analytics/taxonomy/object_type.h>
 #include <nx/utils/impl_ptr.h>
 
 Q_MOC_INCLUDE("nx/vms/client/core/analytics/taxonomy/attribute.h")
@@ -32,7 +32,7 @@ public:
 
     std::vector<Attribute*> attributes() const;
 
-    void addObjectType(nx::analytics::taxonomy::AbstractObjectType* objectType);
+    void addObjectType(nx::analytics::taxonomy::ObjectType* objectType);
 
 private:
     struct Private;

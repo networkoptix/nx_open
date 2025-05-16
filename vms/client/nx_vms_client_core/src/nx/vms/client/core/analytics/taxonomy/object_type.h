@@ -11,7 +11,7 @@
 
 #include "attribute.h"
 
-namespace nx::analytics::taxonomy { class AbstractObjectType; }
+namespace nx::analytics::taxonomy { class ObjectType; }
 
 namespace nx::vms::client::core::analytics::taxonomy {
 
@@ -42,7 +42,7 @@ class NX_VMS_CLIENT_CORE_API ObjectType: public QObject
         READ derivedObjectTypes CONSTANT)
 
 public:
-    ObjectType(const nx::analytics::taxonomy::AbstractObjectType* mainObjectType,
+    ObjectType(const nx::analytics::taxonomy::ObjectType* mainObjectType,
         QObject* parent = nullptr);
 
     virtual ~ObjectType() override;
@@ -77,7 +77,7 @@ public:
 
     std::vector<ObjectType*> derivedObjectTypes() const;
 
-    void addObjectType(const nx::analytics::taxonomy::AbstractObjectType* objectType);
+    void addObjectType(const nx::analytics::taxonomy::ObjectType* objectType);
 
     void addDerivedObjectType(ObjectType* objectType);
 

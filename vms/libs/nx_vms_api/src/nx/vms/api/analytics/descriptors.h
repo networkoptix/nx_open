@@ -209,6 +209,7 @@ struct ExtendedScopedDescriptor: public BaseScopedDescriptor
     std::vector<QString> omittedBaseAttributes;
     std::vector<AttributeDescription> attributes;
     std::map<QString /*attributeName*/, std::set<EngineId>> attributeSupportInfo;
+    bool hasEverBeenSupported = false;
 };
 #define nx_vms_api_analytics_ExtendedScopedDescriptor_Fields \
     nx_vms_api_analytics_BaseScopedDescriptor_Fields \
@@ -232,7 +233,6 @@ struct EventTypeDescriptor: public ExtendedScopedDescriptor
     bool operator==(const EventTypeDescriptor& other) const = default;
 
     EventTypeFlags flags;
-    bool hasEverBeenSupported = false;
 
     /** See ObjectType::isSupposedToMimicBaseType(). */
     bool isSupposedToMimicBaseType() const { return false; }
@@ -257,7 +257,6 @@ struct ObjectTypeDescriptor: public ExtendedScopedDescriptor
     bool operator==(const ObjectTypeDescriptor& other) const = default;
 
     ObjectTypeFlags flags;
-    bool hasEverBeenSupported = false;
 
     /**
      * Some Object Types aren't visible anywhere in the GUI (hidden), but behave like mixins for

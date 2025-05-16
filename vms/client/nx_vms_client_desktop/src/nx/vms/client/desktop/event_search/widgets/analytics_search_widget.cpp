@@ -31,9 +31,9 @@
 #include <network/system_helpers.h>
 #include <nx/analytics/action_type_descriptor_manager.h>
 #include <nx/analytics/taxonomy/abstract_engine.h>
-#include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/analytics/taxonomy/object_type.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>

@@ -24,7 +24,7 @@ Attribute::Attribute(
 
 Attribute::Attribute(
     nx::vms::api::analytics::AttributeDescription attributeDescription,
-    AbstractObjectType* objectType,
+    ObjectType* objectType,
     QObject* parent)
     :
     AbstractAttribute(parent),
@@ -93,7 +93,7 @@ AbstractEnumType* Attribute::enumType() const
     return m_enumType;
 }
 
-AbstractObjectType* Attribute::objectType() const
+ObjectType* Attribute::objectType() const
 {
     if (!NX_ASSERT(fromDescriptorAttributeType(m_attributeDescription.type) == Type::object))
         return nullptr;

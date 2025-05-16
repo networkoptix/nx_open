@@ -3,8 +3,7 @@
 #include "scope_state_view_filter.h"
 
 #include <nx/analytics/taxonomy/abstract_engine.h>
-#include <nx/analytics/taxonomy/abstract_object_type.h>
-#include <nx/analytics/taxonomy/abstract_scope.h>
+#include <nx/analytics/taxonomy/object_type.h>
 
 namespace nx::vms::client::core::analytics::taxonomy {
 
@@ -47,7 +46,7 @@ QString ScopeStateViewFilter::name() const
 }
 
 bool ScopeStateViewFilter::matches(
-    const nx::analytics::taxonomy::AbstractObjectType* objectType) const
+    const nx::analytics::taxonomy::ObjectType* objectType) const
 {
     if (d->devices.empty())
         return false;

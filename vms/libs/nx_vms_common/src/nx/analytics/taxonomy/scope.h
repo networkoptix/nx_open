@@ -2,27 +2,27 @@
 
 #pragma once
 
-#include <nx/analytics/taxonomy/abstract_scope.h>
+#include "nx/analytics/taxonomy/abstract_engine.h"
+#include "nx/analytics/taxonomy/abstract_group.h"
 
 namespace nx::analytics::taxonomy {
 
 class Engine;
 class Group;
 
-class Scope: public AbstractScope
+class NX_VMS_COMMON_API Scope
 {
 public:
-    Scope(QObject* parent = nullptr);
+    AbstractEngine* engine() const;
 
-    virtual AbstractEngine* engine() const override;
+    AbstractGroup* group() const;
 
-    virtual AbstractGroup* group() const override;
+    QString provider() const;
 
-    virtual QString provider() const override;
+    bool hasTypeEverBeenSupportedInThisScope() const;
 
-    virtual bool hasTypeEverBeenSupportedInThisScope() const override;
+    bool isEmpty() const;
 
-    virtual bool isEmpty() const override;
 
     void setEngine(Engine* engine);
 

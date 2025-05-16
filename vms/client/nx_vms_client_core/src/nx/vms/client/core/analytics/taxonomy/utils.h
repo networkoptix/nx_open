@@ -42,7 +42,7 @@ Attribute* mergeAttributes(
     QObject* parent);
 
 std::vector<Attribute*> resolveAttributes(
-    const std::vector<const nx::analytics::taxonomy::AbstractObjectType*>& objectTypes,
+    const std::vector<const nx::analytics::taxonomy::ObjectType*>& objectTypes,
     const AbstractStateViewFilter* filter,
     QObject* parent);
 

@@ -458,124 +458,124 @@ protected:
     void thenSupportedEventTypesAreCorrect()
     {
         ASSERT_EQ(m_devices.size(), 1);
-        thenEntitySetIsCorrect<AbstractEventType>(
+        thenEntitySetIsCorrect<EventType>(
             [this]() { return s_stateHelper->supportedEventTypes(m_devices[0]); });
     }
 
     void thenSupportedObjectTypesAreCorrect()
     {
         ASSERT_EQ(m_devices.size(), 1);
-        thenEntitySetIsCorrect<AbstractObjectType>(
+        thenEntitySetIsCorrect<ObjectType>(
             [this]() { return s_stateHelper->supportedObjectTypes(m_devices[0]); });
     }
 
     void thenSupportedEventTypeUnionIsCorrect()
     {
-        thenEntitySetIsCorrect<AbstractEventType>(
+        thenEntitySetIsCorrect<EventType>(
             [this]() { return s_stateHelper->supportedEventTypeUnion(m_devices); });
     }
 
     void thenSupportedObjectTypeUnionIsCorrect()
     {
-        thenEntitySetIsCorrect<AbstractObjectType>(
+        thenEntitySetIsCorrect<ObjectType>(
             [this]() { return s_stateHelper->supportedObjectTypeUnion(m_devices); });
     }
 
     void thenSupportedEventTypeIntersectionIsCorrect()
     {
-        thenEntitySetIsCorrect<AbstractEventType>(
+        thenEntitySetIsCorrect<EventType>(
             [this]() { return s_stateHelper->supportedEventTypeIntersection(m_devices); });
     }
 
     void thenSupportedObjectTypeIntersectionIsCorrect()
     {
-        thenEntitySetIsCorrect<AbstractObjectType>(
+        thenEntitySetIsCorrect<ObjectType>(
             [this]() { return s_stateHelper->supportedObjectTypeIntersection(m_devices); });
     }
 
     void thenCompatibleEventTypesAreCorrect()
     {
         ASSERT_EQ(m_devices.size(), 1);
-        thenEntitySetIsCorrect<AbstractEventType>(
+        thenEntitySetIsCorrect<EventType>(
             [this]() { return s_stateHelper->compatibleEventTypes(m_devices[0]); });
     }
 
     void thenCompatibleObjectTypesAreCorrect()
     {
         ASSERT_EQ(m_devices.size(), 1);
-        thenEntitySetIsCorrect<AbstractObjectType>(
+        thenEntitySetIsCorrect<ObjectType>(
             [this]() { return s_stateHelper->compatibleObjectTypes(m_devices[0]); });
     }
 
     void thenCompatibleEventTypeUnionIsCorrect()
     {
-        thenEntitySetIsCorrect<AbstractEventType>(
+        thenEntitySetIsCorrect<EventType>(
             [this]() { return s_stateHelper->compatibleEventTypeUnion(m_devices); });
     }
 
     void thenCompatibleObjectTypeUnionIsCorrect()
     {
-        thenEntitySetIsCorrect<AbstractObjectType>(
+        thenEntitySetIsCorrect<ObjectType>(
             [this]() { return s_stateHelper->compatibleObjectTypeUnion(m_devices); });
     }
 
     void thenCompatibleEventTypeIntersectionIsCorrect()
     {
-        thenEntitySetIsCorrect<AbstractEventType>(
+        thenEntitySetIsCorrect<EventType>(
             [this]() { return s_stateHelper->compatibleEventTypeIntersection(m_devices); });
     }
 
     void thenCompatibleObjectTypeIntersectionIsCorrect()
     {
-        thenEntitySetIsCorrect<AbstractObjectType>(
+        thenEntitySetIsCorrect<ObjectType>(
             [this]() { return s_stateHelper->compatibleObjectTypeIntersection(m_devices); });
     }
 
     void thenSupportedEventTypeTreeUnionIsCorrect()
     {
-        thenEntityTreeIsCorrect<AbstractEventType>(
+        thenEntityTreeIsCorrect<EventType>(
             [this]() { return s_stateHelper->supportedEventTypeTreeUnion(m_devices); });
     }
 
     void thenSupportedObjectTypeTreeUnionIsCorrect()
     {
-        thenEntityTreeIsCorrect<AbstractObjectType>(
+        thenEntityTreeIsCorrect<ObjectType>(
             [this]() { return s_stateHelper->supportedObjectTypeTreeUnion(m_devices); });
     }
 
     void thenCompatibleEventTypeTreeUnionIsCorrect()
     {
-        thenEntityTreeIsCorrect<AbstractEventType>(
+        thenEntityTreeIsCorrect<EventType>(
             [this]() { return s_stateHelper->compatibleEventTypeTreeUnion(m_devices); });
     }
 
     void thenCompatibleObjectTypeTreeUnionIsCorrect()
     {
-        thenEntityTreeIsCorrect<AbstractObjectType>(
+        thenEntityTreeIsCorrect<ObjectType>(
             [this]() { return s_stateHelper->compatibleObjectTypeTreeUnion(m_devices); });
     }
 
     void thenSupportedEventTypeTreeIntersectionIsCorrect()
     {
-        thenEntityTreeIsCorrect<AbstractEventType>(
+        thenEntityTreeIsCorrect<EventType>(
             [this]() { return s_stateHelper->supportedEventTypeTreeIntersection(m_devices); });
     }
 
     void thenSupportedObjectTypeTreeIntersectionIsCorrect()
     {
-        thenEntityTreeIsCorrect<AbstractObjectType>(
+        thenEntityTreeIsCorrect<ObjectType>(
             [this]() { return s_stateHelper->supportedObjectTypeTreeIntersection(m_devices); });
     }
 
     void thenCompatibleEventTypeTreeIntersectionIsCorrect()
     {
-        thenEntityTreeIsCorrect<AbstractEventType>(
+        thenEntityTreeIsCorrect<EventType>(
             [this]() { return s_stateHelper->compatibleEventTypeTreeIntersection(m_devices); });
     }
 
     void thenCompatibleObjectTypeTreeIntersectionIsCorrect()
     {
-        thenEntityTreeIsCorrect<AbstractObjectType>(
+        thenEntityTreeIsCorrect<ObjectType>(
             [this]() { return s_stateHelper->compatibleObjectTypeTreeIntersection(m_devices); });
     }
 

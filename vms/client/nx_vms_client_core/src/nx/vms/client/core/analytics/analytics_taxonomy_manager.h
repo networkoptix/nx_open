@@ -9,8 +9,8 @@
 #include <QtCore/QSet>
 
 #include <nx/analytics/taxonomy/abstract_engine.h>
-#include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
+#include <nx/analytics/taxonomy/object_type.h>
 #include <nx/vms/client/core/system_context_aware.h>
 #include <nx/utils/impl_ptr.h>
 
@@ -56,12 +56,12 @@ public:
 
     Q_INVOKABLE bool isEngineRelevant(nx::analytics::taxonomy::AbstractEngine* engine) const;
 
-    Q_INVOKABLE bool isRelevantForEngine(nx::analytics::taxonomy::AbstractObjectType* type,
+    Q_INVOKABLE bool isRelevantForEngine(nx::analytics::taxonomy::ObjectType* type,
         nx::analytics::taxonomy::AbstractEngine* engine) const;
 
     QSet<nx::analytics::taxonomy::AbstractEngine*> relevantEngines() const;
 
-    QSet<nx::analytics::taxonomy::AbstractObjectType*> relevantObjectTypes(
+    QSet<nx::analytics::taxonomy::ObjectType*> relevantObjectTypes(
         nx::analytics::taxonomy::AbstractEngine* engine) const;
 
 signals:

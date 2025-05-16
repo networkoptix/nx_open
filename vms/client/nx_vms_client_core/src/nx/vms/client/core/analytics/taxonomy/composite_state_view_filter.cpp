@@ -30,7 +30,7 @@ QString CompositeFilter::name() const
     return names.join("&");
 }
 
-bool CompositeFilter::matches(const nx::analytics::taxonomy::AbstractObjectType* objectType) const
+bool CompositeFilter::matches(const nx::analytics::taxonomy::ObjectType* objectType) const
 {
     return std::all_of(m_filters.begin(), m_filters.end(),
         [&](AbstractStateViewFilter* filter) { return filter->matches(objectType); });

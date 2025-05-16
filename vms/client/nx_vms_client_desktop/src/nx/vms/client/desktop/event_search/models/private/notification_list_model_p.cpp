@@ -9,8 +9,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/analytics/taxonomy/object_type.h>
 #include <nx/utils/metatypes.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>

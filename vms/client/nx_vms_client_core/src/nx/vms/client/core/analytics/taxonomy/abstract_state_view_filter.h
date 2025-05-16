@@ -6,7 +6,7 @@
 
 namespace nx::analytics::taxonomy {
 
-class AbstractObjectType;
+class ObjectType;
 class AbstractAttribute;
 
 } // namespace nx::analytics::taxonomy
@@ -37,7 +37,7 @@ public:
     virtual QString name() const = 0;
 
     /** @return True if the given Object type passes the filter, false otherwise. */
-    virtual bool matches(const nx::analytics::taxonomy::AbstractObjectType* objectType) const = 0;
+    virtual bool matches(const nx::analytics::taxonomy::ObjectType* objectType) const = 0;
 
     /** @return True if the given Attribute passes the filter, false otherwise. */
     virtual bool matches(const nx::analytics::taxonomy::AbstractAttribute* attribute) const = 0;

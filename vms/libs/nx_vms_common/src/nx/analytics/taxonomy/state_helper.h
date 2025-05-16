@@ -61,7 +61,7 @@ public:
     StateHelper(std::shared_ptr<AbstractState> state);
 
     /** @return Map of supported Event types indexed by the Event type id. */
-    std::map<QString, AbstractEventType*> supportedEventTypes(
+    std::map<QString, EventType*> supportedEventTypes(
         const QnVirtualCameraResourcePtr& device) const;
 
     /**
@@ -69,7 +69,7 @@ public:
      *     Calculated as a union of maps of supported Event types of particular devices from the
      *     set.
      */
-    std::map<QString, AbstractEventType*> supportedEventTypeUnion(
+    std::map<QString, EventType*> supportedEventTypeUnion(
         const QnVirtualCameraResourceList& device) const;
 
     /**
@@ -77,7 +77,7 @@ public:
      *     Calculated as an intersection of maps of supported Event types of particular devices
      *     from the set.
      */
-    std::map<QString, AbstractEventType*> supportedEventTypeIntersection(
+    std::map<QString, EventType*> supportedEventTypeIntersection(
         const QnVirtualCameraResourceList& device) const;
 
     /**
@@ -86,9 +86,9 @@ public:
      * @return Tree of supported Event types for a set of devices. Calculated as an intersection of
      *     trees of supported Event types of particular devices from the set.
      */
-    std::vector<EngineScope<AbstractEventType>> supportedEventTypeTreeUnion(
+    std::vector<EngineScope<EventType>> supportedEventTypeTreeUnion(
         const QnVirtualCameraResourceList& devices,
-        const std::vector<ScopedEntity<AbstractEventType>>& additionalEntities = {}) const;
+        const std::vector<ScopedEntity<EventType>>& additionalEntities = {}) const;
 
     /**
      * @param devices List of devices for which the Event type tree should be built.
@@ -96,14 +96,14 @@ public:
      * @return Tree of supported Event types for a set of devices. Calculated as a union of trees
      *     of supported Event types of particular devices from the set.
      */
-    std::vector<EngineScope<AbstractEventType>> supportedEventTypeTreeIntersection(
+    std::vector<EngineScope<EventType>> supportedEventTypeTreeIntersection(
         const QnVirtualCameraResourceList& devices,
-        const std::vector<ScopedEntity<AbstractEventType>>& additionalEntities = {}) const;
+        const std::vector<ScopedEntity<EventType>>& additionalEntities = {}) const;
 
     //----------------------------------------------------------------------------------------------
 
     /** @return Map of compatible Event types indexed by the Event type id. */
-    std::map<QString, AbstractEventType*> compatibleEventTypes(
+    std::map<QString, EventType*> compatibleEventTypes(
         const QnVirtualCameraResourcePtr& device) const;
 
     /**
@@ -111,7 +111,7 @@ public:
      *     Calculated as a union of maps of compatible Event types of particular devices from the
      *     set.
      */
-    std::map<QString, AbstractEventType*> compatibleEventTypeUnion(
+    std::map<QString, EventType*> compatibleEventTypeUnion(
         const QnVirtualCameraResourceList& device) const;
 
     /**
@@ -119,7 +119,7 @@ public:
      *     Calculated as an intersection of maps of compatible Event types of particular devices
      *     from the set.
      */
-    std::map<QString, AbstractEventType*> compatibleEventTypeIntersection(
+    std::map<QString, EventType*> compatibleEventTypeIntersection(
         const QnVirtualCameraResourceList& device) const;
 
     /**
@@ -128,9 +128,9 @@ public:
      * @return Tree of compatible Event types for a set of devices. Calculated as a union
      *     of trees of compatible Event types of particular devices from the set.
      */
-    std::vector<EngineScope<AbstractEventType>> compatibleEventTypeTreeUnion(
+    std::vector<EngineScope<EventType>> compatibleEventTypeTreeUnion(
         const QnVirtualCameraResourceList& devices,
-        const std::vector<ScopedEntity<AbstractEventType>>& additionalEntities = {}) const;
+        const std::vector<ScopedEntity<EventType>>& additionalEntities = {}) const;
 
     /**
      * @param devices List of devices for which the Event type tree should be built.
@@ -138,14 +138,14 @@ public:
      * @return Tree of compatible Event types for a set of devices. Calculated as an intersection
      *     of trees of compatible Event types of particular devices from the set.
      */
-    std::vector<EngineScope<AbstractEventType>> compatibleEventTypeTreeIntersection(
+    std::vector<EngineScope<EventType>> compatibleEventTypeTreeIntersection(
         const QnVirtualCameraResourceList& devices,
-        const std::vector<ScopedEntity<AbstractEventType>>& additionalEntities = {}) const;
+        const std::vector<ScopedEntity<EventType>>& additionalEntities = {}) const;
 
     //----------------------------------------------------------------------------------------------
 
     /** @return Map of supported Object types indexed by the Object type id. */
-    std::map<QString, AbstractObjectType*> supportedObjectTypes(
+    std::map<QString, ObjectType*> supportedObjectTypes(
         const QnVirtualCameraResourcePtr& device) const;
 
     /**
@@ -153,7 +153,7 @@ public:
      *     Calculated as a union of maps of supported Object types of particular devices from the
      *     set.
      */
-    std::map<QString, AbstractObjectType*> supportedObjectTypeUnion(
+    std::map<QString, ObjectType*> supportedObjectTypeUnion(
         const QnVirtualCameraResourceList& device) const;
 
     /**
@@ -161,7 +161,7 @@ public:
      *     Calculated as an intersection of maps of supported Object types of particular devices
      *     from the set.
      */
-    std::map<QString, AbstractObjectType*> supportedObjectTypeIntersection(
+    std::map<QString, ObjectType*> supportedObjectTypeIntersection(
         const QnVirtualCameraResourceList& device) const;
 
     /**
@@ -170,9 +170,9 @@ public:
      * @return Tree of supported Object types for a set of devices. Calculated as an intersection
      *     of trees of supported Object types of particular devices from the set.
      */
-    std::vector<EngineScope<AbstractObjectType>> supportedObjectTypeTreeUnion(
+    std::vector<EngineScope<ObjectType>> supportedObjectTypeTreeUnion(
         const QnVirtualCameraResourceList& devices,
-        const std::vector<ScopedEntity<AbstractObjectType>>& additionalEntities = {}) const;
+        const std::vector<ScopedEntity<ObjectType>>& additionalEntities = {}) const;
 
     /**
      * @param devices List of devices for which the Object type tree should be built.
@@ -180,14 +180,14 @@ public:
      * @return Tree of supported Object types for a set of devices. Calculated as a union of trees
      *     of supported Object types of particular devices from the set.
      */
-    std::vector<EngineScope<AbstractObjectType>> supportedObjectTypeTreeIntersection(
+    std::vector<EngineScope<ObjectType>> supportedObjectTypeTreeIntersection(
         const QnVirtualCameraResourceList& devices,
-        const std::vector<ScopedEntity<AbstractObjectType>>& additionalEntities = {}) const;
+        const std::vector<ScopedEntity<ObjectType>>& additionalEntities = {}) const;
 
     //----------------------------------------------------------------------------------------------
 
     /** @return Map of compatible Object types indexed by the Object type id. */
-    std::map<QString, AbstractObjectType*> compatibleObjectTypes(
+    std::map<QString, ObjectType*> compatibleObjectTypes(
         const QnVirtualCameraResourcePtr& device) const;
 
     /**
@@ -195,7 +195,7 @@ public:
      *     Calculated as a union of maps of compatible Object types of particular devices from the
      *     set.
      */
-    std::map<QString, AbstractObjectType*> compatibleObjectTypeUnion(
+    std::map<QString, ObjectType*> compatibleObjectTypeUnion(
         const QnVirtualCameraResourceList& device) const;
 
     /**
@@ -203,7 +203,7 @@ public:
      *     Calculated as an intersection of maps of compatible Object types of particular devices
      *     from the set.
      */
-    std::map<QString, AbstractObjectType*> compatibleObjectTypeIntersection(
+    std::map<QString, ObjectType*> compatibleObjectTypeIntersection(
         const QnVirtualCameraResourceList& device) const;
 
     /**
@@ -212,9 +212,9 @@ public:
      * @return Tree of compatible Object types for a set of devices. Calculated as a union
      *     of trees of compatible Object types of particular devices from the set.
      */
-    std::vector<EngineScope<AbstractObjectType>> compatibleObjectTypeTreeUnion(
+    std::vector<EngineScope<ObjectType>> compatibleObjectTypeTreeUnion(
         const QnVirtualCameraResourceList& devices,
-        const std::vector<ScopedEntity<AbstractObjectType>>& additionalEntities = {}) const;
+        const std::vector<ScopedEntity<ObjectType>>& additionalEntities = {}) const;
 
     /**
      * @param devices List of devices for which the Object type tree should be built.
@@ -222,9 +222,9 @@ public:
      * @return Tree of compatible Object types for a set of devices. Calculated as an intersection
      *     of trees of compatible Object types of particular devices from the set.
      */
-    std::vector<EngineScope<AbstractObjectType>> compatibleObjectTypeTreeIntersection(
+    std::vector<EngineScope<ObjectType>> compatibleObjectTypeTreeIntersection(
         const QnVirtualCameraResourceList& devices,
-        const std::vector<ScopedEntity<AbstractObjectType>>& additionalEntities = {}) const;
+        const std::vector<ScopedEntity<ObjectType>>& additionalEntities = {}) const;
 
 private:
     std::shared_ptr<AbstractState> m_state;

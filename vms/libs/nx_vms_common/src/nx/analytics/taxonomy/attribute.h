@@ -17,7 +17,7 @@ public:
 
     Attribute(
         nx::vms::api::analytics::AttributeDescription attributeDescription,
-        AbstractObjectType* objectType,
+        ObjectType* objectType,
         QObject* parent = nullptr);
 
     Attribute(
@@ -38,7 +38,7 @@ public:
 
     virtual AbstractEnumType* enumType() const override;
 
-    virtual AbstractObjectType* objectType() const override;
+    virtual ObjectType* objectType() const override;
 
     virtual AbstractColorType* colorType() const override;
 
@@ -58,7 +58,7 @@ private:
     nx::vms::api::analytics::AttributeDescription m_attributeDescription;
 
     AbstractEnumType* m_enumType = nullptr;
-    AbstractObjectType* m_objectType = nullptr;
+    ObjectType* m_objectType = nullptr;
     AbstractColorType* m_colorType = nullptr;
 
     AbstractAttribute* m_base = nullptr;

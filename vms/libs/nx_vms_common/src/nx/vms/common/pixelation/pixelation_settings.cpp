@@ -20,7 +20,7 @@ struct PixelationSettings::Private:
 
     Private(SystemContext* context);
     void updateObjectTypes();
-    void addObjectTypes(analytics::taxonomy::AbstractObjectType* objectType);
+    void addObjectTypes(analytics::taxonomy::ObjectType* objectType);
 };
 
 PixelationSettings::Private::Private(SystemContext* context):
@@ -43,7 +43,7 @@ void PixelationSettings::Private::updateObjectTypes()
 
     for (const QString& objectTypeId: settings.objectTypeIds)
     {
-        analytics::taxonomy::AbstractObjectType* objectType = state->objectTypeById(objectTypeId);
+        analytics::taxonomy::ObjectType* objectType = state->objectTypeById(objectTypeId);
         if (!NX_ASSERT(objectType))
             continue;
 
@@ -52,7 +52,7 @@ void PixelationSettings::Private::updateObjectTypes()
 }
 
 void PixelationSettings::Private::addObjectTypes(
-    analytics::taxonomy::AbstractObjectType* objectType)
+    analytics::taxonomy::ObjectType* objectType)
 {
     objectTypeIds.insert(objectType->id());
     for (const auto& derivedTypeId: objectType->derivedTypes())

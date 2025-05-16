@@ -9,9 +9,9 @@
 #include <QtGui/QColor>
 
 #include <nx/analytics/taxonomy/abstract_attribute.h>
-#include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/analytics/taxonomy/object_type.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/std/algorithm.h>
@@ -54,7 +54,7 @@ public:
         const auto addAttributes = nx::utils::y_combinator(
             [&attributePathByName](
                 auto addAttributes,
-                AbstractObjectType* objectType,
+                ObjectType* objectType,
                 const QVector<AbstractAttribute*>& pathPrefix = QVector<AbstractAttribute*>(),
                 const QString& namePrefix = QString()) -> void
             {
@@ -103,7 +103,7 @@ public:
             return {};
 
         QVector<QString> result;
-        for (const AbstractObjectType* objectType: taxonomy->objectTypes())
+        for (const ObjectType* objectType: taxonomy->objectTypes())
             result.append(objectType->id());
 
         return result;

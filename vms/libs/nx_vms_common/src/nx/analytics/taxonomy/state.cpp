@@ -127,7 +127,7 @@ std::vector<AbstractGroup*> State::groups() const
     return m_cachedGroups;
 }
 
-std::vector<AbstractObjectType*> State::objectTypes() const
+std::vector<ObjectType*> State::objectTypes() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (m_cachedObjectType.empty())
@@ -136,7 +136,7 @@ std::vector<AbstractObjectType*> State::objectTypes() const
     return m_cachedObjectType;
 }
 
-std::vector<AbstractEventType*> State::eventTypes() const
+std::vector<EventType*> State::eventTypes() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (m_cachedEventType.empty())
@@ -163,7 +163,7 @@ std::vector<AbstractColorType*> State::colorTypes() const
     return m_cachedColorTypes;
 }
 
-std::vector<AbstractObjectType*> State::rootObjectTypes() const
+std::vector<ObjectType*> State::rootObjectTypes() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (m_cachedRootObjectType.empty())
@@ -172,7 +172,7 @@ std::vector<AbstractObjectType*> State::rootObjectTypes() const
     return m_cachedRootObjectType;
 }
 
-std::vector<AbstractEventType*> State::rootEventTypes() const
+std::vector<EventType*> State::rootEventTypes() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (m_cachedRootEventType.empty())
@@ -181,12 +181,12 @@ std::vector<AbstractEventType*> State::rootEventTypes() const
     return m_cachedRootEventType;
 }
 
-AbstractObjectType* State::objectTypeById(const QString& objectTypeId) const
+ObjectType* State::objectTypeById(const QString& objectTypeId) const
 {
     return m_internalState.getTypeById<ObjectType>(objectTypeId);
 }
 
-AbstractEventType* State::eventTypeById(const QString& eventTypeId) const
+EventType* State::eventTypeById(const QString& eventTypeId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_internalState.getTypeById<EventType>(eventTypeId);

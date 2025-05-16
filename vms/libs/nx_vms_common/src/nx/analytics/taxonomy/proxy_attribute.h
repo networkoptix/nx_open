@@ -8,6 +8,8 @@
 
 namespace nx::analytics::taxonomy {
 
+class ProxyObjectType;
+
 /**
  * Attributes sometimes need to be wrapped to Proxy Attributes because under different
  * circumstances they can have different lists of Device Agents that support them. For example,
@@ -35,7 +37,7 @@ public:
 
     virtual AbstractEnumType* enumType() const override;
 
-    virtual AbstractObjectType* objectType() const override;
+    virtual ObjectType* objectType() const override;
 
     virtual AbstractColorType* colorType() const override;
 
@@ -51,7 +53,7 @@ public:
 
 private:
     AbstractAttribute* m_proxiedAttribute = nullptr;
-    AbstractObjectType* m_proxyObjectType = nullptr;
+    ProxyObjectType* m_proxyObjectType = nullptr;
     std::set<nx::Uuid> m_supportByEngine;
     QString m_prefix;
     QString m_rootParentTypeId;

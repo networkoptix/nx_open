@@ -7,8 +7,8 @@
 
 #include <QtCore/QPointer>
 
-#include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/common.h>
+#include <nx/analytics/taxonomy/object_type.h>
 #include <nx/vms/client/core/analytics/taxonomy/abstract_state_view_filter.h>
 #include <nx/vms/client/core/analytics/taxonomy/attribute.h>
 #include <nx/vms/client/core/analytics/taxonomy/attribute_set.h>
@@ -20,15 +20,15 @@ namespace nx::vms::client::core::analytics::taxonomy {
 
 static bool objectTypeMatchesFilter(
     const AbstractStateViewFilter* filter,
-    const nx::analytics::taxonomy::AbstractObjectType* objectType)
+    const nx::analytics::taxonomy::ObjectType* objectType)
 {
     return (!filter || filter->matches(objectType)) && objectType->hasEverBeenSupported();
 }
 
 struct ObjectType::Private
 {
-    const nx::analytics::taxonomy::AbstractObjectType* const mainObjectType = nullptr;
-    std::map<QString, const nx::analytics::taxonomy::AbstractObjectType*> additionalObjectTypes;
+    const nx::analytics::taxonomy::ObjectType* const mainObjectType = nullptr;
+    std::map<QString, const nx::analytics::taxonomy::ObjectType*> additionalObjectTypes;
     mutable std::optional<std::vector<QString>> cachedTypeIds;
     mutable std::optional<std::vector<QString>> cachedFullSubtreeTypeIds;
     QPointer<ObjectType> baseObjectType;
@@ -38,7 +38,7 @@ struct ObjectType::Private
 };
 
 ObjectType::ObjectType(
-    const nx::analytics::taxonomy::AbstractObjectType* mainObjectType,
+    const nx::analytics::taxonomy::ObjectType* mainObjectType,
     QObject* parent)
     :
     QObject(parent),
@@ -63,7 +63,7 @@ void ObjectType::addDerivedObjectType(ObjectType* objectType)
     d->derivedObjectTypes.push_back(objectType);
 }
 
-void ObjectType::addObjectType(const nx::analytics::taxonomy::AbstractObjectType* objectType)
+void ObjectType::addObjectType(const nx::analytics::taxonomy::ObjectType* objectType)
 {
     if (!NX_ASSERT(objectType))
         return;
@@ -159,7 +159,7 @@ void ObjectType::setFilter(const AbstractStateViewFilter* filter)
 
 void ObjectType::resolveAttributes()
 {
-    std::vector<const nx::analytics::taxonomy::AbstractObjectType*> objectTypes;
+    std::vector<const nx::analytics::taxonomy::ObjectType*> objectTypes;
 
     if (objectTypeMatchesFilter(d->filter, d->mainObjectType))
         objectTypes.push_back(d->mainObjectType);

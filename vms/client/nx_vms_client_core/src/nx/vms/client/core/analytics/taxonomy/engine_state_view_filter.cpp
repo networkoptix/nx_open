@@ -4,8 +4,7 @@
 
 #include <analytics/db/text_search_utils.h>
 #include <nx/analytics/taxonomy/abstract_engine.h>
-#include <nx/analytics/taxonomy/abstract_object_type.h>
-#include <nx/analytics/taxonomy/abstract_scope.h>
+#include <nx/analytics/taxonomy/object_type.h>
 
 namespace nx::vms::client::core::analytics::taxonomy {
 
@@ -45,12 +44,12 @@ QString EngineStateViewFilter::name() const
 }
 
 bool EngineStateViewFilter::matches(
-    const nx::analytics::taxonomy::AbstractObjectType* objectType) const
+    const nx::analytics::taxonomy::ObjectType* objectType) const
 {
     if (!d->engine)
         return true;
 
-    for (const nx::analytics::taxonomy::AbstractScope* scope: objectType->scopes())
+    for (const auto& scope: objectType->scopes())
     {
         const nx::analytics::taxonomy::AbstractEngine* engine = scope->engine();
         if (engine && d->engine->id() == engine->id())

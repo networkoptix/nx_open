@@ -2,18 +2,18 @@
 
 #pragma once
 
-#include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
+#include <nx/analytics/taxonomy/object_type.h>
 #include <nx/analytics/taxonomy/utils.h>
 
 namespace nx::analytics::taxonomy {
 
-class ProxyObjectType: public AbstractObjectType
+class ProxyObjectType: public ObjectType
 {
 
 public:
     ProxyObjectType(
-        AbstractObjectType* proxiedObjectType,
+        ObjectType* proxiedObjectType,
         std::map<QString, AttributeSupportInfoTree> attributeSupportInfoTree,
         AbstractResourceSupportProxy* resourceSupportProxy,
         QString prefix,
@@ -26,9 +26,9 @@ public:
 
     virtual QString icon() const override;
 
-    virtual AbstractObjectType* base() const override;
+    virtual ObjectType* base() const override;
 
-    virtual std::vector<AbstractObjectType*> derivedTypes() const override;
+    virtual std::vector<ObjectType*> derivedTypes() const override;
 
     virtual std::vector<AbstractAttribute*> baseAttributes() const override;
 
@@ -50,12 +50,12 @@ public:
 
     virtual bool isNonIndexable() const override;
 
-    virtual const std::vector<AbstractScope*>& scopes() const override;
+    virtual const std::vector<std::unique_ptr<Scope>>& scopes() const override;
 
     virtual nx::vms::api::analytics::ObjectTypeDescriptor serialize() const override;
 
 private:
-    AbstractObjectType* m_proxiedObjectType = nullptr;
+    ObjectType* m_proxiedObjectType = nullptr;
     mutable std::map<QString, AttributeSupportInfoTree> m_attributeSupportInfoTree;
     mutable std::optional<std::vector<AbstractAttribute*>> m_supportedAttributes;
     mutable std::optional<std::vector<AbstractAttribute*>> m_supportedOwnAttributes;

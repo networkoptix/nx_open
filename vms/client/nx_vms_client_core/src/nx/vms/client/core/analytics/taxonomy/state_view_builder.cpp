@@ -9,7 +9,7 @@
 namespace nx::vms::client::core::analytics::taxonomy {
 
 static void engineFiltersFromObjectType(
-    const nx::analytics::taxonomy::AbstractObjectType* objectType,
+    const nx::analytics::taxonomy::ObjectType* objectType,
     std::map<QString, AbstractStateViewFilter*>* inOutEngineFilterById,
     QObject* parent)
 {
@@ -19,7 +19,7 @@ static void engineFiltersFromObjectType(
     if (!objectType->hasEverBeenSupported())
         return;
 
-    for (const nx::analytics::taxonomy::AbstractScope* scope: objectType->scopes())
+    for (const auto& scope: objectType->scopes())
     {
         // Skip the Type which is in the Engine scope but has never been supported by any Device Agent.
         if (!scope->hasTypeEverBeenSupportedInThisScope())
@@ -39,13 +39,13 @@ static void engineFiltersFromObjectType(
     }
 }
 
-static bool isHidden(const nx::analytics::taxonomy::AbstractObjectType* objectType)
+static bool isHidden(const nx::analytics::taxonomy::ObjectType* objectType)
 {
     return !objectType->isReachable() && objectType->hasEverBeenSupported();
 }
 
 static ObjectType* makeFilteredObjectType(
-    const nx::analytics::taxonomy::AbstractObjectType* objectType,
+    const nx::analytics::taxonomy::ObjectType* objectType,
     const AbstractStateViewFilter* filter,
     QObject* parent,
     std::map<QString, AbstractStateViewFilter*>* outEngineFilters = nullptr)
@@ -53,10 +53,10 @@ static ObjectType* makeFilteredObjectType(
     if (!objectType->isReachable())
         return nullptr;
 
-    std::vector<const nx::analytics::taxonomy::AbstractObjectType*> filteredObjectTypes;
+    std::vector<const nx::analytics::taxonomy::ObjectType*> filteredObjectTypes;
     std::vector<ObjectType*> derivedObjectTypes;
 
-    for (nx::analytics::taxonomy::AbstractObjectType* derivedObjectType:
+    for (nx::analytics::taxonomy::ObjectType* derivedObjectType:
         objectType->derivedTypes())
     {
         if (isHidden(derivedObjectType) && (!filter || filter->matches(derivedObjectType)))
@@ -84,7 +84,7 @@ static ObjectType* makeFilteredObjectType(
     result->moveToThread(parent->thread());
     result->setParent(parent);
     result->setFilter(filter);
-    for (const nx::analytics::taxonomy::AbstractObjectType* baseObjectType: filteredObjectTypes)
+    for (const nx::analytics::taxonomy::ObjectType* baseObjectType: filteredObjectTypes)
         result->addObjectType(baseObjectType);
 
     for (ObjectType* derived: derivedObjectTypes)
@@ -100,11 +100,11 @@ static StateView* makeFilteredView(
     std::map<QString, AbstractStateViewFilter*>* outEngineFilters = nullptr,
     QObject* parent = nullptr)
 {
-    const std::vector<nx::analytics::taxonomy::AbstractObjectType*> rootObjectTypes =
+    const std::vector<nx::analytics::taxonomy::ObjectType*> rootObjectTypes =
         taxonomyState->rootObjectTypes();
 
     std::vector<ObjectType*> result;
-    for (nx::analytics::taxonomy::AbstractObjectType* objectType: rootObjectTypes)
+    for (nx::analytics::taxonomy::ObjectType* objectType: rootObjectTypes)
     {
         if (ObjectType* filteredObjectType =
             makeFilteredObjectType(objectType, filter, taxonomyState.get(), outEngineFilters))

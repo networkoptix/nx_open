@@ -6,11 +6,10 @@
 
 #include <nx/utils/std/algorithm.h>
 
-#include "abstract_event_type.h"
 #include "abstract_group.h"
-#include "abstract_object_type.h"
-#include "abstract_scope.h"
 #include "abstract_state.h"
+#include "event_type.h"
+#include "object_type.h"
 #include "proxy_attribute.h"
 
 namespace nx::analytics::taxonomy {
@@ -94,7 +93,7 @@ std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
 
     for (const AbstractAttribute* objectTypeAttribute: objectTypeAttributes)
     {
-        const AbstractObjectType* objectType = objectTypeAttribute->objectType();
+        const ObjectType* objectType = objectTypeAttribute->objectType();
         if (!NX_ASSERT(objectType))
             continue;
 
@@ -147,9 +146,9 @@ std::vector<AbstractAttribute*> makeSupportedAttributes(
     return result;
 }
 
-bool eventBelongsToGroup(const AbstractEventType* eventType, const QString& groupId)
+bool eventBelongsToGroup(const EventType* eventType, const QString& groupId)
 {
-    for (const AbstractScope* scope: eventType->scopes())
+    for (const auto& scope: eventType->scopes())
     {
         const AbstractGroup* group = scope->group();
         if (!group)
@@ -165,8 +164,8 @@ bool eventBelongsToGroup(const AbstractEventType* eventType, const QString& grou
 QList<QString> getAttributesNames(const AbstractState* taxonomyState, const QString& objectId)
 {
     QList<QString> result;
-    std::function<void(const AbstractObjectType*, QString)> addAttributesRecursive =
-        [&](const AbstractObjectType* objectType, const QString& prefix)
+    std::function<void(const ObjectType*, QString)> addAttributesRecursive =
+        [&](const ObjectType* objectType, const QString& prefix)
         {
             if (!objectType)
                 return;
@@ -191,7 +190,7 @@ NX_VMS_COMMON_API AbstractAttribute* findAttributeByName(
     const AbstractState* taxonomyState, const QString& objectTypeId, const QString& name)
 {
     auto findAttribute = nx::utils::y_combinator(
-        [](auto findAttribute, const AbstractObjectType* objectType, const QString& name)
+        [](auto findAttribute, const ObjectType* objectType, const QString& name)
             -> AbstractAttribute*
         {
             if (!objectType)

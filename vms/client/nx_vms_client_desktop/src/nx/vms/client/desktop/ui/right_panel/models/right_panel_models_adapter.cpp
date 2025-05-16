@@ -20,8 +20,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
-#include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/analytics/taxonomy/object_type.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/metatypes.h>
@@ -905,13 +905,13 @@ bool RightPanelModelsAdapter::Private::isAllowed() const
             if (!hasPermissions)
                 return false;
 
-            std::vector<AbstractObjectType*> objectTypes;
+            std::vector<ObjectType*> objectTypes;
             const auto state = m_context->system()->analyticsTaxonomyState();
             if (state)
                 objectTypes = state->rootObjectTypes();
 
             return std::any_of(objectTypes.cbegin(), objectTypes.cend(),
-                [](nx::analytics::taxonomy::AbstractObjectType* objectType)
+                [](nx::analytics::taxonomy::ObjectType* objectType)
                 {
                     return objectType->isReachable();
                 });

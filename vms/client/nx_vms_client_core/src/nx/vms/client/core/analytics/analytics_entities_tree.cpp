@@ -55,18 +55,18 @@ std::vector<ScopedEntity<EntityType>> resolveEntities(
     for (const auto& unresolved: unresolvedIds)
     {
         EntityType* entity = nullptr;
-        if constexpr (std::is_same_v<AbstractEventType, EntityType>)
+        if constexpr (std::is_same_v<EventType, EntityType>)
             entity = state->eventTypeById(unresolved.entityId);
 
-        if constexpr (std::is_same_v<AbstractObjectType, EntityType>)
+        if constexpr (std::is_same_v<ObjectType, EntityType>)
             entity = state->objectTypeById(unresolved.entityId);
 
         if (!entity)
             continue;
 
-        for (const auto scope: entity->scopes())
+        for (const auto& scope: entity->scopes())
         {
-            if (const auto engine = scope->engine();
+            if (const auto& engine = scope->engine();
                 engine
                 && allowedEngines.contains(nx::Uuid(engine->id()))
                 && (unresolved.engineId.isNull()
@@ -80,18 +80,18 @@ std::vector<ScopedEntity<EntityType>> resolveEntities(
     return result;
 }
 
-NodePtr buildEventTypesTree(const std::vector<EngineScope<AbstractEventType>>& eventTypeTree)
+NodePtr buildEventTypesTree(const std::vector<EngineScope<EventType>>& eventTypeTree)
 {
     auto root = makeNode(NodeType::root, {});
 
-    for (const EngineScope<AbstractEventType>& engineScope: eventTypeTree)
+    for (const EngineScope<EventType>& engineScope: eventTypeTree)
     {
         auto engine = makeNode(NodeType::engine, root, engineScope.engine->name());
         const nx::Uuid engineId(engineScope.engine->id());
         engine->engineId = engineId;
         root->children.push_back(engine);
 
-        for (const GroupScope<AbstractEventType>& groupScope: engineScope.groups)
+        for (const GroupScope<EventType>& groupScope: engineScope.groups)
         {
             NodePtr parentNode = engine;
 
@@ -122,11 +122,11 @@ NodePtr buildEventTypesTree(const std::vector<EngineScope<AbstractEventType>>& e
     return AnalyticsEntitiesTreeBuilder::cleanupTree(root);
 }
 
-NodePtr buildObjectTypesTree(const std::vector<EngineScope<AbstractObjectType>>& objectTypeTree)
+NodePtr buildObjectTypesTree(const std::vector<EngineScope<ObjectType>>& objectTypeTree)
 {
     auto root = makeNode(NodeType::root, {});
 
-    for (const EngineScope<AbstractObjectType>& engineScope: objectTypeTree)
+    for (const EngineScope<ObjectType>& engineScope: objectTypeTree)
     {
         const AbstractEngine* taxonomyEngine = engineScope.engine;
         if (!NX_ASSERT(taxonomyEngine))
@@ -137,7 +137,7 @@ NodePtr buildObjectTypesTree(const std::vector<EngineScope<AbstractObjectType>>&
         engine->engineId = engineId;
         root->children.push_back(engine);
 
-        for (const GroupScope<AbstractObjectType>& groupScope: engineScope.groups)
+        for (const GroupScope<ObjectType>& groupScope: engineScope.groups)
         {
             NodePtr parentNode = engine;
 
@@ -151,7 +151,7 @@ NodePtr buildObjectTypesTree(const std::vector<EngineScope<AbstractObjectType>>&
                 parentNode = group;
             }
 
-            for (const AbstractObjectType* taxonomyObjectType: groupScope.entities)
+            for (const ObjectType* taxonomyObjectType: groupScope.entities)
             {
                 auto objectType = makeNode(
                     NodeType::objectType, parentNode, taxonomyObjectType->name());
@@ -311,8 +311,8 @@ NodePtr AnalyticsEntitiesTreeBuilder::eventTypesForRulesPurposes(
             allowed = set_intersection(allowed, devices[i]->compatibleAnalyticsEngines());
     }
 
-    std::vector<ScopedEntity<AbstractEventType>> additionalScopedEventTypes =
-        resolveEntities<AbstractEventType>(taxonomyState, additionalUnresolvedEventTypes, allowed);
+    std::vector<ScopedEntity<EventType>> additionalScopedEventTypes =
+        resolveEntities<EventType>(taxonomyState, additionalUnresolvedEventTypes, allowed);
 
     StateHelper stateHelper(taxonomyState);
 

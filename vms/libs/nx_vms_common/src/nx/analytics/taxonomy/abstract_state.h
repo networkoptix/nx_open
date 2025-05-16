@@ -9,11 +9,11 @@
 #include <nx/analytics/taxonomy/abstract_color_type.h>
 #include <nx/analytics/taxonomy/abstract_engine.h>
 #include <nx/analytics/taxonomy/abstract_enum_type.h>
-#include <nx/analytics/taxonomy/abstract_event_type.h>
 #include <nx/analytics/taxonomy/abstract_group.h>
-#include <nx/analytics/taxonomy/abstract_object_type.h>
 #include <nx/analytics/taxonomy/abstract_integration.h>
 #include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
+#include <nx/analytics/taxonomy/event_type.h>
+#include <nx/analytics/taxonomy/object_type.h>
 #include <nx/vms/api/analytics/descriptors.h>
 
 namespace nx::analytics::taxonomy {
@@ -22,7 +22,7 @@ class NX_VMS_COMMON_API AbstractState: public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(std::vector<nx::analytics::taxonomy::AbstractObjectType*> rootObjectTypes
+    Q_PROPERTY(std::vector<nx::analytics::taxonomy::ObjectType*> rootObjectTypes
         READ rootObjectTypes CONSTANT)
 
     Q_PROPERTY(std::vector<nx::analytics::taxonomy::AbstractEngine*> engines
@@ -37,21 +37,21 @@ public:
 
     virtual std::vector<AbstractGroup*> groups() const = 0;
 
-    virtual std::vector<AbstractObjectType*> objectTypes() const = 0;
+    virtual std::vector<ObjectType*> objectTypes() const = 0;
 
-    virtual std::vector<AbstractEventType*> eventTypes() const = 0;
+    virtual std::vector<EventType*> eventTypes() const = 0;
 
     virtual std::vector<AbstractEnumType*> enumTypes() const = 0;
 
     virtual std::vector<AbstractColorType*> colorTypes() const = 0;
 
-    virtual std::vector<AbstractObjectType*> rootObjectTypes() const = 0;
+    virtual std::vector<ObjectType*> rootObjectTypes() const = 0;
 
-    virtual std::vector<AbstractEventType*> rootEventTypes() const = 0;
+    virtual std::vector<EventType*> rootEventTypes() const = 0;
 
-    virtual AbstractObjectType* objectTypeById(const QString& objectTypeId) const = 0;
+    virtual ObjectType* objectTypeById(const QString& objectTypeId) const = 0;
 
-    virtual AbstractEventType* eventTypeById(const QString& eventTypeId) const = 0;
+    virtual EventType* eventTypeById(const QString& eventTypeId) const = 0;
 
     virtual AbstractIntegration* integrationById(const QString& integrationId) const = 0;
 

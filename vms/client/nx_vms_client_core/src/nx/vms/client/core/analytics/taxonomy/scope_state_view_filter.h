@@ -29,7 +29,7 @@ public:
     virtual QString name() const override;
 
     virtual bool matches(
-        const nx::analytics::taxonomy::AbstractObjectType* objectType) const override;
+        const nx::analytics::taxonomy::ObjectType* objectType) const override;
 
     virtual bool matches(
         const nx::analytics::taxonomy::AbstractAttribute* attribute) const override;

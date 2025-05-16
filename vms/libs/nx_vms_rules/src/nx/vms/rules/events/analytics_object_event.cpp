@@ -51,7 +51,7 @@ QString AnalyticsObjectEvent::cacheKey() const
     return state() == State::started ? m_objectTrackId.toSimpleString() : QString();
 }
 
-nx::analytics::taxonomy::AbstractObjectType* AnalyticsObjectEvent::objectTypeById(
+nx::analytics::taxonomy::ObjectType* AnalyticsObjectEvent::objectTypeById(
     common::SystemContext* context) const
 {
     const auto camera =

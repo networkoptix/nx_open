@@ -11,7 +11,7 @@
 
 namespace nx::analytics::taxonomy {
 
-class AbstractEventType;
+class EventType;
 class AbstractResourceSupportProxy;
 class AbstractState;
 
@@ -45,7 +45,7 @@ nx::vms::api::analytics::AttributeType toDescriptorAttributeType(
     AbstractAttribute::Type attributeType);
 
 NX_VMS_COMMON_API bool eventBelongsToGroup(
-    const AbstractEventType* eventType,
+    const EventType* eventType,
     const QString& groupId);
 
 QString maybeUnscopedExtendedObjectTypeId(const QString& scopedExtendedObjectTypeId);

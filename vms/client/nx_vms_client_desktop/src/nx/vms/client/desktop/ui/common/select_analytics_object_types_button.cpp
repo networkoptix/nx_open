@@ -26,7 +26,7 @@ void SelectAnalyticsObjectTypesButton::setSelectedObjectTypes(
     }
     else if (ids.size() == 1)
     {
-        const nx::analytics::taxonomy::AbstractObjectType* objectType =
+        const nx::analytics::taxonomy::ObjectType* objectType =
             context->analyticsTaxonomyState()->objectTypeById(ids[0]);
 
         const QString iconPath =

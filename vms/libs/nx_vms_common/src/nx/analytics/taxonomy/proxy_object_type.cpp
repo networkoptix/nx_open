@@ -9,14 +9,14 @@
 namespace nx::analytics::taxonomy {
 
 ProxyObjectType::ProxyObjectType(
-    AbstractObjectType* proxiedObjectType,
+    ObjectType* proxiedObjectType,
     std::map<QString, AttributeSupportInfoTree> attributeSupportInfoTree,
     AbstractResourceSupportProxy* resourceSupportProxy,
     QString prefix,
     QString rootParentTypeId,
     EntityType rootEntityType)
     :
-    AbstractObjectType(proxiedObjectType),
+    ObjectType(proxiedObjectType->descriptor(), resourceSupportProxy),
     m_proxiedObjectType(proxiedObjectType),
     m_attributeSupportInfoTree(std::move(attributeSupportInfoTree)),
     m_resourceSupportProxy(resourceSupportProxy),
@@ -41,12 +41,12 @@ QString ProxyObjectType::icon() const
     return m_proxiedObjectType->icon();
 }
 
-AbstractObjectType* ProxyObjectType::base() const
+ObjectType* ProxyObjectType::base() const
 {
     return m_proxiedObjectType->base();
 }
 
-std::vector<AbstractObjectType*> ProxyObjectType::derivedTypes() const
+std::vector<ObjectType*> ProxyObjectType::derivedTypes() const
 {
     return m_proxiedObjectType->derivedTypes();
 }
@@ -141,7 +141,7 @@ bool ProxyObjectType::isNonIndexable() const
     return m_proxiedObjectType->isNonIndexable();
 }
 
-const std::vector<AbstractScope*>& ProxyObjectType::scopes() const
+const std::vector<std::unique_ptr<Scope>>& ProxyObjectType::scopes() const
 {
     return m_proxiedObjectType->scopes();
 }

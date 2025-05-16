@@ -44,7 +44,7 @@ QString AttributeConditionStateViewFilter::name() const
 }
 
 bool AttributeConditionStateViewFilter::matches(
-    const nx::analytics::taxonomy::AbstractObjectType* objectType) const
+    const nx::analytics::taxonomy::ObjectType* objectType) const
 {
     if (!d->baseFilter)
         return true;

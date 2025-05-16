@@ -22,7 +22,7 @@ using namespace nx::analytics::taxonomy;
 struct TaxonomyManager::Private
 {
     mutable std::optional<std::shared_ptr<Taxonomy>> currentTaxonomy;
-    mutable std::optional<QHash<AbstractEngine*, QSet<AbstractObjectType*>>> relevantObjectTypes;
+    mutable std::optional<QHash<AbstractEngine*, QSet<ObjectType*>>> relevantObjectTypes;
     mutable QSet<AbstractEngine*> relevantEngines;
 
     void reset()
@@ -48,7 +48,7 @@ struct TaxonomyManager::Private
         if (relevantObjectTypes.has_value())
             return;
 
-        relevantObjectTypes = QHash<AbstractEngine*, QSet<AbstractObjectType*>>();
+        relevantObjectTypes = QHash<AbstractEngine*, QSet<ObjectType*>>();
 
         ensureTaxonomy(stateWatcher);
         if (!*currentTaxonomy)
@@ -61,7 +61,7 @@ struct TaxonomyManager::Private
         // descendants are detected by a given engine and to check if a given engine detects any
         // public object types.
 
-        QSet<AbstractObjectType*> publicRootTypes;
+        QSet<ObjectType*> publicRootTypes;
         for (const auto objectType: (*currentTaxonomy)->rootObjectTypes())
         {
             if (objectType->isReachable())
@@ -74,7 +74,7 @@ struct TaxonomyManager::Private
                 && !objectType->isLiveOnly()
                 && !objectType->isNonIndexable();
 
-            for (const auto scope: objectType->scopes())
+            for (const auto& scope: objectType->scopes())
             {
                 auto& relevantTypes = (*relevantObjectTypes)[scope->engine()];
 
@@ -90,7 +90,7 @@ struct TaxonomyManager::Private
             }
         }
 
-        QSet<AbstractObjectType*> allRelevantTypes;
+        QSet<ObjectType*> allRelevantTypes;
         for (const auto& [engine, types]: nx::utils::constKeyValueRange(*relevantObjectTypes))
         {
             if (relevantEngines.contains(engine))
@@ -170,7 +170,7 @@ bool TaxonomyManager::isEngineRelevant(AbstractEngine* engine) const
     return d->relevantEngines.contains(engine);
 }
 
-bool TaxonomyManager::isRelevantForEngine(AbstractObjectType* type, AbstractEngine* engine) const
+bool TaxonomyManager::isRelevantForEngine(ObjectType* type, AbstractEngine* engine) const
 {
     if (!NX_ASSERT(type))
         return false;
@@ -185,7 +185,7 @@ QSet<nx::analytics::taxonomy::AbstractEngine*> TaxonomyManager::relevantEngines(
     return d->relevantEngines;
 }
 
-QSet<AbstractObjectType*> TaxonomyManager::relevantObjectTypes(AbstractEngine* engine) const
+QSet<ObjectType*> TaxonomyManager::relevantObjectTypes(AbstractEngine* engine) const
 {
     d->ensureRelevancyInfo(systemContext()->analyticsTaxonomyStateWatcher());
     return d->relevantObjectTypes->value(engine);
@@ -222,10 +222,6 @@ void TaxonomyManager::registerQmlTypes()
     qmlRegisterUncreatableType<taxonomy::Attribute>(
         "nx.vms.client.core.analytics", 1, 0, "Attribute",
         "Cannot create an instance of Attribute");
-
-    qmlRegisterUncreatableType<AbstractScope>(
-        "nx.vms.client.core.analytics", 1, 0, "Scope",
-        "Cannot create an instance of Scope");
 
     qmlRegisterUncreatableType<AbstractGroup>(
         "nx.vms.client.core.analytics", 1, 0, "Group",

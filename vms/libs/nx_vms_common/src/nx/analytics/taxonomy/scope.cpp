@@ -7,11 +7,6 @@
 
 namespace nx::analytics::taxonomy {
 
-Scope::Scope(QObject* parent):
-    AbstractScope(parent)
-{
-}
-
 AbstractEngine* Scope::engine() const
 {
     return m_engine;
