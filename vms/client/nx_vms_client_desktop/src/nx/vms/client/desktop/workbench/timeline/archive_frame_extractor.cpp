@@ -365,7 +365,7 @@ ArchiveFrameExtractor::ArchiveFrameExtractor(
         auto rtspDelegate = std::make_unique<QnRtspClientArchiveDelegate>(
             /*archiveStreamReader*/ nullptr,
             std::move(credentials),
-            /*rtpLogTag*/ QString(),
+            "ArchiveFrameExtractor",
             sleepIfEmptySocket);
         rtspDelegate->setCamera(cameraResource);
         rtspDelegate->setMediaRole(PlaybackMode::archive);

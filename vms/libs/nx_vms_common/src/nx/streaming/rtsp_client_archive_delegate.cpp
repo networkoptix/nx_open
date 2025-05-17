@@ -4,8 +4,6 @@
 
 #include <QtConcurrent/QtConcurrentFilter>
 #include <QtCore/QBuffer>
-#include <QtCore/QUrl>
-#include <QtNetwork/QNetworkCookie>
 
 #include <api/network_proxy_factory.h>
 #include <core/resource/camera_history.h>
@@ -239,7 +237,7 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime
         &m_serverTimePeriod);
 }
 
-void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(
+bool QnRtspClientArchiveDelegate::checkGlobalTimeAsync(
     const QnVirtualCameraResourcePtr& camera, const QnMediaServerResourcePtr& server, qint64* result)
 {
     QnRtspClient client(
@@ -247,7 +245,10 @@ void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(
             .shouldGuessAuthDigest = true,
             .backChannelAudioOnly = false,
             .sleepIfEmptySocket = m_sleepIfEmptySocket});
-    QnRtspClientArchiveDelegate::setupRtspSession(camera, server, &client);
+
+    if (!setupRtspSession(camera, server, &client))
+        return false;
+
     const auto url = getUrl(camera, server);
     const auto error = client.open(url).errorCode;
     if (error != CameraDiagnostics::ErrorCode::noError)
@@ -259,7 +260,7 @@ void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(
             server,
             url,
             error);
-        return;
+        return false;
     }
 
     qint64 startTime = client.startTime();
@@ -268,6 +269,8 @@ void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(
         if (startTime < *result || *result == DATETIME_INVALID)
             *result = startTime;
     }
+
+    return true;
 }
 
 void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(
@@ -303,8 +306,7 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(
         nx::suppressExceptions(
             [this](const ArchiveTimeCheckInfo& checkInfo)
             {
-                checkGlobalTimeAsync(checkInfo.camera, checkInfo.server, checkInfo.result);
-                return true;
+                return checkGlobalTimeAsync(checkInfo.camera, checkInfo.server, checkInfo.result);
             },
             this,
             [](auto item)
@@ -314,11 +316,17 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(
                     item.server,
                     nx::suppressExceptions(&getUrl)(item.camera, item.server));
             }));
-    if ((otherMinTime != DATETIME_INVALID)
+
+    if ((checkList.size() == mediaServerList.size())
+        && (otherMinTime != DATETIME_INVALID)
         && (currentMinTime == DATETIME_INVALID || otherMinTime < currentMinTime))
+    {
         m_globalMinArchiveTime = otherMinTime;
+    }
     else
+    {
         m_globalMinArchiveTime = DATETIME_INVALID;
+    }
 }
 
 QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 timeUsec)
@@ -398,7 +406,9 @@ bool QnRtspClientArchiveDelegate::openInternal()
         if (videoLayout)
             m_channelCount = videoLayout->channelCount();
     }
-    setupRtspSession(m_camera, m_server, m_rtspSession.get());
+
+    if (!setupRtspSession(m_camera, m_server, m_rtspSession.get()))
+        return false;
 
     const bool isOpened = m_rtspSession->open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode
         == CameraDiagnostics::ErrorCode::noError;
@@ -1078,19 +1088,24 @@ void QnRtspClientArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qin
     seek(startTime, endTime);
 }
 
-void QnRtspClientArchiveDelegate::setupRtspSession(
+bool QnRtspClientArchiveDelegate::setupRtspSession(
     const QnVirtualCameraResourcePtr& camera,
     const QnMediaServerResourcePtr& server,
     QnRtspClient* session) const
 {
     NX_DEBUG(this, "Setup RTSP session for camera %1 via server %2", camera, server);
 
-    session->setCredentials(m_credentials, nx::network::http::header::AuthScheme::digest);
-
     // TODO: #sivanov This place is the only reason to have `auditId` access in the common system
-    // context class.
+    // context class. It may be empty if the connection is closing.
+
+    const auto context = camera->systemContext();
+    const auto auditId = context->auditId();
+    if (auditId.isNull())
+        return false;
+
+    session->setCredentials(m_credentials, nx::network::http::header::AuthScheme::digest);
     session->setAdditionAttribute(
-        Qn::EC2_RUNTIME_GUID_HEADER_NAME, camera->systemContext()->auditId().toSimpleByteArray());
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME, auditId.toSimpleByteArray());
     session->setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1");
     session->setAdditionAttribute(
         Qn::CUSTOM_USERNAME_HEADER_NAME, QString::fromStdString(m_credentials.username).toUtf8());
@@ -1109,8 +1124,9 @@ void QnRtspClientArchiveDelegate::setupRtspSession(
     }
 
     session->setTransport(nx::vms::api::RtpTransportType::tcp);
-    const auto settings = m_camera->systemContext()->globalSettings();
-    session->setTcpRecvBufferSize(settings->mediaBufferSizeKb() * 1024);
+    session->setTcpRecvBufferSize(context->globalSettings()->mediaBufferSizeKb() * 1024);
+
+    return true;
 }
 
 void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)

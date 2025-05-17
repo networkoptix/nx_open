@@ -211,7 +211,7 @@ rest::ServerConnectionPtr SystemContext::connectedServerApi() const
 
 nx::Uuid SystemContext::auditId() const
 {
-    if (auto connection = this->connection(); NX_ASSERT(connection, "Connection must exist here."))
+    if (auto connection = this->connection())
         return connection->auditId();
 
     return {};

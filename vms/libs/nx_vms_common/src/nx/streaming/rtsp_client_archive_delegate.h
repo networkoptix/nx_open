@@ -35,9 +35,9 @@ class NX_VMS_COMMON_API QnRtspClientArchiveDelegate: public QnAbstractArchiveDel
     Q_OBJECT
 public:
     QnRtspClientArchiveDelegate(
-        QnArchiveStreamReader* reader = nullptr,
-        nx::network::http::Credentials credentials = nx::network::http::Credentials(),
-        const QString& rtpLogTag = QString(),
+        QnArchiveStreamReader* reader,
+        nx::network::http::Credentials credentials,
+        const QString& rtpLogTag,
         bool sleepIfEmptySocket = false);
 
     virtual ~QnRtspClientArchiveDelegate();
@@ -149,12 +149,12 @@ private:
     QnMediaServerResourcePtr getNextMediaServerFromTime(
         const QnVirtualCameraResourcePtr& camera, qint64 time);
     QnAbstractMediaDataPtr getNextDataInternal();
-    void checkGlobalTimeAsync(
+    bool checkGlobalTimeAsync(
         const QnVirtualCameraResourcePtr& camera,
         const QnMediaServerResourcePtr& server,
         qint64* result);
     void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr& camera);
-    void setupRtspSession(
+    bool setupRtspSession(
         const QnVirtualCameraResourcePtr& camera,
         const QnMediaServerResourcePtr& server,
         QnRtspClient* session) const;
