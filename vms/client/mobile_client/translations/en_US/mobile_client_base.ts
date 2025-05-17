@@ -83,6 +83,14 @@
         <comment>%1 is time text like &apos;48 minutes&apos;</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot share bookmark.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::mobile::UiController</name>
