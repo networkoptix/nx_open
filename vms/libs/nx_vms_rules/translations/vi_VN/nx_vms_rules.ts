@@ -288,15 +288,15 @@
     </message>
     <message>
       <source>Select Integration Action</source>
-      <translation type="unfinished">Select Integration Action</translation>
+      <translation>Chọn Hành động Tích hợp</translation>
     </message>
     <message>
       <source>Integration not found for Integration Action %1</source>
-      <translation type="unfinished">Integration not found for Integration Action %1</translation>
+      <translation>Không tìm thấy tích hợp cho Hành động tích hợp %1</translation>
     </message>
     <message>
       <source>Unsupported JSON value type in key %1</source>
-      <translation type="unfinished">Unsupported JSON value type in key %1</translation>
+      <translation>Kiểu giá trị JSON không được hỗ trợ trong khóa %1</translation>
     </message>
     <message>
       <source>Total number of events</source>
@@ -563,7 +563,7 @@
     </message>
     <message>
       <source>Fan failure at %1</source>
-      <translation type="unfinished">Fan failure at %1</translation>
+      <translation>Quạt hỏng ở %1</translation>
     </message>
   </context>
   <context>
@@ -657,11 +657,11 @@
     <name>nx::vms::rules::IntegrationAction</name>
     <message>
       <source>Integration Action</source>
-      <translation type="unfinished">Integration Action</translation>
+      <translation>Hành động tích hợp</translation>
     </message>
     <message>
       <source>Integration Action Parameters</source>
-      <translation type="unfinished">Integration Action Parameters</translation>
+      <translation>Tham số hành động tích hợp</translation>
     </message>
   </context>
   <context>
@@ -1086,6 +1086,10 @@
     <message>
       <source>%1 Failure</source>
       <translation>%1 Thất bại</translation>
+    </message>
+    <message>
+      <source>The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</source>
+      <translation type="unfinished">The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</translation>
     </message>
   </context>
   <context>

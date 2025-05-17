@@ -908,22 +908,22 @@
     </message>
     <message>
       <source>Share Link</source>
-      <translation type="unfinished">Share Link</translation>
+      <translation>Поделиться ссылкой</translation>
     </message>
   </context>
   <context>
     <name>SiteConnectionSheet</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Подключиться к cайту</translation>
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Адрес</translation>
     </message>
     <message>
       <source>Log in as</source>
-      <translation type="unfinished">Log in as</translation>
+      <translation>Войти как</translation>
     </message>
     <message>
       <source>Login</source>

@@ -916,7 +916,7 @@
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>주소</translation>
     </message>
     <message>
       <source>Log in as</source>

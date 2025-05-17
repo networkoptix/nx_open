@@ -897,30 +897,30 @@
     </message>
     <message>
       <source>Sharing</source>
-      <translation type="unfinished">Sharing</translation>
+      <translation>共有中</translation>
     </message>
     <message>
       <source>Select Lifetime</source>
-      <translation type="unfinished">Select Lifetime</translation>
+      <translation>有効期限を選択してください</translation>
     </message>
     <message>
       <source>Share Link</source>
-      <translation type="unfinished">Share Link</translation>
+      <translation>リンクを共有</translation>
     </message>
   </context>
   <context>
     <name>SiteConnectionSheet</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>サイトに接続</translation>
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>アドレス</translation>
     </message>
     <message>
       <source>Log in as</source>
-      <translation type="unfinished">Log in as</translation>
+      <translation>ログイン:</translation>
     </message>
     <message>
       <source>Login</source>

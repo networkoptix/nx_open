@@ -11481,7 +11481,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>
-      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+      <translation>Người dùng có email được chỉ định đã có quyền truy cập Quản trị viên thông qua Đối tác kênh</translation>
     </message>
   </context>
   <context>
@@ -12406,15 +12406,15 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
     <message>
       <source>No settings model</source>
-      <translation type="unfinished">No settings model</translation>
+      <translation>Không có mô hình cài đặt</translation>
     </message>
     <message>
       <source>No parameters</source>
-      <translation type="unfinished">No parameters</translation>
+      <translation>Không có tham số</translation>
     </message>
     <message>
       <source>Parameters set</source>
-      <translation type="unfinished">Parameters set</translation>
+      <translation>Các thông số được thiết lập</translation>
     </message>
   </context>
   <context>
@@ -12623,15 +12623,15 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message numerus="yes">
       <source>Some of the rules were not enabled</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the rules were not enabled</numerusform>
+      <translation>
+        <numerusform>Một số quy tắc không được kích hoạt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      <translation>
+        <numerusform>Một số quy tắc đã chọn không thể bật được vì chúng có thông số sai. Hãy sửa chúng và bật lại quy tắc.</numerusform>
       </translation>
     </message>
   </context>

@@ -917,7 +917,7 @@
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Endereço</translation>
     </message>
     <message>
       <source>Log in as</source>

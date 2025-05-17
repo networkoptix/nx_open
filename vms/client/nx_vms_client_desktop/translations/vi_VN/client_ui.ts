@@ -532,7 +532,7 @@
     </message>
     <message>
       <source>Native camera presets will not be available.</source>
-      <translation type="unfinished">Native camera presets will not be available.</translation>
+      <translation>Cài đặt gốc của camera sẽ không có sẵn.</translation>
     </message>
   </context>
   <context>

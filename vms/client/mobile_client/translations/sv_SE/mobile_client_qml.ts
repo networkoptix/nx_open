@@ -898,7 +898,7 @@
     </message>
     <message>
       <source>Sharing</source>
-      <translation type="unfinished">Sharing</translation>
+      <translation>Delning</translation>
     </message>
     <message>
       <source>Select Lifetime</source>
@@ -913,11 +913,11 @@
     <name>SiteConnectionSheet</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Anslut till sajten</translation>
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Adress</translation>
     </message>
     <message>
       <source>Log in as</source>

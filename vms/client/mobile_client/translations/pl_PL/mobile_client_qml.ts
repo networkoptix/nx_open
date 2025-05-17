@@ -900,7 +900,7 @@
     </message>
     <message>
       <source>Sharing</source>
-      <translation type="unfinished">Sharing</translation>
+      <translation>Udostępnianie</translation>
     </message>
     <message>
       <source>Select Lifetime</source>
@@ -915,11 +915,11 @@
     <name>SiteConnectionSheet</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Połącz z witryną</translation>
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Adres</translation>
     </message>
     <message>
       <source>Log in as</source>

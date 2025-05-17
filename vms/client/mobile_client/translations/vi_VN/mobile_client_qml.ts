@@ -183,7 +183,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>Chia sẻ mở hộp thoại đánh dấu mới để tạo liên kết phát lại sau khi thiết lập tùy chọn chia sẻ</translation>
     </message>
   </context>
   <context>
@@ -897,30 +897,30 @@
     </message>
     <message>
       <source>Sharing</source>
-      <translation type="unfinished">Sharing</translation>
+      <translation>Chia sẻ</translation>
     </message>
     <message>
       <source>Select Lifetime</source>
-      <translation type="unfinished">Select Lifetime</translation>
+      <translation>Chọn trọn đời</translation>
     </message>
     <message>
       <source>Share Link</source>
-      <translation type="unfinished">Share Link</translation>
+      <translation>Chia sẻ Liên kết</translation>
     </message>
   </context>
   <context>
     <name>SiteConnectionSheet</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Kết nối với Chi nhánh</translation>
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Địa chỉ</translation>
     </message>
     <message>
       <source>Log in as</source>
-      <translation type="unfinished">Log in as</translation>
+      <translation>Đăng nhập với tên</translation>
     </message>
     <message>
       <source>Login</source>

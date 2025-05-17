@@ -897,7 +897,7 @@
     </message>
     <message>
       <source>Sharing</source>
-      <translation type="unfinished">Sharing</translation>
+      <translation>分享中</translation>
     </message>
     <message>
       <source>Select Lifetime</source>
@@ -912,11 +912,11 @@
     <name>SiteConnectionSheet</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>連線到站點</translation>
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>位址</translation>
     </message>
     <message>
       <source>Log in as</source>

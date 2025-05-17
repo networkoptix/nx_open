@@ -919,7 +919,7 @@
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Адреса</translation>
     </message>
     <message>
       <source>Log in as</source>

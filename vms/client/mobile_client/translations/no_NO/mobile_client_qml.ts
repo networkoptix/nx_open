@@ -898,7 +898,7 @@
     </message>
     <message>
       <source>Sharing</source>
-      <translation type="unfinished">Sharing</translation>
+      <translation>Deling</translation>
     </message>
     <message>
       <source>Select Lifetime</source>
@@ -917,7 +917,7 @@
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Adresse</translation>
     </message>
     <message>
       <source>Log in as</source>
