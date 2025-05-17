@@ -17,6 +17,11 @@ class QnSystemsModelPrivate;
 
 namespace nx::vms::client::core {
 
+struct ChannelPartnerList;
+struct OrganizationList;
+struct GroupStructure;
+struct SystemInOrganization;
+
 /**
  * This model unifies organizations for a single channel partner (with systems and folder
  * structure) and non-SaaS systems in a tree, making its content viewable via a QML tree and
@@ -110,6 +115,11 @@ public:
     bool hasChannelPartners() const;
     bool hasOrganizations() const;
 
+    void setChannelPartners(const ChannelPartnerList& data);
+    void setOrganizations(const OrganizationList& data, nx::Uuid parentId);
+    void setOrgStructure(nx::Uuid orgId, const std::vector<GroupStructure>& data);
+    void setOrgSystems(nx::Uuid orgId, const std::vector<SystemInOrganization>& data);
+
 signals:
     void statusWatcherChanged();
     void systemsModelChanged();
@@ -124,7 +134,7 @@ private:
 };
 
 // Hides 'SitesNode' root node and places its children last, optionally hiding SaaS systems.
-class OrganizationsFilterModel: public QSortFilterProxyModel
+class NX_VMS_CLIENT_CORE_API OrganizationsFilterModel: public QSortFilterProxyModel
 {
     Q_OBJECT
 

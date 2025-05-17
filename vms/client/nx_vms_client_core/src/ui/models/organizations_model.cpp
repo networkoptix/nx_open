@@ -1016,6 +1016,28 @@ bool OrganizationsModel::topLevelLoading() const
     return d->topLevelLoading;
 }
 
+void OrganizationsModel::setChannelPartners(const ChannelPartnerList& data)
+{
+    d->setChannelPartners(data);
+}
+
+void OrganizationsModel::setOrganizations(const OrganizationList& data, nx::Uuid parentId)
+{
+    d->setOrganizations(data, parentId);
+}
+
+void OrganizationsModel::setOrgStructure(nx::Uuid orgId, const std::vector<GroupStructure>& data)
+{
+    d->setOrgStructure(orgId, data);
+}
+
+void OrganizationsModel::setOrgSystems(
+    nx::Uuid orgId,
+    const std::vector<SystemInOrganization>& data)
+{
+    d->setOrgSystems(orgId, data);
+}
+
 void OrganizationsModel::setSystemsModel(QAbstractProxyModel* systemsModel)
 {
     if (d->proxyModel == systemsModel)
