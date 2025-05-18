@@ -24,6 +24,7 @@ Page
     leftButtonIcon.source: "image://skin/20x20/Solid/layouts.svg?primary=light10"
     leftButtonIcon.width: 20
     leftButtonIcon.height: 20
+    leftButtonEnabled: !loadingDummy.visible
 
     LayoutSheet
     {

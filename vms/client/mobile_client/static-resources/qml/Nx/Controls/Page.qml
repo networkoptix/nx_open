@@ -20,6 +20,7 @@ QuickControls.Page
 
     property alias leftButtonIcon: toolBar.leftButtonIcon
     property alias leftButtonImageSource: toolBar.leftButtonImageSource
+    property alias leftButtonEnabled: toolBar.leftButtonEnabled
     property alias titleControls: toolBar.controls
     property alias warningText: warningPanel.text
     property alias warningVisible: warningPanel.opened

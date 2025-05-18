@@ -15,6 +15,7 @@ ToolBarBase
 
     property alias leftButtonIcon: leftButton.icon
     property alias leftButtonImageSource: leftButton.imageSource
+    property alias leftButtonEnabled: leftButton.enabled
     property alias title: label.text
     property alias controls: controlsRow.data
     property alias titleOpacity: label.opacity
