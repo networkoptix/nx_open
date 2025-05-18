@@ -55,7 +55,7 @@ struct ApplicationContext::Private
     std::unique_ptr<QnMobileAppInfo> appInfo = std::make_unique<QnMobileAppInfo>();
     std::unique_ptr<PushNotificationManager> pushManager;
     std::unique_ptr<detail::CredentialsHelper> credentialsHelper;
-    QPointer<QnCameraThumbnailProvider> cameraThumbnailProvider;
+    QPointer<QnCameraThumbnailProvider> cameraThumbnailProvider; //< Owned by the QML engine.
 
     void initializeHolePunching();
     void initializeTranslations();
@@ -252,8 +252,18 @@ ApplicationContext::~ApplicationContext()
     qmlEngine()->removeImageProvider("thumbnail");
     resetEngine(); // Frees all systems contexts of the QML objects.
 
-    // DesktopCameraConnection is a SystemContextAware object, so it should be deleted before the
-    // SystemContext.
+    // Currently, throughout the derived client code (desktop, mobile) it's assumed everywhere
+    // that all system contexts are of that most derived level. I.e. desktop client code expects
+    // desktop::SystemContext, mobile client code expects mobile::SystemContext everywhere.
+    // As soon as some system context creation code appeared at the client::core level,
+    // we had to introduce in ApplicationContext a virtual function to create system contexts
+    // of the most derived type. However, system contexts often rely on the application context
+    // - apparently of the same most derived level. For that reason we must destroy all
+    // system contexts in the most derived ApplicationContext destructor.
+    destroyCrossSystemModules();
+
+    // System contexts destruction is delayed and delegated to QnLongRunableCleanup.
+    // We must enforce it to finish here synchronously.
     common::ApplicationContext::stopAll();
 }
 

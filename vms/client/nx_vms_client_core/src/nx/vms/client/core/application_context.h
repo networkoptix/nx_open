@@ -115,18 +115,6 @@ public:
 
     Qn::SerializationFormat serializationFormat() const;
 
-    /**
-     * Initialize network-related modules.
-     * Not called from the constructor, should be explicitly called from descendants instead.
-     */
-    void initializeNetworkModules();
-
-    /**
-     * Initialize cross-system-related modules.
-     * Not called from the constructor, should be explicitly called from descendants instead.
-     */
-    void initializeCrossSystemModules();
-
     QQmlEngine* qmlEngine() const;
 
     CloudStatusWatcher* cloudStatusWatcher() const;
@@ -236,6 +224,21 @@ protected:
      *  we need some migration/initializations to be done before translations setup.
      */
     void initializeTranslations(const QString& targetLocale);
+
+    /**
+    * Initialize network-related modules.
+    * Not called from the constructor, should be explicitly called from descendants instead.
+    */
+    void initializeNetworkModules();
+
+    /**
+    * Initialize cross-system-related modules.
+    * Not called from the constructor, should be explicitly called from descendants instead.
+    */
+    void initializeCrossSystemModules();
+
+    /** Destroy cross-system-related modules early from descendants. */
+    void destroyCrossSystemModules();
 
 private:
     struct Private;

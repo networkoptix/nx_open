@@ -96,6 +96,7 @@ struct CloudLayoutsManager::Private
     Private(CloudLayoutsManager* owner):
         q(owner)
     {
+        systemContext->setObjectName("Cloud Layouts System Context");
         appContext()->addSystemContext(systemContext.get());
         timer->setInterval(kRequestInterval);
         timer->callOnTimeout([this](){ updateLayouts(); });

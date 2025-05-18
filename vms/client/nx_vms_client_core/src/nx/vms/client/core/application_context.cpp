@@ -341,6 +341,13 @@ void ApplicationContext::initializeCrossSystemModules()
     d->crossSystemLayoutsWatcher = std::make_unique<CrossSystemLayoutsWatcher>();
 }
 
+void ApplicationContext::destroyCrossSystemModules()
+{
+    d->crossSystemLayoutsWatcher.release();
+    d->cloudCrossSystemManager.release();
+    d->cloudLayoutsManager.release();
+}
+
 void ApplicationContext::initializeTranslations(const QString& targetLocale)
 {
     NX_INFO(this, "Trying to Initialize translations for locale %1", targetLocale);

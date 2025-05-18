@@ -242,7 +242,8 @@ SystemContext::SystemContext(WindowContext* context,
             if (watcher->userName().isEmpty())
             {
                 NX_DEBUG(this, "User name changed to empty, stopping session");
-                sessionManager()->stopSessionByUser();
+                if (sessionManager()->hasSession())
+                    sessionManager()->stopSessionByUser();
             }
         });
 
@@ -256,7 +257,9 @@ SystemContext::~SystemContext()
     if (d->thumbnailProvider)
         d->thumbnailProvider->removeThumbnailCache(d->thumbnailsCache.get());
 
-    setSession({});
+    if (mode() == Mode::client)
+        sessionManager()->resetSession();
+
     if (messageProcessor())
         deleteMessageProcessor();
 }

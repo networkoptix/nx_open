@@ -844,6 +844,20 @@ ApplicationContext::~ApplicationContext()
         // Remote session must be fully destroyed while application context still exists.
         removeSystemContext(d->mainSystemContext.release());
     }
+
+    // Currently, throughout the derived client code (desktop, mobile) it's assumed everywhere
+    // that all system contexts are of that most derived level. I.e. desktop client code expects
+    // desktop::SystemContext, mobile client code expects mobile::SystemContext everywhere.
+    // As soon as some system context creation code appeared at the client::core level,
+    // we had to introduce in ApplicationContext a virtual function to create system contexts
+    // of the most derived type. However, system contexts often rely on the application context
+    // - apparently of the same most derived level. For that reason we must destroy all
+    // system contexts in the most derived ApplicationContext destructor.
+    destroyCrossSystemModules();
+
+    // System contexts destruction is delayed and delegated to QnLongRunableCleanup.
+    // We must enforce it to finish here synchronously.
+    common::ApplicationContext::stopAll();
 }
 
 core::SystemContext* ApplicationContext::createSystemContext(
