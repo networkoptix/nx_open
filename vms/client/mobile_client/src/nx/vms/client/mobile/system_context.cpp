@@ -47,6 +47,7 @@
 namespace nx::vms::client::mobile {
 
 namespace {
+
 static const nx::utils::SoftwareVersion kObjectSearchMinimalSupportVersion(5, 0);
 
 void initializeConnectionUserInteractionDelegate(SystemContext* systemContext)
@@ -122,6 +123,9 @@ struct SystemContext::Private
     std::unique_ptr<core::TwoWayAudioController> twoWayAudioController;
     std::unique_ptr<nx::client::mobile::EventRulesWatcher> eventRulesWatcher;
     std::unique_ptr<QnCameraThumbnailCache> thumbnailsCache;
+
+    const QPointer<QnCameraThumbnailProvider> thumbnailProvider{
+        appContext()->cameraThumbnailProvider()};
 };
 
 SystemContext::SystemContext(WindowContext* context,
@@ -147,8 +151,8 @@ SystemContext::SystemContext(WindowContext* context,
                 d->thumbnailsCache->stop();
         });
 
-    if (auto thumbnailProvider = appContext()->cameraThumbnailProvider())
-        thumbnailProvider->addThumbnailCache(d->thumbnailsCache.get());
+    if (d->thumbnailProvider)
+        d->thumbnailProvider->addThumbnailCache(d->thumbnailsCache.get());
 
     if (mode == Mode::crossSystem)
         return;
@@ -249,8 +253,8 @@ SystemContext::SystemContext(WindowContext* context,
 
 SystemContext::~SystemContext()
 {
-    if (auto thumbnailProvider = appContext()->cameraThumbnailProvider())
-        thumbnailProvider->removeThumbnailCache(d->thumbnailsCache.get());
+    if (d->thumbnailProvider)
+        d->thumbnailProvider->removeThumbnailCache(d->thumbnailsCache.get());
 
     setSession({});
     if (messageProcessor())

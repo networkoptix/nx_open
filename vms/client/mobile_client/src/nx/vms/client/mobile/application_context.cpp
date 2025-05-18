@@ -55,8 +55,7 @@ struct ApplicationContext::Private
     std::unique_ptr<QnMobileAppInfo> appInfo = std::make_unique<QnMobileAppInfo>();
     std::unique_ptr<PushNotificationManager> pushManager;
     std::unique_ptr<detail::CredentialsHelper> credentialsHelper;
-    std::unique_ptr<QnCameraThumbnailProvider> cameraThumbnailProvider{
-        new QnCameraThumbnailProvider()};
+    QPointer<QnCameraThumbnailProvider> cameraThumbnailProvider;
 
     void initializeHolePunching();
     void initializeTranslations();
@@ -156,7 +155,8 @@ void ApplicationContext::Private::initializeEngine(
     for (const QString& path: params.qmlImportPaths)
         engine->addImportPath(path);
 
-    engine->addImageProvider("thumbnail", cameraThumbnailProvider.get());
+    cameraThumbnailProvider = new QnCameraThumbnailProvider();
+    engine->addImageProvider("thumbnail", cameraThumbnailProvider);
 }
 
 void ApplicationContext::Private::initializeMainWindowContext()
