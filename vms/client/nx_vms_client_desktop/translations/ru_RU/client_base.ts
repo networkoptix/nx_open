@@ -1174,7 +1174,7 @@
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Подключиться к cайту</translation>
     </message>
     <message>
       <source>Site Administration...</source>
@@ -1630,7 +1630,7 @@ License Key: %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Подключиться к cайту</translation>
     </message>
   </context>
   <context>

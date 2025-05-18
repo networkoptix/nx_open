@@ -1103,7 +1103,7 @@
     </message>
     <message>
       <source>The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</source>
-      <translation type="unfinished">The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</translation>
+      <translation>Den lokala databasen hittades vara skadad och kunde inte återställas. En ny tom databas har initierats. En säkerhetskopia av den skadade databasen har sparats för referens.</translation>
     </message>
   </context>
   <context>
