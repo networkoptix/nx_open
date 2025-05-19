@@ -34,7 +34,7 @@ static constexpr auto kMinTimePeriodAggregationPeriod = std::chrono::seconds(3);
 static constexpr int kUsecInMs = 1000;
 
 static constexpr auto kTrackAggregationPeriod = std::chrono::seconds(5);
-static constexpr auto kMaxCachedObjectLifeTime = std::chrono::minutes(1);
+static constexpr auto kMaxCachedObjectLifeTime = std::chrono::minutes(3);
 static constexpr auto kTrackSearchResolutionX = 44;
 static constexpr auto kTrackSearchResolutionY = 32;
 
