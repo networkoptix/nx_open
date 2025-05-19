@@ -65,6 +65,9 @@ public:
 
     virtual ~ApplicationContext() override;
 
+    /** Call before the destructor to ensure correct stop order. */
+    virtual void stopAll();
+
     const Features& commonFeatures() const;
 
     /**
@@ -98,8 +101,6 @@ public:
     {
         return qobject_cast<ContextType*>(this);
     }
-
-    void stopAll();
 
 private:
     struct Private;

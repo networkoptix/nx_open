@@ -285,6 +285,18 @@ ApplicationContext::~ApplicationContext()
     nx::setOnAssertHandler(nullptr);
 }
 
+void ApplicationContext::stopAll()
+{
+    NX_VERBOSE(this, "Stop");
+
+    common::ApplicationContext::stopAll();
+
+    // Cross-system modules should be destroyed before the certificate verifier & the UI-delegate.
+    d->crossSystemLayoutsWatcher.reset();
+    d->cloudCrossSystemManager.reset();
+    d->cloudLayoutsManager.reset();
+}
+
 Qn::SerializationFormat ApplicationContext::serializationFormat() const
 {
     return d->format;

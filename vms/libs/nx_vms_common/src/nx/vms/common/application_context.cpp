@@ -119,6 +119,8 @@ ApplicationContext::ApplicationContext(
 
 void ApplicationContext::stopAll()
 {
+    NX_VERBOSE(this, "Stop");
+
     d->longRunnablePool->stopAll();
 }
 
