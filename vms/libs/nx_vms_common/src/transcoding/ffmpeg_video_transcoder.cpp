@@ -329,7 +329,6 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     if (decodedFrame->size() != m_sourceResolution || decodedFrame->format != AV_PIX_FMT_YUV420P)
     {
         decodedFrame = decodedFrame->scaled(m_sourceResolution, AV_PIX_FMT_YUV420P);
-
         if (!decodedFrame)
         {
             NX_ERROR(this, "Failed to scale video frame to %1", m_sourceResolution);

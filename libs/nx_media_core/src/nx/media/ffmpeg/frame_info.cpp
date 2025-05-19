@@ -274,36 +274,13 @@ bool CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     height = newHeight;
     format = newFormat;
 
-    int rc = 32 >> (newFormat == AV_PIX_FMT_RGBA || newFormat == AV_PIX_FMT_ABGR || newFormat == AV_PIX_FMT_BGRA ? 2 : 0);
-    int roundWidth = qPower2Ceil((unsigned) width, rc);
-    int numBytes = av_image_get_buffer_size((AVPixelFormat) format, roundWidth, height, /*align*/ 1);
-    if (numBytes <= 0)
+    int status = av_image_alloc(
+        data, linesize, newWidth, newHeight, (AVPixelFormat)newFormat, CL_MEDIA_ALIGNMENT);
+    if (status <= 0)
+    {
+        NX_WARNING(this, "Failed to allocate frame: %1x%2, format: %3", width, height, format);
         return false;
-    numBytes += AV_INPUT_BUFFER_PADDING_SIZE; // extra alloc space due to ffmpeg doc
-    av_image_fill_arrays(
-        data,
-        linesize,
-        (quint8*) av_malloc(numBytes),
-        (AVPixelFormat) format, roundWidth, height, /*align*/ 1);
-    return true;
-}
-
-bool CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint)
-{
-    clean();
-    setUseExternalData(false);
-    width = newWidth;
-    height = newHeight;
-    format = newFormat;
-
-    int numBytes = av_image_get_buffer_size((AVPixelFormat) format, lineSizeHint, height, /*align*/ 1);
-    if (numBytes <= 0)
-        return false;
-    av_image_fill_arrays(
-        data,
-        linesize,
-        (quint8*) av_malloc(numBytes),
-        (AVPixelFormat) format, lineSizeHint, height, /*align*/ 1);
+    }
     return true;
 }
 
@@ -551,7 +528,9 @@ CLVideoDecoderOutputPtr CLVideoDecoderOutput::scaled(
     }
 
     CLVideoDecoderOutputPtr dst(new CLVideoDecoderOutput);
-    dst->reallocate(newSize.width(), newSize.height(), newFormat);
+    if (!dst->reallocate(newSize.width(), newSize.height(), newFormat))
+        return nullptr;
+
     dst->assignMiscData(this);
     dst->sample_aspect_ratio = 1.0;
     if (keepAspectRatio)
