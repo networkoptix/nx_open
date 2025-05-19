@@ -11,19 +11,21 @@
 namespace nx::utils {
 
 /**
- * Containers like vector of non-copyable types cannot be initialized by the initializer list (it
+ * std::vector of non-copyable types cannot be initialized by the initializer list (it
  * requires a copy constructor), but can be initialized by the following method:
  * ```
- *     auto vector = make_container<std::vector<std::unique_ptr<Data>>>(
- *         std::make_unique<Data>(1), std::make_unique<Data>(2), std::make_unique<Data>(2));
+ *     auto vector = make_vector(std::make_unique<Data>(1),
+ *         std::make_unique<Data>(2), std::make_unique<Data>(2));
  * ```
  */
-template<typename Container, typename... Args>
-Container make_container(Args... args)
+template<template<typename> typename Allocator = std::allocator, typename... Elements>
+auto make_vector(Elements&&... e)
 {
-    Container container;
-    (container.push_back(std::forward<Args>(args)), ...);
-    return container;
+    using ValueType = std::common_type_t<std::decay_t<Elements>...>;
+    std::vector<ValueType, Allocator<ValueType>> result;
+    result.reserve(sizeof...(Elements));
+    (result.emplace_back(std::forward<Elements>(e)), ...);
+    return result;
 }
 
 }   //namespace nx::utils

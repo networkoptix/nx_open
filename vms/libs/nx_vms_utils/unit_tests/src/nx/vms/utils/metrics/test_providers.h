@@ -83,34 +83,34 @@ private:
 
     static ValueGroupProviders<Resource> makeProviders()
     {
-        return nx::utils::make_container<ValueGroupProviders<Resource>>(
+        return nx::utils::make_vector(
             makeValueGroupProvider<Resource>(
                 "_",
-                makeLocalValueProvider<Resource>(
+                std::make_unique<ValueProvider<Resource>>(Scope::local,
                     "name",
                     [](const auto& r) { return "TR" + r.idForToStringFromPtr(); }
                 )
             ),
             makeValueGroupProvider<Resource>(
                 "g1",
-                makeLocalValueProvider<Resource>(
+                std::make_unique<ValueProvider<Resource>>(Scope::local,
                     "i",
                     [](const auto& r) { return r.current("i1"); },
                     [](const auto& r, auto change) { return r.monitor("i1", std::move(change)); }
                 ),
-                makeLocalValueProvider<Resource>(
+                std::make_unique<ValueProvider<Resource>>(Scope::local,
                     "t",
                     [](const auto& r) { return r.current("t1"); }
                 )
             ),
             makeValueGroupProvider<Resource>(
                 "g2",
-                makeSystemValueProvider<Resource>(
+                std::make_unique<ValueProvider<Resource>>(Scope::site,
                     "i",
                     [](const auto& r) { return r.current("i2"); },
                     [](const auto& r, auto change) { return r.monitor("i2", std::move(change)); }
                 ),
-                makeSystemValueProvider<Resource>(
+                std::make_unique<ValueProvider<Resource>>(Scope::site,
                     "t",
                     [](const auto& r) { return r.current("t2"); }
                 )

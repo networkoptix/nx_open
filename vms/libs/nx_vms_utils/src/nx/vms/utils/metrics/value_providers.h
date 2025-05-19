@@ -37,12 +37,6 @@ private:
 template<typename ResourceType>
 using ValueProviders = std::vector<std::unique_ptr<ValueProvider<ResourceType>>>;
 
-template<typename ResourceType, typename... Args>
-std::unique_ptr<ValueProvider<ResourceType>> makeLocalValueProvider(Args... args);
-
-template<typename ResourceType, typename... Args>
-std::unique_ptr<ValueProvider<ResourceType>> makeSystemValueProvider(Args... args);
-
 /**
  * Provides a parameter group.
  * Creates a ParameterGroupMonitor with monitor for each parameter inside.
@@ -54,7 +48,7 @@ public:
     ValueGroupProvider(QString id, ValueProviders<ResourceType> providers);
 
     template<typename... Providers>
-    ValueGroupProvider(QString id, Providers... providers);
+    ValueGroupProvider(QString id, Providers&&... providers);
 
     const QString& id() const { return m_id; }
     std::vector<QString> children() const;
@@ -67,9 +61,6 @@ private:
 
 template<typename ResourceType>
 using ValueGroupProviders = std::vector<std::unique_ptr<ValueGroupProvider<ResourceType>>>;
-
-template<typename ResourceType, typename... Args>
-std::unique_ptr<ValueGroupProvider<ResourceType>> makeValueGroupProvider(Args... args);
 
 // -----------------------------------------------------------------------------------------------
 
@@ -105,33 +96,21 @@ std::unique_ptr<ValueMonitor> ValueProvider<ResourceType>::monitor(
         m_id, m_scope, resource, m_getter, m_watch);
 }
 
-template<typename ResourceType, typename... Args>
-std::unique_ptr<ValueProvider<ResourceType>> makeLocalValueProvider(Args... args)
-{
-    return std::make_unique<ValueProvider<ResourceType>>(Scope::local, std::forward<Args>(args)...);
-}
-
-template<typename ResourceType, typename... Args>
-std::unique_ptr<ValueProvider<ResourceType>> makeSystemValueProvider(Args... args)
-{
-    return std::make_unique<ValueProvider<ResourceType>>(Scope::site, std::forward<Args>(args)...);
-}
-
 template<typename ResourceType>
 ValueGroupProvider<ResourceType>::ValueGroupProvider(
     QString id,
     std::vector<std::unique_ptr<ValueProvider<ResourceType>>> providers)
 :
-    m_id(id),
+    m_id(std::move(id)),
     m_providers(std::move(providers))
 {
 }
 
 template<typename ResourceType>
 template<typename... Providers>
-ValueGroupProvider<ResourceType>::ValueGroupProvider(QString id, Providers... providers):
+ValueGroupProvider<ResourceType>::ValueGroupProvider(QString id, Providers&&... providers):
     ValueGroupProvider(
-        id, nx::utils::make_container<ValueProviders<ResourceType>>(std::move(providers)...))
+        id, nx::utils::make_vector(std::forward<Providers>(providers)...))
 {
 }
 
