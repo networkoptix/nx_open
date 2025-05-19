@@ -1089,7 +1089,7 @@
     </message>
     <message>
       <source>The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</source>
-      <translation type="unfinished">The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</translation>
+      <translation>ローカルデータベースの破損が検出されましたが、復旧できませんでした。新しい空のデータベースが用意されました。参照用として、破損したデータベースのバックアップコピーを保存しました。</translation>
     </message>
   </context>
   <context>
