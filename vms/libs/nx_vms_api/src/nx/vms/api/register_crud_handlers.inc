@@ -1995,6 +1995,7 @@ static void registerDeviceHandlers(
 
     /**%apidoc GET /rest/v{1-}/devices/%2A/bookmarks/%2A/tags
      * Retrieves the Bookmark tags.
+     * %jsonrpc[result] all
      * %caption Get Bookmark tags
      * %ingroup Device Media
      * %struct BookmarkTagFilter
