@@ -370,8 +370,10 @@ QVariant BookmarkSearchListModel::data(const QModelIndex& index, int role) const
         case BookmarkTagRole:
             return QVariant::fromValue(bookmark.tags);
         case IsSharedBookmark:
-            return bookmark.shareable() && bookmark.bookmarkMatchesFilter(
-                api::BookmarkShareFilter::shared | api::BookmarkShareFilter::accessible);
+            return bookmark.shareable()
+                && bookmark.bookmarkMatchesFilter(
+                    api::BookmarkShareFilter::shared | api::BookmarkShareFilter::accessible)
+                && systemContext()->moduleInformation().organizationId;
         default:
             return {};
     }
