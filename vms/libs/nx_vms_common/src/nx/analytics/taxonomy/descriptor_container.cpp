@@ -50,8 +50,19 @@ Descriptors DescriptorContainer::descriptors(const nx::Uuid& serverId)
         for (const QnMediaServerResourcePtr& server: servers)
         {
             const QString serializedDescriptors = server->getProperty(kDescriptorsProperty);
-            descriptorsByServer[server->getId()] =
-                QJson::deserialized(serializedDescriptors.toUtf8(), Descriptors());
+            auto [descriptors, success] = nx::reflect::json::deserialize<Descriptors>(
+                serializedDescriptors.toStdString());
+            if (!success)
+            {
+                // Trying to deserialize with another method to support client connections to
+                // the old systems.
+                descriptorsByServer[server->getId()] =
+                    QJson::deserialized(serializedDescriptors.toUtf8(), Descriptors());
+            }
+            else
+            {
+                descriptorsByServer[server->getId()] = std::move(descriptors);
+            }
         }
 
         for (auto& [serverId, descriptors]: descriptorsByServer)
@@ -69,7 +80,9 @@ Descriptors DescriptorContainer::descriptors(const nx::Uuid& serverId)
         return Descriptors();
 
     const QString serializedDescriptors = server->getProperty(kDescriptorsProperty);
-    return QJson::deserialized(serializedDescriptors.toUtf8(), Descriptors());
+    auto [descriptors, _] = nx::reflect::json::deserialize<Descriptors>(
+        serializedDescriptors.toStdString());
+    return descriptors;
 }
 
 void DescriptorContainer::updateDescriptors(Descriptors descriptors)
@@ -79,8 +92,7 @@ void DescriptorContainer::updateDescriptors(Descriptors descriptors)
 
     if (!NX_ASSERT(ownServer, "Unable to find own mediaserver"))
         return;
-
-    ownServer->setProperty(kDescriptorsProperty, QString::fromUtf8(QJson::serialized(descriptors)));
+    ownServer->setProperty(kDescriptorsProperty, QString::fromUtf8(nx::reflect::json::serialize(descriptors)));
     ownServer->saveProperties();
 }
 
