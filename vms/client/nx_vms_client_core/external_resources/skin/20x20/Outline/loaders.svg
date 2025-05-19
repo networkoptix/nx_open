@@ -1,12 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
   <g class="20x20/Outline/loaders">
-    <path fill="url(#a)" fill-rule="evenodd" d="M10 15.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11Zm0 1.5a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z" class="Primary" clip-rule="evenodd"/>
+    <g clip-path="url(#a)" data-figma-skip-parse="true">
+      <foreignObject width="2428.57" height="2428.57" x="-1214.29" y="-1214.29" transform="rotate(90 0 10) scale(.007)">
+        <div xmlns="http://www.w3.org/1999/xhtml" opacity="1" style="background:conic-gradient(from 90deg,#fff 0deg,rgba(165,183,192,0) .036deg,rgba(213,222,226,.5433) 327.872deg,#fff 360deg);height:100%;width:100%"/>
+      </foreignObject>
+    </g>
+    <path d="M10 15.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11Zm0 1.5a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z" class="Primary" clip-rule="evenodd" data-figma-gradient-fill="{&quot;type&quot;:&quot;GRADIENT_ANGULAR&quot;,&quot;stops&quot;:[{&quot;color&quot;:{&quot;r&quot;:1.0,&quot;g&quot;:1.0,&quot;b&quot;:1.0,&quot;a&quot;:1.0},&quot;position&quot;:0.0},{&quot;color&quot;:{&quot;r&quot;:0.64705884456634521,&quot;g&quot;:0.71764707565307617,&quot;b&quot;:0.75294119119644165,&quot;a&quot;:0.0},&quot;position&quot;:9.9999997473787516e-05},{&quot;color&quot;:{&quot;r&quot;:0.83882087469100952,&quot;g&quot;:0.87105673551559448,&quot;b&quot;:0.88717460632324219,&quot;a&quot;:0.54332584142684937},&quot;position&quot;:0.91075432300567627}],&quot;stopsVar&quot;:[],&quot;transform&quot;:{&quot;m00&quot;:8.5725282327939710e-16,&quot;m01&quot;:-14.0,&quot;m02&quot;:17.0,&quot;m10&quot;:14.0,&quot;m11&quot;:8.5725282327939710e-16,&quot;m12&quot;:3.0},&quot;opacity&quot;:1.0,&quot;blendMode&quot;:&quot;NORMAL&quot;,&quot;visible&quot;:true}"/>
   </g>
   <defs>
-    <radialGradient id="a" cx="0" cy="0" r="1" class="a" gradientTransform="matrix(0 7 -7 0 10 10)" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#ffffff"/>
-      <stop offset="0" stop-color="#A5B7C0" stop-opacity="0"/>
-      <stop offset=".911" stop-color="#D6DEE2" stop-opacity=".543"/>
-    </radialGradient>
+    <clipPath id="a" class="a">
+      <path fill-rule="evenodd" d="M10 15.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11Zm0 1.5a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z" class="Primary" clip-rule="evenodd"/>
+    </clipPath>
   </defs>
 </svg>

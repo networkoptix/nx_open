@@ -3,7 +3,7 @@
     <path stroke="#E1E7EA" stroke-linecap="round" stroke-linejoin="round" d="M8 4.267V8l3.267 2.333M15 8a7.002 7.002 0 0 1-9.679 6.467A7 7 0 1 1 15 8Z" class="Primary"/>
   </g>
   <defs>
-    <clipPath id="a">
+    <clipPath id="a" class="a">
       <path fill="#ffffff" d="M0 0h16v16H0z"/>
     </clipPath>
   </defs>

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
   <g class="20x20/Solid/group_organization">
     <path fill="#A5B7C0" fill-rule="evenodd" d="M8 3a3 3 0 0 0-3 3v1a3 3 0 0 0 6 0V6c0-.888-.386-1.687-1-2.236A2.989 2.989 0 0 0 8 3ZM2.007 15.266c.254-1.66 1.567-2.94 3.204-3.212L6 16H2.65a.643.643 0 0 1-.643-.734ZM10 16l.79-3.946c1.636.273 2.95 1.551 3.203 3.212a.643.643 0 0 1-.643.734H10Zm2-9V6a3.987 3.987 0 0 0-1.126-2.782A3 3 0 0 1 15 6v1a3 3 0 0 1-4.126 2.782A3.987 3.987 0 0 0 12 7Zm2.87 9h2.48a.643.643 0 0 0 .643-.734C17.706 13.389 16.065 12 14.134 12h-1.015a4.81 4.81 0 0 1 1.862 3.115 1.62 1.62 0 0 1-.11.885Z" class="Primary" clip-rule="evenodd"/>
-    <path fill="#E1E7EA" fill-rule="evenodd" d="M8.94 11.5H7.06a.3.3 0 0 0-.25.466L7.5 13h1l.69-1.034a.3.3 0 0 0-.25-.466Zm-.273 2H7.333L6.5 16h3l-.833-2.5Z" id="Subtract" clip-rule="evenodd"/>
+    <path fill="#E1E7EA" fill-rule="evenodd" d="M8.94 11.5H7.06a.3.3 0 0 0-.25.466L7.5 13h1l.69-1.034a.3.3 0 0 0-.25-.466Zm-.273 2H7.333L6.5 16h3l-.833-2.5Z" class="Secondary" clip-rule="evenodd"/>
   </g>
 </svg>
