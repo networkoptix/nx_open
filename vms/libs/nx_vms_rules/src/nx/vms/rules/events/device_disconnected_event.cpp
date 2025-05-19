@@ -60,9 +60,9 @@ QString DeviceDisconnectedEvent::caption(common::SystemContext* context) const
     return QnDeviceDependentStrings::getNameFromSet(
         context->resourcePool(),
         QnCameraDeviceStringSet(
-            tr("Device was disconnected"),
-            tr("Camera was disconnected"),
-            tr("I/O Module was disconnected")),
+            tr("Device disconnected"),
+            tr("Camera disconnected"),
+            tr("I/O Module disconnected")),
         camera);
 }
 
@@ -76,9 +76,9 @@ QString DeviceDisconnectedEvent::extendedCaption(common::SystemContext* context,
     return QnDeviceDependentStrings::getNameFromSet(
         context->resourcePool(),
         QnCameraDeviceStringSet(
-            tr("Device was disconnected at %1", "%1 is a server name"),
-            tr("Camera was disconnected at %1", "%1 is a server name"),
-            tr("I/O Module was disconnected at %1", "%1 is a server name")),
+            tr("Device disconnected at %1", "%1 is a server name"),
+            tr("Camera disconnected at %1", "%1 is a server name"),
+            tr("I/O Module disconnected at %1", "%1 is a server name")),
         camera).arg(serverName);
 }
 

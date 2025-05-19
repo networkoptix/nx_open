@@ -101,7 +101,7 @@ NX_REFLECTION_ENUM(EventType,
     /** Camera input signal is received. */
     cameraInputEvent = 2,
 
-    /** Camera was disconnected. */
+    /** Camera disconnected. */
     cameraDisconnectEvent = 3,
 
     /** Storage read error has occurred. */

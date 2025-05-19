@@ -371,12 +371,12 @@ Input on Entrance
 
 TEST_F(NotificationActionsTest, event_deviceDisconnected)
 {
-    static constexpr auto kExpectedCaption = "Camera was disconnected";
+    static constexpr auto kExpectedCaption = "Camera disconnected";
 
     static constexpr auto kExpectedDescription = "Entrance";
 
     static constexpr auto kExpectedTooltip = R"(
-Camera was disconnected at Server1
+Camera disconnected at Server1
 15:46:29
   Entrance
 15:48:30

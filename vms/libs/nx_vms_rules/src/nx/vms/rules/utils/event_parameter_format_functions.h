@@ -60,7 +60,7 @@ QString eventSourceName(SubstitutionContext* substitution, common::SystemContext
  * tooltip. Has {event.extendedCaption} as the first line, and then {event.details.detailing}.
  *
  * Example:
- * Camera was disconnected at Server1
+ * Camera disconnected at Server1
  * 15:46:29
  *   Camera1
  * 15:48:30

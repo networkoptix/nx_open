@@ -55,7 +55,7 @@ static constexpr auto kDestinationDetailName = "destination";
 
 /**
  * Extended event caption with resource name. Used as email subject or bookmark name.
- * Example: "Camera was disconnected at Server1".
+ * Example: "Camera disconnected at Server1".
  */
 static constexpr auto kExtendedCaptionDetailName = "extendedCaption";
 
