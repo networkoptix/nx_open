@@ -22,6 +22,7 @@ public:
     virtual bool removeValue(const QString& name) override;
     virtual bool exists(const QString& name) const override;
     virtual bool sync() override;
+    virtual bool writeDocumentation(const QString& docText) override;
 
 protected:
     QDir m_path;

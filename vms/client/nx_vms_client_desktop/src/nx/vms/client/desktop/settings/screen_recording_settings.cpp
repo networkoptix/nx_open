@@ -21,6 +21,10 @@ ScreenRecordingSettings::ScreenRecordingSettings()
 
     if (recordingFolder().isEmpty())
         recordingFolder = QDir::tempPath();
+
+    save();
+    generateDocumentation("Screen Recording Settings",
+        "Options from the \"Local Settings\" dialog - \"Screen Recording\" page.");
 }
 
 int ScreenRecordingSettings::screen() const

@@ -29,6 +29,34 @@ void Storage::load()
         loadProperty(property);
 }
 
+void Storage::save()
+{
+    for (const auto& property: m_properties)
+        saveProperty(property);
+}
+
+void Storage::generateDocumentation(const QString& caption, const QString& description)
+{
+    static const QString kTitle = "# ";
+    static const QString kOption = "## ";
+
+    QStringList lines;
+    lines.append(kTitle + caption);
+    if (!description.isEmpty())
+        lines.append(description);
+
+    for (const auto& property: m_properties)
+    {
+        lines.append("\n" + kOption + property->name);
+        if (!property->description.isEmpty())
+            lines.append(property->description);
+        const QString defaultValue = property->defaultValueDoc();
+        if (!defaultValue.isEmpty())
+            lines.append(nx::format("Default value: `%1`.", defaultValue));
+    }
+    m_backend->writeDocumentation(lines.join("\n"));
+}
+
 void Storage::sync()
 {
     m_backend->sync();

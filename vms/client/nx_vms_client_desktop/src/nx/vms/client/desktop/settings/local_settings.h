@@ -75,7 +75,7 @@ public:
         "Unique id for this PC for videowall construction."};
 
     Property<Qn::ResourceInfoLevel> resourceInfoLevel{this, "resourceInfoLevel", Qn::RI_NameOnly,
-        "Level of resource detalization in the resource tree, notifications, etc. Includes"
+        "Level of resource detalization in the resource tree, notifications, etc. Includes "
             "displaying camera IP addresses, user roles, videowall layouts."};
     Property<bool> showFullInfo{this, "showFullInfo", false,
         "When 'Info' mode is enabled on cameras, full info will be displayed even without hover."};

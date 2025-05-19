@@ -94,6 +94,7 @@ public:
             "tileVisibilityScopeFilter",
             welcome_screen::TileScopeFilter::AllSystemsTileScopeFilter};
 
+    // FIXME: #sivanov Rename `Hadrware` -> `Hardware` and implement option migration.
     Property<bool> enableHardwareDecoding{this, "enableHadrwareDecoding", true};
 
     /** Adapter for the cloudCredentials property. */

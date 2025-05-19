@@ -18,8 +18,22 @@ class SystemSpecificFileSystemBackend:
     public nx::utils::property_storage::FileSystemBackend,
     public SystemContextAware
 {
+    using base_type = nx::utils::property_storage::FileSystemBackend;
+
 public:
     SystemSpecificFileSystemBackend(SystemContext* systemContext, QObject* parent = nullptr);
+
+    virtual bool isWritable() const override;
+    virtual QString readValue(const QString& name, bool* success = nullptr) override;
+    virtual bool writeValue(const QString& name, const QString& value) override;
+    virtual bool removeValue(const QString& name) override;
+    virtual bool exists(const QString& name) const override;
+    virtual bool sync() override;
+    virtual bool writeDocumentation(const QString& docText) override;
+
+private:
+    /** System-specific settings shall not be written when the user is logged out. */
+    bool m_valid = false;
 };
 
 } // namespace nx::vms::client::desktop

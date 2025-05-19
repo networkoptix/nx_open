@@ -38,7 +38,23 @@ signals:
     void changed(BaseProperty* property);
 
 protected:
+    /** Load all properties. */
     void load();
+
+    /** Save all properties. */
+    void save();
+
+    /**
+     * Generate documentation for all properties and publish it in the backend.
+     * @param caption Documentation caption, e.g. "Local Client Settings".
+     * @param description Detailed description.
+     */
+    void generateDocumentation(const QString& caption, const QString& description = {});
+
+    /**
+    * Write any unsaved changes and reload any settings that have been changed in the meantime by
+    * another application.
+    */
     void sync();
 
     QByteArray securityKey() const;

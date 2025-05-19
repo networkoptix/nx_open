@@ -274,6 +274,9 @@ LocalSettings::LocalSettings():
 
     if (!mediaFolders().isEmpty())
         nx::utils::file_system::ensureDir(mediaFolders().first());
+
+    save();
+    generateDocumentation("Local Settings", "Options from the \"Local Settings\" dialog.");
 }
 
 void LocalSettings::reload()

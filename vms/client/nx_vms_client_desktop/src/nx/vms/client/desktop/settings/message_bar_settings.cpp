@@ -16,6 +16,9 @@ MessageBarSettings::MessageBarSettings():
     ))
 {
     load();
+    save();
+    generateDocumentation("Message Bar Settings",
+        "Options to hide information message bars in various dialogs.");
 }
 
 void MessageBarSettings::reload()

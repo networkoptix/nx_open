@@ -29,6 +29,9 @@ public:
     virtual void setVariantValue(const QVariant& value) = 0;
     bool exists() const;
 
+    /** Default value string representation for the documentation. */
+    virtual QString defaultValueDoc() const { return QString(); }
+
 signals:
     void changed(BaseProperty* property);
 
@@ -54,7 +57,8 @@ public:
         bool secure = false)
         :
         BaseProperty(storage, name, description, secure),
-        m_value(defaultValue)
+        m_value(defaultValue),
+        m_defaultValue(defaultValue)
     {
     }
 
@@ -109,6 +113,11 @@ public:
         setValue(value.value<T>());
     }
 
+    virtual QString defaultValueDoc() const override
+    {
+        return serializeValue(m_defaultValue);
+    }
+
 protected:
     virtual T deserializeValue(const QString& value, bool* success) const
     {
@@ -126,6 +135,7 @@ protected:
 
 private:
     T m_value;
+    T m_defaultValue;
 };
 
 template<typename T>
