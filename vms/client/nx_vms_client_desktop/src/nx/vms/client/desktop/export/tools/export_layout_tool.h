@@ -29,7 +29,7 @@ class ExportLayoutTool: public AbstractExportTool
 public:
     explicit ExportLayoutTool(
         ExportLayoutSettings settings,
-        LayoutResourcePtr layout,
+        core::LayoutResourcePtr layout,
         QObject* parent = nullptr);
     virtual ~ExportLayoutTool() override;
 

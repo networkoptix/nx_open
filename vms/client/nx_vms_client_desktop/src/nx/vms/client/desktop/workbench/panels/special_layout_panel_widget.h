@@ -26,7 +26,7 @@ class SpecialLayoutPanelWidget: public QnMaskedProxyWidget, public WindowContext
 public:
     SpecialLayoutPanelWidget(
         WindowContext* windowContext,
-        const LayoutResourcePtr& layoutResource,
+        const core::LayoutResourcePtr& layoutResource,
         QObject* parent = nullptr);
 
     virtual ~SpecialLayoutPanelWidget();
@@ -39,7 +39,7 @@ private:
 
 private:
     QScopedPointer<Ui::SpecialLayoutPanelWidget> ui;
-    LayoutResourcePtr m_layoutResource;
+    core::LayoutResourcePtr m_layoutResource;
 
     using ButtonPtr = QAbstractButton*;
     QHash<nx::vms::client::desktop::menu::IDType, ButtonPtr> m_actionButtons;

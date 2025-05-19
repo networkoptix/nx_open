@@ -41,6 +41,7 @@
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
@@ -50,7 +51,7 @@
 #include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/layout_resource_helpers.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
@@ -103,6 +104,9 @@
 #include <utils/screen_utils.h>
 #include <utils/unity_launcher_workaround.h>
 
+using nx::vms::client::core::LayoutResource;
+using nx::vms::client::core::LayoutResourcePtr;
+using nx::vms::client::core::LayoutResourceList;
 using nx::vms::client::core::MotionSelection;
 using nx::vms::common::LayoutItemData;
 

@@ -4,10 +4,10 @@
 
 #include <client/client_message_processor.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/videowall/desktop_camera_preloader_resource.h>
 #include <utils/common/id.h>
@@ -58,7 +58,7 @@ void DesktopCameraStubController::atResourcesAdded(const QnResourceList& resourc
 {
     for (const auto& resource: resources)
     {
-        const auto layout = resource.dynamicCast<LayoutResource>();
+        const auto layout = resource.dynamicCast<core::LayoutResource>();
         if (!layout)
             continue;
 
@@ -77,7 +77,7 @@ void DesktopCameraStubController::atResourcesAdded(const QnResourceList& resourc
 
         const auto layoutId = layout->getId();
         m_desktopCameraLayoutConnections[layout->getId()] =
-            connect(layout.get(), &LayoutResource::itemRemoved, this,
+            connect(layout.get(), &core::LayoutResource::itemRemoved, this,
                 [this, layoutId](const QnLayoutResourcePtr& resource,
                     const nx::vms::common::LayoutItemData& item)
                 {
@@ -114,7 +114,7 @@ void DesktopCameraStubController::atResourcesRemoved(const QnResourceList& resou
             continue;
         }
 
-        const auto layout = resource.dynamicCast<LayoutResource>();
+        const auto layout = resource.dynamicCast<core::LayoutResource>();
         if (!layout)
             continue;
 

@@ -13,10 +13,10 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/system_context.h>

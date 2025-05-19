@@ -24,7 +24,7 @@ public:
     explicit LayoutActionHandler(WindowContext* windowContext, QObject* parent = nullptr);
     virtual ~LayoutActionHandler();
 
-    void renameLayout(const LayoutResourcePtr& layout, const QString& newName);
+    void renameLayout(const core::LayoutResourcePtr& layout, const QString& newName);
 
 private:
     void at_newUserLayoutAction_triggered();
@@ -47,34 +47,34 @@ private:
      * Save target file, local or remote layout.
      * @param layout Layout to save.
      */
-    void saveLayout(const LayoutResourcePtr& layout);
+    void saveLayout(const core::LayoutResourcePtr& layout);
 
     /**
      * Save provided layout under another name. Remote layout will be copied for the current user.
      */
-    void saveLayoutAs(const LayoutResourcePtr& layout);
+    void saveLayoutAs(const core::LayoutResourcePtr& layout);
 
     /** Save a copy of remote layout for the current user. */
-    void saveRemoteLayoutAs(const LayoutResourcePtr& layout);
+    void saveRemoteLayoutAs(const core::LayoutResourcePtr& layout);
 
     /** Save common remote layout as a cloud one. */
-    void saveLayoutAsCloud(const LayoutResourcePtr& layout);
+    void saveLayoutAsCloud(const core::LayoutResourcePtr& layout);
 
     /** Save existing cloud layout under another name. */
-    void saveCloudLayoutAs(const LayoutResourcePtr& layout);
+    void saveCloudLayoutAs(const core::LayoutResourcePtr& layout);
 
-    void convertLayoutToShared(const LayoutResourcePtr& layout);
+    void convertLayoutToShared(const core::LayoutResourcePtr& layout);
 
     void removeLayoutItems(const LayoutItemIndexList& items, bool autoSave);
 
     struct LayoutChange
     {
-        LayoutResourcePtr layout;
+        core::LayoutResourcePtr layout;
         QnResourceList added;
         QnResourceList removed;
     };
 
-    LayoutChange calculateLayoutChange(const LayoutResourcePtr& layout);
+    LayoutChange calculateLayoutChange(const core::LayoutResourcePtr& layout);
 
     /** Ask user if layout should be saved. Actual when admin modifies shared layout
      *  or layout belonging to user with custom access rights.
@@ -84,11 +84,11 @@ private:
     bool confirmChangeSharedLayout(const LayoutChange& change);
     bool confirmChangeVideoWallLayout(const LayoutChange& change);
 
-    bool canRemoveLayouts(const LayoutResourceList& layouts);
+    bool canRemoveLayouts(const core::LayoutResourceList& layouts);
 
-    void removeLayouts(const LayoutResourceList& layouts);
+    void removeLayouts(const core::LayoutResourceList& layouts);
 
-    bool closeLayouts(const LayoutResourceList& resources);
+    bool closeLayouts(const core::LayoutResourceList& resources);
     bool closeLayouts(const QnWorkbenchLayoutList& layouts);
 
     /**
@@ -98,7 +98,7 @@ private:
      *     ignoring their previous state.
      */
     void openLayouts(
-        const LayoutResourceList& layouts,
+        const core::LayoutResourceList& layouts,
         const StreamSynchronizationState& playbackState,
         bool forceStateUpdate = false);
 

@@ -9,9 +9,9 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/resource/camera_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/intercom/intercom_resource_widget.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/showreel/showreel_item_widget.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/intercom/utils.h>
@@ -49,9 +49,9 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchItem* item)
     // TODO: #sivanov Take Window Context from the workbench item.
     auto windowContext = appContext()->mainWindowContext();
 
-    const auto layoutResource = item->layout()->resource().dynamicCast<LayoutResource>();
+    const auto layoutResource = item->layout()->resource().dynamicCast<core::LayoutResource>();
     const bool itemIsIntercomLayout = resource->hasFlags(Qn::media)
-        && layoutResource && layoutResource->layoutType() == LayoutResource::LayoutType::intercom;
+        && layoutResource && layoutResource->layoutType() == core::LayoutResource::LayoutType::intercom;
 
     // Intercom cameras can be placed on layout even if there are no permissions.
     if (!itemIsIntercomLayout

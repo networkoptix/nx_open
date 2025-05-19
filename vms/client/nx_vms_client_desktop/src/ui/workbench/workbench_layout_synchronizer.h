@@ -21,7 +21,7 @@ class QnWorkbenchLayoutSynchronizer: public QObject
 {
     Q_OBJECT
     typedef QObject base_type;
-    using LayoutResourcePtr = nx::vms::client::desktop::LayoutResourcePtr;
+    using LayoutResourcePtr = nx::vms::client::core::LayoutResourcePtr;
 
 public:
     QnWorkbenchLayoutSynchronizer(

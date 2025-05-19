@@ -24,6 +24,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/ptz/hotkey_resource_property_adaptor.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -39,7 +40,6 @@
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/menu/menu_event_filter.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_widget.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>

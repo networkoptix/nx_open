@@ -54,7 +54,7 @@ public:
     void saveSettings();
 
     void setMediaResource(const QnMediaResourcePtr& media);
-    void setLayout(const LayoutResourcePtr& layout, const QPalette& palette);
+    void setLayout(const core::LayoutResourcePtr& layout, const QPalette& palette);
 
     bool mediaSupportsUtc() const;
     Filename selectedFileName(ExportMode mode) const;
@@ -62,7 +62,7 @@ public:
     static FileExtensionList allowedFileExtensions(ExportMode mode);
 
     QnMediaResourcePtr mediaResource() const;
-    LayoutResourcePtr layout() const;
+    core::LayoutResourcePtr layout() const;
 
     void createOverlays(QWidget* overlayContainer);
 
@@ -123,7 +123,7 @@ private:
 
     // Layout group
 
-    LayoutResourcePtr m_layout;
+    core::LayoutResourcePtr m_layout;
     // Image provider for layout preview
     std::unique_ptr<core::ImageProvider> m_layoutPreviewProvider;
     QPointer<nx::vms::client::desktop::AsyncImageWidget> m_layoutPreviewWidget;

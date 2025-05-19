@@ -17,6 +17,7 @@
 #include <nx/vms/client/core/analytics/taxonomy/object_type.h>
 #include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/user.h>
 #include <nx/vms/client/core/utils/video_cache.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -24,7 +25,6 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/user_specific_settings.h>
 #include <nx/vms/client/desktop/system_context.h>

@@ -15,8 +15,8 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/api/data/resource_property_key.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/server.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_extra_status.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
@@ -228,11 +228,11 @@ QVariant ResourceItem::resourceIconKeyData() const
                     discardIconCache));
             }
 
-            const auto layout = m_resource.objectCast<LayoutResource>();
+            const auto layout = m_resource.objectCast<core::LayoutResource>();
             if (layout && !m_resource->hasFlags(Qn::exported_layout))
             {
                 m_connectionsGuard.add(layout->connect(
-                    layout.get(), &LayoutResource::layoutTypeChanged, discardIconCache));
+                    layout.get(), &core::LayoutResource::layoutTypeChanged, discardIconCache));
             }
 
             if (m_resource.objectCast<QnWebPageResource>())

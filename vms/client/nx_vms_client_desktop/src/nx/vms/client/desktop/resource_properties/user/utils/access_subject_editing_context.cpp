@@ -23,8 +23,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/system_context.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/common/system_context.h>
 
@@ -891,8 +891,8 @@ QnResourceList AccessSubjectEditingContext::selectionLayouts(
         const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTree::NodeType>();
         if (nodeType == ResourceTree::NodeType::layouts)
         {
-            return resourcePool()->getResources<LayoutResource>(
-                [this, &currentUserId](const LayoutResourcePtr& layout) -> bool
+            return resourcePool()->getResources<core::LayoutResource>(
+                [this, &currentUserId](const core::LayoutResourcePtr& layout) -> bool
                 {
                     if (layout->isFile())
                         return false;

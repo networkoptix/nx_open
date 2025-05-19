@@ -26,6 +26,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -38,7 +39,6 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_target_provider.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -93,8 +93,11 @@
 using namespace nx;
 using namespace nx::vms::client::desktop;
 using namespace ui;
+
 using nx::vms::client::core::Geometry;
 using nx::vms::client::core::MotionSelection;
+using nx::vms::client::core::LayoutResource;
+using nx::vms::client::core::LayoutResourcePtr;
 
 namespace {
 

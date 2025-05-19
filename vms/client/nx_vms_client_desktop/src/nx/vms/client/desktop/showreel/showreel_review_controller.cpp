@@ -13,12 +13,12 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/vms/api/data/showreel_data.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/utils/grid_walker.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -196,7 +196,7 @@ void ShowreelReviewController::reviewShowreel(const nx::vms::api::ShowreelData& 
 
     static const float kCellAspectRatio{16.0f / 9.0f};
 
-    const auto layout = LayoutResourcePtr(new LayoutResource());
+    const auto layout = core::LayoutResourcePtr(new core::LayoutResource());
     layout->setIdUnsafe(nx::Uuid::createUuid()); //< Layout is never saved to server.
     layout->addFlags(Qn::local);
     layout->setParentId(showreel.id);
@@ -255,7 +255,7 @@ void ShowreelReviewController::connectToLayout(QnWorkbenchLayout* layout)
     m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, this, saveAndUpdateLayout,
         Qt::QueuedConnection);
 
-    m_connections << connect(layout->resource().get(), &LayoutResource::itemDataChanged, this,
+    m_connections << connect(layout->resource().get(), &core::LayoutResource::itemDataChanged, this,
         &ShowreelReviewController::handleItemDataChanged);
 }
 
@@ -271,7 +271,7 @@ void ShowreelReviewController::updateOrder()
         item->setData(Qn::ShowreelItemOrderRole, ++index);
 }
 
-void ShowreelReviewController::updateButtons(const LayoutResourcePtr& layout)
+void ShowreelReviewController::updateButtons(const core::LayoutResourcePtr& layout)
 {
     NX_ASSERT(layout);
     if (!layout)
@@ -425,7 +425,7 @@ void ShowreelReviewController::updateItemsLayout()
 }
 
 void ShowreelReviewController::resetReviewLayout(
-    const LayoutResourcePtr& layout,
+    const core::LayoutResourcePtr& layout,
     const nx::vms::api::ShowreelItemDataList& items)
 {
     layout->cleanupItemData();
@@ -447,7 +447,7 @@ void ShowreelReviewController::resetReviewLayout(
 }
 
 bool ShowreelReviewController::addItemToReviewLayout(
-    const LayoutResourcePtr& layout,
+    const core::LayoutResourcePtr& layout,
     const nx::vms::api::ShowreelItemData& item,
     const QPointF& position,
     bool pinItem)
@@ -469,7 +469,7 @@ bool ShowreelReviewController::addItemToReviewLayout(
 }
 
 bool ShowreelReviewController::addResourcesToReviewLayout(
-    const LayoutResourcePtr& layout,
+    const core::LayoutResourcePtr& layout,
     const QnResourceList& resources,
     const QPointF& position)
 {

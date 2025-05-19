@@ -24,11 +24,11 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/export/data/nov_metadata.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
@@ -83,10 +83,10 @@ struct ExportLayoutTool::Private
     bool exportedAnyData = false;
 
     /** Source layout. */
-    LayoutResourcePtr originalLayout;
+    core::LayoutResourcePtr originalLayout;
 
     /** Copy of the provided layout. */
-    LayoutResourcePtr layout;
+    core::LayoutResourcePtr layout;
 
     explicit Private(ExportLayoutTool* owner, const ExportLayoutSettings& settings):
         q(owner),
@@ -147,7 +147,7 @@ struct ExportLayoutTool::Private
 
 ExportLayoutTool::ExportLayoutTool(
     ExportLayoutSettings settings,
-    LayoutResourcePtr layout,
+    core::LayoutResourcePtr layout,
     QObject* parent)
     :
     base_type(parent),
@@ -156,8 +156,8 @@ ExportLayoutTool::ExportLayoutTool(
     d->originalLayout = layout;
     // Make d->layout a deep exact copy of original layout.
     d->layout = (settings.mode == ExportLayoutSettings::Mode::LocalSave
-        ? LayoutResourcePtr(new QnFileLayoutResource({}))
-        : LayoutResourcePtr(new LayoutResource()));
+        ? core::LayoutResourcePtr(new QnFileLayoutResource({}))
+        : core::LayoutResourcePtr(new core::LayoutResource()));
     d->layout->setIdUnsafe(layout->getId()); //before update() uuid's must be the same
     d->layout->update(layout);
 

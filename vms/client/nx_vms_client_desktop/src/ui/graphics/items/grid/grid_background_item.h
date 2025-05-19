@@ -45,7 +45,7 @@ public:
     QnWorkbenchGridMapper* mapper() const;
     void setMapper(QnWorkbenchGridMapper* mapper);
 
-    void update(const nx::vms::client::desktop::LayoutResourcePtr& layout);
+    void update(const nx::vms::client::core::LayoutResourcePtr& layout);
 
     QRect sceneBoundingRect() const;
 

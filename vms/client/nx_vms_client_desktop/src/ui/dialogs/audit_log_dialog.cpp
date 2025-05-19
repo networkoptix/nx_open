@@ -18,6 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -31,7 +32,6 @@
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -55,6 +55,9 @@
 #include <utils/math/color_transformations.h>
 
 using namespace nx::vms::client::desktop;
+
+using nx::vms::client::core::LayoutResource;
+using nx::vms::client::core::LayoutResourcePtr;
 
 namespace {
 

@@ -7,15 +7,18 @@
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 #include "workbench_layout.h"
 
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
+
+using nx::vms::client::core::LayoutResource;
+using nx::vms::client::core::LayoutResourcePtr;
 
 QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource, const nx::Uuid& uuid, QObject* parent):
     QObject(parent),

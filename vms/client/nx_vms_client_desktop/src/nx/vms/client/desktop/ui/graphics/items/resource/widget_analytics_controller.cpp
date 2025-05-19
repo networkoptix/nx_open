@@ -23,9 +23,9 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/analytics/object_display_settings.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/analytics_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/box.h>

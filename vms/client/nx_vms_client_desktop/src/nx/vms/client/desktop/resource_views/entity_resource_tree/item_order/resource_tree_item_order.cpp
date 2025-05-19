@@ -4,8 +4,8 @@
 
 #include <client/client_globals.h>
 #include <common/common_globals.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/intercom/utils.h>
@@ -48,8 +48,8 @@ ItemOrder layoutsOrder()
         {
             const auto lhsResource = lhs->data(core::ResourceRole).value<QnResourcePtr>();
             const auto rhsResource = rhs->data(core::ResourceRole).value<QnResourcePtr>();
-            const auto lhsLayout = lhsResource.objectCast<LayoutResource>();
-            const auto rhsLayout = rhsResource.objectCast<LayoutResource>();
+            const auto lhsLayout = lhsResource.objectCast<core::LayoutResource>();
+            const auto rhsLayout = rhsResource.objectCast<core::LayoutResource>();
 
             const bool lhsIsSharedLayout = lhsLayout->isShared();
             const bool rhsIsSharedLayout = rhsLayout->isShared();

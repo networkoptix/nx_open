@@ -11,11 +11,11 @@
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
@@ -28,6 +28,7 @@
 
 using namespace nx::vms::client::desktop;
 using nx::vms::client::core::Geometry;
+using nx::vms::client::core::LayoutResourcePtr;
 
 namespace {
 

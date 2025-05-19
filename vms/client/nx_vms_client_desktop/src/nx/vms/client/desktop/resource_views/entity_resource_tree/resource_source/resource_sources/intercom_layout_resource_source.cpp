@@ -6,7 +6,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <client/client_globals.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/common/intercom/utils.h>
 
 namespace nx::vms::client::desktop {
@@ -58,8 +58,8 @@ void IntercomLayoutResourceSource::onResourcesRemoved(const QnResourceList& reso
 
         resource->disconnect(this);
 
-        LayoutResourcePtr layout = resource.objectCast<LayoutResource>();
-        if (NX_ASSERT(layout) && layout->layoutType() == LayoutResource::LayoutType::intercom)
+        core::LayoutResourcePtr layout = resource.objectCast<core::LayoutResource>();
+        if (NX_ASSERT(layout) && layout->layoutType() == core::LayoutResource::LayoutType::intercom)
             emit resourceRemoved(resource);
     }
 }
@@ -78,14 +78,14 @@ bool IntercomLayoutResourceSource::processResource(const QnResourcePtr& resource
     if (resource->hasFlags(Qn::removed) || resource->hasFlags(Qn::exported))
         return false;
 
-    const auto layout = resource.objectCast<LayoutResource>();
+    const auto layout = resource.objectCast<core::LayoutResource>();
     if (!NX_ASSERT(layout))
         return false;
 
-    if (layout->layoutType() == LayoutResource::LayoutType::intercom)
+    if (layout->layoutType() == core::LayoutResource::LayoutType::intercom)
         return true;
 
-    connect(layout.get(), &LayoutResource::layoutTypeChanged, this,
+    connect(layout.get(), &core::LayoutResource::layoutTypeChanged, this,
         &IntercomLayoutResourceSource::onLayoutTypeChanged, Qt::UniqueConnection);
 
     return false;

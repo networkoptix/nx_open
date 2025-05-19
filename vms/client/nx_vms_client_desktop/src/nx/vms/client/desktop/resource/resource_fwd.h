@@ -15,10 +15,6 @@ class ServerResource;
 using ServerResourcePtr = QnSharedResourcePointer<ServerResource>;
 using ServerResourceList = QnSharedResourcePointerList<ServerResource>;
 
-using LayoutResource = core::LayoutResource;
-using LayoutResourcePtr = core::LayoutResourcePtr;
-using LayoutResourceList = core::LayoutResourceList;
-
 class LayoutItemIndex;
 using LayoutItemIndexList = QList<LayoutItemIndex>;
 

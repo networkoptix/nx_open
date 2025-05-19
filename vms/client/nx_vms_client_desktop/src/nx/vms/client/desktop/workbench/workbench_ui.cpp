@@ -21,6 +21,7 @@
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/trace/trace_categories.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/instruments/frame_time_points_provider_instrument.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
@@ -28,7 +29,6 @@
 #include <nx/vms/client/desktop/left_panel/qml_resource_browser_widget.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameter_types.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>

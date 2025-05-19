@@ -2,7 +2,7 @@
 
 #include "intercom_resource_widget.h"
 
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <ui/workbench/workbench_item.h>

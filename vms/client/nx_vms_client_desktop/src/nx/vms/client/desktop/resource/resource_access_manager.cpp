@@ -5,7 +5,7 @@
 #include <client/client_globals.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/access/access_controller.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop {
@@ -15,7 +15,7 @@ namespace {
 Qn::Permissions calculateNonContextualResourcePermissions(const QnResourcePtr& resource)
 {
     // TODO: #sivanov Code duplication.
-    if (auto layout = resource.dynamicCast<LayoutResource>())
+    if (auto layout = resource.dynamicCast<core::LayoutResource>())
     {
         // Some layouts are created with predefined permissions which are never changed.
         QVariant presetPermissions = layout->data().value(Qn::LayoutPermissionsRole);

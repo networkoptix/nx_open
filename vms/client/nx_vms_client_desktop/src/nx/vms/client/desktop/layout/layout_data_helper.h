@@ -17,7 +17,7 @@ nx::vms::common::LayoutItemData layoutItemFromResource(
     const QnResourcePtr& resource, bool forceCloud = false);
 
 /** Create a new layout resource with a given resource on it. */
-LayoutResourcePtr layoutFromResource(const QnResourcePtr& resource);
+core::LayoutResourcePtr layoutFromResource(const QnResourcePtr& resource);
 
 /** Get all resources placed on the layout. WARNING: method is SLOW! */
 QSet<QnResourcePtr> layoutResources(const QnLayoutResourcePtr& layout);

@@ -5,7 +5,8 @@
 #include <QtQml/QtQml>
 
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/layout_resource_helpers.h>
 
 #include "layout_item_adaptor.h"
 
@@ -35,7 +36,7 @@ private:
     void setGridBoundingRect(const QRect& rect);
 
 public:
-    LayoutResourcePtr layout;
+    core::LayoutResourcePtr layout;
     QList<nx::Uuid> itemIds;
     QHash<nx::Uuid, ItemAdaptorPtr> adaptorById;
     QRect gridBoundingRect;
@@ -54,7 +55,7 @@ void LayoutModel::Private::setLayout(const QnLayoutResourcePtr& newLayout)
         itemIds.clear();
     }
 
-    layout = newLayout.objectCast<LayoutResource>();
+    layout = newLayout.objectCast<core::LayoutResource>();
 
     if (!layout)
     {

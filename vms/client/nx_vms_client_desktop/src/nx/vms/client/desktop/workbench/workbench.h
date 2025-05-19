@@ -82,7 +82,7 @@ public:
      * Resource for the current layout.
      * Note that this function never returns nullptr.
      */
-    LayoutResourcePtr currentLayoutResource() const;
+    core::LayoutResourcePtr currentLayoutResource() const;
 
     /**
      * @return Index of the current layout. May return -1 if dummy layout is currently in use.
@@ -96,7 +96,7 @@ public:
     QnWorkbenchLayout* layout(int index) const;
 
     /** Find existing layout, corresponding to the provided resource. */
-    QnWorkbenchLayout* layout(const LayoutResourcePtr& resource);
+    QnWorkbenchLayout* layout(const core::LayoutResourcePtr& resource);
 
     /**
      * @return All layouts of this workbench. May be empty.
@@ -106,12 +106,12 @@ public:
     /**
      * Create a new layout in this workbench.
      */
-    QnWorkbenchLayout* addLayout(const LayoutResourcePtr& resource);
+    QnWorkbenchLayout* addLayout(const core::LayoutResourcePtr& resource);
 
     /**
      * Create a new layout in this workbench and insert it to the given position.
      */
-    QnWorkbenchLayout* insertLayout(const LayoutResourcePtr& resource, int index);
+    QnWorkbenchLayout* insertLayout(const core::LayoutResourcePtr& resource, int index);
 
     /**
      * If provided layout based on 'replaceableLayout' is opened on the workbench, it is replaced
@@ -119,18 +119,18 @@ public:
      * @return Newly created layout if any, nullptr otherwise.
      */
     QnWorkbenchLayout* replaceLayout(
-        const LayoutResourcePtr& replaceableLayout,
-        const LayoutResourcePtr& newLayout);
+        const core::LayoutResourcePtr& replaceableLayout,
+        const core::LayoutResourcePtr& newLayout);
 
     /**
      * Remove this resource's layout if it exists.
      */
-    void removeLayout(const LayoutResourcePtr& resource);
+    void removeLayout(const core::LayoutResourcePtr& resource);
 
     /**
      * Remove thes resources' layouts if exists.
      */
-    void removeLayouts(const LayoutResourceList& resources);
+    void removeLayouts(const core::LayoutResourceList& resources);
 
     /**
      * @param index Index of the layout to remove from the list of this workbench's layouts.

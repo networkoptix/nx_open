@@ -5,8 +5,8 @@
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 #include "resource_tree_model_test_fixture.h"
@@ -553,7 +553,7 @@ TEST_F(ResourceTreeModelTest, DISABLED_videoWallModificationMark)
     auto videoWallScreensLayouts = resourcePool()->getResourcesByParentId(videoWall->getId());
     ASSERT_FALSE(videoWallScreensLayouts.isEmpty());
 
-    const auto firstLayout = videoWallScreensLayouts.first().objectCast<LayoutResource>();
+    const auto firstLayout = videoWallScreensLayouts.first().objectCast<core::LayoutResource>();
     ASSERT_FALSE(firstLayout.isNull());
 
     // Make the layout changed.

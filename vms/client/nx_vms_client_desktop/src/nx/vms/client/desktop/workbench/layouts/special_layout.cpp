@@ -2,7 +2,7 @@
 
 #include "special_layout.h"
 
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/workbench/panels/special_layout_panel_widget.h>
 #include <ui/workbench/workbench_layout.h>
 

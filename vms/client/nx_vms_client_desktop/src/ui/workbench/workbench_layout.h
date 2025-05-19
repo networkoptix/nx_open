@@ -52,7 +52,7 @@ class QnWorkbenchLayout: public QObject,
     Q_PROPERTY(QnLayoutResource* resource READ resourcePtr CONSTANT)
 
 public:
-    using LayoutResourcePtr = nx::vms::client::desktop::LayoutResourcePtr;
+    using LayoutResourcePtr = nx::vms::client::core::LayoutResourcePtr;
     using StreamSynchronizationState = nx::vms::client::desktop::StreamSynchronizationState;
     static constexpr auto kDefaultCellSpacing = nx::vms::client::core::CellSpacing::Small;
 

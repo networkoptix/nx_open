@@ -9,7 +9,7 @@
 #include <core/resource/layout_resource.h>
 #include <nx/utils/algorithm/same.h>
 #include <nx/utils/math/fuzzy.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 
 #include "../action_manager.h"
 #include "../action_parameters.h"

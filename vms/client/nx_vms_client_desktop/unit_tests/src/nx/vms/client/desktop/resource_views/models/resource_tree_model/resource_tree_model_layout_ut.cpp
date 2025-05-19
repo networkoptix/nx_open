@@ -9,9 +9,9 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/user_group_data.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/intercom/utils.h>
 
@@ -407,7 +407,7 @@ TEST_F(ResourceTreeModelTest, intercomLayoutLayoutTypeCheck)
 
     // Layout is not an intercom layout.
     ASSERT_TRUE(!nx::vms::common::isIntercomLayout(layout));
-    ASSERT_NE(layout->layoutType(), LayoutResource::LayoutType::intercom);
+    ASSERT_NE(layout->layoutType(), core::LayoutResource::LayoutType::intercom);
 
     // When videowall is added to the resource pool.
     auto videowall = addVideoWall(kVideowallName);
@@ -417,7 +417,7 @@ TEST_F(ResourceTreeModelTest, intercomLayoutLayoutTypeCheck)
 
     // Layout is not an intercom layout.
     ASSERT_TRUE(!nx::vms::common::isIntercomLayout(layout));
-    ASSERT_NE(layout->layoutType(), LayoutResource::LayoutType::intercom);
+    ASSERT_NE(layout->layoutType(), core::LayoutResource::LayoutType::intercom);
 
     // When intercom camera is added to the resource pool.
     const auto intercom = addIntercomCamera(kIntercomCameraName, powerUser->getId());
@@ -427,7 +427,7 @@ TEST_F(ResourceTreeModelTest, intercomLayoutLayoutTypeCheck)
 
     // Layout is an intercom layout.
     ASSERT_TRUE(nx::vms::common::isIntercomLayout(layout));
-    ASSERT_EQ(layout->layoutType(), LayoutResource::LayoutType::intercom);
+    ASSERT_EQ(layout->layoutType(), core::LayoutResource::LayoutType::intercom);
 }
 
 } // namespace test

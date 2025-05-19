@@ -34,7 +34,7 @@ public:
     Qn::Permissions permissionsForArchive(const QnAbstractArchiveResourcePtr& archive) const;
     Qn::Permissions permissionsForCamera(const QnVirtualCameraResourcePtr& camera) const;
     Qn::Permissions permissionsForFileLayout(const QnFileLayoutResourcePtr& layout) const;
-    Qn::Permissions permissionsForRemoteLayout(const LayoutResourcePtr& layout) const;
+    Qn::Permissions permissionsForRemoteLayout(const core::LayoutResourcePtr& layout) const;
     Qn::Permissions permissionsForUser(const QnUserResourcePtr& user) const;
 
 private:
@@ -99,7 +99,7 @@ Qn::Permissions AccessController::calculatePermissions(const QnResourcePtr& targ
     if (const auto fileLayout = targetResource.objectCast<QnFileLayoutResource>())
         return d->permissionsForFileLayout(fileLayout);
 
-    if (const auto layout = targetResource.objectCast<LayoutResource>())
+    if (const auto layout = targetResource.objectCast<core::LayoutResource>())
         return d->permissionsForRemoteLayout(layout);
 
     if (qnRuntime->isVideoWallMode())
@@ -218,7 +218,7 @@ Qn::Permissions AccessController::Private::permissionsForFileLayout(
 }
 
 Qn::Permissions AccessController::Private::permissionsForRemoteLayout(
-    const LayoutResourcePtr& layout) const
+    const core::LayoutResourcePtr& layout) const
 {
     // Some layouts are created with predefined permissions which are never changed.
     const QVariant presetPermissions = layout->data().value(Qn::LayoutPermissionsRole);

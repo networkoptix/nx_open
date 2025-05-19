@@ -7,7 +7,6 @@
 #include <QtCore/QObject>
 
 #include <client/client_globals.h>
-#include <core/resource/resource_fwd.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
@@ -56,20 +55,20 @@ private:
     void connectToLayout(QnWorkbenchLayout* layout);
 
     void updateOrder();
-    void updateButtons(const LayoutResourcePtr& layout);
+    void updateButtons(const core::LayoutResourcePtr& layout);
     void updatePlaceholders();
     void updateItemsLayout();
 
-    void resetReviewLayout(const LayoutResourcePtr& layout,
+    void resetReviewLayout(const core::LayoutResourcePtr& layout,
         const nx::vms::api::ShowreelItemDataList& items);
 
     bool addItemToReviewLayout(
-        const LayoutResourcePtr& layout,
+        const core::LayoutResourcePtr& layout,
         const nx::vms::api::ShowreelItemData& item,
         const QPointF& position,
         bool pinItem);
     bool addResourcesToReviewLayout(
-        const LayoutResourcePtr& layout,
+        const core::LayoutResourcePtr& layout,
         const QnResourceList& resources,
         const QPointF& position);
 
@@ -88,7 +87,7 @@ private:
 
 private:
     nx::utils::ScopedConnections m_connections;
-    QHash<nx::Uuid, LayoutResourcePtr> m_reviewLayouts;
+    QHash<nx::Uuid, core::LayoutResourcePtr> m_reviewLayouts;
     QHash<QPoint, QSharedPointer<ShowreelDropPlaceholder>> m_dropPlaceholders;
     QSet<nx::Uuid> m_saveShowreelsQueue;
     nx::utils::PendingOperation* m_saveShowreelsOperation = nullptr;

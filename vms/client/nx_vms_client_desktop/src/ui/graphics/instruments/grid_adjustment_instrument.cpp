@@ -5,7 +5,7 @@
 #include <QtGui/QWheelEvent>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>

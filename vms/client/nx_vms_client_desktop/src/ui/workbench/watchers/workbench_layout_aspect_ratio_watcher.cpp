@@ -2,8 +2,8 @@
 
 #include "workbench_layout_aspect_ratio_watcher.h"
 
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/utils/geometry.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <ui/graphics/items/resource/resource_widget.h>

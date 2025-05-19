@@ -15,11 +15,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/layout_resource_helpers.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -34,7 +35,10 @@
 #include "workbench_utility.h"
 
 using namespace nx::vms::client::desktop;
+
 using nx::vms::client::core::Geometry;
+using nx::vms::client::core::LayoutResource;
+using nx::vms::client::core::LayoutResourcePtr;
 
 namespace {
 

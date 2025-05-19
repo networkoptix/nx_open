@@ -9,11 +9,11 @@
 #include <core/resource/user_resource.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/client/core/resource/camera_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -164,7 +164,7 @@ public:
 
         if (!layoutResource)
         {
-            LayoutResourcePtr intercomLayout = layoutFromResource(intercomCamera);
+            core::LayoutResourcePtr intercomLayout = layoutFromResource(intercomCamera);
             intercomLayout->setName(intercomLayoutName(intercomCamera->getName()));
             intercomLayout->setIdUnsafe(intercomLayoutId);
             intercomLayout->addFlags(Qn::local_intercom_layout);

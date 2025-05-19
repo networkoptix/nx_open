@@ -7,12 +7,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/math/math.h>
 #include <nx/vms/api/data/showreel_data.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
@@ -201,11 +201,11 @@ void ShowreelExecutor::resetShowreelItems(const nx::vms::api::ShowreelItemDataLi
         if (!existing)
             continue;
 
-        const auto existingLayout = existing.dynamicCast<LayoutResource>();
+        const auto existingLayout = existing.dynamicCast<core::LayoutResource>();
 
-        LayoutResource::ItemsRemapHash remapHash;
+        core::LayoutResource::ItemsRemapHash remapHash;
 
-        LayoutResourcePtr layout = existingLayout
+        core::LayoutResourcePtr layout = existingLayout
             ? existingLayout->clone(&remapHash)
             : layoutFromResource(existing);
 

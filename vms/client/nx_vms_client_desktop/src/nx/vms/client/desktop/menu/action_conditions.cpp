@@ -668,8 +668,8 @@ ActionVisibility ResourceRemovalCondition::check(
             if (!resource || !resource->resourcePool())
                 return false;
 
-            const auto layout = resource.dynamicCast<LayoutResource>();
-            if (layout && layout->layoutType() == LayoutResource::LayoutType::intercom)
+            const auto layout = resource.dynamicCast<core::LayoutResource>();
+            if (layout && layout->layoutType() == core::LayoutResource::LayoutType::intercom)
                 return false;
 
             if (resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::local))
@@ -816,7 +816,7 @@ ActionVisibility SaveLayoutCondition::check(
     const QnResourceList& resources,
     WindowContext* context)
 {
-    LayoutResourcePtr layout;
+    core::LayoutResourcePtr layout;
 
     if (m_current)
     {
@@ -827,7 +827,7 @@ ActionVisibility SaveLayoutCondition::check(
         if (resources.size() != 1)
             return InvisibleAction;
 
-        layout = resources[0].dynamicCast<LayoutResource>();
+        layout = resources[0].dynamicCast<core::LayoutResource>();
     }
 
     if (!layout)
@@ -1153,7 +1153,7 @@ ActionVisibility OpenInLayoutCondition::check(
     const Parameters& parameters,
     WindowContext* /*context*/)
 {
-    auto layout = parameters.argument<LayoutResourcePtr>(core::LayoutResourceRole);
+    auto layout = parameters.argument<core::LayoutResourcePtr>(core::LayoutResourceRole);
     if (!NX_ASSERT(layout))
         return InvisibleAction;
 
@@ -1445,7 +1445,7 @@ ActionVisibility SaveVideowallReviewCondition::check(
     const QnResourceList& resources,
     WindowContext* context)
 {
-    LayoutResourceList layouts;
+    core::LayoutResourceList layouts;
 
     if (m_current)
     {
@@ -2437,7 +2437,7 @@ ConditionWrapper canSaveLayoutAs()
             if (resources.size() != 1)
                 return false;
 
-            auto layout = resources[0].dynamicCast<LayoutResource>();
+            auto layout = resources[0].dynamicCast<core::LayoutResource>();
 
             if (!layout)
                 return false;
@@ -2470,7 +2470,7 @@ ConditionWrapper isOwnLayout()
             if (resources.size() != 1)
                 return false;
 
-            const auto layout = resources[0].objectCast<LayoutResource>();
+            const auto layout = resources[0].objectCast<core::LayoutResource>();
             return layout && layout->getParentId() == user->getId();
         });
 }
@@ -2600,10 +2600,10 @@ ConditionWrapper customCellSpacingIsSet()
             const auto layout = context->workbench()->currentLayout();
             const auto cellSpacing = layout->cellSpacing();
 
-            return !LayoutResource::isEqualCellSpacing(core::CellSpacing::None, cellSpacing)
-                && !LayoutResource::isEqualCellSpacing(core::CellSpacing::Small, cellSpacing)
-                && !LayoutResource::isEqualCellSpacing(core::CellSpacing::Medium, cellSpacing)
-                && !LayoutResource::isEqualCellSpacing(core::CellSpacing::Large, cellSpacing);
+            return !core::LayoutResource::isEqualCellSpacing(core::CellSpacing::None, cellSpacing)
+                && !core::LayoutResource::isEqualCellSpacing(core::CellSpacing::Small, cellSpacing)
+                && !core::LayoutResource::isEqualCellSpacing(core::CellSpacing::Medium, cellSpacing)
+                && !core::LayoutResource::isEqualCellSpacing(core::CellSpacing::Large, cellSpacing);
         });
 }
 

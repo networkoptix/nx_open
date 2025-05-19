@@ -12,11 +12,11 @@
 #include <nx/utils/algorithm/same.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 
 namespace nx::vms::client::desktop {
 
@@ -112,7 +112,7 @@ RadassResourceManager::~RadassResourceManager()
 {
 }
 
-RadassMode RadassResourceManager::mode(const LayoutResourcePtr& layout) const
+RadassMode RadassResourceManager::mode(const core::LayoutResourcePtr& layout) const
 {
     if (!layout)
         return RadassMode::Auto;
@@ -124,7 +124,7 @@ RadassMode RadassResourceManager::mode(const LayoutResourcePtr& layout) const
     return mode(items);
 }
 
-void RadassResourceManager::setMode(const LayoutResourcePtr& layout, RadassMode value)
+void RadassResourceManager::setMode(const core::LayoutResourcePtr& layout, RadassMode value)
 {
     if (!layout)
         return;

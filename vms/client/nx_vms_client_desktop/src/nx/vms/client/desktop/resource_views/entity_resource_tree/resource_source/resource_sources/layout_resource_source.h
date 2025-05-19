@@ -26,7 +26,7 @@ public:
 private:
     void onResourceAdded(const QnResourcePtr& resource);
     void onResourceRemoved(const QnResourcePtr& resource);
-    void onLayoutTypeChanged(const LayoutResourcePtr& resource);
+    void onLayoutTypeChanged(const core::LayoutResourcePtr& resource);
     void holdLocalLayout(const QnResourcePtr& resource);
     void processResource(const QnResourcePtr& resource, std::function<void()> successHandler);
 

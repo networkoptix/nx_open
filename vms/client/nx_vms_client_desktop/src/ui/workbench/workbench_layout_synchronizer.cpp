@@ -3,8 +3,8 @@
 #include "workbench_layout_synchronizer.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <utils/common/checked_cast.h>
@@ -16,6 +16,7 @@
 #include "workbench_layout.h"
 
 using namespace nx::vms::client::desktop;
+using nx::vms::client::core::LayoutResourcePtr;
 
 QnWorkbenchLayoutSynchronizer::QnWorkbenchLayoutSynchronizer(
     QnWorkbenchLayout* layout,

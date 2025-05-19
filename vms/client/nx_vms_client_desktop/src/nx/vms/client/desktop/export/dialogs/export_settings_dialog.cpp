@@ -15,6 +15,7 @@
 #include <nx/core/layout/layout_file_info.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -26,7 +27,6 @@
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -503,7 +503,7 @@ QnMediaResourcePtr ExportSettingsDialog::mediaResource() const
     return d->mediaResource();
 }
 
-LayoutResourcePtr ExportSettingsDialog::layout() const
+core::LayoutResourcePtr ExportSettingsDialog::layout() const
 {
     return d->layout();
 }
@@ -699,7 +699,7 @@ void ExportSettingsDialog::setBookmarks(const QnCameraBookmarkList& bookmarks)
     d->dispatch(Reducer::setBookmarks, bookmarks);
 }
 
-void ExportSettingsDialog::setLayout(const LayoutResourcePtr& layout)
+void ExportSettingsDialog::setLayout(const core::LayoutResourcePtr& layout)
 {
     d->dispatch(Reducer::enableTab, ExportMode::layout);
     const auto palette = ui->layoutPreviewWidget->palette();

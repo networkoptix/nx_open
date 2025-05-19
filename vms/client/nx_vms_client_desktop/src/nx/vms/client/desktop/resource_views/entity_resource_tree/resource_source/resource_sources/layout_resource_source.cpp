@@ -5,7 +5,7 @@
 #include <client/client_globals.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/common/intercom/utils.h>
 
 namespace nx::vms::client::desktop {
@@ -72,13 +72,13 @@ void LayoutResourceSource::onResourceRemoved(const QnResourcePtr& resource)
 
     if (resource->hasFlags(Qn::layout))
     {
-        const auto layout = resource.dynamicCast<LayoutResource>();
+        const auto layout = resource.dynamicCast<core::LayoutResource>();
         if (NX_ASSERT(layout)) //< Sending `resourceRemoved` for a not added resource is OK.
             emit resourceRemoved(resource);
     }
 }
 
-void LayoutResourceSource::onLayoutTypeChanged(const LayoutResourcePtr& layoutResource)
+void LayoutResourceSource::onLayoutTypeChanged(const core::LayoutResourcePtr& layoutResource)
 {
     emit resourceRemoved(layoutResource);
     onResourceAdded(layoutResource);
@@ -94,14 +94,14 @@ void LayoutResourceSource::processResource(
     if (resource->hasFlags(Qn::removed) || resource->hasFlags(Qn::exported))
         return;
 
-    const auto layout = resource.dynamicCast<LayoutResource>();
+    const auto layout = resource.dynamicCast<core::LayoutResource>();
     if (!NX_ASSERT(layout))
         return;
 
     if (layout->isServiceLayout()
-        || layout->layoutType() == LayoutResource::LayoutType::intercom
-        || layout->layoutType() == LayoutResource::LayoutType::videoWall
-        || layout->layoutType() == LayoutResource::LayoutType::invalid)
+        || layout->layoutType() == core::LayoutResource::LayoutType::intercom
+        || layout->layoutType() == core::LayoutResource::LayoutType::videoWall
+        || layout->layoutType() == core::LayoutResource::LayoutType::invalid)
     {
         return;
     }
@@ -112,10 +112,10 @@ void LayoutResourceSource::processResource(
         return;
     }
 
-    connect(layout.get(), &LayoutResource::layoutTypeChanged,
+    connect(layout.get(), &core::LayoutResource::layoutTypeChanged,
         this, &LayoutResourceSource::onLayoutTypeChanged, Qt::UniqueConnection);
 
-    if (layout->layoutType() == LayoutResource::LayoutType::unknown)
+    if (layout->layoutType() == core::LayoutResource::LayoutType::unknown)
         return;
 
     if (!m_parentUser

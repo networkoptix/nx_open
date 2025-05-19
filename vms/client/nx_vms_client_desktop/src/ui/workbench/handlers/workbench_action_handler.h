@@ -114,19 +114,19 @@ protected:
     };
 
     void addToLayout(
-        const LayoutResourcePtr& layout,
+        const core::LayoutResourcePtr& layout,
         const QnResourcePtr& resource,
         const AddToLayoutParams& params);
     void addToLayout(
-        const LayoutResourcePtr& layout,
+        const core::LayoutResourcePtr& layout,
         const QnResourceList& resources,
         const AddToLayoutParams& params);
     void addToLayout(
-        const LayoutResourcePtr& layout,
+        const core::LayoutResourcePtr& layout,
         const QList<QnMediaResourcePtr>& resources,
         const AddToLayoutParams& params);
     void addToLayout(
-        const LayoutResourcePtr& layout,
+        const core::LayoutResourcePtr& layout,
         const QList<QString>& files,
         const AddToLayoutParams& params);
 

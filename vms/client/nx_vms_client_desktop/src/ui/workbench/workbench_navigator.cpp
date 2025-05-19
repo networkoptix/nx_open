@@ -37,13 +37,14 @@
 #include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/layout_resource_helpers.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
@@ -81,6 +82,8 @@
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 using namespace std::chrono;
+
+using nx::vms::client::core::LayoutResourcePtr;
 
 namespace {
 

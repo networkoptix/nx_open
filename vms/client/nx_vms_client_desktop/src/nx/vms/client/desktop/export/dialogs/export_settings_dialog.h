@@ -60,13 +60,13 @@ public:
     ExportLayoutSettings exportLayoutSettings() const;
 
     QnMediaResourcePtr mediaResource() const;
-    LayoutResourcePtr layout() const;
+    core::LayoutResourcePtr layout() const;
 
     virtual void accept() override;
 
     // Making this methods private causes pointless code bloat
     void disableTab(ExportMode mode, const QString& reason);
-    void setLayout(const LayoutResourcePtr& layout);
+    void setLayout(const core::LayoutResourcePtr& layout);
     void setMediaParams(
         const QnMediaResourcePtr& mediaResource, const nx::vms::common::LayoutItemData& itemData);
     void setBookmarks(const QnCameraBookmarkList& bookmarks);

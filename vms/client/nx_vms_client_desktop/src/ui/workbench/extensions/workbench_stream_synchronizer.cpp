@@ -8,8 +8,8 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/resource.h>
 #include <nx/utils/counter.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <plugins/resource/archive/syncplay_archive_delegate.h>

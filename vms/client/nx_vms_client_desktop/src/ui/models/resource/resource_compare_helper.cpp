@@ -8,7 +8,7 @@
 #include <client/client_globals.h>
 #include <core/resource/layout_resource.h>
 #include <nx/vms/client/core/client_core_globals.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 
 namespace {
 
@@ -52,8 +52,8 @@ bool QnResourceCompareHelper::resourceLessThan(
 
         if (l->hasFlags(Qn::layout) && r->hasFlags(Qn::layout))
         {
-            auto leftLayout = l.dynamicCast<nx::vms::client::desktop::LayoutResource>();
-            auto rightLayout = r.dynamicCast<nx::vms::client::desktop::LayoutResource>();
+            auto leftLayout = l.dynamicCast<nx::vms::client::core::LayoutResource>();
+            auto rightLayout = r.dynamicCast<nx::vms::client::core::LayoutResource>();
             NX_ASSERT(leftLayout && rightLayout);
             if (leftLayout && rightLayout)
             {

@@ -68,7 +68,7 @@ protected:
     QnAviResourcePtr addLocalMedia(const QString& path) const;
     QnFileLayoutResourcePtr addFileLayout(const QString& path,
         bool isEncrypted = false) const;
-    LayoutResourcePtr addLayout(const QString& name,
+    core::LayoutResourcePtr addLayout(const QString& name,
         const nx::Uuid& parentId = nx::Uuid()) const;
 
     QnWebPageResourcePtr addWebPage(const QString& name, WebPageSubtype subtype) const;
@@ -111,7 +111,7 @@ protected:
         const QString& name,
         const nx::Uuid& parentId = nx::Uuid(),
         const QString& hostAddress = QString()) const;
-    LayoutResourcePtr addIntercomLayout(
+    core::LayoutResourcePtr addIntercomLayout(
         const QString& name,
         const nx::Uuid& parentId = nx::Uuid()) const;
     void removeCamera(const QnVirtualCameraResourcePtr& camera) const;

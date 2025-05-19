@@ -11,7 +11,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/core/access/access_controller.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <ui/workbench/workbench_context.h>
@@ -46,7 +46,7 @@ protected:
         }
         else
         {
-            layout.reset(new LayoutResource());
+            layout.reset(new core::LayoutResource());
         }
 
         layout->setIdUnsafe(nx::Uuid::createUuid());

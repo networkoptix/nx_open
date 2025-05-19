@@ -11,8 +11,8 @@
 #include <nx/utils/compound_visitor.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/scoped_rollback.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -529,7 +529,7 @@ void UserGroupRequestChain::updateLayoutSharing(
         boost::make_transform_iterator(accessRights.cbegin(), getKey),
         boost::make_transform_iterator(accessRights.cend(), getKey));
 
-    const auto layouts = resourcePool->getResourcesByIds(keys).filtered<LayoutResource>(
+    const auto layouts = resourcePool->getResourcesByIds(keys).filtered<core::LayoutResource>(
         [](const QnLayoutResourcePtr& layout)
         {
             return !layout->isFile()

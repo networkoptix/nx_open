@@ -8,10 +8,10 @@
 #include <core/resource/layout_item_data.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
 #include <nx/vms/common/resource/camera_resource_stub.h>
@@ -50,7 +50,7 @@ protected:
 
         m_manager.reset(new RadassResourceManager());
         m_manager->setCacheDirectory(testDataDir());
-        m_layout.reset(new LayoutResource());
+        m_layout.reset(new core::LayoutResource());
         m_layout->setIdUnsafe(nx::Uuid::createUuid());
         systemContext()->resourcePool()->addResource(m_layout);
     }
@@ -99,15 +99,15 @@ protected:
     }
 
     RadassResourceManager* manager() const { return m_manager.data(); }
-    LayoutResourcePtr layout() const { return m_layout; }
+    core::LayoutResourcePtr layout() const { return m_layout; }
 
     QScopedPointer<RadassResourceManager> m_manager;
-    LayoutResourcePtr m_layout;
+    core::LayoutResourcePtr m_layout;
 };
 
 TEST_F(RadassResourceManagerTest, initNull)
 {
-    ASSERT_EQ(RadassMode::Auto, manager()->mode(LayoutResourcePtr()));
+    ASSERT_EQ(RadassMode::Auto, manager()->mode(core::LayoutResourcePtr()));
 }
 
 TEST_F(RadassResourceManagerTest, initLayout)

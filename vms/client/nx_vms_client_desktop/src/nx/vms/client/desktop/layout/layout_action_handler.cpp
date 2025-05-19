@@ -27,6 +27,7 @@
 #include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/core/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
@@ -40,7 +41,7 @@
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/layout_resource_helpers.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
@@ -88,15 +89,15 @@ namespace {
  * @param layout                    Layout that we want to rename (if any).
  * @return                          List of existing layouts with same name.
  */
-LayoutResourceList alreadyExistingLayouts(
+core::LayoutResourceList alreadyExistingLayouts(
     QnResourcePool* resourcePool,
     const QString& name,
     const nx::Uuid& parentId,
-    const LayoutResourcePtr& layout = LayoutResourcePtr())
+    const core::LayoutResourcePtr& layout = core::LayoutResourcePtr())
 {
-    LayoutResourceList result;
+    core::LayoutResourceList result;
     for (const auto& existingLayout:
-        resourcePool->getResourcesByParentId(parentId).filtered<LayoutResource>())
+        resourcePool->getResourcesByParentId(parentId).filtered<core::LayoutResource>())
     {
         if (existingLayout == layout)
             continue;
@@ -134,12 +135,12 @@ QSet<QnResourcePtr> localLayoutResources(QnResourcePool* resourcePool,
     return result;
 }
 
-QSet<QnResourcePtr> localLayoutResources(const LayoutResourcePtr& layout)
+QSet<QnResourcePtr> localLayoutResources(const core::LayoutResourcePtr& layout)
 {
     return localLayoutResources(layout->resourcePool(), layout->getItems());
 }
 
-bool hasCrossSystemItems(const LayoutResourcePtr& layout)
+bool hasCrossSystemItems(const core::LayoutResourcePtr& layout)
 {
     const auto currentCloudSystemId = appContext()->currentSystemContext()->globalSettings()
         ->cloudSystemId();
@@ -153,14 +154,14 @@ bool hasCrossSystemItems(const LayoutResourcePtr& layout)
         });
 }
 
-void saveCloudLayoutRetryCallback(bool success, const LayoutResourcePtr& layout)
+void saveCloudLayoutRetryCallback(bool success, const core::LayoutResourcePtr& layout)
 {
     if (success || !layout->canBeSaved())
         return;
 
     const auto kSaveAttemptDelay = 5s;
     QTimer::singleShot(kSaveAttemptDelay,
-        [layoutWeakPtr = QWeakPointer<LayoutResource>(layout)]()
+        [layoutWeakPtr = QWeakPointer<core::LayoutResource>(layout)]()
         {
             if (auto layout = layoutWeakPtr.toStrongRef())
                 layout->saveAsync(saveCloudLayoutRetryCallback);
@@ -215,7 +216,7 @@ LayoutActionHandler::LayoutActionHandler(WindowContext* windowContext, QObject* 
     auto getLayoutFromParameters =
         [this]()
         {
-            return menu()->currentParameters(sender()).resource().dynamicCast<LayoutResource>();
+            return menu()->currentParameters(sender()).resource().dynamicCast<core::LayoutResource>();
         };
 
     connect(action(menu::NewUserLayoutAction), &QAction::triggered, this,
@@ -273,7 +274,7 @@ LayoutActionHandler::LayoutActionHandler(WindowContext* windowContext, QObject* 
     connect(appContext()->unifiedResourcePool(), &core::UnifiedResourcePool::resourcesRemoved, this,
         [this](const QnResourceList& resources)
         {
-            auto layouts = resources.filtered<LayoutResource>();
+            auto layouts = resources.filtered<core::LayoutResource>();
             if (!layouts.empty())
                 workbench()->removeLayouts(layouts);
 
@@ -294,13 +295,13 @@ LayoutActionHandler::LayoutActionHandler(WindowContext* windowContext, QObject* 
         connect(cachingController, &CachingAccessController::permissionsChanged, this,
             [this](const QnResourcePtr& resource)
             {
-                const auto layoutResource = resource.dynamicCast<LayoutResource>();
+                const auto layoutResource = resource.dynamicCast<core::LayoutResource>();
                 if (!layoutResource)
                     return;
 
                 const auto accessController = system()->accessController();
 
-                if (layoutResource->layoutType() == LayoutResource::LayoutType::videoWall
+                if (layoutResource->layoutType() == core::LayoutResource::LayoutType::videoWall
                     && accessController->hasPermissions(
                         layoutResource->getParentResource(), Qn::ReadPermission))
                 {
@@ -343,13 +344,13 @@ void LayoutActionHandler::at_forgetLayoutPasswordAction_triggered()
     layout->storeSnapshot();
 }
 
-void LayoutActionHandler::renameLayout(const LayoutResourcePtr &layout, const QString &newName)
+void LayoutActionHandler::renameLayout(const core::LayoutResourcePtr &layout, const QString &newName)
 {
     auto systemContext = SystemContext::fromResource(layout);
     if (!NX_ASSERT(systemContext))
         return;
 
-    LayoutResourceList existing = alreadyExistingLayouts(
+    core::LayoutResourceList existing = alreadyExistingLayouts(
         systemContext->resourcePool(),
         newName,
         layout->getParentId(),
@@ -377,7 +378,7 @@ void LayoutActionHandler::renameLayout(const LayoutResourcePtr &layout, const QS
         layout->saveAsync();
 }
 
-void LayoutActionHandler::saveLayout(const LayoutResourcePtr& layout)
+void LayoutActionHandler::saveLayout(const core::LayoutResourcePtr& layout)
 {
     if (!layout)
         return;
@@ -426,7 +427,7 @@ void LayoutActionHandler::saveLayout(const LayoutResourcePtr& layout)
     }
 }
 
-void LayoutActionHandler::saveLayoutAs(const LayoutResourcePtr& layout)
+void LayoutActionHandler::saveLayoutAs(const core::LayoutResourcePtr& layout)
 {
     if (!NX_ASSERT(layout))
         return;
@@ -437,7 +438,7 @@ void LayoutActionHandler::saveLayoutAs(const LayoutResourcePtr& layout)
         saveRemoteLayoutAs(layout);
 }
 
-void LayoutActionHandler::saveRemoteLayoutAs(const LayoutResourcePtr& layout)
+void LayoutActionHandler::saveRemoteLayoutAs(const core::LayoutResourcePtr& layout)
 {
     QnUserResourcePtr user = system()->user();
     if (!NX_ASSERT(layout) || !NX_ASSERT(user))
@@ -489,9 +490,9 @@ void LayoutActionHandler::saveRemoteLayoutAs(const LayoutResourcePtr& layout)
         }
 
         /* Check if we have rights to overwrite the layout */
-        LayoutResourcePtr excludingSelfLayout =
-            hasSavePermission ? layout : LayoutResourcePtr();
-        LayoutResourceList existing = alreadyExistingLayouts(
+        core::LayoutResourcePtr excludingSelfLayout =
+            hasSavePermission ? layout : core::LayoutResourcePtr();
+        core::LayoutResourceList existing = alreadyExistingLayouts(
             system()->resourcePool(),
             name,
             user->getId(),
@@ -514,8 +515,8 @@ void LayoutActionHandler::saveRemoteLayoutAs(const LayoutResourcePtr& layout)
 
     } while (true);
 
-    LayoutResource::ItemsRemapHash newUuidByOldUuid;
-    LayoutResourcePtr newLayout = layout->clone(&newUuidByOldUuid);
+    core::LayoutResource::ItemsRemapHash newUuidByOldUuid;
+    core::LayoutResourcePtr newLayout = layout->clone(&newUuidByOldUuid);
     newLayout->setName(name);
     newLayout->setParentId(user->getId());
     system()->resourcePool()->addResource(newLayout);
@@ -567,10 +568,10 @@ void LayoutActionHandler::saveRemoteLayoutAs(const LayoutResourcePtr& layout)
     }
 
     if (shouldDelete)
-        removeLayouts(LayoutResourceList() << layout);
+        removeLayouts(core::LayoutResourceList() << layout);
 }
 
-void LayoutActionHandler::saveLayoutAsCloud(const LayoutResourcePtr& layout)
+void LayoutActionHandler::saveLayoutAsCloud(const core::LayoutResourcePtr& layout)
 {
     if (!NX_ASSERT(layout))
         return;
@@ -598,8 +599,8 @@ void LayoutActionHandler::saveLayoutAsCloud(const LayoutResourcePtr& layout)
 
             auto cloudResourcesPool = appContext()->cloudLayoutsSystemContext()->resourcePool();
 
-            LayoutResourceList existing = cloudResourcesPool->getResources<LayoutResource>(
-                [suggestedName = name.toLower()](const LayoutResourcePtr& layout)
+            core::LayoutResourceList existing = cloudResourcesPool->getResources<core::LayoutResource>(
+                [suggestedName = name.toLower()](const core::LayoutResourcePtr& layout)
                 {
                     return suggestedName == layout->getName().toLower();
                 });
@@ -622,7 +623,7 @@ void LayoutActionHandler::saveLayoutAsCloud(const LayoutResourcePtr& layout)
     dialog->show();
 }
 
-void LayoutActionHandler::saveCloudLayoutAs(const LayoutResourcePtr& layout)
+void LayoutActionHandler::saveCloudLayoutAs(const core::LayoutResourcePtr& layout)
 {
     if (!NX_ASSERT(layout->isCrossSystem()))
         return;
@@ -656,8 +657,8 @@ void LayoutActionHandler::saveCloudLayoutAs(const LayoutResourcePtr& layout)
 
             auto cloudResourcesPool = appContext()->cloudLayoutsSystemContext()->resourcePool();
 
-            LayoutResourceList existing = cloudResourcesPool->getResources<LayoutResource>(
-                [suggestedName = name.toLower()](const LayoutResourcePtr& layout)
+            core::LayoutResourceList existing = cloudResourcesPool->getResources<core::LayoutResource>(
+                [suggestedName = name.toLower()](const core::LayoutResourcePtr& layout)
                 {
                     return suggestedName == layout->getName().toLower();
                 });
@@ -682,7 +683,7 @@ void LayoutActionHandler::saveCloudLayoutAs(const LayoutResourcePtr& layout)
     dialog->show();
 }
 
-void LayoutActionHandler::convertLayoutToShared(const LayoutResourcePtr& layout)
+void LayoutActionHandler::convertLayoutToShared(const core::LayoutResourcePtr& layout)
 {
     const auto user = system()->accessController()->user();
     if (!NX_ASSERT(layout && user && layout->getParentId() == user->getId()))
@@ -715,7 +716,7 @@ void LayoutActionHandler::removeLayoutItems(const LayoutItemIndexList& items, bo
     }
 
     QList<nx::Uuid> orphanedUuids;
-    QSet<LayoutResourcePtr> layouts;
+    QSet<core::LayoutResourcePtr> layouts;
     for (const LayoutItemIndex &index : items)
     {
         if (index.layout())
@@ -758,7 +759,7 @@ void LayoutActionHandler::removeLayoutItems(const LayoutItemIndexList& items, bo
 }
 
 LayoutActionHandler::LayoutChange LayoutActionHandler::calculateLayoutChange(
-    const LayoutResourcePtr& layout)
+    const core::LayoutResourcePtr& layout)
 {
     auto systemContext = SystemContext::fromResource(layout);
     if (!NX_ASSERT(systemContext))
@@ -805,7 +806,7 @@ bool LayoutActionHandler::confirmLayoutChange(
         return confirmChangeSharedLayout(change);
 
     // Never ask for intercom layouts.
-    if (change.layout->layoutType() == LayoutResource::LayoutType::intercom)
+    if (change.layout->layoutType() == core::LayoutResource::LayoutType::intercom)
         return true;
 
     NX_ASSERT(false, "Editing of private layouts of other users is no longer supported.");
@@ -823,16 +824,16 @@ bool LayoutActionHandler::confirmChangeVideoWallLayout(const LayoutChange& chang
     return validator.confirmChangeVideoWallLayout(change.layout, change.removed);
 }
 
-bool LayoutActionHandler::canRemoveLayouts(const LayoutResourceList &layouts)
+bool LayoutActionHandler::canRemoveLayouts(const core::LayoutResourceList &layouts)
 {
     return std::all_of(layouts.cbegin(), layouts.cend(),
-        [](const LayoutResourcePtr& layout)
+        [](const core::LayoutResourcePtr& layout)
         {
             return ResourceAccessManager::hasPermissions(layout, Qn::RemovePermission);
         });
 }
 
-void LayoutActionHandler::removeLayouts(const LayoutResourceList &layouts)
+void LayoutActionHandler::removeLayouts(const core::LayoutResourceList &layouts)
 {
     if (layouts.isEmpty())
         return;
@@ -840,8 +841,8 @@ void LayoutActionHandler::removeLayouts(const LayoutResourceList &layouts)
     if (!canRemoveLayouts(layouts))
         return;
 
-    LayoutResourceList remoteResources;
-    for (const LayoutResourcePtr& layout: layouts)
+    core::LayoutResourceList remoteResources;
+    for (const core::LayoutResourcePtr& layout: layouts)
     {
         NX_ASSERT(!layout->isFile());
         if (layout->isFile())
@@ -861,14 +862,14 @@ void LayoutActionHandler::removeLayouts(const LayoutResourceList &layouts)
 
 bool LayoutActionHandler::closeLayouts(const QnWorkbenchLayoutList& layouts)
 {
-    LayoutResourceList resources;
+    core::LayoutResourceList resources;
     for (auto layout: layouts)
         resources.push_back(layout->resource());
 
     return closeLayouts(resources);
 }
 
-bool LayoutActionHandler::closeLayouts(const LayoutResourceList& resources)
+bool LayoutActionHandler::closeLayouts(const core::LayoutResourceList& resources)
 {
     if (resources.empty())
         return true;
@@ -881,7 +882,7 @@ bool LayoutActionHandler::closeLayouts(const LayoutResourceList& resources)
 }
 
 void LayoutActionHandler::openLayouts(
-    const LayoutResourceList& layouts,
+    const core::LayoutResourceList& layouts,
     const StreamSynchronizationState& playbackState,
     bool forceStateUpdate)
 {
@@ -932,7 +933,7 @@ QString LayoutActionHandler::generateUniqueLayoutName(const QnUserResourcePtr& u
 {
     QStringList usedNames;
     nx::Uuid parentId = user ? user->getId() : nx::Uuid();
-    for (const auto& layout: system()->resourcePool()->getResources<LayoutResource>())
+    for (const auto& layout: system()->resourcePool()->getResources<core::LayoutResource>())
     {
         if (layout->isShared() || layout->getParentId() == parentId)
             usedNames.push_back(layout->getName());
@@ -990,7 +991,7 @@ void LayoutActionHandler::at_closeAllButThisLayoutAction_triggered()
     auto selectedLayout = layouts[0];
     workbench()->setCurrentLayout(selectedLayout);
 
-    LayoutResourceList layoutsToClose;
+    core::LayoutResourceList layoutsToClose;
     for (const auto& layout: workbench()->layouts())
         layoutsToClose.push_back(layout->resource());
 
@@ -1000,10 +1001,10 @@ void LayoutActionHandler::at_closeAllButThisLayoutAction_triggered()
 
 void LayoutActionHandler::at_removeFromServerAction_triggered()
 {
-    auto layouts = menu()->currentParameters(sender()).resources().filtered<LayoutResource>();
+    auto layouts = menu()->currentParameters(sender()).resources().filtered<core::LayoutResource>();
 
-    LayoutResourceList personalAndVideowallLayouts;
-    LayoutResourceList sharedLayouts;
+    core::LayoutResourceList personalAndVideowallLayouts;
+    core::LayoutResourceList sharedLayouts;
     for (const auto& layout: layouts)
     {
         NX_ASSERT(!layout->isFile());
@@ -1019,7 +1020,7 @@ void LayoutActionHandler::at_removeFromServerAction_triggered()
     }
 
     const auto personalLayouts = personalAndVideowallLayouts.filtered(
-        [](const LayoutResourcePtr& layout)
+        [](const core::LayoutResourcePtr& layout)
         {
             return !layout->getParentResource().objectCast<QnVideoWallResource>();
         });
@@ -1035,7 +1036,7 @@ void LayoutActionHandler::onRenameResourceAction()
 {
     const auto parameters = menu()->currentParameters(sender());
 
-    if (const auto layout = parameters.resource().dynamicCast<LayoutResource>();
+    if (const auto layout = parameters.resource().dynamicCast<core::LayoutResource>();
         layout && !layout->isFile())
     {
         QString name = parameters.argument<QString>(core::ResourceNameRole).trimmed();
@@ -1049,7 +1050,7 @@ void LayoutActionHandler::onRenameResourceAction()
 void LayoutActionHandler::onNewUserLayoutNameChoosen(
     const QString& name, const QnUserResourcePtr& user)
 {
-    LayoutResourceList existing = alreadyExistingLayouts(
+    core::LayoutResourceList existing = alreadyExistingLayouts(
         system()->resourcePool(),
         name,
         user->getId());
@@ -1063,7 +1064,7 @@ void LayoutActionHandler::onNewUserLayoutNameChoosen(
     if (!existing.isEmpty())
     {
         bool allAreLocal = std::all_of(existing.cbegin(), existing.cend(),
-            [](const LayoutResourcePtr& layout)
+            [](const core::LayoutResourcePtr& layout)
             {
                 return layout->hasFlags(Qn::local);
             });
@@ -1074,7 +1075,7 @@ void LayoutActionHandler::onNewUserLayoutNameChoosen(
         removeLayouts(existing);
     }
 
-    LayoutResourcePtr layout(new LayoutResource());
+    core::LayoutResourcePtr layout(new core::LayoutResource());
     layout->setIdUnsafe(nx::Uuid::createUuid());
     layout->setName(name);
     layout->setParentId(user->getId());
@@ -1087,7 +1088,7 @@ void LayoutActionHandler::onNewUserLayoutNameChoosen(
 
 void LayoutActionHandler::at_openNewTabAction_triggered()
 {
-    auto resource = LayoutResourcePtr(new LayoutResource());
+    auto resource = core::LayoutResourcePtr(new core::LayoutResource());
     resource->setIdUnsafe(nx::Uuid::createUuid());
     resource->addFlags(Qn::local);
     resource->setName(generateUniqueLayoutName(system()->user()));
@@ -1150,7 +1151,7 @@ void LayoutActionHandler::at_openInNewTabAction_triggered()
     {
         for (const auto& widget: parameters.widgets())
             items.push_back(widget->item()->data());
-        items = LayoutResource::cloneItems(items);
+        items = core::LayoutResource::cloneItems(items);
     }
 
     const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
@@ -1189,7 +1190,7 @@ void LayoutActionHandler::at_openInNewTabAction_triggered()
     if (action(menu::ToggleShowreelModeAction)->isChecked())
         menu()->trigger(menu::ToggleShowreelModeAction);
 
-    const auto layouts = resources.filtered<LayoutResource>();
+    const auto layouts = resources.filtered<core::LayoutResource>();
     if (!layouts.empty())
     {
         NX_ASSERT(!calledFromScene, "Layouts can not be passed from the scene");
@@ -1209,8 +1210,8 @@ void LayoutActionHandler::at_openInNewTabAction_triggered()
         [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::cross_system); });
 
     auto layout = hasCrossSystemResources
-        ? LayoutResourcePtr(new core::CrossSystemLayoutResource())
-        : LayoutResourcePtr(new LayoutResource());
+        ? core::LayoutResourcePtr(new core::CrossSystemLayoutResource())
+        : core::LayoutResourcePtr(new core::LayoutResource());
     layout->setIdUnsafe(nx::Uuid::createUuid());
     layout->addFlags(Qn::local);
 

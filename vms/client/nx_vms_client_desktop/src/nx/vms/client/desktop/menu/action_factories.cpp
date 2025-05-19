@@ -20,11 +20,12 @@
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/ptz/helpers.h>
 #include <nx/vms/client/core/ptz/hotkey_resource_property_adaptor.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/layout_resource_helpers.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -67,11 +68,11 @@ Factory::ActionList OpenCurrentUserLayoutFactory::newActions(const Parameters& /
 {
     /* Multi-videos and shared layouts will go here. */
     auto layouts = system()->resourcePool()->getResourcesByParentId(nx::Uuid())
-        .filtered<LayoutResource>();
+        .filtered<core::LayoutResource>();
     if (auto user = workbenchContext()->user())
     {
         layouts.append(system()->resourcePool()->getResourcesByParentId(user->getId())
-            .filtered<LayoutResource>());
+            .filtered<core::LayoutResource>());
     }
 
     std::sort(layouts.begin(), layouts.end(),

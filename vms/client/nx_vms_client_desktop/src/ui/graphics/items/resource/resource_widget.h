@@ -148,7 +148,7 @@ public:
     const QnResourcePtr &resource() const;
 
     /** Layout resource, owning this item. */
-    nx::vms::client::desktop::LayoutResourcePtr layoutResource() const;
+    nx::vms::client::core::LayoutResourcePtr layoutResource() const;
 
     /**
      * \returns                         Workbench item associated with this widget. Never returns nullptr.

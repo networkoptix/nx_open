@@ -6,8 +6,8 @@
 #include <core/resource/resource_media_layout.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 
 namespace nx::vms::client::desktop {
 
@@ -25,13 +25,13 @@ nx::vms::common::LayoutItemData layoutItemFromResource(
     return data;
 }
 
-LayoutResourcePtr layoutFromResource(const QnResourcePtr& resource)
+core::LayoutResourcePtr layoutFromResource(const QnResourcePtr& resource)
 {
     NX_ASSERT(QnResourceAccessFilter::isOpenableInLayout(resource));
     if (!resource)
-        return LayoutResourcePtr();
+        return core::LayoutResourcePtr();
 
-    LayoutResourcePtr layout(new LayoutResource());
+    core::LayoutResourcePtr layout(new core::LayoutResource());
     layout->setCellSpacing(0);
     layout->setName(resource->getName());
     if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())

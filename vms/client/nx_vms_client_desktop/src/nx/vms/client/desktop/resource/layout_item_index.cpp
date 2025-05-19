@@ -3,8 +3,7 @@
 #include "layout_item_index.h"
 
 #include <nx/utils/log/log.h>
-
-#include "layout_resource.h"
+#include <nx/vms/client/core/resource/layout_resource.h>
 
 namespace nx::vms::client::desktop {
 
@@ -12,18 +11,18 @@ LayoutItemIndex::LayoutItemIndex()
 {
 }
 
-LayoutItemIndex::LayoutItemIndex(const LayoutResourcePtr& layout, const nx::Uuid& uuid):
+LayoutItemIndex::LayoutItemIndex(const core::LayoutResourcePtr& layout, const nx::Uuid& uuid):
     m_layout(layout),
     m_uuid(uuid)
 {
 }
 
-const LayoutResourcePtr& LayoutItemIndex::layout() const
+const core::LayoutResourcePtr& LayoutItemIndex::layout() const
 {
     return m_layout;
 }
 
-void LayoutItemIndex::setLayout(const LayoutResourcePtr& layout)
+void LayoutItemIndex::setLayout(const core::LayoutResourcePtr& layout)
 {
     m_layout = layout;
 }

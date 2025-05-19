@@ -10,9 +10,9 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/flat_map.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -58,7 +58,7 @@ public:
         insert(qMetaTypeId<QnResourcePtr>(), ResourcePtr);
         insert(qMetaTypeId<QnUserResourcePtr>(), UserResourcePtr);
         insert(qMetaTypeId<QnLayoutResourcePtr>(), QnLayoutResourcePtrMetaType);
-        insert(qMetaTypeId<LayoutResourcePtr>(), LayoutResourcePtrMetaType);
+        insert(qMetaTypeId<core::LayoutResourcePtr>(), LayoutResourcePtrMetaType);
         insert(qMetaTypeId<QnMediaServerResourcePtr>(), MediaServerResourcePtr);
         insert(qMetaTypeId<QnResourceList>(), ResourceList);
         insert(qMetaTypeId<QnResourceWidget*>(), ResourceWidget);
@@ -85,14 +85,13 @@ QnResourcePtr singleResource(const QVariant& items)
         case QnLayoutResourcePtrMetaType:
             return items.value<QnLayoutResourcePtr>();
         case LayoutResourcePtrMetaType:
-            return items.value<LayoutResourcePtr>();
+            return items.value<nx::vms::client::core::LayoutResourcePtr>();
         case MediaServerResourcePtr:
             return items.value<QnMediaServerResourcePtr>();
         default:
             return QnResourcePtr();
     }
 }
-
 
 template<class T>
 bool isValid(const T& value)
@@ -338,7 +337,7 @@ LayoutItemIndex ParameterTypes::layoutItem(QnResourceWidget* widget)
     if (layout == nullptr)
         return LayoutItemIndex();
 
-    LayoutResourcePtr resource = layout->resource();
+    core::LayoutResourcePtr resource = layout->resource();
     if (!resource)
     {
         NX_ASSERT(false,
@@ -475,7 +474,7 @@ QString ParameterTypes::toString(const QVariant& items)
         case QnLayoutResourcePtrMetaType:
             return nx::format("QnLayoutResourcePtr %1").arg(items.value<QnLayoutResourcePtr>());
         case LayoutResourcePtrMetaType:
-            return nx::format("LayoutResourcePtr %1").arg(items.value<LayoutResourcePtr>());
+            return nx::format("core::LayoutResourcePtr %1").arg(items.value<core::LayoutResourcePtr>());
         case MediaServerResourcePtr:
             return nx::format("QnMediaServerResourcePtr %1").arg(items.value<QnMediaServerResourcePtr>());
         case ResourceList:

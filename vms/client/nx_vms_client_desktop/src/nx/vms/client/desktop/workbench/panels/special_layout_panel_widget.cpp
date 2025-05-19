@@ -8,10 +8,10 @@
 #include <QtWidgets/QPushButton>
 
 #include <client/client_globals.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/common/palette.h>
@@ -20,7 +20,7 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-QString getString(Qn::ItemDataRole role, const LayoutResourcePtr& resource)
+QString getString(Qn::ItemDataRole role, const core::LayoutResourcePtr& resource)
 {
     return resource->data(role).toString();
 }
@@ -32,7 +32,7 @@ namespace workbench {
 
 SpecialLayoutPanelWidget::SpecialLayoutPanelWidget(
     WindowContext* windowContext,
-    const LayoutResourcePtr& layoutResource,
+    const core::LayoutResourcePtr& layoutResource,
     QObject* parent)
     :
     WindowContextAware(windowContext),
@@ -54,7 +54,7 @@ SpecialLayoutPanelWidget::SpecialLayoutPanelWidget(
 
     setWidget(body);
 
-    connect(m_layoutResource.get(), &LayoutResource::dataChanged,
+    connect(m_layoutResource.get(), &core::LayoutResource::dataChanged,
         this, &SpecialLayoutPanelWidget::handleResourceDataChanged);
     connect(m_layoutResource.get(), &QnResource::nameChanged, this,
         &SpecialLayoutPanelWidget::updateTitle);

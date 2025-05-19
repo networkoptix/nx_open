@@ -70,6 +70,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/resource/camera_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -88,7 +89,6 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
@@ -502,7 +502,7 @@ ActionHandler::~ActionHandler()
 }
 
 void ActionHandler::addToLayout(
-    const LayoutResourcePtr& layout,
+    const core::LayoutResourcePtr& layout,
     const QnResourcePtr& resource,
     const AddToLayoutParams& params)
 {
@@ -641,7 +641,7 @@ void ActionHandler::addToLayout(
 }
 
 void ActionHandler::addToLayout(
-    const LayoutResourcePtr& layout,
+    const core::LayoutResourcePtr& layout,
     const QnResourceList& resources,
     const AddToLayoutParams& params)
 {
@@ -650,7 +650,7 @@ void ActionHandler::addToLayout(
 }
 
 void ActionHandler::addToLayout(
-    const LayoutResourcePtr& layout,
+    const core::LayoutResourcePtr& layout,
     const QList<QnMediaResourcePtr>& resources,
     const AddToLayoutParams& params)
 {
@@ -659,7 +659,7 @@ void ActionHandler::addToLayout(
 }
 
 void ActionHandler::addToLayout(
-    const LayoutResourcePtr& layout,
+    const core::LayoutResourcePtr& layout,
     const QList<QString>& files,
     const AddToLayoutParams& params)
 {
@@ -756,13 +756,13 @@ void ActionHandler::at_workbench_cellSpacingChanged()
 {
     qreal value = workbench()->currentLayout()->cellSpacing();
 
-    if (LayoutResource::isEqualCellSpacing(core::CellSpacing::None, value))
+    if (core::LayoutResource::isEqualCellSpacing(core::CellSpacing::None, value))
         action(menu::SetCurrentLayoutItemSpacingNoneAction)->setChecked(true);
-    else if (LayoutResource::isEqualCellSpacing(core::CellSpacing::Small, value))
+    else if (core::LayoutResource::isEqualCellSpacing(core::CellSpacing::Small, value))
         action(menu::SetCurrentLayoutItemSpacingSmallAction)->setChecked(true);
-    else if (LayoutResource::isEqualCellSpacing(core::CellSpacing::Medium, value))
+    else if (core::LayoutResource::isEqualCellSpacing(core::CellSpacing::Medium, value))
         action(menu::SetCurrentLayoutItemSpacingMediumAction)->setChecked(true);
-    else if (LayoutResource::isEqualCellSpacing(core::CellSpacing::Large, value))
+    else if (core::LayoutResource::isEqualCellSpacing(core::CellSpacing::Large, value))
         action(menu::SetCurrentLayoutItemSpacingLargeAction)->setChecked(true);
     else
         action(menu::CurrentLayoutItemSpacingCustomMenuItem)->setChecked(true);
@@ -959,7 +959,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
 
-    LayoutResourcePtr layout = parameters.argument<LayoutResourcePtr>(core::LayoutResourceRole);
+    core::LayoutResourcePtr layout = parameters.argument<core::LayoutResourcePtr>(core::LayoutResourceRole);
     if (!NX_ASSERT(layout))
         return;
 
@@ -1730,7 +1730,7 @@ void ActionHandler::at_dropResourcesAction_triggered()
         foreach (QnVideoWallResourcePtr r, videowalls)
             resources.removeOne(r);
 
-        if (currentLayout->resource()->layoutType() == LayoutResource::LayoutType::videoWall)
+        if (currentLayout->resource()->layoutType() == core::LayoutResource::LayoutType::videoWall)
         {
             workbenchContext()->instance<QnWorkbenchVideoWallHandler>()->
                 filterAllowedMediaResources(resources);
@@ -2360,7 +2360,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * itemCount / desiredCellAspectRatio)));
 
     /* Construct and add a new layout. */
-    LayoutResourcePtr layout(new LayoutResource());
+    core::LayoutResourcePtr layout(new core::LayoutResource());
     layout->setIdUnsafe(nx::Uuid::createUuid());
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
 
@@ -2718,7 +2718,7 @@ void ActionHandler::at_renameAction_triggered()
     if (name == oldName)
         return;
 
-    if (auto layout = resource.dynamicCast<LayoutResource>())
+    if (auto layout = resource.dynamicCast<core::LayoutResource>())
     {
         if (layout->isFile())
             renameLocalFile(layout, name);

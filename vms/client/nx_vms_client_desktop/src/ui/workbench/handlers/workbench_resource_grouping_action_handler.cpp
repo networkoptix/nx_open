@@ -9,10 +9,10 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
@@ -32,7 +32,7 @@ void saveResources(const QnResourceList& resources)
     {
         resource->savePropertiesAsync();
 
-        if (const auto layout = resource.objectCast<LayoutResource>())
+        if (const auto layout = resource.objectCast<nx::vms::client::core::LayoutResource>())
             layout->saveAsync();
     }
 
@@ -177,7 +177,7 @@ void ResourceGroupingActionHandler::renameCustomResourceTreeGroup() const
     }
     else if (std::any_of(resources.begin(), resources.end(), isLayout))
     {
-        resourcesWithinTopLevelNode = context()->system()->resourcePool()->getResources<LayoutResource>();
+        resourcesWithinTopLevelNode = context()->system()->resourcePool()->getResources<core::LayoutResource>();
     }
 
     const auto it =

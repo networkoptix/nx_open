@@ -4,17 +4,17 @@
 
 #include <common/common_globals.h>
 #include <nx/utils/crypt/encryptable.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/export/data/nov_metadata.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 
 class NX_VMS_CLIENT_DESKTOP_API QnFileLayoutResource:
-    public nx::vms::client::desktop::LayoutResource,
+    public nx::vms::client::core::LayoutResource,
     public nx::crypt::Encryptable
 {
     Q_OBJECT
 
-    using base_type = nx::vms::client::desktop::LayoutResource;
+    using base_type = nx::vms::client::core::LayoutResource;
 public:
     QnFileLayoutResource(const nx::vms::client::desktop::NovMetadata& metadata);
 

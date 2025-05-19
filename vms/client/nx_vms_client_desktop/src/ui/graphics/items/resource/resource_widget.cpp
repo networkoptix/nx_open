@@ -20,6 +20,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/string.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -29,7 +30,6 @@
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/playback_position_item.h>
 #include <nx/vms/client/desktop/scene/resource_widget/overlays/rewind_overlay.h>
@@ -77,7 +77,10 @@
 
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
+
 using nx::vms::client::core::Geometry;
+using nx::vms::client::core::LayoutResource;
+using nx::vms::client::core::LayoutResourcePtr;
 
 QnFixedWidthTooltipWidget* QnResourceWidget::s_overlayTooltip;
 QGraphicsScene* QnResourceWidget::s_tooltipScene;

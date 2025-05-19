@@ -10,7 +10,7 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/access_rights_types.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_properties/user/models/resource_access_rights_model.h>
 
 #include "../utils/access_subject_editing_fixture.h"
@@ -44,21 +44,21 @@ public:
 
         ASSERT_EQ(accessRightsModel->info().size(), accessRightsList.size());
 
-        const auto layout1 = resource("Layout1").objectCast<LayoutResource>();
+        const auto layout1 = resource("Layout1").objectCast<core::LayoutResource>();
         ASSERT_TRUE((bool) layout1);
         addToLayout(layout1, resource("Camera1"));
         addToLayout(layout1, resource("Camera2"));
         addToLayout(layout1, resource("Camera3"));
         layout1->storeSnapshot();
 
-        const auto layout2 = resource("Layout2").objectCast<LayoutResource>();
+        const auto layout2 = resource("Layout2").objectCast<core::LayoutResource>();
         ASSERT_TRUE((bool) layout2);
         addToLayout(layout2, resource("Camera1"));
         addToLayout(layout2, resource("Camera2"));
         layout2->storeSnapshot();
 
-        const auto videoWallLayout1 = addLayoutForVideoWall(
-            resource("VideoWall1").objectCast<QnVideoWallResource>()).objectCast<LayoutResource>();
+        const auto videoWallLayout1 = addLayoutForVideoWall(resource("VideoWall1")
+            .objectCast<QnVideoWallResource>()).objectCast<core::LayoutResource>();
         ASSERT_TRUE((bool) videoWallLayout1);
         addToLayout(videoWallLayout1, resource("Camera1"));
         addToLayout(videoWallLayout1, resource("Camera4"));

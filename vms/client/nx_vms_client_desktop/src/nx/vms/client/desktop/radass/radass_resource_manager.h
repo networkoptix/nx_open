@@ -24,8 +24,8 @@ public:
     RadassResourceManager(QObject* parent = nullptr);
     virtual ~RadassResourceManager() override;
 
-    RadassMode mode(const LayoutResourcePtr& layout) const;
-    void setMode(const LayoutResourcePtr& layout, RadassMode value);
+    RadassMode mode(const core::LayoutResourcePtr& layout) const;
+    void setMode(const core::LayoutResourcePtr& layout, RadassMode value);
 
     RadassMode mode(const LayoutItemIndex& item) const;
     void setMode(const LayoutItemIndex& item, RadassMode value);

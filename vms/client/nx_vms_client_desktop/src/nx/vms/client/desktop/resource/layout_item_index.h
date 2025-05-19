@@ -17,10 +17,10 @@ class NX_VMS_CLIENT_DESKTOP_API LayoutItemIndex
 {
 public:
     LayoutItemIndex();
-    LayoutItemIndex(const LayoutResourcePtr& layout, const nx::Uuid& uuid);
+    LayoutItemIndex(const core::LayoutResourcePtr& layout, const nx::Uuid& uuid);
 
-    const LayoutResourcePtr& layout() const;
-    void setLayout(const LayoutResourcePtr& layout);
+    const core::LayoutResourcePtr& layout() const;
+    void setLayout(const core::LayoutResourcePtr& layout);
 
     const nx::Uuid& uuid() const;
     void setUuid(const nx::Uuid& uuid);
@@ -31,7 +31,7 @@ public:
     QString toString() const;
 
 private:
-    LayoutResourcePtr m_layout;
+    core::LayoutResourcePtr m_layout;
     nx::Uuid m_uuid;
 };
 

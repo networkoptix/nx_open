@@ -83,7 +83,7 @@ private:
 
     struct Item
     {
-        LayoutResourcePtr layout;
+        core::LayoutResourcePtr layout;
         int delayMs = 0;
     };
 

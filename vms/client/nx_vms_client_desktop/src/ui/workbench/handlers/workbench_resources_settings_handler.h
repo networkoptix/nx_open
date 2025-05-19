@@ -38,7 +38,7 @@ private:
     void at_copyRecordingScheduleAction_triggered();
 
 private:
-    void openLayoutSettingsDialog(const nx::vms::client::desktop::LayoutResourcePtr& layout);
+    void openLayoutSettingsDialog(const nx::vms::client::core::LayoutResourcePtr& layout);
 
 private:
     QPointer<nx::vms::client::desktop::CameraSettingsDialog> m_cameraSettingsDialog;

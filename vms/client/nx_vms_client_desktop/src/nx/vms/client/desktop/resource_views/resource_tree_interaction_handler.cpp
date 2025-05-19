@@ -19,13 +19,13 @@
 #include <nx/build_info.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/common/models/filter_proxy_model.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
@@ -173,7 +173,7 @@ LayoutItemIndexList selectedLayoutItems(const QModelIndexList& selection)
         if (id.isNull())
             continue;
 
-        const auto layout = getResource<LayoutResource>(modelIndex.parent());
+        const auto layout = getResource<core::LayoutResource>(modelIndex.parent());
         if (layout)
             result.push_back(LayoutItemIndex(layout, id));
     }

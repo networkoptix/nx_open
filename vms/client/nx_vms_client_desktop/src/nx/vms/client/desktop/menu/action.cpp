@@ -11,9 +11,9 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -305,7 +305,7 @@ ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& pa
             }
             else if (key == Qn::CurrentLayoutResourceRole)
             {
-                if (LayoutResourcePtr layout = workbench()->currentLayoutResource())
+                if (core::LayoutResourcePtr layout = workbench()->currentLayoutResource())
                     resources.push_back(layout);
             }
 

@@ -22,8 +22,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/client_camera_resource_stub.h>
@@ -170,11 +170,11 @@ QnFileLayoutResourcePtr ResourceTreeModelTest::addFileLayout(
     return fileLayout;
 }
 
-LayoutResourcePtr ResourceTreeModelTest::addLayout(
+core::LayoutResourcePtr ResourceTreeModelTest::addLayout(
     const QString& name,
     const nx::Uuid& parentId) const
 {
-    LayoutResourcePtr layout(new LayoutResource());
+    core::LayoutResourcePtr layout(new core::LayoutResource());
     layout->setName(name);
     layout->setIdUnsafe(nx::Uuid::createUuid());
     layout->setParentId(parentId);
@@ -386,11 +386,11 @@ QnVirtualCameraResourcePtr ResourceTreeModelTest::addIntercomCamera(
     return camera;
 }
 
-LayoutResourcePtr ResourceTreeModelTest::addIntercomLayout(
+core::LayoutResourcePtr ResourceTreeModelTest::addIntercomLayout(
     const QString& name,
     const nx::Uuid& parentId) const
 {
-    LayoutResourcePtr layout(new LayoutResource());
+    core::LayoutResourcePtr layout(new core::LayoutResource());
     layout->setName(name);
     layout->setIdUnsafe(nx::vms::common::calculateIntercomLayoutId(parentId));
     layout->setParentId(parentId);
@@ -399,12 +399,12 @@ LayoutResourcePtr ResourceTreeModelTest::addIntercomLayout(
     if (parentId.isNull())
     {
         NX_ASSERT(!nx::vms::common::isIntercomLayout(layout));
-        NX_ASSERT(layout->layoutType() != LayoutResource::LayoutType::intercom);
+        NX_ASSERT(layout->layoutType() != core::LayoutResource::LayoutType::intercom);
     }
     else
     {
         NX_ASSERT(nx::vms::common::isIntercomLayout(layout));
-        NX_ASSERT(layout->layoutType() == LayoutResource::LayoutType::intercom);
+        NX_ASSERT(layout->layoutType() == core::LayoutResource::LayoutType::intercom);
     }
 
     return layout;

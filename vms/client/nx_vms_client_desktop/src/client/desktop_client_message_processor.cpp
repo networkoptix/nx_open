@@ -4,8 +4,8 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/showreel_data.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_factory.h>
 #include <nx/vms/client/desktop/showreel/showreel_state_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -35,7 +35,7 @@ void QnDesktopClientMessageProcessor::updateResource(
     if (isFile(resource) || isFile(ownResource))
         return;
 
-    const auto layout = ownResource.objectCast<LayoutResource>();
+    const auto layout = ownResource.objectCast<nx::vms::client::core::LayoutResource>();
     const auto remoteLayout = resource.objectCast<QnLayoutResource>();
     const auto systemContext = dynamic_cast<SystemContext*>(this->systemContext());
 

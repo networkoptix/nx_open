@@ -30,6 +30,7 @@
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/network/logon_data_helpers.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -37,7 +38,6 @@
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
@@ -430,7 +430,7 @@ void StartupActionsHandler::handleAcsModeResources(
     if (windowStart.count() < 0 || windowStart + kAcsModeTimelineWindowSize > maxTime)
         windowStart = maxTime - kAcsModeTimelineWindowSize;
 
-    LayoutResourcePtr layout(new LayoutResource());
+    core::LayoutResourcePtr layout(new core::LayoutResource());
     layout->setIdUnsafe(nx::Uuid::createUuid());
     layout->setCellSpacing(0);
     layout->addFlags(Qn::local);

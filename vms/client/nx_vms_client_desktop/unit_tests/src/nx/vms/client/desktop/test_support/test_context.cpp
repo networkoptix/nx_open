@@ -7,8 +7,8 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
 #include <nx/branding.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/message_processor_mock.h>
 
@@ -46,7 +46,7 @@ MessageProcessorMock* SystemContextBasedTest::createMessageProcessor()
 
 QnLayoutResourcePtr SystemContextBasedTest::createLayout()
 {
-    LayoutResourcePtr layout(new LayoutResource());
+    core::LayoutResourcePtr layout(new core::LayoutResource());
     layout->setIdUnsafe(nx::Uuid::createUuid());
     return layout;
 }

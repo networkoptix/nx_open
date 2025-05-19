@@ -41,7 +41,7 @@ public:
     virtual ~QnWorkbenchVideoWallHandler();
 
     void filterAllowedMediaResources(QnResourceList& resources) const;
-    void filterAllowedLayoutItems(const nx::vms::client::desktop::LayoutResourcePtr& layout) const;
+    void filterAllowedLayoutItems(const nx::vms::client::core::LayoutResourcePtr& layout) const;
 
 private:
     enum class ItemAction
@@ -52,7 +52,7 @@ private:
     };
 
     void resetLayout(const QnVideoWallItemIndexList& items,
-        const nx::vms::client::desktop::LayoutResourcePtr& layout);
+        const nx::vms::client::core::LayoutResourcePtr& layout);
 
     /**
      * Place first layout to the first item, second layout to the second item. Save layouts if
@@ -60,9 +60,9 @@ private:
      */
     void swapLayouts(
         const QnVideoWallItemIndex firstIndex,
-        const nx::vms::client::desktop::LayoutResourcePtr& firstLayout,
+        const nx::vms::client::core::LayoutResourcePtr& firstLayout,
         const QnVideoWallItemIndex& secondIndex,
-        const nx::vms::client::desktop::LayoutResourcePtr& secondLayout);
+        const nx::vms::client::core::LayoutResourcePtr& secondLayout);
 
     /** Updates item's layout with provided value. Provided layout should be saved. */
     void updateItemsLayout(const QnVideoWallItemIndexList& items, const nx::Uuid& layoutId);
@@ -106,7 +106,7 @@ private:
     /** Returns list of target videowall items for current layout. */
     QnVideoWallItemIndexList targetList() const;
 
-    nx::vms::client::desktop::LayoutResourcePtr constructLayout(
+    nx::vms::client::core::LayoutResourcePtr constructLayout(
         const QnResourceList& resources) const;
     void cleanupUnusedLayouts(const QnVideoWallResourceList& videowalls = {});
 
@@ -237,7 +237,7 @@ private:
         VideoWallCallbackFunction callback = {});
     void saveVideowallAndReviewLayout(
         const QnVideoWallResourcePtr& videowall,
-        nx::vms::client::desktop::LayoutResourcePtr reviewLayout = {},
+        nx::vms::client::core::LayoutResourcePtr reviewLayout = {},
         VideoWallCallbackFunction callback = {});
 
 private:

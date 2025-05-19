@@ -25,6 +25,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
+#include <nx/vms/client/desktop/resource/layout_resource_helpers.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/showreel/showreel_actions_handler.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
@@ -142,7 +143,7 @@ private:
 class WorkbenchLayout: public QnWorkbenchLayout
 {
 public:
-    WorkbenchLayout(WindowContext* windowContext, const LayoutResourcePtr& resource):
+    WorkbenchLayout(WindowContext* windowContext, const core::LayoutResourcePtr& resource):
         QnWorkbenchLayout(windowContext, resource)
     {
     }
@@ -170,7 +171,7 @@ struct Workbench::Private
     /** Stored dummy layout. It is used to ensure that current layout is never nullptr. */
     std::unique_ptr<QnWorkbenchLayout> dummyLayout = std::make_unique<WorkbenchLayout>(
         q->windowContext(),
-        LayoutResourcePtr(new LayoutResource()));
+        core::LayoutResourcePtr(new core::LayoutResource()));
 
     /** Whether current layout is being changed. */
     bool inLayoutChangeProcess = false;
@@ -191,7 +192,7 @@ struct Workbench::Private
     {
     }
 
-    int layoutIndex(const LayoutResourcePtr& resource) const
+    int layoutIndex(const core::LayoutResourcePtr& resource) const
     {
         auto iter = std::find_if(
             layouts.cbegin(),
@@ -207,9 +208,9 @@ struct Workbench::Private
     }
 
     /** Remove unsaved local layouts, restore modified ones. */
-    void processRemovedLayouts(const QSet<LayoutResourcePtr>& layouts)
+    void processRemovedLayouts(const QSet<core::LayoutResourcePtr>& layouts)
     {
-        LayoutResourceList rollbackResources;
+        core::LayoutResourceList rollbackResources;
 
         for (const auto& layout: layouts)
         {
@@ -300,7 +301,7 @@ void Workbench::clear()
     QScopedValueRollback<bool> rollback(d->inClearProcess, true);
     setCurrentLayout(nullptr);
 
-    QSet<LayoutResourcePtr> removedLayouts;
+    QSet<core::LayoutResourcePtr> removedLayouts;
 
     for (const auto& layout: d->layouts)
         removedLayouts.insert(layout->resource());
@@ -321,7 +322,7 @@ QnWorkbenchLayout* Workbench::currentLayout() const
     return d->currentLayout;
 }
 
-LayoutResourcePtr Workbench::currentLayoutResource() const
+core::LayoutResourcePtr Workbench::currentLayoutResource() const
 {
     return currentLayout()->resource();
 }
@@ -337,7 +338,7 @@ QnWorkbenchLayout* Workbench::layout(int index) const
     return d->layouts[index].get();
 }
 
-QnWorkbenchLayout* Workbench::layout(const LayoutResourcePtr& resource)
+QnWorkbenchLayout* Workbench::layout(const core::LayoutResourcePtr& resource)
 {
     auto index = d->layoutIndex(resource);
     return index >= 0
@@ -350,12 +351,12 @@ const std::vector<std::unique_ptr<QnWorkbenchLayout>>& Workbench::layouts() cons
     return d->layouts;
 }
 
-QnWorkbenchLayout* Workbench::addLayout(const LayoutResourcePtr& resource)
+QnWorkbenchLayout* Workbench::addLayout(const core::LayoutResourcePtr& resource)
 {
     return insertLayout(resource, d->layouts.size());
 }
 
-QnWorkbenchLayout* Workbench::insertLayout(const LayoutResourcePtr& resource, int index)
+QnWorkbenchLayout* Workbench::insertLayout(const core::LayoutResourcePtr& resource, int index)
 {
     auto existing = layout(resource);
     if (!NX_ASSERT(!existing, "Layout resource already exists on workbench"))
@@ -382,8 +383,8 @@ QnWorkbenchLayout* Workbench::insertLayout(const LayoutResourcePtr& resource, in
 }
 
 QnWorkbenchLayout* Workbench::replaceLayout(
-    const LayoutResourcePtr& replaceableLayout,
-    const LayoutResourcePtr& newLayout)
+    const core::LayoutResourcePtr& replaceableLayout,
+    const core::LayoutResourcePtr& newLayout)
 {
     // Replace layout only if it is already on the workbench.
     if (const auto workbenchLayout = layout(replaceableLayout))
@@ -414,7 +415,7 @@ void Workbench::removeLayout(int index)
         return;
 
     auto layout = d->layouts[index].get();
-    QSet<LayoutResourcePtr> removedLayouts{layout->resource()};
+    QSet<core::LayoutResourcePtr> removedLayouts{layout->resource()};
 
     // Update current layout if it's being removed.
     if (layout == d->currentLayout)
@@ -437,14 +438,14 @@ void Workbench::removeLayout(int index)
     emit layoutsChanged();
 }
 
-void Workbench::removeLayout(const LayoutResourcePtr& resource)
+void Workbench::removeLayout(const core::LayoutResourcePtr& resource)
 {
     auto index = d->layoutIndex(resource);
     if (index >= 0)
         removeLayout(index);
 }
 
-void Workbench::removeLayouts(const LayoutResourceList& resources)
+void Workbench::removeLayouts(const core::LayoutResourceList& resources)
 {
     const auto removedLayouts = nx::utils::toQSet(resources);
     NX_ASSERT(removedLayouts.size() == resources.size());
@@ -723,7 +724,7 @@ void Workbench::update(const WorkbenchState& state)
     for (const auto& id: state.layoutUuids)
     {
         const auto activeItemId = activeItems.value(id);
-        if (const auto layout = resourcePool->getResourceById<LayoutResource>(id))
+        if (const auto layout = resourcePool->getResourceById<core::LayoutResource>(id))
         {
             if (!activeItemId.isNull())
                 layout->setData(Qn::LayoutActiveItemRole, QVariant::fromValue(activeItemId));
@@ -757,7 +758,7 @@ void Workbench::update(const WorkbenchState& state)
     if (auto user = windowContext()->workbenchContext()->user())
     {
         auto initialFillLayoutFromState =
-            [](const LayoutResourcePtr& layout, const WorkbenchState::UnsavedLayout& state)
+            [](const core::LayoutResourcePtr& layout, const WorkbenchState::UnsavedLayout& state)
             {
                 layout->addFlags(Qn::local);
                 layout->setParentId(state.parentId);
@@ -768,11 +769,11 @@ void Workbench::update(const WorkbenchState& state)
         const auto userId = user->getId();
         for (const auto& stateLayout: state.unsavedLayouts)
         {
-            LayoutResourcePtr layoutResource;
+            core::LayoutResourcePtr layoutResource;
             if (stateLayout.isCrossSystem)
             {
                 layoutResource = appContext()->cloudLayoutsPool()->
-                    getResourceById<LayoutResource>(stateLayout.id);
+                    getResourceById<core::LayoutResource>(stateLayout.id);
                 if (!layoutResource)
                 {
                     // TODO: #vkutin Figure out what's done here.
@@ -787,10 +788,10 @@ void Workbench::update(const WorkbenchState& state)
                 if (stateLayout.parentId != userId)
                     continue;
 
-                layoutResource = resourcePool->getResourceById<LayoutResource>(stateLayout.id);
+                layoutResource = resourcePool->getResourceById<core::LayoutResource>(stateLayout.id);
                 if (!layoutResource)
                 {
-                    layoutResource.reset(new LayoutResource());
+                    layoutResource.reset(new core::LayoutResource());
                     initialFillLayoutFromState(layoutResource, stateLayout);
                     resourcePool->addResource(layoutResource);
                 }
@@ -821,7 +822,7 @@ void Workbench::update(const WorkbenchState& state)
         auto restoreCurrentLayout =
             [this](const QnResourcePool* pool, const nx::Uuid id)
             {
-                const LayoutResourcePtr& layout = pool->getResourceById<LayoutResource>(id);
+                const core::LayoutResourcePtr& layout = pool->getResourceById<core::LayoutResource>(id);
                 if (!layout)
                     return false;
 
@@ -857,7 +858,7 @@ void Workbench::update(const WorkbenchState& state)
 
 void Workbench::submit(WorkbenchState& state)
 {
-    auto isLayoutSupported = [](const LayoutResourcePtr& layout, bool allowLocals)
+    auto isLayoutSupported = [](const core::LayoutResourcePtr& layout, bool allowLocals)
     {
         // Support showreels.
         if (isShowreelReviewLayout(layout))
@@ -877,7 +878,7 @@ void Workbench::submit(WorkbenchState& state)
         return true;
     };
 
-    auto sourceId = [](const LayoutResourcePtr& layout)
+    auto sourceId = [](const core::LayoutResourcePtr& layout)
     {
         if (const auto videoWall =
                 layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>())

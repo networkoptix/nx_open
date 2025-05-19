@@ -335,7 +335,7 @@ protected slots:
     void synchronizeSceneBoundsExtension();
     void synchronizeRaisedGeometry();
 
-    void updateBackground(const nx::vms::client::desktop::LayoutResourcePtr &layout);
+    void updateBackground(const nx::vms::client::core::LayoutResourcePtr& layout);
 
     /** Mark item on the scene selected as it was selected in the tree. */
     void updateSelectionFromTree();

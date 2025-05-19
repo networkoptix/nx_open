@@ -59,6 +59,7 @@
 #include <nx/vms/client/core/motion/motion_grid.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h> //< TODO: #sivanov Remove this dependency.
 #include <nx/vms/client/core/resource/camera_resource.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -75,7 +76,7 @@
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/opengl/opengl_renderer.h>
-#include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/layout_resource_helpers.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
@@ -151,6 +152,8 @@ namespace common_ptz = nx::vms::common::ptz;
 namespace html = nx::vms::common::html;
 
 using nx::vms::client::core::Geometry;
+using nx::vms::client::core::LayoutResource;
+using nx::vms::client::core::LayoutResourcePtr;
 using nx::vms::client::core::MotionGrid;
 using nx::vms::client::core::MotionSelection;
 
