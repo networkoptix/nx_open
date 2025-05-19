@@ -113,6 +113,7 @@ struct CombinedProperties
     CombinedValue streamCapabilitiesInitialized = CombinedValue::None;
     CombinedValue hasRtspSettings = CombinedValue::None;
     CombinedValue defaultKeepCameraTimeSettingsState = CombinedValue::None;
+    CombinedValue defaultRemoteArchiveSynchronizationEnabledState = CombinedValue::None;
 
     int maxFps = 0;
 };
@@ -124,7 +125,8 @@ NX_REFLECTION_INSTRUMENT(CombinedProperties,
     (canForceZoomCapability)(hasStoppablePtz)(canAdjustPtzSensitivity)
     (hasCustomMediaPortCapability)
     (hasCustomMediaPort)(supportsSchedule)(isUdpMulticastTransportAllowed)
-    (streamCapabilitiesInitialized)(hasRtspSettings)(defaultKeepCameraTimeSettingsState)(maxFps))
+    (streamCapabilitiesInitialized)(hasRtspSettings)(defaultKeepCameraTimeSettingsState)
+    (defaultRemoteArchiveSynchronizationEnabledState)(maxFps))
 
 struct MotionConstraints
 {
@@ -347,6 +349,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         nx::vms::api::DeviceProfiles availableProfiles;
 
         UserEditableMultiple<bool> remoteArchiveSynchronizationEnabled;
+        bool isRemoteArchiveSynchronizationEnabledDefault = false;
     };
     ExpertSettings expert;
     bool isDefaultExpertSettings = false;

@@ -583,6 +583,7 @@ public:
 
     bool isRemoteArchiveSynchronizationEnabled() const;
     void setRemoteArchiveSynchronizationEnabled(bool value);
+    bool defaultRemoteArchiveSynchronizationEnabledState() const;
 
     /** If preferred server is not set, assigns current server as preferred. */
     void updatePreferredServerId();
