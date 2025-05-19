@@ -83,4 +83,10 @@ bool FileSystemBackend::sync()
     return true;
 }
 
+bool FileSystemBackend::writeDocumentation(const QString& docText)
+{
+    static const QString kReadmeFile = "readme.md";
+    return writeValue(kReadmeFile, docText);
+}
+
 } // namespace nx::utils::property_storage

@@ -17,6 +17,7 @@ public:
     virtual bool removeValue(const QString& name) = 0;
     virtual bool exists(const QString& name) const = 0;
     virtual bool sync() { return false; }
+    virtual bool writeDocumentation(const QString& /*docText*/) { return false; };
 };
 
 } // namespace nx::utils::property_storage

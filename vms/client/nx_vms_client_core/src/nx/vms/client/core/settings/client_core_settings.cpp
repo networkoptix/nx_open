@@ -114,6 +114,10 @@ Settings::Settings(const InitializationOptions& options):
         migrateOldSettings();
         clearInvalidKnownConnections();
     }
+
+    save();
+    generateDocumentation("Core Settings",
+        "Internal network and connection-related client settings.");
 }
 
 Settings::~Settings()

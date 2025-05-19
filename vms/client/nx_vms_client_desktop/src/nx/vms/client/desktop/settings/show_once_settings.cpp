@@ -18,6 +18,9 @@ ShowOnceSettings::ShowOnceSettings():
 {
     load();
     migrate();
+    save();
+    generateDocumentation("Show Once Settings",
+        "Set of checkboxes for the \"Do not show this message again\" options.");
 }
 
 void ShowOnceSettings::reload()

@@ -49,7 +49,7 @@ public:
     /** List of muted layout item ids.
      *
      * Note that the fact that we're only saving item ids here means that we need to GC them
-     * somehow. We do this on save just by checking the ids that we have agains all items in
+     * somehow. We do this on save just by checking the ids that we have against all items in
      * the resource pool. This works because even live viewers have access to layout resources
      * for all other users (even though they don't see them in the UI). */
     Property<std::set<nx::Uuid>> mutedItemIds{this, "mutedItemIds"};

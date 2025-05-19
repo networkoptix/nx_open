@@ -19,10 +19,16 @@ SystemSpecificLocalSettings::SystemSpecificLocalSettings(SystemContext* systemCo
     connect(systemContext,
         &SystemContext::remoteIdChanged,
         this,
-        [this]
+        [this](Uuid serverId)
         {
-            NX_DEBUG(this, "Reload system-specific local settings.");
-            load();
+            if (!serverId.isNull())
+            {
+                NX_DEBUG(this, "Reload system-specific local settings.");
+                load();
+                save();
+                generateDocumentation(
+                    "Site-specific Settings", "Options actual for the currently connected site.");
+            }
         });
 }
 
