@@ -340,6 +340,7 @@ protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter* painter, const QStyleOptionGraphicsItem* option,
         QWidget* widget) override;
+    virtual Qn::RenderStatus paintBackground(QPainter* painter, const QRectF& paintRect);
     virtual Qn::RenderStatus paintChannelBackground(QPainter* painter, int channel,
         const QRectF& channelRect, const QRectF& paintRect);
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect);

@@ -700,10 +700,9 @@ int QnServerResourceWidget::helpTopicAt(const QPointF &) const {
     return HelpTopic::Id::MainWindow_MonitoringItem;
 }
 
-Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter* painter, int channel,
-    const QRectF& channelRect, const QRectF& paintRect)
+Qn::RenderStatus QnServerResourceWidget::paintBackground(QPainter* painter, const QRectF& paintRect)
 {
-    base_type::paintChannelBackground(painter, channel, channelRect, paintRect);
+    base_type::paintBackground(painter, paintRect);
     return m_renderStatus;
 }
 

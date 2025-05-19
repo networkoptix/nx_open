@@ -1359,18 +1359,26 @@ void QnResourceWidget::paint(QPainter* painter,
 
     Qn::RenderStatus renderStatus = Qn::NothingRendered;
 
-    for (int i = 0; i < channelCount(); i++)
+    const auto channels = channelCount();
+    if (channels > 0)
     {
-        /* Draw content. */
-        QRectF channelRect = this->channelRect(i);
-        QRectF paintRect = this->exposedRect(i, false, false, false);
-        if (paintRect.isEmpty())
-            continue;
+        for (int i = 0; i < channels; i++)
+        {
+            /* Draw content. */
+            QRectF channelRect = this->channelRect(i);
+            QRectF paintRect = this->exposedRect(i, false, false, false);
+            if (paintRect.isEmpty())
+                continue;
 
-        renderStatus = qMax(renderStatus, paintChannelBackground(painter, i, channelRect, paintRect));
+            renderStatus = qMax(renderStatus, paintChannelBackground(painter, i, channelRect, paintRect));
 
-        /* Draw foreground. */
-        paintChannelForeground(painter, i, paintRect);
+            /* Draw foreground. */
+            paintChannelForeground(painter, i, paintRect);
+        }
+    }
+    else if (!this->rect().isEmpty())
+    {
+        renderStatus = qMax(renderStatus, paintBackground(painter, this->rect()));
     }
 
     paintEffects(painter);
@@ -1429,12 +1437,17 @@ void QnResourceWidget::updateSelectedState()
     emit selectionStateChanged(m_selectionState, QPrivateSignal());
 }
 
-Qn::RenderStatus QnResourceWidget::paintChannelBackground(QPainter* painter, int /*channel*/,
-    const QRectF& /*channelRect*/, const QRectF& paintRect)
+Qn::RenderStatus QnResourceWidget::paintBackground(QPainter* painter, const QRectF& paintRect)
 {
     const PainterTransformScaleStripper scaleStripper(painter);
     painter->fillRect(scaleStripper.mapRect(paintRect), palette().color(QPalette::Window));
     return Qn::NewFrameRendered;
+}
+
+Qn::RenderStatus QnResourceWidget::paintChannelBackground(QPainter* painter, int /*channel*/,
+    const QRectF& /*channelRect*/, const QRectF& paintRect)
+{
+    return paintBackground(painter, paintRect);
 }
 
 float QnResourceWidget::defaultAspectRatio() const
