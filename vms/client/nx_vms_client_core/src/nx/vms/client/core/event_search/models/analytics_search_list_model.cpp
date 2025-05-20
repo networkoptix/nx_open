@@ -444,6 +444,24 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(
     filter.timePeriod = request.period(q->interestTimePeriod());
     filter.objectTypeId = selectedObjectTypes;
 
+    if (!selectedObjectTypes.empty())
+    {
+        const auto& state = q->systemContext()->analyticsTaxonomyStateWatcher()->state();
+        auto currentObjectType = state->objectTypeById(selectedObjectTypeList.first());
+        auto prevObjectType = currentObjectType;
+        while (currentObjectType && selectedObjectTypeList.contains(currentObjectType->id()))
+        {
+            prevObjectType = currentObjectType;
+            currentObjectType = currentObjectType->base();
+        }
+
+        if (prevObjectType)
+        {
+            filter.objectTypeId.clear();
+            filter.objectTypeId.insert(prevObjectType->id());
+        }
+    }
+
     if (q->cameraSet().type() == ManagedCameraSet::Type::single && filterRect.isValid())
         filter.boundingBox = filterRect;
 

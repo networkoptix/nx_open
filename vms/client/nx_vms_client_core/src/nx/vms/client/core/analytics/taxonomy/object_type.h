@@ -85,8 +85,6 @@ public:
 
     void resolveAttributes();
 
-    static QString makeId(const QStringList& analyticsObjectTypeIds);
-
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;

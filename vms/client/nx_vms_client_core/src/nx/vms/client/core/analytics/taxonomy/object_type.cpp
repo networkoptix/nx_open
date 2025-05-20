@@ -173,11 +173,6 @@ void ObjectType::resolveAttributes()
     d->attributes = taxonomy::resolveAttributes(objectTypes, d->filter, this);
 }
 
-QString ObjectType::makeId(const QStringList& analyticsObjectTypeIds)
-{
-    return analyticsObjectTypeIds.join("|");
-}
-
 void ObjectType::setBaseObjectType(ObjectType* objectType)
 {
     d->baseObjectType = objectType;

@@ -307,7 +307,18 @@ ObjectType* AnalyticsFilterModel::objectTypeById(const QString& id) const
 
 ObjectType* AnalyticsFilterModel::findFilterObjectType(const QStringList& analyticsObjectTypeIds)
 {
-    return objectTypeById(ObjectType::makeId(analyticsObjectTypeIds));
+    if (analyticsObjectTypeIds.empty())
+        return nullptr;
+
+    auto currentObjectType = objectTypeById(analyticsObjectTypeIds.first());
+    auto prevObjectType = currentObjectType;
+    while (currentObjectType && analyticsObjectTypeIds.contains(currentObjectType->id()))
+    {
+        prevObjectType = currentObjectType;
+        currentObjectType = currentObjectType->baseObjectType();
+    }
+
+    return prevObjectType;
 }
 
 nx::analytics::taxonomy::AbstractEngine* AnalyticsFilterModel::findEngine(
@@ -318,7 +329,11 @@ nx::analytics::taxonomy::AbstractEngine* AnalyticsFilterModel::findEngine(
 
 QStringList AnalyticsFilterModel::getAnalyticsObjectTypeIds(ObjectType* filterObjectType)
 {
-    return filterObjectType ? QStringList{filterObjectType->id()} : QStringList{};
+    if (!filterObjectType)
+        return {};
+
+    const auto ids = filterObjectType->fullSubtreeTypeIds();
+    return QStringList{ids.begin(), ids.end()};
 }
 
 bool AnalyticsFilterModel::isActive() const
