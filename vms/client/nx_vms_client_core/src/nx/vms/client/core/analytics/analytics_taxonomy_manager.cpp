@@ -76,7 +76,7 @@ struct TaxonomyManager::Private
 
             for (const auto& scope: objectType->scopes())
             {
-                auto& relevantTypes = (*relevantObjectTypes)[scope->engine()];
+                auto& relevantTypes = (*relevantObjectTypes)[scope.engine()];
 
                 for (auto currentType = objectType;
                     currentType && !relevantTypes.contains(currentType);
@@ -85,7 +85,7 @@ struct TaxonomyManager::Private
                     relevantTypes.insert(currentType);
 
                     if (wasUsed && publicRootTypes.contains(currentType))
-                        relevantEngines.insert(scope->engine());
+                        relevantEngines.insert(scope.engine());
                 }
             }
         }

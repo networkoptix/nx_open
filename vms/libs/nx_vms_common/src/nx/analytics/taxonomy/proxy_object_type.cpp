@@ -141,7 +141,7 @@ bool ProxyObjectType::isNonIndexable() const
     return m_proxiedObjectType->isNonIndexable();
 }
 
-const std::vector<std::unique_ptr<Scope>>& ProxyObjectType::scopes() const
+const std::vector<Scope>& ProxyObjectType::scopes() const
 {
     return m_proxiedObjectType->scopes();
 }

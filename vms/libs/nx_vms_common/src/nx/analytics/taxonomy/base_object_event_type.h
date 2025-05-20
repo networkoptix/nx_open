@@ -83,7 +83,7 @@ public:
     virtual DerivedType* base() const;
     virtual std::vector<DerivedType*> derivedTypes() const;
     virtual bool isSupported(nx::Uuid engineId, nx::Uuid deviceId) const;
-    virtual const std::vector<std::unique_ptr<Scope>>& scopes() const;
+    virtual const std::vector<Scope>& scopes() const;
     virtual void addDerivedType(DerivedType* derivedType);
     virtual bool isLeaf() const;
     virtual void resolveReachability();
@@ -110,7 +110,7 @@ protected:
 
     std::vector<AttributeContext> m_attributes;
     std::vector<AbstractAttribute*> m_ownAttributes;
-    std::vector<std::unique_ptr<Scope>> m_scopes;
+    std::vector<Scope> m_scopes;
 
     QString m_typeName;
     bool m_isReachable = false;

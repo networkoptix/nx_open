@@ -150,7 +150,7 @@ bool eventBelongsToGroup(const EventType* eventType, const QString& groupId)
 {
     for (const auto& scope: eventType->scopes())
     {
-        const AbstractGroup* group = scope->group();
+        const AbstractGroup* group = scope.group();
         if (!group)
             continue;
 

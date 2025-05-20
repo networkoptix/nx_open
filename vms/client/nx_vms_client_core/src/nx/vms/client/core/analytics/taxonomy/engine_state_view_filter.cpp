@@ -51,7 +51,7 @@ bool EngineStateViewFilter::matches(
 
     for (const auto& scope: objectType->scopes())
     {
-        const nx::analytics::taxonomy::AbstractEngine* engine = scope->engine();
+        const nx::analytics::taxonomy::AbstractEngine* engine = scope.engine();
         if (engine && d->engine->id() == engine->id())
             return true;
     }

@@ -50,7 +50,7 @@ public:
 
     virtual bool isNonIndexable() const override;
 
-    virtual const std::vector<std::unique_ptr<Scope>>& scopes() const override;
+    virtual const std::vector<Scope>& scopes() const override;
 
     virtual nx::vms::api::analytics::ObjectTypeDescriptor serialize() const override;
 

@@ -66,13 +66,13 @@ std::vector<ScopedEntity<EntityType>> resolveEntities(
 
         for (const auto& scope: entity->scopes())
         {
-            if (const auto& engine = scope->engine();
+            if (const auto& engine = scope.engine();
                 engine
                 && allowedEngines.contains(nx::Uuid(engine->id()))
                 && (unresolved.engineId.isNull()
                     || engine->id() == unresolved.engineId.toString(QUuid::WithBraces)))
             {
-                result.push_back(ScopedEntity<EntityType>(engine, scope->group(), entity));
+                result.push_back(ScopedEntity<EntityType>(engine, scope.group(), entity));
             }
         }
     }

@@ -193,7 +193,7 @@ bool BaseObjectEventType<DerivedType, DescriptorType>::isReachable() const
 }
 
 template <typename DerivedType, typename DescriptorType>
-const std::vector<std::unique_ptr<Scope>>& BaseObjectEventType<DerivedType, DescriptorType>::scopes() const
+const std::vector<Scope>& BaseObjectEventType<DerivedType, DescriptorType>::scopes() const
 {
     return m_scopes;
 }
@@ -253,13 +253,13 @@ void BaseObjectEventType<DerivedType, DescriptorType>::resolveScopes(InternalSta
 
     for (const DescriptorScope& scope : m_descriptor.scopes)
     {
-        auto taxonomyScope = std::make_unique<Scope>();
+        Scope taxonomyScope;
         if (!scope.engineId.isNull())
         {
             if (Engine* engine =
                 inOutInternalState->getTypeById<Engine>(scope.engineId.toString(QUuid::WithBraces)))
             {
-                taxonomyScope->setEngine(engine);
+                taxonomyScope.setEngine(engine);
             }
             else
             {
@@ -278,7 +278,7 @@ void BaseObjectEventType<DerivedType, DescriptorType>::resolveScopes(InternalSta
             if (Group* group = inOutInternalState->getTypeById<Group>(scope.groupId);
                 group)
             {
-                taxonomyScope->setGroup(group);
+                taxonomyScope.setGroup(group);
             }
             else
             {
@@ -292,10 +292,10 @@ void BaseObjectEventType<DerivedType, DescriptorType>::resolveScopes(InternalSta
             }
         }
 
-        taxonomyScope->setProvider(scope.provider);
-        taxonomyScope->setHasTypeEverBeenSupportedInThisScope(scope.hasTypeEverBeenSupportedInThisScope);
+        taxonomyScope.setProvider(scope.provider);
+        taxonomyScope.setHasTypeEverBeenSupportedInThisScope(scope.hasTypeEverBeenSupportedInThisScope);
 
-        if (!taxonomyScope->isEmpty())
+        if (!taxonomyScope.isEmpty())
         {
             scopes.insert(scope);
             m_scopes.push_back(std::move(taxonomyScope));

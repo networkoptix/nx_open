@@ -99,9 +99,9 @@ std::set<ScopedEntity<EntityType>> supportedScopedEntityTypes(
             scopedEntityType.entityType = entityType;
             for (const auto& scope: entityType->scopes())
             {
-                if (scope->engine() == scopedEntityType.engine)
+                if (scope.engine() == scopedEntityType.engine)
                 {
-                    scopedEntityType.group = scope->group();
+                    scopedEntityType.group = scope.group();
                     break;
                 }
             }
@@ -258,10 +258,10 @@ std::set<ScopedEntity<EntityType>> compatibleScopedEntityTypes(
             const QString engineId = engine->getId().toString(QUuid::WithBraces);
             for (const auto& scope: entityType->scopes())
             {
-                const AbstractEngine* taxonomyEngine = scope->engine();
+                const AbstractEngine* taxonomyEngine = scope.engine();
                 if (taxonomyEngine && taxonomyEngine->id() == engineId)
                 {
-                    scopedEntityType.group = scope->group();
+                    scopedEntityType.group = scope.group();
                     break;
                 }
             }

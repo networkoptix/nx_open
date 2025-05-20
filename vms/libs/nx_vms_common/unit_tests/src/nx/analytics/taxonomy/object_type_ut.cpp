@@ -206,10 +206,10 @@ protected:
             for (const auto& scope: scopes)
             {
                 ScopeInfo scopeInfo;
-                const AbstractEngine* engine = scope->engine();
+                const AbstractEngine* engine = scope.engine();
                 ASSERT_TRUE(engine);
 
-                const AbstractGroup* group = scope->group();
+                const AbstractGroup* group = scope.group();
 
                 AbstractIntegration* integration = nullptr;
                 if (engine)

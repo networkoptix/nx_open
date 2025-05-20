@@ -31,7 +31,7 @@ EventDurationType eventGroupDuration(
     {
         for (const auto& scope: eventType->scopes())
         {
-            const auto group = scope->group();
+            const auto group = scope.group();
             if (group && (group->id() == groupId))
             {
                 if (!eventType->isStateDependent())
