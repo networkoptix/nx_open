@@ -221,7 +221,7 @@ void CommandAction::trigger()
         toggle();
 
     if (guard)
-        trigger();
+        emit triggered();
 }
 
 QAction* CommandAction::createQtAction(const CommandActionPtr& source, QObject* parent)
