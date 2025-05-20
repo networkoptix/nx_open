@@ -46,7 +46,5 @@ Item
         color: model.foregroundColor
 
         text: model.display
-
-        GlobalToolTip.text: model.toolTip
     }
 }
