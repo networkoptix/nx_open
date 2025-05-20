@@ -31,6 +31,7 @@
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/time/formatter.h>
 #include <storage/server_storage_manager.h>
 #include <ui/common/palette.h>
 
@@ -253,11 +254,12 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
         }
         else if (cloudBackupStorage && servicesStatus.status == nx::vms::api::UseStatus::overUse)
         {
+            const auto formatter = nx::vms::time::Formatter::system();
             alertBarMessage = tr("The number of devices selected for backup exceeds available "
                 "services. Add additional services or reduce the number of devices configured for "
                 "backup. On %1 the site will automatically limit the number of backed-up devices "
                 "to match the available services")
-                    .arg(servicesStatus.issueExpirationDate.toString());
+                    .arg(formatter->toString(servicesStatus.issueExpirationDate));
         }
 
         m_backupSettingsViewWidget->resourceViewWidget()->footerWidget()->setHidden(
