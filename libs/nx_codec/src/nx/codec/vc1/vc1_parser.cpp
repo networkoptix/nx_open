@@ -5,10 +5,8 @@
 #include <memory>
 #include <sstream>
 
-#include <QtCore/QDebug>
-#include <QtCore/QTextStream>
-
 #include <nx/codec/nal_units.h>
+#include <nx/utils/log/log.h>
 
 const char* pict_type_str[4] = {"I_TYPE", "P_TYPE", "B_TYPE", "BI_TYPE"};
 
@@ -110,7 +108,7 @@ bool VC1SequenceHeader::setFPS(double value)
             time_base_num = num_units_in_tick;
         }
         else {
-            qWarning() << "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams";
+            NX_DEBUG(this, "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams");
             return false;
         }
         if (time_scale == 24'000)
@@ -132,7 +130,7 @@ bool VC1SequenceHeader::setFPS(double value)
         return true;
     }
     else {
-        qWarning() << "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams";
+        NX_DEBUG(this, "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams");
         return false;
     }
 }
@@ -143,7 +141,7 @@ int VC1SequenceHeader::decode_sequence_header()
         bitReader.setBuffer(m_nalBuffer, m_nalBuffer + m_nalBufferLen); // skip 00 00 01 xx marker
         profile = bitReader.getBits(2);
         if (profile == PROFILE_COMPLEX)
-            qWarning() << "WMV3 Complex Profile is not fully supported";
+            NX_DEBUG(this, "WMV3 Complex Profile is not fully supported");
 
         if (profile == PROFILE_ADVANCED)
             return decode_sequence_header_adv();
@@ -151,7 +149,7 @@ int VC1SequenceHeader::decode_sequence_header()
         {
             res_sm = bitReader.getBits(2); //reserved
             if (res_sm) {
-                qWarning() << "Reserved RES_SM=" << res_sm << " is forbidden";
+                NX_DEBUG(this, "Reserved RES_SM=%1 is forbidden", res_sm);
                 return UNSUPPORTED_PARAM;
             }
         }
@@ -160,42 +158,42 @@ int VC1SequenceHeader::decode_sequence_header()
         bitrtq_postproc = bitReader.getBits(5); //common
         loop_filter = bitReader.getBit(); //common
         if(loop_filter == 1 && profile == PROFILE_SIMPLE)
-            qWarning() << "LOOPFILTER shell not be enabled in simple profile";
+            NX_DEBUG(this, "LOOPFILTER shell not be enabled in simple profile");
         int res_x8 = bitReader.getBit(); //reserved
         if (res_x8)
-            qWarning() << "1 for reserved RES_X8 is forbidden";
+            NX_DEBUG(this, "1 for reserved RES_X8 is forbidden");
         multires = bitReader.getBit();
         int res_fasttx = bitReader.getBit();
         if (!res_fasttx)
-            qWarning() << "0 for reserved RES_FASTTX is forbidden";
+            NX_DEBUG(this, "0 for reserved RES_FASTTX is forbidden");
         fastuvmc = bitReader.getBit();
         if (!profile && !fastuvmc) {
-            qWarning() << "FASTUVMC unavailable in Simple Profile";
+            NX_DEBUG(this, "FASTUVMC unavailable in Simple Profile");
             return UNSUPPORTED_PARAM;
         }
         extended_mv = bitReader.getBit();
         if (!profile && extended_mv) {
-            qWarning() << "Extended MVs unavailable in Simple Profile";
+            NX_DEBUG(this, "Extended MVs unavailable in Simple Profile");
             return UNSUPPORTED_PARAM;
         }
         dquant = bitReader.getBits(2);
         vstransform = bitReader.getBit();
         int res_transtab = bitReader.getBit();
         if (res_transtab) {
-            qWarning() << "1 for reserved RES_TRANSTAB is forbidden\n";
+            NX_DEBUG(this, "1 for reserved RES_TRANSTAB is forbidden");
             return UNSUPPORTED_PARAM;
         }
         overlap = bitReader.getBit();
         resync_marker = bitReader.getBit();
         rangered = bitReader.getBit();
         if (rangered && profile == PROFILE_SIMPLE)
-            qWarning() << "RANGERED should be set to 0 in simple profile";
+            NX_DEBUG(this, "RANGERED should be set to 0 in simple profile");
         max_b_frames = bitReader.getBits(3);
         quantizer_mode = bitReader.getBits(2);
         finterpflag = bitReader.getBit();
         int res_rtm_flag = bitReader.getBit();
         if (res_rtm_flag)
-            qWarning() << "Old WMV3 version detected.";
+            NX_DEBUG(this, "Old WMV3 version detected.");
         // TODO: figure out what they mean (always 0x402F)
         if(!res_fasttx) bitReader.skipBits(16);
         return 0;
@@ -208,7 +206,7 @@ int VC1SequenceHeader::decode_sequence_header_adv()
 {
     level = bitReader.getBits(3);
     if(level >= 5)
-        qWarning() << "Reserved LEVEL " << level;
+        NX_DEBUG(this, "Reserved LEVEL %1", level);
     chromaformat = bitReader.getBits(2);
     frmrtq_postproc = bitReader.getBits(3); //common
     bitrtq_postproc = bitReader.getBits(5); //common
@@ -257,7 +255,7 @@ int VC1SequenceHeader::decode_sequence_header_adv()
                     time_base_den = ff_vc1_fps_nr[nr - 1] * 1000;
                 }
                 else
-                    qWarning() << "Invalid fps value";
+                    NX_DEBUG(this, "Invalid fps value");
             }
         }
 

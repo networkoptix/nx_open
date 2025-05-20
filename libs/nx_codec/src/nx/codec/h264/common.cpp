@@ -5,6 +5,7 @@
 #include <nx/codec/h264/slice_header.h>
 #include <nx/codec/nal_units.h>
 #include <nx/utils/bit_stream.h>
+#include <nx/utils/log/log.h>
 
 namespace {
 
@@ -82,7 +83,7 @@ int NALUnit::deserialize(uint8_t* buffer, uint8_t* end)
 
     //NX_ASSERT((*buffer & 0x80) == 0);
     if ((*buffer & 0x80) != 0) {
-        qWarning() << "Invalid forbidden_zero_bit for nal unit " << decodeType(*buffer);
+        NX_DEBUG(this, "Invalid forbidden_zero_bit for nal unit %1", decodeType(*buffer));
     }
 
     nal_ref_idc   = (*buffer >> 5) & 0x3;
