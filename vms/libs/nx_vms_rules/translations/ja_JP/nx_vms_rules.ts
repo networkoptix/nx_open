@@ -425,18 +425,6 @@
   <context>
     <name>nx::vms::rules::DeviceDisconnectedEvent</name>
     <message>
-      <source>Device was disconnected</source>
-      <translation>デバイスが切断されました</translation>
-    </message>
-    <message>
-      <source>Camera was disconnected</source>
-      <translation>カメラが切断されました</translation>
-    </message>
-    <message>
-      <source>I/O Module was disconnected</source>
-      <translation>I/Oモジュールが切断されました</translation>
-    </message>
-    <message>
       <source>Device Disconnected</source>
       <translation>デバイス切断</translation>
     </message>
@@ -453,19 +441,31 @@
       <translation>カメラ</translation>
     </message>
     <message>
-      <source>Device was disconnected at %1</source>
-      <comment>%1 is a server name</comment>
-      <translation>%1 のデバイスが切断されました。</translation>
+      <source>Device disconnected</source>
+      <translation type="unfinished">Device disconnected</translation>
     </message>
     <message>
-      <source>Camera was disconnected at %1</source>
-      <comment>%1 is a server name</comment>
-      <translation>%1 のカメラが切断されました。</translation>
+      <source>Camera disconnected</source>
+      <translation type="unfinished">Camera disconnected</translation>
     </message>
     <message>
-      <source>I/O Module was disconnected at %1</source>
+      <source>I/O Module disconnected</source>
+      <translation type="unfinished">I/O Module disconnected</translation>
+    </message>
+    <message>
+      <source>Device disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation>%1 のI/Oモジュールが切断されました。</translation>
+      <translation type="unfinished">Device disconnected at %1</translation>
+    </message>
+    <message>
+      <source>Camera disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">Camera disconnected at %1</translation>
+    </message>
+    <message>
+      <source>I/O Module disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">I/O Module disconnected at %1</translation>
     </message>
   </context>
   <context>

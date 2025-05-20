@@ -6312,6 +6312,16 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler</name>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n Marcadores</numerusform>
+        <numerusform>%n Marcadores</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -12000,13 +12010,6 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
   </context>
   <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n marcadores</numerusform>
-        <numerusform>%n marcadores</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Export completed</source>
       <translation>Exportação concluída</translation>

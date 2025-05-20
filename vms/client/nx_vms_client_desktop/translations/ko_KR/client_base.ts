@@ -6207,6 +6207,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler</name>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>즐겨찾기 %n</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -11822,12 +11831,6 @@ We recommend you not to open this web page. If you understand the risks, you can
   </context>
   <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>즐겨찾기 %n</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Export completed</source>
       <translation>내보내기 완료</translation>

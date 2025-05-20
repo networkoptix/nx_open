@@ -6207,6 +6207,15 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler</name>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n bookmark</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -11824,12 +11833,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
   </context>
   <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n bookmark</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Export completed</source>
       <translation>Ekspor selesai</translation>

@@ -6312,6 +6312,16 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler</name>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n signet</numerusform>
+        <numerusform>%n signets</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -12002,13 +12012,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
   </context>
   <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n signet</numerusform>
-        <numerusform>%n signets</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Export completed</source>
       <translation>Exportation terminée</translation>

@@ -93,7 +93,7 @@
     </message>
     <message>
       <source>Cannot share bookmark.</source>
-      <translation type="unfinished">Cannot share bookmark.</translation>
+      <translation>Нельзя поделиться закладкой.</translation>
     </message>
   </context>
   <context>

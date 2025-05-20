@@ -6311,6 +6311,16 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler</name>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n yer işareti</numerusform>
+        <numerusform>%n yer işareti</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -11995,13 +12005,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
   </context>
   <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n yer işareti</numerusform>
-        <numerusform>%n yer işareti</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Export completed</source>
       <translation>Aktarma tamamlandı</translation>

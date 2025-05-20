@@ -446,18 +446,6 @@
   <context>
     <name>nx::vms::rules::DeviceDisconnectedEvent</name>
     <message>
-      <source>Device was disconnected</source>
-      <translation>Устройство отключено</translation>
-    </message>
-    <message>
-      <source>Camera was disconnected</source>
-      <translation>Камера отключена</translation>
-    </message>
-    <message>
-      <source>I/O Module was disconnected</source>
-      <translation>Модуль ввода/вывода отключен</translation>
-    </message>
-    <message>
       <source>Device Disconnected</source>
       <translation type="unfinished">Device Disconnected</translation>
     </message>
@@ -474,19 +462,31 @@
       <translation>Камера</translation>
     </message>
     <message>
-      <source>Device was disconnected at %1</source>
-      <comment>%1 is a server name</comment>
-      <translation>Устройство было отключено от %1</translation>
+      <source>Device disconnected</source>
+      <translation type="unfinished">Device disconnected</translation>
     </message>
     <message>
-      <source>Camera was disconnected at %1</source>
-      <comment>%1 is a server name</comment>
-      <translation>Устройство было отключено от %1</translation>
+      <source>Camera disconnected</source>
+      <translation type="unfinished">Camera disconnected</translation>
     </message>
     <message>
-      <source>I/O Module was disconnected at %1</source>
+      <source>I/O Module disconnected</source>
+      <translation type="unfinished">I/O Module disconnected</translation>
+    </message>
+    <message>
+      <source>Device disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">I/O Module was disconnected at %1</translation>
+      <translation type="unfinished">Device disconnected at %1</translation>
+    </message>
+    <message>
+      <source>Camera disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">Camera disconnected at %1</translation>
+    </message>
+    <message>
+      <source>I/O Module disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">I/O Module disconnected at %1</translation>
     </message>
   </context>
   <context>
@@ -1131,7 +1131,7 @@
     </message>
     <message>
       <source>The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</source>
-      <translation type="unfinished">The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</translation>
+      <translation>Локальная база данных была обнаружена поврежденной и не может быть восстановлена. Была инициализирована новая пустая база данных. Была сохранена резервная копия поврежденной базы данных.</translation>
     </message>
   </context>
   <context>

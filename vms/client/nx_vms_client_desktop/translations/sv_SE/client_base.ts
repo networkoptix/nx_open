@@ -6312,6 +6312,16 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler</name>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n bokmärken</numerusform>
+        <numerusform>%n bokmärken</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -12000,13 +12010,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
   </context>
   <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n bokmärken</numerusform>
-        <numerusform>%n bokmärken</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Export completed</source>
       <translation>Export slutförd</translation>

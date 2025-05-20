@@ -6207,6 +6207,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler</name>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n dấu trang</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -11824,12 +11833,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
   </context>
   <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n dấu trang</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Export completed</source>
       <translation>Hoàn thành xuất file</translation>

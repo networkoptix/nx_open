@@ -87,7 +87,7 @@
     </message>
     <message>
       <source>Cannot share bookmark.</source>
-      <translation type="unfinished">Cannot share bookmark.</translation>
+      <translation>Tidak dapat membagikan bookmark.</translation>
     </message>
   </context>
   <context>

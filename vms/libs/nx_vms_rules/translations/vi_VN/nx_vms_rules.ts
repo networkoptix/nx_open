@@ -425,18 +425,6 @@
   <context>
     <name>nx::vms::rules::DeviceDisconnectedEvent</name>
     <message>
-      <source>Device was disconnected</source>
-      <translation>Thiết bị đã được ngắt kết nối</translation>
-    </message>
-    <message>
-      <source>Camera was disconnected</source>
-      <translation>Camera bị ngắt kết nối</translation>
-    </message>
-    <message>
-      <source>I/O Module was disconnected</source>
-      <translation>Mô-đun I/O bị ngắt kết nối</translation>
-    </message>
-    <message>
       <source>Device Disconnected</source>
       <translation>Thiết bị ngắt kết nối</translation>
     </message>
@@ -453,19 +441,31 @@
       <translation>Camera</translation>
     </message>
     <message>
-      <source>Device was disconnected at %1</source>
-      <comment>%1 is a server name</comment>
-      <translation>Thiết bị đã bị ngắt kết nối lúc %1</translation>
+      <source>Device disconnected</source>
+      <translation type="unfinished">Device disconnected</translation>
     </message>
     <message>
-      <source>Camera was disconnected at %1</source>
-      <comment>%1 is a server name</comment>
-      <translation>Camera đã bị ngắt kết nối lúc %1</translation>
+      <source>Camera disconnected</source>
+      <translation type="unfinished">Camera disconnected</translation>
     </message>
     <message>
-      <source>I/O Module was disconnected at %1</source>
+      <source>I/O Module disconnected</source>
+      <translation type="unfinished">I/O Module disconnected</translation>
+    </message>
+    <message>
+      <source>Device disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation>Mô-đun I/O đã bị ngắt kết nối lúc %1</translation>
+      <translation type="unfinished">Device disconnected at %1</translation>
+    </message>
+    <message>
+      <source>Camera disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">Camera disconnected at %1</translation>
+    </message>
+    <message>
+      <source>I/O Module disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">I/O Module disconnected at %1</translation>
     </message>
   </context>
   <context>

@@ -6521,6 +6521,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler</name>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n zakładka</numerusform>
+        <numerusform>%n zakładki</numerusform>
+        <numerusform>%n zakładek</numerusform>
+        <numerusform>%n zakładek</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -12351,15 +12363,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
   </context>
   <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n zakładka</numerusform>
-        <numerusform>%n zakładki</numerusform>
-        <numerusform>%n zakładek</numerusform>
-        <numerusform>%n zakładek</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Export completed</source>
       <translation>Zakończono eksportowanie</translation>

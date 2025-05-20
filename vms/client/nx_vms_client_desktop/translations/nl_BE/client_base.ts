@@ -6312,6 +6312,16 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
   </context>
   <context>
+    <name>WorkbenchExportHandler</name>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n bladwijzer</numerusform>
+        <numerusform>%n bladwijzers</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -12000,13 +12010,6 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
   </context>
   <context>
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n bladwijzer</numerusform>
-        <numerusform>%n bladwijzers</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Export completed</source>
       <translation>Exporteren voltooid</translation>

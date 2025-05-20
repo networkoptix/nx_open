@@ -425,18 +425,6 @@
   <context>
     <name>nx::vms::rules::DeviceDisconnectedEvent</name>
     <message>
-      <source>Device was disconnected</source>
-      <translation>Perangkat tidak terkoneksi</translation>
-    </message>
-    <message>
-      <source>Camera was disconnected</source>
-      <translation>Kamera tidak terkoneksi</translation>
-    </message>
-    <message>
-      <source>I/O Module was disconnected</source>
-      <translation>Modul I/O tidak terkoneksi</translation>
-    </message>
-    <message>
       <source>Device Disconnected</source>
       <translation>Perangkat Tidak Terkoneksi</translation>
     </message>
@@ -453,19 +441,31 @@
       <translation>Camera</translation>
     </message>
     <message>
-      <source>Device was disconnected at %1</source>
-      <comment>%1 is a server name</comment>
-      <translation>Perangkat tidak terkoneksi pada %1</translation>
+      <source>Device disconnected</source>
+      <translation type="unfinished">Device disconnected</translation>
     </message>
     <message>
-      <source>Camera was disconnected at %1</source>
-      <comment>%1 is a server name</comment>
-      <translation>Kamera tidak terkoneksi pada %1</translation>
+      <source>Camera disconnected</source>
+      <translation type="unfinished">Camera disconnected</translation>
     </message>
     <message>
-      <source>I/O Module was disconnected at %1</source>
+      <source>I/O Module disconnected</source>
+      <translation type="unfinished">I/O Module disconnected</translation>
+    </message>
+    <message>
+      <source>Device disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation>Modul I/O tidak terkoneksi pada %1</translation>
+      <translation type="unfinished">Device disconnected at %1</translation>
+    </message>
+    <message>
+      <source>Camera disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">Camera disconnected at %1</translation>
+    </message>
+    <message>
+      <source>I/O Module disconnected at %1</source>
+      <comment>%1 is a server name</comment>
+      <translation type="unfinished">I/O Module disconnected at %1</translation>
     </message>
   </context>
   <context>
@@ -1089,7 +1089,7 @@
     </message>
     <message>
       <source>The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</source>
-      <translation type="unfinished">The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</translation>
+      <translation>Database lokal ditemukan rusak dan tidak dapat dipulihkan. Database kosong baru telah diinisialisasi. Salinan backup database yang rusak telah disimpan untuk referensi.</translation>
     </message>
   </context>
   <context>

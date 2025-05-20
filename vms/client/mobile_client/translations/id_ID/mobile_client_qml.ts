@@ -901,11 +901,11 @@
     </message>
     <message>
       <source>Select Lifetime</source>
-      <translation type="unfinished">Select Lifetime</translation>
+      <translation>Pilih Seumur Hidup</translation>
     </message>
     <message>
       <source>Share Link</source>
-      <translation type="unfinished">Share Link</translation>
+      <translation>Bagi Link</translation>
     </message>
   </context>
   <context>
@@ -920,7 +920,7 @@
     </message>
     <message>
       <source>Log in as</source>
-      <translation type="unfinished">Log in as</translation>
+      <translation>Masuk sebagai</translation>
     </message>
     <message>
       <source>Login</source>
