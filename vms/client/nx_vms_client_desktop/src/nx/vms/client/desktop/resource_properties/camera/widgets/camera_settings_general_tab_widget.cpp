@@ -199,6 +199,8 @@ void CameraSettingsGeneralTabWidget::editCredentials(CameraSettingsDialogStore* 
 
             store->setCredentials(dialog->login(), dialog->password());
         });
+
+    dialog->show();
 }
 
 void CameraSettingsGeneralTabWidget::editCameraStreams(CameraSettingsDialogStore* store)
