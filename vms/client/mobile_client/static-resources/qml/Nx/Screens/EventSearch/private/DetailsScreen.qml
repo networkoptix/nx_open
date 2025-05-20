@@ -79,7 +79,7 @@ Page
 
             description: qsTr("Sharing opens the new bookmark dialog to generate a playback link" +
                 " after setting the sharing options")
-            doNotShowAgain: !appContext.settings.showHowshareWorksNotification
+            doNotShowAgain: !appContext.settings.showHowShareWorksNotification
             onContinued:
             {
                 appContext.settings.showHowShareWorksNotification = !doNotShowAgain
