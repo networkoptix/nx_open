@@ -21,10 +21,17 @@ class WebSocketConnection;
 class Executor
 {
 public:
+    Executor(Request request): m_responseId(request.responseId()), m_request(std::move(request)) {}
     virtual ~Executor() = default;
+    const ResponseId& responseId() const { return m_responseId; }
+
+    using ResponseHandler = nx::MoveOnlyFunc<void(Response)>;
     virtual void execute(
-        std::weak_ptr<WebSocketConnection> connection,
-        nx::MoveOnlyFunc<void(Response)> handler) = 0;
+        std::weak_ptr<WebSocketConnection> connection, ResponseHandler handler) = 0;
+
+protected:
+    ResponseId m_responseId;
+    Request m_request;
 };
 
 class ExecutorCreator
@@ -64,7 +71,6 @@ private:
     };
 
     void executeAsync(
-        ResponseId responseId,
         Connection* connection,
         std::unique_ptr<Executor> executor,
         nx::MoveOnlyFunc<void(Response)> handler);

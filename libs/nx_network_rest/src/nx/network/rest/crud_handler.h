@@ -166,8 +166,7 @@ protected:
     virtual Response executePut(const Request& request) override;
     virtual Response executeDelete(const Request& request) override;
     virtual QString subscriptionId(const Request& request) override;
-    virtual nx::utils::Guard subscribe(
-        const QString& id, const Request& request, SubscriptionCallback callback) override;
+    virtual nx::utils::Guard subscribe(const Request& request, SubscriptionCallback callback) override;
     virtual QString idParamName() const override { return m_idParamName; }
 
     template<typename T>
@@ -726,12 +725,13 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
 
 template<typename Derived>
 nx::utils::Guard CrudHandler<Derived>::subscribe(
-    const QString& id, const Request& request, SubscriptionCallback callback)
+    const Request& request, SubscriptionCallback callback)
 {
-    NX_ASSERT(!id.isEmpty(), "Id must be obtained by subscriptionId()");
+    NX_ASSERT(!request.jsonRpcContext()->subscriptionId.isEmpty(),
+        "Id must be filled by setJsonRpcSubscriptionId()");
     if constexpr (DoesMethodExist_addSubscription<Derived>::value)
     {
-        return static_cast<Derived*>(this)->addSubscription(id, request, std::move(callback));
+        return static_cast<Derived*>(this)->addSubscription(request, std::move(callback));
     }
     else
     {

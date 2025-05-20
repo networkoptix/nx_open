@@ -113,7 +113,7 @@ public:
     using SubscriptionCallback = nx::MoveOnlyFunc<void(
         const QString& id, NotifyType, const std::shared_ptr<rapidjson::Document>& payload)>;
 
-    virtual nx::utils::Guard subscribe(const QString& /*id*/, const Request&, SubscriptionCallback)
+    virtual nx::utils::Guard subscribe(const Request&, SubscriptionCallback)
     {
         return {};
     }
@@ -122,13 +122,13 @@ public:
     virtual QString subscriptionId(const Request&) { return {}; }
 
     virtual bool proxySubscribe(
-        const Request&, nx::MoveOnlyFunc<void(nx::json_rpc::Response)>* /*handler*/)
+        const Request&, nx::MoveOnlyFunc<void(nx::json_rpc::Response)> /*handler*/)
     {
         return false;
     }
 
     virtual bool proxyUnsubscribe(
-        const Request&, nx::MoveOnlyFunc<void(nx::json_rpc::Response)>* /*handler*/)
+        const Request&, nx::MoveOnlyFunc<void(nx::json_rpc::Response)> /*handler*/)
     {
         return false;
     }

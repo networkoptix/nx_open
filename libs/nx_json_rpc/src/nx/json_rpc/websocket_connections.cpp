@@ -11,7 +11,6 @@
 namespace nx::json_rpc {
 
 void WebSocketConnections::executeAsync(
-    ResponseId responseId,
     Connection* connection,
     std::unique_ptr<Executor> executor,
     nx::MoveOnlyFunc<void(Response)> handler)
@@ -19,14 +18,13 @@ void WebSocketConnections::executeAsync(
     auto threadIt = connection->threads.insert(connection->threads.begin(), std::thread());
     *threadIt = std::thread(
         [this,
-            responseId = std::move(responseId),
             executor = std::move(executor),
             handler = std::move(handler),
             weakConnection = std::weak_ptr(connection->connection),
             threadIt]() mutable
         {
             auto response =
-                [responseId = std::move(responseId), executor = std::move(executor), &weakConnection]()
+                [executor = std::move(executor), &weakConnection]()
                 {
                     std::promise<Response> promise;
                     auto future = promise.get_future();
@@ -38,14 +36,15 @@ void WebSocketConnections::executeAsync(
                     }
                     catch (const std::exception& e)
                     {
-                        return nx::json_rpc::Response::makeError(responseId,
+                        return nx::json_rpc::Response::makeError(executor->responseId(),
                             Error::internalError,
-                                NX_FMT("Unhandled exception: %1", e.what()).toStdString());
+                            NX_FMT("Unhandled exception: %1", e.what()).toStdString());
                     }
                     catch (...)
                     {
-                        return nx::json_rpc::Response::makeError(
-                            responseId, Error::internalError, "Unhandled exception");
+                        return nx::json_rpc::Response::makeError(executor->responseId(),
+                            Error::internalError,
+                            "Unhandled exception");
                     }
                 }();
             if (auto connection = weakConnection.lock())
@@ -95,9 +94,7 @@ void WebSocketConnections::addConnection(std::shared_ptr<WebSocketConnection> co
             {
                 if (executorCreator->isMatched(request.method))
                 {
-                    auto responseId = request.responseId();
                     executeAsync(
-                        std::move(responseId),
                         &it->second,
                         executorCreator->create(std::move(request)),
                         std::move(handler));

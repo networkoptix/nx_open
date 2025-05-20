@@ -46,6 +46,9 @@ struct Context
     std::weak_ptr<nx::json_rpc::WebSocketConnection> connection;
     bool subscribed = false;
 
+    // Field is filled by PathRouter.
+    QString subscriptionId;
+
     // Next fields are filled by Request constructor.
     std::optional<Crud> crud;
     std::optional<Subs> subs;
@@ -232,6 +235,7 @@ public:
 
     void forceSessionAccess(UserAccessData access) const;
     void renameParameter(const QString& oldName, const QString& newName);
+    void setJsonRpcSubscriptionId(const QString& id) { m_jsonRpcContext->subscriptionId = id; }
 
 private:
     template<typename T, typename = std::void_t<>> struct HasPostprocessFields: std::false_type {};

@@ -94,8 +94,14 @@ Handler* PathRouter::findHandlerOrThrow(Request* request, const QString& pathIgn
     bool needModify = true;
     if (auto context = request->jsonRpcContext())
     {
-        if (context->subs && result.handler->subscriptionId(*request).isEmpty())
-            return nullptr;
+        if (context->subs)
+        {
+            const auto id = result.handler->subscriptionId(*request);
+            if (id.isEmpty())
+                return nullptr;
+
+            request->setJsonRpcSubscriptionId(id);
+        }
 
         const bool isOne = context->crud == json_rpc::Crud::one;
         const bool isAll = context->crud == json_rpc::Crud::all;

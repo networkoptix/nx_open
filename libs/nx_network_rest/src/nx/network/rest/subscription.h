@@ -37,8 +37,9 @@ public:
         subscribedIds = std::move(m_subscribedIds);
     }
 
-    nx::utils::Guard addSubscription(const QString& id, const Request&, SubscriptionCallback callback)
+    nx::utils::Guard addSubscription(const Request& request, SubscriptionCallback callback)
     {
+        const auto& id = request.jsonRpcContext()->subscriptionId;
         auto subscription = std::make_shared<SubscriptionCallback>(std::move(callback));
         NX_VERBOSE(this, "Add subscription %1 for %2", subscription.get(), id);
 
