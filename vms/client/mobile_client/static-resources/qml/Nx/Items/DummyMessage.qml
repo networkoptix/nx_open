@@ -41,6 +41,8 @@ Pane
                 id: title
                 width: parent.width
                 topPadding: 8
+                leftPadding: 16
+                rightPadding: 16
                 horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: 22
                 lineHeight: 1.25
@@ -53,6 +55,8 @@ Pane
             {
                 id: description
                 topPadding: 8
+                leftPadding: 16
+                rightPadding: 16
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: 14
