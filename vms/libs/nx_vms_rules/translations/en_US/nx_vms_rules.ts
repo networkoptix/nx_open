@@ -432,18 +432,6 @@
 <context>
     <name>nx::vms::rules::DeviceDisconnectedEvent</name>
     <message>
-        <source>Device was disconnected</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera was disconnected</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O Module was disconnected</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Device Disconnected</source>
         <translation></translation>
     </message>
@@ -460,17 +448,29 @@
         <translation></translation>
     </message>
     <message>
-        <source>Device was disconnected at %1</source>
+        <source>Device disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device disconnected at %1</source>
         <comment>%1 is a server name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera was disconnected at %1</source>
+        <source>Camera disconnected at %1</source>
         <comment>%1 is a server name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>I/O Module was disconnected at %1</source>
+        <source>I/O Module disconnected at %1</source>
         <comment>%1 is a server name</comment>
         <translation type="unfinished"></translation>
     </message>
