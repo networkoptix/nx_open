@@ -6313,7 +6313,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>WorkbenchExportHandler</name>
     <message numerus="yes">
         <source>%n bookmarks</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n bookmark</numerusform>
             <numerusform>%n bookmarks</numerusform>
         </translation>
