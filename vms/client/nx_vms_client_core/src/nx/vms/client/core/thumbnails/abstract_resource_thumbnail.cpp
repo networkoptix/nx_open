@@ -164,6 +164,7 @@ void AbstractResourceThumbnail::setResource(const QnResourcePtr& value)
         return;
 
     d->receiver.reset();
+    d->updateOperation.cancel();
     d->resource = value;
     reset();
 
@@ -192,6 +193,13 @@ void AbstractResourceThumbnail::setResource(const QnResourcePtr& value)
 
         connect(d->resource.get(), &QnResource::parentIdChanged, d->receiver.get(),
             [this]() { d->updateIsArmServer(); });
+
+        connect(d->resource.get(), &QnResource::flagsChanged, d->receiver.get(),
+            [this](const QnResourcePtr& sender)
+            {
+                if (d->resource == sender && sender->hasFlags(Qn::removed))
+                    setResource({});
+            });
     }
 
     emit resourceChanged();
