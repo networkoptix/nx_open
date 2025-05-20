@@ -15,17 +15,22 @@ Popup
     property alias title: sheetTitleText.text
     property alias contentSpacing: contentColumn.spacing
 
-    implicitWidth: mainWindow.width
-    implicitHeight: mainWindow.height
+    parent: Overlay.overlay
+
+    width: parent.width
+    height: parent.height
+
+    modal: true
 
     background: Rectangle
     {
         color: ColorTheme.colors.dark7
     }
 
-    leftPadding: 16
-    rightPadding: 16
-    bottomPadding: 16
+    topPadding: windowParams.topMargin
+    leftPadding: 0
+    rightPadding: 0
+    bottomPadding: 16 + windowParams.bottomMargin
 
     contentItem: Item
     {
@@ -33,8 +38,8 @@ Popup
         {
             id: header
 
-            x: -control.leftPadding
-            width: parent.width + control.leftPadding + control.rightPadding
+            x: windowParams.leftMargin
+            width: parent.width - windowParams.leftMargin - windowParams.rightMargin
             height: 56
 
             TitleLabel
@@ -65,7 +70,7 @@ Popup
             y: header.height + 12
 
             width: parent.width
-            height: parent.height - y - control.bottomPadding
+            height: parent.height - y
             clip: true
 
             contentHeight: contentColumn.height
@@ -74,8 +79,12 @@ Popup
             {
                 id: contentColumn
 
-                spacing: 4
-                width: parent.width
+                readonly property int leftPadding: 16 + windowParams.leftMargin
+                readonly property int rightPadding: 16 + windowParams.rightMargin
+
+                spacing: control.spacing
+                x: leftPadding
+                width: parent.width - leftPadding - rightPadding
             }
         }
     }

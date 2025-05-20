@@ -29,8 +29,6 @@ Page
     LayoutSheet
     {
         id: layoutSheet
-
-        y: -toolBar.height
     }
 
     onLeftButtonClicked: layoutSheet.open()
