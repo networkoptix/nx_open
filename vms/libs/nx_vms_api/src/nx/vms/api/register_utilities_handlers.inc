@@ -68,6 +68,8 @@ void registerUtilitiesHandlers(
      *     will wait before starting, until the next key frame from Device is received.
      * %param[opt]:option enable_analytics_objects Add an RTSP channel that contains Analytics
      *     Objects data in the JSON format.
+     * %param[opt]:option enable_start_time_header Add `x-start-time` header when responding to
+     *     PLAY request, only relevant if disable_fast_channel_zapping is absent (or false).
      * %return RTSP video/audio/metadata streams.
      * NOTE for analytics streaming: if Device has analytics plugin then RTSP server creates
      * addition track with type 'text'. This track contains analytics objects in the JSON format described below.
