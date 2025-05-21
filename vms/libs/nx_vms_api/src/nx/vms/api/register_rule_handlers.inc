@@ -145,6 +145,7 @@ void registerRuleHandlers(
 
     /**%apidoc GET /rest/v{4-}/events/triggers
      * Retrieves software triggers available to the given user.
+     * %jsonrpc subscribe
      * %caption Software triggers
      * %ingroup Events
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_with,_strict,_ticket,_local
