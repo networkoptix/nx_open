@@ -130,6 +130,10 @@ const UserAccessData kVideowallUserAccess(
     nx::Uuid("1044d2a5-639d-4c49-963e-c03898d0c113"),
     UserAccessData::Access::ReadAllResources);
 
+const UserAccessData kCloudServiceUserAccess(
+    nx::Uuid("f1361176-c57e-403b-b62b-297056707d45"),
+    UserAccessData::Access::ReadAllResources);
+
 const UserSession kSystemSession{{nx::Uuid()}, kSystemAccess};
 
 } // namespace nx::network::rest

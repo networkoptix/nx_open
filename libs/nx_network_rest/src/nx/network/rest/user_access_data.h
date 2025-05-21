@@ -107,5 +107,6 @@ struct UserSession
 NX_NETWORK_REST_API extern const UserSession kSystemSession;
 NX_NETWORK_REST_API extern const UserAccessData kSystemAccess;
 NX_NETWORK_REST_API extern const UserAccessData kVideowallUserAccess;
+NX_NETWORK_REST_API extern const UserAccessData kCloudServiceUserAccess;
 
 } // namespace nx::network::rest

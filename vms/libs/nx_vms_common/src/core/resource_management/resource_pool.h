@@ -231,6 +231,17 @@ public:
         return false;
     }
 
+    template<class Resource, class UnaryFunc>
+    void forEach(UnaryFunc filter) const
+    {
+        NX_READ_LOCKER locker(&m_resourcesMutex);
+        for (const QnResourcePtr& resource: m_resources)
+        {
+            if (auto derived = resource.template dynamicCast<Resource>())
+                filter(derived);
+        }
+    }
+
     QnVirtualCameraResourceList getAllNetResourceByHostAddress(
         const nx::network::HostAddress& hostAddress) const;
 
