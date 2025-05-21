@@ -902,11 +902,11 @@
     </message>
     <message>
       <source>Select Lifetime</source>
-      <translation type="unfinished">Select Lifetime</translation>
+      <translation>Välj livstid</translation>
     </message>
     <message>
       <source>Share Link</source>
-      <translation type="unfinished">Share Link</translation>
+      <translation>Dela länk</translation>
     </message>
   </context>
   <context>
@@ -921,7 +921,7 @@
     </message>
     <message>
       <source>Log in as</source>
-      <translation type="unfinished">Log in as</translation>
+      <translation>Logga in som</translation>
     </message>
     <message>
       <source>Login</source>
