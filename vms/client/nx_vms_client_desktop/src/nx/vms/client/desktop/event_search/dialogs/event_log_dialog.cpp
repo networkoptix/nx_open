@@ -64,6 +64,7 @@ namespace {
 
 constexpr auto kUpdateDelay = 1s;
 constexpr auto kQueryTimeout = 15s;
+constexpr auto kMaxEventLogToRequest = 1000;
 
 const auto kAnalyticsEventType = rules::utils::type<AnalyticsEvent>();
 
@@ -613,6 +614,7 @@ void EventLogDialog::query(
     filter.eventSubtype = analyticsEventTypeId;
     filter.actionType = typeList(actionType);
     filter.text = text;
+    filter.limit = kMaxEventLogToRequest + 1;
 
     const auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(eventDevices());
     if (!cameras.empty())
@@ -668,6 +670,10 @@ void EventLogDialog::retranslateUi()
 void EventLogDialog::requestFinished(
     nx::vms::api::rules::EventLogRecordList&& records, nx::network::rest::ErrorId error)
 {
+    const bool hasMoreRecords = records.size() > kMaxEventLogToRequest;
+    if (records.size() > kMaxEventLogToRequest)
+        records.erase(records.begin() + kMaxEventLogToRequest, records.end());
+
     m_model->setEvents(std::move(records));
 
     if (error != nx::network::rest::ErrorId::ok)
@@ -682,11 +688,23 @@ void EventLogDialog::requestFinished(
 
     if (start != end)
     {
-        ui->statusLabel->setText(
-            tr("Event log for period from %1 to %2 - %n events found",
-                "Dates are substituted", m_model->rowCount())
-            .arg(locale.toString(start, QLocale::LongFormat))
-            .arg(locale.toString(end, QLocale::LongFormat)));
+        if (hasMoreRecords)
+        {
+            ui->statusLabel->setText(
+                tr("Event log for period from %1 to %2 - Showing first %n events. To find "
+                    "specific events, please adjust the date range or apply additional filters",
+                    "Dates are substituted", m_model->rowCount())
+                .arg(locale.toString(start, QLocale::LongFormat))
+                .arg(locale.toString(end, QLocale::LongFormat)));
+        }
+        else
+        {
+            ui->statusLabel->setText(
+                tr("Event log for period from %1 to %2 - %n events found",
+                    "Dates are substituted", m_model->rowCount())
+                .arg(locale.toString(start, QLocale::LongFormat))
+                .arg(locale.toString(end, QLocale::LongFormat)));
+        }
     }
     else
     {
