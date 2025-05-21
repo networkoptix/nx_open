@@ -17,10 +17,11 @@ template<typename ResourceType>
 class ValueProvider
 {
 public:
+    template<typename Getter>
     ValueProvider(
         Scope scope,
         QString id,
-        Getter<ResourceType> getter,
+        Getter getter,
         Watch<ResourceType> watch = nullptr);
 
     const QString& id() const { return m_id; }
@@ -29,7 +30,7 @@ public:
 private:
     const Scope m_scope = Scope::local;
     const QString m_id;
-    const Getter<ResourceType> m_getter;
+    std::function<api::metrics::Value(const ResourceType&)> m_getter;
     const Watch<ResourceType> m_watch;
 };
 
@@ -73,15 +74,16 @@ std::unique_ptr<ValueGroupProvider<ResourceType>> makeValueGroupProvider(Args...
 // -----------------------------------------------------------------------------------------------
 
 template<typename ResourceType>
+template<typename Getter>
 ValueProvider<ResourceType>::ValueProvider(
     Scope scope,
     QString id,
-    Getter<ResourceType> getter,
+    Getter getter,
     Watch<ResourceType> watch)
 :
     m_scope(scope),
     m_id(std::move(id)),
-    m_getter(std::move(getter)),
+    m_getter(getter),
     m_watch(std::move(watch))
 {
 }

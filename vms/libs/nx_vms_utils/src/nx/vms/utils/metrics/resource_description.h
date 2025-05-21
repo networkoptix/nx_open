@@ -19,7 +19,6 @@ NX_VMS_UTILS_API QString toString(Scope scope);
  */
 struct NX_VMS_UTILS_API ResourceDescription
 {
-    ResourceDescription(QString id, Scope scope);
     virtual ~ResourceDescription() = default;
 
     ResourceDescription(const ResourceDescription&) = delete;
@@ -27,6 +26,9 @@ struct NX_VMS_UTILS_API ResourceDescription
 
     const QString id;
     const Scope scope = Scope::local;
+
+protected:
+    ResourceDescription(QString id, Scope scope);
 };
 
 /**

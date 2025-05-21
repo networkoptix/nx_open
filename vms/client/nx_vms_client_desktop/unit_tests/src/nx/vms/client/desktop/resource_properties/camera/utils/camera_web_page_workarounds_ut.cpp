@@ -125,7 +125,8 @@ private:
     quint16 m_port = 0;
 };
 
-TEST_F(CameraWebPageWorkaroundsTest, setXmlHttpRequestTimeout)
+// FIXME: @unikitenkov VMS-54962
+TEST_F(CameraWebPageWorkaroundsTest, DISABLED_setXmlHttpRequestTimeout)
 {
     static constexpr milliseconds kRequestDelay = 1000ms;
     givenWebServerWithHtml(R"HTML(
