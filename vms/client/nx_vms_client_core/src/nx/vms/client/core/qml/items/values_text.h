@@ -34,6 +34,11 @@ class ValuesText: public QQuickItem
         NOTIFY maximumLineCountChanged)
     Q_PROPERTY(qreal effectiveWidth READ effectiveWidth NOTIFY effectiveWidthChanged)
     Q_PROPERTY(int spacing READ spacing WRITE setSpacing() NOTIFY spacingChanged)
+    Q_PROPERTY(
+        qreal colorBoxSize
+        READ colorBoxSize
+        WRITE setColorBoxSize
+        NOTIFY colorBoxSizeChanged)
 
 public:
     ValuesText(QQuickItem* parent = nullptr);
@@ -65,6 +70,9 @@ public:
     int spacing() const;
     void setSpacing(int value);
 
+    qreal colorBoxSize() const;
+    void setColorBoxSize(qreal value);
+
     static void registerQmlType();
 
 protected:
@@ -82,6 +90,7 @@ signals:
     void maximumLineCountChanged();
     void effectiveWidthChanged();
     void spacingChanged();
+    void colorBoxSizeChanged();
 
 private:
     void updateItemView();

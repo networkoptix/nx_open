@@ -12,7 +12,6 @@ class ColorSquareTextObject: public QObject, public QTextObjectInterface
     Q_INTERFACES(QTextObjectInterface)
 
 public:
-    static constexpr int sLength = 16;
     enum
     {
         ColorSquareTextFormat = QTextFormat::UserObject + 1
@@ -20,7 +19,8 @@ public:
 
     enum Properties
     {
-        Color = 1
+        Color = 1,
+        Length
     };
 
     QSizeF intrinsicSize(QTextDocument* doc, int posInDocument, const QTextFormat& format) override;

@@ -33,6 +33,8 @@ struct ValuesText::Private
     QTextDocument document{};
     bool dirty = true;
     int spacing = 4;
+    int innerSpacing = 2;
+    qreal colorBoxSize = 16;
     qreal effectiveWidth = 0;
 
     void updateImplicitWidth()
@@ -50,7 +52,7 @@ struct ValuesText::Private
                 if (i > 0)
                     implicitWidth += spacing;
                 if (colorValues.count() > i)
-                    implicitWidth += ColorSquareTextObject::sLength + spacing;
+                    implicitWidth += colorBoxSize + spacing;
                 implicitWidth += fm.size(0, values.at(i)).width();
             }
         }
@@ -59,9 +61,7 @@ struct ValuesText::Private
 
     QString appendixText() const
     {
-        const int moreItemsCount = colorValues.count() > 0
-            ? qMin(colorValues.count(), values.count()) - visibleValues.count()
-            : values.count() - visibleValues.count();
+        const int moreItemsCount = values.count() - visibleValues.count();
         return moreItemsCount > 0
             ? QString("+%1").arg(moreItemsCount)
             : "";
@@ -229,6 +229,21 @@ void ValuesText::setSpacing(int value)
     emit spacingChanged();
 }
 
+qreal ValuesText::colorBoxSize() const
+{
+    return d->colorBoxSize;
+}
+
+void ValuesText::setColorBoxSize(qreal value)
+{
+    if (d->colorBoxSize == value)
+        return;
+
+    d->colorBoxSize = value;
+    updateItemView();
+    emit colorBoxSizeChanged();
+}
+
 void ValuesText::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
     base_type::geometryChange(newGeometry, oldGeometry);
@@ -382,8 +397,10 @@ void ValuesText::updateColorRow()
     qreal valuesWidth = 0;
     qreal appendixWidth = 0;
     qreal availableWidth = 0;
+    qreal textHeight = 0;
     QFontMetricsF fm(d->document.defaultFont());
     d->visibleValues = d->values;
+    QList<qreal> valuesWidthList(d->values.count());
     while (d->visibleValues.count() > 0)
     {
         valuesWidth = 0;
@@ -394,41 +411,53 @@ void ValuesText::updateColorRow()
             if (valuesWidth > 0)
                 valuesWidth += d->spacing;
             if (d->colorValues.count() > i)
-                valuesWidth += ColorSquareTextObject::sLength + d->spacing;
-            valuesWidth += fm.size(0, d->visibleValues.at(i)).width();
+                valuesWidth += d->colorBoxSize + d->innerSpacing;
+            QSizeF textSize = fm.size(0, d->visibleValues.at(i));
+            valuesWidthList[i] = ceil(textSize.width());
+            valuesWidth += valuesWidthList[i];
+            textHeight = textSize.height();
         }
         if (d->visibleValues.count() == 1 || valuesWidth <= availableWidth)
             break;
         d->visibleValues.removeLast();
     }
-    setImplicitHeight(ColorSquareTextObject::sLength);
+    setImplicitHeight(qMax(textHeight, d->colorBoxSize));
 
-    QTextCursor cursor(&d->document);
     QTextCharFormat textFormat;
     textFormat.setForeground(d->color);
-    textFormat.setVerticalAlignment(QTextCharFormat::AlignTop);
-    cursor.setCharFormat(textFormat);
-
+    textFormat.setVerticalAlignment(QTextCharFormat::AlignMiddle);
     const QString appendix = d->appendixText();
     QTextTableFormat tableFormat;
     tableFormat.setCellPadding(0);
     tableFormat.setCellSpacing(0);
     tableFormat.setBorder(0);
     tableFormat.setWidth(width());
+    tableFormat.setHeight(implicitHeight());
     QList<QTextLength> constraints;
     for (int i = 0; i < d->visibleValues.count(); ++i)
-        constraints.append(QTextLength());
-    qreal spacerWidth = width() - valuesWidth - appendixWidth;
-    if (spacerWidth > 0)
-        constraints.append(QTextLength(QTextLength::FixedLength, spacerWidth));
+    {
+        if (d->colorValues.count() > i)
+        {
+            constraints.append(QTextLength(QTextLength::FixedLength, d->colorBoxSize));
+            constraints.append(QTextLength(QTextLength::FixedLength, d->innerSpacing));
+        }
+        constraints.append(QTextLength(QTextLength::FixedLength, valuesWidthList[i]));
+        if (i < d->visibleValues.count() - 1)
+            constraints.append(QTextLength(QTextLength::FixedLength, d->spacing));
+    }
+    constraints.append(QTextLength());
     if (!appendix.isEmpty())
         constraints.append(QTextLength(QTextLength::FixedLength, ceil(appendixWidth)));
     tableFormat.setColumnWidthConstraints(constraints);
+    QTextCursor cursor(&d->document);
+    cursor.setCharFormat(textFormat);
     auto table = cursor.insertTable(1, constraints.count(), tableFormat);
 
+    int column = 0;
     for (int i = 0; i < d->visibleValues.count(); ++i)
     {
-        cursor = table->cellAt(0, i).firstCursorPosition();
+        auto cell = table->cellAt(0, column);
+        cursor = cell.firstCursorPosition();
         int decorationWidth = 0;
         if (d->colorValues.count() > i)
         {
@@ -436,9 +465,15 @@ void ValuesText::updateColorRow()
             QTextCharFormat squareFormat(textFormat);
             squareFormat.setObjectType(ColorSquareTextObject::ColorSquareTextFormat);
             squareFormat.setProperty(ColorSquareTextObject::Color, color);
-            cursor.insertText(QString(QChar::ObjectReplacementCharacter) + " ", squareFormat);
-            decorationWidth = ColorSquareTextObject::sLength + d->spacing;
+            squareFormat.setProperty(ColorSquareTextObject::Length, d->colorBoxSize);
+            cursor.insertText(QString(QChar::ObjectReplacementCharacter), squareFormat);
+            decorationWidth = d->colorBoxSize + d->innerSpacing;
+
+            column += 2;
+            cell = table->cellAt(0, column);
+            cursor = cell.firstCursorPosition();
         }
+        cell.setFormat(textFormat);
         QString text = d->values.at(i);
         if (d->visibleValues.count() == 1)
         {
@@ -448,6 +483,7 @@ void ValuesText::updateColorRow()
                 text = "";
         }
         cursor.insertText(text);
+        column += 2;
     }
     if (appendixWidth > 0)
     {

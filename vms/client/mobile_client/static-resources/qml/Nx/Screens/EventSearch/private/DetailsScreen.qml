@@ -346,6 +346,7 @@ Page
                 valueFont.pixelSize: 16
                 valueColor: ColorTheme.colors.light4
                 valueFont.weight: Font.Medium
+                colorBoxSize: 18
             }
         }
     }

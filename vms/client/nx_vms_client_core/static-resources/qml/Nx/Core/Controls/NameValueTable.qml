@@ -28,6 +28,7 @@ Item
     property alias maxRowCount: grid.maxRowCount
     property int maximumLineCount: 2
     property alias rowSpacing: grid.rowSpacing
+    property real colorBoxSize: 16
 
     property color nameColor: "gray"
     property color valueColor: "white"
@@ -182,6 +183,7 @@ Item
                 values: modelData[control.valuesRole] ?? []
                 colorValues: modelData[control.colorsRole] ?? []
                 maximumLineCount: control.maximumLineCount
+                colorBoxSize: control.colorBoxSize
             }
         }
     }

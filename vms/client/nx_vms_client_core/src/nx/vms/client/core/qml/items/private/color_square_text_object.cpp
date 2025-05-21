@@ -9,9 +9,10 @@
 namespace nx::vms::client::core {
 
 QSizeF ColorSquareTextObject::intrinsicSize(
-    QTextDocument* /*doc*/, int /*posInDocument*/, const QTextFormat& /*format*/)
+    QTextDocument* /*doc*/, int /*posInDocument*/, const QTextFormat& format)
 {
-    return QSizeF{sLength, sLength};
+    const qreal length = qvariant_cast<qreal>(format.property(Properties::Length));
+    return QSizeF{length, length};
 }
 
 void ColorSquareTextObject::drawObject(
