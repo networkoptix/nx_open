@@ -7,6 +7,7 @@
 #include <opentelemetry/context/propagation/global_propagator.h>
 #include <opentelemetry/exporters/otlp/otlp_grpc_exporter.h>
 #include <opentelemetry/sdk/resource/resource.h>
+#include <opentelemetry/sdk/resource/resource_detector.h>
 #include <opentelemetry/sdk/trace/simple_processor.h>
 #include <opentelemetry/sdk/trace/tracer_provider.h>
 #include <opentelemetry/trace/propagation/http_trace_context.h>
@@ -18,7 +19,7 @@
 
 namespace nx::telemetry {
 
-void init(const std::string_view& serviceName, const Settings& settings)
+void init(const InitAttributes& attributes, const Settings& settings)
 {
     using namespace opentelemetry;
     using nostd::shared_ptr;
@@ -29,12 +30,12 @@ void init(const std::string_view& serviceName, const Settings& settings)
     if (!dynamic_cast<trace::NoopTracerProvider*>(trace::Provider::GetTracerProvider().get())) {
         NX_WARNING(NX_SCOPE_TAG,
             "Skipping telemetry initialization for %1. It has already been initialized.",
-            serviceName);
+            attributes.serviceName);
         return;
     }
 
     NX_INFO(NX_SCOPE_TAG, "Starting telemetry for %1. Collector endpoint: %2.",
-        serviceName, settings.endpoint);
+        attributes.serviceName, settings.endpoint);
 
     exporter::otlp::OtlpGrpcExporterOptions otlpOptions;
     otlpOptions.endpoint = settings.endpoint;
@@ -42,8 +43,11 @@ void init(const std::string_view& serviceName, const Settings& settings)
     auto exporter = std::make_unique<exporter::otlp::OtlpGrpcExporter>(otlpOptions);
     auto processor = std::make_unique<sdk::trace::SimpleSpanProcessor>(std::move(exporter));
 
-    auto resource = sdk::resource::Resource::Create(
-        {{"service.name", std::string(serviceName)}});
+    auto resource = sdk::resource::OTELResourceDetector().Detect();
+    resource = resource.Merge(sdk::resource::Resource::Create({
+        {"service.name", attributes.serviceName},
+        {"service.version", attributes.serviceVersion},
+    }));
 
     auto provider = shared_ptr<trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));

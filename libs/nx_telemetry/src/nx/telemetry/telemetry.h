@@ -2,12 +2,18 @@
 
 #pragma once
 
-#include <string_view>
+#include <string>
 
 namespace nx::telemetry {
 
 class Settings;
 
-NX_TELEMETRY_API void init(const std::string_view& serviceName, const Settings& settings);
+struct InitAttributes
+{
+    std::string serviceName;
+    std::string serviceVersion;
+};
+
+NX_TELEMETRY_API void init(const InitAttributes& attributes, const Settings& settings);
 
 } // namespace nx::telemetry
