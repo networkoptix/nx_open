@@ -64,9 +64,6 @@ private:
 
 using ValueMonitors = std::map<QString, std::unique_ptr<ValueMonitor>>;
 
-template<typename ResourceType>
-using Getter = nx::utils::MoveOnlyFunc<api::metrics::Value(const ResourceType&)>;
-
 using OnChange = nx::utils::MoveOnlyFunc<void()>;
 
 template<typename ResourceType>
@@ -83,7 +80,7 @@ public:
         QString name,
         Scope scope,
         const ResourceType& resource,
-        const Getter<ResourceType>& getter);
+        std::function<api::metrics::Value(const ResourceType&)> getter);
 
     void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const override;
 
@@ -91,8 +88,20 @@ protected:
     virtual api::metrics::Value valueOrThrow() const override;
 
 private:
-    const ResourceType& m_resource;
-    const Getter<ResourceType>& m_getter;
+    // NOTE: Storing const reference to raw pointer results in a corrupted address, because const
+    // reference is passed all the way down upon initialization.
+    // ```
+    //  std::unique_ptr<Camera> camera = ...;
+    //  auto monitor = RuntimeValueMonitor<Camera>(name, scope, camera.get(), getter);
+    //  -------------------------------------------------------------------^
+    //  `monitor` will store `const Camera*&` which references a temporary pointer from
+    //  `camera.get()` which will die at the end of the full expression.
+    // ```
+    // Consider `const ResourceType* m_resource;` in future.
+    std::conditional_t<std::is_pointer_v<ResourceType>, const ResourceType, const ResourceType&> m_resource;
+
+    // Copy is used to prevent data races.
+    std::function<api::metrics::Value(const ResourceType&)> m_getter;
 };
 
 /**
@@ -106,7 +115,7 @@ public:
         QString name,
         Scope scope,
         const ResourceType& resource,
-        const Getter<ResourceType>& getter,
+        std::function<api::metrics::Value(const ResourceType&)> getter,
         const Watch<ResourceType>& watch);
 
     void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const override;
@@ -133,7 +142,7 @@ RuntimeValueMonitor<ResourceType>::RuntimeValueMonitor(
     QString name,
     Scope scope,
     const ResourceType& resource,
-    const Getter<ResourceType>& getter)
+    std::function<api::metrics::Value(const ResourceType&)> getter)
 :
     ValueMonitor(std::move(name), scope),
     m_resource(resource),
@@ -159,7 +168,7 @@ ValueHistoryMonitor<ResourceType>::ValueHistoryMonitor(
     QString name,
     Scope scope,
     const ResourceType& resource,
-    const Getter<ResourceType>& getter,
+    std::function<api::metrics::Value(const ResourceType&)> getter,
     const Watch<ResourceType>& watch)
 :
     RuntimeValueMonitor<ResourceType>(std::move(name), scope, resource, getter),

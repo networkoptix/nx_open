@@ -34,7 +34,7 @@ protected:
     ValueMonitors monitors;
 
 private:
-    std::map<QString, Getter<TestResource>> m_getters;
+    std::map<QString, std::function<api::metrics::Value(const TestResource&)>> m_getters;
     std::map<QString, Watch<TestResource>> m_watches;
 };
 
