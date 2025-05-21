@@ -25,7 +25,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kGreenSub
 };
 
 NX_DECLARE_COLORIZED_ICON(kCloseIcon, "20x20/Outline/close_medium.svg", kRedSubstitutions)
-NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/success.svg", kGreenSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/check.svg", kGreenSubstitutions)
 
 QIcon icon(LogsManagementUnitPtr unit)
 {
