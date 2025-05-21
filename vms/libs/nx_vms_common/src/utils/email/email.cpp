@@ -40,8 +40,9 @@ bool nx::email::isValidAddress(const QString& address)
 QString nx::email::maskEmail(const QString& address)
 {
     QnEmailAddress email(address);
-    return email.isValid() && !email.user().isEmpty()
-        ? QString("%1***%2@%3").arg(email.user().front(), email.user().back(), email.domain())
+    const auto localPart = email.value().split("@").value(0);
+    return email.isValid() && !localPart.isEmpty()
+        ? QString("%1***%2@%3").arg(localPart.front(), localPart.back(), email.domain())
         : address;
 }
 
