@@ -248,6 +248,10 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
         m_maxFrameNumber = m_streamInfo.objectsByFrameNumber.rbegin()->first;
 
     m_frameNumber = 0;
+    // It seems there is invalid track generate after loop is finished.
+    // It is needed to uncomment this line. So far, one of the FT failed if do that.
+    // It is needed to fix FT first.
+    //m_lastFrameTimestampUs = -1;
 
     reportIssues(issues);
 
