@@ -10,6 +10,8 @@ import Nx.Core.Controls
 import "private"
 
 // TODO #ynikitenkov Add "support text" functionality support.
+// Note: On MacOS ComboBox can't get focus by the keyboard (TAB) until it is set in OS settings.
+// See QTBUG-39647.
 T.ComboBox
 {
     id: control
@@ -66,13 +68,59 @@ T.ComboBox
         function onRowsMoved() { d.updateCurrentIndex() }
     }
 
-    Q.MouseArea
+    // Workaround: prevents too early focus on press event. Otherwise on mobile devices
+    // user can see keyboard unexpectedly going up and down.
+    // We have to use this mouse area workaround to preserve natural behavior similar to the
+    // other controls like text edits.
+    component FocusWorkaround: Q.MouseArea
     {
-        id: labelClickPreventer
+        id: focusWorkaround
+
+        property var extraAction
+
+        onReleased:
+            (mouse) =>
+            {
+                if (!d.isMouseEventInsideControl(mouse))
+                    return
+
+                control.forceActiveFocus()
+                if (extraAction)
+                    extraAction()
+            }
+    }
+
+    // Prevents popup showing and early focus on click to the label area.
+    FocusWorkaround
+    {
+        id: labelFocusAndClickWorkaround
 
         visible: control.editable
         height: topPadding
         width: contentItem.width + leftPadding
+    }
+
+    // Prevents early focus in the indicator area and shows popup if needed.
+    FocusWorkaround
+    {
+        id: indicatorFocusWorkaround
+
+        anchors.right: parent.right
+        width: editable
+            ? parent.width - contentItem.width - leftPadding
+            : parent.width
+        height: parent.height
+
+        extraAction: () => { control.popup.open() }
+    }
+
+    // Prevents early focus in the left padding area.
+    FocusWorkaround
+    {
+        id: leftPaddingFocusWorkaround
+
+        width: leftPadding
+        height: parent.height
     }
 
     contentItem: Q.Loader
@@ -88,7 +136,9 @@ T.ComboBox
         {
             id: textInputContentItemComponent
 
-            Q.TextInput
+            // Using TextField instead of TextInput as it works correctly with focus - it
+            // gets it on mouse release or proper movement, not from pressed event (like TextInput).
+            TextField
             {
                 focus: true
                 clip: true
@@ -98,6 +148,8 @@ T.ComboBox
                     : ColorTheme.transparent(ColorTheme.colors.light4, 0.3)
 
                 text: control.editText
+                leftPadding: 0
+                rightPadding: 0
                 onTextChanged:
                 {
                     if (control.editText !== text)
@@ -106,6 +158,7 @@ T.ComboBox
 
                 onAccepted: control.accepted()
 
+                background: null
                 Q.Keys.onPressed: (event) => fieldBackground.handleKeyPressedEvent(event)
             }
         }
@@ -281,6 +334,12 @@ T.ComboBox
                 control.editText = currentEditText
 
             d.updating = false
+        }
+
+        function isMouseEventInsideControl(mouse)
+        {
+            return mouse.x >= 0 && mouse.x <= control.width
+                && mouse.y >= 0 && mouse.y <= control.height
         }
     }
 }
