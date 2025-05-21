@@ -36,7 +36,7 @@ public:
 
     bool hardwareDecoder() const override {return m_hardwareMode; }
     void setLightCpuMode(DecodeMode) override {}
-    void setMultiThreadDecodePolicy(MultiThreadDecodePolicy) override {}
+    void setMultiThreadDecodePolicy(MultiThreadDecodePolicy policy) override;
     int getWidth() const override;
     int getHeight() const override;
     bool resetDecoder(const QnConstCompressedVideoDataPtr& data) override;
@@ -64,6 +64,7 @@ private:
     std::unique_ptr<AvOptions> m_options = nullptr;
     nx::metric::Storage* m_metrics = nullptr;
     quint32 m_lastChannel = 0;
+    MultiThreadDecodePolicy m_mtDecodingPolicy;
 };
 
 } // namespace nx::media::ffmpeg

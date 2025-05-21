@@ -2,9 +2,8 @@
 
 #include "ffmpeg_video_decoder.h"
 
-#include <QtCore/QThread>
-
 extern "C" {
+#include <libavutil/cpu.h>
 #include <libavutil/imgutils.h>
 } // extern "C"
 
@@ -22,7 +21,6 @@ extern "C" {
 #include <utils/media/frame_type_extractor.h>
 
 static const int LIGHT_CPU_MODE_FRAME_PERIOD = 2;
-static const int MAX_DECODE_THREAD = 4;
 
 namespace {
 
@@ -74,7 +72,7 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
     // Don't use multithread decoding for images, since then ffmpeg increases AVCodecContext->delay
     // to more than 0 and does not output frames on single call decode(without flushing).
     if (m_useMtDecoding && !isImage(data))
-        m_context->thread_count = qMin(MAX_DECODE_THREAD, QThread::idealThreadCount() + 1);
+        m_context->thread_count = std::min(kMaxDecodeThread, av_cpu_count());
     else
         m_context->thread_count = 1; //< Turn off multi thread decoding.
 

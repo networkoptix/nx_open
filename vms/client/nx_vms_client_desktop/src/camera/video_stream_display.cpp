@@ -489,6 +489,7 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
     {
         if (auto rhi = appContext()->mainWindowContext()->rhi())
             decoder = new nx::media::HwVideoDecoderOldPlayer(rhi);
+        decoder->setMultiThreadDecodePolicy(toEncoderPolicy(mtDecoding));
     }
 
     if (!decoder)

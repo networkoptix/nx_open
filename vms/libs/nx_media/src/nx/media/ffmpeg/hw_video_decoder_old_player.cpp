@@ -179,6 +179,7 @@ bool HwVideoDecoderOldPlayer::decode(
                 std::move(options),
                 initFunc);
 
+            m_impl->setMultiThreadDecodePolicy(m_mtDecodingPolicy);
             if (api)
                 m_decoderData = api->createDecoderData(m_rhi);
         }
@@ -269,8 +270,11 @@ void HwVideoDecoderOldPlayer::setLightCpuMode(DecodeMode /*val*/)
 }
 
 void HwVideoDecoderOldPlayer::setMultiThreadDecodePolicy(
-    MultiThreadDecodePolicy /*mtDecodingPolicy*/)
+    MultiThreadDecodePolicy mtDecodingPolicy)
 {
+    if (m_impl)
+        m_impl->setMultiThreadDecodePolicy(mtDecodingPolicy);
+    m_mtDecodingPolicy = mtDecodingPolicy;
 }
 
 } // namespace nx::media

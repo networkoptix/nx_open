@@ -11,6 +11,8 @@ extern "C" {
 #include <libavutil/pixfmt.h>
 }
 
+static constexpr int kMaxDecodeThread = 4;
+
 class QGLContext;
 
 struct DecoderConfig

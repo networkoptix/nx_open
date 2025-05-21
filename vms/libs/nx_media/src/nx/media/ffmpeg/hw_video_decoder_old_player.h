@@ -44,6 +44,7 @@ private:
     QnAbstractMediaData::MediaFlags m_lastFlags {};
     static int m_instanceCount;
     bool m_isHW = true;
+    MultiThreadDecodePolicy m_mtDecodingPolicy = MultiThreadDecodePolicy::enabled;
 };
 
 } // namespace nx::media

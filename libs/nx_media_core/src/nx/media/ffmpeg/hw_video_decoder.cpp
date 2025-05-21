@@ -9,6 +9,7 @@
 
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libavutil/cpu.h>
 #include <libavutil/hwcontext.h>
 } // extern "C"
 
@@ -209,6 +210,13 @@ bool HwVideoDecoder::initializeHardware(const QnConstCompressedVideoDataPtr& dat
         m_decoderContext->hw_device_ctx = av_buffer_ref(m_hwDeviceContext);
     }
 
+    if (m_mtDecodingPolicy != MultiThreadDecodePolicy::disabled)
+    {
+        m_decoderContext->thread_count = std::min(kMaxDecodeThread, av_cpu_count());
+        NX_DEBUG(this, "Hardware becoder thread_count: %1(used in case of software fallback)",
+            m_decoderContext->thread_count);
+    }
+
     if ((status = avcodec_open2(m_decoderContext, decoder, NULL)) < 0)
     {
         NX_DEBUG(this, "Failed to open HW decoder %1", avErrorToString(status));
@@ -321,6 +329,11 @@ void HwVideoDecoder::setGreyOnlyMode(bool value)
         m_decoderContext->flags |= AV_CODEC_FLAG_GRAY;
     else
         m_decoderContext->flags &= ~AV_CODEC_FLAG_GRAY;
+}
+
+void HwVideoDecoder::setMultiThreadDecodePolicy(MultiThreadDecodePolicy policy)
+{
+    m_mtDecodingPolicy = policy;
 }
 
 int HwVideoDecoder::getWidth() const { return m_decoderContext ? m_decoderContext->width : 0; }
