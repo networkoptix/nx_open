@@ -83,9 +83,16 @@ struct NX_VMS_API AuditRecord
 
     /**%apidoc
      * Detailed information about what's happened.
-     * %// The `details` declaration below should be a single line for apidoctool processing.
      */
-    std::variant<std::nullptr_t, DescriptionDetails, ResourceDetails, DeviceDetails, PlaybackDetails, SessionDetails, UpdateDetails, MitmDetails, ProxySessionDetails> details = nullptr;
+    std::variant<std::nullptr_t,
+        DescriptionDetails,
+        ResourceDetails,
+        DeviceDetails,
+        PlaybackDetails,
+        SessionDetails,
+        UpdateDetails,
+        MitmDetails,
+        ProxySessionDetails> details = nullptr;
 
     /**%apidoc[proprietary]
      * Internal audit information about API request.

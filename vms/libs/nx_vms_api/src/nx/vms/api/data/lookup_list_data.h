@@ -14,7 +14,6 @@
 
 namespace nx::vms::api {
 
-// TODO: Use it in the LookupListData::entries as soon as apidoctool support is implemented.
 using LookupListEntry = std::map<QString, QString>;
 
 /**
@@ -61,7 +60,7 @@ struct NX_VMS_API LookupListData: IdData
      *     {"Color": "blue", "License Plate.Number": "BB777B"}
      * ]
      */
-    std::vector<std::map<QString, QString>> entries;
+    std::vector<LookupListEntry> entries;
 
     bool operator==(const LookupListData& other) const = default;
 

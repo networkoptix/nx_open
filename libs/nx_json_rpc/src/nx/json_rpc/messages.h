@@ -252,8 +252,7 @@ struct NX_JSON_RPC_API Response
      */
     std::string jsonrpc = "2.0";
 
-    // TODO: Use `ResponseId` when apidoctool will support `using`.
-    std::variant<QString, int, std::nullptr_t> id{std::nullptr_t()};
+    ResponseId id{std::nullptr_t()};
 
     /**%apidoc[opt]:{QJsonValue} */
     rapidjson::Value* result = nullptr;
