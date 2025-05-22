@@ -407,6 +407,16 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
 
     connect(q->windowContext()->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
         this, handleCurrentResourceChanged);
+
+    // For the case when an empty CSL was changed to an empty local layout,
+    // and the current system has objects.
+    connect(q->windowContext()->workbench(), &Workbench::currentLayoutChanged, this,
+        [this, handleCurrentResourceChanged]()
+        {
+            const auto currentResource = this->q->windowContext()->navigator()->currentResource();
+            if (!currentResource)
+                handleCurrentResourceChanged();
+        });
 }
 
 void AnalyticsSearchWidget::Private::resetFilters()
