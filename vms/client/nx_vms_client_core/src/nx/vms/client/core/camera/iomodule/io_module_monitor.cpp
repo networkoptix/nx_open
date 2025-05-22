@@ -2,6 +2,7 @@
 
 #include "io_module_monitor.h"
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QUrlQuery>
 
 #include <core/resource/camera_resource.h>
@@ -154,6 +155,8 @@ IOModuleMonitor::~IOModuleMonitor()
 
 bool IOModuleMonitor::open()
 {
+    NX_ASSERT(QThread::currentThread() == qApp->thread(), "This class is not thread-safe");
+
     {
         nx::network::http::AsyncHttpClientPtr httpClient;
         NX_MUTEX_LOCKER lk(&d->mutex);
@@ -176,14 +179,26 @@ bool IOModuleMonitor::open()
     d->httpClient->setResponseReadTimeoutMs(kHttpReadTimeout);
     d->httpClient->setMessageBodyReadTimeoutMs(kHttpReadTimeout);
 
-    connect(d->httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived,
-        this, [this](const AsyncHttpClientPtr& client) { d->handleResponseReceived(client); });
+    connect(
+        d->httpClient.get(),
+        &nx::network::http::AsyncHttpClient::responseReceived,
+        this,
+        [this](const AsyncHttpClientPtr& client) { d->handleResponseReceived(client); },
+        Qt::DirectConnection);
 
-    connect(d->httpClient.get(), &nx::network::http::AsyncHttpClient::someMessageBodyAvailable,
-        this, [this](const AsyncHttpClientPtr& client) { d->handleMessageBodyAvailable(client); });
+    connect(
+        d->httpClient.get(),
+        &nx::network::http::AsyncHttpClient::someMessageBodyAvailable,
+        this,
+        [this](const AsyncHttpClientPtr& client) { d->handleMessageBodyAvailable(client); },
+        Qt::DirectConnection);
 
-    connect(d->httpClient.get(), &nx::network::http::AsyncHttpClient::done,
-        this, [this](const AsyncHttpClientPtr& client) { d->handleConnectionClosed(client); });
+    connect(
+        d->httpClient.get(),
+        &nx::network::http::AsyncHttpClient::done,
+        this,
+        [this](const AsyncHttpClientPtr& client) { d->handleConnectionClosed(client); },
+        Qt::DirectConnection);
 
     d->multipartContentParser = std::make_shared<nx::network::http::MultipartContentParser>();
     d->multipartContentParser->setNextFilter(std::make_shared<MessageBodyParser>(this));
