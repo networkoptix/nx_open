@@ -409,8 +409,6 @@ void QnWorkbenchNavigator::initialize()
 
     connect(m_timeSlider, &QnTimeSlider::timeChanged,
         this, &QnWorkbenchNavigator::at_timeSlider_valueChanged);
-    connect(m_timeSlider, &QnTimeSlider::visibleChanged,
-        this, &QnWorkbenchNavigator::updateLive);
     connect(m_timeSlider, &QnTimeSlider::sliderPressed,
         this, &QnWorkbenchNavigator::at_timeSlider_sliderPressed);
     connect(m_timeSlider, &QnTimeSlider::sliderReleased,
