@@ -29,6 +29,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/session_token_terminator.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_data_provider.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
@@ -511,6 +512,9 @@ void ApplicationContext::removeSystemContext(SystemContext* systemContext)
 
 SystemContext* ApplicationContext::systemContextByCloudSystemId(const QString& cloudSystemId) const
 {
+    if (cloudSystemId == genericCloudSystemId())
+        return cloudLayoutsSystemContext();
+
     if (const auto cloudContext = d->cloudCrossSystemManager->systemContext(cloudSystemId))
         return cloudContext->systemContext();
 

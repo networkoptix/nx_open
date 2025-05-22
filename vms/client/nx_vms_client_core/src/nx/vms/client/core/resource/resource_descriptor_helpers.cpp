@@ -2,8 +2,8 @@
 
 #include "resource_descriptor_helpers.h"
 
-#include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/cross_system/cross_system_camera_resource.h>
