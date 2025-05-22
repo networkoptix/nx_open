@@ -389,8 +389,9 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
         tr("Custom number that can be assigned to a camera for quick identification and access"));
 
     ui->remoteArchiveSynchronizationCheckBox->setHint(tr(
-        "Only camera or server offline periods after the first addition to the site will be "
-        "imported automatically."));
+        "Only camera or server offline periods that occurred after enabling this option will be "
+        "imported automatically. Please note: if you disable this option, any offline periods "
+        "that have not yet been imported will be lost and cannot be recovered later."));
 
     ui->settingsDisableControlCheckBoxAlertLabel->setText(
         tr("Quality and frame rate (FPS) settings in the "
