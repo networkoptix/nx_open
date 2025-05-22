@@ -768,7 +768,11 @@ AbstractSearchWidget::Controls AbstractSearchWidget::Private::relevantControls()
 
 void AbstractSearchWidget::Private::setRelevantControls(Controls value)
 {
+    if (m_relevantControls == value)
+        return;
+
     m_relevantControls = value;
+    updateControlsVisibility();
 }
 
 void AbstractSearchWidget::Private::updateControlsVisibility()
@@ -776,22 +780,9 @@ void AbstractSearchWidget::Private::updateControlsVisibility()
     if (workbench()->currentLayoutResource()->isCrossSystem())
         q->commonSetup()->setCameraSelection(nx::vms::client::core::EventSearch::CameraSelection::current);
 
-    if (m_relevantControls.testFlags(Control::cameraSelector | Control::cameraSelectionDisplay))
-    {
-        ui->cameraSelectionButton->setVisible(
-            m_relevantControls.testFlag(Control::cameraSelector)
-                && !workbench()->currentLayout()->resource()->isCrossSystem());
-        ui->cameraDisplayingButton->setVisible(
-            m_relevantControls.testFlag(Control::cameraSelectionDisplay)
-                && workbench()->currentLayout()->resource()->isCrossSystem());
-    }
-    else // For SimpleMotionSearchWidget correct displaying.
-    {
-        ui->cameraSelectionButton->setVisible(
-            m_relevantControls.testFlag(Control::cameraSelector));
-        ui->cameraDisplayingButton->setVisible(
-            m_relevantControls.testFlag(Control::cameraSelectionDisplay));
-    }
+    ui->cameraSelectionButton->setVisible(m_relevantControls.testFlag(Control::cameraSelector));
+    ui->cameraDisplayingButton->setVisible(
+        m_relevantControls.testFlag(Control::cameraSelectionDisplay));
 
     ui->timeSelectionButton->setVisible(m_relevantControls.testFlag(Control::timeSelector));
     const bool hasTextSearch = m_relevantControls.testFlag(Control::freeTextFilter);

@@ -354,17 +354,25 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
 
             SystemContext* cameraContext = nullptr;
 
+            const auto currentLayout =
+                this->q->windowContext()->workbench()->currentLayout()->resource();
+            const bool cslMode = currentLayout->flags().testFlag(Qn::cross_system);
+
+            constexpr Controls kControls = Control::timeSelector | Control::freeTextFilter
+                | Control::previewsToggler | Control::footersToggler;
+
+            this->q->setRelevantControls(cslMode
+                ? kControls | Control::cameraSelectionDisplay
+                : kControls | Control::cameraSelector);
+
             if (const auto currentResource =
                 this->q->windowContext()->navigator()->currentResource())
             {
                 cameraContext = SystemContext::fromResource(currentResource);
             }
-            else
+            else if (!cslMode)
             {
-                const auto currentLayout =
-                    this->q->windowContext()->workbench()->currentLayout()->resource();
-                if (!currentLayout->flags().testFlag(Qn::cross_system))
-                    cameraContext = appContext()->currentSystemContext();
+                cameraContext = appContext()->currentSystemContext();
             }
 
             setSystemContextToModels(cameraContext);
