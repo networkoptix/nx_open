@@ -16,9 +16,9 @@
 
 namespace {
 
-const QString kDefaultPrimaryUrlsList(QLatin1String("https://tools.vmsproxy.com/myip"));
+const QString kDefaultPrimaryUrlsList(QLatin1String("https://checkip.amazonaws.com;https://www.cloudflare.com/cdn-cgi/trace;https://icanhazip.com"));
 const QString kDefaultSecondaryUrlsList(NX_FMT(
-    "https://tools-eu.vmsproxy.com/myip;https://%1/myip", nx::branding::cloudHost()));
+    "https://tools.vmsproxy.com/myip;https://tools-eu.vmsproxy.com/myip;https://%1/myip", nx::branding::cloudHost()));
 
 const int kRequestTimeoutMs = 10 * 1000;
 const std::string kIpRegExprValue("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
