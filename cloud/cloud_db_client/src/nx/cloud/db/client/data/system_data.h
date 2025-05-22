@@ -63,8 +63,6 @@ NX_REFLECTION_INSTRUMENT(SystemIdList, SystemIdList_Fields)
 //-------------------------------------------------------------------------------------------------
 // Filter
 
-NX_REFLECTION_INSTRUMENT_ENUM(FilterField, customization, systemStatus)
-
 void serializeToUrlQuery(const Filter& data, QUrlQuery* const urlQuery);
 
 void serialize(

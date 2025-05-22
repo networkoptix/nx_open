@@ -743,11 +743,10 @@ NX_REFLECTION_INSTRUMENT(MergeReply, (failedServers))
 
 //-------------------------------------------------------------------------------------------------
 
-enum class FilterField
-{
+NX_REFLECTION_ENUM_CLASS(FilterField,
     customization,
     systemStatus,
-};
+    directlyShared)
 
 struct Filter
 {
