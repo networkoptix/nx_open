@@ -115,7 +115,8 @@ static constexpr char kBatchIdParam[] = "batchId";
 //-------------------------------------------------------------------------------------------------
 // Organizations.
 
-static constexpr char kOrganizationInternalPath[] = "/cdb/v0/organizations/{organizationId}";
+static constexpr char kOrganizationInternalPath[] =
+    "/cdb/v1/internal/organizations/{organizationId}";
 
 static constexpr char kOrganizationSystemOwnershipOffers[] =
     "/cdb/v0/organizations/{organizationId}/system-offers";
