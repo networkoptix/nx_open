@@ -5,11 +5,11 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/desktop/system_context_aware.h>
+#include <nx/vms/client/core/system_context_aware.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
-class TrafficRelayUrlWatcher:
+class NX_VMS_CLIENT_CORE_API TrafficRelayUrlWatcher:
     public QObject,
     public SystemContextAware
 {
@@ -29,4 +29,4 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

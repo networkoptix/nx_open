@@ -36,6 +36,7 @@
 #include <nx/vms/client/core/resource/user.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/core/watchers/traffic_relay_url_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
@@ -52,7 +53,6 @@
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_administration/globals/user_group_request_chain.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
-#include <nx/vms/client/desktop/system_administration/watchers/traffic_relay_url_watcher.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
@@ -202,7 +202,7 @@ struct UserSettingsDialog::Private
         continuousSync = q->globalSettings()->ldap().continuousSync;
 
         connect(q->systemContext()->trafficRelayUrlWatcher(),
-            &TrafficRelayUrlWatcher::trafficRelayUrlReady,
+            &core::TrafficRelayUrlWatcher::trafficRelayUrlReady,
             q,
             [this] { linkReady = true; });
 

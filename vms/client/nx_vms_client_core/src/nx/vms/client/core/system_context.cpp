@@ -63,6 +63,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->videoCache = std::make_unique<VideoCache>(this);
             d->sessionTimeoutWatcher =
                 std::make_unique<RemoteSessionTimeoutWatcher>(globalSettings());
+            d->trafficRelayUrlWatcher = std::make_unique<TrafficRelayUrlWatcher>(this);
             break;
         }
 
@@ -333,6 +334,11 @@ IoPortsCompatibilityInterface* SystemContext::ioPortsInterface() const
 RemoteSessionTimeoutWatcher* SystemContext::sessionTimeoutWatcher() const
 {
     return d->sessionTimeoutWatcher.get();
+}
+
+TrafficRelayUrlWatcher* SystemContext::trafficRelayUrlWatcher() const
+{
+    return d->trafficRelayUrlWatcher.get();
 }
 
 CameraDataManager* SystemContext::cameraDataManager() const

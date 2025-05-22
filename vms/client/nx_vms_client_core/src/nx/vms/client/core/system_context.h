@@ -42,6 +42,7 @@ class UserWatcher;
 class VideoCache;
 class RemoteSessionTimeoutWatcher;
 class WatermarkWatcher;
+class TrafficRelayUrlWatcher;
 
 namespace analytics {
 class AttributeHelper;
@@ -191,6 +192,8 @@ public:
     IoPortsCompatibilityInterface* ioPortsInterface() const;
 
     RemoteSessionTimeoutWatcher* sessionTimeoutWatcher() const;
+
+    TrafficRelayUrlWatcher* trafficRelayUrlWatcher() const;
 
 signals:
     void remoteIdChanged(const nx::Uuid& id);

@@ -14,10 +14,10 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/url.h>
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
-#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/common/system_settings.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 static const std::chrono::seconds kRequestRetryDelay(5);
 
@@ -163,4 +163,4 @@ TrafficRelayUrlWatcher::~TrafficRelayUrlWatcher()
 {
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

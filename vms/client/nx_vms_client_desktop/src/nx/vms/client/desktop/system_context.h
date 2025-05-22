@@ -31,7 +31,6 @@ class ServerNotificationCache;
 class ShowreelStateManager;
 class SystemHealthState;
 class SystemSpecificLocalSettings;
-class TrafficRelayUrlWatcher;
 class UserNotificationSettingsManager;
 class UserSpecificSettings;
 class VideoCache;
@@ -93,7 +92,6 @@ public:
     virtual nx::vms::common::SessionTokenHelperPtr getSessionTokenHelper() const override;
     DefaultPasswordCamerasWatcher* defaultPasswordCamerasWatcher() const;
     SystemHealthState* systemHealthState() const;
-    TrafficRelayUrlWatcher* trafficRelayUrlWatcher() const;
     LocalFileCache* localFileCache() const;
     ServerImageCache* serverImageCache() const;
     ServerNotificationCache* serverNotificationCache() const;

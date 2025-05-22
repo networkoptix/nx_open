@@ -28,7 +28,6 @@
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
-#include <nx/vms/client/desktop/system_administration/watchers/traffic_relay_url_watcher.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
@@ -106,7 +105,6 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->nonEditableUsersAndGroups = std::make_unique<NonEditableUsersAndGroups>(this);
             d->defaultPasswordCamerasWatcher = std::make_unique<DefaultPasswordCamerasWatcher>(
                 this);
-            d->trafficRelayUrlWatcher = std::make_unique<TrafficRelayUrlWatcher>(this);
             d->localFileCache = std::make_unique<LocalFileCache>(this);
             d->serverImageCache = std::make_unique<ServerImageCache>(this);
             d->serverNotificationCache = std::make_unique<ServerNotificationCache>(this);
@@ -242,11 +240,6 @@ DefaultPasswordCamerasWatcher* SystemContext::defaultPasswordCamerasWatcher() co
 SystemHealthState* SystemContext::systemHealthState() const
 {
     return d->systemHealthState.get();
-}
-
-TrafficRelayUrlWatcher* SystemContext::trafficRelayUrlWatcher() const
-{
-    return d->trafficRelayUrlWatcher.get();
 }
 
 LocalFileCache* SystemContext::localFileCache() const

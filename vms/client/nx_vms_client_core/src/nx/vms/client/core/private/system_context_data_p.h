@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/core/utils/video_cache.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/core/watchers/traffic_relay_url_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/core/watchers/watermark_watcher.h>
 #include <nx/vms/rules/engine_holder.h>
@@ -52,6 +53,7 @@ struct SystemContext::Private
     std::unique_ptr<VideoCache> videoCache;
     std::unique_ptr<AnalyticsEventsSearchTreeBuilder> analyticsEventsSearchTreeBuilder;
     std::unique_ptr<RemoteSessionTimeoutWatcher> sessionTimeoutWatcher;
+    std::unique_ptr<TrafficRelayUrlWatcher> trafficRelayUrlWatcher;
 
     mutable nx::Mutex sessionMutex;
 

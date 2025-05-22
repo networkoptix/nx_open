@@ -17,9 +17,10 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/watchers/traffic_relay_url_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
-#include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
+#include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/delayed.h>
@@ -39,16 +40,6 @@ struct VideoDownloadContext
 };
 
 using VideoDownloadCallback = std::function<void (VideoDownloadContext context)>;
-
-namespace {
-
-nx::network::url::Builder relayUrlBuilder(const QString& systemId, const QString& path)
-{
-    return nx::network::url::Builder(
-        nx::format("https://%1.relay.vmsproxy.com", systemId).toQString()).setPath(path);
-}
-
-} // namespace
 
 bool sameCameras(const QnVirtualCameraResourcePtr& left, const QnVirtualCameraResourcePtr& right)
 {
@@ -71,12 +62,22 @@ struct MediaDownloadBackend::Private
 
     std::unique_ptr<ClientPool> clientPool = std::make_unique<ClientPool>();
 
+    nx::network::url::Builder relayUrlBuilder(const QString& systemId, const QString& path);
     QString currentCloudSystemId() const;
     void updateDownloadAvailability();
     void gatherProxyServerId(VideoDownloadContext&& context, VideoDownloadCallback&& callback);
     void runDownloadForContext(const VideoDownloadContext& context, const QString& ticket);
     void showDownloadProcessError();
 };
+
+nx::network::url::Builder MediaDownloadBackend::Private::relayUrlBuilder(
+    const QString& systemId,
+    const QString& path)
+{
+    const QUrl relayUrl = q->system()->trafficRelayUrlWatcher()->trafficRelayUrl();
+    const QString url = nx::format("https://%1.%2", systemId, relayUrl.host());
+    return nx::network::url::Builder(url).setPath(path);
+}
 
 QString MediaDownloadBackend::Private::currentCloudSystemId() const
 {
