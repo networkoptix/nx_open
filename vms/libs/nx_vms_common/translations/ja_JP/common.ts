@@ -1782,7 +1782,7 @@
     </message>
     <message>
       <source>Execute PTZ preset</source>
-      <translation>PTZプリセットを実行</translation>
+      <translation>PTZプリセット呼び出し</translation>
     </message>
     <message>
       <source>Show text overlay</source>

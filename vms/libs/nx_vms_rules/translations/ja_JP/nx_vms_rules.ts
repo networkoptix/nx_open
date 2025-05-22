@@ -705,7 +705,7 @@
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation>PTZプリセットを実行</translation>
+      <translation>PTZプリセット呼び出し</translation>
     </message>
     <message>
       <source>At</source>
