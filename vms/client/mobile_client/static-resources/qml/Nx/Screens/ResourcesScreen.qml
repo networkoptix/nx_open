@@ -55,7 +55,7 @@ Page
 
         onResourceChanged:
         {
-            if (resource?.crossSystem)
+            if (resource && (resource.flags & ResourceFlag.cross_system))
                 resource.makeSystemConnectionsWithUserInteraction()
         }
     }

@@ -19,7 +19,6 @@ namespace nx::vms::client::core {
 class NX_VMS_CLIENT_CORE_API LayoutResource: public QnLayoutResource
 {
     Q_OBJECT
-    Q_PROPERTY(bool crossSystem READ isCrossSystem CONSTANT)
 
 public:
     using DataHash = QHash<int, QVariant>;

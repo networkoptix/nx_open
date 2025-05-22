@@ -55,6 +55,7 @@
 #include <nx/vms/client/core/network/cloud_user_profile_watcher.h>
 #include <nx/vms/client/core/network/oauth_client.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
+#include <nx/vms/client/core/qml/enums_as_singletons.h>
 #include <nx/vms/client/core/qml/items/multiline_text_item.h>
 #include <nx/vms/client/core/qml/items/values_text.h>
 #include <nx/vms/client/core/qml/name_value_table_calculator.h>
@@ -257,6 +258,8 @@ void registerQmlTypesInternal()
         "API", "API is a namespace");
     qmlRegisterUncreatableMetaObject(
         Qn::staticMetaObject, "nx.vms.common", 1, 0, "CommonGlobals", "");
+
+    nxRegisterQmlEnumType<Qn::ResourceFlags>("nx.vms.client.core", 1, 0, "ResourceFlag");
 }
 
 void registerQmlTypes()

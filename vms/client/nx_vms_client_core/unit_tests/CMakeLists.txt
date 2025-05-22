@@ -10,4 +10,6 @@ nx_add_test(nx_vms_client_core_ut
     FOLDER client/tests
     FORCE_INCLUDE
         ${nx_utils_dir}/src/nx/utils/test_support/custom_gtest_printers.h
+    ADDITIONAL_MOCABLES
+        src/nx/vms/client/core/qml/enums_as_singletons_ut.cpp
 )
