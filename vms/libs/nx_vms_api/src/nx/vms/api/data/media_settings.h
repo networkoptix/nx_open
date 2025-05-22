@@ -38,19 +38,34 @@ struct NX_VMS_API MediaSettings
     std::optional<std::chrono::milliseconds> positionMs = std::nullopt;
 
     /**%apidoc[opt]:string
-     * The option will be applied only when the stream transcoding is turned on by some of other
-     * transcoding options, or because the original stream codec doesn't fit within the Client
-     * request. The resolution format is `{width}x{height}`. The string may contain either a width
-     * and height (for instance, 320x240) or a height only (for instance, 240p). By default, the
-     * default secondary stream resolution is used.
-     */
-    std::optional<ResolutionData> resolutionWhenTranscoding = std::nullopt;
-
-    /**%apidoc[opt]:string
-     * A transcoding option. Resolution is in format `{width}x{height}`. The string may contain
-     * either a width and height (for instance, 320x240), or a height only (for instance, 240p).
+     * Specifies the exact resolution to be used for the output video.
+     * The resolution format is `{width}x{height}` (for example, "320x240") or can be defined
+     * using a height-only format (for example, "240p").
+     * When provided, this option ensures that the output is rendered at the specified resolution.
+     * If both this option and `resolutionWhenTranscoding` are supplied, this option takes
+     * precedence. If neither option is set, the following defaults apply:
+     *   When transcoding is enabled:
+     *       For low or undefined streams: use the default secondary-stream resolution.
+     *       For high streams: use the lesser of 1080p and the high-stream's native resolution.
+     *   When transcoding is not enabled:
+     *       Use the primary stream's native resolution.
      */
     std::optional<ResolutionData> resolution = std::nullopt;
+
+    /**%apidoc[opt]:string
+     * Specifies the resolution to be used only if the video is transcoded.
+     * This option applies when transcoding is triggered (either through other transcoding settings
+     * or because the original stream's codec is incompatible with the client request).
+     * The resolution format is `{width}x{height}` (for example, "320x240") or can use a
+     * height-only format (for example, "240p"). If the `resolution` option is also provided, it
+     * will override this setting. If neither option is set, the following defaults apply:
+     *   When transcoding is enabled:
+     *       For low or undefined streams: use the default secondary-stream resolution.
+     *       For high streams: use the lesser of 1080p and the high-stream's native resolution.
+     *   When transcoding is not enabled:
+     *       Use the primary stream's native resolution.
+     */
+    std::optional<ResolutionData> resolutionWhenTranscoding = std::nullopt;
 
     /**%apidoc[opt]
      * A transcoding option. Item rotation, in degrees. If the parameter is `auto`, the video will

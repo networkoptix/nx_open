@@ -1,9 +1,18 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "resolution_data.h"
+
 #include <nx/fusion/model_functions.h>
 
 namespace nx::vms::api {
+
+namespace {
+
+const std::string kResolutionStringSeparator("x");
+const std::string kResolutionStringSuffix("p");
+const std::regex kResolutionRegexp("^([+-]?\\d+)([px])([+-]?\\d+)?$");
+
+} // namespace
 
 bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, ResolutionData* target)
 {
@@ -11,17 +20,9 @@ bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, ResolutionData
     {
         const auto str = value.toString().toStdString();
 
-        // Regex below fails for this case.
-        if (str == "-1p")
-        {
-            target->size = QSize();
-            return true;
-        }
-
-        std::regex re("^([+-]?\\d+)([px])([+-]?\\d+)?$");
         std::smatch match;
 
-        if (!std::regex_search(str, match, re))
+        if (!std::regex_search(str, match, kResolutionRegexp))
             return false;
 
         if (match.size() < 3)
@@ -29,18 +30,19 @@ bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, ResolutionData
 
         try
         {
-            if (match.size() < 4)
+            if (match.size() == 3 || match[3].str().empty())
             {
-                if (match[2] != "p")
+                if (match[2] != kResolutionStringSuffix)
                     return false;
-                target->size.setHeight(std::stoi(match[1]));
+
+                target->size.setHeight(std::stoi(match[1].str()));
                 return true;
             }
 
-            if (match[2] != "x")
+            if (match[2] != kResolutionStringSeparator)
                 return false;
-            target->size.setWidth(std::stoi(match[1]));
-            target->size.setHeight(std::stoi(match[3]));
+            target->size.setWidth(std::stoi(match[1].str()));
+            target->size.setHeight(std::stoi(match[3].str()));
             return true;
         }
         catch (const std::exception& e)

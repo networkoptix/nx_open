@@ -54,6 +54,7 @@ public:
     bool operator==( const CameraMediaStreamInfo& rhs ) const;
     bool operator!=( const CameraMediaStreamInfo& rhs ) const;
     QSize getResolution() const;
+    std::optional<double> getAspectRatio() const;
 };
 
 #define CameraMediaStreamInfo_Fields (encoderIndex)(resolution)(transports)(transcodingRequired)(codec)(customStreamParams)
