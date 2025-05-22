@@ -8088,6 +8088,14 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>All Servers are offline. Logs are not available.</source>
       <translation>Alla servrar är offline. Loggarna är inte tillgängliga.</translation>
     </message>
+    <message numerus="yes">
+      <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
+      <comment>Dates are substituted</comment>
+      <translation type="unfinished">
+        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventLogModel</name>
