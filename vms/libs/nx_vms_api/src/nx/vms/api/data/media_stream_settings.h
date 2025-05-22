@@ -86,9 +86,11 @@ struct NX_VMS_API StreamSettings: MediaSettings
      */
     bool utcTimestamps = false;
 
-    /**%apidoc[opt] Add continuous timestamps in exported media data.
+    /**%apidoc[opt]
+     * %deprecated Add continuous timestamps in exported media data. Always true, regardless of
+     * the parameter value.
      */
-    bool continuousTimestamps = false;
+    bool continuousTimestamps = true;
 
     /**%apidoc[opt] Force to download file in browser instead of displaying it.
      */
