@@ -7019,7 +7019,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8089,9 +8089,9 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
         <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
         <comment>Dates are substituted</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Event log for period from %1 to %2 - Showing first %n event. To find specific events, please adjust the date range or apply additional filters</numerusform>
+            <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
         </translation>
     </message>
 </context>
