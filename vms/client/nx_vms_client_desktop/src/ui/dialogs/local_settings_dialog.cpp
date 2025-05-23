@@ -29,7 +29,9 @@ using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
-QDialogButtonBox::StandardButton getRestartDialogAnswer()
+using StandardButton = QDialogButtonBox::StandardButton;
+
+StandardButton getRestartDialogAnswer()
 {
     QnMessageBox dialog(nullptr);
     dialog.setText(QnLocalSettingsDialog::tr("Some changes will take effect only after %1 restart")
@@ -44,7 +46,7 @@ QDialogButtonBox::StandardButton getRestartDialogAnswer()
     dialog.addButton(
         QnLocalSettingsDialog::tr("Restart Later"), QDialogButtonBox::NoRole);
 
-    auto result = static_cast<QDialogButtonBox::StandardButton>(dialog.exec());
+    auto result = static_cast<StandardButton>(dialog.exec());
     if ((result == QDialogButtonBox::NoButton) && (dialog.clickedButton() == restartNowButton))
         result = QDialogButtonBox::Yes;
 

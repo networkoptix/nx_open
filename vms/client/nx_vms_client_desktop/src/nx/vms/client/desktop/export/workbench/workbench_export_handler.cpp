@@ -209,7 +209,7 @@ public:
         return false;
     }
 
-    nx::Uuid createExportContext(Settings settings,
+    Uuid createExportContext(Settings settings,
         const QnResourcePtr& resource, bool saveExistingLayout, bool forceTranscoding)
     {
         const auto& manager = q->context()->instance<workbench::LocalNotificationsManager>();

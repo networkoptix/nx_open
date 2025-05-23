@@ -765,7 +765,7 @@ Error TabApiBackend::removeItem(const QUuid& itemId)
 Error TabApiBackend::syncWith(const QUuid& itemId)
 {
     if (itemId.isNull())
-        return Error::invalidArguments(tr(""));
+        return Error::invalidArguments();
 
     const auto item = d->layout()->item(itemId);
     if (!item)

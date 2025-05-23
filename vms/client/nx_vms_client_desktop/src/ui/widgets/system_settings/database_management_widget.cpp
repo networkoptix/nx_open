@@ -28,8 +28,11 @@ namespace {
 
 static const QString kDbExtension = ".db";
 
-static const QString kDbFilesFilter = QnCustomFileDialog::createFilter(
-    QnDatabaseManagementWidget::tr("Database Backup Files"), kDbExtension.mid(1));
+QString makeDbFilesFilter()
+{
+    return QnCustomFileDialog::createFilter(
+        QnDatabaseManagementWidget::tr("Database Backup Files"), kDbExtension.mid(1));
+}
 
 } // namespace
 
@@ -88,7 +91,7 @@ void QnDatabaseManagementWidget::backupDb()
         this,
         tr("Save Database Backup..."),
         appContext()->localSettings()->lastDatabaseBackupDir(),
-        kDbFilesFilter));
+        makeDbFilesFilter()));
     fileDialog->setAcceptMode(QFileDialog::AcceptSave);
     if (!fileDialog->exec())
         return;
@@ -184,7 +187,7 @@ void QnDatabaseManagementWidget::restoreDb()
         this,
         tr("Open Database Backup..."),
         appContext()->localSettings()->lastDatabaseBackupDir(),
-        kDbFilesFilter,
+        makeDbFilesFilter(),
         nullptr,
         QnCustomFileDialog::fileDialogOptions());
     if (fileName.isEmpty())

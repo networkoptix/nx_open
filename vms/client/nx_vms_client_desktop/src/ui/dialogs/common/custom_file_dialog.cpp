@@ -12,6 +12,8 @@
 
 namespace {
 
+using FileFilter = QnCustomFileDialog::FileFilter;
+
 static QString kSpinBoxPlaceholder("%value%");
 
 class FileExtensions
@@ -19,7 +21,7 @@ class FileExtensions
     Q_DECLARE_TR_FUNCTIONS(FileExtensions)
 
 public:
-    static QnCustomFileDialog::FileFilter createPicturesFilter()
+    static FileFilter createPicturesFilter()
     {
         QStringList extensions;
         for (const QByteArray& format: QImageReader::supportedImageFormats())
@@ -27,14 +29,14 @@ public:
         return {tr("Pictures"), extensions};
     }
 
-    static QnCustomFileDialog::FileFilter createVideoFilter()
+    static FileFilter createVideoFilter()
     {
         static const QStringList kVideoFormats{"avi", "mkv", "mp4", "mov", "ts", "m2ts", "mpeg",
             "mpegts", "mpg", "flv", "wmv", "3gp"};
         return {tr("Video"), kVideoFormats};
     }
 
-    static QnCustomFileDialog::FileFilter createAllFilesFilter()
+    static FileFilter createAllFilesFilter()
     {
         return {tr("All Files"), {"*"}};
     }
