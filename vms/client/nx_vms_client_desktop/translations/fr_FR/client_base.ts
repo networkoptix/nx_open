@@ -7012,16 +7012,16 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Ne modifiez pas ces paramètres à moins d'être absolument sûr de leur impact potentiel sur les performances</translation>
     </message>
     <message>
-      <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
-      <translation>Seules les périodes hors ligne de la caméra ou du serveur après le premier ajout au site seront importées automatiquement.</translation>
-    </message>
-    <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
       <translation>Pour éviter des modifications irréversibles dans l'archive, il est recommandé de désactiver &quot;Conserver les paramètres de temps de la caméra&quot; avant d'activer &quot;Importer automatiquement la vidéo&quot;.</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
       <translation>L'activation de ce paramètre peut entraîner des modifications irréversibles dans l'archive. Il est déconseillé de l'activer lorsque l'option &quot;Importer automatiquement la vidéo&quot; est activée.</translation>
+    </message>
+    <message>
+      <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
+      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
     </message>
   </context>
   <context>

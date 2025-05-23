@@ -1479,7 +1479,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
       <translation>
-        <numerusform>その他 %n を無効化</numerusform>
+        <numerusform>その他 %n を解除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1870,7 +1870,7 @@ License Key: %2</source>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation>このページから移動してもよろしいですか？変更が保存されない可能性があります。</translation>
+      <translation>このページから移動してもよろしいですか? 変更が保存されない可能性があります。</translation>
     </message>
   </context>
   <context>
@@ -2880,7 +2880,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Download Client version %1?</source>
-      <translation>バージョン %1 のクライアントをダウンロードしますか？</translation>
+      <translation>バージョン %1 のクライアントをダウンロードしますか?</translation>
     </message>
     <message>
       <source>Restart</source>
@@ -2912,7 +2912,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Restart %1 in compatibility mode?</source>
-      <translation>互換モードで %1 を再起動しますか？</translation>
+      <translation>互換モードで %1 を再起動しますか?</translation>
     </message>
     <message>
       <source>Failed to restart %1</source>
@@ -3022,7 +3022,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Restore database?</source>
-      <translation>データベースを復元しますか？</translation>
+      <translation>データベースを復元しますか?</translation>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
@@ -3644,7 +3644,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Delete sound?</source>
-      <translation>サウンドを削除しますか？</translation>
+      <translation>サウンドを削除しますか?</translation>
     </message>
   </context>
   <context>
@@ -4163,7 +4163,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Apply changes before switching to another server?</source>
-      <translation>別のサーバーに切り替える前に変更を適用しますか？</translation>
+      <translation>別のサーバーに切り替える前に変更を適用しますか?</translation>
     </message>
     <message>
       <source>Server Web Page</source>
@@ -4453,7 +4453,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation>現在の分析データをどうしますか？</translation>
+      <translation>既存の分析データはどうしますか?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -4741,7 +4741,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add this storage anyway?</source>
-      <translation>このストレージを追加しますか？</translation>
+      <translation>このストレージを追加しますか?</translation>
     </message>
     <message>
       <source>Storage path used by another server</source>
@@ -5193,7 +5193,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Delete &quot;%1&quot;?</source>
-      <translation>&quot;%1&quot; を削除しますか？</translation>
+      <translation>&quot;%1&quot; を削除しますか?</translation>
     </message>
   </context>
   <context>
@@ -5254,7 +5254,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
       <translation>
-        <numerusform>%n ブックマークを削除しますか？</numerusform>
+        <numerusform>%n ブックマークを削除しますか?</numerusform>
       </translation>
     </message>
   </context>
@@ -5469,7 +5469,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Overwrite existing layout?</source>
-      <translation>既存のレイアウトを上書きしますか？</translation>
+      <translation>既存のレイアウトを上書きしますか?</translation>
     </message>
     <message>
       <source>There is another layout with the same name.</source>
@@ -5486,7 +5486,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
       <translation>
-        <numerusform>レイアウトから %n アイテムを削除しますか？</numerusform>
+        <numerusform>レイアウトから %n アイテムを削除しますか?</numerusform>
       </translation>
     </message>
     <message>
@@ -5504,25 +5504,25 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Delete %n devices?</source>
       <translation>
-        <numerusform>%n デバイスを削除しますか？</numerusform>
+        <numerusform>%n デバイスを削除しますか?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
       <translation>
-        <numerusform>%n カメラを削除しますか？</numerusform>
+        <numerusform>%n カメラを削除しますか?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
       <translation>
-        <numerusform>%n I/O モジュールを削除しますか？</numerusform>
+        <numerusform>%n I/O モジュールを削除しますか?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation>
-        <numerusform>%n アイテムを削除しますか？</numerusform>
+        <numerusform>%n アイテムを削除しますか?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5563,7 +5563,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation>アップロードを停止しますか？</translation>
+      <translation>アップロードを停止しますか?</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -5577,7 +5577,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Merge this group with %1?</source>
-      <translation>このグループを %1 と結合しますか？</translation>
+      <translation>このグループを %1 と結合しますか?</translation>
     </message>
     <message>
       <source>Two groups with the same name cannot exist.</source>
@@ -5593,7 +5593,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Move anyway?</source>
-      <translation>移動しますか？</translation>
+      <translation>移動してもよろしいですか?</translation>
     </message>
     <message>
       <source>Move</source>
@@ -5664,7 +5664,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Delete %n matrices?</source>
       <translation>
-        <numerusform>%n マトリックスを削除しますか？</numerusform>
+        <numerusform>%n マトリックスを削除しますか?</numerusform>
       </translation>
     </message>
     <message>
@@ -5692,7 +5692,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Delete %n users?</source>
       <translation>
-        <numerusform>%n ユーザーを削除しますか？</numerusform>
+        <numerusform>%n ユーザーを削除しますか?</numerusform>
       </translation>
     </message>
     <message>
@@ -6275,7 +6275,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Save changes before exit?</source>
-      <translation>終了する前に変更を適用しますか？</translation>
+      <translation>終了する前に変更を適用しますか?</translation>
     </message>
   </context>
   <context>
@@ -6713,7 +6713,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Skip backup for existing footage?</source>
-      <translation>既存の録画データのバックアップをスキップしますか？</translation>
+      <translation>既存の録画データのバックアップをスキップしますか?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -6897,16 +6897,16 @@ If you intended to move analytics data to another storage location, please conta
       <translation>パフォーマンスに対する潜在的な影響を正確に理解していない場合、これらの設定を変更しないでください。</translation>
     </message>
     <message>
-      <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
-      <translation>サイト追加後のカメラまたはサーバーのオフライン期間のみが自動的にインポートされます。</translation>
-    </message>
-    <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
       <translation>アーカイブの不可逆的な変更を回避するために、 &quot;カメラの時刻設定を保持する&quot; を無効化してから、 &quot;映像を自動的にインポート&quot; を有効化することを推奨します。</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
       <translation>この設定を有効化すると、アーカイブに不可逆的な変更が生じる可能性があります。&quot;映像を自動的にインポート&quot; が有効な場合、この設定を有効化することは推奨されません。</translation>
+    </message>
+    <message>
+      <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
+      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
     </message>
   </context>
   <context>
@@ -7055,7 +7055,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reset motion regions to default?</source>
-      <translation>モーションエリアをリセットしますか？</translation>
+      <translation>モーションエリアをデフォルトにリセットしますか?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -7262,7 +7262,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Apply changes before switching to another camera?</source>
-      <translation>別のカメラに切り替える前に変更を適用しますか？</translation>
+      <translation>別のカメラに切り替える前に変更を適用しますか?</translation>
     </message>
     <message>
       <source>Device Settings</source>
@@ -7962,8 +7962,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      <translation>
+        <numerusform>%1 から %2 までのイベントログ - 最初の %n 件のイベントを表示しています。特定のイベントを検索するには、期間を調整するか追加のフィルターを適用してください。</numerusform>
       </translation>
     </message>
   </context>
@@ -8304,7 +8304,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
     <message>
       <source>Force secure authentication?</source>
-      <translation>安全な認証を強制しますか？</translation>
+      <translation>安全な認証を強制しますか?</translation>
     </message>
     <message>
       <source>To revert this change user password reset will be required.</source>
@@ -8725,12 +8725,12 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation>
-        <numerusform>ライセンスを無効にしますか？</numerusform>
+        <numerusform>ライセンスを解除しますか?</numerusform>
       </translation>
     </message>
     <message>
       <source>Deactivate</source>
-      <translation>無効化</translation>
+      <translation>解除</translation>
     </message>
     <message>
       <source>Export licenses to a file</source>
@@ -9185,7 +9185,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>Merge anyway?</source>
-      <translation>統合しますか？</translation>
+      <translation>統合してもよろしいですか?</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
@@ -9356,7 +9356,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Some servers are offline and will not be updated. Skip them?</source>
-      <translation>一部のサーバーはオフラインであるため、更新されません。それらをスキップしてよろしいですか?</translation>
+      <translation>一部のサーバーはオフラインであるため、更新されません。それらをスキップしてもよろしいですか?</translation>
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
@@ -9374,7 +9374,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation>更新をキャンセルし、ダウンロードしたすべてのデータを削除しますか？</translation>
+      <translation>更新をキャンセルし、ダウンロードしたすべてのデータを削除しますか?</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
@@ -9394,7 +9394,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation>一部のサーバーでは更新プロセスが完了しませんでした。終了しますか？</translation>
+      <translation>一部のサーバーでは更新プロセスが完了しませんでした。終了してもよろしいですか?</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -10573,7 +10573,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Pin this certificate to %1?</source>
-      <translation>この証明書を %1 にピン留めしますか？</translation>
+      <translation>この証明書を %1 にピン留めしますか?</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -10846,7 +10846,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>シーケンシャル表示 「%1」 を削除しますか?</translation>
+      <translation>シーケンシャル表示 %1 を削除しますか?</translation>
     </message>
   </context>
   <context>
@@ -11540,7 +11540,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation>アップロードを停止しますか？</translation>
+      <translation>アップロードを停止しますか?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
@@ -11636,7 +11636,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Upload anyway?</source>
-      <translation>アップロードを行いますか？</translation>
+      <translation>アップロードしてもよろしいですか?</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
@@ -11753,7 +11753,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Open this web page?</source>
-      <translation>このWebページを開きますか？</translation>
+      <translation>このWebページを開きますか?</translation>
     </message>
     <message>
       <source>Integration</source>
@@ -11822,7 +11822,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::WelcomeScreen</name>
     <message>
       <source>Are you sure you want to hide this tile?</source>
-      <translation>このタイルを非表示にしてよろしいですか？</translation>
+      <translation>このタイルを非表示にしてもよろしいですか?</translation>
     </message>
     <message>
       <source>You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</source>
@@ -12552,7 +12552,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::SingleTargetLayoutPicker</name>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation>ローカルレイアウトをお探しですか？ユーザーのローカルレイアウトをオプションとして表示するには、 &quot;表示先&quot; リストからユーザーを1名のみ選択してください。</translation>
+      <translation>ローカルレイアウトをお探しですか? ユーザーのローカルレイアウトをオプションとして表示するには、 &quot;表示先&quot; リストからユーザーを1名のみ選択してください。</translation>
     </message>
   </context>
   <context>
@@ -12868,7 +12868,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
       <translation>
-        <numerusform>%n ファイルを削除しますか？</numerusform>
+        <numerusform>%n ファイルを削除しますか?</numerusform>
       </translation>
     </message>
     <message>
@@ -13019,7 +13019,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation>ファイルのダウンロードを停止しますか？</translation>
+      <translation>ファイルのダウンロードを停止しますか?</translation>
     </message>
     <message>
       <source>File downloaded</source>

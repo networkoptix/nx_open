@@ -6896,16 +6896,16 @@ If you intended to move analytics data to another storage location, please conta
       <translation>請避免變更這些設定，除非您清楚該變更對效能可能造成的影響</translation>
     </message>
     <message>
-      <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
-      <translation>只有首次新增至站點後的攝影機或伺服器的離線時間段會自動匯入。</translation>
-    </message>
-    <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
       <translation>為避免檔案中發生不可回復的更改，建議在啟用 &quot;自動匯入影片&quot;之前，停用 &quot;保留攝影機時間設定&quot; 。</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
       <translation>啟用此設定可能會導致檔案發生不可逆的變更。不建議在啟用 &quot;自動匯入影片&quot; 時啟用它。</translation>
+    </message>
+    <message>
+      <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
+      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
     </message>
   </context>
   <context>

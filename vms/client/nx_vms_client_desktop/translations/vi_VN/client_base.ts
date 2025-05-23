@@ -6896,16 +6896,16 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Không thay đổi các thiết lập này trừ khi bạn hoàn toàn chắc chắn về tác động tiềm tàng của chúng đối với hiệu suất</translation>
     </message>
     <message>
-      <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
-      <translation>Chỉ những khoảng thời gian camera hoặc máy chủ ngoại tuyến sau lần đầu tiên thêm vào trang web mới được tự động nhập.</translation>
-    </message>
-    <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
       <translation>Để tránh những thay đổi không thể đảo ngược trong kho lưu trữ, bạn nên tắt &quot;Giữ nguyên cài đặt thời gian của camera&quot; trước khi bật &quot;Tự động nhập video&quot;.</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
       <translation>Bật cài đặt này có thể dẫn đến những thay đổi không thể đảo ngược trong kho lưu trữ. Không nên bật cài đặt này khi &quot;Nhập video tự động&quot; đang hoạt động</translation>
+    </message>
+    <message>
+      <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
+      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
     </message>
   </context>
   <context>

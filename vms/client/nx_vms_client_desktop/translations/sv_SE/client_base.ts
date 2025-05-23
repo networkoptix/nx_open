@@ -7012,16 +7012,16 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Ändra inte dessa inställningar om du inte är helt säker på deras eventuella inverkan på systemets prestanda</translation>
     </message>
     <message>
-      <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
-      <translation>Endast kamera- eller server offlineperioder efter det första tillägget till webbplatsen kommer att importeras automatiskt.</translation>
-    </message>
-    <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
       <translation>För att undvika oåterkalleliga ändringar i arkivet, rekommenderas det att inaktivera &quot;Behåll kamerans tidsinställningar&quot; innan du aktiverar &quot;Importera video automatiskt&quot;.</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
       <translation>Aktivering av den här inställningen kan leda till oåterkalleliga ändringar i arkivet. Det rekommenderas inte att aktivera det medan &quot;Importera video automatiskt&quot; är aktiv</translation>
+    </message>
+    <message>
+      <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
+      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
     </message>
   </context>
   <context>

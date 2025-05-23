@@ -333,7 +333,7 @@ Escキーでキャンセル</translation>
     <name>QDialog</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation>これは何ですか？</translation>
+      <translation>これは何ですか?</translation>
     </message>
   </context>
   <context>
@@ -575,7 +575,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
-      <translation>&apos;%1&apos; を削除してもよろしいですか？</translation>
+      <translation>&apos;%1&apos; を削除してもよろしいですか?</translation>
     </message>
     <message>
       <source>Could not delete directory.</source>
@@ -1138,7 +1138,7 @@ Do you want to delete it anyway?</source>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation>これは何ですか？</translation>
+      <translation>これは何ですか?</translation>
     </message>
   </context>
   <context>

@@ -6896,16 +6896,16 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <translation>Jangan ubah pengaturan ini kecuali Anda benar-benar yakin akan potensi dampaknya terhadap performa</translation>
     </message>
     <message>
-      <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
-      <translation>Hanya kamera atau server offline yang akan diimpor secara otomatis setelah penambahan pertama ke site.</translation>
-    </message>
-    <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
       <translation>Untuk menghindari perubahan yang tidak dapat dikembalikan lagi pada archive, disarankan untuk menonaktifkan &quot;Pertahankan pengaturan waktu kamera&quot; sebelum mengaktifkan &quot;Impor video secara otomatis&quot;.</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
       <translation>Mengaktifkan pengaturan ini dapat menyebabkan perubahan yang tidak dapat dikembalikan pada archive. Tidak disarankan untuk mengaktifkannya saat &quot;Impor video secara otomatis&quot; aktif</translation>
+    </message>
+    <message>
+      <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
+      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
     </message>
   </context>
   <context>
@@ -7961,8 +7961,8 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      <translation>
+        <numerusform>Log event untuk periode dari %1 hingga %2 - Menampilkan event %n pertama. Untuk menemukan event tertentu, harap sesuaikan rentang tanggal atau terapkan filter tambahan</numerusform>
       </translation>
     </message>
   </context>
