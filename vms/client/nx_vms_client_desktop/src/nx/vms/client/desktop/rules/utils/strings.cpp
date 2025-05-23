@@ -314,7 +314,7 @@ QStringList Strings::subjectsLong(
     QStringList result;
 
     for (int i = 0; i < max && i < users.count(); ++i)
-        result.push_back(users[i]->getName());
+        result.push_back(users[i]->displayName());
 
     result.sort(Qt::CaseInsensitive);
     max -= result.size();
