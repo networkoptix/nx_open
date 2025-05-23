@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation>このページを離れますか？変更が保存されない可能性があります。</translation>
+      <translation>このページから移動してもよろしいですか? 変更が保存されない可能性があります。</translation>
     </message>
     <message>
       <source>&amp;Back</source>
@@ -409,7 +409,7 @@
     </message>
     <message>
       <source>Are you sure you want to leave this page?</source>
-      <translation>このページを離れてもよろしいですか？</translation>
+      <translation>このページを離れてもよろしいですか?</translation>
     </message>
     <message>
       <source>Changes that you made may not be saved.</source>
