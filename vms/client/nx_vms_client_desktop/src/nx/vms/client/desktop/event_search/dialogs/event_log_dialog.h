@@ -53,6 +53,7 @@ private:
 
 private:
     void retranslateUi();
+    void resizeTableColumns();
     void initEventsModel();
     void initActionsModel();
 

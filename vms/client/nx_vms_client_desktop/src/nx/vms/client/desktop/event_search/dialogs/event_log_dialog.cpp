@@ -158,6 +158,16 @@ int dateTimeColumnDefaultWidth(QTableView* tableView)
         + style::Metrics::kStandardPadding * 2;
 }
 
+int calculateItemMaxWidth(
+    const QFontMetrics& metrics, const QMap<QString, ItemDescriptor>& items)
+{
+    qsizetype maxCharCount = 0;
+    for (auto& item: items)
+        maxCharCount = std::max(maxCharCount, item.displayName.value().size());
+
+    return metrics.averageCharWidth() * maxCharCount + style::Metrics::kStandardPadding * 2;
+}
+
 } // namespace
 
 enum class EventLogDialog::State
@@ -195,8 +205,6 @@ EventLogDialog::EventLogDialog(QWidget* parent):
     ui->gridEvents->setModel(m_model);
 
     ui->gridEvents->hoverTracker()->setMouseCursorRole(Qn::ItemMouseCursorRole);
-
-    //ui->gridEvents->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     initEventsModel();
     initActionsModel();
@@ -378,6 +386,8 @@ void EventLogDialog::updateAnalyticsEvents()
         QSignalBlocker signalBlocker(ui->eventComboBox);
         setAnalyticsEventType(selectedAnalyticsEventTypeId);
     }
+
+    resizeTableColumns();
 }
 
 void EventLogDialog::updateServerEventsMenu()
@@ -476,6 +486,7 @@ void EventLogDialog::initActionsModel()
         m_actionTypesModel->appendRow(item);
     }
     ui->actionComboBox->setModel(m_actionTypesModel);
+    resizeTableColumns();
 }
 
 void EventLogDialog::reset()
@@ -667,6 +678,41 @@ void EventLogDialog::retranslateUi()
     ui->eventRulesButton->setVisible(menu()->canTrigger(menu::OpenVmsRulesDialogAction));
 }
 
+/*
+ * Resizes event log table columns:
+ * - Sets fixed widths for DateTime, Action, and Event columns.
+ * - Distributes remaining space evenly across other columns.
+ */
+void EventLogDialog::resizeTableColumns()
+{
+    if (!ui->gridEvents->model() || !ui->eventComboBox->model())
+        return;
+
+    const auto dateTimeWidth = dateTimeColumnDefaultWidth(ui->gridEvents);
+    const auto actionColumnWidth = calculateItemMaxWidth(
+        ui->gridEvents->fontMetrics(), system()->vmsRulesEngine()->actions());
+    const auto eventColumnWidth =
+        calculateItemMaxWidth(ui->gridEvents->fontMetrics(), system()->vmsRulesEngine()->events());
+
+    const std::unordered_map<EventLogModel::Column, int> fixedSizeColumns = {
+        {EventLogModel::DateTimeColumn, dateTimeWidth},
+        {EventLogModel::ActionColumn, actionColumnWidth},
+        {EventLogModel::EventColumn, eventColumnWidth}
+    };
+
+    const auto totalWidth = width() - style::Metrics::kStandardPadding * 2;
+    const auto basicColumnWidth =
+        (totalWidth - dateTimeWidth - actionColumnWidth - eventColumnWidth)
+        / (EventLogModel::ColumnCount - fixedSizeColumns.size());
+
+    for (int i = 0; i < EventLogModel::ColumnCount; i++)
+    {
+        auto it = fixedSizeColumns.find(static_cast<EventLogModel::Column>(i));
+        ui->gridEvents->setColumnWidth(
+            i, it == fixedSizeColumns.end() ? basicColumnWidth : it->second);
+    }
+}
+
 void EventLogDialog::requestFinished(
     nx::vms::api::rules::EventLogRecordList&& records, nx::network::rest::ErrorId error)
 {
@@ -713,14 +759,6 @@ void EventLogDialog::requestFinished(
             .arg(locale.toString(start, QLocale::LongFormat)));
     }
 
-    ui->gridEvents->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
-
-    // Resize the first column to prevent the datetime text from being reduced. This could happen
-    // when scrolling if the datetime in the beginning of the delegate is shorter than the text in
-    // the middle of the table, which has not yet been uploaded to the table.
-    // TODO: #mmalofeev consider using custom delegate for the datetime column.
-    ui->gridEvents->horizontalHeader()->resizeSection(
-        EventLogModel::DateTimeColumn, dateTimeColumnDefaultWidth(ui->gridEvents));
     setLoading(State::loaded);
 }
 
