@@ -2,9 +2,9 @@
 
 #include "performance_monitor.h"
 
-#include "performance_worker.h"
-
 #include <QtCore/QThread>
+
+#include "performance_worker.h"
 
 namespace nx::vms::client::desktop {
 
@@ -50,6 +50,9 @@ bool PerformanceMonitor::isDebugInfoVisible() const
 
 void PerformanceMonitor::setVisible(bool visible)
 {
+    if (isEnabled() != visible)
+        setEnabled(visible);
+
     if (d->visible == visible)
         return;
 
