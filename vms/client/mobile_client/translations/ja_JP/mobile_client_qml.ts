@@ -138,7 +138,7 @@
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation>接続を削除しますか？</translation>
+      <translation>接続を削除しますか?</translation>
     </message>
     <message>
       <source>Enter server address</source>
@@ -147,7 +147,7 @@
     <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
-      <translation>&quot;%1&quot; を削除しますか？</translation>
+      <translation>ログイン &quot;%1&quot; を削除しますか?</translation>
     </message>
     <message>
       <source>Login field cannot be empty</source>
@@ -405,7 +405,7 @@
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>変更を保存しますか？</translation>
+      <translation>変更を保存しますか?</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -632,7 +632,7 @@
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
-      <translation>現在保存されているパスワードはどうしますか？</translation>
+      <translation>すでに保存済みのパスワードはどうしますか?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -859,7 +859,7 @@
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>このアプリケーションでは、I/Oモジュールは音声入力デバイスとしてのみ使用できます。コントロールモジュールとして使用するには、%1 のデスクトップバージョンを使用してください</translation>
+      <translation>このアプリケーションでは、I/Oモジュールは音声入力デバイスとしてのみ使用できます。コントロールモジュールとして使用するには、%1 のデスクトップ版を使用してください。</translation>
     </message>
     <message>
       <source>No live stream</source>
@@ -876,7 +876,7 @@
     </message>
     <message>
       <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation>このアーカイブを復号するには、デスクトップクライアントに暗号化パスワードを入力するか、サイト管理者に問い合わせてください。</translation>
+      <translation>このアーカイブを復号するには、デスクトップクライアントに暗号化パスワードを入力するか、サイト管理者にお問い合わせください。</translation>
     </message>
   </context>
   <context>
