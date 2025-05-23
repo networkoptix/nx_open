@@ -36,6 +36,7 @@ extern "C" {
 #include <nx/network/http/log/har.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/crash_dump/systemexcept.h>
+#include <nx/utils/debug.h>
 #include <nx/utils/ios_device_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
@@ -283,9 +284,11 @@ static void initializeNetworkLogging()
 {
     if (QString harFile = nx::mobile_client::ini().harFile; !harFile.isEmpty())
     {
-        nx::network::http::Har::instance()->setFileName(
-            QDir(nx::kit::IniConfig::iniFilesDir()).absoluteFilePath(harFile));
-        NX_INFO(NX_SCOPE_TAG, "HAR logging is enabled: %1", harFile);
+        const auto fileName = nx::utils::debug::formatFileName(
+            harFile,
+            QDir(nx::kit::IniConfig::iniFilesDir()));
+        nx::network::http::Har::instance()->setFileName(fileName);
+        NX_INFO(NX_SCOPE_TAG, "HAR logging is enabled: %1", fileName);
     }
 }
 

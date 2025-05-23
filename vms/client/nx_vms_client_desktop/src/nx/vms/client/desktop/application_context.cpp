@@ -35,6 +35,7 @@
 #include <nx/network/http/log/har.h>
 #include <nx/p2p/p2p_ini.h>
 #include <nx/utils/crash_dump/systemexcept.h>
+#include <nx/utils/debug.h>
 #include <nx/utils/external_resources.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
@@ -56,13 +57,13 @@
 #include <nx/vms/client/core/skin/font_config.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/font_loader.h>
-#include <nx/vms/client/desktop/menu/actions.h>
-#include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/common/widgets/loading_indicator.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
+#include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/resource/resource_factory.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
@@ -516,9 +517,9 @@ struct ApplicationContext::Private
 
         if (QString harFile = ini().harFile; !harFile.isEmpty())
         {
-            nx::network::http::Har::instance()->setFileName(
-                QDir(logDir).absoluteFilePath(harFile));
-            NX_INFO(NX_SCOPE_TAG, "HAR logging is enabled: %1", harFile);
+            const auto fileName = nx::utils::debug::formatFileName(harFile, logDir);
+            nx::network::http::Har::instance()->setFileName(fileName);
+            NX_INFO(NX_SCOPE_TAG, "HAR logging is enabled: %1", fileName);
         }
     }
 
