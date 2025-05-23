@@ -19,6 +19,7 @@ MouseArea
     property EventSearchModel eventsModel: null
     property int currentEventIndex: -1
     property alias previewId: preview.previewId
+    property string trackId //< This property is used in GUI tests, do not remove.
     property alias previewState: preview.previewState
     property var resource
     property var timestampMs

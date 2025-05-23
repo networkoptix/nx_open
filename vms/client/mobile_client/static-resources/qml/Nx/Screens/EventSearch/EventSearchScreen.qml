@@ -134,6 +134,7 @@ Page
             currentEventIndex: index
             resource: model.resource
             previewId: model.previewId
+            trackId: model.trackId?.toString() ?? ""
             previewState: model.previewState
             title: model.display
             extraText: model.description
