@@ -444,9 +444,10 @@ void QnLayoutsModel::onContextReady()
     const auto updateModel =
         [this]()
         {
+            const std::unique_ptr<QAbstractItemModel> previousSourceModelDeleter{sourceModel()};
             if (const auto systemContext = windowContext()->mainSystemContext())
             {
-                setSourceModel(new QnLayoutsModelUnsorted(systemContext));
+                setSourceModel(new QnLayoutsModelUnsorted(systemContext, this));
                 sort(0);
             }
             else
