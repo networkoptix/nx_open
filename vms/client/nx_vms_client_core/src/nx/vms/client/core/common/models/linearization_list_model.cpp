@@ -17,6 +17,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/utils/persistent_index_watcher.h>
 
 template<typename Container, typename ToString>
 QString itemsToString(const Container& items, ToString itemToString)
@@ -187,6 +188,7 @@ public:
 private:
     QPointer<QAbstractItemModel> m_sourceModel;
     QPersistentModelIndex m_sourceRoot;
+    std::unique_ptr<PersistentIndexWatcher> m_sourceRootWatcher;
     QSet<QPersistentModelIndex> m_expandedSourceIndices;
     bool m_sourceModelDestroying = false;
 
@@ -444,8 +446,15 @@ void LinearizationListModel::Private::setSourceModel(QAbstractItemModel* value, 
     reset();
     m_operationInProgress = false;
 
+    if (!m_sourceRootWatcher)
+    {
+        m_sourceRootWatcher = std::make_unique<PersistentIndexWatcher>(q);
+        connect(m_sourceRootWatcher.get(), &PersistentIndexWatcher::indexChanged,
+            q, &LinearizationListModel::sourceRootChanged);
+    }
+
     if (updateSourceRoot)
-        emit q->sourceRootChanged();
+        m_sourceRootWatcher->setIndex(m_sourceRoot);
 
     if (!m_sourceModel)
         return;
@@ -527,7 +536,7 @@ void LinearizationListModel::Private::setSourceRoot(const QModelIndex& sourceInd
     QScopedValueRollback progressRollback(m_operationInProgress, true);
     m_sourceRoot = newSourceRoot;
     reset();
-    emit q->sourceRootChanged();
+    m_sourceRootWatcher->setIndex(m_sourceRoot);
 }
 
 bool LinearizationListModel::Private::autoExpandAll() const
