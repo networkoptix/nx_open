@@ -47,7 +47,7 @@
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your system administrator.</source>
-      <translation>この認証方法は禁止されています。システム管理者に問い合わせてください。</translation>
+      <translation>この認証方法は禁止されています。システム管理者にお問い合わせください。</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>

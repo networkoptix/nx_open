@@ -12,7 +12,7 @@
 /norestart - インストール完了後に再起動しません。既定では、再起動する前にUIが表示されます。
 
 /log log.txt - 指定したファイルにログを書き出します。既定では、%TEMP%にログファイルが作成されます。</String>
-  <String Id="ConfirmCancelMessage">キャンセルしてもよろしいですか？</String>
+  <String Id="ConfirmCancelMessage">キャンセルしてもよろしいですか?</String>
   <String Id="ClientAndServer">クライアントとサーバー</String>
   <String Id="ClientOnly">クライアントのみ</String>
   <String Id="ClientOnlyDesc">クライアントアプリケーションは、映像表示とシステム管理に使用します。</String>
