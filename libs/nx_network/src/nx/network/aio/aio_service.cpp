@@ -3,21 +3,19 @@
 #include "aio_service.h"
 
 #include <atomic>
-#include <iostream>
-#include <memory>
-#include <thread>
 
 #include <QtCore/QThread>
 
 #include <nx/network/nx_network_ini.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 
+#include "../common_socket_impl.h"
 #include "aio_task_queue.h"
 #include "pollable.h"
-#include "../common_socket_impl.h"
 
 namespace nx::network::aio {
 
@@ -31,16 +29,21 @@ void AIOService::pleaseStopSync()
     for (auto& thread: m_aioThreadPool)
         thread->pleaseStop();
 
+    if (m_aioThreadWatcher)
+        m_aioThreadWatcher->stop();
+
     m_aioThreadPool.clear();
+
+    m_aioThreadWatcher.reset();
 }
 
-bool AIOService::initialize(unsigned int aioThreadPoolSize)
+bool AIOService::initialize(unsigned int aioThreadPoolSize, bool enableAioThreadWatcher)
 {
     if (!aioThreadPoolSize)
         aioThreadPoolSize = nx::network::ini().aioThreadCount;
     if (!aioThreadPoolSize)
         aioThreadPoolSize = QThread::idealThreadCount();
-    initializeAioThreadPool(aioThreadPoolSize);
+    initializeAioThreadPool(aioThreadPoolSize, enableAioThreadWatcher);
     return !m_aioThreadPool.empty();
 }
 
@@ -144,15 +147,35 @@ bool AIOService::isInAnyAioThread() const
     return getCurrentAioThread() != nullptr;
 }
 
-void AIOService::initializeAioThreadPool(unsigned int threadCount)
+void AIOService::initializeAioThreadPool(unsigned int threadCount, bool enableAioThreadWatcher)
 {
+    if (enableAioThreadWatcher)
+    {
+        m_aioThreadWatcher = std::make_unique<AioThreadWatcher>(
+            /*pollRatePerSecond*/ 100,
+            /*averageTimeMultiplier*/ 5 * detail::AioTaskQueue::kAbnormalProcessTimeFactor,
+            /*absoluteThreshold*/ std::chrono::seconds(5),
+            [this](AioThreadWatcher::StuckThread thread)
+            {
+                NX_ERROR(this, "Detected stuck thread: %1", thread);
+            });
+    }
+
     for (unsigned int i = 0; i < threadCount; ++i)
     {
-        auto thread = std::make_unique<AioThread>();
+        auto thread = std::make_unique<AioThread>(nullptr, m_aioThreadWatcher.get());
         thread->start();
         if (!thread->isRunning())
             continue;
         m_aioThreadPool.push_back(std::move(thread));
+    }
+
+    if (m_aioThreadWatcher)
+    {
+        std::vector<const AbstractAioThread*> threadsToWatch;
+        for(const auto& t: m_aioThreadPool)
+            threadsToWatch.push_back(t.get());
+        m_aioThreadWatcher->startWatcherThread(threadsToWatch);
     }
 }
 
@@ -185,6 +208,57 @@ std::vector<int> AIOService::aioThreadsQueueSize() const
     }
 
     return result;
+}
+
+AioThreadWatcher* AIOService::aioThreadWatcher() const
+{
+    return m_aioThreadWatcher.get();
+}
+
+AioStatistics AIOService::statistics() const
+{
+    AioStatistics statistics;
+    statistics.threadCount = (int) m_aioThreadPool.size();
+
+    if (m_aioThreadWatcher)
+    {
+        auto stuckThreads = m_aioThreadWatcher->detectStuckThreads();
+
+        statistics.stuckThreadData = AioStatistics::StuckAioThreadData{
+            .count = (int) stuckThreads.size(),
+            .averageTimeMultiplier = m_aioThreadWatcher->averageTimeMultiplier(),
+            .absoluteThresholdMsec = m_aioThreadWatcher->absoluteThreshold(),
+        };
+
+        std::transform(
+            stuckThreads.begin(), stuckThreads.end(),
+            std::back_inserter(statistics.stuckThreadData->threadIds),
+            [](auto stuckThread){ return stuckThread.aioThread->systemThreadId(); });
+    }
+
+    for (const auto& thread: m_aioThreadPool)
+    {
+        const auto queueSize = thread->taskQueue().postedCallCount();
+        statistics.queueSizesTotal += queueSize;
+
+        std::optional<bool> stuck;
+        if (statistics.stuckThreadData)
+        {
+            stuck = nx::utils::contains(
+                statistics.stuckThreadData->threadIds,
+                thread->systemThreadId());
+        }
+
+        statistics.threads[thread->systemThreadId()] = AioStatistics::AioThreadData{
+            .queueSize = queueSize,
+            .averageExecutionTimeUsecPerLastPeriod =
+                thread->taskQueue().averageExecutionTimePerLastPeriod(),
+            .periodMsec = detail::AioTaskQueue::kAbnormalProcessTimeDetectionPeriod,
+            .stuck = stuck,
+        };
+    }
+
+    return statistics;
 }
 
 } // namespace nx::network::aio

@@ -46,13 +46,14 @@ public:
     /**
      * NOTE: Anomaly detection really starts after accumulating data for the period
      * specified in the constructor.
+     * @return the value per last period if there is enough data to test, otherwise Value().
      */
     template<typename... AuxArgs>
-    void add(Value value, AuxArgs&&... args)
+    Value add(Value value, AuxArgs&&... args)
     {
         if (m_hasEnoughData)
         {
-            testValue(value, std::forward<AuxArgs>(args)...);
+            return testValue(value, std::forward<AuxArgs>(args)...);
         }
         else
         {
@@ -64,6 +65,8 @@ public:
         }
 
         m_averageCalculator.add(value);
+
+        return Value();
     }
 
     Multiplier multiplier() const
@@ -80,8 +83,11 @@ private:
     bool m_hasEnoughData = false;
     std::optional<ElapsedTimer> m_initialDataAccumulationTimer;
 
+    /**
+     * @return the average per last period.
+     */
     template<typename... AuxArgs>
-    void testValue(Value value, AuxArgs&&... args)
+    Value testValue(Value value, AuxArgs&&... args)
     {
         auto average = m_averageCalculator.getAveragePerLastPeriod();
         if (average == Value()) // aka zero
@@ -93,6 +99,8 @@ private:
 
         if (anomaly)
             m_reportAnomalyFunc(value, average, std::forward<AuxArgs>(args)...);
+
+        return average;
     }
 };
 

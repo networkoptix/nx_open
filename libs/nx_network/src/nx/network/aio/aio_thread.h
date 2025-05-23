@@ -16,6 +16,8 @@ namespace nx::network { class Pollable; }
 
 namespace nx::network::aio {
 
+class AioThreadWatcher;
+
 namespace detail { class AioTaskQueue; }
 
 class NX_NETWORK_API AbstractAioThread:
@@ -56,7 +58,9 @@ public:
     /**
      * @param pollSet If null, will be created using PollSetFactory.
      */
-    AioThread(std::unique_ptr<AbstractPollSet> pollSet = nullptr);
+    AioThread(
+        std::unique_ptr<AbstractPollSet> pollSet = nullptr,
+        AioThreadWatcher* aioThreadsWatcher = nullptr);
     virtual ~AioThread();
 
     virtual void pleaseStop() override;

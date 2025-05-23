@@ -9,7 +9,9 @@
 #include <nx/utils/move_only_func.h>
 
 #include "aio_event_handler.h"
+#include "aio_statistics.h"
 #include "aio_thread.h"
+#include "aio_thread_watcher.h"
 
 namespace nx::network::aio {
 
@@ -41,9 +43,11 @@ public:
     /**
      * @param aioThreadPoolSize Number of threads to launch. If zero, then it is auto-detected.
      * In most cases it is equal to the number of virtual cores.
+     * @param enableAioWatcherThread if true, an extra thread is created to monitor the aio threads
+     * for deadlocks.
      * @return true, if object has been successfully initialized.
      */
-    bool initialize(unsigned int aioThreadPoolSize = 0);
+    bool initialize(unsigned int aioThreadPoolSize = 0, bool enableAioWatcherThread = false);
 
     /**
      * Monitor sock for event eventToWatch and trigger eventHandler on event.
@@ -112,10 +116,19 @@ public:
 
     std::vector<int> aioThreadsQueueSize() const;
 
-private:
-    void initializeAioThreadPool(unsigned int threadCount);
+    /**
+     * @return nullptr if enableAioWatcherThread was false during the call to
+     * AIOService::initialize().
+     */
+    AioThreadWatcher* aioThreadWatcher() const;
+
+    AioStatistics statistics() const;
 
 private:
+    void initializeAioThreadPool(unsigned int threadCount, bool enableAioWatcherThread);
+
+private:
+    std::unique_ptr<AioThreadWatcher> m_aioThreadWatcher;
     std::vector<std::unique_ptr<AioThread>> m_aioThreadPool;
 };
 

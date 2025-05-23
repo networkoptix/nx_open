@@ -32,6 +32,11 @@ public:
     bool read(const QString& name, int* const value) const;
     bool read(const QString& name, size_t* const value) const;
     bool read(const QString& name, double* const value) const;
+    /**
+     * sets the bool value to true or false if the argument name is one of:
+     * TRUE, true, T, t, 1, FALSE, false, F, f, 0
+     */
+    bool read(const QString& name, bool* const value) const;
 
     template<typename ValueType = QString, typename MainName, typename ... AltNames>
     std::optional<ValueType> get(MainName mainName, AltNames ... altNames) const;

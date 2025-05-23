@@ -10,9 +10,6 @@
 
 namespace nx::network::aio::detail {
 
-static constexpr int kAbnormalProcessTimeFactor = 1000;
-static constexpr auto kAbnormalProcessTimeDetectionPeriod = std::chrono::seconds(20);
-
 AioTaskQueue::AioTaskQueue(AbstractPollSet* pollSet):
     m_pollSet(pollSet),
     m_abnormalProcessingTimeDetector(
@@ -144,6 +141,18 @@ bool AioTaskQueue::empty() const
     return m_postedCalls.empty()
         && m_pollSetModificationQueue.empty()
         && m_periodicTasksByClock.empty();
+}
+
+void AioTaskQueue::setAboutToInvoke(
+    nx::utils::MoveOnlyFunc<void(const char* /*functionType*/)> handler)
+{
+    m_aboutToInvokeHandler = std::move(handler);
+}
+
+void AioTaskQueue::setDoneInvoking(
+    nx::utils::MoveOnlyFunc<void(std::chrono::microseconds)> handler)
+{
+    m_doneInvokingHandler = std::move(handler);
 }
 
 void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
@@ -398,6 +407,11 @@ std::size_t AioTaskQueue::postedCallCount() const
     NX_MUTEX_LOCKER lock(&m_mutex);
 
     return m_postedCalls.size();
+}
+
+std::chrono::microseconds AioTaskQueue::averageExecutionTimePerLastPeriod() const
+{
+    return m_averageExecutionTimePerLastPeriod.load(std::memory_order_relaxed);
 }
 
 qint64 AioTaskQueue::getMonotonicTime()
@@ -781,10 +795,27 @@ void AioTaskQueue::callAndReportAbnormalProcessingTime(
     Func func,
     const char* description)
 {
+    if (m_aboutToInvokeHandler)
+        m_aboutToInvokeHandler(description);
+
     nx::utils::BasicElapsedTimer<std::chrono::microseconds> timer(
         nx::utils::ElapsedTimerState::started);
+
+    const auto doneInvoking = nx::utils::makeScopeGuard(
+        [this, &timer, description]()
+        {
+            const auto averagePerLastPeriod =
+                m_abnormalProcessingTimeDetector.add(timer.elapsed(), description);
+
+            m_averageExecutionTimePerLastPeriod.store(
+                averagePerLastPeriod,
+                std::memory_order_relaxed);
+
+            if (m_doneInvokingHandler)
+                m_doneInvokingHandler(averagePerLastPeriod);
+        });
+
     func();
-    m_abnormalProcessingTimeDetector.add(timer.elapsed(), description);
 }
 
 void AioTaskQueue::reportAbnormalProcessingTime(

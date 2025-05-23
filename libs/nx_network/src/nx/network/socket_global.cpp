@@ -7,22 +7,20 @@
 
 #include <QtCore/QRegularExpression>
 
-#include <udt/udt.h>
-
 #include <nx/utils/debug.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
+#include <udt/udt.h>
 
+#include "address_resolver.h"
 #include "aio/aio_service.h"
 #include "aio/pollset_factory.h"
 #include "aio/timer.h"
-#include "address_resolver.h"
 #include "cloud/cloud_connect_controller.h"
 #include "cloud/tunnel/outgoing_tunnel_pool.h" //< TODO: #akolesnikov Get rid of this dependency.
 #include "http/global_context.h"
 #include "nx_network_ini.h"
 #include "socket_factory.h"
-#include "ssl/context.h"
 
 static constexpr std::chrono::seconds kDebugIniReloadInterval{10};
 
@@ -44,10 +42,10 @@ public:
             m_aioService->pleaseStopSync();
     }
 
-    void initialize(unsigned int aioThreadPoolSize)
+    void initialize(unsigned int aioThreadPoolSize, bool enableAioThreadWatcher = false)
     {
         m_aioService = std::make_unique<aio::AIOService>();
-        m_aioService->initialize(aioThreadPoolSize);
+        m_aioService->initialize(aioThreadPoolSize, enableAioThreadWatcher);
     }
 
     aio::AIOService& aioService()
@@ -427,7 +425,9 @@ void SocketGlobals::initializeNetworking(const ArgumentParser& arguments)
 
     int aioThreadCount = 0;
     arguments.read("aio-thread-count", &aioThreadCount);
-    m_impl->aioServiceGuard.initialize(aioThreadCount);
+    bool enableAioThreadWatcher = false;
+    arguments.read("enable-aio-thread-watcher", &enableAioThreadWatcher);
+    m_impl->aioServiceGuard.initialize(aioThreadCount, enableAioThreadWatcher);
 
     m_impl->onAboutToBlockHandler = nx::utils::debug::setOnAboutToBlockHandler(
         []() { NX_ASSERT(!aioService().isInAnyAioThread()); });

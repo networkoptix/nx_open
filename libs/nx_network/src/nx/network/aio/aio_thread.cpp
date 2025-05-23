@@ -9,6 +9,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "aio_task_queue.h"
+#include "aio_thread_watcher.h"
 #include "pollset_factory.h"
 
 // TODO: #akolesnikov Memory order semantic used with std::atomic.
@@ -16,11 +17,29 @@
 
 namespace nx::network::aio {
 
-AioThread::AioThread(std::unique_ptr<AbstractPollSet> pollSet):
+AioThread::AioThread(
+    std::unique_ptr<AbstractPollSet> pollSet,
+    AioThreadWatcher* aioThreadWatcher)
+    :
     m_pollSet(pollSet ? std::move(pollSet) : PollSetFactory::instance()->create()),
     m_taskQueue(std::make_unique<detail::AioTaskQueue>(m_pollSet.get()))
 {
     setObjectName("AioThread");
+
+    if (aioThreadWatcher)
+    {
+        m_taskQueue->setAboutToInvoke(
+            [this, aioThreadWatcher](const char* functionType)
+            {
+                aioThreadWatcher->aboutToInvoke(this, functionType);
+            });
+
+        m_taskQueue->setDoneInvoking(
+            [this, aioThreadWatcher](std::chrono::microseconds average)
+            {
+                aioThreadWatcher->doneInvoking(this, average);
+            });
+    }
 }
 
 AioThread::~AioThread()

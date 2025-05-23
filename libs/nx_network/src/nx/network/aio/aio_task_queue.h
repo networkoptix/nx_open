@@ -173,6 +173,9 @@ public:
 class NX_NETWORK_API AioTaskQueue
 {
 public:
+    static constexpr int kAbnormalProcessTimeFactor = 1000;
+    static constexpr auto kAbnormalProcessTimeDetectionPeriod = std::chrono::seconds(20);
+
     AioTaskQueue(AbstractPollSet* pollSet);
 
     //---------------------------------------------------------------------------------------------
@@ -225,6 +228,18 @@ public:
 
     bool empty() const;
 
+    /**
+     * Install a callback to be executed right before invoking a function.
+     */
+    void setAboutToInvoke(
+        nx::utils::MoveOnlyFunc<void(const char* /*functionType*/)> handler);
+
+    /**
+     * Install a callback to be executed right after invoking a function.
+     */
+    void setDoneInvoking(
+        nx::utils::MoveOnlyFunc<void(std::chrono::microseconds /*average*/)> handler);
+
     //---------------------------------------------------------------------------------------------
     // Methods that are called within the corresponding AIO thread only.
 
@@ -256,6 +271,8 @@ public:
 
     std::size_t postedCallCount() const;
 
+    std::chrono::microseconds averageExecutionTimePerLastPeriod() const;
+
     //---------------------------------------------------------------------------------------------
 
     /**
@@ -276,9 +293,12 @@ private:
     std::multimap<qint64, PeriodicTaskData> m_periodicTasksByClock;
     mutable nx::Mutex m_mutex;
     nx::utils::math::AbnormalValueDetector<
-        std::chrono::microseconds, int, const char*> m_abnormalProcessingTimeDetector;
+    std::chrono::microseconds, int, const char*> m_abnormalProcessingTimeDetector;
     std::atomic<std::size_t> m_newReadMonitorTaskCount = 0;
     std::atomic<std::size_t> m_newWriteMonitorTaskCount = 0;
+    std::atomic<std::chrono::microseconds> m_averageExecutionTimePerLastPeriod;
+    nx::utils::MoveOnlyFunc<void(const char* /*functionType*/)> m_aboutToInvokeHandler;
+    nx::utils::MoveOnlyFunc<void(std::chrono::microseconds /*average*/)> m_doneInvokingHandler;
 
     void addTask(
         const nx::Locker<nx::Mutex>&,

@@ -125,6 +125,33 @@ bool ArgumentParser::read(const QString& name, double* const value) const
     return true;
 }
 
+bool ArgumentParser::read(const QString& name, bool* const value) const
+{
+    QString strValue;
+    if (!read(name, &strValue))
+        return false;
+
+    for (const auto& v: {"TRUE", "true", "T", "t", "1"})
+    {
+        if (v == strValue)
+        {
+            *value = true;
+            return true;
+        }
+    }
+
+    for (const auto& v: {"FALSE", "false", "F", "f", "0"})
+    {
+        if (v == strValue)
+        {
+            *value = false;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool ArgumentParser::contains(const QString& name) const
 {
     return m_args.count(name) > 0;

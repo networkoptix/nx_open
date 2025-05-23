@@ -4,9 +4,8 @@
 
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_types.h>
-#include <nx/reflect/json.h>
-
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/reflect/json.h>
 
 #include "request_path.h"
 #include "statistics.h"
@@ -24,8 +23,6 @@ void Server::registerRequestHandlers(
 {
     /**%apidoc GET /placeholder/maintenance/statistics/general
      * Meant to provide some generic statistics metrics. E.g., service uptime.
-     * %deprecated This call was deprecated since services usually provide statistics
-     * themselves with `.../statistics/metrics/` API call.
      *
      * %caption Get some common statistics
      * %ingroup Maintenance
@@ -42,8 +39,11 @@ void Server::getStatisticsGeneral(
     http::RequestProcessedHandler completionHandler)
 {
     using namespace std::chrono;
+
     Statistics stats{
-        duration_cast<milliseconds>(steady_clock::now() - m_processStartTime)};
+        .uptimeMsec = duration_cast<milliseconds>(steady_clock::now() - m_processStartTime),
+        .aio = SocketGlobals::aioService().statistics(),
+    };
 
     http::RequestResult result(http::StatusCode::ok);
     result.body = std::make_unique<http::BufferSource>(
