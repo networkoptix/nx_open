@@ -251,13 +251,13 @@ void CloudStatusWatcher::logSession(const QString& cloudSystemId)
 
 void CloudStatusWatcher::resetAuthData()
 {
-    RemoteConnectionFactoryCache::clearForUser(credentials().username);
     setAuthData(CloudAuthData(), AuthMode::login);
     appContext()->coreSettings()->setCloudAuthData(CloudAuthData());
 }
 
 bool CloudStatusWatcher::setAuthData(const CloudAuthData& authData, AuthMode mode)
 {
+    RemoteConnectionFactoryCache::clearForUser(credentials().username);
     return d->setAuthData(authData, mode);
 }
 
