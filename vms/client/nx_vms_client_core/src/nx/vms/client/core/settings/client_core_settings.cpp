@@ -28,6 +28,7 @@ namespace nx::vms::client::core {
 namespace {
 
 static const QString kSecureKeyPropertyName("key");
+static const QString kSecureKeyV2PropertyName("key_v2");
 
 nx::utils::property_storage::AbstractBackend* createBackend(bool useQSettings)
 {
@@ -85,14 +86,27 @@ Settings::Settings(const InitializationOptions& options):
             const QString serviceName = nx::branding::company() + " " + nx::branding::vmsName();
             KeychainBackend keychain(serviceName);
 
-            QByteArray key = keychain.readValue(kSecureKeyPropertyName).toUtf8();
+            // We store base64-encoded key as v2 because the Windows backend does not allow to
+            // store non-latin1 symbols reliably - what we read significantly differs from what
+            // we have written before.
+            QByteArray key = QByteArray::fromBase64(
+                keychain.readValue(kSecureKeyV2PropertyName).toUtf8());
+            if (key.isEmpty())
+                key = keychain.readValue(kSecureKeyPropertyName).toUtf8();
+
             if (key.isEmpty())
             {
                 key = nx::crypt::generateAesExtraKey();
-                if (!keychain.writeValue(kSecureKeyPropertyName, QString::fromUtf8(key)))
+                if (!keychain.writeValue(
+                        kSecureKeyV2PropertyName, QString::fromUtf8(key.toBase64())))
                 {
                     NX_WARNING(this, "Keychain is not available, using predefined key");
                     key = {};
+                }
+                else
+                {
+                    // Written for compatibility purposes with previous clients versions.
+                    keychain.writeValue(kSecureKeyPropertyName, QString::fromUtf8(key));
                 }
             }
 
