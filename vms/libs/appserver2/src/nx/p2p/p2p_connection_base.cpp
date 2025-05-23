@@ -287,7 +287,7 @@ void ConnectionBase::onHttpClientDone()
 
     if (remotePeer.dataFormat == Qn::SerializationFormat::ubjson && m_localPeer.isServer())
         m_localPeer.dataFormat = Qn::SerializationFormat::ubjson;
-    m_remotePeer = std::move(remotePeer);
+    m_remotePeer = remotePeer;
 
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
 
@@ -309,7 +309,7 @@ void ConnectionBase::onHttpClientDone()
     }
 
     using namespace nx::network;
-    websocket::FrameType frameType = remotePeer.dataFormat == Qn::SerializationFormat::json
+    websocket::FrameType frameType = m_remotePeer.dataFormat == Qn::SerializationFormat::json
         ? websocket::FrameType::text
         : websocket::FrameType::binary;
 

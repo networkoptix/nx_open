@@ -70,7 +70,8 @@ bool PeerData::isClient(PeerType peerType)
     return peerType == PeerType::desktopClient
         || peerType == PeerType::videowallClient
         || peerType == PeerType::mobileClient
-        || peerType == PeerType::oldMobileClient;
+        || peerType == PeerType::oldMobileClient
+        || peerType == PeerType::notDefined;
 }
 
 bool PeerData::isServer(PeerType peerType)
