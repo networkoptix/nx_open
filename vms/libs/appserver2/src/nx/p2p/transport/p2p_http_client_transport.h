@@ -6,11 +6,13 @@
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/websocket/websocket_common_types.h>
 #include <nx/p2p/transport/i_p2p_transport.h>
 #include <nx/string.h>
 #include <nx/utils/interruption_flag.h>
+#include <nx/utils/lockable.h>
 
 namespace nx::p2p {
 
@@ -44,6 +46,8 @@ public:
     network:: SocketAddress getForeignAddress() const override;
     virtual void start(
         utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart = nullptr) override;
+
+    nx::network::http::HttpHeaders firstResponseHeaders() const;
 
     // For tests.
     static void setPingTimeout(std::optional<std::chrono::milliseconds> pingTimeout);
@@ -94,6 +98,7 @@ private:
     network::aio::Timer m_inactivityTimer;
     std::queue<OutgoingData> m_outgoingMessageQueue;
     bool m_sendInProgress = false;
+    nx::Lockable<network::http::HttpHeaders> m_firstResponseHeaders;
 
     // For tests.
     static std::optional<std::chrono::milliseconds> s_pingTimeout;

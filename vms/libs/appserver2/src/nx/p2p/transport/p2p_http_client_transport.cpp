@@ -436,6 +436,7 @@ void P2PHttpClientTransport::startReading()
             {
                 m_multipartContentParser.setNextFilter(nextFilter);
                 const auto& headers = m_readHttpClient->response()->headers;
+                *m_firstResponseHeaders.lock() = headers;
                 const auto contentTypeIt = headers.find("Content-Type");
 
                 NX_ASSERT(contentTypeIt != headers.end());
@@ -496,6 +497,11 @@ void P2PHttpClientTransport::startReading()
 
     NX_VERBOSE(this, "startReading: Sending initial GET request to '%1'", m_url);
     m_readHttpClient->doGet(m_url);
+}
+
+nx::network::http::HttpHeaders P2PHttpClientTransport::firstResponseHeaders() const
+{
+    return *m_firstResponseHeaders.lock();
 }
 
 P2PHttpClientTransport::PostBodySource::PostBodySource(
