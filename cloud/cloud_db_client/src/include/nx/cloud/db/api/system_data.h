@@ -498,7 +498,7 @@ struct SystemSharingEx: SystemSharing
     SystemSharingEx() = default;
 
     SystemSharingEx(const SystemSharing& systemSharing):
-        SystemSharing(std::move(systemSharing))
+        SystemSharing(systemSharing)
     {
     }
 };

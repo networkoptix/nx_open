@@ -2,6 +2,7 @@
 
 #include "uuid.h"
 
+#include <regex>
 #include <type_traits>
 
 #include <QtCore/QCryptographicHash>
@@ -87,28 +88,32 @@ bool Uuid::isUuidString(const std::string_view& data)
         || data.size() == 38; //< {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
 }
 
+inline bool validateUuid(const std::string& s) {
+    static const std::regex uuid_regex(
+        "^\\{?[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}\\}?$",
+        std::regex_constants::icase
+    );
+    return std::regex_match(s, uuid_regex);
+}
+
 bool Uuid::isValidUuidString(const QByteArray& data)
 {
-    QUuid uuid(data);
-    return !uuid.isNull();
+    return validateUuid(std::string(data));
 }
 
 bool Uuid::isValidUuidString(const QString& data)
 {
-    QUuid uuid(data);
-    return !uuid.isNull();
+    return validateUuid(data.toStdString());
 }
 
 bool Uuid::isValidUuidString(const std::string& data)
 {
-    QUuid uuid(data);
-    return !uuid.isNull();
+    return validateUuid(data);
 }
 
 bool Uuid::isValidUuidString(const std::string_view& data)
 {
-    QUuid uuid(data);
-    return !uuid.isNull();
+    return validateUuid(std::string(data));
 }
 
 const QUuid& Uuid::getQUuid() const
