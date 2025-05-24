@@ -532,7 +532,7 @@
     </message>
     <message>
       <source>Native camera presets will not be available.</source>
-      <translation type="unfinished">Native camera presets will not be available.</translation>
+      <translation>攝影機內建預設點將無法使用。</translation>
     </message>
   </context>
   <context>

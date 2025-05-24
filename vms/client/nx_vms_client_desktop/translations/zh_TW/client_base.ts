@@ -6905,7 +6905,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
-      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
+      <translation>只有啟用此選項後發生的相機或伺服器離線期才會自動匯入。請注意：如果您停用此選項，任何尚未匯入的離線時段都會遺失，並且無法復原。</translation>
     </message>
   </context>
   <context>
@@ -7961,8 +7961,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      <translation>
+        <numerusform>從 %1 到 %2 期間的事件日誌 - 顯示前 %n 個事件。若要尋找特定事件，請調整日期範圍或套用其他篩選器</numerusform>
       </translation>
     </message>
   </context>
@@ -12411,7 +12411,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
     <message>
       <source>No settings model</source>
-      <translation type="unfinished">No settings model</translation>
+      <translation>無設定模型</translation>
     </message>
     <message>
       <source>No parameters</source>
@@ -12419,7 +12419,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Parameters set</source>
-      <translation type="unfinished">Parameters set</translation>
+      <translation>參數設定</translation>
     </message>
   </context>
   <context>

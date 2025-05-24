@@ -6906,7 +6906,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
-      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
+      <translation>このオプションの有効化後に発生した、カメラやサーバーのオフライン期間が自動的にインポートされます。注: このオプションを無効化すると、未インポートのオフライン期間は失われ、後で復元できなくなります。</translation>
     </message>
   </context>
   <context>
