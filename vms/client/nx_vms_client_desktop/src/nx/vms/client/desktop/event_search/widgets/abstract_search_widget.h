@@ -29,6 +29,7 @@ class EventTile;
 class EventRibbon;
 class SelectableTextButton;
 class CommonObjectSearchSetup;
+class AbstractSearchWidgetPrivate;
 
 /**
  * Base class for Right Panel search tabs. Contains common filter setup controls, tiles view
@@ -162,8 +163,8 @@ private:
     virtual bool calculateAllowance() const { return true; }
 
 private:
-    class Private;
-    nx::utils::ImplPtr<Private> d;
+    friend class AbstractSearchWidgetPrivate;
+    nx::utils::ImplPtr<AbstractSearchWidgetPrivate> d;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractSearchWidget::Controls)

@@ -31,7 +31,7 @@ AbstractSearchWidget::AbstractSearchWidget(
     :
     base_type(parent),
     WindowContextAware(context),
-    d(new Private(this, model))
+    d(new AbstractSearchWidgetPrivate(this, model))
 {
     auto listenPermissionsChanges =
         [this]()

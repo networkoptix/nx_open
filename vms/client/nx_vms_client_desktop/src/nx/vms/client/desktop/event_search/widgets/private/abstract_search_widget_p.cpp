@@ -145,7 +145,7 @@ QToolButton* createCheckableToolButton(QWidget* parent)
 
 } // namespace
 
-AbstractSearchWidget::Private::Private(
+AbstractSearchWidgetPrivate::AbstractSearchWidgetPrivate(
     AbstractSearchWidget* q,
     core::AbstractSearchListModel* model)
     :
@@ -208,7 +208,7 @@ AbstractSearchWidget::Private::Private(
     }
 
     connect(q->navigator(), &QnWorkbenchNavigator::currentResourceChanged, this,
-        &Private::updateCameraDisplaying);
+        &AbstractSearchWidgetPrivate::updateCameraDisplaying);
 
     setupModels();
     setupRibbon();
@@ -250,15 +250,15 @@ AbstractSearchWidget::Private::Private(
     updateControlsVisibility();
 }
 
-AbstractSearchWidget::Private::~Private()
+AbstractSearchWidgetPrivate::~AbstractSearchWidgetPrivate()
 {
     // Required here for forward-declared scoped pointer destruction.
 }
 
-void AbstractSearchWidget::Private::setupModels()
+void AbstractSearchWidgetPrivate::setupModels()
 {
     connect(m_mainModel.data(), &core::AbstractSearchListModel::dataNeeded,
-        this, &Private::requestFetchIfNeeded);
+        this, &AbstractSearchWidgetPrivate::requestFetchIfNeeded);
 
     connect(m_mainModel.data(), &QAbstractItemModel::modelReset,
         this,
@@ -269,10 +269,10 @@ void AbstractSearchWidget::Private::setupModels()
         });
 
     connect(m_mainModel.data(), &QAbstractItemModel::rowsRemoved,
-        this, &Private::handleItemCountChanged);
+        this, &AbstractSearchWidgetPrivate::handleItemCountChanged);
 
     connect(m_mainModel.data(), &QAbstractItemModel::rowsInserted,
-        this, &Private::handleItemCountChanged);
+        this, &AbstractSearchWidgetPrivate::handleItemCountChanged);
 
     using UpdateMode = EventRibbon::UpdateMode;
 
@@ -339,7 +339,7 @@ void AbstractSearchWidget::Private::setupModels()
         m_headIndicatorModel.data(), m_mainModel.data(), m_tailIndicatorModel.data()});
 }
 
-void AbstractSearchWidget::Private::setupRibbon()
+void AbstractSearchWidgetPrivate::setupRibbon()
 {
     ui->ribbon->setModel(m_visualModel.data());
     ui->ribbon->setViewportMargins(0, style::Metrics::kStandardPadding);
@@ -366,7 +366,7 @@ void AbstractSearchWidget::Private::setupRibbon()
     TileInteractionHandler::install(ui->ribbon);
 }
 
-void AbstractSearchWidget::Private::setupViewportHeader()
+void AbstractSearchWidgetPrivate::setupViewportHeader()
 {
     const auto toolbar = new QWidget(q);
     toolbar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -434,7 +434,7 @@ void AbstractSearchWidget::Private::setupViewportHeader()
     updateThumbnailsToolTip();
 }
 
-void AbstractSearchWidget::Private::setupPlaceholder()
+void AbstractSearchWidgetPrivate::setupPlaceholder()
 {
     anchorWidgetToParent(m_placeholderWidget);
 
@@ -452,7 +452,7 @@ void AbstractSearchWidget::Private::setupPlaceholder()
     effect->setOpacity(0.0);
 }
 
-void AbstractSearchWidget::Private::setupTimeSelection()
+void AbstractSearchWidgetPrivate::setupTimeSelection()
 {
     ui->timeSelectionButton->setSelectable(false);
     ui->timeSelectionButton->setDeactivatable(true);
@@ -508,7 +508,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
     m_timeSelectionActions[core::EventSearch::TimeSelection::selection]->setVisible(false);
 }
 
-void AbstractSearchWidget::Private::setupCameraSelection()
+void AbstractSearchWidgetPrivate::setupCameraSelection()
 {
     ui->cameraSelectionButton->setSelectable(false);
     ui->cameraSelectionButton->setDeactivatable(true);
@@ -628,7 +628,7 @@ void AbstractSearchWidget::Private::setupCameraSelection()
         });
 }
 
-void AbstractSearchWidget::Private::setupCameraDisplaying()
+void AbstractSearchWidgetPrivate::setupCameraDisplaying()
 {
     setReadOnly(ui->cameraDisplayingButton, true);
 
@@ -641,7 +641,7 @@ void AbstractSearchWidget::Private::setupCameraDisplaying()
     updateCameraDisplaying();
 }
 
-void AbstractSearchWidget::Private::updateCameraDisplaying()
+void AbstractSearchWidgetPrivate::updateCameraDisplaying()
 {
     const auto resource = q->navigator()->currentResource();
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
@@ -676,7 +676,7 @@ void AbstractSearchWidget::Private::updateCameraDisplaying()
     }
 }
 
-QString AbstractSearchWidget::Private::currentDeviceText() const
+QString AbstractSearchWidgetPrivate::currentDeviceText() const
 {
     const auto camera = m_commonSetup->singleCamera();
     const auto baseText = QnDeviceDependentStrings::getNameFromSet(system()->resourcePool(),
@@ -685,7 +685,7 @@ QString AbstractSearchWidget::Private::currentDeviceText() const
     return singleDeviceText(baseText, camera);
 }
 
-QString AbstractSearchWidget::Private::singleDeviceText(
+QString AbstractSearchWidgetPrivate::singleDeviceText(
     const QString& baseText, const QnVirtualCameraResourcePtr& device) const
 {
     return QString("%1 %2 %3").arg(baseText, nx::UnicodeChars::kEnDash, device
@@ -693,7 +693,7 @@ QString AbstractSearchWidget::Private::singleDeviceText(
         : tr("none", "No currently selected camera"));
 };
 
-QString AbstractSearchWidget::Private::deviceButtonText(
+QString AbstractSearchWidgetPrivate::deviceButtonText(
     core::EventSearch::CameraSelection selection) const
 {
     switch (selection)
@@ -725,17 +725,17 @@ QString AbstractSearchWidget::Private::deviceButtonText(
     }
 }
 
-core::AbstractSearchListModel* AbstractSearchWidget::Private::model() const
+core::AbstractSearchListModel* AbstractSearchWidgetPrivate::model() const
 {
     return m_mainModel.data();
 }
 
-EventRibbon* AbstractSearchWidget::Private::view() const
+EventRibbon* AbstractSearchWidgetPrivate::view() const
 {
     return ui->ribbon;
 }
 
-bool AbstractSearchWidget::Private::isAllowed() const
+bool AbstractSearchWidgetPrivate::isAllowed() const
 {
     if (!m_isAllowed.has_value())
         q->updateAllowance();
@@ -744,7 +744,7 @@ bool AbstractSearchWidget::Private::isAllowed() const
     return *m_isAllowed;
 }
 
-void AbstractSearchWidget::Private::setAllowed(bool value)
+void AbstractSearchWidgetPrivate::setAllowed(bool value)
 {
     if (m_isAllowed.has_value() && *m_isAllowed == value)
         return;
@@ -753,7 +753,7 @@ void AbstractSearchWidget::Private::setAllowed(bool value)
     emit q->allowanceChanged(*m_isAllowed, AbstractSearchWidget::QPrivateSignal());
 }
 
-void AbstractSearchWidget::Private::goToLive()
+void AbstractSearchWidgetPrivate::goToLive()
 {
     if (m_mainModel->effectiveLiveSupported())
         m_mainModel->setLive(true);
@@ -761,12 +761,12 @@ void AbstractSearchWidget::Private::goToLive()
     ui->ribbon->scrollBar()->setValue(0);
 }
 
-AbstractSearchWidget::Controls AbstractSearchWidget::Private::relevantControls() const
+AbstractSearchWidget::Controls AbstractSearchWidgetPrivate::relevantControls() const
 {
     return m_relevantControls;
 }
 
-void AbstractSearchWidget::Private::setRelevantControls(Controls value)
+void AbstractSearchWidgetPrivate::setRelevantControls(Controls value)
 {
     if (m_relevantControls == value)
         return;
@@ -775,7 +775,7 @@ void AbstractSearchWidget::Private::setRelevantControls(Controls value)
     updateControlsVisibility();
 }
 
-void AbstractSearchWidget::Private::updateControlsVisibility()
+void AbstractSearchWidgetPrivate::updateControlsVisibility()
 {
     if (workbench()->currentLayoutResource()->isCrossSystem())
         q->commonSetup()->setCameraSelection(nx::vms::client::core::EventSearch::CameraSelection::current);
@@ -793,17 +793,17 @@ void AbstractSearchWidget::Private::updateControlsVisibility()
     m_togglePreviewsButton->setVisible(m_relevantControls.testFlag(Control::previewsToggler));
 }
 
-CommonObjectSearchSetup* AbstractSearchWidget::Private::commonSetup() const
+CommonObjectSearchSetup* AbstractSearchWidgetPrivate::commonSetup() const
 {
     return m_commonSetup;
 }
 
-void AbstractSearchWidget::Private::setPlaceholderPixmap(const QPixmap& value)
+void AbstractSearchWidgetPrivate::setPlaceholderPixmap(const QPixmap& value)
 {
     m_placeholderWidget->setPixmap(value);
 }
 
-SelectableTextButton* AbstractSearchWidget::Private::createCustomFilterButton()
+SelectableTextButton* AbstractSearchWidgetPrivate::createCustomFilterButton()
 {
     auto result = new SelectableTextButton(ui->filters);
     result->setFlat(true);
@@ -815,7 +815,7 @@ SelectableTextButton* AbstractSearchWidget::Private::createCustomFilterButton()
     return result;
 }
 
-void AbstractSearchWidget::Private::addFilterWidget(QWidget* widget, Qt::Alignment alignment)
+void AbstractSearchWidgetPrivate::addFilterWidget(QWidget* widget, Qt::Alignment alignment)
 {
     if (!NX_ASSERT(widget))
         return;
@@ -824,7 +824,7 @@ void AbstractSearchWidget::Private::addFilterWidget(QWidget* widget, Qt::Alignme
     ui->filtersLayout->addWidget(widget, 0, alignment);
 }
 
-std::optional<FetchDirection> AbstractSearchWidget::Private::getFetchDirection()
+std::optional<FetchDirection> AbstractSearchWidgetPrivate::getFetchDirection()
 {
     if (!m_mainModel)
         return {};
@@ -839,7 +839,7 @@ std::optional<FetchDirection> AbstractSearchWidget::Private::getFetchDirection()
     return {}; //< Scroll bar is not at the beginning nor the end.
 }
 
-void AbstractSearchWidget::Private::requestFetchIfNeeded()
+void AbstractSearchWidgetPrivate::requestFetchIfNeeded()
 {
     if (!ui->ribbon->isVisible())
         return;
@@ -848,41 +848,41 @@ void AbstractSearchWidget::Private::requestFetchIfNeeded()
         m_fetchDataOperation->requestOperation();
 }
 
-void AbstractSearchWidget::Private::resetFilters()
+void AbstractSearchWidgetPrivate::resetFilters()
 {
     ui->cameraSelectionButton->deactivate(); //< Will do nothing if selector is set to read-only.
     ui->timeSelectionButton->deactivate();
     m_textFilterEdit->clear();
 }
 
-void AbstractSearchWidget::Private::addDeviceDependentAction(
+void AbstractSearchWidgetPrivate::addDeviceDependentAction(
     QAction* action, const QString& mixedString, const QString& cameraString)
 {
     NX_ASSERT(action);
     m_deviceDependentActions.push_back({action, mixedString, cameraString});
 }
 
-void AbstractSearchWidget::Private::setPreviewToggled(bool value)
+void AbstractSearchWidgetPrivate::setPreviewToggled(bool value)
 {
     m_togglePreviewsButton->setChecked(value);
 }
 
-bool AbstractSearchWidget::Private::previewToggled() const
+bool AbstractSearchWidgetPrivate::previewToggled() const
 {
     return m_togglePreviewsButton->isChecked();
 }
 
-void AbstractSearchWidget::Private::setFooterToggled(bool value)
+void AbstractSearchWidgetPrivate::setFooterToggled(bool value)
 {
     m_toggleFootersButton->setChecked(value);
 }
 
-bool AbstractSearchWidget::Private::footerToggled() const
+bool AbstractSearchWidgetPrivate::footerToggled() const
 {
     return m_toggleFootersButton->isChecked();
 }
 
-void AbstractSearchWidget::Private::updateDeviceDependentActions()
+void AbstractSearchWidgetPrivate::updateDeviceDependentActions()
 {
     for (const auto& item: m_deviceDependentActions)
     {
@@ -894,7 +894,7 @@ void AbstractSearchWidget::Private::updateDeviceDependentActions()
     }
 }
 
-void AbstractSearchWidget::Private::tryFetchData()
+void AbstractSearchWidgetPrivate::tryFetchData()
 {
     const auto direction = getFetchDirection();
 
@@ -925,7 +925,7 @@ void AbstractSearchWidget::Private::tryFetchData()
     updatePlaceholderVisibility();
 }
 
-void AbstractSearchWidget::Private::setIndicatorVisible(FetchDirection direction, bool value)
+void AbstractSearchWidgetPrivate::setIndicatorVisible(FetchDirection direction, bool value)
 {
     const QScopedValueRollback scrollGuard(m_skipFetchOnScrollChange, true);
 
@@ -936,7 +936,7 @@ void AbstractSearchWidget::Private::setIndicatorVisible(FetchDirection direction
     indicator->setVisible(value);
 }
 
-void AbstractSearchWidget::Private::handleItemCountChanged()
+void AbstractSearchWidgetPrivate::handleItemCountChanged()
 {
     updatePlaceholderVisibility();
 
@@ -950,7 +950,7 @@ void AbstractSearchWidget::Private::handleItemCountChanged()
         m_itemCounterLabel->setText(q->itemCounterText(itemCount));
 }
 
-void AbstractSearchWidget::Private::updatePlaceholderVisibility()
+void AbstractSearchWidgetPrivate::updatePlaceholderVisibility()
 {
     m_placeholderVisible =
         (m_visualModel->rowCount() == 0 && m_dataFetched) || m_mainModel->isFilterDegenerate();
@@ -983,7 +983,7 @@ void AbstractSearchWidget::Private::updatePlaceholderVisibility()
     m_placeholderOpacityAnimation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void AbstractSearchWidget::Private::setCurrentDate(const QDateTime& value)
+void AbstractSearchWidgetPrivate::setCurrentDate(const QDateTime& value)
 {
     auto startOfDay = value;
     startOfDay.setTime(QTime(0, 0));
@@ -1003,7 +1003,7 @@ void AbstractSearchWidget::Private::setCurrentDate(const QDateTime& value)
         model->index(range.lower()), model->index(range.upper()), {core::TimestampTextRole});
 }
 
-void AbstractSearchWidget::Private::addSearchAction(QAction* action)
+void AbstractSearchWidgetPrivate::addSearchAction(QAction* action)
 {
     const auto advancedButton = new QPushButton(action->text());
     connect(advancedButton, &QPushButton::clicked, action, &QAction::triggered);
@@ -1011,7 +1011,7 @@ void AbstractSearchWidget::Private::addSearchAction(QAction* action)
     ui->headerSearchLayout->addWidget(advancedButton);
 }
 
-microseconds AbstractSearchWidget::Private::currentCentralPointUs() const
+microseconds AbstractSearchWidgetPrivate::currentCentralPointUs() const
 {
     if (!m_mainModel->rowCount())
         return microseconds(qnSyncTime->currentUSecsSinceEpoch());
@@ -1037,7 +1037,7 @@ microseconds AbstractSearchWidget::Private::currentCentralPointUs() const
     return m_mainModel->data(index, core::TimestampRole).value<microseconds>();
 }
 
-void AbstractSearchWidget::Private::setSearchDelay(std::chrono::milliseconds delay)
+void AbstractSearchWidgetPrivate::setSearchDelay(std::chrono::milliseconds delay)
 {
     m_textFilterEdit->setTextChangedSignalFilterMs(delay.count());
 }

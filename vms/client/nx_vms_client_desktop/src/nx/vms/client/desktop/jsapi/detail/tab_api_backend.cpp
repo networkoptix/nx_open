@@ -830,7 +830,7 @@ Error TabApiBackend::removeItem(const QUuid& itemId)
 Error TabApiBackend::syncWith(const QUuid& itemId)
 {
     if (itemId.isNull())
-        return Error::invalidArguments(tr(""));
+        return Error::invalidArguments();
 
     if (!NX_ASSERT(d->layout))
         return Error::failed();

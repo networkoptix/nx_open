@@ -62,8 +62,9 @@
 
 namespace nx::vms::client::desktop {
 
-namespace
-{
+using core::LayoutResourcePtr;
+
+namespace {
 
 QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
     const menu::Parameters& parameters)
@@ -92,9 +93,9 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
     return dynamic_cast<QnMediaResourceWidget*>(display->activeWidget());
 }
 
-core::LayoutResourcePtr layoutFromBookmarks(const QnCameraBookmarkList& bookmarks, QnResourcePool* pool)
+LayoutResourcePtr layoutFromBookmarks(const QnCameraBookmarkList& bookmarks, QnResourcePool* pool)
 {
-    core::LayoutResourcePtr layout(new core::LayoutResource());
+    LayoutResourcePtr layout(new core::LayoutResource());
     layout->setName(WorkbenchExportHandler::tr("%n bookmarks", "", bookmarks.size()));
     layout->setPredefinedCellSpacing(core::CellSpacing::Small);
 
@@ -209,7 +210,7 @@ public:
         return false;
     }
 
-    nx::Uuid createExportContext(Settings settings,
+    Uuid createExportContext(Settings settings,
         const QnResourcePtr& resource, bool saveExistingLayout, bool forceTranscoding)
     {
         const auto& manager = q->windowContext()->localNotificationsManager();

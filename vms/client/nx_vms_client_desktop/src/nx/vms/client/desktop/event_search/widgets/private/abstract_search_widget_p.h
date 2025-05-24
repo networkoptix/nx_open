@@ -34,19 +34,21 @@ class BusyIndicatorModel;
 class CommonObjectSearchSetup;
 class PlaceholderWidget;
 
-class AbstractSearchWidget::Private:
+class AbstractSearchWidgetPrivate:
     public QObject,
     public WindowContextAware
 {
     Q_OBJECT
     using base_type = QWidget;
+    using Control = AbstractSearchWidget::Control;
+    using Controls = AbstractSearchWidget::Controls;
 
     AbstractSearchWidget* const q;
     nx::utils::ImplPtr<Ui::AbstractSearchWidget> ui;
 
 public:
-    Private(AbstractSearchWidget* q, core::AbstractSearchListModel* model);
-    virtual ~Private() override;
+    AbstractSearchWidgetPrivate(AbstractSearchWidget* q, core::AbstractSearchListModel* model);
+    virtual ~AbstractSearchWidgetPrivate() override;
 
     core::AbstractSearchListModel* model() const;
     EventRibbon* view() const;

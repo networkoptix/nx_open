@@ -34,7 +34,7 @@ void RestApiHelper::setParent(QWidget *parentWidget)
 {
     d->sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
         parentWidget,
-        tr(""),
+        /*title*/ QString(),
         tr("Password confirmation is required to apply changes"),
         tr("Confirm"),
         FreshSessionTokenHelper::ActionType::updateSettings);

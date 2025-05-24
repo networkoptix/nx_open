@@ -2,108 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
-    <name>AbstractSearchWidget::Private</name>
-    <message>
-        <source>Hide information</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show information</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Hide thumbnails</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show thumbnails</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Last day</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Last 7 days</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Last 30 days</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Selected on Timeline</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any time</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Devices on layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cameras on layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Selected device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Selected camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Choose devices...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Choose cameras...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Selected media</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>none</source>
-        <comment>No currently selected camera</comment>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n chosen devices</source>
-        <translation>
-            <numerusform>%n chosen device</numerusform>
-            <numerusform>%n chosen devices</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n chosen cameras</source>
-        <translation>
-            <numerusform>%n chosen camera</numerusform>
-            <numerusform>%n chosen cameras</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Chosen device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Chosen camera</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>ActionDurationPickerWidget</name>
     <message>
         <source>For the duration of event</source>
@@ -1312,6 +1210,21 @@
     <message>
         <source>Please re-enter password for layout %1:</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>FileExtensions</name>
+    <message>
+        <source>Pictures</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Files</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2976,21 +2889,6 @@ License Key: %2</source>
     </message>
     <message>
         <source>Failed to log in to Site &quot;%1&quot;</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnCustomFileDialog</name>
-    <message>
-        <source>Pictures</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Video</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>All Files</source>
         <translation></translation>
     </message>
 </context>
@@ -6310,16 +6208,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
 </context>
 <context>
-    <name>WorkbenchExportHandler</name>
-    <message numerus="yes">
-        <source>%n bookmarks</source>
-        <translation>
-            <numerusform>%n bookmark</numerusform>
-            <numerusform>%n bookmarks</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
         <source>Cannot write file</source>
@@ -6335,32 +6223,29 @@ If you intended to move analytics data to another storage location, please conta
         <comment>%1 is file name</comment>
         <translation></translation>
     </message>
-</context>
-<context>
-    <name>nx</name>
     <message>
         <source>Saving layout</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Exporting video</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Stop Saving</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Stop Export</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Transcoding is required. Export session restarted.</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Minimize</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6380,6 +6265,108 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Save changes before exit?</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
+    <message>
+        <source>Hide information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last 7 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last 30 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected on Timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Devices on layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras on layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose devices...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose cameras...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>none</source>
+        <comment>No currently selected camera</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chosen devices</source>
+        <translation type="unfinished">
+            <numerusform>%n chosen device</numerusform>
+            <numerusform>%n chosen devices</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n chosen cameras</source>
+        <translation type="unfinished">
+            <numerusform>%n chosen camera</numerusform>
+            <numerusform>%n chosen cameras</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Chosen device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chosen camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12036,6 +12023,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>We are preparing files for the export process. Please wait for a few seconds.</source>
         <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n bookmarks</source>
+        <translation type="unfinished">
+            <numerusform>%n bookmark</numerusform>
+            <numerusform>%n bookmarks</numerusform>
+        </translation>
     </message>
 </context>
 <context>
