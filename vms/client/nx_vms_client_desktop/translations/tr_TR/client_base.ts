@@ -2,108 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="tr_TR" sourcelanguage="en">
   <context>
-    <name>AbstractSearchWidget::Private</name>
-    <message>
-      <source>Hide information</source>
-      <translation>Bilgileri gizle</translation>
-    </message>
-    <message>
-      <source>Show information</source>
-      <translation>Bilgileri göster</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>Küçük resimleri gizle</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>Küçük resimleri göster</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>Son gün</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>Son 7 Gün</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>Son 30 Gün</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>Seçilen zaman</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>Herhangi bir zaman</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>Ekran düzenindeki cihazlar</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>Ekran düzenindeki kameralar</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Seçilen cihazlar</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Seçilen kamera</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation>Cihazları seçin...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation>Kameraları seçin...</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>Herhangi bir cihaz</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>Herhangi bir kamera</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Seçilen medya</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>hiçbiri</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation>
-        <numerusform>%n seçili cihaz</numerusform>
-        <numerusform>%n seçili cihaz</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation>
-        <numerusform>%n seçilmiş kamera</numerusform>
-        <numerusform>%n seçilmiş kamera</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Chosen device</source>
-      <translation>Seçilen cihaz</translation>
-    </message>
-    <message>
-      <source>Chosen camera</source>
-      <translation>Seçilen kamera</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
@@ -1312,6 +1210,21 @@
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Lütfen %1 düzeni için şifreyi tekrar girin:</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Resimler</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Tüm Dosyalar</translation>
     </message>
   </context>
   <context>
@@ -2977,21 +2890,6 @@ License Key: %2</source>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
       <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Resimler</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Tüm Dosyalar</translation>
     </message>
   </context>
   <context>
@@ -6311,16 +6209,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
   </context>
   <context>
-    <name>WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n yer işareti</numerusform>
-        <numerusform>%n yer işareti</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -6336,9 +6224,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <comment>%1 is file name</comment>
       <translation>%1 başka bir aktarma işlemi tarafından kullanılıyor.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
       <translation>Ekran düzeni kaydetme</translation>
@@ -6381,6 +6266,108 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Save changes before exit?</source>
       <translation>Çıkmadan önce değişiklikler kaydedilsin mi?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
+    <message>
+      <source>Hide information</source>
+      <translation>Bilgileri gizle</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>Bilgileri göster</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>Küçük resimleri gizle</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>Küçük resimleri göster</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>Son gün</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>Son 7 Gün</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Son 30 Gün</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>Seçilen zaman</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Herhangi bir zaman</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>Ekran düzenindeki cihazlar</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>Ekran düzenindeki kameralar</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Seçilen cihazlar</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Seçilen kamera</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation>Cihazları seçin...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation>Kameraları seçin...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>Herhangi bir cihaz</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>Herhangi bir kamera</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Seçilen medya</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>hiçbiri</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation>
+        <numerusform>%n seçili cihaz</numerusform>
+        <numerusform>%n seçili cihaz</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation>
+        <numerusform>%n seçilmiş kamera</numerusform>
+        <numerusform>%n seçilmiş kamera</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation>Seçilen cihaz</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation>Seçilen kamera</translation>
     </message>
   </context>
   <context>
@@ -12052,6 +12039,13 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Dosyaları dışarı aktarma işlemini hazırlıyorum. Lütfen birkaç saniye bekleyiniz.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n yer işareti</numerusform>
+        <numerusform>%n yer işareti</numerusform>
+      </translation>
     </message>
   </context>
   <context>

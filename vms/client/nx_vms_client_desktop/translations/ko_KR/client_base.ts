@@ -2,106 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ko_KR" sourcelanguage="en">
   <context>
-    <name>AbstractSearchWidget::Private</name>
-    <message>
-      <source>Hide information</source>
-      <translation>정보 숨기기</translation>
-    </message>
-    <message>
-      <source>Show information</source>
-      <translation>정보 표시</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>썸네일 숨김</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>썸네일 표시</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>마지막 날</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>지난 7 일</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>지난 30 일</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>타임 라인에서 선택</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>모든 시간</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>레이아웃에 있는 장치</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>레이아웃에 있는 카메라들</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>선택된 장치</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>선택된 카메라</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation>장치 선택...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation>카메라 선택...</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>모든 장치</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>모든 카메라</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>선택된 미디어</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>없음</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation>
-        <numerusform>%n 선택된 장치</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation>
-        <numerusform>%n 선택된 카메라</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Chosen device</source>
-      <translation>선택된 장치</translation>
-    </message>
-    <message>
-      <source>Chosen camera</source>
-      <translation>선택된 카메라</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
@@ -1304,6 +1204,21 @@
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>%1레이아웃의 암호 재입력:</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>그림</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>동영상</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>모든 파일</translation>
     </message>
   </context>
   <context>
@@ -2945,21 +2860,6 @@ License Key: %2</source>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
       <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>그림</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>동영상</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>모든 파일</translation>
     </message>
   </context>
   <context>
@@ -6207,15 +6107,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>즐겨찾기 %n</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -6231,9 +6122,6 @@ If you intended to move analytics data to another storage location, please conta
       <comment>%1 is file name</comment>
       <translation>%1이 다른 내보내기에서 사용 중입니다.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
       <translation>레이아웃 저장중</translation>
@@ -6276,6 +6164,106 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Save changes before exit?</source>
       <translation>종료 하기 전에 변경 내용을 저장 하 시겠습니까?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
+    <message>
+      <source>Hide information</source>
+      <translation>정보 숨기기</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>정보 표시</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>썸네일 숨김</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>썸네일 표시</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>마지막 날</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>지난 7 일</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>지난 30 일</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>타임 라인에서 선택</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>모든 시간</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>레이아웃에 있는 장치</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>레이아웃에 있는 카메라들</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>선택된 장치</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>선택된 카메라</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation>장치 선택...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation>카메라 선택...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>모든 장치</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>모든 카메라</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>선택된 미디어</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>없음</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation>
+        <numerusform>%n 선택된 장치</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation>
+        <numerusform>%n 선택된 카메라</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation>선택된 장치</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation>선택된 카메라</translation>
     </message>
   </context>
   <context>
@@ -11877,6 +11865,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>내보내기 프로세스를 위해 파일을 준비 중입니다. 몇 초 정도 기다리십시오.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>즐겨찾기 %n</numerusform>
+      </translation>
     </message>
   </context>
   <context>

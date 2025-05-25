@@ -2,112 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="he_IL" sourcelanguage="en">
   <context>
-    <name>AbstractSearchWidget::Private</name>
-    <message>
-      <source>Hide information</source>
-      <translation>הסתר מידע</translation>
-    </message>
-    <message>
-      <source>Show information</source>
-      <translation>הצג מידע</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>הסתר תמונות ממוזערות</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>הצג תמונות ממוזערות</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>יום אחרון</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>7 ימים אחרונים</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>30 הימים האחרונים</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>נבחר על ציר זמן</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>בכל עת</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>התקנים על פריסה</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>מצלמות על פריסה</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>התקן נבחר</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>מצלמה שנבחרה</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>כל התקן</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>כל מצלמה</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>מדיה נבחרת</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ללא</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
-    </message>
-    <message>
-      <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
@@ -1328,6 +1222,21 @@
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>הזן מחדש את הסיסמה עבור פריסה %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>תמונות</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>סרטון</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>כל הקבצים</translation>
     </message>
   </context>
   <context>
@@ -3044,21 +2953,6 @@ License Key: %2</translation>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
       <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>תמונות</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>סרטון</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>כל הקבצים</translation>
     </message>
   </context>
   <context>
@@ -6522,18 +6416,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n סימניות</numerusform>
-        <numerusform>%n סימניות</numerusform>
-        <numerusform>%n סימניות</numerusform>
-        <numerusform>%n סימניות</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -6549,9 +6431,6 @@ If you intended to move analytics data to another storage location, please conta
       <comment>%1 is file name</comment>
       <translation>%1 נמצא בשימוש על-ידי ייצוא אחר.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
       <translation>שומר את הפריסה</translation>
@@ -6594,6 +6473,112 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Save changes before exit?</source>
       <translation>שמור שינויים לפני היציאה?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
+    <message>
+      <source>Hide information</source>
+      <translation>הסתר מידע</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>הצג מידע</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>הסתר תמונות ממוזערות</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>הצג תמונות ממוזערות</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>יום אחרון</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>7 ימים אחרונים</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>30 הימים האחרונים</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>נבחר על ציר זמן</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>בכל עת</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>התקנים על פריסה</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>מצלמות על פריסה</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>התקן נבחר</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>מצלמה שנבחרה</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation type="unfinished">Choose devices...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation type="unfinished">Choose cameras...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>כל התקן</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>כל מצלמה</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>מדיה נבחרת</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ללא</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation type="unfinished">
+        <numerusform>%n chosen devices</numerusform>
+        <numerusform>%n chosen devices</numerusform>
+        <numerusform>%n chosen devices</numerusform>
+        <numerusform>%n chosen devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n chosen cameras</numerusform>
+        <numerusform>%n chosen cameras</numerusform>
+        <numerusform>%n chosen cameras</numerusform>
+        <numerusform>%n chosen cameras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation type="unfinished">Chosen device</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation type="unfinished">Chosen camera</translation>
     </message>
   </context>
   <context>
@@ -12416,6 +12401,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>אנחנו מכינים קבצים לתהליך הייצוא. המתן מספר שניות.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n סימניות</numerusform>
+        <numerusform>%n סימניות</numerusform>
+        <numerusform>%n סימניות</numerusform>
+        <numerusform>%n סימניות</numerusform>
+      </translation>
     </message>
   </context>
   <context>

@@ -2,106 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="id_ID" sourcelanguage="en">
   <context>
-    <name>AbstractSearchWidget::Private</name>
-    <message>
-      <source>Hide information</source>
-      <translation>Sembunyikan informasi</translation>
-    </message>
-    <message>
-      <source>Show information</source>
-      <translation>Tampilkan informasi</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>Sembunyikan thumbnail</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>Tampilkan thumbnail</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>Hari terakhir</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>7 Hari terakhir</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>30 Hari terakhir</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>Dipilih di Timeline</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>Semua waktu</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>Perangkat pada layout</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>Kamera pada layout</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Perangkat yang dipilih</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Kamera yang dipilih</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation>Pilih perangkat...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation>Pilih kamera...</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>Perangkat apa pun</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>Kamera apa pun</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Media yang dipilih</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>tidak ada</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation>
-        <numerusform>%n perangkat yang dipilih</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation>
-        <numerusform>%n kamera yang dipilih</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Chosen device</source>
-      <translation>Perangkat terpilih</translation>
-    </message>
-    <message>
-      <source>Chosen camera</source>
-      <translation>Kamera terpilih</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
@@ -1304,6 +1204,21 @@
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Silakan masukkan kembali kata sandi untuk layout %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Pictures</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Semua File</translation>
     </message>
   </context>
   <context>
@@ -2945,21 +2860,6 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
       <translation>Gagal masuk ke Site &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Pictures</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Semua File</translation>
     </message>
   </context>
   <context>
@@ -6207,15 +6107,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
   </context>
   <context>
-    <name>WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n bookmark</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -6231,9 +6122,6 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <comment>%1 is file name</comment>
       <translation>%1 sedang digunakan oleh ekspor lain.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
       <translation>Menyimpan layout</translation>
@@ -6276,6 +6164,106 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Save changes before exit?</source>
       <translation>Simpan perubahan sebelum keluar?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
+    <message>
+      <source>Hide information</source>
+      <translation>Sembunyikan informasi</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>Tampilkan informasi</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>Sembunyikan thumbnail</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>Tampilkan thumbnail</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>Hari terakhir</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>7 Hari terakhir</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>30 Hari terakhir</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>Dipilih di Timeline</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Semua waktu</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>Perangkat pada layout</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>Kamera pada layout</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Perangkat yang dipilih</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Kamera yang dipilih</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation>Pilih perangkat...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation>Pilih kamera...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>Perangkat apa pun</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>Kamera apa pun</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Media yang dipilih</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>tidak ada</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation>
+        <numerusform>%n perangkat yang dipilih</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation>
+        <numerusform>%n kamera yang dipilih</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation>Perangkat terpilih</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation>Kamera terpilih</translation>
     </message>
   </context>
   <context>
@@ -11879,6 +11867,12 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Kami sedang mempersiapkan file untuk proses ekspor. Harap tunggu beberapa detik.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n bookmark</numerusform>
+      </translation>
     </message>
   </context>
   <context>

@@ -2,112 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pl_PL" sourcelanguage="en">
   <context>
-    <name>AbstractSearchWidget::Private</name>
-    <message>
-      <source>Hide information</source>
-      <translation>Ukryj informacje</translation>
-    </message>
-    <message>
-      <source>Show information</source>
-      <translation>Pokaż informacje</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>Ukryj miniatury</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>Pokaż miniatury</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>Ostatni dzień</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>Ostatnie 7 dni</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>Ostatnie 30 dni</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>Okres na linii czasu</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>Kiedykolwiek</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>Urządzenia w układzie</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>Kamery w układzie</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Wybrane urządzenie</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Wybrana kamera</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation>Wybierz urządzenia...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation>Wybierz kamery...</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>Dowolne urządzenie</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>Dowolna kamera</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Wybrane media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>brak</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation>
-        <numerusform>%n wybranych urządzeń</numerusform>
-        <numerusform>%n wybranych urządzeń</numerusform>
-        <numerusform>%n wybranych urządzeń</numerusform>
-        <numerusform>%n wybranych urządzeń</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation>
-        <numerusform>%n wybranych kamer</numerusform>
-        <numerusform>%n wybranych kamer</numerusform>
-        <numerusform>%n wybranych kamer</numerusform>
-        <numerusform>%n wybranych kamer</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Chosen device</source>
-      <translation>Wybrane urządzenie</translation>
-    </message>
-    <message>
-      <source>Chosen camera</source>
-      <translation>Wybrana kamera</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
@@ -1328,6 +1222,21 @@
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Wprowadź ponownie hasło dla układu %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Zdjęcia</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Wideo</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Wszystkie pliki</translation>
     </message>
   </context>
   <context>
@@ -3044,21 +2953,6 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
       <translation>Nie udało się zalogować do witryny &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Zdjęcia</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Wideo</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Wszystkie pliki</translation>
     </message>
   </context>
   <context>
@@ -6521,18 +6415,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n zakładka</numerusform>
-        <numerusform>%n zakładki</numerusform>
-        <numerusform>%n zakładek</numerusform>
-        <numerusform>%n zakładek</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -6548,9 +6430,6 @@ If you intended to move analytics data to another storage location, please conta
       <comment>%1 is file name</comment>
       <translation>%1 jest używany przez inny proces eksportowania.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
       <translation>Zapisywanie układu</translation>
@@ -6593,6 +6472,112 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Save changes before exit?</source>
       <translation>Zapisać zmiany przed wyjściem?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
+    <message>
+      <source>Hide information</source>
+      <translation>Ukryj informacje</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>Pokaż informacje</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>Ukryj miniatury</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>Pokaż miniatury</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>Ostatni dzień</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>Ostatnie 7 dni</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Ostatnie 30 dni</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>Okres na linii czasu</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Kiedykolwiek</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>Urządzenia w układzie</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>Kamery w układzie</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Wybrane urządzenie</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Wybrana kamera</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation>Wybierz urządzenia...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation>Wybierz kamery...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>Dowolne urządzenie</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>Dowolna kamera</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Wybrane media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>brak</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation>
+        <numerusform>%n wybranych urządzeń</numerusform>
+        <numerusform>%n wybranych urządzeń</numerusform>
+        <numerusform>%n wybranych urządzeń</numerusform>
+        <numerusform>%n wybranych urządzeń</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation>
+        <numerusform>%n wybranych kamer</numerusform>
+        <numerusform>%n wybranych kamer</numerusform>
+        <numerusform>%n wybranych kamer</numerusform>
+        <numerusform>%n wybranych kamer</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation>Wybrane urządzenie</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation>Wybrana kamera</translation>
     </message>
   </context>
   <context>
@@ -12412,6 +12397,15 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Przygotowujemy pliki do eksportu. Proszę zaczekać kilka sekund.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n zakładka</numerusform>
+        <numerusform>%n zakładki</numerusform>
+        <numerusform>%n zakładek</numerusform>
+        <numerusform>%n zakładek</numerusform>
+      </translation>
     </message>
   </context>
   <context>

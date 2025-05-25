@@ -2,108 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="nl_NL" sourcelanguage="en">
   <context>
-    <name>AbstractSearchWidget::Private</name>
-    <message>
-      <source>Hide information</source>
-      <translation>Verberg informatie</translation>
-    </message>
-    <message>
-      <source>Show information</source>
-      <translation>Toon informatie</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>Miniatuurweergaven verbergen</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>Miniatuurweergaven tonen</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>Laatste dag</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>Laatste 7 dagen</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>Laatste 30 dagen</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>Geselecteerd op de tijdlijn</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>Altijd</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>Apparaten op de schermindeling</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>Camera's op de schermindeling</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Geselecteerde apparaat</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Geselecteerde camera</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation>Kies apparaten...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation>Kies camera's...</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>Elk apparaat</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>Elke Camera</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Geselecteerde media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>geen</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation>
-        <numerusform>%n gekozen apparaten</numerusform>
-        <numerusform>%n gekozen apparaten</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation>
-        <numerusform>%n gekozen camera's</numerusform>
-        <numerusform>%n gekozen camera's</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Chosen device</source>
-      <translation>Gekozen apparaat</translation>
-    </message>
-    <message>
-      <source>Chosen camera</source>
-      <translation>Gekozen camera</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
@@ -1312,6 +1210,21 @@
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Voer het wachtwoord opnieuw in voor lay-out %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Afbeeldingen</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Alle bestanden</translation>
     </message>
   </context>
   <context>
@@ -2978,21 +2891,6 @@ License Key: %2</translation>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
       <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Afbeeldingen</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Alle bestanden</translation>
     </message>
   </context>
   <context>
@@ -6312,16 +6210,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
   </context>
   <context>
-    <name>WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n bladwijzer</numerusform>
-        <numerusform>%n bladwijzers</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -6337,9 +6225,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <comment>%1 is file name</comment>
       <translation>%1 is in gebruik door een andere export.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
       <translation>Schermindeling opslaan</translation>
@@ -6382,6 +6267,108 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Save changes before exit?</source>
       <translation>Wijzigingen opslaan voor het verlaten?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
+    <message>
+      <source>Hide information</source>
+      <translation>Verberg informatie</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>Toon informatie</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>Miniatuurweergaven verbergen</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>Miniatuurweergaven tonen</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>Laatste dag</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>Laatste 7 dagen</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Laatste 30 dagen</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>Geselecteerd op de tijdlijn</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Altijd</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>Apparaten op de schermindeling</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>Camera's op de schermindeling</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Geselecteerde apparaat</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Geselecteerde camera</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation>Kies apparaten...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation>Kies camera's...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>Elk apparaat</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>Elke Camera</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Geselecteerde media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>geen</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation>
+        <numerusform>%n gekozen apparaten</numerusform>
+        <numerusform>%n gekozen apparaten</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation>
+        <numerusform>%n gekozen camera's</numerusform>
+        <numerusform>%n gekozen camera's</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation>Gekozen apparaat</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation>Gekozen camera</translation>
     </message>
   </context>
   <context>
@@ -12058,6 +12045,13 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>We bereiden bestanden voor op het exportproces. Wacht enkele seconden.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n bladwijzer</numerusform>
+        <numerusform>%n bladwijzers</numerusform>
+      </translation>
     </message>
   </context>
   <context>

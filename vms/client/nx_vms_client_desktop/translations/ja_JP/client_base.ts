@@ -2,106 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja_JP" sourcelanguage="en">
   <context>
-    <name>AbstractSearchWidget::Private</name>
-    <message>
-      <source>Hide information</source>
-      <translation>情報を非表示</translation>
-    </message>
-    <message>
-      <source>Show information</source>
-      <translation>情報を表示</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>サムネイルを非表示</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>サムネイルを表示</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>今日</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>直近 7 日間</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>直近 30 日間</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>タイムラインの選択期間内</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>期間指定なし</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>レイアウト上のデバイス</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>レイアウト上のカメラ</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>選択したデバイス</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>選択したカメラ</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation>デバイスを選択...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation>カメラを選択...</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>全デバイス</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>全カメラ</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>選択したメディア</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>なし</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation>
-        <numerusform>選択した %n デバイス</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation>
-        <numerusform>選択した %n カメラ</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Chosen device</source>
-      <translation>選択したデバイス</translation>
-    </message>
-    <message>
-      <source>Chosen camera</source>
-      <translation>選択したカメラ</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
@@ -1304,6 +1204,21 @@
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>レイアウト %1 のパスワードを再入力してください:</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>画像</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>映像</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>すべてのファイル</translation>
     </message>
   </context>
   <context>
@@ -2945,21 +2860,6 @@ License Key: %2</source>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
       <translation>サイト &quot;%1&quot; へのログインに失敗しました</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>画像</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>映像</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>すべてのファイル</translation>
     </message>
   </context>
   <context>
@@ -6207,15 +6107,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n ブックマーク</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -6231,9 +6122,6 @@ If you intended to move analytics data to another storage location, please conta
       <comment>%1 is file name</comment>
       <translation>%1 は別のエクスポートで使用されています。</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
       <translation>レイアウトを保存</translation>
@@ -6276,6 +6164,106 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Save changes before exit?</source>
       <translation>終了する前に変更を適用しますか?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
+    <message>
+      <source>Hide information</source>
+      <translation>情報を非表示</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>情報を表示</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>サムネイルを非表示</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>サムネイルを表示</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>今日</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>直近 7 日間</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>直近 30 日間</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>タイムラインの選択期間内</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>期間指定なし</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>レイアウト上のデバイス</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>レイアウト上のカメラ</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>選択したデバイス</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>選択したカメラ</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation>デバイスを選択...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation>カメラを選択...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>全デバイス</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>全カメラ</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>選択したメディア</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>なし</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation>
+        <numerusform>選択した %n デバイス</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation>
+        <numerusform>選択した %n カメラ</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation>選択したデバイス</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation>選択したカメラ</translation>
     </message>
   </context>
   <context>
@@ -11878,6 +11866,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>エクスポート処理用のファイルを準備中です。しばらくお待ちください。</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n ブックマーク</numerusform>
+      </translation>
     </message>
   </context>
   <context>

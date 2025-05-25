@@ -2,112 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru_RU" sourcelanguage="en">
   <context>
-    <name>AbstractSearchWidget::Private</name>
-    <message>
-      <source>Hide information</source>
-      <translation>Скрыть информацию</translation>
-    </message>
-    <message>
-      <source>Show information</source>
-      <translation>Показать информацию</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>Скрыть миниатюры</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>Показать миниатюры</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>Последний день</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>Последние 7 дней</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>Последние 30 дней</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>Выбрано на временной шкале</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>Любое время</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>Устройства на раскладке</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>Камеры на раскладке</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Выбранное устройство</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Выбранная камера</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation>Выбрать устройства...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation>Выбрать камеры...</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>Любое устройство</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>Любая камера</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Выбранные медиа</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>нет</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation>
-        <numerusform>%n выбранное устройство</numerusform>
-        <numerusform>%n выбранных устройства</numerusform>
-        <numerusform>%n выбранных устройств</numerusform>
-        <numerusform>%n выбранных устройств</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation>
-        <numerusform>%n выбранная камера</numerusform>
-        <numerusform>%n выбранные камеры</numerusform>
-        <numerusform>%n выбранных камер</numerusform>
-        <numerusform>%n выбранных камер</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Chosen device</source>
-      <translation>Выбранное устройство</translation>
-    </message>
-    <message>
-      <source>Chosen camera</source>
-      <translation>Выбранная камера</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
@@ -1328,6 +1222,21 @@
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Пожалуйста, введите пароль для раскладки %1 еще раз:</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Изображения</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Видео</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Все файлы</translation>
     </message>
   </context>
   <context>
@@ -3044,21 +2953,6 @@ License Key: %2</translation>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
       <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Изображения</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Видео</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Все файлы</translation>
     </message>
   </context>
   <context>
@@ -6522,18 +6416,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n закладка</numerusform>
-        <numerusform>%n закладки</numerusform>
-        <numerusform>%n закладок</numerusform>
-        <numerusform>%n закладок</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -6549,9 +6431,6 @@ If you intended to move analytics data to another storage location, please conta
       <comment>%1 is file name</comment>
       <translation>%1 используется другим процессом экспорта.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
       <translation>Сохранение раскладки</translation>
@@ -6594,6 +6473,112 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Save changes before exit?</source>
       <translation>Применить изменения перед выходом?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
+    <message>
+      <source>Hide information</source>
+      <translation>Скрыть информацию</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>Показать информацию</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>Скрыть миниатюры</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>Показать миниатюры</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>Последний день</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>Последние 7 дней</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Последние 30 дней</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>Выбрано на временной шкале</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Любое время</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>Устройства на раскладке</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>Камеры на раскладке</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Выбранное устройство</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Выбранная камера</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation>Выбрать устройства...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation>Выбрать камеры...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>Любое устройство</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>Любая камера</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Выбранные медиа</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>нет</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation>
+        <numerusform>%n выбранное устройство</numerusform>
+        <numerusform>%n выбранных устройства</numerusform>
+        <numerusform>%n выбранных устройств</numerusform>
+        <numerusform>%n выбранных устройств</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation>
+        <numerusform>%n выбранная камера</numerusform>
+        <numerusform>%n выбранные камеры</numerusform>
+        <numerusform>%n выбранных камер</numerusform>
+        <numerusform>%n выбранных камер</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation>Выбранное устройство</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation>Выбранная камера</translation>
     </message>
   </context>
   <context>
@@ -12415,6 +12400,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Мы готовим файлы для экспорта. Пожалуйста, подождите несколько секунд.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n закладка</numerusform>
+        <numerusform>%n закладки</numerusform>
+        <numerusform>%n закладок</numerusform>
+        <numerusform>%n закладок</numerusform>
+      </translation>
     </message>
   </context>
   <context>

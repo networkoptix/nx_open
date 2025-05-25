@@ -2,108 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="sv_SE" sourcelanguage="en">
   <context>
-    <name>AbstractSearchWidget::Private</name>
-    <message>
-      <source>Hide information</source>
-      <translation>Dölj information</translation>
-    </message>
-    <message>
-      <source>Show information</source>
-      <translation>Visa information</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>Dölj miniatyrer</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>Visa miniatyrer</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>Sista dagen</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>Senaste 7 Dagarna</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>Senaste 30 dagarna</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>Markerade på tidslinjen</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>När som helst</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>Enheter på layout</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>Kameror på layout</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Vald enhet</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Vald kamera</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation>Välj enheter...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation>Välj kameror...</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>Valfri enhet</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>Valfri kamera</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Vald media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ingen</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation>
-        <numerusform>%n valda enheter</numerusform>
-        <numerusform>%n valda enheter</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation>
-        <numerusform>%n valda kameror</numerusform>
-        <numerusform>%n valda kameror</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Chosen device</source>
-      <translation>Vald enhet</translation>
-    </message>
-    <message>
-      <source>Chosen camera</source>
-      <translation>Vald kamera</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
@@ -1312,6 +1210,21 @@
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Vänligen skriv in lösenordet för layout %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Bilder</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Alla filer</translation>
     </message>
   </context>
   <context>
@@ -2978,21 +2891,6 @@ Licensnyckel: %2</translation>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
       <translation>Det gick inte att logga in på webbplatsen &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Bilder</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Alla filer</translation>
     </message>
   </context>
   <context>
@@ -6312,16 +6210,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
-    <name>WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n bokmärken</numerusform>
-        <numerusform>%n bokmärken</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -6337,9 +6225,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <comment>%1 is file name</comment>
       <translation>%1 används av en annan export.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
       <translation>Spara layout</translation>
@@ -6382,6 +6267,108 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Save changes before exit?</source>
       <translation>Spara ändringar före avslut?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
+    <message>
+      <source>Hide information</source>
+      <translation>Dölj information</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>Visa information</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>Dölj miniatyrer</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>Visa miniatyrer</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>Sista dagen</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>Senaste 7 Dagarna</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Senaste 30 dagarna</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>Markerade på tidslinjen</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>När som helst</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>Enheter på layout</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>Kameror på layout</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Vald enhet</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Vald kamera</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation>Välj enheter...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation>Välj kameror...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>Valfri enhet</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>Valfri kamera</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Vald media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ingen</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation>
+        <numerusform>%n valda enheter</numerusform>
+        <numerusform>%n valda enheter</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation>
+        <numerusform>%n valda kameror</numerusform>
+        <numerusform>%n valda kameror</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation>Vald enhet</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation>Vald kamera</translation>
     </message>
   </context>
   <context>
@@ -12057,6 +12044,13 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Vi förbereder filer för exportprocessen. Vänta några sekunder.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n bokmärken</numerusform>
+        <numerusform>%n bokmärken</numerusform>
+      </translation>
     </message>
   </context>
   <context>

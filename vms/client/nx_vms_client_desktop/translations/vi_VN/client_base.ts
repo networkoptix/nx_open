@@ -2,106 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi_VN" sourcelanguage="en">
   <context>
-    <name>AbstractSearchWidget::Private</name>
-    <message>
-      <source>Hide information</source>
-      <translation>Ẩn thông tin</translation>
-    </message>
-    <message>
-      <source>Show information</source>
-      <translation>Hiển thị thông tin</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>Ẩn hình thu nhỏ</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>Hiển thị hình thu nhỏ</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>Ngày cuối</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>7 ngày qua</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>30 ngày trước</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>Được chọn trên Dòng thời gian</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>Mọi lúc</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>Thiết bị trên bố cục</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>Các camera trên bố cục</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Thiết bị được chọn</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Camera đã chọn</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation>Chọn thiết bị...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation>Chọn máy ảnh...</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>Mọi thiết bị</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>Tất cả camera</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Chọn phương tiện</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>không xác định</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation>
-        <numerusform>%n thiết bị được chọn</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation>
-        <numerusform>%n camera được chọn</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Chosen device</source>
-      <translation>Thiết bị được chọn</translation>
-    </message>
-    <message>
-      <source>Chosen camera</source>
-      <translation>Camera được chọn</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
@@ -1304,6 +1204,21 @@
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Vui lòng nhập lại mật khẩu cho bố cục %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Hình ảnh</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Tất cả các file</translation>
     </message>
   </context>
   <context>
@@ -2945,21 +2860,6 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
       <translation>Không thể đăng nhập vào Chi nhánh &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Hình ảnh</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Tất cả các file</translation>
     </message>
   </context>
   <context>
@@ -6207,15 +6107,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
-    <name>WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n dấu trang</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -6231,9 +6122,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <comment>%1 is file name</comment>
       <translation>%1 đang được sử dụng bởi một người dùng khác.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
       <translation>Đang lưu bố cục</translation>
@@ -6276,6 +6164,106 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Save changes before exit?</source>
       <translation>Lưu thay đổi trước khi thoát?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
+    <message>
+      <source>Hide information</source>
+      <translation>Ẩn thông tin</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>Hiển thị thông tin</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>Ẩn hình thu nhỏ</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>Hiển thị hình thu nhỏ</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>Ngày cuối</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>7 ngày qua</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>30 ngày trước</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>Được chọn trên Dòng thời gian</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Mọi lúc</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>Thiết bị trên bố cục</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>Các camera trên bố cục</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Thiết bị được chọn</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Camera đã chọn</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation>Chọn thiết bị...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation>Chọn máy ảnh...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>Mọi thiết bị</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>Tất cả camera</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Chọn phương tiện</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>không xác định</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation>
+        <numerusform>%n thiết bị được chọn</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation>
+        <numerusform>%n camera được chọn</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation>Thiết bị được chọn</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation>Camera được chọn</translation>
     </message>
   </context>
   <context>
@@ -11879,6 +11867,12 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Chúng tôi đang chuẩn bị các tập tin cho quá trình xuất khẩu. Xin vui lòng chờ trong vài giây.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n dấu trang</numerusform>
+      </translation>
     </message>
   </context>
   <context>

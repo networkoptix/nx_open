@@ -2,106 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="th_TH" sourcelanguage="en">
   <context>
-    <name>AbstractSearchWidget::Private</name>
-    <message>
-      <source>Hide information</source>
-      <translation>ซ่อนข้อมูล</translation>
-    </message>
-    <message>
-      <source>Show information</source>
-      <translation>แสดงข้อมูล</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>ซ่อนภาพขนาดย่อ</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>แสดงภาพขนาดย่อ</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>วันสุดท้าย</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>7 วันที่แล้ว</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>30 วันที่แล้ว</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>เลือกในแทบเวลา</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>ตลอดเวลา</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>อุปกรณ์บนโครงร่าง</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>กล้องบนโครงร่าง</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>เลือกอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>เลือกกล้อง</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>อุปกรณ์ใด ๆ</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>กล้องอะไรก็ได้</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>เลือกสื่อ</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ไม่มี</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
-    </message>
-    <message>
-      <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
@@ -1304,6 +1204,21 @@
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>กรุณาใส่รหัสผ่านใหม่สำหรับเลย์เอาต์ %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>รูปภาพ</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>วิดีโอ</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>ไฟล์ทั้งหมด</translation>
     </message>
   </context>
   <context>
@@ -2945,21 +2860,6 @@ License Key: %2</translation>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
       <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>รูปภาพ</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>วิดีโอ</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>ไฟล์ทั้งหมด</translation>
     </message>
   </context>
   <context>
@@ -6207,15 +6107,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>บุ๊คมาร์ค %n</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -6231,9 +6122,6 @@ If you intended to move analytics data to another storage location, please conta
       <comment>%1 is file name</comment>
       <translation>%1 ถูกใช้โดยส่งออกอื่น</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
       <translation>กำลังบันทึกเค้าโครง</translation>
@@ -6276,6 +6164,106 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Save changes before exit?</source>
       <translation>บันทึกการเปลี่ยนแปลงก่อนออก?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
+    <message>
+      <source>Hide information</source>
+      <translation>ซ่อนข้อมูล</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>แสดงข้อมูล</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>ซ่อนภาพขนาดย่อ</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>แสดงภาพขนาดย่อ</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>วันสุดท้าย</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>7 วันที่แล้ว</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>30 วันที่แล้ว</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>เลือกในแทบเวลา</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>ตลอดเวลา</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>อุปกรณ์บนโครงร่าง</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>กล้องบนโครงร่าง</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>เลือกอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>เลือกกล้อง</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation type="unfinished">Choose devices...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation type="unfinished">Choose cameras...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>อุปกรณ์ใด ๆ</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>กล้องอะไรก็ได้</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>เลือกสื่อ</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ไม่มี</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation type="unfinished">
+        <numerusform>%n chosen devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n chosen cameras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation type="unfinished">Chosen device</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation type="unfinished">Chosen camera</translation>
     </message>
   </context>
   <context>
@@ -11879,6 +11867,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>เรากำลังเตรียมไฟล์สำหรับกระบวนการส่งออก กรุณารอสักครู่</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>บุ๊คมาร์ค %n</numerusform>
+      </translation>
     </message>
   </context>
   <context>

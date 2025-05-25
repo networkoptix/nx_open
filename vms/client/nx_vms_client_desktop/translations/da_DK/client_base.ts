@@ -2,108 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="da_DK" sourcelanguage="en">
   <context>
-    <name>AbstractSearchWidget::Private</name>
-    <message>
-      <source>Hide information</source>
-      <translation>Skjul information</translation>
-    </message>
-    <message>
-      <source>Show information</source>
-      <translation>Vis information</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>Skjul miniaturebillede</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>Vis miniaturebillede</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>Sidste dag</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>Sidste 7 dage</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>Sidste 30 dage</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>Valgt på tidslinjen</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>Enhver tid</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>Enheder på layout</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>Kameraer på layout</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Valgt enhed</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Valgt kamera</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation>Vælg enheder...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation>Vælg kameraer...</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>Enhver enhed</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>Ethvert kamera</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ingen</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation>
-        <numerusform>%n valgte enheder</numerusform>
-        <numerusform>%n valgte enheder</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation>
-        <numerusform>%n valgte kameraer</numerusform>
-        <numerusform>%n valgte kameraer</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Chosen device</source>
-      <translation>Valgt enhed</translation>
-    </message>
-    <message>
-      <source>Chosen camera</source>
-      <translation>Valgt kamera</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
@@ -1312,6 +1210,21 @@
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation type="unfinished">Please re-enter password for layout %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Billeder</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Alle Filer</translation>
     </message>
   </context>
   <context>
@@ -2978,21 +2891,6 @@ Licensnøgle: %2</translation>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
       <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Billeder</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Alle Filer</translation>
     </message>
   </context>
   <context>
@@ -6312,16 +6210,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -6337,9 +6225,6 @@ If you intended to move analytics data to another storage location, please conta
       <comment>%1 is file name</comment>
       <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
       <translation type="unfinished">Saving layout</translation>
@@ -6382,6 +6267,108 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Save changes before exit?</source>
       <translation type="unfinished">Save changes before exit?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
+    <message>
+      <source>Hide information</source>
+      <translation>Skjul information</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>Vis information</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>Skjul miniaturebillede</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>Vis miniaturebillede</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>Sidste dag</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>Sidste 7 dage</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Sidste 30 dage</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>Valgt på tidslinjen</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Enhver tid</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>Enheder på layout</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>Kameraer på layout</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Valgt enhed</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Valgt kamera</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation>Vælg enheder...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation>Vælg kameraer...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>Enhver enhed</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>Ethvert kamera</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation type="unfinished">Selected media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ingen</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation>
+        <numerusform>%n valgte enheder</numerusform>
+        <numerusform>%n valgte enheder</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation>
+        <numerusform>%n valgte kameraer</numerusform>
+        <numerusform>%n valgte kameraer</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation>Valgt enhed</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation>Valgt kamera</translation>
     </message>
   </context>
   <context>
@@ -12056,6 +12043,13 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation type="unfinished">
+        <numerusform>%n bookmarks</numerusform>
+        <numerusform>%n bookmarks</numerusform>
+      </translation>
     </message>
   </context>
   <context>

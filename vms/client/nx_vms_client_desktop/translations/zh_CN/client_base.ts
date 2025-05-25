@@ -2,106 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN" sourcelanguage="en">
   <context>
-    <name>AbstractSearchWidget::Private</name>
-    <message>
-      <source>Hide information</source>
-      <translation>隐藏信息</translation>
-    </message>
-    <message>
-      <source>Show information</source>
-      <translation>显示信息</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>隐藏缩图</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>显示缩图</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>一天内</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>过去 7 天</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>过去 30 天</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>在时间轴上选择</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>任何时间</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>布局上的设备</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>布局上的摄像机</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>被选定之设备</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>被选定之摄像机</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation>选择设备...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation>选择摄像机...</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>任何设备</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>任何摄像机</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>选择媒体</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>无</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation>
-        <numerusform>%n 个已选择的设备</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation>
-        <numerusform>%n 已选取的摄像机</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Chosen device</source>
-      <translation>已选择的设备</translation>
-    </message>
-    <message>
-      <source>Chosen camera</source>
-      <translation>已选取的摄像机</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
@@ -1304,6 +1204,21 @@
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>请重新输入布局 %1密码：</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>图片</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>视频</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>所有文件</translation>
     </message>
   </context>
   <context>
@@ -2945,21 +2860,6 @@ License Key: %2</translation>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
       <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>图片</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>视频</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>所有文件</translation>
     </message>
   </context>
   <context>
@@ -6207,15 +6107,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n 书签</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -6231,9 +6122,6 @@ If you intended to move analytics data to another storage location, please conta
       <comment>%1 is file name</comment>
       <translation>%1 正在被另一个导出使用。</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
       <translation>储存布局中</translation>
@@ -6276,6 +6164,106 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Save changes before exit?</source>
       <translation>保存更改之前退出吗？</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
+    <message>
+      <source>Hide information</source>
+      <translation>隐藏信息</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>显示信息</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>隐藏缩图</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>显示缩图</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>一天内</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>过去 7 天</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>过去 30 天</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>在时间轴上选择</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>任何时间</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>布局上的设备</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>布局上的摄像机</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>被选定之设备</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>被选定之摄像机</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation>选择设备...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation>选择摄像机...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>任何设备</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>任何摄像机</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>选择媒体</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>无</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation>
+        <numerusform>%n 个已选择的设备</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation>
+        <numerusform>%n 已选取的摄像机</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation>已选择的设备</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation>已选取的摄像机</translation>
     </message>
   </context>
   <context>
@@ -11874,6 +11862,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>正在为导出过程准备文件。请稍等。</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n 书签</numerusform>
+      </translation>
     </message>
   </context>
   <context>

@@ -2,108 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fi_FI" sourcelanguage="en">
   <context>
-    <name>AbstractSearchWidget::Private</name>
-    <message>
-      <source>Hide information</source>
-      <translation>Piilota tiedot</translation>
-    </message>
-    <message>
-      <source>Show information</source>
-      <translation>Näytä tiedot</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>Piilota pikkukuvat</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>Näytä pikkukuvat</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>Viimeinen päivä</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>Viimeiset 7 päivää</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>Viimeiset 30 päivää</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>Valittu aikajanalla</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>Milloin tahansa</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>Laitteet asettelussa</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>Kamerat asettelussa</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Valitut laitteet</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Valittu kamera</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>Mikä tahansa laite</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>Mikä tahansa kamera</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Valittu media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ei mitään</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
-    </message>
-    <message>
-      <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
@@ -1312,6 +1210,21 @@
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Anna salasana uudelleen asettelulle %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Kuvat</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Kaikki tiedostot</translation>
     </message>
   </context>
   <context>
@@ -2978,21 +2891,6 @@ License Key: %2</translation>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
       <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Kuvat</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Kaikki tiedostot</translation>
     </message>
   </context>
   <context>
@@ -6312,16 +6210,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
   </context>
   <context>
-    <name>WorkbenchExportHandler</name>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n kirjanmerkit</numerusform>
-        <numerusform>%n kirjanmerkkiä</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>WorkbenchExportHandler::Private</name>
     <message>
       <source>Cannot write file</source>
@@ -6337,9 +6225,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <comment>%1 is file name</comment>
       <translation>%1 on toisen viennin käytössä.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
       <translation>Asettelun tallentaminen</translation>
@@ -6382,6 +6267,108 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>Save changes before exit?</source>
       <translation>Vahvista muutokset ennen poistumista?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
+    <message>
+      <source>Hide information</source>
+      <translation>Piilota tiedot</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>Näytä tiedot</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>Piilota pikkukuvat</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>Näytä pikkukuvat</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>Viimeinen päivä</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>Viimeiset 7 päivää</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Viimeiset 30 päivää</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>Valittu aikajanalla</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Milloin tahansa</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>Laitteet asettelussa</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>Kamerat asettelussa</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Valitut laitteet</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Valittu kamera</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation type="unfinished">Choose devices...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation type="unfinished">Choose cameras...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>Mikä tahansa laite</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>Mikä tahansa kamera</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Valittu media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ei mitään</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation type="unfinished">
+        <numerusform>%n chosen devices</numerusform>
+        <numerusform>%n chosen devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n chosen cameras</numerusform>
+        <numerusform>%n chosen cameras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation type="unfinished">Chosen device</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation type="unfinished">Chosen camera</translation>
     </message>
   </context>
   <context>
@@ -12058,6 +12045,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
       <translation>Valmistelemme tiedostoja vientiprosessille. Odota muutama sekunti.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n kirjanmerkit</numerusform>
+        <numerusform>%n kirjanmerkkiä</numerusform>
+      </translation>
     </message>
   </context>
   <context>
