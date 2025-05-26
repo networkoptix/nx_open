@@ -37,7 +37,9 @@ public:
 
     void setCredentials(nx::network::http::Credentials credentials)
     {
-        m_credentials = std::move(credentials);
+        m_credentials = credentials;
+        if (m_connection)
+            m_connection->setCredentials(std::move(credentials));
     }
 
     api::AccountManager* accountManager()
