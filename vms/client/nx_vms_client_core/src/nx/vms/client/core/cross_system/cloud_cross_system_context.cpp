@@ -175,7 +175,12 @@ struct CloudCrossSystemContext::Private
 
         auto timer = new QTimer(q);
         timer->setInterval(kUpdateConnectionInterval);
-        timer->callOnTimeout([this]() { ensureConnection(); });
+        timer->callOnTimeout(
+            [this]()
+            {
+                updateTokenUpdater();
+                ensureConnection();
+            });
         timer->start();
 
         automaticReconnection = true;
