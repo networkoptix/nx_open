@@ -50,7 +50,7 @@ ContactAddressTestCase expectEmail(QString address)
 
 ContactAddressTestCase expectLink(QString address)
 {
-    return {address, Channel::link, common::html::link(nx::utils::Url::fromUserInput(address))};
+    return {address, Channel::link, common::html::link(nx::Url::fromUserInput(address))};
 }
 
 ContactAddressTestCase expectTextLink(QString address)

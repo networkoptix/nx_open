@@ -22,7 +22,7 @@ NX_VMS_CLIENT_CORE_API std::optional<LogonData> cloudLogonData(
 
 /** Parameters for a connection to the local system with specified url and credentials. */
 NX_VMS_CLIENT_CORE_API LogonData localLogonData(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const nx::network::http::Credentials& credentials);
 
 } // namespace nx::vms::client::core

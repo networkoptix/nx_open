@@ -12,7 +12,7 @@
 namespace nx::json_rpc {
 
 WebSocketClient::WebSocketClient(
-    nx::utils::Url url,
+    nx::Url url,
     std::unique_ptr<nx::network::http::AsyncClient> client,
     RequestHandler handler)
     :
@@ -30,7 +30,7 @@ WebSocketClient::WebSocketClient(
 }
 
 WebSocketClient::WebSocketClient(
-    nx::utils::Url url,
+    nx::Url url,
     nx::network::http::Credentials credentials,
     nx::network::ssl::AdapterFunc adapterFunc,
     RequestHandler handler)

@@ -12,9 +12,9 @@ class NX_VMS_GATEWAY_API UrlRewriter:
     public nx::network::http::server::proxy::AbstractUrlRewriter
 {
 public:
-    virtual nx::utils::Url originalResourceUrlToProxyUrl(
-        const nx::utils::Url& originalResourceUrl,
-        const nx::utils::Url& proxyHostUrl,
+    virtual nx::Url originalResourceUrlToProxyUrl(
+        const nx::Url& originalResourceUrl,
+        const nx::Url& proxyHostUrl,
         const std::string& targetHost) const override;
 };
 

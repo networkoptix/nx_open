@@ -10,8 +10,8 @@
 class NX_VMS_COMMON_API QnNetworkProxyFactory
 {
 public:
-    static nx::utils::Url urlToResource(
-        const nx::utils::Url& baseUrl,
+    static nx::Url urlToResource(
+        const nx::Url& baseUrl,
         const QnResourcePtr& resource,
         const QString& proxyQueryParameterName = QString());
 

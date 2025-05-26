@@ -107,7 +107,7 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
     void setUserAgent(const QString& value);
 
-    nx::utils::Url getCurrentStreamUrl() const;
+    nx::Url getCurrentStreamUrl() const;
 
     void setPlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec = AV_NOPTS_VALUE);
     void setPlaybackRange(const PlaybackRange& playbackRange);
@@ -151,7 +151,7 @@ public:
      */
     void setForceCameraTime(bool value);
 
-    void setUrl(const nx::utils::Url& url);
+    void setUrl(const nx::Url& url);
 
 protected:
     const QString& logName() const { return m_logName; }
@@ -259,7 +259,7 @@ protected:
     nx::rtp::Result m_lastRtpParseResult;
     nx::network::AbstractStreamSocket* m_tcpSocket = nullptr;
     bool m_cloudConnectEnabled = false;
-    nx::utils::Url m_url;
+    nx::Url m_url;
     std::optional<nx::network::http::Credentials> m_credentials;
 };
 

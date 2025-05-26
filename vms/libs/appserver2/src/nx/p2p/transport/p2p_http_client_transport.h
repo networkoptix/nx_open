@@ -27,7 +27,7 @@ public:
         HttpClientPtr readHttpClient,
         const nx::network::http::HttpHeaders& additionalRequestHeaders,
         network::websocket::FrameType frameType,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         std::optional<std::chrono::milliseconds> pingTimeout);
 
     virtual ~P2PHttpClientTransport() override;
@@ -85,7 +85,7 @@ private:
     UserReadHandlerPair m_userReadHandlerPair;
     network::websocket::FrameType m_messageType;
     bool m_failed = false;
-    nx::utils::Url m_url;
+    nx::Url m_url;
     utils::InterruptionFlag m_destructionFlag;
     const nx::network::http::HttpHeaders m_additionalRequestHeaders;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onStartHandler;

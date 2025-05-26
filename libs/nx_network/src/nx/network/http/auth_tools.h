@@ -278,7 +278,7 @@ NX_NETWORK_API header::WWWAuthenticate generateWwwAuthenticateDigestHeader(
     const std::string& nonce,
     const std::string& realm = AppInfo::realm());
 
-NX_NETWORK_API std::string digestUri(const Method& method, const nx::utils::Url& url);
+NX_NETWORK_API std::string digestUri(const Method& method, const nx::Url& url);
 
 //-------------------------------------------------------------------------------------------------
 

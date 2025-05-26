@@ -29,7 +29,7 @@ bool StunOverHttpServer::listen()
     return true;
 }
 
-nx::utils::Url StunOverHttpServer::url() const
+nx::Url StunOverHttpServer::url() const
 {
     return nx::network::url::Builder()
         .setScheme(nx::network::http::kUrlSchemeName)
@@ -73,7 +73,7 @@ nx::network::stun::MessageDispatcher& StunOverHttpServerFixture::dispatcher()
     return m_server.dispatcher();
 }
 
-nx::utils::Url StunOverHttpServerFixture::tunnelUrl() const
+nx::Url StunOverHttpServerFixture::tunnelUrl() const
 {
     return m_server.url();
 }

@@ -9,8 +9,8 @@ namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::common::update {
 
-NX_VMS_COMMON_API nx::utils::Url releaseListUrl(SystemContext* context);
-NX_VMS_COMMON_API nx::utils::Url updateGeneratorUrl();
+NX_VMS_COMMON_API nx::Url releaseListUrl(SystemContext* context);
+NX_VMS_COMMON_API nx::Url updateGeneratorUrl();
 NX_VMS_COMMON_API QString passwordForBuild(const QString& build);
 
 } // namespace nx::vms::common::update

@@ -79,7 +79,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 Client::Client(
-    const nx::utils::Url& baseTunnelUrl,
+    const nx::Url& baseTunnelUrl,
     const std::string& userTag,
     std::optional<int> forcedTunnelType,
     const ConnectOptions& options)

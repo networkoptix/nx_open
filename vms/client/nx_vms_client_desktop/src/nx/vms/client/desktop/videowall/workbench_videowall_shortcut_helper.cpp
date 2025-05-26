@@ -81,7 +81,7 @@ bool VideoWallShortcutHelper::createShortcut(const QnVideoWallResourcePtr& video
     arguments << "--videowall";
     arguments << videowall->getId().toString(QUuid::WithBraces);
 
-    const nx::utils::Url serverUrl = nx::network::url::Builder()
+    const nx::Url serverUrl = nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
         .setEndpoint(connection->address())
         .toUrl();
@@ -109,7 +109,7 @@ bool VideoWallShortcutHelper::deleteShortcut(const QnVideoWallResourcePtr& video
 void VideoWallShortcutHelper::setVideoWallAutorunEnabled(
     const nx::Uuid& videowallUuid,
     bool value,
-    const nx::utils::Url& serverUrl)
+    const nx::Url& serverUrl)
 {
     NX_ASSERT(!value || serverUrl.isValid(), "Url must be filled when enabling the autorun");
 

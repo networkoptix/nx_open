@@ -87,7 +87,7 @@ public:
         m_httpClient.reset();
     }
 
-    void setModulesXmlUrl(nx::utils::Url url)
+    void setModulesXmlUrl(nx::Url url)
     {
         m_modulesXmlUrl = std::move(url);
     }
@@ -148,14 +148,14 @@ protected:
         });
     }
 
-    nx::utils::Url buildUrl(const std::string& str, const std::string& moduleAttrName)
+    nx::Url buildUrl(const std::string& str, const std::string& moduleAttrName)
     {
-        nx::utils::Url url(str);
+        nx::Url url(str);
         if (url.host().isEmpty())
         {
             // str could be host:port.
             const SocketAddress endpoint(str);
-            url = nx::utils::Url();
+            url = nx::Url();
             url.setHost(endpoint.address);
             if (endpoint.port > 0)
                 url.setPort(endpoint.port);
@@ -181,7 +181,7 @@ protected:
     }
 
 private:
-    std::optional<nx::utils::Url> m_modulesXmlUrl;
+    std::optional<nx::Url> m_modulesXmlUrl;
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
     std::vector<Handler> m_resolveHandlers;
     std::list<std::pair<std::string, std::string>> m_additionalHttpHeadersForGetRequest;

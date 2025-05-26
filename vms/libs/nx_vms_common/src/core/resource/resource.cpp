@@ -28,7 +28,7 @@ QString hidePasswordIfCredentialsPropety(const QString& key, const QString& valu
     if (key == nx::vms::api::device_properties::kCredentials
         || key == nx::vms::api::device_properties::kDefaultCredentials)
     {
-        return value.left(value.indexOf(':')) + ":" + nx::utils::Url::kMaskedPassword;
+        return value.left(value.indexOf(':')) + ":" + nx::Url::kMaskedPassword;
     }
 
     return value;

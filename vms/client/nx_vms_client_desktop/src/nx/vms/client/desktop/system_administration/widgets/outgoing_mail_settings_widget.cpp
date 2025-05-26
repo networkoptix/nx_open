@@ -208,7 +208,7 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
     ui->serverAddressInput->setValidator(
         [](const QString& text)
         {
-            auto url = nx::utils::Url::fromUserInput(text);
+            auto url = nx::Url::fromUserInput(text);
             return url.isValid()
                 ? ValidationResult::kValid
                 : ValidationResult(tr("URL is not valid."));
@@ -286,7 +286,7 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
             if (QnEmailSettings::defaultPort(preset.connectionType) != preset.port
                 && isValidPort(preset.port))
             {
-                auto serverUrl = nx::utils::Url::fromUserInput(preset.server);
+                auto serverUrl = nx::Url::fromUserInput(preset.server);
                 serverUrl.setPort(preset.port);
                 ui->serverAddressInput->setText(serverUrl.displayAddress());
             }
@@ -400,7 +400,7 @@ void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
         return;
 
     std::optional<nx::Uuid> proxyServerId;
-    const auto serverUrl = nx::utils::Url::fromUserInput(ui->serverAddressInput->text().trimmed());
+    const auto serverUrl = nx::Url::fromUserInput(ui->serverAddressInput->text().trimmed());
 
     if (!network::HostAddress(serverUrl.host()).isLoopback()
         && !q->currentServer()->hasInternetAccess())
@@ -530,7 +530,7 @@ void OutgoingMailSettingsWidget::Private::loadEmailSettingsToDialog()
     if (isValidPort(emailSettings.port)
         && emailSettings.port != QnEmailSettings::defaultPort(emailSettings.connectionType))
     {
-        auto serverUrl = nx::utils::Url::fromUserInput(emailSettings.server);
+        auto serverUrl = nx::Url::fromUserInput(emailSettings.server);
         serverUrl.setPort(emailSettings.port);
         ui->serverAddressInput->setText(serverUrl.displayAddress());
     }
@@ -566,7 +566,7 @@ api::EmailSettings OutgoingMailSettingsWidget::Private::getEmailSettingsFromDial
     {
         const QnEmailAddress emailAddress(ui->emailInput->text());
         const auto serverUrlText = ui->serverAddressInput->text().trimmed();
-        const auto serverUrl = nx::utils::Url::fromUserInput(serverUrlText);
+        const auto serverUrl = nx::Url::fromUserInput(serverUrlText);
 
         emailSettings.email = emailAddress.value();
         emailSettings.server = serverUrl.port() > 0

@@ -28,7 +28,7 @@ namespace {
 
 struct Request
 {
-    nx::utils::Url url;
+    nx::Url url;
     std::unique_ptr<nx::network::http::AsyncClient> client;
 };
 

@@ -108,7 +108,7 @@ public:
 
     bool registerRedirectHandler(
         const std::string& resourcePath,
-        const nx::utils::Url& location,
+        const nx::Url& location,
         const Method& method = nx::network::http::kAnyMethod);
 
     // used for test purpose

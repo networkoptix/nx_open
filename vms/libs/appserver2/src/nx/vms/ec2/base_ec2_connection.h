@@ -98,7 +98,7 @@ public:
     virtual void addRemotePeer(
         const nx::Uuid& id,
         nx::vms::api::PeerType peerType,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         nx::network::ssl::AdapterFunc adapterFunc) override;
 
     virtual void deleteRemotePeer(const nx::Uuid& id) override;
@@ -517,10 +517,10 @@ template<class QueryProcessorType>
 void BaseEc2Connection<QueryProcessorType>::addRemotePeer(
     const nx::Uuid& id,
     nx::vms::api::PeerType peerType,
-    const nx::utils::Url &_url,
+    const nx::Url &_url,
     nx::network::ssl::AdapterFunc adapterFunc)
 {
-    nx::utils::Url url(_url);
+    nx::Url url(_url);
     QUrlQuery q;
     url.setQuery(q);
     messageBus()->addOutgoingConnectionToPeer(

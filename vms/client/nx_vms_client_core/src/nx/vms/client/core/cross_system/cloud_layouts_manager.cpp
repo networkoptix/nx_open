@@ -48,12 +48,12 @@ constexpr auto kRequestInterval = 30s;
 constexpr auto kLayoutsPath = "/docdb/v1/docs/layouts";
 const auto kParticularLayoutPathTemplate = kLayoutsPath + QString("/%1.json");
 
-nx::utils::Url actualLayoutsEndpoint()
+nx::Url actualLayoutsEndpoint()
 {
     const QString cloudLayoutsEndpointOverride(ini().cloudLayoutsEndpointOverride);
     if (!cloudLayoutsEndpointOverride.isEmpty())
     {
-        const auto endpoint = nx::utils::Url::fromUserInput(cloudLayoutsEndpointOverride);
+        const auto endpoint = nx::Url::fromUserInput(cloudLayoutsEndpointOverride);
         if (NX_ASSERT(endpoint.isValid()))
             return endpoint;
     }
@@ -71,7 +71,7 @@ nx::utils::Url actualLayoutsEndpoint()
 
 bool isWebPage(const QString& url)
 {
-    return nx::network::http::isUrlScheme(nx::utils::Url(url).scheme());
+    return nx::network::http::isUrlScheme(nx::Url(url).scheme());
 }
 
 } // namespace
@@ -88,7 +88,7 @@ struct CloudLayoutsManager::Private
     CloudStatus status = CloudStatus::Offline;
     std::unique_ptr<SystemContext> systemContext{appContext()->createSystemContext(
         SystemContext::Mode::cloudLayouts)};
-    const nx::utils::Url endpoint = actualLayoutsEndpoint();
+    const nx::Url endpoint = actualLayoutsEndpoint();
     std::unique_ptr<NetworkManager> networkManager = std::make_unique<NetworkManager>();
     std::unique_ptr<QTimer> timer = std::make_unique<QTimer>();
     QnUserResourcePtr user;

@@ -12,7 +12,7 @@
 namespace nx::network::http::tunneling::detail {
 
 ExperimentalTunnelClient::ExperimentalTunnelClient(
-    const nx::utils::Url& baseTunnelUrl,
+    const nx::Url& baseTunnelUrl,
     const ConnectOptions& /*options*/,
     ClientFeedbackFunction clientFeedbackFunction)
     :

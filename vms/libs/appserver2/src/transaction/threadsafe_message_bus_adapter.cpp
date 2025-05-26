@@ -40,7 +40,7 @@ int ThreadsafeMessageBusAdapter::distanceToPeer(const nx::Uuid& dstPeer) const
 void ThreadsafeMessageBusAdapter::addOutgoingConnectionToPeer(
     const nx::Uuid& id,
     nx::vms::api::PeerType peerType,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     std::optional<nx::network::http::Credentials> credentials,
     nx::network::ssl::AdapterFunc adapterFunc)
 {

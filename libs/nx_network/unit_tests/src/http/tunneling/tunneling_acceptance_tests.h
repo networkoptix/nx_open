@@ -48,7 +48,7 @@ public:
         m_clientFactoryBak = detail::ClientFactory::instance().setCustomFunc(
             [this](
                 const std::string& tag,
-                const nx::utils::Url& baseUrl,
+                const nx::Url& baseUrl,
                 std::optional<int> forcedTunnelType,
                 const ConnectOptions& options)
             {
@@ -275,12 +275,12 @@ protected:
         m_tunnelingServer.reset();
     }
 
-    nx::utils::Url baseUrl() const
+    nx::Url baseUrl() const
     {
         return m_baseUrl;
     }
 
-    void setBaseUrl(const nx::utils::Url& url)
+    void setBaseUrl(const nx::Url& url)
     {
         m_baseUrl = url;
         m_tunnelingClient = std::make_unique<Client>(m_baseUrl, kTunnelTag);
@@ -324,7 +324,7 @@ private:
     detail::ClientFactory::Function m_clientFactoryBak;
     http::HttpHeaders m_customHeaders;
     OpenTunnelResult m_prevClientTunnelResult;
-    nx::utils::Url m_baseUrl;
+    nx::Url m_baseUrl;
     std::unique_ptr<AbstractStreamSocket> m_prevServerTunnelConnection;
     std::optional<std::chrono::milliseconds> m_timeout;
     std::optional<std::chrono::milliseconds> m_httpConnectionInactivityTimeout;

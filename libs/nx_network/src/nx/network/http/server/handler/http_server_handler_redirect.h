@@ -10,14 +10,14 @@ class NX_NETWORK_API Redirect:
     public RequestHandlerWithContext
 {
 public:
-    Redirect(const nx::utils::Url& actualLocation);
+    Redirect(const nx::Url& actualLocation);
 
     virtual void processRequest(
         RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler) override;
 
 private:
-    const nx::utils::Url m_actualLocation;
+    const nx::Url m_actualLocation;
 };
 
 } // namespace nx::network::http::server::handler

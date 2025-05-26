@@ -52,7 +52,7 @@ class NX_NETWORK_API Client:
 public:
     using ResultCode = ApiResultCodeDescriptor::ResultCode;
 
-    Client(const nx::utils::Url& baseMediatorApiUrl, nx::network::ssl::AdapterFunc adapterFunc);
+    Client(const nx::Url& baseMediatorApiUrl, nx::network::ssl::AdapterFunc adapterFunc);
     ~Client();
 
     void getListeningPeers(

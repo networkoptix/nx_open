@@ -19,23 +19,23 @@ namespace nx::vms::license {
 
 struct LicenseServer
 {
-    static const nx::utils::Url indexUrl(common::SystemContext* context);
-    static const nx::utils::Url activateUrl(common::SystemContext* context);
-    static const nx::utils::Url activateV2Url(common::SystemContext* context);
-    static const nx::utils::Url deactivateUrl(common::SystemContext* context);
-    static const nx::utils::Url validateUrl(common::SystemContext* context);
-    static const nx::utils::Url inspectUrl(common::SystemContext* context);
+    static const nx::Url indexUrl(common::SystemContext* context);
+    static const nx::Url activateUrl(common::SystemContext* context);
+    static const nx::Url activateV2Url(common::SystemContext* context);
+    static const nx::Url deactivateUrl(common::SystemContext* context);
+    static const nx::Url validateUrl(common::SystemContext* context);
+    static const nx::Url inspectUrl(common::SystemContext* context);
 private:
     static const QString baseUrl(common::SystemContext* context);
 };
 
 struct ChannelPartnerServer
 {
-    static const nx::utils::Url reportUrl(const common::SystemSettings* settings);
-    static const nx::utils::Url quantityReportUrl(const common::SystemSettings* settings);
-    static const nx::utils::Url saasServicesUrl(const common::SystemSettings* settings);
-    static const nx::utils::Url saasDataUrl(const common::SystemSettings* settings);
-    static const nx::utils::Url migrateLicensesUrl(const common::SystemSettings* settings);
+    static const nx::Url reportUrl(const common::SystemSettings* settings);
+    static const nx::Url quantityReportUrl(const common::SystemSettings* settings);
+    static const nx::Url saasServicesUrl(const common::SystemSettings* settings);
+    static const nx::Url saasDataUrl(const common::SystemSettings* settings);
+    static const nx::Url migrateLicensesUrl(const common::SystemSettings* settings);
 
     static const QString baseUrl(const common::SystemSettings* settings);
 };

@@ -7,7 +7,7 @@
 namespace nx::network::http::tunneling::detail {
 
 SslTunnelClient::SslTunnelClient(
-    const nx::utils::Url& baseTunnelUrl,
+    const nx::Url& baseTunnelUrl,
     const ConnectOptions& options,
     ClientFeedbackFunction clientFeedbackFunction)
     :
@@ -20,8 +20,8 @@ SslTunnelClient::SslTunnelClient(
         baseTunnelUrl, convertToHttpsUrl(baseTunnelUrl));
 }
 
-nx::utils::Url SslTunnelClient::convertToHttpsUrl(
-    nx::utils::Url httpUrl)
+nx::Url SslTunnelClient::convertToHttpsUrl(
+    nx::Url httpUrl)
 {
     if (httpUrl.scheme() == kSecureUrlSchemeName)
         return httpUrl;

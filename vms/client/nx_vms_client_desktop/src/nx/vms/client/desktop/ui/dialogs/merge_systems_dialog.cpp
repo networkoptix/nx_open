@@ -146,10 +146,10 @@ MergeSystemsDialog::~MergeSystemsDialog()
 {
 }
 
-nx::utils::Url MergeSystemsDialog::url() const {
+nx::Url MergeSystemsDialog::url() const {
     /* filter unnecessary information from the URL */
-    nx::utils::Url enteredUrl = nx::utils::Url::fromUserInput(ui->urlComboBox->currentText());
-    nx::utils::Url url;
+    nx::Url enteredUrl = nx::Url::fromUserInput(ui->urlComboBox->currentText());
+    nx::Url url;
     url.setScheme(enteredUrl.scheme());
     url.setHost(enteredUrl.host());
     url.setPort(enteredUrl.port());
@@ -287,7 +287,7 @@ void MergeSystemsDialog::at_testConnectionButton_clicked()
 
     updateMergeButtonAvailability();
 
-    nx::utils::Url url = nx::utils::Url::fromUserInput(ui->urlComboBox->currentText());
+    nx::Url url = nx::Url::fromUserInput(ui->urlComboBox->currentText());
     QString login = ui->loginEdit->text();
     QString password = ui->passwordEdit->text();
 

@@ -24,9 +24,9 @@ class NX_NETWORK_API AbstractUrlRewriter
 public:
     virtual ~AbstractUrlRewriter() = default;
 
-    virtual nx::utils::Url originalResourceUrlToProxyUrl(
-        const nx::utils::Url& originalResourceUrl,
-        const nx::utils::Url& proxyHostUrl,
+    virtual nx::Url originalResourceUrlToProxyUrl(
+        const nx::Url& originalResourceUrl,
+        const nx::Url& proxyHostUrl,
         const std::string& targetHost) const = 0;
 };
 
@@ -34,7 +34,7 @@ public:
 
 using MessageBodyConverterFactoryFunction =
     std::unique_ptr<AbstractMessageBodyConverter>(
-        const nx::utils::Url& proxyHostUrl,
+        const nx::Url& proxyHostUrl,
         const std::string& targetHost,
         const std::string& contentType);
 
@@ -57,7 +57,7 @@ private:
     std::unique_ptr<AbstractUrlRewriter> m_urlConverter;
 
     std::unique_ptr<AbstractMessageBodyConverter> defaultFactoryFunction(
-        const nx::utils::Url& proxyHostUrl,
+        const nx::Url& proxyHostUrl,
         const std::string& targetHost,
         const std::string& contentType);
 };

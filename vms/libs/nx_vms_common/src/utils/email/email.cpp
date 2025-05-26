@@ -99,7 +99,7 @@ bool QnEmailSettings::isFilled() const
 
 bool QnEmailSettings::isValid(const QString& email, const QString& server)
 {
-    return QnEmailAddress(email).isValid() && nx::utils::Url::fromUserInput(server).isValid();
+    return QnEmailAddress(email).isValid() && nx::Url::fromUserInput(server).isValid();
 }
 
 QnEmailAddress::QnEmailAddress(const QString& email):

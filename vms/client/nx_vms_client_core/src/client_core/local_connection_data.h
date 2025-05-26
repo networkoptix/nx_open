@@ -12,7 +12,7 @@ namespace nx::vms::client::core {
 struct LocalConnectionData
 {
     QString systemName;
-    QList<nx::utils::Url> urls;
+    QList<nx::Url> urls;
     nx::utils::SoftwareVersion version;
 
     bool operator==(const LocalConnectionData&) const = default;

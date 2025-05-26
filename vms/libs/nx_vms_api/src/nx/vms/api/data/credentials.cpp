@@ -15,7 +15,7 @@ Credentials::Credentials(const QString& user, const QString& password):
 {
 }
 
-Credentials::Credentials(const nx::utils::Url& url):
+Credentials::Credentials(const nx::Url& url):
     Credentials(url.userName(), url.password())
 {
 }
@@ -25,9 +25,9 @@ Credentials Credentials::parseColon(const QString& value, bool hidePassword)
     if (const auto colon = value.indexOf(':'); colon >= 0)
     {
         return {value.left(colon),
-            hidePassword ? nx::utils::Url::kMaskedPassword : value.mid(colon + 1)};
+            hidePassword ? nx::Url::kMaskedPassword : value.mid(colon + 1)};
     }
-    return {value, hidePassword ? nx::utils::Url::kMaskedPassword : QString()};
+    return {value, hidePassword ? nx::Url::kMaskedPassword : QString()};
 }
 
 bool Credentials::isEmpty() const

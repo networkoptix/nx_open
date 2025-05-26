@@ -34,8 +34,8 @@ public:
     virtual void setAcceptErrorHandler(ErrorHandler handler) override;
 
     void setEstablishedConnectionsToReport(
-        std::list<nx::utils::Url> remoteAddresses,
-        nx::utils::SyncQueue<nx::utils::Url>* acceptorErrorReported = nullptr);
+        std::list<nx::Url> remoteAddresses,
+        nx::utils::SyncQueue<nx::Url>* acceptorErrorReported = nullptr);
 
     void setAcceptorErrorsToReport(
         std::list<cloud::AcceptorError> acceptorErrors,
@@ -60,8 +60,8 @@ private:
     mutable nx::Mutex m_mutex;
     nx::network::aio::RepetitiveTimer m_repetitiveTimer;
 
-    std::list<nx::utils::Url> m_connectionsToRemoteAdressesToReport;
-    nx::utils::SyncQueue<nx::utils::Url>* m_connectionEstablishedReportedEvent = nullptr;
+    std::list<nx::Url> m_connectionsToRemoteAdressesToReport;
+    nx::utils::SyncQueue<nx::Url>* m_connectionEstablishedReportedEvent = nullptr;
 
     std::list<cloud::AcceptorError> m_acceptorErrorsToReport;
     nx::utils::SyncQueue<cloud::AcceptorError>* m_acceptorErrorReportedEvent = nullptr;

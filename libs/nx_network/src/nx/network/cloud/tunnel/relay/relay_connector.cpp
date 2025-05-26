@@ -15,7 +15,7 @@
 namespace nx::network::cloud::relay {
 
 Connector::Connector(
-    nx::utils::Url relayUrl,
+    nx::Url relayUrl,
     AddressEntry targetHostAddress,
     std::string connectSessionId)
     :
@@ -152,7 +152,7 @@ void Connector::onStartRelaySessionResponse(
                 }
 
                 result.connection = std::make_unique<OutgoingTunnelConnection>(
-                    nx::utils::Url(relayUrl),
+                    nx::Url(relayUrl),
                     m_connectSessionId,
                     std::move(m_relayClient));
 
@@ -161,7 +161,7 @@ void Connector::onStartRelaySessionResponse(
     }
 
     result.connection = std::make_unique<OutgoingTunnelConnection>(
-        nx::utils::Url(response.actualRelayUrl),
+        nx::Url(response.actualRelayUrl),
         m_connectSessionId,
         std::move(m_relayClient));
 

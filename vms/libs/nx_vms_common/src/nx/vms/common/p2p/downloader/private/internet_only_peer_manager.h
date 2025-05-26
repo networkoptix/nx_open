@@ -22,7 +22,7 @@ public:
     virtual RequestContextPtr<FileInformation> requestFileInfo(
         const nx::Uuid& peerId,
         const QString& fileName,
-        const nx::utils::Url& url) override;
+        const nx::Url& url) override;
 
     virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
         const nx::Uuid& peerId, const QString& fileName) override;
@@ -30,7 +30,7 @@ public:
     virtual RequestContextPtr<nx::Buffer> downloadChunk(
         const nx::Uuid& peerId,
         const QString& fileName,
-        const nx::utils::Url &url,
+        const nx::Url &url,
         int chunkIndex,
         int chunkSize,
         qint64 fileSize) override;

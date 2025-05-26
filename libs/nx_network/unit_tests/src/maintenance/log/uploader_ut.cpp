@@ -185,7 +185,7 @@ private:
         completionHandler(http::StatusCode::created);
     }
 
-    nx::utils::Url collectorUrl()
+    nx::Url collectorUrl()
     {
         return url::Builder().setScheme(http::kUrlSchemeName)
             .setEndpoint(m_collector.serverAddress()).toUrl();

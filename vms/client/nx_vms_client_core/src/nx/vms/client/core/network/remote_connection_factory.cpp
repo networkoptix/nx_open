@@ -103,14 +103,14 @@ std::optional<nx::Uuid> deductServerId(const std::vector<nx::vms::api::ServerInf
     return std::nullopt;
 }
 
-nx::utils::Url mainServerUrl(const QSet<QString>& remoteAddresses, int port)
+nx::Url mainServerUrl(const QSet<QString>& remoteAddresses, int port)
 {
-    std::vector<nx::utils::Url> addresses;
+    std::vector<nx::Url> addresses;
     for (const auto& addressString: remoteAddresses)
     {
         nx::network::SocketAddress sockAddr(addressString.toStdString());
 
-        nx::utils::Url url = nx::network::url::Builder()
+        nx::Url url = nx::network::url::Builder()
             .setScheme(nx::network::http::kSecureUrlSchemeName)
             .setEndpoint(sockAddr)
             .toUrl();

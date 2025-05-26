@@ -44,16 +44,16 @@ void HttpClient::pleaseStop()
     m_cond.wakeAll();
 }
 
-bool HttpClient::doGet(const nx::utils::Url& url)
+bool HttpClient::doGet(const nx::Url& url)
 {
     using namespace std::placeholders;
     return doRequest(std::bind(
-        static_cast<void(AsyncClient::*)(const nx::utils::Url&)>(
+        static_cast<void(AsyncClient::*)(const nx::Url&)>(
             &nx::network::http::AsyncClient::doGet), _1, url));
 }
 
 bool HttpClient::doUpgrade(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::string& protocolToUpgradeTo)
 {
     return doRequest(
@@ -64,7 +64,7 @@ bool HttpClient::doUpgrade(
 }
 
 bool HttpClient::doUpgrade(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     Method method,
     const std::string& protocolToUpgradeTo)
 {
@@ -75,14 +75,14 @@ bool HttpClient::doUpgrade(
         });
 }
 
-bool HttpClient::doConnect(const nx::utils::Url& proxyUrl, const std::string& targetHost)
+bool HttpClient::doConnect(const nx::Url& proxyUrl, const std::string& targetHost)
 {
     return doRequest(
         [&proxyUrl, &targetHost](auto client) { client->doConnect(proxyUrl, targetHost); });
 }
 
 bool HttpClient::doPost(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     std::unique_ptr<AbstractMsgBodySource> body)
 {
     return doRequest(
@@ -94,7 +94,7 @@ bool HttpClient::doPost(
 }
 
 bool HttpClient::doPost(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::string& contentType,
     nx::Buffer messageBody)
 {
@@ -103,13 +103,13 @@ bool HttpClient::doPost(
         std::make_unique<BufferSource>(contentType, std::move(messageBody)));
 }
 
-bool HttpClient::doPost(const nx::utils::Url& url)
+bool HttpClient::doPost(const nx::Url& url)
 {
     return doRequest([url](nx::network::http::AsyncClient* client) { client->doPost(url); });
 }
 
 bool HttpClient::doPut(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     std::unique_ptr<AbstractMsgBodySource> body)
 {
     return doRequest(
@@ -121,7 +121,7 @@ bool HttpClient::doPut(
 }
 
 bool HttpClient::doPut(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::string& contentType,
     nx::Buffer messageBody)
 {
@@ -131,7 +131,7 @@ bool HttpClient::doPut(
 }
 
 bool HttpClient::doPatch(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::string& contentType,
     nx::Buffer messageBody)
 {
@@ -148,19 +148,19 @@ bool HttpClient::doPatch(
         });
 }
 
-bool HttpClient::doDelete(const nx::utils::Url& url)
+bool HttpClient::doDelete(const nx::Url& url)
 {
     using namespace std::placeholders;
     return doRequest(std::bind(
-        static_cast<void(AsyncClient::*)(const nx::utils::Url&)>(
+        static_cast<void(AsyncClient::*)(const nx::Url&)>(
             &nx::network::http::AsyncClient::doDelete), _1, url));
 }
 
-bool HttpClient::doRequest(const Method& method, const nx::utils::Url& url)
+bool HttpClient::doRequest(const Method& method, const nx::Url& url)
 {
     using namespace std::placeholders;
     return doRequest(std::bind(
-        static_cast<void(AsyncClient::*)(const Method&, const nx::utils::Url&)>(
+        static_cast<void(AsyncClient::*)(const Method&, const nx::Url&)>(
             &nx::network::http::AsyncClient::doRequest), _1, method, url));
 }
 
@@ -255,12 +255,12 @@ void HttpClient::removeAdditionalHeader(const std::string& key)
         m_additionalHeaders.end());
 }
 
-const nx::utils::Url& HttpClient::url() const
+const nx::Url& HttpClient::url() const
 {
     return m_asyncHttpClient->url();
 }
 
-const nx::utils::Url& HttpClient::contentLocationUrl() const
+const nx::Url& HttpClient::contentLocationUrl() const
 {
     return m_asyncHttpClient->contentLocationUrl();
 }
@@ -396,7 +396,7 @@ std::unique_ptr<AbstractStreamSocket> HttpClient::takeSocket()
 }
 
 bool HttpClient::fetchResource(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     nx::Buffer* msgBody,
     std::string* contentType,
     std::optional<std::chrono::milliseconds> customResponseReadTimeout,
@@ -419,7 +419,7 @@ bool HttpClient::fetchResource(
 }
 
 bool HttpClient::fetchResource(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     nx::network::http::StatusCode::Value* const statusCode,
     nx::Buffer* const message,
     int messageSizeLimit,

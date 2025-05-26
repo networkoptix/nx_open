@@ -12,7 +12,7 @@
 
 namespace nx::network { class HostAddress; }
 
-namespace nx::utils {
+namespace nx {
 
 class NX_UTILS_API Url
 {
@@ -164,7 +164,7 @@ public:
     Q_INVOKABLE static Url fromLocalFile(const QString &localfile);
     Q_INVOKABLE QString toLocalFile() const;
 
-    Q_INVOKABLE nx::utils::Url cleanUrl() const;
+    Q_INVOKABLE nx::Url cleanUrl() const;
 
     bool operator <(const Url &url) const;
     bool operator ==(const Url &url) const;
@@ -205,7 +205,7 @@ inline std::ostream& operator<<(std::ostream& s, const Url& url)
     return s << url.toString().toStdString();
 }
 
-namespace url {
+namespace utils::url {
 
 enum class UrlPart
 {
@@ -225,9 +225,9 @@ enum class UrlPart
 using ComparisonFlag = UrlPart;
 Q_DECLARE_FLAGS(ComparisonFlags, ComparisonFlag)
 
-NX_UTILS_API bool equal(const nx::utils::Url& lhs, const nx::utils::Url& rhs, ComparisonFlags flags = ComparisonFlag::All);
+NX_UTILS_API bool equal(const nx::Url& lhs, const nx::Url& rhs, ComparisonFlags flags = ComparisonFlag::All);
 
-inline bool addressesEqual(const nx::utils::Url& lhs, const nx::utils::Url& rhs)
+inline bool addressesEqual(const nx::Url& lhs, const nx::Url& rhs)
 {
     return equal(lhs, rhs, ComparisonFlag::Address);
 }
@@ -237,7 +237,7 @@ inline bool addressesEqual(const nx::utils::Url& lhs, const nx::utils::Url& rhs)
 * parser for other cases.
 * @return URL which may not be a valid one, so it should be checked after the call.
 */
-NX_UTILS_API nx::utils::Url parseUrlFields(const QString& urlStr, QString scheme = "");
+NX_UTILS_API nx::Url parseUrlFields(const QString& urlStr, QString scheme = "");
 
 /**
  * Hides password in the url and also in the query parameters, provided they are valid urls.
@@ -245,34 +245,34 @@ NX_UTILS_API nx::utils::Url parseUrlFields(const QString& urlStr, QString scheme
  * Note: Behavior may be altered by setting the showPasswordsInLogs nx_utils.ini to true; in this
  * case url.toString() is returned.
  */
-NX_UTILS_API QString hidePassword(nx::utils::Url url);
+NX_UTILS_API QString hidePassword(nx::Url url);
 
 /**
  * Compares web page hosts omitting the default "www" subdomain.
  */
-NX_UTILS_API bool webPageHostsEqual(const nx::utils::Url& left, const nx::utils::Url& right);
+NX_UTILS_API bool webPageHostsEqual(const nx::Url& left, const nx::Url& right);
 
-} // namespace url
+} // namespace utils::url
 
 /**
 * Used only to hide passwords from logs.
 */
-NX_UTILS_API QString toString(const nx::utils::Url& value);
+NX_UTILS_API QString toString(const nx::Url& value);
 
-} // namespace nx::utils
+} // namespace nx
 
 class QnJsonContext;
 class QJsonValue;
 
-NX_UTILS_API void serialize(QnJsonContext* /*ctx*/, const nx::utils::Url& url, QJsonValue* target);
-NX_UTILS_API bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, nx::utils::Url* target);
+NX_UTILS_API void serialize(QnJsonContext* /*ctx*/, const nx::Url& url, QJsonValue* target);
+NX_UTILS_API bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, nx::Url* target);
 
 namespace std {
 
 template<>
-struct hash<nx::utils::Url>
+struct hash<nx::Url>
 {
-    std::size_t operator()(const nx::utils::Url& k) const
+    std::size_t operator()(const nx::Url& k) const
     {
         return std::hash<std::string>()(k.toStdString());
     }

@@ -64,7 +64,7 @@ public:
      * @return true, if socket is created and async connect is started. false otherwise.
      *   To get error description use SystemError::getLastOSErrorCode().
      */
-    void doGet(const nx::utils::Url& url);
+    void doGet(const nx::Url& url);
     /**
      * This overload is same as:
      * @code{.cpp}
@@ -78,12 +78,12 @@ public:
      * @endcode
      */
     void doGet(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
-    void doHead(const nx::utils::Url& url);
+    void doHead(const nx::Url& url);
     void doHead(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     /**
@@ -97,47 +97,47 @@ public:
      * @return True, if the socket is created and async connection is started, false otherwise.
      */
     void doPost(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::string& contentType,
         nx::Buffer messageBody,
         bool includeContentLength = true);
     void doPost(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::string& contentType,
         nx::Buffer messageBody,
         bool includeContentLength,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     void doPut(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::string& contentType,
         nx::Buffer messageBody);
     void doPut(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::string& contentType,
         nx::Buffer messageBody,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     void doPatch(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::string& contentType,
         nx::Buffer messageBody);
     void doPatch(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::string& contentType,
         nx::Buffer messageBody,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
-    void doDelete(const nx::utils::Url& url);
+    void doDelete(const nx::Url& url);
     void doDelete(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     void doUpgrade(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::string& protocolToUpgradeTo);
     void doUpgrade(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::string& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
@@ -160,8 +160,8 @@ public:
      * NOTE: This method is thread-safe and can be called in any thread.
      */
     nx::Buffer fetchMessageBodyBuffer();
-    const nx::utils::Url& url() const;
-    const nx::utils::Url& contentLocationUrl() const;
+    const nx::Url& url() const;
+    const nx::Url& contentLocationUrl() const;
     /**
      * Number of bytes read (including http request line and headers)
      *  via single HTTP request.
@@ -228,7 +228,7 @@ public:
     static AsyncHttpClientPtr create(
         std::unique_ptr<AbstractStreamSocket> socket, ssl::AdapterFunc adapterFunc);
 
-    static std::string endpointWithProtocol(const nx::utils::Url &url);
+    static std::string endpointWithProtocol(const nx::Url &url);
 
 signals:
     /**
@@ -405,7 +405,7 @@ using DownloadCompletionHandler = std::function<void(
  */
 void NX_NETWORK_API downloadFileAsync(
     ssl::AdapterFunc adapterFunc,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     DownloadCompletionHandler completionHandler,
     const http::HttpHeaders& extraHeaders = http::HttpHeaders(),
     AuthType authType = AuthType::authBasicAndDigest,
@@ -420,7 +420,7 @@ using DownloadCompletionHandlerEx = std::function<void(SystemError::ErrorCode, i
  */
 void NX_NETWORK_API downloadFileAsyncEx(
     ssl::AdapterFunc adapterFunc,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     DownloadCompletionHandlerEx completionHandlerEx,
     const http::HttpHeaders& extraHeaders = http::HttpHeaders(),
     AuthType authType = AuthType::authBasicAndDigest,
@@ -428,7 +428,7 @@ void NX_NETWORK_API downloadFileAsyncEx(
     const std::string_view& method = nx::network::http::Method::get);
 
 void downloadFileAsyncEx(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     std::function<void(SystemError::ErrorCode, int, std::string, nx::Buffer)> completionHandler,
     nx::network::http::AsyncHttpClientPtr httpClientCaptured);
 
@@ -439,7 +439,7 @@ using UploadCompletionHandler = std::function<void(SystemError::ErrorCode, int h
  */
 void NX_NETWORK_API uploadDataAsync(
     ssl::AdapterFunc adapterFunc,
-    const nx::utils::Url &url,
+    const nx::Url &url,
     const nx::Buffer& data,
     const std::string& contentType,
     const http::HttpHeaders& extraHeaders,
@@ -452,7 +452,7 @@ void NX_NETWORK_API uploadDataAsync(
 
 SystemError::ErrorCode NX_NETWORK_API uploadDataSync(
     ssl::AdapterFunc adapterFunc,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const nx::Buffer& data,
     const std::string& contentType,
     const std::string& user,

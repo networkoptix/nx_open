@@ -20,7 +20,7 @@ class NX_NETWORK_API Connector:
 
 public:
     Connector(
-        nx::utils::Url relayUrl,
+        nx::Url relayUrl,
         AddressEntry targetHostAddress,
         std::string connectSessionId);
     virtual ~Connector() override;
@@ -35,7 +35,7 @@ public:
     virtual const AddressEntry& targetPeerAddress() const override;
 
 private:
-    const nx::utils::Url m_relayUrl;
+    const nx::Url m_relayUrl;
     const AddressEntry m_targetHostAddress;
     std::string m_connectSessionId;
     std::unique_ptr<nx::cloud::relay::api::Client> m_relayClient;

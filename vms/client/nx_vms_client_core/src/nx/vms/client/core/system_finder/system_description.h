@@ -81,9 +81,9 @@ public:
     virtual bool isReachableServer(const Uuid& serverId) const = 0;
 
     // TODO: #ynikitenkov Rename host "field" to appropriate
-    virtual nx::utils::Url getServerHost(const Uuid& serverId) const = 0;
+    virtual nx::Url getServerHost(const Uuid& serverId) const = 0;
 
-    virtual QSet<nx::utils::Url> getServerRemoteAddresses(const Uuid& serverId) const = 0;
+    virtual QSet<nx::Url> getServerRemoteAddresses(const Uuid& serverId) const = 0;
 
     virtual qint64 getServerLastUpdatedMs(const Uuid& serverId) const = 0;
 

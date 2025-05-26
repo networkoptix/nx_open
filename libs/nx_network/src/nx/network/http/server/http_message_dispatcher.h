@@ -189,7 +189,7 @@ protected:
     };
 
 protected:
-    virtual void applyModRewrite(nx::utils::Url* url) const = 0;
+    virtual void applyModRewrite(nx::Url* url) const = 0;
 
     /**
      * @return HTTP message handler functor that corresponds to the given HTTP method and path.
@@ -325,7 +325,7 @@ private:
     std::map<std::string, std::string> m_rewritePrefixes;
     std::map<Method, PathMatchContext> m_factories;
 
-    virtual void applyModRewrite(nx::utils::Url* url) const override
+    virtual void applyModRewrite(nx::Url* url) const override
     {
         if (const auto it = findByMaxPrefix(m_rewritePrefixes, url->path().toStdString()))
         {

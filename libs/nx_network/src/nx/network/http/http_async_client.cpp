@@ -412,39 +412,39 @@ void AsyncClient::setRequestBody(std::unique_ptr<AbstractMsgBodySource> body)
         m_requestBody->bindToAioThread(getAioThread());
 }
 
-void AsyncClient::doGet(const nx::utils::Url& url)
+void AsyncClient::doGet(const nx::Url& url)
 {
     doRequest(nx::network::http::Method::get, url);
 }
 
 void AsyncClient::doGet(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doGet(url);
 }
 
-void AsyncClient::doHead(const nx::utils::Url& url)
+void AsyncClient::doHead(const nx::Url& url)
 {
     doRequest(nx::network::http::Method::head, url);
 }
 
 void AsyncClient::doHead(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doHead(url);
 }
 
-void AsyncClient::doPost(const nx::utils::Url& url)
+void AsyncClient::doPost(const nx::Url& url)
 {
     doRequest(nx::network::http::Method::post, url);
 }
 
 void AsyncClient::doPost(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     std::unique_ptr<AbstractMsgBodySource> body)
 {
     setRequestBody(std::move(body));
@@ -452,7 +452,7 @@ void AsyncClient::doPost(
 }
 
 void AsyncClient::doPost(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     std::unique_ptr<AbstractMsgBodySource> body,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
@@ -461,20 +461,20 @@ void AsyncClient::doPost(
 }
 
 void AsyncClient::doPost(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doPost(url);
 }
 
-void AsyncClient::doPut(const nx::utils::Url& url)
+void AsyncClient::doPut(const nx::Url& url)
 {
     doRequest(nx::network::http::Method::put, url);
 }
 
 void AsyncClient::doPut(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     std::unique_ptr<AbstractMsgBodySource> body)
 {
     setRequestBody(std::move(body));
@@ -482,7 +482,7 @@ void AsyncClient::doPut(
 }
 
 void AsyncClient::doPut(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     std::unique_ptr<AbstractMsgBodySource> body,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
@@ -491,20 +491,20 @@ void AsyncClient::doPut(
 }
 
 void AsyncClient::doPut(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doPut(url);
 }
 
-void AsyncClient::doPatch(const nx::utils::Url& url)
+void AsyncClient::doPatch(const nx::Url& url)
 {
     doRequest(nx::network::http::Method::patch, url);
 }
 
 void AsyncClient::doPatch(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     std::unique_ptr<AbstractMsgBodySource> body)
 {
     setRequestBody(std::move(body));
@@ -512,7 +512,7 @@ void AsyncClient::doPatch(
 }
 
 void AsyncClient::doPatch(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     std::unique_ptr<AbstractMsgBodySource> body,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
@@ -521,20 +521,20 @@ void AsyncClient::doPatch(
 }
 
 void AsyncClient::doPatch(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doPatch(url);
 }
 
-void AsyncClient::doDelete(const nx::utils::Url& url)
+void AsyncClient::doDelete(const nx::Url& url)
 {
     doRequest(nx::network::http::Method::delete_, url);
 }
 
 void AsyncClient::doDelete(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
@@ -542,14 +542,14 @@ void AsyncClient::doDelete(
 }
 
 void AsyncClient::doUpgrade(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::string& protocolToUpgradeTo)
 {
     doUpgrade(url, Method::options, protocolToUpgradeTo);
 }
 
 void AsyncClient::doUpgrade(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const Method& method,
     const std::string& protocolToUpgradeTo)
 {
@@ -569,7 +569,7 @@ void AsyncClient::doUpgrade(
 }
 
 void AsyncClient::doUpgrade(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::string& protocolToUpgradeTo,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
@@ -581,7 +581,7 @@ void AsyncClient::doUpgrade(
 }
 
 void AsyncClient::doUpgrade(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const Method& method,
     const std::string& protocolToUpgradeTo,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -591,7 +591,7 @@ void AsyncClient::doUpgrade(
 }
 
 void AsyncClient::doConnect(
-    const nx::utils::Url& proxyUrl,
+    const nx::Url& proxyUrl,
     const std::string& targetHost)
 {
     NX_ASSERT(proxyUrl.isValid());
@@ -609,7 +609,7 @@ void AsyncClient::doConnect(
 }
 
 void AsyncClient::doConnect(
-    const nx::utils::Url& proxyUrl,
+    const nx::Url& proxyUrl,
     const std::string& targetHost,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
@@ -619,11 +619,11 @@ void AsyncClient::doConnect(
 
 void AsyncClient::doRequest(
     const Method& method,
-    const nx::utils::Url& urlOriginal)
+    const nx::Url& urlOriginal)
 {
     NX_VERBOSE(this, "Issuing request %1 %2 to %3", method, urlOriginal.path(), urlOriginal);
 
-    nx::utils::Url url = urlOriginal;
+    nx::Url url = urlOriginal;
     NX_ASSERT(!url.host().isEmpty() || m_messagePipeline, "Url: %1", url);
 
     if (m_messagePipeline && url.host().isEmpty())
@@ -671,7 +671,7 @@ void AsyncClient::doRequest(
 
 void AsyncClient::doRequest(
     const Method& method,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
@@ -740,12 +740,12 @@ std::unique_ptr<AbstractMsgBodySource> AsyncClient::takeResponseBodySource()
         std::exchange(m_messagePipeline, nullptr));
 }
 
-const nx::utils::Url& AsyncClient::url() const
+const nx::Url& AsyncClient::url() const
 {
     return m_requestUrl;
 }
 
-const nx::utils::Url& AsyncClient::contentLocationUrl() const
+const nx::Url& AsyncClient::contentLocationUrl() const
 {
     return m_contentLocationUrl;
 }
@@ -1346,7 +1346,7 @@ bool AsyncClient::sendRequestToNewLocation(const Response& response)
     m_authorizationTried = false;
     m_ha1RecalcTried = false;
 
-    nx::utils::Url newUrl(locationIter->second);
+    nx::Url newUrl(locationIter->second);
     if (newUrl.host().isEmpty())
     {
         newUrl.setHost(m_contentLocationUrl.host());
@@ -1581,7 +1581,7 @@ bool AsyncClient::reconnectIfAppropriate()
     return false;
 }
 
-std::string AsyncClient::endpointWithProtocol(const nx::utils::Url& url)
+std::string AsyncClient::endpointWithProtocol(const nx::Url& url)
 {
     return nx::format("%1://%2:%3").args(url.scheme(), url.host(),
         url.port(nx::network::http::defaultPortForScheme(url.scheme().toStdString()))).toStdString();

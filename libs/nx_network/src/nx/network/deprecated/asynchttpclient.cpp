@@ -89,26 +89,26 @@ SystemError::ErrorCode AsyncHttpClient::lastSysErrorCode() const
     return m_delegate.lastSysErrorCode();
 }
 
-void AsyncHttpClient::doGet(const nx::utils::Url& url)
+void AsyncHttpClient::doGet(const nx::Url& url)
 {
     m_delegate.doGet(url);
 }
 
 void AsyncHttpClient::doGet(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
 {
     m_onDoneHandler = std::move(completionHandler);
     m_delegate.doGet(url);
 }
 
-void AsyncHttpClient::doHead(const nx::utils::Url& url)
+void AsyncHttpClient::doHead(const nx::Url& url)
 {
     m_delegate.doHead(url);
 }
 
 void AsyncHttpClient::doHead(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
 {
     m_onDoneHandler = std::move(completionHandler);
@@ -148,7 +148,7 @@ private:
 } // namespace
 
 void AsyncHttpClient::doPost(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::string& contentType,
     nx::Buffer messageBodyBuffer,
     bool includeContentLength)
@@ -162,7 +162,7 @@ void AsyncHttpClient::doPost(
 }
 
 void AsyncHttpClient::doPost(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::string& contentType,
     nx::Buffer messageBody,
     bool includeContentLength,
@@ -173,7 +173,7 @@ void AsyncHttpClient::doPost(
 }
 
 void AsyncHttpClient::doPut(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::string& contentType,
     nx::Buffer messageBodyBuffer)
 {
@@ -185,7 +185,7 @@ void AsyncHttpClient::doPut(
 }
 
 void AsyncHttpClient::doPut(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::string& contentType,
     nx::Buffer messageBody,
     nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
@@ -195,7 +195,7 @@ void AsyncHttpClient::doPut(
 }
 
 void AsyncHttpClient::doPatch(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::string& contentType,
     nx::Buffer messageBodyBuffer)
 {
@@ -207,7 +207,7 @@ void AsyncHttpClient::doPatch(
 }
 
 void AsyncHttpClient::doPatch(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::string& contentType,
     nx::Buffer messageBody,
     nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
@@ -216,13 +216,13 @@ void AsyncHttpClient::doPatch(
     doPatch(url, contentType, std::move(messageBody));
 }
 
-void AsyncHttpClient::doDelete(const nx::utils::Url& url)
+void AsyncHttpClient::doDelete(const nx::Url& url)
 {
     m_delegate.doDelete(url);
 }
 
 void AsyncHttpClient::doDelete(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     nx::utils::MoveOnlyFunc<void (AsyncHttpClientPtr)> completionHandler)
 {
     m_onDoneHandler = std::move(completionHandler);
@@ -230,14 +230,14 @@ void AsyncHttpClient::doDelete(
 }
 
 void AsyncHttpClient::doUpgrade(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::string& protocolToUpgradeTo)
 {
     m_delegate.doUpgrade(url, protocolToUpgradeTo, [](){});
 }
 
 void AsyncHttpClient::doUpgrade(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::string& protocolToUpgradeTo,
     nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
 {
@@ -270,12 +270,12 @@ nx::Buffer AsyncHttpClient::fetchMessageBodyBuffer()
     return m_delegate.fetchMessageBodyBuffer();
 }
 
-const nx::utils::Url& AsyncHttpClient::url() const
+const nx::Url& AsyncHttpClient::url() const
 {
     return m_delegate.url();
 }
 
-const nx::utils::Url& AsyncHttpClient::contentLocationUrl() const
+const nx::Url& AsyncHttpClient::contentLocationUrl() const
 {
     return m_delegate.contentLocationUrl();
 }
@@ -404,7 +404,7 @@ AsyncHttpClientPtr AsyncHttpClient::create(
         new AsyncHttpClient(std::move(socket), std::move(adapterFunc))));
 }
 
-std::string AsyncHttpClient::endpointWithProtocol(const nx::utils::Url& url)
+std::string AsyncHttpClient::endpointWithProtocol(const nx::Url& url)
 {
     return nx::format("%1://%2:%3")
         .arg(url.scheme())
@@ -448,7 +448,7 @@ void AsyncHttpClient::onDone()
 // Utilities.
 
 void downloadFileAsyncEx(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     DownloadCompletionHandlerEx completionHandlerEx,
     nx::network::http::AsyncHttpClientPtr httpClientCaptured,
     const std::string_view& method)
@@ -515,7 +515,7 @@ void downloadFileAsyncEx(
 
 void downloadFileAsyncEx(
     ssl::AdapterFunc adapterFunc,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     DownloadCompletionHandlerEx completionHandlerEx,
     const http::HttpHeaders& extraHeaders,
     AuthType authType,
@@ -533,7 +533,7 @@ void downloadFileAsyncEx(
 
 void downloadFileAsync(
     ssl::AdapterFunc adapterFunc,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     DownloadCompletionHandler completionHandler,
     const http::HttpHeaders& extraHeaders,
     AuthType authType,
@@ -561,7 +561,7 @@ void downloadFileAsync(
 
 void uploadDataAsync(
     ssl::AdapterFunc adapterFunc,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const nx::Buffer& data,
     const std::string& contentType,
     const http::HttpHeaders& extraHeaders,
@@ -619,7 +619,7 @@ void uploadDataAsync(
 
 SystemError::ErrorCode uploadDataSync(
     ssl::AdapterFunc adapterFunc,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const nx::Buffer& data,
     const std::string& contentType,
     const std::string& user,

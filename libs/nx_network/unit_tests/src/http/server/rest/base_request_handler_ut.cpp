@@ -144,7 +144,7 @@ private:
     nx::utils::SyncQueue<ResponseContext> m_responseQueue;
     std::optional<ResponseContext> m_lastResponse;
 
-    nx::utils::Url generateRequestUrl(const std::string& path)
+    nx::Url generateRequestUrl(const std::string& path)
     {
         return nx::network::url::Builder()
             .setScheme(kUrlSchemeName).setEndpoint(m_httpServer.serverAddress())

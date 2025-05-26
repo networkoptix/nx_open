@@ -102,7 +102,7 @@ public:
      *     pinged just once.
      */
     void checkEndpoint(nx::network::SocketAddress endpoint, nx::Uuid expectedId = nx::Uuid());
-    void checkEndpoint(const nx::utils::Url &url, nx::Uuid expectedId = nx::Uuid());
+    void checkEndpoint(const nx::Url &url, nx::Uuid expectedId = nx::Uuid());
 
     template<typename Ptr, typename Found, typename Changed, typename Lost>
     void onSignals(Ptr ptr, Found foundSlot, Changed changedSlot, Lost lostSlot)

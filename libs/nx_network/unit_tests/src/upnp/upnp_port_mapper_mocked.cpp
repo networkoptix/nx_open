@@ -25,7 +25,7 @@ AsyncClientMock::~AsyncClientMock()
 }
 
 void AsyncClientMock::externalIp(
-    const nx::utils::Url& /*url*/,
+    const nx::Url& /*url*/,
     std::function< void(const HostAddress&) > callback)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -33,7 +33,7 @@ void AsyncClientMock::externalIp(
 }
 
 void AsyncClientMock::addMapping(
-    const nx::utils::Url& /*url*/, const HostAddress& internalIp,
+    const nx::Url& /*url*/, const HostAddress& internalIp,
     quint16 internalPort, quint16 externalPort,
     Protocol protocol, const QString& description, quint64 /*duration*/,
     std::function< void(bool) > callback)
@@ -53,7 +53,7 @@ void AsyncClientMock::addMapping(
 }
 
 void AsyncClientMock::deleteMapping(
-    const nx::utils::Url& /*url*/, quint16 externalPort, Protocol protocol,
+    const nx::Url& /*url*/, quint16 externalPort, Protocol protocol,
     std::function< void(bool) > callback)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -62,7 +62,7 @@ void AsyncClientMock::deleteMapping(
 }
 
 void AsyncClientMock::getMapping(
-    const nx::utils::Url& /*url*/, quint32 index,
+    const nx::Url& /*url*/, quint32 index,
     std::function< void(MappingInfo) > callback)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -83,7 +83,7 @@ void AsyncClientMock::getMapping(
 }
 
 void AsyncClientMock::getMapping(
-    const nx::utils::Url& /*url*/, quint16 externalPort, Protocol protocol,
+    const nx::Url& /*url*/, quint16 externalPort, Protocol protocol,
     std::function< void(MappingInfo) > callback)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);

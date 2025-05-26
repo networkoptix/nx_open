@@ -20,7 +20,7 @@ class NX_NETWORK_API UplinkBandwidthTester:
     using base_type = network::aio::BasicPollable;
 public:
     UplinkBandwidthTester(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::chrono::milliseconds& testDuration,
         int minBandwidthRequests,
         const std::chrono::microseconds& pingTime);
@@ -67,7 +67,7 @@ private:
     };
 
 private:
-    const nx::utils::Url m_url;
+    const nx::Url m_url;
     const std::chrono::milliseconds m_testDuration;
     const int m_minBandwidthRequests;
     const std::chrono::microseconds m_pingTime;

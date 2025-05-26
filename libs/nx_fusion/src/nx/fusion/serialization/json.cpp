@@ -264,7 +264,7 @@ public:
         registerSerializer<QPointF>();
         registerSerializer<nx::Uuid>();
         registerSerializer<QUrl>();
-        registerSerializer<nx::utils::Url>();
+        registerSerializer<nx::Url>();
         registerSerializer<QDateTime>();
 
         registerSerializer<QnLatin1Array>();

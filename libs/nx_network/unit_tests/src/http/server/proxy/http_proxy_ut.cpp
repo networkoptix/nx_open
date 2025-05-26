@@ -214,7 +214,7 @@ protected:
         return *m_targetServer;
     }
 
-    nx::utils::Url requestUrl(const std::string& path)
+    nx::Url requestUrl(const std::string& path)
     {
         return url::Builder()
             .setScheme(kUrlSchemeName)

@@ -19,7 +19,7 @@ class NX_NETWORK_API GetPostTunnelClient:
 
 public:
     GetPostTunnelClient(
-        const nx::utils::Url& baseTunnelUrl,
+        const nx::Url& baseTunnelUrl,
         const ConnectOptions& options,
         ClientFeedbackFunction clientFeedbackFunction);
 
@@ -31,7 +31,7 @@ public:
     virtual const Response& response() const override;
 
 private:
-    nx::utils::Url m_tunnelUrl;
+    nx::Url m_tunnelUrl;
     Response m_openTunnelResponse;
     nx::Buffer m_serializedOpenUpChannelRequest;
     std::optional<std::chrono::milliseconds> m_timeout;

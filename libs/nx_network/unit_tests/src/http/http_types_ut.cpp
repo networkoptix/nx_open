@@ -819,7 +819,7 @@ TEST(HttpTypesRequestLine, parse)
         RequestLine requestLine;
         ASSERT_TRUE(requestLine.parse(Buffer("GET /test/test/test?test=test&test HTTP/1.0")));
         ASSERT_EQ(requestLine.method, Method::get);
-        ASSERT_EQ(requestLine.url, nx::utils::Url("/test/test/test?test=test&test"));
+        ASSERT_EQ(requestLine.url, nx::Url("/test/test/test?test=test&test"));
         ASSERT_EQ(requestLine.version, http_1_0);
     }
 
@@ -827,7 +827,7 @@ TEST(HttpTypesRequestLine, parse)
         RequestLine requestLine;
         ASSERT_TRUE(requestLine.parse(Buffer("  PUT   /abc?def=ghi&jkl   HTTP/1.1")));
         ASSERT_EQ(requestLine.method, Method::put);
-        ASSERT_EQ(requestLine.url, nx::utils::Url("/abc?def=ghi&jkl"));
+        ASSERT_EQ(requestLine.url, nx::Url("/abc?def=ghi&jkl"));
         ASSERT_EQ(requestLine.version, http_1_1);
     }
 

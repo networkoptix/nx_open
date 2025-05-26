@@ -13,12 +13,12 @@ class NX_NETWORK_API SslTunnelClient:
 
 public:
     SslTunnelClient(
-        const nx::utils::Url& baseTunnelUrl,
+        const nx::Url& baseTunnelUrl,
         const ConnectOptions& options,
         ClientFeedbackFunction clientFeedbackFunction);
 
 private:
-    static nx::utils::Url convertToHttpsUrl(nx::utils::Url httpUrl);
+    static nx::Url convertToHttpsUrl(nx::Url httpUrl);
 };
 
 } // namespace nx::network::http::tunneling::detail

@@ -20,11 +20,11 @@ using namespace nx::vms::client::core;
 
 namespace {
 
-using UrlsList = QList<nx::utils::Url>;
+using UrlsList = QList<nx::Url>;
 
 constexpr int kLowestServerPriority = std::numeric_limits<int>::max();
 
-QSet<nx::utils::Url> formAdditionalUrlsSet(
+QSet<nx::Url> formAdditionalUrlsSet(
     const SystemDescriptionPtr& systemDescription,
     const nx::Uuid& serverId)
 {
@@ -33,18 +33,18 @@ QSet<nx::utils::Url> formAdditionalUrlsSet(
     // Only connection url is valid for localhost determination.
     if (QnSystemHostsModel::isLocalhost(mainServerUrl.host(), true))
     {
-        nx::utils::Url localhostUrl;
+        nx::Url localhostUrl;
         localhostUrl.setScheme("https");
         localhostUrl.setHost(nx::network::HostAddress::localhost);
         localhostUrl.setPort(mainServerUrl.port());
 
-        nx::utils::Url localhostIpUrl;
+        nx::Url localhostIpUrl;
         localhostIpUrl.setScheme("https");
         localhostIpUrl.setHost(nx::network::HostAddress::localhost);
         localhostIpUrl.setPort(mainServerUrl.port());
 
         return systemDescription->getServerRemoteAddresses(serverId)
-            + QSet<nx::utils::Url>{localhostUrl, localhostIpUrl};
+            + QSet<nx::Url>{localhostUrl, localhostIpUrl};
     }
 
     return systemDescription->getServerRemoteAddresses(serverId);
@@ -62,12 +62,12 @@ class QnSystemHostsModel::HostsModel: public QAbstractListModel
     struct ServerUrlData
     {
         nx::Uuid id;
-        nx::utils::Url mainUrl;
-        QSet<nx::utils::Url> additionalUrls;
+        nx::Url mainUrl;
+        QSet<nx::Url> additionalUrls;
         bool compatible = true;
         int priority = kLowestServerPriority;
 
-        bool containsUrl(const nx::utils::Url& url) const
+        bool containsUrl(const nx::Url& url) const
         {
             return additionalUrls.contains(url) || mainUrl == url;
         }
@@ -84,8 +84,8 @@ public:
     QUuid localSystemId() const;
     void setLocalSystemId(const QUuid& id);
 
-    bool getUrlVersionCompatibility(const nx::utils::Url& url) const;
-    int getUrlPriority(const nx::utils::Url& url) const;
+    bool getUrlVersionCompatibility(const nx::Url& url) const;
+    int getUrlPriority(const nx::Url& url) const;
 
     bool forcedLocalhostConversion() const;
     void setForcedLocalhostConversion(bool convert);
@@ -161,7 +161,7 @@ void QnSystemHostsModel::HostsModel::forceResort()
             {
                 return std::any_of(
                     serverData.additionalUrls.begin(), serverData.additionalUrls.end(),
-                    [recentUrl](const nx::utils::Url& url)
+                    [recentUrl](const nx::Url& url)
                     {
                         return recentUrl.host() == url.host();
                     });
@@ -205,7 +205,7 @@ void QnSystemHostsModel::HostsModel::setLocalSystemId(const QUuid& id)
     emit m_owner->localSystemIdChanged();
 }
 
-bool QnSystemHostsModel::HostsModel::getUrlVersionCompatibility(const nx::utils::Url& url) const
+bool QnSystemHostsModel::HostsModel::getUrlVersionCompatibility(const nx::Url& url) const
 {
     for (const auto& serverHostData: m_serversUrlData)
     {
@@ -216,7 +216,7 @@ bool QnSystemHostsModel::HostsModel::getUrlVersionCompatibility(const nx::utils:
     return false;
 }
 
-int QnSystemHostsModel::HostsModel::getUrlPriority(const nx::utils::Url& url) const
+int QnSystemHostsModel::HostsModel::getUrlPriority(const nx::Url& url) const
 {
     for (const auto& serverHostData: m_serversUrlData)
     {
@@ -453,10 +453,10 @@ bool QnSystemHostsModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
 {
-    const auto leftUrl = sourceLeft.data(UrlRole).value<nx::utils::Url>();
+    const auto leftUrl = sourceLeft.data(UrlRole).value<nx::Url>();
     NX_ASSERT(leftUrl.isValid(), nx::format("Invalid url %1").arg(leftUrl.toString()));
 
-    const auto rightUrl = sourceRight.data(UrlRole).value<nx::utils::Url>();
+    const auto rightUrl = sourceRight.data(UrlRole).value<nx::Url>();
     NX_ASSERT(rightUrl.isValid(), nx::format("Invalid url %1").arg(rightUrl.toString()));
 
     if (!leftUrl.isValid() || !rightUrl.isValid())
@@ -523,7 +523,7 @@ QString QnSystemHostsModel::getRequiredSystemVersion(int hostIndex) const
     if (rowCount() > 0 && hostIndex < rowCount())
     {
         const QModelIndex index = QnSystemHostsModel::index(hostIndex, 0);
-        const auto url = index.data(UrlRole).value<nx::utils::Url>();
+        const auto url = index.data(UrlRole).value<nx::Url>();
         const bool isCompatible = hostsModel()->getUrlVersionCompatibility(url);
         if (isCompatible)
             return "";

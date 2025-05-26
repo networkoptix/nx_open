@@ -68,7 +68,7 @@ public:
     [[nodiscard]]
     nx::Uuid pingSystem(
         const QnMediaServerResourcePtr& proxy,
-        const nx::utils::Url& targetUrl,
+        const nx::Url& targetUrl,
         const nx::network::http::Credentials& targetCredentials,
         std::optional<DryRunSettings> dryRunSettings = {});
 

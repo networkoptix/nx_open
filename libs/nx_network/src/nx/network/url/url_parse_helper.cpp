@@ -20,14 +20,14 @@ std::uint16_t getDefaultPortForScheme(const std::string_view& scheme)
     return 0;
 }
 
-SocketAddress getEndpoint(const nx::utils::Url& url, int defaultPort)
+SocketAddress getEndpoint(const nx::Url& url, int defaultPort)
 {
     return SocketAddress(
         url.host().toStdString(),
         static_cast<std::uint16_t>(url.port(defaultPort)));
 }
 
-SocketAddress getEndpoint(const nx::utils::Url& url)
+SocketAddress getEndpoint(const nx::Url& url)
 {
     return getEndpoint(url, getDefaultPortForScheme(url.scheme().toStdString()));
 }

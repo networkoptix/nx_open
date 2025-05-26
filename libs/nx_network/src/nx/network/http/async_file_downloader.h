@@ -58,7 +58,7 @@ public:
      * @param name file to save the received data.
      * @return .
      */
-    void start(const nx::utils::Url& url, std::shared_ptr<QFile> file);
+    void start(const nx::Url& url, std::shared_ptr<QFile> file);
 
     std::string contentType() const;
     std::optional<size_t> contentLength() const;

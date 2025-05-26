@@ -176,7 +176,7 @@ void OauthLoginDialogPrivate::twoFaVerified(const QString& code)
 
 void OauthLoginDialogPrivate::openUrlInBrowser(const QString &path)
 {
-    nx::utils::Url externalUrl(path);
+    nx::Url externalUrl(path);
     if (!externalUrl.isValid() || externalUrl.scheme().isEmpty())
     {
         const QUrl currentUrl = m_webViewWidget->controller()->url();

@@ -8,7 +8,7 @@ namespace ec2 {
 
 nx::vms::api::DiscoveryData toApiDiscoveryData(
     const nx::Uuid &id,
-    const nx::utils::Url &url,
+    const nx::Url &url,
     bool ignore)
 {
     nx::vms::api::DiscoveryData params;

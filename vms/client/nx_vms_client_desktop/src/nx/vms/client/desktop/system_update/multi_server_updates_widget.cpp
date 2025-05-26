@@ -840,7 +840,7 @@ void MultiServerUpdatesWidget::updateAlertBlock()
     ui->messageBarBlock->setMessageBars(messages);
 }
 
-nx::utils::Url MultiServerUpdatesWidget::generateUpcombinerUrl() const
+nx::Url MultiServerUpdatesWidget::generateUpcombinerUrl() const
 {
     const api::PersistentUpdateStorage updateStorage =
         systemContext()->globalSettings()->targetPersistentUpdateStorage();
@@ -890,7 +890,7 @@ nx::utils::Url MultiServerUpdatesWidget::generateUpcombinerUrl() const
     query.addQueryItem("allClients", includeAllClientPackages ? "true" : "false");
     query.addQueryItem("components", getComponentQuery(osInfoList));
 
-    nx::utils::Url url(common::update::updateGeneratorUrl());
+    nx::Url url(common::update::updateGeneratorUrl());
     url.setQuery(query);
 
     return url;

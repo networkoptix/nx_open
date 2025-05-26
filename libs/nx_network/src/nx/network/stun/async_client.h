@@ -44,7 +44,7 @@ public:
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     virtual void connect(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         ConnectHandler completionHandler = nullptr) override;
 
     virtual void setIndicationHandler(

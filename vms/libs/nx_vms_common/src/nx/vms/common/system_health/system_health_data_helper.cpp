@@ -12,7 +12,7 @@ static const auto kDeviceModelAttributeName = "deviceModelAttribute";
 namespace nx::vms::common::system_health {
 
 std::map<std::string, std::string> storeDiscoveredDeviceDataToAttributes(
-    const nx::utils::Url& deviceUrl,
+    const nx::Url& deviceUrl,
     const QString& deviceModel)
 {
     return {
@@ -20,12 +20,12 @@ std::map<std::string, std::string> storeDiscoveredDeviceDataToAttributes(
         {kDeviceModelAttributeName, deviceModel.toStdString()}};
 }
 
-std::optional<nx::utils::Url> getDeviceUrlFromAttributes(
+std::optional<nx::Url> getDeviceUrlFromAttributes(
     const std::map<std::string, std::string>& attributes)
 {
     const auto itr = attributes.find(kDeviceUrlAttributeName);
     return itr != attributes.cend()
-        ? std::make_optional(nx::utils::Url(itr->second))
+        ? std::make_optional(nx::Url(itr->second))
         : std::nullopt;
 }
 

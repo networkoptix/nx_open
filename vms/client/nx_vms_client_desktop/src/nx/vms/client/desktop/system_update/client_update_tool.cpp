@@ -244,7 +244,7 @@ void ClientUpdateTool::verifyUpdateFile()
 }
 
 std::future<UpdateContents> ClientUpdateTool::requestInternetUpdateInfo(
-    const nx::utils::Url& updateUrl,
+    const nx::Url& updateUrl,
     const nx::vms::update::PublicationInfoParams& params)
 {
     return std::async(
@@ -269,7 +269,7 @@ std::future<UpdateContents> ClientUpdateTool::requestUpdateInfoFromServer(
         [this, params]()
         {
             UpdateContents contents = system_update::getUpdateContents(
-                m_serverConnection, nx::utils::Url(), params);
+                m_serverConnection, nx::Url(), params);
             contents.sourceType = UpdateSourceType::mediaservers;
             contents.source = "mediaserver";
 

@@ -117,7 +117,7 @@ protected:
 public:
     struct AddressCheckParams
     {
-        nx::utils::Url url;
+        nx::Url url;
         QAuthenticator auth;
         bool doMultichannelCheck = false;
     };
@@ -141,7 +141,7 @@ public:
      * This helper function checks whether it's needed to update URL to 'https' or not.
      */
 
-    static nx::utils::Url updateUrlToHttpsIfNeed(const nx::utils::Url& foundUrl);
+    static nx::Url updateUrlToHttpsIfNeed(const nx::Url& foundUrl);
 
 protected:
     // checks this host and creates a QnResource in case of success

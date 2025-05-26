@@ -16,7 +16,7 @@ class NX_NETWORK_API ConnectionUpgradeTunnelClient:
 
 public:
     ConnectionUpgradeTunnelClient(
-        const nx::utils::Url& baseTunnelUrl,
+        const nx::Url& baseTunnelUrl,
         const ConnectOptions& options,
         ClientFeedbackFunction clientFeedbackFunction);
 
@@ -28,7 +28,7 @@ public:
     virtual const Response& response() const override;
 
 private:
-    nx::utils::Url m_tunnelUrl;
+    nx::Url m_tunnelUrl;
     http::Response m_openTunnelResponse;
     std::optional<std::chrono::milliseconds> m_timeout;
     bool m_isConnectionTestRequested = false;

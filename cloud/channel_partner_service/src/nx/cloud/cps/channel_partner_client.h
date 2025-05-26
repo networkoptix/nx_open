@@ -67,7 +67,7 @@ class ChannelPartnerClient:
     using base_type = nx::network::http::GenericApiClient<ApiResultCodeDescriptor>;
 
 public:
-    ChannelPartnerClient(const nx::utils::Url& baseApiUrl);
+    ChannelPartnerClient(const nx::Url& baseApiUrl);
     ~ChannelPartnerClient();
 
     void bindSystemToOrganization(

@@ -15,7 +15,7 @@
 namespace nx::cloud::relay::api::detail {
 
 using ClientFactoryFunction = std::unique_ptr<AbstractClient>(
-    const nx::utils::Url& baseUrl,
+    const nx::Url& baseUrl,
     std::optional<int> forcedHttpTunnelType);
 
 /**
@@ -33,7 +33,7 @@ public:
 
 private:
     std::unique_ptr<AbstractClient> defaultFactoryFunction(
-        const nx::utils::Url& baseUrl,
+        const nx::Url& baseUrl,
         std::optional<int> forcedHttpTunnelType);
 };
 

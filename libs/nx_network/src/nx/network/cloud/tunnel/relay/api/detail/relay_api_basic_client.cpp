@@ -15,7 +15,7 @@
 
 namespace nx::cloud::relay::api::detail {
 
-BasicClient::BasicClient(const nx::utils::Url& baseUrl):
+BasicClient::BasicClient(const nx::Url& baseUrl):
     m_baseUrl(baseUrl)
 {
 }
@@ -58,7 +58,7 @@ void BasicClient::startSession(
         });
 }
 
-nx::utils::Url BasicClient::url() const
+nx::Url BasicClient::url() const
 {
     return m_baseUrl;
 }

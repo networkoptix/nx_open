@@ -10,8 +10,8 @@ namespace nx::network::cloud {
 
 using MediatorUrlHandler = nx::utils::MoveOnlyFunc<void(
     nx::network::http::StatusCode::Value /*result code*/,
-    nx::utils::Url /*tcp url*/,
-    nx::utils::Url /*udp url*/)>;
+    nx::Url /*tcp url*/,
+    nx::Url /*udp url*/)>;
 
 class NX_NETWORK_API ConnectionMediatorUrlFetcher:
     public BasicCloudModuleUrlFetcher<MediatorUrlHandler>
@@ -43,8 +43,8 @@ protected:
 private:
     struct MediatorHostDescriptor
     {
-        nx::utils::Url tcpUrl;
-        nx::utils::Url udpUrl;
+        nx::Url tcpUrl;
+        nx::Url udpUrl;
     };
 
     std::optional<MediatorHostDescriptor> m_mediatorHostDescriptor;

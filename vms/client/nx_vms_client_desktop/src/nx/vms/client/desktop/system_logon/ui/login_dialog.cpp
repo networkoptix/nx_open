@@ -117,7 +117,7 @@ LoginDialog::LoginDialog(QWidget *parent):
     connect(ui->linkLineEdit, &InputField::textChanged, this, &LoginDialog::updateAcceptibility);
 
 
-    const auto url = nx::utils::Url(appContext()->localSettings()->lastLocalConnectionUrl());
+    const auto url = nx::Url(appContext()->localSettings()->lastLocalConnectionUrl());
     if (url.host().isEmpty()) //< No last used connection.
     {
         ui->hostnameLineEdit->setText(kLocalHost);
@@ -152,7 +152,7 @@ ConnectionInfo LoginDialog::connectionInfo() const
         const auto host = ui->hostnameLineEdit->text().trimmed().toStdString();
         uint16_t port = ui->portSpinBox->value();
 
-        if (!nx::utils::Url::isValidHost(host) || port == 0)
+        if (!nx::Url::isValidHost(host) || port == 0)
             return {};
 
         nx::network::SocketAddress address(host, port);

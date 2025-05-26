@@ -29,7 +29,7 @@ struct NX_VMS_UPDATE_API Package
     qint64 size = 0;
     QByteArray signature;
 
-    nx::utils::Url url;
+    nx::Url url;
 
     bool operator==(const Package& other) const = default;
 
@@ -71,7 +71,7 @@ struct NX_VMS_UPDATE_API PublicationInfo
     QString eula;
     QList<Package> packages;
 
-    nx::utils::Url url;
+    nx::Url url;
 
     using FindPackageResult = std::variant<Package, FindPackageError>;
 

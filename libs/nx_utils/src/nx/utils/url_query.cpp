@@ -2,7 +2,7 @@
 
 #include "url_query.h"
 
-namespace nx::utils {
+namespace nx {
 
 namespace detail {
 
@@ -53,4 +53,4 @@ UrlQuery::operator const QUrlQuery&() const
     return m_query;
 }
 
-} // namespace nx::utils
+} // namespace nx

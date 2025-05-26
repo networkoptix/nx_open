@@ -38,12 +38,12 @@ nx::vms::client::mobile::ApplicationContext* appContext()
     return nx::vms::client::mobile::appContext();
 }
 
-nx::utils::Url connectionUrl(const SystemUri& uri)
+nx::Url connectionUrl(const SystemUri& uri)
 {
     if (uri.systemAddress.isEmpty())
-        return nx::utils::Url();
+        return nx::Url();
 
-    nx::utils::Url result;
+    nx::Url result;
     if (uri.protocol == SystemUri::Protocol::Http)
         result.setScheme(nx::network::http::kUrlSchemeName);
     else
@@ -423,7 +423,7 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& nativeUrl)
 {
     NX_DEBUG(this, "handleUrl(): start: url is <%1>", nativeUrl.toString(QUrl::RemovePassword));
 
-    const auto url = nx::utils::Url::fromQUrl(nativeUrl);
+    const auto url = nx::Url::fromQUrl(nativeUrl);
     SystemUri uri(url);
 
     if (!uri.isValid(/*requireAuthForCloudSystemConnection*/ false))

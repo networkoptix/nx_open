@@ -31,7 +31,7 @@ public:
 
     virtual AuditHandle notifyProxySessionStarted(
         const nx::network::rest::audit::Record& auditRecord,
-        const nx::utils::Url& dstUrl,
+        const nx::Url& dstUrl,
         bool wasConnected) = 0;
 
     virtual void openLoginSessionIfNeeded(

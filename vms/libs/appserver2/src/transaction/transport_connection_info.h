@@ -17,7 +17,7 @@ struct QnTransportConnectionInfo
     nx::Uuid remotePeerId;
     nx::Uuid remotePeerDbId;
     /**%apidoc:string */
-    nx::utils::Url url;
+    nx::Url url;
     QString state;
     QString previousState;
     bool isIncoming = false;

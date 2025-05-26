@@ -15,7 +15,7 @@ namespace nx::vms::client::core {
 
 namespace {
 
-bool isCloudUrl(const nx::utils::Url& url)
+bool isCloudUrl(const nx::Url& url)
 {
     return nx::network::SocketGlobals::addressResolver().isCloudHostname(url.host());
 }
@@ -59,7 +59,7 @@ std::optional<LogonData> cloudLogonData(const SystemDescriptionPtr& system, bool
     const bool systemHasInitialServerOnly = systemHasInitialServer && servers.size() == 1;
 
     LogonData result;
-    nx::utils::Url url;
+    nx::Url url;
 
     if (systemHasInitialServerOnly)
     {
@@ -175,7 +175,7 @@ std::optional<LogonData> cloudLogonData(const SystemDescriptionPtr& system, bool
 }
 
 LogonData localLogonData(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const nx::network::http::Credentials& credentials)
 {
     LogonData result;

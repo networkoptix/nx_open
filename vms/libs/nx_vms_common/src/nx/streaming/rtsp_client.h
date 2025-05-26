@@ -187,7 +187,7 @@ public:
     int tcpRecvBufferSize() const { return m_tcpRecvBufferSize; }
 
     // returns \a CameraDiagnostics::ErrorCode::noError if stream was opened, error code - otherwise
-    CameraDiagnostics::Result open(const nx::utils::Url& url, qint64 startTime = AV_NOPTS_VALUE);
+    CameraDiagnostics::Result open(const nx::Url& url, qint64 startTime = AV_NOPTS_VALUE);
 
     /*
     * Start playing RTSP session.
@@ -260,7 +260,7 @@ public:
 
     const nx::network::http::Credentials& getCredentials() const;
 
-    nx::utils::Url getUrl() const;
+    nx::Url getUrl() const;
 
     void setProxyAddr(const nx::String& addr, int port);
     void resetProxyAddr();
@@ -381,7 +381,7 @@ private:
 
     std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSock;
     std::unique_ptr<nx::network::AbstractStreamSocket> m_proxySocket;
-    nx::utils::Url m_url;
+    nx::Url m_url;
     QString m_SessionId;
     unsigned short m_ServerPort;
     std::vector<SDPTrackInfo> m_sdpTracks;

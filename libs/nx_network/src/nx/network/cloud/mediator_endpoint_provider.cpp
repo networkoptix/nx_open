@@ -21,7 +21,7 @@ void MediatorEndpointProvider::bindToAioThread(
 }
 
 void MediatorEndpointProvider::mockupCloudModulesXmlUrl(
-    const nx::utils::Url& cloudModulesXmlUrl)
+    const nx::Url& cloudModulesXmlUrl)
 {
     m_cloudModulesXmlUrl = cloudModulesXmlUrl;
 }
@@ -49,8 +49,8 @@ void MediatorEndpointProvider::fetchMediatorEndpoints(
     m_mediatorUrlFetcher->get(
         [this](
             nx::network::http::StatusCode::Value resultCode,
-            nx::utils::Url tcpUrl,
-            nx::utils::Url udpUrl)
+            nx::Url tcpUrl,
+            nx::Url udpUrl)
         {
             m_mediatorUrlFetcher.reset();
 

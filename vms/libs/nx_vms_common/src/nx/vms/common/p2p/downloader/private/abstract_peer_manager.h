@@ -110,7 +110,7 @@ public:
     virtual int distanceTo(const nx::Uuid& peerId) const = 0;
 
     virtual RequestContextPtr<FileInformation> requestFileInfo(
-        const nx::Uuid& peer, const QString& fileName, const nx::utils::Url& url) = 0;
+        const nx::Uuid& peer, const QString& fileName, const nx::Url& url) = 0;
 
     virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
         const nx::Uuid& peer, const QString& fileName) = 0;
@@ -118,7 +118,7 @@ public:
     virtual RequestContextPtr<nx::Buffer> downloadChunk(
         const nx::Uuid& peerId,
         const QString& fileName,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         int chunkIndex,
         int chunkSize,
         qint64 fileSize) = 0;

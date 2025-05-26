@@ -158,7 +158,7 @@ QString Strings::urlForCamera(
         if (newServer)
             server = newServer;
 
-        nx::utils::Url serverUrl = server->getRemoteUrl();
+        nx::Url serverUrl = server->getRemoteUrl();
         switch (urlType)
         {
             case Url::localIp:
@@ -197,7 +197,7 @@ QString Strings::urlForCamera(
         .setFragment("/view/" + camera->getId().toSimpleString())
         .setQuery(QString("time=%1").arg(timestampMs.count()));
 
-    const nx::utils::Url url = builder.toUrl();
+    const nx::Url url = builder.toUrl();
     NX_ASSERT(url.isValid());
     return url.toWebClientStandardViolatingUrl();
 }

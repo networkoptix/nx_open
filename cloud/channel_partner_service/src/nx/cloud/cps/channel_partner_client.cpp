@@ -54,7 +54,7 @@ api::Result ApiResultCodeDescriptor::getResultCodeFromResponse(
 
 // -----ChannelPartnerClient ------
 
-ChannelPartnerClient::ChannelPartnerClient(const nx::utils::Url& baseApiUrl)
+ChannelPartnerClient::ChannelPartnerClient(const nx::Url& baseApiUrl)
     :
     base_type(baseApiUrl, nx::network::ssl::kDefaultCertificateCheck)
 {

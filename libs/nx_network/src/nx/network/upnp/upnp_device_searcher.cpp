@@ -271,7 +271,7 @@ void DeviceSearcher::onSomeBytesRead(
     uuidStr = uuidStr.substr(kUuidPrefix.size());
 
     using namespace nx::network::http;
-    nx::utils::Url descriptionUrl(locationHeader->second);
+    nx::Url descriptionUrl(locationHeader->second);
     const bool useHttps = descriptionUrl.port() == DEFAULT_HTTPS_PORT
         || (m_isHttpsForced && m_isHttpsForced());
     if (useHttps)
@@ -423,7 +423,7 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf(
 
 void DeviceSearcher::startFetchDeviceXml(
     const QByteArray& uuidStr,
-    const nx::utils::Url& descriptionUrl,
+    const nx::Url& descriptionUrl,
     const HostAddress& remoteHost)
 {
     DiscoveredDeviceInfo info;

@@ -107,7 +107,7 @@ class NX_OAUTH2_CLIENT_API Oauth2Client:
 
 public:
     Oauth2Client(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::optional<nx::network::http::Credentials>& credentials);
 
     void issueToken(
@@ -179,7 +179,7 @@ public:
 };
 
 using Oauth2ClientFactoryFunc = std::unique_ptr<AbstractOauth2Client>(
-    const nx::utils::Url&, const std::optional<nx::network::http::Credentials>&);
+    const nx::Url&, const std::optional<nx::network::http::Credentials>&);
 
 class NX_OAUTH2_CLIENT_API Oauth2ClientFactory:
     public nx::utils::BasicFactory<Oauth2ClientFactoryFunc>

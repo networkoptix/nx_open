@@ -290,7 +290,7 @@ public:
     nx::Uuid lastMergeSlaveId() const;
     void setLastMergeSlaveId(const nx::Uuid& value);
 
-    nx::utils::Url clientStatisticsSettingsUrl() const;
+    nx::Url clientStatisticsSettingsUrl() const;
 
     std::chrono::seconds deviceStorageInfoUpdateInterval() const;
     void setDeviceStorageInfoUpdateInterval(std::chrono::seconds value);
@@ -421,8 +421,8 @@ public:
     int maxRemoteArchiveSynchronizationThreads() const;
     void setMaxRemoteArchiveSynchronizationThreads(int newValue);
 
-    nx::utils::Url customReleaseListUrl() const;
-    void setCustomReleaseListUrl(const nx::utils::Url& url);
+    nx::Url customReleaseListUrl() const;
+    void setCustomReleaseListUrl(const nx::Url& url);
 
     QByteArray targetUpdateInformation() const;
     void setTargetUpdateInformation(const QByteArray& updateInformation);
@@ -491,7 +491,7 @@ public:
     QString licenseServerUrl() const;
     void setLicenseServerUrl(const QString& value);
 
-    nx::utils::Url resourceFileUri() const;
+    nx::Url resourceFileUri() const;
 
     /**
      * Advanced value which used as a default user locale on user creating or LDAP import - if it

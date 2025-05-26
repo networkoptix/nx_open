@@ -26,32 +26,32 @@ std::string CloudModulesXmlServer::cloudModulesXmlPath() const
     return m_cloudModulesXmlPath;
 }
 
-void CloudModulesXmlServer::setCdbUrl(const nx::utils::Url& url)
+void CloudModulesXmlServer::setCdbUrl(const nx::Url& url)
 {
     setModule(kCloudDbModuleName, url);
 }
 
-void CloudModulesXmlServer::setHpmTcpUrl(const nx::utils::Url& url)
+void CloudModulesXmlServer::setHpmTcpUrl(const nx::Url& url)
 {
     setModule(kConnectionMediatorTcpUrlName, url);
 }
 
-void CloudModulesXmlServer::setHpmUdpUrl(const nx::utils::Url& url)
+void CloudModulesXmlServer::setHpmUdpUrl(const nx::Url& url)
 {
     setModule(kConnectionMediatorUdpUrlName, url);
 }
 
-void CloudModulesXmlServer::setNotificationModuleUrl(const nx::utils::Url& url)
+void CloudModulesXmlServer::setNotificationModuleUrl(const nx::Url& url)
 {
     setModule(kNotificationModuleName, url);
 }
 
-void CloudModulesXmlServer::setSpeedTestUrl(const nx::utils::Url& url)
+void CloudModulesXmlServer::setSpeedTestUrl(const nx::Url& url)
 {
     setModule(kSpeedTestModuleName, url);
 }
 
-void CloudModulesXmlServer::setModule(const std::string& resName, const nx::utils::Url& resValue)
+void CloudModulesXmlServer::setModule(const std::string& resName, const nx::Url& resValue)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_modules[resName] = resValue;

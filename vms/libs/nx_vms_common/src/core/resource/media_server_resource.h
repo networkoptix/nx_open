@@ -51,11 +51,11 @@ public:
     QList<nx::network::SocketAddress> getNetAddrList() const;
 
     // TODO: #dklychkov Use QSet instead of QList.
-    void setAdditionalUrls(const QList<nx::utils::Url>& urls);
-    QList<nx::utils::Url> getAdditionalUrls() const;
+    void setAdditionalUrls(const QList<nx::Url>& urls);
+    QList<nx::Url> getAdditionalUrls() const;
 
-    void setIgnoredUrls(const QList<nx::utils::Url>& urls);
-    QList<nx::utils::Url> getIgnoredUrls() const;
+    void setIgnoredUrls(const QList<nx::Url>& urls);
+    QList<nx::Url> getIgnoredUrls() const;
 
     std::optional<nx::network::SocketAddress> getCloudAddress() const;
 
@@ -64,10 +64,10 @@ public:
     virtual void setUrl(const QString& url) override;
     // TODO: #dklychkov Remove this, use getPrimaryAddress() instead.
     quint16 getPort() const;
-    virtual nx::utils::Url getApiUrl() const;
+    virtual nx::Url getApiUrl() const;
 
     // This getter should be used on when we need remote address of the server even on the current server.
-    virtual nx::utils::Url getRemoteUrl() const;
+    virtual nx::Url getRemoteUrl() const;
 
     nx::network::SocketAddress getPrimaryAddress() const;
     void setPrimaryAddress(const nx::network::SocketAddress& getPrimaryAddress);
@@ -218,8 +218,8 @@ protected:
 private:
     nx::network::SocketAddress m_primaryAddress;
     QList<nx::network::SocketAddress> m_netAddrList;
-    QList<nx::utils::Url> m_additionalUrls;
-    QList<nx::utils::Url> m_ignoredUrls;
+    QList<nx::Url> m_additionalUrls;
+    QList<nx::Url> m_ignoredUrls;
     nx::vms::api::ServerFlags m_serverFlags;
     nx::utils::SoftwareVersion m_version;
     nx::utils::OsInfo m_osInfo;

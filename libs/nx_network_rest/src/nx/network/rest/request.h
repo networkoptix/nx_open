@@ -97,7 +97,7 @@ public:
     void resetParamsCache() { m_paramsCache.reset(); }
     const nx::network::http::Request* httpRequest() const { return m_httpRequest; };
     const nx::network::http::HttpHeaders& httpHeaders() const { return m_httpHeaders; }
-    const nx::utils::Url& url() const { return m_url; }
+    const nx::Url& url() const { return m_url; }
 
     QString path() const
     {
@@ -254,7 +254,7 @@ private:
     nx::network::http::Method m_method;
     std::optional<Content> m_content;
     nx::network::http::HttpHeaders m_httpHeaders;
-    nx::utils::Url m_url;
+    nx::Url m_url;
     QString m_decodedPath;
     mutable std::optional<Params> m_paramsCache;
     mutable Qn::SerializationFormat m_responseFormat = Qn::SerializationFormat::unsupported;

@@ -52,7 +52,7 @@ public:
      * @param handler Called when 1st connection attempt has passed regardless of its success.
      * NOTE: Shall be called only once (to provide address). Reconnect will happen automatically.
      */
-    virtual void connect(const nx::utils::Url& url, ConnectHandler handler = nullptr) = 0;
+    virtual void connect(const nx::Url& url, ConnectHandler handler = nullptr) = 0;
 
     /**
      * Subscribes for certain indications. If there is already a handler registered for the given

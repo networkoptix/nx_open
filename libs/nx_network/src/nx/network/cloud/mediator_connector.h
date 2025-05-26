@@ -78,7 +78,7 @@ public:
     /**
      * NOTE: Mediator url resolution will still happen by referring to specified address.
      */
-    void mockupCloudModulesXmlUrl(const nx::utils::Url &cloudModulesXmlUrl);
+    void mockupCloudModulesXmlUrl(const nx::Url &cloudModulesXmlUrl);
 
     /**
      * Injects mediator url.

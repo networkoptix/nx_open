@@ -60,7 +60,7 @@ public:
         OpenRelayConnectionHandler handler,
         const nx::network::http::tunneling::ConnectOptions& options = {}) = 0;
 
-    virtual nx::utils::Url url() const = 0;
+    virtual nx::Url url() const = 0;
 
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const = 0;
     virtual nx::network::http::StatusCode::Value prevRequestHttpStatusCode() const = 0;
@@ -84,7 +84,7 @@ public:
      * @param forcedHttpTunnelType passed to the nx::network::http::tunneling::Client.
      */
     Client(
-        const nx::utils::Url& baseUrl,
+        const nx::Url& baseUrl,
         std::optional<int> forcedHttpTunnelType = std::nullopt);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
@@ -103,7 +103,7 @@ public:
         OpenRelayConnectionHandler handler,
         const nx::network::http::tunneling::ConnectOptions& options = {}) override;
 
-    virtual nx::utils::Url url() const override;
+    virtual nx::Url url() const override;
 
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const override;
     virtual nx::network::http::StatusCode::Value prevRequestHttpStatusCode() const override;

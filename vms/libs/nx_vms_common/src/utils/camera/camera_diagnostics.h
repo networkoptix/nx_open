@@ -117,7 +117,7 @@ public:
     QString toString(QnResourcePool* resourcePool, const QnVirtualCameraResourcePtr& device) const;
     nx::media::StreamEvent toMediaStreamEvent() const;
 protected:
-    QString urlToStr(const nx::utils::Url& value) const;
+    QString urlToStr(const nx::Url& value) const;
 };
 
 class NoErrorResult: public Result
@@ -167,7 +167,7 @@ class CannotOpenCameraMediaPortResult: public Result
 {
 public:
     CannotOpenCameraMediaPortResult(
-        const nx::utils::Url& mediaURL,
+        const nx::Url& mediaURL,
         const int mediaPort)
         :
         Result(ErrorCode::cannotOpenCameraMediaPort, urlToStr(mediaURL), QString::number(mediaPort))
@@ -218,7 +218,7 @@ class CameraResponseParseErrorResult: public Result
 {
 public:
     CameraResponseParseErrorResult(
-        const nx::utils::Url& requestedURL,
+        const nx::Url& requestedURL,
         const QString &requestName)
         :
         Result(ErrorCode::responseParseError, urlToStr(requestedURL), requestName)
@@ -230,7 +230,7 @@ class NoMediaTrackResult: public Result
 {
 public:
     NoMediaTrackResult(
-        const nx::utils::Url& requestedURL)
+        const nx::Url& requestedURL)
         :
         Result(ErrorCode::noMediaTrack, urlToStr(requestedURL))
     {
@@ -241,7 +241,7 @@ class NotAuthorisedResult: public Result
 {
 public:
     NotAuthorisedResult(
-        const nx::utils::Url& requestedURL)
+        const nx::Url& requestedURL)
         :
         Result(ErrorCode::notAuthorised, urlToStr(requestedURL))
     {
@@ -252,7 +252,7 @@ class UnsupportedProtocolResult: public Result
 {
 public:
     UnsupportedProtocolResult(
-        const nx::utils::Url& mediaUrl,
+        const nx::Url& mediaUrl,
         const QString& protocolName)
         :
         Result(ErrorCode::unsupportedProtocol, urlToStr(mediaUrl), protocolName)

@@ -228,14 +228,14 @@ void MessageBus::stop()
 void MessageBus::addOutgoingConnectionToPeer(
     const nx::Uuid& peer,
     nx::vms::api::PeerType peerType,
-    const nx::utils::Url &_url,
+    const nx::Url &_url,
     std::optional<nx::network::http::Credentials> credentials,
     nx::network::ssl::AdapterFunc adapterFunc)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     deleteRemoveUrlById(peer);
 
-    nx::utils::Url url(_url);
+    nx::Url url(_url);
     const auto patch = globalSettings()->isWebSocketEnabled()
         ? ConnectionBase::kWebsocketUrlPath : ConnectionBase::kHttpHandshakeUrlPath;
     if (peerType == nx::vms::api::PeerType::cloudServer)

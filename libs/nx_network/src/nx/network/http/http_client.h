@@ -36,17 +36,17 @@ public:
     /**
      * @return true if response has been received.
      */
-    bool doGet(const nx::utils::Url& url);
+    bool doGet(const nx::Url& url);
 
     /**
      * @return true if response has been received.
      */
     bool doUpgrade(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::string& protocolToUpgradeTo);
 
     bool doUpgrade(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         Method method,
         const std::string& protocolToUpgradeTo);
 
@@ -54,25 +54,25 @@ public:
      * @return true if response has been received.
      */
     bool doPost(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         std::unique_ptr<AbstractMsgBodySource> body);
 
     bool doPost(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::string& contentType,
         nx::Buffer messageBody);
 
-    bool doPost(const nx::utils::Url& url);
+    bool doPost(const nx::Url& url);
 
     /**
      * @return true if response has been received.
      */
     bool doPut(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         std::unique_ptr<AbstractMsgBodySource> body);
 
     bool doPut(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::string& contentType = {},
         nx::Buffer messageBody = {});
 
@@ -80,21 +80,21 @@ public:
      * @return true if response has been received.
      */
     bool doPatch(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::string& contentType = {},
         nx::Buffer messageBody = {});
 
     /**
      * @return true if response has been received.
      */
-    bool doDelete(const nx::utils::Url& url);
+    bool doDelete(const nx::Url& url);
 
-    bool doConnect(const nx::utils::Url& proxyUrl, const std::string& targetHost);
+    bool doConnect(const nx::Url& proxyUrl, const std::string& targetHost);
 
     /**
      * @return true if response has been received.
      */
-    bool doRequest(const Method& method, const nx::utils::Url& url);
+    bool doRequest(const Method& method, const nx::Url& url);
 
     const Request& request() const;
     const Response* response() const;
@@ -117,8 +117,8 @@ public:
 
     void addAdditionalHeader(const std::string& key, const std::string& value);
     void removeAdditionalHeader(const std::string& key);
-    const nx::utils::Url& url() const;
-    const nx::utils::Url& contentLocationUrl() const;
+    const nx::Url& url() const;
+    const nx::Url& contentLocationUrl() const;
     std::string contentType() const;
 
     /** See AsyncHttpClient::setSubsequentReconnectTries */
@@ -166,7 +166,7 @@ public:
      * @param customResponseReadTimeout If not specified, then default timeout is used.
      */
     static bool fetchResource(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         nx::Buffer* msgBody,
         std::string* contentType,
         std::optional<std::chrono::milliseconds> customResponseReadTimeout,
@@ -176,7 +176,7 @@ public:
      * Fetch entire resource data to message.
      */
     static bool fetchResource(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         nx::network::http::StatusCode::Value* const statusCode,
         nx::Buffer* const message,
         int messageSizeLimit = 1024 * 64,

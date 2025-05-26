@@ -26,7 +26,7 @@ public:
         const QString& password,
         const QByteArray& key = QByteArray());
 
-    explicit EncodedCredentials(const nx::utils::Url& url, const QByteArray& key = QByteArray());
+    explicit EncodedCredentials(const nx::Url& url, const QByteArray& key = QByteArray());
 
     /** Extra cryptography key. */
     QByteArray key() const;

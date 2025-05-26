@@ -362,7 +362,7 @@ private:
         m_expectedLoggers.emplace_back(logger);
     }
 
-    nx::utils::Url createRequestUrl(
+    nx::Url createRequestUrl(
         const std::string& requestName,
         const std::string& query = std::string())
     {
@@ -375,7 +375,7 @@ private:
         return builder;
     }
 
-    nx::utils::Url createDeleteRequestUrl(const std::string& requestName, int loggerId)
+    nx::Url createDeleteRequestUrl(const std::string& requestName, int loggerId)
     {
         return url::Builder().setScheme(http::kUrlSchemeName)
             .setEndpoint(m_httpServer->serverAddress())

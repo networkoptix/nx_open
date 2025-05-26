@@ -6,17 +6,17 @@
 
 namespace nx::network::url {
 
-Builder::Builder(const nx::utils::Url& url):
+Builder::Builder(const nx::Url& url):
     m_url(url)
 {
 }
 
-nx::utils::Url Builder::toUrl() const
+nx::Url Builder::toUrl() const
 {
     return m_url;
 }
 
-Builder::operator nx::utils::Url() const
+Builder::operator nx::Url() const
 {
     return toUrl();
 }
@@ -136,7 +136,7 @@ Builder& Builder::setQuery(const QUrlQuery& query)
     return *this;
 }
 
-Builder& Builder::setQuery(const nx::utils::UrlQuery& query)
+Builder& Builder::setQuery(const nx::UrlQuery& query)
 {
     m_url.setQuery(query);
     return *this;
@@ -145,14 +145,14 @@ Builder& Builder::setQuery(const nx::utils::UrlQuery& query)
 Builder& Builder::addQueryItem(const QString& name, const QString& value)
 {
     // TODO: Optimize by QUrlQuery field in Builder.
-    nx::utils::UrlQuery query(m_url.query());
+    nx::UrlQuery query(m_url.query());
     query.addQueryItem(name, value);
     return setQuery(query);
 }
 
 Builder& Builder::removeQueryItem(const QString& name)
 {
-    nx::utils::UrlQuery query(m_url.query());
+    nx::UrlQuery query(m_url.query());
     if (query.hasQueryItem(name))
     {
         query.removeQueryItem(name);

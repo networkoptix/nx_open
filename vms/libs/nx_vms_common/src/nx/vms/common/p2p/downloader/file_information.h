@@ -62,7 +62,7 @@ public:
     QByteArray md5;
 
     /**%apidoc URL via which the file could be downloaded from the Internet. */
-    nx::utils::Url url;
+    nx::Url url;
 
     /**%apidoc Size of a chunk, in bytes. */
     qint64 chunkSize = 0;

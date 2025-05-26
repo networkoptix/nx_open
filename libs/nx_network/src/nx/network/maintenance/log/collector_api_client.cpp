@@ -8,7 +8,7 @@
 
 namespace nx::network::maintenance::log {
 
-CollectorApiClient::CollectorApiClient(const nx::utils::Url& baseApiUrl):
+CollectorApiClient::CollectorApiClient(const nx::Url& baseApiUrl):
     m_baseApiUrl(baseApiUrl)
 {
     bindToAioThread(getAioThread());

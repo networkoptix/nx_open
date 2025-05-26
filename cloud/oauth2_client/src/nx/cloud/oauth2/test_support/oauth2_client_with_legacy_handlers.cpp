@@ -10,7 +10,7 @@ namespace nx::cloud::oauth2::client::test {
 using namespace db::api;
 
 Oauth2ClientWithLegacyHandlers::Oauth2ClientWithLegacyHandlers(
-    const nx::utils::Url& url, const std::optional<nx::network::http::Credentials>& credentials):
+    const nx::Url& url, const std::optional<nx::network::http::Credentials>& credentials):
     Oauth2Client(url, credentials)
 {
 }

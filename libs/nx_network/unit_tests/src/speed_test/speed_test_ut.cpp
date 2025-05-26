@@ -75,19 +75,19 @@ protected:
         m_testHttpServer.reset();
     }
 
-    nx::utils::Url testHttpServerUrl() const
+    nx::Url testHttpServerUrl() const
     {
         return url::Builder()
             .setScheme(network::http::kUrlSchemeName)
             .setEndpoint(m_testHttpServer->serverAddress());
     }
 
-	nx::utils::Url validSpeedTestUrl() const
+	nx::Url validSpeedTestUrl() const
 	{
         return testHttpServerUrl();
 	}
 
-	nx::utils::Url invalidSpeedTestUrl() const
+	nx::Url invalidSpeedTestUrl() const
 	{
 		return "http://127.0.0.1:1";
 	}
@@ -131,7 +131,7 @@ protected:
 class UplinkSpeedTester: public TestFixture
 {
 protected:
-    void whenStartSpeedTest(const nx::utils::Url& url)
+    void whenStartSpeedTest(const nx::Url& url)
     {
         m_speedTestSettings.url = url;
         m_speedTester = std::make_unique<speed_test::UplinkSpeedTester>(m_speedTestSettings);
@@ -350,13 +350,13 @@ private:
             });
     }
 
-    nx::utils::Url cloudModulesXmlUrl() const
+    nx::Url cloudModulesXmlUrl() const
     {
         return url::Builder(testHttpServerUrl()).setPath(
             m_cloudModulesServer.cloudModulesXmlPath());
     }
 
-    nx::utils::Url mediatorHttpUrl() const
+    nx::Url mediatorHttpUrl() const
     {
         return network::url::Builder()
             .setScheme(network::http::kUrlSchemeName)

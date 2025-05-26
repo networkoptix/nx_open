@@ -53,7 +53,7 @@ struct SingleCameraProperties
     QString vendor;
     QString macAddress;
     QString ipAddress;
-    nx::utils::Url baseCameraUrl;
+    nx::Url baseCameraUrl;
     QString settingsUrlPath;
     QString webPageLabelText;
     QString settingsUrl;

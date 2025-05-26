@@ -294,7 +294,7 @@ SessionManager::~SessionManager()
 }
 
 void SessionManager::startSessionWithCredentials(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const nx::network::http::Credentials& credentials,
     session::ConnectionCallback&& callback)
 {
@@ -351,7 +351,7 @@ void SessionManager::startCloudSession(
 }
 
 bool SessionManager::startSessionWithStoredCredentials(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const nx::Uuid& localSystemId,
     const QString& user,
     QJSValue callback)
@@ -373,7 +373,7 @@ bool SessionManager::startSessionWithStoredCredentials(
 }
 
 void SessionManager::startSession(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const QString& user,
     const QString& password,
     const QString& supposedSystemName,
@@ -389,7 +389,7 @@ void SessionManager::startSession(
 }
 
 void SessionManager::startSessionByUrl(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     session::ConnectionCallback&& callback)
 {
     NX_DEBUG(this, "startSessionByUrl(): called");

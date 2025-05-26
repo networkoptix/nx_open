@@ -11,7 +11,7 @@ namespace ec2 {
 
 // TODO: #vkutin #muskov Think where to put these globals.
 nx::vms::api::DiscoveryData toApiDiscoveryData(
-    const nx::Uuid &id, const nx::utils::Url &url, bool ignore);
+    const nx::Uuid &id, const nx::Url &url, bool ignore);
 
 template<class QueryProcessorType>
 class QnDiscoveryManager: public AbstractDiscoveryManager
@@ -21,20 +21,20 @@ public:
 
     virtual int discoverPeer(
         const nx::Uuid& id,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int addDiscoveryInformation(
         const nx::Uuid& id,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         bool ignore,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int removeDiscoveryInformation(
         const nx::Uuid& id,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         bool ignore,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
@@ -63,7 +63,7 @@ QnDiscoveryManager<QueryProcessorType>::QnDiscoveryManager(
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::discoverPeer(
     const nx::Uuid& id,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
@@ -85,7 +85,7 @@ int QnDiscoveryManager<QueryProcessorType>::discoverPeer(
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::addDiscoveryInformation(
     const nx::Uuid& id,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     bool ignore,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
@@ -105,7 +105,7 @@ int QnDiscoveryManager<QueryProcessorType>::addDiscoveryInformation(
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::removeDiscoveryInformation(
     const nx::Uuid& id,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     bool ignore,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)

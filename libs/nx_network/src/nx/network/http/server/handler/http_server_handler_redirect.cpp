@@ -10,7 +10,7 @@
 
 namespace nx::network::http::server::handler {
 
-Redirect::Redirect(const nx::utils::Url& actualLocation):
+Redirect::Redirect(const nx::Url& actualLocation):
     m_actualLocation(actualLocation)
 {
 }

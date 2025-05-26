@@ -402,7 +402,7 @@ nx::vms::api::ModuleInformationWithAddresses SystemDescriptionAggregator::getSer
     return {};
 }
 
-nx::utils::Url SystemDescriptionAggregator::getServerHost(const nx::Uuid& serverId) const
+nx::Url SystemDescriptionAggregator::getServerHost(const nx::Uuid& serverId) const
 {
     for (const auto& systemDescription: m_systems)
     {
@@ -420,7 +420,7 @@ nx::utils::Url SystemDescriptionAggregator::getServerHost(const nx::Uuid& server
     return {};
 }
 
-QSet<nx::utils::Url> SystemDescriptionAggregator::getServerRemoteAddresses(
+QSet<nx::Url> SystemDescriptionAggregator::getServerRemoteAddresses(
     const nx::Uuid& serverId) const
 {
     for (const auto& systemDescription: m_systems)

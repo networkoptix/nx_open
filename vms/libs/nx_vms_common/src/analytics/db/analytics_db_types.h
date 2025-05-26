@@ -86,7 +86,7 @@ NX_REFLECTION_ENUM_CLASS(ImageType,
 struct ImageEx: Image
 {
     ImageType imageType = ImageType::notDefined;
-    nx::utils::Url url;
+    nx::Url url;
 };
 
 struct BaseTrackImage
@@ -356,7 +356,7 @@ NX_VMS_COMMON_API bool loadFromUrlQuery(
     const QnResourcePool* resourcePool,
     const nx::analytics::taxonomy::AbstractStateWatcher* taxonomyStateWatcher);
 
-NX_VMS_COMMON_API void serializeToUrlQuery(const Filter& filter, nx::utils::UrlQuery& urlQuery);
+NX_VMS_COMMON_API void serializeToUrlQuery(const Filter& filter, nx::UrlQuery& urlQuery);
 
 NX_VMS_COMMON_API ::std::ostream& operator<<(::std::ostream& os, const Filter& filter);
 NX_VMS_COMMON_API QString toString(const Filter& filter);

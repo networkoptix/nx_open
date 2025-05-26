@@ -73,7 +73,7 @@ public:
     AsyncClient& operator=(AsyncClient&&) = delete;
 
     //! Creates request by @param message and calls @fn doPost
-    void doUpnp(const nx::utils::Url& url, const Message& message,
+    void doUpnp(const nx::Url& url, const Message& message,
         std::function<void(const Message&)> callback);
 
     //! ID string of this client
@@ -86,28 +86,28 @@ public:
     static constexpr auto kWanIp = "WANIPConnection";
 
     //! Finds out external IP address
-    virtual void externalIp(const nx::utils::Url& url,
+    virtual void externalIp(const nx::Url& url,
             std::function<void(const HostAddress&)> callback);
 
     //! Maps @param externalPort to @param internalPort on @param internalIp
-    virtual void addMapping(const nx::utils::Url& url, const HostAddress& internalIp,
+    virtual void addMapping(const nx::Url& url, const HostAddress& internalIp,
             quint16 internalPort, quint16 externalPort,
             Protocol protocol, const QString& description, quint64 duration,
             std::function<void(bool)> callback);
 
     //! Removes mapping of @param externalPort
-    virtual void deleteMapping(const nx::utils::Url& url, quint16 externalPort, Protocol protocol,
+    virtual void deleteMapping(const nx::Url& url, quint16 externalPort, Protocol protocol,
             std::function<void(bool)> callback);
 
     //! Provides mapping info by @param index
-    virtual void getMapping(const nx::utils::Url& url, quint32 index,
+    virtual void getMapping(const nx::Url& url, quint32 index,
             std::function<void(MappingInfo)> callback);
 
     //! Provides mapping info by @param externalPort and @param protocol
-    virtual void getMapping(const nx::utils::Url& url, quint16 externalPort, Protocol protocol,
+    virtual void getMapping(const nx::Url& url, quint16 externalPort, Protocol protocol,
             std::function<void(MappingInfo)> callback);
 
-    void getAllMappings(const nx::utils::Url& url,
+    void getAllMappings(const nx::Url& url,
         std::function<void(MappingList)> callback);
 
 private:

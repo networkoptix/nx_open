@@ -401,7 +401,7 @@ nx::media::StreamEvent Result::toMediaStreamEvent() const
     }
 }
 
-QString Result::urlToStr(const nx::utils::Url& value) const
+QString Result::urlToStr(const nx::Url& value) const
 {
     return value.toString(QUrl::RemoveUserInfo);
 }

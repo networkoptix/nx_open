@@ -294,7 +294,7 @@ private:
 
     enum class AuthMethod { queryParam, bearerToken };
     void openInBrowser(const QnMediaServerResourcePtr& server,
-        nx::utils::Url targetUrl, std::string auth, AuthMethod authMethod) const;
+        nx::Url targetUrl, std::string auth, AuthMethod authMethod) const;
 
     void muteUnmuteWidgets(const QnResourceWidgetList& widgets, bool muted) const;
 
@@ -328,10 +328,10 @@ private:
     struct ServerRequest
     {
         QnMediaServerResourcePtr server;
-        nx::utils::Url url;
+        nx::Url url;
     };
 
-    std::multimap<nx::utils::Url, ServerRequest> m_serverRequests;
+    std::multimap<nx::Url, ServerRequest> m_serverRequests;
     QPointer<nx::vms::client::desktop::SceneBanner> m_layoutIsFullMessage;
     QPointer<nx::vms::client::desktop::SceneBanner> m_accessDeniedMessage;
 

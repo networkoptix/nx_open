@@ -24,33 +24,33 @@ class NX_NETWORK_API Client: public AsyncClient
 public:
     using AsyncClient::AsyncClient;
 
-    cf::future<Response> get(const nx::utils::Url& url);
+    cf::future<Response> get(const nx::Url& url);
 
-    cf::future<Response> head(const nx::utils::Url& url);
+    cf::future<Response> head(const nx::Url& url);
 
     using AsyncClient::post;
-    cf::future<Response> post(const nx::utils::Url& url);
-    cf::future<Response> post(const nx::utils::Url& url,
+    cf::future<Response> post(const nx::Url& url);
+    cf::future<Response> post(const nx::Url& url,
         std::unique_ptr<AbstractMsgBodySource>&& requestBody);
-    cf::future<Response> post(const nx::utils::Url& url,
+    cf::future<Response> post(const nx::Url& url,
         const std::string& contentType, nx::Buffer requestBody);
 
-    cf::future<Response> put(const nx::utils::Url& url);
-    cf::future<Response> put(const nx::utils::Url& url,
+    cf::future<Response> put(const nx::Url& url);
+    cf::future<Response> put(const nx::Url& url,
         std::unique_ptr<AbstractMsgBodySource>&& requestBody);
-    cf::future<Response> put(const nx::utils::Url& url,
+    cf::future<Response> put(const nx::Url& url,
         const std::string& contentType, nx::Buffer requestBody);
 
-    cf::future<Response> delete_(const nx::utils::Url& url);
+    cf::future<Response> delete_(const nx::Url& url);
 
-    cf::future<Response> upgrade(const nx::utils::Url& url, const std::string& targetProtocol);
-    cf::future<Response> upgrade(const nx::utils::Url& url,
+    cf::future<Response> upgrade(const nx::Url& url, const std::string& targetProtocol);
+    cf::future<Response> upgrade(const nx::Url& url,
         const Method& method, const std::string& targetProtocol);
 
-    cf::future<Response> connect(const nx::utils::Url& url, const std::string& targetHost);
+    cf::future<Response> connect(const nx::Url& url, const std::string& targetHost);
 
     using AsyncClient::request;
-    cf::future<Response> request(Method method, const nx::utils::Url& url);
+    cf::future<Response> request(Method method, const nx::Url& url);
 };
 
 } // namespace nx::network::http::futures

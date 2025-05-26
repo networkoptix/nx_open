@@ -18,7 +18,7 @@ EncodedCredentials::EncodedCredentials(
 {
 }
 
-EncodedCredentials::EncodedCredentials(const nx::utils::Url& url, const QByteArray& key):
+EncodedCredentials::EncodedCredentials(const nx::Url& url, const QByteArray& key):
     EncodedCredentials(url.userName(), url.password(), key)
 {
 }

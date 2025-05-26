@@ -26,8 +26,8 @@ enum class ServerHostPriority
 
 NX_VMS_COMMON_API ServerHostPriority serverHostPriority(const nx::network::HostAddress& host);
 
-NX_VMS_COMMON_API nx::utils::Url mainServerUrl(
+NX_VMS_COMMON_API nx::Url mainServerUrl(
     const QSet<QString>& remoteAddresses,
-    std::function<int(const nx::utils::Url&)> priority = nullptr);
+    std::function<int(const nx::Url&)> priority = nullptr);
 
 } // namespace nx::vms::common

@@ -14,7 +14,7 @@
 #include <nx/vms/client/desktop/window_context_aware.h>
 
 namespace nx::vms::common { struct Credentials; }
-namespace nx::utils { class Url; }
+namespace nx { class Url; }
 namespace nx::network::http { class AsyncHttpClientPtr; }
 
 namespace nx::vms::client::desktop {

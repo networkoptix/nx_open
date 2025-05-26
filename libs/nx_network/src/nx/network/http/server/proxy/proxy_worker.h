@@ -57,7 +57,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    nx::utils::Url m_proxyHostUrl;
+    nx::Url m_proxyHostUrl;
     network::SocketAddress m_targetHost;
     std::string m_targetHostName;
     bool m_isSslConnectionRequired;

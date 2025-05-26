@@ -40,7 +40,7 @@ struct StatisticsSettingsWatcher::Private
             request->pleaseStopSync();
     }
 
-    nx::utils::Url actualUrl() const
+    nx::Url actualUrl() const
     {
         const auto localSettingsUrl =
             q->systemSettings()->clientStatisticsSettingsUrl();

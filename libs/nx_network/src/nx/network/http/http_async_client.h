@@ -225,7 +225,7 @@ public:
      * @return true, if socket is created and async connect is started. false otherwise.
      *   To get error description use SystemError::getLastOSErrorCode().
      */
-    void doGet(const nx::utils::Url& url);
+    void doGet(const nx::Url& url);
 
     /**
      * This overload is same as:
@@ -235,91 +235,91 @@ public:
      * @endcode
      */
     void doGet(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    void doHead(const nx::utils::Url& url);
+    void doHead(const nx::Url& url);
     void doHead(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     /**
      * Start POST request to url.
      * @return true, if socket is created and async connect is started. false otherwise
      */
-    void doPost(const nx::utils::Url& url);
+    void doPost(const nx::Url& url);
     void doPost(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         std::unique_ptr<AbstractMsgBodySource> body);
     void doPost(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         std::unique_ptr<AbstractMsgBodySource> body,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
     void doPost(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    void doPut(const nx::utils::Url& url);
+    void doPut(const nx::Url& url);
     void doPut(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         std::unique_ptr<AbstractMsgBodySource> body);
     void doPut(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         std::unique_ptr<AbstractMsgBodySource> body,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
     void doPut(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    void doPatch(const nx::utils::Url& url);
+    void doPatch(const nx::Url& url);
     void doPatch(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         std::unique_ptr<AbstractMsgBodySource> body);
     void doPatch(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         std::unique_ptr<AbstractMsgBodySource> body,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
     void doPatch(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    void doDelete(const nx::utils::Url& url);
+    void doDelete(const nx::Url& url);
     void doDelete(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     void doUpgrade(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::string& protocolToUpgradeTo);
     void doUpgrade(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const Method& method,
         const std::string& protocolToUpgradeTo);
 
     void doUpgrade(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::string& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
     void doUpgrade(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const Method& method,
         const std::string& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     void doConnect(
-        const nx::utils::Url& proxyUrl,
+        const nx::Url& proxyUrl,
         const std::string& targetHost);
     void doConnect(
-        const nx::utils::Url& proxyUrl,
+        const nx::Url& proxyUrl,
         const std::string& targetHost,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     void doRequest(
         const Method& method,
-        const nx::utils::Url& url);
+        const nx::Url& url);
     void doRequest(
         const Method& method,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     const nx::network::http::Request& request() const;
@@ -347,8 +347,8 @@ public:
      */
     std::unique_ptr<AbstractMsgBodySource> takeResponseBodySource();
 
-    const nx::utils::Url& url() const;
-    const nx::utils::Url& contentLocationUrl() const;
+    const nx::Url& url() const;
+    const nx::Url& contentLocationUrl() const;
 
     /**
      * Number of bytes read (including http request line and headers)
@@ -370,7 +370,7 @@ public:
     void setCustomRequestPrepareFunc(CustomRequestPrepareFunc func);
     void setKeepAlive(const KeepAliveOptions& keepAliveOptions);
 
-    static std::string endpointWithProtocol(const nx::utils::Url& url);
+    static std::string endpointWithProtocol(const nx::Url& url);
 
     int totalRequestsSentViaCurrentConnection() const;
     int totalRequestsSent() const;
@@ -435,8 +435,8 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_socket;
     std::unique_ptr<AsyncMessagePipeline> m_messagePipeline;
     std::unique_ptr<HarEntry> m_harEntry;
-    nx::utils::Url m_requestUrl;
-    nx::utils::Url m_contentLocationUrl;
+    nx::Url m_requestUrl;
+    nx::Url m_contentLocationUrl;
     bool m_authorizationTried = false;
     bool m_proxyAuthorizationTried = false;
     bool m_ha1RecalcTried = false;

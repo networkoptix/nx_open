@@ -29,7 +29,7 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     HttpClientPtr readHttpClient,
     const nx::network::http::HttpHeaders& additionalRequestHeaders,
     network::websocket::FrameType messageType,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     std::optional<std::chrono::milliseconds> pingTimeout)
     :
     m_writeHttpClient(new network::http::AsyncClient({readHttpClient->adapterFunc()})),

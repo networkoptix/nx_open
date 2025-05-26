@@ -9,16 +9,16 @@
 class NX_VMS_COMMON_API QnServerAdditionalAddressesDictionary
 {
 public:
-    QList<nx::utils::Url> additionalUrls(const nx::Uuid &serverId) const;
-    QList<nx::utils::Url> ignoredUrls(const nx::Uuid &serverId) const;
-    void setAdditionalUrls(const nx::Uuid &serverId, const QList<nx::utils::Url> &additionalUrls);
-    void setIgnoredUrls(const nx::Uuid &serverId, const QList<nx::utils::Url> &additionalUrls);
+    QList<nx::Url> additionalUrls(const nx::Uuid &serverId) const;
+    QList<nx::Url> ignoredUrls(const nx::Uuid &serverId) const;
+    void setAdditionalUrls(const nx::Uuid &serverId, const QList<nx::Url> &additionalUrls);
+    void setIgnoredUrls(const nx::Uuid &serverId, const QList<nx::Url> &additionalUrls);
     void clear();
 
 private:
     struct DiscoveryInfo {
-        QList<nx::utils::Url> additionalUrls;
-        QList<nx::utils::Url> ignoredUrls;
+        QList<nx::Url> additionalUrls;
+        QList<nx::Url> ignoredUrls;
     };
 
     QMap<nx::Uuid, DiscoveryInfo> m_discoveryInfoById;

@@ -55,7 +55,7 @@ void AsyncClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)
 }
 
 void AsyncClient::connect(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     ConnectHandler completionHandler)
 {
     if (url.scheme() != nx::network::stun::kUrlSchemeName &&

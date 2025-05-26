@@ -133,7 +133,7 @@ bool TestHttpServer::registerContentProvider(
 
 bool TestHttpServer::registerRedirectHandler(
     const std::string& resourcePath,
-    const nx::utils::Url& location,
+    const nx::Url& location,
     const Method& method)
 {
     return registerRequestProcessor(

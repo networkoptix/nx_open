@@ -39,7 +39,7 @@ static constexpr nx::network::http::AsyncClient::Timeouts kDefaultTimeouts{
     .messageBodyReadTimeout = 1min
 };
 
-nx::utils::Url systemUrl(const QString& cloudSystemId)
+nx::Url systemUrl(const QString& cloudSystemId)
 {
     return nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
@@ -47,9 +47,9 @@ nx::utils::Url systemUrl(const QString& cloudSystemId)
         .toUrl();
 }
 
-nx::utils::Url makeCloudModuleInformationUrl(const QString& cloudSystemId)
+nx::Url makeCloudModuleInformationUrl(const QString& cloudSystemId)
 {
-    nx::utils::Url url = systemUrl(cloudSystemId);
+    nx::Url url = systemUrl(cloudSystemId);
     url.setPath("/api/moduleInformation");
     return url;
 }
@@ -226,7 +226,7 @@ struct CloudSystemFinder::Private
             }
         }
 
-        nx::utils::Url url;
+        nx::Url url;
         url.setHost(moduleInformation.cloudId());
         url.setScheme(nx::network::http::kSecureUrlSchemeName);
         systemDescription->setServerHost(serverId, url);

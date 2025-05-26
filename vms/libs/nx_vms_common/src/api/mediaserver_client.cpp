@@ -14,7 +14,7 @@
 using namespace nx::network::http;
 
 MediaServerClient::MediaServerClient(
-    const nx::utils::Url& baseRequestUrl, nx::network::ssl::AdapterFunc adapterFunc):
+    const nx::Url& baseRequestUrl, nx::network::ssl::AdapterFunc adapterFunc):
     m_baseRequestUrl(baseRequestUrl), m_adapterFunc(std::move(adapterFunc))
 {
 }

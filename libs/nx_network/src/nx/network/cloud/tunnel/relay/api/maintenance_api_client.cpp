@@ -8,7 +8,7 @@
 
 namespace nx::cloud::relay::api {
 
-MaintenanceClient::MaintenanceClient(const nx::utils::Url& baseUrl):
+MaintenanceClient::MaintenanceClient(const nx::Url& baseUrl):
     base_type(baseUrl, nx::network::ssl::kDefaultCertificateCheck)
 {
 }
@@ -28,7 +28,7 @@ std::tuple<api::Result, api::Relays> MaintenanceClient::getRelays()
     return base_type::template makeSyncCall<api::Relays>(
         nx::network::http::Method::get,
         kDbRelaysPath,
-        nx::utils::UrlQuery()); // query
+        nx::UrlQuery()); // query
 }
 
 void MaintenanceClient::deleteRelay(
@@ -47,7 +47,7 @@ api::Result MaintenanceClient::deleteRelay(const std::string& name)
     return std::get<0>(base_type::template makeSyncCall<void>(
         nx::network::http::Method::delete_,
         nx::network::http::rest::substituteParameters(kDbRelayPath, {name}),
-        nx::utils::UrlQuery()));
+        nx::UrlQuery()));
 }
 
 } // namespace nx::cloud::relay::api

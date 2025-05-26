@@ -6,7 +6,7 @@
 
 #include <nx/vms/api/data/data_macros.h>
 
-namespace nx::utils { class Url; }
+namespace nx { class Url; }
 
 namespace nx::vms::api {
 
@@ -30,7 +30,7 @@ private:
 public:
     Credentials() = default;
     Credentials(const QString& user, const QString& password);
-    Credentials(const nx::utils::Url& url);
+    Credentials(const nx::Url& url);
 
     bool operator==(const Credentials& other) const = default;
 

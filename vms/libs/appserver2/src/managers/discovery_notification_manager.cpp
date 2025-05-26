@@ -21,7 +21,7 @@ void QnDiscoveryNotificationManager::triggerNotification(
     if (m_discoveryManager)
     {
         m_discoveryManager->checkEndpoint(
-            nx::utils::Url(transaction.params.url), transaction.params.id);
+            nx::Url(transaction.params.url), transaction.params.id);
     }
 
     //    emit peerDiscoveryRequested(QUrl(transaction.params.url));

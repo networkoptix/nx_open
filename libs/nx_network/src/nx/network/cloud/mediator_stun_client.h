@@ -33,7 +33,7 @@ public:
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     virtual void connect(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         ConnectHandler handler) override;
 
     virtual void sendRequest(
@@ -62,7 +62,7 @@ private:
     };
 
     AbstractMediatorEndpointProvider* m_endpointProvider = nullptr;
-    std::optional<nx::utils::Url> m_url;
+    std::optional<nx::Url> m_url;
     std::vector<RequestContext> m_postponedRequests;
     std::unique_ptr<nx::network::stun::ServerAlivenessTester> m_alivenessTester;
     std::optional<nx::network::KeepAliveOptions> m_keepAliveOptions;

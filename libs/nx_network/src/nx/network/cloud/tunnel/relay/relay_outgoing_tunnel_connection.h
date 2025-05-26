@@ -23,7 +23,7 @@ class NX_NETWORK_API OutgoingTunnelConnection:
 
 public:
     OutgoingTunnelConnection(
-        nx::utils::Url relayUrl,
+        nx::Url relayUrl,
         std::string relaySessionId,
         std::unique_ptr<nx::cloud::relay::api::AbstractClient> relayApiClient);
 
@@ -55,7 +55,7 @@ private:
         nx::network::aio::Timer timer;
     };
 
-    const nx::utils::Url m_relayUrl;
+    const nx::Url m_relayUrl;
     const std::string m_relaySessionId;
     std::unique_ptr<nx::cloud::relay::api::AbstractClient> m_relayApiClient;
     nx::Mutex m_mutex;

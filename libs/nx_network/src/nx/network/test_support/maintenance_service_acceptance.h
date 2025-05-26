@@ -184,7 +184,7 @@ protected:
             nx::network::maintenance::log::kLoggers);
     }
 
-    nx::utils::Url requestUrl(const std::string& requestPath) const
+    nx::Url requestUrl(const std::string& requestPath) const
     {
         return nx::network::url::Builder().setEndpoint(this->httpEndpoint())
             .setScheme(nx::network::http::kUrlSchemeName)
@@ -192,7 +192,7 @@ protected:
             .appendPath(nx::network::maintenance::kMaintenance).appendPath(requestPath);
     }
 
-    nx::utils::Url httpsUrl(const std::string& requestPath) const
+    nx::Url httpsUrl(const std::string& requestPath) const
     {
         return nx::network::url::Builder()
             .setScheme(nx::network::http::kSecureUrlSchemeName)

@@ -204,12 +204,12 @@ protected:
         ASSERT_TRUE(m_httpServer.bindAndListen());
     }
 
-    void sendRequest(const nx::utils::Url& url)
+    void sendRequest(const nx::Url& url)
     {
         m_client->doGet(url, [this]() { saveResponse(); });
     }
 
-    nx::utils::Url prepareUrl(const std::string& requestPath = std::string())
+    nx::Url prepareUrl(const std::string& requestPath = std::string())
     {
         const auto serverAddress = m_synchronousServer
             ? m_synchronousServer->endpoint()
@@ -1355,7 +1355,7 @@ protected:
             [this]() { saveResponse(); });
     }
 
-    nx::utils::Url getUrl(const std::string_view&)
+    nx::Url getUrl(const std::string_view&)
     {
         return url::Builder().setScheme(kUrlSchemeName)
             .setEndpoint(m_resourceServer.serverAddress())

@@ -309,7 +309,7 @@ void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& cont
 
 void WorkbenchUpdateWatcher::notifyUserAboutWorkbenchUpdate(
     const nx::utils::SoftwareVersion& targetVersion,
-    const nx::utils::Url& releaseNotesUrl,
+    const nx::Url& releaseNotesUrl,
     const QString& description)
 {
     if (!updateNotificationId.isNull())

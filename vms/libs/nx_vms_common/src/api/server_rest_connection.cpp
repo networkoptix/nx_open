@@ -942,7 +942,7 @@ Handle ServerConnection::downloadFileChunk(
 Handle ServerConnection::downloadFileChunkFromInternet(
     const nx::Uuid& serverId,
     const QString& fileName,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     int chunkIndex,
     int chunkSize,
     qint64 fileSize,
@@ -1243,7 +1243,7 @@ Handle ServerConnection::getCameraCredentials(
                 {
                     success = QJson::deserialize(result, &resultObject)
                         && resultObject.credentials.has_value()
-                        && resultObject.credentials->password != nx::utils::Url::kMaskedPassword;
+                        && resultObject.credentials->password != nx::Url::kMaskedPassword;
                 }
 
                 QAuthenticator credentials;
@@ -2871,7 +2871,7 @@ bool setupAuth(
                 ->getResourceById<QnMediaServerResource>(systemContext->peerId());
             if (NX_ASSERT(currentServer))
             {
-                const auto url = nx::utils::Url(currentServer->getUrl());
+                const auto url = nx::Url(currentServer->getUrl());
                 if (url.port() > 0)
                     request.url.setPort(url.port());
             }

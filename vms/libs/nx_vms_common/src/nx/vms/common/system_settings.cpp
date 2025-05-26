@@ -195,7 +195,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<int>* maxRemoteArchiveSynchronizationThreadsAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* maxVirtualCameraArchiveSynchronizationThreadsAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<nx::utils::Url>* customReleaseListUrlAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::Url>* customReleaseListUrlAdaptor = nullptr;
     QnResourcePropertyAdaptor<QByteArray>* targetUpdateInformationAdaptor = nullptr;
     QnResourcePropertyAdaptor<QByteArray>* installedUpdateInformationAdaptor = nullptr;
     QnResourcePropertyAdaptor<api::PersistentUpdateStorage>* targetPersistentUpdateStorageAdaptor = nullptr;
@@ -221,7 +221,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>* metadataStorageChangePolicyAdaptor = nullptr;
     QnResourcePropertyAdaptor<std::map<QString, int>>* specificFeaturesAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* licenseServerAdaptor = nullptr;
-    QnResourcePropertyAdaptor<nx::utils::Url>* resourceFileUriAdaptor = nullptr;
+    QnResourcePropertyAdaptor<nx::Url>* resourceFileUriAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* defaultUserLocaleAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* additionalLocalFsTypesAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* keepIoPortStateIntactOnInitializationAdaptor= nullptr;
@@ -754,8 +754,8 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [](auto v) { return v >= -1 && v <= 32; }, this,
         [] { return tr("Max thread count for remote archive synchronization (<=0 - auto, max 32)."); });
 
-    d->customReleaseListUrlAdaptor = new QnLexicalResourcePropertyAdaptor<utils::Url>(
-        "customReleaseListUrl", nx::utils::Url(), this,
+    d->customReleaseListUrlAdaptor = new QnLexicalResourcePropertyAdaptor<nx::Url>(
+        "customReleaseListUrl", nx::Url(), this,
         [] { return tr("Update releases.json file URL."); });
 
     d->targetUpdateInformationAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
@@ -829,7 +829,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Names::licenseServer, "https://licensing.vmsproxy.com", this,
         [] { return tr("License server."); });
 
-    d->resourceFileUriAdaptor = new QnLexicalResourcePropertyAdaptor<nx::utils::Url>(
+    d->resourceFileUriAdaptor = new QnLexicalResourcePropertyAdaptor<nx::Url>(
         Names::resourceFileUri, "https://resources.vmsproxy.com/resource_data.json", this,
         [] { return tr("URI for resource_data.json automatic update."); });
 
@@ -1787,9 +1787,9 @@ void SystemSettings::setLastMergeSlaveId(const nx::Uuid& value)
     d->lastMergeSlaveIdAdaptor->setValue(value.toSimpleString());
 }
 
-nx::utils::Url SystemSettings::clientStatisticsSettingsUrl() const
+nx::Url SystemSettings::clientStatisticsSettingsUrl() const
 {
-    return nx::utils::Url::fromUserInput(d->clientStatisticsSettingsUrlAdaptor->value().trimmed());
+    return nx::Url::fromUserInput(d->clientStatisticsSettingsUrlAdaptor->value().trimmed());
 }
 
 std::chrono::seconds SystemSettings::deviceStorageInfoUpdateInterval() const
@@ -2089,12 +2089,12 @@ void SystemSettings::setEdgeRecordingEnabled(bool enabled)
     d->enableEdgeRecordingAdaptor->setValue(enabled);
 }
 
-nx::utils::Url SystemSettings::customReleaseListUrl() const
+nx::Url SystemSettings::customReleaseListUrl() const
 {
     return d->customReleaseListUrlAdaptor->value();
 }
 
-void SystemSettings::setCustomReleaseListUrl(const nx::utils::Url& url)
+void SystemSettings::setCustomReleaseListUrl(const nx::Url& url)
 {
     d->customReleaseListUrlAdaptor->setValue(url);
 }
@@ -2338,7 +2338,7 @@ QString SystemSettings::licenseServerUrl() const
     return d->licenseServerAdaptor->value();
 }
 
-nx::utils::Url SystemSettings::resourceFileUri() const
+nx::Url SystemSettings::resourceFileUri() const
 {
     return d->resourceFileUriAdaptor->value();
 }
@@ -2510,7 +2510,7 @@ QString SystemSettings::supportedOrigins() const
     auto supportedOrigins = d->supportedOriginsAdaptor->value();
     if (supportedOrigins != "*" && !nx::network::SocketGlobals::cloud().cloudHost().empty())
     {
-        auto cloudUrl = nx::utils::Url::fromUserInput(
+        auto cloudUrl = nx::Url::fromUserInput(
             QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost()));
         cloudUrl.setScheme(nx::network::http::kSecureUrlSchemeName);
 

@@ -18,7 +18,7 @@ namespace nx::network::http::tunneling::detail {
 using ClientFactoryFunction =
     std::vector<std::unique_ptr<BaseTunnelClient>>(
         const std::string& /*tag*/,
-        const nx::utils::Url& /*baseUrl*/,
+        const nx::Url& /*baseUrl*/,
         std::optional<int> /*forcedTunnelType*/,
         const ConnectOptions& /*options*/);
 
@@ -50,7 +50,7 @@ public:
     {
         return registerClientType(
             [](
-                const nx::utils::Url& baseUrl,
+                const nx::Url& baseUrl,
                 const ConnectOptions& options,
                 ClientFeedbackFunction feedbackFunction)
             {
@@ -79,7 +79,7 @@ public:
     {
         setForcedClientFactory(
             [](
-                const nx::utils::Url& baseUrl,
+                const nx::Url& baseUrl,
                 const ConnectOptions& options,
                 ClientFeedbackFunction feedbackFunction)
             {
@@ -97,7 +97,7 @@ public:
 private:
     using InternalFactoryFunction = nx::utils::MoveOnlyFunc<
         std::unique_ptr<BaseTunnelClient>(
-            const nx::utils::Url&,
+            const nx::Url&,
             const ConnectOptions&,
             ClientFeedbackFunction)>;
 
@@ -117,7 +117,7 @@ private:
 
     std::vector<std::unique_ptr<BaseTunnelClient>> defaultFactoryFunction(
         const std::string& tag,
-        const nx::utils::Url& baseUrl,
+        const nx::Url& baseUrl,
         std::optional<int> forcedTunnelType,
         const ConnectOptions& options);
 

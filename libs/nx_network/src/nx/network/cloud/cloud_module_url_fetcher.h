@@ -21,13 +21,13 @@ namespace nx::network::cloud {
  */
 class NX_NETWORK_API CloudModuleUrlFetcher:
     public BasicCloudModuleUrlFetcher<
-        nx::utils::MoveOnlyFunc<void(nx::network::http::StatusCode::Value, nx::utils::Url)>>
+        nx::utils::MoveOnlyFunc<void(nx::network::http::StatusCode::Value, nx::Url)>>
 {
     using base_type = BasicCloudModuleUrlFetcher<
-        nx::utils::MoveOnlyFunc<void(nx::network::http::StatusCode::Value, nx::utils::Url)>>;
+        nx::utils::MoveOnlyFunc<void(nx::network::http::StatusCode::Value, nx::Url)>>;
 
 public:
-    using Handler = nx::utils::MoveOnlyFunc<void(nx::network::http::StatusCode::Value, nx::utils::Url)>;
+    using Handler = nx::utils::MoveOnlyFunc<void(nx::network::http::StatusCode::Value, nx::Url)>;
 
     /**
      * Helper class to be used if BasicCloudModuleUrlFetcher user can die before
@@ -67,7 +67,7 @@ public:
     /**
      * Specify url explicitly.
      */
-    void setUrl(nx::utils::Url endpoint);
+    void setUrl(nx::Url endpoint);
 
     /**
      * Reset cached url value.
@@ -85,7 +85,7 @@ protected:
 private:
     mutable nx::Mutex m_mutex;
     const std::string m_moduleAttrName;
-    std::optional<nx::utils::Url> m_url;
+    std::optional<nx::Url> m_url;
 };
 
 //-------------------------------------------------------------------------------------------------

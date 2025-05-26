@@ -60,7 +60,7 @@ private:
     statistics::Server m_statisticsServer;
     http::HttpClient m_httpClient{ssl::kAcceptAnyCertificate};
 
-    nx::utils::Url requestUrl(const std::string& requestName = std::string()) const
+    nx::Url requestUrl(const std::string& requestName = std::string()) const
     {
         return url::Builder().setEndpoint(m_httpServer.serverAddress())
             .setScheme(http::kUrlSchemeName).setPath(kStatistics)

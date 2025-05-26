@@ -405,7 +405,7 @@ void QnRtspClient::setTcpSocket(std::unique_ptr<nx::network::AbstractStreamSocke
     m_tcpSock = std::move(socket);
 }
 
-CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 startTime)
+CameraDiagnostics::Result QnRtspClient::open(const nx::Url& url, qint64 startTime)
 {
     /*
      * Our own client uses CSEQ. This value is put to the media packets and player check whether it get old or new value
@@ -530,7 +530,7 @@ QString QnRtspClient::parseContentBase(const QString& response)
     QString contentBase = extractRtspParam(response, "Content-Base:");
     if (!contentBase.isEmpty())
     {
-        if (nx::utils::Url(contentBase).isValid())
+        if (nx::Url(contentBase).isValid())
             return contentBase;
         NX_DEBUG(this, "Invalid Content-Base url: [%1], ignore it", contentBase);
     }
@@ -538,7 +538,7 @@ QString QnRtspClient::parseContentBase(const QString& response)
     contentBase = extractRtspParam(response, "Content-Location:");
     if (!contentBase.isEmpty())
     {
-        if (nx::utils::Url(contentBase).isValid())
+        if (nx::Url(contentBase).isValid())
             return contentBase;
         NX_DEBUG(this, "Invalid Content-Location url: [%1], ignore it", contentBase);
     }
@@ -822,8 +822,8 @@ bool QnRtspClient::sendSetup()
         }
         nx::network::http::Request request;
         auto setupUrl = track.sdpMedia.control == "*"
-                ? nx::utils::Url()
-                : nx::utils::Url(track.sdpMedia.control);
+                ? nx::Url()
+                : nx::Url(track.sdpMedia.control);
 
         request.requestLine.method = kSetupCommand;
         if( setupUrl.isRelative() )
@@ -1583,7 +1583,7 @@ const nx::network::http::Credentials& QnRtspClient::getCredentials() const
     return m_credentials;
 }
 
-nx::utils::Url QnRtspClient::getUrl() const
+nx::Url QnRtspClient::getUrl() const
 {
     return m_url;
 }

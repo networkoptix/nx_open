@@ -74,7 +74,7 @@ public:
     /**
      * @return List of URLs containing scheme and endpoint only.
      */
-    const std::vector<nx::utils::Url>& urls() const
+    const std::vector<nx::Url>& urls() const
     {
         return m_urls;
     }
@@ -82,7 +82,7 @@ public:
     // TODO: #akolesnikov Remove this function! URL list should be auto-generated.
     // Though, this requires some refactoring in some nx::network::server classes.
     // Relying on Builder to set this properly.
-    void setUrls(std::vector<nx::utils::Url> urls)
+    void setUrls(std::vector<nx::Url> urls)
     {
         m_urls = std::move(urls);
     }
@@ -90,7 +90,7 @@ public:
     /**
      * @return HTTPS url (if any), otherwise - any other URL.
      */
-    nx::utils::Url preferredUrl() const
+    nx::Url preferredUrl() const
     {
         auto it = std::find_if(
             m_urls.begin(), m_urls.end(),
@@ -101,7 +101,7 @@ public:
 
 private:
     int m_tcpBackLogSize = Settings::kDefaultTcpBacklogSize;
-    std::vector<nx::utils::Url> m_urls;
+    std::vector<nx::Url> m_urls;
     std::unique_ptr<SummingStatisticsProvider> m_httpStatsProvider;
     HttpHeaders m_extraSuccessResponseHeaders;
 

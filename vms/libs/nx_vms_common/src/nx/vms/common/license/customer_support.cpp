@@ -58,7 +58,7 @@ QString makeHref(ContactAddress::Channel channel, const QString& address)
         case ContactAddress::Channel::plainText:
             return address;
         case ContactAddress::Channel::link:
-            return html::link(nx::utils::Url::fromUserInput(address));
+            return html::link(nx::Url::fromUserInput(address));
     }
     NX_ASSERT(false, "Unhandled switch case");
     return address;

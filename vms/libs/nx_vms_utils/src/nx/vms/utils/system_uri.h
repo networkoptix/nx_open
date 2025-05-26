@@ -115,7 +115,7 @@ public:
 
     SystemUri() = default;
     SystemUri(const SystemUri& other) = default;
-    SystemUri(const nx::utils::Url& url);
+    SystemUri(const nx::Url& url);
     SystemUri(const QString& uri);
 
     bool hasCloudSystemAddress() const;
@@ -126,7 +126,7 @@ public:
     QString authKey() const;
 
     QString toString() const;
-    nx::utils::Url toUrl() const;
+    nx::Url toUrl() const;
 
     // TODO: #sivanov Use nx_reflect.
     static QString toString(Scope value);

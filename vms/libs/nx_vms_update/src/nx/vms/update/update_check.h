@@ -29,19 +29,19 @@ enum class FetchError
 using FetchReleasesResult = std::variant<ReleasesInfo, FetchError>;
 
 NX_VMS_UPDATE_API FetchReleasesResult fetchReleasesInfo(
-    const nx::utils::Url& url);
+    const nx::Url& url);
 
 using FetchPublicationInfoResult = std::variant<PublicationInfo, FetchError>;
 
 NX_VMS_UPDATE_API FetchPublicationInfoResult fetchPublicationInfo(
-    const nx::utils::SoftwareVersion& version, const nx::utils::Url& urlPrefix);
+    const nx::utils::SoftwareVersion& version, const nx::Url& urlPrefix);
 NX_VMS_UPDATE_API FetchPublicationInfoResult fetchPublicationInfo(
-    const nx::utils::SoftwareVersion& version, const QVector<nx::utils::Url>& urlPrefixes);
+    const nx::utils::SoftwareVersion& version, const QVector<nx::Url>& urlPrefixes);
 
 NX_VMS_UPDATE_API FetchPublicationInfoResult fetchLegacyPublicationInfo(
-    const nx::utils::SoftwareVersion& version, const nx::utils::Url& urlPrefix);
+    const nx::utils::SoftwareVersion& version, const nx::Url& urlPrefix);
 NX_VMS_UPDATE_API FetchPublicationInfoResult fetchLegacyPublicationInfo(
-    const nx::utils::SoftwareVersion& version, const QVector<nx::utils::Url>& urlPrefixes);
+    const nx::utils::SoftwareVersion& version, const QVector<nx::Url>& urlPrefixes);
 
 using PublicationInfoResult = std::variant<PublicationInfo, FetchError, std::nullptr_t>;
 
@@ -67,7 +67,7 @@ using PublicationInfoParams = std::variant<
     CertainVersionParams>;
 
 NX_VMS_UPDATE_API PublicationInfoResult getPublicationInfo(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const PublicationInfoParams& params);
 
 } // namespace nx::vms::update

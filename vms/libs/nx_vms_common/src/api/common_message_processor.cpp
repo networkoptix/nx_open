@@ -565,7 +565,7 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(
     if (data.id.isNull())
         return;
 
-    nx::utils::Url url(data.url);
+    nx::Url url(data.url);
 
     auto server = resourcePool()->getResourceById<QnMediaServerResource>(data.id);
     if (!server)
@@ -573,13 +573,13 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(
         const auto dictionary = serverAdditionalAddressesDictionary();
         if (!data.ignore)
         {
-            QList<nx::utils::Url> urls = dictionary->additionalUrls(data.id);
+            QList<nx::Url> urls = dictionary->additionalUrls(data.id);
             urls.append(url);
             dictionary->setAdditionalUrls(data.id, urls);
         }
         else
         {
-            QList<nx::utils::Url> urls = dictionary->ignoredUrls(data.id);
+            QList<nx::Url> urls = dictionary->ignoredUrls(data.id);
             urls.append(url);
             dictionary->setIgnoredUrls(data.id, urls);
         }
@@ -587,8 +587,8 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(
     }
 
     QList<nx::network::SocketAddress> addresses = server->getNetAddrList();
-    QList<nx::utils::Url> additionalUrls = server->getAdditionalUrls();
-    QList<nx::utils::Url> ignoredUrls = server->getIgnoredUrls();
+    QList<nx::Url> additionalUrls = server->getAdditionalUrls();
+    QList<nx::Url> ignoredUrls = server->getIgnoredUrls();
 
     if (addInformation) {
         if (!additionalUrls.contains(url) && !addresses.contains(nx::network::url::getEndpoint(url)))

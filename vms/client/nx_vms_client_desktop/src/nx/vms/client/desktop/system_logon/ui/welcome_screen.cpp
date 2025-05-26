@@ -400,7 +400,7 @@ void WelcomeScreen::connectToLocalSystem(
     const QString& password,
     bool storePassword)
 {
-    nx::utils::Url url = parseConnectionUrlFromUserInput(serverUrl);
+    nx::Url url = parseConnectionUrlFromUserInput(serverUrl);
 
     connectToSystemInternal(
         systemId,
@@ -425,7 +425,7 @@ void WelcomeScreen::connectToLocalSystemUsingSavedPassword(
     const auto credentials = CredentialsManager::credentials(
         localSystemId,
         userName.toStdString());
-    const nx::utils::Url url = parseConnectionUrlFromUserInput(serverUrl);
+    const nx::Url url = parseConnectionUrlFromUserInput(serverUrl);
 
     connectToSystemInternal(
         systemId,

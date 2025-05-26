@@ -12,9 +12,9 @@
 
 namespace nx::vms::client::desktop {
 
-nx::utils::Url parseConnectionUrlFromUserInput(const QString& input)
+nx::Url parseConnectionUrlFromUserInput(const QString& input)
 {
-    nx::utils::Url result;
+    nx::Url result;
 
     if (input.isEmpty())
         return result;
@@ -38,7 +38,7 @@ nx::utils::Url parseConnectionUrlFromUserInput(const QString& input)
     }
     else
     {
-        const auto sourceUrl = nx::utils::Url::fromUserInput(input);
+        const auto sourceUrl = nx::Url::fromUserInput(input);
 
         result.setHost(sourceUrl.host());
         result.setPort(sourceUrl.port(helpers::kDefaultConnectionPort));

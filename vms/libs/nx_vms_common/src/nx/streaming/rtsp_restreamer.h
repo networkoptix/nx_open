@@ -46,7 +46,7 @@ public:
 
     void setRequest(const QString& request);
     void setRole(Qn::ConnectionRole role);
-    nx::utils::Url getCurrentStreamUrl() const;
+    nx::Url getCurrentStreamUrl() const;
     void setUserAgent(const QString& value);
 
     static bool probeStream(
@@ -61,10 +61,10 @@ public:
     void setConnectionTimeout(std::chrono::milliseconds timeout);
 
 private:
-    static bool tryRewriteRequest(nx::utils::Url& url, bool force);
+    static bool tryRewriteRequest(nx::Url& url, bool force);
     static CameraDiagnostics::Result requestToken(
         std::chrono::milliseconds timeout,
-        const nx::utils::Url& rtspUrl,
+        const nx::Url& rtspUrl,
         const std::string& username,
         const std::string& password,
         std::string& token,
@@ -74,7 +74,7 @@ private:
     nx::streaming::RtspResourceStreamProvider m_reader;
     CameraDiagnostics::Result m_openStreamResult = CameraDiagnostics::NoErrorResult();
     bool m_useCloud = false;
-    nx::utils::Url m_url;
+    nx::Url m_url;
     QnVirtualCameraResourcePtr m_camera;
 };
 

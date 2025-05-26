@@ -26,13 +26,13 @@ public:
     using OnDone = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, WebSocketConnection*)>;
 
     WebSocketClient(
-        nx::utils::Url url,
+        nx::Url url,
         nx::network::http::Credentials credentials,
         nx::network::ssl::AdapterFunc adapterFunc,
         RequestHandler handler = {});
 
     WebSocketClient(
-        nx::utils::Url url,
+        nx::Url url,
         std::unique_ptr<nx::network::http::AsyncClient> client,
         RequestHandler handler = {});
 
@@ -49,7 +49,7 @@ private:
 
 private:
     std::vector<nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>> m_connectHandlers;
-    nx::utils::Url m_url;
+    nx::Url m_url;
     RequestHandler m_handler;
     std::unique_ptr<nx::network::http::AsyncClient> m_handshakeClient;
     std::shared_ptr<nx::json_rpc::WebSocketConnection> m_connection;

@@ -40,7 +40,7 @@ std::string UplinkBandwidthTester::RunningValue::toString() const
 }
 
 UplinkBandwidthTester::UplinkBandwidthTester(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::chrono::milliseconds& testDuration,
     int minBandwidthRequests,
     const std::chrono::microseconds& pingTime)

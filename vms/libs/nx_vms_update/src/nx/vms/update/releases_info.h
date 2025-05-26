@@ -46,7 +46,7 @@ NX_REFLECTION_INSTRUMENT(ReleaseInfo, ReleaseInfo_Fields)
 
 struct NX_VMS_UPDATE_API ReleasesInfo
 {
-    QVector<nx::utils::Url> packages_urls;
+    QVector<nx::Url> packages_urls;
     QVector<ReleaseInfo> releases;
 
     std::optional<ReleaseInfo> selectVmsRelease(

@@ -43,7 +43,7 @@ public:
         }
 
         Method method;
-        nx::utils::Url url;
+        nx::Url url;
         nx::network::http::HttpHeaders headers;
         nx::String contentType;
         nx::String messageBody;
@@ -143,7 +143,7 @@ public:
         StatusLine getStatusLine() const;
 
         /** Get request URL. */
-        nx::utils::Url getUrl() const;
+        nx::Url getUrl() const;
 
         /**
          * Checks if request is complete.

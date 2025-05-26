@@ -17,7 +17,7 @@ class NX_NETWORK_API BasicClient:
     using base_type = AbstractClient;
 
 public:
-    BasicClient(const nx::utils::Url& baseUrl);
+    BasicClient(const nx::Url& baseUrl);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
@@ -26,7 +26,7 @@ public:
         const std::string& targetPeerName,
         StartClientConnectSessionHandler handler) override;
 
-    virtual nx::utils::Url url() const override;
+    virtual nx::Url url() const override;
 
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const override;
     virtual nx::network::http::StatusCode::Value prevRequestHttpStatusCode() const override;
@@ -78,7 +78,7 @@ protected:
     }
 
 private:
-    const nx::utils::Url m_baseUrl;
+    const nx::Url m_baseUrl;
     SystemError::ErrorCode m_prevSysErrorCode = SystemError::noError;
     nx::network::http::StatusCode::Value m_prevHttpStatusCode = nx::network::http::StatusCode::undefined;
     std::optional<std::chrono::milliseconds> m_timeout;
@@ -188,7 +188,7 @@ BasicClient::prepareHttpRequest(
     const char* requestPathTemplate,
     std::initializer_list<RequestPathArgument> requestPathArguments)
 {
-    nx::utils::Url requestUrl = m_baseUrl;
+    nx::Url requestUrl = m_baseUrl;
     requestUrl.setPath(network::url::normalizePath(
         requestUrl.path().toStdString() +
         nx::network::http::rest::substituteParameters(

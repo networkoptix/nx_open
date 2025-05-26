@@ -15,10 +15,10 @@ namespace nx::network::url {
 class NX_NETWORK_API Builder
 {
 public:
-    Builder(const nx::utils::Url& url = nx::utils::Url());
+    Builder(const nx::Url& url = nx::Url());
 
-    nx::utils::Url toUrl() const;
-    operator nx::utils::Url() const;
+    nx::Url toUrl() const;
+    operator nx::Url() const;
 
     Builder& setScheme(const QString& scheme);
     Builder& setAuthority(const std::string& authority, QUrl::ParsingMode mode = QUrl::TolerantMode);
@@ -52,7 +52,7 @@ public:
 
     Builder& setQuery(const QString& query, QUrl::ParsingMode mode = QUrl::TolerantMode);
     Builder& setQuery(const QUrlQuery& query);
-    Builder& setQuery(const nx::utils::UrlQuery& query);
+    Builder& setQuery(const nx::UrlQuery& query);
 
     Builder& addQueryItem(const QString& name, const QString& value = {});
     Builder& removeQueryItem(const QString& name);
@@ -119,7 +119,7 @@ public:
     }
 
 private:
-    nx::utils::Url m_url;
+    nx::Url m_url;
 };
 
 } // namespace nx::network::url

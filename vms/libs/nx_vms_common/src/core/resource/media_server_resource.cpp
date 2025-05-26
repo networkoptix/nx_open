@@ -186,10 +186,10 @@ QList<nx::network::SocketAddress> QnMediaServerResource::getNetAddrList() const
     return m_netAddrList;
 }
 
-void QnMediaServerResource::setAdditionalUrls(const QList<nx::utils::Url> &urls)
+void QnMediaServerResource::setAdditionalUrls(const QList<nx::Url> &urls)
 {
     nx::Uuid id = getId();
-    QList<nx::utils::Url> oldUrls = getAdditionalUrls();
+    QList<nx::Url> oldUrls = getAdditionalUrls();
     if (oldUrls == urls)
         return;
 
@@ -197,15 +197,15 @@ void QnMediaServerResource::setAdditionalUrls(const QList<nx::utils::Url> &urls)
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
-QList<nx::utils::Url> QnMediaServerResource::getAdditionalUrls() const
+QList<nx::Url> QnMediaServerResource::getAdditionalUrls() const
 {
     return systemContext()->serverAdditionalAddressesDictionary()->additionalUrls(getId());
 }
 
-void QnMediaServerResource::setIgnoredUrls(const QList<nx::utils::Url> &urls)
+void QnMediaServerResource::setIgnoredUrls(const QList<nx::Url> &urls)
 {
     nx::Uuid id = getId();
-    QList<nx::utils::Url> oldUrls = getIgnoredUrls();
+    QList<nx::Url> oldUrls = getIgnoredUrls();
     if (oldUrls == urls)
         return;
 
@@ -213,7 +213,7 @@ void QnMediaServerResource::setIgnoredUrls(const QList<nx::utils::Url> &urls)
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
-QList<nx::utils::Url> QnMediaServerResource::getIgnoredUrls() const
+QList<nx::Url> QnMediaServerResource::getIgnoredUrls() const
 {
     return systemContext()->serverAdditionalAddressesDictionary()->ignoredUrls(getId());
 }
@@ -235,13 +235,13 @@ quint16 QnMediaServerResource::getPort() const
 QList<nx::network::SocketAddress> QnMediaServerResource::getAllAvailableAddresses() const
 {
     auto toAddress =
-        [](const nx::utils::Url& url)
+        [](const nx::Url& url)
         {
             return nx::network::url::getEndpoint(url, 0);
         };
 
     QSet<nx::network::SocketAddress> ignored;
-    for (const nx::utils::Url &url : getIgnoredUrls())
+    for (const nx::Url &url : getIgnoredUrls())
         ignored.insert(toAddress(url));
 
     QSet<nx::network::SocketAddress> result;
@@ -253,7 +253,7 @@ QList<nx::network::SocketAddress> QnMediaServerResource::getAllAvailableAddresse
         result.insert(address);
     }
 
-    for (const nx::utils::Url& url : getAdditionalUrls())
+    for (const nx::Url& url : getAdditionalUrls())
     {
         nx::network::SocketAddress address = toAddress(url);
         if (ignored.contains(address))
@@ -310,19 +310,19 @@ void QnMediaServerResource::setUrl(const QString& url)
     emit apiUrlChanged(toSharedPointer(this));
 }
 
-static nx::utils::Url makeUrl(const nx::network::SocketAddress& endpoint)
+static nx::Url makeUrl(const nx::network::SocketAddress& endpoint)
 {
     return nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
         .setEndpoint(endpoint).toUrl();
 }
 
-nx::utils::Url QnMediaServerResource::getApiUrl() const
+nx::Url QnMediaServerResource::getApiUrl() const
 {
     return makeUrl(getPrimaryAddress());
 }
 
-nx::utils::Url QnMediaServerResource::getRemoteUrl() const
+nx::Url QnMediaServerResource::getRemoteUrl() const
 {
     auto address = getPrimaryAddress();
     if (address.address == nx::network::HostAddress::localhost && !m_netAddrList.isEmpty())
@@ -404,7 +404,7 @@ nx::network::SocketAddress QnMediaServerResource::getPrimaryAddress() const
         return m_primaryAddress;
     if (m_url.isEmpty())
         return nx::network::SocketAddress();
-    return nx::network::url::getEndpoint(nx::utils::Url(m_url));
+    return nx::network::url::getEndpoint(nx::Url(m_url));
 }
 
 Qn::PanicMode QnMediaServerResource::getPanicMode() const

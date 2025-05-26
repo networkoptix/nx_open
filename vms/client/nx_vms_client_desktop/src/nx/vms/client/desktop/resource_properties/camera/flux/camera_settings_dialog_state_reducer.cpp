@@ -125,12 +125,12 @@ CombinedValue combinedValue(const Cameras& cameras, std::function<bool(const Cam
 }
 
 /** Get camera webpage address as http(s)://host[:port] */
-nx::utils::Url getBaseCameraUrl(const Camera& camera)
+nx::Url getBaseCameraUrl(const Camera& camera)
 {
     if (!NX_ASSERT(camera))
         return {};
 
-    auto url = nx::utils::Url::fromUserInput(camera->getUrl());
+    auto url = nx::Url::fromUserInput(camera->getUrl());
     if (!url.isValid())
         url.setHost(camera->getHostAddress());
 

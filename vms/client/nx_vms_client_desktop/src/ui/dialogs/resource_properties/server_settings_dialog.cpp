@@ -303,6 +303,6 @@ void QnServerSettingsDialog::updateWebPageLink()
     {
         d->webPageLink->setText(nx::vms::common::html::link(
             tr("Server Web Page"),
-            nx::utils::Url(d->server->getUrl())));
+            nx::Url(d->server->getUrl())));
     }
 }

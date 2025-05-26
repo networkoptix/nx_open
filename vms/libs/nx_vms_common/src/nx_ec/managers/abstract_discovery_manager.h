@@ -18,7 +18,7 @@ class NX_VMS_COMMON_API AbstractDiscoveryNotificationManager: public QObject
     Q_OBJECT
 
 signals:
-    void peerDiscoveryRequested(const nx::utils::Url& url);
+    void peerDiscoveryRequested(const nx::Url& url);
     void discoveryInformationChanged(const nx::vms::api::DiscoveryData& data, bool addInformation);
     void discoveredServerChanged(const nx::vms::api::DiscoveredServerData& discoveredServer);
     void gotInitialDiscoveredServers(const nx::vms::api::DiscoveredServerDataList& discoveredServers);
@@ -31,31 +31,31 @@ public:
 
     virtual int discoverPeer(
         const nx::Uuid& id,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode discoverPeerSync(const nx::Uuid& id, const nx::utils::Url& url);
+    ErrorCode discoverPeerSync(const nx::Uuid& id, const nx::Url& url);
 
     virtual int addDiscoveryInformation(
         const nx::Uuid& id,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         bool ignore,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
     ErrorCode addDiscoveryInformationSync(
-        const nx::Uuid& id, const nx::utils::Url& url, bool ignore);
+        const nx::Uuid& id, const nx::Url& url, bool ignore);
 
     virtual int removeDiscoveryInformation(
         const nx::Uuid& id,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         bool ignore,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
     ErrorCode removeDiscoveryInformationSync(
-        const nx::Uuid& id, const nx::utils::Url& url, bool ignore);
+        const nx::Uuid& id, const nx::Url& url, bool ignore);
 
     virtual int getDiscoveryData(
         Handler<nx::vms::api::DiscoveryDataList> handler,

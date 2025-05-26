@@ -43,7 +43,7 @@ class NX_VMS_COMMON_API MediaServerClient: public nx::network::aio::BasicPollabl
 
 public:
     MediaServerClient(
-        const nx::utils::Url& baseRequestUrl, nx::network::ssl::AdapterFunc adapterFunc);
+        const nx::Url& baseRequestUrl, nx::network::ssl::AdapterFunc adapterFunc);
     ~MediaServerClient();
 
     MediaServerClient(const MediaServerClient&) = delete;
@@ -201,7 +201,7 @@ protected:
     {
         using ActualOutputType = nx::utils::tuple_first_element_t<std::tuple<Output...>>;
 
-        const nx::utils::Url requestUrl = nx::network::url::Builder(m_baseRequestUrl)
+        const nx::Url requestUrl = nx::network::url::Builder(m_baseRequestUrl)
             .appendPath("/").appendPath(requestPath).toUrl();
         nx::network::http::Credentials credentials;
         if (NX_ASSERT(m_credentials))
@@ -231,7 +231,7 @@ protected:
         std::function<void(SystemError::ErrorCode,
             nx::network::http::StatusCode::Value statusCode)> completionHandler)
     {
-        const nx::utils::Url requestUrl = nx::network::url::Builder(m_baseRequestUrl)
+        const nx::Url requestUrl = nx::network::url::Builder(m_baseRequestUrl)
                                               .appendPath("/")
                                               .appendPath(requestPath)
                                               .toUrl();
@@ -270,7 +270,7 @@ protected:
 
         performRequest(
             httpMethod,
-            [&inputData, this](const nx::utils::Url& url, nx::network::http::Credentials credentials)
+            [&inputData, this](const nx::Url& url, nx::network::http::Credentials credentials)
             {
                 return std::make_unique<nx::network::http::FusionDataHttpClient<
                     Input, ActualOutputType, SerializationImpl>>(
@@ -293,7 +293,7 @@ protected:
 
         performRequest(
             httpMethod,
-            [this](const nx::utils::Url& url, nx::network::http::Credentials credentials)
+            [this](const nx::Url& url, nx::network::http::Credentials credentials)
             {
                 return std::make_unique<nx::network::http::FusionDataHttpClient<
                     void, ActualOutputType, SerializationImpl>>(
@@ -321,7 +321,7 @@ protected:
             requestPath.erase(queryPos, std::string::npos);
         }
 
-        nx::utils::Url requestUrl = nx::network::url::Builder(m_baseRequestUrl)
+        nx::Url requestUrl = nx::network::url::Builder(m_baseRequestUrl)
             .appendPath("/").appendPath(requestPath).setQuery(query).toUrl();
         if (!m_authenticationKey.isEmpty())
         {
@@ -558,7 +558,7 @@ protected:
 
 private:
     std::optional<std::chrono::milliseconds> m_requestTimeout;
-    const nx::utils::Url m_baseRequestUrl;
+    const nx::Url m_baseRequestUrl;
     nx::network::ssl::AdapterFunc m_adapterFunc;
     std::optional<nx::network::http::Credentials> m_credentials;
     std::list<std::unique_ptr<nx::network::aio::BasicPollable>> m_activeClients;

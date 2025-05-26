@@ -164,7 +164,7 @@ nx::vms::client::mobile::OperationManager* QnMobileClientUiController::operation
 }
 
 void QnMobileClientUiController::openConnectToServerScreen(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const QString& operationId)
 {
     NX_DEBUG(this, "openConnectToServerScreen(): url is <%1>", url.toString(QUrl::RemovePassword));

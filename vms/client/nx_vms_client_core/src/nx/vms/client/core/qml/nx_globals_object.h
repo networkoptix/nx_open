@@ -28,10 +28,10 @@ class NX_VMS_CLIENT_CORE_API NxGlobalsObject: public QObject
 public:
     NxGlobalsObject(QObject* parent = nullptr);
 
-    Q_INVOKABLE nx::utils::Url url(const QString& url) const;
-    Q_INVOKABLE nx::utils::Url url(const QUrl& url) const;
-    Q_INVOKABLE nx::utils::Url urlFromUserInput(const QString& url) const;
-    Q_INVOKABLE nx::utils::Url emptyUrl() const;
+    Q_INVOKABLE nx::Url url(const QString& url) const;
+    Q_INVOKABLE nx::Url url(const QUrl& url) const;
+    Q_INVOKABLE nx::Url urlFromUserInput(const QString& url) const;
+    Q_INVOKABLE nx::Url emptyUrl() const;
 
     Q_INVOKABLE QModelIndex invalidModelIndex() const;
     Q_INVOKABLE QPersistentModelIndex toPersistent(const QModelIndex& index) const;

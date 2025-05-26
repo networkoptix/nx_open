@@ -81,7 +81,7 @@ void AsyncFileDownloader::setProxyVia(
     m_client.setProxyVia(proxyEndpoint, isSecure, std::move(adapterFunc));
 }
 
-void AsyncFileDownloader::start(const nx::utils::Url& url, std::shared_ptr<QFile> file)
+void AsyncFileDownloader::start(const nx::Url& url, std::shared_ptr<QFile> file)
 {
     if (!NX_ASSERT(m_state == State::init || m_state == State::stopped))
         return;

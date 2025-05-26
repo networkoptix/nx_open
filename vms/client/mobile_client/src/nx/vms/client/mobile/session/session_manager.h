@@ -109,7 +109,7 @@ public:
      * @param credentials Credentials to be used for the connection.
      */
     void startSessionWithCredentials(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const nx::network::http::Credentials& credentials,
         session::ConnectionCallback&& callback = session::ConnectionCallback());
 
@@ -159,7 +159,7 @@ public:
      * @return Whether the connection credentials were found and connection process was started.
      */
     Q_INVOKABLE bool startSessionWithStoredCredentials(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const nx::Uuid& localSystemId,
         const QString& user,
         QJSValue callback = QJSValue());
@@ -175,7 +175,7 @@ public:
      * is successful or not.
      */
     Q_INVOKABLE void startSession(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const QString& user,
         const QString& password,
         const QString& supposedSystemName,
@@ -187,7 +187,7 @@ public:
      * @param callback Callback to signalize if initial connection is successful or not.
      */
     void startSessionByUrl(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         session::ConnectionCallback&& callback = session::ConnectionCallback());
 
     /** Stop currently running session (if any). */

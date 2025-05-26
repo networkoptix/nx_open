@@ -103,7 +103,7 @@ public:
 
 public:
     Q_INVOKABLE void openConnectToServerScreen(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const QString& operationId);
     Q_INVOKABLE void openResourcesScreen(const ResourceIdList& filterIds = ResourceIdList());
     Q_INVOKABLE void openVideoScreen(QnResource* cameraResource, qint64 timestamp);

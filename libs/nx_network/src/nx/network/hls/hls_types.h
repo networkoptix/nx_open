@@ -16,7 +16,7 @@ class NX_NETWORK_API Chunk
 {
 public:
     std::chrono::microseconds duration{0};
-    nx::utils::Url url;
+    nx::Url url;
     /** If true, there is discontinuity between this chunk and previous one. */
     bool discontinuity = false;
     /** #EXT-X-PROGRAM-DATE-TIME tag. */
@@ -37,7 +37,7 @@ public:
 class NX_NETWORK_API VariantPlaylistData
 {
 public:
-    nx::utils::Url url;
+    nx::Url url;
     std::optional<int> bandwidth;
 };
 

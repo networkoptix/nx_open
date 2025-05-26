@@ -24,7 +24,7 @@ bool validateUrlOrEmpty(const QString& value)
 {
     if (value.isEmpty())
         return true;
-    return validateForbiddenSpaces(value) && nx::utils::Url(value).isValid();
+    return validateForbiddenSpaces(value) && nx::Url(value).isValid();
 }
 
 bool validateUrl(const QString& value)

@@ -40,7 +40,7 @@ public:
      * detail::ClientFactory::instance().create.
      */
     Client(
-        const nx::utils::Url& baseTunnelUrl,
+        const nx::Url& baseTunnelUrl,
         const std::string& userTag = "",
         std::optional<int> forcedTunnelType = std::nullopt,
         const ConnectOptions& options = {});
@@ -99,7 +99,7 @@ private:
         OpenTunnelResult result;
     };
 
-    const nx::utils::Url m_baseTunnelUrl;
+    const nx::Url m_baseTunnelUrl;
     std::vector<ClientContext> m_actualClients;
     std::size_t m_completedClients = 0;
     TunnelValidatorFactoryFunc m_validatorFactory;

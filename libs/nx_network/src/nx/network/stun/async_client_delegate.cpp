@@ -22,7 +22,7 @@ void AsyncClientDelegate::bindToAioThread(
 }
 
 void AsyncClientDelegate::connect(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     ConnectHandler handler)
 {
     m_delegate->connect(url, std::move(handler));

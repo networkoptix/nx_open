@@ -14,7 +14,7 @@ class NX_NETWORK_API MultiMessageClient:
 
 public:
     MultiMessageClient(
-        const nx::utils::Url& baseTunnelUrl,
+        const nx::Url& baseTunnelUrl,
         ClientFeedbackFunction clientFeedbackFunction);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;

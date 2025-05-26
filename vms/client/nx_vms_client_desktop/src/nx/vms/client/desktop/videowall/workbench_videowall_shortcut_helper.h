@@ -19,7 +19,7 @@ public:
     static void setVideoWallAutorunEnabled(
         const nx::Uuid& videowallUuid,
         bool value,
-        const nx::utils::Url& serverUrl = {});
+        const nx::Url& serverUrl = {});
 
     static bool canStartVideoWall(const QnVideoWallResourcePtr& videowall);
 };

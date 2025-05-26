@@ -50,7 +50,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 ReverseConnection::ReverseConnection(
-    const nx::utils::Url& relayUrl,
+    const nx::Url& relayUrl,
     std::optional<std::chrono::milliseconds> connectTimeout,
     std::optional<int> forcedHttpTunnelType)
     :
@@ -266,7 +266,7 @@ void ReverseConnection::processTestConnectionNotification(
 
 //-------------------------------------------------------------------------------------------------
 
-ReverseConnector::ReverseConnector(const nx::utils::Url& relayUrl):
+ReverseConnector::ReverseConnector(const nx::Url& relayUrl):
     // NOTE: A null connection factory is passed to the base_type since connectAsync is overridden
     // and, thus, connections are created by this class directly.
     base_type(/*connection factory*/ nullptr),
@@ -295,7 +295,7 @@ void ReverseConnector::setConnectTimeout(std::optional<std::chrono::milliseconds
 
 //-------------------------------------------------------------------------------------------------
 
-ConnectionAcceptor::ConnectionAcceptor(const nx::utils::Url& relayUrl):
+ConnectionAcceptor::ConnectionAcceptor(const nx::Url& relayUrl):
     m_relayUrl(relayUrl),
     m_acceptor(std::make_unique<detail::ReverseConnector>(m_relayUrl))
 {
@@ -446,7 +446,7 @@ ConnectionAcceptorFactory& ConnectionAcceptorFactory::instance()
 }
 
 std::unique_ptr<AbstractConnectionAcceptor> ConnectionAcceptorFactory::defaultFactoryFunc(
-    const nx::utils::Url& relayUrl)
+    const nx::Url& relayUrl)
 {
     return std::make_unique<ConnectionAcceptor>(relayUrl);
 }

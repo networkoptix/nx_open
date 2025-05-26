@@ -406,11 +406,11 @@ bool QnWebResourceWidget::verifyCertificate(const QString& pemString, const QUrl
     if (chain.empty())
         return false;
 
-    return askUserToAcceptCertificate(chain, nx::utils::Url::fromQUrl(url));
+    return askUserToAcceptCertificate(chain, nx::Url::fromQUrl(url));
 }
 
 bool QnWebResourceWidget::askUserToAcceptCertificate(
-    const nx::network::ssl::CertificateChain& chain, const nx::utils::Url& url)
+    const nx::network::ssl::CertificateChain& chain, const nx::Url& url)
 {
     const auto webPage = resource().dynamicCast<QnWebPageResource>();
     const bool isIntegration = ini().webPagesAndIntegrations

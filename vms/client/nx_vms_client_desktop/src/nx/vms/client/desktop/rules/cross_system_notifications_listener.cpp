@@ -76,7 +76,7 @@ public:
                     nx::vms::utils::SystemUri::ReferralSource::DesktopClient,
                     nx::vms::utils::SystemUri::ReferralContext::None);
 
-                auto urlCloud = nx::utils::Url::fromQUrl(cloudUrlHelper.mainUrl());
+                auto urlCloud = nx::Url::fromQUrl(cloudUrlHelper.mainUrl());
 
                 const auto address = nx::network::SocketAddress::fromUrl(urlCloud, true);
 

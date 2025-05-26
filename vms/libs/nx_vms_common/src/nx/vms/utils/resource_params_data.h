@@ -17,7 +17,7 @@ struct NX_VMS_COMMON_API ResourceParamsData
     QString location;
     QByteArray value;
 
-    static ResourceParamsData load(const nx::utils::Url& url);
+    static ResourceParamsData load(const nx::Url& url);
     static ResourceParamsData load(QFile&& file);
 
     static ResourceParamsData getWithGreaterVersion(

@@ -87,7 +87,7 @@ protected:
 
     void whenMakeRequestOnHttp()
     {
-        nx::utils::Url httpUrl = *std::find_if(server().urls().begin(), server().urls().end(),
+        nx::Url httpUrl = *std::find_if(server().urls().begin(), server().urls().end(),
         [] (const auto& url)
         {
             return url.scheme() == nx::network::http::kUrlSchemeName;
@@ -150,7 +150,7 @@ protected:
                 return verifyServerCertificate(std::forward<decltype(args)>(args)...);
             });
 
-        nx::utils::Url httpsUrl = *std::find_if(server().urls().begin(), server().urls().end(),
+        nx::Url httpsUrl = *std::find_if(server().urls().begin(), server().urls().end(),
         [] (const auto& url)
         {
             return url.scheme() == nx::network::http::kSecureUrlSchemeName;
@@ -188,7 +188,7 @@ TEST_F(HttpServerBuilder, preferred_url_has_listening_endpoint)
     buildServer();
 
     ASSERT_EQ(
-        nx::utils::Url(nx::format("https://127.0.0.1:%1").args(server().endpoints().back().port)),
+        nx::Url(nx::format("https://127.0.0.1:%1").args(server().endpoints().back().port)),
         server().preferredUrl());
 }
 
@@ -199,7 +199,7 @@ TEST_F(HttpServerBuilder, preferred_url_has_given_server_name)
     buildServer();
 
     ASSERT_EQ(
-        nx::utils::Url(nx::format("https://example.com:%1").args(server().endpoints().back().port)),
+        nx::Url(nx::format("https://example.com:%1").args(server().endpoints().back().port)),
         server().preferredUrl());
 }
 
@@ -209,7 +209,7 @@ TEST_F(HttpServerBuilder, preferred_url_has_given_server_name_and_port)
 
     buildServer();
 
-    ASSERT_EQ(nx::utils::Url("https://example.com:443"), server().preferredUrl());
+    ASSERT_EQ(nx::Url("https://example.com:443"), server().preferredUrl());
 }
 
 TEST_F(HttpServerBuilder, redirect_http_to_https)

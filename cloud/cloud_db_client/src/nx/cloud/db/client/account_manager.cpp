@@ -66,7 +66,7 @@ void AccountManager::getAccountForSharing(
     api::AccountForSharingRequest accountRequest,
     std::function<void(api::ResultCode, api::AccountForSharing)> completionHandler)
 {
-    nx::utils::UrlQuery query;
+    nx::UrlQuery query;
     if (accountRequest.nonce)
         query.addQueryItem("nonce", *accountRequest.nonce);
 

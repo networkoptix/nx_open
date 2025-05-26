@@ -47,7 +47,7 @@ public:
     /** Sends \param crash to \param serverApi asynchronously
      *  \note Might be used for debug purposes
      */
-    bool send(const nx::utils::Url& serverApi, const QFileInfo& crash);
+    bool send(const nx::Url& serverApi, const QFileInfo& crash);
 
     Settings* settings() const;
 

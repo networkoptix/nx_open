@@ -10,7 +10,7 @@
 namespace nx::network::cloud::relay {
 
 OutgoingTunnelConnection::OutgoingTunnelConnection(
-    nx::utils::Url relayUrl,
+    nx::Url relayUrl,
     std::string relaySessionId,
     std::unique_ptr<nx::cloud::relay::api::AbstractClient> relayApiClient)
     :

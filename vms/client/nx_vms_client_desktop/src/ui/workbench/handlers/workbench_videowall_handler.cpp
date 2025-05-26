@@ -320,7 +320,7 @@ QRect mainWindowGeometry(const QnScreenSnaps& snaps, QWidget* mainWindowWidget)
     return screenSnapsToWidgetGeometry(snaps, mainWindowWidget);
 }
 
-nx::utils::Url serverUrl(const nx::vms::client::core::RemoteConnectionPtr& connection)
+nx::Url serverUrl(const nx::vms::client::core::RemoteConnectionPtr& connection)
 {
     return nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
@@ -328,7 +328,7 @@ nx::utils::Url serverUrl(const nx::vms::client::core::RemoteConnectionPtr& conne
         .toUrl();
 }
 
-nx::utils::Url serverUrl(const QnResourcePtr& resource)
+nx::Url serverUrl(const QnResourcePtr& resource)
 {
     if (const auto context = resource->systemContext())
     {

@@ -31,7 +31,7 @@ struct NX_NETWORK_API TargetHost
      * Filled in case a redirect is needed to reach the requested target.
      * If filled then proxy request will complete with a redirect to the specified URL.
      */
-    std::optional<nx::utils::Url> redirectLocation;
+    std::optional<nx::Url> redirectLocation;
 
     TargetHost() = default;
     TargetHost(network::SocketAddress target);

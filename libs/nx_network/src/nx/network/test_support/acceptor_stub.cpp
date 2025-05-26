@@ -79,7 +79,7 @@ bool AcceptorStub::reportConnectionEstablishedIfNeeded()
     if (!m_connectionEstablishedHandler)
         return false;
 
-    nx::utils::Url nextRemoteAddress;
+    nx::Url nextRemoteAddress;
 
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
@@ -185,8 +185,8 @@ void AcceptorDelegate::cancelIOSync()
 }
 
 void AcceptorStub::setEstablishedConnectionsToReport(
-        std::list<nx::utils::Url> remoteAddresses,
-        nx::utils::SyncQueue<nx::utils::Url>* connectionEstablishedReported)
+        std::list<nx::Url> remoteAddresses,
+        nx::utils::SyncQueue<nx::Url>* connectionEstablishedReported)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_connectionsToRemoteAdressesToReport = std::move(remoteAddresses);

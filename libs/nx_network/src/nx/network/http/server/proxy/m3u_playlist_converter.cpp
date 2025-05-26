@@ -9,7 +9,7 @@ namespace nx::network::http::server::proxy {
 
 M3uPlaylistConverter::M3uPlaylistConverter(
     const AbstractUrlRewriter& urlRewriter,
-    const nx::utils::Url& proxyHostUrl,
+    const nx::Url& proxyHostUrl,
     const std::string& targetHost)
     :
     m_urlRewriter(urlRewriter),
@@ -32,7 +32,7 @@ nx::Buffer M3uPlaylistConverter::convert(
         if (entry.type != EntryType::location)
             continue;
 
-        nx::utils::Url url(entry.value);
+        nx::Url url(entry.value);
         url = m_urlRewriter.originalResourceUrlToProxyUrl(url, m_proxyHostUrl, m_targetHost);
         NX_VERBOSE(this, "Replacing URL %1 with %2", entry.value, url);
         entry.value = url.toString().toStdString();

@@ -16,7 +16,7 @@ class NX_NETWORK_API Client:
 public:
     using ResultCode = nx::network::http::StatusCode::Value;
 
-    Client(const nx::utils::Url& baseApiUrl);
+    Client(const nx::Url& baseApiUrl);
     ~Client();
 
     void getConfiguration(

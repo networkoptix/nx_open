@@ -765,7 +765,7 @@ void RtspStreamProvider::setCredentials(const nx::network::http::Credentials& cr
     m_credentials = credentials;
 }
 
-void  RtspStreamProvider::setUrl(const nx::utils::Url& url)
+void  RtspStreamProvider::setUrl(const nx::Url& url)
 {
     m_url = url;
 }
@@ -1026,7 +1026,7 @@ void RtspStreamProvider::setUserAgent(const QString& value)
     m_RtpSession.setUserAgent(value);
 }
 
-nx::utils::Url RtspStreamProvider::getCurrentStreamUrl() const
+nx::Url RtspStreamProvider::getCurrentStreamUrl() const
 {
     return m_url;
 }
@@ -1409,7 +1409,7 @@ void RtspResourceStreamProvider::processCameraTimeHelperEvent(
     using namespace vms::api;
     const auto currentTime = qnSyncTime->currentTimePoint();
 
-    const nx::utils::Url url(m_resource->getUrl());
+    const nx::Url url(m_resource->getUrl());
     nx::vms::rules::NetworkIssueInfo info;
     info.deviceName = m_resource->getName();
     info.address.address = url.host();

@@ -221,7 +221,7 @@ constexpr auto visitAllConversions(Visitor&& visitor)
                     nx::Uuid(QByteArray(legacyRecord.extractParam("serverId"))),
                     QByteArray(legacyRecord.extractParam("expectedPem")),
                     QByteArray(legacyRecord.extractParam("actualPem")),
-                    nx::utils::Url(legacyRecord.extractParam("url"))};
+                    nx::Url(legacyRecord.extractParam("url"))};
             }},
         Conversion<AuditRecordType::updateInstall>{
             [](const AuditRecord& record, QnLegacyAuditRecord& legacyRecord)

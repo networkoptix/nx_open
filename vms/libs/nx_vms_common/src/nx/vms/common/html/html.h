@@ -7,7 +7,7 @@
 class QColor;
 class QUrl;
 
-namespace nx::utils { class Url; }
+namespace nx { class Url; }
 
 /**
  * Set of functions for generating Qt-compliant html-formatted text lines.
@@ -120,7 +120,7 @@ NX_VMS_COMMON_API QString link(const QUrl& url);
 /**
  * Create html link with text, equal to url.
  */
-NX_VMS_COMMON_API QString link(const nx::utils::Url& url);
+NX_VMS_COMMON_API QString link(const nx::Url& url);
 
 /**
  * Create html link with the given text and url.
@@ -130,7 +130,7 @@ NX_VMS_COMMON_API QString link(const QString& text, const QUrl& url);
 /**
  * Create html link with the given text and url.
  */
-NX_VMS_COMMON_API QString link(const QString& text, const nx::utils::Url& url);
+NX_VMS_COMMON_API QString link(const QString& text, const nx::Url& url);
 
 /**
  * Extended analog of QString::toHtmlEscaped() which also affect spaces.

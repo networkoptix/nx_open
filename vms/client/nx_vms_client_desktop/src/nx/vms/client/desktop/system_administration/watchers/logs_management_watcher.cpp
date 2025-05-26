@@ -541,7 +541,7 @@ struct LogsManagementWatcher::Unit::Private
 
     void startServerDownload(
         const QString& folder,
-        const nx::utils::Url& apiUrl,
+        const nx::Url& apiUrl,
         const network::http::Credentials& credentials,
         nx::network::ssl::AdapterFunc adapterFunc,
         std::function<void()> callback)
@@ -555,7 +555,7 @@ struct LogsManagementWatcher::Unit::Private
         m_downloader->setTimeouts(nx::network::http::AsyncClient::kInfiniteTimeouts);
 
         auto serverId = m_server->getId().toSimpleString();
-        nx::utils::Url url = apiUrl;
+        nx::Url url = apiUrl;
         url.setPath(QString("/rest/v2/servers/%1/logArchive").arg(serverId));
 
         QDir dir(folder);

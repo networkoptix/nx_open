@@ -382,7 +382,7 @@ void Worker::requestFileInformationInternal()
         return;
     }
 
-    const nx::utils::Url& url = fileInformation().url;
+    const nx::Url& url = fileInformation().url;
 
     using Context = RequestContext<FileInformation, Peer>;
     std::vector<Context> contexts;

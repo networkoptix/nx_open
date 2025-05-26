@@ -46,7 +46,7 @@ std::string OpenTunnelResult::toString() const
 namespace detail {
 
 BaseTunnelClient::BaseTunnelClient(
-    const nx::utils::Url& baseTunnelUrl,
+    const nx::Url& baseTunnelUrl,
     ClientFeedbackFunction clientFeedbackFunction)
     :
     m_baseTunnelUrl(baseTunnelUrl),

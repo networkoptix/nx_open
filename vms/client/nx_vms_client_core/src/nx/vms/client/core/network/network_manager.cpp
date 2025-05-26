@@ -141,7 +141,7 @@ void NetworkManager::setDefaultTimeouts(AsyncClient* client)
 void NetworkManager::doRequest(
     nx::network::http::Method method,
     std::unique_ptr<nx::network::http::AsyncClient> request,
-    nx::utils::Url url,
+    nx::Url url,
     QObject* owner,
     RequestCallback callback,
     Qt::ConnectionType connectionType)
@@ -188,7 +188,7 @@ void NetworkManager::doRequest(
 
 void NetworkManager::doConnect(
     std::unique_ptr<nx::network::http::AsyncClient> client,
-    const nx::utils::Url& proxyUrl,
+    const nx::Url& proxyUrl,
     const std::string& targetHost,
     QObject* owner,
     ConnectCallback callback,
@@ -230,7 +230,7 @@ void NetworkManager::doConnect(
 
 void NetworkManager::doGet(
     std::unique_ptr<nx::network::http::AsyncClient> request,
-    nx::utils::Url url,
+    nx::Url url,
     QObject* owner,
     RequestCallback callback,
     Qt::ConnectionType connectionType)
@@ -240,7 +240,7 @@ void NetworkManager::doGet(
 
 void NetworkManager::doPost(
     std::unique_ptr<nx::network::http::AsyncClient> request,
-    nx::utils::Url url,
+    nx::Url url,
     QObject* owner,
     RequestCallback callback,
     Qt::ConnectionType connectionType)
@@ -250,7 +250,7 @@ void NetworkManager::doPost(
 
 void NetworkManager::doPut(
     std::unique_ptr<nx::network::http::AsyncClient> request,
-    nx::utils::Url url,
+    nx::Url url,
     QObject* owner,
     RequestCallback callback,
     Qt::ConnectionType connectionType)
@@ -260,7 +260,7 @@ void NetworkManager::doPut(
 
 void NetworkManager::doDelete(
     std::unique_ptr<nx::network::http::AsyncClient> request,
-    nx::utils::Url url,
+    nx::Url url,
     QObject* owner,
     RequestCallback callback,
     Qt::ConnectionType connectionType)

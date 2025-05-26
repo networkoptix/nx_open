@@ -3101,7 +3101,7 @@ void ActionHandler::at_browseUrlAction_triggered() {
     if (url.isEmpty())
         return;
 
-    QDesktopServices::openUrl(nx::utils::Url::fromUserInput(url).toQUrl());
+    QDesktopServices::openUrl(nx::Url::fromUserInput(url).toQUrl());
 }
 
 void ActionHandler::handleBetaUpdateWarning()
@@ -3309,7 +3309,7 @@ void ActionHandler::openInBrowserDirectly(const QnMediaServerResourcePtr& server
     if (isCloudServer(server))
         return;
 
-    nx::utils::Url url(server->getApiUrl());
+    nx::Url url(server->getApiUrl());
     url.setUserName(QString());
     url.setPassword(QString());
     url.setPath(path);
@@ -3327,7 +3327,7 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
 
     // path may contains path + url query params
     // TODO: #akolesnikov #3.1 VMS-2806
-    nx::utils::Url serverUrl(server->getApiUrl().toString() + path);
+    nx::Url serverUrl(server->getApiUrl().toString() + path);
     serverUrl.setFragment(fragment);
 
     auto systemContext = SystemContext::fromResource(server);
@@ -3340,7 +3340,7 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
         return openInBrowser(server, serverUrl, token.value, AuthMethod::bearerToken);
     }
 
-    nx::utils::Url proxyUrl = QnNetworkProxyFactory::urlToResource(serverUrl, server);
+    nx::Url proxyUrl = QnNetworkProxyFactory::urlToResource(serverUrl, server);
     proxyUrl.setPath(lit("/api/getNonce"));
 
     if (m_serverRequests.find(proxyUrl) == m_serverRequests.end())
@@ -3403,7 +3403,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
 }
 
 void ActionHandler::openInBrowser(
-    const QnMediaServerResourcePtr& server, nx::utils::Url targetUrl,
+    const QnMediaServerResourcePtr& server, nx::Url targetUrl,
     std::string auth, AuthMethod authMethod) const
 {
     targetUrl = QnNetworkProxyFactory::urlToResource(targetUrl, server);
@@ -3437,7 +3437,7 @@ void ActionHandler::openInBrowser(
 
     // Client local gateway uses SSL regardless of its endpoint, so it never makes sense to open
     // gateway url by https.
-    targetUrl = nx::utils::Url(nx::format("https://%1/%2:%3:%4%5?%6").args(
+    targetUrl = nx::Url(nx::format("https://%1/%2:%3:%4%5?%6").args(
         gateway->endpoint().toString(), targetUrl.scheme(),
         targetUrl.host(), targetUrl.port(),
         targetUrl.path(), targetUrl.query()));

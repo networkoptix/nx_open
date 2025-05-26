@@ -58,7 +58,7 @@ class GenericApiClient:
     using base_type = Base;
     using ResultType = typename ApiResultCodeDescriptor::ResultCode;
 public:
-    GenericApiClient(const nx::utils::Url& baseApiUrl, ssl::AdapterFunc adapterFunc);
+    GenericApiClient(const nx::Url& baseApiUrl, ssl::AdapterFunc adapterFunc);
     ~GenericApiClient();
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
@@ -116,7 +116,7 @@ protected:
     void makeAsyncCall(
         const network::http::Method& method,
         const std::string& requestPath,
-        const nx::utils::UrlQuery& urlQuery,
+        const nx::UrlQuery& urlQuery,
         InputData&& inputData,
         Handler handler);
 
@@ -125,14 +125,14 @@ protected:
     void makeAsyncCall(
         const network::http::Method& method,
         const std::string& requestPath,
-        const nx::utils::UrlQuery& urlQuery,
+        const nx::UrlQuery& urlQuery,
         Handler handler);
     template<typename Output, typename InputTuple, typename Handler,
         typename SerializationLibWrapper = detail::NxReflectWrapper, typename... ResponseFetchers>
     void makeAsyncCallWithRetries(
         const network::http::Method& method,
         const std::string& requestPath,
-        const nx::utils::UrlQuery& urlQuery,
+        const nx::UrlQuery& urlQuery,
         std::tuple<ResponseFetchers...> /*dummy*/,
         InputTuple&& argsTuple,
         unsigned attemptNum,
@@ -147,7 +147,7 @@ protected:
 protected:
     virtual void stopWhileInAioThread() override;
 
-    const nx::utils::Url& baseApiUrl() const;
+    const nx::Url& baseApiUrl() const;
 
 private:
     struct Context
@@ -178,7 +178,7 @@ private:
     {
     };
 
-    const nx::utils::Url m_baseApiUrl;
+    const nx::Url m_baseApiUrl;
     ssl::AdapterFunc m_adapterFunc;
     std::map<network::aio::BasicPollable*, Context> m_activeRequests;
     nx::Mutex m_mutex;
@@ -193,7 +193,7 @@ private:
     nx::network::http::HttpHeaders m_lastResponseHeaders;
 
     template<typename Output, typename SerializationLibWrapper, typename... Args>
-    auto createHttpClient(const nx::utils::Url& url, Args&&... args);
+    auto createHttpClient(const nx::Url& url, Args&&... args);
 
     std::string makeCacheKey(const network::http::Method& method, const std::string& requestPath);
 
@@ -257,7 +257,7 @@ public:
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 GenericApiClient<ApiResultCodeDescriptor, Base>::GenericApiClient(
-    const nx::utils::Url& baseApiUrl,
+    const nx::Url& baseApiUrl,
     ssl::AdapterFunc adapterFunc)
     :
     m_baseApiUrl(baseApiUrl),
@@ -330,7 +330,7 @@ template<typename Output, typename... ResponseFetchers, typename InputData, type
 inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCall(
     const network::http::Method& method,
     const std::string& requestPath,
-    const nx::utils::UrlQuery& urlQuery,
+    const nx::UrlQuery& urlQuery,
     InputData&& inputData,
     Handler handler)
 {
@@ -349,7 +349,7 @@ template<typename Output, typename... ResponseFetchers, typename Handler>
 inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCall(
     const network::http::Method& method,
     const std::string& requestPath,
-    const nx::utils::UrlQuery& urlQuery,
+    const nx::UrlQuery& urlQuery,
     Handler handler)
 {
     makeAsyncCallWithRetries<Output>(
@@ -369,7 +369,7 @@ template<typename Output,
 inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCallWithRetries(
     const network::http::Method& method,
     const std::string& requestPath,
-    const nx::utils::UrlQuery& urlQuery,
+    const nx::UrlQuery& urlQuery,
     std::tuple<ResponseFetchers...> /*dummy*/,
     InputTuple&& argsTuple,
     unsigned attemptNum,
@@ -445,7 +445,7 @@ auto GenericApiClient<ApiResultCodeDescriptor, Base>::makeSyncCall(InputArgs&&..
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
-const nx::utils::Url& GenericApiClient<ApiResultCodeDescriptor, Base>::baseApiUrl() const
+const nx::Url& GenericApiClient<ApiResultCodeDescriptor, Base>::baseApiUrl() const
 {
     return m_baseApiUrl;
 }
@@ -453,7 +453,7 @@ const nx::utils::Url& GenericApiClient<ApiResultCodeDescriptor, Base>::baseApiUr
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename Output, typename SerializationLibWrapper, typename... Args>
 auto GenericApiClient<ApiResultCodeDescriptor, Base>::createHttpClient(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     Args&&... args)
 {
     using InputParamType = nx::utils::tuple_first_element_t<std::tuple<std::decay_t<Args>...>>;

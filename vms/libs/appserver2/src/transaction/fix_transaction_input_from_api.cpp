@@ -58,7 +58,7 @@ Result fixRequestDataIfNeeded(nx::vms::api::ResourceParamData* paramData)
 
 Result fixRequestDataIfNeeded(nx::vms::api::StorageData* paramData)
 {
-    nx::utils::Url url = paramData->url;
+    nx::Url url = paramData->url;
     if (url.password().isEmpty())
         return Result();
 
@@ -93,7 +93,7 @@ Result fixRequestDataIfNeeded(nx::vms::api::EventRuleData* paramData)
             NX_FMT("Unsupported `actionParams.httpMethod`: %1", params.httpMethod));
     }
 
-    if (nx::utils::Url url = params.url; !url.password().isEmpty())
+    if (nx::Url url = params.url; !url.password().isEmpty())
     {
         url.setPassword(nx::crypt::encodeHexStringFromStringAES128CBC(url.password()));
         params.url = url.toString();

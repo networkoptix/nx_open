@@ -39,7 +39,7 @@ public:
      * NOTE: url in speedTestSettings has no effect, it is fetched from cloud_modules.xml
      */
     UplinkSpeedReporter(
-        const nx::utils::Url& cloudModulesXmlUrl,
+        const nx::Url& cloudModulesXmlUrl,
         hpm::api::MediatorConnector* mediatorConnector,
         std::unique_ptr<nx::network::aio::Scheduler> scheduler = nullptr,
         const AbstractSpeedTester::Settings& speedTestSettings =
@@ -67,7 +67,7 @@ public:
     /**
      * Replaces cloud_modules.xml url given in constructor. Must be called before start().
      */
-    void setCloudModulesXmlUrl(const nx::utils::Url& url);
+    void setCloudModulesXmlUrl(const nx::Url& url);
 
     /**
      * Checks for valid system credentials and listens for them to be set, invoking a speed test
@@ -81,7 +81,7 @@ private:
 
     void onFetchSpeedTestUrlComplete(
         http::StatusCode::Value statusCode,
-        nx::utils::Url speedTestUrl);
+        nx::Url speedTestUrl);
 
     void onSpeedTestComplete(
         SystemError::ErrorCode errorCode,
@@ -98,7 +98,7 @@ private:
     void fetchSpeedTestUrl();
 
 private:
-    nx::utils::Url m_cloudModulesXmlUrl;
+    nx::Url m_cloudModulesXmlUrl;
     hpm::api::MediatorConnector* m_mediatorConnector;
     nx::utils::SubscriptionId m_systemCredentialsSubscriptionId = nx::utils::kInvalidSubscriptionId;
     std::unique_ptr<AbstractSpeedTester> m_uplinkSpeedTester;

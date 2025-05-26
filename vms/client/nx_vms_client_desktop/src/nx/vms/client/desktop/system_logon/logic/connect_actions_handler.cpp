@@ -1298,7 +1298,7 @@ void ConnectActionsHandler::at_connectAction_triggered()
 
         if (!isTemporaryUser)
         {
-            nx::utils::Url lastUrlForLoginDialog = nx::network::url::Builder()
+            nx::Url lastUrlForLoginDialog = nx::network::url::Builder()
                 .setScheme(nx::network::http::kSecureUrlSchemeName)
                 .setEndpoint(connection->address())
                 .setUserName(QString::fromStdString(connection->credentials().username))

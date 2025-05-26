@@ -313,7 +313,7 @@ protected:
         return m_httpServer;
     }
 
-    nx::utils::Url prepareUrl(const char* urlScheme, const char* path)
+    nx::Url prepareUrl(const char* urlScheme, const char* path)
     {
         return nx::network::url::Builder()
             .setScheme(urlScheme).setEndpoint(m_httpServer.serverAddress()).setPath(path);
@@ -349,7 +349,7 @@ private:
     nx::utils::test::ScopedTimeShift m_timeShift;
     HttpHeaders m_requestHeaders;
 
-    void performRequest(const nx::utils::Url& url, bool reuseConnection = false)
+    void performRequest(const nx::Url& url, bool reuseConnection = false)
     {
         m_prevResponse = std::nullopt;
 

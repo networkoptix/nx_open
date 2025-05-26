@@ -68,7 +68,7 @@ class NX_NETWORK_API BaseTunnelClient:
 
 public:
     BaseTunnelClient(
-        const nx::utils::Url& baseTunnelUrl,
+        const nx::Url& baseTunnelUrl,
         ClientFeedbackFunction clientFeedbackFunction);
     virtual ~BaseTunnelClient() = default;
 
@@ -86,7 +86,7 @@ public:
     const HttpHeaders& customHeaders() const;
 
 protected:
-    const nx::utils::Url m_baseTunnelUrl;
+    const nx::Url m_baseTunnelUrl;
     std::unique_ptr<AsyncClient> m_httpClient;
     OpenTunnelCompletionHandler m_completionHandler;
     std::unique_ptr<network::AbstractStreamSocket> m_connection;

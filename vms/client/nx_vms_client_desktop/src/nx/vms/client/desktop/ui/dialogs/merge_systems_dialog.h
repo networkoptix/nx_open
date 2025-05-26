@@ -35,7 +35,7 @@ public:
     explicit MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate> delegate);
     virtual ~MergeSystemsDialog() override;
 
-    nx::utils::Url url() const;
+    nx::Url url() const;
     QString password() const;
 
 private slots:
@@ -74,7 +74,7 @@ private:
 
     nx::Uuid m_mergeContextId;
     std::optional<nx::vms::api::ModuleInformation> m_targetModule;
-    nx::utils::Url m_url;
+    nx::Url m_url;
     nx::network::http::Credentials m_remoteOwnerCredentials;
 };
 

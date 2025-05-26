@@ -75,7 +75,7 @@ public:
      * Create AdapterFunc that uses the active connection certificate cache.
      */
     virtual nx::network::ssl::AdapterFunc makeAdapterFunc(
-        const nx::Uuid& serverId, const nx::utils::Url& url = {}) override;
+        const nx::Uuid& serverId, const nx::Url& url = {}) override;
 
     /**
      * Check certificate chain using certificate keys in persistent storage.
@@ -141,7 +141,7 @@ public:
     void removeCertificates(const nx::Uuid& serverId);
 
     virtual nx::network::ssl::AdapterFunc makeAdapterFunc(
-        const nx::Uuid& serverId, const nx::utils::Url& url = {}) override;
+        const nx::Uuid& serverId, const nx::Url& url = {}) override;
 
 private:
     struct Private;

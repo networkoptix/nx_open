@@ -89,7 +89,7 @@ void ClientPool::Context::setCanceled()
     state = State::canceled;
 }
 
-nx::utils::Url ClientPool::Context::getUrl() const
+nx::Url ClientPool::Context::getUrl() const
 {
     NX_MUTEX_LOCKER lock(&mutex);
     return request.url;

@@ -9,7 +9,7 @@
 
 namespace nx::vms::common::update {
 
-nx::utils::Url releaseListUrl(SystemContext* context)
+nx::Url releaseListUrl(SystemContext* context)
 {
     QString value = ini().releaseListUrl;
 
@@ -28,7 +28,7 @@ nx::utils::Url releaseListUrl(SystemContext* context)
     return value;
 }
 
-nx::utils::Url updateGeneratorUrl()
+nx::Url updateGeneratorUrl()
 {
     if (!branding::customOfflineUpdateGeneratorUrl().isEmpty())
         return branding::customOfflineUpdateGeneratorUrl();

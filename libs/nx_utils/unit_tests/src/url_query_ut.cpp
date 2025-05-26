@@ -28,7 +28,7 @@ protected:
     template<typename T, typename Key>
     void test(Key key, T val, const std::string& expectedStr)
     {
-        nx::utils::UrlQuery query;
+        nx::UrlQuery query;
         query.addQueryItem(key, val);
 
         ASSERT_EQ(val, query.queryItemValue<T>(key));
@@ -39,7 +39,7 @@ protected:
         const std::string& query,
         const std::vector<std::pair<std::string, bool>>& expected)
     {
-        nx::utils::UrlQuery q(QString::fromStdString(query));
+        nx::UrlQuery q(QString::fromStdString(query));
         for (auto& item: expected)
         {
             ASSERT_EQ(item.second, q.queryItemValue<bool>(item.first));

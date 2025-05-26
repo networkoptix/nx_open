@@ -119,7 +119,7 @@ QN_FUSION_DEFINE_FUNCTIONS(double, (xml_lexical), inline)
 QN_FUSION_DEFINE_FUNCTIONS(QString, (xml_lexical), inline)
 QN_FUSION_DEFINE_FUNCTIONS(nx::Uuid, (xml_lexical), inline)
 QN_FUSION_DEFINE_FUNCTIONS(QUrl, (xml_lexical), inline)
-QN_FUSION_DEFINE_FUNCTIONS(nx::utils::Url, (xml_lexical), inline)
+QN_FUSION_DEFINE_FUNCTIONS(nx::Url, (xml_lexical), inline)
 QN_FUSION_DEFINE_FUNCTIONS(QnLatin1Array, (xml_lexical), inline)
 QN_FUSION_DEFINE_FUNCTIONS(QByteArray, (xml_lexical), inline)
 

@@ -21,7 +21,7 @@ static constexpr std::chrono::milliseconds kOneDay = std::chrono::hours(24);
 } // namespace
 
 UplinkSpeedReporter::UplinkSpeedReporter(
-    const nx::utils::Url& cloudModulesXmlUrl,
+    const nx::Url& cloudModulesXmlUrl,
     hpm::api::MediatorConnector* mediatorConnector,
     std::unique_ptr<nx::network::aio::Scheduler> scheduler,
     const AbstractSpeedTester::Settings& settings)
@@ -79,7 +79,7 @@ void UplinkSpeedReporter::setFetchMediatorAddressHandler(
     m_fetchMediatorAddressHandler = std::move(handler);
 }
 
-void UplinkSpeedReporter::setCloudModulesXmlUrl(const nx::utils::Url& url)
+void UplinkSpeedReporter::setCloudModulesXmlUrl(const nx::Url& url)
 {
     m_cloudModulesXmlUrl = url;
 }
@@ -165,7 +165,7 @@ void UplinkSpeedReporter::onSystemCredentialsSet(
 
 void UplinkSpeedReporter::onFetchSpeedTestUrlComplete(
     http::StatusCode::Value statusCode,
-    nx::utils::Url speedTestUrl)
+    nx::Url speedTestUrl)
 {
     using namespace std::placeholders;
 

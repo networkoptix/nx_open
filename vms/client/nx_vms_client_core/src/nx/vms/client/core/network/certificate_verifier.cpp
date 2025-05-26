@@ -219,7 +219,7 @@ nx::network::ssl::AdapterFunc CertificateVerifier::makeRestrictedAdapterFunc(
 }
 
 nx::network::ssl::AdapterFunc CertificateVerifier::makeAdapterFunc(
-    const nx::Uuid& serverId, const nx::utils::Url& url)
+    const nx::Uuid& serverId, const nx::Url& url)
 {
     if (!nx::network::ini().verifyVmsSslCertificates)
         return nx::network::ssl::kAcceptAnyCertificate;
@@ -307,7 +307,7 @@ struct CertificateCache::Private
     template<typename Chain>
     Status verifyCertificateByCache(
         const nx::Uuid& serverId,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const Chain& chain)
     {
         if (!NX_ASSERT(!serverId.isNull()))
@@ -467,7 +467,7 @@ void CertificateCache::removeCertificates(const nx::Uuid& serverId)
 }
 
 nx::network::ssl::AdapterFunc CertificateCache::makeAdapterFunc(
-    const nx::Uuid& serverId, const nx::utils::Url& url)
+    const nx::Uuid& serverId, const nx::Url& url)
 {
     if (!nx::network::ini().verifyVmsSslCertificates)
         return nx::network::ssl::kAcceptAnyCertificate;

@@ -100,7 +100,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 Uploader::Uploader(
-    const nx::utils::Url& logCollectorUrl,
+    const nx::Url& logCollectorUrl,
     const std::string& sessionId,
     const nx::log::LevelSettings& logFilter)
     :
@@ -350,7 +350,7 @@ void Uploader::reportResult()
 //-------------------------------------------------------------------------------------------------
 
 UploaderManager::UploaderManager(
-    const nx::utils::Url& logCollectorApiBaseUrl,
+    const nx::Url& logCollectorApiBaseUrl,
     const nx::log::LevelSettings& logFilter)
     :
     m_logCollectorApiBaseUrl(logCollectorApiBaseUrl),

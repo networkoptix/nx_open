@@ -57,7 +57,7 @@ public:
     {
         const nx::network::SocketAddress address = queryProcessor()->address();
 
-        const nx::utils::Url url = nx::network::url::Builder()
+        const nx::Url url = nx::network::url::Builder()
             .setScheme(nx::network::http::kSecureUrlSchemeName)
             .setEndpoint(address)
             .toUrl();

@@ -94,14 +94,14 @@ template<typename T>
 nx::coro::Task<CloudResult<T>> cloudGet(
     CloudStatusWatcher* statusWatcher,
     const std::string& path,
-    const nx::utils::UrlQuery& query = {})
+    const nx::UrlQuery& query = {})
 {
     struct Awaiter
     {
         Awaiter(
             nx::cloud::db::client::Connection* connection,
             const std::string& path,
-            const nx::utils::UrlQuery& query)
+            const nx::UrlQuery& query)
             :
             m_connection(connection),
             m_path(path),
@@ -150,7 +150,7 @@ nx::coro::Task<CloudResult<T>> cloudGet(
 
         nx::cloud::db::client::Connection* const m_connection;
         std::string m_path;
-        nx::utils::UrlQuery m_query;
+        nx::UrlQuery m_query;
         std::optional<CloudResult<T>> m_result;
     };
 

@@ -16,7 +16,7 @@ CloudModuleUrlFetcher::CloudModuleUrlFetcher(std::string moduleName):
 {
 }
 
-void CloudModuleUrlFetcher::setUrl(nx::utils::Url url)
+void CloudModuleUrlFetcher::setUrl(nx::Url url)
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     m_url = std::move(url);
@@ -70,7 +70,7 @@ void CloudModuleUrlFetcher::invokeHandler(
     nx::network::http::StatusCode::Value statusCode)
 {
     NX_ASSERT(statusCode != nx::network::http::StatusCode::ok || static_cast<bool>(m_url));
-    handler(statusCode, m_url ? *m_url : nx::utils::Url());
+    handler(statusCode, m_url ? *m_url : nx::Url());
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ void CloudModuleUrlFetcher::ScopedOperation::get(
     m_fetcher->get(auth, std::move(adapterFunc),
         [sharedGuard = std::move(sharedGuard), handler = std::move(handler)](
             nx::network::http::StatusCode::Value statusCode,
-            nx::utils::Url result) mutable
+            nx::Url result) mutable
         {
             if (auto lock = sharedGuard->lock())
                 handler(statusCode, result);

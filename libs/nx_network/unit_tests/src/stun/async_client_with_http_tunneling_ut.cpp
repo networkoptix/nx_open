@@ -151,7 +151,7 @@ protected:
         m_tunnelFactoryBak = http::tunneling::detail::ClientFactory::instance().setCustomFunc(
             [](
                 const std::string& /*tag*/,
-                const nx::utils::Url& url,
+                const nx::Url& url,
                 std::optional<int>,
                 const http::tunneling::ConnectOptions& options)
             {
@@ -171,7 +171,7 @@ private:
     std::unique_ptr<http::TestHttpServer> m_httpServer;
     std::optional<http::tunneling::detail::ClientFactory::Function> m_tunnelFactoryBak;
 
-    nx::utils::Url httpUrl() const
+    nx::Url httpUrl() const
     {
         if (m_httpServer)
         {

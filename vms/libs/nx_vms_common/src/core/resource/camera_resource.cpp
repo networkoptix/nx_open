@@ -1532,7 +1532,7 @@ bool QnVirtualCameraResource::isBackupEnabled() const
 QString QnVirtualCameraResource::getUrl() const
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-    return nx::utils::Url::fromUserInput(m_url).toString();
+    return nx::Url::fromUserInput(m_url).toString();
 }
 
 void QnVirtualCameraResource::setMotionType(nx::vms::api::MotionType value)
@@ -2721,7 +2721,7 @@ QString QnVirtualCameraResource::sourceUrl(Qn::ConnectionRole role) const
     return streamUrls[roleStr].toString();
 }
 
-void QnVirtualCameraResource::updateSourceUrl(const nx::utils::Url& tempUrl,
+void QnVirtualCameraResource::updateSourceUrl(const nx::Url& tempUrl,
     Qn::ConnectionRole role,
     bool save)
 {
@@ -3293,9 +3293,9 @@ int QnVirtualCameraResource::backupMegapixels(nx::vms::api::CameraBackupQuality 
     return result;
 }
 
-nx::utils::Url QnVirtualCameraResource::vmsCloudUrl() const
+nx::Url QnVirtualCameraResource::vmsCloudUrl() const
 {
-    nx::utils::Url result;
+    nx::Url result;
 
     if (!systemContext())
         return result;
@@ -3316,7 +3316,7 @@ nx::utils::Url QnVirtualCameraResource::vmsCloudUrl() const
 
 bool QnVirtualCameraResource::isVmsCloudUrl() const
 {
-    return nx::utils::Url(getUrl()).host().endsWith(kRelayHost);
+    return nx::Url(getUrl()).host().endsWith(kRelayHost);
 }
 
 QSize QnVirtualCameraResource::maxVideoResolution() const

@@ -17,8 +17,8 @@
 #include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/synctime.h>
 
-nx::utils::Url QnNetworkProxyFactory::urlToResource(
-    const nx::utils::Url& baseUrl,
+nx::Url QnNetworkProxyFactory::urlToResource(
+    const nx::Url& baseUrl,
     const QnResourcePtr& resource,
     const QString& proxyQueryParameterName)
 {
@@ -31,7 +31,7 @@ nx::utils::Url QnNetworkProxyFactory::urlToResource(
             break;
         case QNetworkProxy::HttpProxy:
         {
-            nx::utils::Url url(baseUrl);
+            nx::Url url(baseUrl);
             QUrlQuery query(url.query());
             if (proxyQueryParameterName.isEmpty())
                 url.setPath(lit("/proxy/%1%2").arg(resource->getId().toString(QUuid::WithBraces)).arg(url.path()));

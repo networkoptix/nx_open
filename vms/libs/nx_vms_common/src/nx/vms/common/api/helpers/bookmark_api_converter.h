@@ -75,7 +75,7 @@ Bookmark bookmarkToApi(T&& oldBookmark, nx::Uuid serverId, bool includeDigest = 
                 if (includeDigest)
                     share.password = std::forward<T>(oldBookmark).share.digest.value();
                 else
-                    share.password = nx::utils::Url::kMaskedPassword;
+                    share.password = nx::Url::kMaskedPassword;
             }
 
             result.share = std::move(share);

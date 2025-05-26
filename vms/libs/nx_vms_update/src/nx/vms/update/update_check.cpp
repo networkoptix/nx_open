@@ -44,7 +44,7 @@ static utils::OsInfo osInfoFromLegacySystemInformation(
 }
 
 template<typename T>
-std::variant<T, FetchError> fetchJson(const nx::utils::Url& url)
+std::variant<T, FetchError> fetchJson(const nx::Url& url)
 {
     nx::network::http::HttpClient httpClient{nx::network::ssl::kDefaultCertificateCheck};
 
@@ -82,13 +82,13 @@ std::variant<T, FetchError> fetchJson(const nx::utils::Url& url)
 
 } // namespace
 
-FetchReleasesResult fetchReleasesInfo(const nx::utils::Url& url)
+FetchReleasesResult fetchReleasesInfo(const nx::Url& url)
 {
     return fetchJson<ReleasesInfo>(url);
 }
 
 FetchPublicationInfoResult fetchPublicationInfo(
-    const nx::utils::SoftwareVersion& version, const nx::utils::Url& urlPrefix)
+    const nx::utils::SoftwareVersion& version, const nx::Url& urlPrefix)
 {
     const utils::SoftwareVersion kFullVersionUrlsAppearedVersion(4, 2);
 
@@ -117,7 +117,7 @@ FetchPublicationInfoResult fetchPublicationInfo(
 }
 
 FetchPublicationInfoResult fetchPublicationInfo(
-    const nx::utils::SoftwareVersion& version, const QVector<nx::utils::Url>& urlPrefixes)
+    const nx::utils::SoftwareVersion& version, const QVector<nx::Url>& urlPrefixes)
 {
     if (!NX_ASSERT(!urlPrefixes.isEmpty()))
         return FetchError::paramsError;
@@ -166,7 +166,7 @@ FetchPublicationInfoResult fetchPublicationInfo(
 }
 
 FetchPublicationInfoResult fetchLegacyPublicationInfo(
-    const nx::utils::SoftwareVersion& version, const nx::utils::Url& urlPrefix)
+    const nx::utils::SoftwareVersion& version, const nx::Url& urlPrefix)
 {
     // Legacy versions don't have full version in URLs.
     auto publicationUrlPath = urlPrefix.path() + nx::format("/%1/", version.build);
@@ -286,7 +286,7 @@ FetchPublicationInfoResult fetchLegacyPublicationInfo(
 }
 
 FetchPublicationInfoResult fetchLegacyPublicationInfo(
-    const nx::utils::SoftwareVersion& version, const QVector<nx::utils::Url>& urlPrefixes)
+    const nx::utils::SoftwareVersion& version, const QVector<nx::Url>& urlPrefixes)
 {
     if (!NX_ASSERT(!urlPrefixes.isEmpty()))
         return FetchError::paramsError;
@@ -309,7 +309,7 @@ FetchPublicationInfoResult fetchLegacyPublicationInfo(
 
 static PublicationInfoResult getCertainVersionPublicationInfo(
     const nx::utils::SoftwareVersion& version,
-    const QVector<nx::utils::Url>& urlPrexifes)
+    const QVector<nx::Url>& urlPrexifes)
 {
     // When we have only publication key, we don't know if it's a legacy package or new package, so
     // try both variants.
@@ -330,7 +330,7 @@ static PublicationInfoResult getCertainVersionPublicationInfo(
 }
 
 PublicationInfoResult getPublicationInfo(
-    const nx::utils::Url& url, const PublicationInfoParams& params)
+    const nx::Url& url, const PublicationInfoParams& params)
 {
     const auto releasesResult = fetchReleasesInfo(url);
     if (std::holds_alternative<FetchError>(releasesResult))

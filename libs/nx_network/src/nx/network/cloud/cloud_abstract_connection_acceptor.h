@@ -14,7 +14,7 @@ namespace nx::network::cloud {
  */
 struct NX_NETWORK_API AcceptorError
 {
-    nx::utils::Url remoteAddress;
+    nx::Url remoteAddress;
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
     std::optional<http::StatusCode::Value> httpStatusCode;
 
@@ -31,7 +31,7 @@ public:
     using ErrorHandler = nx::utils::MoveOnlyFunc<void(AcceptorError)>;
 
     using ConnectionEstablishedHandler =
-        nx::utils::MoveOnlyFunc<void(nx::utils::Url /*remoteAddress*/)>;
+        nx::utils::MoveOnlyFunc<void(nx::Url /*remoteAddress*/)>;
 
     /**
      * @return Ready-to-use connection from internal listen queue.

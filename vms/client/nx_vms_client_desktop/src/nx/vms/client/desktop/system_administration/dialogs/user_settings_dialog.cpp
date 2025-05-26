@@ -105,7 +105,7 @@ enum LinkHostPriority
 };
 
 const auto customPriority =
-    [](const nx::utils::Url& url) -> int
+    [](const nx::Url& url) -> int
     {
         using namespace nx::vms::common;
         switch (serverHostPriority(url.host()))

@@ -204,7 +204,7 @@ bool IOModuleMonitor::open()
     d->multipartContentParser->setNextFilter(std::make_shared<MessageBodyParser>(this));
 
     d->httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, server->getId().toSimpleStdString());
-    nx::utils::Url requestUrl(server->getApiUrl());
+    nx::Url requestUrl(server->getApiUrl());
     requestUrl.setPath(lit("/api/iomonitor"));
     QUrlQuery query;
     query.addQueryItem(QString::fromLatin1(Qn::PHYSICAL_ID_URL_QUERY_ITEM), d->camera->getPhysicalId());

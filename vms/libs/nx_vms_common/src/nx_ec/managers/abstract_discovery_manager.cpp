@@ -6,7 +6,7 @@
 
 namespace ec2 {
 
-ErrorCode AbstractDiscoveryManager::discoverPeerSync(const nx::Uuid& id, const nx::utils::Url& url)
+ErrorCode AbstractDiscoveryManager::discoverPeerSync(const nx::Uuid& id, const nx::Url& url)
 {
     return detail::callSync(
         [&](auto handler)
@@ -16,7 +16,7 @@ ErrorCode AbstractDiscoveryManager::discoverPeerSync(const nx::Uuid& id, const n
 }
 
 ErrorCode AbstractDiscoveryManager::addDiscoveryInformationSync(
-    const nx::Uuid& id, const nx::utils::Url& url, bool ignore)
+    const nx::Uuid& id, const nx::Url& url, bool ignore)
 {
     return detail::callSync(
         [&](auto handler)
@@ -26,7 +26,7 @@ ErrorCode AbstractDiscoveryManager::addDiscoveryInformationSync(
 }
 
 ErrorCode AbstractDiscoveryManager::removeDiscoveryInformationSync(
-    const nx::Uuid& id, const nx::utils::Url& url, bool ignore)
+    const nx::Uuid& id, const nx::Url& url, bool ignore)
 {
     return detail::callSync(
         [&](auto handler)

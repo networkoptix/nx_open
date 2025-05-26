@@ -43,7 +43,7 @@ void RecentLocalSystemFinder::updateSystems()
             continue;
 
         const bool hasOnlyCloudUrls = std::all_of(connection.urls.cbegin(), connection.urls.cend(),
-            [](const nx::utils::Url& url)
+            [](const nx::Url& url)
             {
                 return nx::network::SocketGlobals::addressResolver().isCloudHostname(url.host());
             });

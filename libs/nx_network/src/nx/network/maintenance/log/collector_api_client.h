@@ -21,7 +21,7 @@ class CollectorApiClient:
     using base_type = nx::network::aio::BasicPollable;
 
 public:
-    CollectorApiClient(const nx::utils::Url& baseApiUrl);
+    CollectorApiClient(const nx::Url& baseApiUrl);
     ~CollectorApiClient();
 
     virtual void bindToAioThread(aio::AbstractAioThread*) override;
@@ -41,7 +41,7 @@ private:
 
 private:
     aio::AsyncOperationPool<http::AsyncClient> m_httpClientPool;
-    const nx::utils::Url m_baseApiUrl;
+    const nx::Url m_baseApiUrl;
 };
 
 } // namespace nx::network::maintenance::log

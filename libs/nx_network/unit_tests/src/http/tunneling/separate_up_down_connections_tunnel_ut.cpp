@@ -128,17 +128,17 @@ private:
     nx::utils::SyncQueue<
         std::tuple<AsyncMessagePipeline*, SystemError::ErrorCode, bool>> m_connectionClosedEvents;
 
-    nx::utils::Url downChannelUrl()
+    nx::Url downChannelUrl()
     {
         return channelUrl(detail::kExperimentalTunnelDownPath);
     }
 
-    nx::utils::Url upChannelUrl()
+    nx::Url upChannelUrl()
     {
         return channelUrl(detail::kExperimentalTunnelUpPath);
     }
 
-    nx::utils::Url channelUrl(const std::string& path)
+    nx::Url channelUrl(const std::string& path)
     {
         return nx::network::url::Builder(baseUrl()).appendPath(
             rest::substituteParameters(path, {"testTunnelId"}))
@@ -175,7 +175,7 @@ private:
         m_completedOpenDownChannelRequests.push(std::move(httpClient));
     }
 
-    void addTunnelRequest(Method method, const nx::utils::Url& url, nx::Buffer* buf)
+    void addTunnelRequest(Method method, const nx::Url& url, nx::Buffer* buf)
     {
         Message msg(MessageType::request);
         msg.request->requestLine.method = method;

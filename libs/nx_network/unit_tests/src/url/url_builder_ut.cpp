@@ -9,10 +9,10 @@ namespace nx::network::url::test {
 
 namespace {
 
-static const nx::utils::Url kSampleUrl("https://localhost:7001");
+static const nx::Url kSampleUrl("https://localhost:7001");
 static const std::string kSampleHost = "localhost";
 
-static bool urlIsValid(const nx::utils::Url& url)
+static bool urlIsValid(const nx::Url& url)
 {
     return url.isValid() && url.toQUrl().isValid();
 }
@@ -76,7 +76,7 @@ INSTANTIATE_TEST_SUITE_P(UrlBuilderParseIPv6Host,
 class BuildUrlWithHostAndPath: public BuildUrlWithPath
 {
 protected:
-    nx::utils::Url url() const { return Builder(kSampleUrl).setPath(path()); }
+    nx::Url url() const { return Builder(kSampleUrl).setPath(path()); }
 };
 
 TEST_P(BuildUrlWithHostAndPath, urlIsValid)
@@ -137,7 +137,7 @@ TEST_P(BuildUrlWithHostAndPath, noDoubleSlashInPath)
 class BuildUrlWithPathOnly: public BuildUrlWithPath
 {
 protected:
-    nx::utils::Url url() const { return Builder().setPath(path()); }
+    nx::Url url() const { return Builder().setPath(path()); }
 };
 
 TEST_P(BuildUrlWithPathOnly, urlIsValid)

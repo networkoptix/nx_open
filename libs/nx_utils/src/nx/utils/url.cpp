@@ -12,7 +12,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/nx_utils_ini.h>
 
-namespace nx::utils {
+namespace nx {
 
 Url::Url() {}
 
@@ -91,7 +91,7 @@ QString Url::toString(QUrl::FormattingOptions options) const
 
 QString Url::toWebClientStandardViolatingUrl(QUrl::FormattingOptions options) const
 {
-    nx::utils::Url newUrl(*this);
+    nx::Url newUrl(*this);
 
     if (hasFragment())
     {
@@ -425,7 +425,7 @@ QString Url::toLocalFile() const
 
 Url Url::cleanUrl() const
 {
-    nx::utils::Url url;
+    nx::Url url;
     url.setScheme(m_url.scheme());
     url.setHost(m_url.host());
     url.setPort(m_url.port());
@@ -483,9 +483,9 @@ std::string Url::toPercentEncoding(
         QByteArray::fromRawData(include.data(), include.size())).toStdString();
 }
 
-namespace url {
+namespace utils::url {
 
-bool equal(const nx::utils::Url& lhs, const nx::utils::Url& rhs, ComparisonFlags flags)
+bool equal(const nx::Url& lhs, const nx::Url& rhs, ComparisonFlags flags)
 {
     if (flags.testFlag(ComparisonFlag::All))
         return lhs == rhs;
@@ -500,7 +500,7 @@ bool equal(const nx::utils::Url& lhs, const nx::utils::Url& rhs, ComparisonFlags
         && (!flags.testFlag(ComparisonFlag::Query) || lhs.query() == rhs.query());
 }
 
-nx::utils::Url parseUrlFields(const QString &urlStr, QString scheme)
+nx::Url parseUrlFields(const QString &urlStr, QString scheme)
 {
     Url result;
 
@@ -537,7 +537,7 @@ nx::utils::Url parseUrlFields(const QString &urlStr, QString scheme)
     return result;
 }
 
-QString hidePassword(nx::utils::Url url)
+QString hidePassword(nx::Url url)
 {
     if (nx::log::showPasswords())
         return url.toString();
@@ -558,7 +558,7 @@ QString hidePassword(nx::utils::Url url)
     return url.toString();
 }
 
-bool webPageHostsEqual(const nx::utils::Url& left, const nx::utils::Url& right)
+bool webPageHostsEqual(const nx::Url& left, const nx::Url& right)
 {
     static const QString kPrefix = "www.";
     const QStringView leftHost{left.host()};
@@ -568,9 +568,9 @@ bool webPageHostsEqual(const nx::utils::Url& left, const nx::utils::Url& right)
         == rightHost.sliced(rightHost.startsWith(kPrefix) ? kPrefix.length() : 0);
 }
 
-} // namespace url
+} // namespace utils::url
 
-QString toString(const nx::utils::Url& value)
+QString toString(const nx::Url& value)
 {
     if (nx::log::showPasswords())
         return value.toString();
@@ -578,15 +578,15 @@ QString toString(const nx::utils::Url& value)
     return value.toDisplayString();
 }
 
-} // namespace nx::utils
+} // namespace nx
 
-void serialize(QnJsonContext* /*ctx*/, const nx::utils::Url& url, QJsonValue* target)
+void serialize(QnJsonContext* /*ctx*/, const nx::Url& url, QJsonValue* target)
 {
     *target = QJsonValue(url.toString());
 }
 
-bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, nx::utils::Url* target)
+bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, nx::Url* target)
 {
-    *target = nx::utils::Url(value.toString());
+    *target = nx::Url(value.toString());
     return true;
 }

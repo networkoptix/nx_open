@@ -5,7 +5,7 @@
 namespace nx::network::http::tunneling::detail {
 
 MultiMessageClient::MultiMessageClient(
-    const nx::utils::Url& baseTunnelUrl,
+    const nx::Url& baseTunnelUrl,
     ClientFeedbackFunction clientFeedbackFunction)
     :
     base_type(baseTunnelUrl, std::move(clientFeedbackFunction))

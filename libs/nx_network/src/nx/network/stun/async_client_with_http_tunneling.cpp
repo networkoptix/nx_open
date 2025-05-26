@@ -44,7 +44,7 @@ void AsyncClientWithHttpTunneling::bindToAioThread(
         m_httpTunnelingClient->bindToAioThread(aioThread);
 }
 
-void AsyncClientWithHttpTunneling::connect(const nx::utils::Url& url, ConnectHandler handler)
+void AsyncClientWithHttpTunneling::connect(const nx::Url& url, ConnectHandler handler)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_url = url;
@@ -371,7 +371,7 @@ void AsyncClientWithHttpTunneling::dispatchIndication(
 
 void AsyncClientWithHttpTunneling::openHttpTunnel(
     const nx::Locker<nx::Mutex>&,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     ConnectHandler handler)
 {
     using namespace std::placeholders;

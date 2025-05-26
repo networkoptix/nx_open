@@ -345,11 +345,11 @@ bool loadFromUrlQuery(
         nx::network::rest::Params::fromUrlQuery(urlQuery), filter, resourcePool, taxonomyStateWatcher);
 }
 
-void serializeToUrlQuery(const Filter& filter, nx::utils::UrlQuery& urlQuery)
+void serializeToUrlQuery(const Filter& filter, nx::UrlQuery& urlQuery)
 {
     auto paramList = std::make_unique<nx::network::rest::Params>();
     serializeToParams(filter, paramList.get());
-    urlQuery = nx::utils::UrlQuery(paramList->toUrlQuery());
+    urlQuery = nx::UrlQuery(paramList->toUrlQuery());
 }
 
 std::set<QString> addDerivedTypeIds(

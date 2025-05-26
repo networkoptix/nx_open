@@ -14,7 +14,7 @@
 namespace nx::cloud::relay::api::detail {
 
 ClientOverHttpTunnel::ClientOverHttpTunnel(
-    const nx::utils::Url& baseUrl,
+    const nx::Url& baseUrl,
     std::optional<int> forcedHttpTunnelType)
     :
     base_type(baseUrl),

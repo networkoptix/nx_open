@@ -17,7 +17,7 @@ class NX_NETWORK_API MaintenanceClient:
     using base_type = nx::network::http::GenericApiClient<ResultDescriptor>;
 
 public:
-    MaintenanceClient(const nx::utils::Url& baseUrl);
+    MaintenanceClient(const nx::Url& baseUrl);
 
     void getRelays(nx::utils::MoveOnlyFunc<void(api::Result, api::Relays)> handler);
     std::tuple<api::Result, api::Relays> getRelays();

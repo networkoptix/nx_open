@@ -108,7 +108,7 @@ static std::unique_ptr<AbstractDatagramSocket> datagramSocket()
 
 TestListeningPeer::TestListeningPeer(
     const network::SocketAddress& mediatorUdpEndpoint,
-    const nx::utils::Url& mediatorTcpUrl,
+    const nx::Url& mediatorTcpUrl,
     SystemCredentials systemData,
     std::string serverName)
 :
@@ -496,7 +496,7 @@ std::unique_ptr<TestListeningPeer> TestListeningPeer::buildServer(
     std::string name,
     ServerTweak serverConf,
     const SocketAddress& stunUdpEndpoint,
-    const nx::utils::Url& mediatorTcpUrl)
+    const nx::Url& mediatorTcpUrl)
 {
     auto server = std::make_unique<TestListeningPeer>(
         stunUdpEndpoint,

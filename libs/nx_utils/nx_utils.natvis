@@ -18,7 +18,7 @@
       <DisplayString>{m_uuid}</DisplayString>
   </Type>
 
-  <Type Name="nx::utils::Url">
+  <Type Name="nx::Url">
     <Intrinsic Name="memberOffset" Expression="sizeof(QAtomicInt) + sizeof(int) + (sizeof(QString) * count)">
       <Parameter Name="count" Type="int"/>
     </Intrinsic>

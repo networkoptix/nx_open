@@ -42,9 +42,9 @@ public:
 
     nx::vms::api::ModuleInformationWithAddresses getServer(const nx::Uuid& serverId) const override;
 
-    nx::utils::Url getServerHost(const nx::Uuid& serverId) const override;
+    nx::Url getServerHost(const nx::Uuid& serverId) const override;
 
-    QSet<nx::utils::Url> getServerRemoteAddresses(const nx::Uuid& serverId) const override;
+    QSet<nx::Url> getServerRemoteAddresses(const nx::Uuid& serverId) const override;
 
     qint64 getServerLastUpdatedMs(const nx::Uuid& serverId) const override;
 
@@ -77,7 +77,7 @@ public:
 
     void removeServer(const nx::Uuid& serverId);
 
-    void setServerHost(const nx::Uuid& serverId, const nx::utils::Url& host);
+    void setServerHost(const nx::Uuid& serverId, const nx::Url& host);
 
     void setName(const QString& value);
 
@@ -103,9 +103,9 @@ private:
     QString m_systemName;
     QHash<nx::Uuid, QElapsedTimer> m_serverTimestamps;
     QHash<nx::Uuid, nx::vms::api::ModuleInformationWithAddresses> m_servers;
-    mutable QHash<nx::Uuid, QSet<nx::utils::Url>> m_remoteAddressesCache;
+    mutable QHash<nx::Uuid, QSet<nx::Url>> m_remoteAddressesCache;
     QMultiMap<int, nx::Uuid> m_prioritized;
-    QHash<nx::Uuid, nx::utils::Url> m_hosts;
+    QHash<nx::Uuid, nx::Url> m_hosts;
     QSet<nx::Uuid> m_reachableServers;
     bool m_isPending = false;
 };

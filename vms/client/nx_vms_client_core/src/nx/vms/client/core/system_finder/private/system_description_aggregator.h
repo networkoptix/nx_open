@@ -72,9 +72,9 @@ public:
 
     nx::vms::api::ModuleInformationWithAddresses getServer(const nx::Uuid& serverId) const override;
 
-    nx::utils::Url getServerHost(const nx::Uuid& serverId) const override;
+    nx::Url getServerHost(const nx::Uuid& serverId) const override;
 
-    QSet<nx::utils::Url> getServerRemoteAddresses(const nx::Uuid& serverId) const override;
+    QSet<nx::Url> getServerRemoteAddresses(const nx::Uuid& serverId) const override;
 
     qint64 getServerLastUpdatedMs(const nx::Uuid& serverId) const override;
 

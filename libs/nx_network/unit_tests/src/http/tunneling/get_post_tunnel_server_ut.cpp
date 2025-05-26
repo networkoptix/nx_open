@@ -180,7 +180,7 @@ private:
     Request m_userRequest;
     nx::utils::SyncQueue<StatusCode::Value> m_requestResults;
 
-    void addTunnelGetRequest(const nx::utils::Url& url, nx::Buffer* buf)
+    void addTunnelGetRequest(const nx::Url& url, nx::Buffer* buf)
     {
         Message getRequest(MessageType::request);
         getRequest.request->requestLine.method = Method::get;
@@ -189,7 +189,7 @@ private:
         getRequest.serialize(buf);
     }
 
-    void addTunnelPostRequest(const nx::utils::Url& url, nx::Buffer* buf)
+    void addTunnelPostRequest(const nx::Url& url, nx::Buffer* buf)
     {
         Message postRequest(MessageType::request);
         postRequest.request->requestLine.method = Method::post;

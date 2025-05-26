@@ -171,7 +171,7 @@ bool amendOutputDataIfNeeded(
     QnResourceAccessManager* accessManager,
     nx::vms::api::StorageData* storageData)
 {
-    nx::utils::Url url(storageData->url);
+    nx::Url url(storageData->url);
     const nx::log::Tag kLogTag(QString("AmendStorageData"));
     if (url.password().isEmpty())
     {
@@ -191,7 +191,7 @@ bool amendOutputDataIfNeeded(
         NX_VERBOSE(
             kLogTag, "%1: Masking url '%2' password",
             __func__, url.toDisplayString(QUrl::RemovePassword));
-        url.setPassword(nx::utils::Url::kMaskedPassword);
+        url.setPassword(nx::Url::kMaskedPassword);
     }
 
     storageData->url = url.toString();
@@ -306,14 +306,14 @@ bool amendOutputDataIfNeeded(
     if (!QJson::deserialize<nx::vms::event::ActionParameters>(rule->actionParams, &params))
         return false;
 
-    nx::utils::Url url = params.url;
+    nx::Url url = params.url;
     if (url.password().isEmpty())
         return false;
 
     if (accessManager->hasPowerUserPermissions(accessData))
         url.setPassword(nx::crypt::decodeStringFromHexStringAES128CBC(url.password()));
     else
-        url.setPassword(nx::utils::Url::kMaskedPassword);
+        url.setPassword(nx::Url::kMaskedPassword);
     params.url = url.toString();
     rule->actionParams = QJson::serialized(params);
     return true;
@@ -345,7 +345,7 @@ bool amendOutputDataIfNeeded(
                     }
                     else
                     {
-                        it.value() = QString(nx::utils::Url::kMaskedPassword);
+                        it.value() = QString(nx::Url::kMaskedPassword);
                     }
 
                     ++count;

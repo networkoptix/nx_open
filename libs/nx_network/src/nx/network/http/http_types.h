@@ -339,7 +339,7 @@ public:
 
     // FIXME: URL is not correct structure here, should use more general structure.
     //        See: RFC 2616, section-5.1.2.
-    nx::utils::Url url;
+    nx::Url url;
     MimeProtoVersion version;
 
     bool parse(const ConstBufferRefType& data);
@@ -353,7 +353,7 @@ public:
      * Encodes the URL before putting it into the HTTP request.
      */
     std::string encodeUrl(
-        const nx::utils::Url& url, EncodeUrlParts parts = EncodeUrlParts::all) const;
+        const nx::Url& url, EncodeUrlParts parts = EncodeUrlParts::all) const;
 };
 
 inline bool operator==(const RequestLine& left, const RequestLine& right)

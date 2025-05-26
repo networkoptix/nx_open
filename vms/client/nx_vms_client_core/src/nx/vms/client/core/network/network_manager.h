@@ -58,7 +58,7 @@ public:
     void doRequest(
         nx::network::http::Method method,
         std::unique_ptr<nx::network::http::AsyncClient> request,
-        nx::utils::Url url,
+        nx::Url url,
         QObject* owner,
         RequestCallback callback,
         Qt::ConnectionType connectionType = Qt::AutoConnection);
@@ -69,7 +69,7 @@ public:
      */
     void doGet(
         std::unique_ptr<nx::network::http::AsyncClient> request,
-        nx::utils::Url url,
+        nx::Url url,
         QObject* owner,
         RequestCallback callback,
         Qt::ConnectionType connectionType = Qt::AutoConnection);
@@ -80,7 +80,7 @@ public:
      */
     void doPost(
         std::unique_ptr<nx::network::http::AsyncClient> request,
-        nx::utils::Url url,
+        nx::Url url,
         QObject* owner,
         RequestCallback callback,
         Qt::ConnectionType connectionType = Qt::AutoConnection);
@@ -91,7 +91,7 @@ public:
      */
     void doPut(
         std::unique_ptr<nx::network::http::AsyncClient> request,
-        nx::utils::Url url,
+        nx::Url url,
         QObject* owner,
         RequestCallback callback,
         Qt::ConnectionType connectionType = Qt::AutoConnection);
@@ -102,7 +102,7 @@ public:
      */
     void doDelete(
         std::unique_ptr<nx::network::http::AsyncClient> request,
-        nx::utils::Url url,
+        nx::Url url,
         QObject* owner,
         RequestCallback callback,
         Qt::ConnectionType connectionType = Qt::AutoConnection);
@@ -115,7 +115,7 @@ public:
     * Connected socket can be extracted and used in new AsyncClient for proxified request.
     */
     void doConnect(std::unique_ptr<nx::network::http::AsyncClient> client,
-        const nx::utils::Url& proxyUrl,
+        const nx::Url& proxyUrl,
         const std::string& targetHost,
         QObject* owner,
         ConnectCallback callback,

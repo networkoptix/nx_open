@@ -104,7 +104,7 @@ private:
         QHostAddress localInterfaceAddress;
         /** Device uuid. Places as a separator member because it becomes known before devInfo. */
         QByteArray uuid;
-        nx::utils::Url descriptionUrl;
+        nx::Url descriptionUrl;
         DeviceInfo devInfo;
         QByteArray xmlDevInfo;
     };
@@ -169,7 +169,7 @@ private:
     std::shared_ptr<AbstractDatagramSocket> getSockByIntf(const HostAddress& address);
     void startFetchDeviceXml(
         const QByteArray& uuidStr,
-        const nx::utils::Url& descriptionUrl,
+        const nx::Url& descriptionUrl,
         const HostAddress& sender);
     void processDeviceXml(const DiscoveredDeviceInfo& devInfo, const nx::Buffer& foundDeviceDescription);
     QHostAddress findBestIface(const HostAddress& host);

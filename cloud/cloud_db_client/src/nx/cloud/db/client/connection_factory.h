@@ -28,7 +28,7 @@ public:
     virtual void setCloudUrl(const std::string& url) override;
 
 private:
-    nx::utils::Url m_cloudUrl;
+    nx::Url m_cloudUrl;
 };
 
 } // nx::cloud::db::client

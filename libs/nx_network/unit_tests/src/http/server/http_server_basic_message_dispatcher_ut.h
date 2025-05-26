@@ -202,7 +202,7 @@ private:
         request.requestLine.method = method;
         request.requestLine.version = nx::network::http::http_1_1;
         request.requestLine.url =
-            nx::utils::Url(nx::utils::buildString("http://127.0.0.1:7001", path));
+            nx::Url(nx::utils::buildString("http://127.0.0.1:7001", path));
         return request;
     }
 };

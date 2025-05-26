@@ -299,7 +299,7 @@ public:
     Handle downloadFileChunkFromInternet(
         const nx::Uuid& serverId,
         const QString& fileName,
-        const nx::utils::Url &url,
+        const nx::Url &url,
         int chunkIndex,
         int chunkSize,
         qint64 fileSize,

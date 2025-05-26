@@ -25,7 +25,7 @@ static const std::vector<UniqueLicenseType> kUniqueLicenseTypes{
 namespace nx::vms::license {
 
 QnLicenseList remoteLicenses(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const QAuthenticator& auth,
     nx::network::ssl::AdapterFunc adapterFunc,
     int* status)
@@ -92,7 +92,7 @@ MergeSystemsStatus remoteLicensesConflict(
 
 MergeSystemsStatus remoteLicensesConflict(
     QnLicensePool* localLicensesPool,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const QAuthenticator& auth,
     nx::network::ssl::AdapterFunc adapterFunc)
 {

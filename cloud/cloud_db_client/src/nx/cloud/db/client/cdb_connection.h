@@ -21,7 +21,7 @@ class Connection:
 {
 public:
     Connection(
-        const nx::utils::Url& baseUrl,
+        const nx::Url& baseUrl,
         nx::network::ssl::AdapterFunc adapterFunc);
 
     virtual api::AccountManager* accountManager() override;

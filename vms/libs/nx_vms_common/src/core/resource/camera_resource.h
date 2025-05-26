@@ -135,7 +135,7 @@ public:
 
     virtual QString getProperty(const QString& key) const override;
 
-    // TODO: #skolesnik nx::utils::Url
+    // TODO: #skolesnik nx::Url
     virtual void setUrl(const QString& url) override;
 
     virtual nx::network::HostAddress getHostAddress() const;
@@ -700,7 +700,7 @@ public:
      */
     bool isBackupEnabled() const;
 
-    // TODO: #skolesnik nx::utils::Url ?
+    // TODO: #skolesnik nx::Url ?
     virtual QString getUrl() const override;
 
     nx::vms::api::CameraAttributesData getUserAttributes() const;
@@ -716,7 +716,7 @@ public:
 
     //! Camera source URL, commonly - rtsp link.
     QString sourceUrl(Qn::ConnectionRole role) const;
-    void updateSourceUrl(const nx::utils::Url& url, Qn::ConnectionRole role, bool save = true);
+    void updateSourceUrl(const nx::Url& url, Qn::ConnectionRole role, bool save = true);
 
     bool virtualCameraIgnoreTimeZone() const;
     /**
@@ -879,7 +879,7 @@ public:
     int backupMegapixels(nx::vms::api::CameraBackupQuality quality) const;
 
     QnLiveStreamParams streamConfiguration(nx::vms::api::StreamIndex stream) const;
-    nx::utils::Url vmsCloudUrl() const;
+    nx::Url vmsCloudUrl() const;
     bool isVmsCloudUrl() const;
 
     QSize maxVideoResolution() const;

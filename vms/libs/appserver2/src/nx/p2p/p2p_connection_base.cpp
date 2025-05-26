@@ -64,7 +64,7 @@ ConnectionBase::ConnectionBase(
     const nx::Uuid& remoteId,
     nx::vms::api::PeerType remotePeerType,
     const vms::api::PeerDataEx& localPeer,
-    const nx::utils::Url& remotePeerUrl,
+    const nx::Url& remotePeerUrl,
     const std::chrono::seconds& keepAliveTimeout,
     std::unique_ptr<QObject> opaqueObject,
     network::ssl::AdapterFunc adapterFunc,
@@ -159,16 +159,16 @@ ConnectionBase::~ConnectionBase()
 {
 }
 
-nx::utils::Url ConnectionBase::remoteAddr() const
+nx::Url ConnectionBase::remoteAddr() const
 {
     if (m_direction == Direction::outgoing)
         return m_remotePeerUrl;
     if (m_p2pTransport)
     {
         auto address = m_p2pTransport->getForeignAddress();
-        return nx::utils::Url(nx::format("http://%1").args(address));
+        return nx::Url(nx::format("http://%1").args(address));
     }
-    return nx::utils::Url();
+    return nx::Url();
 }
 
 void ConnectionBase::addAdditionalRequestHeaders(

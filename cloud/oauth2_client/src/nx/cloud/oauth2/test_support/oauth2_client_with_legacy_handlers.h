@@ -14,7 +14,7 @@ class NX_OAUTH2_CLIENT_API Oauth2ClientWithLegacyHandlers: public Oauth2Client
 
 public:
     Oauth2ClientWithLegacyHandlers(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const std::optional<nx::network::http::Credentials>& credentials);
 
     void legacyValidateToken(

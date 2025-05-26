@@ -493,7 +493,7 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
     if (systemAddress.isEmpty())
         return false;
 
-    const auto systemUrl = nx::utils::Url::fromUserInput(systemAddress);
+    const auto systemUrl = nx::Url::fromUserInput(systemAddress);
     nx::network::SocketAddress address(systemUrl.host(), systemUrl.port(0));
     NX_DEBUG(this, "Custom URI: Connecting to the system %1", address);
 

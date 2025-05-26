@@ -309,18 +309,18 @@ bool deserialize(QnUbjsonReader<T> *stream, QUrl *target) {
 }
 
 template <class Output>
-void serialize(const nx::utils::Url& value, QnUbjsonWriter<Output> *stream)
+void serialize(const nx::Url& value, QnUbjsonWriter<Output> *stream)
 {
     QnUbjson::serialize(value.toString(), stream);
 }
 
 template <class T>
-bool deserialize(QnUbjsonReader<T> *stream, nx::utils::Url *target)
+bool deserialize(QnUbjsonReader<T> *stream, nx::Url *target)
 {
     QString tmp;
     if(!QnUbjson::deserialize(stream, &tmp))
         return false;
-    *target = nx::utils::Url(tmp);
+    *target = nx::Url(tmp);
     return true;
 }
 

@@ -214,7 +214,7 @@ bool Builder::reuseEndpointsForConcurrency(Context* ctx)
 
 void Builder::configureServerUrls(Context* ctx, bool sslRequired)
 {
-    std::vector<nx::utils::Url> urls;
+    std::vector<nx::Url> urls;
     ctx->server->forEachListener(
         [sslRequired, &urls](auto listener)
         {

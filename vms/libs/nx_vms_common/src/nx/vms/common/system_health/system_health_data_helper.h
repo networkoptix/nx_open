@@ -13,13 +13,13 @@ namespace nx::vms::common::system_health {
  * with <tt>replacedDeviceDiscovered</tt> system health notification.
  */
 NX_VMS_COMMON_API std::map<std::string, std::string> storeDiscoveredDeviceDataToAttributes(
-    const nx::utils::Url& deviceUrl,
+    const nx::Url& deviceUrl,
     const QString& deviceModel);
 
 /**
  * @return Device URL retrieved from the attributes if they contain it, std::nullopt otherwise.
  */
-NX_VMS_COMMON_API std::optional<nx::utils::Url> getDeviceUrlFromAttributes(
+NX_VMS_COMMON_API std::optional<nx::Url> getDeviceUrlFromAttributes(
     const std::map<std::string, std::string>& attributes);
 
 /**

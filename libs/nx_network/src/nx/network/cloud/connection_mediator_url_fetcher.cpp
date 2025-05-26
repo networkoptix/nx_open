@@ -41,8 +41,8 @@ bool ConnectionMediatorUrlFetcher::analyzeXmlSearchResult(
     if (foundTcpUrlStr && foundUdpUrlStr)
     {
         m_mediatorHostDescriptor = MediatorHostDescriptor();
-        m_mediatorHostDescriptor->tcpUrl = nx::utils::Url(*foundTcpUrlStr);
-        m_mediatorHostDescriptor->udpUrl = nx::utils::Url(*foundUdpUrlStr);
+        m_mediatorHostDescriptor->tcpUrl = nx::Url(*foundTcpUrlStr);
+        m_mediatorHostDescriptor->udpUrl = nx::Url(*foundUdpUrlStr);
         return true;
     }
 
@@ -70,8 +70,8 @@ void ConnectionMediatorUrlFetcher::invokeHandler(
 
     handler(
         statusCode,
-        m_mediatorHostDescriptor ? m_mediatorHostDescriptor->tcpUrl : nx::utils::Url(),
-        m_mediatorHostDescriptor ? m_mediatorHostDescriptor->udpUrl : nx::utils::Url());
+        m_mediatorHostDescriptor ? m_mediatorHostDescriptor->tcpUrl : nx::Url(),
+        m_mediatorHostDescriptor ? m_mediatorHostDescriptor->udpUrl : nx::Url());
 }
 
 } // namespace nx::network::cloud

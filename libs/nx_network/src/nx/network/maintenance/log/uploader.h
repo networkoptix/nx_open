@@ -51,7 +51,7 @@ public:
     using Handler = nx::utils::MoveOnlyFunc<void(UploadResult)>;
 
     Uploader(
-        const nx::utils::Url& logCollectorUrl,
+        const nx::Url& logCollectorUrl,
         const std::string& sessionId,
         const nx::log::LevelSettings& logFilter);
 
@@ -124,7 +124,7 @@ private:
         done,
     };
 
-    const nx::utils::Url m_uploadLogFragmentUrl;
+    const nx::Url m_uploadLogFragmentUrl;
     const nx::log::LevelSettings m_logFilter;
     UploadResult m_progress;
     Handler m_handler;
@@ -154,7 +154,7 @@ class NX_NETWORK_API UploaderManager
 {
 public:
     UploaderManager(
-        const nx::utils::Url& logCollectorApiBaseUrl,
+        const nx::Url& logCollectorApiBaseUrl,
         const nx::log::LevelSettings& logFilter);
 
     ~UploaderManager();
@@ -187,7 +187,7 @@ private:
     void onLoggingCompletion(UploadResult result);
 
 private:
-    const nx::utils::Url m_logCollectorApiBaseUrl;
+    const nx::Url m_logCollectorApiBaseUrl;
     const nx::log::LevelSettings m_logFilter;
     std::string m_sessionId;
     std::unique_ptr<Uploader> m_uploader;

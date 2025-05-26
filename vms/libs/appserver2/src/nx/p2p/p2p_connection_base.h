@@ -69,7 +69,7 @@ public:
         const nx::Uuid& remoteId,
         nx::vms::api::PeerType remotePeerType,
         const vms::api::PeerDataEx& localPeer,
-        const nx::utils::Url& remotePeerUrl,
+        const nx::Url& remotePeerUrl,
         const std::chrono::seconds& keepAliveTimeout,
         std::unique_ptr<QObject> opaqueObject,
         nx::network::ssl::AdapterFunc adapterFunc,
@@ -149,7 +149,7 @@ public:
 
     QObject* opaqueObject();
 
-    nx::utils::Url remoteAddr() const;
+    nx::Url remoteAddr() const;
     void pleaseStopSync();
 
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& /*peer*/) const { return true; }
@@ -285,7 +285,7 @@ private:
     P2pTransportPtr m_p2pTransport;
     std::atomic<State> m_state{State::Connecting};
 
-    nx::utils::Url m_remotePeerUrl;
+    nx::Url m_remotePeerUrl;
 
     static SendCounters m_sendCounters;
 

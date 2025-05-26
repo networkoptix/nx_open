@@ -97,7 +97,7 @@ private:
     maintenance::Server m_maintenanceServer{""};
     http::HttpClient m_httpClient{ssl::kAcceptAnyCertificate};
 
-    nx::utils::Url requestUrl(const std::string& requestName) const
+    nx::Url requestUrl(const std::string& requestName) const
     {
         return url::Builder().setEndpoint(m_httpServer.serverAddress())
             .setScheme(http::kUrlSchemeName).setPath(kMaintenance)

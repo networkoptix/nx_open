@@ -57,7 +57,7 @@ public:
     using Handler = std::function<void(Result, const LicenseErrorHash&)>;
 
     static void deactivateAsync(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const RequestInfo& info,
         const QnLicenseList& licenses,
         const Handler& completionHandler,

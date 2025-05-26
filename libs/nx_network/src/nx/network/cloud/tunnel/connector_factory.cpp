@@ -68,11 +68,11 @@ CloudConnectors ConnectorFactory::defaultFactoryFunction(
 
         for (const auto& urlStr: relayUrls)
         {
-            nx::utils::Url url(urlStr);
+            nx::Url url(urlStr);
             TunnelConnectorContext context;
             context.startDelay = response.params.trafficRelayingStartDelay;
 
-            nx::utils::UrlQuery urlQuery(url.query());
+            nx::UrlQuery urlQuery(url.query());
             if (urlQuery.contains(nx::hpm::api::kDelayParamName))
             {
                 context.startDelay += nx::utils::parseTimerDuration(

@@ -10,7 +10,7 @@
 namespace nx::hpm::api {
 
 Client::Client(
-    const nx::utils::Url& baseMediatorApiUrl, nx::network::ssl::AdapterFunc adapterFunc):
+    const nx::Url& baseMediatorApiUrl, nx::network::ssl::AdapterFunc adapterFunc):
     base_type(baseMediatorApiUrl, std::move(adapterFunc))
 {
 }
@@ -34,7 +34,7 @@ std::tuple<Client::ResultCode, SystemPeers> Client::getListeningPeers(
 {
     return base_type::template makeSyncCall<SystemPeers>(nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(kStatisticsSystemPeersPath, {systemId}),
-        nx::utils::UrlQuery());
+        nx::UrlQuery());
 }
 
 void Client::initiateConnection(const ConnectRequest& request,
@@ -75,7 +75,7 @@ std::tuple<api::ResultCode, std::vector<std::string>> Client::resetConnections(c
     return base_type::template makeSyncCall<std::vector<std::string>>(
         nx::network::http::Method::post,
         nx::network::http::rest::substituteParameters(kSystemResetPath, {systemId}),
-        nx::utils::UrlQuery{});
+        nx::UrlQuery{});
 }
 
 void Client::getStatistics(
@@ -93,7 +93,7 @@ std::tuple<ResultCode, Statistics> Client::getStatistics()
     return base_type::template makeSyncCall<Statistics>(
         nx::network::http::Method::get,
         kStatisticsMetricsPath,
-        nx::utils::UrlQuery{});
+        nx::UrlQuery{});
 }
 
 void Client::getListeningPeersStatistics(
@@ -111,7 +111,7 @@ std::tuple<ResultCode, ListeningPeerStatistics> Client::getListeningPeersStatist
     return base_type::template makeSyncCall<ListeningPeerStatistics>(
         nx::network::http::Method::get,
         kStatisticsListeningPeersPath,
-        nx::utils::UrlQuery{});
+        nx::UrlQuery{});
 }
 
 ApiResultCodeDescriptor::ResultCode ApiResultCodeDescriptor::systemErrorCodeToResultCode(

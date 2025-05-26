@@ -31,7 +31,7 @@ public:
         stopWhileInAioThread();
     }
 
-    virtual void connect(const nx::utils::Url&, ConnectHandler) override {}
+    virtual void connect(const nx::Url&, ConnectHandler) override {}
 
     virtual void addOnReconnectedHandler(
         ReconnectHandler /*handler*/, void* /*client*/ = 0) override {}

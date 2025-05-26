@@ -55,7 +55,7 @@ public:
      */
     TestListeningPeer(
         const network::SocketAddress& mediatorUdpEndpoint,
-        const nx::utils::Url& mediatorTcpUrl,
+        const nx::Url& mediatorTcpUrl,
         SystemCredentials systemData,
         std::string serverName = std::string());
     virtual ~TestListeningPeer();
@@ -117,7 +117,7 @@ public:
         std::string name,
         ServerTweak serverConf,
         const SocketAddress& mediatorStunUdpEndpoint,
-        const nx::utils::Url& mediatorTcpUrl);
+        const nx::Url& mediatorTcpUrl);
 
 private:
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;

@@ -269,7 +269,7 @@ QString link(const QUrl& url)
     return makeLink(url.toString());
 }
 
-QString link(const nx::utils::Url& url)
+QString link(const nx::Url& url)
 {
     return makeLink(url.toString());
 }
@@ -279,7 +279,7 @@ QString link(const QString& text, const QUrl& url)
     return makeLink(text, url.toString());
 }
 
-QString link(const QString& text, const nx::utils::Url& url)
+QString link(const QString& text, const nx::Url& url)
 {
     return makeLink(text, url.toString());
 }

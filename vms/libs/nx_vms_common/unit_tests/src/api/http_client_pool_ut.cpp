@@ -49,7 +49,7 @@ public:
 
     int doGet(
         ClientPool* clientPool,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         std::function<void (QSharedPointer<ClientPool::Context> context)> completionFunc)
     {
         auto context = clientPool->createContext(nx::Uuid(), nullptr);
@@ -80,9 +80,9 @@ TEST_F(HttpClientPoolTest, GeneralTest)
     ASSERT_TRUE(testHttpServer()->bindAndListen());
     ASSERT_TRUE(testHttpServer2()->bindAndListen());
 
-    const nx::utils::Url url(lit("http://127.0.0.1:%1/test")
+    const nx::Url url(lit("http://127.0.0.1:%1/test")
         .arg(testHttpServer()->serverAddress().port));
-    const nx::utils::Url url2(lit("http://127.0.0.1:%1/test2")
+    const nx::Url url2(lit("http://127.0.0.1:%1/test2")
         .arg(testHttpServer2()->serverAddress().port));
 
     std::unique_ptr<ClientPool> httpPool(new ClientPool());
@@ -144,10 +144,10 @@ TEST_F(HttpClientPoolTest, GeneralNegativeTest)
     int requestsFinished = 0;
 
     static const int kRequests = 10;
-    const nx::utils::Url wrongUrl(lit("nothttp://127.0.0.0.0.1:%1/test")
+    const nx::Url wrongUrl(lit("nothttp://127.0.0.0.0.1:%1/test")
         .arg(testHttpServer()->serverAddress().port));
 
-    const nx::utils::Url wrongPathUrl(lit("http://127.0.0.1:%1/wrong_test2")
+    const nx::Url wrongPathUrl(lit("http://127.0.0.1:%1/wrong_test2")
         .arg(testHttpServer2()->serverAddress().port));
 
     // We expect all requests to fail
@@ -215,7 +215,7 @@ TEST_F(HttpClientPoolTest, terminateTest)
 
     ASSERT_TRUE(testHttpServer()->bindAndListen());
 
-    const nx::utils::Url url(lit("http://127.0.0.1:%1/test")
+    const nx::Url url(lit("http://127.0.0.1:%1/test")
         .arg(testHttpServer()->serverAddress().port));
 
     nx::Mutex mutex;

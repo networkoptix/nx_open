@@ -57,7 +57,7 @@ public:
         const nx::Buffer& message,
         std::optional<qint64>* const fullMessageSize = nullptr );
 
-    bool isLargeRequestAllowed(const nx::utils::Url& url);
+    bool isLargeRequestAllowed(const nx::Url& url);
     bool isLargeRequestAllowed(const QByteArray& message);
 
     /**
@@ -75,7 +75,7 @@ public:
     void execute(nx::Locker<nx::Mutex>& mutex);
     virtual void pleaseStop() override;
     nx::network::SocketAddress getForeignAddress() const;
-    nx::utils::Url getDecodedUrl() const;
+    nx::Url getDecodedUrl() const;
 
     bool sendBuffer(
         const nx::utils::ByteArray& sendBuffer, std::optional<int64_t> timestampForLogging = std::nullopt);

@@ -61,7 +61,7 @@ void SystemManager::getSystemsByEmail(
     api::Filter filter;
     filter.nameToValue.emplace(
         api::FilterField::customization, nx::branding::customization().toStdString());
-    nx::utils::UrlQuery query;
+    nx::UrlQuery query;
     for (const auto& [name, value]: filter.nameToValue)
         query.addQueryItem(name, value);
 
@@ -76,7 +76,7 @@ void SystemManager::getSystemsFiltered(
     const api::Filter& filter,
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
 {
-    nx::utils::UrlQuery query;
+    nx::UrlQuery query;
     for (const auto& [name, value]: filter.nameToValue)
         query.addQueryItem(name, value);
 
@@ -107,7 +107,7 @@ void SystemManager::getSystems(
     api::SystemIdList systemIdList,
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
 {
-    nx::utils::UrlQuery query;
+    nx::UrlQuery query;
     for (const auto& systemId: systemIdList.systemIds)
         query.addQueryItem("systemId", systemId);
 
@@ -177,7 +177,7 @@ void SystemManager::getAccessRoleList(
     const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler)
 {
-    nx::utils::UrlQuery query;
+    nx::UrlQuery query;
     query.addQueryItem("systemId", systemId);
 
     m_requestsExecutor->makeAsyncCall<api::SystemAccessRoleList>(

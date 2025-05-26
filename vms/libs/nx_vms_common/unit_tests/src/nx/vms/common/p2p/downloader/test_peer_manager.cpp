@@ -103,7 +103,7 @@ void TestPeerManager::setPeerGroups(const nx::Uuid& peerId, const QStringList& g
         m_peersByGroup.insert(group, peerId);
 }
 
-void TestPeerManager::addInternetFile(const nx::utils::Url& url, const QString& fileName)
+void TestPeerManager::addInternetFile(const nx::Url& url, const QString& fileName)
 {
     m_fileByUrl[url] = fileName;
 }
@@ -130,7 +130,7 @@ int TestPeerManager::distanceTo(const nx::Uuid& /*peerId*/) const
 AbstractPeerManager::RequestContextPtr<FileInformation> TestPeerManager::requestFileInfo(
     const nx::Uuid& peerId,
     const QString& fileName,
-    const nx::utils::Url& url)
+    const nx::Url& url)
 {
     m_requestCounter.incrementCounters(peerId, RequestCounter::FileInfoRequest);
 
@@ -203,7 +203,7 @@ AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> TestPeerManager::req
 AbstractPeerManager::RequestContextPtr<nx::Buffer> TestPeerManager::downloadChunk(
     const nx::Uuid& peerId,
     const QString& fileName,
-    const nx::utils::Url &url,
+    const nx::Url &url,
     int chunkIndex,
     int chunkSize,
     qint64 /*fileSize*/)
@@ -484,7 +484,7 @@ int ProxyTestPeerManager::distanceTo(const nx::Uuid& peerId) const
 AbstractPeerManager::RequestContextPtr<FileInformation> ProxyTestPeerManager::requestFileInfo(
     const nx::Uuid& peer,
     const QString& fileName,
-    const nx::utils::Url& url)
+    const nx::Url& url)
 {
     m_requestCounter.incrementCounters(peer, RequestCounter::FileInfoRequest);
     return m_peerManager->requestFileInfo(peer, fileName, url);
@@ -500,7 +500,7 @@ AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> ProxyTestPeerManager
 AbstractPeerManager::RequestContextPtr<nx::Buffer> ProxyTestPeerManager::downloadChunk(
     const nx::Uuid& peerId,
     const QString& fileName,
-    const nx::utils::Url &url,
+    const nx::Url &url,
     int chunkIndex,
     int chunkSize,
     qint64 fileSize)

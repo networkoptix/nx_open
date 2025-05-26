@@ -239,8 +239,8 @@ nx::vms::client::core::LogonData QnStartupParameters::parseAuthenticationString(
         string = nx::vms::client::core::EncodedString::fromEncoded(string).decoded();
     }
 
-    const nx::utils::Url url = nx::utils::Url::fromUserInput(string);
-    const auto query = nx::utils::UrlQuery(url.query());
+    const nx::Url url = nx::Url::fromUserInput(string);
+    const auto query = nx::UrlQuery(url.query());
 
     nx::vms::client::core::LogonData result;
     result.address = nx::network::SocketAddress::fromUrl(url);

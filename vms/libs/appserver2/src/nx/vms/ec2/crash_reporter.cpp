@@ -156,7 +156,7 @@ bool CrashReporter::scanAndReport()
         return false;
     }
 
-    const nx::utils::Url url = apiUrl;
+    const nx::Url url = apiUrl;
 
     auto crashes = readCrashes();
     while (!crashes.isEmpty())
@@ -213,7 +213,7 @@ void CrashReporter::scanAndReportByTimer()
     }
 }
 
-bool CrashReporter::send(const nx::utils::Url& serverApi, const QFileInfo& crash)
+bool CrashReporter::send(const nx::Url& serverApi, const QFileInfo& crash)
 {
     auto filePath = crash.absoluteFilePath();
     QFile file(filePath);

@@ -271,7 +271,7 @@ private:
         ASSERT_EQ(m_serverEndpoint, m_stunClient->remoteAddress());
     }
 
-    SystemError::ErrorCode connectToUrl(const nx::utils::Url& url)
+    SystemError::ErrorCode connectToUrl(const nx::Url& url)
     {
         nx::utils::promise<SystemError::ErrorCode> connectedPromise;
         m_stunClient->connect(
@@ -283,7 +283,7 @@ private:
         return connectedPromise.get_future().get();
     }
 
-    nx::utils::Url serverUrl() const
+    nx::Url serverUrl() const
     {
         return nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(
             SocketAddress(HostAddress("localhost"), m_serverEndpoint.port));

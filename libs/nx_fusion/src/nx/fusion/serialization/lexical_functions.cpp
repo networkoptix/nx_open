@@ -317,13 +317,13 @@ bool deserialize(const QString& value, QJsonValue::Type* target)
     return *target != QJsonValue::Undefined;
 }
 
-bool deserialize(const QString& s, nx::utils::Url* url)
+bool deserialize(const QString& s, nx::Url* url)
 {
-    *url = nx::utils::Url(s);
+    *url = nx::Url(s);
     return true;
 }
 
-void serialize(const nx::utils::Url& url, QString* target)
+void serialize(const nx::Url& url, QString* target)
 {
     *target = url.toString();
 }

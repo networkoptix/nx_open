@@ -27,7 +27,7 @@ public:
     virtual void addOutgoingConnectionToPeer(
         const nx::Uuid& id,
         nx::vms::api::PeerType peerType,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         std::optional<nx::network::http::Credentials> credentials,
         nx::network::ssl::AdapterFunc adapterFunc) override;
     virtual void removeOutgoingConnectionFromPeer(const nx::Uuid& id) override;

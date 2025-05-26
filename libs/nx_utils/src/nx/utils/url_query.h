@@ -9,7 +9,7 @@
 #include <nx/utils/std/charconv.h>
 #include <nx/utils/std_string_utils.h>
 
-namespace nx::utils {
+namespace nx {
 
 namespace detail {
 
@@ -89,7 +89,7 @@ public:
         T value;
         const auto str = m_query.queryItemValue(prepareKey(key), encoding).toStdString();
         const auto result =
-            charconv::from_chars(&str.front(), &str.front() + str.size(), value, base);
+            utils::charconv::from_chars(&str.front(), &str.front() + str.size(), value, base);
         if (ok)
             *ok = result.ec == std::errc();
         return value;
@@ -104,12 +104,12 @@ public:
         const String& key,
         QUrl::ComponentFormattingOptions encoding = QUrl::PrettyDecoded,
         bool* ok = nullptr,
-        charconv::chars_format format = charconv::chars_format::general) const
+        utils::charconv::chars_format format = utils::charconv::chars_format::general) const
     {
         T value;
         const auto str = m_query.queryItemValue(prepareKey(key), encoding).toStdString();
         const auto result =
-            charconv::from_chars(&str.front(), &str.front() + str.size(), value, format);
+            utils::charconv::from_chars(&str.front(), &str.front() + str.size(), value, format);
         if (ok)
             *ok = result.ec == std::errc();
         return value;
@@ -151,7 +151,7 @@ public:
             return false;
         }
         const auto result =
-            charconv::from_chars(&str.front(), &str.front() + str.size(), value, 10);
+            utils::charconv::from_chars(&str.front(), &str.front() + str.size(), value, 10);
         if (ok)
             *ok = result.ec == std::errc();
         return value != 0;
@@ -190,4 +190,4 @@ private:
     QUrlQuery m_query;
 };
 
-} // namespace nx::utils
+} // namespace nx

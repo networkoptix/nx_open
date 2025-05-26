@@ -256,7 +256,7 @@ struct LdapSettingsWidget::Private
 
         const auto state = LdapState::objectToState(quickWidget->rootObject());
 
-        settings.uri = nx::utils::Url::fromUserInput(state.uri);
+        settings.uri = nx::Url::fromUserInput(state.uri);
         settings.adminDn = state.adminDn;
         settings.adminPassword = state.password.isEmpty()
             ? std::nullopt
@@ -615,7 +615,7 @@ void LdapSettingsWidget::testConnection(
     d->testMessage = "";
 
     nx::vms::api::LdapSettings settings;
-    settings.uri = nx::utils::Url::fromUserInput(url);
+    settings.uri = nx::Url::fromUserInput(url);
     settings.adminDn = adminDn;
     settings.adminPassword = password.isEmpty() ? std::nullopt : std::make_optional(password);
     settings.startTls = startTls;
@@ -672,7 +672,7 @@ void LdapSettingsWidget::testOnline(
     d->checkingOnlineStatus = true;
 
     nx::vms::api::LdapSettings settings;
-    settings.uri = nx::utils::Url::fromUserInput(url);
+    settings.uri = nx::Url::fromUserInput(url);
     settings.adminDn = adminDn;
     settings.adminPassword = password;
     settings.startTls = startTls;

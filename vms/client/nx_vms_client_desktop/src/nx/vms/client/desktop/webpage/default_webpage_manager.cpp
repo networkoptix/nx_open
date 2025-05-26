@@ -22,7 +22,7 @@ static const QString kDefaultWebPageQueryItem = "openAsDefault";
 
 bool isDefaultWebPage(const QnWebPageResourcePtr& webpage)
 {
-    nx::utils::Url url(webpage->getUrl());
+    nx::Url url(webpage->getUrl());
     return url.isValid() && url.hasQueryItem(kDefaultWebPageQueryItem);
 }
 

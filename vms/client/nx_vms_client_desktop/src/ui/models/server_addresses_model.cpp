@@ -28,37 +28,37 @@ int QnServerAddressesModel::port() const {
     return m_port;
 }
 
-void QnServerAddressesModel::setAddressList(const QList<nx::utils::Url> &addresses) {
+void QnServerAddressesModel::setAddressList(const QList<nx::Url> &addresses) {
     beginResetModel();
     m_addresses = addresses;
     endResetModel();
 }
 
-QList<nx::utils::Url> QnServerAddressesModel::addressList() const {
+QList<nx::Url> QnServerAddressesModel::addressList() const {
     return m_addresses;
 }
 
-void QnServerAddressesModel::setManualAddressList(const QList<nx::utils::Url> &addresses) {
+void QnServerAddressesModel::setManualAddressList(const QList<nx::Url> &addresses) {
     beginResetModel();
     m_manualAddresses = addresses;
     endResetModel();
 }
 
-QList<nx::utils::Url> QnServerAddressesModel::manualAddressList() const {
+QList<nx::Url> QnServerAddressesModel::manualAddressList() const {
     return m_manualAddresses;
 }
 
-void QnServerAddressesModel::setIgnoredAddresses(const QSet<nx::utils::Url> &ignoredAddresses) {
+void QnServerAddressesModel::setIgnoredAddresses(const QSet<nx::Url> &ignoredAddresses) {
     beginResetModel();
     m_ignoredAddresses = ignoredAddresses;
     endResetModel();
 }
 
-QSet<nx::utils::Url> QnServerAddressesModel::ignoredAddresses() const {
+QSet<nx::Url> QnServerAddressesModel::ignoredAddresses() const {
     return m_ignoredAddresses;
 }
 
-void QnServerAddressesModel::addAddress(const nx::utils::Url &url, bool isManualAddress) {
+void QnServerAddressesModel::addAddress(const nx::Url &url, bool isManualAddress) {
     int row;
     if (isManualAddress)
         row = m_addresses.size() + m_manualAddresses.size();
@@ -101,7 +101,7 @@ void QnServerAddressesModel::setReadOnly(bool readOnly) {
 }
 
 
-void QnServerAddressesModel::resetModel(const QList<nx::utils::Url> &addresses, const QList<nx::utils::Url> &manualAddresses, const QSet<nx::utils::Url> &ignoredAddresses, int port) {
+void QnServerAddressesModel::resetModel(const QList<nx::Url> &addresses, const QList<nx::Url> &manualAddresses, const QSet<nx::Url> &ignoredAddresses, int port) {
     beginResetModel();
     m_addresses = addresses;
     m_manualAddresses = manualAddresses;
@@ -171,7 +171,7 @@ bool QnServerAddressesModel::setData(const QModelIndex &index, const QVariant &v
 
     switch (index.column()) {
     case AddressColumn: {
-        nx::utils::Url url = nx::utils::Url::fromUserInput(value.toString());
+        nx::Url url = nx::Url::fromUserInput(value.toString());
         url.setScheme(nx::network::http::kSecureUrlSchemeName);
 
         if (url.isEmpty())
@@ -191,7 +191,7 @@ bool QnServerAddressesModel::setData(const QModelIndex &index, const QVariant &v
         }
 
         if (url.port() == -1) {
-            nx::utils::Url explicitUrl = url;
+            nx::Url explicitUrl = url;
             explicitUrl.setPort(m_port);
 
             if (m_addresses.contains(explicitUrl) || m_ignoredAddresses.contains(explicitUrl)) {
@@ -210,7 +210,7 @@ bool QnServerAddressesModel::setData(const QModelIndex &index, const QVariant &v
         return true;
     }
     case InUseColumn: {
-        nx::utils::Url url = addressAtIndex(index);
+        nx::Url url = addressAtIndex(index);
 
         if (value.toInt() == Qt::Unchecked)
             m_ignoredAddresses.insert(url);
@@ -281,11 +281,11 @@ Qt::ItemFlags QnServerAddressesModel::flags(const QModelIndex &index) const {
     return flags;
 }
 
-nx::utils::Url QnServerAddressesModel::addressAtIndex(const QModelIndex &index, int defaultPort) const {
+nx::Url QnServerAddressesModel::addressAtIndex(const QModelIndex &index, int defaultPort) const {
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return QString();
 
-    nx::utils::Url url;
+    nx::Url url;
 
     int idx = index.row();
 

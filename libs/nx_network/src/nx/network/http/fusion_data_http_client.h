@@ -53,7 +53,7 @@ class BaseFusionDataHttpClient:
 
 public:
     BaseFusionDataHttpClient(
-        nx::utils::Url url,
+        nx::Url url,
         Credentials credentials,
         ssl::AdapterFunc adapterFunc)
         :
@@ -65,7 +65,7 @@ public:
     }
 
     BaseFusionDataHttpClient(
-        nx::utils::Url url,
+        nx::Url url,
         AuthInfo info,
         ssl::AdapterFunc adapterFunc,
         ssl::AdapterFunc proxyAdapterFunc)
@@ -167,7 +167,7 @@ public:
     }
 
 protected:
-    nx::utils::Url m_url;
+    nx::Url m_url;
     std::string m_requestContentType;
     nx::Buffer m_requestBody;
     nx::utils::MoveOnlyFunc<HandlerFunc> m_handler;
@@ -314,7 +314,7 @@ public:
      * TODO: #akolesnikov If response Content-Type is multipart, then handler is invoked for every body part.
      */
     FusionDataHttpClient(
-        nx::utils::Url url,
+        nx::Url url,
         Credentials credentials,
         ssl::AdapterFunc adapterFunc,
         const InputData& input)
@@ -327,7 +327,7 @@ public:
     }
 
     FusionDataHttpClient(
-        nx::utils::Url url,
+        nx::Url url,
         AuthInfo info,
         ssl::AdapterFunc adapterFunc,
         ssl::AdapterFunc proxyAdapterFunc,
@@ -369,13 +369,13 @@ class FusionDataHttpClient<void, OutputData, SerializationLibWrapper>:
 
 public:
     FusionDataHttpClient(
-        nx::utils::Url url, Credentials credentials, ssl::AdapterFunc adapterFunc):
+        nx::Url url, Credentials credentials, ssl::AdapterFunc adapterFunc):
         base_type(std::move(url), std::move(credentials), std::move(adapterFunc))
     {
     }
 
     FusionDataHttpClient(
-        nx::utils::Url url,
+        nx::Url url,
         AuthInfo info,
         ssl::AdapterFunc adapterFunc,
         ssl::AdapterFunc proxyAdapterFunc)
@@ -413,7 +413,7 @@ class FusionDataHttpClient<InputData, void, SerializationLibWrapper>:
 
 public:
     FusionDataHttpClient(
-        nx::utils::Url url,
+        nx::Url url,
         Credentials credentials,
         ssl::AdapterFunc adapterFunc,
         const InputData& input)
@@ -434,7 +434,7 @@ public:
     }
 
     FusionDataHttpClient(
-        nx::utils::Url url,
+        nx::Url url,
         AuthInfo info,
         ssl::AdapterFunc adapterFunc,
         ssl::AdapterFunc proxyAdapterFunc,
@@ -480,13 +480,13 @@ class FusionDataHttpClient<void, void, SerializationLibWrapper>:
 
 public:
     FusionDataHttpClient(
-        nx::utils::Url url, Credentials credentials, ssl::AdapterFunc adapterFunc):
+        nx::Url url, Credentials credentials, ssl::AdapterFunc adapterFunc):
         base_type(std::move(url), std::move(credentials), std::move(adapterFunc))
     {
     }
 
     FusionDataHttpClient(
-        nx::utils::Url url,
+        nx::Url url,
         AuthInfo info,
         ssl::AdapterFunc adapterFunc,
         ssl::AdapterFunc proxyAdapterFunc)

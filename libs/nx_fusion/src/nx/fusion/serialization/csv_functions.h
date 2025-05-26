@@ -69,7 +69,7 @@ void serialize(const QUrl &value, QnCsvStreamWriter<Output> *stream) {
 }
 
 template<class Output>
-void serialize(const nx::utils::Url& value, QnCsvStreamWriter<Output> *stream) {
+void serialize(const nx::Url& value, QnCsvStreamWriter<Output> *stream) {
     stream->writeUtf8Field(value.toEncoded());
 }
 

@@ -26,14 +26,14 @@ struct CloudConnectListenerStatusReport
     template<typename ResultType>
     struct Error
     {
-        nx::utils::Url url;
+        nx::Url url;
         ResultType result;
     };
 
     /**
      * The mediator endpoint that the server socket attempts to connect to.
      */
-    nx::utils::Url mediatorUrl;
+    nx::Url mediatorUrl;
 
     /**
      * The most recent listen response sent back by the mediator. Contains the relay urls.
@@ -112,7 +112,7 @@ public:
     hpm::api::ResultCode registerOnMediatorSync();
     void setSupportedConnectionMethods(hpm::api::ConnectionMethods value);
 
-    void setOnAcceptorConnectionEstablished(nx::utils::MoveOnlyFunc<void(nx::utils::Url)> handler);
+    void setOnAcceptorConnectionEstablished(nx::utils::MoveOnlyFunc<void(nx::Url)> handler);
     /**
      * @Install a handler to notified when the socket experiences a connection error to the relay, e.g. if a connection
      * is closed or it fails to connect at all.
@@ -150,7 +150,7 @@ protected:
     void bindToAioThreadUnchecked(aio::AbstractAioThread* aioThread);
     void initTunnelPool(int queueLen);
     void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);
-    void onAcceptorConnectionEstablished(nx::utils::Url remoteAddress);
+    void onAcceptorConnectionEstablished(nx::Url remoteAddress);
     void saveAcceptorError(AcceptorError acceptorError);
     void onListenRequestCompleted(
         nx::hpm::api::ResultCode resultCode, hpm::api::ListenResponse response);
@@ -190,7 +190,7 @@ protected:
     nx::hpm::api::CloudConnectVersion m_cloudConnectVersion =
         nx::hpm::api::kDefaultCloudConnectVersion;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onMediatorConnectionClosed;
-    nx::utils::MoveOnlyFunc<void(nx::utils::Url/*remoteAddress*/)> m_onAcceptorConnectionEstablished;
+    nx::utils::MoveOnlyFunc<void(nx::Url/*remoteAddress*/)> m_onAcceptorConnectionEstablished;
     nx::utils::MoveOnlyFunc<void(AcceptorError)> m_onAcceptorError;
 
 private:

@@ -6,7 +6,7 @@
 
 namespace nx::network::maintenance::log {
 
-Client::Client(const nx::utils::Url& baseApiUrl):
+Client::Client(const nx::Url& baseApiUrl):
     base_type(baseApiUrl, ssl::kDefaultCertificateCheck)
 {
 }
@@ -29,7 +29,7 @@ void Client::getConfiguration(
 std::tuple<Client::ResultCode, LoggerList> Client::getConfiguration()
 {
     return base_type::template makeSyncCall<LoggerList>(
-        http::Method::get, kLoggers, nx::utils::UrlQuery());
+        http::Method::get, kLoggers, nx::UrlQuery());
 }
 
 } // namespace nx::network::maintenance::log

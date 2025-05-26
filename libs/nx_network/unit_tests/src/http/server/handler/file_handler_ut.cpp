@@ -159,7 +159,7 @@ private:
     nx::Buffer* m_expectedFileContents = nullptr;
     std::size_t m_fileReadSize = 1;
 
-    nx::utils::Url buildUrl(const std::string& path)
+    nx::Url buildUrl(const std::string& path)
     {
         auto url = url::Builder().setScheme(kUrlSchemeName)
             .setEndpoint(m_server.serverAddress()).toUrl();

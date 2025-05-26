@@ -10,7 +10,7 @@
 namespace nx::cloud::db::client {
 
 Connection::Connection(
-    const nx::utils::Url& baseUrl,
+    const nx::Url& baseUrl,
     nx::network::ssl::AdapterFunc adapterFunc)
     :
     m_requestExecutor(baseUrl, std::move(adapterFunc)),

@@ -78,7 +78,7 @@ ClientFactory& ClientFactory::instance()
 
 std::vector<std::unique_ptr<BaseTunnelClient>> ClientFactory::defaultFactoryFunction(
     const std::string& tag,
-    const nx::utils::Url& baseUrl,
+    const nx::Url& baseUrl,
     std::optional<int> forcedTunnelType,
     const ConnectOptions& options)
 {

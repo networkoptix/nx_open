@@ -72,7 +72,7 @@ public:
                 AuthToken{std::move(actualPassword), authTokenType}});
     }
 
-    nx::utils::Url httpsUrl(std::string_view path) const
+    nx::Url httpsUrl(std::string_view path) const
     {
         return url::Builder()
             .setScheme(kSecureUrlSchemeName)
@@ -82,7 +82,7 @@ public:
 
     std::optional<Response> makeRequest(
         const Method& method,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         std::optional<AuthType> clientAuthType,
         std::optional<Credentials> creds)
     {

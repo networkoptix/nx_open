@@ -25,7 +25,7 @@ rest::Handle requestUpdateStatus(
 /** Get update info directly from the Internet or via the given proxy connection. */
 UpdateContents getUpdateContents(
     rest::ServerConnectionPtr proxyConnection,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const nx::vms::common::update::UpdateInfoParams& params,
     const bool skipVersionEqualToCurrent = true);
 

@@ -72,12 +72,12 @@ QnAbstractNetworkResourceSearcher::QnAbstractNetworkResourceSearcher(SystemConte
 {
 }
 
-nx::utils::Url QnAbstractNetworkResourceSearcher::updateUrlToHttpsIfNeed(const nx::utils::Url& foundUrl)
+nx::Url QnAbstractNetworkResourceSearcher::updateUrlToHttpsIfNeed(const nx::Url& foundUrl)
 {
     if (foundUrl.scheme() == nx::network::http::kSecureUrlSchemeName)
         return foundUrl;
 
-    nx::utils::Url requestUrl(foundUrl);
+    nx::Url requestUrl(foundUrl);
     if (foundUrl.port() == -1)
         requestUrl.setScheme(nx::network::http::kSecureUrlSchemeName);
 

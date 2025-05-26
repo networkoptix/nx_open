@@ -23,7 +23,7 @@ public:
     bool add(
         const Method& method,
         const std::string_view& pathRegex,
-        const nx::utils::Url& target);
+        const nx::Url& target);
 
     virtual void serve(
         network::http::RequestContext requestContext,

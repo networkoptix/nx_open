@@ -524,7 +524,7 @@ private:
         const char* path,
         std::vector<HttpHeader> headers = {})
     {
-        const nx::utils::Url url(nx::format("http://%1/%2%3").args(
+        const nx::Url url(nx::format("http://%1/%2%3").args(
             endpoint(), testHttpServer()->serverAddress(), path));
         HttpClient httpClient{nx::network::ssl::kAcceptAnyCertificate};
         for (const auto& header: headers)

@@ -57,7 +57,7 @@ protected:
     void givenResourceServer()
     {
         ASSERT_TRUE(m_resourceServer->bindAndListen());
-        m_actualUrl = nx::utils::Url(nx::format("http://localhost:%1%2")
+        m_actualUrl = nx::Url(nx::format("http://localhost:%1%2")
             .arg(m_resourceServer->serverAddress().port)
             .arg(nx::network::url::joinPath(kContentServerPathPrefix, kTestPath)));
     }
@@ -82,7 +82,7 @@ protected:
     void givenRedirectServer()
     {
         ASSERT_TRUE(m_redirector->bindAndListen());
-        m_redirectUrl = nx::utils::Url(nx::format("http://127.0.0.1:%1%2")
+        m_redirectUrl = nx::Url(nx::format("http://127.0.0.1:%1%2")
             .arg(m_redirector->serverAddress().port).arg(kTestPath));
         ASSERT_TRUE(m_redirector->registerRedirectHandler(kTestPath, m_actualUrl));
     }
@@ -187,8 +187,8 @@ private:
     HttpClient m_httpClient{ssl::kAcceptAnyCertificate};
     std::unique_ptr<TestHttpServer> m_redirector;
     std::unique_ptr<TestHttpServer> m_resourceServer;
-    nx::utils::Url m_redirectUrl;
-    nx::utils::Url m_actualUrl;
+    nx::Url m_redirectUrl;
+    nx::Url m_actualUrl;
     nx::utils::SyncQueue<nx::network::http::Request> m_postResourceRequests;
     std::optional<nx::network::http::Request> m_prevReceivedPostRequest;
 

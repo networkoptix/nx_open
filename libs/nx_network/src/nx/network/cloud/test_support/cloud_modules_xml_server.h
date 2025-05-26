@@ -31,12 +31,12 @@ public:
      */
     std::string cloudModulesXmlPath() const;
 
-    void setCdbUrl(const nx::utils::Url& url);
-    void setHpmTcpUrl(const nx::utils::Url& url);
-    void setHpmUdpUrl(const nx::utils::Url& url);
-    void setNotificationModuleUrl(const nx::utils::Url& url);
-    void setSpeedTestUrl(const nx::utils::Url& url);
-    void setModule(const std::string& resName, const nx::utils::Url& resValue);
+    void setCdbUrl(const nx::Url& url);
+    void setHpmTcpUrl(const nx::Url& url);
+    void setHpmUdpUrl(const nx::Url& url);
+    void setNotificationModuleUrl(const nx::Url& url);
+    void setSpeedTestUrl(const nx::Url& url);
+    void setModule(const std::string& resName, const nx::Url& resValue);
 
     /**
      * @return a string containing the serialized cloud modules in xml format.
@@ -53,7 +53,7 @@ private:
 private:
     std::string m_cloudModulesXmlPath;
     mutable nx::Mutex m_mutex;
-    std::map<std::string /*resName*/, nx::utils::Url /*resValue*/> m_modules;
+    std::map<std::string /*resName*/, nx::Url /*resValue*/> m_modules;
 };
 
 } // namespace nx::network::cloud::test

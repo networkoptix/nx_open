@@ -104,7 +104,7 @@ public:
 
     struct LocalConnectionData
     {
-        nx::utils::Url url;
+        nx::Url url;
         nx::network::http::Credentials credentials;
     };
 

@@ -10,12 +10,12 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-nx::utils::Url UrlRewriter::originalResourceUrlToProxyUrl(
-    const nx::utils::Url& originalResourceUrl,
-    const nx::utils::Url& proxyHostUrl,
+nx::Url UrlRewriter::originalResourceUrlToProxyUrl(
+    const nx::Url& originalResourceUrl,
+    const nx::Url& proxyHostUrl,
     const std::string& targetHost) const
 {
-    nx::utils::Url url = originalResourceUrl;
+    nx::Url url = originalResourceUrl;
 
     url.setPath(nx::network::url::normalizePath(
         nx::format("/%1/%2/%3").arg(kApiPathPrefix).arg(targetHost).arg(url.path()).toStdString()));

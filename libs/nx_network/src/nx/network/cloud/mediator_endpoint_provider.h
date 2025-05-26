@@ -18,7 +18,7 @@ struct MediatorAddress
     /**
      * Can be either stun://, http:// or https://
      */
-    nx::utils::Url tcpUrl;
+    nx::Url tcpUrl;
     network::SocketAddress stunUdpEndpoint;
 
     std::string toString() const
@@ -70,7 +70,7 @@ public:
     virtual void bindToAioThread(
         network::aio::AbstractAioThread* aioThread) override;
 
-    void mockupCloudModulesXmlUrl(const nx::utils::Url& cloudModulesXmlUrl);
+    void mockupCloudModulesXmlUrl(const nx::Url& cloudModulesXmlUrl);
 
     void mockupMediatorAddress(const MediatorAddress& mediatorAddress);
 
@@ -87,7 +87,7 @@ private:
     mutable nx::Mutex m_mutex;
     std::vector<FetchMediatorEndpointsCompletionHandler> m_fetchMediatorEndpointsHandlers;
     std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> m_mediatorUrlFetcher;
-    std::optional<nx::utils::Url> m_cloudModulesXmlUrl;
+    std::optional<nx::Url> m_cloudModulesXmlUrl;
     std::optional<MediatorAddress> m_mediatorAddress;
 
     void initializeUrlFetcher();

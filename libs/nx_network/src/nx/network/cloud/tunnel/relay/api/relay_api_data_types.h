@@ -149,7 +149,7 @@ NX_REFLECTION_INSTRUMENT(ConnectToPeerRequest, ConnectToPeerRequest_Fields)
 
 struct Relay
 {
-    nx::utils::Url url;
+    nx::Url url;
     int listeningPeerCount = 0;
 
     /**%apidoc Last recorded timestamp of the server start. */

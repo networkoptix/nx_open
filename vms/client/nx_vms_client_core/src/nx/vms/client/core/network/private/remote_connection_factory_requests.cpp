@@ -166,7 +166,7 @@ struct ModuleInformationWrapper
 };
 NX_REFLECTION_INSTRUMENT(ModuleInformationWrapper, (reply));
 
-nx::utils::Url makeUrl(nx::network::SocketAddress address, std::string path = {})
+nx::Url makeUrl(nx::network::SocketAddress address, std::string path = {})
 {
     return nx::network::url::Builder()
         .setScheme(kSecureUrlSchemeName)
@@ -196,7 +196,7 @@ struct RemoteConnectionFactoryRequestsManager::Private
         return (bool) cloudConnection;
     }
 
-    Request makeRequestWithCertificateValidation(ContextPtr context, const nx::utils::Url& url) const
+    Request makeRequestWithCertificateValidation(ContextPtr context, const nx::Url& url) const
     {
         const auto expectedKey = publicKey(context->handshakeCertificateChain);
         bool lastHostIsServer = false;
@@ -288,7 +288,7 @@ struct RemoteConnectionFactoryRequestsManager::Private
 
     template<typename ResultType>
     ResultType doGet(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         ContextPtr context,
         Request request = {},
         ExternalErrorHandler externalErrorHandler = {}) const
@@ -311,7 +311,7 @@ struct RemoteConnectionFactoryRequestsManager::Private
 
     template<typename ResultType>
     ResultType doPost(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         ContextPtr context,
         nx::Buffer data,
         ExternalErrorHandler externalErrorHandler = {}) const

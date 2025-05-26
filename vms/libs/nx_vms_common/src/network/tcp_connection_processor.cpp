@@ -170,7 +170,7 @@ int QnTCPConnectionProcessor::isFullMessage(
     return isFullMessage(message.toRawByteArray(), fullMessageSize);
 }
 
-bool QnTCPConnectionProcessor::isLargeRequestAllowed(const nx::utils::Url& url)
+bool QnTCPConnectionProcessor::isLargeRequestAllowed(const nx::Url& url)
 {
     Q_D(QnTCPConnectionProcessor);
     return d->owner->isLargeRequestAllowed(url.path());
@@ -714,7 +714,7 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
     other.d_ptr->requestAuthTrusted = d->requestAuthTrusted;
 }
 
-nx::utils::Url QnTCPConnectionProcessor::getDecodedUrl() const
+nx::Url QnTCPConnectionProcessor::getDecodedUrl() const
 {
     Q_D(const QnTCPConnectionProcessor);
     return d->request.requestLine.url;

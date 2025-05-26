@@ -56,7 +56,7 @@ std::unique_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection
 }
 
 void MediatorConnector::mockupCloudModulesXmlUrl(
-    const nx::utils::Url& cloudModulesXmlUrl)
+    const nx::Url& cloudModulesXmlUrl)
 {
     m_mediatorEndpointProvider->mockupCloudModulesXmlUrl(cloudModulesXmlUrl);
 }

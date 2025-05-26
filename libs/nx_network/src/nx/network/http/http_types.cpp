@@ -413,7 +413,7 @@ std::string RequestLine::toString() const
     return std::string(nx::utils::trim((std::string_view) buf));
 }
 
-std::string RequestLine::encodeUrl(const nx::utils::Url& url, EncodeUrlParts parts) const
+std::string RequestLine::encodeUrl(const nx::Url& url, EncodeUrlParts parts) const
 {
     QString encoded;
     switch (parts)

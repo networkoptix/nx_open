@@ -45,7 +45,7 @@ int InternetOnlyPeerManager::distanceTo(const nx::Uuid& /*peerId*/) const
 AbstractPeerManager::RequestContextPtr<FileInformation> InternetOnlyPeerManager::requestFileInfo(
     const nx::Uuid& peerId,
     const QString& fileName,
-    const nx::utils::Url& url)
+    const nx::Url& url)
 {
     if (!peerId.isNull())
         return {};
@@ -69,7 +69,7 @@ AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> InternetOnlyPeerMana
 AbstractPeerManager::RequestContextPtr<nx::Buffer> InternetOnlyPeerManager::downloadChunk(
     const nx::Uuid& peerId,
     const QString& /*fileName*/,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     int chunkIndex,
     int chunkSize,
     qint64 fileSize)

@@ -12,9 +12,9 @@ namespace test {
 
 TEST(UrlGetEndpoint, defaultPortCorrespondsToUrlScheme)
 {
-    ASSERT_EQ(80, getEndpoint(nx::utils::Url("http://host/path")).port);
-    ASSERT_EQ(443, getEndpoint(nx::utils::Url("https://host/path")).port);
-    ASSERT_EQ(554, getEndpoint(nx::utils::Url("rtsp://host/path")).port);
+    ASSERT_EQ(80, getEndpoint(nx::Url("http://host/path")).port);
+    ASSERT_EQ(443, getEndpoint(nx::Url("https://host/path")).port);
+    ASSERT_EQ(554, getEndpoint(nx::Url("rtsp://host/path")).port);
 }
 
 TEST(Url, joinPath)
@@ -31,7 +31,7 @@ TEST(Url, joinPath)
 // NOTE: Copy-paste from url test in utils in order to check cross-library behavior.
 TEST(Url, logging)
 {
-    nx::utils::Url url;
+    nx::Url url;
     if (!nx::log::showPasswords())
     {
         url.setScheme("http");
@@ -59,7 +59,7 @@ TEST(Url, ipv6_host)
 {
     static constexpr char kUrl[] = "http://[fe80::f80b:5eab:64a8:7b63%2514]:7001/foo";
 
-    nx::utils::Url url(kUrl);
+    nx::Url url(kUrl);
     ASSERT_TRUE(url.isValid());
     ASSERT_EQ("http", url.scheme());
     ASSERT_EQ("fe80::f80b:5eab:64a8:7b63%14", url.host());

@@ -30,7 +30,7 @@ bool QnAsyncHttpClientReply::isFailed() const
     return m_failed;
 }
 
-nx::utils::Url QnAsyncHttpClientReply::url() const
+nx::Url QnAsyncHttpClientReply::url() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_url;

@@ -21,7 +21,7 @@ public:
 
     nx::network::http::AsyncHttpClientPtr asyncHttpClient() const;
     bool isFailed() const;
-    nx::utils::Url url() const;
+    nx::Url url() const;
     std::string contentType();
     nx::Buffer data();
     nx::network::http::Response response();
@@ -38,7 +38,7 @@ private:
     nx::network::http::AsyncHttpClientPtr m_client;
 
     bool m_failed;
-    nx::utils::Url m_url;
+    nx::Url m_url;
     std::string m_contentType;
     nx::Buffer m_data;
     nx::network::http::Response m_response;

@@ -213,7 +213,7 @@ protected:
 
         auto httpClient = std::make_unique<HttpClient>(ssl::kAcceptAnyCertificate);
 
-        const nx::utils::Url url(nx::format("%1://%2%3")
+        const nx::Url url(nx::format("%1://%2%3")
             .arg(scheme)
             .arg(httpServer->serverAddress().toString())
             .arg(kRestHandlerPath));

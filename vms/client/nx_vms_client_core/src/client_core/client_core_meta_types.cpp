@@ -160,7 +160,7 @@ void registerQmlTypesInternal()
 
     qmlRegisterUncreatableType<nx::Uuid>(
         "Nx.Utils", 1, 0, "Uuid", "Cannot create an instance of Uuid.");
-    qmlRegisterUncreatableType<nx::utils::Url>(
+    qmlRegisterUncreatableType<nx::Url>(
         "Nx.Utils", 1, 0, "Url", "Cannot create an instance of Url.");
     qmlRegisterUncreatableType<nx::utils::SoftwareVersion>(
         "Nx.Core", 1, 0, "SoftwareVersion", "Cannot create an instance of SoftwareVersion.");

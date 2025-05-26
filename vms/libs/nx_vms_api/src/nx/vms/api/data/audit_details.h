@@ -114,7 +114,7 @@ struct NX_VMS_API MitmDetails
     /**%apidoc Server actual certificate in PEM format. */
     QByteArray actualPem;
     /**%apidoc Requested Url on the compromised Server. */
-    nx::utils::Url url;
+    nx::Url url;
     bool operator==(const MitmDetails& other) const = default;
 };
 #define MitmDetails_Fields (id)(expectedPem)(actualPem)(url)

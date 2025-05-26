@@ -14,7 +14,7 @@ namespace nx::vms::license {
 
 /** Get list of licenses on the remote server. */
 QnLicenseList remoteLicenses(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const QAuthenticator& auth,
     nx::network::ssl::AdapterFunc adapterFunc,
     int* status = nullptr);
@@ -37,7 +37,7 @@ MergeSystemsStatus remoteLicensesConflict(
  */
 MergeSystemsStatus remoteLicensesConflict(
     QnLicensePool* localLicensesPool,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const QAuthenticator& auth,
     nx::network::ssl::AdapterFunc adapterFunc);
 

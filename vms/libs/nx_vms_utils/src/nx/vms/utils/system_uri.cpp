@@ -119,7 +119,7 @@ bool isCloudHostname(const QString& hostname)
     return !uuid.isNull();
 }
 
-void parseParameters(const nx::utils::Url& url, SystemUri* uri)
+void parseParameters(const nx::Url& url, SystemUri* uri)
 {
     if (!NX_ASSERT(uri))
         return;
@@ -243,7 +243,7 @@ QString encodePasswordCredentials(const nx::network::http::Credentials& credenti
         .toUtf8().toBase64();
 }
 
-void parse(const nx::utils::Url& url, SystemUri* uri)
+void parse(const nx::Url& url, SystemUri* uri)
 {
     if (!NX_ASSERT(uri))
         return;
@@ -325,7 +325,7 @@ void parse(const nx::utils::Url& url, SystemUri* uri)
 
 } // namespace
 
-SystemUri::SystemUri(const nx::utils::Url& url) :
+SystemUri::SystemUri(const nx::Url& url) :
     SystemUri()
 {
     parse(url, this);
@@ -333,7 +333,7 @@ SystemUri::SystemUri(const nx::utils::Url& url) :
 
 SystemUri::SystemUri(const QString& uri)
 {
-    nx::utils::Url url(uri);
+    nx::Url url(uri);
     if (url.isValid())
         parse(url, this);
 }
@@ -418,9 +418,9 @@ QString SystemUri::toString() const
     return toUrl().toString();
 }
 
-nx::utils::Url SystemUri::toUrl() const
+nx::Url SystemUri::toUrl() const
 {
-    nx::utils::Url result;
+    nx::Url result;
     result.setScheme(protocolToString[protocol]);
 
     if (scope == Scope::direct)

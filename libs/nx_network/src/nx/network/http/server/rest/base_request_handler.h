@@ -58,12 +58,12 @@ public:
 class UrlQueryFetcher
 {
 public:
-    using type = nx::utils::UrlQuery;
+    using type = nx::UrlQuery;
 
     type operator()(
         const network::http::RequestContext& requestContext) const
     {
-        return nx::utils::UrlQuery(requestContext.request.requestLine.url.query());
+        return nx::UrlQuery(requestContext.request.requestLine.url.query());
     }
 };
 

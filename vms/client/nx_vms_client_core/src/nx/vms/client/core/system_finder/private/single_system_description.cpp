@@ -359,7 +359,7 @@ void SingleSystemDescription::setName(const QString& value)
     emit systemNameChanged();
 }
 
-void SingleSystemDescription::setServerHost(const nx::Uuid& serverId, const nx::utils::Url& host)
+void SingleSystemDescription::setServerHost(const nx::Uuid& serverId, const nx::Url& host)
 {
     const bool containsServer = m_servers.contains(serverId);
 
@@ -380,7 +380,7 @@ void SingleSystemDescription::setServerHost(const nx::Uuid& serverId, const nx::
     emit serverChanged(serverId, QnServerField::Host);
 }
 
-nx::utils::Url SingleSystemDescription::getServerHost(const nx::Uuid& serverId) const
+nx::Url SingleSystemDescription::getServerHost(const nx::Uuid& serverId) const
 {
     NX_ASSERT(m_servers.contains(serverId),
         "System does not contain specified server");
@@ -388,7 +388,7 @@ nx::utils::Url SingleSystemDescription::getServerHost(const nx::Uuid& serverId) 
     return m_hosts.value(serverId);
 }
 
-QSet<nx::utils::Url> SingleSystemDescription::getServerRemoteAddresses(const nx::Uuid& serverId) const
+QSet<nx::Url> SingleSystemDescription::getServerRemoteAddresses(const nx::Uuid& serverId) const
 {
     NX_ASSERT(m_servers.contains(serverId),
         "System does not contain specified server");
@@ -398,12 +398,12 @@ QSet<nx::utils::Url> SingleSystemDescription::getServerRemoteAddresses(const nx:
 
     const auto& server = m_servers.value(serverId);
 
-    QSet<nx::utils::Url> addresses;
+    QSet<nx::Url> addresses;
     for (const auto& addressString: server.remoteAddresses)
     {
         nx::network::SocketAddress sockAddr(addressString.toStdString());
 
-        nx::utils::Url url = nx::network::url::Builder()
+        nx::Url url = nx::network::url::Builder()
             .setScheme(nx::network::http::kSecureUrlSchemeName)
             .setEndpoint(sockAddr)
             .toUrl();

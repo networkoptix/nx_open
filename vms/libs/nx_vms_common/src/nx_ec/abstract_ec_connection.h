@@ -63,7 +63,7 @@ public:
     virtual void addRemotePeer(
         const nx::Uuid& id,
         nx::vms::api::PeerType peerType,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         nx::network::ssl::AdapterFunc adapterFunc = nx::network::ssl::kDefaultCertificateCheck) = 0;
 
     virtual void deleteRemotePeer(const nx::Uuid& id) = 0;

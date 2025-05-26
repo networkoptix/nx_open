@@ -12,7 +12,7 @@ namespace nx::cloud::oauth2::client {
 static constexpr auto kDefaultRequestTimeout = std::chrono::seconds(10);
 
 Oauth2Client::Oauth2Client(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const std::optional<nx::network::http::Credentials>& credentials):
     base_type(url, nx::network::ssl::kDefaultCertificateCheck)
 {
@@ -172,7 +172,7 @@ void Oauth2Client::internalGetSession(
 }
 
 Oauth2ClientFactory::Oauth2ClientFactory():
-    base_type([](const nx::utils::Url& url,
+    base_type([](const nx::Url& url,
         const std::optional<nx::network::http::Credentials>& credentials)
         { return std::make_unique<Oauth2Client>(url, credentials); })
 {

@@ -37,7 +37,7 @@ public:
 private:
     void notifyUserAboutWorkbenchUpdate(
         const nx::utils::SoftwareVersion& targetVersion,
-        const nx::utils::Url& releaseNotesUrl,
+        const nx::Url& releaseNotesUrl,
         const QString& description);
 
     void atCheckerUpdateAvailable(const UpdateContents& info);

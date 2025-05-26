@@ -23,8 +23,8 @@ NX_NETWORK_API std::string joinPath(
  * @return 0 for unknown scheme
  */
 NX_NETWORK_API std::uint16_t getDefaultPortForScheme(const std::string_view& scheme);
-NX_NETWORK_API SocketAddress getEndpoint(const nx::utils::Url& url, int defaultPort);
-NX_NETWORK_API SocketAddress getEndpoint(const nx::utils::Url& url);
+NX_NETWORK_API SocketAddress getEndpoint(const nx::Url& url, int defaultPort);
+NX_NETWORK_API SocketAddress getEndpoint(const nx::Url& url);
 
 NX_NETWORK_API std::string normalizePath(const std::string_view&);
 

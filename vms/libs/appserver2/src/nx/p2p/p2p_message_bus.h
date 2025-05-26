@@ -58,7 +58,7 @@ public:
     virtual void addOutgoingConnectionToPeer(
         const nx::Uuid& id,
         nx::vms::api::PeerType peerType,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         std::optional<nx::network::http::Credentials> credentials,
         nx::network::ssl::AdapterFunc adapterFunc) override;
     virtual void removeOutgoingConnectionFromPeer(const nx::Uuid& id) override;
@@ -277,7 +277,7 @@ private:
         RemoteConnection(
             const nx::Uuid& peerId,
             nx::vms::api::PeerType peerType,
-            const nx::utils::Url& url,
+            const nx::Url& url,
             std::optional<nx::network::http::Credentials> credentials,
             nx::network::ssl::AdapterFunc adapterFunc)
             :
@@ -291,7 +291,7 @@ private:
 
         nx::Uuid peerId;
         nx::vms::api::PeerType peerType = nx::vms::api::PeerType::notDefined;
-        nx::utils::Url url;
+        nx::Url url;
         std::optional<nx::network::http::Credentials> credentials;
         nx::network::ssl::AdapterFunc adapterFunc;
         QVector<nx::utils::ElapsedTimer> disconnectTimes;

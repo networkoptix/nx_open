@@ -26,7 +26,7 @@ public:
         const nx::Uuid& remoteId,
         nx::vms::api::PeerType remotePeerType,
         const vms::api::PeerDataEx& localPeer,
-        const nx::utils::Url& remotePeerUrl,
+        const nx::Url& remotePeerUrl,
         std::unique_ptr<QObject> opaqueObject,
         std::unique_ptr<ConnectionLockGuard> connectionLockGuard,
         ValidateRemotePeerFunc validateRemotePeerFunc);

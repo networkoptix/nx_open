@@ -218,7 +218,7 @@ void Settings::storeRecentConnection(
     const nx::Uuid& localSystemId,
     const QString& systemName,
     const nx::utils::SoftwareVersion& version,
-    const nx::utils::Url& url)
+    const nx::Url& url)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "Storing recent system connection id: %1, url: %2",
         localSystemId, url);

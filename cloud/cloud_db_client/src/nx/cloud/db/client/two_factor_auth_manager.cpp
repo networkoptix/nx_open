@@ -40,7 +40,7 @@ void TwoFactorAuthManager::validateTotpKey(
     const api::ValidateKeyRequest& request,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    nx::utils::UrlQuery query;
+    nx::UrlQuery query;
     query.addQueryItem("token", request.token);
 
     m_requestsExecutor->makeAsyncCall</*Output*/ void>(
@@ -55,7 +55,7 @@ void TwoFactorAuthManager::validateBackupCode(
     const api::ValidateBackupCodeRequest& request,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    nx::utils::UrlQuery query;
+    nx::UrlQuery query;
     query.addQueryItem("token", request.token);
 
     m_requestsExecutor->makeAsyncCall</*Output*/ void>(

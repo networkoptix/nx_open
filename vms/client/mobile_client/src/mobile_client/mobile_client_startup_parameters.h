@@ -17,7 +17,7 @@ struct QnMobileClientStartupParameters
 
     QString qmlRoot;
     QStringList qmlImportPaths;
-    nx::utils::Url url;
+    nx::Url url;
     QString logLevel;
 };
 

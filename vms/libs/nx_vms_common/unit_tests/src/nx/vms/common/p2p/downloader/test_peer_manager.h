@@ -76,7 +76,7 @@ public:
     QList<nx::Uuid> peersInGroup(const QString& group) const;
     void setPeerGroups(const nx::Uuid& peerId, const QStringList& groups);
 
-    void addInternetFile(const nx::utils::Url& url, const QString& fileName);
+    void addInternetFile(const nx::Url& url, const QString& fileName);
 
     const RequestCounter* requestCounter() const;
 
@@ -93,7 +93,7 @@ public:
     virtual RequestContextPtr<downloader::FileInformation> requestFileInfo(
         const nx::Uuid& peer,
         const QString& fileName,
-        const nx::utils::Url& url) override;
+        const nx::Url& url) override;
 
     virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
         const nx::Uuid& peerId, const QString& fileName) override;
@@ -101,7 +101,7 @@ public:
     virtual RequestContextPtr<nx::Buffer> downloadChunk(
         const nx::Uuid& peerId,
         const QString& fileName,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         int chunkIndex,
         int chunkSize,
         qint64 fileSize) override;
@@ -136,7 +136,7 @@ private:
     QMultiHash<QString, nx::Uuid> m_peersByGroup;
     int m_requestIndex = 0;
 
-    QHash<nx::utils::Url, QString> m_fileByUrl;
+    QHash<nx::Url, QString> m_fileByUrl;
     QList<nx::Uuid> m_peerList;
 
     bool m_allowIndirectInternetRequests = false;
@@ -181,7 +181,7 @@ public:
     virtual RequestContextPtr<FileInformation> requestFileInfo(
         const nx::Uuid& peer,
         const QString& fileName,
-        const nx::utils::Url& url) override;
+        const nx::Url& url) override;
 
     virtual RequestContextPtr<QVector<QByteArray>> requestChecksums(
         const nx::Uuid& peer, const QString& fileName) override;
@@ -189,7 +189,7 @@ public:
     virtual RequestContextPtr<nx::Buffer> downloadChunk(
         const nx::Uuid& peerId,
         const QString& fileName,
-        const nx::utils::Url& url,
+        const nx::Url& url,
         int chunkIndex,
         int chunkSize,
         qint64 fileSize) override;

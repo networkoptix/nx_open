@@ -46,7 +46,7 @@ struct SaveableSettingsBase
 
     std::optional<bool> timeSynchronizationEnabled;
     std::optional<nx::Uuid> primaryTimeServer;
-    std::optional<nx::utils::Url> customReleaseListUrl;
+    std::optional<nx::Url> customReleaseListUrl;
 
     std::optional<ClientUpdateSettings> clientUpdateSettings;
     std::optional<BackupSettings> backupSettings;
@@ -108,7 +108,7 @@ struct SaveableSettingsBase
     std::optional<std::chrono::milliseconds> osTimeChangeCheckPeriodMs;
     std::optional<int> proxyConnectTimeoutSec;
     std::optional<ProxyConnectionAccessPolicy> proxyConnectionAccessPolicy;
-    std::optional<nx::utils::Url> resourceFileUri;
+    std::optional<nx::Url> resourceFileUri;
     std::optional<std::chrono::milliseconds> rtpTimeoutMs;
     std::optional<bool> securityForPowerUsers;
     std::optional<bool> sequentialFlirOnvifSearcherEnabled;

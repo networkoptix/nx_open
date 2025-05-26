@@ -268,7 +268,7 @@ protected:
         completionHandler(std::move(result));
     }
 
-    nx::utils::Url prepareUrl(const std::string& requestPath = std::string())
+    nx::Url prepareUrl(const std::string& requestPath = std::string())
     {
         const auto serverAddress = m_httpServer->serverAddress();
         return nx::network::url::Builder().setScheme(nx::network::http::kSecureUrlSchemeName)

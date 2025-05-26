@@ -22,7 +22,7 @@ class NX_NETWORK_API ExperimentalTunnelClient:
 
 public:
     ExperimentalTunnelClient(
-        const nx::utils::Url& baseTunnelUrl,
+        const nx::Url& baseTunnelUrl,
         const ConnectOptions& options,
         ClientFeedbackFunction clientFeedbackFunction);
 
@@ -40,7 +40,7 @@ protected:
 
 private:
     std::string m_tunnelId;
-    nx::utils::Url m_tunnelUrl;
+    nx::Url m_tunnelUrl;
     Response m_openTunnelResponse;
     std::optional<std::chrono::milliseconds> m_timeout;
     aio::Timer m_timer;

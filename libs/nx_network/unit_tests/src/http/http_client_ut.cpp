@@ -80,42 +80,42 @@ protected:
         return m_testHttpServer.get();
     }
 
-    nx::utils::Url staticDataUrl() const
+    nx::Url staticDataUrl() const
     {
         return url::Builder().setScheme(kUrlSchemeName)
             .setEndpoint(m_testHttpServer->serverAddress())
             .setPath(kStaticDataPath).toUrl();
     }
 
-    nx::utils::Url fileUrl() const
+    nx::Url fileUrl() const
     {
         return url::Builder().setScheme(kUrlSchemeName)
             .setEndpoint(m_testHttpServer->serverAddress())
             .setPath(kTestFileHttpPath).toUrl();
     }
 
-    nx::utils::Url silentHandlerUrl() const
+    nx::Url silentHandlerUrl() const
     {
         return url::Builder().setScheme(kUrlSchemeName)
             .setEndpoint(m_testHttpServer->serverAddress())
             .setPath(kSilentHandlerPath).toUrl();
     }
 
-    nx::utils::Url incompleteBodyUrl() const
+    nx::Url incompleteBodyUrl() const
     {
         return url::Builder().setScheme(kUrlSchemeName)
             .setEndpoint(m_testHttpServer->serverAddress())
             .setPath(kIncompleteBodyPath).toUrl();
     }
 
-    nx::utils::Url compressedBodyUrl() const
+    nx::Url compressedBodyUrl() const
     {
         return url::Builder().setScheme(kUrlSchemeName)
             .setEndpoint(m_testHttpServer->serverAddress())
             .setPath(kCompressedFilePath).toUrl();
     }
 
-    nx::utils::Url http10BodyUrl() const
+    nx::Url http10BodyUrl() const
     {
         return url::Builder().setScheme(kUrlSchemeName)
             .setEndpoint(m_testHttpServer->serverAddress())

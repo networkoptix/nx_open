@@ -94,7 +94,7 @@ GenericRemoteImageRequest::GenericRemoteImageRequest(
 
     NX_VERBOSE(this, "Requesting an image (%1)", requestLine);
 
-    nx::utils::Url url(requestLine);
+    nx::Url url(requestLine);
 
     d->requestId = api->getRawResult(url.toString(QUrl::PrettyDecoded | QUrl::RemoveQuery),
         nx::network::rest::Params::fromList(url.queryItems()),

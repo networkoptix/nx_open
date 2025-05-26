@@ -28,7 +28,7 @@ class NX_NETWORK_API ReverseConnection:
 
 public:
     ReverseConnection(
-        const nx::utils::Url& relayUrl,
+        const nx::Url& relayUrl,
         std::optional<std::chrono::milliseconds> connectTimeout,
         std::optional<int> forcedHttpTunnelType);
 
@@ -85,7 +85,7 @@ class NX_NETWORK_API ReverseConnector:
     using base_type = SimpleReverseConnector<ReverseConnection>;
 
 public:
-    ReverseConnector(const nx::utils::Url& relayUrl);
+    ReverseConnector(const nx::Url& relayUrl);
 
     /**
      * Note: it is possible that a single call to this method will actually open multiple connections
@@ -98,7 +98,7 @@ public:
     void setConnectTimeout(std::optional<std::chrono::milliseconds> timeout);
 
 private:
-    nx::utils::Url m_relayUrl;
+    nx::Url m_relayUrl;
     std::optional<std::chrono::milliseconds> m_connectTimeout;
 };
 
@@ -112,7 +112,7 @@ class NX_NETWORK_API ConnectionAcceptor:
     using base_type = AbstractConnectionAcceptor;
 
 public:
-    ConnectionAcceptor(const nx::utils::Url& relayUrl);
+    ConnectionAcceptor(const nx::Url& relayUrl);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -143,7 +143,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    const nx::utils::Url m_relayUrl;
+    const nx::Url m_relayUrl;
     ReverseConnectionAcceptor<detail::ReverseConnection> m_acceptor;
     bool m_started = false;
     AbstractConnectionAcceptor::ConnectionEstablishedHandler m_connectionEstablishedHandler;
@@ -163,10 +163,10 @@ private:
 
 class NX_NETWORK_API ConnectionAcceptorFactory:
     public nx::utils::BasicFactory<
-        std::unique_ptr<AbstractConnectionAcceptor>(const nx::utils::Url& /*relayUrl*/)>
+        std::unique_ptr<AbstractConnectionAcceptor>(const nx::Url& /*relayUrl*/)>
 {
     using base_type = nx::utils::BasicFactory<
-        std::unique_ptr<AbstractConnectionAcceptor>(const nx::utils::Url& /*relayUrl*/)>;
+        std::unique_ptr<AbstractConnectionAcceptor>(const nx::Url& /*relayUrl*/)>;
 
 public:
     ConnectionAcceptorFactory();
@@ -174,7 +174,7 @@ public:
     static ConnectionAcceptorFactory& instance();
 
 private:
-    std::unique_ptr<AbstractConnectionAcceptor> defaultFactoryFunc(const nx::utils::Url &relayUrl);
+    std::unique_ptr<AbstractConnectionAcceptor> defaultFactoryFunc(const nx::Url &relayUrl);
 };
 
 } // namespace nx::network::cloud::relay

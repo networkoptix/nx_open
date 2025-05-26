@@ -30,7 +30,7 @@ class QString;
 class QJsonValue;
 class QnJsonContext;
 
-namespace nx::utils { class Url; }
+namespace nx { class Url; }
 
 namespace nx::network {
 
@@ -278,7 +278,7 @@ public:
     static std::string_view trimIpV6(const std::string_view& str);
 
     static SocketAddress fromString(const std::string_view& str);
-    static SocketAddress fromUrl(const nx::utils::Url& url, bool useDefaultPortFromScheme = false);
+    static SocketAddress fromUrl(const nx::Url& url, bool useDefaultPortFromScheme = false);
 
     /**
      * Split host:port string to host and port. Port is optional.

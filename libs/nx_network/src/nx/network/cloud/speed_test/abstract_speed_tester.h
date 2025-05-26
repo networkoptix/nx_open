@@ -19,7 +19,7 @@ class AbstractSpeedTester:
 {
 public:
     struct Settings {
-        nx::utils::Url url;
+        nx::Url url;
         int maxPingRequests = 0;
         int minBandwidthRequests = 5;
         std::chrono::milliseconds testDuration{0};

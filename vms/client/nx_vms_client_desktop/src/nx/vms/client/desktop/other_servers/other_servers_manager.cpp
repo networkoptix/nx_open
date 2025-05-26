@@ -310,7 +310,7 @@ nx::vms::api::ModuleInformationWithAddresses OtherServersManager::getModuleInfor
     return {};
 }
 
-nx::utils::Url OtherServersManager::getUrl(const nx::Uuid& serverId) const
+nx::Url OtherServersManager::getUrl(const nx::Uuid& serverId) const
 {
     return nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)

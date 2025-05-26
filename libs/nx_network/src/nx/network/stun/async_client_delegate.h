@@ -18,7 +18,7 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     virtual void connect(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         ConnectHandler handler) override;
 
     virtual void setIndicationHandler(

@@ -89,9 +89,9 @@ UnsubscribePayload::UnsubscribePayload(const TokenData& data):
 
 //-------------------------------------------------------------------------------------------------
 
-nx::utils::Url makeRequestUrl(const QString& token)
+nx::Url makeRequestUrl(const QString& token)
 {
-    const nx::utils::Url url = nx::network::url::Builder()
+    const nx::Url url = nx::network::url::Builder()
         .setScheme(nx::network::http::urlScheme(/*isSecure*/ true))
         .setHost(nx::branding::cloudHost())
         .setPath(QString("/api/notifications/subscriptions/%1").arg(token));

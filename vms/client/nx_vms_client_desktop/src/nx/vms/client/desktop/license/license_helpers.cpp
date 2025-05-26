@@ -93,7 +93,7 @@ class LicenseDeactivatorPrivate: public QObject
 
 public:
     LicenseDeactivatorPrivate(
-        const nx::utils::Url& url,
+        const nx::Url& url,
         const RequestInfo& info,
         const QnLicenseList& licenses,
         const Handler& handler,
@@ -109,7 +109,7 @@ private:
 };
 
 LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const RequestInfo& info,
     const QnLicenseList& licenses,
     const Handler& handler,
@@ -207,7 +207,7 @@ namespace nx::vms::client::desktop::license {
 NX_REFLECTION_INSTRUMENT(RequestInfo, (name)(email)(reason)(systemName)(localUser))
 
 void Deactivator::deactivateAsync(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const RequestInfo& info,
     const QnLicenseList& licenses,
     const Handler& completionHandler,

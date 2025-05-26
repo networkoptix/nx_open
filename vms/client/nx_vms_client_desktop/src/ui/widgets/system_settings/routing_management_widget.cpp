@@ -63,7 +63,7 @@ namespace {
         }
     };
 
-    static void getAddresses(const QnMediaServerResourcePtr &server, QSet<nx::utils::Url> &autoUrls, QSet<nx::utils::Url> &additionalUrls, QSet<nx::utils::Url> &ignoredUrls) {
+    static void getAddresses(const QnMediaServerResourcePtr &server, QSet<nx::Url> &autoUrls, QSet<nx::Url> &additionalUrls, QSet<nx::Url> &ignoredUrls) {
         for (const nx::network::SocketAddress &address: server->getNetAddrList())
         {
             autoUrls.insert(nx::network::url::Builder()
@@ -72,10 +72,10 @@ namespace {
                 .toUrl());
         }
 
-        for (const nx::utils::Url &url: server->getAdditionalUrls())
+        for (const nx::Url &url: server->getAdditionalUrls())
             additionalUrls.insert(url);
 
-        for (const nx::utils::Url &url: server->getIgnoredUrls())
+        for (const nx::Url &url: server->getIgnoredUrls())
             ignoredUrls.insert(url);
     }
 
@@ -83,18 +83,18 @@ namespace {
 
 class RoutingChange {
 public:
-    QHash<nx::utils::Url, bool> addresses;
-    QHash<nx::utils::Url, bool> ignoredAddresses;
+    QHash<nx::Url, bool> addresses;
+    QHash<nx::Url, bool> ignoredAddresses;
 
-    void apply(QSet<nx::utils::Url> &additionalUrls, QSet<nx::utils::Url> &ignoredUrls) const {
+    void apply(QSet<nx::Url> &additionalUrls, QSet<nx::Url> &ignoredUrls) const {
         processSet(additionalUrls, addresses);
         processSet(ignoredUrls, ignoredAddresses);
     }
 
-    void simplify(const QSet<nx::utils::Url> &autoUrls, const QSet<nx::utils::Url> &additionalUrls, const QSet<nx::utils::Url> &ignoredUrls, int port) {
+    void simplify(const QSet<nx::Url> &autoUrls, const QSet<nx::Url> &additionalUrls, const QSet<nx::Url> &ignoredUrls, int port) {
         for (auto it = addresses.begin(); it != addresses.end(); /* no inc */) {
-            nx::utils::Url url = it.key();
-            nx::utils::Url defaultUrl = url;
+            nx::Url url = it.key();
+            nx::Url defaultUrl = url;
             defaultUrl.setPort(port);
 
             if (autoUrls.contains(url) || it.value() == (additionalUrls.contains(url) || additionalUrls.contains(defaultUrl)))
@@ -103,8 +103,8 @@ public:
                 ++it;
         }
         for (auto it = ignoredAddresses.begin(); it != ignoredAddresses.end(); /* no inc */) {
-            nx::utils::Url url = it.key();
-            nx::utils::Url defaultUrl = url;
+            nx::Url url = it.key();
+            nx::Url defaultUrl = url;
             defaultUrl.setPort(port);
 
             if (it.value() == (ignoredUrls.contains(url) || ignoredUrls.contains(defaultUrl)))
@@ -118,16 +118,16 @@ public:
         return addresses.isEmpty() && ignoredAddresses.isEmpty();
     }
 
-    static RoutingChange diff(const QSet<nx::utils::Url> &additionalUrlsA, const QSet<nx::utils::Url> &ignoredUrlsA,
-                              const QSet<nx::utils::Url> &additionalUrlsB, const QSet<nx::utils::Url> &ignoredUrlsB)
+    static RoutingChange diff(const QSet<nx::Url> &additionalUrlsA, const QSet<nx::Url> &ignoredUrlsA,
+                              const QSet<nx::Url> &additionalUrlsB, const QSet<nx::Url> &ignoredUrlsB)
     {
         RoutingChange change;
 
-        QSet<nx::utils::Url> removed = additionalUrlsA;
-        QSet<nx::utils::Url> added = additionalUrlsB;
+        QSet<nx::Url> removed = additionalUrlsA;
+        QSet<nx::Url> added = additionalUrlsB;
         for (auto it = removed.begin(); it != removed.end(); /* no inc */) {
-            nx::utils::Url url = *it;
-            nx::utils::Url implicitUrl = url;
+            nx::Url url = *it;
+            nx::Url implicitUrl = url;
             implicitUrl.setPort(-1);
 
             if (added.contains(url) || added.contains(implicitUrl)) {
@@ -139,16 +139,16 @@ public:
             }
         }
 
-        for (const nx::utils::Url &url: removed)
+        for (const nx::Url &url: removed)
             change.addresses.insert(url, false);
-        for (const nx::utils::Url &url: added)
+        for (const nx::Url &url: added)
             change.addresses.insert(url, true);
 
         removed = ignoredUrlsA;
         added = ignoredUrlsB;
         for (auto it = removed.begin(); it != removed.end(); /* no inc */) {
-            nx::utils::Url url = *it;
-            nx::utils::Url implicitUrl = url;
+            nx::Url url = *it;
+            nx::Url implicitUrl = url;
             implicitUrl.setPort(-1);
 
             if (added.contains(url) || added.contains(implicitUrl)) {
@@ -160,16 +160,16 @@ public:
             }
         }
 
-        for (const nx::utils::Url &url: removed)
+        for (const nx::Url &url: removed)
             change.ignoredAddresses.insert(url, false);
-        for (const nx::utils::Url &url: added)
+        for (const nx::Url &url: added)
             change.ignoredAddresses.insert(url, true);
 
         return change;
     }
 
 private:
-    void processSet(QSet<nx::utils::Url> &set, const QHash<nx::utils::Url, bool> &hash) const {
+    void processSet(QSet<nx::Url> &set, const QHash<nx::Url, bool> &hash) const {
         for (auto it = hash.begin(); it != hash.end(); ++it) {
             if (it.value())
                 set.insert(it.key());
@@ -300,18 +300,18 @@ void QnRoutingManagementWidget::applyChanges() {
         if (!server)
             continue;
 
-        QSet<nx::utils::Url> autoUrls;
-        QSet<nx::utils::Url> additionalUrls;
-        QSet<nx::utils::Url> ignoredUrls;
+        QSet<nx::Url> autoUrls;
+        QSet<nx::Url> additionalUrls;
+        QSet<nx::Url> ignoredUrls;
         getAddresses(server, autoUrls, additionalUrls, ignoredUrls);
 
         it->simplify(autoUrls, additionalUrls, ignoredUrls, server->getPort());
-        QHash<nx::utils::Url, bool> additional = it->addresses;
-        QHash<nx::utils::Url, bool> ignored = it->ignoredAddresses;
+        QHash<nx::Url, bool> additional = it->addresses;
+        QHash<nx::Url, bool> ignored = it->ignoredAddresses;
 
         const auto discoveryManager = connection->getDiscoveryManager(nx::network::rest::kSystemSession);
         for (auto it = additional.begin(); it != additional.end(); ++it) {
-            nx::utils::Url url = it.key();
+            nx::Url url = it.key();
 
             if (it.value()) {
                 bool ign = false;
@@ -331,7 +331,7 @@ void QnRoutingManagementWidget::applyChanges() {
             }
         }
         for (auto it = ignored.begin(); it != ignored.end(); ++it) {
-            nx::utils::Url url = it.key();
+            nx::Url url = it.key();
 
             if (it.value())
             {
@@ -399,15 +399,15 @@ void QnRoutingManagementWidget::updateModel() {
 
     nx::Uuid serverId = m_server->getId();
 
-    QSet<nx::utils::Url> autoUrls;
-    QSet<nx::utils::Url> additionalUrls;
-    QSet<nx::utils::Url> ignoredUrls;
+    QSet<nx::Url> autoUrls;
+    QSet<nx::Url> additionalUrls;
+    QSet<nx::Url> ignoredUrls;
     getAddresses(m_server, autoUrls, additionalUrls, ignoredUrls);
 
     m_changes->changes.value(serverId).apply(additionalUrls, ignoredUrls);
 
     int row = ui->addressesView->currentIndex().row();
-    nx::utils::Url url = nx::utils::Url::fromQUrl(ui->addressesView->currentIndex().data(Qt::EditRole).toUrl());
+    nx::Url url = nx::Url::fromQUrl(ui->addressesView->currentIndex().data(Qt::EditRole).toUrl());
 
     m_serverAddressesModel->resetModel(autoUrls.values(), additionalUrls.values(), ignoredUrls, m_server->getPort());
 
@@ -432,9 +432,9 @@ void QnRoutingManagementWidget::updateFromModel() {
 
     nx::Uuid serverId = m_server->getId();
 
-    QSet<nx::utils::Url> autoUrls;
-    QSet<nx::utils::Url> additionalUrls;
-    QSet<nx::utils::Url> ignoredUrls;
+    QSet<nx::Url> autoUrls;
+    QSet<nx::Url> additionalUrls;
+    QSet<nx::Url> ignoredUrls;
     getAddresses(m_server, autoUrls, additionalUrls, ignoredUrls);
     m_changes->changes[serverId] = RoutingChange::diff(
         additionalUrls, ignoredUrls,
@@ -478,7 +478,7 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
     if (urlString.isEmpty())
         return;
 
-    nx::utils::Url url = nx::utils::Url::fromUserInput(urlString);
+    nx::Url url = nx::Url::fromUserInput(urlString);
     url.setScheme(nx::network::http::kSecureUrlSchemeName);
 
     const bool validUrl = url.isValid() && !url.host().isEmpty();
@@ -491,7 +491,7 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
     if (url.port() <= 0)
         url.setPort(getCurrentServerPort());
 
-    nx::utils::Url implicitUrl = url;
+    nx::Url implicitUrl = url;
     implicitUrl.setPort(-1);
     if (m_serverAddressesModel->addressList().contains(url) ||
         m_serverAddressesModel->addressList().contains(implicitUrl) ||

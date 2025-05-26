@@ -7,7 +7,7 @@
 namespace nx::cloud::relay::api {
 
 Client::Client(
-    const nx::utils::Url& baseUrl,
+    const nx::Url& baseUrl,
     std::optional<int> forcedHttpTunnelType)
     :
     m_actualClient(detail::ClientFactory::instance().create(baseUrl, forcedHttpTunnelType))
@@ -52,7 +52,7 @@ void Client::openConnectionToTheTargetHost(
         options);
 }
 
-nx::utils::Url Client::url() const
+nx::Url Client::url() const
 {
     return m_actualClient->url();
 }

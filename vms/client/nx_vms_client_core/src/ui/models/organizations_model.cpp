@@ -515,7 +515,7 @@ nx::coro::FireAndForget OrganizationsModel::Private::loadOrgs(nx::Uuid cpId)
                         cloudGet<SystemList>(
                             self->statusWatcher,
                             systemsPath,
-                            nx::utils::UrlQuery().addQueryItem("rootOnly", "false")));
+                            nx::UrlQuery().addQueryItem("rootOnly", "false")));
 
                     if (!groupStructure || !systems)
                     {

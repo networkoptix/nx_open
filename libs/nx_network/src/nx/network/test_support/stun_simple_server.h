@@ -17,7 +17,7 @@ public:
     SimpleServer();
     ~SimpleServer();
 
-    nx::utils::Url url() const;
+    nx::Url url() const;
 
     nx::network::stun::MessageDispatcher& dispatcher();
 

@@ -43,7 +43,7 @@ void MediatorStunClient::bindToAioThread(
 }
 
 void MediatorStunClient::connect(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     ConnectHandler handler)
 {
     dispatch(

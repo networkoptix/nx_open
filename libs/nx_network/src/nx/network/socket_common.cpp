@@ -76,7 +76,7 @@ HostAddress::HostAddress(const std::string_view& host): m_string(host)
     if (!host.empty())
     {
         NX_ASSERT_HEAVY_CONDITION(
-            nx::utils::Url::isValidHost(host), "Invalid host address: [%1]", host);
+            nx::Url::isValidHost(host), "Invalid host address: [%1]", host);
     }
 }
 
@@ -448,7 +448,7 @@ HostAddress HostAddress::fromString(const std::string_view& host)
 {
     std::optional<std::string_view> addressString;
     std::optional<in6_addr> ipV6;
-    if (nx::utils::Url::isValidHost(host))
+    if (nx::Url::isValidHost(host))
         addressString = host;
     else
         ipV6 = in6addr_any;
@@ -570,7 +570,7 @@ SocketAddress SocketAddress::fromString(const std::string_view& str)
     return SocketAddress(str);
 }
 
-SocketAddress SocketAddress::fromUrl(const nx::utils::Url& url, bool useDefaultPortFromScheme)
+SocketAddress SocketAddress::fromUrl(const nx::Url& url, bool useDefaultPortFromScheme)
 {
     if (!url.isValid() || url.isLocalFile())
         return {};

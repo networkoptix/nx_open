@@ -179,7 +179,7 @@ void ResourcePoolPeerManager::setIndirectInternetRequestsAllowed(bool allow)
 AbstractPeerManager::RequestContextPtr<FileInformation> ResourcePoolPeerManager::requestFileInfo(
     const nx::Uuid& peerId,
     const QString& fileName,
-    const nx::utils::Url& url)
+    const nx::Url& url)
 {
     const auto& connection = getConnection(peerId);
     if (!connection)
@@ -253,7 +253,7 @@ AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> ResourcePoolPeerMana
 AbstractPeerManager::RequestContextPtr<nx::Buffer> ResourcePoolPeerManager::downloadChunk(
     const nx::Uuid& peerId,
     const QString& fileName,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     int chunkIndex,
     int chunkSize,
     qint64 fileSize)

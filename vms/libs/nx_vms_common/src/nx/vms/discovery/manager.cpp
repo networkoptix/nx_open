@@ -365,7 +365,7 @@ void Manager::checkEndpoint(nx::network::SocketAddress endpoint, nx::Uuid expect
         });
 }
 
-void Manager::checkEndpoint(const nx::utils::Url& url, nx::Uuid expectedId)
+void Manager::checkEndpoint(const nx::Url& url, nx::Uuid expectedId)
 {
     checkEndpoint(
         nx::network::url::getEndpoint(url),

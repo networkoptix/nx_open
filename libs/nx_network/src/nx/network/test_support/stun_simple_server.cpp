@@ -16,7 +16,7 @@ SimpleServer::~SimpleServer()
     pleaseStopSync();
 }
 
-nx::utils::Url SimpleServer::url() const
+nx::Url SimpleServer::url() const
 {
     return nx::network::url::Builder()
         .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address());

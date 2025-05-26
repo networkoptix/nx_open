@@ -33,7 +33,7 @@ public:
 
     virtual bool bind(const network::SocketAddress&) = 0;
     virtual bool listen() = 0;
-    virtual nx::utils::Url url() const = 0;
+    virtual nx::Url url() const = 0;
     virtual void sendIndicationThroughEveryConnection(stun::Message) = 0;
     virtual nx::network::stun::MessageDispatcher& dispatcher() = 0;
     virtual std::size_t connectionCount() const = 0;
@@ -441,7 +441,7 @@ private:
     std::unique_ptr<typename AsyncClientTestTypes::ServerType> m_server;
     std::vector<std::unique_ptr<typename AsyncClientTestTypes::ServerType>> m_oldServers;
     SocketAddress m_serverEndpoint = SocketAddress::anyPrivateAddress;
-    nx::utils::Url m_serverUrl;
+    nx::Url m_serverUrl;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_connectResults;
     nx::utils::SyncQueue<int /*dummy*/> m_reconnectEvents;
     nx::utils::SyncQueue<RequestResult> m_requestResult;
@@ -506,7 +506,7 @@ private:
             });
     }
 
-    nx::utils::Url serverUrl() const
+    nx::Url serverUrl() const
     {
         auto url = m_serverUrl;
         if (m_proxyAddress)

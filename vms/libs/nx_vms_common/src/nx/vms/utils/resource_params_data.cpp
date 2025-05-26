@@ -11,7 +11,7 @@ static const std::chrono::seconds kResourceDataFetchEntireBodyTimeout(10);
 
 namespace nx::vms::utils {
 
-ResourceParamsData ResourceParamsData::load(const nx::utils::Url& url)
+ResourceParamsData ResourceParamsData::load(const nx::Url& url)
 {
     ResourceParamsData result;
     result.location = url.toString();

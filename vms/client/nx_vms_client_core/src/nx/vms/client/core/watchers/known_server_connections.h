@@ -23,7 +23,7 @@ public:
     struct Connection
     {
         nx::Uuid serverId;
-        nx::utils::Url url;
+        nx::Url url;
 
         bool operator==(const Connection& other) const = default;
     };

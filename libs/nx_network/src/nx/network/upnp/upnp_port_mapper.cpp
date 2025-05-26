@@ -159,7 +159,7 @@ bool PortMapper::searchForMappers(
         if (service.serviceType != AsyncClient::kWanIp)
             continue; // uninteresting
 
-        nx::utils::Url url;
+        nx::Url url;
         url.setHost(devAddress.address);
         url.setPort(devAddress.port);
         url.setPath(service.controlUrl);
@@ -214,7 +214,7 @@ void PortMapper::onTimer(const quint64& /*timerId*/)
 
 void PortMapper::addNewDevice(
     const HostAddress& localAddress,
-    const nx::utils::Url& url,
+    const nx::Url& url,
     const QString& serial)
 {
     const auto itBool = m_devices.emplace(serial, std::make_unique<Device>());

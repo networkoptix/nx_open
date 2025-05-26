@@ -113,7 +113,7 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
         return Result::error;
     }
 
-    nx::utils::Url url(server->getApiUrl());
+    nx::Url url(server->getApiUrl());
     url.setHost(route.addr.address);
     url.setPort(route.addr.port);
     url.setPath(kTimeSyncUrlPath);

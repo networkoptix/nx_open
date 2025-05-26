@@ -49,7 +49,7 @@ private:
     void setupWidget();
     bool verifyCertificate(const QString& pemString, const QUrl& url);
     bool askUserToAcceptCertificate(
-        const nx::network::ssl::CertificateChain& chain, const nx::utils::Url& url);
+        const nx::network::ssl::CertificateChain& chain, const nx::Url& url);
 
 private:
     std::unique_ptr<nx::vms::client::desktop::GraphicsWebEngineView> m_webEngineView;

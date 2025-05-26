@@ -1460,7 +1460,7 @@ void ServerUpdateTool::atDownloadStalled(const QString& fileName, bool stalled)
     NX_ERROR(this, "atDownloadStalled(%1) - stalled=%2", fileName, stalled);
 }
 
-nx::utils::Url getServerUrl(nx::network::SocketAddress address, QString path)
+nx::Url getServerUrl(nx::network::SocketAddress address, QString path)
 {
     if (address == nx::network::SocketAddress())
         return {};

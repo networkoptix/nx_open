@@ -30,7 +30,7 @@ void AuthProvider::getCdbNonce(
     const std::string& systemId,
     std::function<void(api::ResultCode, api::NonceData)> completionHandler)
 {
-    nx::utils::UrlQuery query;
+    nx::UrlQuery query;
     query.addQueryItem("systemId", systemId);
 
     m_requestsExecutor->makeAsyncCall<api::NonceData>(

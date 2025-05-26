@@ -229,7 +229,7 @@ void CloudServerSocket::setSupportedConnectionMethods(
 }
 
 void CloudServerSocket::setOnAcceptorConnectionEstablished(
-    nx::utils::MoveOnlyFunc<void(nx::utils::Url)> handler)
+    nx::utils::MoveOnlyFunc<void(nx::Url)> handler)
 {
     m_onAcceptorConnectionEstablished = std::move(handler);
 }
@@ -319,7 +319,7 @@ void CloudServerSocket::startAcceptor(
         });
 }
 
-void CloudServerSocket::onAcceptorConnectionEstablished(nx::utils::Url remoteAddress)
+void CloudServerSocket::onAcceptorConnectionEstablished(nx::Url remoteAddress)
 {
     remoteAddress.setUserInfo({});
 

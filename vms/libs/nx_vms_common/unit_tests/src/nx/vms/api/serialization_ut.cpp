@@ -106,7 +106,7 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
 
     .timeSynchronizationEnabled = true,
     .primaryTimeServer = nx::Uuid{},
-    .customReleaseListUrl = nx::utils::Url{},
+    .customReleaseListUrl = nx::Url{},
 
     .clientUpdateSettings = ClientUpdateSettings{},
     .backupSettings = BackupSettings{},
@@ -168,7 +168,7 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
     .osTimeChangeCheckPeriodMs = 5s,
     .proxyConnectTimeoutSec = 5,
     .proxyConnectionAccessPolicy = ProxyConnectionAccessPolicy::powerUsers,
-    .resourceFileUri = nx::utils::Url{"https://resources.vmsproxy.com/resource_data.json"},
+    .resourceFileUri = nx::Url{"https://resources.vmsproxy.com/resource_data.json"},
     .rtpTimeoutMs = 10s,
     .securityForPowerUsers = true,
     .sequentialFlirOnvifSearcherEnabled = false,

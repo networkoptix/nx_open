@@ -88,7 +88,7 @@ protected: // for testing only
 
     struct Device
     {
-        nx::utils::Url url;
+        nx::Url url;
         HostAddress internalIp;
         HostAddress externalIp;
 
@@ -111,7 +111,7 @@ protected: // for testing only
 private:
     void addNewDevice(
         const HostAddress& localAddress,
-        const nx::utils::Url &url, const QString& serial);
+        const nx::Url &url, const QString& serial);
 
     void removeMapping(PortId portId);
     void updateExternalIp(Device* device);

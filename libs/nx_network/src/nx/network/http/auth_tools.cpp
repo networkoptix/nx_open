@@ -607,7 +607,7 @@ header::WWWAuthenticate generateWwwAuthenticateDigestHeader(
     return wwwAuthenticate;
 }
 
-std::string digestUri(const Method& method, const nx::utils::Url& url)
+std::string digestUri(const Method& method, const nx::Url& url)
 {
     // TODO: #akolesnikov This is an incorrect value for "uri". See [rfc7616#3.4] and [rfc7230#5.5].
     // The proper fix may be incompatible with some cameras which loosely follow the standards.

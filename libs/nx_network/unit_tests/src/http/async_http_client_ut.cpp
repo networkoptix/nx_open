@@ -157,7 +157,7 @@ protected:
             .setPath(path));
     }
 
-    void doRequest(const nx::utils::Url& url)
+    void doRequest(const nx::Url& url)
     {
         const auto client = std::make_unique<AsyncClient>(ssl::kAcceptAnyCertificate);
         auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
@@ -174,7 +174,7 @@ protected:
 
     void testResult(const std::string& path, const nx::Buffer& expectedResult)
     {
-        const nx::utils::Url url(nx::format("http://%1%2")
+        const nx::Url url(nx::format("http://%1%2")
             .args(m_testHttpServer->serverAddress().toString(), path));
 
         nx::utils::promise<void> promise;
@@ -234,7 +234,7 @@ protected:
 private:
     nx::utils::SyncQueue<nx::network::http::Request> m_receivedRequests;
 
-    nx::utils::Url commonTestUrl(const std::string& requestPath) const
+    nx::Url commonTestUrl(const std::string& requestPath) const
     {
         return nx::network::url::Builder().setScheme("http")
             .setEndpoint(testHttpServer().serverAddress())
@@ -311,7 +311,7 @@ TEST_F(HttpClientAsync, ServerModRewrite)
 }
 
 namespace {
-static void testHttpClientForFastRemove(const nx::utils::Url& url)
+static void testHttpClientForFastRemove(const nx::Url& url)
 {
     // use different delays (10us - 0.5s) to catch problems on different stages
     for (uint time = 10; time < 500000; time *= 2)
@@ -340,7 +340,7 @@ TEST_F(HttpClientAsync, FastRemove)
 
 TEST_F(HttpClientAsync, FastRemoveBadHost)
 {
-    nx::utils::Url url(lit("http://doestNotExist.host/"));
+    nx::Url url(lit("http://doestNotExist.host/"));
 
     for (int i = 0; i < 99; ++i)
     {
@@ -380,7 +380,7 @@ TEST_F(HttpClientAsync, motionJpegRetrieval)
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
     //fetching mjpeg with async http client
-    const nx::utils::Url url(lit("http://127.0.0.1:%1/mjpg").arg(m_testHttpServer->serverAddress().port));
+    const nx::Url url(lit("http://127.0.0.1:%1/mjpg").arg(m_testHttpServer->serverAddress().port));
 
     struct ClientContext
     {
@@ -466,7 +466,7 @@ public:
     }
 
 protected:
-    void doRequest(const nx::utils::Url& url, const nx::Buffer& message)
+    void doRequest(const nx::Url& url, const nx::Buffer& message)
     {
         m_expectedResponse = message;
         m_client->doGet(url);
@@ -482,7 +482,7 @@ protected:
 private:
     struct TestRequestContext
     {
-        nx::utils::Url url;
+        nx::Url url;
         nx::Buffer message;
     };
 
@@ -499,7 +499,7 @@ private:
 
         for (std::size_t i = 0; i < m_requests.size(); ++i)
         {
-            m_requests[i].url = nx::utils::Url(
+            m_requests[i].url = nx::Url(
                 lit("http://127.0.0.1/AsyncHttpClientTestMultiRequest_%1").arg(i));
             m_requests[i].message = nx::utils::buildString("SimpleMessage_", std::to_string(i));
         }
@@ -737,7 +737,7 @@ TEST_F(HttpClientAsync, ConnectionBreakAfterReceivingSecondRequest)
             }));
     ASSERT_TRUE(testHttpServer().bindAndListen());
 
-    nx::utils::Url testUrl(nx::format("http://%1%2")
+    nx::Url testUrl(nx::format("http://%1%2")
         .args(testHttpServer().serverAddress().toString(), testPath));
 
     HttpClient httpClient{ssl::kAcceptAnyCertificate};
@@ -771,7 +771,7 @@ protected:
         const auto query = QUrl::toPercentEncoding("param1=test#%20#&param2");
         const auto fragment = QUrl::toPercentEncoding("#frag%20ment");
 
-        m_testUrl = nx::utils::Url(nx::format("http://%1%2?%3#%4")
+        m_testUrl = nx::Url(nx::format("http://%1%2?%3#%4")
             .args(testHttpServer().serverAddress().toString(),
                 testPath(), query, fragment));
 
@@ -802,9 +802,9 @@ protected:
 
 private:
     nx::utils::SyncQueue<nx::network::http::Request> m_receivedRequests;
-    nx::utils::SyncQueue<nx::utils::Url> m_urlsFromReceivedRequests;
+    nx::utils::SyncQueue<nx::Url> m_urlsFromReceivedRequests;
     HttpClient m_httpClient{ssl::kAcceptAnyCertificate};
-    nx::utils::Url m_testUrl;
+    nx::Url m_testUrl;
 
     void init()
     {
@@ -819,9 +819,9 @@ private:
         ASSERT_TRUE(testHttpServer().bindAndListen());
     }
 
-    nx::utils::Url commonTestUrl() const
+    nx::Url commonTestUrl() const
     {
-        return nx::utils::Url(nx::format("http://%1%2").arg(testHttpServer().serverAddress()).arg(testPath()));
+        return nx::Url(nx::format("http://%1%2").arg(testHttpServer().serverAddress()).arg(testPath()));
     }
 
     void onRequestReceived(
@@ -929,9 +929,9 @@ private:
     SocketAddress m_serverEndpoint;
     std::vector<ClientContext> m_clients;
 
-    nx::utils::Url serverUrl() const
+    nx::Url serverUrl() const
     {
-        return nx::utils::Url(nx::format("http://%1/tst").arg(m_serverEndpoint.toString()));
+        return nx::Url(nx::format("http://%1/tst").arg(m_serverEndpoint.toString()));
     }
 
     void issueRequests()
@@ -1090,10 +1090,10 @@ private:
         int requestsReceived = 0;
     };
 
-    nx::utils::Url m_testUrl;
+    nx::Url m_testUrl;
     nx::utils::SyncQueue<std::unique_ptr<nx::network::http::Response>> m_responseQueue;
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
-    std::queue<nx::utils::Url> m_scheduledRequests;
+    std::queue<nx::Url> m_scheduledRequests;
     std::map<
         nx::network::http::HttpServerConnection*,
         std::unique_ptr<HttpConnectionContext>> m_connectionToContext;
@@ -1315,7 +1315,7 @@ X-Nx-Result-Code: ok
         << SystemError::getLastOSErrorText();
     testTcpServer.start();
 
-    nx::utils::Url url(nx::format("http://%1/secret/path").arg(testTcpServer.endpoint().toString()));
+    nx::Url url(nx::format("http://%1/secret/path").arg(testTcpServer.endpoint().toString()));
     url.setUserName("don't tell");
     url.setPassword("anyone");
     HttpClient httpClient{ssl::kAcceptAnyCertificate};

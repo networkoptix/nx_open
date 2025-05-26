@@ -265,7 +265,7 @@ protected:
         ASSERT_EQ(endpoint.toString(), other.toString());
         ASSERT_EQ(endpoint, other);
 
-        nx::utils::Url url(nx::format("http://%1/path").arg(expectedEndpointString));
+        nx::Url url(nx::format("http://%1/path").arg(expectedEndpointString));
         ASSERT_EQ(endpoint.address.toString(), url.host().toStdString());
         ASSERT_EQ(endpoint.port, url.port(0));
     }
@@ -282,7 +282,7 @@ protected:
 
     network::SocketAddress socketAddressFromUserInput(const QString& url)
     {
-        return network::SocketAddress::fromUrl(nx::utils::Url::fromUserInput(url));
+        return network::SocketAddress::fromUrl(nx::Url::fromUserInput(url));
     }
 };
 

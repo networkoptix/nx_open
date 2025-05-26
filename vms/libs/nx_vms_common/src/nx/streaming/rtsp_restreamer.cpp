@@ -16,7 +16,7 @@ using namespace nx;
 namespace {
 
 CameraDiagnostics::Result probeStreamWithClient(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     std::chrono::seconds timeout,
     bool useCloud,
     const std::optional<nx::network::http::Credentials>& credentials,
@@ -34,7 +34,7 @@ CameraDiagnostics::Result probeStreamWithClient(
 }
 
 CameraDiagnostics::Result probeStreamWithTcpConnect(
-    const nx::utils::Url& url,
+    const nx::Url& url,
     std::chrono::seconds timeout,
     bool useCloud)
 {
@@ -82,7 +82,7 @@ const std::string& RtspRestreamer::cloudAddressTemplate()
     return kCloudAddressTemplate;
 }
 
-bool RtspRestreamer::tryRewriteRequest(nx::utils::Url& url, bool force)
+bool RtspRestreamer::tryRewriteRequest(nx::Url& url, bool force)
 {
     bool useCloud = nx::network::SocketGlobals::addressResolver().isCloudHostname(url.host());
     if (!useCloud && !force)
@@ -130,7 +130,7 @@ bool RtspRestreamer::tryRewriteRequest(nx::utils::Url& url, bool force)
 
 void RtspRestreamer::setRequest(const QString& request)
 {
-    nx::utils::Url url(request);
+    nx::Url url(request);
     m_useCloud = tryRewriteRequest(url, false);
     m_url = url;
 
@@ -151,7 +151,7 @@ bool RtspRestreamer::probeStream(
     std::chrono::seconds timeout,
     bool fast)
 {
-    nx::utils::Url url(address);
+    nx::Url url(address);
     bool force = false;
 
     while (true)
@@ -201,7 +201,7 @@ bool RtspRestreamer::probeStream(
 
 CameraDiagnostics::Result RtspRestreamer::requestToken(
     std::chrono::milliseconds timeout,
-    const nx::utils::Url& rtspUrl,
+    const nx::Url& rtspUrl,
     const std::string& username,
     const std::string& password,
     std::string& token,
@@ -216,7 +216,7 @@ CameraDiagnostics::Result RtspRestreamer::requestToken(
             .username = QString::fromStdString(username),
             .password = QString::fromStdString(password)});
 
-    nx::utils::Url url;
+    nx::Url url;
     url.setScheme(http::kSecureUrlSchemeName); //< https.
     url.setHost(rtspUrl.host());
     url.setPort(rtspUrl.port());
@@ -328,7 +328,7 @@ void RtspRestreamer::setRole(Qn::ConnectionRole role)
     m_reader.setRole(role);
 }
 
-nx::utils::Url RtspRestreamer::getCurrentStreamUrl() const
+nx::Url RtspRestreamer::getCurrentStreamUrl() const
 {
     return m_reader.getCurrentStreamUrl();
 }

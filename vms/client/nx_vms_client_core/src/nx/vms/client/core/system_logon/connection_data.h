@@ -14,7 +14,7 @@ namespace nx::vms::client::core {
 struct ConnectionData
 {
     /** Server url with username. */
-    nx::utils::Url url;
+    nx::Url url;
 
     /**
      * Id of the system. Used as the credentials storage key.

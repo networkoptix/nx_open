@@ -38,7 +38,7 @@ public:
     bool containsServer(const nx::Uuid& serverId) const;
     nx::vms::api::ModuleInformationWithAddresses getModuleInformationWithAddresses(
         const nx::Uuid& serverId) const;
-    nx::utils::Url getUrl(const nx::Uuid& serverId) const;
+    nx::Url getUrl(const nx::Uuid& serverId) const;
 
 signals:
     void serverAdded(const nx::Uuid& serverId);

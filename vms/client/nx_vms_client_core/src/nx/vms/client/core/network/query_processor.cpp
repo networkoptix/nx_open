@@ -53,7 +53,7 @@ struct QueryProcessor::Private
         return httpClient;
     }
 
-    nx::utils::Url makeUrl(ec2::ApiCommand::Value cmdCode) const
+    nx::Url makeUrl(ec2::ApiCommand::Value cmdCode) const
     {
         NX_MUTEX_LOCKER lk(&mutex);
         return nx::network::url::Builder()
@@ -144,7 +144,7 @@ void QueryProcessor::sendGetRequest(
 {
     auto httpClient = d->makeHttpClient();
 
-    nx::utils::Url requestUrl(d->makeUrl(cmdCode));
+    nx::Url requestUrl(d->makeUrl(cmdCode));
 
     query.addQueryItem("format", nx::toString(d->serializationFormat));
     requestUrl.setQuery(query);

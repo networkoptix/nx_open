@@ -31,16 +31,16 @@ ServerHostPriority serverHostPriority(const nx::network::HostAddress& host)
     return ServerHostPriority::dns;
 }
 
-nx::utils::Url mainServerUrl(const QSet<QString>& remoteAddresses,
-    std::function<int(const nx::utils::Url&)> priority)
+nx::Url mainServerUrl(const QSet<QString>& remoteAddresses,
+    std::function<int(const nx::Url&)> priority)
 {
-    std::map<nx::utils::Url, int> addresses;
+    std::map<nx::Url, int> addresses;
     for (const auto& addressString: remoteAddresses)
     {
         auto str = addressString.toStdString();
         nx::network::SocketAddress sockAddr(addressString.toStdString());
 
-        nx::utils::Url url = nx::network::url::Builder()
+        nx::Url url = nx::network::url::Builder()
             .setScheme(nx::network::http::kSecureUrlSchemeName)
             .setEndpoint(sockAddr)
             .toUrl();

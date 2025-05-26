@@ -20,7 +20,7 @@ public:
      * @param forcedHttpTunnelType passed to the nx::network::http::tunneling::Client.
      */
     ClientOverHttpTunnel(
-        const nx::utils::Url& baseUrl,
+        const nx::Url& baseUrl,
         std::optional<int> forcedHttpTunnelType);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
