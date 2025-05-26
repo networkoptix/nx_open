@@ -1210,15 +1210,15 @@
     <name>FileExtensions</name>
     <message>
       <source>Pictures</source>
-      <translation>รูปภาพ</translation>
+      <translation type="unfinished">Pictures</translation>
     </message>
     <message>
       <source>Video</source>
-      <translation>วิดีโอ</translation>
+      <translation type="unfinished">Video</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation>ไฟล์ทั้งหมด</translation>
+      <translation type="unfinished">All Files</translation>
     </message>
   </context>
   <context>
@@ -6124,27 +6124,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Saving layout</source>
-      <translation>กำลังบันทึกเค้าโครง</translation>
+      <translation type="unfinished">Saving layout</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>การส่งออกวิดีโอ</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation>หยุดการบันทึก</translation>
+      <translation type="unfinished">Stop Saving</translation>
     </message>
     <message>
       <source>Stop Export</source>
-      <translation>หยุดการส่งออก</translation>
+      <translation type="unfinished">Stop Export</translation>
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation>จำเป็นต้องมีการแปลงรหัส รีสตาร์ทเซสชันการส่งออกแล้ว</translation>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>ย่อขนาด</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
   </context>
   <context>

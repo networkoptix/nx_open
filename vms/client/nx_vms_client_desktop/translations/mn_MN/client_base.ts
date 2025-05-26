@@ -1216,7 +1216,7 @@
     <name>FileExtensions</name>
     <message>
       <source>Pictures</source>
-      <translation>Зургууд</translation>
+      <translation type="unfinished">Pictures</translation>
     </message>
     <message>
       <source>Video</source>

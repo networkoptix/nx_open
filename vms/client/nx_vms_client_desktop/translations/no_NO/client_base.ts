@@ -1216,15 +1216,15 @@
     <name>FileExtensions</name>
     <message>
       <source>Pictures</source>
-      <translation>Bilder</translation>
+      <translation type="unfinished">Pictures</translation>
     </message>
     <message>
       <source>Video</source>
-      <translation>Video</translation>
+      <translation type="unfinished">Video</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation>Alle filer</translation>
+      <translation type="unfinished">All Files</translation>
     </message>
   </context>
   <context>
@@ -6227,27 +6227,27 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Saving layout</source>
-      <translation>Lagrer visning</translation>
+      <translation type="unfinished">Saving layout</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>Eksporter video</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation>Stopp lagring</translation>
+      <translation type="unfinished">Stop Saving</translation>
     </message>
     <message>
       <source>Stop Export</source>
-      <translation>Stopp eksport</translation>
+      <translation type="unfinished">Stop Export</translation>
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation>Transkoding er nødvendig. Eksporter økten må startes på nytt.</translation>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Minimer</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
   </context>
   <context>

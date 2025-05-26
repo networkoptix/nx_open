@@ -1222,7 +1222,7 @@
     <name>FileExtensions</name>
     <message>
       <source>Pictures</source>
-      <translation>Pictures</translation>
+      <translation type="unfinished">Pictures</translation>
     </message>
     <message>
       <source>Video</source>
@@ -6334,7 +6334,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>Exporting video</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
@@ -6350,7 +6350,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Minimize</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
   </context>
   <context>

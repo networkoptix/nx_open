@@ -1210,15 +1210,15 @@
     <name>FileExtensions</name>
     <message>
       <source>Pictures</source>
-      <translation>Hình ảnh</translation>
+      <translation type="unfinished">Pictures</translation>
     </message>
     <message>
       <source>Video</source>
-      <translation>Video</translation>
+      <translation type="unfinished">Video</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation>Tất cả các file</translation>
+      <translation type="unfinished">All Files</translation>
     </message>
   </context>
   <context>
@@ -6124,27 +6124,27 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Saving layout</source>
-      <translation>Đang lưu bố cục</translation>
+      <translation type="unfinished">Saving layout</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>Xuất ra video</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation>Dừng lưu</translation>
+      <translation type="unfinished">Stop Saving</translation>
     </message>
     <message>
       <source>Stop Export</source>
-      <translation>Dừng xuất</translation>
+      <translation type="unfinished">Stop Export</translation>
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation>Chuyển mã là bắt buộc. Phiên xuất lại được khởi động lại.</translation>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Thu nhỏ</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
   </context>
   <context>

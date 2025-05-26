@@ -1210,15 +1210,15 @@
     <name>FileExtensions</name>
     <message>
       <source>Pictures</source>
-      <translation>Pictures</translation>
+      <translation type="unfinished">Pictures</translation>
     </message>
     <message>
       <source>Video</source>
-      <translation>Video</translation>
+      <translation type="unfinished">Video</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation>Semua File</translation>
+      <translation type="unfinished">All Files</translation>
     </message>
   </context>
   <context>
@@ -6124,27 +6124,27 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Saving layout</source>
-      <translation>Menyimpan layout</translation>
+      <translation type="unfinished">Saving layout</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>Mengekspor video</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation>Berhenti Menyimpan</translation>
+      <translation type="unfinished">Stop Saving</translation>
     </message>
     <message>
       <source>Stop Export</source>
-      <translation>Hentikan Ekspor</translation>
+      <translation type="unfinished">Stop Export</translation>
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation>Transkode diperlukan. Sesi ekspor direstart.</translation>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Minimalkan</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
   </context>
   <context>

@@ -1216,15 +1216,15 @@
     <name>FileExtensions</name>
     <message>
       <source>Pictures</source>
-      <translation>Kuvat</translation>
+      <translation type="unfinished">Pictures</translation>
     </message>
     <message>
       <source>Video</source>
-      <translation>Video</translation>
+      <translation type="unfinished">Video</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation>Kaikki tiedostot</translation>
+      <translation type="unfinished">All Files</translation>
     </message>
   </context>
   <context>
@@ -6227,19 +6227,19 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Saving layout</source>
-      <translation>Asettelun tallentaminen</translation>
+      <translation type="unfinished">Saving layout</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>Vie video</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation>Lopeta tallennus</translation>
+      <translation type="unfinished">Stop Saving</translation>
     </message>
     <message>
       <source>Stop Export</source>
-      <translation>Lopeta vienti</translation>
+      <translation type="unfinished">Stop Export</translation>
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
@@ -6247,7 +6247,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Pienennä</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
   </context>
   <context>

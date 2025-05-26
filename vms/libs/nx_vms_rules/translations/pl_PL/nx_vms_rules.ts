@@ -676,8 +676,8 @@
   <context>
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
-      <source>HTTP Method should be known</source>
-      <translation>Metoda HTTP powinna być znana</translation>
+      <source>Not allowed HTTP method</source>
+      <translation type="unfinished">Not allowed HTTP method</translation>
     </message>
   </context>
   <context>
