@@ -389,11 +389,10 @@ void AbstractResourceThumbnail::Private::setImage(const QImage& value)
     if (image.constBits() == value.constBits())
         return;
 
-    NX_VERBOSE(q, "Received new image %3x%4 for %1 (%2)",
-        resource ? resource->getName() : QString("<no resource>"),
-        resource ? resource->getId() : nx::Uuid(),
-        value.width(),
-        value.height());
+    if (value.isNull())
+        NX_VERBOSE(q, "Cleared image for %1", resource);
+    else
+        NX_VERBOSE(q, "Received new image %2x%3 for %1", resource, value.width(), value.height());
 
     image = value;
     imageTimestamp = AsyncImageResult::timestamp(image);

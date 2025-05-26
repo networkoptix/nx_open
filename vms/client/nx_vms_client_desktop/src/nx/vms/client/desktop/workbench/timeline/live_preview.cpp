@@ -7,6 +7,7 @@
 
 #include <core/resource/resource.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/client/desktop/workbench/timeline/live_preview_thumbnail.h>
@@ -24,6 +25,7 @@ struct LivePreview::Private
     QnTimeSlider* const slider;
 
     bool dataExistsForTime(milliseconds time) const;
+    void setResource(const QnResourcePtr& resource);
 
     void updateLineLength();
     void updateConstraints();
@@ -34,6 +36,8 @@ struct LivePreview::Private
     const QmlProperty<qreal> markerLineLength{q->widget(), "markerLineLength"};
     const QmlProperty<qreal> desiredPreviewHeight{q->widget(), "desiredPreviewHeight"};
     const QmlProperty<qreal> maximumPreviewWidth{q->widget(), "maximumPreviewWidth"};
+
+    nx::utils::ScopedConnections resourceConnections;
 };
 
 LivePreview::LivePreview(QnTimeSlider* slider, QObject* parent):
@@ -67,6 +71,9 @@ LivePreview::LivePreview(QnTimeSlider* slider, QObject* parent):
         {
             if (d->slider)
                 d->slider->setThumbnailsFaded(state == State::shown);
+
+            if (state != State::shown)
+                d->setResource({});
         });
 }
 
@@ -86,7 +93,8 @@ void LivePreview::showAt(
     const TimeContent& timeContent)
 {
     const auto newResource = navigator()->currentResource();
-    d->thumbnailSource->setResource(newResource);
+    d->setResource(newResource);
+
     if (!NX_ASSERT(newResource))
     {
         hide();
@@ -121,6 +129,27 @@ bool LivePreview::Private::dataExistsForTime(milliseconds timePoint) const
         slider->msecsPerPixel());
 
     return slider->timePeriods(0, Qn::RecordingContent).intersects(testTimePeriod);
+}
+
+void LivePreview::Private::setResource(const QnResourcePtr& resource)
+{
+    if (thumbnailSource->resource() == resource)
+        return;
+
+    NX_VERBOSE(q, "Setting resource to %1", resource);
+
+    resourceConnections.reset();
+    thumbnailSource->setResource(resource);
+
+    if (!resource)
+        return;
+
+    resourceConnections << QObject::connect(resource.get(), &QnResource::flagsChanged, q,
+        [this](const QnResourcePtr& resource)
+        {
+            if (resource == thumbnailSource->resource() && resource->hasFlags(Qn::removed))
+                setResource({});
+        });
 }
 
 void LivePreview::Private::updateLineLength()
