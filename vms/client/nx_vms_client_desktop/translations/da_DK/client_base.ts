@@ -1291,15 +1291,15 @@
     <name>FileExtensions</name>
     <message>
       <source>Pictures</source>
-      <translation type="unfinished">Pictures</translation>
+      <translation>Billeder</translation>
     </message>
     <message>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>Video</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation type="unfinished">All Files</translation>
+      <translation>Alle Filer</translation>
     </message>
   </context>
   <context>
@@ -6921,7 +6921,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>Eksporterer video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
@@ -6937,7 +6937,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Minimér</translation>
     </message>
   </context>
   <context>

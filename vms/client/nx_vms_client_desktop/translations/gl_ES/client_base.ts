@@ -6917,11 +6917,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>Gardando deseño</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>Exportando vídeo</translation>
     </message>
     <message>
       <source>Stop Saving</source>
@@ -6937,7 +6937,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Minimizar</translation>
     </message>
   </context>
   <context>

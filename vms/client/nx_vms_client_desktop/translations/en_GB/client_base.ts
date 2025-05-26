@@ -6921,7 +6921,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>Exporting video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
@@ -6937,7 +6937,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Minimise</translation>
     </message>
   </context>
   <context>
