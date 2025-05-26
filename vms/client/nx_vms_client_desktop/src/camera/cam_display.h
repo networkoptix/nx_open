@@ -4,7 +4,6 @@
 #define QN_CAM_DISPLAY_H
 
 #include <chrono>
-#include <map>
 
 #include <QtCore/QElapsedTimer>
 
@@ -31,28 +30,9 @@ class QnResourceWidgetRenderer;
 class QnVideoStreamDisplay;
 class QnAudioStreamDisplay;
 class QnCompressedVideoData;
-class QnArchiveStreamReader;
-class QnlTimeSource;
+class QnAbstractArchiveStreamReader;
 
 namespace nx::vms::client::core { struct SpectrumData; }
-
-/*
-* This class is not duplicate statistics from Reader. If not enough CPU/network this class still show full (correct) stream fps
-*/
-class QnFpsStatistics
-{
-public:
-    static const int MAX_QUEUE_SIZE = 30;
-
-    QnFpsStatistics(): m_lastTime(AV_NOPTS_VALUE), m_queue(MAX_QUEUE_SIZE), m_queueSum(0) {}
-    void updateFpsStatistics(QnCompressedVideoDataPtr vd);
-    int getFps() const;
-private:
-    mutable nx::Mutex m_mutex;
-    qint64 m_lastTime;
-    QnUnsafeQueue<qint64> m_queue;
-    qint64 m_queueSum;
-};
 
 /**
   * Stores QnVideoStreamDisplay for each channel/sensor
@@ -65,7 +45,8 @@ class QnCamDisplay:
     using base_type = QnAbstractDataConsumer;
     Q_OBJECT
 public:
-    QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* reader);
+    /** Owns and stops reader in display thread. */
+    QnCamDisplay(QnMediaResourcePtr resource, QnAbstractArchiveStreamReader* reader);
     ~QnCamDisplay();
 
     void addVideoRenderer(int channelCount, QnResourceWidgetRenderer* vw, bool canDownscale);
@@ -117,7 +98,7 @@ public:
     bool isStillImage() const;
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
     virtual QSize getMaxScreenSize() const override; //< From AbstractVideoDisplay
-    QnArchiveStreamReader* getArchiveReader() const;
+    QnAbstractArchiveStreamReader* getArchiveReader() const;
     virtual bool isFullScreen() const override; //< From AbstractVideoDisplay
     virtual bool isZoomWindow() const override; //< From AbstractVideoDisplay
     void setFullScreen(bool fullScreen);
@@ -195,6 +176,8 @@ protected:
     void processNewSpeed(float speed);
     bool useSync(QnConstAbstractMediaDataPtr md);
     int getBufferingMask();
+
+    void at_finished() override;
 
 private:
     /** Process incoming video frame and clear the video queue if possible. */
@@ -311,7 +294,7 @@ protected:
     QElapsedTimer m_afterJumpTimer;
     qint64 m_firstAfterJumpTime;
     qint64 m_receivedInterval;
-    QnArchiveStreamReader* m_archiveReader;
+    std::unique_ptr<QnAbstractArchiveStreamReader> m_archiveReader;
 
     bool m_fullScreen;
     int m_prevLQ;

@@ -3,7 +3,6 @@
 #include "workbench_stream_synchronizer.h"
 
 #include <camera/cam_display.h>
-#include <camera/client_video_camera.h>
 #include <camera/resource_display.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/resource.h>
@@ -235,9 +234,9 @@ void QnWorkbenchStreamSynchronizer::handleWidget(QnMediaResourceWidget* widget)
     if (hasToBeSynced && !isSyncedAlready && !isSyncedActually)
     {
         // New or queued widget.
-        QnClientVideoCamera* camera = widget->display()->camera();
-        m_syncPlay->addArchiveReader(widget->display()->archiveReader(), camera->getCamDisplay());
-        camera->getCamDisplay()->setExternalTimeSource(m_syncPlay);
+        auto camDisplay = widget->display()->camDisplay();
+        m_syncPlay->addArchiveReader(widget->display()->archiveReader(), camDisplay);
+        camDisplay->setExternalTimeSource(m_syncPlay);
 
         m_counter->increment();
         connect(
@@ -260,7 +259,7 @@ void QnWorkbenchStreamSynchronizer::handleWidget(QnMediaResourceWidget* widget)
             if (NX_ASSERT(archiveReader))
             {
                 m_syncPlay->removeArchiveReader(archiveReader);
-                widget->display()->camera()->getCamDisplay()->setExternalTimeSource(nullptr);
+                widget->display()->camDisplay()->setExternalTimeSource(nullptr);
 
                 m_counter->decrement();
                 archiveReader->disconnect(m_counter);

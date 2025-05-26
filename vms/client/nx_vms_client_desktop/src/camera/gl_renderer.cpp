@@ -10,7 +10,6 @@
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QErrorMessage>
 
-#include <camera/client_video_camera.h>
 #include <nx/media/ffmpeg_video_decoder.h>
 #include <nx/media/sse_helper.h>
 #include <nx/media/video_frame.h>

@@ -17,13 +17,6 @@ class QnResourceVideoLayout;
 class QnCamDisplay;
 class QnLongRunnable;
 class QnResourceWidgetRenderer;
-class QnClientVideoCamera;
-
-namespace nx {
-namespace utils {
-class CounterWithSignal;
-} // namespace utils
-} // namespace nx
 
 /**
  * Proxy class to route video data and metadata through it.
@@ -80,11 +73,6 @@ public:
     QnAbstractArchiveStreamReader* archiveReader() const;
 
     /**
-     * \returns                         Video camera associated with this display, if any.
-     */
-    QnClientVideoCamera *camera() const;
-
-    /**
      * \returns                         Camdisplay for this display, if any.
      */
     QnCamDisplay *camDisplay() const;
@@ -128,9 +116,6 @@ public:
 
     QString codecName() const;
 
-protected:
-    void disconnectFromResource();
-
 private:
     void cleanUp(QnLongRunnable *runnable) const;
 
@@ -148,12 +133,7 @@ private:
     QPointer<QnAbstractArchiveStreamReader> m_archiveReader;
 
     /** Video camera. */
-    QPointer<QnClientVideoCamera> m_camera; // TODO: #sivanov Compatibility layer. Remove.
+    std::unique_ptr<QnCamDisplay> m_camDisplay;
 
     QnResourcePtr m_resource;
-
-    /** Whether this display was started. */
-    bool m_started;
-
-    QPointer<nx::utils::CounterWithSignal> m_counter;
 };

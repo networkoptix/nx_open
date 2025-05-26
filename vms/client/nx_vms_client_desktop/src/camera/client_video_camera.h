@@ -15,14 +15,16 @@ class QnlTimeSource;
 class QnMediaStreamStatistics;
 class QnAbstractArchiveStreamReader;
 
-class QnClientVideoCamera : public QObject {
+// TODO: #amalov Used for export only. Remove.
+class [[deprecated]] QnClientVideoCamera : public QObject
+{
     Q_OBJECT
 
     Q_ENUMS(ClientVideoCameraError)
 
     typedef QObject base_type;
 public:
-    QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader = 0);
+    QnClientVideoCamera(const QnMediaResourcePtr &resource);
 
     virtual ~QnClientVideoCamera();
 

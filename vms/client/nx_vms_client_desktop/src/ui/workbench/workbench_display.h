@@ -39,7 +39,6 @@ class QnCurtainAnimator;
 class QnCurtainItem;
 class QnGridItem;
 class QnGridBackgroundItem;
-class QnClientVideoCamera;
 class QnCamDisplay;
 
 namespace nx::vms::client::desktop { class FrameTimePointsProviderInstrument; }
@@ -169,8 +168,6 @@ public:
     QnResourceWidget* activeWidget() const;
 
     QnResourceDisplayPtr display(QnWorkbenchItem *item) const;
-
-    QnClientVideoCamera *camera(QnWorkbenchItem *item) const;
 
     QnCamDisplay *camDisplay(QnWorkbenchItem *item) const;
 

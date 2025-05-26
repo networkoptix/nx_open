@@ -18,38 +18,14 @@
 #include <utils/common/delayed.h>
 #include <utils/common/util.h>
 
-QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader):
+QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource):
     base_type(nullptr),
     m_resource(resource),
-    m_camdispay(resource, dynamic_cast<QnArchiveStreamReader*>(reader)),
-    m_reader(reader),
+    m_camdispay(resource, nullptr),
     m_exportRecorder(nullptr),
     m_exportReader(nullptr),
     m_displayStarted(false)
 {
-    if (m_reader)
-    {
-        m_reader->addDataProcessor(&m_camdispay);
-
-        if (const auto archiveReader =
-            dynamic_cast<QnAbstractArchiveStreamReader*>(m_reader.data()))
-        {
-            connect(archiveReader, &QnAbstractArchiveStreamReader::streamAboutToBePaused,
-                &m_camdispay, &QnCamDisplay::onReaderPaused, Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveStreamReader::streamAboutToBeResumed,
-                &m_camdispay, &QnCamDisplay::onReaderResumed, Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveStreamReader::prevFrameOccurred,
-                &m_camdispay, &QnCamDisplay::onPrevFrameOccurred, Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveStreamReader::nextFrameOccurred,
-                &m_camdispay, &QnCamDisplay::onNextFrameOccurred, Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveStreamReader::beforeJump,
-                &m_camdispay, &QnCamDisplay::onBeforeJump, Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveStreamReader::jumpOccurred,
-                &m_camdispay, &QnCamDisplay::onJumpOccurred, Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveStreamReader::skipFramesTo,
-                &m_camdispay, &QnCamDisplay::onSkippingFrames, Qt::DirectConnection);
-        }
-    }
 }
 
 QnClientVideoCamera::~QnClientVideoCamera()

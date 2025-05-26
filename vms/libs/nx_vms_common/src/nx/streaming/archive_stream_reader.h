@@ -173,7 +173,7 @@ public:
     virtual std::chrono::microseconds currentTime() const override;
 
     void reopen();
-    bool isJumpProcessing() const;
+    bool isJumpProcessing() const override;
 
 protected:
     virtual bool init();

@@ -16,7 +16,6 @@
 #include <camera/cam_display.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
-#include <camera/client_video_camera.h>
 #include <camera/resource_display.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/avi/avi_resource.h>

@@ -14,7 +14,7 @@
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtWidgets/QGraphicsProxyWidget>
 
-#include <camera/client_video_camera.h>
+#include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/camera_resource.h>
@@ -1082,22 +1082,12 @@ QnResourceDisplayPtr QnWorkbenchDisplay::display(QnWorkbenchItem *item) const
     return QnResourceDisplayPtr();
 }
 
-QnClientVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const
-{
-    auto display = this->display(item);
-    if (!display)
-        return nullptr;
-
-    return display->camera();
-}
-
 QnCamDisplay* QnWorkbenchDisplay::camDisplay(QnWorkbenchItem* item) const
 {
-    const auto camera = this->camera(item);
-    if (!camera)
-        return nullptr;
+    if (auto display = this->display(item))
+        return display->camDisplay();
 
-    return camera->getCamDisplay();
+    return nullptr;
 }
 
 // -------------------------------------------------------------------------- //

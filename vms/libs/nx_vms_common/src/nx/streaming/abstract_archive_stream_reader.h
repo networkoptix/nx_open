@@ -113,6 +113,7 @@ public:
     virtual std::chrono::microseconds currentTime() const = 0;
 
     virtual bool jumpToEx(qint64 mksec, qint64 skipTime, bool bindPositionToPlaybackMask, qint64* outJumpTime, bool useDelegate = true) = 0;
+    virtual bool isJumpProcessing() const = 0;
 
     void setRealtimeSpeed(float value) { m_realTimeSpeed = value; }
 

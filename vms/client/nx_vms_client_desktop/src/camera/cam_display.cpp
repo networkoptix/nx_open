@@ -104,7 +104,7 @@ static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 300 * 1000; // 300ms
 static const double FPS_EPS = 0.0001;
 static const int DEFAULT_DELAY_OVERDRAFT = 5000 * 1000;
 
-QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* reader):
+QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnAbstractArchiveStreamReader* reader):
     QnAbstractDataConsumer(CL_MAX_DISPLAY_QUEUE_SIZE),
     m_audioDisplay(0),
     m_delay(DEFAULT_DELAY_OVERDRAFT),
@@ -240,6 +240,15 @@ QnCamDisplay::~QnCamDisplay()
     delete m_audioDisplay;
 }
 
+void QnCamDisplay::at_finished()
+{
+    // Stop archive reader thread in display thread.
+    if (m_archiveReader)
+        m_archiveReader->stop();
+
+    base_type::at_finished();
+}
+
 void QnCamDisplay::setAudioBufferSize(int bufferSize, int prebufferSize)
 {
     m_audioBufferSize = bufferSize;
@@ -372,8 +381,9 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
     }
 }
 
-QnArchiveStreamReader* QnCamDisplay::getArchiveReader() const {
-    return m_archiveReader;
+QnAbstractArchiveStreamReader* QnCamDisplay::getArchiveReader() const
+{
+    return m_archiveReader.get();
 }
 
 void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
