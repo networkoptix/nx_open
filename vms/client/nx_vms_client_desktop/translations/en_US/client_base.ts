@@ -12777,7 +12777,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
