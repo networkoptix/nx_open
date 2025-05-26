@@ -55,7 +55,7 @@ static const core::SvgIconColorer::IconSubstitutions kIconSubstitutions = {
 };
 
 NX_DECLARE_COLORIZED_ICON(kTimePlaceholder,
-    "128x128/Outline/time_placeholder.svg",
+    "64x64/Outline/time.svg",
     kIconSubstitutions)
 
 } // namespace
@@ -260,7 +260,7 @@ void TimeSynchronizationWidget::setupUi()
 
     ui->placeholderImageLabel->setPixmap(
         qnSkin->icon(kTimePlaceholder)
-            .pixmap(QSize(128, 128)));
+            .pixmap(QSize(64, 64)));
 
     QFont font;
     font.setPixelSize(kTimeFontPixelSize);

@@ -155,12 +155,12 @@ NX_DECLARE_COLORIZED_ICON(kTabCloseIcon,
     "16x16/Outline/tab_close.svg", kTabCloseTheme,
     "16x16/Outline/tab_close.svg", kTabCloseCheckedTheme)
 NX_DECLARE_COLORIZED_ICON(kAddFolder2pxIcon, "24x24/Outline/add_folder_2px.svg", kLight1Theme)
-NX_DECLARE_COLORIZED_ICON(kArrowLeft2pxIcon, "24x24/Outline/arrow_left_2px.svg", kLight1Theme)
-NX_DECLARE_COLORIZED_ICON(kArrowRight2pxIcon, "24x24/Outline/arrow_right_2px.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kArrowBackwardIcon, "24x24/Outline/arrow_back.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kArrowForwardIcon, "24x24/Outline/arrow_forward.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kArrowUp2pxIcon, "24x24/Outline/arrow_up_2px.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kCloseIcon, "16x16/Outline/close.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kHamburger2pxIcon, "24x24/Outline/hamburger_menu_2px.svg", kLight1Theme)
-NX_DECLARE_COLORIZED_ICON(kFileDialogIcon, "24x24/Outline/sp_file_dialog_detailed_view.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kFileDialogIcon, "24x24/Outline/grid_view.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kErrorIcon, "64x64/Outline/error.svg", kRedTheme)
 NX_DECLARE_COLORIZED_ICON(kInfoIcon, "64x64/Outline/info.svg", kLight10Theme)
 NX_DECLARE_COLORIZED_ICON(kQuestionIcon, "64x64/Outline/question.svg", kLight10Theme)
@@ -4104,10 +4104,10 @@ QIcon Style::standardIcon(
             return qnSkin->icon(kCloseIcon);
         case SP_ArrowLeft:
         case SP_ArrowBack:
-            return qnSkin->icon(kArrowLeft2pxIcon);
+            return qnSkin->icon(kArrowBackwardIcon);
         case SP_ArrowRight:
         case SP_ArrowForward:
-            return qnSkin->icon(kArrowRight2pxIcon);
+            return qnSkin->icon(kArrowForwardIcon);
         case SP_FileDialogToParent:
             return qnSkin->icon(kArrowUp2pxIcon);
         case SP_FileDialogListView:

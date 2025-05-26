@@ -125,7 +125,7 @@ Rectangle
         readonly property var buttonModel: [
             {
                 "objectName": "switchToResourcesScreenButton",
-                "iconSource": "image://skin/24x24/Outline/camera_2.svg",
+                "iconSource": "image://skin/24x24/Outline/camera.svg",
                 "screenId": Controller.ResourcesScreen,
                 "openScreen": () => Workflow.openResourcesScreen(
                     windowContext.sessionManager.systemName)

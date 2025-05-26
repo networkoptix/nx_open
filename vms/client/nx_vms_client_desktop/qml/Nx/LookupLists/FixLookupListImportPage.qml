@@ -142,7 +142,7 @@ Item
                                 ColoredImage
                                 {
                                     sourceSize: Qt.size(20, 20)
-                                    sourcePath: "24x24/Outline/arrow_right_2px.svg"
+                                    sourcePath: "24x24/Outline/arrow_forward.svg"
                                     primaryColor: ColorTheme.colors.light16
                                 }
 

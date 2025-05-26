@@ -37,7 +37,7 @@
 
 namespace {
 
-static constexpr auto kPlaceholderImageSize = QSize(128, 128);
+static constexpr auto kPlaceholderImageSize = QSize(64, 64);
 static constexpr int kPlaceholderTextPixelSize = 16;
 static constexpr auto kPlaceholderTextWeight = QFont::Light;
 
@@ -46,7 +46,7 @@ nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
 };
 
 NX_DECLARE_COLORIZED_ICON(kBackupPlaceholderIcon,
-    "128x128/Outline/backup_placeholder.svg", kPlaceholderTheme)
+    "64x64/Outline/backup.svg", kPlaceholderTheme)
 
 QFont placeholderMessageCaptionFont()
 {
