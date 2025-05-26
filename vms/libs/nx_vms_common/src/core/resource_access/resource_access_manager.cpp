@@ -368,8 +368,13 @@ void QnResourceAccessManager::handleResourcesAdded(const QnResourceList& resourc
 {
     for (const auto& resource: resources)
     {
-        connect(resource.get(), &QnResource::flagsChanged,
-            this, &QnResourceAccessManager::handleResourceUpdated, Qt::DirectConnection);
+        connect(resource.get(), &QnResource::flagsChanged, this,
+            [this](const QnResourcePtr& resource)
+            {
+                if (!resource->hasFlags(Qn::removed))
+                    handleResourceUpdated(resource);
+            },
+            Qt::DirectConnection);
 
         if (const auto& camera = resource.objectCast<QnVirtualCameraResource>())
         {

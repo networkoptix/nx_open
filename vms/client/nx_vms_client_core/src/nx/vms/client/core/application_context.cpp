@@ -293,9 +293,7 @@ void ApplicationContext::stopAll()
     common::ApplicationContext::stopAll();
 
     // Cross-system modules should be destroyed before the certificate verifier & the UI-delegate.
-    d->crossSystemLayoutsWatcher.reset();
-    d->cloudCrossSystemManager.reset();
-    d->cloudLayoutsManager.reset();
+    destroyCrossSystemModules();
 }
 
 Qn::SerializationFormat ApplicationContext::serializationFormat() const
