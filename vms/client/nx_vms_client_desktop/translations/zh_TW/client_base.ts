@@ -1280,6 +1280,21 @@
     </message>
   </context>
   <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation type="unfinished">Pictures</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation type="unfinished">Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation type="unfinished">All Files</translation>
+    </message>
+  </context>
+  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -3299,21 +3314,6 @@ License Key: %2</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>要產生通用事件, 請參考 %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>圖片</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>影像</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>所有檔案</translation>
     </message>
   </context>
   <context>
@@ -6797,32 +6797,29 @@ If you intended to move analytics data to another storage location, please conta
       <comment>%1 is file name</comment>
       <translation>%1 正在被另一個匯出使用.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
-      <translation>儲存佈局中</translation>
+      <translation type="unfinished">Saving layout</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>匯出影像</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation>終止儲存</translation>
+      <translation type="unfinished">Stop Saving</translation>
     </message>
     <message>
       <source>Stop Export</source>
-      <translation>停止匯出</translation>
+      <translation type="unfinished">Stop Export</translation>
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation>需要重新編碼。已重啟匯出。</translation>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>最小化</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
   </context>
   <context>
@@ -12609,6 +12606,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Value</source>
       <translation>數值</translation>
+    </message>
+    <message>
+      <source/>
+      <translation type="unfinished"/>
     </message>
   </context>
   <context>

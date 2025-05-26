@@ -1304,6 +1304,21 @@
     </message>
   </context>
   <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation type="unfinished">Pictures</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation type="unfinished">Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation type="unfinished">All Files</translation>
+    </message>
+  </context>
+  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -3428,21 +3443,6 @@ License Key: %2</translation>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Для создания произвольного события см. %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Изображения</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Видео</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Все файлы</translation>
     </message>
   </context>
   <context>
@@ -7151,32 +7151,29 @@ If you intended to move analytics data to another storage location, please conta
       <comment>%1 is file name</comment>
       <translation>%1 используется другим процессом экспорта.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
-      <translation>Сохранение раскладки</translation>
+      <translation type="unfinished">Saving layout</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>Экспорт видео</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation>Остановить сохранение</translation>
+      <translation type="unfinished">Stop Saving</translation>
     </message>
     <message>
       <source>Stop Export</source>
-      <translation>Остановить экспорт</translation>
+      <translation type="unfinished">Stop Export</translation>
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation>Требуется транскодирование. Экспорт перезапущен.</translation>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Свернуть</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
   </context>
   <context>
@@ -13165,6 +13162,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Value</source>
       <translation type="unfinished">Value</translation>
+    </message>
+    <message>
+      <source/>
+      <translation type="unfinished"/>
     </message>
   </context>
   <context>

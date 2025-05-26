@@ -1280,6 +1280,21 @@
     </message>
   </context>
   <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation type="unfinished">Pictures</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation type="unfinished">Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation type="unfinished">All Files</translation>
+    </message>
+  </context>
+  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -3299,21 +3314,6 @@ License Key: %2</translation>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>To generate Generic Event, please refer to %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Pictures</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation type="unfinished">Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation type="unfinished">All Files</translation>
     </message>
   </context>
   <context>
@@ -6797,16 +6797,13 @@ If you intended to move analytics data to another storage location, please conta
       <comment>%1 is file name</comment>
       <translation type="unfinished">%1 is in use by another export.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
       <translation type="unfinished">Saving layout</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>Exporting video</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
@@ -6822,7 +6819,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Minimize</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
   </context>
   <context>
@@ -12614,6 +12611,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Value</source>
       <translation type="unfinished">Value</translation>
+    </message>
+    <message>
+      <source/>
+      <translation type="unfinished"/>
     </message>
   </context>
   <context>

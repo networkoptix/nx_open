@@ -1304,6 +1304,21 @@
     </message>
   </context>
   <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation type="unfinished">Pictures</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation type="unfinished">Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation type="unfinished">All Files</translation>
+    </message>
+  </context>
+  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -3428,21 +3443,6 @@ License Key: %2</translation>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>ליצירת אירוע כללי, פנה ל %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>תמונות</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>סרטון</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>כל הקבצים</translation>
     </message>
   </context>
   <context>
@@ -7151,32 +7151,29 @@ If you intended to move analytics data to another storage location, please conta
       <comment>%1 is file name</comment>
       <translation>%1 נמצא בשימוש על-ידי ייצוא אחר.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
-      <translation>שומר את הפריסה</translation>
+      <translation type="unfinished">Saving layout</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>מייצא וידאו</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation>עצור את השמירה</translation>
+      <translation type="unfinished">Stop Saving</translation>
     </message>
     <message>
       <source>Stop Export</source>
-      <translation>לעצור את הייצוא</translation>
+      <translation type="unfinished">Stop Export</translation>
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation>קידוד נדרש. הפעלת הייצוא הופעלה מחדש.</translation>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>מזער</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
   </context>
   <context>
@@ -13166,6 +13163,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Value</source>
       <translation type="unfinished">Value</translation>
+    </message>
+    <message>
+      <source/>
+      <translation type="unfinished"/>
     </message>
   </context>
   <context>

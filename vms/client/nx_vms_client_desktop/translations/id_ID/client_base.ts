@@ -1280,6 +1280,21 @@
     </message>
   </context>
   <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation type="unfinished">Pictures</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation type="unfinished">Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation type="unfinished">All Files</translation>
+    </message>
+  </context>
+  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -3299,21 +3314,6 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>To generate Generic Event, please refer to %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Pictures</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Semua File</translation>
     </message>
   </context>
   <context>
@@ -6797,32 +6797,29 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <comment>%1 is file name</comment>
       <translation>%1 sedang digunakan oleh ekspor lain.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
-      <translation>Menyimpan layout</translation>
+      <translation type="unfinished">Saving layout</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>Mengekspor video</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation>Berhenti Menyimpan</translation>
+      <translation type="unfinished">Stop Saving</translation>
     </message>
     <message>
       <source>Stop Export</source>
-      <translation>Hentikan Ekspor</translation>
+      <translation type="unfinished">Stop Export</translation>
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation>Transkode diperlukan. Sesi ekspor direstart.</translation>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Minimalkan</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
   </context>
   <context>
@@ -12614,6 +12611,10 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>Value</source>
       <translation>Nilai</translation>
+    </message>
+    <message>
+      <source/>
+      <translation type="unfinished"/>
     </message>
   </context>
   <context>

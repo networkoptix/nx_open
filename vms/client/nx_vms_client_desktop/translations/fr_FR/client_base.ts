@@ -1288,6 +1288,21 @@
     </message>
   </context>
   <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation type="unfinished">Pictures</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation type="unfinished">Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation type="unfinished">All Files</translation>
+    </message>
+  </context>
+  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -3342,21 +3357,6 @@ Clé de licence : %2</translation>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Pour générer un'événement générique, S.V.P. se référer à %1.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Images</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Vidéo</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Tous les fichiers</translation>
     </message>
   </context>
   <context>
@@ -6915,32 +6915,29 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <comment>%1 is file name</comment>
       <translation>%1 est utilisé par une autre exportation.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
-      <translation>Enregistrer la mise en page</translation>
+      <translation type="unfinished">Saving layout</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>Exportation vidéo</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation>Arrêter la sauvegarde</translation>
+      <translation type="unfinished">Stop Saving</translation>
     </message>
     <message>
       <source>Stop Export</source>
-      <translation>Arrêter l'exportation</translation>
+      <translation type="unfinished">Stop Export</translation>
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation>Un transcodage est nécessaire. La session d'exportation a redémarré.</translation>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Minimiser</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
   </context>
   <context>
@@ -12799,6 +12796,10 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message>
       <source>Value</source>
       <translation>Valeur</translation>
+    </message>
+    <message>
+      <source/>
+      <translation type="unfinished"/>
     </message>
   </context>
   <context>

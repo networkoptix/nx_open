@@ -1288,6 +1288,21 @@
     </message>
   </context>
   <context>
+    <name>FileExtensions</name>
+    <message>
+      <source>Pictures</source>
+      <translation type="unfinished">Pictures</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation type="unfinished">Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation type="unfinished">All Files</translation>
+    </message>
+  </context>
+  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
@@ -3341,21 +3356,6 @@ License Key: %2</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Kapsamlı Olay Oluşturmak İçin, Lütfen %1'e Bakın.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCustomFileDialog</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Resimler</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Tüm Dosyalar</translation>
     </message>
   </context>
   <context>
@@ -6913,32 +6913,29 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <comment>%1 is file name</comment>
       <translation>%1 başka bir aktarma işlemi tarafından kullanılıyor.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx</name>
     <message>
       <source>Saving layout</source>
-      <translation>Ekran düzeni kaydetme</translation>
+      <translation type="unfinished">Saving layout</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>Videoyu Dışa Aktar</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation>Kaydetmeyi Durdur</translation>
+      <translation type="unfinished">Stop Saving</translation>
     </message>
     <message>
       <source>Stop Export</source>
-      <translation>Aktarmayı durdur</translation>
+      <translation type="unfinished">Stop Export</translation>
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation>Kod dönüştürme gerekli. Dışa aktarma oturumu yeniden başlatıldı.</translation>
+      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Küçült</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
   </context>
   <context>
@@ -12791,6 +12788,10 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <message>
       <source>Value</source>
       <translation>Değer</translation>
+    </message>
+    <message>
+      <source/>
+      <translation type="unfinished"/>
     </message>
   </context>
   <context>
