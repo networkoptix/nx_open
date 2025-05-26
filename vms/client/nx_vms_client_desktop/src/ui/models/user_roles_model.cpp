@@ -13,6 +13,7 @@
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
+#include <nx/vms/common/html/html.h>
 
 #include "private/user_roles_model_p.h"
 
@@ -116,7 +117,8 @@ QVariant QnUserRolesModel::data(const QModelIndex& index, int role) const
         case Qt::StatusTipRole:
         case Qt::AccessibleDescriptionRole:
             return index.column() == NameColumn
-                ? roleModel.description
+                ? nx::vms::common::html::toHtmlEscaped(
+                    roleModel.description, nx::vms::common::html::EscapeMethod::preWrap)
                 : QString();
 
         // Role check state.
