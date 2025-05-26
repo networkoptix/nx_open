@@ -4,6 +4,7 @@
 
 
 from __future__ import print_function
+
 from glob import iglob
 from fnmatch import fnmatch
 from os.path import join
@@ -11,7 +12,6 @@ from itertools import repeat, chain
 from pathlib import Path
 import logging
 import os
-import re
 import sys
 import yaml
 
@@ -190,6 +190,12 @@ def main():
     test_info = load_unit_test_info()
 
     with archiver.Archiver(conf.PACKAGE_FILE, conf=conf) as a:
+        # Fill up unneeded files filter in the archiver.
+        # This is a temporary solution of the problem with the UT distribution size.
+        # After VMS-41928 this code will be removed (and only needed files will be added to the distribution).
+        # Ignore file format is the same as .gitignore
+        a.load_ignore_file('ut_ignored_files.txt')
+
         src_bin_dir = join(conf.BUILD_DIR, bin_dir)
         distrib_dir = join(conf.BUILD_DIR, "distrib")
 
@@ -295,10 +301,6 @@ def main():
                 join(bin_dir if isWindows else "", "resources"),
                 join(conf.QT_DIR, "resources"),
                 "*")
-            archiveByGlob(a, "Qt WebEngine locales",
-                join(translations_dir if isWindows else "translations", "qtwebengine_locales"),
-                join(conf.QT_DIR, "translations", "qtwebengine_locales"),
-                "*.pak")
 
         logging.info("Archiving misc files")
 

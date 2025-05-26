@@ -5,8 +5,6 @@
 import os
 import zipfile
 
-from pathlib import Path
-
 import distribution_tools as tools
 
 qt_libraries = [

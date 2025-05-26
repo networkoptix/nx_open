@@ -9,6 +9,7 @@ set(package_file ${distribution_output_dir}/${unit_tests_distribution_name}.${ex
 
 nx_configure_file(build_distribution_conf.py.in
     ${CMAKE_CURRENT_BINARY_DIR}/build_distribution_conf.py @ONLY)
+nx_configure_file(ut_ignored_files.txt ${CMAKE_CURRENT_BINARY_DIR}/ut_ignored_files.txt COPYONLY)
 
 set(depends unit_tests)
 if(TARGET nx_server_plugin_sdk)

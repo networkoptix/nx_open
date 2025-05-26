@@ -119,7 +119,7 @@ buildDistribution()
     copyHelpFiles
     copyMetadata
 
-    if [ $CODE_SIGNING = true ]
+    if [[ ${CODE_SIGNING} = true ]]
     then
         local KEYCHAIN_ARGS=""
 
@@ -145,7 +145,7 @@ buildDistribution()
         -D dmg_background="$BACKGROUND_PATH" \
         "$VOLUME_NAME" "$DISTRIBUTION_DMG"
 
-    if [ ${NOTARIZATION} = true ] && [ ${CODE_SIGNING} = true ]
+    if [[ ${NOTARIZATION} = true ]] && [[ ${CODE_SIGNING} = true ]]
     then
         # notarize.py can read notarization user and password from the current environment.
         # Check the variables to provide clearer error messages.

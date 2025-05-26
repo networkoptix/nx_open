@@ -69,7 +69,7 @@ add_custom_command(
         ${depends}
         ${configured_files}
         ${nx_vms_distribution_utils_sh}
-    COMMENT "Creating desktop client .deb package"
+    COMMENT "Creating desktop client .deb and update packages"
 )
 
 add_custom_target(distribution_deb_client ALL
