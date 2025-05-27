@@ -90,7 +90,6 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         qnSkin->icon(kNotificationPlaceholderIcon).pixmap(64, 64),
         AbstractSearchWidget::makePlaceholderText(tr("No new notifications"), {}),
         m_ribbonContainer)),
-    m_notificationSettingsDialog{new NotificationSettingsDialog{q}},
     m_model(new NotificationTabModel(windowContext(), this)),
     m_filterModel(new QSortFilterProxyModel(q))
 {
@@ -347,8 +346,7 @@ void NotificationListWidget::Private::onSystemNotificationsActionTriggered()
 
 void NotificationListWidget::Private::onChooseTypesActionTriggered()
 {
-    if (NX_ASSERT(m_notificationSettingsDialog))
-        m_notificationSettingsDialog->show();
+    createSelfDestructingDialog<NotificationSettingsDialog>(q)->show();
 }
 
 void NotificationListWidget::Private::onFilterNotificationsButtonStateChanged()

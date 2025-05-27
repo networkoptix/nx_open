@@ -23,6 +23,9 @@ QString widgetInfo(const QObject* object)
     {
         if (auto title = widget->windowTitle(); !title.isEmpty())
             names.push_back(NX_FMT("Window title: %1", title));
+
+        names.push_back(NX_FMT("Modality: %1, visible: %2, hidden: %3",
+            widget->windowModality(), widget->isVisible(), widget->isHidden()));
     }
 
     return names.join(", ");
@@ -114,8 +117,8 @@ void QnShowDialogHelper::showNonModalDialog(
         dialog->windowTitle(), modalWidgets.size());
 
     NX_ASSERT(modalWidgets.empty(),
-        "Non-modal dialog is shown while %1 modal dialogs are visible:\n%2",
-        modalWidgets.size(), widgetsInfo(modalWidgets));
+        "Non-modal dialog: %1 is shown while %2 modal dialogs are visible:\n%3",
+        dialog->windowTitle(), modalWidgets.size(), widgetsInfo(modalWidgets));
 
     if (dialog->isVisible() && !focus)
         dialog->raise();
