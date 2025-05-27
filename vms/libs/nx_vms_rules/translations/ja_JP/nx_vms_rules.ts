@@ -650,7 +650,7 @@
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
       <source>Not allowed HTTP method</source>
-      <translation type="unfinished">Not allowed HTTP method</translation>
+      <translation>許可されていない HTTP メソッドです。</translation>
     </message>
   </context>
   <context>
