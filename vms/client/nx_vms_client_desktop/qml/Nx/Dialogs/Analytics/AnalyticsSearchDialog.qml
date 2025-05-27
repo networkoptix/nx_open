@@ -400,6 +400,7 @@ Window
                     standardTileInteraction: false
                     keyNavigationEnabled: false //< We implement our own.
                     focus: true
+                    controller.paused: !dialog.visible
                     controller.allowToFetchNewer: counterBlock.availableNewTracks <= 0
                     currentIndex: selection.index.row
 
@@ -847,6 +848,7 @@ Window
                             view: tableView
                             model: eventModel
                             enabled: false
+                            paused: !dialog.visible
                             allowToFetchNewer: counterBlock.availableNewTracks <= 0
                             loggingCategory: LoggingCategory { name: "Nx.RightPanel.TableView" }
                         }

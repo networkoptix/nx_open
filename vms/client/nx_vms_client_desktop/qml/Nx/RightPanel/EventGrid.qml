@@ -131,6 +131,7 @@ GridView
         id: controller
 
         view: view
+        paused: !view?.visible //< Default binding. Replace if invisible view can receive data.
         loggingCategory: loggingCategory
     }
 

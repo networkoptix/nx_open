@@ -14,7 +14,14 @@ NxObject
 {
     id: controller
 
+    // Used for switching different controllers controlling the same model.
+    // Only one or none may be enabled.
     property bool enabled: true
+
+    // Used to temporarily pause the controller, e.g. when a view (or its parent) is invisible.
+    // We cannot use view.visible here because, for example, a placeholder can be visible instead.
+    property bool paused: true
+
     property var view: null
     property var model: view?.model || null
     property var loggingCategory
@@ -64,12 +71,9 @@ NxObject
         }
     }
 
-    Connections
+    onPausedChanged:
     {
-        target: view
-        enabled: controller.enabled
-
-        function onVisibleChanged()
+        if (controller.enabled)
         {
             d.updateData()
             d.updateLive()
@@ -229,12 +233,8 @@ NxObject
 
         function updateData()
         {
-            if (!controller.enabled
-                || fixupInProgress
-                || (!view.visible && !model.placeholderRequired))
-            {
+            if (!controller.enabled || fixupInProgress || controller.paused)
                 return
-            }
 
             function whereAt()
             {
@@ -262,7 +262,7 @@ NxObject
         function updateLive()
         {
             if (model && controller.enabled)
-                model.setLivePaused(!view.visible)
+                model.setLivePaused(controller.paused)
         }
 
         function directionName(direction)
