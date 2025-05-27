@@ -86,6 +86,7 @@ BottomSheet
         labelText: qsTr("Login")
 
         enabled: !d.connectingNow
+        onCurrentIndexChanged: d.resetErrors()
     }
 
     PasswordInput
@@ -100,6 +101,8 @@ BottomSheet
         enabled: !d.connectingNow
 
         onAccepted: d.connectToSite()
+        onSecretIsCleared: appContext.credentialsHelper.removeSavedAuth(
+            hostsModel.localSystemId, d.login)
     }
 
     ButtonBox

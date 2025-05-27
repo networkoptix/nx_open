@@ -30,6 +30,7 @@ FocusScope
     implicitHeight: row.height
 
     signal accepted()
+    signal secretIsCleared()
 
     Row
     {
@@ -101,6 +102,7 @@ FocusScope
                 {
                     control.resetState(/*hasSecretValue*/ false)
                     textInput.errorText = ""
+                    control.secretIsCleared()
                     textInput.forceActiveFocus()
                 }
             }
