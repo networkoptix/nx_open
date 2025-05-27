@@ -399,18 +399,17 @@ T Request::parseContentByFusionOrThrow(NxFusionContent* content) const
     }
     else if (m_jsonRpcContext && m_jsonRpcContext->request.params)
     {
-        QJsonValue requestParams{json::serialized(*m_jsonRpcContext->request.params)};
-        if (requestParams.isObject() && hasNonRefParameter)
+        if (m_jsonRpcContext->request.params->IsObject() && hasNonRefParameter)
         {
             auto paramsObject{params.toJson(/*excludeCommon*/ true)};
-            auto object{requestParams.toObject()};
+            auto object{json::serialized(*m_jsonRpcContext->request.params).toObject()};
             for (auto it = paramsObject.begin(); it != paramsObject.end(); ++it)
                 object.insert(it.key(), it.value());
             deserialize(std::move(object));
         }
-        else
+        else if (!m_jsonRpcContext->request.params->IsNull())
         {
-            deserialize(requestParams);
+            deserialize(json::serialized(*m_jsonRpcContext->request.params));
         }
     }
     else
@@ -522,6 +521,8 @@ std::tuple<T, Request::NxReflectFields> Request::parseContentByReflectOrThrow() 
     {
         if (m_jsonRpcContext->request.params->IsObject())
             removeFieldsFromParams(fields, m_jsonRpcContext->request.params);
+        else if (!m_jsonRpcContext->request.params->IsArray())
+            throw Exception::invalidParameter("params", "Must be a structured value");
         const nx::reflect::json::DeserializationContext deserializationContext{
             *m_jsonRpcContext->request.params, (int) nx::reflect::json::DeserializationFlag::fields};
         return {std::move(data),

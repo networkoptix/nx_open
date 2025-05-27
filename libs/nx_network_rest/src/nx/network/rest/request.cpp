@@ -339,7 +339,9 @@ Params Request::calculateParams() const
         //     For details: VMS-41649
         json = m_content->parse();
     }
-    else if (m_jsonRpcContext && m_jsonRpcContext->request.params)
+    else if (m_jsonRpcContext
+        && m_jsonRpcContext->request.params
+        && m_jsonRpcContext->request.params->IsObject())
     {
         json = json::serialized(*m_jsonRpcContext->request.params);
     }
