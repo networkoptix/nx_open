@@ -245,12 +245,10 @@ Item
 
         parent: grid
         visible: !!dataItem
-        contentWidth: toolTipContent.width
+        popupType: Popup.Window
 
-        Row
+        contentItem: Row
         {
-            id: toolTipContent
-
             spacing: 4
 
             Repeater
