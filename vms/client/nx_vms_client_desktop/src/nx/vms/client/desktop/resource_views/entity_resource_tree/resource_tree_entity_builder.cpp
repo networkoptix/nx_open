@@ -43,6 +43,7 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_item_factory.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/user_layout_resource_index.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/system_settings.h>
 
 using namespace nx::vms::client::desktop;
 
@@ -389,10 +390,18 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createCamerasAndDevicesGroupEntity(
     if (hasPowerUserPermissions())
         camerasAndDevicesitemFlags |= Qt::ItemIsDropEnabled;
 
+    const auto showServersInTreeForNonAdmins =
+        systemContext()->globalSettings()->showServersInTreeForNonAdmins();
+
+    const FlatteningGroupEntity::AutoFlatteningPolicy flatteningPolicy =
+        showServersInTreeForNonAdmins || hasPowerUserPermissions()
+            ? FlatteningGroupEntity::AutoFlatteningPolicy::noPolicy
+            : FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy;
+
     return makeFlatteningGroup(
         m_itemFactory->createCamerasAndDevicesItem(camerasAndDevicesitemFlags),
         createServerCamerasEntity(QnMediaServerResourcePtr(), showProxiedResources),
-        FlatteningGroupEntity::AutoFlatteningPolicy::noPolicy);
+        flatteningPolicy);
 }
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createDialogAllCamerasEntity(
