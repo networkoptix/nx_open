@@ -23,6 +23,94 @@
 
 namespace nx::vms::api {
 
+struct DeviceBitrateInfo
+{
+    StreamIndex encoderIndex = StreamIndex::undefined;
+
+    std::chrono::milliseconds timestampMs;
+
+    /**%apidoc[readonly] Megabits per second. */
+    float rawSuggestedBitrate = -1;
+
+    /**%apidoc[readonly] Megabits per second. */
+    float suggestedBitrate = -1;
+
+    /**%apidoc[readonly] Megabits per second. Current bitrate value. */
+    float actualBitrate = -1;
+
+    bool bitratePerGop = false;
+    float bitrateFactor = -1;
+
+    int fps = -1;
+    float actualFps = -1;
+    float averageGopSize = 0;
+    QString resolution;
+    int numberOfChannels = -1;
+    bool isConfigured = false;
+
+    /**%apidoc[readonly] Megabits per second. Average bitrate for a whole archive. */
+    float avarageBitrateMbps = -1;
+};
+#define DeviceBitrateInfo_Fields (encoderIndex)(timestampMs) \
+    (rawSuggestedBitrate)(suggestedBitrate)(actualBitrate) \
+    (bitratePerGop)(bitrateFactor) \
+    (fps)(actualFps)(averageGopSize)(resolution)(numberOfChannels)(isConfigured)(avarageBitrateMbps)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceBitrateInfo, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceBitrateInfo, DeviceBitrateInfo_Fields)
+
+NX_REFLECTION_ENUM_CLASS(IoSettingsPortType,
+    unknown = 0x0,
+    disabled = 0x1 << 0,
+    input = 0x1 << 1,
+    output = 0x1 << 2,
+
+    PT_Unknown = IoSettingsPortType::unknown,
+    PT_Disabled = IoSettingsPortType::disabled,
+    PT_Input = IoSettingsPortType::input,
+    PT_Output = IoSettingsPortType::output
+)
+Q_DECLARE_FLAGS(IoSettingsPortTypes, IoSettingsPortType)
+Q_DECLARE_OPERATORS_FOR_FLAGS(IoSettingsPortTypes)
+
+enum class IoSettingsDefaultState
+{
+    open_circuit,
+    grounded_circuit,
+};
+
+template<typename Visitor>
+constexpr auto nxReflectVisitAllEnumItems(IoSettingsDefaultState*, Visitor&& visitor)
+{
+    using Item = nx::reflect::enumeration::Item<IoSettingsDefaultState>;
+    return visitor(Item{IoSettingsDefaultState::open_circuit, "open_circuit"},
+        Item{IoSettingsDefaultState::open_circuit, "Open Circuit"},
+        Item{IoSettingsDefaultState::grounded_circuit, "grounded_circuit"},
+        Item{IoSettingsDefaultState::grounded_circuit, "Grounded Circuit"});
+}
+
+struct IoSettings
+{
+    QString id;
+    IoSettingsPortType portType = IoSettingsPortType::disabled;
+    IoSettingsPortTypes supportedPortTypes;
+    QString inputName;
+    QString outputName;
+    IoSettingsDefaultState iDefaultState = IoSettingsDefaultState::open_circuit;
+    IoSettingsDefaultState oDefaultState = IoSettingsDefaultState::open_circuit;
+
+    /**%apidoc
+     * For output only. Keep output state on during timeout if non zero.
+     * %example 0
+     */
+    std::chrono::milliseconds autoResetTimeoutMs{0};
+};
+#define IoSettings_Fields (id)(portType) \
+    (supportedPortTypes)(inputName)(outputName) \
+    (iDefaultState)(oDefaultState) \
+    (autoResetTimeoutMs)
+QN_FUSION_DECLARE_FUNCTIONS(IoSettings, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(IoSettings, IoSettings_Fields)
+
 struct DeviceGroupSettings
 {
     QString id;
@@ -158,8 +246,8 @@ struct DeviceOptions
 
     std::optional<nx::Uuid> audioOutputDeviceId;
 
-    // TODO: #skolesnik `std::vector<CameraBitrateInfo>` defined in ::common
-    std::optional<QString> bitrateInfos;
+    /**%apidoc[readonly] */
+    std::optional<std::vector<DeviceBitrateInfo>> bitrateInfos;
 
     std::optional<bool> useBitratePerGop;
 
@@ -174,8 +262,7 @@ struct DeviceOptions
     // TODO: #skolesnik rename `QnVirtualCameraResource::motionStreamIndexInternal()`
     std::optional<StreamIndex> motionStream;
 
-    // TODO: #skolesnik `std::vector<QnIOPortData>`
-    std::optional<QString> ioSettings;
+    std::optional<std::vector<IoSettings>> ioSettings;
 
     std::optional<int> mediaPort;
 

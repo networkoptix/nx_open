@@ -15,6 +15,8 @@
 
 namespace nx::vms::api {
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceBitrateInfo, (json), DeviceBitrateInfo_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(IoSettings, (json), IoSettings_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceGroupSettings, (json), DeviceGroupSettings_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelGeneral, (json), DeviceModelGeneral_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceOptions, (json), DeviceOptions_Fields)
@@ -31,6 +33,122 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceTypeModel, (json), DeviceTypeModel_Fields
 namespace {
 
 NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasBackupQuality, backupQuality);
+
+struct DefaultDeserialize
+{
+    template<typename T>
+    bool operator()(const QJsonValue& from, T* to) const
+    {
+        return QJson::deserialize(from, to);
+    }
+};
+
+template<typename Model>
+struct ExtractParameterToField
+{
+    std::map<QString, QJsonValue>* from;
+    Model* to;
+
+    template<typename Field, typename M, typename Deserialize = DefaultDeserialize>
+    void operator()(const QString& parameter, Field M::* memPtr, Deserialize deserialize = {}) const
+    {
+        auto found = from->find(parameter);
+        if (found == from->end())
+            return;
+
+        auto* toField =
+            [](Field& value)
+            {
+                if constexpr (nx::utils::Is<std::optional, Field>())
+                    return std::addressof(value.emplace());
+                else
+                    return std::addressof(value);
+            }(std::mem_fn(memPtr)(to));
+
+        if (!deserialize(found->second, toField))
+        {
+            QByteArray contents = found->second.toJson();
+            NX_WARNING(NX_SCOPE_TAG,
+                "Failed to deserialize parameter '%1(%2)' into field",
+                parameter,
+                contents);
+        }
+
+        from->extract(found);
+    }
+};
+
+template <typename Model>
+struct MapFieldToParameter
+{
+    std::map<QString, QJsonValue>* to;
+    const Model& from;
+
+    template<typename Field, typename M>
+    void operator()(const QString& parameter, Field M::* memPtr) const
+    {
+        std::mem_fn(memPtr)(from);
+        const auto& fieldValue = std::mem_fn(memPtr)(&from);
+
+        if constexpr (nx::utils::Is<std::optional, std::decay_t<Field>>())
+        {
+            if (!fieldValue)
+                return;
+
+            QJson::serialize(fieldValue.value(), &(*to)[parameter]);
+        }
+        else
+        {
+            QJson::serialize(fieldValue, &(*to)[parameter]);
+        }
+    }
+};
+
+bool parameterToDeviceBitrateInfos(const QJsonValue& value, std::vector<DeviceBitrateInfo>* to)
+{
+    to->clear();
+    if (!NX_ASSERT(value.isObject()))
+        return false;
+
+    const QJsonObject root = value.toObject();
+    if (!NX_ASSERT(root.contains("streams") && root["streams"].isArray()))
+        return false;
+
+    const QJsonArray streams = root["streams"].toArray();
+    to->reserve(streams.size());
+
+    for (const QJsonValue& elem: streams)
+    {
+        if (!NX_ASSERT(elem.isObject()))
+            return false;
+
+        QJsonObject obj = elem.toObject();
+
+        if (const auto& ts = obj["timestamp"]; !ts.isNull() && !ts.isUndefined())
+        {
+            if (!NX_ASSERT(ts.isString()))
+                return false;
+
+            const QDateTime dt = QDateTime::fromString(ts.toString(), Qt::ISODate);
+            if (!NX_ASSERT(dt.isValid()))
+                return false;
+
+            const std::chrono::milliseconds tsMs{dt.toMSecsSinceEpoch()};
+            QJsonValue converted;
+            QJson::serialize(tsMs, &converted);
+            obj["timestampMs"] = converted;
+            obj.remove("timestamp");
+        }
+
+        DeviceBitrateInfo info;
+        if (!DefaultDeserialize{}(obj, &info))
+            return false;
+
+        to->push_back(std::move(info));
+    }
+
+    return true;
+}
 
 void extractParametersToFields(DeviceModelV1Base* m)
 {
@@ -66,17 +184,12 @@ void extractParametersToFields(DeviceModelV3Base* m)
 {
     extractParametersToFields(static_cast<DeviceModelV1Base*>(m));
 
-    if (const auto it = m->parameters.find(device_properties::kCompatibleAnalyticsEnginesProperty); it != m->parameters.end())
-    {
-        QJson::deserialize(it->second, &m->compatibleAnalyticsEngineIds);
-        m->parameters.erase(it);
-    }
+    const ExtractParameterToField<DeviceModelV3Base> extractToModel{&m->parameters, m};
 
-    if (const auto it = m->parameters.find(device_properties::kMediaCapabilities); it != m->parameters.end())
-    {
-        QJson::deserialize(it->second, &m->mediaCapabilities);
-        m->parameters.erase(it);
-    }
+    extractToModel(device_properties::kCompatibleAnalyticsEnginesProperty, &DeviceModelV3Base::compatibleAnalyticsEngineIds);
+    extractToModel(device_properties::kMediaCapabilities, &DeviceModelV3Base::mediaCapabilities);
+    extractToModel(device_properties::kStreamUrls, &DeviceModelV3Base::streamUrls);
+    extractToModel(device_properties::kUserEnabledAnalyticsEnginesProperty, &DeviceModelV3Base::userEnabledAnalyticsEngineIds);
 
     if (const auto it = m->parameters.find(device_properties::kMediaStreams); it != m->parameters.end())
     {
@@ -112,22 +225,6 @@ void extractParametersToFields(DeviceModelV3Base* m)
 
         m->parameters.erase(it);
     }
-
-    if (const auto it = m->parameters.find(device_properties::kStreamUrls);
-        it != m->parameters.end() /*&& NX_ASSERT(it->second.isObject())*/)
-    {
-        m->streamUrls = it->second.toObject();
-        m->parameters.erase(it);
-    }
-
-    if (const auto it = m->parameters.find(device_properties::kUserEnabledAnalyticsEnginesProperty);
-        it != m->parameters.end())
-    {
-        m->userEnabledAnalyticsEngineIds = std::vector<nx::Uuid>();
-        auto& value = *m->userEnabledAnalyticsEngineIds;
-        QJson::deserialize(it->second, &value);
-        m->parameters.erase(it);
-    }
 }
 
 void extractParametersToFields(DeviceModelV4* m)
@@ -135,38 +232,20 @@ void extractParametersToFields(DeviceModelV4* m)
     extractParametersToFields(static_cast<DeviceModelV3Base*>(m));
 
     // DeviceOptions fields -----------------------------------------------------------------------
-    if (auto p = m->parameters.find(device_properties::kAudioOutputDeviceId); p != m->parameters.end())
-        QJson::deserialize(p->second, &m->options.audioOutputDeviceId);
+    const ExtractParameterToField<DeviceOptions> extractToOptions{&m->parameters, &m->options};
 
-    if (auto p = m->parameters.find(device_properties::kBitrateInfos); p != m->parameters.end())
-        QJson::deserialize(p->second, &m->options.bitrateInfos);
-
-    if (auto p = m->parameters.find(device_properties::kBitratePerGOP); p != m->parameters.end())
-        QJson::deserialize(p->second, &m->options.useBitratePerGop);
-
-    if (auto p = m->parameters.find(device_properties::kCameraHotspotsEnabled); p != m->parameters.end())
-        QJson::deserialize(p->second, &m->options.cameraHotspotsEnabled);
-
-    if (auto p = m->parameters.find(device_properties::kDontRecordSecondaryStreamKey); p != m->parameters.end())
-        QJson::deserialize(p->second, &m->options.dontRecordSecondaryStream);
-
-    if (auto p = m->parameters.find(device_properties::kForcedMotionDetectionKey); p != m->parameters.end())
-        QJson::deserialize(p->second, &m->options.forcedMotionDetection);
-
-    if (auto p = m->parameters.find(device_properties::kIoOverlayStyle); p != m->parameters.end())
-        QJson::deserialize(p->second, &m->options.ioOverlayStyle);
-
-    if (auto p = m->parameters.find(device_properties::kMotionStreamKey); p != m->parameters.end())
-        QJson::deserialize(p->second, &m->options.motionStream);
-
-    if (auto p = m->parameters.find(device_properties::kIoSettings); p != m->parameters.end())
-        QJson::deserialize(p->second, &m->options.ioSettings);
-
-    if (auto p = m->parameters.find(device_properties::kMediaPort); p != m->parameters.end())
-        QJson::deserialize(p->second, &m->options.mediaPort);
-
-    if (auto p = m->parameters.find(device_properties::kHasRtspSettings); p != m->parameters.end())
-        QJson::deserialize(p->second, &m->options.hasRtspSettings);
+    extractToOptions(device_properties::kAudioOutputDeviceId, &DeviceOptions::audioOutputDeviceId);
+    extractToOptions(device_properties::kBitrateInfos, &DeviceOptions::bitrateInfos,
+        parameterToDeviceBitrateInfos);
+    extractToOptions(device_properties::kBitratePerGOP, &DeviceOptions::useBitratePerGop);
+    extractToOptions(device_properties::kCameraHotspotsEnabled, &DeviceOptions::cameraHotspotsEnabled);
+    extractToOptions(device_properties::kDontRecordSecondaryStreamKey, &DeviceOptions::dontRecordSecondaryStream);
+    extractToOptions(device_properties::kForcedMotionDetectionKey, &DeviceOptions::forcedMotionDetection);
+    extractToOptions(device_properties::kHasRtspSettings, &DeviceOptions::hasRtspSettings);
+    extractToOptions(device_properties::kIoOverlayStyle, &DeviceOptions::ioOverlayStyle);
+    extractToOptions(device_properties::kIoSettings, &DeviceOptions::ioSettings);
+    extractToOptions(device_properties::kMediaPort, &DeviceOptions::mediaPort);
+    extractToOptions(device_properties::kMotionStreamKey, &DeviceOptions::motionStream);
 
     // DevicePtzOptions fields --------------------------------------------------------------------
     m->ptz.emplace();
@@ -240,14 +319,11 @@ void moveFieldsToParameters(DeviceModelV1Base* m)
 void moveFieldsToParameters(DeviceModelV3Base* m)
 {
     moveFieldsToParameters(static_cast<DeviceModelV1Base*>(m));
+    const MapFieldToParameter<DeviceModelV3Base> mapToModel{&m->parameters, *m};
 
-    if (m->userEnabledAnalyticsEngineIds)
-    {
-        QJson::serialize(*m->userEnabledAnalyticsEngineIds,
-            &m->parameters[device_properties::kUserEnabledAnalyticsEnginesProperty]);
-    }
-    if (m->streamUrls)
-        m->parameters[device_properties::kStreamUrls] = *m->streamUrls;
+    mapToModel(device_properties::kStreamUrls, &DeviceModelV3Base::streamUrls);
+    mapToModel(device_properties::kUserEnabledAnalyticsEnginesProperty,
+        &DeviceModelV3Base::userEnabledAnalyticsEngineIds);
 }
 
 void movePtzFieldsToParameters(DeviceModelV4* m)
@@ -291,38 +367,18 @@ void moveFieldsToParameters(DeviceModelV4* m)
     moveFieldsToParameters(static_cast<DeviceModelV3Base*>(m));
 
     // DeviceOptions fields -----------------------------------------------------------------------
-    if (m->options.audioOutputDeviceId)
-       QJson::serialize(*m->options.audioOutputDeviceId, &m->parameters[device_properties::kAudioOutputDeviceId]);
+    const MapFieldToParameter<DeviceOptions> mapToOptions{&m->parameters, m->options};
 
-    if (m->options.bitrateInfos)
-       QJson::serialize(*m->options.bitrateInfos, &m->parameters[device_properties::kBitrateInfos]);
-
-    if (m->options.useBitratePerGop)
-       QJson::serialize(*m->options.useBitratePerGop, &m->parameters[device_properties::kBitratePerGOP]);
-
-    if (m->options.cameraHotspotsEnabled)
-       QJson::serialize(*m->options.cameraHotspotsEnabled, &m->parameters[device_properties::kCameraHotspotsEnabled]);
-
-    if (m->options.dontRecordSecondaryStream)
-       QJson::serialize(*m->options.dontRecordSecondaryStream, &m->parameters[device_properties::kDontRecordSecondaryStreamKey]);
-
-    if (m->options.forcedMotionDetection)
-       QJson::serialize(*m->options.forcedMotionDetection, &m->parameters[device_properties::kForcedMotionDetectionKey]);
-
-    if (m->options.ioOverlayStyle)
-       QJson::serialize(*m->options.ioOverlayStyle, &m->parameters[device_properties::kIoOverlayStyle]);
-
-    if (m->options.motionStream)
-       QJson::serialize(*m->options.motionStream, &m->parameters[device_properties::kMotionStreamKey]);
-
-    if (m->options.ioSettings)
-       QJson::serialize(*m->options.ioSettings, &m->parameters[device_properties::kIoSettings]);
-
-    if (m->options.mediaPort)
-       QJson::serialize(*m->options.mediaPort, &m->parameters[device_properties::kMediaPort]);
-
-    if (m->options.hasRtspSettings)
-       QJson::serialize(*m->options.hasRtspSettings, &m->parameters[device_properties::kHasRtspSettings]);
+    mapToOptions(device_properties::kAudioOutputDeviceId, &DeviceOptions::audioOutputDeviceId);
+    mapToOptions(device_properties::kBitratePerGOP, &DeviceOptions::useBitratePerGop);
+    mapToOptions(device_properties::kCameraHotspotsEnabled, &DeviceOptions::cameraHotspotsEnabled);
+    mapToOptions(device_properties::kDontRecordSecondaryStreamKey, &DeviceOptions::dontRecordSecondaryStream);
+    mapToOptions(device_properties::kForcedMotionDetectionKey, &DeviceOptions::forcedMotionDetection);
+    mapToOptions(device_properties::kHasRtspSettings, &DeviceOptions::hasRtspSettings);
+    mapToOptions(device_properties::kIoOverlayStyle, &DeviceOptions::ioOverlayStyle);
+    mapToOptions(device_properties::kIoSettings, &DeviceOptions::ioSettings);
+    mapToOptions(device_properties::kMediaPort, &DeviceOptions::mediaPort);
+    mapToOptions(device_properties::kMotionStreamKey, &DeviceOptions::motionStream);
 
     // DevicePtzOptions fields --------------------------------------------------------------------
     if (m->ptz)
