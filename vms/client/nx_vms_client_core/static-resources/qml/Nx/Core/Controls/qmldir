@@ -11,3 +11,4 @@ RectangularMask 1.0 RectangularMask.qml
 ColoredImage 1.0 ColoredImage.qml
 ToolTip 1.0 ToolTip.qml
 RecordingStatusIndicator 1.0 RecordingStatusIndicator.qml
+ClipboardCopyButton 1.0 ClipboardCopyButton.qml

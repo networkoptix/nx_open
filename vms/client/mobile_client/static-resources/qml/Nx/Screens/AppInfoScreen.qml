@@ -3,6 +3,7 @@
 import QtQuick
 
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Ui
 
 BaseSettingsScreen
@@ -10,6 +11,14 @@ BaseSettingsScreen
     id: appInfoScreen
 
     objectName: "appInfoScreen"
+
+    rightControl: ClipboardCopyButton
+    {
+        id: clipboardCopyButton
+
+        anchors.centerIn: parent
+        textToCopy: `${companyNameText.text} ${versionText.text}`
+    }
 
     title: qsTr("App Info")
 
@@ -72,6 +81,8 @@ BaseSettingsScreen
 
             Text
             {
+                id: companyNameText
+
                 anchors.horizontalCenter: parent.horizontalCenter
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: 18
@@ -83,6 +94,8 @@ BaseSettingsScreen
 
             Text
             {
+                id: versionText
+
                 anchors.horizontalCenter: parent.horizontalCenter
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: 14
