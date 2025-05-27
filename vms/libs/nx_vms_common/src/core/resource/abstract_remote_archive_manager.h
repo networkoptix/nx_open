@@ -94,16 +94,14 @@ public:
      *
      * @param outArchiveEntries Vector of entries to be filled.
      *
-     * @param startTimeMs List entries that starts not earlier than the specified timestamp.
-     *
-     * @param endTimeMs List entries that finishes till the specified timestamp.
+     * @param periodsOfInterest List of time periods for which the entries should be fetched.
+     * If empty, all entries should be fetched.
      *
      * @return True if list of entries has been successfully fetched from the remote device, false otherwise.
      */
     virtual bool listAvailableArchiveEntries(
         OverlappedRemoteChunks* outArchiveEntries,
-        int64_t startTimeMs = 0,
-        int64_t endTimeMs = std::numeric_limits<int64_t>::max()) = 0;
+        const QnTimePeriodList& periodsOfInterest = {}) = 0;
 
     /**
      * Downloads specified entry content. Is used only if FullChunkCapability is present.

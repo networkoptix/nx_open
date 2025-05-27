@@ -135,6 +135,9 @@ const QString kOnvifIgnoreOutdatedNotifications("onvifIgnoreOutdatedNotification
 const QString kReRequestOnvifRecordingEventsIfAllEventsHaveSameTime(
     "reRequestOnvifRecordingEventsIfAllEventsHaveSameTime");
 
+const QString kOnvifFindEventsRequestSupportsTimeRangeParameters(
+    "onvifFindEventsRequestSupportsTimeRangeParameters");
+
 const QString kPreferNativeApiForRemoteArchiveSynchronization(
     "preferNativeApiForRemoteArchiveSynchronization");
 

@@ -185,6 +185,11 @@ NX_VMS_COMMON_API extern const QString kOnvifIgnoreOutdatedNotifications;
 // response.
 NX_VMS_COMMON_API extern const QString kReRequestOnvifRecordingEventsIfAllEventsHaveSameTime;
 
+// Not all devices support the "StartPoint", "EndPoint", and "IncludeStartState" parameters in the
+// ONVIF FindEvents request. In this case, we must request all events since the epoch that do not
+// use these parameters.
+NX_VMS_COMMON_API extern const QString kOnvifFindEventsRequestSupportsTimeRangeParameters;
+
 // Prefer native protocol for remote archive synchronization instead of Onvif Profile-G if available.
 NX_VMS_COMMON_API extern const QString kPreferNativeApiForRemoteArchiveSynchronization;
 
