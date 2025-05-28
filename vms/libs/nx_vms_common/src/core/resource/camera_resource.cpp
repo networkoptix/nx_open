@@ -1715,7 +1715,10 @@ void QnVirtualCameraResource::setKeepCameraTimeSettings(bool value)
 
 bool QnVirtualCameraResource::defaultKeepCameraTimeSettingsState() const
 {
-    return !hasCameraCapabilities(nx::vms::api::DeviceCapability::remoteArchive);
+    // NVRs channels are processed individually, which could lead to SetSystemDateAndTime
+    // request spamming from our side. Thus we should always keep device time settings for NVRs.
+    // See VMS-58717 for additional details.
+    return isNvr() || !hasCameraCapabilities(nx::vms::api::DeviceCapability::remoteArchive);
 }
 
 QString QnVirtualCameraResource::getVendor() const
