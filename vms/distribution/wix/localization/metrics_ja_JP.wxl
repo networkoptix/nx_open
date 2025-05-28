@@ -2,6 +2,4 @@
 <WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="932" Language="1041" Culture="ja-jp">
   <UI Dialog="BalExtension" Control="EulaAcceptCheckbox" Width="120"/>
   <UI Dialog="BalExtension" Control="EulaHyperlink" X="134"/>
-  <UI Dialog="BalExtension" Control="OptionsButton" X="-140"/>
-  <UI Dialog="BalExtension" Control="InstallButton" Width="120"/>
 </WixLocalization>

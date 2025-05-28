@@ -27,8 +27,8 @@
 
         <Checkbox Name="EulaAcceptCheckbox" X="12" Y="-16" Width="91" Height="16" TabStop="yes" FontId="7" HideWhenDisabled="yes">#(loc.InstallAcceptCheckbox)</Checkbox>
         <Hypertext Name="EulaHyperlink" X="105" Y="-16" Width="-192" Height="16" TabStop="yes" FontId="7" HideWhenDisabled="yes">&lt;a href="#"&gt;#(loc.InstallLicenseLinkText)&lt;/a&gt;</Hypertext>
-        <Button Name="OptionsButton" X="-110" Y="-12" Width="80" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.InstallOptionsButton)</Button>
-        <Button Name="InstallButton" X="-12" Y="-12" Width="90" Height="28" TabStop="yes" FontId="0">#(loc.InstallInstallButton)</Button>
+        <Button Name="OptionsButton" X="-130" Y="-12" Width="80" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.InstallOptionsButton)</Button>
+        <Button Name="InstallButton" X="-12" Y="-12" Width="110" Height="28" TabStop="yes" FontId="0">#(loc.InstallInstallButton)</Button>
     </Page>
 
     <Page Name="Options">
