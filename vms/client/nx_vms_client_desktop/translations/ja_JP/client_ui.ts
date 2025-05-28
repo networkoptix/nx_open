@@ -589,7 +589,7 @@
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation>Media2を使用してプロファイルを取得</translation>
+      <translation>Media2 を使用してプロファイルを取得</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
