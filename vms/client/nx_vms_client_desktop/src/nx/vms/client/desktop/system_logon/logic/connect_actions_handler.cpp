@@ -848,6 +848,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                 d->reconnectDialog->setCurrentServer(server);
         });
 
+    // Using queued connection to avoid session destruction during callback.
     connect(session.get(),
         &RemoteSession::reconnectFailed,
         this,
@@ -856,39 +857,36 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
         {
             NX_DEBUG(this, "Reconnect failed with error: %1", errorCode);
 
-            executeDelayedParented(
-                [this, errorCode, serverModuleInformation, cached=cached]()
-                {
-                    d->handleWSError(errorCode);
-
-                    if (cached && !serverModuleInformation.cloudSystemId.isEmpty())
-                    {
-                        NX_DEBUG(this, "Try reconnect to cloud system without cache %1",
-                            d->lastAttemptedConnectCloudSystemId);
-                        connectToCloudSystem({
-                            d->lastAttemptedConnectCloudSystemId,
-                            /*connectScenario*/ std::nullopt,
-                            /*useCache*/ false},
-                            /*anyServer*/ true);
-                        return;
-                    }
-
-                    if (errorCode == RemoteConnectionErrorCode::truncatedSessionToken)
-                    {
-                        d->reconnectToCloudIfNeeded();
-                        return;
-                    }
-
-                    QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
-                        windowContext(),
-                        errorCode,
-                        serverModuleInformation,
-                        appContext()->version()
-                    );
-                },
-                this);
             disconnectFromServer(DisconnectFlag::Force);
-        });
+
+            d->handleWSError(errorCode);
+
+            if (cached && !serverModuleInformation.cloudSystemId.isEmpty())
+            {
+                NX_DEBUG(this, "Try reconnect to cloud system without cache %1",
+                    d->lastAttemptedConnectCloudSystemId);
+                connectToCloudSystem({
+                    d->lastAttemptedConnectCloudSystemId,
+                    /*connectScenario*/ std::nullopt,
+                    /*useCache*/ false},
+                    /*anyServer*/ true);
+                return;
+            }
+
+            if (errorCode == RemoteConnectionErrorCode::truncatedSessionToken)
+            {
+                d->reconnectToCloudIfNeeded();
+                return;
+            }
+
+            QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
+                windowContext(),
+                errorCode,
+                serverModuleInformation,
+                appContext()->version()
+            );
+        },
+        Qt::QueuedConnection);
 
     connect(session.get(),
         &RemoteSession::reconnectRequired,
