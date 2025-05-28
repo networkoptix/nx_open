@@ -20,7 +20,7 @@ class NX_NETWORK_API AbstractAlivenessTester:
 
 public:
     using ProbeResultHandler =
-        nx::utils::MoveOnlyFunc<void(bool /*probeReturned*/)>;
+        nx::MoveOnlyFunc<void(bool /*probeReturned*/)>;
 
     AbstractAlivenessTester(const KeepAliveOptions& keepAliveOptions);
 
@@ -31,7 +31,7 @@ public:
      * is considered failed and its completion is not expected and ignored.
      * AbstractAlivenessTester::start can be called again after completion.
      */
-    void start(nx::utils::MoveOnlyFunc<void()> onTestFailure);
+    void start(nx::MoveOnlyFunc<void()> onTestFailure);
 
     /**
      * Cancels all operations.
@@ -59,7 +59,7 @@ protected:
 private:
     const KeepAliveOptions m_keepAliveOptions;
     aio::Timer m_timer;
-    nx::utils::MoveOnlyFunc<void()> m_onTestFailure;
+    nx::MoveOnlyFunc<void()> m_onTestFailure;
     int m_probeNumber = 0;
 
     void resetState();

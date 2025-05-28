@@ -30,7 +30,7 @@ public:
     /**
      * @param timepoint the corresponding timepoint from the schedule.
      */
-    using Handler = nx::utils::MoveOnlyFunc<void(std::chrono::milliseconds /*timepoint*/)>;
+    using Handler = nx::MoveOnlyFunc<void(std::chrono::milliseconds /*timepoint*/)>;
 
     struct Timepoint
     {

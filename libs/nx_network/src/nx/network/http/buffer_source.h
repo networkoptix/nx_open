@@ -22,7 +22,7 @@ public:
      * Provides the whole buffer as the read result.
      */
     virtual void readAsync(
-        nx::utils::MoveOnlyFunc<
+        nx::MoveOnlyFunc<
             void(SystemError::ErrorCode, nx::Buffer)
         > completionHandler) override;
 

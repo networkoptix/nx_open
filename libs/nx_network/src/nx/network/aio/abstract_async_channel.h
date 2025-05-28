@@ -59,7 +59,7 @@ public:
      */
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> handler) final;
+        nx::MoveOnlyFunc<void()> handler) final;
 
     /**
      * Future-based wrapper for cancelIOAsync.

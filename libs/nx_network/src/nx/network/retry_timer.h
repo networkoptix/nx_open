@@ -62,7 +62,7 @@ public:
     /**
      * @return false, if maximum retries have been done.
      */
-    bool scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFunc);
+    bool scheduleNextTry(nx::MoveOnlyFunc<void()> doAnotherTryFunc);
 
     unsigned int retriesLeft() const;
     std::optional<std::chrono::nanoseconds> timeToEvent() const;
@@ -78,7 +78,7 @@ public:
      */
     void reset();
 
-    void cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler);
+    void cancelAsync(nx::MoveOnlyFunc<void()> completionHandler);
     void cancelSync();
 
 protected:

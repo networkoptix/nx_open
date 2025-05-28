@@ -81,8 +81,8 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     virtual bool isInSelfAioThread() const override;
     virtual Pollable* pollable() override;
-    virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void post(nx::MoveOnlyFunc<void()> handler) override;
+    virtual void dispatch(nx::MoveOnlyFunc<void()> handler) override;
 
 protected:
     friend class UdtPollSet;
@@ -146,7 +146,7 @@ public:
 
     virtual void connectAsync(
         const SocketAddress& addr,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
     virtual void readSomeAsync(
         nx::Buffer* const buf,
         IoCompletionHandler handler) override;
@@ -155,7 +155,7 @@ public:
         IoCompletionHandler handler) override;
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMillis,
-        nx::utils::MoveOnlyFunc<void()> handler) override;
+        nx::MoveOnlyFunc<void()> handler) override;
 
 protected:
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
@@ -190,7 +190,7 @@ public:
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync() override;
 
     // AbstractStreamServerSocket.

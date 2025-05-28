@@ -23,7 +23,7 @@ static const nx::Buffer kTeardownMessage("TEARDOWN\r\n");
 class ResumableThread
 {
 public:
-    ResumableThread(nx::utils::MoveOnlyFunc<void()> func):
+    ResumableThread(nx::MoveOnlyFunc<void()> func):
         m_func(std::move(func))
     {
         m_thread = std::thread([this]() { threadFunc(); });
@@ -40,7 +40,7 @@ public:
     }
 
 private:
-    nx::utils::MoveOnlyFunc<void()> m_func;
+    nx::MoveOnlyFunc<void()> m_func;
     std::thread m_thread;
     nx::utils::promise<void> m_resumed;
 

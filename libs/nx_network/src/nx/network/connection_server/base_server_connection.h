@@ -39,7 +39,7 @@ class NX_NETWORK_API BaseServerConnection:
     using base_type = aio::BasicPollable;
 
 public:
-    using OnConnectionClosedHandler = nx::utils::MoveOnlyFunc<void(
+    using OnConnectionClosedHandler = nx::MoveOnlyFunc<void(
         SystemError::ErrorCode /*closeReason*/, bool /*connectionDestroyed*/)>;
 
     BaseServerConnection(

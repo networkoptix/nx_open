@@ -102,7 +102,7 @@ public:
     void setEnabled(bool value) { m_enabled = value; }
     virtual void setEndOfPlaybackHandler(std::function<void()> /*handler*/) {}
     virtual void setErrorHandler(std::function<void(const QString& errorString)> /*handler*/) {}
-    void setNoDataHandler(nx::utils::MoveOnlyFunc<void()> noDataHandler);
+    void setNoDataHandler(nx::MoveOnlyFunc<void()> noDataHandler);
 
     void addMediaFilter(const std::shared_ptr<AbstractMediaDataFilter>& filter);
 
@@ -138,7 +138,7 @@ protected:
     qint64 m_needToSleep = 0;
     QnAbstractArchiveDelegate* m_delegate = nullptr;
     QnAbstractNavigator* m_navDelegate = nullptr;
-    nx::utils::MoveOnlyFunc<void()> m_noDataHandler;
+    nx::MoveOnlyFunc<void()> m_noDataHandler;
 
 private:
     std::chrono::milliseconds getDelay(int64_t timestamp);

@@ -20,7 +20,7 @@ public:
      * Install an event handler to be notified when a new message is received.
      * NOTE: To be used by the StreamSocketServer class only.
      */
-    void setMessageReceivedHandler(nx::utils::MoveOnlyFunc<void()> handler);
+    void setMessageReceivedHandler(nx::MoveOnlyFunc<void()> handler);
 
     /**
      * Increments received messages counter and invokes messageReceivedHandler, if one is set
@@ -31,7 +31,7 @@ public:
 
 private:
     unsigned int m_messagesReceivedCount{0};
-    nx::utils::MoveOnlyFunc<void()> m_messageReceivedHandler;
+    nx::MoveOnlyFunc<void()> m_messageReceivedHandler;
 };
 
 } // namespace nx::network::server::detail

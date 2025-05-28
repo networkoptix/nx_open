@@ -48,7 +48,7 @@ class NX_NETWORK_API Uploader:
     using base_type = nx::network::aio::BasicPollable;
 
 public:
-    using Handler = nx::utils::MoveOnlyFunc<void(UploadResult)>;
+    using Handler = nx::MoveOnlyFunc<void(UploadResult)>;
 
     Uploader(
         const nx::Url& logCollectorUrl,

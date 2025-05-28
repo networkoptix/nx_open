@@ -18,7 +18,7 @@ namespace nx::sql::test {
 
 static constexpr char kCdbStructureName[] = "test";
 
-using CustomExecSqlFunc = nx::utils::MoveOnlyFunc<DBResult(
+using CustomExecSqlFunc = nx::MoveOnlyFunc<DBResult(
     nx::sql::QueryContext* const queryContext,
     const std::string& script)>;
 
@@ -30,7 +30,7 @@ class TestSqlQuery:
     using base_type = DelegateSqlQuery;
 
 public:
-    using CustomExecSqlFunc = nx::utils::MoveOnlyFunc<DBResult(
+    using CustomExecSqlFunc = nx::MoveOnlyFunc<DBResult(
         nx::sql::QueryContext*, const std::string& /*script*/)>;
 
     using base_type::base_type;
@@ -130,7 +130,7 @@ public:
         m_customExecSqlFunc = std::move(func);
     }
 
-    void setOnCommit(nx::utils::MoveOnlyFunc<void()> func)
+    void setOnCommit(nx::MoveOnlyFunc<void()> func)
     {
         m_onCommit = std::move(func);
     }
@@ -145,7 +145,7 @@ private:
     std::optional<RdbmsDriverType> m_driverType;
     std::unique_ptr<Transaction> m_transaction;
     QtDbConnection m_realConnection;
-    nx::utils::MoveOnlyFunc<void()> m_onCommit;
+    nx::MoveOnlyFunc<void()> m_onCommit;
 };
 
 //-------------------------------------------------------------------------------------------------

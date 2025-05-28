@@ -82,7 +82,7 @@ void AsyncClientDelegate::closeConnection(
 
 void AsyncClientDelegate::cancelHandlers(
     void* client,
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::MoveOnlyFunc<void()> handler)
 {
     m_delegate->cancelHandlers(client, std::move(handler));
 }

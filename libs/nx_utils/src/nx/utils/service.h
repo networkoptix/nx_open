@@ -36,7 +36,7 @@ public:
     virtual void pleaseStop() override;
 
     void setOnStartedEventHandler(
-        nx::utils::MoveOnlyFunc<void(bool /*isStarted*/)> handler);
+        nx::MoveOnlyFunc<void(bool /*isStarted*/)> handler);
 
     /**
      * After starting service check presence of special file in the data directory.
@@ -45,7 +45,7 @@ public:
      * On correct deinitialization this file is removed.
      */
     void setOnAbnormalTerminationDetected(
-        nx::utils::MoveOnlyFunc<void(ServiceStartInfo)> handler);
+        nx::MoveOnlyFunc<void(ServiceStartInfo)> handler);
 
     int exec();
 
@@ -83,8 +83,8 @@ private:
     bool m_isLoggingInitializationRequired = true;
     int m_argc = 0;
     char** m_argv = nullptr;
-    nx::utils::MoveOnlyFunc<void(bool /*isStarted*/)> m_startedEventHandler;
-    nx::utils::MoveOnlyFunc<void(ServiceStartInfo)> m_abnormalTerminationHandler;
+    nx::MoveOnlyFunc<void(bool /*isStarted*/)> m_startedEventHandler;
+    nx::MoveOnlyFunc<void(ServiceStartInfo)> m_abnormalTerminationHandler;
     const QString m_applicationDisplayName;
     nx::utils::SyncQueue<ActionToTake> m_processTerminationEvents;
     ActionToTake m_actionToTake;

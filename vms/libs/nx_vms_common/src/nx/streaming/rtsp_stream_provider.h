@@ -69,7 +69,7 @@ class NX_VMS_COMMON_API RtspStreamProvider:
     public QnStoppable
 {
 public:
-    using OnSocketReadTimeoutCallback = nx::utils::MoveOnlyFunc<QnAbstractMediaDataPtr()>;
+    using OnSocketReadTimeoutCallback = nx::MoveOnlyFunc<QnAbstractMediaDataPtr()>;
 
     RtspStreamProvider(
         const nx::vms::common::SystemSettings* systemSetting,

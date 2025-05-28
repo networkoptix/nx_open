@@ -18,7 +18,7 @@ void UplinkSpeedTestServer::registerRequestHandlers(
 }
 
 void UplinkSpeedTestServer::setBandwidthTestInProgressHandler(
-    nx::utils::MoveOnlyFunc<void(int /*xTestSequence*/)> handler)
+    nx::MoveOnlyFunc<void(int /*xTestSequence*/)> handler)
 {
     m_bandwidthTestInProgressHandler = std:: move(handler);
 }

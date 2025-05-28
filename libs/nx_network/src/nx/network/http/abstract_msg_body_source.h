@@ -27,7 +27,7 @@ class NX_NETWORK_API AbstractMsgBodySource:
 {
 public:
     using CompletionHandler =
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, nx::Buffer)>;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode, nx::Buffer)>;
 
     virtual ~AbstractMsgBodySource() = default;
 

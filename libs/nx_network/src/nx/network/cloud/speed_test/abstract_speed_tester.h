@@ -10,7 +10,7 @@
 namespace nx::network::cloud::speed_test {
 
 using CompletionHandler =
-    nx::utils::MoveOnlyFunc<void(
+    nx::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         std::optional<nx::hpm::api::ConnectionSpeed>)>;
 

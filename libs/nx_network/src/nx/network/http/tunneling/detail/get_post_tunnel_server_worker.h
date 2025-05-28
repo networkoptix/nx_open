@@ -29,7 +29,7 @@ class GetPostTunnelServerWorker:
     using base_type = aio::BasicPollable;
 
 public:
-    using NewTunnelHandler = nx::utils::MoveOnlyFunc<void(
+    using NewTunnelHandler = nx::MoveOnlyFunc<void(
         std::unique_ptr<AbstractStreamSocket> connection,
         ApplicationData...)>;
 

@@ -30,17 +30,17 @@ void AsyncFileDownloader::bindToAioThread(nx::network::aio::AbstractAioThread* a
     m_client.bindToAioThread(aioThread);
 }
 
-void AsyncFileDownloader::setOnResponseReceived(nx::utils::MoveOnlyFunc<void(std::optional<size_t>)> handler)
+void AsyncFileDownloader::setOnResponseReceived(nx::MoveOnlyFunc<void(std::optional<size_t>)> handler)
 {
     m_onResponseReceived = std::move(handler);
 }
 
-void AsyncFileDownloader::setOnProgressHasBeenMade(nx::utils::MoveOnlyFunc<void(nx::Buffer&&, std::optional<double>)> handler)
+void AsyncFileDownloader::setOnProgressHasBeenMade(nx::MoveOnlyFunc<void(nx::Buffer&&, std::optional<double>)> handler)
 {
     m_onProgressHasBeenMade = std::move(handler);
 }
 
-void AsyncFileDownloader::setOnDone(nx::utils::MoveOnlyFunc<void()> handler)
+void AsyncFileDownloader::setOnDone(nx::MoveOnlyFunc<void()> handler)
 {
     m_onDone = std::move(handler);
 }

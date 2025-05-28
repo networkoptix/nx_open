@@ -84,7 +84,7 @@ public:
         }
     }
 
-    using MonitorCallback = nx::utils::MoveOnlyFunc<void(const QnAbstractTransaction&)>;
+    using MonitorCallback = nx::MoveOnlyFunc<void(const QnAbstractTransaction&)>;
     nx::utils::Guard addMonitor(MonitorCallback callback, std::vector<ApiCommand::Value> commands);
 
 private:

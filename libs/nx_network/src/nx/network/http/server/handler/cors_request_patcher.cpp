@@ -13,7 +13,7 @@ void CorsRequestPatcher::addAllowedOrigin(
 
 void CorsRequestPatcher::serve(
     RequestContext requestContext,
-    nx::utils::MoveOnlyFunc<void(RequestResult)> handler)
+    nx::MoveOnlyFunc<void(RequestResult)> handler)
 {
     const auto& request = requestContext.request;
     if (auto originIter = request.headers.find("Origin"); originIter != request.headers.end())

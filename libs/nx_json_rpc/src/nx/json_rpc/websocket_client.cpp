@@ -68,7 +68,7 @@ void WebSocketClient::setHandler(RequestHandler handler)
     m_handler = std::move(handler);
 }
 
-void WebSocketClient::connectAsync(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+void WebSocketClient::connectAsync(nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     post(
         [this, handler = std::move(handler)]() mutable

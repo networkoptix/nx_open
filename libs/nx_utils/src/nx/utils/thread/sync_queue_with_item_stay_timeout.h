@@ -15,7 +15,7 @@ template<typename Item>
 class SyncQueueWithItemStayTimeout
 {
 public:
-    typedef nx::utils::MoveOnlyFunc<void(Item)> ItemStayTimeoutHandler;
+    typedef nx::MoveOnlyFunc<void(Item)> ItemStayTimeoutHandler;
 
     /**
      * @param timeoutHandler This handler is called from SyncQueueWithItemStayTimeout::pop,

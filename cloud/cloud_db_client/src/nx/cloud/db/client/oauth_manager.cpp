@@ -21,7 +21,7 @@ std::chrono::seconds OauthManager::lastServerTime() const
 
 void OauthManager::issueTokenLegacy(
     const api::IssueTokenRequest& request,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)
+    nx::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)
 {
     m_requestsExecutor->makeAsyncCall<api::IssueTokenResponse>(
         nx::network::http::Method::post,
@@ -33,7 +33,7 @@ void OauthManager::issueTokenLegacy(
 
 void OauthManager::issueTokenV1(
     const api::IssueTokenRequest& request,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)
+    nx::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)
 {
     m_requestsExecutor->makeAsyncCall<api::IssueTokenResponse>(
         nx::network::http::Method::post,
@@ -45,7 +45,7 @@ void OauthManager::issueTokenV1(
 
 void OauthManager::issueAuthorizationCode(
     const api::IssueTokenRequest& request,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueCodeResponse)> completionHandler)
+    nx::MoveOnlyFunc<void(api::ResultCode, api::IssueCodeResponse)> completionHandler)
 {
     m_requestsExecutor->makeAsyncCall<api::IssueCodeResponse>(
         nx::network::http::Method::post,
@@ -57,7 +57,7 @@ void OauthManager::issueAuthorizationCode(
 
 void OauthManager::legacyValidateToken(
     const std::string& token,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode, api::ValidateTokenResponse)> completionHandler)
+    nx::MoveOnlyFunc<void(api::ResultCode, api::ValidateTokenResponse)> completionHandler)
 {
     m_requestsExecutor->makeAsyncCall<api::ValidateTokenResponse>(
         nx::network::http::Method::get,
@@ -68,7 +68,7 @@ void OauthManager::legacyValidateToken(
 
 void OauthManager::introspectToken(
     const api::TokenIntrospectionRequest& request,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode, api::TokenIntrospectionResponse)> handler)
+    nx::MoveOnlyFunc<void(api::ResultCode, api::TokenIntrospectionResponse)> handler)
 {
     m_requestsExecutor->makeAsyncCall<api::TokenIntrospectionResponse>(
         nx::network::http::Method::post,
@@ -80,7 +80,7 @@ void OauthManager::introspectToken(
 
 void OauthManager::deleteToken(
     const std::string& token,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
+    nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
     auto requestPath =
         nx::network::http::rest::substituteParameters(kOauthTokenValidatePath, {token});
@@ -94,7 +94,7 @@ void OauthManager::deleteToken(
 
 void OauthManager::deleteTokensByClientId(
     const std::string& clientId,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
+    nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
     auto requestPath =
         nx::network::http::rest::substituteParameters(kOauthTokensDeletePath, {clientId});
@@ -106,7 +106,7 @@ void OauthManager::deleteTokensByClientId(
         std::move(completionHandler));
 }
 
-void OauthManager::logout(nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
+void OauthManager::logout(nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
     m_requestsExecutor->makeAsyncCall</*Output*/ void>(
         nx::network::http::Method::delete_,
@@ -117,7 +117,7 @@ void OauthManager::logout(nx::utils::MoveOnlyFunc<void(api::ResultCode)> complet
 
 void OauthManager::issueStunToken(
     const api::IssueStunTokenRequest& request,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueStunTokenResponse)> completionHandler)
+    nx::MoveOnlyFunc<void(api::ResultCode, api::IssueStunTokenResponse)> completionHandler)
 {
     m_requestsExecutor->makeAsyncCall<api::IssueStunTokenResponse>(
         nx::network::http::Method::post,
@@ -128,7 +128,7 @@ void OauthManager::issueStunToken(
 }
 
 void OauthManager::getJwtPublicKeys(
-    nx::utils::MoveOnlyFunc<void(api::ResultCode, std::vector<nx::network::jwk::Key>)> completionHandler)
+    nx::MoveOnlyFunc<void(api::ResultCode, std::vector<nx::network::jwk::Key>)> completionHandler)
 {
     m_requestsExecutor->makeAsyncCall<std::vector<nx::network::jwk::Key>>(
         nx::network::http::Method::get,
@@ -139,7 +139,7 @@ void OauthManager::getJwtPublicKeys(
 
 void OauthManager::getJwtPublicKeyByKid(
     const std::string& kid,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode, nx::network::jwk::Key)> completionHandler)
+    nx::MoveOnlyFunc<void(api::ResultCode, nx::network::jwk::Key)> completionHandler)
 {
     m_requestsExecutor->makeAsyncCall<nx::network::jwk::Key>(
         nx::network::http::Method::get,

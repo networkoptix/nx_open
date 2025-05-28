@@ -368,7 +368,7 @@ private:
     nx::network::http::TestHttpServer m_fakeMediator;
     nx::utils::SyncQueue<bool> m_reportReceivedEvent;
     nx::utils::SyncQueue<FetchMediatorAddressResult> m_fetchMediatorAddressEvent;
-    nx::utils::MoveOnlyFunc<speed_test::UplinkSpeedTesterFactoryType> m_factoryFuncBak;
+    nx::MoveOnlyFunc<speed_test::UplinkSpeedTesterFactoryType> m_factoryFuncBak;
     nx::network::aio::Scheduler* m_scheduler = nullptr;
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
     std::unique_ptr<speed_test::UplinkSpeedReporter> m_reporter;

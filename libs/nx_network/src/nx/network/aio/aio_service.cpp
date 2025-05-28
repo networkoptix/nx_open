@@ -52,7 +52,7 @@ void AIOService::startMonitoring(
     aio::EventType eventToWatch,
     AIOEventHandler* const eventHandler,
     std::optional<std::chrono::milliseconds> timeoutMillis,
-    nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
+    nx::MoveOnlyFunc<void()> socketAddedToPollHandler)
 {
     sock->impl()->aioThread->load()->startMonitoring(
         sock,
@@ -94,12 +94,12 @@ bool AIOService::isSocketBeingMonitored(Pollable* sock)
     return aioThread->isSocketBeingMonitored(sock);
 }
 
-void AIOService::post(Pollable* sock, nx::utils::MoveOnlyFunc<void()> handler)
+void AIOService::post(Pollable* sock, nx::MoveOnlyFunc<void()> handler)
 {
     sock->impl()->aioThread->load()->post(sock, std::move(handler));
 }
 
-void AIOService::post(nx::utils::MoveOnlyFunc<void()> handler)
+void AIOService::post(nx::MoveOnlyFunc<void()> handler)
 {
     auto& threadToUse = nx::utils::random::choice(m_aioThreadPool);
     NX_ASSERT(threadToUse);
@@ -108,7 +108,7 @@ void AIOService::post(nx::utils::MoveOnlyFunc<void()> handler)
 
 void AIOService::dispatch(
     Pollable* sock,
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::MoveOnlyFunc<void()> handler)
 {
     sock->impl()->aioThread->load()->dispatch(sock, std::move(handler));
 }

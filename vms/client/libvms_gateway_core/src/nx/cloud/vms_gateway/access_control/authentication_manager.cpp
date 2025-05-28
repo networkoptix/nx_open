@@ -42,7 +42,7 @@ AuthenticationManager::AuthenticationManager(
 
 void AuthenticationManager::serve(
     nx::network::http::RequestContext ctx,
-    nx::utils::MoveOnlyFunc<void(nx::network::http::RequestResult)> completionHandler)
+    nx::MoveOnlyFunc<void(nx::network::http::RequestResult)> completionHandler)
 {
     nx::network::http::RequestResult authenticationResult(
         nx::network::http::StatusCode::unauthorized);

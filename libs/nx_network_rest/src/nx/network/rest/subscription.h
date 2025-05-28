@@ -20,10 +20,10 @@ template<typename Data>
 class SubscriptionHandler
 {
 public:
-    using AddMonitor = nx::utils::MoveOnlyFunc<nx::utils::Guard()>;
+    using AddMonitor = nx::MoveOnlyFunc<nx::utils::Guard()>;
     using NotifyType = Handler::NotifyType;
     using SubscriptionCallback =
-        nx::utils::MoveOnlyFunc<void(const QString& id, NotifyType, const Data& data)>;
+        nx::MoveOnlyFunc<void(const QString& id, NotifyType, const Data& data)>;
 
     SubscriptionHandler(AddMonitor addMonitor): m_addMonitor(std::move(addMonitor)) {}
     virtual ~SubscriptionHandler()

@@ -46,12 +46,12 @@ void CloudStreamSocketConnector::connect(
                 post([this, port, code, dnsEntries = std::move(dnsEntries)]() mutable
                 {
                     if (code != SystemError::noError)
-                        return nx::utils::swapAndCall(m_handler, code, std::nullopt, nullptr);
+                        return nx::swapAndCall(m_handler, code, std::nullopt, nullptr);
 
                     if (dnsEntries.empty())
                     {
                         NX_ASSERT(false, "Non-zero error is expected instead of empty addr list");
-                        return nx::utils::swapAndCall(m_handler,
+                        return nx::swapAndCall(m_handler,
                             SystemError::hostNotFound, std::nullopt, nullptr);
                     }
 
@@ -98,7 +98,7 @@ void CloudStreamSocketConnector::connectToEntriesAsync(
         [this](SystemError::ErrorCode err, auto&&... args)
         {
             NX_VERBOSE(this, "Connect to %1 completed with %2", m_addr, SystemError::toString(err));
-            nx::utils::swapAndCall(m_handler, err, std::forward<decltype(args)>(args)...);
+            nx::swapAndCall(m_handler, err, std::forward<decltype(args)>(args)...);
         });
 }
 

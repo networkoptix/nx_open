@@ -9,7 +9,7 @@
 
 namespace nx::utils::debug {
 
-using OnAboutToBlockHandler = nx::utils::MoveOnlyFunc<void()>;
+using OnAboutToBlockHandler = nx::MoveOnlyFunc<void()>;
 
 /**
  * @return The previous handler

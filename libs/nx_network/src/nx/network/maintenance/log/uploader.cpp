@@ -28,7 +28,7 @@ class ProxyLogWriter:
     public nx::log::AbstractWriter
 {
 public:
-    using Func = nx::utils::MoveOnlyFunc<void(
+    using Func = nx::MoveOnlyFunc<void(
         nx::log::Level /*level*/,
         const QString& /*message*/)>;
 

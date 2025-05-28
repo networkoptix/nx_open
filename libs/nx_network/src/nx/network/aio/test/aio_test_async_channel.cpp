@@ -293,7 +293,7 @@ void AsyncChannel::reportIoCompletion(
     if (ioCompletionHandler == &m_readHandler)
         m_readScheduled = false;
 
-    nx::utils::swapAndCall(*ioCompletionHandler, sysErrorCode, bytesTransferred);
+    nx::swapAndCall(*ioCompletionHandler, sysErrorCode, bytesTransferred);
 }
 
 void AsyncChannel::performAsyncSend(const nx::Locker<nx::Mutex>&)

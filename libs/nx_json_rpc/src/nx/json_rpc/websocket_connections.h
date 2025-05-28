@@ -24,7 +24,7 @@ public:
     virtual ~Executor() = default;
     virtual void execute(
         std::weak_ptr<WebSocketConnection> connection,
-        nx::utils::MoveOnlyFunc<void(Response)> handler) = 0;
+        nx::MoveOnlyFunc<void(Response)> handler) = 0;
 };
 
 class ExecutorCreator
@@ -67,7 +67,7 @@ private:
         ResponseId responseId,
         Connection* connection,
         std::unique_ptr<Executor> executor,
-        nx::utils::MoveOnlyFunc<void(Response)> handler);
+        nx::MoveOnlyFunc<void(Response)> handler);
 
 private:
     mutable nx::Mutex m_mutex;

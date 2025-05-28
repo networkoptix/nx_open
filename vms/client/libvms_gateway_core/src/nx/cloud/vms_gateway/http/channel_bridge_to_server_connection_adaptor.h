@@ -18,7 +18,7 @@ class BridgeToServerConnectionAdaptor:
     using base_type = nx::network::aio::BasicPollable;
 
 public:
-    using OnConnectionClosedHandler = nx::utils::MoveOnlyFunc<void(
+    using OnConnectionClosedHandler = nx::MoveOnlyFunc<void(
         SystemError::ErrorCode /*closeReason*/, bool /*connectionDestroyed*/)>;
 
     BridgeToServerConnectionAdaptor(std::unique_ptr<network::aio::AsyncChannelBridge> bridge);

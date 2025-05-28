@@ -32,7 +32,7 @@ public:
     }
 
     virtual void handshakeAsync(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
         m_delegate->handshakeAsync(std::move(handler));
     }
@@ -80,7 +80,7 @@ StreamServerSocket::~StreamServerSocket()
 }
 
 void StreamServerSocket::pleaseStop(
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     post(
         [this, completionHandler = std::move(completionHandler)]()
@@ -271,7 +271,7 @@ void StreamServerSocket::startTimer(std::chrono::milliseconds timeout)
         [this]()
         {
             m_acceptor.cancelIOSync();
-            nx::utils::swapAndCall(m_userHandler, SystemError::timedOut, nullptr);
+            nx::swapAndCall(m_userHandler, SystemError::timedOut, nullptr);
         });
 }
 
@@ -280,7 +280,7 @@ void StreamServerSocket::onAccepted(
     std::unique_ptr<AbstractStreamSocket> connection)
 {
     m_timer.cancelSync();
-    nx::utils::swapAndCall(m_userHandler, systemErrorCode, std::move(connection));
+    nx::swapAndCall(m_userHandler, systemErrorCode, std::move(connection));
 }
 
 void StreamServerSocket::stopWhileInAioThread()

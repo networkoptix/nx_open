@@ -21,7 +21,7 @@ class NX_SQL_API QueryScheduler
 public:
     QueryScheduler(
         nx::sql::AbstractAsyncSqlQueryExecutor* queryExecutor,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*)> func);
+        nx::MoveOnlyFunc<void(nx::sql::QueryContext*)> func);
 
     ~QueryScheduler();
 
@@ -47,7 +47,7 @@ private:
 
 private:
     nx::sql::AbstractAsyncSqlQueryExecutor* m_queryExecutor = nullptr;
-    nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*)> m_func;
+    nx::MoveOnlyFunc<void(nx::sql::QueryContext*)> m_func;
     std::chrono::milliseconds m_periodicDelay = std::chrono::milliseconds::zero();
     std::optional<std::chrono::milliseconds> m_nextShotDelay;
     nx::Mutex m_mutex;

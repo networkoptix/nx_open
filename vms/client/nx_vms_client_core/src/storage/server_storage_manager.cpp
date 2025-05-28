@@ -355,7 +355,7 @@ void QnServerStorageManager::checkStoragesStatusInternal(const QnResourcePtr& re
 
 void QnServerStorageManager::saveStorages(
     const QnStorageResourceList& storages,
-    nx::utils::MoveOnlyFunc<void(ec2::ErrorCode)> callback)
+    nx::MoveOnlyFunc<void(ec2::ErrorCode)> callback)
 {
     auto messageBusConnection = systemContext()->messageBusConnection();
 

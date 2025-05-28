@@ -25,7 +25,7 @@ public:
 
 private:
     using ResendRequestFunc =
-        nx::utils::MoveOnlyFunc<void(std::optional<nx::network::http::AuthToken>)>;
+        nx::MoveOnlyFunc<void(std::optional<nx::network::http::AuthToken>)>;
 
     auto receiveToken()
     {

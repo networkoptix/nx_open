@@ -6,7 +6,7 @@ namespace nx::network::http::server {
 
 void RequestDecoratorHandler::serve(
     RequestContext requestContext,
-    nx::utils::MoveOnlyFunc<void(RequestResult)> handler)
+    nx::MoveOnlyFunc<void(RequestResult)> handler)
 {
     for (const auto& [name, value]: m_attributes)
         requestContext.attrs[name] = value;

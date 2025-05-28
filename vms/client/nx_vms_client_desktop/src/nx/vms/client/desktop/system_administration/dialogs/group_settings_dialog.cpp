@@ -625,7 +625,7 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
 void GroupSettingsDialog::removeGroups(
     WindowContext* windowContext,
     const QSet<nx::Uuid>& idsToRemove,
-    nx::utils::MoveOnlyFunc<void(bool, const QString&)> callback)
+    nx::MoveOnlyFunc<void(bool, const QString&)> callback)
 {
     auto systemContext = windowContext->system();
 

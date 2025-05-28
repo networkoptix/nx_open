@@ -192,7 +192,7 @@ private:
 
     using Readers = std::map<QueueReaderId, ReaderContext>;
     using OnElementReadHandler =
-        nx::utils::MoveOnlyFunc<void(QueueReaderId /*readerId*/, int /*value*/)>;
+        nx::MoveOnlyFunc<void(QueueReaderId /*readerId*/, int /*value*/)>;
 
     Readers m_readers;
     nx::utils::SyncQueue<int> m_syncQueue;

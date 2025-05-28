@@ -14,7 +14,7 @@ MaintenanceClient::MaintenanceClient(const nx::Url& baseUrl):
 }
 
 void MaintenanceClient::getRelays(
-    nx::utils::MoveOnlyFunc<void(api::Result, api::Relays)> handler)
+    nx::MoveOnlyFunc<void(api::Result, api::Relays)> handler)
 {
     base_type::template makeAsyncCall<api::Relays>(
         nx::network::http::Method::get,
@@ -33,7 +33,7 @@ std::tuple<api::Result, api::Relays> MaintenanceClient::getRelays()
 
 void MaintenanceClient::deleteRelay(
     const std::string& name,
-    nx::utils::MoveOnlyFunc<void(api::Result)> handler)
+    nx::MoveOnlyFunc<void(api::Result)> handler)
 {
     base_type::template makeAsyncCall<void>(
         nx::network::http::Method::delete_,

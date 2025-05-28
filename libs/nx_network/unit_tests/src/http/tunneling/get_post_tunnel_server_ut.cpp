@@ -15,7 +15,7 @@ namespace {
 
 struct Events
 {
-    nx::utils::MoveOnlyFunc<void(bool /*isRetryAfterUnauthorizedResponse*/)> onRequestSent = nullptr;
+    nx::MoveOnlyFunc<void(bool /*isRetryAfterUnauthorizedResponse*/)> onRequestSent = nullptr;
 };
 
 // Just forwards all received requests transferring them to a different AIO thread.
@@ -35,7 +35,7 @@ public:
 
     virtual void serve(
         network::http::RequestContext ctx,
-        nx::utils::MoveOnlyFunc<void(network::http::RequestResult)> handler) override
+        nx::MoveOnlyFunc<void(network::http::RequestResult)> handler) override
     {
         if (!nextHandler())
             return handler(StatusCode::notFound);

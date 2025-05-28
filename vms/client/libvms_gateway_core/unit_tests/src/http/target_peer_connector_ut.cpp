@@ -39,7 +39,7 @@ public:
 
     virtual void connectAsync(
         const nx::network::SocketAddress& /*addr*/,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
         if (m_connectFailureType == ConnectFailureType::reportError)
             post([handler = std::move(handler)]() { handler(SystemError::connectionRefused); });

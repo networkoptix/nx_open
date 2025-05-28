@@ -32,7 +32,7 @@ struct SuccessfulAuthenticationResult: RequestResult
 };
 
 using AuthenticationCompletionHandler =
-    nx::utils::MoveOnlyFunc<void(RequestResult)>;
+    nx::MoveOnlyFunc<void(RequestResult)>;
 
 /**
  * Puts the authentication result into the RequestResult::statusCode variable or the

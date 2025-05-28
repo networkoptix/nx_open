@@ -24,7 +24,7 @@ class TestRequestHandler:
 public:
     virtual void serve(
         network::http::RequestContext /*requestContext*/,
-        nx::utils::MoveOnlyFunc<void(network::http::RequestResult)> handler) override
+        nx::MoveOnlyFunc<void(network::http::RequestResult)> handler) override
     {
         handler(StatusCode::noContent);
     }

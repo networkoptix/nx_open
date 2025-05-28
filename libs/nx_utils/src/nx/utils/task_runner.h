@@ -16,7 +16,7 @@ namespace nx::utils {
 class NX_UTILS_API TaskRunner: public SimpleActiveObject
 {
 public:
-    using Task = nx::utils::MoveOnlyFunc<void()>;
+    using Task = nx::MoveOnlyFunc<void()>;
 
     TaskRunner(int threadsNumber);
 

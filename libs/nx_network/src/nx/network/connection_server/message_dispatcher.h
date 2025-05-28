@@ -45,7 +45,7 @@ public:
         message_type&&,
         CompletionFuncType)>;
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> /*completionHandler*/) override
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> /*completionHandler*/) override
     {
         //TODO #akolesnikov
     }

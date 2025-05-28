@@ -56,7 +56,7 @@ public:
     void sendMessage(
         SocketAddress destinationEndpoint,
         const Message& message,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler);
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler);
 
     const std::unique_ptr<AbstractDatagramSocket>& socket();
 

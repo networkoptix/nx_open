@@ -267,19 +267,19 @@ void CloudStreamSocket::cancelIoInAioThread(aio::EventType eventType)
         m_socketDelegate->cancelIOSync(eventType);
 }
 
-void CloudStreamSocket::post(nx::utils::MoveOnlyFunc<void()> handler)
+void CloudStreamSocket::post(nx::MoveOnlyFunc<void()> handler)
 {
     m_aioThreadBinder.post(std::move(handler));
 }
 
-void CloudStreamSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
+void CloudStreamSocket::dispatch(nx::MoveOnlyFunc<void()> handler)
 {
     m_aioThreadBinder.dispatch(std::move(handler));
 }
 
 void CloudStreamSocket::connectAsync(
     const SocketAddress& address,
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     NX_VERBOSE(this, "connectAsync. %1", address);
 
@@ -338,12 +338,12 @@ void CloudStreamSocket::sendAsync(
 
 void CloudStreamSocket::registerTimer(
     std::chrono::milliseconds timeout,
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::MoveOnlyFunc<void()> handler)
 {
     m_timer.start(timeout, std::move(handler));
 }
 
-void CloudStreamSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void CloudStreamSocket::pleaseStop(nx::MoveOnlyFunc<void()> handler)
 {
     m_aioThreadBinder.pleaseStop(
         [this, handler = std::move(handler)]()

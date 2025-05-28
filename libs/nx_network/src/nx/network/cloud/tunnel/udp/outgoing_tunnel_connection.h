@@ -63,7 +63,7 @@ public:
         OnNewConnectionHandler handler) override;
 
     virtual void setControlConnectionClosedHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
     virtual ConnectType connectType() const override;
 
@@ -92,7 +92,7 @@ private:
     nx::Mutex m_mutex;
     bool m_pleaseStopHasBeenCalled = false;
     bool m_pleaseStopCompleted = false;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)>
         m_controlConnectionClosedHandler;
     aio::RepetitiveTimer m_keepAliveTimer;
     bool m_isVerified = false;

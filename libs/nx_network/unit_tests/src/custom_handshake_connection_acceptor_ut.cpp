@@ -70,7 +70,7 @@ public:
     }
 
     virtual void handshakeAsync(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
         m_handshakeThread = getAioThread();
         if (m_needToDelayHandshake)

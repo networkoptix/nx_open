@@ -32,7 +32,7 @@ void VmsGatewayProcessPublic::pleaseStop()
 }
 
 void VmsGatewayProcessPublic::setOnStartedEventHandler(
-    nx::utils::MoveOnlyFunc<void(bool)> handler)
+    nx::MoveOnlyFunc<void(bool)> handler)
 {
     m_impl->setOnStartedEventHandler(std::move(handler));
 }

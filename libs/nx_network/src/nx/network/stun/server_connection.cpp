@@ -52,7 +52,7 @@ SocketAddress ServerConnection::getSourceAddress() const
 }
 
 void ServerConnection::addOnConnectionCloseHandler(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     registerCloseHandler(
         [handler = std::move(handler)](auto reason, auto connectionDestroyed)

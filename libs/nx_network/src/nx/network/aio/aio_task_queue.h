@@ -68,8 +68,8 @@ public:
     /** 0 means no timeout. */
     std::chrono::milliseconds timeout;
     std::atomic<int>* taskCompletionEvent;
-    nx::utils::MoveOnlyFunc<void()> postHandler;
-    nx::utils::MoveOnlyFunc<void()> taskCompletionHandler;
+    nx::MoveOnlyFunc<void()> postHandler;
+    nx::MoveOnlyFunc<void()> taskCompletionHandler;
     nx::telemetry::Span telemetrySpan;
 
     /**
@@ -82,7 +82,7 @@ public:
         AIOEventHandler* const _eventHandler,
         std::chrono::milliseconds _timeout = std::chrono::milliseconds::zero(),
         std::atomic<int>* const _taskCompletionEvent = nullptr,
-        nx::utils::MoveOnlyFunc<void()> _taskCompletionHandler = nx::utils::MoveOnlyFunc<void()>())
+        nx::MoveOnlyFunc<void()> _taskCompletionHandler = nx::MoveOnlyFunc<void()>())
         :
         type(_type),
         socket(_socket),
@@ -106,7 +106,7 @@ class PostAsyncCallTask:
 public:
     PostAsyncCallTask(
         Pollable* const _socket,
-        nx::utils::MoveOnlyFunc<void()> _postHandler)
+        nx::MoveOnlyFunc<void()> _postHandler)
         :
         SocketAddRemoveTask(
             TaskType::tCallFunc,
@@ -215,7 +215,7 @@ public:
         aio::EventType eventToWatch,
         AIOEventHandler* eventHandler,
         std::chrono::milliseconds timeout,
-        nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler);
+        nx::MoveOnlyFunc<void()> socketAddedToPollHandler);
 
     std::size_t newReadMonitorTaskCount() const;
     std::size_t newWriteMonitorTaskCount() const;
@@ -232,13 +232,13 @@ public:
      * Install a callback to be executed right before invoking a function.
      */
     void setAboutToInvoke(
-        nx::utils::MoveOnlyFunc<void(const char* /*functionType*/)> handler);
+        nx::MoveOnlyFunc<void(const char* /*functionType*/)> handler);
 
     /**
      * Install a callback to be executed right after invoking a function.
      */
     void setDoneInvoking(
-        nx::utils::MoveOnlyFunc<void(std::chrono::microseconds /*average*/)> handler);
+        nx::MoveOnlyFunc<void(std::chrono::microseconds /*average*/)> handler);
 
     //---------------------------------------------------------------------------------------------
     // Methods that are called within the corresponding AIO thread only.
@@ -297,8 +297,8 @@ private:
     std::atomic<std::size_t> m_newReadMonitorTaskCount = 0;
     std::atomic<std::size_t> m_newWriteMonitorTaskCount = 0;
     std::atomic<std::chrono::microseconds> m_averageExecutionTimePerLastPeriod;
-    nx::utils::MoveOnlyFunc<void(const char* /*functionType*/)> m_aboutToInvokeHandler;
-    nx::utils::MoveOnlyFunc<void(std::chrono::microseconds /*average*/)> m_doneInvokingHandler;
+    nx::MoveOnlyFunc<void(const char* /*functionType*/)> m_aboutToInvokeHandler;
+    nx::MoveOnlyFunc<void(std::chrono::microseconds /*average*/)> m_doneInvokingHandler;
 
     void addTask(
         const nx::Locker<nx::Mutex>&,

@@ -22,7 +22,7 @@ struct NX_NETWORK_API SendBodyContext
 {
     std::unique_ptr<AbstractMsgBodySourceWithCache> msgBody;
     std::unique_ptr<aio::detail::AsyncChannelUnidirectionalBridge> bridge;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler;
 
 private:
     nx::network::debug::ObjectInstanceCounter<SendBodyContext> m_instanceCounter;
@@ -58,7 +58,7 @@ public:
     void sendMessage(
         Message msg,
         std::unique_ptr<AbstractMsgBodySourceWithCache> msgBody,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -70,7 +70,7 @@ private:
 
     void sendBodyAsync(
         std::unique_ptr<AbstractMsgBodySourceWithCache> msgBody,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
     void finishSendingBody(int id, SystemError::ErrorCode result);
 };

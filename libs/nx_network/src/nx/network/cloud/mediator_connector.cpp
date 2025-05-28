@@ -108,7 +108,7 @@ std::optional<SystemCredentials> MediatorConnector::getSystemCredentials() const
 }
 
 void MediatorConnector::fetchAddress(
-    nx::utils::MoveOnlyFunc<void(
+    nx::MoveOnlyFunc<void(
         nx::network::http::StatusCode::Value /*resultCode*/,
         MediatorAddress /*address*/)> handler)
 {
@@ -136,7 +136,7 @@ std::optional<MediatorAddress> MediatorConnector::address() const
 }
 
 void MediatorConnector::subsribeToSystemCredentialsSet(
-    nx::utils::MoveOnlyFunc<void(std::optional<SystemCredentials>)> handler,
+    nx::MoveOnlyFunc<void(std::optional<SystemCredentials>)> handler,
     nx::utils::SubscriptionId* outId)
 {
     m_credentialsSetEvent.subscribe(std::move(handler), outId);
@@ -148,7 +148,7 @@ void MediatorConnector::unsubscribeFromSystemCredentialsSet(nx::utils::Subscript
 }
 
 void MediatorConnector::setOnConnectionClosedHandler(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_stunClient->addOnConnectionClosedHandler(std::move(handler), this);
 }

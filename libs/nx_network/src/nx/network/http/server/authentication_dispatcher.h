@@ -45,7 +45,7 @@ public:
      */
     void add(
         const std::regex& pathPattern,
-        nx::utils::MoveOnlyFunc<bool(const RequestContext&)> auxiliaryCondition,
+        nx::MoveOnlyFunc<bool(const RequestContext&)> auxiliaryCondition,
         AbstractRequestHandler* authenticator);
 
     void add(
@@ -54,7 +54,7 @@ public:
 
     virtual void serve(
         RequestContext requestContext,
-        nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler) override;
+        nx::MoveOnlyFunc<void(RequestResult)> completionHandler) override;
 
     virtual void pleaseStopSync() override {}
 
@@ -62,7 +62,7 @@ private:
     struct AuthenticatorContext
     {
         std::regex pathPattern;
-        nx::utils::MoveOnlyFunc<bool(const RequestContext&)> cond = nullptr;
+        nx::MoveOnlyFunc<bool(const RequestContext&)> cond = nullptr;
         AbstractRequestHandler* authenticator = nullptr;
     };
 

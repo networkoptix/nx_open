@@ -70,7 +70,7 @@ cf::future<std::size_t> AbstractAsyncChannel::send(const Buffer* buffer)
 
 void AbstractAsyncChannel::cancelIOAsync(
     nx::network::aio::EventType eventType,
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::MoveOnlyFunc<void()> handler)
 {
     this->post(
         [this, eventType, handler = std::move(handler)]()

@@ -68,7 +68,7 @@ void UplinkSpeedReporter::bindToAioThread(aio::AbstractAioThread* aioThread)
 }
 
 void UplinkSpeedReporter::setAboutToRunSpeedTestHandler(
-    nx::utils::MoveOnlyFunc<void(bool)> handler)
+    nx::MoveOnlyFunc<void(bool)> handler)
 {
     m_aboutToRunSpeedTestHandler = std::move(handler);
 }

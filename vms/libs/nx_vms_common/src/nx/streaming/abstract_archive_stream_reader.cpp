@@ -242,7 +242,7 @@ void QnAbstractArchiveStreamReader::run()
 }
 
 void QnAbstractArchiveStreamReader::setNoDataHandler(
-    nx::utils::MoveOnlyFunc<void()> noDataHandler)
+    nx::MoveOnlyFunc<void()> noDataHandler)
 {
     m_noDataHandler = std::move(noDataHandler);
 }

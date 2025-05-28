@@ -90,7 +90,7 @@ public:
         return m_itemByUuid.contains(uuid);
     }
 
-    bool hasItemWithCondition(nx::utils::MoveOnlyFunc<bool(const T& item)> predicate)
+    bool hasItemWithCondition(nx::MoveOnlyFunc<bool(const T& item)> predicate)
     {
         NX_MUTEX_LOCKER locker(m_mutex);
         for (auto it = m_itemByUuid.begin(); it != m_itemByUuid.end(); ++it)

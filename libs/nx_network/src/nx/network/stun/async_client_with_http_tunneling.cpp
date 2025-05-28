@@ -196,7 +196,7 @@ void AsyncClientWithHttpTunneling::closeConnection(SystemError::ErrorCode reason
 
 void AsyncClientWithHttpTunneling::cancelHandlers(
     void* client,
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::MoveOnlyFunc<void()> handler)
 {
     post(
         [this, client, handler = std::move(handler)]() mutable
@@ -278,7 +278,7 @@ void AsyncClientWithHttpTunneling::connectInternal(
                 applyConnectionSettings();
             handler(sysErrorCode);
             if (m_userConnectHandler)
-                nx::utils::swapAndCall(m_userConnectHandler, sysErrorCode);
+                nx::swapAndCall(m_userConnectHandler, sysErrorCode);
         };
 
     if (http::isUrlScheme(m_url.scheme()))
@@ -398,7 +398,7 @@ void AsyncClientWithHttpTunneling::onOpenHttpTunnelCompletion(
         {
             if (resultCode != SystemError::noError)
                 closeConnection(resultCode);
-            nx::utils::swapAndCall(m_httpTunnelEstablishedHandler, resultCode);
+            nx::swapAndCall(m_httpTunnelEstablishedHandler, resultCode);
         });
 
     auto httpTunnelingClient = std::exchange(m_httpTunnelingClient, nullptr);

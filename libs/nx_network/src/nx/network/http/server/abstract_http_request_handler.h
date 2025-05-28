@@ -32,7 +32,7 @@ public:
      */
     virtual void serve(
         network::http::RequestContext requestContext,
-        nx::utils::MoveOnlyFunc<void(network::http::RequestResult)> completionHandler) = 0;
+        nx::MoveOnlyFunc<void(network::http::RequestResult)> completionHandler) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------

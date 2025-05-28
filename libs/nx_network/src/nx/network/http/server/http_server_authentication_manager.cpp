@@ -39,7 +39,7 @@ void AuthenticationManager::pleaseStopSync()
 
 void AuthenticationManager::serve(
     RequestContext ctx,
-    nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler)
+    nx::MoveOnlyFunc<void(RequestResult)> completionHandler)
 {
     std::optional<header::DigestAuthorization> authzHeader;
     const bool isProxy = this->isProxy(ctx.request.requestLine.method);

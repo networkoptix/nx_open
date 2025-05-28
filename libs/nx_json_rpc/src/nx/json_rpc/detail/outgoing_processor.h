@@ -20,16 +20,16 @@ class OutgoingProcessor
 {
 public:
     using Id = std::variant<QString, int>;
-    using SendFunc = nx::utils::MoveOnlyFunc<void(std::string)>;
+    using SendFunc = nx::MoveOnlyFunc<void(std::string)>;
     OutgoingProcessor(SendFunc sendFunc): m_sendFunc(std::move(sendFunc)) {}
     ~OutgoingProcessor() { clear(SystemError::interrupted); }
 
     void clear(SystemError::ErrorCode error);
 
-    using ResponseHandler = nx::utils::MoveOnlyFunc<void(Response)>;
+    using ResponseHandler = nx::MoveOnlyFunc<void(Response)>;
     void processRequest(Request request, ResponseHandler handler, std::string serializedRequest);
 
-    using BatchResponseHandler = nx::utils::MoveOnlyFunc<void(std::vector<Response>)>;
+    using BatchResponseHandler = nx::MoveOnlyFunc<void(std::vector<Response>)>;
     void processBatchRequest(std::vector<Request> jsonRpcRequests, BatchResponseHandler handler);
 
     void onResponse(rapidjson::Document data);

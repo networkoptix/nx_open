@@ -24,7 +24,7 @@ template<typename TimerId, typename... TimerFuncArgs>
 class ElapsedTimerPool
 {
 public:
-    using TimerFunction = nx::utils::MoveOnlyFunc<
+    using TimerFunction = nx::MoveOnlyFunc<
         void(TimerId /*timerId*/, TimerFuncArgs...)>;
 
     ElapsedTimerPool(TimerFunction timerFunction):

@@ -33,8 +33,8 @@ public:
     //---------------------------------------------------------------------------------------------
     // Implementation of AbstractSocket::*
     virtual Pollable* pollable() override;
-    virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void post(nx::MoveOnlyFunc<void()> handler) override;
+    virtual void dispatch(nx::MoveOnlyFunc<void()> handler) override;
     virtual bool bind(const SocketAddress& localAddress) override;
     virtual SocketAddress getLocalAddress() const override;
     virtual bool close() override;
@@ -66,7 +66,7 @@ public:
 
     //---------------------------------------------------------------------------------------------
     // Implementation of QnStoppable::*
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync() override;
 
     //---------------------------------------------------------------------------------------------

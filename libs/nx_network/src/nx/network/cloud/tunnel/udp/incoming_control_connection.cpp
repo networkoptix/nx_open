@@ -37,14 +37,14 @@ void IncomingControlConnection::bindToAioThread(aio::AbstractAioThread* aioThrea
 }
 
 void IncomingControlConnection::setErrorHandler(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     NX_ASSERT(m_socket->isInSelfAioThread());
     m_errorHandler = std::move(handler);
 }
 
 void IncomingControlConnection::start(
-    nx::utils::MoveOnlyFunc<void()> selectedHandler)
+    nx::MoveOnlyFunc<void()> selectedHandler)
 {
     NX_ASSERT(m_socket->isInSelfAioThread());
     m_selectedHandler = std::move(selectedHandler);
@@ -189,7 +189,7 @@ void IncomingControlConnection::processRequest()
 void IncomingControlConnection::reportError(SystemError::ErrorCode code)
 {
     if (m_errorHandler)
-        nx::utils::swapAndCall(m_errorHandler, code);
+        nx::swapAndCall(m_errorHandler, code);
 }
 
 hpm::api::UdpHolePunchingSynResponse IncomingControlConnection::process(
@@ -218,7 +218,7 @@ hpm::api::TunnelConnectionChosenResponse IncomingControlConnection::process(
 void IncomingControlConnection::notifyOnConnectionSelectedIfNeeded()
 {
     if (m_selectedHandler)
-        nx::utils::moveAndCall(m_selectedHandler);
+        nx::moveAndCall(m_selectedHandler);
 }
 
 } // namespace nx::network::cloud::udp

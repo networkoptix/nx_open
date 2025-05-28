@@ -43,7 +43,7 @@ class AbstractMediatorEndpointProvider:
 
 public:
     using FetchMediatorEndpointsCompletionHandler =
-        nx::utils::MoveOnlyFunc<void(
+        nx::MoveOnlyFunc<void(
             nx::network::http::StatusCode::Value /*resultCode*/)>;
 
     /**

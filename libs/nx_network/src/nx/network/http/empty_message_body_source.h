@@ -25,7 +25,7 @@ public:
      * Always reports end-of-stream
      */
     virtual void readAsync(
-        nx::utils::MoveOnlyFunc<
+        nx::MoveOnlyFunc<
             void(SystemError::ErrorCode, nx::Buffer)> completionHandler) override;
 
 private:

@@ -62,7 +62,7 @@ public:
     }
 
     virtual void setControlConnectionClosedHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
         m_onClosedHandler = std::move(handler);
     }
@@ -78,7 +78,7 @@ public:
     }
 
 private:
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onClosedHandler;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onClosedHandler;
     std::tuple<OutgoingTunnelConnectionArgs...> m_args;
 };
 

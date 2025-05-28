@@ -21,7 +21,7 @@ using CertificateChainView = std::vector<CertificateView>;
 using VerifyCertificateFunc = std::function<bool(CertificateChainView)>;
 using VerifyCertificateAsyncFunc = std::function<void(
     CertificateChainView,
-    nx::utils::MoveOnlyFunc<void(bool)>)>;
+    nx::MoveOnlyFunc<void(bool)>)>;
 
 NX_NETWORK_API bool verifyBySystemCertificates(
     const CertificateChainView& chain,

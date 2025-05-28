@@ -20,10 +20,10 @@ class NX_JSON_RPC_API WebSocketClient: public nx::network::aio::BasicPollable
 {
 public:
     using base_type = nx::network::aio::BasicPollable;
-    using ResponseHandler = nx::utils::MoveOnlyFunc<void(Response)>;
+    using ResponseHandler = nx::MoveOnlyFunc<void(Response)>;
     using RequestHandler =
-        nx::utils::MoveOnlyFunc<void(Request, ResponseHandler, WebSocketConnection*)>;
-    using OnDone = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, WebSocketConnection*)>;
+        nx::MoveOnlyFunc<void(Request, ResponseHandler, WebSocketConnection*)>;
+    using OnDone = nx::MoveOnlyFunc<void(SystemError::ErrorCode, WebSocketConnection*)>;
 
     WebSocketClient(
         nx::Url url,
@@ -39,7 +39,7 @@ public:
     virtual ~WebSocketClient() override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     void setHandler(RequestHandler handler);
-    void connectAsync(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+    void connectAsync(nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
     void sendAsync(Request request, ResponseHandler handler);
     void setOnDone(OnDone onDone) { m_onDone = std::move(onDone); }
 
@@ -48,7 +48,7 @@ private:
     void onUpgrade();
 
 private:
-    std::vector<nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>> m_connectHandlers;
+    std::vector<nx::MoveOnlyFunc<void(SystemError::ErrorCode)>> m_connectHandlers;
     nx::Url m_url;
     RequestHandler m_handler;
     std::unique_ptr<nx::network::http::AsyncClient> m_handshakeClient;

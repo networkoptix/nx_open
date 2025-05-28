@@ -26,18 +26,18 @@ namespace nx::utils::fs {
 #endif
 
 using StatHandler =
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, FileStat fileStat)>;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode, FileStat fileStat)>;
 
 using OpenHandler =
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)>;
 
 using CloseHandler =
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)>;
 
 using ReadAllHandler =
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, nx::Buffer)>;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode, nx::Buffer)>;
 
-using IoCompletionHandler = nx::utils::MoveOnlyFunc<
+using IoCompletionHandler = nx::MoveOnlyFunc<
     void(SystemError::ErrorCode /*errorCode*/, std::size_t /*bytesTransferred*/)>;
 
 class AbstractTask;
@@ -85,7 +85,7 @@ public:
      * Executes handler in the same thread that is used for I/O operations.
      * May be used for delayed file object destruction.
      */
-    void post(nx::utils::MoveOnlyFunc<void()> handler);
+    void post(nx::MoveOnlyFunc<void()> handler);
 
 private:
     void taskProcessingThread();

@@ -39,7 +39,7 @@ class NX_NETWORK_API AbstractTunnelConnector:
     public aio::BasicPollable
 {
 public:
-    using ConnectCompletionHandler = nx::utils::MoveOnlyFunc<void(TunnelConnectResult)>;
+    using ConnectCompletionHandler = nx::MoveOnlyFunc<void(TunnelConnectResult)>;
 
     /**
      * Helps to decide which method shall be used first.

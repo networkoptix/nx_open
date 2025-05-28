@@ -18,7 +18,7 @@ public:
     /**
      * @param utcMillis UTC time received. Undefined if sysErrorCode is not SystemError::noError.
      */
-    using CompletionHandler = nx::utils::MoveOnlyFunc<
+    using CompletionHandler = nx::MoveOnlyFunc<
         void(qint64 /*utcMillis*/, SystemError::ErrorCode /*sysErrorCode*/, std::chrono::milliseconds rtt)>;
 
     virtual ~AbstractAccurateTimeFetcher() = default;

@@ -24,7 +24,7 @@ std::optional<uint64_t> EmptyMessageBodySource::contentLength() const
 }
 
 void EmptyMessageBodySource::readAsync(
-    nx::utils::MoveOnlyFunc<
+    nx::MoveOnlyFunc<
         void(SystemError::ErrorCode, nx::Buffer)> completionHandler)
 {
     post(

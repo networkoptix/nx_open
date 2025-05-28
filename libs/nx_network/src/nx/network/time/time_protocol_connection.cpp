@@ -54,7 +54,7 @@ void TimeProtocolConnection::startReadingConnection(
 }
 
 void TimeProtocolConnection::registerCloseHandler(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, bool)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode, bool)> handler)
 {
     m_connectionClosedHandlers.push_back(std::move(handler));
 }

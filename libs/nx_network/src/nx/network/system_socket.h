@@ -102,8 +102,8 @@ public:
     virtual bool setIpv6Only(bool val) override;
 
     virtual Pollable* pollable() override;
-    virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void post(nx::MoveOnlyFunc<void()> handler) override;
+    virtual void dispatch(nx::MoveOnlyFunc<void()> handler) override;
 
     bool createSocket(int type, int protocol);
 
@@ -163,7 +163,7 @@ public:
 
     virtual void connectAsync(
         const SocketAddress& addr,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
     virtual bool isConnected() const override;
 
@@ -181,7 +181,7 @@ public:
 
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,
-        nx::utils::MoveOnlyFunc<void()> handler) override;
+        nx::MoveOnlyFunc<void()> handler) override;
 
     virtual bool close() override;
     virtual bool shutdown() override;
@@ -266,7 +266,7 @@ public:
 
     virtual bool listen(int queueLen = AbstractStreamServerSocket::kDefaultBacklogSize) override;
     virtual std::unique_ptr<AbstractStreamSocket> accept() override;
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc< void() > handler) override;
     virtual void pleaseStopSync() override;
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
@@ -338,7 +338,7 @@ public:
     virtual void sendToAsync(
         const nx::Buffer* buf,
         const SocketAddress& foreignAddress,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) override;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) override;
 
     /**
      * Actually calls UDPSocket::recvFrom and makes datagram source address/port
@@ -353,7 +353,7 @@ public:
 
     virtual void recvFromAsync(
         nx::Buffer* const buf,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> handler) override;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> handler) override;
 
     virtual SocketAddress lastDatagramSourceAddress() const override;
     virtual bool hasData() const override;

@@ -14,7 +14,7 @@
 
 namespace nx::network::aio {
 
-using TimerEventHandler = nx::utils::MoveOnlyFunc<void()>;
+using TimerEventHandler = nx::MoveOnlyFunc<void()>;
 
 /**
  * Single-shot timer that runs in aio thread.
@@ -47,7 +47,7 @@ public:
 
     std::optional<std::chrono::nanoseconds> timeToEvent() const;
 
-    void cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler);
+    void cancelAsync(nx::MoveOnlyFunc<void()> completionHandler);
 
     /**
      * Future-based wrapper for cancelAsync.

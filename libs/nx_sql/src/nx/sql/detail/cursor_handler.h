@@ -29,9 +29,9 @@ class CursorHandler:
     public AbstractCursorHandler
 {
 public:
-    using PrepareCursorFunc = nx::utils::MoveOnlyFunc<void(SqlQuery*)>;
-    using ReadRecordFunc = nx::utils::MoveOnlyFunc<void(SqlQuery*, Record*)>;
-    using CursorCreatedHandler = nx::utils::MoveOnlyFunc<void(DBResult, nx::Uuid /*cursorId*/)>;
+    using PrepareCursorFunc = nx::MoveOnlyFunc<void(SqlQuery*)>;
+    using ReadRecordFunc = nx::MoveOnlyFunc<void(SqlQuery*, Record*)>;
+    using CursorCreatedHandler = nx::MoveOnlyFunc<void(DBResult, nx::Uuid /*cursorId*/)>;
 
     CursorHandler(
         PrepareCursorFunc prepareCursorFunc,
@@ -58,11 +58,11 @@ public:
         {
             m_prepareCursorFunc(m_query.get());
             m_query->exec();
-            nx::utils::swapAndCall(m_cursorCreatedHandler, DBResultCode::ok, m_id);
+            nx::swapAndCall(m_cursorCreatedHandler, DBResultCode::ok, m_id);
         }
         catch (const Exception& e)
         {
-            nx::utils::swapAndCall(m_cursorCreatedHandler, e.dbResult(), nx::Uuid());
+            nx::swapAndCall(m_cursorCreatedHandler, e.dbResult(), nx::Uuid());
             throw;
         }
     }
@@ -79,7 +79,7 @@ public:
     virtual void reportErrorWithoutExecution(DBResult errorCode) override
     {
         if (m_cursorCreatedHandler)
-            nx::utils::swapAndCall(m_cursorCreatedHandler, errorCode, nx::Uuid());
+            nx::swapAndCall(m_cursorCreatedHandler, errorCode, nx::Uuid());
     }
 
 private:
@@ -171,7 +171,7 @@ class FetchNextRecordFromCursorTask:
 public:
     FetchNextRecordFromCursorTask(
         nx::Uuid cursorId,
-        nx::utils::MoveOnlyFunc<void(DBResult, Record)> completionHandler)
+        nx::MoveOnlyFunc<void(DBResult, Record)> completionHandler)
         :
         m_cursorId(std::move(cursorId)),
         m_completionHandler(std::move(completionHandler))
@@ -203,7 +203,7 @@ public:
 
 private:
     const nx::Uuid m_cursorId;
-    nx::utils::MoveOnlyFunc<void(DBResult, Record)> m_completionHandler;
+    nx::MoveOnlyFunc<void(DBResult, Record)> m_completionHandler;
     std::optional<Record> m_record;
 };
 

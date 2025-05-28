@@ -133,7 +133,7 @@ void Pipeline::setVerifyCertificateChainCallback(VerifyCertificateChainCallback 
         SSL_set_verify(m_ssl.get(), SSL_VERIFY_NONE, nullptr);
 }
 
-void Pipeline::pauseDataProcessingAfterHandshake(nx::utils::MoveOnlyFunc<void()> completionHandler)
+void Pipeline::pauseDataProcessingAfterHandshake(nx::MoveOnlyFunc<void()> completionHandler)
 {
     if (m_state >= State::handshakeDone)
     {
@@ -234,7 +234,7 @@ int Pipeline::performHandshakeInternal()
         if (m_isPausePending.compare_exchange_strong(expected, false))
         {
             m_isPaused = true;
-            nx::utils::swapAndCall(m_onIoPausedAfterHandshake);
+            nx::swapAndCall(m_onIoPausedAfterHandshake);
         }
     }
 

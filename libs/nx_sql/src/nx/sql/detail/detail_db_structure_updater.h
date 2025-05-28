@@ -24,7 +24,7 @@ namespace nx::sql::detail {
 class NX_SQL_API DbStructureUpdater
 {
 public:
-    using UpdateFunc = nx::utils::MoveOnlyFunc<DBResult(QueryContext*)>;
+    using UpdateFunc = nx::MoveOnlyFunc<DBResult(QueryContext*)>;
 
     DbStructureUpdater(const std::string& schemaName);
 

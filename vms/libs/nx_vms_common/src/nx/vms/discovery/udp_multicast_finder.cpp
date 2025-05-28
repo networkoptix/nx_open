@@ -144,7 +144,7 @@ void UdpMulticastFinder::updateInterfaces()
     m_updateTimer.dispatch([this]() { updateInterfacesInAioThread(); });
 }
 
-void UdpMulticastFinder::setIsMulticastEnabledFunction(utils::MoveOnlyFunc<bool()> function)
+void UdpMulticastFinder::setIsMulticastEnabledFunction(nx::MoveOnlyFunc<bool()> function)
 {
     m_updateTimer.dispatch(
         [this, function = std::move(function)]() mutable

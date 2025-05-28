@@ -14,7 +14,7 @@ class Connection: public ConnectionBase, public /*mixin*/ nx::vms::common::Syste
 {
 public:
     using ValidateRemotePeerFunc =
-        nx::utils::MoveOnlyFunc<bool(const vms::api::PeerDataEx&)>;
+        nx::MoveOnlyFunc<bool(const vms::api::PeerDataEx&)>;
 
     using UnauthorizedWatcher = std::function<std::vector<nx::utils::Guard>(
         const nx::network::rest::UserAccessData& userAccessData, std::function<void()> handler)>;

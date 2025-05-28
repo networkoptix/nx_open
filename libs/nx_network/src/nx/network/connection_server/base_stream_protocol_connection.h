@@ -91,7 +91,7 @@ public:
      */
     void sendMessage(
         Message msg,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
         auto newTask = std::make_unique<SendTask>(
             std::move(msg),
@@ -106,7 +106,7 @@ public:
 
     void sendData(
         nx::Buffer data,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
         auto newTask = std::make_unique<SendTask>(
             std::move(data),
@@ -194,7 +194,7 @@ protected:
     }
 
 private:
-    using SendHandler = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>;
+    using SendHandler = nx::MoveOnlyFunc<void(SystemError::ErrorCode)>;
 
     struct SendTask
     {
@@ -481,7 +481,7 @@ template<
 
 public:
     using OnConnectionClosedHandler =
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode /*closeReason*/)>;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode /*closeReason*/)>;
 
     StreamProtocolConnection(
         std::unique_ptr<AbstractStreamSocket> streamSocket)

@@ -36,7 +36,7 @@ public:
     virtual ~BaseQueryExecutor() = default;
 
     virtual ConnectionState state() const = 0;
-    virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) = 0;
+    virtual void setOnClosedHandler(nx::MoveOnlyFunc<void()> handler) = 0;
 
     /**
      * @param connectDelay Delay before connection to the DB.

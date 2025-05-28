@@ -102,7 +102,7 @@ public:
      * NOTE: In most cases, you don't need to override this.
      * Override BasicPollable::stopWhileInAioThread instead.
      */
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> completionHandler) override;
 
     /**
      * If called within object's AIO thread (returned by getAioThread()) then cancells all
@@ -128,14 +128,14 @@ public:
      * Posts func to be called in object's AIO thread ASAP.
      * Returns immediately (without waiting for func to be executed).
      */
-    virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
+    virtual void post(nx::MoveOnlyFunc<void()> func) override;
 
     /**
      * If called within AIO thread (same as returned by getAioThread()) then func is executed
      * right in this call and dispatch returns after that.
      * Otherwise, invokes BasicPollable::post.
      */
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
+    virtual void dispatch(nx::MoveOnlyFunc<void()> func) override;
 
     /**
      * @return true if called within same thread as reported by getAioThread().
@@ -146,7 +146,7 @@ public:
      * @param completionHandler Will be called in object's AIO thread (returned by getAioThread())
      * after completion or cancellation of every call posted with BasicPollable::post.
      */
-    void cancelPostedCalls(nx::utils::MoveOnlyFunc<void()> completionHandler);
+    void cancelPostedCalls(nx::MoveOnlyFunc<void()> completionHandler);
 
     /**
      * When called from object's AIO thread, then cancells all posted calls immediately and returns.

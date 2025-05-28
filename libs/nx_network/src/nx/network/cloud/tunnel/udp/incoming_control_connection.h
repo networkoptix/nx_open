@@ -34,13 +34,13 @@ public:
     /**
      * This handler is called when an error occurs (so the object is not useful any more).
      */
-    void setErrorHandler(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+    void setErrorHandler(nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
     /**
      * Starts reading the socket and processes events.
      * @param selectedHandler is called when this connection is selected by client.
      */
-    void start(utils::MoveOnlyFunc<void()> selectedHandler);
+    void start(nx::MoveOnlyFunc<void()> selectedHandler);
 
     AbstractStreamSocket* socket();
     std::unique_ptr<AbstractStreamSocket> takeSocket();
@@ -69,8 +69,8 @@ private:
     const std::chrono::milliseconds m_maxKeepAliveInterval;
 
     std::chrono::steady_clock::time_point m_lastKeepAliveTime;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_errorHandler;
-    nx::utils::MoveOnlyFunc<void()> m_selectedHandler;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_errorHandler;
+    nx::MoveOnlyFunc<void()> m_selectedHandler;
 
     Buffer m_recvBuffer;
     Buffer m_sendBuffer;

@@ -48,7 +48,7 @@ public:
 
     virtual void connectAsync(
         const SocketAddress& /*address*/,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
         NX_ASSERT(false);
         this->post(

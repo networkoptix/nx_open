@@ -19,7 +19,7 @@ public:
     StreamSocketStub();
     ~StreamSocketStub();
 
-    virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
+    virtual void post(nx::MoveOnlyFunc<void()> func) override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     virtual void readSomeAsync(

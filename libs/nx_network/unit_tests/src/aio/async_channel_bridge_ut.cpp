@@ -46,7 +46,7 @@ protected:
     }
 
     void setAdditionalOnBridgeDoneHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
         m_additionalOnBridgeDoneHandler = std::move(handler);
     }
@@ -157,7 +157,7 @@ private:
     std::unique_ptr<AsyncChannel> m_rightFile;
     nx::utils::promise<SystemError::ErrorCode> m_bridgeDone;
     std::optional<std::chrono::milliseconds> m_inactivityTimeout;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_additionalOnBridgeDoneHandler;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_additionalOnBridgeDoneHandler;
 
     void createChannel(AsyncChannel::InputDepletionPolicy inputDepletionPolicy)
     {

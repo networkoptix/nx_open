@@ -175,7 +175,7 @@ void ModuleConnector::InformationReader::start(const nx::network::SocketAddress&
             m_httpClient.reset();
             if (!client->hasRequestSucceeded())
             {
-                return nx::utils::swapAndCall(m_handler, std::nullopt,
+                return nx::swapAndCall(m_handler, std::nullopt,
                     nx::format("HTTP request has failed: [%1], http code [%2]").args(
                         SystemError::toString(client->lastSysErrorCode()),
                         client->response() ? client->response()->statusLine.statusCode : 0));
@@ -187,7 +187,7 @@ void ModuleConnector::InformationReader::start(const nx::network::SocketAddress&
             if (!m_socket->setNonBlockingMode(true)
                 || !m_socket->setRecvTimeout(m_parent->m_disconnectTimeout))
             {
-                return nx::utils::swapAndCall(
+                return nx::swapAndCall(
                     m_handler, std::nullopt, SystemError::getLastOSErrorText().c_str());
             }
 
@@ -237,15 +237,15 @@ void ModuleConnector::InformationReader::readUntilError()
         if (!QJson::deserialize(*object, &restResult)
             || restResult.errorId != nx::network::rest::ErrorId::ok)
         {
-            return nx::utils::swapAndCall(m_handler, std::nullopt, restResult.errorString);
+            return nx::swapAndCall(m_handler, std::nullopt, restResult.errorString);
         }
 
         nx::vms::api::ModuleInformationWithAddresses moduleInformation;
         if (!QJson::deserialize(restResult.reply, &moduleInformation))
-            return nx::utils::swapAndCall(m_handler, std::nullopt, "Deserialization has failed");
+            return nx::swapAndCall(m_handler, std::nullopt, "Deserialization has failed");
 
         if (moduleInformation.id.isNull())
-            return nx::utils::swapAndCall(m_handler, std::nullopt, "Module id is null");
+            return nx::swapAndCall(m_handler, std::nullopt, "Module id is null");
 
         const auto host = m_endpoint.address.toString();
         const bool isCloud = network::SocketGlobals::addressResolver().isCloudHostname(host);
@@ -254,7 +254,7 @@ void ModuleConnector::InformationReader::readUntilError()
             host, isCloud ? "" : "non-", isInvalid ? "in" : "", moduleInformation.cloudId());
         if (isInvalid)
         {
-            return nx::utils::swapAndCall(
+            return nx::swapAndCall(
                 m_handler, std::nullopt, "Invalid cloud host: " + moduleInformation.cloudId());
         }
 
@@ -270,10 +270,10 @@ void ModuleConnector::InformationReader::readUntilError()
         [this](SystemError::ErrorCode code, size_t size)
         {
             if (code != SystemError::noError)
-                return nx::utils::swapAndCall(m_handler, std::nullopt, SystemError::toString(code).c_str());
+                return nx::swapAndCall(m_handler, std::nullopt, SystemError::toString(code).c_str());
 
             if (size == 0)
-                return nx::utils::swapAndCall(m_handler, std::nullopt, "Peer has closed connection");
+                return nx::swapAndCall(m_handler, std::nullopt, "Peer has closed connection");
 
             readUntilError();
         });

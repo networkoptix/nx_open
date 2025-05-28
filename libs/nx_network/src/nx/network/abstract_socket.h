@@ -243,7 +243,7 @@ public:
      * in aio thread, it will be called after handler has returned.
      * NOTE: handler execution is cancelled if socket polling for every event is cancelled.
      */
-    virtual void post(nx::utils::MoveOnlyFunc<void()> handler) = 0;
+    virtual void post(nx::MoveOnlyFunc<void()> handler) = 0;
 
     /**
      * Call handler from within AIO thread the socket is bound to.
@@ -255,7 +255,7 @@ public:
      * is invoked.
      * NOTE: handler execution is cancelled if socket polling for every event is cancelled.
      */
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) = 0;
+    virtual void dispatch(nx::MoveOnlyFunc<void()> handler) = 0;
 
     /**
      * @return Pointer to AIO thread this socket is bound to.
@@ -277,7 +277,7 @@ public:
     virtual bool isInSelfAioThread() const;
 };
 
-using IoCompletionHandler = nx::utils::MoveOnlyFunc<
+using IoCompletionHandler = nx::MoveOnlyFunc<
     void(SystemError::ErrorCode /*errorCode*/, std::size_t /*bytesTransferred*/)>;
 
 /**
@@ -315,7 +315,7 @@ public:
      */
     virtual void connectAsync(
         const SocketAddress& address,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
 
     /**
      * Read into the given buffer up to bufferLen bytes from connected socket.
@@ -395,11 +395,11 @@ public:
      */
     virtual void registerTimer(
         std::chrono::milliseconds timeout,
-        nx::utils::MoveOnlyFunc<void()> handler) = 0;
+        nx::MoveOnlyFunc<void()> handler) = 0;
 
     void registerTimer(
         unsigned int timeoutMs,
-        nx::utils::MoveOnlyFunc<void()> handler);
+        nx::MoveOnlyFunc<void()> handler);
 
     /**
      * Cancel async socket operation. cancellationDoneHandler is invoked when cancelled.
@@ -408,7 +408,7 @@ public:
      */
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> handler) final;
+        nx::MoveOnlyFunc<void()> handler) final;
 
     /**
      * Cancels scheduled async operations with a given eventType (e.g., aio::etRead) and blocks
@@ -434,7 +434,7 @@ public:
      */
     void cancelWrite() { cancelIOSync(aio::etWrite); };
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> handler) override;
 
     virtual void pleaseStopSync() override;
 
@@ -512,10 +512,10 @@ public:
      */
     virtual bool getKeepAlive(std::optional<KeepAliveOptions>* result) const = 0;
 
-    void setBeforeDestroyCallback(nx::utils::MoveOnlyFunc<void()> callback);
+    void setBeforeDestroyCallback(nx::MoveOnlyFunc<void()> callback);
 
 private:
-    nx::utils::MoveOnlyFunc<void()> m_beforeDestroyCallback;
+    nx::MoveOnlyFunc<void()> m_beforeDestroyCallback;
 };
 
 /**
@@ -536,7 +536,7 @@ public:
      * Similar to AbstractCommunicatingSocket::connectAsync uses socket's send timeout.
      */
     virtual void handshakeAsync(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
 
     /**
      * @return "servername" TLS extension from ClientHello. Valid only for accepted socket.
@@ -545,7 +545,7 @@ public:
 };
 
 using AcceptCompletionHandler =
-    nx::utils::MoveOnlyFunc<void(
+    nx::MoveOnlyFunc<void(
         SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>)>;
 
 /**
@@ -589,7 +589,7 @@ public:
     /**
      * Cancel active AbstractStreamServerSocket::acceptAsync.
      */
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) final;
+    virtual void cancelIOAsync(nx::MoveOnlyFunc<void()> handler) final;
 
     /**
      * Cancel active AbstractStreamServerSocket::acceptAsync waiting for completion.
@@ -661,7 +661,7 @@ public:
     virtual void sendToAsync(
         const nx::Buffer* buf,
         const SocketAddress& targetAddress,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
 
     /**
      * Read up to bufferLen bytes data from this socket.
@@ -682,7 +682,7 @@ public:
      */
     virtual void recvFromAsync(
         nx::Buffer* const buf,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
 
     /**
      * @return Address of previous datagram read with

@@ -133,7 +133,7 @@ TestConnection::~TestConnection()
     --TestConnection_count;
 }
 
-void TestConnection::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void TestConnection::pleaseStop(nx::MoveOnlyFunc<void()> handler)
 {
     m_socket->pleaseStop(std::move(handler));
 }
@@ -214,7 +214,7 @@ void TestConnection::setReadBufferSize(size_t newSize)
 }
 
 void TestConnection::setOnFinishedEventHandler(
-    nx::utils::MoveOnlyFunc<void(int, TestConnection*, SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(int, TestConnection*, SystemError::ErrorCode)> handler)
 {
     m_finishedEventHandler = std::move(handler);
 }
@@ -573,7 +573,7 @@ void RandomDataTcpServer::setServerSocket(
     m_serverSocket = std::move(serverSock);
 }
 
-void RandomDataTcpServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void RandomDataTcpServer::pleaseStop(nx::MoveOnlyFunc<void()> handler)
 {
     m_serverSocket->pleaseStop(
         [this, handler = std::move(handler)]() mutable
@@ -603,7 +603,7 @@ void RandomDataTcpServer::setConnectionsReadBufferSize(size_t newSize)
 }
 
 void RandomDataTcpServer::setOnFinishedConnectionHandler(
-    nx::utils::MoveOnlyFunc<void (TestConnection *)> handler)
+    nx::MoveOnlyFunc<void (TestConnection *)> handler)
 {
     m_finishedConnectionHandler = std::move(handler);
 }
@@ -764,7 +764,7 @@ ConnectionsGenerator::~ConnectionsGenerator()
 }
 
 void ConnectionsGenerator::pleaseStop(
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::MoveOnlyFunc<void()> handler)
 {
     std::unique_lock<std::mutex> lk( m_mutex );
     m_terminated = true;
@@ -793,7 +793,7 @@ void ConnectionsGenerator::pleaseStop(
 }
 
 void ConnectionsGenerator::setOnFinishedHandler(
-    nx::utils::MoveOnlyFunc<void()> func)
+    nx::MoveOnlyFunc<void()> func)
 {
     m_onFinishedHandler = std::move(func);
 }
@@ -1024,7 +1024,7 @@ bool MultipleClientSocketTester::connect(
 
 void MultipleClientSocketTester::connectAsync(
     const SocketAddress& address,
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     TCPSocket::connectAsync(modifyAddress(address), std::move(handler));
 }

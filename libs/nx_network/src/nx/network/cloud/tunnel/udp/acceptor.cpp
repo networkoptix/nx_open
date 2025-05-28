@@ -79,7 +79,7 @@ void TunnelAcceptor::accept(AcceptHandler handler)
 }
 
 void TunnelAcceptor::pleaseStop(
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::MoveOnlyFunc<void()> handler)
 {
     m_mediatorConnection->pleaseStop(
         [this, handler = std::move(handler)]()
@@ -212,7 +212,7 @@ void TunnelAcceptor::executeAcceptHandler(
         return;
     }
 
-    nx::utils::swapAndCall(m_acceptHandler, code, std::move(connection));
+    nx::swapAndCall(m_acceptHandler, code, std::move(connection));
 }
 
 } // namespace nx::network::cloud::udp

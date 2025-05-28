@@ -57,24 +57,24 @@ public:
     virtual bool setKeepAlive( std::optional< KeepAliveOptions > info ) override;
     virtual bool getKeepAlive( std::optional< KeepAliveOptions >* result ) const override;
 
-    virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler ) override;
+    virtual void post( nx::MoveOnlyFunc<void()> handler ) override;
+    virtual void dispatch(nx::MoveOnlyFunc<void()> handler ) override;
 
     virtual void connectAsync(
         const SocketAddress& addr,
-        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler ) override;
+        nx::MoveOnlyFunc<void( SystemError::ErrorCode )> handler ) override;
 
     virtual void readSomeAsync(
         nx::Buffer* const buf,
-        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode, size_t )> handler ) override;
+        nx::MoveOnlyFunc<void( SystemError::ErrorCode, size_t )> handler ) override;
 
     virtual void sendAsync(
         const nx::Buffer* buf,
-        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode, size_t )> handler ) override;
+        nx::MoveOnlyFunc<void( SystemError::ErrorCode, size_t )> handler ) override;
 
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,
-        nx::utils::MoveOnlyFunc<void()> handler ) override;
+        nx::MoveOnlyFunc<void()> handler ) override;
 
     virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;

@@ -52,7 +52,7 @@ public:
     }
 
     virtual void readAsync(
-        nx::utils::MoveOnlyFunc<
+        nx::MoveOnlyFunc<
             void(SystemError::ErrorCode, nx::Buffer)> completionHandler) override
     {
         const std::size_t kReadBufferSize = 16 * 1024;
@@ -90,7 +90,7 @@ private:
     std::string m_mimeType;
     std::unique_ptr<AsyncChannel> m_channel;
     nx::Buffer m_readBuffer;
-    nx::utils::MoveOnlyFunc<
+    nx::MoveOnlyFunc<
         void(SystemError::ErrorCode, nx::Buffer)> m_completionHandler;
     std::optional<std::uint64_t> m_messageBodyLimit;
     std::uint64_t m_totalBytesSent = 0;
@@ -107,7 +107,7 @@ private:
     }
 
     void reportEndOfMessageBody(
-        nx::utils::MoveOnlyFunc<
+        nx::MoveOnlyFunc<
             void(SystemError::ErrorCode, nx::Buffer)> completionHandler)
     {
         return post(
@@ -135,7 +135,7 @@ private:
             readBuffer.size(), SystemError::toString(systemErrorCode), m_totalBytesSent,
             m_messageBodyLimit);
 
-        nx::utils::swapAndCall(
+        nx::swapAndCall(
             m_completionHandler,
             systemErrorCode,
             std::move(readBuffer));

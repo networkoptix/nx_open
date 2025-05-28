@@ -19,12 +19,12 @@
 namespace nx::network::http {
 
 using ContentProviderFactoryFunction =
-    nx::utils::MoveOnlyFunc<std::unique_ptr<nx::network::http::AbstractMsgBodySource>()>;
+    nx::MoveOnlyFunc<std::unique_ptr<nx::network::http::AbstractMsgBodySource>()>;
 
 class NX_NETWORK_API TestHttpServer
 {
 public:
-    using ProcessHttpRequestFunc = nx::utils::MoveOnlyFunc<void(
+    using ProcessHttpRequestFunc = nx::MoveOnlyFunc<void(
         nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::AttributeDictionary /*authInfo*/,
         nx::network::http::Request /*request*/,

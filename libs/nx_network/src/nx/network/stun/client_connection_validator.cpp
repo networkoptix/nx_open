@@ -76,7 +76,7 @@ void ClientConnectionValidator::processMessage(Message /*message*/)
     NX_VERBOSE(this, "STUN connection to %1 has been validated",
         m_connection->getForeignAddress());
 
-    nx::utils::swapAndCall(m_completionHandler, http::tunneling::ResultCode::ok);
+    nx::swapAndCall(m_completionHandler, http::tunneling::ResultCode::ok);
 }
 
 void ClientConnectionValidator::sendBindingRequest()
@@ -94,7 +94,7 @@ void ClientConnectionValidator::processConnectionClosure(
     m_messagePipeline->pleaseStopSync();
 
     if (m_completionHandler)
-        nx::utils::swapAndCall(m_completionHandler, http::tunneling::ResultCode::ioError);
+        nx::swapAndCall(m_completionHandler, http::tunneling::ResultCode::ioError);
 }
 
 } // namespace nx::network::stun

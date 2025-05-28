@@ -91,11 +91,11 @@ public:
     bool listen(int queueLen) override;
     std::unique_ptr<AbstractStreamSocket> accept() override;
 
-    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    void pleaseStop(nx::MoveOnlyFunc<void()> handler) override;
     void pleaseStopSync() override;
 
-    void post(nx::utils::MoveOnlyFunc<void()> handler) override;
-    void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
+    void post(nx::MoveOnlyFunc<void()> handler) override;
+    void dispatch(nx::MoveOnlyFunc<void()> handler) override;
     aio::AbstractAioThread* getAioThread() const override;
     void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -107,24 +107,24 @@ public:
      * Invokes listen on mediator.
      */
     void registerOnMediator(
-        nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> handler);
+        nx::MoveOnlyFunc<void(hpm::api::ResultCode)> handler);
 
     hpm::api::ResultCode registerOnMediatorSync();
     void setSupportedConnectionMethods(hpm::api::ConnectionMethods value);
 
-    void setOnAcceptorConnectionEstablished(nx::utils::MoveOnlyFunc<void(nx::Url)> handler);
+    void setOnAcceptorConnectionEstablished(nx::MoveOnlyFunc<void(nx::Url)> handler);
     /**
      * @Install a handler to notified when the socket experiences a connection error to the relay, e.g. if a connection
      * is closed or it fails to connect at all.
      */
-    void setOnAcceptorError(nx::utils::MoveOnlyFunc<void(AcceptorError)> handler);
+    void setOnAcceptorError(nx::MoveOnlyFunc<void(AcceptorError)> handler);
 
     /**
      * Install a handler to be notified when the connection to the mediator was closed. It is safe
      * to call getStatusReport within this handler. It must be installed before starting to listen.
      */
     void setOnMediatorConnectionClosed(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
     /**
      * Provides the current status of the listener. Note that the list of errors is cleared on
@@ -183,15 +183,15 @@ protected:
     mutable SystemError::ErrorCode m_lastError;
     AcceptCompletionHandler m_savedAcceptHandler;
     hpm::api::ConnectionMethods m_supportedConnectionMethods = 0xFFFF; //< No limits by default.
-    nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> m_registrationHandler;
+    nx::MoveOnlyFunc<void(hpm::api::ResultCode)> m_registrationHandler;
     AggregateAcceptor m_aggregateAcceptor;
     mutable nx::Mutex m_mutex;
     std::optional<CloudConnectListenerStatusReport> m_lastListenStatusReport;
     nx::hpm::api::CloudConnectVersion m_cloudConnectVersion =
         nx::hpm::api::kDefaultCloudConnectVersion;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onMediatorConnectionClosed;
-    nx::utils::MoveOnlyFunc<void(nx::Url/*remoteAddress*/)> m_onAcceptorConnectionEstablished;
-    nx::utils::MoveOnlyFunc<void(AcceptorError)> m_onAcceptorError;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onMediatorConnectionClosed;
+    nx::MoveOnlyFunc<void(nx::Url/*remoteAddress*/)> m_onAcceptorConnectionEstablished;
+    nx::MoveOnlyFunc<void(AcceptorError)> m_onAcceptorError;
 
 private:
     void stopWhileInAioThread();

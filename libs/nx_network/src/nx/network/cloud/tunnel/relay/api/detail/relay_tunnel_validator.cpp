@@ -120,14 +120,14 @@ void TunnelValidator::processRelayNotification(network::http::Message message)
     m_connection = m_httpConnection.takeSocket();
 
     if (m_handler)
-        nx::utils::swapAndCall(m_handler, resultCode);
+        nx::swapAndCall(m_handler, resultCode);
 }
 
 void TunnelValidator::handleConnectionClosure(
     SystemError::ErrorCode /*reason*/)
 {
     if (m_handler)
-        nx::utils::swapAndCall(m_handler, network::http::tunneling::ResultCode::ioError);
+        nx::swapAndCall(m_handler, network::http::tunneling::ResultCode::ioError);
 }
 
 } // namespace nx::cloud::relay::api::detail

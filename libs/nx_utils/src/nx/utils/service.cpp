@@ -56,13 +56,13 @@ void Service::pleaseStop()
 }
 
 void Service::setOnStartedEventHandler(
-    nx::utils::MoveOnlyFunc<void(bool /*isStarted*/)> handler)
+    nx::MoveOnlyFunc<void(bool /*isStarted*/)> handler)
 {
     m_startedEventHandler = std::move(handler);
 }
 
 void Service::setOnAbnormalTerminationDetected(
-    nx::utils::MoveOnlyFunc<void(ServiceStartInfo)> handler)
+    nx::MoveOnlyFunc<void(ServiceStartInfo)> handler)
 {
     m_abnormalTerminationHandler.swap(handler);
 }

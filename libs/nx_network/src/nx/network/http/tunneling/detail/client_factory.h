@@ -95,7 +95,7 @@ public:
     static ClientFactory& instance();
 
 private:
-    using InternalFactoryFunction = nx::utils::MoveOnlyFunc<
+    using InternalFactoryFunction = nx::MoveOnlyFunc<
         std::unique_ptr<BaseTunnelClient>(
             const nx::Url&,
             const ConnectOptions&,

@@ -27,7 +27,7 @@ AbstractMessageDispatcher::~AbstractMessageDispatcher()
 
 void AbstractMessageDispatcher::serve(
     RequestContext requestContext,
-    nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler)
+    nx::MoveOnlyFunc<void(RequestResult)> completionHandler)
 {
     auto sharedHandler = std::make_shared<decltype(completionHandler)>(std::move(completionHandler));
 

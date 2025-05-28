@@ -18,20 +18,20 @@ namespace nx::cloud::relay::api {
 // Client
 
 using BeginListeningHandler =
-    nx::utils::MoveOnlyFunc<void(
+    nx::MoveOnlyFunc<void(
         ResultCode,
         BeginListeningResponse,
         std::unique_ptr<network::AbstractStreamSocket>)>;
 
 using StartClientConnectSessionHandler =
-    nx::utils::MoveOnlyFunc<void(ResultCode, CreateClientSessionResponse)>;
+    nx::MoveOnlyFunc<void(ResultCode, CreateClientSessionResponse)>;
 
 using OpenRelayConnectionHandler =
-    nx::utils::MoveOnlyFunc<void(
+    nx::MoveOnlyFunc<void(
         ResultCode,
         std::unique_ptr<network::AbstractStreamSocket>)>;
 
-using ClientFeedbackFunction = nx::utils::MoveOnlyFunc<void(ResultCode)>;
+using ClientFeedbackFunction = nx::MoveOnlyFunc<void(ResultCode)>;
 
 //-------------------------------------------------------------------------------------------------
 

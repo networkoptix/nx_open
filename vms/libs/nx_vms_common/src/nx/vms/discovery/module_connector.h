@@ -22,14 +22,14 @@ namespace discovery {
 class NX_VMS_COMMON_API ModuleConnector: public nx::network::aio::BasicPollable
 {
 public:
-    typedef nx::utils::MoveOnlyFunc<void(
+    typedef nx::MoveOnlyFunc<void(
         api::ModuleInformationWithAddresses,
         nx::network::SocketAddress /*requestedEndpoint*/,
         nx::network::SocketAddress /*resolvedEndpoint*/
     )> ConnectedHandler;
 
-    typedef nx::utils::MoveOnlyFunc<void(nx::Uuid)> DisconnectedHandler;
-    typedef nx::utils::MoveOnlyFunc<void(api::ModuleInformation, api::ModuleInformation)> ConflictHandler;
+    typedef nx::MoveOnlyFunc<void(nx::Uuid)> DisconnectedHandler;
+    typedef nx::MoveOnlyFunc<void(api::ModuleInformation, api::ModuleInformation)> ConflictHandler;
 
     ModuleConnector(nx::network::aio::AbstractAioThread* thread = nullptr);
 

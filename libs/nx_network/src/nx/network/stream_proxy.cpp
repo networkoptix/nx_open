@@ -20,7 +20,7 @@ StreamProxy::~StreamProxy()
 }
 
 void StreamProxy::pleaseStop(
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     nx::utils::BarrierHandler barrierHandler(std::move(completionHandler));
 
@@ -144,7 +144,7 @@ void StreamProxy::removeProxyChannel(
 }
 
 void StreamProxy::stopProxyChannels(
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     nx::utils::BarrierHandler barrierHandler(std::move(completionHandler));
 
@@ -163,7 +163,7 @@ StreamProxyPool::~StreamProxyPool()
 }
 
 void StreamProxyPool::pleaseStop(
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     nx::utils::BarrierHandler barrierHandler(std::move(completionHandler));
 
@@ -322,7 +322,7 @@ void StreamProxyChannel::onConnectToTargetCompletion(
     {
         NX_DEBUG(this, nx::format("Proxy to %1. Failed to connect to the destination. %2")
             .args(m_destinationEndpoint, SystemError::toString(systemErrorCode)));
-        nx::utils::swapAndCall(m_completionHandler, systemErrorCode);
+        nx::swapAndCall(m_completionHandler, systemErrorCode);
         return;
     }
 
@@ -340,7 +340,7 @@ void StreamProxyChannel::onBridgeCompleted(
 {
     stopWhileInAioThread();
 
-    nx::utils::swapAndCall(m_completionHandler, completionCode);
+    nx::swapAndCall(m_completionHandler, completionCode);
 }
 
 } // namespace detail

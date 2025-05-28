@@ -74,7 +74,7 @@ public:
 
     virtual void cancelRead() override;
 
-    void setOnBeforeDestructionHandler(nx::utils::MoveOnlyFunc<void()> handler);
+    void setOnBeforeDestructionHandler(nx::MoveOnlyFunc<void()> handler);
 
     /**
      * @param data Empty buffer signals EOF.
@@ -91,9 +91,9 @@ public:
 private:
     const std::string m_mimeType;
     std::optional<uint64_t> m_contentLength;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, nx::Buffer)> m_readCompletionHandler;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode, nx::Buffer)> m_readCompletionHandler;
     nx::Buffer m_dataBuffer;
-    nx::utils::MoveOnlyFunc<void()> m_onBeforeDestructionHandler;
+    nx::MoveOnlyFunc<void()> m_onBeforeDestructionHandler;
     std::optional<SystemError::ErrorCode> m_eof;
     std::shared_ptr<MessageBodyWriter> m_writer;
 

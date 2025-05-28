@@ -9,7 +9,7 @@ namespace nx::sql {
 
 QueryScheduler::QueryScheduler(
     nx::sql::AbstractAsyncSqlQueryExecutor* queryExecutor,
-    nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*)> func)
+    nx::MoveOnlyFunc<void(nx::sql::QueryContext*)> func)
     :
     m_queryExecutor(queryExecutor),
     m_func(std::move(func))

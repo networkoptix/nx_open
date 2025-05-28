@@ -38,7 +38,7 @@ public:
         OnNewConnectionHandler handler) override;
 
     virtual void setControlConnectionClosedHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
     virtual ConnectType connectType() const override;
 
@@ -60,7 +60,7 @@ private:
     std::unique_ptr<nx::cloud::relay::api::AbstractClient> m_relayApiClient;
     nx::Mutex m_mutex;
     std::list<std::unique_ptr<RequestContext>> m_activeRequests;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_tunnelClosedHandler;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_tunnelClosedHandler;
     utils::InterruptionFlag m_objectDestructionFlag;
     std::optional<std::chrono::milliseconds> m_inactivityTimeout;
     nx::network::aio::Timer m_inactivityTimer;

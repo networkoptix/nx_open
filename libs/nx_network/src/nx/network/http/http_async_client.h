@@ -162,7 +162,7 @@ class NX_NETWORK_API AsyncClient:
     using base_type = nx::network::aio::BasicPollable;
 
 public:
-    using CustomRequestPrepareFunc = nx::utils::MoveOnlyFunc<void(Request* request)>;
+    using CustomRequestPrepareFunc = nx::MoveOnlyFunc<void(Request* request)>;
 
     static constexpr int UNLIMITED_RECONNECT_TRIES = -1;
 
@@ -192,10 +192,10 @@ public:
      * TODO: #akolesnikov Check if really needed.
      */
     void setOnRequestHasBeenSent(
-        nx::utils::MoveOnlyFunc<void(bool /*isRetryAfterUnauthorizedResponse*/)> handler);
+        nx::MoveOnlyFunc<void(bool /*isRetryAfterUnauthorizedResponse*/)> handler);
 
     /** Emitted when response headers has been read. */
-    void setOnResponseReceived(nx::utils::MoveOnlyFunc<void()> handler);
+    void setOnResponseReceived(nx::MoveOnlyFunc<void()> handler);
 
     /**
      * Message body buffer is not empty.
@@ -206,7 +206,7 @@ public:
      * WARNING: It is strongly recommended to call AsyncClient::fetchMessageBodyBuffer()
      *   every time on receiving this signal
     */
-    void setOnSomeMessageBodyAvailable(nx::utils::MoveOnlyFunc<void()> handler);
+    void setOnSomeMessageBodyAvailable(nx::MoveOnlyFunc<void()> handler);
 
     /**
      * Emitted when http request is done with any result
@@ -216,7 +216,7 @@ public:
      * NOTE: Some message body can still be stored in internal buffer.
      *   To read it, call AsyncClient::fetchMessageBodyBuffer.
      */
-    void setOnDone(nx::utils::MoveOnlyFunc<void()> handler);
+    void setOnDone(nx::MoveOnlyFunc<void()> handler);
 
     void setRequestBody(std::unique_ptr<AbstractMsgBodySource> body);
 
@@ -236,12 +236,12 @@ public:
      */
     void doGet(
         const nx::Url& url,
-        nx::utils::MoveOnlyFunc<void()> completionHandler);
+        nx::MoveOnlyFunc<void()> completionHandler);
 
     void doHead(const nx::Url& url);
     void doHead(
         const nx::Url& url,
-        nx::utils::MoveOnlyFunc<void()> completionHandler);
+        nx::MoveOnlyFunc<void()> completionHandler);
 
     /**
      * Start POST request to url.
@@ -254,10 +254,10 @@ public:
     void doPost(
         const nx::Url& url,
         std::unique_ptr<AbstractMsgBodySource> body,
-        nx::utils::MoveOnlyFunc<void()> completionHandler);
+        nx::MoveOnlyFunc<void()> completionHandler);
     void doPost(
         const nx::Url& url,
-        nx::utils::MoveOnlyFunc<void()> completionHandler);
+        nx::MoveOnlyFunc<void()> completionHandler);
 
     void doPut(const nx::Url& url);
     void doPut(
@@ -266,10 +266,10 @@ public:
     void doPut(
         const nx::Url& url,
         std::unique_ptr<AbstractMsgBodySource> body,
-        nx::utils::MoveOnlyFunc<void()> completionHandler);
+        nx::MoveOnlyFunc<void()> completionHandler);
     void doPut(
         const nx::Url& url,
-        nx::utils::MoveOnlyFunc<void()> completionHandler);
+        nx::MoveOnlyFunc<void()> completionHandler);
 
     void doPatch(const nx::Url& url);
     void doPatch(
@@ -278,15 +278,15 @@ public:
     void doPatch(
         const nx::Url& url,
         std::unique_ptr<AbstractMsgBodySource> body,
-        nx::utils::MoveOnlyFunc<void()> completionHandler);
+        nx::MoveOnlyFunc<void()> completionHandler);
     void doPatch(
         const nx::Url& url,
-        nx::utils::MoveOnlyFunc<void()> completionHandler);
+        nx::MoveOnlyFunc<void()> completionHandler);
 
     void doDelete(const nx::Url& url);
     void doDelete(
         const nx::Url& url,
-        nx::utils::MoveOnlyFunc<void()> completionHandler);
+        nx::MoveOnlyFunc<void()> completionHandler);
 
     void doUpgrade(
         const nx::Url& url,
@@ -299,12 +299,12 @@ public:
     void doUpgrade(
         const nx::Url& url,
         const std::string& protocolToUpgradeTo,
-        nx::utils::MoveOnlyFunc<void()> completionHandler);
+        nx::MoveOnlyFunc<void()> completionHandler);
     void doUpgrade(
         const nx::Url& url,
         const Method& method,
         const std::string& protocolToUpgradeTo,
-        nx::utils::MoveOnlyFunc<void()> completionHandler);
+        nx::MoveOnlyFunc<void()> completionHandler);
 
     void doConnect(
         const nx::Url& proxyUrl,
@@ -312,7 +312,7 @@ public:
     void doConnect(
         const nx::Url& proxyUrl,
         const std::string& targetHost,
-        nx::utils::MoveOnlyFunc<void()> completionHandler);
+        nx::MoveOnlyFunc<void()> completionHandler);
 
     void doRequest(
         const Method& method,
@@ -320,7 +320,7 @@ public:
     void doRequest(
         const Method& method,
         const nx::Url& url,
-        nx::utils::MoveOnlyFunc<void()> completionHandler);
+        nx::MoveOnlyFunc<void()> completionHandler);
 
     const nx::network::http::Request& request() const;
 
@@ -423,10 +423,10 @@ private:
         rawConnection,
     };
 
-    nx::utils::MoveOnlyFunc<void(bool /*isRetryAfterUnauthorizedResponse*/)> m_onRequestHasBeenSent;
-    nx::utils::MoveOnlyFunc<void()> m_onResponseReceived;
-    nx::utils::MoveOnlyFunc<void()> m_onSomeMessageBodyAvailable;
-    nx::utils::MoveOnlyFunc<void()> m_onDone;
+    nx::MoveOnlyFunc<void(bool /*isRetryAfterUnauthorizedResponse*/)> m_onRequestHasBeenSent;
+    nx::MoveOnlyFunc<void()> m_onResponseReceived;
+    nx::MoveOnlyFunc<void()> m_onSomeMessageBodyAvailable;
+    nx::MoveOnlyFunc<void()> m_onDone;
 
     State m_state = State::sInit;
     Request m_request;
@@ -520,7 +520,7 @@ private:
 
     template<typename ... Args>
     Result invokeHandler(
-        nx::utils::MoveOnlyFunc<void(Args...)>& handler,
+        nx::MoveOnlyFunc<void(Args...)>& handler,
         Args... args);
 
     static const char* toString(State state);

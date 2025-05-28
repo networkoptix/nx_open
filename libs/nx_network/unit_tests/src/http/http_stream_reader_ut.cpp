@@ -137,7 +137,7 @@ protected:
     void parseBufWithFixedReadStep(
         const nx::Buffer& buf,
         std::size_t readStep,
-        nx::utils::MoveOnlyFunc<void(http::HttpStreamReader&, const Message&)> func,
+        nx::MoveOnlyFunc<void(http::HttpStreamReader&, const Message&)> func,
         bool ignoreParseErrors = false)
     {
         http::HttpStreamReader reader;

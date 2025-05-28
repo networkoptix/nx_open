@@ -23,7 +23,7 @@ namespace nx {
 namespace network {
 
 using ReverseConnectionCompletionHandler =
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)>;
 
 class AbstractAcceptableReverseConnection
 {
@@ -47,7 +47,7 @@ class AbstractReverseConnector:
 
 public:
     using ConnectHandler =
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::unique_ptr<Connection>)>;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode, std::unique_ptr<Connection>)>;
 
     virtual ~AbstractReverseConnector() = default;
 
@@ -83,7 +83,7 @@ class SimpleReverseConnector:
 
 public:
     using ConnectionFactoryFunc =
-        nx::utils::MoveOnlyFunc<std::unique_ptr<Connection>()>;
+        nx::MoveOnlyFunc<std::unique_ptr<Connection>()>;
 
     SimpleReverseConnector(ConnectionFactoryFunc factoryFunc):
         m_factoryFunc(std::move(factoryFunc))
@@ -201,14 +201,14 @@ class ReverseConnectionAcceptor:
     using base_type = aio::BasicPollable;
 
 public:
-    using AcceptCompletionHandler = nx::utils::MoveOnlyFunc<
+    using AcceptCompletionHandler = nx::MoveOnlyFunc<
         void(SystemError::ErrorCode, std::unique_ptr<Connection>)>;
 
-    using OnConnectionEstablished = nx::utils::MoveOnlyFunc<
+    using OnConnectionEstablished = nx::MoveOnlyFunc<
         void(const Connection& connection)>;
 
     using ConnectionFactoryFunc =
-        nx::utils::MoveOnlyFunc<std::unique_ptr<Connection>()>;
+        nx::MoveOnlyFunc<std::unique_ptr<Connection>()>;
 
     constexpr static std::size_t kDefaultPreemptiveConnectionCount = 7;
     constexpr static std::size_t kDefaultMaxReadyConnectionCount = 32;
@@ -590,7 +590,7 @@ private:
         if (connection)
             connection->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
 
-        nx::utils::swapAndCall(
+        nx::swapAndCall(
             m_acceptHandler,
             sysErrorCode,
             std::move(connection));

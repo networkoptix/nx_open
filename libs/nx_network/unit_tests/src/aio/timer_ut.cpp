@@ -35,7 +35,7 @@ protected:
 
     void startTimerFor(
         std::chrono::milliseconds timeout,
-        nx::utils::MoveOnlyFunc<void()> customHandler = nullptr)
+        nx::MoveOnlyFunc<void()> customHandler = nullptr)
     {
         m_timer->start(
             timeout,

@@ -21,7 +21,7 @@ class NX_NETWORK_API CloudStreamSocketConnector:
     using base_type = PollbableWithDependants<aio::BasicPollable>;
 
 public:
-    using CompletionHandler = nx::utils::MoveOnlyFunc<void(
+    using CompletionHandler = nx::MoveOnlyFunc<void(
         SystemError::ErrorCode errorCode,
         std::optional<TunnelAttributes> cloudTunnelAttributes,
         std::unique_ptr<AbstractStreamSocket> connection)>;

@@ -17,7 +17,7 @@ public:
     /**
      * @param statusCode Any 2xx code is considered a success.
      */
-    using CompletionHandler = nx::utils::MoveOnlyFunc<void(
+    using CompletionHandler = nx::MoveOnlyFunc<void(
         StatusCode::Value /*statusCode*/,
         HttpHeaders /*responseHeaders*/,
         ApplicationData... /*applicationData*/)>;

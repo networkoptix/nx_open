@@ -60,7 +60,7 @@ public:
         aio::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
         std::optional<std::chrono::milliseconds> timeoutMillis = std::nullopt,
-        nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler = nx::utils::MoveOnlyFunc<void()>());
+        nx::MoveOnlyFunc<void()> socketAddedToPollHandler = nx::MoveOnlyFunc<void()>());
 
     /**
      * Cancel monitoring sock for event eventType.
@@ -93,19 +93,19 @@ public:
      * WARNING: Currently, there is no way to find out whether call
      *   has been posted or being executed currently.
      */
-    void post(Pollable* sock, nx::utils::MoveOnlyFunc<void()> handler);
+    void post(Pollable* sock, nx::MoveOnlyFunc<void()> handler);
 
     /**
      * Calls handler in random aio thread.
      */
-    void post(nx::utils::MoveOnlyFunc<void()> handler);
+    void post(nx::MoveOnlyFunc<void()> handler);
 
     /**
      * Call handler from within aio thread sock is bound to.
      * NOTE: If called in aio thread, handler will be called from within this method,
      *   otherwise - queued like aio::AIOService::post does.
      */
-    void dispatch(Pollable* sock, nx::utils::MoveOnlyFunc<void()> handler);
+    void dispatch(Pollable* sock, nx::MoveOnlyFunc<void()> handler);
 
     AbstractAioThread* getRandomAioThread() const;
     AbstractAioThread* getCurrentAioThread() const;

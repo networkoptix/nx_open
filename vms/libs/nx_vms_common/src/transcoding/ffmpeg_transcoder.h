@@ -51,7 +51,7 @@ public:
     bool open(const AVCodecParameters* codecParameters);
     void setTranscodingSettings(const QnLegacyTranscodingSettings& settings);
 
-    using BeforeOpenCallback = nx::utils::MoveOnlyFunc<void(
+    using BeforeOpenCallback = nx::MoveOnlyFunc<void(
         QnFfmpegTranscoder* transcoder,
         const QnConstCompressedVideoDataPtr & video,
         const QnConstCompressedAudioDataPtr & audio)>;

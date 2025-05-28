@@ -19,12 +19,12 @@ class NX_NETWORK_API MaintenanceClient:
 public:
     MaintenanceClient(const nx::Url& baseUrl);
 
-    void getRelays(nx::utils::MoveOnlyFunc<void(api::Result, api::Relays)> handler);
+    void getRelays(nx::MoveOnlyFunc<void(api::Result, api::Relays)> handler);
     std::tuple<api::Result, api::Relays> getRelays();
 
     void deleteRelay(
         const std::string& name,
-        nx::utils::MoveOnlyFunc<void(api::Result)> handler);
+        nx::MoveOnlyFunc<void(api::Result)> handler);
 
     api::Result deleteRelay(const std::string& name);
 };

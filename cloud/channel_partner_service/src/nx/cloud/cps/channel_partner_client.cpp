@@ -69,7 +69,7 @@ ChannelPartnerClient::~ChannelPartnerClient()
 
 void ChannelPartnerClient::bindSystemToOrganization(
     api::SystemRegistrationRequest data,
-    nx::utils::MoveOnlyFunc<void(api::Result, api::SystemRegistrationResponse)> handler)
+    nx::MoveOnlyFunc<void(api::Result, api::SystemRegistrationResponse)> handler)
 {
     base_type::template makeAsyncCall<api::SystemRegistrationResponse>(
         nx::network::http::Method::post,
@@ -81,7 +81,7 @@ void ChannelPartnerClient::bindSystemToOrganization(
 
 void ChannelPartnerClient::unbindSystemFromOrganization(
     std::string systemId,
-    nx::utils::MoveOnlyFunc<void(api::Result)> handler)
+    nx::MoveOnlyFunc<void(api::Result)> handler)
 {
     base_type::template makeAsyncCall<void>(
         nx::network::http::Method::delete_,
@@ -94,7 +94,7 @@ void ChannelPartnerClient::unbindSystemFromOrganization(
 void ChannelPartnerClient::getSystemUser(
     const std::string& systemId,
     const std::string& email,
-    nx::utils::MoveOnlyFunc<void(api::Result, api::User)> handler)
+    nx::MoveOnlyFunc<void(api::Result, api::User)> handler)
 {
     base_type::template makeAsyncCall<api::User>(
         nx::network::http::Method::get,
@@ -106,7 +106,7 @@ void ChannelPartnerClient::getSystemUser(
 
 void ChannelPartnerClient::getSystemUsers(
     const std::string& systemId,
-    nx::utils::MoveOnlyFunc<void(api::Result, std::vector<api::User>)> handler)
+    nx::MoveOnlyFunc<void(api::Result, std::vector<api::User>)> handler)
 {
     base_type::template makeAsyncCall<std::vector<api::User>>(
         nx::network::http::Method::get,
@@ -117,7 +117,7 @@ void ChannelPartnerClient::getSystemUsers(
 
 void ChannelPartnerClient::getUserSystems(
     const std::string& email,
-    nx::utils::MoveOnlyFunc<void(api::Result, std::vector<api::SystemAllowance>)> handler)
+    nx::MoveOnlyFunc<void(api::Result, std::vector<api::SystemAllowance>)> handler)
 {
     base_type::template makeAsyncCall<std::vector<api::SystemAllowance>>(
         nx::network::http::Method::get,
@@ -128,7 +128,7 @@ void ChannelPartnerClient::getUserSystems(
 
 void ChannelPartnerClient::getOrganization(
     const std::string& organizationId,
-    nx::utils::MoveOnlyFunc<void(api::Result, api::Organization)> handler)
+    nx::MoveOnlyFunc<void(api::Result, api::Organization)> handler)
 {
     base_type::template makeAsyncCall<api::Organization>(
         nx::network::http::Method::get,
@@ -139,7 +139,7 @@ void ChannelPartnerClient::getOrganization(
 }
 
 void ChannelPartnerClient::getAllOrganizationsUsers(
-    nx::utils::MoveOnlyFunc<void(api::Result, api::GetUsersResponse)> handler)
+    nx::MoveOnlyFunc<void(api::Result, api::GetUsersResponse)> handler)
 {
     base_type::template makeAsyncCall<api::GetUsersResponse>(
         nx::network::http::Method::get,

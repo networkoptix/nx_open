@@ -204,7 +204,7 @@ static constexpr auto kControllerProperty = "controller";
 
 struct WebViewController::Private: public QObject
 {
-    using Callback = nx::utils::MoveOnlyFunc<void(QQuickItem*)>;
+    using Callback = nx::MoveOnlyFunc<void(QQuickItem*)>;
 
     WebViewController* const q;
     QPointer<QQuickWidget> quickWidget;

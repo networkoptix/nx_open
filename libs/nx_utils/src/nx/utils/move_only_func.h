@@ -8,7 +8,6 @@
 #include <nx/utils/log/assert.h>
 
 namespace nx {
-namespace utils {
 
 /**
  * Move-only analogue of std::function.
@@ -144,5 +143,4 @@ void swapAndCall(Function& function, Args&& ... args)
     functionLocal(std::forward<Args>(args) ...);
 }
 
-} // namespace utils
 } // namespace nx

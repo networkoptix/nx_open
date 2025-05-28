@@ -20,7 +20,7 @@ class RendezvousConnector:
     public aio::AbstractPollable
 {
 public:
-    typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>
+    typedef nx::MoveOnlyFunc<void(SystemError::ErrorCode)>
         ConnectCompletionHandler;
 
     /**
@@ -38,12 +38,12 @@ public:
 
     virtual ~RendezvousConnector();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> completionHandler) override;
 
     virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
-    virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
+    virtual void post(nx::MoveOnlyFunc<void()> func) override;
+    virtual void dispatch(nx::MoveOnlyFunc<void()> func) override;
 
     virtual void connect(
         std::chrono::milliseconds timeout,

@@ -267,7 +267,7 @@ void TunnelConnector::holePunchingDone(
             std::move(udtConnection));
     }
 
-    nx::utils::swapAndCall(m_completionHandler, std::move(result));
+    nx::swapAndCall(m_completionHandler, std::move(result));
 }
 
 TunnelConnector::ConnectorContext

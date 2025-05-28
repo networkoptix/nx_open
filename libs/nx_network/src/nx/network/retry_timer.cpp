@@ -63,7 +63,7 @@ void RetryTimer::bindToAioThread(aio::AbstractAioThread* aioThread)
     m_timer->bindToAioThread(aioThread);
 }
 
-bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFunc)
+bool RetryTimer::scheduleNextTry(nx::MoveOnlyFunc<void()> doAnotherTryFunc)
 {
     if (retriesLeft() == 0)
         return false;
@@ -95,7 +95,7 @@ void RetryTimer::reset()
     m_delayCalculator.reset();
 }
 
-void RetryTimer::cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler)
+void RetryTimer::cancelAsync(nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_timer->cancelAsync(
         [this, completionHandler = std::move(completionHandler)]()

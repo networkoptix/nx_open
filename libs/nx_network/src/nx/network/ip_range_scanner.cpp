@@ -124,7 +124,7 @@ void IpRangeScanner::onDone(IpCheckers::iterator clientIter)
         m_onlineHosts.size());
 
     m_state = State::readyToScan;
-    nx::utils::moveAndCall(m_completionHandler, std::move(m_onlineHosts));
+    nx::moveAndCall(m_completionHandler, std::move(m_onlineHosts));
 }
 
 } // namespace nx::network

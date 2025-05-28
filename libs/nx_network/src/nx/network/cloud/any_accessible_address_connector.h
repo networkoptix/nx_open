@@ -28,7 +28,7 @@ class NX_NETWORK_API AnyAccessibleAddressConnector:
     using base_type = aio::BasicPollable;
 
 public:
-    using ConnectHandler = nx::utils::MoveOnlyFunc<void(
+    using ConnectHandler = nx::MoveOnlyFunc<void(
         SystemError::ErrorCode /*sysErrorCode*/,
         std::optional<TunnelAttributes> /*cloudTunnelAttributes*/,
         std::unique_ptr<AbstractStreamSocket>)>;

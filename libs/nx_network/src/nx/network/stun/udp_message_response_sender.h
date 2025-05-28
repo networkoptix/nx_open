@@ -37,7 +37,7 @@ public:
     virtual SocketAddress getSourceAddress() const override;
 
     virtual void addOnConnectionCloseHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
     virtual AbstractCommunicatingSocket* socket() override;
     virtual void close() override;

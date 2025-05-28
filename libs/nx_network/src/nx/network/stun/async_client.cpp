@@ -197,7 +197,7 @@ void removeByClient(Container* container, void* client)
     }
 }
 
-void AsyncClient::cancelHandlers(void* client, nx::utils::MoveOnlyFunc<void()> handler)
+void AsyncClient::cancelHandlers(void* client, nx::MoveOnlyFunc<void()> handler)
 {
     NX_ASSERT(client);
     dispatch(

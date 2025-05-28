@@ -306,7 +306,7 @@ public:
 
     void whenMakeAsyncGetRequest(
         std::string path,
-        nx::utils::MoveOnlyFunc<void()> handler)
+        nx::MoveOnlyFunc<void()> handler)
     {
         auto client = std::make_unique<http::AsyncClient>(ssl::kAcceptAnyCertificate);
         client->setTimeouts(AsyncClient::kInfiniteTimeouts);

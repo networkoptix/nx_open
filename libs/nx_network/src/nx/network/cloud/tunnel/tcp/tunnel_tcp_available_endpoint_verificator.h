@@ -29,7 +29,7 @@ public:
     virtual void verifyHost(
         const SocketAddress& endpointToVerify,
         const AddressEntry& desiredHostAddress,
-        nx::utils::MoveOnlyFunc<void(VerificationResult)> completionHandler) override;
+        nx::MoveOnlyFunc<void(VerificationResult)> completionHandler) override;
 
     virtual SystemError::ErrorCode lastSystemErrorCode() const override;
 
@@ -43,7 +43,7 @@ private:
     std::optional<std::chrono::milliseconds> m_timeout;
     std::unique_ptr<AbstractStreamSocket> m_connection;
     SystemError::ErrorCode m_lastSystemErrorCode = SystemError::noError;
-    nx::utils::MoveOnlyFunc<void(VerificationResult)> m_completionHandler;
+    nx::MoveOnlyFunc<void(VerificationResult)> m_completionHandler;
 
     void onConnectDone(SystemError::ErrorCode sysErrorCode);
 };

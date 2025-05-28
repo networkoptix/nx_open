@@ -98,7 +98,7 @@ void WebSocketConnection::start(
 
 WebSocketConnection::~WebSocketConnection()
 {
-    nx::utils::moveAndCallOptional(m_onDone, SystemError::noError, this);
+    nx::moveAndCallOptional(m_onDone, SystemError::noError, this);
 }
 
 void WebSocketConnection::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
@@ -165,7 +165,7 @@ void WebSocketConnection::readNextMessage()
                     NX_DEBUG(
                         lock.get(), "Failed to read next message with error code %1", errorCode);
                     lock->m_outgoingProcessor->clear(errorCode);
-                    nx::utils::moveAndCallOptional(lock->m_onDone, errorCode, lock.get());
+                    nx::moveAndCallOptional(lock->m_onDone, errorCode, lock.get());
                 }
                 return;
             }
@@ -245,7 +245,7 @@ void WebSocketConnection::send(std::string data)
             {
                 NX_DEBUG(lock.get(), "Failed to send message with error code %1", errorCode);
                 lock->m_outgoingProcessor->clear(errorCode);
-                nx::utils::moveAndCallOptional(lock->m_onDone, errorCode, lock.get());
+                nx::moveAndCallOptional(lock->m_onDone, errorCode, lock.get());
             }
         });
 }

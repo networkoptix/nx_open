@@ -34,7 +34,7 @@ RendezvousConnector::~RendezvousConnector()
 }
 
 void RendezvousConnector::pleaseStop(
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_aioThreadBinder.pleaseStop(
         [this, completionHandler = std::move(completionHandler)]()
@@ -54,12 +54,12 @@ void RendezvousConnector::bindToAioThread(
     m_aioThreadBinder.bindToAioThread(aioThread);
 }
 
-void RendezvousConnector::post(nx::utils::MoveOnlyFunc<void()> func)
+void RendezvousConnector::post(nx::MoveOnlyFunc<void()> func)
 {
     m_aioThreadBinder.post(std::move(func));
 }
 
-void RendezvousConnector::dispatch(nx::utils::MoveOnlyFunc<void()> func)
+void RendezvousConnector::dispatch(nx::MoveOnlyFunc<void()> func)
 {
     m_aioThreadBinder.dispatch(std::move(func));
 }

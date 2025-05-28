@@ -5,11 +5,11 @@
 namespace nx {
 namespace utils {
 
-BarrierHandler::BarrierHandler(nx::utils::MoveOnlyFunc<void()> handler)
+BarrierHandler::BarrierHandler(nx::MoveOnlyFunc<void()> handler)
 {
     //auto handlerPtr = std::make_shared<decltype(handler)>(std::move(handler));
-    std::shared_ptr<nx::utils::MoveOnlyFunc<void()>> handlerPtr(
-        new nx::utils::MoveOnlyFunc<void()>(std::move(handler)));
+    std::shared_ptr<nx::MoveOnlyFunc<void()>> handlerPtr(
+        new nx::MoveOnlyFunc<void()>(std::move(handler)));
     m_handlerHolder = std::shared_ptr<BarrierHandler>(
         this,
         [handlerPtr]( //not passing handler directly since std::shared_ptr's deleter MUST be CopyConstructible

@@ -19,7 +19,7 @@ class NX_NETWORK_API IpRangeScanner:
     using base_type = aio::BasicPollable;
 
 public:
-    using CompletionHandler = nx::utils::MoveOnlyFunc<void(std::vector<nx::network::HostAddress>)>;
+    using CompletionHandler = nx::MoveOnlyFunc<void(std::vector<nx::network::HostAddress>)>;
 
     IpRangeScanner(aio::AbstractAioThread* aioThread = nullptr);
 

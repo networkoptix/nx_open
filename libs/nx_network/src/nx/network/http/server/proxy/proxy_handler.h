@@ -76,7 +76,7 @@ public:
     void setCertificateChainVerificationCallback(ssl::VerifyCertificateAsyncFunc cb);
 
 protected:
-    using ProxyTargetDetectedHandler = nx::utils::MoveOnlyFunc<void(
+    using ProxyTargetDetectedHandler = nx::MoveOnlyFunc<void(
         StatusCode::Value resultCode,
         TargetHost proxyTarget)>;
 
@@ -142,7 +142,7 @@ private:
     void processSslHandshakeResult(SystemError::ErrorCode handshakeResult);
 
     static void acceptAllCertificates(
-        ssl::CertificateChainView, nx::utils::MoveOnlyFunc<void(bool)>);
+        ssl::CertificateChainView, nx::MoveOnlyFunc<void(bool)>);
 };
 
 //-------------------------------------------------------------------------------------------------

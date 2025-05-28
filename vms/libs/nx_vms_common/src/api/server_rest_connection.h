@@ -680,7 +680,7 @@ public:
         Callback<ResultWithData<QnCameraDiagnosticsReply>>&& callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
-    using LdapAuthenticateCallback = nx::utils::MoveOnlyFunc<void(
+    using LdapAuthenticateCallback = nx::MoveOnlyFunc<void(
         Handle requestId,
         ErrorOrData<nx::vms::api::UserModelV3> userOrError,
         nx::network::rest::AuthResult authResult)>;
@@ -902,7 +902,7 @@ public:
 private:
     ContextPtr prepareContext(
         const nx::network::http::ClientPool::Request& request,
-        nx::utils::MoveOnlyFunc<void (ContextPtr)> callback,
+        nx::MoveOnlyFunc<void (ContextPtr)> callback,
         std::optional<Timeouts> timeouts = std::nullopt);
 
     QUrl prepareUrl(const QString& path, const nx::network::rest::Params& params) const;

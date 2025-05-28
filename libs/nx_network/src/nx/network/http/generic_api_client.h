@@ -69,7 +69,7 @@ public:
     void setRetryPolicy(unsigned numOfRetries, ResultType res);
     void setRetryPolicy(
         unsigned numOfRetries,
-        nx::utils::MoveOnlyFunc<bool(ResultType)> requestSuccessed);
+        nx::MoveOnlyFunc<bool(ResultType)> requestSuccessed);
 
     // Deprecated. Use httpClientOptions().setCredentials() instead.
     void setHttpCredentials(Credentials credentials);
@@ -184,7 +184,7 @@ private:
     nx::Mutex m_mutex;
     std::optional<std::chrono::milliseconds> m_requestTimeout;
     unsigned int m_numRetries = 1;
-    std::optional<nx::utils::MoveOnlyFunc<bool(ResultType)>> m_isRequestSucceeded;
+    std::optional<nx::MoveOnlyFunc<bool(ResultType)>> m_isRequestSucceeded;
     ClientOptions m_clientOptions;
     bool m_cacheEnabled = false;
     // Actual value has type CacheEntry<T> where T is passed via OutputData template parameter.
@@ -298,7 +298,7 @@ void GenericApiClient<ResultCode, Base>::setRetryPolicy(unsigned numOfRetries, R
 
 template<HasResultCodeT ResultCode, typename Base>
 void GenericApiClient<ResultCode, Base>::setRetryPolicy(
-    unsigned numOfRetries, nx::utils::MoveOnlyFunc<bool(ResultType)> m_isRequstSucceded)
+    unsigned numOfRetries, nx::MoveOnlyFunc<bool(ResultType)> m_isRequstSucceded)
 {
     m_numRetries = numOfRetries;
     m_isRequstSucceded = std::move(m_isRequstSucceded);

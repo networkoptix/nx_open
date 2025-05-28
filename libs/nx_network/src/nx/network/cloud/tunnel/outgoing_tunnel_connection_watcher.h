@@ -34,7 +34,7 @@ public:
         OnNewConnectionHandler handler) override;
 
     virtual void setControlConnectionClosedHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
     virtual ConnectType connectType() const override;
 
@@ -44,7 +44,7 @@ private:
     const nx::hpm::api::ConnectionParameters m_connectionParameters;
     std::unique_ptr<AbstractOutgoingTunnelConnection> m_tunnelConnection;
     std::unique_ptr<aio::Timer> m_inactivityTimer;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onTunnelClosedHandler;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onTunnelClosedHandler;
     SystemError::ErrorCode m_statusCode = SystemError::noError;
 
     void launchInactivityTimer();

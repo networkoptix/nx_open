@@ -113,7 +113,7 @@ bool QnRuntimeInfoManager::hasItem(const nx::Uuid& id)
 }
 
 bool QnRuntimeInfoManager::hasItem(
-    nx::utils::MoveOnlyFunc<bool(const QnPeerRuntimeInfo& item)> predicate)
+    nx::MoveOnlyFunc<bool(const QnPeerRuntimeInfo& item)> predicate)
 {
     return m_items->hasItemWithCondition(std::move(predicate));
 }

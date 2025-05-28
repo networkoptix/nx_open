@@ -61,7 +61,7 @@ void AioThread::startMonitoring(
     aio::EventType eventToWatch,
     AIOEventHandler* const eventHandler,
     std::optional<std::chrono::milliseconds> timeout,
-    nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
+    nx::MoveOnlyFunc<void()> socketAddedToPollHandler)
 {
     if (!timeout)
     {
@@ -117,7 +117,7 @@ void AioThread::stopMonitoring(
     stopMonitoringInternal(sock, eventType);
 }
 
-void AioThread::post(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor)
+void AioThread::post(Pollable* const sock, nx::MoveOnlyFunc<void()> functor)
 {
     m_taskQueue->addTask(
         detail::PostAsyncCallTask(sock, std::move(functor)));
@@ -127,7 +127,7 @@ void AioThread::post(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> funct
         m_pollSet->interrupt();
 }
 
-void AioThread::dispatch(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor)
+void AioThread::dispatch(Pollable* const sock, nx::MoveOnlyFunc<void()> functor)
 {
     if (currentThreadSystemId() == systemThreadId())  //< If called from this aio thread.
     {

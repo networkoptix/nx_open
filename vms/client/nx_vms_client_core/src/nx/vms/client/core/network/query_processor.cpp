@@ -140,7 +140,7 @@ Qn::SerializationFormat QueryProcessor::serializationFormat() const
 void QueryProcessor::sendGetRequest(
     ec2::ApiCommand::Value cmdCode,
     QUrlQuery query,
-    nx::utils::MoveOnlyFunc<void(ec2::ErrorCode, Qn::SerializationFormat, const nx::Buffer&)> handler)
+    nx::MoveOnlyFunc<void(ec2::ErrorCode, Qn::SerializationFormat, const nx::Buffer&)> handler)
 {
     auto httpClient = d->makeHttpClient();
 
@@ -163,7 +163,7 @@ void QueryProcessor::sendGetRequest(
 void QueryProcessor::sendPostRequest(
     ec2::ApiCommand::Value cmdCode,
     QByteArray serializedData,
-    nx::utils::MoveOnlyFunc<void(ec2::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(ec2::ErrorCode)> handler)
 {
     auto httpClient = d->makeHttpClient();
 

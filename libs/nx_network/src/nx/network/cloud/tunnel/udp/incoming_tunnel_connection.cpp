@@ -34,7 +34,7 @@ IncomingTunnelConnection::IncomingTunnelConnection(
                 m_serverSocket->pleaseStopSync(); //< We are in AIO thread.
 
             if (m_acceptHandler)
-                nx::utils::swapAndCall(m_acceptHandler, code, nullptr);
+                nx::swapAndCall(m_acceptHandler, code, nullptr);
         });
 
     const SocketAddress addressToBind(
@@ -86,7 +86,7 @@ void IncomingTunnelConnection::accept(AcceptHandler handler)
                     else
                         m_controlConnection->resetLastKeepAlive();
 
-                    nx::utils::swapAndCall(m_acceptHandler, code, std::move(socket));
+                    nx::swapAndCall(m_acceptHandler, code, std::move(socket));
                 });
         });
 }

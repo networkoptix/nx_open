@@ -18,7 +18,7 @@ namespace nx::utils {
 class NX_UTILS_API IoDeviceWrapper: public QIODevice
 {
 public:
-    using Callback = nx::utils::MoveOnlyFunc<void(qint64, std::chrono::milliseconds)>;
+    using Callback = nx::MoveOnlyFunc<void(qint64, std::chrono::milliseconds)>;
 
     IoDeviceWrapper(std::unique_ptr<QIODevice> source);
     virtual ~IoDeviceWrapper() override;

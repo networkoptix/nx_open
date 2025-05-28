@@ -124,7 +124,7 @@ void AuthProvider::getSystemAccessLevel(
                         --result->responsesExpected;
                         if (result->responsesExpected == 0)
                         {
-                            nx::utils::swapAndCall(
+                            nx::swapAndCall(
                                 result->completionHandler,
                                 result->resultCode,
                                 std::move(result->response));

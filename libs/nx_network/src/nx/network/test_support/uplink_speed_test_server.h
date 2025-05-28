@@ -31,7 +31,7 @@ public:
      * sequence.
      */
     void setBandwidthTestInProgressHandler(
-        nx::utils::MoveOnlyFunc<void(int /*xTestSequence*/)> handler);
+        nx::MoveOnlyFunc<void(int /*xTestSequence*/)> handler);
 
 private:
     void serve(
@@ -40,7 +40,7 @@ private:
 
 private:
     std::string m_speedTestRequestPath;
-    nx::utils::MoveOnlyFunc<void(int /*xTestSequence*/)> m_bandwidthTestInProgressHandler;
+    nx::MoveOnlyFunc<void(int /*xTestSequence*/)> m_bandwidthTestInProgressHandler;
 };
 
 } // namespace nx::network::cloud::speed_test::test

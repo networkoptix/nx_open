@@ -55,7 +55,7 @@ void OutgoingTunnel::stopWhileInAioThread()
     m_connectHandlers.clear();
 }
 
-void OutgoingTunnel::setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler)
+void OutgoingTunnel::setOnClosedHandler(nx::MoveOnlyFunc<void()> handler)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     NX_ASSERT(!m_onClosedHandler, "State handler is already set");
@@ -245,7 +245,7 @@ void OutgoingTunnel::onTunnelClosed(SystemError::ErrorCode errorCode)
     dispatch(
         [this, errorCode]()
         {
-            nx::utils::MoveOnlyFunc<void()> tunnelClosedHandler;
+            nx::MoveOnlyFunc<void()> tunnelClosedHandler;
             {
                 NX_MUTEX_LOCKER lk(&m_mutex);
                 std::swap(tunnelClosedHandler, m_onClosedHandler);

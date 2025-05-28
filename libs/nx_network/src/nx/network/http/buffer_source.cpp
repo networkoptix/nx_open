@@ -21,7 +21,7 @@ std::optional<uint64_t> BufferSource::contentLength() const
 }
 
 void BufferSource::readAsync(
-    nx::utils::MoveOnlyFunc<
+    nx::MoveOnlyFunc<
         void(SystemError::ErrorCode, nx::Buffer)
     > completionHandler)
 {

@@ -11,7 +11,7 @@
 namespace nx::network::http::server::handler {
 
 using TunnelCreatedHandler =
-    nx::utils::MoveOnlyFunc<void(
+    nx::MoveOnlyFunc<void(
         std::unique_ptr<AbstractStreamSocket>,
         RequestContext /*openTunnelRequestContext*/)>;
 

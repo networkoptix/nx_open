@@ -58,7 +58,7 @@ public:
         ProtocolProcessorFactoryFunc delegateFactoryFunc);
 
     void detectProtocol(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler);
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler);
 
 protected:
     /**
@@ -95,7 +95,7 @@ private:
     std::tuple<nx::Buffer*, IoCompletionHandler> m_pendingAsyncRead;
     nx::Buffer m_readBuffer;
     nx::Buffer m_readDataCache;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)>
         m_protocolDetectionCompletionHandler;
 
     void completePendingAsyncRead(SystemError::ErrorCode protocolDetectionResultCode);
@@ -219,7 +219,7 @@ void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::registerPro
 
 template<typename Base, typename AsyncChannelInterface>
 void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::detectProtocol(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler)
 {
     this->post(
         [this, completionHandler = std::move(completionHandler)]() mutable
@@ -236,7 +236,7 @@ void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::completePen
 {
     if (protocolDetectionResultCode != SystemError::noError)
     {
-        return nx::utils::swapAndCall(
+        return nx::swapAndCall(
             std::get<1>(m_pendingAsyncRead), protocolDetectionResultCode, -1);
     }
 
@@ -299,7 +299,7 @@ void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::analyzeRead
     if (osErrorCode != SystemError::noError ||
         bytesRead == 0) //< Connection is closed.
     {
-        nx::utils::swapAndCall(
+        nx::swapAndCall(
             m_protocolDetectionCompletionHandler,
             osErrorCode == SystemError::noError ? SystemError::connectionReset : osErrorCode);
         return;
@@ -314,7 +314,7 @@ void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::analyzeRead
         return;
     }
 
-    nx::utils::swapAndCall(
+    nx::swapAndCall(
         m_protocolDetectionCompletionHandler,
         SystemError::noError);
 }

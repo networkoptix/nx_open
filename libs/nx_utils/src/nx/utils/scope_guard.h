@@ -81,7 +81,7 @@ private:
 template<typename Callback>
 ScopeGuard(Callback) -> ScopeGuard<Callback>;
 
-using Guard = ScopeGuard<nx::utils::MoveOnlyFunc<void()>>;
+using Guard = ScopeGuard<nx::MoveOnlyFunc<void()>>;
 
 template<class Func>
 ScopeGuard<Func> makeScopeGuard(Func func)
@@ -91,7 +91,7 @@ ScopeGuard<Func> makeScopeGuard(Func func)
 
 //-------------------------------------------------------------------------------------------------
 
-using SharedGuardCallback = nx::utils::MoveOnlyFunc<void()>;
+using SharedGuardCallback = nx::MoveOnlyFunc<void()>;
 using SharedGuard = ScopeGuard<SharedGuardCallback>;
 
 using SharedGuardPtr = std::shared_ptr<SharedGuard>;

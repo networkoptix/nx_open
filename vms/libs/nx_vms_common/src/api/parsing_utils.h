@@ -306,7 +306,7 @@ private:
 };
 
 using RequestCallback =
-    nx::utils::MoveOnlyFunc<void (std::unique_ptr<BaseResultContext>, rest::Handle)>;
+    nx::MoveOnlyFunc<void (std::unique_ptr<BaseResultContext>, rest::Handle)>;
 
 template <typename T>
 class ResultContext: public BaseResultContext

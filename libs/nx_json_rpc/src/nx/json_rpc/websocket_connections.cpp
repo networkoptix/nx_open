@@ -14,7 +14,7 @@ void WebSocketConnections::executeAsync(
     ResponseId responseId,
     Connection* connection,
     std::unique_ptr<Executor> executor,
-    nx::utils::MoveOnlyFunc<void(Response)> handler)
+    nx::MoveOnlyFunc<void(Response)> handler)
 {
     auto threadIt = connection->threads.insert(connection->threads.begin(), std::thread());
     *threadIt = std::thread(

@@ -1612,7 +1612,7 @@ void SystemSettings::synchronizeNow()
     resourcePropertyDictionary()->saveParamsAsync(d->admin->getId());
 }
 
-bool SystemSettings::resynchronizeNowSync(nx::utils::MoveOnlyFunc<
+bool SystemSettings::resynchronizeNowSync(nx::MoveOnlyFunc<
     bool(const QString& paramName, const QString& paramValue)> filter)
 {
     {

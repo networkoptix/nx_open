@@ -49,7 +49,7 @@ AsyncHttpClient::~AsyncHttpClient()
     pleaseStopSync();
 }
 
-void AsyncHttpClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
+void AsyncHttpClient::pleaseStop(nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_delegate.pleaseStop(std::move(completionHandler));
 }
@@ -69,12 +69,12 @@ void AsyncHttpClient::bindToAioThread(nx::network::aio::AbstractAioThread* aioTh
     m_delegate.bindToAioThread(aioThread);
 }
 
-void AsyncHttpClient::post(nx::utils::MoveOnlyFunc<void()> func)
+void AsyncHttpClient::post(nx::MoveOnlyFunc<void()> func)
 {
     m_delegate.post(std::move(func));
 }
 
-void AsyncHttpClient::dispatch(nx::utils::MoveOnlyFunc<void()> func)
+void AsyncHttpClient::dispatch(nx::MoveOnlyFunc<void()> func)
 {
     m_delegate.dispatch(std::move(func));
 }
@@ -96,7 +96,7 @@ void AsyncHttpClient::doGet(const nx::Url& url)
 
 void AsyncHttpClient::doGet(
     const nx::Url& url,
-    nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    nx::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
 {
     m_onDoneHandler = std::move(completionHandler);
     m_delegate.doGet(url);
@@ -109,7 +109,7 @@ void AsyncHttpClient::doHead(const nx::Url& url)
 
 void AsyncHttpClient::doHead(
     const nx::Url& url,
-    nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    nx::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
 {
     m_onDoneHandler = std::move(completionHandler);
     m_delegate.doHead(url);
@@ -166,7 +166,7 @@ void AsyncHttpClient::doPost(
     const std::string& contentType,
     nx::Buffer messageBody,
     bool includeContentLength,
-    nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    nx::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
 {
     m_onDoneHandler = std::move(completionHandler);
     doPost(url, contentType, std::move(messageBody), includeContentLength);
@@ -188,7 +188,7 @@ void AsyncHttpClient::doPut(
     const nx::Url& url,
     const std::string& contentType,
     nx::Buffer messageBody,
-    nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    nx::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
 {
     m_onDoneHandler = std::move(completionHandler);
     doPut(url, contentType, std::move(messageBody));
@@ -210,7 +210,7 @@ void AsyncHttpClient::doPatch(
     const nx::Url& url,
     const std::string& contentType,
     nx::Buffer messageBody,
-    nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    nx::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
 {
     m_onDoneHandler = std::move(completionHandler);
     doPatch(url, contentType, std::move(messageBody));
@@ -223,7 +223,7 @@ void AsyncHttpClient::doDelete(const nx::Url& url)
 
 void AsyncHttpClient::doDelete(
     const nx::Url& url,
-    nx::utils::MoveOnlyFunc<void (AsyncHttpClientPtr)> completionHandler)
+    nx::MoveOnlyFunc<void (AsyncHttpClientPtr)> completionHandler)
 {
     m_onDoneHandler = std::move(completionHandler);
     doDelete(url);
@@ -239,7 +239,7 @@ void AsyncHttpClient::doUpgrade(
 void AsyncHttpClient::doUpgrade(
     const nx::Url& url,
     const std::string& protocolToUpgradeTo,
-    nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    nx::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
 {
     m_onDoneHandler = std::move(completionHandler);
     doUpgrade(url, protocolToUpgradeTo);
@@ -441,7 +441,7 @@ void AsyncHttpClient::onDone()
     emit done(sharedThis);
 
     if (m_onDoneHandler)
-        nx::utils::swapAndCall(m_onDoneHandler, sharedThis);
+        nx::swapAndCall(m_onDoneHandler, sharedThis);
 }
 
 //-------------------------------------------------------------------------------------------------

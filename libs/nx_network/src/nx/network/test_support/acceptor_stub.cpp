@@ -141,7 +141,7 @@ void AcceptorStub::deliverConnectionIfAvailable()
         return;
 
     m_repetitiveTimer.cancelSync();
-    nx::utils::swapAndCall(m_acceptHandler, SystemError::noError, std::move(*connection));
+    nx::swapAndCall(m_acceptHandler, SystemError::noError, std::move(*connection));
 }
 
 void AcceptorStub::setConnectionEstablishedHandler(ConnectionEstablishedHandler handler)

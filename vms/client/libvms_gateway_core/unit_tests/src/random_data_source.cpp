@@ -23,7 +23,7 @@ std::optional<uint64_t> RandomDataSource::contentLength() const
 }
 
 void RandomDataSource::readAsync(
-    nx::utils::MoveOnlyFunc<
+    nx::MoveOnlyFunc<
         void(SystemError::ErrorCode, nx::Buffer)> completionHandler)
 {
     post(

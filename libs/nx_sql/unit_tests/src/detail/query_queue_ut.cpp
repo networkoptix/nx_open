@@ -57,7 +57,7 @@ public:
     }
 
     virtual void setOnBeforeDestruction(
-        nx::utils::MoveOnlyFunc<void()> handler) override
+        nx::MoveOnlyFunc<void()> handler) override
     {
         m_onBeforeDestructionHandler.swap(handler);
     }
@@ -70,7 +70,7 @@ private:
     const QueryType m_queryType;
     const std::string m_queryAggregationKey;
     std::function<void()> m_onQueryExecuted;
-    nx::utils::MoveOnlyFunc<void()> m_onBeforeDestructionHandler;
+    nx::MoveOnlyFunc<void()> m_onBeforeDestructionHandler;
 };
 
 //-------------------------------------------------------------------------------------------------

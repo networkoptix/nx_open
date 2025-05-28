@@ -108,7 +108,7 @@ void MeanTimeFetcher::timeFetchingDone(
     {
         if (ctx->errorCode != SystemError::noError)
         {
-            nx::utils::swapAndCall(m_completionHandler, -1, ctx->errorCode, std::chrono::milliseconds::zero());
+            nx::swapAndCall(m_completionHandler, -1, ctx->errorCode, std::chrono::milliseconds::zero());
             return;
         }
 
@@ -116,7 +116,7 @@ void MeanTimeFetcher::timeFetchingDone(
         if ((minUtcTimeMillis != std::numeric_limits<qint64>::max()) &&
             (qAbs(ctx->utcMillis - minUtcTimeMillis) > m_maxDeviationMillis))
         {
-            nx::utils::swapAndCall(m_completionHandler, -1, SystemError::invalidData, std::chrono::milliseconds::zero());
+            nx::swapAndCall(m_completionHandler, -1, SystemError::invalidData, std::chrono::milliseconds::zero());
             return;
         }
 
@@ -129,7 +129,7 @@ void MeanTimeFetcher::timeFetchingDone(
 
     NX_ASSERT(collectedValuesCount > 0);
 
-    nx::utils::swapAndCall(
+    nx::swapAndCall(
         m_completionHandler,
         sumOfReceivedUtcTimesMillis / collectedValuesCount,
         SystemError::noError,

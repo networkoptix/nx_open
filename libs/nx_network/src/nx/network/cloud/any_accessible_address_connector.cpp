@@ -261,7 +261,7 @@ void AnyAccessibleAddressConnector::cleanUpAndReportResult(
     m_cloudConnectors.clear();
     m_awaitedConnectOperationCount = 0;
 
-    nx::utils::swapAndCall(
+    nx::swapAndCall(
         m_handler,
         sysErrorCode,
         std::move(cloudTunnelAttributes),

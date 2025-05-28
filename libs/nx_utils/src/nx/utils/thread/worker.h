@@ -21,7 +21,7 @@ namespace detail { class Impl; }
 class NX_UTILS_API Worker: public QnLongRunnable
 {
 public:
-    using Task = nx::utils::MoveOnlyFunc<void()>;
+    using Task = nx::MoveOnlyFunc<void()>;
     Worker(std::optional<size_t> maxTaskCount);
 
     ~Worker();

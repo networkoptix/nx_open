@@ -19,7 +19,7 @@ StreamSocketStub::~StreamSocketStub()
     m_timer.pleaseStopSync();
 }
 
-void StreamSocketStub::post(nx::utils::MoveOnlyFunc<void()> func)
+void StreamSocketStub::post(nx::MoveOnlyFunc<void()> func)
 {
     if (m_postDelay)
         m_timer.start(*m_postDelay, std::move(func));
@@ -130,7 +130,7 @@ void StreamSocketStub::reportConnectionClosure()
 {
     m_readBuffer->append(
         "Just checking that buffer is always alive when completion handler is triggered");
-    nx::utils::swapAndCall(m_readHandler, SystemError::noError, 0);
+    nx::swapAndCall(m_readHandler, SystemError::noError, 0);
 }
 
 } // namespace nx::network::test

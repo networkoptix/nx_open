@@ -36,7 +36,7 @@ class BasicCustomTunnelServer:
     public AbstractTunnelServer<ApplicationData...>
 {
 public:
-    using NewTunnelHandler = nx::utils::MoveOnlyFunc<void(
+    using NewTunnelHandler = nx::MoveOnlyFunc<void(
         std::unique_ptr<network::AbstractStreamSocket> /*connection*/,
         ApplicationData... /*requestData*/)>;
 
@@ -248,7 +248,7 @@ void BasicCustomTunnelServer<ApplicationData...>::onTunnelAutorizationCompleted(
     {
         RequestResult result(authorizationResult);
         result.headers = std::move(responseHeaders);
-        return nx::utils::swapAndCall(completionHandler, std::move(result));
+        return nx::swapAndCall(completionHandler, std::move(result));
     }
 
     openTunnel(
@@ -271,7 +271,7 @@ void BasicCustomTunnelServer<ApplicationData...>::openTunnel(
 
     requestResult.headers.merge(std::move(responseHeaders));
 
-    nx::utils::swapAndCall(completionHandler, std::move(requestResult));
+    nx::swapAndCall(completionHandler, std::move(requestResult));
 }
 
 } // namespace nx::network::http::tunneling::detail

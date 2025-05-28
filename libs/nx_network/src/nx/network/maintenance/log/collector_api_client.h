@@ -29,14 +29,14 @@ public:
     void upload(
         const std::string& sessionId,
         nx::Buffer text,
-        nx::utils::MoveOnlyFunc<void(Result)> handler);
+        nx::MoveOnlyFunc<void(Result)> handler);
 
 protected:
     virtual void stopWhileInAioThread() override;
 
 private:
     void reportResult(
-        nx::utils::MoveOnlyFunc<void(Result)> handler,
+        nx::MoveOnlyFunc<void(Result)> handler,
         std::unique_ptr<http::AsyncClient> client);
 
 private:

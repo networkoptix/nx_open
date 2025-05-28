@@ -24,7 +24,7 @@ std::optional<uint64_t> RepeatingBufferMsgBodySource::contentLength() const
 }
 
 void RepeatingBufferMsgBodySource::readAsync(
-    nx::utils::MoveOnlyFunc<
+    nx::MoveOnlyFunc<
         void(SystemError::ErrorCode, nx::Buffer)
     > completionHandler)
 {

@@ -38,7 +38,7 @@ public:
      */
     void bind(
         nx::hpm::api::BindRequest requestData,
-        nx::utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
+        nx::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
     {
         this->doAuthRequest(
             std::move(requestData),
@@ -50,7 +50,7 @@ public:
      */
     void listen(
         nx::hpm::api::ListenRequest listenParams,
-        nx::utils::MoveOnlyFunc<void(
+        nx::MoveOnlyFunc<void(
             nx::hpm::api::ResultCode,
             nx::hpm::api::ListenResponse)> completionHandler)
     {
@@ -64,7 +64,7 @@ public:
      */
     void connectionAck(
         nx::hpm::api::ConnectionAckRequest request,
-        nx::utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
+        nx::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
     {
         this->doAuthRequest(
             std::move(request),
@@ -75,7 +75,7 @@ public:
      * Reads own state from mediator perspective.
      */
     void getConnectionState(
-        nx::utils::MoveOnlyFunc<void(
+        nx::MoveOnlyFunc<void(
             nx::hpm::api::ResultCode,
             nx::hpm::api::GetConnectionStateResponse)> completionHandler)
     {

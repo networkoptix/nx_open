@@ -23,7 +23,7 @@ class HttpServerFileDownloader:
 public:
     struct EventHandlers
     {
-        std::optional<nx::utils::MoveOnlyFunc<void(bool)>> onRequestHasBeenSent;
+        std::optional<nx::MoveOnlyFunc<void(bool)>> onRequestHasBeenSent;
     };
 
     ~HttpServerFileDownloader()

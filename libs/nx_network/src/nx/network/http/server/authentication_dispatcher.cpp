@@ -20,7 +20,7 @@ void AuthenticationDispatcher::add(
 
 void AuthenticationDispatcher::add(
     const std::regex& pathPattern,
-    nx::utils::MoveOnlyFunc<bool(const RequestContext&)> auxiliaryCondition,
+    nx::MoveOnlyFunc<bool(const RequestContext&)> auxiliaryCondition,
     AbstractRequestHandler* authenticator)
 {
     auto ctx = std::make_unique<AuthenticatorContext>();
@@ -40,7 +40,7 @@ void AuthenticationDispatcher::add(
 
 void AuthenticationDispatcher::serve(
     RequestContext reqCtx,
-    nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler)
+    nx::MoveOnlyFunc<void(RequestResult)> completionHandler)
 {
     AbstractRequestHandler* manager = nullptr;
     std::string path = reqCtx.request.requestLine.url.path().toStdString();

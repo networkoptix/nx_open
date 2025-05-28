@@ -423,7 +423,7 @@ Pollable* Socket<SocketInterfaceToImplement>::pollable()
 }
 
 template<typename SocketInterfaceToImplement>
-void Socket<SocketInterfaceToImplement>::post(nx::utils::MoveOnlyFunc<void()> handler)
+void Socket<SocketInterfaceToImplement>::post(nx::MoveOnlyFunc<void()> handler)
 {
     if (impl()->terminated.load(std::memory_order_relaxed) > 0)
         return;
@@ -432,7 +432,7 @@ void Socket<SocketInterfaceToImplement>::post(nx::utils::MoveOnlyFunc<void()> ha
 }
 
 template<typename SocketInterfaceToImplement>
-void Socket<SocketInterfaceToImplement>::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
+void Socket<SocketInterfaceToImplement>::dispatch(nx::MoveOnlyFunc<void()> handler)
 {
     if (impl()->terminated.load(std::memory_order_relaxed) > 0)
         return;
@@ -675,7 +675,7 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connect(
 template<typename SocketInterfaceToImplement>
 void CommunicatingSocket<SocketInterfaceToImplement>::connectAsync(
     const SocketAddress& addr,
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     return m_aioHelper->connectAsync(
         addr,
@@ -881,7 +881,7 @@ void CommunicatingSocket<SocketInterfaceToImplement>::sendAsync(
 template<typename SocketInterfaceToImplement>
 void CommunicatingSocket<SocketInterfaceToImplement>::registerTimer(
     std::chrono::milliseconds timeout,
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::MoveOnlyFunc<void()> handler)
 {
     //currently, aio considers 0 timeout as no timeout and will NOT call handler
     //NX_ASSERT(timeoutMs > std::chrono::milliseconds(0));
@@ -1564,7 +1564,7 @@ bool TCPServerSocket::listen(int queueLen)
     return false;
 }
 
-void TCPServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
+void TCPServerSocket::pleaseStop(nx::MoveOnlyFunc<void()> completionHandler)
 {
     // TODO #akolesnikov: Add general implementation to Socket class and remove this method.
     dispatch(
@@ -1910,7 +1910,7 @@ bool UDPSocket::sendTo(
 void UDPSocket::sendToAsync(
     const nx::Buffer* buffer,
     const SocketAddress& endpoint,
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
 {
     if (endpoint.address.isIpAddress())
     {
@@ -2001,7 +2001,7 @@ int UDPSocket::recvFrom(
 
 void UDPSocket::recvFromAsync(
     nx::Buffer* const buf,
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
 {
     readSomeAsync(
         buf,

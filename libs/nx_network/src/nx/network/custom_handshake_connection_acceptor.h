@@ -39,7 +39,7 @@ class CustomHandshakeConnectionAcceptor:
 
 public:
     using CustomHandshakeConnectionFactory =
-        nx::utils::MoveOnlyFunc<std::unique_ptr<CustomHandshakeConnection>(
+        nx::MoveOnlyFunc<std::unique_ptr<CustomHandshakeConnection>(
             std::unique_ptr<AbstractStreamSocket>)>;
 
     constexpr static std::size_t kDefaultMaxReadyConnectionCount = 32;
@@ -391,7 +391,7 @@ private:
         openConnections(lock);
         if (acceptResult)
         {
-            nx::utils::swapAndCall(
+            nx::swapAndCall(
                 m_acceptHandler,
                 acceptResult->resultCode,
                 std::move(acceptResult->connection));

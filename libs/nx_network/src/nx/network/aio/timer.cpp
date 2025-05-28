@@ -71,7 +71,7 @@ std::optional<std::chrono::nanoseconds> Timer::timeToEvent() const
         : m_timeout - elapsed;
 }
 
-void Timer::cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler)
+void Timer::cancelAsync(nx::MoveOnlyFunc<void()> completionHandler)
 {
     post(
         [this, completionHandler = std::move(completionHandler)]()

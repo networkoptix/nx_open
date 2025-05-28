@@ -38,7 +38,7 @@ struct ResultWithData
     T data;
 };
 
-using DataCallback = nx::utils::MoveOnlyFunc<void(
+using DataCallback = nx::MoveOnlyFunc<void(
     bool success,
     Handle requestId,
     QByteArray result,

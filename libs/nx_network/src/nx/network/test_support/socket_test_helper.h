@@ -76,7 +76,7 @@ public:
 
     virtual ~TestConnection();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync() override;
 
     int id() const;
@@ -90,7 +90,7 @@ public:
 
     void setReadBufferSize(size_t newSize);
     void setOnFinishedEventHandler(
-        nx::utils::MoveOnlyFunc<void(int, TestConnection*, SystemError::ErrorCode)> handler);
+        nx::MoveOnlyFunc<void(int, TestConnection*, SystemError::ErrorCode)> handler);
 
     AbstractStreamSocket& socket();
 
@@ -101,7 +101,7 @@ private:
     const TestTransmissionMode m_transmissionMode;
     bool m_connected;
     SocketAddress m_remoteAddress;
-    nx::utils::MoveOnlyFunc<
+    nx::MoveOnlyFunc<
         void(int, TestConnection*, SystemError::ErrorCode)
     > m_finishedEventHandler;
     nx::Buffer m_readBuffer;
@@ -196,10 +196,10 @@ public:
 
     void setServerSocket(std::unique_ptr<AbstractStreamServerSocket> serverSock);
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> handler) override;
 
     void setConnectionsReadBufferSize(size_t newSize);
-    void setOnFinishedConnectionHandler(nx::utils::MoveOnlyFunc<void(TestConnection*)> handler);
+    void setOnFinishedConnectionHandler(nx::MoveOnlyFunc<void(TestConnection*)> handler);
     void setLocalAddress(SocketAddress addr);
     bool start(std::chrono::milliseconds rwTimeout = TestConnection::kDefaultRwTimeout);
 
@@ -212,7 +212,7 @@ private:
     const size_t m_trafficLimit;
     const TestTransmissionMode m_transmissionMode;
     mutable nx::Mutex m_mutex;
-    nx::utils::MoveOnlyFunc<void(TestConnection*)> m_finishedConnectionHandler;
+    nx::MoveOnlyFunc<void(TestConnection*)> m_finishedConnectionHandler;
     std::list<std::shared_ptr<TestConnection>> m_aliveConnections;
     SocketAddress m_localAddress;
     size_t m_connectionsReadBufferSize = TestConnection::kReadBufferSize;
@@ -240,8 +240,8 @@ class NX_NETWORK_API ConnectionsGenerator:
     public ConnectionPool
 {
 public:
-    using ConfigureSocketFunc = nx::utils::MoveOnlyFunc<void(AbstractStreamSocket*)>;
-    using SocketFactoryFunc = nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractStreamSocket>()>;
+    using ConfigureSocketFunc = nx::MoveOnlyFunc<void(AbstractStreamSocket*)>;
+    using SocketFactoryFunc = nx::MoveOnlyFunc<std::unique_ptr<AbstractStreamSocket>()>;
 
     static constexpr size_t kInfiniteConnectionCount = 0;
 
@@ -266,9 +266,9 @@ public:
 
     virtual ~ConnectionsGenerator();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> handler) override;
 
-    void setOnFinishedHandler(nx::utils::MoveOnlyFunc<void()> func);
+    void setOnFinishedHandler(nx::MoveOnlyFunc<void()> func);
     void setLocalAddress(SocketAddress addr);
     void resetRemoteAddresses(std::vector<SocketAddress> remoteAddress);
     void start(std::chrono::milliseconds rwTimeout = TestConnection::kDefaultRwTimeout);
@@ -307,7 +307,7 @@ private:
     size_t m_totalConnectionsEstablished;
     std::set<int> m_finishedConnectionsIDs;
     std::optional<SocketAddress> m_localAddress;
-    nx::utils::MoveOnlyFunc<void()> m_onFinishedHandler;
+    nx::MoveOnlyFunc<void()> m_onFinishedHandler;
     std::chrono::milliseconds m_rwTimeout{0};
     SocketFactoryFunc m_socketFactoryFunc;
     ConfigureSocketFunc m_configureSocketFunc;
@@ -366,7 +366,7 @@ public:
         std::chrono::milliseconds timeout) override;
     void connectAsync(
         const SocketAddress& address,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
 private:
     SocketAddress modifyAddress(const SocketAddress& address);

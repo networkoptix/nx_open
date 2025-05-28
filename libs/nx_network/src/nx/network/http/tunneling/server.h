@@ -37,7 +37,7 @@ template<typename ...ApplicationData>
 class Server
 {
 public:
-    using TunnelCreatedHandler = nx::utils::MoveOnlyFunc<void(
+    using TunnelCreatedHandler = nx::MoveOnlyFunc<void(
         std::unique_ptr<network::AbstractStreamSocket> /*connection*/,
         ApplicationData... /*applicationData*/)>;
 

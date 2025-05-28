@@ -276,7 +276,7 @@ void SystemManager::startMerge(
 void SystemManager::validateMSSignature(
     const std::string& systemId,
     const api::ValidateMSSignatureRequest& request,
-    nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
+    nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
     m_requestsExecutor->makeAsyncCall<void>(
         nx::network::http::Method::post,

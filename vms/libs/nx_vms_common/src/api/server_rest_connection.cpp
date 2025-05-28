@@ -123,7 +123,7 @@ nx::log::Tag makeLogTag(rest::ServerConnection* instance, const nx::Uuid& server
 
 namespace rest {
 
-using HandleCallback = nx::utils::MoveOnlyFunc<void(rest::Handle)>;
+using HandleCallback = nx::MoveOnlyFunc<void(rest::Handle)>;
 
 struct ServerConnection::Private
 {
@@ -2993,7 +2993,7 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRestRequest(
 
 nx::network::http::ClientPool::ContextPtr ServerConnection::prepareContext(
     const nx::network::http::ClientPool::Request& request,
-    nx::utils::MoveOnlyFunc<void (ContextPtr)> callback,
+    nx::MoveOnlyFunc<void (ContextPtr)> callback,
     std::optional<Timeouts> timeouts)
 {
     auto certificateVerifier = d->directConnect

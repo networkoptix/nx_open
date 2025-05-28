@@ -121,7 +121,7 @@ class NotifyingTwoWayPipelineWrapper:
     public nx::utils::bstream::AbstractTwoWayConverter
 {
 public:
-    using DataWrittenEventHandler = nx::utils::MoveOnlyFunc<void(const void*, size_t)>;
+    using DataWrittenEventHandler = nx::MoveOnlyFunc<void(const void*, size_t)>;
 
     NotifyingTwoWayPipelineWrapper(
         std::unique_ptr<utils::bstream::AbstractTwoWayConverter> twoWayPipeline)

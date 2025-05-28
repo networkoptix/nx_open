@@ -235,7 +235,7 @@ std::unique_ptr<AbstractStreamSocket> MultipleServerSocket::accept()
     return std::move(result.second);
 }
 
-void MultipleServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void MultipleServerSocket::pleaseStop(nx::MoveOnlyFunc<void()> handler)
 {
     NX_VERBOSE(this, nx::format("Stopping..."));
     m_timer.pleaseStop(
@@ -260,12 +260,12 @@ Pollable* MultipleServerSocket::pollable()
     return nullptr;
 }
 
-void MultipleServerSocket::post(nx::utils::MoveOnlyFunc<void()> handler)
+void MultipleServerSocket::post(nx::MoveOnlyFunc<void()> handler)
 {
     m_timer.post(std::move(handler));
 }
 
-void MultipleServerSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
+void MultipleServerSocket::dispatch(nx::MoveOnlyFunc<void()> handler)
 {
     m_timer.dispatch(std::move(handler));
 }

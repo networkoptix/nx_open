@@ -27,15 +27,15 @@ public:
     bool isActive() const;
 
     void addOnSuccessfulCommitHandler(
-        nx::utils::MoveOnlyFunc<void()> func);
+        nx::MoveOnlyFunc<void()> func);
 
     void addOnTransactionCompletionHandler(
-        nx::utils::MoveOnlyFunc<void(DBResult)> func);
+        nx::MoveOnlyFunc<void(DBResult)> func);
 
 private:
     AbstractDbConnection* const m_connection;
     bool m_started;
-    std::vector<nx::utils::MoveOnlyFunc<void(DBResult)>> m_onTransactionCompletedHandlers;
+    std::vector<nx::MoveOnlyFunc<void(DBResult)>> m_onTransactionCompletedHandlers;
 
     void notifyOnTransactionCompletion(DBResult dbResult);
 };

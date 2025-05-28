@@ -142,7 +142,7 @@ void setPayload(const HttpClientPtr& client, const std::string& payload)
 
 using Handler = std::function<void (bool value)>;
 
-nx::utils::MoveOnlyFunc<void ()> makeSafeCallback(
+nx::MoveOnlyFunc<void ()> makeSafeCallback(
     const HttpClientPtr& client,
     PushApiHelper::Callback callback,
     const QString& requestMethod)

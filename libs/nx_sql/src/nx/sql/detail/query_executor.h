@@ -28,7 +28,7 @@ public:
     virtual DBResult execute(AbstractDbConnection* const connection) = 0;
     virtual void reportErrorWithoutExecution(DBResult errorCode) = 0;
     virtual QueryType queryType() const = 0;
-    virtual void setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler) = 0;
+    virtual void setOnBeforeDestruction(nx::MoveOnlyFunc<void()> handler) = 0;
     virtual void setExternalTransaction(Transaction* transaction) = 0;
     virtual std::string aggregationKey() const = 0;
 };
@@ -47,7 +47,7 @@ public:
 
     virtual DBResult execute(AbstractDbConnection* const connection) override;
     virtual QueryType queryType() const override;
-    virtual void setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void setOnBeforeDestruction(nx::MoveOnlyFunc<void()> handler) override;
     virtual std::string aggregationKey() const override;
 
     void setStatisticsCollector(StatisticsCollector* statisticsCollector);
@@ -86,7 +86,7 @@ private:
     std::chrono::steady_clock::time_point m_creationTime;
     QueryExecutionTaskRecord m_queryStatistics;
     bool m_queryExecuted;
-    nx::utils::MoveOnlyFunc<void()> m_onBeforeDestructionHandler;
+    nx::MoveOnlyFunc<void()> m_onBeforeDestructionHandler;
     QueryType m_queryType;
     const std::string m_queryAggregationKey;
 
@@ -116,7 +116,7 @@ class BaseUpdateExecutor:
 
 public:
     using CompletionHandler =
-        nx::utils::MoveOnlyFunc<void(DBResult, CompletionHandlerArgs...)>;
+        nx::MoveOnlyFunc<void(DBResult, CompletionHandlerArgs...)>;
 
     BaseUpdateExecutor(
         CompletionHandler completionHandler,
@@ -288,8 +288,8 @@ class NX_SQL_API UpdateWithoutAnyDataExecutor:
 
 public:
     UpdateWithoutAnyDataExecutor(
-        nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+        nx::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
+        nx::MoveOnlyFunc<void(DBResult)> completionHandler,
         const std::string& queryAggregationKey);
 
 protected:
@@ -298,7 +298,7 @@ protected:
     virtual void reportSuccess() override;
 
 private:
-    nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> m_dbUpdateFunc;
+    nx::MoveOnlyFunc<DBResult(QueryContext* const)> m_dbUpdateFunc;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -311,8 +311,8 @@ class NX_SQL_API SelectExecutor:
 
 public:
     SelectExecutor(
-        nx::utils::MoveOnlyFunc<DBResult(QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+        nx::MoveOnlyFunc<DBResult(QueryContext*)> dbSelectFunc,
+        nx::MoveOnlyFunc<void(DBResult)> completionHandler,
         const std::string& queryAggregationKey);
 
     virtual DBResult executeQuery(AbstractDbConnection* const connection) override;
@@ -320,8 +320,8 @@ public:
     virtual void setExternalTransaction(Transaction* transaction) override;
 
 private:
-    nx::utils::MoveOnlyFunc<DBResult(QueryContext*)> m_dbSelectFunc;
-    nx::utils::MoveOnlyFunc<void(DBResult)> m_completionHandler;
+    nx::MoveOnlyFunc<DBResult(QueryContext*)> m_dbSelectFunc;
+    nx::MoveOnlyFunc<void(DBResult)> m_completionHandler;
 };
 
 } // namespace nx::sql::detail

@@ -19,7 +19,7 @@ public:
 
     virtual void serve(
         RequestContext requestContext,
-        nx::utils::MoveOnlyFunc<void(RequestResult)> handler) override;
+        nx::MoveOnlyFunc<void(RequestResult)> handler) override;
 
     /**
      * Attributes specified here are added to each request.

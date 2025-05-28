@@ -170,7 +170,7 @@ private:
     void apiCall(
         const std::string& restParam,
         const Input& input,
-        nx::utils::MoveOnlyFunc<void(Result, Output)> handler)
+        nx::MoveOnlyFunc<void(Result, Output)> handler)
     {
         m_requestQueue.push(RequestContext{restParam, input});
         m_expectedOutput.s = nx::utils::generateRandomName(7);
@@ -179,7 +179,7 @@ private:
     }
 
     void apiCall(
-        nx::utils::MoveOnlyFunc<void(StatusCode::Value)> handler)
+        nx::MoveOnlyFunc<void(StatusCode::Value)> handler)
     {
         handler(StatusCode::ok);
     }

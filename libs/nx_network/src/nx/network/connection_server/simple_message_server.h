@@ -27,7 +27,7 @@ public:
         std::optional<std::chrono::milliseconds> /*inactivityTimeout*/);
 
     void registerCloseHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, bool /*connectionDestroyed*/)> handler);
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode, bool /*connectionDestroyed*/)> handler);
 
     void setKeepConnection(bool val);
 
@@ -42,7 +42,7 @@ private:
     const std::chrono::steady_clock::time_point m_creationTimestamp;
     bool m_keepConnection = false;
     std::queue<nx::Buffer> m_sendQueue;
-    std::vector<nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, bool)>> m_connectionClosedHandlers;
+    std::vector<nx::MoveOnlyFunc<void(SystemError::ErrorCode, bool)>> m_connectionClosedHandlers;
     nx::utils::InterruptionFlag m_connectionFreedFlag;
 
     void onDataRead(

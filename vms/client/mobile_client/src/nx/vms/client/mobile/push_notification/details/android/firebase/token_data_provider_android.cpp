@@ -20,7 +20,7 @@ namespace {
 
 static constexpr auto kStorageClass = "com/nxvms/mobile/push/firebase/FirebaseTokenHelper";
 
-using TokenCallback = nx::utils::MoveOnlyFunc<void(bool, const QString&)>;
+using TokenCallback = nx::MoveOnlyFunc<void(bool, const QString&)>;
 
 class CallbackManager
 {

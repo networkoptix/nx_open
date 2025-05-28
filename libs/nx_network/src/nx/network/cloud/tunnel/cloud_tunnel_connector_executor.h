@@ -26,7 +26,7 @@ class NX_NETWORK_API ConnectorExecutor:
     using base_type = aio::BasicPollable;
 
 public:
-    using CompletionHandler = nx::utils::MoveOnlyFunc<void(TunnelConnectResult)>;
+    using CompletionHandler = nx::MoveOnlyFunc<void(TunnelConnectResult)>;
 
     ConnectorExecutor(
         const AddressEntry& targetAddress,

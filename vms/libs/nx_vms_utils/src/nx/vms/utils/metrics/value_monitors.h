@@ -64,10 +64,10 @@ private:
 
 using ValueMonitors = std::map<QString, std::unique_ptr<ValueMonitor>>;
 
-using OnChange = nx::utils::MoveOnlyFunc<void()>;
+using OnChange = nx::MoveOnlyFunc<void()>;
 
 template<typename ResourceType>
-using Watch = nx::utils::MoveOnlyFunc<nx::utils::SharedGuardPtr(const ResourceType&, OnChange)>;
+using Watch = nx::MoveOnlyFunc<nx::utils::SharedGuardPtr(const ResourceType&, OnChange)>;
 
 /**
  * Provides a value at any given time only.

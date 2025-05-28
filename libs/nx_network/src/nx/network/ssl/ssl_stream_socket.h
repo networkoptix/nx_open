@@ -60,7 +60,7 @@ class StreamSocket;
  * @param socket The socket that wants to verify a certificate.
  * @return true if the chain has been verified, false otherwise.
  */
-using VerifyCertificateChainCallbackSync = nx::utils::MoveOnlyFunc<
+using VerifyCertificateChainCallbackSync = nx::MoveOnlyFunc<
     bool(CertificateChainView /*chain*/, StreamSocket* /*socket*/)>;
 
 /**
@@ -68,7 +68,7 @@ using VerifyCertificateChainCallbackSync = nx::utils::MoveOnlyFunc<
  * @param result The result of the verification.
  */
 using VerifyCertificateCallbackAsyncCompletionHandler =
-    nx::utils::MoveOnlyFunc<void(bool /*result*/)>;
+    nx::MoveOnlyFunc<void(bool /*result*/)>;
 
 /**
  * Type of the function being called on asynchronous certificate chain verification start.
@@ -76,7 +76,7 @@ using VerifyCertificateCallbackAsyncCompletionHandler =
  * @param socket The socket that wants to verify a certificate.
  * @param completionHandler The callback function which is called on completion.
  */
-using VerifyCertificateChainCallbackAsync = nx::utils::MoveOnlyFunc<
+using VerifyCertificateChainCallbackAsync = nx::MoveOnlyFunc<
     void(
         CertificateChainView /*chain*/,
         StreamSocket* /*socket*/,
@@ -107,7 +107,7 @@ public:
     StreamSocket(const StreamSocket&) = delete;
     StreamSocket& operator=(const StreamSocket&) = delete;
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync() override;
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
@@ -118,7 +118,7 @@ public:
 
     virtual void connectAsync(
         const SocketAddress& address,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
     virtual int recv(void* buffer, std::size_t bufferLen, int flags = 0) override;
 
@@ -137,7 +137,7 @@ public:
     virtual bool isEncryptionEnabled() const override;
 
     virtual void handshakeAsync(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
     virtual std::string serverName() const override;
 
@@ -156,7 +156,7 @@ private:
     nx::utils::bstream::ProxyConverter m_proxyConverter;
     nx::Buffer m_emptyBuffer;
     aio::Timer m_handshakeTimer;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_handshakeHandler;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_handshakeHandler;
     std::optional<unsigned int> m_recvTimeoutBak;
     std::optional<unsigned int> m_sendTimeoutBak;
     std::optional<std::string> m_serverName;

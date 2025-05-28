@@ -19,7 +19,7 @@ public:
     virtual std::optional<uint64_t> contentLength() const override;
 
     virtual void readAsync(
-        nx::utils::MoveOnlyFunc<
+        nx::MoveOnlyFunc<
             void(SystemError::ErrorCode, nx::Buffer)
         > completionHandler) override;
 

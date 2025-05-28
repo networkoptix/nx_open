@@ -151,7 +151,7 @@ void CrossNatConnector::onFetchMediatorAddressCompletion(
 {
     if (!http::StatusCode::isSuccessCode(resultCode))
     {
-        nx::utils::swapAndCall(m_completionHandler, SystemError::hostUnreachable, nullptr);
+        nx::swapAndCall(m_completionHandler, SystemError::hostUnreachable, nullptr);
         return;
     }
 
@@ -172,7 +172,7 @@ void CrossNatConnector::issueConnectRequestToMediator()
             [this, resultCode = resultCode]() mutable
             {
                 mediatorResponseCounter().addResult(hpm::api::ResultCode::badTransport);
-                nx::utils::swapAndCall(m_completionHandler, resultCode, nullptr);
+                nx::swapAndCall(m_completionHandler, resultCode, nullptr);
             });
         return;
     }

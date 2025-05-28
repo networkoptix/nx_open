@@ -32,7 +32,7 @@ protected:
      * The started request is considered running until completionHandler has been invoked.
      */
     virtual std::unique_ptr<nx::network::aio::BasicPollable> startRequest(
-        nx::utils::MoveOnlyFunc<void()> completionHandler) = 0;
+        nx::MoveOnlyFunc<void()> completionHandler) = 0;
 
 private:
     struct Request

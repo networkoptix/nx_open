@@ -44,7 +44,7 @@ private:
     nx::utils::ElapsedTimer m_responseTimer;
     std::unique_ptr<nx::network::http::AsyncMessagePipeline> m_httpPipeline;
     std::string m_expectedConnectionTestId;
-    nx::utils::MoveOnlyFunc<void(bool)> m_connectionTestHandler;
+    nx::MoveOnlyFunc<void(bool)> m_connectionTestHandler;
 
     virtual void stopWhileInAioThread() override;
 
@@ -55,7 +55,7 @@ private:
         nx::cloud::relay::api::CreateClientSessionResponse response,
         nx::hpm::api::CloudConnectVersion cloudConnectVersion);
 
-    void testConnection(nx::utils::MoveOnlyFunc<void(bool)>);
+    void testConnection(nx::MoveOnlyFunc<void(bool)>);
     void onTestConnectionResponse(nx::network::http::Message message);
 
     void onTestConnectionClosed(

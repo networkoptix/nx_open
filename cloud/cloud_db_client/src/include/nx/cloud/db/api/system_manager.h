@@ -156,7 +156,7 @@ public:
     virtual void validateMSSignature(
         const std::string& systemId,
         const api::ValidateMSSignatureRequest& request,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) = 0;
+        nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler) = 0;
 
     /**
      * Returns sharings (account email, direct and org access roles) for the specified system.

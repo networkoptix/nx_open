@@ -27,7 +27,7 @@ public:
      * NOTE: If operation is already stopped it is allowed for completionHandler
      *   to be executed directly in QnStoppableAsync::pleaseStop.
      */
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) = 0;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> completionHandler) = 0;
 
     /**
      * Stops object's asynchronous operations and waits for completion.

@@ -29,13 +29,13 @@ public:
     /**
      * Queues functor to be executed from within this aio thread as soon as possible.
      */
-    virtual void post(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor) = 0;
+    virtual void post(Pollable* const sock, nx::MoveOnlyFunc<void()> functor) = 0;
 
     /**
      * If called in this aio thread, then calls functor immediately.
      * Otherwise, invokes AioThread::post.
      */
-    virtual void dispatch(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor) = 0;
+    virtual void dispatch(Pollable* const sock, nx::MoveOnlyFunc<void()> functor) = 0;
 
     /**
      * Cancels calls scheduled with aio::AioThread::post and aio::AioThread::dispatch.
@@ -67,11 +67,11 @@ public:
 
     virtual void post(
         Pollable* const sock,
-        nx::utils::MoveOnlyFunc<void()> functor) override;
+        nx::MoveOnlyFunc<void()> functor) override;
 
     virtual void dispatch(
         Pollable* const sock,
-        nx::utils::MoveOnlyFunc<void()> functor) override;
+        nx::MoveOnlyFunc<void()> functor) override;
 
     virtual void cancelPostedCalls(Pollable* const sock) override;
 
@@ -83,7 +83,7 @@ public:
         aio::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
         std::optional<std::chrono::milliseconds> timeoutMillis = std::nullopt,
-        nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler = nullptr);
+        nx::MoveOnlyFunc<void()> socketAddedToPollHandler = nullptr);
 
     /**
      * Stop monitoring sock for event eventType.

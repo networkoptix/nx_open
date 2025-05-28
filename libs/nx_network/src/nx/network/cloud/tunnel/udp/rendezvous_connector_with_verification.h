@@ -26,7 +26,7 @@ public:
         SocketAddress remotePeerAddress,
         SocketAddress localAddressToBindTo);
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> completionHandler) override;
 
     /**
      * If the connection established with a call to connect() is closed before a call to

@@ -579,7 +579,7 @@ protected:
     }
 
     void whenReceivedMessageFromServerAsync(
-        nx::utils::MoveOnlyFunc<void()> auxiliaryHandler)
+        nx::MoveOnlyFunc<void()> auxiliaryHandler)
     {
         m_auxiliaryRecvHandler.swap(auxiliaryHandler);
 
@@ -1525,7 +1525,7 @@ private:
     std::unique_ptr<typename SocketTypeSet::ServerSocket> m_serverSocket;
     std::unique_ptr<typename SocketTypeSet::ClientSocket> m_connection;
     std::unique_ptr<server::SimpleMessageServer> m_server;
-    nx::utils::MoveOnlyFunc<void()> m_auxiliaryRecvHandler;
+    nx::MoveOnlyFunc<void()> m_auxiliaryRecvHandler;
     std::vector<std::unique_ptr<ClientConnectionContext>> m_clientConnections;
     nx::utils::SyncQueue<AcceptResult> m_acceptedConnections;
     AcceptResult m_prevAcceptResult;
@@ -1588,7 +1588,7 @@ private:
         }
 
         if (m_auxiliaryRecvHandler)
-            nx::utils::swapAndCall(m_auxiliaryRecvHandler);
+            nx::swapAndCall(m_auxiliaryRecvHandler);
 
         if (!m_waitForSingleRecvResult)
             continueReceiving();

@@ -40,7 +40,7 @@ DBResult DbConnectionMock::lastError()
         : *m_forcedError;
 }
 
-void DbConnectionMock::setOnDestructionHandler(nx::utils::MoveOnlyFunc<void()> handler)
+void DbConnectionMock::setOnDestructionHandler(nx::MoveOnlyFunc<void()> handler)
 {
     m_onDestructionHandler = std::move(handler);
 }

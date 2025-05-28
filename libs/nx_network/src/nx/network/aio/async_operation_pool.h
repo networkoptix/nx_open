@@ -43,7 +43,7 @@ public:
     struct Context
     {
         std::unique_ptr<Executor> executor;
-        nx::utils::MoveOnlyFunc<void(std::unique_ptr<Executor>)> handler;
+        nx::MoveOnlyFunc<void(std::unique_ptr<Executor>)> handler;
     };
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override

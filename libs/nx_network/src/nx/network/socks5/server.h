@@ -19,7 +19,7 @@ class AbstractTunnelConnector: public aio::BasicPollable
 {
 public:
     using DoneCallback =
-        nx::utils::MoveOnlyFunc<void(
+        nx::MoveOnlyFunc<void(
             SystemError::ErrorCode,
             std::unique_ptr<nx::network::AbstractStreamSocket>)>;
 
@@ -71,7 +71,7 @@ class NX_NETWORK_API Server:
 
 public:
     using ConnectorFactoryFunc =
-        nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractTunnelConnector>()>;
+        nx::MoveOnlyFunc<std::unique_ptr<AbstractTunnelConnector>()>;
 
     /**
      * Create server instance.

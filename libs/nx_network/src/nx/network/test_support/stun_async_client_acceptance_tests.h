@@ -66,7 +66,7 @@ private:
     public:
         virtual void connectAsync(
             const SocketAddress& /*addr*/,
-            nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
+            nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
         {
             post([handler = std::move(handler)]() { handler(SystemError::connectionRefused); });
         }

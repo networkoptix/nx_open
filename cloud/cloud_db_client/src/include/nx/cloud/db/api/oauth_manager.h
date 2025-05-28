@@ -26,42 +26,42 @@ public:
 
     virtual void issueTokenLegacy(
         const IssueTokenRequest& request,
-        nx::utils::MoveOnlyFunc<void(ResultCode, IssueTokenResponse)> completionHandler) = 0;
+        nx::MoveOnlyFunc<void(ResultCode, IssueTokenResponse)> completionHandler) = 0;
 
     virtual void issueTokenV1(const IssueTokenRequest& request,
-        nx::utils::MoveOnlyFunc<void(ResultCode, IssueTokenResponse)> completionHandler) = 0;
+        nx::MoveOnlyFunc<void(ResultCode, IssueTokenResponse)> completionHandler) = 0;
 
     virtual void issueAuthorizationCode(
         const IssueTokenRequest& request,
-        nx::utils::MoveOnlyFunc<void(ResultCode, IssueCodeResponse)> completionHandler) = 0;
+        nx::MoveOnlyFunc<void(ResultCode, IssueCodeResponse)> completionHandler) = 0;
 
     virtual void legacyValidateToken(
         const std::string& token,
-        nx::utils::MoveOnlyFunc<void(ResultCode, ValidateTokenResponse)> completionHandler) = 0;
+        nx::MoveOnlyFunc<void(ResultCode, ValidateTokenResponse)> completionHandler) = 0;
 
     // Get attributes and claims associated with the token.
     virtual void introspectToken(
         const TokenIntrospectionRequest& request,
-        nx::utils::MoveOnlyFunc<void(ResultCode, TokenIntrospectionResponse)> completionHandler) = 0;
+        nx::MoveOnlyFunc<void(ResultCode, TokenIntrospectionResponse)> completionHandler) = 0;
 
     virtual void deleteToken(
-        const std::string& token, nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
+        const std::string& token, nx::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
 
     virtual void deleteTokensByClientId(
         const std::string& clientId,
-        nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
+        nx::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
 
-    virtual void logout(nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
+    virtual void logout(nx::MoveOnlyFunc<void(ResultCode)> completionHandler) = 0;
 
     virtual void issueStunToken(const IssueStunTokenRequest& request,
-        nx::utils::MoveOnlyFunc<void(ResultCode, IssueStunTokenResponse)> completionHandler) = 0;
+        nx::MoveOnlyFunc<void(ResultCode, IssueStunTokenResponse)> completionHandler) = 0;
 
     virtual void getJwtPublicKeys(
-        nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<nx::network::jwk::Key>)> completionHandler) = 0;
+        nx::MoveOnlyFunc<void(ResultCode, std::vector<nx::network::jwk::Key>)> completionHandler) = 0;
 
     virtual void getJwtPublicKeyByKid(
         const std::string& kid,
-        nx::utils::MoveOnlyFunc<void(ResultCode, nx::network::jwk::Key)> completionHandler) = 0;
+        nx::MoveOnlyFunc<void(ResultCode, nx::network::jwk::Key)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api

@@ -83,7 +83,7 @@ void HttpServerConnection::setExtraSuccessResponseHeaders(HttpHeaders responseHe
 }
 
 void HttpServerConnection::setOnResponseSent(
-    nx::utils::MoveOnlyFunc<void(std::chrono::microseconds)> handler)
+    nx::MoveOnlyFunc<void(std::chrono::microseconds)> handler)
 {
     m_responseSentHandler = std::move(handler);
 }

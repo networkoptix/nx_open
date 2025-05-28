@@ -23,10 +23,10 @@ public:
     virtual bool open() override;
     virtual bool begin() override;
     virtual DBResult lastError() override;
-    void setOnDestructionHandler(nx::utils::MoveOnlyFunc<void()> handler);
+    void setOnDestructionHandler(nx::MoveOnlyFunc<void()> handler);
 
 private:
-    nx::utils::MoveOnlyFunc<void()> m_onDestructionHandler;
+    nx::MoveOnlyFunc<void()> m_onDestructionHandler;
     std::shared_ptr<DBResult> m_forcedError;
 };
 

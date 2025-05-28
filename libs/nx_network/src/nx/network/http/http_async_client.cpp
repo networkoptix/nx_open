@@ -385,22 +385,22 @@ SystemError::ErrorCode AsyncClient::lastSysErrorCode() const
 }
 
 void AsyncClient::setOnRequestHasBeenSent(
-    nx::utils::MoveOnlyFunc<void(bool /*isRetryAfterUnauthorizedResponse*/)> handler)
+    nx::MoveOnlyFunc<void(bool /*isRetryAfterUnauthorizedResponse*/)> handler)
 {
     m_onRequestHasBeenSent = std::move(handler);
 }
 
-void AsyncClient::setOnResponseReceived(nx::utils::MoveOnlyFunc<void()> handler)
+void AsyncClient::setOnResponseReceived(nx::MoveOnlyFunc<void()> handler)
 {
     m_onResponseReceived = std::move(handler);
 }
 
-void AsyncClient::setOnSomeMessageBodyAvailable(nx::utils::MoveOnlyFunc<void()> handler)
+void AsyncClient::setOnSomeMessageBodyAvailable(nx::MoveOnlyFunc<void()> handler)
 {
     m_onSomeMessageBodyAvailable = std::move(handler);
 }
 
-void AsyncClient::setOnDone(nx::utils::MoveOnlyFunc<void()> handler)
+void AsyncClient::setOnDone(nx::MoveOnlyFunc<void()> handler)
 {
     m_onDone = std::move(handler);
 }
@@ -419,7 +419,7 @@ void AsyncClient::doGet(const nx::Url& url)
 
 void AsyncClient::doGet(
     const nx::Url& url,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doGet(url);
@@ -432,7 +432,7 @@ void AsyncClient::doHead(const nx::Url& url)
 
 void AsyncClient::doHead(
     const nx::Url& url,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doHead(url);
@@ -454,7 +454,7 @@ void AsyncClient::doPost(
 void AsyncClient::doPost(
     const nx::Url& url,
     std::unique_ptr<AbstractMsgBodySource> body,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doPost(url, std::move(body));
@@ -462,7 +462,7 @@ void AsyncClient::doPost(
 
 void AsyncClient::doPost(
     const nx::Url& url,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doPost(url);
@@ -484,7 +484,7 @@ void AsyncClient::doPut(
 void AsyncClient::doPut(
     const nx::Url& url,
     std::unique_ptr<AbstractMsgBodySource> body,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doPut(url, std::move(body));
@@ -492,7 +492,7 @@ void AsyncClient::doPut(
 
 void AsyncClient::doPut(
     const nx::Url& url,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doPut(url);
@@ -514,7 +514,7 @@ void AsyncClient::doPatch(
 void AsyncClient::doPatch(
     const nx::Url& url,
     std::unique_ptr<AbstractMsgBodySource> body,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doPatch(url, std::move(body));
@@ -522,7 +522,7 @@ void AsyncClient::doPatch(
 
 void AsyncClient::doPatch(
     const nx::Url& url,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doPatch(url);
@@ -535,7 +535,7 @@ void AsyncClient::doDelete(const nx::Url& url)
 
 void AsyncClient::doDelete(
     const nx::Url& url,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doDelete(url);
@@ -571,7 +571,7 @@ void AsyncClient::doUpgrade(
 void AsyncClient::doUpgrade(
     const nx::Url& url,
     const std::string& protocolToUpgradeTo,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     doUpgrade(
         url,
@@ -584,7 +584,7 @@ void AsyncClient::doUpgrade(
     const nx::Url& url,
     const Method& method,
     const std::string& protocolToUpgradeTo,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doUpgrade(url, method, protocolToUpgradeTo);
@@ -611,7 +611,7 @@ void AsyncClient::doConnect(
 void AsyncClient::doConnect(
     const nx::Url& proxyUrl,
     const std::string& targetHost,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doConnect(proxyUrl, targetHost);
@@ -672,7 +672,7 @@ void AsyncClient::doRequest(
 void AsyncClient::doRequest(
     const Method& method,
     const nx::Url& url,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doRequest(method, url);
@@ -1813,7 +1813,7 @@ AsyncClient::Result AsyncClient::emitSomeMessageBodyAvailable()
 
 template<typename ... Args>
 AsyncClient::Result AsyncClient::invokeHandler(
-    nx::utils::MoveOnlyFunc<void(Args...)>& handler,
+    nx::MoveOnlyFunc<void(Args...)>& handler,
     Args... args)
 {
     if (!handler)

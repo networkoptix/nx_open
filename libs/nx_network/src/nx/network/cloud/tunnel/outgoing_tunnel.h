@@ -21,7 +21,7 @@ class NX_NETWORK_API AbstractOutgoingTunnel:
     public aio::BasicPollable
 {
 public:
-    using NewConnectionHandler = nx::utils::MoveOnlyFunc<void(
+    using NewConnectionHandler = nx::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         TunnelAttributes tunnelAttributes,
         std::unique_ptr<AbstractStreamSocket>)>;
@@ -30,7 +30,7 @@ public:
 
     virtual ~AbstractOutgoingTunnel() = default;
 
-    virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) = 0;
+    virtual void setOnClosedHandler(nx::MoveOnlyFunc<void()> handler) = 0;
 
     /**
      * Establish new connection.
@@ -59,7 +59,7 @@ class NX_NETWORK_API OutgoingTunnel:
     using base_type = AbstractOutgoingTunnel;
 
 public:
-    using SocketHandler = nx::utils::MoveOnlyFunc<
+    using SocketHandler = nx::MoveOnlyFunc<
         void(SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>)>;
 
     enum class State
@@ -81,7 +81,7 @@ public:
      */
     virtual void stopWhileInAioThread() override;
 
-    virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void setOnClosedHandler(nx::MoveOnlyFunc<void()> handler) override;
 
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,
@@ -114,7 +114,7 @@ private:
     SystemError::ErrorCode m_lastErrorCode = SystemError::noError;
     nx::Mutex m_mutex;
     State m_state = State::init;
-    nx::utils::MoveOnlyFunc<void()> m_onClosedHandler;
+    nx::MoveOnlyFunc<void()> m_onClosedHandler;
     TunnelAttributes m_attributes;
 
     void postponeConnectTask(

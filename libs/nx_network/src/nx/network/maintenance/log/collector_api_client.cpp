@@ -28,7 +28,7 @@ void CollectorApiClient::bindToAioThread(aio::AbstractAioThread* aioThread)
 void CollectorApiClient::upload(
     const std::string& sessionId,
     nx::Buffer text,
-    nx::utils::MoveOnlyFunc<void(Result)> handler)
+    nx::MoveOnlyFunc<void(Result)> handler)
 {
     post(
         [this, sessionId, text = std::move(text), handler = std::move(handler)]() mutable
@@ -58,7 +58,7 @@ void CollectorApiClient::stopWhileInAioThread()
 }
 
 void CollectorApiClient::reportResult(
-    nx::utils::MoveOnlyFunc<void(Result)> handler,
+    nx::MoveOnlyFunc<void(Result)> handler,
     std::unique_ptr<http::AsyncClient> client)
 {
     if (client->failed())

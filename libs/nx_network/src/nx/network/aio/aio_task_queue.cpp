@@ -62,7 +62,7 @@ bool AioTaskQueue::pushAddSocketTaskIfNeeded(
     aio::EventType eventToWatch,
     AIOEventHandler* eventHandler,
     std::chrono::milliseconds timeout,
-    nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler)
+    nx::MoveOnlyFunc<void()> socketAddedToPollHandler)
 {
     bool reverseTaskCancelled = false;
     std::deque<SocketAddRemoveTask> tasksToRemove;
@@ -144,13 +144,13 @@ bool AioTaskQueue::empty() const
 }
 
 void AioTaskQueue::setAboutToInvoke(
-    nx::utils::MoveOnlyFunc<void(const char* /*functionType*/)> handler)
+    nx::MoveOnlyFunc<void(const char* /*functionType*/)> handler)
 {
     m_aboutToInvokeHandler = std::move(handler);
 }
 
 void AioTaskQueue::setDoneInvoking(
-    nx::utils::MoveOnlyFunc<void(std::chrono::microseconds)> handler)
+    nx::MoveOnlyFunc<void(std::chrono::microseconds)> handler)
 {
     m_doneInvokingHandler = std::move(handler);
 }

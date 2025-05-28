@@ -65,6 +65,6 @@ NX_VMS_COMMON_API Result toResult(QSqlError&& error);
 NX_VMS_COMMON_API QString toString(NotificationSource source);
 
 template <typename... Args>
-using Handler = nx::utils::MoveOnlyFunc<void(int reqId, Result, Args&&...)>;
+using Handler = nx::MoveOnlyFunc<void(int reqId, Result, Args&&...)>;
 
 } // namespace ec2

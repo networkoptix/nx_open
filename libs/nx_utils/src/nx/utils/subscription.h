@@ -30,7 +30,7 @@ class Subscription
     typedef Subscription<Data...> SelfType;
 
 public:
-    using NotificationCallback = nx::utils::MoveOnlyFunc<void(Data...)>;
+    using NotificationCallback = nx::MoveOnlyFunc<void(Data...)>;
 
     ~Subscription()
     {

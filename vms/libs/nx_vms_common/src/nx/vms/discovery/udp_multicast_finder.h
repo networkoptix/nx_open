@@ -23,7 +23,7 @@ namespace discovery {
 class NX_VMS_COMMON_API UdpMulticastFinder: public nx::network::aio::BasicPollable
 {
 public:
-    using ModuleHandler = nx::utils::MoveOnlyFunc<void(
+    using ModuleHandler = nx::MoveOnlyFunc<void(
         const api::ModuleInformationWithAddresses& module,
         const nx::network::SocketAddress& endpoint)>;
 
@@ -44,7 +44,7 @@ public:
 
     virtual void stopWhileInAioThread() override;
     void updateInterfaces();
-    void setIsMulticastEnabledFunction(nx::utils::MoveOnlyFunc<bool()> function);
+    void setIsMulticastEnabledFunction(nx::MoveOnlyFunc<bool()> function);
 
 private:
     typedef std::map<nx::network::HostAddress, std::unique_ptr<nx::network::UDPSocket>> Senders;
@@ -63,7 +63,7 @@ private:
     nx::network::SocketAddress m_multicastEndpoint;
     std::chrono::milliseconds m_updateInterfacesInterval;
     std::chrono::milliseconds m_sendInterval;
-    nx::utils::MoveOnlyFunc<bool()> m_isMulticastEnabledFunction;
+    nx::MoveOnlyFunc<bool()> m_isMulticastEnabledFunction;
 
     nx::network::aio::Timer m_updateTimer;
     nx::Buffer m_ownModuleInformation;

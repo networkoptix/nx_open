@@ -134,7 +134,7 @@ void OutgoingTunnelConnection::establishNewConnection(
 }
 
 void OutgoingTunnelConnection::setControlConnectionClosedHandler(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_controlConnectionClosedHandler = std::move(handler);
 }

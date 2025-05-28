@@ -163,7 +163,7 @@ public:
     /**
      * Save all settings to database
      */
-    bool resynchronizeNowSync(nx::utils::MoveOnlyFunc<
+    bool resynchronizeNowSync(nx::MoveOnlyFunc<
         bool(const QString& paramName, const QString& paramValue)> filter = nullptr);
 
     /**

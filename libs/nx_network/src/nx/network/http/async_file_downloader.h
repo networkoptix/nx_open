@@ -31,17 +31,17 @@ public:
     /**
      * Set the callback to call when the headers have been read.
      */
-    void setOnResponseReceived(nx::utils::MoveOnlyFunc<void(std::optional<size_t>)> handler);
+    void setOnResponseReceived(nx::MoveOnlyFunc<void(std::optional<size_t>)> handler);
 
     /**
      * Set the callback to call when some data has been downloaded and saved.
      */
-    void setOnProgressHasBeenMade(nx::utils::MoveOnlyFunc<void(nx::Buffer&&, std::optional<double>)> handler);
+    void setOnProgressHasBeenMade(nx::MoveOnlyFunc<void(nx::Buffer&&, std::optional<double>)> handler);
 
     /**
      * Set the callback to call when the download has been finished.
      */
-    void setOnDone(nx::utils::MoveOnlyFunc<void()> handler);
+    void setOnDone(nx::MoveOnlyFunc<void()> handler);
 
     void setTimeouts(const AsyncClient::Timeouts& timeouts);
     void setAuthType(AuthType value);
@@ -90,9 +90,9 @@ private:
         stopped
     };
 
-    nx::utils::MoveOnlyFunc<void(std::optional<size_t>)> m_onResponseReceived;
-    nx::utils::MoveOnlyFunc<void(nx::Buffer&&, std::optional<double>)> m_onProgressHasBeenMade;
-    nx::utils::MoveOnlyFunc<void()> m_onDone;
+    nx::MoveOnlyFunc<void(std::optional<size_t>)> m_onResponseReceived;
+    nx::MoveOnlyFunc<void(nx::Buffer&&, std::optional<double>)> m_onProgressHasBeenMade;
+    nx::MoveOnlyFunc<void()> m_onDone;
 
     State m_state = State::init;
     AsyncClient m_client;

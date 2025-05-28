@@ -25,7 +25,7 @@ OutgoingTunnelPool::~OutgoingTunnelPool()
     NX_ASSERT(m_pool.empty());
 }
 
-void OutgoingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
+void OutgoingTunnelPool::pleaseStop(nx::MoveOnlyFunc<void()> completionHandler)
 {
     // Stopping all tunnels. Assuming no one calls establishNewConnection anymore.
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -229,7 +229,7 @@ void OutgoingTunnelPool::onTunnelClosed(AbstractOutgoingTunnel* tunnelPtr)
 }
 
 void OutgoingTunnelPool::tunnelsStopped(
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     m_aioThreadBinder.post(
         [this, completionHandler = std::move(completionHandler)]

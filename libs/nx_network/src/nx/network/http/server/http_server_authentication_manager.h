@@ -15,7 +15,7 @@ namespace nx::network::http::server {
 class NX_NETWORK_API AbstractAuthenticationDataProvider
 {
 public:
-    using LookupResultHandler = nx::utils::MoveOnlyFunc<void(PasswordLookupResult)>;
+    using LookupResultHandler = nx::MoveOnlyFunc<void(PasswordLookupResult)>;
 
     virtual ~AbstractAuthenticationDataProvider() = default;
 
@@ -61,7 +61,7 @@ public:
 
     virtual void serve(
         RequestContext requestContext,
-        nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler) override;
+        nx::MoveOnlyFunc<void(RequestResult)> completionHandler) override;
 
     std::string realm();
 

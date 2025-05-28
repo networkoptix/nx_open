@@ -47,7 +47,7 @@ public:
     void sendDatagram(
         SocketAddress destinationEndpoint,
         nx::Buffer datagram,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress)> completionHandler);
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress)> completionHandler);
 
 protected:
     virtual void datagramReceived(
@@ -60,14 +60,14 @@ private:
     {
         SocketAddress destinationEndpoint;
         nx::Buffer serializedMessage;
-        nx::utils::MoveOnlyFunc<void(
+        nx::MoveOnlyFunc<void(
             SystemError::ErrorCode,
             SocketAddress resolvedTargetAddress)> completionHandler;
 
         OutgoingMessageContext(
             SocketAddress _destinationEndpoint,
             nx::Buffer _serializedMessage,
-            nx::utils::MoveOnlyFunc<void(
+            nx::MoveOnlyFunc<void(
                 SystemError::ErrorCode, SocketAddress)> _completionHandler);
         OutgoingMessageContext(OutgoingMessageContext&& rhs);
 
@@ -158,7 +158,7 @@ public:
     void sendMessage(
         SocketAddress destinationEndpoint,
         const MessageType& message,
-        nx::utils::MoveOnlyFunc<void(
+        nx::MoveOnlyFunc<void(
             SystemError::ErrorCode /*sysErrorCode*/,
             SocketAddress /*resolvedTargetAddress*/)> completionHandler)
     {

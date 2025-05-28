@@ -23,7 +23,7 @@ void AsyncMessagePipeline::bindToAioThread(aio::AbstractAioThread* aioThread)
 void AsyncMessagePipeline::sendMessage(
     Message msg,
     std::unique_ptr<AbstractMsgBodySourceWithCache> msgBody,
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     if (msgBody)
         msgBody->bindToAioThread(getAioThread());
@@ -49,7 +49,7 @@ void AsyncMessagePipeline::stopWhileInAioThread()
 
 void AsyncMessagePipeline::sendBodyAsync(
     std::unique_ptr<AbstractMsgBodySourceWithCache> msgBody,
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     auto bridge = aio::makeAsyncChannelUnidirectionalBridge(
         msgBody.get(), this);

@@ -58,7 +58,7 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     m_writeHttpClient->setCredentials(m_readHttpClient->credentials());
 }
 
-void P2PHttpClientTransport::start(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart)
+void P2PHttpClientTransport::start(nx::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart)
 {
     post(
         [this, onStart = std::move(onStart)]() mutable
@@ -458,7 +458,7 @@ void P2PHttpClientTransport::startReading()
                 utils::InterruptionFlag::Watcher watcher(&m_destructionFlag);
                 const auto resultCode =
                     m_failed ? SystemError::connectionAbort : SystemError::noError;
-                nx::utils::swapAndCall(m_onStartHandler, resultCode);
+                nx::swapAndCall(m_onStartHandler, resultCode);
                 if (watcher.interrupted())
                     return;
             }
@@ -491,7 +491,7 @@ void P2PHttpClientTransport::startReading()
 
             setFailedState("The read (GET) http client emitted 'onDone'. Moving to a failed state.");
             if (m_onStartHandler)
-                nx::utils::swapAndCall(m_onStartHandler, SystemError::connectionAbort);
+                nx::swapAndCall(m_onStartHandler, SystemError::connectionAbort);
         });
 
     NX_VERBOSE(this, "startReading: Sending initial GET request to '%1'", m_url);

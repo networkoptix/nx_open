@@ -118,9 +118,9 @@ void BaseTunnelClient::cleanUpFailedTunnel(
 void BaseTunnelClient::reportFailure(OpenTunnelResult result)
 {
     if (m_clientFeedbackFunction)
-        nx::utils::swapAndCall(m_clientFeedbackFunction, false);
+        nx::swapAndCall(m_clientFeedbackFunction, false);
 
-    nx::utils::swapAndCall(m_completionHandler, std::move(result));
+    nx::swapAndCall(m_completionHandler, std::move(result));
 }
 
 bool BaseTunnelClient::resetConnectionAttributes()
@@ -134,7 +134,7 @@ void BaseTunnelClient::reportSuccess()
     OpenTunnelResult result(std::exchange(m_connection, nullptr));
     result.httpStatus = (StatusCode::Value) response().statusLine.statusCode;
 
-    nx::utils::swapAndCall(
+    nx::swapAndCall(
         m_completionHandler,
         std::move(result));
 }

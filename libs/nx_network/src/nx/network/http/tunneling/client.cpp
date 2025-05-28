@@ -65,7 +65,7 @@ private:
     {
         m_isDataReceived = true;
         if (m_feedbackFunc)
-            nx::utils::swapAndCall(m_feedbackFunc, true);
+            nx::swapAndCall(m_feedbackFunc, true);
     }
 
 private:
@@ -258,7 +258,7 @@ void Client::reportResult(ClientContext* ctx, OpenTunnelResult result)
 
     m_actualClients.clear();
 
-    return nx::utils::swapAndCall(m_completionHandler, std::move(result));
+    return nx::swapAndCall(m_completionHandler, std::move(result));
 }
 
 } // namespace nx::network::http::tunneling

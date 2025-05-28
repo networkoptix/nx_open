@@ -34,7 +34,7 @@ void CloudMediaServerEndpointVerificator::setTimeout(
 void CloudMediaServerEndpointVerificator::verifyHost(
     const nx::network::SocketAddress& endpointToVerify,
     const nx::network::AddressEntry& targetHostAddress,
-    nx::utils::MoveOnlyFunc<void(VerificationResult)> completionHandler)
+    nx::MoveOnlyFunc<void(VerificationResult)> completionHandler)
 {
     m_endpointToVerify = endpointToVerify;
     m_targetHostAddress = targetHostAddress;
@@ -81,7 +81,7 @@ void CloudMediaServerEndpointVerificator::onHttpRequestDone()
             m_connectSessionId, m_endpointToVerify.toString(),
                 SystemError::toString(m_httpClient->lastSysErrorCode()));
         m_lastSystemErrorCode = m_httpClient->lastSysErrorCode();
-        return nx::utils::swapAndCall(
+        return nx::swapAndCall(
             m_completionHandler,
             VerificationResult::ioError);
     }
@@ -93,7 +93,7 @@ void CloudMediaServerEndpointVerificator::onHttpRequestDone()
             m_connectSessionId, m_endpointToVerify.toString(),
             nx::network::http::StatusCode::toString(
                 m_httpClient->response()->statusLine.statusCode));
-        return nx::utils::swapAndCall(
+        return nx::swapAndCall(
             m_completionHandler,
             VerificationResult::notPassed);
     }
@@ -103,7 +103,7 @@ void CloudMediaServerEndpointVerificator::onHttpRequestDone()
         NX_VERBOSE(this, "cross-nat %1. Failed to verify %2",
             m_connectSessionId, m_httpClient->url());
 
-        return nx::utils::swapAndCall(
+        return nx::swapAndCall(
             m_completionHandler,
             VerificationResult::notPassed);
     }
@@ -111,7 +111,7 @@ void CloudMediaServerEndpointVerificator::onHttpRequestDone()
     NX_VERBOSE(this, "cross-nat %1. URL %2 has been verified. Target server confirmed",
         m_connectSessionId, m_httpClient->url());
 
-    return nx::utils::swapAndCall(
+    return nx::swapAndCall(
         m_completionHandler,
         VerificationResult::passed);
 }

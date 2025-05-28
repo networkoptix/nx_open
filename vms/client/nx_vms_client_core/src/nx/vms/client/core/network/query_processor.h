@@ -49,7 +49,7 @@ public:
 
     nx::network::ssl::AdapterFunc adapterFunc(const nx::Uuid& serverId) const;
 
-    using PostRequestHandler = nx::utils::MoveOnlyFunc<void(ec2::ErrorCode)>;
+    using PostRequestHandler = nx::MoveOnlyFunc<void(ec2::ErrorCode)>;
 
     /**
      * Send POST request.
@@ -148,7 +148,7 @@ private:
     void sendGetRequest(
         ec2::ApiCommand::Value cmdCode,
         QUrlQuery query,
-        nx::utils::MoveOnlyFunc<void(ec2::ErrorCode, Qn::SerializationFormat, const nx::Buffer&)> handler);
+        nx::MoveOnlyFunc<void(ec2::ErrorCode, Qn::SerializationFormat, const nx::Buffer&)> handler);
 
     void sendPostRequest(
         ec2::ApiCommand::Value cmdCode,

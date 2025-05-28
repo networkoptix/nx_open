@@ -477,13 +477,13 @@ Pollable* UdtSocket<InterfaceToImplement>::pollable()
 }
 
 template<typename InterfaceToImplement>
-void UdtSocket<InterfaceToImplement>::post(nx::utils::MoveOnlyFunc<void()> handler)
+void UdtSocket<InterfaceToImplement>::post(nx::MoveOnlyFunc<void()> handler)
 {
     m_aioService->post(static_cast<Pollable*>(this), std::move(handler));
 }
 
 template<typename InterfaceToImplement>
-void UdtSocket<InterfaceToImplement>::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
+void UdtSocket<InterfaceToImplement>::dispatch(nx::MoveOnlyFunc<void()> handler)
 {
     m_aioService->dispatch(static_cast<Pollable*>(this), std::move(handler));
 }
@@ -761,7 +761,7 @@ bool UdtStreamSocket::getKeepAlive(std::optional< KeepAliveOptions >* result) co
 
 void UdtStreamSocket::connectAsync(
     const SocketAddress& addr,
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     return m_aioHelper->connectAsync(
         addr,
@@ -775,21 +775,21 @@ void UdtStreamSocket::connectAsync(
 
 void UdtStreamSocket::readSomeAsync(
     nx::Buffer* const buf,
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, size_t)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode, size_t)> handler)
 {
     return m_aioHelper->readSomeAsync(buf, std::move(handler));
 }
 
 void UdtStreamSocket::sendAsync(
     const nx::Buffer* buf,
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, size_t)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode, size_t)> handler)
 {
     return m_aioHelper->sendAsync(buf, std::move(handler));
 }
 
 void UdtStreamSocket::registerTimer(
     std::chrono::milliseconds timeoutMillis,
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::MoveOnlyFunc<void()> handler)
 {
     return m_aioHelper->registerTimer(timeoutMillis, std::move(handler));
 }
@@ -1041,7 +1041,7 @@ void UdtStreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
 }
 
 void UdtStreamServerSocket::pleaseStop(
-    nx::utils::MoveOnlyFunc< void() > completionHandler)
+    nx::MoveOnlyFunc< void() > completionHandler)
 {
     // TODO #akolesnikov: Add general implementation to Socket class and remove this method.
     dispatch(

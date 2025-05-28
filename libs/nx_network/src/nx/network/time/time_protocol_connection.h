@@ -22,7 +22,7 @@ public:
     void startReadingConnection(std::optional<std::chrono::milliseconds> inactivityTimeout);
 
     void registerCloseHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, bool /*connectionDestroyed*/)> handler);
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode, bool /*connectionDestroyed*/)> handler);
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -31,7 +31,7 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_socket;
     nx::Buffer m_outputBuffer;
     std::chrono::steady_clock::time_point m_creationTimestamp;
-    std::vector<nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, bool)>> m_connectionClosedHandlers;
+    std::vector<nx::MoveOnlyFunc<void(SystemError::ErrorCode, bool)>> m_connectionClosedHandlers;
     nx::utils::InterruptionFlag m_connectionFreedFlag;
 
     void onDataSent(

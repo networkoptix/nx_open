@@ -181,12 +181,12 @@ public:
         return m_target->pollable();
     }
 
-    virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override
+    virtual void post(nx::MoveOnlyFunc<void()> handler) override
     {
         return m_target->post(std::move(handler));
     }
 
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override
+    virtual void dispatch(nx::MoveOnlyFunc<void()> handler) override
     {
         return m_target->dispatch(std::move(handler));
     }
@@ -245,7 +245,7 @@ public:
 
     virtual void connectAsync(
         const SocketAddress& address,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
         return this->m_target->connectAsync(address, std::move(handler));
     }
@@ -270,7 +270,7 @@ public:
 
     virtual void registerTimer(
         std::chrono::milliseconds timeout,
-        nx::utils::MoveOnlyFunc<void()> handler) override
+        nx::MoveOnlyFunc<void()> handler) override
     {
         return this->m_target->registerTimer(timeout, std::move(handler));
     }
@@ -346,7 +346,7 @@ class NX_NETWORK_API StreamServerSocketDelegate:
 public:
     StreamServerSocketDelegate(AbstractStreamServerSocket* target);
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync() override;
     virtual bool listen(int backlog = kDefaultBacklogSize) override;
     virtual std::unique_ptr<AbstractStreamSocket> accept() override;

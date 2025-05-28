@@ -41,7 +41,7 @@ public:
     virtual void setReadBufferSize(std::size_t readBufferSize) = 0;
     virtual void setMaxSendQueueSizeBytes(std::size_t maxSendQueueSizeBytes) = 0;
     virtual void setInactivityTimeout(std::chrono::milliseconds) = 0;
-    virtual void start(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> doneHandler) = 0;
+    virtual void start(nx::MoveOnlyFunc<void(SystemError::ErrorCode)> doneHandler) = 0;
 };
 
 /**
@@ -100,7 +100,7 @@ public:
         m_inactivityTimeout = timeout;
     }
 
-    virtual void start(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> doneHandler) override
+    virtual void start(nx::MoveOnlyFunc<void(SystemError::ErrorCode)> doneHandler) override
     {
         using namespace std::placeholders;
 
@@ -128,7 +128,7 @@ private:
 
     LeftChannelPtr m_leftChannel;
     RightChannelPtr m_rightChannel;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onDoneHandler;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onDoneHandler;
     int m_closedChannelCount;
     std::optional<std::chrono::milliseconds> m_inactivityTimeout;
     aio::Timer m_timer;

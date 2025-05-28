@@ -24,7 +24,7 @@ class NX_UTILS_API thread
     public QThread
 {
 public:
-    thread(nx::utils::MoveOnlyFunc<void()> threadFunc) noexcept(false);
+    thread(nx::MoveOnlyFunc<void()> threadFunc) noexcept(false);
     thread(const thread&) = delete;
     thread& operator=(const thread&) = delete;
 
@@ -40,7 +40,7 @@ private:
     promise<void> m_threadCanBeStarted;
     std::thread::id m_id;
     uintptr_t m_nativeHandle;
-    nx::utils::MoveOnlyFunc<void()> m_threadFunc;
+    nx::MoveOnlyFunc<void()> m_threadFunc;
 };
 
 }   //namespace detail

@@ -171,18 +171,18 @@ struct CompletionHandlerDeclarator<Result, void>
  * public:
  *     void putFoo(
  *         FooRequest request,
- *         nx::utils::MoveOnlyFunc<void(FooResult, FooResponse)> handler);
+ *         nx::MoveOnlyFunc<void(FooResult, FooResponse)> handler);
  *
  *     // NOTE: void input type. id requires parsing of http request path "/foo/{id}"
  *     void getFoo(
  *           std::string id,
- *           nx::utils::MoveOnlyFunc<void(FooResult, FooResponse)> handler);
+ *           nx::MoveOnlyFunc<void(FooResult, FooResponse)> handler);
  *
  *    // NOTE: requires getting the client's IP address from the http request
  *    void deleteFooAndLogClientEndpoint(
  *        std::string id,
  *        network::SocketAddress clientEndpoint,
- *        nx::utils::MoveOnlyFunc<void(FooResult)> handler);
+ *        nx::MoveOnlyFunc<void(FooResult)> handler);
  * };
  *
  * // The application has to provide the following function:

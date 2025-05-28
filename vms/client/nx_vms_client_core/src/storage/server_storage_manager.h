@@ -55,7 +55,7 @@ public:
 
     void saveStorages(
         const QnStorageResourceList& storages,
-        nx::utils::MoveOnlyFunc<void(ec2::ErrorCode)> callback = std::nullopt);
+        nx::MoveOnlyFunc<void(ec2::ErrorCode)> callback = std::nullopt);
     void deleteStorages(const nx::vms::api::IdDataList& ids);
 
     QnStorageResourcePtr activeMetadataStorage(const QnMediaServerResourcePtr& server) const;

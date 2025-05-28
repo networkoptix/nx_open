@@ -32,7 +32,7 @@ public:
     virtual void verifyHost(
         const SocketAddress& endpointToVerify,
         const AddressEntry& desiredHostAddress,
-        nx::utils::MoveOnlyFunc<void(VerificationResult)> completionHandler) = 0;
+        nx::MoveOnlyFunc<void(VerificationResult)> completionHandler) = 0;
 
     virtual SystemError::ErrorCode lastSystemErrorCode() const = 0;
 

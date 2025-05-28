@@ -53,7 +53,7 @@ public:
      */
     void take(
         const ConnectionInfo& info,
-        nx::utils::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)> handler);
+        nx::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)> handler);
 
     /**
      * Returns the number of elements in the cache.

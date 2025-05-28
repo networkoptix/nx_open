@@ -45,13 +45,13 @@ public:
     AsyncHttpClient(std::unique_ptr<AbstractStreamSocket> socket, ssl::AdapterFunc adapterFunc);
     virtual ~AsyncHttpClient();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> completionHandler) override;
     virtual void pleaseStopSync() override;
 
     virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
-    virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
+    virtual void post(nx::MoveOnlyFunc<void()> func) override;
+    virtual void dispatch(nx::MoveOnlyFunc<void()> func) override;
 
     /**
      * Returns true if no response has been received due to transport error.
@@ -79,12 +79,12 @@ public:
      */
     void doGet(
         const nx::Url& url,
-        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
+        nx::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     void doHead(const nx::Url& url);
     void doHead(
         const nx::Url& url,
-        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
+        nx::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     /**
      * Start POST request to url.
@@ -106,7 +106,7 @@ public:
         const std::string& contentType,
         nx::Buffer messageBody,
         bool includeContentLength,
-        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
+        nx::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     void doPut(
         const nx::Url& url,
@@ -116,7 +116,7 @@ public:
         const nx::Url& url,
         const std::string& contentType,
         nx::Buffer messageBody,
-        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
+        nx::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     void doPatch(
         const nx::Url& url,
@@ -126,12 +126,12 @@ public:
         const nx::Url& url,
         const std::string& contentType,
         nx::Buffer messageBody,
-        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
+        nx::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     void doDelete(const nx::Url& url);
     void doDelete(
         const nx::Url& url,
-        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
+        nx::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     void doUpgrade(
         const nx::Url& url,
@@ -139,7 +139,7 @@ public:
     void doUpgrade(
         const nx::Url& url,
         const std::string& protocolToUpgradeTo,
-        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
+        nx::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     const nx::network::http::Request& request() const;
 
@@ -261,7 +261,7 @@ private:
     void initDelegate();
 private:
     AsyncClient m_delegate;
-    nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> m_onDoneHandler;
+    nx::MoveOnlyFunc<void(AsyncHttpClientPtr)> m_onDoneHandler;
 
     virtual void stopWhileInAioThread();
 

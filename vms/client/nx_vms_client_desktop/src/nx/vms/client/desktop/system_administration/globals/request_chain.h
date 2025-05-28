@@ -19,7 +19,7 @@ class RequestChain
 {
 public:
     using ChainCompleteCallback =
-        nx::utils::MoveOnlyFunc<void(bool, nx::network::rest::ErrorId, const QString&)>;
+        nx::MoveOnlyFunc<void(bool, nx::network::rest::ErrorId, const QString&)>;
 
 public:
     virtual ~RequestChain()

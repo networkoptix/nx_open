@@ -20,7 +20,7 @@ public:
 
     Connection(
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, Connection*)> closeConnection,
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode, Connection*)> closeConnection,
         const nx::network::SocketAddress& target,
         uint16_t targetPort,
         const nx::network::ssl::AdapterFunc& certificateCheck,
@@ -107,7 +107,7 @@ private:
     }
 
 private:
-    const nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, Connection*)> m_closeConnection;
+    const nx::MoveOnlyFunc<void(SystemError::ErrorCode, Connection*)> m_closeConnection;
     const nx::network::SocketAddress m_target;
     const uint16_t m_targetPort;
     std::unique_ptr<nx::network::AbstractStreamSocket> m_inSocket;

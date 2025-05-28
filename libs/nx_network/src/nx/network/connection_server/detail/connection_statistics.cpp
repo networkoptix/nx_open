@@ -5,7 +5,7 @@
 namespace nx::network::server::detail {
 
 void ConnectionStatistics::setMessageReceivedHandler(
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::MoveOnlyFunc<void()> handler)
 {
     m_messageReceivedHandler = std::move(handler);
 }

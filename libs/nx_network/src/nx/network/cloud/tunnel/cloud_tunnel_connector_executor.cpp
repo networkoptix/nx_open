@@ -90,7 +90,7 @@ void ConnectorExecutor::reportNoSuitableConnectMethod()
                 .resultCode = nx::hpm::api::NatTraversalResultCode::noSuitableMethod,
                 .sysErrorCode = SystemError::hostUnreachable,
             };
-            nx::utils::swapAndCall(m_handler, std::move(connectResult));
+            nx::swapAndCall(m_handler, std::move(connectResult));
         });
 }
 
@@ -139,7 +139,7 @@ void ConnectorExecutor::onConnectorFinished(
     NX_CRITICAL(!result.ok() || result.connection);
     m_connectors.clear();   // Cancelling other connectors.
 
-    nx::utils::swapAndCall(m_handler, std::move(result));
+    nx::swapAndCall(m_handler, std::move(result));
 }
 
 } // namespace nx::network::cloud

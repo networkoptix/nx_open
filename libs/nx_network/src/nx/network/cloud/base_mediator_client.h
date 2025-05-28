@@ -45,7 +45,7 @@ protected:
     template<typename ResponseData>
     void sendRequestAndReceiveResponse(
         network::stun::Message request,
-        nx::utils::MoveOnlyFunc<void(network::stun::TransportHeader, nx::hpm::api::ResultCode, ResponseData)> completionHandler)
+        nx::MoveOnlyFunc<void(network::stun::TransportHeader, nx::hpm::api::ResultCode, ResponseData)> completionHandler)
     {
         using namespace nx::hpm::api;
         const network::stun::extension::methods::Value method =
@@ -107,11 +107,11 @@ protected:
     template<typename ResponseData>
     void sendRequestAndReceiveResponse(
         network::stun::Message request,
-        nx::utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode, ResponseData)> completionHandler)
+        nx::MoveOnlyFunc<void(nx::hpm::api::ResultCode, ResponseData)> completionHandler)
     {
         sendRequestAndReceiveResponse<ResponseData>(
             std::move(request),
-            nx::utils::MoveOnlyFunc<void(network::stun::TransportHeader, nx::hpm::api::ResultCode, ResponseData)>(
+            nx::MoveOnlyFunc<void(network::stun::TransportHeader, nx::hpm::api::ResultCode, ResponseData)>(
                 [completionHandler = std::move(completionHandler)](
                     network::stun::TransportHeader /*transportHeader*/,
                     nx::hpm::api::ResultCode resultCode,
@@ -123,7 +123,7 @@ protected:
 
     void sendRequestAndReceiveResponse(
         network::stun::Message request,
-        nx::utils::MoveOnlyFunc<void(network::stun::TransportHeader, nx::hpm::api::ResultCode)> completionHandler)
+        nx::MoveOnlyFunc<void(network::stun::TransportHeader, nx::hpm::api::ResultCode)> completionHandler)
     {
         using namespace nx::hpm::api;
 
@@ -165,11 +165,11 @@ protected:
 
     void sendRequestAndReceiveResponse(
         network::stun::Message request,
-        nx::utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
+        nx::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
     {
         sendRequestAndReceiveResponse(
             std::move(request),
-            nx::utils::MoveOnlyFunc<void(network::stun::TransportHeader, nx::hpm::api::ResultCode)>(
+            nx::MoveOnlyFunc<void(network::stun::TransportHeader, nx::hpm::api::ResultCode)>(
                 [completionHandler = std::move(completionHandler)](
                     network::stun::TransportHeader /*transportHeader*/,
                     nx::hpm::api::ResultCode resultCode)

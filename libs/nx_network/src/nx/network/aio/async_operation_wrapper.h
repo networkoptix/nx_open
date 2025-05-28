@@ -34,7 +34,7 @@ class AsyncOperationWrapper:
     using base_type = nx::network::aio::BasicPollable;
 
 public:
-    using OnTimeoutHandler = nx::utils::MoveOnlyFunc<void()>;
+    using OnTimeoutHandler = nx::MoveOnlyFunc<void()>;
 
     template<typename _Func>
     AsyncOperationWrapper(_Func func):

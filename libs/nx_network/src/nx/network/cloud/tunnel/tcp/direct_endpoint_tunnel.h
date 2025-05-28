@@ -31,7 +31,7 @@ public:
         OnNewConnectionHandler handler) override;
 
     virtual void setControlConnectionClosedHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
     virtual ConnectType connectType() const override;
 
@@ -50,7 +50,7 @@ private:
     const int m_targetEndpointIpVersion;
     std::unique_ptr<AbstractStreamSocket> m_controlConnection;
     std::list<ConnectionContext> m_connections;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectionClosedHandler;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectionClosedHandler;
     mutable nx::Mutex m_mutex;
     nx::utils::InterruptionFlag m_destructionFlag;
 

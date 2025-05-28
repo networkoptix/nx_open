@@ -31,7 +31,7 @@ public:
     void setHolePunchingEnabled(bool value);
 
     virtual void accept(AcceptHandler handler) override;
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> handler) override;
     virtual std::string toString() const override;
 
 private:

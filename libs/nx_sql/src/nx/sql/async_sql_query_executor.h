@@ -65,8 +65,8 @@ public:
      * can be executed together under single transaction.
      */
     virtual void executeUpdate(
-        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+        nx::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
+        nx::MoveOnlyFunc<void(DBResult)> completionHandler,
         const std::string& queryAggregationKey = std::string()) = 0;
 
     /**
@@ -78,15 +78,15 @@ public:
      * DB transaction resulting in data consistency issues.
      */
     virtual void executeSelect(
-        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) = 0;
+        nx::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
+        nx::MoveOnlyFunc<void(DBResult)> completionHandler) = 0;
 
     /**
      * Syntax sugar. Same as 'executeSelect'.
      */
     void executeUpdateWithoutTran(
-        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler);
+        nx::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
+        nx::MoveOnlyFunc<void(DBResult)> completionHandler);
 
     virtual QueryQueueStatistics queryQueueStatistics() const = 0;
     virtual Statistics statistics() const = 0;
@@ -103,7 +103,7 @@ public:
     >
     void executeUpdate(
         DbFunc dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+        nx::MoveOnlyFunc<void(DBResult)> completionHandler,
         const std::string& queryAggregationKey = std::string())
     {
         executeUpdate(
@@ -160,7 +160,7 @@ public:
     >
     void executeSelect(
         DbFunc dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
+        nx::MoveOnlyFunc<void(DBResult)> completionHandler)
     {
         executeSelect(
             [dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) -> DBResult
@@ -275,9 +275,9 @@ public:
      */
     template<typename Record>
     void createCursor(
-        nx::utils::MoveOnlyFunc<void(SqlQuery*)> prepareCursorFunc,
-        nx::utils::MoveOnlyFunc<void(SqlQuery*, Record*)> readRecordFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult, nx::Uuid /*cursorId*/)> completionHandler)
+        nx::MoveOnlyFunc<void(SqlQuery*)> prepareCursorFunc,
+        nx::MoveOnlyFunc<void(SqlQuery*, Record*)> readRecordFunc,
+        nx::MoveOnlyFunc<void(DBResult, nx::Uuid /*cursorId*/)> completionHandler)
     {
         auto cursorHandler = std::make_unique<detail::CursorHandler<Record>>(
             std::move(prepareCursorFunc),
@@ -297,7 +297,7 @@ public:
     template<typename Record>
     void fetchNextRecordFromCursor(
         nx::Uuid id,
-        nx::utils::MoveOnlyFunc<void(DBResult, Record)> completionHandler)
+        nx::MoveOnlyFunc<void(DBResult, Record)> completionHandler)
     {
         auto task = std::make_unique<detail::FetchNextRecordFromCursorTask<Record>>(
             id,
@@ -351,13 +351,13 @@ public:
      * Overload for updates with no input data.
      */
     virtual void executeUpdate(
-        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+        nx::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
+        nx::MoveOnlyFunc<void(DBResult)> completionHandler,
         const std::string& queryAggregationKey = std::string()) override;
 
     virtual void executeSelect(
-        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) override;
+        nx::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
+        nx::MoveOnlyFunc<void(DBResult)> completionHandler) override;
 
     virtual DBResult execSqlScript(
         nx::sql::QueryContext* const queryContext,
@@ -383,7 +383,7 @@ public:
 
     virtual int openCursorCount() const override;
 
-    using ConnectionFactoryFunc = nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractDbConnection>(
+    using ConnectionFactoryFunc = nx::MoveOnlyFunc<std::unique_ptr<AbstractDbConnection>(
         const ConnectionOptions& connectionOptions)>;
 
     void setCustomConnectionFactory(std::optional<ConnectionFactoryFunc> func);

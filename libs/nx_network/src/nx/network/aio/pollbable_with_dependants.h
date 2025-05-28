@@ -31,7 +31,7 @@ public:
         NX_ASSERT(m_dependants.empty(), "pleaseStop or cancelDependantsIo must have been invoked");
 
         if (m_onDestruction)
-            nx::utils::swapAndCall(m_onDestruction);
+            nx::swapAndCall(m_onDestruction);
     }
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
@@ -46,7 +46,7 @@ public:
      * @param handler Guaranteed to be executed within AIO thread (within either
      * stopWhileInAioThread() or the destructor).
      */
-    void setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler)
+    void setOnBeforeDestruction(nx::MoveOnlyFunc<void()> handler)
     {
         m_onDestruction = std::move(handler);
     }
@@ -59,7 +59,7 @@ protected:
         cancelDependantsIo();
 
         if (m_onDestruction)
-            nx::utils::swapAndCall(m_onDestruction);
+            nx::swapAndCall(m_onDestruction);
     }
 
     /**
@@ -72,7 +72,7 @@ protected:
      */
     void addDependant(
         nx::network::aio::BasicPollable* dependant,
-        nx::utils::MoveOnlyFunc<void()> customStopFunc = nullptr)
+        nx::MoveOnlyFunc<void()> customStopFunc = nullptr)
     {
         dependant->bindToAioThread(this->getAioThread());
 
@@ -105,10 +105,10 @@ private:
     struct DependantCtx
     {
         nx::network::aio::BasicPollable* obj = nullptr;
-        nx::utils::MoveOnlyFunc<void()> customStopFunc;
+        nx::MoveOnlyFunc<void()> customStopFunc;
     };
 
-    nx::utils::MoveOnlyFunc<void()> m_onDestruction;
+    nx::MoveOnlyFunc<void()> m_onDestruction;
     std::vector<DependantCtx> m_dependants;
 };
 

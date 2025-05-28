@@ -72,11 +72,11 @@ public:
 
     void bindSystemToOrganization(
         api::SystemRegistrationRequest data,
-        nx::utils::MoveOnlyFunc<void(api::Result, api::SystemRegistrationResponse)> handler);
+        nx::MoveOnlyFunc<void(api::Result, api::SystemRegistrationResponse)> handler);
 
     void unbindSystemFromOrganization(
         std::string systemId,
-        nx::utils::MoveOnlyFunc<void(api::Result)> handler);
+        nx::MoveOnlyFunc<void(api::Result)> handler);
 
     /**
      * Returns user access rights on a system. Note that these are organization-provided rights.
@@ -84,7 +84,7 @@ public:
     void getSystemUser(
         const std::string& systemId,
         const std::string& email,
-        nx::utils::MoveOnlyFunc<void(api::Result, api::User)> handler);
+        nx::MoveOnlyFunc<void(api::Result, api::User)> handler);
 
     /**
      * Get users of a system as specified by an organization owning the system or channel partner.
@@ -92,24 +92,24 @@ public:
      */
     void getSystemUsers(
         const std::string& systemId,
-        nx::utils::MoveOnlyFunc<void(api::Result, std::vector<api::User>)> handler);
+        nx::MoveOnlyFunc<void(api::Result, std::vector<api::User>)> handler);
 
     /**
      * Get organization-owned or channel partner-accessible systems a specified user has access to.
      */
     void getUserSystems(
         const std::string& email,
-        nx::utils::MoveOnlyFunc<void(api::Result, std::vector<api::SystemAllowance>)> handler);
+        nx::MoveOnlyFunc<void(api::Result, std::vector<api::SystemAllowance>)> handler);
 
     /**
      * Get organization attributes by id. Provides requesting user rights on the organization.
      */
     void getOrganization(
         const std::string& organizationId,
-        nx::utils::MoveOnlyFunc<void(api::Result, api::Organization)> handler);
+        nx::MoveOnlyFunc<void(api::Result, api::Organization)> handler);
 
     void getAllOrganizationsUsers(
-        nx::utils::MoveOnlyFunc<void(api::Result, api::GetUsersResponse)> handler);
+        nx::MoveOnlyFunc<void(api::Result, api::GetUsersResponse)> handler);
 };
 
 } // namespace nx::cloud::cps

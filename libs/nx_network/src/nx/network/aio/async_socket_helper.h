@@ -50,7 +50,7 @@ public:
             m_socketInterruptionFlag.interrupt();
     }
 
-    void post(nx::utils::MoveOnlyFunc<void()> handler)
+    void post(nx::MoveOnlyFunc<void()> handler)
     {
         if (m_socket->impl()->terminated.load(std::memory_order_relaxed) > 0)
             return;
@@ -58,7 +58,7 @@ public:
         m_socket->impl()->aioThread->load()->post(m_socket, std::move(handler));
     }
 
-    void dispatch(nx::utils::MoveOnlyFunc<void()> handler)
+    void dispatch(nx::MoveOnlyFunc<void()> handler)
     {
         if (m_socket->impl()->terminated.load(std::memory_order_relaxed) > 0)
             return;
@@ -151,7 +151,7 @@ public:
 
     void resolve(
         const HostAddress& address,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::deque<HostAddress>)> handler)
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode, std::deque<HostAddress>)> handler)
     {
         m_addressResolverIsInUse = true;
         m_addressResolver->resolveAsync(
@@ -185,7 +185,7 @@ public:
 
     void connectAsync(
         const SocketAddress& endpoint,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
         NX_ASSERT(isNonBlockingMode());
         if (endpoint.address.isIpAddress())
@@ -211,7 +211,7 @@ public:
 
     void connectToIpsAsync(
         std::deque<HostAddress> ips, uint16_t port,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
         SocketAddress firstAddress(std::move(ips.front()), port);
         ips.pop_front();
@@ -229,7 +229,7 @@ public:
 
     void connectToIpAsync(
         const SocketAddress& addr,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
         if (!NX_ASSERT(addr.address.isIpAddress(), addr))
             return handler(SystemError::dnsServerFailure);
@@ -315,7 +315,7 @@ public:
 
     void registerTimer(
         std::chrono::milliseconds timeoutMs,
-        nx::utils::MoveOnlyFunc<void()> handler)
+        nx::MoveOnlyFunc<void()> handler)
     {
         NX_CRITICAL(timeoutMs.count(), "Timer with timeout 0 does not make any sense");
         if (this->m_socket->impl()->terminated.load(std::memory_order_relaxed) > 0)
@@ -382,7 +382,7 @@ private:
 
     AddressResolver* m_addressResolver;
 
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectHandler;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectHandler;
     size_t m_connectSendAsyncCallCounter = 0;
 
     IoCompletionHandler m_recvHandler;
@@ -402,7 +402,7 @@ private:
     std::size_t m_maxSendDataSize = 128*1024;
     bool m_maxSendDataSizeSet = false;
 
-    nx::utils::MoveOnlyFunc<void()> m_timerHandler;
+    nx::MoveOnlyFunc<void()> m_timerHandler;
     size_t m_registerTimerCallCounter = 0;
 
     std::atomic<bool> m_asyncSendIssued{false};
@@ -527,7 +527,7 @@ private:
                 }
             });
 
-        nx::utils::swapAndCall(m_timerHandler);
+        nx::swapAndCall(m_timerHandler);
     }
 
     void processRecvEvent(aio::EventType eventType)
@@ -603,7 +603,7 @@ private:
                 }
             });
 
-        nx::utils::swapAndCall(m_recvHandler, errorCode, bytesRead);
+        nx::swapAndCall(m_recvHandler, errorCode, bytesRead);
     }
 
     void processWriteEvent(aio::EventType eventType)
@@ -704,7 +704,7 @@ private:
                 }
             });
 
-        nx::utils::swapAndCall(handler, args...);
+        nx::swapAndCall(handler, args...);
     }
 
     void processErrorEvent()
@@ -949,7 +949,7 @@ private:
 
         try
         {
-            nx::utils::swapAndCall(m_acceptHandler, errorCode, std::move(newConnection));
+            nx::swapAndCall(m_acceptHandler, errorCode, std::move(newConnection));
             return execFinally();
         }
         catch (const std::exception&)

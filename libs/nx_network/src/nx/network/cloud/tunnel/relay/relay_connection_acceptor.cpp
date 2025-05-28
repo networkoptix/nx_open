@@ -142,7 +142,7 @@ void ReverseConnection::onConnectionClosed(
     m_httpPipeline.reset();
 
     if (m_onConnectionActivated)
-        nx::utils::swapAndCall(m_onConnectionActivated, closeReason);
+        nx::swapAndCall(m_onConnectionActivated, closeReason);
     else
         NX_DEBUG(this, "Closed connection is not activated, nothing will happen");
 }
@@ -182,7 +182,7 @@ void ReverseConnection::onConnectDone(
         NX_VERBOSE(this, "Server relay connection failed with result: %1", resultCode);
     }
 
-    nx::utils::swapAndCall(m_connectHandler, api::toSystemError(resultCode));
+    nx::swapAndCall(m_connectHandler, api::toSystemError(resultCode));
 }
 
 void ReverseConnection::dispatchRelayNotificationReceived(
@@ -239,7 +239,7 @@ void ReverseConnection::processOpenTunnelNotification(
     }
 
     m_streamSocket.swap(streamSocket);
-    nx::utils::swapAndCall(m_onConnectionActivated, SystemError::noError);
+    nx::swapAndCall(m_onConnectionActivated, SystemError::noError);
 }
 
 void ReverseConnection::processTestConnectionNotification(
@@ -260,7 +260,7 @@ void ReverseConnection::processTestConnectionNotification(
             }
             m_streamSocket = m_httpPipeline->takeSocket();
             m_httpPipeline.reset();
-            nx::utils::swapAndCall(m_onConnectionActivated, SystemError::noError);
+            nx::swapAndCall(m_onConnectionActivated, SystemError::noError);
         });
 }
 

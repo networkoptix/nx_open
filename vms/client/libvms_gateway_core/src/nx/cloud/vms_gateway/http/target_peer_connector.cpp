@@ -129,7 +129,7 @@ void TargetPeerConnector::processConnectionResult(
         }
     }
 
-    nx::utils::swapAndCall(
+    nx::swapAndCall(
         m_completionHandler,
         systemErrorCode,
         std::move(connection));

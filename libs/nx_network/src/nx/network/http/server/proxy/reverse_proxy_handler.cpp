@@ -55,7 +55,7 @@ bool ReverseProxyHandler::add(
 
 void ReverseProxyHandler::serve(
     network::http::RequestContext requestContext,
-    nx::utils::MoveOnlyFunc<void(network::http::RequestResult)> completionHandler)
+    nx::MoveOnlyFunc<void(network::http::RequestResult)> completionHandler)
 {
     m_dispatcher.serve(std::move(requestContext), std::move(completionHandler));
 }

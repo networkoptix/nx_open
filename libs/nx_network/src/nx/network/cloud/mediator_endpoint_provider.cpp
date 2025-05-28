@@ -71,7 +71,7 @@ void MediatorEndpointProvider::fetchMediatorEndpoints(
             }
 
             for (auto& handler : m_fetchMediatorEndpointsHandlers)
-                nx::utils::swapAndCall(handler, resultCode);
+                nx::swapAndCall(handler, resultCode);
             m_fetchMediatorEndpointsHandlers.clear();
         });
 }

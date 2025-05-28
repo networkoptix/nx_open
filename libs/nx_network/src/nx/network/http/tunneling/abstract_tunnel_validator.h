@@ -10,7 +10,7 @@
 
 namespace nx::network::http::tunneling {
 
-using ValidateTunnelCompletionHandler = nx::utils::MoveOnlyFunc<void(ResultCode)>;
+using ValidateTunnelCompletionHandler = nx::MoveOnlyFunc<void(ResultCode)>;
 
 class NX_NETWORK_API AbstractTunnelValidator:
     public aio::BasicPollable

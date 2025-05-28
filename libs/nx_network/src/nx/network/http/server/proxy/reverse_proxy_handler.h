@@ -27,7 +27,7 @@ public:
 
     virtual void serve(
         network::http::RequestContext requestContext,
-        nx::utils::MoveOnlyFunc<void(network::http::RequestResult)> completionHandler) override;
+        nx::MoveOnlyFunc<void(network::http::RequestResult)> completionHandler) override;
 
 private:
     rest::MessageDispatcher m_dispatcher;

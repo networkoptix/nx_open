@@ -35,7 +35,7 @@ bool EncryptionDetectingStreamSocket::isEncryptionEnabled() const
 }
 
 void EncryptionDetectingStreamSocket::handshakeAsync(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     using namespace std::placeholders;
 
@@ -68,13 +68,13 @@ void EncryptionDetectingStreamSocket::proceedWithSslHandshakeIfNeeded(
 {
     if (protocolDetectionResult != SystemError::noError)
     {
-        nx::utils::swapAndCall(m_handshakeCompletionUserHandler, protocolDetectionResult);
+        nx::swapAndCall(m_handshakeCompletionUserHandler, protocolDetectionResult);
         return;
     }
 
     if (!m_sslUsed)
     {
-        nx::utils::swapAndCall(m_handshakeCompletionUserHandler, SystemError::noError);
+        nx::swapAndCall(m_handshakeCompletionUserHandler, SystemError::noError);
         return;
     }
 

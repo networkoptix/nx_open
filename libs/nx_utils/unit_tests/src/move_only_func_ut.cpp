@@ -13,7 +13,7 @@ TEST(MoveOnlyFunc, common)
 {
     for (int i = 0; i < 100; ++i)
     {
-        nx::utils::MoveOnlyFunc< void() > handler;
+        nx::MoveOnlyFunc< void() > handler;
         std::optional< nx::utils::promise< bool > > promise;
         {
             promise = nx::utils::promise< bool >();

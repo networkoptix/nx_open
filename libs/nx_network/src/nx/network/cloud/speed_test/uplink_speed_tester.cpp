@@ -152,7 +152,7 @@ void UplinkSpeedTester::emitTestResult(
         SystemError::toString(errorCode), resultStr);
 
     if (m_handler)
-        nx::utils::swapAndCall(m_handler, errorCode, std::move(result));
+        nx::swapAndCall(m_handler, errorCode, std::move(result));
 }
 
 

@@ -48,7 +48,7 @@ public:
         m_channelToReflect->bindToAioThread(aioThread);
     }
 
-    void start(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onChannelClosedHandler)
+    void start(nx::MoveOnlyFunc<void(SystemError::ErrorCode)> onChannelClosedHandler)
     {
         m_onChannelClosedHandler = std::move(onChannelClosedHandler);
         scheduleRead();
@@ -69,7 +69,7 @@ public:
 
 private:
     std::unique_ptr<ChannelToReflectType> m_channelToReflect;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onChannelClosedHandler;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onChannelClosedHandler;
     nx::Buffer m_readBuffer;
     std::size_t m_readBufferSize;
     std::deque<nx::Buffer> m_sendQueue;

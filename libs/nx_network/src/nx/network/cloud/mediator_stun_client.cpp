@@ -274,7 +274,7 @@ void MediatorStunClient::handleConnectCompletion(
         scheduleReconnect();
 
     if (handler)
-        nx::utils::swapAndCall(handler, resultCode);
+        nx::swapAndCall(handler, resultCode);
 }
 
 void MediatorStunClient::startKeepAliveProbing()

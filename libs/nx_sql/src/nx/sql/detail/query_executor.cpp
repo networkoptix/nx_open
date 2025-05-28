@@ -77,7 +77,7 @@ QueryType BaseExecutor::queryType() const
     return m_queryType;
 }
 
-void BaseExecutor::setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler)
+void BaseExecutor::setOnBeforeDestruction(nx::MoveOnlyFunc<void()> handler)
 {
     m_onBeforeDestructionHandler = std::move(handler);
 }
@@ -96,8 +96,8 @@ void BaseExecutor::setStatisticsCollector(StatisticsCollector* statisticsCollect
 // UpdateWithoutAnyDataExecutor
 
 UpdateWithoutAnyDataExecutor::UpdateWithoutAnyDataExecutor(
-    nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
-    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+    nx::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
+    nx::MoveOnlyFunc<void(DBResult)> completionHandler,
     const std::string& queryAggregationKey)
     :
     base_type(
@@ -121,8 +121,8 @@ void UpdateWithoutAnyDataExecutor::reportSuccess()
 // SelectExecutor
 
 SelectExecutor::SelectExecutor(
-    nx::utils::MoveOnlyFunc<DBResult(QueryContext*)> dbSelectFunc,
-    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+    nx::MoveOnlyFunc<DBResult(QueryContext*)> dbSelectFunc,
+    nx::MoveOnlyFunc<void(DBResult)> completionHandler,
     const std::string& queryAggregationKey)
     :
     base_type(QueryType::lookup, queryAggregationKey),

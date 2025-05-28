@@ -88,7 +88,7 @@ public:
         m_httpClient.bindToAioThread(aioThread);
     }
 
-    void execute(nx::utils::MoveOnlyFunc<HandlerFunc> handler)
+    void execute(nx::MoveOnlyFunc<HandlerFunc> handler)
     {
         m_handler = std::move(handler);
         if (!m_requestBody.empty())
@@ -103,7 +103,7 @@ public:
 
     void execute(
         const Method& httpMethod,
-        nx::utils::MoveOnlyFunc<HandlerFunc> handler)
+        nx::MoveOnlyFunc<HandlerFunc> handler)
     {
         m_handler = std::move(handler);
         if (!m_requestBody.empty())
@@ -115,7 +115,7 @@ public:
 
     void executeUpgrade(
         const std::string& protocolToUpgradeConnectionTo,
-        nx::utils::MoveOnlyFunc<HandlerFunc> handler)
+        nx::MoveOnlyFunc<HandlerFunc> handler)
     {
         executeUpgrade(
             nx::network::http::Method::options,
@@ -126,7 +126,7 @@ public:
     void executeUpgrade(
         const Method& httpMethod,
         const std::string& protocolToUpgradeConnectionTo,
-        nx::utils::MoveOnlyFunc<HandlerFunc> handler)
+        nx::MoveOnlyFunc<HandlerFunc> handler)
     {
         m_handler = std::move(handler);
         if (!m_requestBody.empty())
@@ -170,7 +170,7 @@ protected:
     nx::Url m_url;
     std::string m_requestContentType;
     nx::Buffer m_requestBody;
-    nx::utils::MoveOnlyFunc<HandlerFunc> m_handler;
+    nx::MoveOnlyFunc<HandlerFunc> m_handler;
     ApiRequestResult m_lastFusionRequestResult;
 
     template<typename T, typename = void>
@@ -226,7 +226,7 @@ protected:
 
     template<typename OutputData>
     void processHttpResponse(
-        nx::utils::MoveOnlyFunc<void(
+        nx::MoveOnlyFunc<void(
             SystemError::ErrorCode,
             const nx::network::http::Response*,
             OutputData)> handler,

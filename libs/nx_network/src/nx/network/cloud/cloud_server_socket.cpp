@@ -109,7 +109,7 @@ std::unique_ptr<AbstractStreamSocket> CloudServerSocket::accept()
     return acceptBlocking();
 }
 
-void CloudServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void CloudServerSocket::pleaseStop(nx::MoveOnlyFunc<void()> handler)
 {
     m_mediatorRegistrationRetryTimer.post(
         [this, handler = std::move(handler)]()
@@ -131,12 +131,12 @@ void CloudServerSocket::pleaseStopSync()
     }
 }
 
-void CloudServerSocket::post(nx::utils::MoveOnlyFunc<void()> handler)
+void CloudServerSocket::post(nx::MoveOnlyFunc<void()> handler)
 {
     m_mediatorRegistrationRetryTimer.post(std::move(handler));
 }
 
-void CloudServerSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
+void CloudServerSocket::dispatch(nx::MoveOnlyFunc<void()> handler)
 {
     m_mediatorRegistrationRetryTimer.dispatch(std::move(handler));
 }
@@ -196,7 +196,7 @@ bool CloudServerSocket::isInSelfAioThread() const
 }
 
 void CloudServerSocket::registerOnMediator(
-    nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> handler)
+    nx::MoveOnlyFunc<void(hpm::api::ResultCode)> handler)
 {
     NX_VERBOSE(this, "Starting registration on the mediator. Current state %1", m_state);
 
@@ -229,18 +229,18 @@ void CloudServerSocket::setSupportedConnectionMethods(
 }
 
 void CloudServerSocket::setOnAcceptorConnectionEstablished(
-    nx::utils::MoveOnlyFunc<void(nx::Url)> handler)
+    nx::MoveOnlyFunc<void(nx::Url)> handler)
 {
     m_onAcceptorConnectionEstablished = std::move(handler);
 }
 
-void CloudServerSocket::setOnAcceptorError(nx::utils::MoveOnlyFunc<void(AcceptorError)> handler)
+void CloudServerSocket::setOnAcceptorError(nx::MoveOnlyFunc<void(AcceptorError)> handler)
 {
     m_onAcceptorError = std::move(handler);
 }
 
 void CloudServerSocket::setOnMediatorConnectionClosed(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_onMediatorConnectionClosed = std::move(handler);
 }

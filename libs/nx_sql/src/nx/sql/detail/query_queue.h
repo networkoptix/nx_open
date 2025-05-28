@@ -22,7 +22,7 @@ class NX_SQL_API QueryQueue
 {
 public:
     using value_type = std::unique_ptr<AbstractExecutor>;
-    using ItemStayTimeoutHandler = nx::utils::MoveOnlyFunc<void(value_type)>;
+    using ItemStayTimeoutHandler = nx::MoveOnlyFunc<void(value_type)>;
 
     static constexpr int kDefaultPriority = 0;
 

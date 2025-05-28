@@ -17,7 +17,7 @@ P2PWebsocketTransport::P2PWebsocketTransport(
     m_webSocket->setAliveTimeout(aliveTimeout);
 }
 
-void P2PWebsocketTransport::start(utils::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart)
+void P2PWebsocketTransport::start(nx::MoveOnlyFunc<void(SystemError::ErrorCode)> onStart)
 {
     m_webSocket->start();
     if (onStart)

@@ -138,7 +138,7 @@ void QnResourcePropertyDictionary::clear(const QVector<nx::Uuid>& idList)
 
 void QnResourcePropertyDictionary::markAllParamsDirty(
     const nx::Uuid& resourceId,
-    nx::utils::MoveOnlyFunc<bool(const QString& paramName, const QString& paramValue)> filter)
+    nx::MoveOnlyFunc<bool(const QString& paramName, const QString& paramValue)> filter)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     auto itr = m_items.find(resourceId);

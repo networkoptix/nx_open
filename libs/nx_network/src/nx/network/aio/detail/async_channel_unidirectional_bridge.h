@@ -73,8 +73,8 @@ public:
 
     virtual void setReadBufferSize(std::size_t readBufferSize) = 0;
     virtual void setMaxSendQueueSizeBytes(std::size_t maxSendQueueSizeBytes) = 0;
-    virtual void start(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> doneHandler) = 0;
-    virtual void setOnSomeActivity(nx::utils::MoveOnlyFunc<void()> handler) = 0;
+    virtual void start(nx::MoveOnlyFunc<void(SystemError::ErrorCode)> doneHandler) = 0;
+    virtual void setOnSomeActivity(nx::MoveOnlyFunc<void()> handler) = 0;
     virtual bool isSendQueueEmpty() const = 0;
 };
 
@@ -125,7 +125,7 @@ public:
         m_maxSendQueueSizeBytes = maxSendQueueSizeBytes;
     }
 
-    virtual void start(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> doneHandler) override
+    virtual void start(nx::MoveOnlyFunc<void(SystemError::ErrorCode)> doneHandler) override
     {
         NX_ASSERT(m_source->getAioThread() == m_destination->getAioThread());
 
@@ -133,7 +133,7 @@ public:
         scheduleRead();
     }
 
-    virtual void setOnSomeActivity(nx::utils::MoveOnlyFunc<void()> handler) override
+    virtual void setOnSomeActivity(nx::MoveOnlyFunc<void()> handler) override
     {
         m_onSomeActivityHander = std::move(handler);
     }
@@ -168,8 +168,8 @@ private:
     bool m_isReading;
     bool m_isSourceOpened;
     SystemError::ErrorCode m_sourceClosureReason;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onDoneHandler;
-    nx::utils::MoveOnlyFunc<void()> m_onSomeActivityHander;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onDoneHandler;
+    nx::MoveOnlyFunc<void()> m_onSomeActivityHander;
 
     void scheduleRead()
     {

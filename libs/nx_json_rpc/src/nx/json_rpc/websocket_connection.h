@@ -21,10 +21,10 @@ class NX_JSON_RPC_API WebSocketConnection: public nx::network::aio::BasicPollabl
 {
 public:
     using base_type = nx::network::aio::BasicPollable;
-    using ResponseHandler = nx::utils::MoveOnlyFunc<void(Response)>;
-    using RequestHandler = nx::utils::MoveOnlyFunc<
+    using ResponseHandler = nx::MoveOnlyFunc<void(Response)>;
+    using RequestHandler = nx::MoveOnlyFunc<
         void(const Request&, ResponseHandler, WebSocketConnection*)>;
-    using OnDone = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, WebSocketConnection*)>;
+    using OnDone = nx::MoveOnlyFunc<void(SystemError::ErrorCode, WebSocketConnection*)>;
 
     WebSocketConnection(std::unique_ptr<nx::network::websocket::WebSocket> socket, OnDone onDone);
     virtual ~WebSocketConnection() override;
@@ -37,7 +37,7 @@ public:
         std::string serializedRequest = {});
 
     using BatchResponseHandler =
-        nx::utils::MoveOnlyFunc<void(std::vector<Response>)>;
+        nx::MoveOnlyFunc<void(std::vector<Response>)>;
     void send(std::vector<Request> jsonRpcRequests,
         BatchResponseHandler handler = nullptr);
 

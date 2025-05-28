@@ -14,7 +14,7 @@ template<typename FactoryFunc>
 class BasicFactory
 {
 public:
-    using Function = nx::utils::MoveOnlyFunc<FactoryFunc>;
+    using Function = nx::MoveOnlyFunc<FactoryFunc>;
 
     BasicFactory(Function defaultFunc):
         m_func(std::move(defaultFunc))

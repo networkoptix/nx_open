@@ -32,7 +32,7 @@ public:
      * Asserts on reading beyond the chunked stream EOF marker.
      */
     virtual void readAsync(
-        nx::utils::MoveOnlyFunc<
+        nx::MoveOnlyFunc<
             void(SystemError::ErrorCode, nx::Buffer)
         > completionHandler) override
     {

@@ -21,7 +21,7 @@ Client::~Client()
 }
 
 void Client::getListeningPeers(const std::string_view& systemId,
-    nx::utils::MoveOnlyFunc<void(ResultCode, SystemPeers)> completionHandler)
+    nx::MoveOnlyFunc<void(ResultCode, SystemPeers)> completionHandler)
 {
     base_type::template makeAsyncCall<SystemPeers>(nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(kStatisticsSystemPeersPath, {systemId}),
@@ -38,7 +38,7 @@ std::tuple<Client::ResultCode, SystemPeers> Client::getListeningPeers(
 }
 
 void Client::initiateConnection(const ConnectRequest& request,
-    nx::utils::MoveOnlyFunc<void(ResultCode, ConnectResponse)> completionHandler)
+    nx::MoveOnlyFunc<void(ResultCode, ConnectResponse)> completionHandler)
 {
     base_type::template makeAsyncCall<ConnectResponse>(nx::network::http::Method::post,
         nx::network::http::rest::substituteParameters(
@@ -49,7 +49,7 @@ void Client::initiateConnection(const ConnectRequest& request,
 }
 
 void Client::reportUplinkSpeed(const PeerConnectionSpeed& connectionSpeed,
-    nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler)
+    nx::MoveOnlyFunc<void(ResultCode)> completionHandler)
 {
     base_type::template makeAsyncCall<void>(nx::network::http::Method::post,
         nx::network::http::rest::substituteParameters(
@@ -61,7 +61,7 @@ void Client::reportUplinkSpeed(const PeerConnectionSpeed& connectionSpeed,
 
 void Client::resetConnections(
     const std::string_view& systemId,
-    nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<std::string>)> completionHandler)
+    nx::MoveOnlyFunc<void(ResultCode, std::vector<std::string>)> completionHandler)
 {
     base_type::template makeAsyncCall<std::vector<std::string>>(
         nx::network::http::Method::post,
@@ -79,7 +79,7 @@ std::tuple<api::ResultCode, std::vector<std::string>> Client::resetConnections(c
 }
 
 void Client::getStatistics(
-    nx::utils::MoveOnlyFunc<void(ResultCode, Statistics)> completionHandler)
+    nx::MoveOnlyFunc<void(ResultCode, Statistics)> completionHandler)
 {
     base_type::template makeAsyncCall<Statistics>(
         nx::network::http::Method::get,
@@ -97,7 +97,7 @@ std::tuple<ResultCode, Statistics> Client::getStatistics()
 }
 
 void Client::getListeningPeersStatistics(
-    nx::utils::MoveOnlyFunc<void(ResultCode, ListeningPeerStatistics)> completionHandler)
+    nx::MoveOnlyFunc<void(ResultCode, ListeningPeerStatistics)> completionHandler)
 {
     base_type::template makeAsyncCall<ListeningPeerStatistics>(
         nx::network::http::Method::get,

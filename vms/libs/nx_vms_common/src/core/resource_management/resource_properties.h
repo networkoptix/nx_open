@@ -45,7 +45,7 @@ public:
      **/
     void markAllParamsDirty(
         const nx::Uuid& resourceId,
-        nx::utils::MoveOnlyFunc<bool(const QString& paramName, const QString& paramValue)> filter = nullptr);
+        nx::MoveOnlyFunc<bool(const QString& paramName, const QString& paramValue)> filter = nullptr);
 
     QHash<nx::Uuid, QSet<QString> > allPropertyNamesByResource() const;
 

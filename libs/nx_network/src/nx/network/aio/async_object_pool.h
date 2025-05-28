@@ -26,7 +26,7 @@ requires std::is_base_of_v<BasicPollable, Worker>
 class AsyncObjectPool
 {
 public:
-    using FactoryFunc = nx::utils::MoveOnlyFunc<std::unique_ptr<Worker>()>;
+    using FactoryFunc = nx::MoveOnlyFunc<std::unique_ptr<Worker>()>;
 
     /**
      * thread-to-worker dictionary is pre-allocated here.

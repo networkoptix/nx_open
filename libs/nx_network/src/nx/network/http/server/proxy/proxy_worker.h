@@ -30,7 +30,7 @@ class NX_NETWORK_API ProxyWorker:
     using ResponseMsgBodySource = AsyncChannelMessageBodySource<AbstractStreamSocket>;
 
 public:
-    using ProxyCompletionHander = nx::utils::MoveOnlyFunc<void(
+    using ProxyCompletionHander = nx::MoveOnlyFunc<void(
         RequestResult requestResult)>;
 
     ProxyWorker(

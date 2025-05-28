@@ -16,7 +16,7 @@ class GetHandler:
     public nx::network::http::AbstractApiRequestHandler<>
 {
 public:
-    using FunctorType = nx::utils::MoveOnlyFunc<ResultType()>;
+    using FunctorType = nx::MoveOnlyFunc<ResultType()>;
 
     GetHandler(FunctorType func):
         m_func(std::move(func))
@@ -40,7 +40,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * HTTP-handler that wraps a `void func(nx::utils::MoveOnlyFunc<ResultType()> completionHandler)`
+ * HTTP-handler that wraps a `void func(nx::MoveOnlyFunc<ResultType()> completionHandler)`
  * functor into a HTTP GET hander.
  */
 template<typename ResultType>
@@ -48,8 +48,8 @@ class GetAsyncHandler:
     public nx::network::http::AbstractApiRequestHandler<>
 {
 public:
-    using CompletionHandler = nx::utils::MoveOnlyFunc<void(ResultType)>;
-    using FunctorType = nx::utils::MoveOnlyFunc<void(CompletionHandler)>;
+    using CompletionHandler = nx::MoveOnlyFunc<void(ResultType)>;
+    using FunctorType = nx::MoveOnlyFunc<void(CompletionHandler)>;
 
     GetAsyncHandler(FunctorType func):
         m_func(std::move(func))

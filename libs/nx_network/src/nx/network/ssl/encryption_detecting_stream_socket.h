@@ -35,13 +35,13 @@ public:
      * If SSL is used, then performs SSL handshake.
      */
     virtual void handshakeAsync(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
     virtual std::string serverName() const override;
 
 private:
     Context* m_context = nullptr;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_handshakeCompletionUserHandler;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_handshakeCompletionUserHandler;
     std::atomic<bool> m_sslUsed = false;
 
     std::unique_ptr<AbstractStreamSocket> createSslSocket(

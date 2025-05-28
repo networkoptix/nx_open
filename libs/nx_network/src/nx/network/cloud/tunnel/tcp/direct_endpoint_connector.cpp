@@ -195,7 +195,7 @@ void DirectEndpointConnector::reportErrorOnEndpointVerificationFailure(
         .sysErrorCode = sysErrorCode,
         .stats = std::move(verificatorCtx.stats)};
 
-    nx::utils::swapAndCall(m_completionHandler, std::move(error));
+    nx::swapAndCall(m_completionHandler, std::move(error));
 }
 
 void DirectEndpointConnector::reportSuccessfulVerificationResult(VerificatorContext verificatorCtx)
@@ -218,7 +218,7 @@ void DirectEndpointConnector::reportSuccessfulVerificationResult(VerificatorCont
 
     m_verificators.clear();
 
-    nx::utils::swapAndCall(m_completionHandler, std::move(result));
+    nx::swapAndCall(m_completionHandler, std::move(result));
 }
 
 } // namespace nx::network::cloud::tcp

@@ -34,7 +34,7 @@ public:
     StreamProxy();
     ~StreamProxy();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> completionHandler) override;
 
     /**
      * NOTE: "Upstream" is the stream from the source to the target.
@@ -103,7 +103,7 @@ private:
         SystemError::ErrorCode completionCode);
 
     void stopProxyChannels(
-        nx::utils::MoveOnlyFunc<void()> completionHandler);
+        nx::MoveOnlyFunc<void()> completionHandler);
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -117,7 +117,7 @@ class NX_NETWORK_API StreamProxyPool:
 public:
     ~StreamProxyPool();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> completionHandler) override;
 
     /**
      * @return ID of proxy that may be used later to modify or stop the proxy. Always non-zero.
@@ -188,7 +188,7 @@ class StreamProxyChannel:
 
 public:
     using ProxyCompletionHandler =
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)>;
 
     StreamProxyChannel(
         std::unique_ptr<AbstractStreamSocket> sourceConnection,

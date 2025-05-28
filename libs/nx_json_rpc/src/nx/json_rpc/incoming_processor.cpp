@@ -29,7 +29,7 @@ static QString idWithMethod(const Request& request)
 }
 
 void IncomingProcessor::processRequest(
-    rapidjson::Document data, nx::utils::MoveOnlyFunc<void(std::string)> handler)
+    rapidjson::Document data, nx::MoveOnlyFunc<void(std::string)> handler)
 {
     if (data.IsArray())
     {
@@ -73,7 +73,7 @@ void IncomingProcessor::processRequest(
 }
 
 void IncomingProcessor::processBatchRequest(
-    rapidjson::Document list, nx::utils::MoveOnlyFunc<void(std::string)> handler)
+    rapidjson::Document list, nx::MoveOnlyFunc<void(std::string)> handler)
 {
     std::vector<Response> responses;
     std::unordered_map<Request*, std::unique_ptr<Request>> requests;
@@ -160,7 +160,7 @@ void IncomingProcessor::onBatchResponse(
 }
 
 void IncomingProcessor::sendResponse(
-    Response response, const nx::utils::MoveOnlyFunc<void(std::string)>& handler)
+    Response response, const nx::MoveOnlyFunc<void(std::string)>& handler)
 {
     NX_DEBUG(this, response.error
         ? "Send error response " + nx::reflect::json::serialize(response)

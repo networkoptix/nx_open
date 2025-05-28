@@ -38,7 +38,7 @@ public:
      * NOTE: AbstractServerConnection::sendMessage does nothing after handler has been invoked.
      */
     virtual void addOnConnectionCloseHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
 
     virtual AbstractCommunicatingSocket* socket() = 0;
     virtual void close() = 0;

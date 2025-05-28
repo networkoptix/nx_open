@@ -23,7 +23,7 @@ public:
     virtual void verifyHost(
         const nx::network::SocketAddress& endpointToVerify,
         const nx::network::AddressEntry& targetHostAddress,
-        nx::utils::MoveOnlyFunc<void(VerificationResult)> completionHandler) override;
+        nx::MoveOnlyFunc<void(VerificationResult)> completionHandler) override;
 
     virtual SystemError::ErrorCode lastSystemErrorCode() const override;
 
@@ -39,7 +39,7 @@ private:
     nx::network::http::AsyncHttpClientPtr m_httpClient;
     nx::network::SocketAddress m_endpointToVerify;
     nx::network::AddressEntry m_targetHostAddress;
-    nx::utils::MoveOnlyFunc<void(VerificationResult)> m_completionHandler;
+    nx::MoveOnlyFunc<void(VerificationResult)> m_completionHandler;
 
     void onHttpRequestDone();
     bool verifyHostResponse(nx::network::http::AsyncHttpClientPtr httpClient);

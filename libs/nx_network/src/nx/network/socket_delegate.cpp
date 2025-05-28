@@ -35,7 +35,7 @@ StreamServerSocketDelegate::StreamServerSocketDelegate(AbstractStreamServerSocke
 {
 }
 
-void StreamServerSocketDelegate::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void StreamServerSocketDelegate::pleaseStop(nx::MoveOnlyFunc<void()> handler)
 {
     m_target->pleaseStop(std::move(handler));
 }

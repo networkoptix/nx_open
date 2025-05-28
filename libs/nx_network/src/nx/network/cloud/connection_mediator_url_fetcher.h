@@ -8,7 +8,7 @@
 
 namespace nx::network::cloud {
 
-using MediatorUrlHandler = nx::utils::MoveOnlyFunc<void(
+using MediatorUrlHandler = nx::MoveOnlyFunc<void(
     nx::network::http::StatusCode::Value /*result code*/,
     nx::Url /*tcp url*/,
     nx::Url /*udp url*/)>;

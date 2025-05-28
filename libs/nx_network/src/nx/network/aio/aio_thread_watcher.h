@@ -33,7 +33,7 @@ public:
         }
     };
 
-    using StuckThreadHandler = nx::utils::MoveOnlyFunc<void(StuckThread)>;
+    using StuckThreadHandler = nx::MoveOnlyFunc<void(StuckThread)>;
 
     AioThreadWatcher(
         int pollRatePerSecond,

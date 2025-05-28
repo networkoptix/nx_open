@@ -17,7 +17,7 @@ Client::~Client()
 }
 
 void Client::getConfiguration(
-    nx::utils::MoveOnlyFunc<void(ResultCode, LoggerList)> completionHandler)
+    nx::MoveOnlyFunc<void(ResultCode, LoggerList)> completionHandler)
 {
     base_type::template makeAsyncCall<LoggerList>(
         http::Method::get,

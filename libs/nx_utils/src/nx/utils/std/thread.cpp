@@ -57,7 +57,7 @@ void DetachedThreads::addThread(std::unique_ptr<detail::thread> thread)
 
 namespace detail {
 
-thread::thread(nx::utils::MoveOnlyFunc<void()> threadFunc) noexcept(false):
+thread::thread(nx::MoveOnlyFunc<void()> threadFunc) noexcept(false):
     m_threadFunc(std::move(threadFunc))
 {
     setObjectName("nx::utils::detail::thread: QThread");

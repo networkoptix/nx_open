@@ -23,7 +23,7 @@ class AbstractTunnelConnection:
     public QnStoppableAsync
 {
 public:
-    using SocketHandler = nx::utils::MoveOnlyFunc<void(
+    using SocketHandler = nx::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>,
         bool /*stillValid*/)>;

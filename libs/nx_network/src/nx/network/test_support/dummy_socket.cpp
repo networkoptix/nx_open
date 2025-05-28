@@ -175,19 +175,19 @@ bool DummySocket::getKeepAlive(std::optional< KeepAliveOptions >* /*result*/) co
     return false;
 }
 
-void DummySocket::post(nx::utils::MoveOnlyFunc<void()> handler)
+void DummySocket::post(nx::MoveOnlyFunc<void()> handler)
 {
     m_basicPollable.post(std::move(handler));
 }
 
-void DummySocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
+void DummySocket::dispatch(nx::MoveOnlyFunc<void()> handler)
 {
     m_basicPollable.dispatch(std::move(handler));
 }
 
 void DummySocket::connectAsync(
     const SocketAddress& /*addr*/,
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     post([handler = std::move(handler)]() { handler(SystemError::notImplemented); });
 }
@@ -208,7 +208,7 @@ void DummySocket::sendAsync(
 
 void DummySocket::registerTimer(
     std::chrono::milliseconds /*timeoutMs*/,
-    nx::utils::MoveOnlyFunc<void()> /*handler*/)
+    nx::MoveOnlyFunc<void()> /*handler*/)
 {
     NX_ASSERT(false);
 }

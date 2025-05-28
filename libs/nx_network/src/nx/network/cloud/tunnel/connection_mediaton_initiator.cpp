@@ -174,7 +174,7 @@ void ConnectionMediationInitiator::handleResponse(
     m_tcpConnectDelayTimer.pleaseStopSync();
     m_mediatorApiClient.reset();
 
-    nx::utils::swapAndCall(m_handler, resultCode, std::move(response));
+    nx::swapAndCall(m_handler, resultCode, std::move(response));
 }
 
 } // namespace nx::network::cloud

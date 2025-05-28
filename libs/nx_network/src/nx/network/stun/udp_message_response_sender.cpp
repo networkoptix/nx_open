@@ -41,7 +41,7 @@ SocketAddress UDPMessageResponseSender::getSourceAddress() const
 }
 
 void UDPMessageResponseSender::addOnConnectionCloseHandler(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*handler*/)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> /*handler*/)
 {
     // This class emulates "server connection" on top of UDP for convenience.
     // So, connection-related logic like this one is not appropriate.

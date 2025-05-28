@@ -41,7 +41,7 @@ public:
         return value;
     }
 
-    nx::utils::SharedGuardPtr monitor(const QString& name, nx::utils::MoveOnlyFunc<void()> change) const
+    nx::utils::SharedGuardPtr monitor(const QString& name, nx::MoveOnlyFunc<void()> change) const
     {
         m_params[name].change = std::move(change);
         return nx::utils::makeSharedGuard([](){});
@@ -56,7 +56,7 @@ private:
     struct Param
     {
         api::metrics::Value value;
-        nx::utils::MoveOnlyFunc<void()> change;
+        nx::MoveOnlyFunc<void()> change;
     };
 
 private:

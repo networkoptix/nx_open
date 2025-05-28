@@ -23,7 +23,7 @@ Oauth2Client::Oauth2Client(
 
 void Oauth2Client::issueToken(
     const db::api::IssueTokenRequest& request,
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)> handler)
+    nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)> handler)
 {
     base_type::template makeAsyncCall<db::api::IssueTokenResponse>(
         nx::network::http::Method::post,
@@ -35,7 +35,7 @@ void Oauth2Client::issueToken(
 
 void Oauth2Client::issueAuthorizationCode(
     const db::api::IssueTokenRequest& request,
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)> handler)
+    nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)> handler)
 {
     base_type::template makeAsyncCall<db::api::IssueCodeResponse>(
         nx::network::http::Method::post,
@@ -47,7 +47,7 @@ void Oauth2Client::issueAuthorizationCode(
 
 void Oauth2Client::issuePasswordResetCode(
     const db::api::IssuePasswordResetCodeRequest& request,
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)> handler)
+    nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)> handler)
 {
     base_type::template makeAsyncCall<db::api::IssueCodeResponse>(
         nx::network::http::Method::post,
@@ -59,7 +59,7 @@ void Oauth2Client::issuePasswordResetCode(
 
 void Oauth2Client::introspectToken(
     const db::api::TokenIntrospectionRequest& request,
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::TokenIntrospectionResponse)> handler)
+    nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::TokenIntrospectionResponse)> handler)
 {
     base_type::template makeAsyncCall<db::api::TokenIntrospectionResponse>(
         nx::network::http::Method::post,
@@ -69,7 +69,7 @@ void Oauth2Client::introspectToken(
         std::move(handler));
 }
 
-void Oauth2Client::logout(nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> handler)
+void Oauth2Client::logout(nx::MoveOnlyFunc<void(db::api::ResultCode)> handler)
 {
     base_type::template makeAsyncCall<void>(
         nx::network::http::Method::delete_,
@@ -80,7 +80,7 @@ void Oauth2Client::logout(nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> han
 
 void Oauth2Client::clientLogout(
     const std::string& clientId,
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler)
+    nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler)
 {
     base_type::template makeAsyncCall<void>(
         nx::network::http::Method::delete_,
@@ -90,7 +90,7 @@ void Oauth2Client::clientLogout(
 }
 
 void Oauth2Client::getJwtPublicKeys(
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, std::vector<nx::network::jwk::Key>)> handler)
+    nx::MoveOnlyFunc<void(db::api::ResultCode, std::vector<nx::network::jwk::Key>)> handler)
 {
     base_type::template makeAsyncCall<std::vector<nx::network::jwk::Key>>(
         nx::network::http::Method::get,
@@ -101,7 +101,7 @@ void Oauth2Client::getJwtPublicKeys(
 
 void Oauth2Client::getJwtPublicKeyByKid(
     const std::string& kid,
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, nx::network::jwk::Key)> handler)
+    nx::MoveOnlyFunc<void(db::api::ResultCode, nx::network::jwk::Key)> handler)
 {
     base_type::template makeAsyncCall<nx::network::jwk::Key>(
         nx::network::http::Method::get,
@@ -112,7 +112,7 @@ void Oauth2Client::getJwtPublicKeyByKid(
 
 void Oauth2Client::introspectSession(
     const std::string& session,
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, api::GetSessionResponse)> handler)
+    nx::MoveOnlyFunc<void(db::api::ResultCode, api::GetSessionResponse)> handler)
 {
     base_type::template makeAsyncCall<api::GetSessionResponse>(
         nx::network::http::Method::get,
@@ -122,7 +122,7 @@ void Oauth2Client::introspectSession(
 }
 
 void Oauth2Client::markSessionMfaVerified(
-    const std::string& sessionId, nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> handler)
+    const std::string& sessionId, nx::MoveOnlyFunc<void(db::api::ResultCode)> handler)
 {
     base_type::template makeAsyncCall<void>(
         nx::network::http::Method::post,
@@ -133,7 +133,7 @@ void Oauth2Client::markSessionMfaVerified(
 
 void Oauth2Client::notifyAccountUpdated(
     const db::api::AccountChangedEvent& event,
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler)
+    nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler)
 {
     base_type::template makeAsyncCall<void>(
         nx::network::http::Method::post,
@@ -144,7 +144,7 @@ void Oauth2Client::notifyAccountUpdated(
 }
 
 void Oauth2Client::internalLogout(
-    const std::string&, nx::utils::MoveOnlyFunc<void(db::api::ResultCode)>)
+    const std::string&, nx::MoveOnlyFunc<void(db::api::ResultCode)>)
 {
     throw std::logic_error("not implemented");
 }
@@ -153,20 +153,20 @@ void Oauth2Client::internalIssueToken(
     const std::optional<std::string>&,
     const network::SocketAddress&,
     const nx::cloud::db::api::IssueTokenRequest&,
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)>)
+    nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)>)
 {
     throw std::logic_error("not implemented");
 }
 
 void Oauth2Client::internalClientLogout(
-    const std::string&, const std::string&, nx::utils::MoveOnlyFunc<void(db::api::ResultCode)>)
+    const std::string&, const std::string&, nx::MoveOnlyFunc<void(db::api::ResultCode)>)
 {
     throw std::logic_error("not implemented");
 }
 
 void Oauth2Client::internalGetSession(
     const std::string&,
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, nx::cloud::db::api::AuthSession)>)
+    nx::MoveOnlyFunc<void(db::api::ResultCode, nx::cloud::db::api::AuthSession)>)
 {
     throw std::logic_error("not implemented");
 }

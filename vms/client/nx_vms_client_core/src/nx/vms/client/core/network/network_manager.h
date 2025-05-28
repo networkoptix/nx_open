@@ -49,7 +49,7 @@ public:
      */
     static void setDefaultTimeouts(nx::network::http::AsyncClient* request);
 
-    using RequestCallback = nx::utils::MoveOnlyFunc<void(Response)>;
+    using RequestCallback = nx::MoveOnlyFunc<void(Response)>;
 
     /**
      * Send request of the provided type to the following url. Callback will be delivered using Qt

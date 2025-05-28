@@ -20,7 +20,7 @@ public:
     ~Client();
 
     void getConfiguration(
-        nx::utils::MoveOnlyFunc<void(ResultCode, LoggerList)> completionHandler);
+        nx::MoveOnlyFunc<void(ResultCode, LoggerList)> completionHandler);
 
     std::tuple<ResultCode, LoggerList> getConfiguration();
 };

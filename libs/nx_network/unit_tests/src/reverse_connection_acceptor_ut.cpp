@@ -132,18 +132,18 @@ public:
             });
     }
 
-    void setOnConnectDone(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    void setOnConnectDone(nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
         m_onConnectDone = std::move(handler);
     }
 
     void setOnReadinessWaitDone(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
         m_onReadinessWaitDone = std::move(handler);
     }
 
-    void setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler)
+    void setOnBeforeDestruction(nx::MoveOnlyFunc<void()> handler)
     {
         m_onBeforeDestruction = std::move(handler);
     }
@@ -164,9 +164,9 @@ private:
     ReverseConnectionCompletionHandler m_connectionBecameReadyHandler;
     bool m_isConnected = false;
     bool m_ready = false;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onConnectDone;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onReadinessWaitDone;
-    nx::utils::MoveOnlyFunc<void()> m_onBeforeDestruction;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onConnectDone;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onReadinessWaitDone;
+    nx::MoveOnlyFunc<void()> m_onBeforeDestruction;
     std::optional<SystemError::ErrorCode> m_connectResult;
     std::optional<SystemError::ErrorCode> m_readinessWaitResult;
     bool m_waitForReadinessInvoked = false;
@@ -177,7 +177,7 @@ private:
             m_readinessWaitResult ? *m_readinessWaitResult : SystemError::noError;
         if (m_onReadinessWaitDone)
             m_onReadinessWaitDone(result);
-        nx::utils::swapAndCall(m_connectionBecameReadyHandler, result);
+        nx::swapAndCall(m_connectionBecameReadyHandler, result);
     }
 };
 

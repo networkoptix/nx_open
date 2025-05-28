@@ -35,7 +35,7 @@ RendezvousConnectorWithVerification::RendezvousConnectorWithVerification(
 }
 
 void RendezvousConnectorWithVerification::pleaseStop(
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    nx::MoveOnlyFunc<void()> completionHandler)
 {
     RendezvousConnector::pleaseStop(
         [this, completionHandler = std::move(completionHandler)]() mutable
@@ -129,7 +129,7 @@ void RendezvousConnectorWithVerification::onConnectCompleted(
 
     if (errorCode != SystemError::noError)
     {
-        nx::utils::swapAndCall(m_connectCompletionHandler, errorCode);
+        nx::swapAndCall(m_connectCompletionHandler, errorCode);
         return;
     }
 
@@ -213,7 +213,7 @@ void RendezvousConnectorWithVerification::processUdpHolePunchingSynAck(
     NX_VERBOSE(this, nx::format("cross-nat %1. Successfully verified connection to %2")
         .arg(connectSessionId()).arg(remoteAddress().toString()));
 
-    nx::utils::swapAndCall(m_connectCompletionHandler, SystemError::noError);
+    nx::swapAndCall(m_connectCompletionHandler, SystemError::noError);
 }
 
 void RendezvousConnectorWithVerification::processTunnelConnectionChosen(
@@ -231,7 +231,7 @@ void RendezvousConnectorWithVerification::processTunnelConnectionChosen(
     NX_VERBOSE(this, nx::format("cross-nat %1. Successfully notified host %2 about udp tunnel choice")
         .arg(connectSessionId()).arg(remoteAddress().toString()));
 
-    nx::utils::swapAndCall(m_connectCompletionHandler, SystemError::noError);
+    nx::swapAndCall(m_connectCompletionHandler, SystemError::noError);
 }
 
 void RendezvousConnectorWithVerification::onTimeout(std::string requestName)
@@ -249,7 +249,7 @@ void RendezvousConnectorWithVerification::processError(
 
     m_requestPipeline.reset();
 
-    nx::utils::swapAndCall(m_connectCompletionHandler, errorCode);
+    nx::swapAndCall(m_connectCompletionHandler, errorCode);
 }
 
 } // namespace nx::network::cloud::udp

@@ -33,7 +33,7 @@ public:
 
     virtual void serve(
         RequestContext /*requestContext*/,
-        nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler) override
+        nx::MoveOnlyFunc<void(RequestResult)> completionHandler) override
     {
         m_authenticateCalled = true;
         completionHandler(nx::network::http::server::SuccessfulAuthenticationResult());

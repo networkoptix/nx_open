@@ -25,7 +25,7 @@ public:
      * @param stillValid If false, connection cannot be used anymore.
      * (every subsequent AbstractOutgoingTunnelConnection::establishNewConnection call will fail).
      */
-    typedef nx::utils::MoveOnlyFunc<void(
+    typedef nx::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>,
         bool stillValid)> OnNewConnectionHandler;
@@ -53,7 +53,7 @@ public:
         OnNewConnectionHandler handler) = 0;
 
     virtual void setControlConnectionClosedHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
+        nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
 
     virtual ConnectType connectType() const = 0;
 

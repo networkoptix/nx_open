@@ -25,7 +25,7 @@ class Pipeline;
  * @param chain The chain that must be verified.
  * @return true if the chain has been verified, false otherwise.
  */
-using VerifyCertificateChainCallback = nx::utils::MoveOnlyFunc<
+using VerifyCertificateChainCallback = nx::MoveOnlyFunc<
     bool(CertificateChainView /*chain*/)>;
 
 /**
@@ -89,7 +89,7 @@ public:
      *     - completionHandler may never be called if the handshake fails or if
      *         resumeDataProcessing() was invoked just after pauseDataProcessingAfterHandshake().
      */
-    void pauseDataProcessingAfterHandshake(nx::utils::MoveOnlyFunc<void()> completionHandler);
+    void pauseDataProcessingAfterHandshake(nx::MoveOnlyFunc<void()> completionHandler);
 
     /**
      * Resumes previously paused user I/O. I/O can be resumed even if it wasn't fully paused,
@@ -119,7 +119,7 @@ private:
     VerifyCertificateChainCallback m_verifyCertificateChainCallback;
     std::atomic<bool> m_isPausePending = false;
     std::atomic<bool> m_isPaused = false;
-    nx::utils::MoveOnlyFunc<void()> m_onIoPausedAfterHandshake;
+    nx::MoveOnlyFunc<void()> m_onIoPausedAfterHandshake;
 
     void initSslBio(std::shared_ptr<SSL_CTX> sslContext);
 

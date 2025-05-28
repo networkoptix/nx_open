@@ -18,7 +18,7 @@ static rest::Handle kNoConnection = -2;
 
 struct OrderedRequestsHelper::Private
 {
-    using Request = nx::utils::MoveOnlyFunc<rest::Handle()>;
+    using Request = nx::MoveOnlyFunc<rest::Handle()>;
     using Requests = std::deque<Request>;
 
     void addRequest(Request&& request);

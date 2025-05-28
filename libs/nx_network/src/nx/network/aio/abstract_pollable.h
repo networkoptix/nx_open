@@ -30,8 +30,8 @@ public:
      * NOTE: Re-binding is allowed.
      */
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) = 0;
-    virtual void post(nx::utils::MoveOnlyFunc<void()> func) = 0;
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) = 0;
+    virtual void post(nx::MoveOnlyFunc<void()> func) = 0;
+    virtual void dispatch(nx::MoveOnlyFunc<void()> func) = 0;
 };
 
 } // namespace aio

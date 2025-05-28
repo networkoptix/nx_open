@@ -21,7 +21,7 @@ BufferedStreamSocket::BufferedStreamSocket(
 }
 
 void BufferedStreamSocket::catchRecvEvent(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_catchRecvEventHandler = std::move(handler);
 
@@ -100,7 +100,7 @@ void BufferedStreamSocket::triggerCatchRecvEvent(SystemError::ErrorCode resultCo
     post(
         [this, resultCode]()
         {
-            nx::utils::swapAndCall(m_catchRecvEventHandler, resultCode);
+            nx::swapAndCall(m_catchRecvEventHandler, resultCode);
         });
 }
 

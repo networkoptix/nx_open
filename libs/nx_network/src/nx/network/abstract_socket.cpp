@@ -18,7 +18,7 @@ AbstractStreamSocket::~AbstractStreamSocket()
         m_beforeDestroyCallback();
 }
 
-void AbstractStreamSocket::setBeforeDestroyCallback(nx::utils::MoveOnlyFunc<void()> callback)
+void AbstractStreamSocket::setBeforeDestroyCallback(nx::MoveOnlyFunc<void()> callback)
 {
     m_beforeDestroyCallback = std::move(callback);
 }
@@ -61,7 +61,7 @@ std::string AbstractCommunicatingSocket::getForeignHostName() const
 
 void AbstractCommunicatingSocket::registerTimer(
     unsigned int timeout,
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::MoveOnlyFunc<void()> handler)
 {
     return registerTimer(
         std::chrono::milliseconds(timeout),
@@ -87,7 +87,7 @@ void AbstractCommunicatingSocket::readAsyncAtLeast(
         static_cast<size_t>(buffer->size()));
 }
 
-void AbstractCommunicatingSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void AbstractCommunicatingSocket::pleaseStop(nx::MoveOnlyFunc<void()> handler)
 {
     post(
         [this, handler = std::move(handler)]()
@@ -116,7 +116,7 @@ void AbstractCommunicatingSocket::pleaseStopSync()
 
 void AbstractCommunicatingSocket::cancelIOAsync(
     nx::network::aio::EventType eventType,
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::MoveOnlyFunc<void()> handler)
 {
     this->post(
         [this, eventType, handler = std::move(handler)]()
@@ -170,7 +170,7 @@ void AbstractCommunicatingSocket::readAsyncAtLeastImpl(
 //-------------------------------------------------------------------------------------------------
 
 void AbstractStreamServerSocket::cancelIOAsync(
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::MoveOnlyFunc<void()> handler)
 {
     post(
         [this, handler = std::move(handler)]()

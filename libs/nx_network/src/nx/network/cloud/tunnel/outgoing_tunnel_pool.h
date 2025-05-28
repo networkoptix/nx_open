@@ -29,7 +29,7 @@ public:
     OutgoingTunnelPool(const CloudConnectSettings& settings);
     virtual ~OutgoingTunnelPool();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> completionHandler) override;
 
     /**
      * Establish new connection for user needs.
@@ -100,7 +100,7 @@ private:
         std::list<AbstractOutgoingTunnel::NewConnectionHandler>::iterator handlerIter);
 
     void onTunnelClosed(AbstractOutgoingTunnel* tunnelPtr);
-    void tunnelsStopped(nx::utils::MoveOnlyFunc<void()> completionHandler);
+    void tunnelsStopped(nx::MoveOnlyFunc<void()> completionHandler);
 
     static bool s_isIgnoringOwnPeerIdChange;
 };

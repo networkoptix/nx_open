@@ -23,7 +23,7 @@ class NX_NETWORK_API ConnectionMediationInitiator:
 
 public:
     using Handler =
-        nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode, hpm::api::ConnectResponse)>;
+        nx::MoveOnlyFunc<void(hpm::api::ResultCode, hpm::api::ConnectResponse)>;
 
     ConnectionMediationInitiator(
         const CloudConnectSettings& settings,

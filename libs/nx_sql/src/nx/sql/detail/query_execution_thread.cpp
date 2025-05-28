@@ -60,7 +60,7 @@ ConnectionState QueryExecutionThread::state() const
     return m_state;
 }
 
-void QueryExecutionThread::setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler)
+void QueryExecutionThread::setOnClosedHandler(nx::MoveOnlyFunc<void()> handler)
 {
     m_onClosedHandler = std::move(handler);
 }

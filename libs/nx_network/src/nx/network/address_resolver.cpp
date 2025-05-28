@@ -132,7 +132,7 @@ std::deque<AddressEntry> AddressResolver::resolveSync(
 }
 
 void AddressResolver::cancel(
-    void* requestId, nx::utils::MoveOnlyFunc<void()> handler)
+    void* requestId, nx::MoveOnlyFunc<void()> handler)
 {
     std::optional<utils::promise<bool>> promise;
     if (!handler)
@@ -181,7 +181,7 @@ bool AddressResolver::isCloudHostname(const char* hostname) const
     return isCloudHostname(std::string_view(hostname));
 }
 
-void AddressResolver::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void AddressResolver::pleaseStop(nx::MoveOnlyFunc<void()> handler)
 {
     m_dnsResolver.stop();
     handler();

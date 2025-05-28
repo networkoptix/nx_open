@@ -115,7 +115,7 @@ public:
     static void removeGroups(
         WindowContext* windowContext,
         const QSet<nx::Uuid>& idsToRemove,
-        nx::utils::MoveOnlyFunc<void(bool, const QString&)> callback = {});
+        nx::MoveOnlyFunc<void(bool, const QString&)> callback = {});
 
 public slots:
     void onDeleteRequested();

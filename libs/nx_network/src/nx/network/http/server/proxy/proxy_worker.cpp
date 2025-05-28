@@ -102,7 +102,7 @@ void ProxyWorker::onConnectionClosed(SystemError::ErrorCode closeReason)
         m_targetHostPipeline->socket()->getForeignAddress().toString(),
         SystemError::toString(closeReason));
 
-    nx::utils::swapAndCall(m_completionHandler, StatusCode::serviceUnavailable);
+    nx::swapAndCall(m_completionHandler, StatusCode::serviceUnavailable);
 }
 
 void ProxyWorker::stopWhileInAioThread()
@@ -133,7 +133,7 @@ void ProxyWorker::onMessageFromTargetHost(Message message)
             m_targetHostPipeline->socket()->getForeignAddress());
 
         // TODO: #akolesnikov Use better status code.
-        nx::utils::swapAndCall(m_completionHandler, StatusCode::serviceUnavailable);
+        nx::swapAndCall(m_completionHandler, StatusCode::serviceUnavailable);
         return;
     }
 
@@ -185,7 +185,7 @@ void ProxyWorker::startMessageBodyStreaming(Message message)
     }
     requestResult.headers = std::move(message.response->headers);
 
-    nx::utils::swapAndCall(m_completionHandler, std::move(requestResult));
+    nx::swapAndCall(m_completionHandler, std::move(requestResult));
 }
 
 std::unique_ptr<ProxyWorker::ResponseMsgBodySource>
@@ -263,7 +263,7 @@ void ProxyWorker::onMessageEnd()
 
     requestResult.headers = std::exchange(m_responseMessage.response->headers, {});
 
-    nx::utils::swapAndCall(m_completionHandler, std::move(requestResult));
+    nx::swapAndCall(m_completionHandler, std::move(requestResult));
 }
 
 std::unique_ptr<AbstractMsgBodySource> ProxyWorker::prepareFixedMessageBody()

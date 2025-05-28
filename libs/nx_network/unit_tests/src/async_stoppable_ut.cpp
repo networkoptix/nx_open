@@ -34,7 +34,7 @@ public:
         return m_isRunning;
     }
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override
+    virtual void pleaseStop(nx::MoveOnlyFunc<void()> completionHandler) override
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
         m_handler = std::move(completionHandler);
@@ -45,12 +45,12 @@ private:
     nx::Mutex m_mutex;
     bool m_isRunning;
     nx::WaitCondition m_condition;
-    nx::utils::MoveOnlyFunc< void() > m_handler;
+    nx::MoveOnlyFunc< void() > m_handler;
     nx::utils::thread m_thread;
 
     void threadMain()
     {
-        nx::utils::MoveOnlyFunc< void() > handler;
+        nx::MoveOnlyFunc< void() > handler;
         {
             NX_MUTEX_LOCKER lk(&m_mutex);
             while (!m_handler)

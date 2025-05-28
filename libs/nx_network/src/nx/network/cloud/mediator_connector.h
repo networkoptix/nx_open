@@ -27,7 +27,7 @@ class MediatorStunClient;
 class MediatorEndpointProvider;
 
 using MediatorAvailabilityChangedHandler =
-    nx::utils::MoveOnlyFunc<void(bool /*isMediatorAvailable*/)>;
+    nx::MoveOnlyFunc<void(bool /*isMediatorAvailable*/)>;
 
 class NX_NETWORK_API AbstractMediatorConnector:
     public network::aio::BasicPollable
@@ -44,7 +44,7 @@ public:
     /**
      * @param endpoint Defined only if resultCode is SystemError::noError.
      */
-    virtual void fetchAddress(nx::utils::MoveOnlyFunc<void(
+    virtual void fetchAddress(nx::MoveOnlyFunc<void(
         nx::network::http::StatusCode::Value /*resultCode*/,
         MediatorAddress /*address*/)> handler) = 0;
 
@@ -90,14 +90,14 @@ public:
 
     virtual std::optional<SystemCredentials> getSystemCredentials() const override;
 
-    virtual void fetchAddress(nx::utils::MoveOnlyFunc<void(
+    virtual void fetchAddress(nx::MoveOnlyFunc<void(
         nx::network::http::StatusCode::Value /*resultCode*/,
         MediatorAddress /*address*/)> handler) override;
 
     virtual std::optional<MediatorAddress> address() const override;
 
     void subsribeToSystemCredentialsSet(
-        nx::utils::MoveOnlyFunc<void(std::optional<SystemCredentials>)> handler,
+        nx::MoveOnlyFunc<void(std::optional<SystemCredentials>)> handler,
         nx::utils::SubscriptionId* outId);
 
     void unsubscribeFromSystemCredentialsSet(nx::utils::SubscriptionId id);
@@ -107,7 +107,7 @@ public:
      * Depending on settings, a reconnect attempt could be scheduled automatically. So, generally,
      * there is no need to response to this event.
      */
-    void setOnConnectionClosedHandler(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+    void setOnConnectionClosedHandler(nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
     /**
      * @return The previous settings.

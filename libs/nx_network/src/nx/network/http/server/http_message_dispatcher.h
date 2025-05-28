@@ -58,7 +58,7 @@ public:
 
     virtual void serve(
         RequestContext requestContext,
-        nx::utils::MoveOnlyFunc<void(RequestResult)> completionHandler) override;
+        nx::MoveOnlyFunc<void(RequestResult)> completionHandler) override;
 
     /**
      * @return false if some handler is already registered for path.

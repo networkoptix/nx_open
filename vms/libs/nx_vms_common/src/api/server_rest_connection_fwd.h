@@ -24,7 +24,7 @@ namespace rest {
 #endif
 
 template<typename ResultType>
-using Callback = nx::utils::MoveOnlyFunc<void(bool success, Handle requestId, ResultType result)>;
+using Callback = nx::MoveOnlyFunc<void(bool success, Handle requestId, ResultType result)>;
 
 class ServerConnection;
 using ServerConnectionPtr = std::shared_ptr<ServerConnection>;

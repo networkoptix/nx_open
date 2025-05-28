@@ -27,7 +27,7 @@ class NX_NETWORK_API AddressResolver:
 public:
     static constexpr auto kDnsCacheTimeout = std::chrono::seconds(10);
 
-    using ResolveHandler = nx::utils::MoveOnlyFunc<void(
+    using ResolveHandler = nx::MoveOnlyFunc<void(
         SystemError::ErrorCode, std::deque<AddressEntry>)>;
 
     AddressResolver();
@@ -89,7 +89,7 @@ public:
      */
     void cancel(
         void* requestId,
-        nx::utils::MoveOnlyFunc<void()> handler = nullptr);
+        nx::MoveOnlyFunc<void()> handler = nullptr);
 
     bool isRequestIdKnown(void* requestId) const;
 
@@ -97,7 +97,7 @@ public:
     bool isCloudHostname(const QString& hostname) const;
     bool isCloudHostname(const char* hostname) const;
 
-    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    void pleaseStop(nx::MoveOnlyFunc<void()> handler) override;
 
     DnsResolver& dnsResolver() { return m_dnsResolver; }
 

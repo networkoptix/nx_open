@@ -49,7 +49,7 @@ public:
         bool /*sslRequired*/,
         std::optional<int> /*ipVersion*/)>;
 
-    using DatagramSocketFactoryFunc = nx::utils::MoveOnlyFunc<
+    using DatagramSocketFactoryFunc = nx::MoveOnlyFunc<
         std::unique_ptr<AbstractDatagramSocket>(int /*e.g., AF_INET*/)>;
 
     static std::unique_ptr<AbstractDatagramSocket> createDatagramSocket();

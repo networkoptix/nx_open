@@ -52,7 +52,7 @@ void CloudAddressConnector::connectAsync(ConnectHandler handler)
                     if (cloudConnection)
                         cloudConnection->bindToAioThread(getAioThread());
 
-                    nx::utils::swapAndCall(
+                    nx::swapAndCall(
                         m_handler,
                         errorCode,
                         std::move(tunnelAttributes),

@@ -45,7 +45,7 @@ public:
 
     virtual void serve(
         nx::network::http::RequestContext requestContext,
-        nx::utils::MoveOnlyFunc<void(nx::network::http::RequestResult)> completionHandler) override;
+        nx::MoveOnlyFunc<void(nx::network::http::RequestResult)> completionHandler) override;
 
     static std::string realm();
 

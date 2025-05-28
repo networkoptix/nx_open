@@ -17,7 +17,7 @@ class NX_NETWORK_API AbstractCrossNatConnector:
     public aio::BasicPollable
 {
 public:
-    using ConnectCompletionHandler = nx::utils::MoveOnlyFunc<void(
+    using ConnectCompletionHandler = nx::MoveOnlyFunc<void(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractOutgoingTunnelConnection>)>;
 

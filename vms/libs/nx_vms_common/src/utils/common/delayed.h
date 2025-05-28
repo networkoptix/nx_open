@@ -14,7 +14,7 @@ class QTimer;
 
 enum { kDefaultDelay = 1 };
 
-using Callback = nx::utils::MoveOnlyFunc<void()>;
+using Callback = nx::MoveOnlyFunc<void()>;
 
 /// @brief Executes specified functor in the specified <targetThread>
 /// after <delay> has expired

@@ -109,12 +109,12 @@ void AbstractProxyHandler::startProxying(
         if ((resultCode / 100) * 100 == 300)
             result.statusCode = resultCode;
         result.headers.emplace("Location", proxyTarget.redirectLocation->toStdString());
-        return nx::utils::swapAndCall(m_requestCompletionHandler, std::move(result));
+        return nx::swapAndCall(m_requestCompletionHandler, std::move(result));
     }
 
     if (!StatusCode::isSuccessCode(resultCode))
     {
-        nx::utils::swapAndCall(m_requestCompletionHandler, resultCode);
+        nx::swapAndCall(m_requestCompletionHandler, resultCode);
         return;
     }
 
@@ -179,7 +179,7 @@ void AbstractProxyHandler::onConnected(
             targetAddress, m_request.requestLine.url, m_sslConnectionRequired,
             SystemError::toString(errorCode));
 
-        return nx::utils::swapAndCall(
+        return nx::swapAndCall(
             m_requestCompletionHandler,
             (errorCode == SystemError::hostNotFound || errorCode == SystemError::hostUnreachable)
             ? StatusCode::badGateway
@@ -231,7 +231,7 @@ void AbstractProxyHandler::sendTargetServerResponse(RequestResult requestResult)
     // local HTTP server to implement its own keep-alive policy.
     removeKeepAliveConnectionHeaders(&requestResult.headers);
 
-    nx::utils::swapAndCall(m_requestCompletionHandler, std::move(requestResult));
+    nx::swapAndCall(m_requestCompletionHandler, std::move(requestResult));
 }
 
 void AbstractProxyHandler::removeKeepAliveConnectionHeaders(HttpHeaders* responseHeaders)
@@ -270,7 +270,7 @@ void AbstractProxyHandler::establishSecureConnectionToTheTarget(
                 m_request.requestLine.url, connectionLocalAddress,
                 SystemError::getLastOSErrorCode());
 
-        return nx::utils::swapAndCall(
+        return nx::swapAndCall(
             m_requestCompletionHandler,
             StatusCode::internalServerError);
     }
@@ -293,7 +293,7 @@ void AbstractProxyHandler::processSslHandshakeResult(
                 m_request.requestLine.url, m_encryptedConnection->getLocalAddress(),
                 SystemError::toString(handshakeResult));
 
-        return nx::utils::swapAndCall(
+        return nx::swapAndCall(
             m_requestCompletionHandler,
             StatusCode::badGateway);
     }
@@ -309,7 +309,7 @@ void AbstractProxyHandler::processSslHandshakeResult(
 }
 
 void AbstractProxyHandler::acceptAllCertificates(
-    ssl::CertificateChainView, nx::utils::MoveOnlyFunc<void(bool)> cb)
+    ssl::CertificateChainView, nx::MoveOnlyFunc<void(bool)> cb)
 {
     cb(true);
 }

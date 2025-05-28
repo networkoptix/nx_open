@@ -100,7 +100,7 @@ public:
     virtual void validateMSSignature(
         const std::string& systemId,
         const api::ValidateMSSignatureRequest& request,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
+        nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
     virtual void getCloudUsersOfSystem(
         const std::string& systemId,

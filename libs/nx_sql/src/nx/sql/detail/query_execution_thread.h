@@ -43,7 +43,7 @@ public:
     virtual void join() override;
 
     virtual ConnectionState state() const override;
-    virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void setOnClosedHandler(nx::MoveOnlyFunc<void()> handler) override;
     virtual void start(std::chrono::milliseconds connectDelay = std::chrono::milliseconds::zero()) override;
 
 private:
@@ -59,7 +59,7 @@ private:
     std::unique_ptr<AbstractDbConnection> m_externalConnection;
     std::chrono::milliseconds m_connectDelay = std::chrono::milliseconds::zero();
     std::atomic<ConnectionState> m_state{ConnectionState::initializing};
-    nx::utils::MoveOnlyFunc<void()> m_onClosedHandler;
+    nx::MoveOnlyFunc<void()> m_onClosedHandler;
     std::thread m_queryExecutionThread;
     std::atomic<bool> m_terminated{false};
     int m_numberOfFailedRequestsInARow = 0;

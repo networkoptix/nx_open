@@ -59,70 +59,70 @@ public:
 
     void issueToken(
         const db::api::IssueTokenRequest& request,
-        nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)>
+        nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)>
             completionHandler) override;
 
     void issueAuthorizationCode(
         const db::api::IssueTokenRequest& request,
-        nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)>
+        nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)>
             completionHandler) override;
 
     void issuePasswordResetCode(
         const db::api::IssuePasswordResetCodeRequest& request,
-        nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)>
+        nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)>
             completionHandler) override;
 
     void introspectToken(
         const db::api::TokenIntrospectionRequest& request,
-        nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::TokenIntrospectionResponse)>
+        nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::TokenIntrospectionResponse)>
             completionHandler) override;
 
-    void logout(nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
+    void logout(nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
 
     virtual void clientLogout(
         const std::string& clientId,
-        nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
+        nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
 
     void getJwtPublicKeys(
-        nx::utils::MoveOnlyFunc<void(db::api::ResultCode, std::vector<nx::network::jwk::Key>)>
+        nx::MoveOnlyFunc<void(db::api::ResultCode, std::vector<nx::network::jwk::Key>)>
             completionHandler) override;
 
     void getJwtPublicKeyByKid(
         const std::string& kid,
-        nx::utils::MoveOnlyFunc<void(db::api::ResultCode, nx::network::jwk::Key)>
+        nx::MoveOnlyFunc<void(db::api::ResultCode, nx::network::jwk::Key)>
             completionHandler) override;
 
     void introspectSession(
         const std::string& session,
-        nx::utils::MoveOnlyFunc<void(db::api::ResultCode, api::GetSessionResponse)>
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::GetSessionResponse)>
             completionHandler) override;
 
     void internalClientLogout(
         const std::string& email,
         const std::string& clienId,
-        nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
+        nx::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
 
     void internalLogout(
-        const std::string& email, nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
+        const std::string& email, nx::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
 
     void internalIssueToken(
         const std::optional<std::string>& hostName,
         const network::SocketAddress& clientEndpoint,
         const nx::cloud::db::api::IssueTokenRequest& request,
-        nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)> handler) override;
+        nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)> handler) override;
 
     void internalGetSession(
         const std::string& sessionId,
-        nx::utils::MoveOnlyFunc<void(db::api::ResultCode, nx::cloud::db::api::AuthSession)>
+        nx::MoveOnlyFunc<void(db::api::ResultCode, nx::cloud::db::api::AuthSession)>
             handler) override;
 
     void markSessionMfaVerified(
         const std::string& sessionId,
-        nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
+        nx::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
 
     void notifyAccountUpdated(
         const db::api::AccountChangedEvent& /*event*/,
-        nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
+        nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
 
 protected:
     template <class Request, class Response, class CompletionHandler>

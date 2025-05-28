@@ -113,7 +113,7 @@ void OutgoingTunnelConnection::establishNewConnection(
 }
 
 void OutgoingTunnelConnection::setControlConnectionClosedHandler(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_tunnelClosedHandler = std::move(handler);
 }
@@ -200,7 +200,7 @@ void OutgoingTunnelConnection::reportTunnelClosure(SystemError::ErrorCode reason
         m_relaySessionId, SystemError::toString(reason));
 
     if (m_tunnelClosedHandler)
-        nx::utils::swapAndCall(m_tunnelClosedHandler, reason);
+        nx::swapAndCall(m_tunnelClosedHandler, reason);
 }
 
 void OutgoingTunnelConnection::onInactivityTimeout()

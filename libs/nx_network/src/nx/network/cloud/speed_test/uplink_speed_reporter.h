@@ -26,7 +26,7 @@ class CloudModuleUrlFetcher;
 namespace speed_test {
 
 using FetchMediatorAddressHandler =
-    nx::utils::MoveOnlyFunc<void(
+    nx::MoveOnlyFunc<void(
         http::StatusCode::Value statusCode,
         const hpm::api::MediatorAddress& mediatorAddress)>;
 
@@ -57,7 +57,7 @@ public:
      * It is not discarded after invocation.
      */
     void setAboutToRunSpeedTestHandler(
-        nx::utils::MoveOnlyFunc<void(bool)> handler);
+        nx::MoveOnlyFunc<void(bool)> handler);
 
     /**
      * Invoked when fetching the mediator address completes.
@@ -108,7 +108,7 @@ private:
 
     std::unique_ptr<nx::network::aio::Scheduler> m_scheduler;
     AbstractSpeedTester::Settings m_speedTestSettings;
-    nx::utils::MoveOnlyFunc<void(bool /*inProgress*/)> m_aboutToRunSpeedTestHandler;
+    nx::MoveOnlyFunc<void(bool /*inProgress*/)> m_aboutToRunSpeedTestHandler;
     FetchMediatorAddressHandler m_fetchMediatorAddressHandler;
 };
 

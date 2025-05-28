@@ -64,13 +64,13 @@ WritableMessageBody::WritableMessageBody(
 WritableMessageBody::~WritableMessageBody()
 {
     if (m_onBeforeDestructionHandler)
-        nx::utils::swapAndCall(m_onBeforeDestructionHandler);
+        nx::swapAndCall(m_onBeforeDestructionHandler);
 }
 
 void WritableMessageBody::stopWhileInAioThread()
 {
     if (m_onBeforeDestructionHandler)
-        nx::utils::swapAndCall(m_onBeforeDestructionHandler);
+        nx::swapAndCall(m_onBeforeDestructionHandler);
 }
 
 std::string WritableMessageBody::mimeType() const
@@ -128,7 +128,7 @@ void WritableMessageBody::cancelRead()
 }
 
 void WritableMessageBody::setOnBeforeDestructionHandler(
-    nx::utils::MoveOnlyFunc<void()> handler)
+    nx::MoveOnlyFunc<void()> handler)
 {
     m_onBeforeDestructionHandler = std::move(handler);
 }
@@ -143,7 +143,7 @@ void WritableMessageBody::writeBodyData(nx::Buffer data)
 
             if (m_readCompletionHandler)
             {
-                nx::utils::swapAndCall(
+                nx::swapAndCall(
                     m_readCompletionHandler,
                     m_eof ? *m_eof : SystemError::noError, std::move(data));
             }
@@ -164,7 +164,7 @@ void WritableMessageBody::writeEof(SystemError::ErrorCode resultCode)
             if (m_readCompletionHandler)
             {
                 NX_ASSERT(m_dataBuffer.empty());
-                nx::utils::swapAndCall(m_readCompletionHandler, *m_eof, nx::Buffer());
+                nx::swapAndCall(m_readCompletionHandler, *m_eof, nx::Buffer());
             }
         });
 }

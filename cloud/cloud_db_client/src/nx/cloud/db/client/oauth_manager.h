@@ -19,52 +19,52 @@ public:
 
     virtual void issueTokenLegacy(
         const api::IssueTokenRequest& request,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)
+        nx::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)
         override;
 
     virtual void issueTokenV1(
         const api::IssueTokenRequest& request,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)
+        nx::MoveOnlyFunc<void(api::ResultCode, api::IssueTokenResponse)> completionHandler)
         override;
 
     virtual void issueAuthorizationCode(
         const api::IssueTokenRequest& request,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueCodeResponse)> completionHandler)
+        nx::MoveOnlyFunc<void(api::ResultCode, api::IssueCodeResponse)> completionHandler)
         override;
 
     virtual void legacyValidateToken(
         const std::string& token,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, api::ValidateTokenResponse)>
+        nx::MoveOnlyFunc<void(api::ResultCode, api::ValidateTokenResponse)>
             completionHandler)
         override;
 
     virtual void introspectToken(
         const api::TokenIntrospectionRequest& request,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, api::TokenIntrospectionResponse)>
+        nx::MoveOnlyFunc<void(api::ResultCode, api::TokenIntrospectionResponse)>
             completionHandler) override;
 
     virtual void deleteToken(
         const std::string& token,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
+        nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
     virtual void deleteTokensByClientId(
         const std::string& clientId,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
+        nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
-    virtual void logout(nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
+    virtual void logout(nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
     void issueStunToken(
         const api::IssueStunTokenRequest& request,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, api::IssueStunTokenResponse)>
+        nx::MoveOnlyFunc<void(api::ResultCode, api::IssueStunTokenResponse)>
             completionHandler) override;
 
     virtual void getJwtPublicKeys(
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, std::vector<nx::network::jwk::Key>)>
+        nx::MoveOnlyFunc<void(api::ResultCode, std::vector<nx::network::jwk::Key>)>
             completionHandler) override;
 
     virtual void getJwtPublicKeyByKid(
         const std::string& kid,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, nx::network::jwk::Key)>
+        nx::MoveOnlyFunc<void(api::ResultCode, nx::network::jwk::Key)>
             completionHandler) override;
 
 private:

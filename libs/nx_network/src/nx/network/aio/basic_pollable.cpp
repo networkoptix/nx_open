@@ -47,7 +47,7 @@ BasicPollable::~BasicPollable()
     }
 }
 
-void BasicPollable::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
+void BasicPollable::pleaseStop(nx::MoveOnlyFunc<void()> completionHandler)
 {
     post(
         [this, completionHandler = std::move(completionHandler)]
@@ -90,12 +90,12 @@ void BasicPollable::bindToAioThread(aio::AbstractAioThread* aioThread)
     m_pollable.bindToAioThread(aioThread);
 }
 
-void BasicPollable::post(nx::utils::MoveOnlyFunc<void()> func)
+void BasicPollable::post(nx::MoveOnlyFunc<void()> func)
 {
     m_pollable.getAioThread()->post(&m_pollable, std::move(func));
 }
 
-void BasicPollable::dispatch(nx::utils::MoveOnlyFunc<void()> func)
+void BasicPollable::dispatch(nx::MoveOnlyFunc<void()> func)
 {
     m_pollable.getAioThread()->dispatch(&m_pollable, std::move(func));
 }
@@ -105,7 +105,7 @@ bool BasicPollable::isInSelfAioThread() const
     return m_pollable.isInSelfAioThread();
 }
 
-void BasicPollable::cancelPostedCalls(nx::utils::MoveOnlyFunc<void()> completionHandler)
+void BasicPollable::cancelPostedCalls(nx::MoveOnlyFunc<void()> completionHandler)
 {
     post(
         [this, completionHandler = std::move(completionHandler)]()

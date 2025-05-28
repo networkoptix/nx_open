@@ -21,13 +21,13 @@ namespace nx::network::cloud {
  */
 class NX_NETWORK_API CloudModuleUrlFetcher:
     public BasicCloudModuleUrlFetcher<
-        nx::utils::MoveOnlyFunc<void(nx::network::http::StatusCode::Value, nx::Url)>>
+        nx::MoveOnlyFunc<void(nx::network::http::StatusCode::Value, nx::Url)>>
 {
     using base_type = BasicCloudModuleUrlFetcher<
-        nx::utils::MoveOnlyFunc<void(nx::network::http::StatusCode::Value, nx::Url)>>;
+        nx::MoveOnlyFunc<void(nx::network::http::StatusCode::Value, nx::Url)>>;
 
 public:
-    using Handler = nx::utils::MoveOnlyFunc<void(nx::network::http::StatusCode::Value, nx::Url)>;
+    using Handler = nx::MoveOnlyFunc<void(nx::network::http::StatusCode::Value, nx::Url)>;
 
     /**
      * Helper class to be used if BasicCloudModuleUrlFetcher user can die before

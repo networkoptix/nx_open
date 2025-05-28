@@ -29,7 +29,7 @@ void AvailableEndpointVerificator::setTimeout(std::chrono::milliseconds timeout)
 void AvailableEndpointVerificator::verifyHost(
     const SocketAddress& endpointToVerify,
     const AddressEntry& /*desiredHostAddress*/,
-    nx::utils::MoveOnlyFunc<void(VerificationResult)> completionHandler)
+    nx::MoveOnlyFunc<void(VerificationResult)> completionHandler)
 {
     using namespace std::placeholders;
 

@@ -168,7 +168,7 @@ void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
 
     task->status = detail::UserTaskStatus::done;
 
-    nx::utils::swapAndCall(task->handler, sysErrorCode, bytesRead);
+    nx::swapAndCall(task->handler, sysErrorCode, bytesRead);
 }
 
 void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
@@ -220,7 +220,7 @@ void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
     }
     else
     {
-        nx::utils::swapAndCall(task->handler, sysErrorCode, 0);
+        nx::swapAndCall(task->handler, sysErrorCode, 0);
     }
 }
 
@@ -442,7 +442,7 @@ bool StreamTransformingAsyncChannel::completeRawSendTasks(
 
         try
         {
-            nx::utils::swapAndCall(
+            nx::swapAndCall(
                 sendTask.userHandler,
                 sysErrorCode,
                 sysErrorCode == SystemError::noError ? sendTask.userByteCount : (size_t) -1);

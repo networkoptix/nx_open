@@ -12,7 +12,7 @@
 namespace nx::network::cloud::speed_test {
 
 using BandwidthCompletionHandler =
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, int /*Kbps*/)>;
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode, int /*Kbps*/)>;
 
 class NX_NETWORK_API UplinkBandwidthTester:
     public network::aio::BasicPollable

@@ -41,7 +41,7 @@ private:
     using TunnelingClients =
         std::list<std::unique_ptr<network::http::tunneling::Client>>;
 
-    using OpenTrafficRelayTunnelHandler = nx::utils::MoveOnlyFunc<void(
+    using OpenTrafficRelayTunnelHandler = nx::MoveOnlyFunc<void(
         const network::http::tunneling::Client&,
         network::http::tunneling::OpenTunnelResult)>;
 

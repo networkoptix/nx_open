@@ -176,7 +176,7 @@ class ValueCacheUnSafe
 {
 public:
     ValueCacheUnSafe(
-        nx::utils::MoveOnlyFunc<Value()> generator,
+        nx::MoveOnlyFunc<Value()> generator,
         std::chrono::milliseconds valueUpdatePeriod)
         :
         m_generator(std::move(generator)),
@@ -203,7 +203,7 @@ protected:
     }
 
 private:
-    nx::utils::MoveOnlyFunc<Value()> m_generator;
+    nx::MoveOnlyFunc<Value()> m_generator;
     const std::chrono::milliseconds m_valueUpdatePeriod;
     std::atomic<std::chrono::steady_clock::time_point> m_lastUpdateTime;
     StorageType m_value = {};

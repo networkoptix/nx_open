@@ -57,30 +57,30 @@ public:
 
     void getListeningPeers(
         const std::string_view& systemId,
-        nx::utils::MoveOnlyFunc<void(ResultCode, SystemPeers)> completionHandler);
+        nx::MoveOnlyFunc<void(ResultCode, SystemPeers)> completionHandler);
 
     std::tuple<ResultCode, SystemPeers> getListeningPeers(const std::string_view& systemId);
 
     void initiateConnection(
         const ConnectRequest& request,
-        nx::utils::MoveOnlyFunc<void(ResultCode, ConnectResponse)> completionHandler);
+        nx::MoveOnlyFunc<void(ResultCode, ConnectResponse)> completionHandler);
 
     void reportUplinkSpeed(
         const PeerConnectionSpeed& connectionSpeed,
-        nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler);
+        nx::MoveOnlyFunc<void(ResultCode)> completionHandler);
 
     void resetConnections(
         const std::string_view& systemId,
-        nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<std::string>)> completionHandler);
+        nx::MoveOnlyFunc<void(ResultCode, std::vector<std::string>)> completionHandler);
 
     std::tuple<api::ResultCode, std::vector<std::string>> resetConnections(const std::string_view& systemId);
 
-    void getStatistics(nx::utils::MoveOnlyFunc<void(ResultCode, Statistics)> completionHandler);
+    void getStatistics(nx::MoveOnlyFunc<void(ResultCode, Statistics)> completionHandler);
 
     std::tuple<ResultCode, Statistics> getStatistics();
 
     void getListeningPeersStatistics(
-        nx::utils::MoveOnlyFunc<void(ResultCode, ListeningPeerStatistics)> completionHandler);
+        nx::MoveOnlyFunc<void(ResultCode, ListeningPeerStatistics)> completionHandler);
 
     std::tuple<ResultCode, ListeningPeerStatistics> getListeningPeersStatistics();
 

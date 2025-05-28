@@ -20,7 +20,7 @@ class Settings;
 
 
 using TunnelCreatedHandler =
-    nx::utils::MoveOnlyFunc<void(std::unique_ptr<network::aio::AsyncChannelBridge>)>;
+    nx::MoveOnlyFunc<void(std::unique_ptr<network::aio::AsyncChannelBridge>)>;
 
 class ConnectHandler:
     public nx::network::http::RequestHandlerWithContext

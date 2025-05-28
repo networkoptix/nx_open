@@ -119,7 +119,7 @@ void Connector::onStartRelaySessionResponse(
     if (!result.ok())
     {
         m_relayClient.reset();
-        nx::utils::swapAndCall(m_handler, std::move(result));
+        nx::swapAndCall(m_handler, std::move(result));
         return;
     }
 
@@ -147,7 +147,7 @@ void Connector::onStartRelaySessionResponse(
                 {
                     result.resultCode =
                         nx::hpm::api::NatTraversalResultCode::endpointVerificationFailure;
-                    nx::utils::swapAndCall(m_handler, std::move(result));
+                    nx::swapAndCall(m_handler, std::move(result));
                     return;
                 }
 
@@ -156,7 +156,7 @@ void Connector::onStartRelaySessionResponse(
                     m_connectSessionId,
                     std::move(m_relayClient));
 
-                nx::utils::swapAndCall(m_handler, std::move(result));
+                nx::swapAndCall(m_handler, std::move(result));
             });
     }
 
@@ -165,10 +165,10 @@ void Connector::onStartRelaySessionResponse(
         m_connectSessionId,
         std::move(m_relayClient));
 
-    nx::utils::swapAndCall(m_handler, std::move(result));
+    nx::swapAndCall(m_handler, std::move(result));
 }
 
-void Connector::testConnection(nx::utils::MoveOnlyFunc<void(bool)> handler)
+void Connector::testConnection(nx::MoveOnlyFunc<void(bool)> handler)
 {
     m_connectionTestHandler = std::move(handler);
     m_relayClient->openConnectionToTheTargetHost(
@@ -180,7 +180,7 @@ void Connector::testConnection(nx::utils::MoveOnlyFunc<void(bool)> handler)
             {
                 NX_VERBOSE(this, "Cannot open connection to target host: sessionId=%1, "
                     "resultCode=%2", m_connectSessionId, resultCode);
-                return nx::utils::swapAndCall(m_connectionTestHandler, false);
+                return nx::swapAndCall(m_connectionTestHandler, false);
             }
 
             m_httpPipeline = std::make_unique<nx::network::http::AsyncMessagePipeline>(
@@ -215,7 +215,7 @@ void Connector::onTestConnectionResponse(nx::network::http::Message message)
     {
         NX_VERBOSE(this, "Connection test failed: sessionId=%1, status=%2",
             m_connectSessionId, message.response->statusLine.toString());
-        nx::utils::swapAndCall(m_connectionTestHandler, false);
+        nx::swapAndCall(m_connectionTestHandler, false);
         return;
     }
 
@@ -223,7 +223,7 @@ void Connector::onTestConnectionResponse(nx::network::http::Message message)
     {
         NX_VERBOSE(this, "Connection test failed: sessionId=%1, testId=%2, expected=%3",
             m_connectSessionId, response.testId(), m_expectedConnectionTestId);
-        nx::utils::swapAndCall(m_connectionTestHandler, false);
+        nx::swapAndCall(m_connectionTestHandler, false);
         return;
     }
 

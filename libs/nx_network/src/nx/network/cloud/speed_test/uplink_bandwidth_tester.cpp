@@ -295,7 +295,7 @@ void UplinkBandwidthTester::testComplete(int bytesPerMsec)
         NX_VERBOSE(this, "Test complete, reporting bytes per msec %1 (%2 Kbps)",
             bytesPerMsec, kilobitsPerSec);
 
-        nx::utils::swapAndCall(m_handler, SystemError::noError, (int) kilobitsPerSec);
+        nx::swapAndCall(m_handler, SystemError::noError, (int) kilobitsPerSec);
     }
 }
 
@@ -306,7 +306,7 @@ void UplinkBandwidthTester::testFailed(SystemError::ErrorCode errorCode, const Q
         NX_VERBOSE(this, "Test failed, errorCode: %1: %2", errorCode, reason);
 
         m_testContext = TestContext();
-        nx::utils::swapAndCall(m_handler, errorCode, 0);
+        nx::swapAndCall(m_handler, errorCode, 0);
     }
 }
 

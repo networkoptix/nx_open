@@ -154,7 +154,7 @@ StreamSocket::~StreamSocket()
     SocketGlobals::instance().allocationAnalyzer().recordObjectDestruction(this);
 }
 
-void StreamSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
+void StreamSocket::pleaseStop(nx::MoveOnlyFunc<void()> completionHandler)
 {
     post(
         [this, completionHandler = std::move(completionHandler)]()
@@ -248,7 +248,7 @@ bool StreamSocket::restoreTimeouts()
 
 void StreamSocket::connectAsync(
     const SocketAddress& endpoint,
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     base_type::connectAsync(
         endpoint,
@@ -328,7 +328,7 @@ bool StreamSocket::isEncryptionEnabled() const
 }
 
 void StreamSocket::handshakeAsync(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     switchToAsyncModeIfNeeded();
 
@@ -462,7 +462,7 @@ void StreamSocket::startHandshakeTimer(std::chrono::milliseconds timout)
         [this]()
         {
             cancelIoInAioThread(aio::EventType::etWrite);
-            nx::utils::swapAndCall(m_handshakeHandler, SystemError::timedOut);
+            nx::swapAndCall(m_handshakeHandler, SystemError::timedOut);
         });
 }
 
@@ -475,7 +475,7 @@ void StreamSocket::doHandshake()
             std::size_t /*bytesSent*/)
         {
             m_handshakeTimer.pleaseStopSync();
-            nx::utils::swapAndCall(m_handshakeHandler, systemErrorCode);
+            nx::swapAndCall(m_handshakeHandler, systemErrorCode);
         });
 }
 

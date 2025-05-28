@@ -127,7 +127,7 @@ public:
     /**
      * Invoked just after sending the response.
      */
-    nx::utils::MoveOnlyFunc<void(HttpServerConnection*)> onResponseHasBeenSent;
+    nx::MoveOnlyFunc<void(HttpServerConnection*)> onResponseHasBeenSent;
 };
 
 /**
@@ -167,6 +167,6 @@ struct NX_NETWORK_API RequestResult
         std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody);
 };
 
-using RequestProcessedHandler = nx::utils::MoveOnlyFunc<void(RequestResult)>;
+using RequestProcessedHandler = nx::MoveOnlyFunc<void(RequestResult)>;
 
 } // namespace nx::network::http

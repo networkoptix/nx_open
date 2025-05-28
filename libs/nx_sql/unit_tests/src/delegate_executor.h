@@ -230,8 +230,8 @@ public:
     // Asynchronous operations.
 
     virtual void executeUpdate(
-        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+        nx::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
+        nx::MoveOnlyFunc<void(DBResult)> completionHandler,
         const std::string& queryAggregationKey) override
     {
         return m_delegate->executeUpdate(
@@ -241,8 +241,8 @@ public:
     }
 
     virtual void executeSelect(
-        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) override
+        nx::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
+        nx::MoveOnlyFunc<void(DBResult)> completionHandler) override
     {
         m_delegate->executeSelect(std::move(dbSelectFunc), std::move(completionHandler));
     }

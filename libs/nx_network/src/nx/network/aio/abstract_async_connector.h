@@ -22,7 +22,7 @@ class NX_NETWORK_API AbstractAsyncConnector:
     using base_type = network::aio::BasicPollable;
 
 public:
-    using ConnectHandler = nx::utils::MoveOnlyFunc<void(
+    using ConnectHandler = nx::MoveOnlyFunc<void(
         SystemError::ErrorCode /*systemErrorCode*/,
         std::unique_ptr<network::AbstractStreamSocket> /*connectionToTheTargetPeer*/)>;
 

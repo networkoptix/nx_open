@@ -77,7 +77,7 @@ void DirectTcpEndpointTunnel::start()
 
             m_controlConnection.reset();
             if (m_connectionClosedHandler)
-                utils::moveAndCall(m_connectionClosedHandler, SystemError::connectionReset);
+                nx::moveAndCall(m_connectionClosedHandler, SystemError::connectionReset);
         });
 }
 
@@ -99,7 +99,7 @@ void DirectTcpEndpointTunnel::establishNewConnection(
 }
 
 void DirectTcpEndpointTunnel::setControlConnectionClosedHandler(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_connectionClosedHandler = std::move(handler);
 }

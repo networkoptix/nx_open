@@ -26,7 +26,7 @@ void AbstractAlivenessTester::bindToAioThread(
 }
 
 void AbstractAlivenessTester::start(
-    nx::utils::MoveOnlyFunc<void()> onTestFailure)
+    nx::MoveOnlyFunc<void()> onTestFailure)
 {
     dispatch(
         [this, onTestFailure = std::move(onTestFailure)]() mutable
@@ -101,7 +101,7 @@ void AbstractAlivenessTester::handleTimerEvent()
 
 void AbstractAlivenessTester::reportFailure()
 {
-    nx::utils::swapAndCall(m_onTestFailure);
+    nx::swapAndCall(m_onTestFailure);
 }
 
 void AbstractAlivenessTester::handleProbeResult(bool success)

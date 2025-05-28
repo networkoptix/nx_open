@@ -202,7 +202,7 @@ private:
 class Post: public AbstractTask
 {
 public:
-    Post(nx::utils::MoveOnlyFunc<void()> handler):
+    Post(nx::MoveOnlyFunc<void()> handler):
         AbstractTask(nullptr),
         m_handler(std::move(handler))
     {
@@ -214,7 +214,7 @@ public:
     }
 
 private:
-    nx::utils::MoveOnlyFunc<void()> m_handler;
+    nx::MoveOnlyFunc<void()> m_handler;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -274,7 +274,7 @@ void FileAsyncIoScheduler::close(IQnFile* file, CloseHandler handler)
     m_tasks.push(std::make_unique<Close>(file, std::move(handler)));
 }
 
-void FileAsyncIoScheduler::post(nx::utils::MoveOnlyFunc<void()> handler)
+void FileAsyncIoScheduler::post(nx::MoveOnlyFunc<void()> handler)
 {
     m_tasks.push(std::make_unique<Post>(std::move(handler)));
 }

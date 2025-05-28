@@ -24,7 +24,7 @@ class ListenHelper: public QObject
 public:
     explicit ListenHelper(QObject* parent = nullptr): base_type(parent) {}
 
-    void setCallback(nx::utils::MoveOnlyFunc<void()> callback)
+    void setCallback(nx::MoveOnlyFunc<void()> callback)
     {
         m_callback = std::move(callback);
     }
@@ -33,7 +33,7 @@ public slots:
     void execute() { m_callback(); }
 
 private:
-    nx::utils::MoveOnlyFunc<void()> m_callback;
+    nx::MoveOnlyFunc<void()> m_callback;
 };
 
 } // namespace detail
