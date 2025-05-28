@@ -2,6 +2,8 @@
 
 #include "fixed_size_message_pipeline.h"
 
+#include <nx/utils/system_network_headers.h>
+
 namespace nx::network::server {
 
 static constexpr int kMessageSizeBytes = sizeof(std::uint32_t);

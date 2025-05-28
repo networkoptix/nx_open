@@ -3,6 +3,7 @@
 #include "message_integrity.h"
 
 #include <nx/utils/auth/utils.h>
+#include <nx/utils/system_network_headers.h>
 
 #include "message_parser.h"
 #include "message_serializer.h"

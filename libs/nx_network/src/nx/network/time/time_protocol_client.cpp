@@ -9,6 +9,7 @@
 #include <nx/network/socket_factory.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
+#include <nx/utils/system_network_headers.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/time.h>
 

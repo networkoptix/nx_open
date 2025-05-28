@@ -6,6 +6,7 @@
 
 #include <nx/network/time/time_protocol_client.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/system_network_headers.h>
 #include <nx/utils/time.h>
 
 namespace nx {

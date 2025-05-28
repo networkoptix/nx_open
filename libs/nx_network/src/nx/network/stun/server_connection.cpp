@@ -3,6 +3,7 @@
 #include "server_connection.h"
 
 #include <nx/network/socket_global.h>
+#include <nx/utils/system_network_headers.h>
 
 #include "abstract_message_handler.h"
 

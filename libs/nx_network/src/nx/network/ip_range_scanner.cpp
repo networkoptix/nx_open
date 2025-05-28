@@ -4,6 +4,7 @@
 
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/system_network_headers.h>
 
 static constexpr int kMaxHostsCheckedSimultaneously = 256;
 
