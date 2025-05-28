@@ -8,7 +8,8 @@
 #include <nx/media/media_data_packet.h>
 
 // This class was supposed to eliminate the gaps and recalculate the timestamps from 0 or offset,
-// individually for each stream.
+// individually for each stream. Gaps will be recalculated only for the stream with index 0 as the
+// main stream. For other streams, timestamps will be recalculated to keep synchronization.
 class NX_VMS_COMMON_API TimestampCorrector
 {
 public:
@@ -24,6 +25,19 @@ public:
         bool forceDiscontinuity = false);
 
     void clear();
+
+private:
+    std::chrono::microseconds processPrimary(
+        std::chrono::microseconds timestamp,
+        std::chrono::microseconds newTimestamp,
+        std::chrono::microseconds lastTimestamp,
+        bool equalAllowed,
+        bool forceDiscontinuity);
+
+    std::chrono::microseconds processDependent(
+        std::chrono::microseconds newTimestamp,
+        std::chrono::microseconds lastTimestamp,
+        bool equalAllowed);
 
 private:
     const std::chrono::microseconds kMaxFrameDurationUs;

@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <recording/helpers/recording_context_helpers.h>
+#include <utils/common/util.h>
 #include <transcoding/transcoding_utils.h>
 
 namespace nx::vms::client::desktop {
@@ -73,7 +74,8 @@ ExportStorageStreamRecorder::ExportStorageStreamRecorder(
     const QnResourcePtr& dev, QnAbstractStreamDataProvider* mediaProvider):
     QnStreamRecorder(dev),
     nx::StorageRecordingContext(true),
-    m_mediaProvider(mediaProvider)
+    m_mediaProvider(mediaProvider),
+    m_timestampStitcher(std::chrono::milliseconds(MAX_FRAME_DURATION_MS), std::chrono::milliseconds(33))
 {
 }
 
@@ -461,20 +463,15 @@ void ExportStorageStreamRecorder::setLastError(nx::recording::Error::Code code)
     m_needStop = true;
 }
 
-qint64 ExportStorageStreamRecorder::getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md)
+qint64 ExportStorageStreamRecorder::getPacketTimeUsec(const QnConstAbstractMediaDataPtr& data)
 {
-    auto timestamp = md->timestamp - startTimeUs();
+    auto timestamp = data->timestamp - startTimeUs();
     if (ini().ignoreTimelineGaps && m_stitchTimestampGaps)
     {
-        const int index = getStreamIndex(md);
-        if (index > CL_MAX_CHANNEL_NUMBER)
-        {
-            NX_WARNING(this, "Too big channel number %1", index);
-            return timestamp;
-        }
-        if (index >= (int) m_timestampStitcher.size())
-            m_timestampStitcher.resize(index + 1);
-        return m_timestampStitcher[index].process(std::chrono::microseconds(timestamp)).count();
+        const int index = getStreamIndex(data);
+        const bool allowEqual = data->dataType == QnAbstractMediaData::GENERIC_METADATA;
+        return m_timestampStitcher.process(
+            std::chrono::microseconds(timestamp), index, allowEqual).count();
     }
 
     return timestamp;
