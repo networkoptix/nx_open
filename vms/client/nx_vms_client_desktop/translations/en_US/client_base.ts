@@ -10720,6 +10720,10 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <source>Confirm</source>
         <translation></translation>
     </message>
+    <message>
+        <source></source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::RightPanelModelsAdapter</name>
@@ -12728,6 +12732,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>Cannot find a resource with the specified ID.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
