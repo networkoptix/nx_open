@@ -194,7 +194,7 @@ BottomSheet
                 if (id == "share")
                 {
                     if (backend.isExpired)
-                        lifetimeComboBox.currentIndex = 0
+                        lifetimeComboBox.currentIndex = 1
                     d.share(/*showNativeShareSheet*/true)
                 }
 
@@ -207,9 +207,11 @@ BottomSheet
         d.updating = true
         d.hasChanges = false
 
+        const animationDuration = enableSharingToggle.animationDuration
+        enableSharingToggle.animationDuration = 0
+
         backend.resetBookmarkData()
 
-        const currentAnimationDuration = enableSharingToggle.animationDuration
         enableSharingToggle.visible = backend.isShared || backend.isExpired
 
         let expiresInModel = [
@@ -241,6 +243,8 @@ BottomSheet
         shareLinkOptionsText.text = qsTr("Shared link options")
 
         sharePasswordInput.resetState(/*hasSecretValue*/ !!backend.bookmarkDigest);
+
+        enableSharingToggle.animationDuration = animationDuration
 
         d.updating = false
     }

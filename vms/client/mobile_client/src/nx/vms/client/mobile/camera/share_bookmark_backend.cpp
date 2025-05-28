@@ -315,8 +315,10 @@ QString ShareBookmarkBackend::bookmarkDigest() const
 
 bool ShareBookmarkBackend::isExpired() const
 {
-    return d->bookmark.shareable() && d->bookmark.bookmarkMatchesFilter(
-        api::BookmarkShareFilter::shared | api::BookmarkShareFilter::expired);
+    return d->bookmark.shareable()
+        && d->bookmark.bookmarkMatchesFilter(api::BookmarkShareFilter::shared
+            | api::BookmarkShareFilter::expired
+            | api::BookmarkShareFilter::hasExpiration);
 }
 
 bool ShareBookmarkBackend::isNeverExpires() const
