@@ -605,7 +605,7 @@
     <name>nx::vms::rules::PanicRecordingAction</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>パニック録画モードは、すべてのカメラの録画設定を最大FPS・最高品質に切り替えます。</translation>
+      <translation>パニック録画モードでは、すべてのカメラの録画設定について、FPSと映像品質が最大値に切り替わります。</translation>
     </message>
     <message>
       <source>Panic Recording</source>
@@ -820,7 +820,7 @@
     </message>
     <message>
       <source>Additional Recipients</source>
-      <translation>追加の受信者</translation>
+      <translation>追加の宛先</translation>
     </message>
     <message>
       <source>Interval of Action</source>
