@@ -318,15 +318,6 @@ void setGraphicsSettings()
         }
     }
 
-    if (graphicsApi == GraphicsApi::vulkan && nx::build_info::isLinux())
-    {
-        // Workaround for QTBUG-123607.
-        static const char* kDisableNativePixmaps = "QTWEBENGINE_DISABLE_NATIVE_PIXMAPS";
-
-        if (qgetenv(kDisableNativePixmaps).isEmpty())
-            qputenv(kDisableNativePixmaps, "1");
-    }
-
     const auto gpuInfo = gpu::selectDevice(graphicsApi, ini().gpuName);
 
     if (gpuInfo.name.toLower().contains("nvidia") && graphicsApi == GraphicsApi::vulkan)
@@ -352,6 +343,15 @@ void setGraphicsSettings()
     {
         // Never autoselect Intel+Vulkan on Linux - vulkan video support is not reliable.
         graphicsApi = GraphicsApi::opengl;
+    }
+
+    if (graphicsApi == GraphicsApi::vulkan && nx::build_info::isLinux())
+    {
+        // Workaround for QTBUG-123607.
+        static const char* kDisableNativePixmaps = "QTWEBENGINE_DISABLE_NATIVE_PIXMAPS";
+
+        if (qgetenv(kDisableNativePixmaps).isEmpty())
+            qputenv(kDisableNativePixmaps, "1");
     }
 
     const auto selectedApi = nameToApi.value(graphicsApi, QSGRendererInterface::OpenGL);
