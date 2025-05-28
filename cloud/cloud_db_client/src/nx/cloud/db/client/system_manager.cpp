@@ -4,6 +4,7 @@
 
 #include <nx/branding.h>
 #include <nx/network/http/rest/http_rest_client.h>
+#include <nx/utils/url_query.h>
 
 #include "cdb_request_path.h"
 #include "data/account_data.h"
@@ -67,7 +68,7 @@ void SystemManager::getSystemsByEmail(
     m_requestsExecutor->makeAsyncCall<api::SystemDataExList>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(kSystemsByEmailPath, {email}),
-        nx::utils::UrlQuery(query),
+        nx::UrlQuery(query),
         std::move(completionHandler));
 }
 
@@ -81,7 +82,7 @@ void SystemManager::getSystemsFiltered(
     m_requestsExecutor->makeAsyncCall<api::SystemDataExList>(
         nx::network::http::Method::get,
         kSystemsPath,
-        nx::utils::UrlQuery(query),
+        nx::UrlQuery(query),
         std::move(completionHandler));
 }
 
