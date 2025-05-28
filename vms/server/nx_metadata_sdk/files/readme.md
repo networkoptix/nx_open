@@ -135,10 +135,6 @@ build_samples_arm64.sh
 build_samples_arm32.sh
 ```
 
-On Windows, after CMake generation phase, Visual Studio GUI can be used to compile a sample:
-open `..\metadata_sdk-build\<sample_name>\<sample_name>.sln` and build the `ALL_BUILD` project.
-Make sure that the platform combo-box is set to "x64".
-
 After the successful build, locate the built artifacts:
 ```
 # Windows:
