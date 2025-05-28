@@ -2595,7 +2595,7 @@
     <name>SendmailBusinessActionWidget</name>
     <message>
       <source>Additional Recipients:</source>
-      <translation>追加の受信者:</translation>
+      <translation>追加の宛先:</translation>
     </message>
     <message>
       <source>Global Email Settings...</source>
@@ -2683,7 +2683,7 @@
     <name>ShowOnAlarmLayoutActionWidget</name>
     <message>
       <source>for</source>
-      <translation>ユーザー</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>Force Alarm Layout opening</source>

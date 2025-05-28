@@ -2582,7 +2582,7 @@ License Key: %2</source>
     <message>
       <source>to</source>
       <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
-      <translation>宛先</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>at</source>
@@ -10200,7 +10200,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation>ローカルレイアウトをお探しですか? ユーザーのローカルレイアウトをオプションとして表示するには、 &quot;表示先&quot; リストからユーザーを1名のみ選択してください。</translation>
+      <translation>ローカルレイアウトをお探しですか? ユーザーのローカルレイアウトをオプションとして表示するには、 &quot;対象ユーザー&quot; リストからユーザーを1名のみ選択してください。</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners</source>
@@ -12714,7 +12714,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation>ローカルレイアウトをお探しですか? ユーザーのローカルレイアウトをオプションとして表示するには、 &quot;表示先&quot; リストからユーザーを1名のみ選択してください。</translation>
+      <translation>ローカルレイアウトをお探しですか? ユーザーのローカルレイアウトをオプションとして表示するには、 &quot;対象ユーザー&quot; リストからユーザーを1名のみ選択してください。</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners</source>
