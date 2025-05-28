@@ -28,10 +28,7 @@ public:
 
     QColor checkBoxColor(const QStyleOption* option, bool radio = false) const;
 
-    void drawSwitch(
-            QPainter* painter,
-            const QStyleOption* option,
-            const QWidget* widget = nullptr) const;
+    void drawSwitch(QPainter* painter, const QStyleOption* option) const;
 
     void drawCheckBox(
             QPainter* painter,

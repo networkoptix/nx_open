@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="33" height="17" fill="none" viewBox="0 0 33 17">
+  <g class="33x17/Outline/switch_middle">
+    <path fill="#E5E8EB" d="M24.5 16v1h-16v-1h16ZM32 8.5A7.5 7.5 0 0 0 24.5 1h-16a7.5 7.5 0 1 0 0 15v1l-.438-.01a8.5 8.5 0 0 1 0-16.98L8.5 0h16l.438.01a8.5 8.5 0 0 1 0 16.98L24.5 17v-1A7.5 7.5 0 0 0 32 8.5Z" class="Primary"/>
+    <rect width="11" height="11" x="11" y="3" fill="#E5E8EB" class="Secondary" rx="5.5"/>
+  </g>
+</svg>

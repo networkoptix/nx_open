@@ -53,7 +53,7 @@ struct Metrics
     static constexpr int kRounding = 1;
 
     static constexpr QSize kButtonSwitchSize{33, 17};
-    static constexpr QSize kStandaloneSwitchSize{30, 15};
+
 
     /** Margin between switch subcontrol and right side of a control, eg. push button. */
     static constexpr int kSwitchMargin = 4;

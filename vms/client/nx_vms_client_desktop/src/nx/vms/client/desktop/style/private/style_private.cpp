@@ -152,123 +152,71 @@ bool StylePrivate::isTextButton(const QStyleOption* option)
     return false;
 }
 
-void StylePrivate::drawSwitch(
-    QPainter* painter, const QStyleOption* option, const QWidget* widget) const
+void StylePrivate::drawSwitch(QPainter* painter, const QStyleOption* option) const
 {
-    Q_UNUSED(widget);
+    const bool pressed = option->state.testFlag(QStyle::State_Sunken);
+    const bool focused = option->state.testFlag(QStyle::State_HasFocus);
 
-    const bool checked = option->state.testFlag(QStyle::State_On);
+    QString switchOnFillColor = "green_l";
+    QString switchOnFrameColor = "transparent";
+
+    if (focused)
+        switchOnFrameColor = "light2";
+    else if (pressed)
+        switchOnFillColor = "green_d";
+
+    const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSwitchOnTheme = {
+        {QIcon::Normal, {.primary = "green", .secondary = "transparent", .tertiary = "dark5"}},
+        {QIcon::Active,
+            {.primary = switchOnFillColor, .secondary = switchOnFrameColor, .tertiary = "dark5"}},
+        {QIcon::Disabled,
+            {.primary = "green", .secondary = "transparent", .tertiary = "dark5", .alpha = 0.5}}};
+
+    QString switchOffActiveColor = "light8";
+    if (pressed)
+        switchOffActiveColor = "light12";
+    else if (focused)
+        switchOffActiveColor = "light6";
+
+    const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSwitchOffTheme = {
+        {QIcon::Normal, {.primary = "light10", .secondary = "light10"}},
+        {QIcon::Active, {.primary = switchOffActiveColor, .secondary = switchOffActiveColor}},
+        {QIcon::Disabled, {.primary = "light10", .secondary = "light10", .alpha = 0.5}}
+    };
+
+    const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kSwitchPartiallyOnTheme = {
+        {QIcon::Normal, {.primary = "light4", .secondary = "light4"}},
+        {QIcon::Active, {.primary = switchOffActiveColor, .secondary = switchOffActiveColor}},
+        {QIcon::Disabled, {.primary = "light10", .secondary = "light10", .alpha = 0.5}}
+    };
+
+    NX_DECLARE_COLORIZED_ICON(kSwitchOn, "33x17/Solid/switch_on.svg", kSwitchOnTheme)
+    NX_DECLARE_COLORIZED_ICON(kSwitchOff, "33x17/Outline/switch_off.svg", kSwitchOffTheme)
+    NX_DECLARE_COLORIZED_ICON(
+        kSwitchPartiallyOn, "33x17/Outline/switch_middle.svg", kSwitchPartiallyOnTheme)
+
+    const auto rect = Geometry::aligned(Metrics::kButtonSwitchSize, option->rect, Qt::AlignCenter);
+
     const bool enabled = option->state.testFlag(QStyle::State_Enabled);
-    const bool undefined = option->state.testFlag(QStyle::State_NoChange);
-    const bool standalone = !qstyleoption_cast<const QStyleOptionButton*>(option)
-        || qobject_cast<const SlideSwitch*>(widget);
+    const bool hovered = enabled && option->state.testFlag(QStyle::State_MouseOver);
+    const auto iconMode = enabled
+        ? ((pressed || focused || hovered) ? QIcon::Active : QIcon::Normal)
+        : QIcon::Disabled;
 
-    QColor fillColorOn; //< On: background
-    QColor fillColorOff; //< Off: background
-    QColor frameColorOn; //< On: frame
-    QColor frameColorOff; //< Off: frame
-    QColor signColorOn; //< On: "1" indicator
-    QColor signColorOff; //< Off: "0" indicator
-
-    if (standalone)
+    if (option->state.testFlag(QStyle::State_On))
     {
-        bool hovered = enabled && option->state.testFlag(QStyle::State_MouseOver);
-
-        fillColorOff = hovered ? core::colorTheme()->color("dark14") : core::colorTheme()->color("dark13");
-        fillColorOn =
-            hovered ? core::colorTheme()->color("green_l") : core::colorTheme()->color("green");
-        frameColorOff = fillColorOff;
-        frameColorOn = fillColorOn;
-        signColorOff = core::colorTheme()->color("dark17");
-        signColorOn = hovered ? core::colorTheme()->color("green_l") : core::colorTheme()->color("green");
+        painter->drawPixmap(
+            rect, qnSkin->icon(kSwitchOn).pixmap(Metrics::kButtonSwitchSize, iconMode));
+    }
+    else if (option->state.testFlag(QStyle::State_NoChange))
+    {
+        painter->drawPixmap(
+            rect, qnSkin->icon(kSwitchPartiallyOn).pixmap(Metrics::kButtonSwitchSize, iconMode));
     }
     else
     {
-        fillColorOff = core::colorTheme()->color("dark8");
-        fillColorOn = core::colorTheme()->color("green");
-        frameColorOff = core::colorTheme()->color("dark7");
-        frameColorOn = fillColorOn;
-        signColorOff = core::colorTheme()->color("dark10");
-        signColorOn = core::colorTheme()->color("green");
-    }
-
-    // TODO: Implement animation
-
-    qreal animationProgress = undefined ? 0.5 : (checked ? 1.0 : 0.0);
-
-    QnScopedPainterPenRollback penRollback(painter);
-    QnScopedPainterBrushRollback brushRollback(painter);
-    QnScopedPainterClipPathRollback clipRollback(painter);
-    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-    QnScopedPainterOpacityRollback opacityRollback(painter);
-
-    if (!enabled)
-        painter->setOpacity(painter->opacity() * Hints::kDisabledItemOpacity);
-
-    QSize switchSize = standalone ? Metrics::kStandaloneSwitchSize : Metrics::kButtonSwitchSize;
-
-    QRectF rect = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, switchSize, option->rect);
-    rect = Geometry::eroded(rect, 0.5);
-
-    QRectF indicatorsRect = Geometry::eroded(rect, 3.5);
-
-    /* Set clip path with excluded grip circle: */
-    QRectF gripRect = Geometry::eroded(rect, 1);
-    gripRect.moveLeft(
-        gripRect.left() + (gripRect.width() - gripRect.height()) * animationProgress);
-    gripRect.setWidth(gripRect.height());
-    QPainterPath wholeRect;
-    wholeRect.addRect(option->rect);
-    QPainterPath gripCircle;
-    gripCircle.addEllipse(Geometry::dilated(gripRect, 0.5));
-    painter->setClipPath(wholeRect.subtracted(gripCircle));
-
-    const double kSideTransition = 0.3;
-    qreal oneMinusAnimationProgress = 1.0 - animationProgress;
-
-    qreal baseOpacity = painter->opacity();
-
-    /* Draw state "off", or transitional blend with it: */
-
-    painter->setPen(QPen(frameColorOff, 0));
-    painter->setBrush(fillColorOff);
-    painter->drawRoundedRect(rect, rect.height() / 2.0, rect.height() / 2.0);
-
-    if (animationProgress < kSideTransition)
-    {
-        QRectF zeroRect = indicatorsRect;
-        zeroRect.setLeft(indicatorsRect.right() - indicatorsRect.height());
-        painter->setOpacity(baseOpacity * (kSideTransition - animationProgress) / kSideTransition);
-        painter->setPen(QPen(signColorOff, 2));
-        painter->drawRoundedRect(zeroRect, zeroRect.width() / 2, zeroRect.height() / 2);
-    }
-
-    /* Draw state "on", or transitional blend with it: */
-
-    painter->setOpacity(baseOpacity * animationProgress);
-    painter->setPen(QPen(frameColorOn, 0));
-    painter->setBrush(fillColorOn);
-    painter->drawRoundedRect(rect, rect.height() / 2.0, rect.height() / 2.0);
-
-    if (oneMinusAnimationProgress < kSideTransition)
-    {
-        int x = indicatorsRect.left() + indicatorsRect.height() / 2 + 1;
-        int h = indicatorsRect.height() - 3;
-        int y = rect.center().y() - h / 2;
-        painter->setOpacity(
-            baseOpacity * (kSideTransition - oneMinusAnimationProgress) / kSideTransition);
-        painter->setPen(QPen(signColorOn, 2));
-        painter->drawLine(x, y, x, y + h + 1);
-    }
-
-    opacityRollback.rollback();
-
-    if (standalone && option->state.testFlag(QStyle::State_HasFocus))
-    {
-        Q_Q(const Style);
-        QStyleOptionFocusRect focusOption;
-        focusOption.QStyleOption::operator=(*option);
-        q->proxy()->drawPrimitive(QStyle::PE_FrameFocusRect, &focusOption, painter, widget);
+        painter->drawPixmap(
+            rect, qnSkin->icon(kSwitchOff).pixmap(Metrics::kButtonSwitchSize, iconMode));
     }
 }
 
@@ -443,14 +391,14 @@ void StylePrivate::drawTextButton(QPainter* painter,
     if (checkable)
     {
         QStyleOption switchOption(*option); //< not QStyleOptionButton for standalone switch
-        switchOption.rect.setWidth(Metrics::kStandaloneSwitchSize.width());
+        switchOption.rect.setWidth(Metrics::kButtonSwitchSize.width());
 
         if (option->direction == Qt::LeftToRight)
             textRect.setLeft(switchOption.rect.right() + Metrics::kStandardPadding + 1);
         else
             textRect.setRight(switchOption.rect.left() - Metrics::kStandardPadding - 1);
 
-        drawSwitch(painter, &switchOption, widget);
+        drawSwitch(painter, &switchOption);
     }
 
     if (hasIcon)

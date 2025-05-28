@@ -3,7 +3,6 @@
 #include "switch_item_delegate.h"
 
 #include <client/client_globals.h>
-
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/style.h>
 
@@ -56,7 +55,7 @@ QSize SwitchItemDelegate::sizeHint(const QStyleOptionViewItem& /*option*/,
     const QModelIndex& /*index*/) const
 {
     static const int kFocusFrameMargin = 2;
-    return style::Metrics::kStandaloneSwitchSize
+    return style::Metrics::kButtonSwitchSize
         + QSize(style::Metrics::kSwitchMargin, kFocusFrameMargin) * 2;
 }
 

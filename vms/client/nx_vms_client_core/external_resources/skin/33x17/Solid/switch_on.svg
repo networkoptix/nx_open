@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="33" height="17" fill="none" viewBox="0 0 33 17">
+  <g class="33x17/Solid/switch_on">
+    <rect width="33" height="17" fill="#4CAF50" class="Primary" rx="8.5"/>
+    <rect x="0.5" y="0.5" width="32" height="16" rx="8" stroke="none" stroke-opacity="0.7" class="Secondary"/>
+    <rect width="11" height="11" x="19" y="3" fill="#111417" class="Tertiary" rx="5.5"/>
+  </g>
+</svg>

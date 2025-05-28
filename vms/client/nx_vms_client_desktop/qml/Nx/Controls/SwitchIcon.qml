@@ -1,135 +1,96 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick 2.11
-import Qt5Compat.GraphicalEffects
 import Nx.Core 1.0
+import Nx.Core.Controls
 
 Item
 {
+    id: item
+
     property int checkState: Qt.Unchecked
 
     property bool hovered: false
+    property bool pressed: false
+    property bool focused: false
+    property bool enabled: true
 
-    property color uncheckedColor: ColorTheme.colors.dark13
-    property color uncheckedIndicatorColor: ColorTheme.lighter(ColorTheme.colors.dark13, 4)
-    property color checkedColor: ColorTheme.colors.green_core
-    property color checkedIndicatorColor: ColorTheme.colors.green_l2
-    property color handleColor: "transparent"
+    property color fillColorOff : "transparent"
+    property color fillColorOn :
+    {
+        if (hovered || focused)
+            return ColorTheme.colors.green_l
+        if (pressed)
+            return ColorTheme.colors.green_d
+        return ColorTheme.colors.green
+    }
+    property color frameColorOff:
+    {
+        if (hovered)
+            return ColorTheme.colors.light8
+        if (checkState === Qt.PartiallyChecked)
+            return ColorTheme.colors.light4
+        if (focused)
+            return ColorTheme.colors.light6
+        if (pressed)
+            return ColorTheme.colors.light12
+        return ColorTheme.colors.light10
+    }
+    property color frameColorOn:
+    {
+        if (focused)
+            return ColorTheme.colors.light2
+        if (checkState === Qt.PartiallyChecked)
+            return frameColorOff
+        return "transparent"
+    }
+
+    property color gripColor:
+    {
+        return checkState === Qt.Checked ? ColorTheme.colors.dark5 : frameColorOff
+    }
 
     property int animationDuration: 0
 
     implicitWidth: 33
     implicitHeight: 17
     baselineOffset: implicitHeight - 2
+    opacity: enabled ? 1 : 0.5
 
-    readonly property bool _transparentHandle: handleColor.a === 0
-
-    function _hoverColor(color)
+    ColoredImage
     {
-        return ColorTheme.lighter(color, hovered ? 1 : 0)
+        id: checkedIcon
+
+        visible: checkState === Qt.Checked
+        anchors.fill: parent
+        primaryColor: item.fillColorOn
+        secondaryColor: item.frameColorOn
+        tertiaryColor: item.gripColor
+        sourcePath: "image://skin/33x17/Solid/switch_on.svg"
+        sourceSize: Qt.size(item.implicitWidth, item.implicitHeight)
     }
 
-    Rectangle
+    ColoredImage
     {
-        id: uncheckedLayer
+        id: uncheckedIcon
 
-        visible: !_transparentHandle
         anchors.fill: parent
-
-        radius: height / 2
-        color: _hoverColor(uncheckedColor)
-
-        Rectangle
-        {
-            id: uncheckedindicator
-
-            width: parent.height / 2 + 2.5
-            height: width
-            radius: height / 2
-            x: parent.width - parent.height / 2 - width / 2
-            anchors.verticalCenter: uncheckedLayer.verticalCenter
-            color: _hoverColor(uncheckedIndicatorColor)
-
-            Rectangle
-            {
-                width: parent.width - 4
-                height: width
-                radius: height / 2
-                anchors.centerIn: parent
-                color: _hoverColor(uncheckedColor)
-            }
-
-            visible: checkState !== Qt.PartiallyChecked
-        }
-
-        Rectangle
-        {
-            id: checkedLayer
-
-            anchors.fill: parent
-            radius: height / 2
-            color: _hoverColor(checkedColor)
-
-            Rectangle
-            {
-                id: checkedIndicator
-
-                width: 2
-                height: parent.height / 2
-                x: parent.height / 2
-                anchors.verticalCenter: checkedLayer.verticalCenter
-                color: _hoverColor(checkedIndicatorColor)
-                visible: checkState !== Qt.PartiallyChecked
-            }
-
-            opacity:
-            {
-                if (checkState === Qt.Unchecked)
-                    return 0
-                if (checkState === Qt.Checked)
-                    return 1
-                return 0.4
-            }
-            Behavior on opacity { NumberAnimation { duration: animationDuration } }
-        }
+        visible: checkState === Qt.Unchecked
+        primaryColor: item.frameColorOff
+        secondaryColor: item.gripColor
+        sourcePath: "image://skin/33x17/Outline/switch_off.svg"
+        sourceSize: Qt.size(item.implicitWidth, item.implicitHeight)
     }
 
-    Item
+    ColoredImage
     {
-        id: opacityMaskSource
+        id: partiallyCheckedIcon
 
+        visible: checkState === Qt.PartiallyChecked
         anchors.fill: parent
-        visible: !_transparentHandle
-
-        Rectangle
-        {
-            id: handle
-
-            width: parent.height - 2
-            height: width
-            radius: height / 2
-            color: _transparentHandle ? "white" : _hoverColor(handleColor)
-            anchors.verticalCenter: opacityMaskSource.verticalCenter
-
-            x:
-            {
-                if (checkState === Qt.Unchecked)
-                    return 1
-                if (checkState === Qt.Checked)
-                    return parent.width - width - 1
-                return (parent.width - width) / 2
-            }
-            Behavior on x { NumberAnimation { duration: animationDuration } }
-        }
-    }
-
-    OpacityMask
-    {
-        visible: _transparentHandle
-        anchors.fill: parent
-        source: uncheckedLayer
-        maskSource: opacityMaskSource
-        opacity: enabled ? 1.0 : 0.3
-        invert: true
+        primaryColor: item.frameColorOff
+        secondaryColor: item.gripColor
+        sourcePath: "image://skin/33x17/Outline/switch_middle.svg"
+        sourceSize: Qt.size(item.implicitWidth, item.implicitHeight)
     }
 }

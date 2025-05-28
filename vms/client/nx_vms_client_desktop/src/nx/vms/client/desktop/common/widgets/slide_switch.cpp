@@ -17,7 +17,7 @@ SlideSwitch::SlideSwitch(QWidget* parent):
 
 QSize SlideSwitch::minimumSizeHint() const
 {
-    return nx::style::Metrics::kStandaloneSwitchSize;
+    return nx::style::Metrics::kButtonSwitchSize;
 }
 
 QSize nx::vms::client::desktop::SlideSwitch::sizeHint() const

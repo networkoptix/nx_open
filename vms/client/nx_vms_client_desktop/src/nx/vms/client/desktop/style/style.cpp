@@ -863,9 +863,9 @@ void Style::drawSwitch(QPainter* painter, const QStyleOption* option, const QWid
     Q_D(const Style);
     QStyleOptionViewItem optionAdjusted;
     if (viewItemHoverAdjusted(widget, option, optionAdjusted))
-        d->drawSwitch(painter, &optionAdjusted, widget);
+        d->drawSwitch(painter, &optionAdjusted);
     else
-        d->drawSwitch(painter, option, widget);
+        d->drawSwitch(painter, option);
 }
 
 void Style::drawPrimitive(PrimitiveElement element,
@@ -3145,7 +3145,7 @@ QRect Style::subControlRect(ComplexControl control,
                             headerRect.setHeight(Metrics::kPanelHeaderHeight - 1);
                             return alignedRect(Qt::LeftToRight,
                                 Qt::AlignLeft | Qt::AlignVCenter,
-                                Metrics::kStandaloneSwitchSize + kSwitchFocusFrameMargins
+                                Metrics::kButtonSwitchSize + kSwitchFocusFrameMargins
                                     + QSize(0, 1),
                                 headerRect);
                         }
@@ -3450,7 +3450,7 @@ QRect Style::subElementRect(
                 if (item->state.testFlag(State_On) || item->state.testFlag(State_Off))
                     return alignedRect(Qt::LeftToRight,
                         Qt::AlignCenter,
-                        Metrics::kStandaloneSwitchSize + kSwitchFocusFrameMargins,
+                        Metrics::kButtonSwitchSize + kSwitchFocusFrameMargins,
                         option->rect);
             }
         }
@@ -3644,8 +3644,7 @@ QSize Style::sizeFromContents(
 
             if (StylePrivate::isCheckableButton(option))
             {
-                const QSize switchSize =
-                    textButton ? Metrics::kStandaloneSwitchSize : Metrics::kButtonSwitchSize;
+                const QSize switchSize = Metrics::kButtonSwitchSize;
 
                 result.rwidth() +=
                     switchSize.width() + Metrics::kStandardPadding * 2 - Metrics::kSwitchMargin;
