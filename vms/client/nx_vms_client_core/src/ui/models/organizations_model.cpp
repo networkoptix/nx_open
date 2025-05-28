@@ -516,6 +516,8 @@ struct OrganizationsModel::Private
     coro::Task<bool> loadOrgAsync(struct Organization org);
     coro::Task<bool> loadOrgListAsync(OrganizationList orgList);
     coro::Task<bool> loadChannelPartnerOrgsAsync(ChannelPartnerList cpList);
+
+    void clearCloudData();
 };
 
 OrganizationsModel::OrganizationsModel(QObject* parent):
@@ -785,6 +787,7 @@ void OrganizationsModel::setStatusWatcher(CloudStatusWatcher* statusWatcher)
             else if (newStatus == CloudStatusWatcher::LoggedOut)
             {
                 d->setTopLevelLoading(false);
+                d->clearCloudData();
             }
             d->prevStatus = newStatus;
         },
@@ -799,6 +802,13 @@ void OrganizationsModel::setStatusWatcher(CloudStatusWatcher* statusWatcher)
 QAbstractProxyModel* OrganizationsModel::systemsModel() const
 {
     return d->proxyModel;
+}
+
+void OrganizationsModel::Private::clearCloudData()
+{
+    // Remove all except 'Sites' node.
+    while (root->allChildren().size() > 1)
+        remove(root->allChildren().size() - 1, root.get());
 }
 
 coro::Task<bool> OrganizationsModel::Private::loadOrgAsync(struct Organization org)
