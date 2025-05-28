@@ -1030,7 +1030,7 @@
     </message>
     <message>
       <source>Additional Recipients</source>
-      <translation>追加の受信者</translation>
+      <translation>追加の宛先</translation>
     </message>
   </context>
   <context>

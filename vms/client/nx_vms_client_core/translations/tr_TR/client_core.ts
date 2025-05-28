@@ -394,7 +394,7 @@
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>İş Ortakları</translation>
     </message>
   </context>
   <context>

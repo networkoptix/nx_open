@@ -398,7 +398,7 @@
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>Partnerzy</translation>
     </message>
   </context>
   <context>

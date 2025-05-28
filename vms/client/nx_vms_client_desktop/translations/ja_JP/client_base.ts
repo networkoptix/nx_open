@@ -12546,7 +12546,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::SingleTargetLayoutPicker</name>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation>ローカルレイアウトをお探しですか? ユーザーのローカルレイアウトをオプションとして表示するには、 &quot;表示先&quot; リストからユーザーを1名のみ選択してください。</translation>
+      <translation>ローカルレイアウトをお探しですか? ユーザーのローカルレイアウトをオプションとして表示するには、 &quot;対象ユーザー&quot; リストからユーザーを1名のみ選択してください。</translation>
     </message>
   </context>
   <context>

@@ -373,7 +373,7 @@
     <name>nx::vms::client::core::OrganizationsFilterModel</name>
     <message>
       <source>Other results</source>
-      <translation type="unfinished">Other results</translation>
+      <translation>その他の結果</translation>
     </message>
   </context>
   <context>
@@ -392,7 +392,7 @@
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>パートナー</translation>
     </message>
   </context>
   <context>

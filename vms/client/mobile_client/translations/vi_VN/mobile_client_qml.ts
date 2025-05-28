@@ -795,7 +795,7 @@
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>Đối tác</translation>
     </message>
   </context>
   <context>

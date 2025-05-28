@@ -392,7 +392,7 @@
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>合作夥伴</translation>
     </message>
   </context>
   <context>

@@ -798,7 +798,7 @@
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>Партнеры</translation>
     </message>
   </context>
   <context>
