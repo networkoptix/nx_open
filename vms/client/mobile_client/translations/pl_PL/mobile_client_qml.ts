@@ -796,6 +796,10 @@
       <source>Log In</source>
       <translation>Zaloguj się</translation>
     </message>
+    <message>
+      <source>Partners</source>
+      <translation type="unfinished">Partners</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -952,21 +956,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Pole Hasło nie może być puste</translation>
-    </message>
-  </context>
-  <context>
-    <name>SiteList</name>
-    <message>
-      <source>Organizations</source>
-      <translation>Organizacje</translation>
-    </message>
-    <message>
-      <source>Folders</source>
-      <translation>Foldery</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>Witryny</translation>
     </message>
   </context>
   <context>

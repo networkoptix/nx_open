@@ -793,6 +793,10 @@
       <source>Log In</source>
       <translation>Masuk</translation>
     </message>
+    <message>
+      <source>Partners</source>
+      <translation type="unfinished">Partners</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -949,21 +953,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Bidang kata sandi tidak boleh kosong</translation>
-    </message>
-  </context>
-  <context>
-    <name>SiteList</name>
-    <message>
-      <source>Organizations</source>
-      <translation>Organisasi</translation>
-    </message>
-    <message>
-      <source>Folders</source>
-      <translation>Folder</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>Site</translation>
     </message>
   </context>
   <context>

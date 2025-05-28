@@ -183,7 +183,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>設定分享選項後，分享會開啟新的書籤對話框以產生播放連結</translation>
     </message>
   </context>
   <context>
@@ -269,7 +269,7 @@
     <name>EventSearchItem</name>
     <message>
       <source>SHARED</source>
-      <translation>共享</translation>
+      <translation>已分享</translation>
     </message>
   </context>
   <context>
@@ -793,6 +793,10 @@
       <source>Log In</source>
       <translation>登入</translation>
     </message>
+    <message>
+      <source>Partners</source>
+      <translation type="unfinished">Partners</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -901,11 +905,11 @@
     </message>
     <message>
       <source>Select Lifetime</source>
-      <translation type="unfinished">Select Lifetime</translation>
+      <translation>選擇效期</translation>
     </message>
     <message>
       <source>Share Link</source>
-      <translation type="unfinished">Share Link</translation>
+      <translation>分享連結</translation>
     </message>
   </context>
   <context>
@@ -920,7 +924,7 @@
     </message>
     <message>
       <source>Log in as</source>
-      <translation type="unfinished">Log in as</translation>
+      <translation>登入身份</translation>
     </message>
     <message>
       <source>Login</source>
@@ -949,21 +953,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>密碼欄位不能為空</translation>
-    </message>
-  </context>
-  <context>
-    <name>SiteList</name>
-    <message>
-      <source>Organizations</source>
-      <translation>組織</translation>
-    </message>
-    <message>
-      <source>Folders</source>
-      <translation>資料夾</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>站點 (Sites)</translation>
     </message>
   </context>
   <context>

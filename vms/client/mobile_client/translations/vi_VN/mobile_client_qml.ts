@@ -793,6 +793,10 @@
       <source>Log In</source>
       <translation>Đăng nhập</translation>
     </message>
+    <message>
+      <source>Partners</source>
+      <translation type="unfinished">Partners</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -949,21 +953,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Mật khẩu không được để trống</translation>
-    </message>
-  </context>
-  <context>
-    <name>SiteList</name>
-    <message>
-      <source>Organizations</source>
-      <translation>Tổ chức</translation>
-    </message>
-    <message>
-      <source>Folders</source>
-      <translation>Thư mục</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>Các chi nhánh</translation>
     </message>
   </context>
   <context>

@@ -796,6 +796,10 @@
       <source>Log In</source>
       <translation>Войти</translation>
     </message>
+    <message>
+      <source>Partners</source>
+      <translation type="unfinished">Partners</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -952,21 +956,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation type="unfinished">Password field cannot be empty</translation>
-    </message>
-  </context>
-  <context>
-    <name>SiteList</name>
-    <message>
-      <source>Organizations</source>
-      <translation>Организации</translation>
-    </message>
-    <message>
-      <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>Сайты</translation>
     </message>
   </context>
   <context>

@@ -472,7 +472,7 @@
     <message>
       <source>I/O Module disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">I/O Module disconnected at %1</translation>
+      <translation>I/O-modul frakoblet ved %1</translation>
     </message>
   </context>
   <context>
@@ -1103,7 +1103,7 @@
     </message>
     <message>
       <source>The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</source>
-      <translation type="unfinished">The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</translation>
+      <translation>Den lokale databasen ble funnet skadet og kunne ikke gjenopprettes. En ny tom database er initialisert. En kopi av den ødelagte databasen er lagret for referanse.</translation>
     </message>
   </context>
   <context>

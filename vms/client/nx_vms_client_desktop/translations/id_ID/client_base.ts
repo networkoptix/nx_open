@@ -6893,7 +6893,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
-      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
+      <translation>Hanya periode offline kamera atau server yang terjadi setelah mengaktifkan opsi ini yang akan diimpor secara otomatis. Harap diperhatikan: jika Anda menonaktifkan opsi ini, periode offline apa pun yang belum diimpor akan hilang dan tidak dapat dipulihkan nanti.</translation>
     </message>
   </context>
   <context>

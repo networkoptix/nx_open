@@ -370,6 +370,13 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::client::core::OrganizationsFilterModel</name>
+    <message>
+      <source>Other results</source>
+      <translation type="unfinished">Other results</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::core::OrganizationsModel</name>
     <message>
       <source>Organizations</source>
@@ -382,6 +389,10 @@
     <message>
       <source>Sites</source>
       <translation>사이트</translation>
+    </message>
+    <message>
+      <source>Partners</source>
+      <translation type="unfinished">Partners</translation>
     </message>
   </context>
   <context>

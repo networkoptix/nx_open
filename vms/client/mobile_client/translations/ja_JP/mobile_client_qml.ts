@@ -793,6 +793,10 @@
       <source>Log In</source>
       <translation>ログイン</translation>
     </message>
+    <message>
+      <source>Partners</source>
+      <translation type="unfinished">Partners</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -949,21 +953,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>パスワード欄に入力してください</translation>
-    </message>
-  </context>
-  <context>
-    <name>SiteList</name>
-    <message>
-      <source>Organizations</source>
-      <translation>組織</translation>
-    </message>
-    <message>
-      <source>Folders</source>
-      <translation>フォルダー</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>サイト</translation>
     </message>
   </context>
   <context>

@@ -794,6 +794,10 @@
       <source>Log In</source>
       <translation>Logga in</translation>
     </message>
+    <message>
+      <source>Partners</source>
+      <translation type="unfinished">Partners</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -950,21 +954,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Lösenordsfältet får inte vara tomt</translation>
-    </message>
-  </context>
-  <context>
-    <name>SiteList</name>
-    <message>
-      <source>Organizations</source>
-      <translation>Organisationer</translation>
-    </message>
-    <message>
-      <source>Folders</source>
-      <translation>Mappar</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>Platser</translation>
     </message>
   </context>
   <context>

@@ -793,6 +793,10 @@
       <source>Log In</source>
       <translation>로그인</translation>
     </message>
+    <message>
+      <source>Partners</source>
+      <translation type="unfinished">Partners</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -949,21 +953,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>비밀번호는 필수 정보입니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>SiteList</name>
-    <message>
-      <source>Organizations</source>
-      <translation>조직</translation>
-    </message>
-    <message>
-      <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>사이트</translation>
     </message>
   </context>
   <context>

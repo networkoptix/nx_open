@@ -793,6 +793,10 @@
       <source>Log In</source>
       <translation>เข้าสู่ระบบ</translation>
     </message>
+    <message>
+      <source>Partners</source>
+      <translation type="unfinished">Partners</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -949,21 +953,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>ต้องระบุช่องรหัสผ่าน</translation>
-    </message>
-  </context>
-  <context>
-    <name>SiteList</name>
-    <message>
-      <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
-    </message>
-    <message>
-      <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>ไซต์</translation>
     </message>
   </context>
   <context>

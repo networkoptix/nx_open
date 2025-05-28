@@ -1520,7 +1520,7 @@
     </message>
     <message>
       <source>Organization Id.</source>
-      <translation>組織 ID。</translation>
+      <translation>組織 ID</translation>
     </message>
     <message>
       <source>Cloud Site ID.</source>

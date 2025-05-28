@@ -794,6 +794,10 @@
       <source>Log In</source>
       <translation>Logg inn</translation>
     </message>
+    <message>
+      <source>Partners</source>
+      <translation type="unfinished">Partners</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -902,7 +906,7 @@
     </message>
     <message>
       <source>Select Lifetime</source>
-      <translation type="unfinished">Select Lifetime</translation>
+      <translation>Velg levetid</translation>
     </message>
     <message>
       <source>Share Link</source>
@@ -950,21 +954,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Passordfeltet kan ikke være tomt</translation>
-    </message>
-  </context>
-  <context>
-    <name>SiteList</name>
-    <message>
-      <source>Organizations</source>
-      <translation>Organisasjoner</translation>
-    </message>
-    <message>
-      <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>Nettsteder</translation>
     </message>
   </context>
   <context>
