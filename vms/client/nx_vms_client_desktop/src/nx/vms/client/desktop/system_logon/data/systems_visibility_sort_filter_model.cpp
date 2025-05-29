@@ -12,20 +12,9 @@ using namespace nx::vms::client::core::welcome_screen;
 
 namespace nx::vms::client::desktop {
 
-namespace {
-
-bool isLocalHost(const QModelIndex& index)
-{
-    // TODO: #dfisenko Provide this information using special role.
-    return index.data(QnSystemsModel::SearchRoleId).toString().contains("localhost");
-}
-
-} // namespace
-
 struct SystemsVisibilitySortFilterModel::Private
 {
     nx::utils::ScopedConnections sourceModelConnections;
-    QCollator collator;
 
     VisibilityScopeGetter visibilityScopeFilterGetter =
         []()
@@ -50,8 +39,6 @@ SystemsVisibilitySortFilterModel::SystemsVisibilitySortFilterModel(QObject* pare
     base_type(parent),
     d(new Private)
 {
-    d->collator.setCaseSensitivity(Qt::CaseInsensitive);
-    d->collator.setNumericMode(true);
     setDynamicSortFilter(true);
 }
 
@@ -196,64 +183,7 @@ bool SystemsVisibilitySortFilterModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
 {
-    const auto leftIsFactorySystem =
-        sourceLeft.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
-    const auto rightIsFactorySystem =
-        sourceRight.data(QnSystemsModel::IsFactorySystemRoleId).toBool();
-
-    const auto leftVisibilityScope =
-        sourceLeft.data(QnSystemsModel::VisibilityScopeRoleId).value<TileVisibilityScope>();
-    const auto rightVisibilityScope =
-        sourceRight.data(QnSystemsModel::VisibilityScopeRoleId).value<TileVisibilityScope>();
-
-    if (leftIsFactorySystem != rightIsFactorySystem)
-    {
-        if (leftVisibilityScope == rightVisibilityScope)
-            return leftIsFactorySystem;
-
-        return leftIsFactorySystem
-            ? leftVisibilityScope != TileVisibilityScope::HiddenTileVisibilityScope
-            : rightVisibilityScope == TileVisibilityScope::HiddenTileVisibilityScope;
-    }
-
-    if (leftVisibilityScope != rightVisibilityScope)
-        return leftVisibilityScope > rightVisibilityScope;
-
-    const bool leftIsConnectable = sourceLeft.data(QnSystemsModel::IsOnlineRoleId).toBool() &&
-        sourceLeft.data(QnSystemsModel::IsCompatibleToDesktopClient).toBool();
-    const bool rightIsConnectable = sourceRight.data(QnSystemsModel::IsOnlineRoleId).toBool() &&
-        sourceRight.data(QnSystemsModel::IsCompatibleToDesktopClient).toBool();
-
-    if (leftIsConnectable != rightIsConnectable)
-        return leftIsConnectable;
-
-    const bool leftIsPending = sourceLeft.data(QnSystemsModel::IsPending).toBool();
-    const bool rightIsPending = sourceRight.data(QnSystemsModel::IsPending).toBool();
-
-    if (leftIsPending != rightIsPending)
-        return leftIsPending;
-
-    const bool leftIsCloud = sourceLeft.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
-    const bool rightIsCloud = sourceRight.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
-
-    if (leftIsCloud != rightIsCloud)
-        return leftIsCloud;
-
-    const bool leftIsLocalhost = isLocalHost(sourceLeft);
-    const bool rightIsLocalhost = isLocalHost(sourceRight);
-
-    if (leftIsLocalhost != rightIsLocalhost)
-        return leftIsLocalhost;
-
-    const int namesOrder = d->collator.compare(
-        sourceLeft.data(QnSystemsModel::SystemNameRoleId).toString(),
-        sourceRight.data(QnSystemsModel::SystemNameRoleId).toString());
-
-    if (namesOrder != 0)
-        return namesOrder < 0;
-
-    return sourceLeft.data(QnSystemsModel::SystemIdRoleId).toString()
-        < sourceRight.data(QnSystemsModel::SystemIdRoleId).toString();
+    return QnSystemsModel::lessThan(sourceLeft, sourceRight);
 }
 
 bool SystemsVisibilitySortFilterModel::isHidden(const QModelIndex& sourceIndex) const

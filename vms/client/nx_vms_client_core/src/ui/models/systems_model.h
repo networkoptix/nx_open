@@ -67,6 +67,8 @@ public: // overrides
 
     int getRowIndex(const QString& systemId) const;
 
+    static bool lessThan(const QModelIndex& sourceLeft, const QModelIndex& sourceRight);
+
 private:
     QScopedPointer<QnSystemsModelPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QnSystemsModel)

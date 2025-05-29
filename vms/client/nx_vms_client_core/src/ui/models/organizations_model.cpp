@@ -1239,7 +1239,7 @@ bool OrganizationsFilterModel::lessThan(const QModelIndex& left, const QModelInd
             < rightType.value<OrganizationsModel::NodeType>();
     }
 
-    return base_type::lessThan(left, right);
+    return QnSystemsModel::lessThan(left, right);
 }
 
 void OrganizationsFilterModel::setHideOrgSystemsFromSites(bool value)
