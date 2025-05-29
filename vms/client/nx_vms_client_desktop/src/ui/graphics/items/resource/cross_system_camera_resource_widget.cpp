@@ -113,7 +113,7 @@ Qn::ResourceOverlayButton QnCrossSystemCameraWidget::calculateOverlayButton(
     Qn::ResourceStatusOverlay statusOverlay) const
 {
     if (statusOverlay == Qn::ResourceStatusOverlay::UnauthorizedOverlay)
-        return Qn::ResourceOverlayButton::Authorize;
+        return Qn::ResourceOverlayButton::Empty; // VMS-58843: Temporarily not supported.
 
     if (statusOverlay == Qn::ResourceStatusOverlay::InformationRequiredOverlay)
         return Qn::ResourceOverlayButton::RequestInformation;
