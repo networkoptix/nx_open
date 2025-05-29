@@ -9,11 +9,11 @@
 #include <export/signer.h>
 #include <nx/core/transcoding/filters/filter_chain.h>
 #include <nx/vms/client/core/network/remote_connection_aware.h>
-#include <recording/helpers/timestamp_stitcher.h>
 #include <recording/storage_recording_context.h>
 #include <recording/stream_recorder.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
+#include <transcoding/timestamp_corrector.h>
 
 namespace nx::vms::client::desktop {
 
@@ -61,7 +61,7 @@ private:
     AVCodecID m_lastCompressionType = AV_CODEC_ID_NONE;
     MediaSigner m_signer;
     bool m_stitchTimestampGaps = true;
-    std::vector<nx::recording::helpers::TimestampStitcher> m_timestampStitcher;
+    TimestampCorrector m_timestampStitcher;
 
 private:
     virtual void adjustMetaData(QnAviArchiveMetadata& metaData) const override;
