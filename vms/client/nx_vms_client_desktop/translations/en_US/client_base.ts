@@ -10722,7 +10722,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12735,7 +12735,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
