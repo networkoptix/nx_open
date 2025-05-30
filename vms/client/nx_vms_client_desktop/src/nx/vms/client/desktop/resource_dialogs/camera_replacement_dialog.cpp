@@ -242,7 +242,7 @@ void CameraReplacementDialog::Private::reportFailureByMessageBox() const
     if (!deviceReplacementResponce)
     {
         message =
-            tr("The Camera Replacement operation is not possible as the Server is unavailable.");
+            tr("The Camera Replacement operation is not possible as the server is unavailable.");
     }
 
     QnMessageBox::critical(
@@ -608,7 +608,7 @@ void CameraReplacementDialog::updateHeader()
 
             //: %1 will be substituted with the camera's name.
             ui->headerDetailsLabel->setText(
-                tr("%1 will be removed from the Site and replaced by the selected camera")
+                tr("%1 will be removed from the site and replaced by the selected camera")
                     .arg(makeCameraNameRichText(d->cameraToBeReplaced->getName())));
 
             ui->headerDetailsLabel->setHidden(false);
@@ -618,8 +618,8 @@ void CameraReplacementDialog::updateHeader()
         case ReplacementApproval:
             ui->headerCaptionLabel->setText(tr("Data for Transfer"));
             ui->headerDetailsLabel->setText(QStringList({
-                tr("Checking if the old camera's data can be transferred to the new camera."),
-                tr("Some data and settings may not be compatible with the new camera")})
+                tr("Checking if the data from the camera can be transferred to the new one."),
+                tr("Some data and settings may not be supported for the new camera")})
                     .join(QChar::LineFeed));
 
             ui->headerDetailsLabel->setHidden(false);
