@@ -169,7 +169,7 @@ void QnSystemAdministrationDialog::applyChanges()
     if (d->editableSystemSettings.isEmpty())
         return;
 
-    auto callback = nx::utils::guarded(this,
+    auto callback =
         [this, sessionLimitChanged = d->editableSystemSettings.sessionLimitS.has_value()](
             bool /*success*/,
             rest::Handle requestId,
@@ -177,7 +177,6 @@ void QnSystemAdministrationDialog::applyChanges()
         {
             NX_ASSERT(requestId == d->currentRequest || d->currentRequest == 0);
             d->currentRequest = 0;
-            updateButtonBox();
 
             if (!response)
             {
@@ -199,15 +198,18 @@ void QnSystemAdministrationDialog::applyChanges()
                 QnSessionAwareMessageBox::critical(
                     this, tr("Failed to save site settings"), error.errorString);
             }
-        });
+
+            // Dialog buttons will be updated after all requests are complete.
+            // Loading the curreng settings state to match UI state and avoid hasChanges() to
+            // return true.
+            loadDataToUi();
+        };
 
     d->currentRequest = connectedServerApi()->patchSystemSettings(
         systemContext()->getSessionTokenHelper(),
         d->editableSystemSettings,
         std::move(callback),
         this);
-
-    updateButtonBox();
 }
 
 void QnSystemAdministrationDialog::discardChanges()
