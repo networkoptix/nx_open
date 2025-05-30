@@ -47,6 +47,7 @@ struct TreeNode
             QString::fromStdString(cp.name),
             OrganizationsModel::ChannelPartner)
     {
+        state = cp.effectiveState;
         loading = true;
     }
 
@@ -58,6 +59,7 @@ struct TreeNode
             OrganizationsModel::Organization)
     {
         systemCount = org.systemCount;
+        state = org.effectiveState;
         loading = true;
     }
 
@@ -78,6 +80,7 @@ struct TreeNode
             QString::fromStdString(system.name),
             OrganizationsModel::System)
     {
+        state = system.effectiveState;
     }
 
     class Registry
@@ -157,6 +160,7 @@ struct TreeNode
     nx::Uuid id;
     QString name;
     int systemCount = -1;
+    api::SaasState state = api::SaasState::uninitialized;
     OrganizationsModel::NodeType type = OrganizationsModel::None;
     bool loading = false;
 
@@ -665,6 +669,10 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
             return false;
         case QnSystemsModel::IsSaasUninitialized:
             return node->type == SitesNode;
+        case QnSystemsModel::IsSaasSuspended:
+            return node->state == api::SaasState::suspended;
+        case QnSystemsModel::IsSaasShutDown:
+            return node->state == api::SaasState::shutdown;
         default:
             if (node->type == OrganizationsModel::System && d->proxyModel)
             {

@@ -17,6 +17,7 @@ Item
     property var localId
     property bool cloudSystem: false
     property bool factorySystem: false
+    property bool isFromSites: false
     property bool isSaas: false
     property bool saasSuspended: false
     property bool saasShutDown: false
@@ -195,6 +196,7 @@ Item
                     font.pixelSize: 14
                     color: ColorTheme.colors.light16
                     text: control.counter >= 0 ? `${control.counter}` : ""
+                    visible: !issueLabel.text
                 }
 
                 IssueLabel
@@ -228,8 +230,22 @@ Item
 
                     text:
                     {
-                        if (control.type != OrganizationsModel.System)
+                        if (control.type !== OrganizationsModel.System
+                            && control.type !== OrganizationsModel.Organization
+                            && control.type !== OrganizationsModel.ChannelPartner)
+                        {
                             return ""
+                        }
+
+                        const showSaasState = control.isFromSites
+                            ? control.cloudSystem
+                            : control.type !== OrganizationsModel.System
+
+                        if (showSaasState && control.saasSuspended)
+                            return qsTr("SUSPENDED")
+
+                        if (showSaasState && control.saasShutDown)
+                            return qsTr("SHUTDOWN")
 
                         if (factorySystem)
                             return qsTr("NEW")
@@ -242,12 +258,6 @@ Item
 
                         if (!reachable)
                             return qsTr("UNREACHABLE")
-
-                        if (control.saasSuspended)
-                            return qsTr("SUSPENDED")
-
-                        if (control.saasShutDown)
-                            return qsTr("SHUTDOWN")
 
                         return ""
                     }

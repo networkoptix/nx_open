@@ -19,10 +19,12 @@ struct ChannelPartner
     nx::Uuid id;
     std::string name;
     int partnerCount = 0;
+    api::SaasState state = api::SaasState::uninitialized;
+    api::SaasState effectiveState = api::SaasState::uninitialized;
 
     bool operator==(const ChannelPartner&) const = default;
 };
-NX_REFLECTION_INSTRUMENT(ChannelPartner, (id)(name)(partnerCount))
+NX_REFLECTION_INSTRUMENT(ChannelPartner, (id)(name)(partnerCount)(state)(effectiveState))
 
 struct ChannelPartnerList
 {
@@ -41,9 +43,12 @@ struct Organization
     std::string name;
     int systemCount = 0;
     nx::Uuid channelPartner;
+    api::SaasState state = api::SaasState::uninitialized;
+    api::SaasState effectiveState = api::SaasState::uninitialized;
+
     bool operator==(const Organization& other) const = default;
 };
-NX_REFLECTION_INSTRUMENT(Organization, (id)(name)(systemCount)(channelPartner))
+NX_REFLECTION_INSTRUMENT(Organization, (id)(name)(systemCount)(channelPartner)(state)(effectiveState))
 
 struct OrganizationList
 {
@@ -72,10 +77,11 @@ struct SystemInOrganization
     std::string name;
     std::string state;
     nx::Uuid groupId;
+    api::SaasState effectiveState = api::SaasState::uninitialized;
 
     bool operator==(const SystemInOrganization& other) const = default;
 };
-NX_REFLECTION_INSTRUMENT(SystemInOrganization, (systemId)(name)(state)(groupId));
+NX_REFLECTION_INSTRUMENT(SystemInOrganization, (systemId)(name)(state)(groupId)(effectiveState));
 
 struct SystemList
 {

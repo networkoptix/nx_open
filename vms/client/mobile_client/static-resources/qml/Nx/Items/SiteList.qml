@@ -155,6 +155,7 @@ ListView
                     && (organizationsModel.channelPartner != NxGlobals.uuid(""))
                 saasSuspended: modelData.isSaasSuspended ?? false
                 saasShutDown: modelData.isSaasShutDown ?? false
+                isFromSites: modelData.isFromSites ?? false
                 ownerDescription: cloudSystem ? modelData.ownerDescription : ""
                 running: modelData.isOnline || false
                 reachable: modelData.isReachable || false
