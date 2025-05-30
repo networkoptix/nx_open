@@ -171,7 +171,7 @@
             "maxHeight": 0.2,
             "attributes":
             {
-                "Age": "32",
+                "Age": "Child",
                 "Gender": "Woman",
                 "Body Shape": "Normal",
                 "Height": "170",
@@ -189,7 +189,7 @@
             "maxHeight": 0.2,
             "attributes":
             {
-                "Age": "39",
+                "Age": "Middle-aged",
                 "Gender": "Man",
                 "Body Shape": "Normal",
                 "Height": "185",
