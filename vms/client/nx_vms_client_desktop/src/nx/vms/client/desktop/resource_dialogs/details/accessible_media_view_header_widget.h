@@ -17,7 +17,7 @@ namespace nx::vms::client::desktop {
 /**
  * Widget which contains single "All Cameras & Resources" checkbox stylized by checkable row
  * from the resource tree. Used as header for the resource view widget in the accessible media
- * selection tab for custom user user role.
+ * selection tab for custom user role.
  */
 class AccessibleMediaViewHeaderWidget: public QWidget
 {

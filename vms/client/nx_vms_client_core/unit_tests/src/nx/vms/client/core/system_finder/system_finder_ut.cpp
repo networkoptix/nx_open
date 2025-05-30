@@ -220,7 +220,7 @@ TEST_F(SystemFinderTest, disconnectFromCloudWhileTwoSystemsWithSameIdAreAvailabl
 // VMS-53746: Disconnecting from the cloud should not make systems disappear.
 TEST_F(SystemFinderTest, disconnectFromCloudWhileTwoConnectedSystemsWithSameIdAreAvailableLocally)
 {
-    // At least one of systems is known as connected earlier - but the local is is the same.
+    // At least one of systems is known as connected earlier - but the local is the same.
     givenRecentSystem(kLocalId1);
     // Systems are available locally, so we know all its ids.
     givenAccessibleSystem({.cloudSystemId = kCloudId1, .localSystemId = kLocalId1});

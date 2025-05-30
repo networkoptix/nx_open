@@ -501,7 +501,7 @@ QVariant QnStorageListModel::storageArchiveModeWarningIconColumnData(
     const auto serversByArchiveAccessMode =
         serversUsingSameExternalStorage(m_storages.at(index.row()));
 
-    // Either no such storages were found or the same archive mode mode is used for each one.
+    // Either no such storages were found or the same archive mode is used for each one.
     if (serversByArchiveAccessMode.size() <= 1)
         return {};
 

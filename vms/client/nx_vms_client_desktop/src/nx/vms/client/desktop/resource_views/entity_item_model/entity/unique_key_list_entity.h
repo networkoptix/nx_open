@@ -151,7 +151,7 @@ public:
     bool isEmpty() const;
 
     /**
-     * Row index of the the item described by the given key.
+     * Row index of the item described by the given key.
      * @param key The key.
      * @returns Row index of item if such exists, -1 otherwise.
      */

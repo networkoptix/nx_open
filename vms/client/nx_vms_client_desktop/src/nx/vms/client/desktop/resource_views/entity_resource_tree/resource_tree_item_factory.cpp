@@ -39,7 +39,7 @@ using nx::vms::common::SystemSettings;
 using nx::vms::client::core::CloudCrossSystemContext;
 
 //-------------------------------------------------------------------------------------------------
-// Provider and invalidator pair factory functions for the header system name name generic item.
+// Provider and invalidator pair factory functions for the header system name generic item.
 //-------------------------------------------------------------------------------------------------
 GenericItem::DataProvider systemNameProvider(const SystemSettings* globalSettings)
 {

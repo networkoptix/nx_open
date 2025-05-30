@@ -544,7 +544,6 @@ menu::Parameters WorkbenchUi::currentParameters(menu::ActionScope scope) const
     return menu::Parameters();
 }
 
-
 WorkbenchUi::Flags WorkbenchUi::flags() const
 {
     return m_flags;
@@ -762,7 +761,7 @@ void WorkbenchUi::tick(int deltaMSecs)
 
     QGraphicsSceneWheelEvent event(QEvent::GraphicsSceneWheel);
     const int zooming = (m_timeline->item->zooming() == QnNavigationItem::Zooming::In) ? 1 : -1;
-    // 360 degrees per sec, x8 since delta is measured in in eighths (1/8s) of a degree.
+    // 360 degrees per sec, x8 since delta is measured in eighths (1/8s) of a degree.
     event.setDelta(360 * 8 * (deltaMSecs * zooming) / 2000);
     event.setPos(pos);
     event.setScenePos(slider->mapToScene(pos));

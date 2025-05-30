@@ -26,7 +26,7 @@ public:
     /**
      * @param columnCount Column count which be in model being created. All data provided by
      *     attached entity will be mapped to the column 0, while all other columns will be blank.
-     *     Creating model with column count > 1 has no meaning if it will be be used as is, but
+     *     Creating model with column count > 1 has no meaning if it will be used as is, but
      *     it's very convenient way to create source for QIdentityProxyModel-derived decorators,
      *     which may perform data remapping or provide custom data for initially blank columns.
      *     Overhead for mapping source model index to proxy model index and vice versa will be

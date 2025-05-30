@@ -21,7 +21,7 @@ public:
     ~ContextStatisticsModule();
 
     /**
-     * Accessor the the single statistics module instance using Application Context.
+     * Accessor the single statistics module instance using Application Context.
      */
     static ContextStatisticsModule* instance();
 

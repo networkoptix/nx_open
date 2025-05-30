@@ -362,7 +362,7 @@ void TabApiBackend::Private::updateItemParams(
             }
         });
 
-    // We update parameters later to give some time to the the item to be added on the scene.
+    // We update parameters later to give some time to the item to be added on the scene.
     executeDelayedParented(setParametersLater, milliseconds(1), this);
 }
 

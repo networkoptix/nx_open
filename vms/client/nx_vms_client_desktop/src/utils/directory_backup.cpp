@@ -46,7 +46,6 @@ bool copyFiles(const QString& sourceDirectory, const QString& targetDirectory,
         return false;
     };
 
-
     /* Always try to copy as much files as possible even if we have failed some. */
     bool success = true;
     for (const QString& filename : fileNames)
@@ -231,7 +230,7 @@ bool QnDirectoryBackup::backup(QnDirectoryBackupBehavior behavior) const
 
         if (!copyFiles(backupDirectory(), originalDirectory(), m_fileNames, OverwritePolicy::Skip))
         {
-            NX_ERROR(typeid(QnDirectoryBackup), lit("Could not restore backup. System is is invalid state."));
+            NX_ERROR(typeid(QnDirectoryBackup), lit("Could not restore backup. System is invalid state."));
         }
         return false;
     }

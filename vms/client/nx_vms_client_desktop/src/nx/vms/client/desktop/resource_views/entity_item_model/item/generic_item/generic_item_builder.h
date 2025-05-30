@@ -22,7 +22,7 @@ public:
      * @param role Data role for item being constructed, supposed to be used for access to
      *     the stored static data.
      * @param value Value which item should provide by given role, null QVariant is
-     *     considered as invalid input. If it's needed to to return null QVariant, just do nothing.
+     *     considered as invalid input. If it's needed to return null QVariant, just do nothing.
      */
     GenericItemBuilder& withRole(int role, const QVariant& value);
 

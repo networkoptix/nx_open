@@ -160,7 +160,7 @@ protected:
 
     bool haveAudio(float speed) const;
 
-    // puts in in queue and returns first in queue
+    // puts in queue and returns first in queue
     QnCompressedVideoDataPtr nextInOutVideodata(QnCompressedVideoDataPtr incoming, int channel);
 
     // this function doest not changes any quues; it just returns time of next frame been displayed
