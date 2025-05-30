@@ -153,7 +153,7 @@ void AIOService::initializeAioThreadPool(unsigned int threadCount, bool enableAi
     {
         m_aioThreadWatcher = std::make_unique<AioThreadWatcher>(
             /*pollRatePerSecond*/ 100,
-            /*averageTimeMultiplier*/ 5 * detail::AioTaskQueue::kAbnormalProcessTimeFactor,
+            /*averageTimeMultiplier*/ 0,
             /*absoluteThreshold*/ std::chrono::seconds(5),
             [this](AioThreadWatcher::StuckThread thread)
             {

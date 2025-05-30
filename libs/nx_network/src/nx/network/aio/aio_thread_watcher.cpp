@@ -21,10 +21,10 @@ AioThreadWatcher::AioThreadWatcher(
 
     if (!NX_ASSERT(pollRatePerSecond > 0))
         pollRatePerSecond = 10;
-    m_threadSleep = duration_cast<milliseconds>(1s / pollRatePerSecond);
+    m_threadSleep = 1000ms / pollRatePerSecond;
 
-    if (!NX_ASSERT(averageTimeMultiplier > 0))
-        averageTimeMultiplier = 2000;
+    if (!NX_ASSERT(averageTimeMultiplier >= 0))
+        averageTimeMultiplier = 5000;
     m_averageTimeMultiplier = averageTimeMultiplier;
 }
 
@@ -70,9 +70,9 @@ std::chrono::milliseconds AioThreadWatcher::absoluteThreshold() const
 void AioThreadWatcher::aboutToInvoke(const AbstractAioThread* aioThread, const char* functionType)
 {
     auto& ctx = find(aioThread);
-    ctx.watchStart = nx::utils::monotonicTime();
+    ctx.stuck = false;
     ctx.functionType = functionType;
-    NX_ASSERT(!ctx.stuck, "Watching an already stuck thread");
+    ctx.watchStart = nx::utils::monotonicTime();
 }
 
 void AioThreadWatcher::doneInvoking(
@@ -157,6 +157,7 @@ std::optional<AioThreadWatcher::StuckThread>
         return std::nullopt;
 
     if ((averageExecutionTime != 0us
+            && m_averageTimeMultiplier.load() > 0
             && currentExecutionTime >= averageExecutionTime * m_averageTimeMultiplier.load())
         || currentExecutionTime >= m_absoluteThreshold.load())
     {
