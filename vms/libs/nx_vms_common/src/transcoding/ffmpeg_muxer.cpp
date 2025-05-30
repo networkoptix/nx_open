@@ -92,7 +92,6 @@ void FfmpegMuxer::closeFfmpegContext()
         m_formatCtx->pb = nullptr;
         avformat_close_input(&m_formatCtx);
     }
-    m_timestampCorrector.clear();
 }
 
 bool FfmpegMuxer::setContainer(const QString& container)
