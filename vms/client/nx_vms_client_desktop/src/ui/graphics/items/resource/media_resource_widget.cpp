@@ -2643,20 +2643,17 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         if (!NX_ASSERT(d->camera) || !d->camera->isScheduleEnabled())
             return Qn::IoModuleDisabledOverlay;
 
-        if (d->isPlayingLive())
+        Qn::Permissions requiredPermissions = Qn::UserInputPermissions;
+        if (hasVideo() || hasAudio())
         {
-            return d->accessController()->
-                hasAnyPermission(d->camera, Qn::ViewLivePermission | Qn::UserInputPermissions)
-                ? Qn::EmptyOverlay
-                : Qn::AccessDeniedOverlay;
+            requiredPermissions |= d->isPlayingLive()
+                ? Qn::ViewLivePermission
+                : Qn::ViewFootagePermission;
         }
-        else
-        {
-            if (!d->accessController()->hasPermissions(d->camera, Qn::ViewFootagePermission))
-                return Qn::AccessDeniedOverlay;
 
-            return Qn::NoDataOverlay;
-        }
+        return d->accessController()->hasAnyPermission(d->camera, requiredPermissions)
+            ? Qn::EmptyOverlay
+            : Qn::AccessDeniedOverlay;
     }
 
     if (d->camera)
@@ -3063,8 +3060,7 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
     m_ioCouldBeShown = ((ioBtnChecked || onlyIoData) && correctLicenseStatus);
     const bool correctState = (!d->isOffline()
         && !d->isUnauthorized()
-        && d->hasAccess()
-        && d->isPlayingLive());
+        && d->hasAccess());
     const OverlayVisibility visibility = (m_ioCouldBeShown && correctState ? Visible : Invisible);
     setOverlayWidgetVisibility(m_ioModuleOverlayWidget, visibility, animate);
     updateOverlayWidgetsVisibility(animate);
