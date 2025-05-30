@@ -527,6 +527,8 @@ nx::network::http::StatusCode::Value toHttpStatusCode(ResultCode resultCode)
             return nx::network::http::StatusCode::ok;
         case ResultCode::retryLater:
             return nx::network::http::StatusCode::serviceUnavailable;
+        case ResultCode::statementError:
+            return nx::network::http::StatusCode::badRequest;
         case ResultCode::error:
             return nx::network::http::StatusCode::internalServerError;
         default:

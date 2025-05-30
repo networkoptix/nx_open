@@ -203,7 +203,9 @@ DBResult SqlQuery::getLastError()
 {
     DBResult res;
 
-    switch (m_sqlQuery.lastError().type())
+    const auto lastError = m_sqlQuery.lastError();
+
+    switch (lastError.type())
     {
         case QSqlError::StatementError:
             res.code = DBResultCode::statementError;
@@ -231,7 +233,13 @@ DBResult SqlQuery::getLastError()
             res.code = DBResultCode::uniqueConstraintViolation;
     }
 
-    res.text = m_sqlQuery.lastError().text().toStdString();
+    res.text = lastError.text().toStdString();
+    if (lastError.text().contains("syntax error"))
+    {
+        // Ad hoc: "syntax error" in `analytics::db::Filter::freeText` is reported by QSqlQuery
+        // as QSqlError::ConnectionError, which is http 500, but 400 is desired for invalid input.
+        res.code = DBResultCode::statementError;
+    }
 
     return res;
 }

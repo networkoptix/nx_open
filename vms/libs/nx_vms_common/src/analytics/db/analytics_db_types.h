@@ -386,7 +386,8 @@ QN_FUSION_DECLARE_FUNCTIONS(TimePeriodsLookupOptions, (json), NX_VMS_COMMON_API)
 NX_REFLECTION_ENUM_CLASS(ResultCode,
     ok,
     retryLater,
-    error
+    error,
+    statementError
 )
 
 NX_VMS_COMMON_API nx::network::http::StatusCode::Value toHttpStatusCode(ResultCode resultCode);
