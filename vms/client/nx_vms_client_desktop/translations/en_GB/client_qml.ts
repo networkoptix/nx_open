@@ -922,7 +922,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Angle</source>
-      <translation type="unfinished">Angle</translation>
+      <translation>Angle</translation>
     </message>
     <message>
       <source>Camera roll correction</source>

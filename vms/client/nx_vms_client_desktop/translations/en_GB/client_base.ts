@@ -7065,7 +7065,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Color</source>
-      <translation type="unfinished">Color</translation>
+      <translation>Colour</translation>
     </message>
     <message>
       <source>Pointed</source>
@@ -10341,7 +10341,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Confirm</source>
-      <translation type="unfinished">Confirm</translation>
+      <translation>Confirm</translation>
     </message>
   </context>
   <context>
