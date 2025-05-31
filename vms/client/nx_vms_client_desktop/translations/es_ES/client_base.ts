@@ -7724,7 +7724,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Color</source>
-      <translation type="unfinished">Color</translation>
+      <translation>Color</translation>
     </message>
     <message>
       <source>Pointed</source>
