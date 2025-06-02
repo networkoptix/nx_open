@@ -42,20 +42,20 @@ void HandlerPool::registerHandler(
 void HandlerPool::registerHandler(
     const QString& path,
     Handler* handler,
-    GlobalPermission permissions)
+    GlobalPermission permission)
 {
-    registerHandler(kAnyHttpMethod, path, handler, permissions);
+    registerHandler(kAnyHttpMethod, path, handler, permission);
 }
 
 void HandlerPool::registerHandler(
     const nx::network::http::Method& httpMethod,
     const QString& path,
     Handler* handler,
-    GlobalPermission permissions)
+    GlobalPermission permission)
 {
     handler->setPath(path);
-    handler->setReadPermissions(permissions);
-    handler->setModifyPermissions(permissions);
+    handler->setReadPermissions(permission);
+    handler->setModifyPermissions(permission);
     m_handlers[httpMethod][path].reset(handler);
 }
 

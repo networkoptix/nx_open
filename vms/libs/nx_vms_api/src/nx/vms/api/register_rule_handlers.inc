@@ -213,7 +213,7 @@ void registerRuleHandlers(
      * %ingroup Events
      * %param:string id
      * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
-     * %permissions Depends on Resource access rights.
+     * %permissions Power User.
      * %return:{RuleV4}
      *
      **%apidoc GET /rest/v{4-}/events/rules
@@ -222,7 +222,7 @@ void registerRuleHandlers(
      * %caption Get all Rules
      * %ingroup Events
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
-     * %permissions Depends on Resource access rights.
+     * %permissions Power User.
      * %return:{RuleV4List}
      *
      **%apidoc DELETE /rest/v{4-}/events/rules/{id}
@@ -233,7 +233,7 @@ void registerRuleHandlers(
      * %param[ref] _strict,_ticket
      * %permissions Power User.
      */
-    reg("rest/v{4-}/events/rules/:id?", GlobalPermission::none, GlobalPermission::powerUser,
+    reg("rest/v{4-}/events/rules/:id?", GlobalPermission::powerUser,
         std::make_unique<SimpleRuleHandler<QueryProcessor>>(
             serverModule->directConnection()->queryProcessor(), serverModule->systemContext()));
 
