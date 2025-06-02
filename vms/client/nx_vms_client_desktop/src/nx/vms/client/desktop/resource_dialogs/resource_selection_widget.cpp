@@ -54,8 +54,7 @@ struct ResourceSelectionWidget::Private: public QObject
     Private(
         ResourceSelectionWidget* owner,
         int columnCount,
-        const ResourceValidator& resourceValidator,
-        const AlertTextProvider& alertTextProvider);
+        const ResourceValidator& resourceValidator);
 
     void onItemClicked(const QModelIndex& index);
     void updateAlertMessage();
@@ -66,7 +65,7 @@ struct ResourceSelectionWidget::Private: public QObject
     ResourceSelectionWidget* q;
     int columnCount;
     const ResourceValidator resourceValidator;
-    const AlertTextProvider alertTextProvider;
+    AlertTextProvider alertTextProvider;
     std::unique_ptr<InvalidResourceDecoratorModel> invalidResourceDecoratorModel;
     std::unique_ptr<InvalidResourceFilterModel> invalidResourceFilterModel;
     std::unique_ptr<ResourceSelectionDecoratorModel> selectionDecoratorModel;
@@ -76,13 +75,11 @@ struct ResourceSelectionWidget::Private: public QObject
 ResourceSelectionWidget::Private::Private(
     ResourceSelectionWidget* owner,
     int columnCount,
-    const ResourceValidator& resourceValidator,
-    const AlertTextProvider& alertTextProvider)
+    const ResourceValidator& resourceValidator)
     :
     q(owner),
     columnCount(columnCount),
     resourceValidator(resourceValidator),
-    alertTextProvider(alertTextProvider),
     invalidResourceDecoratorModel(new InvalidResourceDecoratorModel(resourceValidator)),
     invalidResourceFilterModel(new InvalidResourceFilterModel())
 {
@@ -125,6 +122,7 @@ void ResourceSelectionWidget::Private::updateAlertMessage()
     if (alertTextProvider)
     {
         const auto alertText = alertTextProvider(
+            q->systemContext(),
             selectionDecoratorModel->selectedResources(),
             selectionDecoratorModel->pinnedItemSelected());
         if (!alertText.trimmed().isEmpty())
@@ -161,13 +159,13 @@ bool ResourceSelectionWidget::selectionHasInvalidResources() const
 //-------------------------------------------------------------------------------------------------
 
 ResourceSelectionWidget::ResourceSelectionWidget(
+    SystemContext* system,
     QWidget* parent,
     int columnCount,
-    ResourceValidator resourceValidator,
-    AlertTextProvider alertTextProvider)
+    ResourceValidator resourceValidator)
     :
-    base_type(columnCount, parent),
-    d(new Private(this, columnCount, resourceValidator, alertTextProvider))
+    base_type(system, columnCount, parent),
+    d(new Private(this, columnCount, resourceValidator))
 {
     const auto checkboxColumn = columnCount - 1;
 
@@ -202,6 +200,11 @@ ResourceSelectionWidget::ResourceSelectionWidget(
 
 ResourceSelectionWidget::~ResourceSelectionWidget()
 {
+}
+
+void ResourceSelectionWidget::setAlertTextProvider(AlertTextProvider provider)
+{
+    d->alertTextProvider = std::move(provider);
 }
 
 ResourceSelectionMode ResourceSelectionWidget::selectionMode() const

@@ -93,7 +93,7 @@ BackupSettingsWidget::BackupSettingsWidget(ServerSettingsDialogStore* store, QWi
         ui->settingsStackedWidget, &QStackedWidget::setCurrentIndex);
 
     // Widget initialized with this pointer as parent to setup workbench context.
-    m_backupSettingsViewWidget = new BackupSettingsViewWidget(store, this);
+    m_backupSettingsViewWidget = new BackupSettingsViewWidget(systemContext(), store, this);
 
     // Ownership of widget is transferred to the layout.
     ui->viewWidgetPageLayout->insertWidget(0, m_backupSettingsViewWidget);

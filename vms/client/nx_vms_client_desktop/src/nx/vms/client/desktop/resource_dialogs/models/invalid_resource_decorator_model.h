@@ -8,6 +8,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include "../resource_selection_delegate.h"
+
 namespace nx::vms::client::desktop {
 
 /**
@@ -19,7 +21,6 @@ class InvalidResourceDecoratorModel: public QIdentityProxyModel
 {
     Q_OBJECT
     using base_type = QIdentityProxyModel;
-    using ResourceValidator = std::function<bool(const QnResourcePtr&)>;
 
 public:
     InvalidResourceDecoratorModel(

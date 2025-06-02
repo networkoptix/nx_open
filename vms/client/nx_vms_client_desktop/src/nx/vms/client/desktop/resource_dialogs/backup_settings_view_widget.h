@@ -24,7 +24,8 @@ class BackupSettingsViewWidget:
     using base_type = DetailedResourceTreeWidget;
 
 public:
-    BackupSettingsViewWidget(ServerSettingsDialogStore* store, QWidget* parent);
+    BackupSettingsViewWidget(
+        SystemContext* system, ServerSettingsDialogStore* store, QWidget* parent);
     virtual ~BackupSettingsViewWidget() override;
 
     bool hasChanges() const;

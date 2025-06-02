@@ -33,8 +33,8 @@ namespace nx::vms::client::desktop {
 
 using namespace nx::vms::api;
 
-FailoverPriorityViewWidget::FailoverPriorityViewWidget(QWidget* parent):
-    base_type(failover_priority_view::ColumnCount, parent),
+FailoverPriorityViewWidget::FailoverPriorityViewWidget(SystemContext* system, QWidget* parent):
+    base_type(system, failover_priority_view::ColumnCount, parent),
     m_failoverPriorityDecoratorModel(new FailoverPriorityDecoratorModel())
 {
     auto failoverPriorityPicker = new FailoverPriorityPickerWidget();

@@ -10,7 +10,9 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/abstract_entity.h>
-#include <ui/workbench/workbench_context_aware.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
+
+#include "resource_selection_delegate.h"
 
 namespace Ui { class DetailedResourceTreeWidget; }
 
@@ -23,7 +25,7 @@ class ResourceTreeIconDecoratorModel;
 class FilteredResourceViewWidget;
 class ResourceDetailsWidget;
 
-class DetailedResourceTreeWidget: public QWidget, public QnWorkbenchContextAware
+class DetailedResourceTreeWidget: public QWidget, public SystemContextAware
 {
     Q_OBJECT
     using base_type = QWidget;
@@ -33,9 +35,8 @@ public:
     using ResourceTreeEntityBuilder = entity_resource_tree::ResourceTreeEntityBuilder;
 
     using EntityFactoryFunction = std::function<AbstractEntityPtr(const ResourceTreeEntityBuilder*)>;
-    using ResourceFilter = std::function<bool(const QnResourcePtr& resource)>;
 
-    DetailedResourceTreeWidget(int columnCount, QWidget* parent);
+    DetailedResourceTreeWidget(SystemContext* system, int columnCount, QWidget* parent);
     virtual ~DetailedResourceTreeWidget() override;
 
     /**

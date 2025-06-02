@@ -60,9 +60,10 @@ CameraSelectionDialog::CameraSelectionDialog(
         };
 
     m_resourceSelectionWidget = new ResourceSelectionWidget(
-        this, resource_selection_view::ColumnCount, resourceValidator, alertTextProvider);
-    ui->widgetLayout->insertWidget(0, m_resourceSelectionWidget);
+        systemContext(), this, resource_selection_view::ColumnCount, resourceValidator);
+    m_resourceSelectionWidget->setAlertTextProvider(alertTextProvider);
     m_resourceSelectionWidget->setTreeEntityFactoryFunction(createTreeEntity);
+    ui->widgetLayout->insertWidget(0, m_resourceSelectionWidget);
 
     const auto allCamerasSwitch = ui->allCamerasSwitch;
 

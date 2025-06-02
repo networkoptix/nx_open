@@ -81,11 +81,10 @@ bool isIndexWithinRange(
 using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
 
 DetailedResourceTreeWidget::DetailedResourceTreeWidget(
-    int columnCount,
-    QWidget* parent)
+    SystemContext* system, int columnCount, QWidget* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    SystemContextAware(system),
     ui(new Ui::DetailedResourceTreeWidget()),
     m_treeEntityBuilder(new entity_resource_tree::ResourceTreeEntityBuilder(systemContext())),
     m_entityModel(new entity_item_model::EntityItemModel(columnCount)),

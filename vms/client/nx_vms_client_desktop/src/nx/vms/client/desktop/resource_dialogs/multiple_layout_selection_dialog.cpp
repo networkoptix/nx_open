@@ -49,7 +49,7 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(
     base_type(parent),
     ui(new Ui::MultipleLayoutSelectionDialog()),
     m_resourceSelectionWidget(new ResourceSelectionWidget(
-        this, resource_selection_view::ColumnCount))
+        systemContext(), this, resource_selection_view::ColumnCount))
 {
     ui->setupUi(this);
     ui->widgetLayout->insertWidget(0, m_resourceSelectionWidget);

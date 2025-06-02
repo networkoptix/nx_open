@@ -19,7 +19,7 @@ FailoverPriorityDialog::FailoverPriorityDialog(QWidget* parent):
 {
     ui->setupUi(this);
 
-    const auto failoverPriorityViewWidget = new FailoverPriorityViewWidget(this);
+    const auto failoverPriorityViewWidget = new FailoverPriorityViewWidget(systemContext(), this);
     ui->widgetLayout->insertWidget(0, failoverPriorityViewWidget);
 
     setHelpTopic(this, HelpTopic::Id::ServerSettings_Failover);

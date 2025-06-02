@@ -64,8 +64,8 @@ using namespace nx::vms::api;
 using namespace nx::vms::license::saas;
 
 BackupSettingsViewWidget::BackupSettingsViewWidget(
-    ServerSettingsDialogStore* store, QWidget* parent):
-    base_type(backup_settings_view::ColumnCount, parent),
+    SystemContext* system, ServerSettingsDialogStore* store, QWidget* parent):
+    base_type(system, backup_settings_view::ColumnCount, parent),
     m_backupSettingsDecoratorModel(new BackupSettingsDecoratorModel(store, systemContext())),
     m_viewItemDelegate(
         new BackupSettingsItemDelegate(resourceViewWidget()->itemViewHoverTracker()))

@@ -20,7 +20,7 @@ class NX_VMS_CLIENT_CORE_API UnifiedResourcePool: public QObject
 public:
     UnifiedResourcePool(QObject* parent = nullptr);
 
-    using ResourceFilter = std::function<bool (const QnResourcePtr& resource)>;
+    using ResourceFilter = nx::vms::common::ResourceFilter;
     QnResourceList resources(ResourceFilter filter = {}) const;
 
     /** Find all resources with given Id. */

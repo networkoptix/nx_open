@@ -18,13 +18,13 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-CameraSelectionDialog::AlertTextProvider initAlertTextProvider(
-    SystemContext* context,
-    const CameraSettingsDialogState& settings)
+AlertTextProvider initAlertTextProvider(const CameraSettingsDialogState& settings)
 {
     return
-        [&settings, context]
-            (const QSet<QnResourcePtr>& resources, bool /*pinnedItemSelected*/) -> QString
+        [&settings](
+            SystemContext* context,
+            const QSet<QnResourcePtr>& resources,
+            bool /*pinnedItemSelected*/) -> QString
         {
             QStringList alertRows;
 
@@ -88,7 +88,7 @@ CameraSelectionDialog::AlertTextProvider initAlertTextProvider(
         };
 }
 
-CameraSelectionDialog::ResourceFilter supportsSchedule(const CameraSettingsDialogState& settings)
+ResourceFilter supportsSchedule(const CameraSettingsDialogState& settings)
 {
     return
         [selfId = settings.singleCameraId()](const QnResourcePtr& resource)
@@ -104,8 +104,7 @@ CameraSelectionDialog::ResourceFilter supportsSchedule(const CameraSettingsDialo
         };
 }
 
-CameraSelectionDialog::ResourceValidator canApplySchedule(
-    const CameraSettingsDialogState& settings)
+ResourceValidator canApplySchedule(const CameraSettingsDialogState& settings)
 {
     return
         [schedule = settings.recording.schedule()](const QnResourcePtr& resource)
@@ -153,7 +152,7 @@ CopyScheduleCameraSelectionDialog::CopyScheduleCameraSelectionDialog(
     base_type(
         /*resourceFilter*/ supportsSchedule(settings),
         /*resourceValidator*/ canApplySchedule(settings),
-        /*alertTextProvider*/ initAlertTextProvider(systemContext(), settings),
+        /*alertTextProvider*/ initAlertTextProvider(settings),
         /*permissionsHandledByFilter*/ false,
         /*pinnedItemDescription*/ {},
         parent)

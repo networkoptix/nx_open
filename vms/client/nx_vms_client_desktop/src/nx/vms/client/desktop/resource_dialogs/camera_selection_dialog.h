@@ -29,17 +29,6 @@ class CameraSelectionDialog: public QnSessionAwareButtonBoxDialog
     using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    using ResourceFilter = std::function<bool(const QnResourcePtr& resource)>;
-    using ResourceValidator = std::function<bool(const QnResourcePtr& resource)>;
-    using AlertTextProvider =
-        std::function<QString(const QSet<QnResourcePtr>& resources, bool pinnedItemSelected)>;
-
-    /**
-     * @param resourceFilter Unary predicate which defines subset of cameras and devices will be
-     *     displayed in the dialog.
-     * @param resourceValidator Unary predicate which defines whether resource is valid choice for
-     *     selection or not.
-     */
     CameraSelectionDialog(
         const ResourceFilter& resourceFilter,
         const ResourceValidator& resourceValidator,
@@ -165,7 +154,8 @@ bool CameraSelectionDialog::selectCameras(
         };
 
     const auto alertProvider =
-        [context, &policy](const QSet<QnResourcePtr>& resourcesSet, bool pinnedItemSelected)
+        [&policy](
+            SystemContext* context, const QSet<QnResourcePtr>& resourcesSet, bool pinnedItemSelected)
         {
             return alertTextProvider(context, policy, resourcesSet, pinnedItemSelected);
         };
@@ -223,7 +213,8 @@ bool CameraSelectionDialog::selectCameras(
         };
 
     const auto alertProvider =
-        [context, &policy](const QSet<QnResourcePtr>& resourcesSet, bool pinnedItemSelected)
+        [&policy](
+            SystemContext* context, const QSet<QnResourcePtr>& resourcesSet, bool pinnedItemSelected)
         {
             return alertTextProvider(context, policy, resourcesSet, pinnedItemSelected);
         };

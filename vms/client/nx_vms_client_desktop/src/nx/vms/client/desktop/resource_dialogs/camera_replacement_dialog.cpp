@@ -265,7 +265,7 @@ CameraReplacementDialog::CameraReplacementDialog(
     setFixedWidth(kDialogFixedWidth);
 
     d->resourceSelectionWidget =
-        new ResourceSelectionWidget(this, resource_selection_view::ColumnCount);
+        new ResourceSelectionWidget(systemContext(), this, resource_selection_view::ColumnCount);
     ui->cameraSelectionPageLayout->addWidget(d->resourceSelectionWidget);
 
     d->resourceSelectionWidget->setShowRecordingIndicator(true);

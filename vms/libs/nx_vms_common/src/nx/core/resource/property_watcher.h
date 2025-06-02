@@ -20,7 +20,7 @@ class NX_VMS_COMMON_API PropertyWatcher: public QObject
     Q_OBJECT
 
 public:
-    using ResourceFilter = std::function<bool(const QnResourcePtr&)>;
+    using ResourceFilter = nx::vms::common::ResourceFilter;
 
 public:
     PropertyWatcher(QnResourcePool* resourcePool);

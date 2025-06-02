@@ -43,7 +43,7 @@ public:
      */
     UniqueResourceSourcePtr healthMonitorsSource(const QnResourceAccessSubject& accessSubject);
 
-    using ResourceFilter = std::function<bool(const QnResourcePtr&)>;
+    using ResourceFilter = nx::vms::common::ResourceFilter;
 
     /**
      * Provides all device resources stored in the resource pool filtered with specified filter.

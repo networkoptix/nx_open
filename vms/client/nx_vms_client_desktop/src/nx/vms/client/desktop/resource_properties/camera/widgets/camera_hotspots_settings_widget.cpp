@@ -69,7 +69,7 @@ struct CameraHotspotsSettingsWidget::Private
 
     CameraSelectionDialog* createHotspotTargetSelectionDialog(int hotspotIndex) const;
 
-    CameraSelectionDialog::ResourceFilter hotspotTargetSelectionResourceFilter(
+    ResourceFilter hotspotTargetSelectionResourceFilter(
         int hotspotIndex) const;
 
     void selectTargetForHotspot(int index) const;
@@ -140,8 +140,8 @@ CameraSelectionDialog* CameraHotspotsSettingsWidget::Private::createHotspotTarge
 {
     auto targetSelectionDialog = createSelfDestructingDialog<CameraSelectionDialog>(
         hotspotTargetSelectionResourceFilter(hotspotIndex),
-        CameraSelectionDialog::ResourceValidator(),
-        CameraSelectionDialog::AlertTextProvider(),
+        ResourceValidator(),
+        AlertTextProvider(),
         /*permissionsHandledByFilter*/ false,
         /*pinnedItemDescription*/ std::nullopt,
         q);
@@ -173,8 +173,7 @@ CameraSelectionDialog* CameraHotspotsSettingsWidget::Private::createHotspotTarge
     return targetSelectionDialog;
 }
 
-CameraSelectionDialog::ResourceFilter
-    CameraHotspotsSettingsWidget::Private::hotspotTargetSelectionResourceFilter(
+ResourceFilter CameraHotspotsSettingsWidget::Private::hotspotTargetSelectionResourceFilter(
         int hotspotIndex) const
 {
     UuidSet usedHotspotTargetsIds;

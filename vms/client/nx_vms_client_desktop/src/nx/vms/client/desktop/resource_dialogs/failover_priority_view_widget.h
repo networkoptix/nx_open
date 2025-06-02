@@ -19,7 +19,7 @@ class FailoverPriorityViewWidget: public DetailedResourceTreeWidget
     using FailoverPriorityMap = QHash<QnVirtualCameraResourcePtr, nx::vms::api::FailoverPriority>;
 
 public:
-    FailoverPriorityViewWidget(QWidget* parent);
+    FailoverPriorityViewWidget(SystemContext* system, QWidget* parent);
     virtual ~FailoverPriorityViewWidget() override;
 
     FailoverPriorityMap modifiedFailoverPriority() const;

@@ -15,27 +15,20 @@ class ResourceSelectionWidget: public DetailedResourceTreeWidget
     using base_type = DetailedResourceTreeWidget;
 
 public:
-    using ResourceValidator = std::function<bool(const QnResourcePtr& resource)>;
-    using AlertTextProvider =
-        std::function<QString(const QSet<QnResourcePtr>& resources, bool pinnedItemSelected)>;
-
     /**
      * @param parent Valid pointer to the parent widget, should be initialized
      *     QnWorkbenchContextAware descendant.
      * @param columnCount Number of columns in the encapsulated resource tree model. Check mark
      *      column will be the last one.
-     * @param resourceValidator Unary predicate which defines whether resource is valid choice for
-     *     selection or not.
-     * @param alertTextProvider Function wrapper which holds function that provides alert text in
-     *     the case if some invalid resources are checked. List of invalid resources will be passed
-     *     as parameter.
      */
     ResourceSelectionWidget(
+        SystemContext* system,
         QWidget* parent,
         int columnCount = resource_selection_view::ColumnCount,
-        ResourceValidator resourceValidator = {},
-        AlertTextProvider alertTextProvider = {});
+        ResourceValidator resourceValidator = {});
     virtual ~ResourceSelectionWidget() override;
+
+    void setAlertTextProvider(AlertTextProvider provider);
 
     /**
      * @return Dialog selection mode, default value is <tt>MultiSelection</tt>.
