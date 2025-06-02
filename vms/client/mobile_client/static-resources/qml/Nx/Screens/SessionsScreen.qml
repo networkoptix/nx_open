@@ -495,7 +495,7 @@ Page
     {
         id: customConnectionButton
 
-        visible: localSitesVisible && !searching
+        visible: localSitesVisible && !searching && !organizationsModel.topLevelLoading
 
         anchors.bottom: parent.bottom
         anchors.right: parent.right
