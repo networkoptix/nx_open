@@ -257,6 +257,11 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
         // No need to lock mutex, since data is removed in this thread only.
         // Copying shared_ptr here because socket can be removed in eventTriggered call.
         auto handlingData = socket->impl()->monitoredEvents[handlerToInvokeType].aioHelperData;
+        if (!NX_ASSERT(handlingData, "Socket %1 has no read or write handler for event type %2",
+            socket, toString(sockEventType)))
+        {
+            continue;
+        }
 
         ++handlingData->beingProcessed;
         auto beingProcessedScopedGuard =
