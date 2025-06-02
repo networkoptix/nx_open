@@ -74,6 +74,13 @@ function openOrganizationScreen(model, rootIndex)
         })
 }
 
+function openSitePlaceholderScreen(systemName)
+{
+    stackView.pushScreen(
+        Qt.resolvedUrl("../Screens/SitePlaceholderScreen.qml"),
+        { "title": systemName })
+}
+
 function openChannelPartnerScreen(profileWatcher)
 {
     stackView.pushScreen(

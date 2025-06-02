@@ -449,6 +449,7 @@ Page
 
         const systemId = accessor.getData(current, "systemId")
         const isCloudSystem = accessor.getData(current, "isCloudSystem")
+
         if (!isCloudSystem)
         {
             const localId = accessor.getData(current, "localId")
@@ -456,7 +457,13 @@ Page
         }
         else if (!siteConnectionSheet.hostsModel.isEmpty)
         {
-            windowContext.sessionManager.startCloudSession(systemId, systemName)
+            const isAccessible = !accessor.getData(current, "isSaasSuspended")
+                && !accessor.getData(current, "isSaasShutDown")
+
+            if (isAccessible)
+                windowContext.sessionManager.startCloudSession(systemId, systemName)
+            else
+                Workflow.openSitePlaceholderScreen(systemName)
         }
     }
 }
