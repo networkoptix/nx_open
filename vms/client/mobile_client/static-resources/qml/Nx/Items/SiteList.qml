@@ -92,8 +92,24 @@ ListView
             ? sectionTextParts[1]
             : sectionTextParts[0]
 
+        readonly property string placeholderDescription: sectionTextParts.length > 2
+            ? sectionTextParts[2]
+            : ""
+
         width: parent.width
         spacing: 12
+
+        Placeholder
+        {
+            id: noResultsPlaceholder
+
+            visible: placeholderDescription
+            Layout.alignment: Qt.AlignHCenter
+
+            imageSource: "image://skin/64x64/Outline/notfound.svg?primary=light10"
+            text: qsTr("Nothing Found")
+            description: qsTr("Try changing the search parameters")
+        }
 
         Text
         {

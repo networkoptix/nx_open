@@ -1361,8 +1361,13 @@ QVariant OrganizationsFilterModel::data(const QModelIndex& index, int role) cons
 
     const auto sectionName = mapToSource(index).data(OrganizationsModel::SectionRole).toString();
 
+    bool addPlaceholder = false;
+
     if (index.row() == 0)
+    {
         otherResults = true;
+        addPlaceholder = true;
+    }
 
     for (int row = index.row() - 1; row >= 0; --row)
     {
@@ -1382,6 +1387,7 @@ QVariant OrganizationsFilterModel::data(const QModelIndex& index, int role) cons
         // We either found an item in the current root or we are at the first item.
         // Anyway if its the same section then it should be marked as "Other results".
         otherResults = inCurrentRoot || (row == 0 && sameSection);
+        addPlaceholder = row == 0 && sameSection;
         break;
     }
 
@@ -1389,13 +1395,17 @@ QVariant OrganizationsFilterModel::data(const QModelIndex& index, int role) cons
         ? (tr("Other results") + "\n") //< QML will split this on "\n".
         : QString{};
 
+    const QString suffix = addPlaceholder
+        ? QString("\n" + tr("Try changing the search parameters"))
+        : QString{};
+
     if (parents.isEmpty())
-        return prefix + base_type::data(index, role).toString();
+        return prefix + base_type::data(index, role).toString() + suffix;
 
     QStringList sectionNameParts;
     for (const auto& parent: parents)
         sectionNameParts << parent.data(Qt::DisplayRole).toString();
-    return prefix + sectionNameParts.join(" / ");
+    return prefix + sectionNameParts.join(" / ") + suffix;
 }
 
 } // nx::vms::client::core

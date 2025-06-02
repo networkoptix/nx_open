@@ -77,6 +77,7 @@ Control
             opacity: control.enabled && control.enabledMask ? 1.0 : 0.3
             width: iconLabel.implicitWidth
             height: iconLabel.implicitHeight
+            sourceSize: `${source}`.startsWith("data:") ? undefined : Qt.size(width, width)
         }
     }
 

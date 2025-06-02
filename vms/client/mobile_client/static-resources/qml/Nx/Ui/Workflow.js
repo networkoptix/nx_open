@@ -64,30 +64,11 @@ function openSessionsScreenWithWarning(systemName, errorText)
         showConnectionErrorMessage(systemName, errorText)
 }
 
-function openOrganizationScreen(model, rootIndex)
-{
-    stackView.pushScreen(
-        Qt.resolvedUrl("../Screens/OrganizationScreen.qml"),
-        {
-            "model": model,
-            "rootIndex": rootIndex
-        })
-}
-
 function openSitePlaceholderScreen(systemName)
 {
     stackView.pushScreen(
         Qt.resolvedUrl("../Screens/SitePlaceholderScreen.qml"),
         { "title": systemName })
-}
-
-function openChannelPartnerScreen(profileWatcher)
-{
-    stackView.pushScreen(
-        Qt.resolvedUrl("../Screens/Cloud/ChannelPartner.qml"),
-        {
-            "profileWatcher": profileWatcher
-        })
 }
 
 function openConnectToServerScreen(host, user, password, operationId)
