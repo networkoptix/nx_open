@@ -209,7 +209,7 @@ void LayoutBackgroundSettingsWidget::initCache(SystemContext* systemContext, boo
         this,
         [this](const QString& filename, ServerFileCache::OperationResult status)
         {
-            at_imageLoaded(filename, status == ServerFileCache::OperationResult::ok);
+            onImageDownloaded(filename, status == ServerFileCache::OperationResult::ok);
         });
 
     connect(
@@ -218,7 +218,7 @@ void LayoutBackgroundSettingsWidget::initCache(SystemContext* systemContext, boo
         this,
         [this](const QString& filename, ServerFileCache::OperationResult status)
         {
-            at_imageStored(filename, status == ServerFileCache::OperationResult::ok);
+            onImageUploaded(filename, status == ServerFileCache::OperationResult::ok);
         });
 }
 
@@ -281,7 +281,7 @@ void LayoutBackgroundSettingsWidget::loadState(const LayoutSettingsDialogState& 
     }
 }
 
-void LayoutBackgroundSettingsWidget::at_imageLoaded(const QString& filename, bool ok)
+void LayoutBackgroundSettingsWidget::onImageDownloaded(const QString& filename, bool ok)
 {
     const auto& state = m_store->state();
 
@@ -300,7 +300,7 @@ void LayoutBackgroundSettingsWidget::at_imageLoaded(const QString& filename, boo
     }
 }
 
-void LayoutBackgroundSettingsWidget::at_imageStored(const QString& filename, bool ok)
+void LayoutBackgroundSettingsWidget::onImageUploaded(const QString& filename, bool ok)
 {
     if (!ok)
     {

@@ -30,11 +30,6 @@ struct LayoutSettingsDialog::Private
     QPointer<LayoutBackgroundSettingsWidget> backgroundTab;
     std::unique_ptr<LayoutLogicalIdsWatcher> logicalIdsWatcher;
 
-    void resetChanges()
-    {
-        store->loadLayout(layout);
-    }
-
     void applyChanges()
     {
         const auto& state = store->state();
@@ -88,7 +83,7 @@ LayoutSettingsDialog::~LayoutSettingsDialog()
 {
 }
 
-bool LayoutSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
+void LayoutSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
 {
     d->logicalIdsWatcher.reset();
     d->layout = layout;
@@ -100,10 +95,9 @@ bool LayoutSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
             layout,
             this);
         d->backgroundTab->initCache(SystemContext::fromResource(layout), layout->isFile());
-    }
 
-    d->resetChanges();
-    return true;
+        d->store->loadLayout(layout);
+    }
 }
 
 void LayoutSettingsDialog::accept()

@@ -26,7 +26,7 @@ public:
     explicit LayoutSettingsDialog(QWidget* parent = nullptr);
     virtual ~LayoutSettingsDialog() override;
 
-    bool setLayout(const QnLayoutResourcePtr& layout);
+    void setLayout(const QnLayoutResourcePtr& layout);
 
     virtual void accept() override;
 

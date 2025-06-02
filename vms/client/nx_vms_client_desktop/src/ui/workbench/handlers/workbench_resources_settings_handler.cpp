@@ -331,12 +331,15 @@ void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
 
     const bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
 
-    connect(
-        dialog,
-        &LayoutSettingsDialog::accepted,
-        this,
-        [this, backgroundWasEmpty, layout]
+    connect(dialog, &LayoutSettingsDialog::finished, this,
+        [this, backgroundWasEmpty, layout, dialog](int result)
         {
+            // Delete dialog early to avoid excess file cache signal processing.
+            delete dialog;
+
+            if (result != QDialog::Accepted)
+                return;
+
             // Move layout items to grid center to best fit the background.
             if (backgroundWasEmpty && !layout->backgroundImageFilename().isEmpty())
             {

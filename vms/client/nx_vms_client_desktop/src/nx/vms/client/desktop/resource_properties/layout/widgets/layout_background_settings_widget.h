@@ -39,8 +39,8 @@ private:
     void loadState(const LayoutSettingsDialogState& state);
 
 private:
-    void at_imageLoaded(const QString& filename, bool ok);
-    void at_imageStored(const QString& filename, bool ok);
+    void onImageUploaded(const QString& filename, bool ok);
+    void onImageDownloaded(const QString& filename, bool ok);
 
     void setPreview(const QImage& image);
 
