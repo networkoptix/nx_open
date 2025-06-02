@@ -214,6 +214,18 @@ Window
                         bottomPadding: 16
 
                         model: eventModel.analyticsFilterModel
+
+                        onModelChanged:
+                        {
+                            if (!model)
+                                return
+
+                            setSelectedObjectTypeIds(
+                                eventModel.analyticsSetup.objectTypes)
+
+                            setSelectedAttributeFilters(
+                                eventModel.analyticsSetup.attributeFilters)
+                        }
                     }
                 }
             }
