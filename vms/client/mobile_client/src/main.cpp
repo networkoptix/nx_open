@@ -53,6 +53,7 @@ extern "C" {
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <ui/window_utils.h>
+#include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 #include <utils/intent_listener_android.h>
 
 #include "gl_context_synchronizer.h"
@@ -392,6 +393,13 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     }
 
     int result = runApplication(&application);
+
+    // Stop all long runnables before destroying application context.
+    applicationContext->stopAll();
+
+    // Wait while deleteLater objects will be freed
+    WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(QThread::currentThread(), 3);
+    waitingForObjectsToBeFreed.join();
 
     return result;
 }
