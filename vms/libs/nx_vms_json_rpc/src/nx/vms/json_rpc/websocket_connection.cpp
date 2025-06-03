@@ -55,57 +55,10 @@ bool isResponse(const QJsonValue& value)
 
 } // namespace
 
-std::shared_ptr<WebSocketConnection> WebSocketConnection::create(
+WebSocketConnection::WebSocketConnection(
     std::unique_ptr<nx::network::websocket::WebSocket> socket,
     OnDone onDone,
     RequestHandler requestHandler)
-{
-    std::shared_ptr<WebSocketConnection> sharedConnection{
-        new WebSocketConnection{std::move(socket), std::move(onDone)}};
-    sharedConnection->m_self = sharedConnection;
-    std::weak_ptr<WebSocketConnection> weakConnection{sharedConnection};
-    auto connectionPointer{sharedConnection.get()};
-    if (requestHandler)
-    {
-        sharedConnection->m_incomingProcessor = std::make_unique<IncomingProcessor>(
-            [weakConnection, connectionPointer, requestHandler = std::move(requestHandler)](
-                auto request, auto responseHandler)
-            {
-                requestHandler(std::move(request),
-                    [weakConnection, handler = std::move(responseHandler)](auto response) mutable
-                    {
-                        if (auto lock = weakConnection.lock())
-                        {
-                            lock->dispatch(
-                                [response = std::move(response), handler = std::move(handler)]() mutable
-                                {
-                                    handler(std::move(response));
-                                });
-                        }
-                        else
-                        {
-                            handler(std::move(response));
-                        }
-                    },
-                    connectionPointer);
-            });
-    }
-    else
-    {
-        sharedConnection->m_incomingProcessor = std::make_unique<IncomingProcessor>();
-    }
-    sharedConnection->m_outgoingProcessor = std::make_unique<OutgoingProcessor>(
-        [weakConnection](auto value)
-        {
-            if (auto lock = weakConnection.lock())
-                lock->send(std::move(value));
-        });
-    sharedConnection->m_socket->start();
-    return sharedConnection;
-}
-
-WebSocketConnection::WebSocketConnection(
-    std::unique_ptr<nx::network::websocket::WebSocket> socket, OnDone onDone)
     :
     m_onDone(std::move(onDone)),
     m_socket(std::move(socket))
@@ -113,10 +66,35 @@ WebSocketConnection::WebSocketConnection(
     base_type::bindToAioThread(m_socket->getAioThread());
     if (auto socket = m_socket->socket())
         m_address = socket->getForeignAddress();
+    if (requestHandler)
+    {
+        m_incomingProcessor = std::make_unique<IncomingProcessor>(
+            [this, requestHandler = std::move(requestHandler)](auto request, auto responseHandler)
+            {
+                requestHandler(
+                    std::move(request),
+                    [this, handler = std::move(responseHandler)](auto response) mutable
+                    {
+                        dispatch(
+                            [response = std::move(response), handler = std::move(handler)]() mutable
+                            {
+                                handler(std::move(response));
+                            });
+                    },
+                    this);
+            });
+    }
+    else
+    {
+        m_incomingProcessor = std::make_unique<IncomingProcessor>();
+    }
+    m_outgoingProcessor =
+        std::make_unique<OutgoingProcessor>([this](auto value) { send(std::move(value)); });
 }
 
 void WebSocketConnection::start()
 {
+    m_socket->start();
     readNextMessage();
 }
 
@@ -146,16 +124,13 @@ void WebSocketConnection::send(
     nx::vms::api::JsonRpcRequest request, ResponseHandler handler, QByteArray serializedRequest)
 {
     dispatch(
-        [self = m_self,
+        [this,
             request = std::move(request),
             handler = std::move(handler),
             serializedRequest = std::move(serializedRequest)]() mutable
         {
-            if (auto lock = self.lock())
-            {
-                lock->m_outgoingProcessor->processRequest(
-                    std::move(request), std::move(handler), std::move(serializedRequest));
-            }
+            m_outgoingProcessor->processRequest(
+                std::move(request), std::move(handler), std::move(serializedRequest));
         });
 }
 
@@ -163,15 +138,9 @@ void WebSocketConnection::send(
     std::vector<nx::vms::api::JsonRpcRequest> jsonRpcRequests, BatchResponseHandler handler)
 {
     dispatch(
-        [self = m_self,
-            jsonRpcRequests = std::move(jsonRpcRequests),
-            handler = std::move(handler)]() mutable
+        [this, jsonRpcRequests = std::move(jsonRpcRequests), handler = std::move(handler)]() mutable
         {
-            if (auto lock = self.lock())
-            {
-                lock->m_outgoingProcessor->processBatchRequest(
-                    std::move(jsonRpcRequests), std::move(handler));
-            }
+            m_outgoingProcessor->processBatchRequest(std::move(jsonRpcRequests), std::move(handler));
         });
 }
 
@@ -179,26 +148,22 @@ void WebSocketConnection::readNextMessage()
 {
     auto buffer = std::make_unique<nx::Buffer>();
     auto bufferPtr = buffer.get();
-    m_socket->readSomeAsync(bufferPtr,
-        [self = m_self, buffer = std::move(buffer)](auto errorCode, auto /*bytesTransferred*/)
+    m_socket->readSomeAsync(
+        bufferPtr,
+        [this, buffer = std::move(buffer)](auto errorCode, auto /*bytesTransferred*/)
         {
             if (errorCode != SystemError::noError)
             {
-                if (auto lock = self.lock())
-                {
-                    NX_DEBUG(
-                        lock.get(), "Failed to read next message with error code %1", errorCode);
-                    lock->m_outgoingProcessor->clear(errorCode);
-                    lock->m_onDone(lock.get());
-                }
+                NX_DEBUG(this, "Failed to read next message with error code %1", errorCode);
+                m_outgoingProcessor->clear(errorCode);
+                m_onDone(this);
                 return;
             }
 
-            if (auto lock = self.lock())
-            {
-                lock->readHandler(*buffer.get());
-                lock->readNextMessage();
-            }
+            auto watcher = interruptionWatcher();
+            readHandler(*buffer.get());
+            if (!watcher.interrupted())
+                readNextMessage();
         });
 }
 
@@ -234,16 +199,13 @@ void WebSocketConnection::processRequest(const QJsonValue& data)
 void WebSocketConnection::processQueuedRequest()
 {
     m_incomingProcessor->processRequest(m_queuedRequests.front(),
-        [self = m_self](QJsonValue response)
+        [this](QJsonValue response)
         {
-            if (auto lock = self.lock())
-            {
-                if (!response.isNull())
-                    lock->send(QJson::serialized(response));
-                lock->m_queuedRequests.pop();
-                if (!lock->m_queuedRequests.empty())
-                    lock->processQueuedRequest();
-            }
+            if (!response.isNull())
+                send(QJson::serialized(response));
+            m_queuedRequests.pop();
+            if (!m_queuedRequests.empty())
+                processQueuedRequest();
         });
 }
 
@@ -253,16 +215,13 @@ void WebSocketConnection::send(QByteArray data)
     auto bufferPtr = buffer.get();
     logMessage("send to", m_address, *bufferPtr);
     m_socket->sendAsync(bufferPtr,
-        [self = m_self, buffer = std::move(buffer)](auto errorCode, auto /*bytesTransferred*/)
+        [buffer = std::move(buffer), this](auto errorCode, auto /*bytesTransferred*/)
         {
-            if (errorCode == SystemError::noError)
-                return;
-
-            if (auto lock = self.lock())
+            if (errorCode != SystemError::noError)
             {
-                NX_DEBUG(lock.get(), "Failed to send message with error code %1", errorCode);
-                lock->m_outgoingProcessor->clear(errorCode);
-                lock->m_onDone(lock.get());
+                NX_DEBUG(this, "Failed to send message with error code %1", errorCode);
+                m_outgoingProcessor->clear(errorCode);
+                m_onDone(this);
             }
         });
 }
@@ -273,27 +232,21 @@ void WebSocketConnection::addGuard(const QString& id, nx::utils::Guard guard)
         return;
 
     dispatch(
-        [self = m_self, id, g = std::move(guard)]() mutable
+        [this, id, g = std::move(guard)]() mutable
         {
-            if (auto lock = self.lock())
-            {
-                auto& guard = lock->m_guards[id];
-                NX_VERBOSE(lock.get(), "%1 guard for %2", guard ? "Adding" : "Replacing", id);
-                guard = std::move(g);
-            }
+            auto& guard = m_guards[id];
+            NX_VERBOSE(this, "%1 guard for %2", guard ? "Adding" : "Replacing", id);
+            guard = std::move(g);
         });
 }
 
 void WebSocketConnection::removeGuard(const QString& id)
 {
     dispatch(
-        [self = m_self, id]() mutable
+        [this, id]() mutable
         {
-            if (auto lock = self.lock())
-            {
-                NX_VERBOSE(lock.get(), "Removing guard for %1", id);
-                lock->m_guards.erase(id);
-            }
+            NX_VERBOSE(this, "Removing guard for %1", id);
+            m_guards.erase(id);
         });
 }
 

@@ -25,11 +25,10 @@ public:
         void(nx::vms::api::JsonRpcRequest, ResponseHandler, WebSocketConnection*)>;
     using OnDone = nx::utils::MoveOnlyFunc<void(WebSocketConnection*)>;
 
-    static std::shared_ptr<WebSocketConnection> create(
+    WebSocketConnection(
         std::unique_ptr<nx::network::websocket::WebSocket> socket,
         OnDone onDone,
         RequestHandler handler = nullptr);
-
     virtual ~WebSocketConnection() override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
@@ -48,7 +47,6 @@ public:
     void removeGuard(const QString& id);
 
 private:
-    WebSocketConnection(std::unique_ptr<nx::network::websocket::WebSocket> socket, OnDone onDone);
     virtual void stopWhileInAioThread() override;
     void readNextMessage();
     void readHandler(const nx::Buffer& buffer);
@@ -57,7 +55,6 @@ private:
     void send(QByteArray data);
 
 private:
-    std::weak_ptr<WebSocketConnection> m_self;
     OnDone m_onDone;
     nx::network::SocketAddress m_address;
     std::unique_ptr<IncomingProcessor> m_incomingProcessor;

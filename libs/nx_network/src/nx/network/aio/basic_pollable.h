@@ -198,6 +198,8 @@ protected:
      */
     virtual void stopWhileInAioThread();
 
+    nx::utils::InterruptionFlag::Watcher interruptionWatcher() { return {&m_interruptionFlag}; }
+
 private:
     mutable Pollable m_pollable;
     AIOService* m_aioService = nullptr;

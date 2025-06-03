@@ -51,7 +51,7 @@ void WebSocketConnections::executeAsync(
 WebSocketConnection* WebSocketConnections::addConnection(
     std::any connectionInfo, std::unique_ptr<nx::network::websocket::WebSocket> socket)
 {
-    auto connection = WebSocketConnection::create(std::move(socket),
+    auto connection = std::make_unique<WebSocketConnection>(std::move(socket),
         [this](auto connection) { removeConnection(connection); },
         [this, connectionInfo = std::move(connectionInfo)](auto request, auto handler, auto connection)
         {
@@ -76,7 +76,7 @@ WebSocketConnection* WebSocketConnections::addConnection(
                         &it->second,
                         executorCreator->create(std::move(request)),
                         std::move(handler),
-                        std::move(connectionInfo));
+                        connectionInfo);
                     return;
                 }
             }

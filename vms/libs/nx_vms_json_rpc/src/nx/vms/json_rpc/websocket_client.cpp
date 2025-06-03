@@ -94,7 +94,7 @@ void WebSocketClient::onUpgrade()
     WebSocketConnection::RequestHandler handler;
     if (m_handler)
         handler = [this](auto&&... args) { m_handler(std::forward<decltype(args)>(args)...); };
-    m_connection = WebSocketConnection::create(
+    m_connection = std::make_unique<WebSocketConnection>(
         std::make_unique<nx::network::websocket::WebSocket>(std::move(socket),
             nx::network::websocket::Role::client,
             nx::network::websocket::FrameType::text,
