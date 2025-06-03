@@ -29,7 +29,8 @@ Item
     property real aspectRatio: 1.0
 
     readonly property alias previewState: loader.previewState
-    readonly property bool cannotDecryptMedia: player?.cannotDecryptMediaError ?? false
+    readonly property bool cannotDecryptMedia:
+        player?.error === MediaPlayer.CannotDecryptMedia ?? false
 
     property bool audioEnabled: false
     property bool autoRepeat: true

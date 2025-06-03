@@ -115,11 +115,7 @@ class NX_MEDIA_API Player: public QObject
 
     Q_PROPERTY(bool audioOnlyMode READ isAudioOnlyMode NOTIFY audioOnlyModeChanged)
 
-    Q_PROPERTY(bool tooManyConnectionsError READ tooManyConnectionsError
-        NOTIFY tooManyConnectionsErrorChanged)
-
-    Q_PROPERTY(bool cannotDecryptMediaError READ cannotDecryptMediaError
-        NOTIFY cannotDecryptMediaErrorChanged)
+    Q_PROPERTY(Error error READ error NOTIFY errorChanged)
 
     /** Human-readable tag for logging and debugging purposes. */
     Q_PROPERTY(QString tag READ tag WRITE setTag NOTIFY tagChanged)
@@ -181,6 +177,14 @@ public:
         TranscodingNotSupportedForServersOlder30,
     };
     Q_ENUM(TranscodingSupportStatus)
+
+    enum class Error
+    {
+        NoError,
+        TooManyConnections,
+        CannotDecryptMedia,
+    };
+    Q_ENUM(Error)
 
 public:
     Player(QObject *parent = nullptr);
@@ -290,9 +294,7 @@ public:
      */
     bool removeMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer);
 
-    bool tooManyConnectionsError() const;
-
-    bool cannotDecryptMediaError() const;
+    Error error() const;
 
     QString tag() const;
     void setTag(const QString& value);
@@ -340,13 +342,12 @@ signals:
     void videoGeometryChanged();
     void currentResolutionChanged();
     void audioEnabledChanged();
-    void tooManyConnectionsErrorChanged();
     void tagChanged();
     void speedChanged();
     void autoJumpPolicyChanged();
-    void cannotDecryptMediaErrorChanged();
     void audioOnlyModeChanged();
     void allowSoftwareDecoderFallbackChanged();
+    void errorChanged();
 
 protected:
     virtual void setResourceInternal(const QnResourcePtr& resource);

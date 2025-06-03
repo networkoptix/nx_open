@@ -288,9 +288,9 @@ Item
                     : StatusOverlay.EmptyOverlay
             }
 
-            if (overlay.mediaPlayer && overlay.mediaPlayer.tooManyConnectionsError)
+            if (overlay.mediaPlayer?.error === MediaPlayer.TooManyConnections)
                 return StatusOverlay.TooManyOpenedConnectionsOverlay
-            if (overlay.mediaPlayer && overlay.mediaPlayer.cannotDecryptMediaError)
+            if (overlay.mediaPlayer?.error === MediaPlayer.CannotDecryptMedia)
                 return StatusOverlay.CannotDecryptMediaOverlay
 
             if (mediaPlayer && mediaPlayer.mediaStatus == MediaPlayer.MediaStatus.Loading)

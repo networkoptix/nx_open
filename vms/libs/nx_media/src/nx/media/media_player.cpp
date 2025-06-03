@@ -152,8 +152,7 @@ public:
     // Either media is on live or archive position. Holds QT property value.
     bool liveMode = true;
 
-    nx::media::StreamEvent lastMediaEvent =
-        nx::media::StreamEvent::noEvent;
+    Error error;
 
     // Video aspect ratio
     double aspectRatio = 1.0;
@@ -307,6 +306,8 @@ public:
 
     /** Push empty video frame to output. */
     void clearVideoOutput();
+
+    void setError(Error value);
 };
 
 Player::Private::Private(Player* parent):
@@ -328,8 +329,11 @@ void Player::Private::setState(State value)
     if (value == state)
         return;
 
+    NX_DEBUG(this, "State changed: %1", value);
     gotDataTimer.restart();
     state = value;
+    if (state == State::Playing)
+        setError(Error::NoError);
 
     emit q->playbackStateChanged();
 }
@@ -774,6 +778,14 @@ void Player::Private::clearVideoOutput()
     }
 }
 
+void Player::Private::setError(Error value)
+{
+    if (error == value)
+        return;
+
+    error = value;
+    emit q->errorChanged();
+}
 
 void Player::Private::applyVideoQuality()
 {
@@ -957,11 +969,10 @@ void Player::Private::handleMediaEventChanged()
         return;
 
     const auto mediaEvent = dataConsumer->mediaEvent().code;
-    if (mediaEvent == lastMediaEvent)
-        return;
-    lastMediaEvent = mediaEvent;
-    emit q->tooManyConnectionsErrorChanged();
-    emit q->cannotDecryptMediaErrorChanged();
+    if (mediaEvent == nx::media::StreamEvent::tooManyOpenedConnections)
+        setError(Error::TooManyConnections);
+    else if (mediaEvent == nx::media::StreamEvent::cannotDecryptMedia)
+        setError(Error::CannotDecryptMedia);
 }
 
 void Player::Private::log(const QString& message) const
@@ -1326,14 +1337,9 @@ void Player::setAudioEnabled(bool value)
     }
 }
 
-bool Player::tooManyConnectionsError() const
+Player::Error Player::error() const
 {
-    return d->lastMediaEvent == nx::media::StreamEvent::tooManyOpenedConnections;
-}
-
-bool Player::cannotDecryptMediaError() const
-{
-    return d->lastMediaEvent == nx::media::StreamEvent::cannotDecryptMedia;
+    return d->error;
 }
 
 QString Player::tag() const

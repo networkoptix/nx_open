@@ -33,8 +33,10 @@ NxObject
     readonly property bool noLicenses: resourceHelper.analogCameraWithoutLicense;
     readonly property bool hasDefaultCameraPassword: resourceHelper.hasDefaultCameraPassword
     readonly property bool hasOldFirmware: resourceHelper.hasOldCameraFirmware
-    readonly property bool tooManyConnections: mediaPlayer.tooManyConnectionsError
-    readonly property bool cannotDecryptMedia: mediaPlayer.cannotDecryptMediaError
+    readonly property bool tooManyConnections:
+        mediaPlayer.error === MediaPlayer.TooManyConnections
+    readonly property bool cannotDecryptMedia:
+        mediaPlayer.error === MediaPlayer.CannotDecryptMediaError
     readonly property bool noVideo: noVideoStreams || !resourceHelper.hasVideo
     readonly property bool ioModuleWarning:
          noVideo && resourceHelper.isIoModule && !resourceHelper.audioSupported

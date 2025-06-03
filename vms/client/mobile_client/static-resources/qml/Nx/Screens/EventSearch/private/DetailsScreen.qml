@@ -188,7 +188,7 @@ Page
             x: parent.width - width - orientationModeButton.width - goToCameraButton.width
             y: parent.height - height
 
-            enabled: preview.player && !preview.player.cannotDecryptMediaError
+            enabled: preview.player && !preview.cannotDecryptMedia
             resource: preview.resource
             positionMs: preview.startTimeMs
             durationMs: preview.durationMs
@@ -310,6 +310,8 @@ Page
 
             Text
             {
+                id: titleText
+
                 width: parent.width
 
                 elide: Text.ElideRight
@@ -325,8 +327,9 @@ Page
 
             Text
             {
-                width: parent.width
+                id: descriptionText
 
+                width: parent.width
                 color: ColorTheme.colors.light10
                 font.pixelSize: 14
                 font.weight: Font.Normal
@@ -355,7 +358,7 @@ Page
     {
         id: playbackPanel
 
-        visible: opacity > 0 && !preview.cannotDecryptMedia
+        visible: opacity > 0
         opacity:
         {
             if (!d.hasControls)
@@ -388,6 +391,8 @@ Page
 
             IconButton
             {
+                id: previousButton
+
                 width: 48
                 height: width
                 icon.source: lp("images/previous_event.svg")
@@ -401,9 +406,11 @@ Page
 
             IconButton
             {
+                id: playPauseButton
+
                 width: 48
                 height: width
-                icon.source: preview.playingPlayerState
+                icon.source: preview.playingPlayerState && !preview.cannotDecryptMedia
                     ? lp("images/pause.svg")
                     : lp("images/play_event.svg")
 
@@ -411,6 +418,7 @@ Page
                 icon.height: icon.width
                 padding: 0
 
+                enabled: !preview.cannotDecryptMedia
                 onClicked:
                 {
                     if (preview.playingPlayerState)
@@ -427,6 +435,8 @@ Page
 
             IconButton
             {
+                id: nextButton
+
                 width: 48
                 height: width
                 icon.source: lp("images/next_event.svg")
