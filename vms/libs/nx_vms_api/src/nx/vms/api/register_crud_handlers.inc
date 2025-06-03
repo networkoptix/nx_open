@@ -1220,6 +1220,25 @@ static void registerServerRestHandlers(
     reg("rest/v{1-}/servers/:id/dbBackups", GlobalPermission::administrator,
         std::make_unique<ServerBackupDbHandler>(serverModule, serverConnector));
 
+    /**%apidoc:binary GET /rest/v{4-}/servers/{id}/dbBackups/{filename}/download
+     * Downloads a Site database Backup from the Server specified by {id}.
+     * %jsonrpc[unused]
+     * %caption Download Site DB Backup
+     * %ingroup Server Data
+     * %param:string id Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers`,
+     *     or be `this` to refer to the current Server.
+     *     %example this
+     * %param:string filename Filename of the backup file.
+     * %param[ref] _language,_strict,_ticket
+     * %param[ref] _local
+     * %permissions Administrator with a fresh session.
+     * %// NOTE: Administrator or Power User is checked by the handler based on the
+     *     adminApiForPowerUsers setting.
+     */
+    reg("rest/v{4-}/servers/:id/dbBackups/:filename/download",
+        GlobalPermission::requireFreshSession,
+        std::make_unique<ServerBackupDbDownloadHandler>(serverModule));
+
     /**%apidoc POST /rest/v{1-}/servers/{id}/detach
      * Detaches the Server specified by {id} from the Site. This means that:
      * - The Server local Site id will be reset.

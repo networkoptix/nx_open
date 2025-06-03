@@ -28,6 +28,7 @@ class NX_VMS_COMMON_API QnTCPConnectionProcessor:
 
 public:
     static const int KEEP_ALIVE_TIMEOUT = 5  * 1000;
+    static constexpr qint64 kLargeTcpRequestSize = 4 * 1024 * 1024 * 1024ll;
 
     /**
      * Called from templates. In derived classes, redefine to return true if the last path

@@ -29,8 +29,6 @@
 
 namespace {
 
-const qint64 kLargeTcpRequestSize = 4 * 1024 * 1024 * 1024ll;
-
 void copyAndReplaceHeader(
     const nx::network::http::HttpHeaders* srcHeaders,
     nx::network::http::HttpHeaders* dstHeaders,
