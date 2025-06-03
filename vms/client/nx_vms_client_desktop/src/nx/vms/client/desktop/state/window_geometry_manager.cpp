@@ -213,7 +213,6 @@ void WindowGeometryManager::createInheritedState(
 
 WindowGeometryState WindowGeometryManager::calculateDefaultGeometry() const
 {
-
     WindowGeometryState window;
 
     // Calculate default window size.
@@ -234,7 +233,8 @@ WindowGeometryState WindowGeometryManager::calculateDefaultGeometry() const
         window.geometry.moveCenter(screenRect.center());
 
     // Show normalized window on Mac, show fullscreen window on Windows/Linux.
-    window.isFullscreen = window.isMaximized = !nx::build_info::isMacOsX();
+    window.isMaximized = false;
+    window.isFullscreen = !nx::build_info::isMacOsX();
 
     return window;
 }

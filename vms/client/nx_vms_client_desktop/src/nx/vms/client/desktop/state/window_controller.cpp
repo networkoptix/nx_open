@@ -38,14 +38,14 @@ void WindowController::setWindowState(Qt::WindowStates state)
 {
     m_window->show();
     qApp->processEvents();
-    m_window->setWindowState(state);
-    if (nx::build_info::isMacOsX())
+
+    if (m_window->windowState().testFlag(Qt::WindowFullScreen)
+        != state.testFlag(Qt::WindowFullScreen))
     {
-        if (state == Qt::WindowNoState)
-            m_window->action(menu::FullscreenAction)->setChecked(false);
-        else if (state.testFlag(Qt::WindowFullScreen))
-            m_window->action(menu::FullscreenAction)->setChecked(true);
+        m_window->action(menu::FullscreenAction)->setChecked(state.testFlag(Qt::WindowFullScreen));
     }
+
+    m_window->setWindowState(state);
 }
 
 int WindowController::nextFreeScreen() const
