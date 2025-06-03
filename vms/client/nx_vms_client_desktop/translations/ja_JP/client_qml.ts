@@ -2277,7 +2277,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Will stay inherited from</source>
-      <translation>引き続き以下から継承します</translation>
+      <translation>引き続き以下から継承します:</translation>
     </message>
   </context>
   <context>

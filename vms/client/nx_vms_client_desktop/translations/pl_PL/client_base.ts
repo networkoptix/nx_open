@@ -7458,21 +7458,21 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Kamera została zastąpiona!</translation>
     </message>
     <message>
-      <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
-      <translation>Sprawdzanie, czy dane ze starej kamery &apos; można przenieść do nowej kamery.</translation>
+      <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
+      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
     </message>
     <message>
-      <source>Some data and settings may not be compatible with the new camera</source>
-      <translation>Niektóre dane i ustawienia mogą nie być kompatybilne z nową kamerą</translation>
-    </message>
-    <message>
-      <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
-      <translation>Operacja wymiany kamery nie jest możliwa, ponieważ serwer jest niedostępny.</translation>
-    </message>
-    <message>
-      <source>%1 will be removed from the Site and replaced by the selected camera</source>
+      <source>%1 will be removed from the site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation>%1 zostanie usunięta z witryny i zastąpiona wybraną kamerą</translation>
+      <translation type="unfinished">%1 will be removed from the site and replaced by the selected camera</translation>
+    </message>
+    <message>
+      <source>Checking if the data from the camera can be transferred to the new one.</source>
+      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+    </message>
+    <message>
+      <source>Some data and settings may not be supported for the new camera</source>
+      <translation type="unfinished">Some data and settings may not be supported for the new camera</translation>
     </message>
   </context>
   <context>

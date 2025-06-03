@@ -7225,21 +7225,21 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Kamera bytt!</translation>
     </message>
     <message>
-      <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
-      <translation>Kontrollera om den gamla kameran&apos;data kan överföras till den nya kameran.</translation>
+      <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
+      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
     </message>
     <message>
-      <source>Some data and settings may not be compatible with the new camera</source>
-      <translation>Vissa data och inställningar stöds inte för ny kamera</translation>
-    </message>
-    <message>
-      <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
-      <translation>Det går inte att byta kamera eftersom servern inte är tillgänglig.</translation>
-    </message>
-    <message>
-      <source>%1 will be removed from the Site and replaced by the selected camera</source>
+      <source>%1 will be removed from the site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation>%1 kommer att tas bort från sajten och ersättas av den valda kameran</translation>
+      <translation type="unfinished">%1 will be removed from the site and replaced by the selected camera</translation>
+    </message>
+    <message>
+      <source>Checking if the data from the camera can be transferred to the new one.</source>
+      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+    </message>
+    <message>
+      <source>Some data and settings may not be supported for the new camera</source>
+      <translation type="unfinished">Some data and settings may not be supported for the new camera</translation>
     </message>
   </context>
   <context>
