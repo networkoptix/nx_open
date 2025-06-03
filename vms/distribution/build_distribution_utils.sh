@@ -780,10 +780,18 @@ distrib_createArchive() # archive dir command...
 # [in] STAGE
 # [in] WORK_DIR
 # [in] CURRENT_BUILD_DIR
-# [in] DISTRIBUTION_ZIP
+# [in] DISTRIBUTION_NAME
+# [in] DISTRIBUTION_ARCHIVE
 # [in] DISTRIBUTION_UPDATE_ZIP
-distrib_createZipDistributionPackage()
+distrib_createDistributionPackages()
 {
+    local -a distrib_archive_type="${1:-zip}"
+
+    if [[ "${distrib_archive_type}" != "zip" && "${distrib_archive_type}" != "tar" ]]; then
+        echo "ERROR: Unsupported archive type: ${distrib_archive_type}" >&2
+        exit 1
+    fi
+
     echo ""
     echo "Creating distribution archive"
 
@@ -799,12 +807,18 @@ distrib_createZipDistributionPackage()
     install -m 644 "${CURRENT_BUILD_DIR}/package.json" "${zip_dir}/"
     install -m 755 "${CURRENT_BUILD_DIR}/install.sh" "${zip_dir}/"
 
-    # Set the compression level to 0 because there is no reason to try to compress .tar.gz file.
-    distrib_createArchive "${DISTRIBUTION_OUTPUT_DIR}/${DISTRIBUTION_ZIP}" "${zip_dir}" zip -0
 
-    echo "  Creating update package"
-    cp "${DISTRIBUTION_OUTPUT_DIR}/${DISTRIBUTION_ZIP}" \
-        "${DISTRIBUTION_OUTPUT_DIR}/${DISTRIBUTION_UPDATE_ZIP}"
+    if [[ "${distrib_archive_type}" == "tar" ]]; then
+        distrib_createArchive \
+            "${DISTRIBUTION_OUTPUT_DIR}/${DISTRIBUTION_ARCHIVE}" "${zip_dir}" tar cf
+        distrib_createArchive \
+            "${DISTRIBUTION_OUTPUT_DIR}/${DISTRIBUTION_UPDATE_ZIP}" "${zip_dir}" zip -0
+    else #< "${distrib_archive_type}" == "zip"
+        distrib_createArchive \
+            "${DISTRIBUTION_OUTPUT_DIR}/${DISTRIBUTION_ARCHIVE}" "${zip_dir}" zip -0
+        cp "${DISTRIBUTION_OUTPUT_DIR}/${DISTRIBUTION_ARCHIVE}" \
+            "${DISTRIBUTION_OUTPUT_DIR}/${DISTRIBUTION_UPDATE_ZIP}"
+    fi
 }
 
 # TODO: Check, if we really need this function - may be it would be better to use "install" instead
