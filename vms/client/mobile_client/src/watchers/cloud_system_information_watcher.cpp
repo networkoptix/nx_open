@@ -120,9 +120,7 @@ QString QnCloudSystemInformationWatcher::ownerDescription() const
 
     const bool yourSystem = qnCloudStatusWatcher->cloudLogin() == d->ownerEmail;
 
-    return yourSystem
-        ? tr("Your Site")
-        : tr("Owner: %1", "%1 is a user name").arg(d->ownerFullName);
+    return yourSystem ? tr("Your Site") : d->ownerFullName;
 }
 
 QnCloudSystemInformationWatcherPrivate::QnCloudSystemInformationWatcherPrivate(
