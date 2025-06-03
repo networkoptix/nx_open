@@ -63,7 +63,7 @@ void BasicPollable::pleaseStopSync()
     {
         m_pollable.getAioThread()->cancelPostedCalls(&m_pollable);
 
-        nx::utils::InterruptionFlag::Watcher watcher(&m_interruptionFlag);
+        auto watcher = interruptionWatcher();
         stopWhileInAioThread();
         if (watcher.interrupted())
             return;

@@ -26,11 +26,13 @@ public:
         void(const Request&, ResponseHandler, WebSocketConnection*)>;
     using OnDone = nx::MoveOnlyFunc<void(SystemError::ErrorCode, WebSocketConnection*)>;
 
-    WebSocketConnection(std::unique_ptr<nx::network::websocket::WebSocket> socket, OnDone onDone);
+    WebSocketConnection(
+        std::unique_ptr<nx::network::websocket::WebSocket> webSocket, OnDone onDone);
     virtual ~WebSocketConnection() override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
-    void start(std::weak_ptr<WebSocketConnection> self, RequestHandler requestHandler = {});
+    void setRequestHandler(RequestHandler requestHandler);
+    void start();
     void send(
         Request request,
         ResponseHandler handler = {},
@@ -53,7 +55,6 @@ private:
     void send(std::string data);
 
 private:
-    std::weak_ptr<WebSocketConnection> m_self;
     OnDone m_onDone;
     nx::network::SocketAddress m_address;
     std::unique_ptr<IncomingProcessor> m_incomingProcessor;

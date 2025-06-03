@@ -114,7 +114,7 @@ void WebSocketClient::onUpgrade()
 
     socket->setNonBlockingMode(true);
     socket->bindToAioThread(getAioThread());
-    m_connection = std::make_shared<WebSocketConnection>(
+    m_connection = std::make_unique<WebSocketConnection>(
         std::make_unique<nx::network::websocket::WebSocket>(std::move(socket),
             nx::network::websocket::Role::client,
             nx::network::websocket::FrameType::text,
@@ -133,13 +133,10 @@ void WebSocketClient::onUpgrade()
         });
     if (m_handler)
     {
-        m_connection->start(m_connection,
+        m_connection->setRequestHandler(
             [this](auto&&... args) { m_handler(std::forward<decltype(args)>(args)...); });
     }
-    else
-    {
-        m_connection->start(m_connection);
-    }
+    m_connection->start();
 }
 
 void WebSocketClient::sendAsync(Request request, ResponseHandler handler)
