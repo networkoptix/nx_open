@@ -22,8 +22,6 @@
 #include "nx_network_ini.h"
 #include "socket_factory.h"
 
-static constexpr std::chrono::seconds kDebugIniReloadInterval{10};
-
 template<>
 nx::network::SocketGlobalsHolder* Singleton<nx::network::SocketGlobalsHolder>::s_instance =
     nullptr;
@@ -240,8 +238,6 @@ void SocketGlobals::init(
         s_initState = InitState::done;
 
         lock.unlock();
-        s_instance->setDebugIniReloadTimer();
-
         applyArguments(arguments);
     }
 }
@@ -405,17 +401,6 @@ void SocketGlobals::reloadIni()
             regexpString,
             QRegularExpression(wildcard, QRegularExpression::CaseInsensitiveOption));
     }
-}
-
-void SocketGlobals::setDebugIniReloadTimer()
-{
-    m_impl->debugIniReloadTimer->start(
-        kDebugIniReloadInterval,
-        [this]()
-        {
-            reloadIni();
-            setDebugIniReloadTimer();
-        });
 }
 
 void SocketGlobals::initializeNetworking(const ArgumentParser& arguments)

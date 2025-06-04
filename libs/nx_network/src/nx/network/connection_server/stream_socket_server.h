@@ -278,10 +278,13 @@ public:
     {
         NX_CRITICAL(m_serverSocket);
 
-        return
+        bool result =
             m_serverSocket->setRecvTimeout(0) &&
             m_serverSocket->setReuseAddrFlag(true) &&
             m_serverSocket->bind(socketAddress);
+        if (result)
+            m_localAddress = m_serverSocket->getLocalAddress();
+        return result;
     }
 
     bool listen(int backlogSize = AbstractStreamServerSocket::kDefaultBacklogSize)
@@ -300,8 +303,7 @@ public:
 
     SocketAddress address() const
     {
-        NX_CRITICAL(m_serverSocket);
-        return m_serverSocket->getLocalAddress();
+        return m_localAddress;
     }
 
     void start()
@@ -339,6 +341,7 @@ private:
     // CLOUD-1925.
 
     AbstractStreamServerSocket* m_serverSocket = nullptr;
+    SocketAddress m_localAddress;
     std::unique_ptr<AbstractStreamSocketAcceptor> m_acceptor;
     std::optional<std::chrono::milliseconds> m_connectionInactivityTimeout;
     std::optional<KeepAliveOptions> m_keepAliveOptions;

@@ -14,11 +14,24 @@ using namespace std::chrono;
 
 namespace {
 
+static constexpr const char* kWeekDays[] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+static constexpr const char* kMonths[] = {
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
 QDateTime parseRfc1123Date(const std::string_view& str)
 {
-    static constexpr char kRfc1123Template[] = "ddd, dd MMM yyyy hh:mm:ss";
-    return QLocale(QLocale::C).toDateTime(
-        QByteArray::fromRawData(str.data(), str.size()), kRfc1123Template);
+    static constexpr const char* kTemplate = "%3s, %d %3s %d %d:%d:%d";
+    char weekday[4], monthStr[4];
+    int day, year, hour, min, sec;
+    if (sscanf(str.data(), kTemplate, weekday, &day, monthStr, &year, &hour, &min, &sec) != 7)
+        return QDateTime();
+
+    for (int month = 0; month < 12; ++month)
+    {
+        if (strncmp(monthStr, kMonths[month], 3) == 0)
+            return QDateTime(QDate(year, month + 1, day), QTime(hour, min, sec), QTimeZone::UTC);
+    }
+    return QDateTime();
 }
 
 // Sunday, 06-Nov-94 08:49:37 GMT (RFC 850, obsoleted by RFC 1036)
@@ -104,9 +117,6 @@ QString timestampToDebugString(milliseconds timestamp, const QString& format)
 std::string formatDateTime(const QDateTime& value)
 {
     // Starts with Monday to correspond to QDate::dayOfWeek() return value: 1 for Monday, 7 for Sunday
-    static constexpr const char* kWeekDays[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
-    static constexpr const char* kMonths[] = {
-         "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
     if (value.isNull() || !value.isValid())
         return std::string();

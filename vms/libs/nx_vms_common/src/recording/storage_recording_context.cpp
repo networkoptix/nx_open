@@ -89,6 +89,7 @@ void StorageRecordingContext::initializeRecordingContext(int64_t startTimeUs)
     }
     m_streamIndexToLastDts.clear();
     m_recordingContext.formatCtx->start_time = startTimeUs;
+    m_recordingContext.formatCtx->flags |= AVFMT_FLAG_BITEXACT; //< Don't randomize track ID in the .mkv file.
 }
 
 int StorageRecordingContext::streamCount() const

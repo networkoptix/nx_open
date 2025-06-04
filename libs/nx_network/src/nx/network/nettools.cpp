@@ -11,12 +11,12 @@
 #include <sstream>
 
 #include <QtCore/QCoreApplication>
-#include <QtCore/QElapsedTimer>
 #include <QtCore/QStringList>
 #include <QtCore/QThreadPool>
 #include <QtCore/QTime>
 #include <QtNetwork/QHostInfo>
 
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
@@ -63,7 +63,7 @@ static QList<QHostAddress> allowedAddresses;
 
 struct nettoolsFunctionsTag {};
 static const nx::log::Tag kLogTag(typeid(nettoolsFunctionsTag));
-static const std::chrono::milliseconds kCacheTimeout(5000);
+static const std::chrono::seconds kUpdateNetworkInterfacesTimeout(10);
 
 } // namespace
 
@@ -103,30 +103,31 @@ QString QnInterfaceAndAddr::toString() const
     return NX_FMT("%1: %2 %3", name, address, netMask);
 }
 
+static QList<QNetworkInterface> allInterfaces()
+{
+    struct LocalCache
+    {
+        QList<QNetworkInterface> value;
+        nx::utils::ElapsedTimer timer;
+    };
+    static nx::Lockable<LocalCache> sCache;
+
+    auto cache = sCache.lock();
+    if (cache->value.isEmpty() || cache->timer.hasExpired(kUpdateNetworkInterfacesTimeout))
+    {
+        cache->value = QNetworkInterface::allInterfaces();
+        cache->timer.restart();
+    }
+    return cache->value;
+}
+
 QnInterfaceAndAddrList getAllIPv4Interfaces(
     bool ignoreUsb0NetworkInterfaceIfOthersExist,
     InterfaceListPolicy interfaceListPolicy,
     bool ignoreLoopback)
 {
-    struct LocalCache
-    {
-        QnInterfaceAndAddrList value;
-        QElapsedTimer timer;
-        nx::Mutex guard;
-    };
-
-    static LocalCache caches[(int)InterfaceListPolicy::count];
-
-    LocalCache &cache = caches[(int) interfaceListPolicy];
-    {
-        // speed optimization
-        NX_MUTEX_LOCKER lock(&cache.guard);
-        if (!cache.value.isEmpty() && (cache.timer.elapsed() < kCacheTimeout.count()))
-            return cache.value;
-    }
-
     QList<QnInterfaceAndAddr> result;
-    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+    QList<QNetworkInterface> interfaces = allInterfaces();
     for (const QNetworkInterface &iface : interfaces)
     {
         if (!iface.flags().testFlag(QNetworkInterface::IsUp))
@@ -164,10 +165,6 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(
             result.append(QnInterfaceAndAddr(iface.name(), QHostAddress(), QHostAddress(), iface));
     }
 
-    NX_MUTEX_LOCKER lock(&cache.guard);
-    cache.timer.restart();
-    cache.value = result;
-
     return result;
 }
 
@@ -202,8 +199,9 @@ static QString ipv6AddrStringWithIfaceNameToAddrStringWithIfaceId(
 
 QList<HostAddress> allLocalAddresses(AddressFilters filter)
 {
+    QList<QNetworkInterface> interfaces = allInterfaces();
+
     QList<HostAddress> result;
-    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
     for (const QNetworkInterface &iface : interfaces)
     {
         if (!(iface.flags() & QNetworkInterface::IsUp))
@@ -272,7 +270,7 @@ QSet<QString> getLocalIpV4AddressList()
 {
     QSet<QString> result;
 
-    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+    QList<QNetworkInterface> interfaces = allInterfaces();
     for (const QNetworkInterface &iface: interfaces)
     {
         if (!(iface.flags() & QNetworkInterface::IsUp) ||

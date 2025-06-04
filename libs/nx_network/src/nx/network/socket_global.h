@@ -146,7 +146,6 @@ private:
     SocketGlobals& operator=(const SocketGlobals&) = delete;
 
     void reloadIni();
-    void setDebugIniReloadTimer();
 
     void initializeNetworking(const ArgumentParser& arguments);
 
