@@ -442,7 +442,7 @@
     <name>nx::vms::rules::LicenseIssueEvent</name>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>Máy chủ &quot;%1&quot; có vấn đề về bản quyền</translation>
+      <translation>Máy chủ &quot;%1&quot; có vấn đề về giấy phép</translation>
     </message>
     <message>
       <source>License Issue</source>
@@ -540,7 +540,7 @@
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Kết nối với camera (luồng thứ cấp) đã bị đóng đột ngột.</translation>
+      <translation>Kết nối với camera (luồng phụ) đã bị đóng đột ngột.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
@@ -605,7 +605,7 @@
     <name>nx::vms::rules::PanicRecordingAction</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>Chế độ Ghi Panic sẽ chuyển cài đặt ghi hình cho tất cả các camera thành FPS và chất lượng tối đa.</translation>
+      <translation>Chế độ Ghi khẩn cấp sẽ chuyển cài đặt ghi hình cho tất cả các camera thành FPS và chất lượng tối đa.</translation>
     </message>
     <message>
       <source>Panic Recording</source>

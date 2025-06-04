@@ -527,7 +527,7 @@ Escキーでキャンセル</translation>
     </message>
     <message>
       <source>&amp;New Folder</source>
-      <translation>新しいフォルダー (&amp;N)</translation>
+      <translation>新規フォルダー (&amp;N)</translation>
     </message>
     <message>
       <source>All files (*)</source>
