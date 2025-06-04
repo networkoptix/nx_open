@@ -50,6 +50,7 @@
 #include <nx/vms/api/data/storage_init_result.h>
 #include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/api/data/storage_space_data.h>
+#include <nx/vms/api/data/stored_file_data.h>
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/api/data/time_reply.h>
 #include <nx/vms/api/data/user_data.h>
@@ -772,6 +773,25 @@ public:
     Handle removeGroupAsync(
         const nx::Uuid& groupId,
         nx::vms::common::SessionTokenHelperPtr helper,
+        Callback<ErrorOrEmpty>&& callback,
+        nx::utils::AsyncHandlerExecutor executor);
+
+    Handle getStoredFiles(
+        Callback<ErrorOrData<nx::vms::api::StoredFileDataList>>&& callback,
+        nx::utils::AsyncHandlerExecutor executor);
+
+    Handle getStoredFile(
+        const QString& filePath,
+        Callback<ErrorOrData<nx::vms::api::StoredFileData>>&& callback,
+        nx::utils::AsyncHandlerExecutor executor);
+
+    Handle putStoredFile(
+        const nx::vms::api::StoredFileData& storedFileData,
+        Callback<ErrorOrData<nx::vms::api::StoredFileData>>&& callback,
+        nx::utils::AsyncHandlerExecutor executor);
+
+    Handle deleteStoredFile(
+        const QString& filePath,
         Callback<ErrorOrEmpty>&& callback,
         nx::utils::AsyncHandlerExecutor executor);
 

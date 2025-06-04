@@ -58,7 +58,7 @@ public:
 protected:
     void ensureCacheFolder();
     QString folderName() const;
-
+    QString relativeFilePath(const QString& filename) const;
     bool isConnectedToServer() const;
 signals:
     void fileDownloaded(const QString& filename, OperationResult status);

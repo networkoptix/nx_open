@@ -2273,6 +2273,41 @@ Handle ServerConnection::removeGroupAsync(
         executor);
 }
 
+Handle ServerConnection::getStoredFiles(
+    Callback<ErrorOrData<nx::vms::api::StoredFileDataList>>&& callback,
+    nx::utils::AsyncHandlerExecutor executor)
+{
+    return executeGet("/rest/v4/storedFiles", {}, std::move(callback), executor);
+}
+
+Handle ServerConnection::getStoredFile(const QString& filePath,
+    Callback<ErrorOrData<nx::vms::api::StoredFileData>>&& callback,
+    nx::utils::AsyncHandlerExecutor executor)
+{
+    return executeGet(
+        nx::format("/rest/v4/storedFiles/%1", filePath), {}, std::move(callback), executor);
+}
+
+Handle ServerConnection::putStoredFile(const nx::vms::api::StoredFileData& storedFileData,
+    Callback<ErrorOrData<nx::vms::api::StoredFileData>>&& callback,
+    nx::utils::AsyncHandlerExecutor executor)
+{
+    return executePut(nx::format("/rest/v4/storedFiles/%1", storedFileData.path),
+        {},
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        nx::reflect::json::serialize(storedFileData),
+        std::move(callback),
+        executor);
+}
+
+Handle ServerConnection::deleteStoredFile(const QString& filePath,
+    Callback<ErrorOrEmpty>&& callback,
+    nx::utils::AsyncHandlerExecutor executor)
+{
+    return executeDelete(
+        nx::format("/rest/v4/storedFiles/%1", filePath), {}, std::move(callback), executor);
+}
+
 Handle ServerConnection::createTicket(
     const nx::Uuid& targetServerId,
     Callback<ErrorOrData<nx::vms::api::LoginSession>> callback,

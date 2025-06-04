@@ -8,15 +8,13 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QTimer>
 
-#include <client/client_message_processor.h>
-#include <network/system_helpers.h>
+#include <api/server_rest_connection.h>
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/stored_file_data.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/common/system_settings.h>
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_stored_file_manager.h>
 #include <utils/common/util.h> //< For removeDir().
 
 namespace nx::vms::client::desktop {
@@ -97,6 +95,11 @@ QString ServerFileCache::folderName() const {
     return m_folderName;
 }
 
+QString ServerFileCache::relativeFilePath(const QString& filename) const
+{
+    return nx::format("%1/%2", m_folderName, filename);
+}
+
 void ServerFileCache::clearLocalCache()
 {
     QDir dir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
@@ -111,88 +114,98 @@ bool ServerFileCache::isConnectedToServer() const
 
 // -------------- File List loading methods -----
 
-void ServerFileCache::getFileList() {
-    if (!isConnectedToServer()) {
+void ServerFileCache::getFileList()
+{
+    const auto api = connectedServerApi();
+    if (!api)
+    {
         emit delayedFileListReceived(QStringList(), OperationResult::disconnected);
         return;
     }
 
-    // FIXME: #sivanov Replace calls using connectedServerApi()
-    auto connection = systemContext()->session()->messageBusConnection();
-    connection->getStoredFileManager(nx::network::rest::kSystemSession)->listDirectory(
-        m_folderName,
-        [this](int /*requestId*/, ec2::ErrorCode errorCode, const QStringList& filenames)
+    api->getStoredFiles(
+        [this](bool success,
+            rest::Handle requestId,
+            const rest::ErrorOrData<nx::vms::api::StoredFileDataList>& result)
         {
-            bool ok = errorCode == ec2::ErrorCode::ok;
-            emit fileListReceived(filenames, ok ? OperationResult::ok : OperationResult::serverError);
+            if (!success || !result)
+            {
+                emit fileListReceived({}, OperationResult::serverError);
+                return;
+            }
+
+            QStringList filenames;
+            for (const auto& file: *result)
+                filenames << QFileInfo(file.path).fileName();
+
+            emit fileListReceived(filenames, OperationResult::ok);
         },
         this);
 }
 
 // -------------- Download File methods ----------
 
-void ServerFileCache::downloadFile(const QString &filename) {
-    if (!isConnectedToServer()) {
+void ServerFileCache::downloadFile(const QString& filename)
+{
+    const auto api = connectedServerApi();
+    if (!api)
+    {
         emit delayedFileDownloaded(filename, OperationResult::disconnected);
         return;
     }
 
-    if (filename.isEmpty()) {
-        emit delayedFileDownloaded(filename, OperationResult::invalidOperation);
-        return;
-    }
-
-    if (m_deleting.values().contains(filename)) {
+    if (filename.isEmpty() || m_deleting.values().contains(filename))
+    {
         emit delayedFileDownloaded(filename, OperationResult::invalidOperation);
         return;
     }
 
     QFileInfo info(getFullPath(filename));
-    if (info.exists()) {
+    if (info.exists())
+    {
         emit delayedFileDownloaded(filename, OperationResult::ok);
         return;
     }
 
     if (m_loading.values().contains(filename))
-      return;
+        return;
 
-    auto connection = systemContext()->session()->messageBusConnection();
-    int handle = connection->getStoredFileManager(nx::network::rest::kSystemSession)->getStoredFile(
-        m_folderName + QLatin1Char('/') + filename,
-        [this](int requestId, ec2::ErrorCode errorCode, const QByteArray& fileData)
+    const auto handle = api->getStoredFile(
+        relativeFilePath(filename),
+        [this](bool success,
+            rest::Handle requestId,
+            const rest::ErrorOrData<nx::vms::api::StoredFileData>& result)
         {
             if (!m_loading.contains(requestId))
                 return;
 
-            QString filename = m_loading[requestId];
+            const auto filename = m_loading[requestId];
             m_loading.remove(requestId);
 
-            if (!isConnectedToServer()) {
+            if (!isConnectedToServer())
+            {
                 emit fileDownloaded(filename, OperationResult::disconnected);
                 return;
             }
 
-            if (errorCode != ec2::ErrorCode::ok) {
-                emit fileDownloaded(filename, OperationResult::serverError);
-                return;
-            }
-
-            if (fileData.size() <= 0) {
+            if (!success || !result || result->data.size() <= 0)
+            {
                 emit fileDownloaded(filename, OperationResult::serverError);
                 return;
             }
 
             ensureCacheFolder();
-            QString filePath = getFullPath(filename);
+            const auto filePath = getFullPath(filename);
             QFile file(filePath);
-            if (!file.open(QIODevice::WriteOnly)) {
+            if (!file.open(QIODevice::WriteOnly))
+            {
                 emit fileDownloaded(filename, OperationResult::fileSystemError);
                 return;
             }
-            QDataStream out(&file);
-            out.writeRawData(fileData, fileData.size());
-            file.close();
 
+            QDataStream out(&file);
+            out.writeRawData(result->data, result->data.size());
+            file.close();
             emit fileDownloaded(filename, OperationResult::ok);
         },
         this);
@@ -201,8 +214,11 @@ void ServerFileCache::downloadFile(const QString &filename) {
 
 // -------------- Uploading methods ----------------
 
-void ServerFileCache::uploadFile(const QString &filename) {
-    if (!isConnectedToServer()) {
+void ServerFileCache::uploadFile(const QString& filename)
+{
+    const auto api = connectedServerApi();
+    if (!api)
+    {
         emit delayedFileUploaded(filename, OperationResult::disconnected);
         return;
     }
@@ -211,56 +227,71 @@ void ServerFileCache::uploadFile(const QString &filename) {
         return;
 
     QFile file(getFullPath(filename));
-    if(!file.open(QIODevice::ReadOnly)) {
+    if (!file.open(QIODevice::ReadOnly))
+    {
         emit delayedFileUploaded(filename, OperationResult::fileSystemError);
         return;
     }
 
-    QByteArray data = file.readAll();
+    api::StoredFileData storedFileData;
+    storedFileData.path = relativeFilePath(filename);
+    storedFileData.data = file.readAll();
     file.close();
 
-    auto connection = systemContext()->session()->messageBusConnection();
-    int handle = connection->getStoredFileManager(nx::network::rest::kSystemSession)->addStoredFile(
-        m_folderName + QLatin1Char('/') + filename,
-        data,
-        [this](int requestId, ec2::ErrorCode errorCode)
+    const auto handle = api->putStoredFile(
+        storedFileData,
+        [this](bool success,
+            rest::Handle requestId,
+            const rest::ErrorOrData<nx::vms::api::StoredFileData>& result)
         {
             if (!m_uploading.contains(requestId))
                 return;
 
-            QString filename = m_uploading[requestId];
+            const auto filename = m_uploading[requestId];
             m_uploading.remove(requestId);
 
-            if (!isConnectedToServer()) {
+            if (!isConnectedToServer())
+            {
                 emit fileUploaded(filename, OperationResult::disconnected);
                 return;
             }
 
-            const bool ok = errorCode == ec2::ErrorCode::ok;
-            if (!ok)
+            if (!success || !result)
+            {
                 QFile::remove(getFullPath(filename));
-            emit fileUploaded(filename, ok ? OperationResult::ok : OperationResult::serverError);
+                emit fileUploaded(filename, OperationResult::serverError);
+                return;
+            }
+
+            emit fileUploaded(filename, OperationResult::ok);
         },
         this);
+
     m_uploading.insert(handle, filename);
 }
 
 // -------------- Deleting methods ----------------
 
-void ServerFileCache::deleteFile(const QString &filename) {
-    if (!isConnectedToServer()) {
+void ServerFileCache::deleteFile(const QString& filename)
+{
+    auto api = connectedServerApi();
+    if (!api)
+    {
         emit delayedFileDeleted(filename, OperationResult::disconnected);
         return;
     }
 
-    if (filename.isEmpty()) {
+    if (filename.isEmpty())
+    {
         emit delayedFileDeleted(filename, OperationResult::invalidOperation);
         return;
     }
 
-    if (m_loading.values().contains(filename)) {
+    if (m_loading.values().contains(filename))
+    {
         QHash<int, QString>::iterator i = m_loading.begin();
-        while (i != m_loading.end()) {
+        while (i != m_loading.end())
+        {
             QHash<int, QString>::iterator prev = i;
             ++i;
             if (prev.value() == filename)
@@ -269,12 +300,13 @@ void ServerFileCache::deleteFile(const QString &filename) {
     }
 
     if (m_deleting.values().contains(filename))
-      return;
+        return;
 
-    auto connection = systemContext()->session()->messageBusConnection();
-    int handle = connection->getStoredFileManager(nx::network::rest::kSystemSession)->deleteStoredFile(
-        m_folderName + QLatin1Char('/') + filename,
-        [this](int requestId, ec2::ErrorCode errorCode)
+    const auto handle = api->deleteStoredFile(
+        relativeFilePath(filename),
+        [this](bool success,
+            rest::Handle requestId,
+            const rest::ServerConnection::ErrorOrEmpty& result)
         {
             if (!m_deleting.contains(requestId))
                 return;
@@ -282,22 +314,25 @@ void ServerFileCache::deleteFile(const QString &filename) {
             QString filename = m_deleting[requestId];
             m_deleting.remove(requestId);
 
-            if (!isConnectedToServer()) {
+            if (!isConnectedToServer())
+            {
                 emit fileDeleted(filename, OperationResult::disconnected);
                 return;
             }
 
-            const bool ok = errorCode == ec2::ErrorCode::ok;
-            if (ok)
+            if (success)
                 QFile::remove(getFullPath(filename));
-            emit fileDeleted(filename, ok ? OperationResult::ok : OperationResult::serverError);
+
+            emit fileDeleted(
+                filename, success ? OperationResult::ok : OperationResult::serverError);
         },
         this);
 
     m_deleting.insert(handle, filename);
 }
 
-void ServerFileCache::clear() {
+void ServerFileCache::clear()
+{
     m_loading.clear();
     m_uploading.clear();
     m_deleting.clear();
