@@ -7226,7 +7226,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
+      <translation>Kamerabytteoperasjonen er ikke mulig da serveren ikke er tilgjengelig.</translation>
     </message>
     <message>
       <source>%1 will be removed from the site and replaced by the selected camera</source>

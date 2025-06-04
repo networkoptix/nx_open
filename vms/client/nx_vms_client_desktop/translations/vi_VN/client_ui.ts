@@ -362,7 +362,7 @@
     <name>CameraAdvancedParamsWidget</name>
     <message>
       <source>Category</source>
-      <translation>Loài</translation>
+      <translation>Danh Mục</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -496,7 +496,7 @@
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation>Hồ sơ luồng thứ cấp</translation>
+      <translation>Hồ sơ luồng phụ</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
@@ -686,7 +686,7 @@
     </message>
     <message>
       <source>Copy Schedule to...</source>
-      <translation>Sao chép lịch biểu vào...</translation>
+      <translation>Sao chép Lịch trình vào...</translation>
     </message>
     <message>
       <source>Motion &amp;&amp; Objects Recording</source>
@@ -800,7 +800,7 @@
     <name>CustomSettingsWidget</name>
     <message>
       <source>Category</source>
-      <translation>Loài</translation>
+      <translation>Danh Mục</translation>
     </message>
   </context>
   <context>
@@ -2031,11 +2031,11 @@
     <name>RecordingThresholdWidget</name>
     <message>
       <source>Pre-Recording</source>
-      <translation>Trước khi ghi</translation>
+      <translation>Ghi trước</translation>
     </message>
     <message>
       <source>Post-Recording</source>
-      <translation>Video liên tục</translation>
+      <translation>Ghi sau</translation>
     </message>
   </context>
   <context>
@@ -2103,11 +2103,11 @@
     </message>
     <message>
       <source>Record Always</source>
-      <translation>Video liên tục</translation>
+      <translation>Ghi liên tục</translation>
     </message>
     <message>
       <source>Motion Only</source>
-      <translation>Chỉ phát hiện di dời</translation>
+      <translation>Chỉ chuyển động</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -2115,7 +2115,7 @@
     </message>
     <message>
       <source>Do Not Record</source>
-      <translation>Làm Video</translation>
+      <translation>Không ghi</translation>
     </message>
     <message>
       <source>Bitrate</source>

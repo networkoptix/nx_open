@@ -7235,7 +7235,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+      <translation>Vérifie si les données de la caméra peuvent être transférées vers la nouvelle.</translation>
     </message>
     <message>
       <source>Some data and settings may not be supported for the new camera</source>

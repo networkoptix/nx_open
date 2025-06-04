@@ -812,7 +812,7 @@
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Kết nối với camera (luồng thứ cấp) đã bị đóng đột ngột.</translation>
+      <translation>Kết nối với camera (luồng phụ) đã bị đóng đột ngột.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>

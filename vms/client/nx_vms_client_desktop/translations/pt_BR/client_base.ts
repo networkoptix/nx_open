@@ -7235,7 +7235,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+      <translation>Verificando se os dados da câmera podem ser transferidos para a nova.</translation>
     </message>
     <message>
       <source>Some data and settings may not be supported for the new camera</source>

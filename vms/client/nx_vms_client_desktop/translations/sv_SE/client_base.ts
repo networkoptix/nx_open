@@ -7235,7 +7235,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+      <translation>Kontrollera om data från kameran kan överföras till den nya.</translation>
     </message>
     <message>
       <source>Some data and settings may not be supported for the new camera</source>

@@ -440,7 +440,7 @@
     </message>
     <message>
       <source>Maximize Item</source>
-      <translation>Tối đa hóa dự án</translation>
+      <translation>Phóng to</translation>
     </message>
     <message>
       <source>Restore Item</source>
@@ -456,7 +456,7 @@
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
-      <translation>Hide chuyển / Wisdom Tìm kiếm</translation>
+      <translation>Hiển thị chuyển động/Tìm kiếm thông minh</translation>
     </message>
     <message>
       <source>Show Motion</source>
@@ -464,11 +464,11 @@
     </message>
     <message>
       <source>Hide Motion/Smart Search</source>
-      <translation>Hide chuyển / Wisdom Tìm kiếm</translation>
+      <translation>Ẩn chuyển động/Tìm kiếm thông minh</translation>
     </message>
     <message>
       <source>Hide Motion</source>
-      <translation>Hide chuyển</translation>
+      <translation>Ẩn chuyển động</translation>
     </message>
     <message>
       <source>Clear Motion Selection</source>
@@ -484,19 +484,19 @@
     </message>
     <message>
       <source>0 degrees</source>
-      <translation>0 trình độ</translation>
+      <translation>0 độ</translation>
     </message>
     <message>
       <source>90 degrees</source>
-      <translation>90 trình độ</translation>
+      <translation>90 độ</translation>
     </message>
     <message>
       <source>180 degrees</source>
-      <translation>180 trình độ</translation>
+      <translation>180 độ</translation>
     </message>
     <message>
       <source>270 degrees</source>
-      <translation>270 trình độ</translation>
+      <translation>270 độ</translation>
     </message>
     <message>
       <source>Remove from Layout</source>
@@ -548,7 +548,7 @@
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation>Nội quy Camera...</translation>
+      <translation>Quy tắc camera...</translation>
     </message>
     <message>
       <source>I/O Module Rules...</source>
@@ -914,7 +914,7 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation>Xoay sang</translation>
+      <translation>Xoay</translation>
     </message>
     <message>
       <source>Create Group</source>
@@ -1145,31 +1145,31 @@
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation>Bản quyền không tồn tại.</translation>
+      <translation>Giấy phép không tồn tại.</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation>Bản quyền bị vô hiệu.</translation>
+      <translation>Giấy phép đã bị vô hiệu hóa.</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation>Bản quyền dừng hoạt động.</translation>
+      <translation>Giấy phép không còn hiệu lực.</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation>Bản quyền không hợp lệ.</translation>
+      <translation>Giấy phép không hợp lệ.</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation>Dùng thử bản quyền.</translation>
+      <translation>Giấy phép dùng thử.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation>Bản quyền đang trong trạng chờ kích hoạt nhưng chưa được hủy kích hoạt.</translation>
+      <translation>Giấy phép đang trong trạng thái chờ hủy kích hoạt nhưng vẫn chưa bị hủy kích hoạt.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation>Số lần hủy kích hoạt vượt quá giới hạn bản quyền này.</translation>
+      <translation>Số lần hủy kích hoạt vượt quá giới hạn cho giấy phép này.</translation>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
@@ -1268,7 +1268,7 @@
     <name>LicenseActivationDialogs</name>
     <message>
       <source>Incompatible license</source>
-      <translation>Bản quyền không tương thích</translation>
+      <translation>Giấy phép không tương thích</translation>
     </message>
     <message>
       <source>License you are trying to activate is incompatible with your software.</source>
@@ -1280,7 +1280,7 @@
     </message>
     <message>
       <source>Failed to activate license</source>
-      <translation>Không thể kích hoạt bản quyền</translation>
+      <translation>Không kích hoạt được giấy phép</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
@@ -1308,11 +1308,11 @@
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>Mã bản quyền này đã được kích hoạt và liên kết với ID Phần cứng %1</translation>
+      <translation>Giấy phép này đã được kích hoạt và liên kết với ID phần cứng %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>Mã bản quyền này đã được kích hoạt và liên kết với ID Phần cứng %1 vào %2</translation>
+      <translation>Giấy phép này đã được kích hoạt và liên kết với ID phần cứng %1 trên %2</translation>
     </message>
     <message>
       <source>License already activated on another server</source>
@@ -1328,7 +1328,7 @@
     </message>
     <message>
       <source>License activated</source>
-      <translation>Bản quyền được kích hoạt</translation>
+      <translation>Giấy phép đã được kích hoạt</translation>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
@@ -1382,7 +1382,7 @@ Khóa giấy phép: %2</translation>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
       <translation>
-        <numerusform>%n Cấp bản quyền lỗi</numerusform>
+        <numerusform>Không thể hủy kích hoạt %n giấy phép</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1400,7 +1400,7 @@ Khóa giấy phép: %2</translation>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
       <translation>
-        <numerusform>Không thể hủy kích hoạt bản quyền</numerusform>
+        <numerusform>Không thể hủy kích hoạt giấy phép</numerusform>
       </translation>
     </message>
     <message>
@@ -1409,7 +1409,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
-      <translation>Không thể kết nối với Máy chủ cấp bản quyền</translation>
+      <translation>Không thể kết nối với Máy chủ cấp phép</translation>
     </message>
     <message>
       <source>Please make sure your server has active Internet connection or check firewall settings.</source>
@@ -1417,16 +1417,16 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>License Server error</source>
-      <translation>Lỗi cấp bản quyền Máy chủ</translation>
+      <translation>Lỗi máy chủ cấp phép</translation>
     </message>
     <message>
       <source>Failed to remove license from Server</source>
-      <translation>Lỗi bỏ bản quyền từ Máy chủ</translation>
+      <translation>Không thể xóa giấy phép khỏi Máy chủ</translation>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
       <translation>
-        <numerusform>%n Bản quyền ngừng hoạt động</numerusform>
+        <numerusform>%n giấy phép đã bị vô hiệu hóa</numerusform>
       </translation>
     </message>
   </context>
@@ -1537,7 +1537,7 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation>Người dùng %1 đang nhận email</translation>
+      <translation>Người dùng %1 nhận email</translation>
     </message>
     <message>
       <source>%1 is not available</source>
@@ -2506,7 +2506,7 @@ Khóa giấy phép: %2</translation>
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation>Ghi âm</translation>
+      <translation>Ghi hình</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2600,7 +2600,7 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Mở %1 Cổng</translation>
+      <translation>Mở cổng %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -3230,11 +3230,11 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>License is active</source>
-      <translation>Bản quyền được kích hoạt</translation>
+      <translation>Giấy phép đang hoạt động</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation>Bản quyền hết hạn</translation>
+      <translation>Giấy phép đã hết hạn</translation>
     </message>
     <message>
       <source>Expires soon</source>
@@ -3242,16 +3242,16 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>License expires today</source>
-      <translation>Bản quyền hết hạn hôm nay</translation>
+      <translation>Giấy phép hết hạn ngày hôm nay</translation>
     </message>
     <message>
       <source>License expires tomorrow</source>
-      <translation>Bản quyền hết hạn trong ngày mai</translation>
+      <translation>Giấy phép hết hạn vào ngày mai</translation>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
       <translation>
-        <numerusform>Bản quyền sẽ hết hạn trong %n ngày</numerusform>
+        <numerusform>Giấy phép hết hạn sau %n ngày</numerusform>
       </translation>
     </message>
     <message>
@@ -7054,7 +7054,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation>Luồng dữ liệu phụ</translation>
+      <translation>Luồng phụ</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
@@ -7118,7 +7118,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+      <translation>Kiểm tra xem dữ liệu từ camera này có thể được chuyển sang camera mới hay không.</translation>
     </message>
     <message>
       <source>Some data and settings may not be supported for the new camera</source>
@@ -7215,7 +7215,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Motion</source>
-      <translation>Vận động</translation>
+      <translation>Chuyển động</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -7227,7 +7227,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Expert</source>
-      <translation>Chế độ Expert</translation>
+      <translation>Chế độ Chuyên gia</translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
@@ -7375,7 +7375,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation>Luồng dữ liệu phụ</translation>
+      <translation>Luồng phụ</translation>
     </message>
     <message>
       <source>No secondary stream</source>

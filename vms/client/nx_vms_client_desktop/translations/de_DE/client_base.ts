@@ -7226,7 +7226,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
+      <translation>Der Vorgang "Kameraaustausch" ist nicht möglich, da der Server nicht verfügbar ist.</translation>
     </message>
     <message>
       <source>%1 will be removed from the site and replaced by the selected camera</source>
@@ -7235,7 +7235,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+      <translation>Prüfen, ob die Daten von der Kamera auf die neue Kamera übertragen werden können.</translation>
     </message>
     <message>
       <source>Some data and settings may not be supported for the new camera</source>

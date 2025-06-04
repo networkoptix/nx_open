@@ -7110,20 +7110,20 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
+      <translation>サーバーが利用できないため、カメラの交換操作は行えません。</translation>
     </message>
     <message>
       <source>%1 will be removed from the site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the site and replaced by the selected camera</translation>
+      <translation>%1 はサイトから削除され、選択したカメラに置き換えられます。</translation>
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+      <translation>カメラからのデータを新しいカメラに移行できるか確認しています。</translation>
     </message>
     <message>
       <source>Some data and settings may not be supported for the new camera</source>
-      <translation type="unfinished">Some data and settings may not be supported for the new camera</translation>
+      <translation>データや設定の一部が、新しいカメラでサポートされない可能性があります。</translation>
     </message>
   </context>
   <context>
@@ -11758,7 +11758,7 @@ but this integration presented an untrusted certificate auth.
 We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
       <comment>%1 is the integration address</comment>
       <translation>%1
-を開こうとしましたが、このインテグレーションは信頼できない証明書認証を提示しました。
+を開こうとしましたが、このインテグレーションは信頼できない証明書を提示しました。
 このインテグレーションを開かないことをお勧めします。リスクを理解している場合は、インテグレーションを開いても構いません。</translation>
     </message>
     <message>
@@ -11768,7 +11768,7 @@ but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
       <comment>%1 is the web page address</comment>
       <translation>%1
-を開こうとしましたが、このWebページは信頼できない証明書認証を提示しました。
+を開こうとしましたが、このWebページは信頼できない証明書を提示しました。
 このWebページを開かないことをお勧めします。リスクを理解している場合は、Webページを開いても構いません。</translation>
     </message>
     <message>
