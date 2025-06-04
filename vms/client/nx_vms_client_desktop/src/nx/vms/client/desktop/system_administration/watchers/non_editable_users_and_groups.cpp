@@ -332,13 +332,14 @@ bool NonEditableUsersAndGroups::addUser(const QnUserResourcePtr& user)
 
     const bool newUser = !m_nonEditableUsers.contains(user);
 
-    const QSet<nx::Uuid> prevGroupIds = m_nonEditableUsers.value(user);
-
-    const auto removed = prevGroupIds - parentIds;
-    const auto added = parentIds - prevGroupIds;
-
-    modifyGroups(removed, -1);
-    modifyGroups(added, 1);
+    if (!user->isOrg())
+    {
+        const auto prevGroupIds = m_nonEditableUsers.value(user);
+        const auto removed = prevGroupIds - parentIds;
+        const auto added = parentIds - prevGroupIds;
+        modifyGroups(removed, -1);
+        modifyGroups(added, 1);
+    }
 
     m_nonEditableUsers[user] = parentIds;
 
