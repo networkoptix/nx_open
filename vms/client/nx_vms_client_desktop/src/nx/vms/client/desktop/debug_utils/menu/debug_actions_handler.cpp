@@ -19,6 +19,7 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
+#include <nx/vms/client/desktop/rules/event_test_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/testkit/testkit.h>
 #include <nx/vms/common/system_settings.h>
@@ -138,6 +139,7 @@ DebugActionsHandler::DebugActionsHandler(WindowContext* windowContext, QObject *
     WebEngineDialog::registerAction();
     SortingTestDialog::registerAction();
     NameValueTableTestDialog::registerAction();
+    rules::EventTestDialog::registerAction();
 
 #ifdef Q_OS_MAC
     if (ini().virtualJoystick)

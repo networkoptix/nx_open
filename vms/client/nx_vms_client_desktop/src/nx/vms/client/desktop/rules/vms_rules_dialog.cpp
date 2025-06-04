@@ -5,6 +5,8 @@
 #include <api/server_rest_connection.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/dialogs/week_time_schedule_dialog.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -16,6 +18,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include "edit_vms_rule_dialog.h"
+#include "event_test_dialog.h"
 #include "model_view/rules_table_model.h"
 #include "utils/confirmation_dialogs.h"
 
@@ -32,6 +35,8 @@ VmsRulesDialog::VmsRulesDialog(QWidget* parent):
     m_rulesTableModel{QmlProperty<RulesTableModel*>(rootObjectHolder(), "rulesTableModel")}
 {
     QmlProperty<QObject*>(rootObjectHolder(), "dialog") = this;
+    QmlProperty<bool>(rootObjectHolder(), "developerMode") =
+        vms::client::desktop::ini().developerMode;
 }
 
 VmsRulesDialog::~VmsRulesDialog()
@@ -177,6 +182,11 @@ void VmsRulesDialog::resetToDefaults()
 void VmsRulesDialog::openEventLogDialog()
 {
     action(menu::OpenEventLogAction)->trigger();
+}
+
+void VmsRulesDialog::openTestEventDialog()
+{
+    debugActions().at(EventTestDialog::kDebugActionName)(workbenchContext());
 }
 
 void VmsRulesDialog::deleteRulesImpl(const UuidList& ids)

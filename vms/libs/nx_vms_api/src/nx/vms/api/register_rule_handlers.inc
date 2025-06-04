@@ -246,4 +246,14 @@ void registerRuleHandlers(
      */
     reg("rest/v{4-}/events/rules/*/reset", GlobalPermission::powerUser,
         std::make_unique<ResetRulesHandler>(serverModule->systemContext()));
+
+    /**%apidoc[proprietary] POST /rest/v{4-}/events/create
+     * <b>ATTENTION:</b> For the debug use only.
+     * %caption Create custom event
+     * %ingroup Events
+     * %param[ref] _strict,_ticket
+     * %permissions Generate events global permission.
+     */
+    reg("rest/v{4-}/events/create", GlobalPermission::generateEvents,
+        std::make_unique<TestEventHandler>(serverModule->systemContext()));
 }

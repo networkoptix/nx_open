@@ -100,7 +100,7 @@ void merge(Container<Key, Value>* origin,
             if constexpr (std::is_same_v<Container<Key, Value>, std::map<Key, QJsonValue>>)
                 originIt = origin->emplace_hint(originIt, updatedIt->first, updatedIt->second);
             else if constexpr (std::is_same_v<Container<Key, Value>, QMap<Key, QJsonValue>>)
-                originIt = origin->insert(originIt, updatedIt->key(), updatedIt->value());
+                originIt = origin->insert(originIt, updatedIt.key(), updatedIt.value());
             ++originIt;
             ++updatedIt;
         }
@@ -110,7 +110,7 @@ void merge(Container<Key, Value>* origin,
         if constexpr (std::is_same_v<Container<Key, Value>, std::map<Key, QJsonValue>>)
             originIt = origin->emplace_hint(originIt, updatedIt->first, updatedIt->second);
         else if constexpr (std::is_same_v<Container<Key, Value>, QMap<Key, QJsonValue>>)
-            originIt = origin->insert(originIt, updatedIt->key(), updatedIt->value());
+            originIt = origin->insert(originIt, updatedIt.key(), updatedIt.value());
         ++originIt;
         ++updatedIt;
     }

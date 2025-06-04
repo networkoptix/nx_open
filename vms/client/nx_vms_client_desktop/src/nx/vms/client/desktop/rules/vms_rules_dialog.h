@@ -28,6 +28,7 @@ public:
     Q_INVOKABLE void setRulesState(const UuidList& ids, bool isEnabled);
     Q_INVOKABLE void resetToDefaults();
     Q_INVOKABLE void openEventLogDialog();
+    Q_INVOKABLE void openTestEventDialog();
 
 signals:
     void error(const QString& error);

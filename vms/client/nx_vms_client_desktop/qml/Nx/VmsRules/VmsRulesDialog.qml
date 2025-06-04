@@ -20,6 +20,7 @@ Dialog
     property alias rulesTableModel: rulesSortFilterModel.sourceModel
     property var dialog: null
     property alias filterText: searchField.text
+    property bool developerMode: false
 
     function deleteCheckedRules()
     {
@@ -360,6 +361,17 @@ Dialog
                 onClicked:
                 {
                     root.dialog.resetToDefaults()
+                }
+            }
+
+            TextButton
+            {
+                text: qsTr("Test events...")
+                visible: developerMode
+
+                onClicked:
+                {
+                    root.dialog.openTestEventDialog()
                 }
             }
         }

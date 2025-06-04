@@ -19,6 +19,7 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/timeline/timeline_actions_factory.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/ini.h>
 #include <ui/workbench/workbench_layout.h>
 
 #include "action.h"
