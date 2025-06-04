@@ -12101,7 +12101,7 @@ but this integration presented an untrusted certificate auth.
 We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
       <comment>%1 is the integration address</comment>
       <translation>%1
-を開こうとしましたが、このインテグレーションは信頼できない証明書認証を提示しました。
+を開こうとしましたが、このインテグレーションは信頼できない証明書を提示しました。
 このインテグレーションを開かないことをお勧めします。リスクを理解している場合は、インテグレーションを開いても構いません。</translation>
     </message>
     <message>
@@ -12111,7 +12111,7 @@ but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
       <comment>%1 is the web page address</comment>
       <translation>%1
-を開こうとしましたが、このWebページは信頼できない証明書認証を提示しました。
+を開こうとしましたが、このWebページは信頼できない証明書を提示しました。
 このWebページを開かないことをお勧めします。リスクを理解している場合は、Webページを開いても構いません。</translation>
     </message>
     <message>
