@@ -321,7 +321,7 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType)
         case Qn::LC_Nvr:
             return tr("NVR Licenses");
         case Qn::LC_SaasLocalRecording:
-            return tr("Local recording service");
+            return tr("Local recording services");
         case Qn::LC_Invalid:
             return tr("Invalid Licenses");
         default:
