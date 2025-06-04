@@ -962,11 +962,11 @@
     </message>
     <message>
       <source>FREE License</source>
-      <translation>Miễn phí bản quyền</translation>
+      <translation>Giấy phép MIỄN PHÍ</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
-      <translation>Bản quyền đã cấp cho: %1</translation>
+      <translation>Cấp giấy phép cho: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
