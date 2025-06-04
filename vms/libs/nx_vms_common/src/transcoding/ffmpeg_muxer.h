@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QQueue>
 
 extern "C" {
@@ -103,4 +105,5 @@ private:
     TimestampCorrector m_timestampCorrector;
     PacketTimestamp m_lastPacketTimestamp;
     int m_rtpMtu = MTU_SIZE;
+    std::optional<int64_t> m_firstVideoTimestamp;
 };

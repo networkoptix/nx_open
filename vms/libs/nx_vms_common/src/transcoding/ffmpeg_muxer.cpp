@@ -226,6 +226,18 @@ bool FfmpegMuxer::muxPacket(const QnConstAbstractMediaDataPtr& media)
         return true;
     }
 
+    if (!m_firstVideoTimestamp && media->dataType == QnAbstractMediaData::VIDEO)
+        m_firstVideoTimestamp = media->timestamp;
+
+    if (m_initializedVideo
+        && media->dataType == QnAbstractMediaData::AUDIO
+        && (!m_firstVideoTimestamp || m_firstVideoTimestamp > media->timestamp))
+    {
+        NX_DEBUG(this, "Skip audio before video: %1, first video timestamp: %2", media,
+            m_firstVideoTimestamp ? *m_firstVideoTimestamp : 0);
+        return true;
+    }
+
     AVStream* stream = m_formatCtx->streams[streamIndex];
     constexpr AVRational srcRate = {1, 1'000'000};
     nx::media::ffmpeg::AvPacket avPacket;
