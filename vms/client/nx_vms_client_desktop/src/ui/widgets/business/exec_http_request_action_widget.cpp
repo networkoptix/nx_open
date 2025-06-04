@@ -98,7 +98,7 @@ void QnExecHttpRequestActionWidget::at_model_dataChanged(Fields fields)
         ui->contentTypeComboBox->setCurrentIndex(kAutoContentTypeItemIndex);
     else
         ui->contentTypeComboBox->setCurrentText(params.contentType);
-    ui->httpUrlLineEdit->setText(url.toString(QUrl::RemoveUserInfo));
+    ui->httpUrlLineEdit->setText(url.toString(QUrl::RemoveUserInfo | QUrl::DecodeReserved));
     ui->loginLineEdit->setText(url.userName());
     ui->passwordLineEdit->setText(url.password());
 
@@ -139,7 +139,7 @@ void QnExecHttpRequestActionWidget::paramsChanged()
     if (url.scheme().isEmpty())
         url.setScheme(nx::network::http::kUrlSchemeName);
 
-    params.url = url.toString();
+    params.url = url.toString(QUrl::DecodeReserved);
     params.text = ui->contentTextEdit->toPlainText();
     params.contentType = ui->contentTypeComboBox->currentText().trimmed();
     if (params.contentType == ui->contentTypeComboBox->itemText(kAutoContentTypeItemIndex))

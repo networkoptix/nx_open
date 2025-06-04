@@ -1470,7 +1470,7 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
         }
 
         case ActionType::execHttpRequestAction:
-            return QUrl(m_actionParams.url).toString(QUrl::RemoveUserInfo);
+            return QUrl(m_actionParams.url).toString(QUrl::RemoveUserInfo | QUrl::DecodeReserved);
 
         default:
             break;
