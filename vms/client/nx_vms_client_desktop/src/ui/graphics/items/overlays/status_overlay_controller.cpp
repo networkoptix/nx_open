@@ -86,7 +86,9 @@ const OverlayInfoMap& overlayInfo()
                 QnStatusOverlayWidget::tr("INFORMATION REQUIRED"),
                 kRestrictIconPath}},
         {Qn::NoDataOverlay,
-            {QnStatusOverlayWidget::ErrorStyle::white, QnStatusOverlayWidget::tr("NO DATA")}},
+            {QnStatusOverlayWidget::ErrorStyle::white,
+                QnStatusOverlayWidget::tr("NO DATA"),
+                kRestrictIconPath}},
         {Qn::AccessDeniedOverlay,
             {QnStatusOverlayWidget::ErrorStyle::white,
                 QnStatusOverlayWidget::tr("NO ACCESS"),
@@ -297,16 +299,23 @@ QnStatusOverlayWidget::Controls QnStatusOverlayController::errorVisibleItems() c
 
 QnStatusOverlayWidget::Controls QnStatusOverlayController::normalVisibleItems() const
 {
+    QnStatusOverlayWidget::Controls result = QnStatusOverlayWidget::Control::kNoControl;
+
+    const auto overlay = statusOverlay();
+    if (!statusIconPath(overlay).isEmpty())
+        result |= QnStatusOverlayWidget::Control::kIcon;
+
     switch (statusOverlay())
     {
         case Qn::LoadingOverlay:
-            return QnStatusOverlayWidget::Control::kPreloader;
+            result |= QnStatusOverlayWidget::Control::kPreloader;
+            break;
         case Qn::NoDataOverlay:
         case Qn::NoLiveStreamOverlay:
-            return QnStatusOverlayWidget::Control::kCaption;
-        default:
-            return QnStatusOverlayWidget::Control::kNoControl;
+            result |= QnStatusOverlayWidget::Control::kCaption;
+            break;
     }
+    return result;
 }
 
 Qn::ResourceStatusOverlay QnStatusOverlayController::statusOverlay() const
@@ -390,11 +399,8 @@ QString QnStatusOverlayController::currentButtonText() const
 const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions&
     QnStatusOverlayController::statusIconColors(Qn::ResourceStatusOverlay overlay)
 {
-    if (isErrorOverlayCheck(overlay)
-        && overlayErrorStyle(overlay) == QnStatusOverlayWidget::ErrorStyle::white)
-    {
+    if (overlayErrorStyle(overlay) == QnStatusOverlayWidget::ErrorStyle::white)
         return kWhiteTheme;
-    }
 
     return kRedTheme;
 }
