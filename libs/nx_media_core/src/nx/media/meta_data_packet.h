@@ -66,8 +66,8 @@ struct NX_MEDIA_CORE_API QnCompressedMetadata: public QnAbstractCompressedMetada
     virtual const char* data() const override;
     virtual size_t dataSize() const override;
 
-    bool setData(const char* data, std::size_t dataSize);
-    bool setData(const QByteArray& data);
+    void setData(const char* data, std::size_t dataSize);
+    void setData(const QByteArray& data);
     using QnAbstractCompressedMetadata::setData;
 
     void setDurationUsec(qint64 value) { m_duration = value;  }

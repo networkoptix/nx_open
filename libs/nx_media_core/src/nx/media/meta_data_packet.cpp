@@ -582,14 +582,15 @@ size_t QnCompressedMetadata::dataSize() const
     return m_data.size();
 }
 
-bool QnCompressedMetadata::setData(const char* data, std::size_t dataSize)
+void QnCompressedMetadata::setData(const char* data, std::size_t dataSize)
 {
-    return m_data.write(data, dataSize) != 0;
+    m_data.clear();
+    m_data.write(data, dataSize);
 }
 
-bool QnCompressedMetadata::setData(const QByteArray& data)
+void QnCompressedMetadata::setData(const QByteArray& data)
 {
-    return m_data.write(data.data(), data.size());
+    setData(data.data(), data.size());
 }
 
 QnCompressedMetadataPtr QnCompressedMetadata::createMediaEventPacket(

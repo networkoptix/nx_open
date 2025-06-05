@@ -27,4 +27,17 @@ TEST(MetaData, serialization)
     ASSERT_EQ(packet.timestamp, packetCopy->timestamp);
 }
 
+TEST(QnCompressedMetadata, main)
+{
+    const QByteArray buffer1("12345");
+    const QByteArray buffer2("6789");
+
+    QnCompressedMetadata data(MetadataType::ObjectDetection);
+    data.setData(buffer1);
+    ASSERT_EQ(buffer1, QByteArray::fromRawData(data.data(), data.dataSize()));
+
+    data.setData(buffer2);
+    ASSERT_EQ(buffer2, QByteArray::fromRawData(data.data(), data.dataSize()));
+}
+
 } // namespace nx::media::test
