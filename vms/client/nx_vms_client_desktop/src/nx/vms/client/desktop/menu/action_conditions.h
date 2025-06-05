@@ -786,6 +786,8 @@ ConditionWrapper customCellSpacingIsSet();
 
 ConditionWrapper hardwareVideoDecodingDisabled();
 
+ConditionWrapper parentServerHasActiveBackupStorage();
+
 } // namespace condition
 
 } // namespace menu
