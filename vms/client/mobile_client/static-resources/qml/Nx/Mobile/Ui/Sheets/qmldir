@@ -1,6 +1,7 @@
 module Nx.Mobile.Ui.Sheets
 
+CloudConnectionHelpSheet 1.0 CloudConnectionHelpSheet.qml
 HowItWorksSheet 1.0 HowItWorksSheet.qml
-ShareBookmarkSheet 1.0 ShareBookmarkSheet.qml
 LayoutSheet 1.0 LayoutSheet.qml
+ShareBookmarkSheet 1.0 ShareBookmarkSheet.qml
 SiteConnectionSheet 1.0 SiteConnectionSheet.qml

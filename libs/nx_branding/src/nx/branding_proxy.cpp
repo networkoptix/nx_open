@@ -13,6 +13,11 @@ QString QmlProxy::cloudName()
     return nx::branding::cloudName();
 }
 
+QString QmlProxy::shortCloudName()
+{
+    return nx::branding::shortCloudName();
+}
+
 QString QmlProxy::company()
 {
     return nx::branding::company();
@@ -26,6 +31,11 @@ QString QmlProxy::companyUrl()
 QString QmlProxy::vmsName()
 {
     return nx::branding::vmsName();
+}
+
+QString QmlProxy::desktopClientDisplayName()
+{
+    return nx::branding::desktopClientDisplayName();
 }
 
 bool QmlProxy::isDesktopClientCustomized()

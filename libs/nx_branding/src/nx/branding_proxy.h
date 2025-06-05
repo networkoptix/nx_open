@@ -14,9 +14,11 @@ public:
     QmlProxy(QObject* parent = nullptr);
 
     Q_INVOKABLE static QString cloudName();
+    Q_INVOKABLE static QString shortCloudName();
     Q_INVOKABLE static QString company();
     Q_INVOKABLE static QString companyUrl();
     Q_INVOKABLE static QString vmsName();
+    Q_INVOKABLE static QString desktopClientDisplayName();
     Q_INVOKABLE static bool isDesktopClientCustomized();
     Q_INVOKABLE static QString supportAddress();
     Q_INVOKABLE static QString defaultLocale();

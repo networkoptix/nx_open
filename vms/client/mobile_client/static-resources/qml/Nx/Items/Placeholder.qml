@@ -54,6 +54,7 @@ ColumnLayout
         Layout.topMargin: 16
         Layout.fillWidth: true
 
+        visible: text !== ""
         color: ColorTheme.colors.light12
 
         horizontalAlignment: Text.AlignHCenter

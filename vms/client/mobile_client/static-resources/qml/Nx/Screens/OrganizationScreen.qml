@@ -10,6 +10,7 @@ import Nx.Controls
 import Nx.Items
 import Nx.Dialogs
 import Nx.Models
+import Nx.Mobile.Ui.Sheets
 import Nx.Ui
 
 import nx.vms.client.core
@@ -219,12 +220,14 @@ Page
 
         imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10"
         text: qsTr("No Sites")
-        description: inOrg
-            ? qsTr("We did not find any sites in this organization")
-            : qsTr("We did not find any sites in this folder")
-        buttonText: inOrg ? qsTr("How to connect sites?") : ""
+        buttonText: inOrg ? qsTr("How to connect?") : ""
         buttonIcon.source: "image://skin/24x24/Outline/cloud.svg?primary=dark1"
-        onButtonClicked: { console.log("how to connect sites?"); }
+        onButtonClicked: cloudConnectionHelp.open()
+
+        CloudConnectionHelpSheet
+        {
+            id: cloudConnectionHelp
+        }
     }
 
     Placeholder
