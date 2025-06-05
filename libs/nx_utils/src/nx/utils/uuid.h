@@ -113,6 +113,8 @@ public:
 
     static Uuid fromString(const std::string_view& str);
 
+    static Uuid fromStringWithCheck(const std::string_view& str, bool* ok);
+
 private:
     QUuid m_uuid;
 

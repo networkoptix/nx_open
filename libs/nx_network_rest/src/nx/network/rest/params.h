@@ -119,7 +119,10 @@ private:
 
         if constexpr (std::is_same_v<nx::Uuid, T>)
         {
-            *data = T::fromString(valueStd);
+            bool ok = false;
+            *data = T::fromStringWithCheck(valueStd, &ok);
+            if (!ok)
+                throw Exception::invalidParameter(name, value);
             return {};
         }
 

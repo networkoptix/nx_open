@@ -12,6 +12,14 @@
 
 namespace {
 
+constexpr std::string_view kNullUuid = "00000000-0000-0000-0000-000000000000";
+constexpr std::string_view kNullUuidWithBraces = "{00000000-0000-0000-0000-000000000000}";
+
+bool isValidNullUuidString(const std::string_view& data)
+{
+    return data == kNullUuid || data == kNullUuidWithBraces;
+}
+
 // Qt 6.8.0 broke or changed QUuid sorting order. This function implements the old behavior.
 Qt::strong_ordering compare(const QUuid& left, const QUuid& right)
 {
@@ -251,13 +259,14 @@ Uuid Uuid::createUuidFromPool(const QUuid &baseId, uint offset)
 
 Uuid Uuid::fromString(const std::string_view& value)
 {
-    Uuid result = Uuid::fromStringSafe(value);
-    if (result.isNull()
-        && value != "00000000-0000-0000-0000-000000000000"
-        && value != "{00000000-0000-0000-0000-000000000000}")
-    {
-        return Uuid();
-    }
+    return Uuid::fromStringSafe(value);
+}
+
+Uuid Uuid::fromStringWithCheck(const std::string_view& str, bool* ok)
+{
+    Uuid result = Uuid::fromStringSafe(str);
+    if (ok)
+        *ok = str.empty() || !result.isNull() || isValidNullUuidString(str);
 
     return result;
 }
