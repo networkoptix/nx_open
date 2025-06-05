@@ -380,7 +380,7 @@ bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
     // Layout background.
     if (!d->layout->backgroundImageFilename().isEmpty())
     {
-        auto systemContext = SystemContext::fromResource(d->layout);
+        auto systemContext = SystemContext::fromResource(d->originalLayout);
         if (!NX_ASSERT(systemContext))
             systemContext = appContext()->currentSystemContext();
 
