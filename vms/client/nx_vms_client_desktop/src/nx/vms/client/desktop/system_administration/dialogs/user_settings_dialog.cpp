@@ -604,14 +604,6 @@ UserSettingsDialog::UserSettingsDialog(
             });
     }
 
-    // FIXME: #sivanov Looks very suspicious.
-    connect(windowContext, &WindowContext::systemChanged, this,
-        [this]
-        {
-            if (d->user || d->dialogType == CreateUser)
-                updateStateFrom(d->user);
-        });
-
     if (dialogType == EditUser)
     {
         // It is important to make the connections queued so we would not block inside QML code.
