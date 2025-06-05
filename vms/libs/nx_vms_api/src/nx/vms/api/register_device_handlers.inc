@@ -134,7 +134,7 @@ void registerDeviceBaseHandlers(
     /**%apidoc POST /rest/v{2-}/devices/{id}/replace
      * Replaces the Device with another one. The replaced Device is removed completely, and its
      * settings and Archive are transferred to the Device it is replaced with.
-     * %caption Replace Device
+     * %caption Replace Device with another
      * %ingroup Devices
      * %struct DeviceReplacementRequest
      * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
@@ -253,7 +253,7 @@ void registerDeviceBaseHandlers(
      * seconds (defaults to 60) of inactivity. To maintain continuous monitoring, make periodic
      * calls to this endpoint.
      * %jsonrpc subscribe Same result and `update` notifications over time.
-     * %caption Get IO States
+     * %caption Get Device IO States
      * %ingroup Devices
      * %struct DeviceIoFilter
      * %param:string deviceId
@@ -267,7 +267,7 @@ void registerDeviceBaseHandlers(
      * if not already active. The monitoring session will timeout after ioPortMonitoringTimeoutS
      * seconds (defaults to 60) of inactivity. To maintain continuous monitoring, make periodic
      * calls to this endpoint.
-     * %caption Get IO States
+     * %caption Get all Devices' IO States
      * %ingroup Devices
      * %struct DeviceIoFilter
      * %param[opt] deviceId
@@ -278,7 +278,7 @@ void registerDeviceBaseHandlers(
      *
      **%apidoc PATCH /rest/v{4-}/devices/{deviceId}/io
      * Update current IO State of Device.
-     * %caption Update IO State
+     * %caption Update Device IO State
      * %ingroup Devices
      * %struct DeviceIoUpdateRequest
      * %param[ref] _local,_strict,_ticket

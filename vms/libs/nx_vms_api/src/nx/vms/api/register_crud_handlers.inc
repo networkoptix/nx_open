@@ -571,7 +571,7 @@ static void registerSystemRestHandlers(
      * Cloud polling interval end. Does nothing if the Cloud pulling is already in progress. Cloud
      * polling interval can be set up using `cloudPollingIntervalS` setting that should be greater
      * than zero.
-     * %caption Pull data from Cloud
+     * %caption Pull data from Cloud service
      * %ingroup Cloud
      * %struct CloudSyncRequest
      * %param[ref] _language,_local,_strict
@@ -582,7 +582,7 @@ static void registerSystemRestHandlers(
      * Retrieves the status of the Cloud pulling that is initiated each Cloud polling interval or
      * using `POST /rest/v{4-}/cloud/sync` call. Cloud polling interval can be set up using
      * `cloudPollingIntervalS` setting that should be greater than zero.
-     * %caption Cloud pulling status
+     * %caption Cloud service pulling status
      * %ingroup Cloud
      * %struct CloudSyncRequest
      * %param[ref] _format,_stripDefault,_language,_local,_pretty,_strict,_with
@@ -2368,7 +2368,7 @@ static void registerDeviceHandlers(
      * <code>https://&lt;server_ip&gt;:&lt;port&gt;/webrtc-camera</code>
      *
      * %jsonrpc[unused]
-     * %caption Open WebRTC Tracker
+     * %caption WebRTC Tracker into Device
      * %ingroup Device Media
      * %struct WebRtcCameraTrackerSettings
      * %param[ref] _local,_strict,_ticket
@@ -2664,7 +2664,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * Get Analytics Actions from all or a specified set of Analytics Plugins which are applicable
      * to the specified metadata Object type.
      * %jsonrpc[result] all
-     * %caption Get Analytics Actions
+     * %caption Get Engines' Analytics Actions
      * %ingroup Analytics
      * %struct RequestAvailableAnalyticsActions
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
@@ -2675,7 +2675,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      *%apidoc GET /rest/v{4-}/analytics/engines/{engineId}/actions
      * Get Analytics Actions from all or a specified set of Analytics Plugins which are applicable
      * to the specified metadata Object type.
-     * %caption Get Analytics Actions
+     * %caption Get Engine Analytics Actions
      * %ingroup Analytics
      * %struct RequestAvailableAnalyticsActions
      * %param:string engineId
@@ -2704,7 +2704,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
 
     /**%apidoc GET /rest/v{4-}/analytics/engines/{id}/settings
      * Gets settings of an Analytics Engine.
-     * %caption Analytics Engine's Settings
+     * %caption Get Analytics Engine Settings
      * %ingroup Analytics
      * %param:uuid id Engine's id
      * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
@@ -2714,7 +2714,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      *
      **%apidoc PUT /rest/v{4-}/analytics/engines/{id}/settings
      * Set settings for an Analytics Engine.
-     * %caption Analytics Engine's Settings
+     * %caption Set Analytics Engine Settings
      * %ingroup Analytics
      * %struct AnalyticsEngineSettings
      * %param[ref] _strict,_ticket,_local
@@ -2760,7 +2760,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
 
     /**%apidoc GET /rest/v{4-}/analytics/engines/{engineId}/deviceAgents/{deviceId}/settings
      * Get settings values of the specified DeviceAgent
-     * %caption Device Agent settings
+     * %caption Get Device Agent settings
      * %ingroup Analytics
      * %struct AnalyticsDeviceSettings
      * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
@@ -2770,7 +2770,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      *
      **%apidoc PUT /rest/v{4-}/analytics/engines/{engineId}/deviceAgents/{deviceId}/settings
      * Set settings values of the specified DeviceAgent
-     * %caption Device Agent settings
+     * %caption Set Device Agent settings
      * %ingroup Analytics
      * %struct AnalyticsDeviceSettings
      * %param[ref] _strict,_ticket
@@ -2977,7 +2977,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
 
     /**%apidoc POST /rest/v{4-}/analytics/engines/{id}/integrationDiagnosticEvent
      * Equivalent of IEngine::pushIntegrationDiagnosticEvent().
-     * %caption Push Diagnostic Event
+     * %caption Push Engine Diagnostic Event
      * %ingroup Analytics
      * %struct EngineIntegrationDiagnosticEvent
      * %param[ref] _strict,_ticket,_local
@@ -2989,7 +2989,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
 
     /**%apidoc POST /rest/v{4-}/analytics/engines/{id}/deviceAgents/{deviceId}/integrationDiagnosticEvent
      * Equivalent of IDeviceAgent::pushIntegrationDiagnosticEvent().
-     * %caption Push Diagnostic Event
+     * %caption Push Agent Diagnostic Event
      * %ingroup Analytics
      * %struct DeviceAgentIntegrationDiagnosticEvent
      * %param[ref] _strict,_ticket,_local

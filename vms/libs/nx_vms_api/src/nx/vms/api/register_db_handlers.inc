@@ -1296,7 +1296,7 @@ void registerRestHandlers(
     /**%apidoc GET /rest/v{3-}/lookupLists
      * Retrieves Lookup List records stored in the Site.
      * %jsonrpc subscribe
-     * %caption Get Lookup List
+     * %caption Get Lookup Lists
      * %ingroup Lookup Lists
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Power User.
