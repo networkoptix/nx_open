@@ -871,10 +871,6 @@
       <source>Local recording</source>
       <translation>Rekaman lokal</translation>
     </message>
-    <message>
-      <source>Local recording service</source>
-      <translation>Layanan rekaman lokal</translation>
-    </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
       <translation>
@@ -887,6 +883,10 @@
       <translation>
         <numerusform>%n/%1 Layanan rekaman lokal</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Local recording services</source>
+      <translation>Layanan rekaman lokal</translation>
     </message>
   </context>
   <context>

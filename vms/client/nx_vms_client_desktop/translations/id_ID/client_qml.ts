@@ -762,6 +762,17 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     </message>
   </context>
   <context>
+    <name>EventTestDialog</name>
+    <message>
+      <source>Event Test</source>
+      <translation type="unfinished">Event Test</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>Test</translation>
+    </message>
+  </context>
+  <context>
     <name>EventTypeSelector</name>
     <message>
       <source>Analytics Event</source>
@@ -3087,6 +3098,10 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     <message>
       <source>Disable</source>
       <translation>Disable</translation>
+    </message>
+    <message>
+      <source>Test events...</source>
+      <translation type="unfinished">Test events...</translation>
     </message>
   </context>
   <context>

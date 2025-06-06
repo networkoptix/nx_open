@@ -871,10 +871,6 @@
       <source>Local recording</source>
       <translation>ローカル録画</translation>
     </message>
-    <message>
-      <source>Local recording service</source>
-      <translation>ローカル録画サービス</translation>
-    </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
       <translation>
@@ -887,6 +883,10 @@
       <translation>
         <numerusform>%n/%1 ローカル録画サービス</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Local recording services</source>
+      <translation>ローカル録画サービス</translation>
     </message>
   </context>
   <context>

@@ -762,6 +762,17 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
   </context>
   <context>
+    <name>EventTestDialog</name>
+    <message>
+      <source>Event Test</source>
+      <translation type="unfinished">Event Test</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>테스트</translation>
+    </message>
+  </context>
+  <context>
     <name>EventTypeSelector</name>
     <message>
       <source>Analytics Event</source>
@@ -3082,6 +3093,10 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     <message>
       <source>Disable</source>
       <translation>비활성화</translation>
+    </message>
+    <message>
+      <source>Test events...</source>
+      <translation type="unfinished">Test events...</translation>
     </message>
   </context>
   <context>

@@ -910,10 +910,6 @@
       <source>Local recording</source>
       <translation>Lokalt opptak</translation>
     </message>
-    <message>
-      <source>Local recording service</source>
-      <translation type="unfinished">Local recording service</translation>
-    </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
       <translation type="unfinished">
@@ -928,6 +924,10 @@
         <numerusform>%n/%1 Local recording services</numerusform>
         <numerusform>%n/%1 Local recording services</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Local recording services</source>
+      <translation type="unfinished">Local recording services</translation>
     </message>
   </context>
   <context>

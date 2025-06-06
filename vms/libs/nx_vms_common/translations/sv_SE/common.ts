@@ -910,10 +910,6 @@
       <source>Local recording</source>
       <translation>Lokal inspelning</translation>
     </message>
-    <message>
-      <source>Local recording service</source>
-      <translation>Lokal inspelningstjänst</translation>
-    </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
       <translation>
@@ -928,6 +924,10 @@
         <numerusform>%n/%1 Lokala inspelningstjänster</numerusform>
         <numerusform>%n/%1 Lokala inspelningstjänster</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Local recording services</source>
+      <translation>Lokala inspelningstjänster</translation>
     </message>
   </context>
   <context>

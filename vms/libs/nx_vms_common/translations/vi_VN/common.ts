@@ -871,10 +871,6 @@
       <source>Local recording</source>
       <translation>Ghi cục bộ</translation>
     </message>
-    <message>
-      <source>Local recording service</source>
-      <translation>Dịch vụ ghi cục bộ</translation>
-    </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
       <translation>
@@ -887,6 +883,10 @@
       <translation>
         <numerusform>%n/%1 Dịch vụ ghi cục bộ</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Local recording services</source>
+      <translation>Dịch vụ ghi cục bộ</translation>
     </message>
   </context>
   <context>

@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>Unknown action</source>
-      <translation type="unfinished">Unknown action</translation>
+      <translation>Nieznana akcja</translation>
     </message>
     <message>
       <source>Any event</source>
@@ -169,7 +169,7 @@
     </message>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>Na układzie</translation>
     </message>
     <message>
       <source>Event Devices</source>
@@ -302,7 +302,7 @@
     </message>
     <message>
       <source>Method</source>
-      <translation type="unfinished">Method</translation>
+      <translation>Metoda</translation>
     </message>
     <message>
       <source>Select Integration Action</source>
@@ -566,7 +566,7 @@
     </message>
     <message>
       <source>Set for</source>
-      <translation type="unfinished">Set for</translation>
+      <translation>Ustaw dla</translation>
     </message>
   </context>
   <context>
@@ -580,7 +580,7 @@
     <name>nx::vms::rules::FanErrorEvent</name>
     <message>
       <source>Fan Failure</source>
-      <translation type="unfinished">Fan Failure</translation>
+      <translation>Awaria wentylatora</translation>
     </message>
     <message>
       <source>Fan failure at %1</source>
@@ -595,11 +595,11 @@
     </message>
     <message>
       <source>Omit logging</source>
-      <translation type="unfinished">Omit logging</translation>
+      <translation>Pomiń logowanie w dzienniku</translation>
     </message>
     <message>
       <source>And Source</source>
-      <translation type="unfinished">And Source</translation>
+      <translation>I źródło</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -622,7 +622,7 @@
     </message>
     <message>
       <source>HTTP(S) Request</source>
-      <translation type="unfinished">HTTP(S) Request</translation>
+      <translation>Żądanie HTTP(S)</translation>
     </message>
     <message>
       <source>URL</source>
@@ -909,14 +909,14 @@
     <name>nx::vms::rules::PanicRecordingAction</name>
     <message>
       <source>Panic Recording</source>
-      <translation type="unfinished">Panic Recording</translation>
+      <translation>Nagrywaj w trybie paniki</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PlaySoundAction</name>
     <message>
       <source>Play Sound</source>
-      <translation type="unfinished">Play Sound</translation>
+      <translation>Odtwórz dźwięk</translation>
     </message>
   </context>
   <context>
@@ -1259,7 +1259,7 @@
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
-      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+      <translation>Kopia zapasowa archiwum nie powiodła się. Nie udało się wykonać kopii zapasowej pliku %1.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
@@ -1319,11 +1319,11 @@
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show Text Overlay</source>
-      <translation type="unfinished">Show Text Overlay</translation>
+      <translation>Wyświetl tekst na obrazie</translation>
     </message>
     <message>
       <source>Custom Text</source>
-      <translation type="unfinished">Custom Text</translation>
+      <translation>Niestandardowy tekst</translation>
     </message>
     <message>
       <source>Show To</source>
@@ -1357,7 +1357,7 @@
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
       <source>Write to Log</source>
-      <translation type="unfinished">Write to Log</translation>
+      <translation>Zapisz w dzienniku</translation>
     </message>
   </context>
 </TS>

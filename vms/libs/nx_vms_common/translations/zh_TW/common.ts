@@ -871,10 +871,6 @@
       <source>Local recording</source>
       <translation>本地錄影</translation>
     </message>
-    <message>
-      <source>Local recording service</source>
-      <translation>本地錄影服務</translation>
-    </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
       <translation>
@@ -887,6 +883,10 @@
       <translation>
         <numerusform>%n/%1 個本地錄影服務</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Local recording services</source>
+      <translation>個本地錄影服務</translation>
     </message>
   </context>
   <context>

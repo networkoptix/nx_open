@@ -763,6 +763,17 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
   </context>
   <context>
+    <name>EventTestDialog</name>
+    <message>
+      <source>Event Test</source>
+      <translation type="unfinished">Event Test</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>テスト</translation>
+    </message>
+  </context>
+  <context>
     <name>EventTypeSelector</name>
     <message>
       <source>Analytics Event</source>
@@ -3091,6 +3102,10 @@ Alt + クリックを使用してください。</translation>
     <message>
       <source>Disable</source>
       <translation>無効化</translation>
+    </message>
+    <message>
+      <source>Test events...</source>
+      <translation type="unfinished">Test events...</translation>
     </message>
   </context>
   <context>
