@@ -57,13 +57,22 @@ public:
     };
 
     SendDataResult sendData(
-        const char* data, int size, std::optional<int64_t> timestampForLogging = std::nullopt)
+        const char* data, int size, std::optional<int64_t> timestampForLogging = {})
+    {
+        return sendData(data, size, socket.get(), std::move(timestampForLogging));
+    }
+
+    SendDataResult sendData(
+        const char* data,
+        int size,
+        nx::network::AbstractStreamSocket* target,
+        std::optional<int64_t> timestampForLogging = {})
     {
         using namespace std::chrono;
 
         const auto beforeSendTime = steady_clock::now();
         SendDataResult result;
-        result.sendResult = socket->send(data, size);
+        result.sendResult = target->send(data, size);
         const auto afterSendTime = steady_clock::now();
 
         if (result.sendResult < 0)

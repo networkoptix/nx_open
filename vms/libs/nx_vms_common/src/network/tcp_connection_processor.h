@@ -117,6 +117,14 @@ public:
 
     QnTcpListener* owner() const;
 
+    static void logRequestOrResponse(
+        const QByteArray& logMessage,
+        const nx::network::SocketAddress& address,
+        const QByteArray& contentType,
+        const QByteArray& contentEncoding,
+        const QByteArray& httpMessageFull,
+        const nx::Buffer& httpMessageBodyOnly);
+
 protected:
     QnAuthSession authSession(const Qn::UserAccessData& accessRights) const;
     QString extractPath() const;
@@ -168,13 +176,6 @@ protected:
     void sendUnauthorizedResponse(
         nx::network::http::StatusCode::Value httpResult,
         const QByteArray& messageBody = {}, const nx::String& details = {});
-
-    void logRequestOrResponse(
-        const QByteArray& logMessage,
-        const QByteArray& contentType,
-        const QByteArray& contentEncoding,
-        const QByteArray& httpMessageFull,
-        const nx::Buffer& httpMessageBodyOnly);
 
 protected:
     Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);
