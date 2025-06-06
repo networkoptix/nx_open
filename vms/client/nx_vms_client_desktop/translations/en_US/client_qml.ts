@@ -762,6 +762,17 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
 </context>
 <context>
+    <name>EventTestDialog</name>
+    <message>
+        <source>Event Test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>EventTypeSelector</name>
     <message>
         <source>Analytics Event</source>
@@ -3090,6 +3101,10 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
         <source>Disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test events...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
