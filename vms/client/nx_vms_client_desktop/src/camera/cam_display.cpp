@@ -847,7 +847,7 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
         m_extTimeSrc->onBufferingStarted(this, time);
 
     {
-        auto randomAccess = m_dataQueue.lock();
+        const auto randomAccess = m_dataQueue.lock();
         markIgnoreBefore(randomAccess, time);
     }
     NX_MUTEX_LOCKER lock( &m_timeMutex );

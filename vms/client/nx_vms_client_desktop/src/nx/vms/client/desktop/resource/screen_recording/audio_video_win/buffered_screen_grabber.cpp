@@ -99,7 +99,7 @@ bool BufferedScreenGrabber::dataExist()
 CaptureInfoPtr BufferedScreenGrabber::getNextFrame()
 {
     CaptureInfoPtr rez;
-    m_queue.pop(rez, 40);
+    m_queue.pop(rez, std::chrono::milliseconds(40));
     return rez;
 }
 

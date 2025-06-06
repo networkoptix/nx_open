@@ -35,11 +35,10 @@ void QnBufferedFrameDisplayer::waitForFramesDisplayed()
 qint64 QnBufferedFrameDisplayer::bufferedDuration()
 {
     NX_MUTEX_LOCKER lock(&m_sync);
-    auto randomAccess = m_queue.lock();
-    if (randomAccess.size() == 0)
-        return 0;
-    else
+    const auto randomAccess = m_queue.lock();
+    if (randomAccess.size() > 0)
         return m_lastQueuedTime - randomAccess.front()->pkt_dts;
+    return 0;
 }
 
 bool QnBufferedFrameDisplayer::addFrame(const CLConstVideoDecoderOutputPtr& outFrame)
@@ -105,7 +104,7 @@ void QnBufferedFrameDisplayer::run()
     while (!needToStop())
     {
         {
-            auto randomAccess = m_queue.lock();
+            const auto randomAccess = m_queue.lock();
             frame = randomAccess.size() > 0 ? randomAccess.front() : CLConstVideoDecoderOutputPtr();
         }
         if (frame)
