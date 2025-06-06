@@ -4,6 +4,8 @@
 
 #include <QtCore/QString>
 
+#include <nx/reflect/json.h>
+
 #include "conversion_wrapper.h"
 
 class QnJsonContext;
@@ -17,6 +19,8 @@ struct Void
     inline QString toString() const { return QString(); }
     bool operator==(const Void&) const { return false; }
 };
+
+NX_REFLECTION_INSTRUMENT(Void, )
 
 inline void serialize(QnJsonContext*, const Void&, QJsonValue*) {}
 inline bool deserialize(QnJsonContext*, QnConversionWrapper<QJsonValue>, Void*) { return true; }

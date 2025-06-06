@@ -174,6 +174,9 @@ public:
     nx::Uuid layoutId;
 };
 
+#define LayoutItemId_Fields (layoutId)
+NX_REFLECTION_INSTRUMENT(LayoutItemId, LayoutItemId_Fields)
+
 /**%apidoc
  * Layout Item filter
  * %param id Layout Item unique id.

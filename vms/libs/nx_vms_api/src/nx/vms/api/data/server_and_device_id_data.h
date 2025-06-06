@@ -12,7 +12,6 @@ namespace nx::vms::api {
 
 struct NX_VMS_API ServerAndDeviceIdData
 {
-    QString toString() const { return NX_FMT("deviceId: %1, serverId: %2", deviceId, serverId); }
     nx::Uuid deviceId;
     nx::Uuid serverId;
 

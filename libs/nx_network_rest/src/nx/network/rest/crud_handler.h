@@ -231,7 +231,11 @@ protected:
     {
         auto list = call(&Derived::read, id, request, responseAttributes);
         if (list.empty())
-            throw Exception{{emptyError, NX_FMT("Resource '%1' is not found", id)}};
+        {
+            throw Exception{{
+                emptyError,
+                NX_FMT("Resource %1 is not found", nx::reflect::json::serialize(id))}};
+        }
 
         size_t size = 0; //< Remove constexpr of std::array::size() to suppress warning C4127.
         if constexpr (nx::reflect::IsArrayV<decltype(list)>)
@@ -240,8 +244,9 @@ protected:
             size = list.size();
         if (size != 1)
         {
-            const auto error =
-                NX_FMT("There are %1 resources with '%2' id while it should be one.", size, id);
+            const auto error = NX_FMT(
+                "There are %1 resources with %2 id while it should be one.",
+                size, nx::reflect::json::serialize(id));
             NX_ASSERT(false, error);
             throw Exception::internalServerError(error);
         }
