@@ -16,11 +16,7 @@
 
 namespace nx::log::test {
 
-#if defined(Q_OS_WIN)
-    const QByteArray kLineSplit("\r\n");
-#else
-    const QByteArray kLineSplit("\n");
-#endif
+const QByteArray kLineSplit("\n");
 
 class LogFile: public ::testing::Test
 {
