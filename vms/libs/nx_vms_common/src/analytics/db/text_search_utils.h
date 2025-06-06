@@ -105,11 +105,12 @@ struct AttributeValueMatch:
 
 struct NumericRangeMatch: public TextSearchCondition
 {
-    NumericRangeMatch(const QString& name, const nx::common::metadata::NumericRange& range):
+    NumericRangeMatch(const QString& name, const nx::common::metadata::NumericRange& range, bool isNegative = false):
         TextSearchCondition(ConditionType::numericRangeMatch)
     {
         this->name = name;
         this->range = range;
+        this->isNegative = isNegative;
     }
 };
 
@@ -327,6 +328,7 @@ void UserTextSearchExpressionParser::processTokens(Handler& handler)
 
             using namespace nx::common::metadata;
             const bool forceTextSearch = nextToken->isQuoted && token.value == QString("=");
+            const bool negative = isNegative(previousToken->value) ^ (token.value == "!=");
             if (!forceTextSearch && AttributeEx::isNumberOrRange(attributeName, attributeValue))
             {
                 NumericRange range;
@@ -340,15 +342,11 @@ void UserTextSearchExpressionParser::processTokens(Handler& handler)
                     range.to = RangePoint{attributeValue.toFloat(), true};
                 else
                     range = AttributeEx::parseRangeFromValue(attributeValue);
-
-                handler(NumericRangeMatch(attributeName, range));
+                handler(NumericRangeMatch(attributeName, range, negative));
             }
             else
             {
-                bool b = isNegative(previousToken->value);
-                if (token.value == QString("!="))
-                    b = !b;
-                handler(AttributeValueMatch(attributeName, valueToken, b));
+                handler(AttributeValueMatch(attributeName, valueToken, negative));
             }
             // We have already consumed the next token.
             ++i;

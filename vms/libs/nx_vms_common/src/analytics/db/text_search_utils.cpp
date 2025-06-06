@@ -237,6 +237,7 @@ uint64_t TextMatcher::matchAttributeValues(
     for (std::size_t i = 0; i < m_conditions.size(); ++i)
     {
         const auto& condition = m_conditions[i];
+        bool isMatched = false;
         if (condition.type == ConditionType::textMatch)
         {
             if (condition.text.length() < kMinTokenLength)
@@ -244,14 +245,20 @@ uint64_t TextMatcher::matchAttributeValues(
                 // Match the text in the same way as the SQL trigram matcher. It can match >= 3 symbols only.
                 continue;
             }
-            if (wordMatchAnyOfAttributes(condition.text, attributes))
-                result |= (1ull << i);
+            isMatched = wordMatchAnyOfAttributes(condition.text, attributes);
         }
         else if (condition.type == ConditionType::numericRangeMatch)
         {
-            if (rangeMatchAttributes(condition.range, condition.name, attributes))
-                result |= (1ull << i);
+            isMatched = rangeMatchAttributes(condition.range, condition.name, attributes);
         }
+        else
+        {
+            continue;
+        }
+        if (condition.isNegative)
+            isMatched = !isMatched;
+        if (isMatched)
+            result |= (1ull << i);
     }
     return result;
 }
