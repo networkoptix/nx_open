@@ -232,6 +232,7 @@ void QnTCPConnectionProcessor::parseRequest()
         d->requestLogged = true;
         logRequestOrResponse(
             "Received request from",
+            d->socket->getForeignAddress(),
             QByteArray::fromStdString(nx::network::http::getHeaderValue(d->request.headers, "Content-Type")),
             QByteArray::fromStdString(nx::network::http::getHeaderValue(d->request.headers, "Content-Encoding")),
             d->clientRequest,
@@ -378,6 +379,7 @@ std::pair<nx::String, nx::String> QnTCPConnectionProcessor::generateErrorRespons
 
 void QnTCPConnectionProcessor::logRequestOrResponse(
     const QByteArray& logMessage,
+    const nx::network::SocketAddress& address,
     const QByteArray& contentType,
     const QByteArray& contentEncoding,
     const QByteArray& httpMessageFull,
@@ -386,7 +388,6 @@ void QnTCPConnectionProcessor::logRequestOrResponse(
     if (!nx::log::isToBeLogged(nx::log::Level::debug, nx::log::kHttpTag))
         return;
 
-    Q_D(QnTCPConnectionProcessor);
     const auto uncompressDataIfNeeded =
         [&]()
         {
@@ -418,7 +419,7 @@ void QnTCPConnectionProcessor::logRequestOrResponse(
         httpMessageFull.constData(), httpMessageFull.size() - httpMessageBodyOnly.size());
 
     NX_DEBUG(nx::log::kHttpTag, "%1 %2:\n%3%4%5",
-        logMessage, d->socket->getForeignAddress(), headers,
+        logMessage, address, headers,
         bodyToPrint, bodyToPrint.isEmpty() ? "" : "\n");
 }
 
@@ -484,7 +485,8 @@ nx::String QnTCPConnectionProcessor::createResponse(
         ? d->response.toMultipartString(multipartBoundary)
         : d->response.toString();
 
-    logRequestOrResponse("Sending response to", contentType, contentEncoding, response, d->response.messageBody);
+    logRequestOrResponse("Sending response to", d->socket->getForeignAddress(),
+        contentType, contentEncoding, response,d->response.messageBody);
 
     return response;
 }
