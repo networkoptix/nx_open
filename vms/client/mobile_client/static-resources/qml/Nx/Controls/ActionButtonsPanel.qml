@@ -53,7 +53,7 @@ Item
         width: parent.width - 1
         height: parent.height
 
-        blockMouseEvents: control.opacity != 1
+        blockMouseEvents: control.opacity === 0
 
         onButtonDownChanged: (index, down) =>
         {
