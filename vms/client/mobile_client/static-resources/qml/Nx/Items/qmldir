@@ -13,3 +13,4 @@ BookmarkList 1.0 BookmarkList.qml
 DownloadMediaButton 1.0 DownloadMediaButton.qml
 Breadcrumb 1.0 Breadcrumb.qml
 SiteList 1.0 SiteList.qml
+HorizontalSlide 1.0 HorizontalSlide.qml
