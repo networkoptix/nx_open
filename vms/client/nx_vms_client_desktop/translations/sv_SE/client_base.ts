@@ -1295,11 +1295,11 @@
     </message>
     <message>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>Video</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation type="unfinished">All Files</translation>
+      <translation>Alla filer</translation>
     </message>
   </context>
   <context>
