@@ -12,35 +12,27 @@
 #include <nx/utils/thread/semaphore.h>
 #include <nx/utils/thread/wait_condition.h>
 
-static const qint32 MAX_THREAD_QUEUE_SIZE = 256;
+static constexpr qint32 kDefaultMaxThreadQueueSize = 256;
 
 template <typename T>
 class QnSafeQueue
 {
 public:
-
-    template <class Q=QnSafeQueue>
+    template <class Q = QnSafeQueue>
     class RandomAccess
     {
     public:
         RandomAccess(const RandomAccess<Q>&) = delete;
         RandomAccess<Q>& operator=(const RandomAccess<Q>&) = delete;
 
-        RandomAccess(RandomAccess<Q>&& other)
+        RandomAccess(RandomAccess<Q>&& other) noexcept
         {
-            m_q = other.m_q;
-            other.m_q = nullptr;
+            m_q = std::exchange(other.m_q, nullptr);
         }
-        RandomAccess<Q>& operator=(RandomAccess<Q>&& other)
+        RandomAccess<Q>& operator=(RandomAccess<Q>&& other) noexcept
         {
-            m_q = other.m_q;
-            other.m_q = nullptr;
-        }
-
-        RandomAccess(Q* queue):
-            m_q(queue)
-        {
-            m_q->lockInternal();
+            m_q = std::exchange(other.m_q, nullptr);
+            return *this;
         }
 
         ~RandomAccess()
@@ -49,20 +41,20 @@ public:
                 m_q->unlockInternal();
         }
 
-        const T& at(int i) const
+        // Returns T() in case of invalid index.
+        const T& at(int index) const
         {
-            return m_q->atUnsafe(i);
+            return m_q->atUnsafe(index);
         }
 
-        void setAt(const T& value, int i)
+        bool setAt(const T& value, int i)
         {
-            int index = m_q->m_headIndex + i;
-            m_q->m_buffer[index % m_q->m_buffer.size()] = value;
+            return m_q->setAtUnsafe(value, i);
         }
 
-        void removeAt(int index)
+        bool removeAt(int index)
         {
-            m_q->removeAtUnsafe(index);
+            return m_q->removeAtUnsafe(index);
         }
 
         void pack()
@@ -70,23 +62,26 @@ public:
             m_q->packUnsafe();
         }
 
-        void popFront()
+        bool popFront()
         {
+            if (m_q->isEmpty())
+                return false;
+
             m_q->m_buffer[m_q->m_headIndex++] = T();
             if (m_q->m_headIndex >= (int) m_q->m_buffer.size())
                 m_q->m_headIndex = 0;
             --m_q->m_bufferLen;
+            return true;
         }
 
-        T front() const
+        const T& front() const
         {
-            return m_q->m_buffer[m_q->m_headIndex];
+            return at(0);
         }
 
-        T last() const
+        const T& last() const
         {
-            int index = m_q->m_headIndex + m_q->m_bufferLen - 1;
-            return m_q->m_bufferLen > 0 ? m_q->m_buffer[index % m_q->m_buffer.size()] : T();
+            return at(size() - 1);
         }
 
         int size() const
@@ -100,25 +95,24 @@ public:
         }
 
     private:
+        explicit RandomAccess(Q* queue): m_q(queue)
+        {
+            m_q->lockInternal();
+        }
+
+    private:
         Q* m_q = nullptr;
+
+        friend class QnSafeQueue<T>;
     };
 
     /**
      * @param maxSize Is not used by the implementation of this class, but rather intended to be
      *     checked by pushers via maxSize().
      */
-    QnSafeQueue( quint32 maxSize = MAX_THREAD_QUEUE_SIZE)
-        : m_headIndex(0),
-        m_bufferLen(0),
-        m_maxSize(maxSize),
-        m_terminated(false)
+    explicit QnSafeQueue(quint32 maxSize = kDefaultMaxThreadQueueSize) : m_maxSize(maxSize)
     {
         reallocateBufferUnsafe(maxSize);
-    }
-
-    ~QnSafeQueue()
-    {
-        clearUnsafe();
     }
 
     RandomAccess<const QnSafeQueue> lock() const
@@ -126,25 +120,27 @@ public:
         return RandomAccess<const QnSafeQueue>(const_cast<QnSafeQueue*>(this));
     }
 
-    RandomAccess<> lock()
+    RandomAccess<QnSafeQueue> lock()
     {
-        return RandomAccess<>(this);
+        return RandomAccess<QnSafeQueue>(this);
     }
 
     bool isEmpty() const
     {
-        return m_bufferLen == 0;
+        return size() == 0;
     }
 
     template<typename ValueRef>
     bool push(ValueRef&& val)
     {
         NX_MUTEX_LOCKER mutex(&m_mutex);
+        if (m_terminated)
+            return false;
 
         if ((uint)m_bufferLen == m_buffer.size())
             reallocateBufferUnsafe(qMax(m_bufferLen + 1, m_bufferLen + m_bufferLen/4));
 
-        int index = (m_headIndex + m_bufferLen) % m_buffer.size();
+        const int index = (m_headIndex + m_bufferLen) % m_buffer.size();
         m_buffer[index] = std::forward<ValueRef>(val);
         m_bufferLen++;
 
@@ -153,15 +149,16 @@ public:
         return true;
     }
 
-    bool pop(T& val, unsigned long time = ULONG_MAX)
+    bool pop(T& val, std::chrono::milliseconds timeout = std::chrono::milliseconds::max())
     {
         NX_MUTEX_LOCKER mutex(&m_mutex);
-        if (!m_terminated && m_bufferLen == 0)
-            m_waitCond.wait(&m_mutex, time);
-        if (m_bufferLen == 0)
+        if (!m_terminated && isEmpty())
+            m_waitCond.wait(&m_mutex, timeout);
+
+        if (m_terminated || isEmpty())
             return false;
 
-        val = std::move(m_buffer[m_headIndex]);
+        val = std::exchange(m_buffer[m_headIndex], T());
         m_headIndex++;
         if ((uint)m_headIndex >= m_buffer.size())
             m_headIndex = 0;
@@ -196,7 +193,7 @@ public:
     {
         NX_MUTEX_LOCKER mutex(&m_mutex);
         m_maxSize = value;
-        reallocateBufferUnsafe(qMax(m_maxSize, (int) m_buffer.size()));
+        reallocateBufferUnsafe(std::max((int) m_maxSize, (int) m_buffer.size()));
     }
 
     void clear()
@@ -207,7 +204,8 @@ public:
     }
 
     /**
-     * Queue in terminated mode will not wait for new data if empty. But pop call returns already queued data anyway.
+     * Queue in terminated mode will not wait for new data if empty.
+     * But pop call returns already queued data anyway.
      */
     void setTerminated(bool value)
     {
@@ -217,7 +215,6 @@ public:
     }
 
 private:
-
     void lockInternal() const
     {
         m_mutex.lock();
@@ -228,14 +225,36 @@ private:
         m_mutex.unlock();
     }
 
+    bool isValidIndex(int index) const
+    {
+        return index >= 0 && index < size();
+    }
+
     const T& atUnsafe(int i) const
     {
-        int index = m_headIndex + i;
+        static const T empty{};
+        if (!isValidIndex(i))
+            return empty;
+
+        const int index = m_headIndex + i;
         return m_buffer[index % m_buffer.size()];
     }
 
-    void removeAtUnsafe(int index)
+    bool setAtUnsafe(const T& value, int i)
     {
+        if (!isValidIndex(i))
+            return false;
+
+        const int index = m_headIndex + i;
+        m_buffer[index % m_buffer.size()] = value;
+        return true;
+    }
+
+    bool removeAtUnsafe(int index)
+    {
+        if (!isValidIndex(index))
+            return false;
+
         int bufferIndex = (m_headIndex + index) % m_buffer.size();
         int toMove = m_bufferLen - index - 1;
         for (int i = 0; i < toMove; ++i)
@@ -246,6 +265,7 @@ private:
         }
         m_buffer[bufferIndex] = T();
         --m_bufferLen;
+        return true;
     }
 
     void packUnsafe()
@@ -270,28 +290,26 @@ private:
         m_bufferLen -= emptyElements;
     }
 
-private:
-    // for grow only
+    // For grow only.
     void reallocateBufferUnsafe(int newSize)
     {
-        int oldSize = (int) m_buffer.size();
+        const int oldSize = (int) m_buffer.size();
         m_buffer.resize(newSize);
 
         if (m_headIndex > 0 && m_bufferLen > 0 && newSize > oldSize)
         {
             int tailIndex = m_headIndex + m_bufferLen;
-            if (tailIndex > oldSize)
-                tailIndex -= oldSize;
-            else
-                return; // no correction is needed
+            if (tailIndex <= oldSize)
+                return; //< No correction is needed.
 
-            int delta = newSize-oldSize;
+            tailIndex -= oldSize;
+            const int delta = newSize - oldSize;
 
             for (int i = 0; i < delta && i < tailIndex; ++i)
                 m_buffer[oldSize + i] = std::move(m_buffer[i]);
             int i = 0;
             for (;i < tailIndex - delta; ++i)
-                m_buffer[i] = std::move(m_buffer[i+delta]);
+                m_buffer[i] = std::move(m_buffer[i + delta]);
             for (;i < tailIndex; ++i)
                 m_buffer[i] = T();
         }
@@ -311,20 +329,20 @@ private:
 
 protected:
     std::vector<T> m_buffer;
-    int m_headIndex;
-    std::atomic<int> m_bufferLen;
+    int m_headIndex = 0;
+    std::atomic<int> m_bufferLen = 0;
+    std::atomic<int> m_maxSize = 0;
 
-    int m_maxSize;
     mutable nx::Mutex m_mutex;
     mutable nx::WaitCondition m_waitCond;
-    bool m_terminated;
+    bool m_terminated = false;
 };
 
 template <typename T>
 class QnUnsafeQueue
 {
 public:
-    QnUnsafeQueue( quint32 maxSize = MAX_THREAD_QUEUE_SIZE)
+    QnUnsafeQueue( quint32 maxSize = kDefaultMaxThreadQueueSize)
         : m_headIndex(0),
         m_bufferLen(0),
         m_maxSize( maxSize )

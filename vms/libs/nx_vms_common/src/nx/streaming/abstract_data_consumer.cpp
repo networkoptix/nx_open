@@ -6,7 +6,7 @@
 #include <nx/utils/log/log.h>
 
 namespace {
-    static const int kWaitTimeoutMs = 200;
+    static constexpr std::chrono::milliseconds kWaitTimeoutMs(200);
 } // namespace
 
 
