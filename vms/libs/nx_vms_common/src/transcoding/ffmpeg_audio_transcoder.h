@@ -83,6 +83,9 @@ public:
     bool receivePacket(QnAbstractMediaDataPtr* const result);
 
 private:
+    bool openDecoder(const CodecParametersConstPtr& context);
+
+private:
     const Config m_config;
     AVCodecContext* m_decoderCtx = nullptr;
     nx::media::ffmpeg::AudioEncoder m_encoder;

@@ -284,11 +284,12 @@ CodecParametersConstPtr ExportStorageStreamRecorder::getAudioCodecParameters(
 
     // In the case of MP2 We don't have information about bitrate until we get the first
     // audio packet. This leads to problems with playback in VLC, so we always
-    // "transcode" MP2 to MP2.
-    const bool transcodingIsRequired = sourceCodecParams->getCodecId() == AV_CODEC_ID_MP2;
+    // "transcode" MP2 to MP3.
+    const bool transcodingIsRequired =
+        sourceCodecParams->getCodecId() == AV_CODEC_ID_MP2 || m_forceAudioTranscoding;
 
     if (transcodingIsRequired && dstAudioCodec == AV_CODEC_ID_NONE)
-        dstAudioCodec = sourceCodecParams->getCodecId();
+        dstAudioCodec = AV_CODEC_ID_MP3;
 
     if ((dstAudioCodec == AV_CODEC_ID_NONE || dstAudioCodec == sourceCodecParams->getCodecId())
         && !transcodingIsRequired)
@@ -375,7 +376,8 @@ void ExportStorageStreamRecorder::reportFinished()
 
 void ExportStorageStreamRecorder::afterClose()
 {
-    m_lastCompressionType = AV_CODEC_ID_NONE;
+    m_lastVideoCodec = AV_CODEC_ID_NONE;
+    m_lastAudioCodec = AV_CODEC_ID_NONE;
 }
 
 void ExportStorageStreamRecorder::onFlush(StorageContext& /*context*/)
@@ -428,17 +430,31 @@ bool ExportStorageStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md
 
     if (md->dataType == QnAbstractMediaData::VIDEO)
     {
-        if (m_lastCompressionType != AV_CODEC_ID_NONE
-            && md->compressionType != m_lastCompressionType
+        if (m_lastVideoCodec != AV_CODEC_ID_NONE
+            && md->compressionType != m_lastVideoCodec
             && !m_videoTranscoder)
         {
             NX_DEBUG(this, "Video compression type has changed from %1 to %2. Close file",
-                m_lastCompressionType, md->compressionType);
+                m_lastVideoCodec, md->compressionType);
 
-            setLastError(nx::recording::Error::Code::transcodingRequired);
+            setLastError(nx::recording::Error::Code::videoTranscodingRequired);
             return false;
         }
-        m_lastCompressionType = md->compressionType;
+        m_lastVideoCodec = md->compressionType;
+    }
+    else if (md->dataType == QnAbstractMediaData::AUDIO)
+    {
+        if (m_lastAudioCodec != AV_CODEC_ID_NONE
+            && md->compressionType != m_lastAudioCodec
+            && !m_audioTranscoder)
+        {
+            NX_DEBUG(this, "Audio compression type has changed from %1 to %2. Close file",
+                m_lastAudioCodec, md->compressionType);
+
+            setLastError(nx::recording::Error::Code::audioTranscodingRequired);
+            return false;
+        }
+        m_lastAudioCodec = md->compressionType;
     }
     else if (auto metadata = std::dynamic_pointer_cast<const QnCompressedMetadata>(md))
     {

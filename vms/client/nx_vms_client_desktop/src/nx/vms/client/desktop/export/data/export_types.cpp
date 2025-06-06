@@ -40,8 +40,11 @@ ExportProcessError convertError(const std::optional<nx::recording::Error>& value
         case Error::Code::dataNotFound:
             return ExportProcessError::dataNotFound;
 
-        case Error::Code::transcodingRequired:
-            return ExportProcessError::transcodingRequired;
+        case Error::Code::videoTranscodingRequired:
+            return ExportProcessError::videoTranscodingRequired;
+
+        case Error::Code::audioTranscodingRequired:
+            return ExportProcessError::audioTranscodingRequired;
 
         case Error::Code::encryptedArchive:
             return ExportProcessError::encryptedArchive;

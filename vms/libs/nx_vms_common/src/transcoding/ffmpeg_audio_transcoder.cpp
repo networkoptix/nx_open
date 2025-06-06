@@ -42,8 +42,6 @@ bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
 bool QnFfmpegAudioTranscoder::open(const CodecParametersConstPtr& context)
 {
     NX_ASSERT(context);
-    close();
-
     auto codecpar = context->getAvCodecParameters();
     if (!m_encoder.open(
         m_config.targetCodecId,
@@ -55,7 +53,12 @@ bool QnFfmpegAudioTranscoder::open(const CodecParametersConstPtr& context)
     {
         return false;
     }
+    return openDecoder(context);
+}
 
+bool QnFfmpegAudioTranscoder::openDecoder(const CodecParametersConstPtr& context)
+{
+    close();
     auto avCodec = avcodec_find_decoder(context->getCodecId());
     if (!avCodec)
     {
@@ -88,6 +91,20 @@ bool QnFfmpegAudioTranscoder::isOpened() const
 int QnFfmpegAudioTranscoder::transcodePacket(
     const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
+    if (m_decoderCtx && media && m_decoderCtx->codec_id != media->compressionType)
+    {
+        NX_DEBUG(this, "Input audio codec changed from: %1 to %2",
+            m_decoderCtx->codec_id, media->compressionType);
+
+        if (!openDecoder(media->context))
+        {
+            NX_WARNING(this,
+                "Failed to reinitialize audio transcoder when codec changed from: %1 to %2",
+                m_decoderCtx->codec_id,
+                media->compressionType);
+            return -1;
+        }
+    }
     if (!m_isOpened)
         return -1;
 

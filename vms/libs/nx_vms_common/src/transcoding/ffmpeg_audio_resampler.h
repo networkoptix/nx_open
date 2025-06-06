@@ -30,6 +30,7 @@ public:
     ~FfmpegAudioResampler();
 
     bool init(const Config& config);
+    bool initSwr(const Config& config);
     bool pushFrame(AVFrame* inputFrame);
     AVFrame* nextFrame();
     bool hasFrame() const;
