@@ -199,7 +199,7 @@ void TileInteractionHandler::handleClick(
             const auto cloudSystemId = index.data(Qn::CloudSystemIdRole).toString();
             if (auto context = appContext()->cloudCrossSystemManager()->systemContext(cloudSystemId))
             {
-                if (context->initializeConnectionWithUserInteraction())
+                if (context->initializeConnection(/*allowUserInteraction*/ true))
                 {
                     auto model = const_cast<QAbstractItemModel*>(index.model());
                     model->setData(index, true, Qn::ForcePreviewLoaderRole);

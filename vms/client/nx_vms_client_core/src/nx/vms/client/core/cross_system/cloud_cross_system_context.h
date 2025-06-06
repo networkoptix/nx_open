@@ -64,10 +64,10 @@ public:
     QString toString() const;
 
     /**
-     * Try to establish connection with user interaction allowed.
+     * Try to establish connection with either user interaction allowed or not allowed.
      * Return true if new connection is started.
      */
-    bool initializeConnectionWithUserInteraction();
+    bool initializeConnection(bool allowUserInteraction);
 
     QnVirtualCameraResourcePtr createThumbCameraResource(const nx::Uuid& id, const QString& name);
 
@@ -77,6 +77,7 @@ public:
     nx::Uuid organizationId() const;
 
 signals:
+    void needsCloudAuthorizationChanged();
     void statusChanged(Status oldStatus);
     void camerasAdded(const QnVirtualCameraResourceList& cameras);
     void camerasRemoved(const QnVirtualCameraResourceList& cameras);

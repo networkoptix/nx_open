@@ -575,7 +575,6 @@ struct ApplicationContext::Private
                 q->cloudCrossSystemManager()->debugResetCloudSystems(/*enableCloudSystems*/ true);
             });
 
-        // TODO: FIXME! #vkutin Add the same in mobile context.
         connect(q->cloudCrossSystemManager(),
             &core::CloudCrossSystemManager::cloudAuthorizationRequested,
             q,

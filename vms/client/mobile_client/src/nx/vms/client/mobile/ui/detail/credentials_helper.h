@@ -38,7 +38,8 @@ public:
     /** Create Oauth client with the specfied token and optional user. */
     Q_INVOKABLE nx::vms::client::core::OauthClient* createOauthClient(
         const QString& token,
-        const QString& user) const;
+        const QString& user,
+        bool forced = false) const;
 
     bool hasDigestCloudPassword() const;
 

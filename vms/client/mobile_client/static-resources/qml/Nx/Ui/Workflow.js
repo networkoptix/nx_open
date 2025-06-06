@@ -155,9 +155,13 @@ function openCloudSummaryScreen()
     stackView.pushScreen(Qt.resolvedUrl("../Screens/Cloud/Summary.qml"))
 }
 
-function openCloudLoginScreen()
+function openCloudLoginScreen(forced)
 {
-    stackView.pushScreen(Qt.resolvedUrl("../Screens/Cloud/Login.qml"))
+    stackView.pushScreen(
+        Qt.resolvedUrl("../Screens/Cloud/Login.qml"),
+        {
+            "forced": forced ?? false
+        })
 }
 
 function openSecuritySettingsScreen()

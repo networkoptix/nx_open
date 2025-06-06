@@ -14,6 +14,8 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/media/watermark_image_provider.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
@@ -24,6 +26,8 @@
 #include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/ui/detail/credentials_helper.h>
+#include <nx/vms/client/mobile/ui/detail/screens.h>
+#include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/time/formatter.h>
 #include <settings/qml_settings_adaptor.h>
@@ -243,6 +247,15 @@ ApplicationContext::ApplicationContext(
     d->initOsSpecificStuff();
     initializeCrossSystemModules();
     d->windowContext->setMainSystemContext(d->mainSystemContext.get());
+
+    connect(cloudCrossSystemManager(),
+        &core::CloudCrossSystemManager::cloudAuthorizationRequested,
+        this,
+        [this]()
+        {
+            d->windowContext->uiController()->screens()->showCloudLoginScreen(
+                /*reauthentication*/ true);
+        });
 }
 
 ApplicationContext::~ApplicationContext()

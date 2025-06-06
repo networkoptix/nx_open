@@ -1,8 +1,11 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import Nx.Core 1.0
-import Nx.Items 1.0
+import QtQuick
+
+import Nx.Core
+import Nx.Core.Controls
+import Nx.Items
+import Nx.Ui
 
 DummyMessage
 {
@@ -29,6 +32,17 @@ DummyMessage
                 target: dummyMessage
                 title: qsTr("Server offline")
                 image: lp("/images/alert_server_offline.png")
+            }
+        },
+        State
+        {
+            name: "needsCloudAuthorization"
+            PropertyChanges
+            {
+                target: dummyMessage
+                title: qsTr("Information required")
+                image: lp("/images/alert_locked.png")
+                buttonText: qsTr("Log In")
             }
         },
         State
@@ -169,6 +183,28 @@ DummyMessage
                 target: dummyMessage
                 title: qsTr("No live stream")
             }
+        },
+        State
+        {
+            name: "preloader"
+            PropertyChanges
+            {
+                target: preloader
+                running: true
+            }
         }
     ]
+
+    NxDotPreloader
+    {
+        id: preloader
+
+        running: false
+        dotRadius: 8
+        spacing: dotRadius * 2
+        color: ColorTheme.colors.light16
+
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: Math.round((parent.height - height) / 3)
+    }
 }

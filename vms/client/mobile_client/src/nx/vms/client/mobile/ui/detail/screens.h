@@ -24,6 +24,9 @@ public:
 
     /** Show 2FA validation screen and validate specified token. */
     bool show2faValidationScreen(const network::http::Credentials& credentials) const;
+
+    /** Show cloud authentication screen. */
+    bool showCloudLoginScreen(bool reauthentication) const;
 };
 
 } // namespace detail

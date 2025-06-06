@@ -56,7 +56,7 @@ QString QmlWrapperHelper::showScreen(
     auto stackView = context->mainWindow()->findChild<QObject*>(
         "mainStackView");
     QObject* screen = nullptr;
-    QMetaObject::invokeMethod(stackView, "safePush", Qt::DirectConnection,
+    QMetaObject::invokeMethod(stackView, "pushScreen", Qt::DirectConnection,
         Q_RETURN_ARG(QObject*, screen),
         Q_ARG(QUrl, source),
         Q_ARG(QVariant, QVariant::fromValue(properties)));

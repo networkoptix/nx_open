@@ -44,6 +44,7 @@ Control
                                status == API.ResourceStatus.unauthorized ||
                                hasDefaultPassword || hasOldFirmware || ioModule
         readonly property bool unauthorized: status == API.ResourceStatus.unauthorized
+        readonly property bool needsCloudAuthorization: mediaResourceHelper.needsCloudAuthorization
         readonly property bool hasDefaultPassword: mediaResourceHelper.hasDefaultCameraPassword
         readonly property bool hasOldFirmware: mediaResourceHelper.hasOldCameraFirmware
         readonly property bool ioModule: !mediaResourceHelper.hasVideo && mediaResourceHelper.isIoModule
@@ -226,7 +227,7 @@ Control
                 anchors.horizontalCenter: parent.horizontalCenter
                 source:
                 {
-                    if (d.unauthorized)
+                    if (d.unauthorized || d.needsCloudAuthorization)
                         return lp("/images/camera_locked.png")
                     if (d.hasDefaultPassword || d.hasOldFirmware)
                         return lp("/images/camera_alert.png")
@@ -247,6 +248,8 @@ Control
 
                 text:
                 {
+                    if (d.needsCloudAuthorization)
+                        return qsTr("Information required")
                     if (d.unauthorized)
                         return qsTr("Authentication required")
                     if (d.hasDefaultPassword)

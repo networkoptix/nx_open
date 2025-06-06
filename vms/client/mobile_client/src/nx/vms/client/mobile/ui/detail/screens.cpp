@@ -7,6 +7,12 @@
 
 namespace nx::vms::client::mobile::detail {
 
+namespace {
+
+static const auto kLoginScreenUrl = QUrl("qrc:///qml/Nx/Screens/Cloud/Login.qml");
+
+} // namespace
+
 Screens::Screens(WindowContext* context, QObject* parent):
     base_type(parent),
     WindowContextAware(context)
@@ -15,10 +21,15 @@ Screens::Screens(WindowContext* context, QObject* parent):
 
 bool Screens::show2faValidationScreen(const network::http::Credentials& credentials) const
 {
-    static const auto kLoginScreenUrl = QUrl("qrc:qml/Nx/Screens/Cloud/Login.qml");
-
     QVariantMap properties;
     properties["token"] = QString::fromStdString(credentials.authToken.value);
+    return QmlWrapperHelper::showScreen(windowContext(), kLoginScreenUrl, properties) == "success";
+}
+
+bool Screens::showCloudLoginScreen(bool reauthentication) const
+{
+    QVariantMap properties;
+    properties["forced"] = reauthentication;
     return QmlWrapperHelper::showScreen(windowContext(), kLoginScreenUrl, properties) == "success";
 }
 

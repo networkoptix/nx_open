@@ -18,6 +18,8 @@ Page
     property string token
     property string user
 
+    property bool forced: false
+
     signal gotResult(value: string)
 
     onLeftButtonClicked: Workflow.popCurrentScreen()
@@ -25,8 +27,6 @@ Page
     WebView
     {
         id: webView
-
-        url: d.oauthClient.url
 
         onUrlChanged: d.handleUrlChanged(url)
 
@@ -59,15 +59,7 @@ Page
     {
         id: d
 
-        property OauthClient oauthClient:
-        {
-            const helper = appContext.credentialsHelper.createOauthClient(token, user)
-            const closePage = ()=>Workflow.popCurrentScreen()
-            helper.authDataReady.connect(closePage)
-            helper.cancelled.connect(closePage)
-            helper.setLocale(locale.name)
-            return helper
-        }
+        property OauthClient oauthClient
 
         function cancelLogInProcess()
         {
@@ -116,5 +108,17 @@ Page
                     (result) => d.handleUrlChanged(result))
             }
         }
+    }
+
+    Component.onCompleted:
+    {
+        const helper = appContext.credentialsHelper.createOauthClient(token, user, forced)
+        const closePage = ()=>Workflow.popCurrentScreen()
+        helper.authDataReady.connect(closePage)
+        helper.cancelled.connect(closePage)
+        helper.setLocale(locale.name)
+
+        d.oauthClient = helper
+        webView.url = d.oauthClient.url
     }
 }

@@ -8,6 +8,12 @@
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/resource_property_key.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/log/format.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/cross_system/cross_system_camera_resource.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/core/system_context.h>
 
 namespace nx::vms::client::core {
@@ -25,6 +31,7 @@ class MediaResourceHelper::Private: public QObject
 public:
     QnVirtualCameraResourcePtr camera;
     QnMediaServerResourcePtr server;
+    QPointer<CloudCrossSystemContext> crossSystem;
 
     Private(MediaResourceHelper* q);
 
@@ -37,6 +44,11 @@ MediaResourceHelper::MediaResourceHelper(QObject* parent):
     base_type(parent),
     d(new Private(this))
 {
+    connect(this, &ResourceHelper::resourceNameChanged,
+        this, &MediaResourceHelper::qualifiedResourceNameChanged);
+
+    connect(this, &MediaResourceHelper::systemNameChanged,
+        this, &MediaResourceHelper::qualifiedResourceNameChanged);
 }
 
 MediaResourceHelper::~MediaResourceHelper()
@@ -135,6 +147,35 @@ MediaDewarpingParams MediaResourceHelper::fisheyeParams() const
         : MediaDewarpingParams();
 }
 
+bool MediaResourceHelper::needsCloudAuthorization() const
+{
+    return d->crossSystem && (d->crossSystem->needsCloudAuthorization()
+        || d->crossSystem->status() == CloudCrossSystemContext::Status::connectionFailure);
+}
+
+QString MediaResourceHelper::systemName() const
+{
+    if (!d->crossSystem)
+        return {};
+
+    const auto systemDescription = d->crossSystem->systemDescription();
+    return systemDescription ? systemDescription->name() : QString{};
+}
+
+QString MediaResourceHelper::qualifiedResourceName() const
+{
+    const auto crossSystemName = systemName();
+    return crossSystemName.isEmpty()
+        ? resourceName()
+        : nx::format("%1/%2", crossSystemName, resourceName()).toQString();
+}
+
+void MediaResourceHelper::cloudAuthorize() const
+{
+    if (NX_ASSERT(d->crossSystem))
+        d->crossSystem->cloudAuthorize();
+}
+
 MediaPlayer::VideoQuality MediaResourceHelper::streamQuality(
     nx::vms::api::StreamIndex streamIndex) const
 {
@@ -202,6 +243,12 @@ void MediaResourceHelper::Private::handleResourceChanged()
     if (camera)
         camera->disconnect(this);
 
+    if (crossSystem)
+    {
+        crossSystem->disconnect(q);
+        crossSystem.clear();
+    }
+
     updateServer();
 
     camera = cameraResource;
@@ -223,6 +270,25 @@ void MediaResourceHelper::Private::handleResourceChanged()
             q, &MediaResourceHelper::audioEnabledChanged);
 
         updateServer();
+
+        if (auto crossSystemCamera = camera.objectCast<CrossSystemCameraResource>())
+        {
+            crossSystem = appContext()->cloudCrossSystemManager()->systemContext(
+                crossSystemCamera->systemId());
+
+            if (crossSystem)
+            {
+                connect(crossSystem.get(), &CloudCrossSystemContext::needsCloudAuthorizationChanged,
+                    q, &MediaResourceHelper::needsCloudAuthorizationChanged);
+
+                connect(crossSystem.get(), &CloudCrossSystemContext::statusChanged,
+                    q, &MediaResourceHelper::needsCloudAuthorizationChanged);
+
+                connect(
+                    crossSystem->systemDescription().get(), &SystemDescription::systemNameChanged,
+                    q, &MediaResourceHelper::systemNameChanged);
+            }
+        }
     }
 
     emit q->customAspectRatioChanged();
@@ -234,6 +300,8 @@ void MediaResourceHelper::Private::handleResourceChanged()
     emit q->virtualCameraChanged();
     emit q->audioEnabledChanged();
     emit q->livePreviewVideoQualityChanged();
+    emit q->needsCloudAuthorizationChanged();
+    emit q->systemNameChanged();
 }
 
 } // namespace nx::vms::client::core

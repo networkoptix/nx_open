@@ -248,6 +248,7 @@ struct CloudCrossSystemContext::Private
                 int /*handle*/,
                 rest::ErrorOrData<nx::vms::api::LoginSession> session)
             {
+                const bool neededCloudAuthorization = needsCloudAuthorization;
                 if (session)
                 {
                     tokenUpdater->onTokenUpdated(
@@ -268,6 +269,9 @@ struct CloudCrossSystemContext::Private
 
                     NX_VERBOSE(this, "Update token error: %1", session.error().errorId);
                 }
+
+                if (needsCloudAuthorization != neededCloudAuthorization)
+                    emit q->needsCloudAuthorizationChanged();
             });
 
         if (const auto api = connection->serverApi(); NX_ASSERT(api, "No Server connection"))
@@ -351,7 +355,7 @@ struct CloudCrossSystemContext::Private
                     {
                         connectionProcess.reset();
                         emit q->cloudAuthorizationRequested(QPrivateSignal{});
-                        ensureConnection(true);
+                        ensureConnection(/*allowUserInteraction*/ true);
                         retryCount++;
                         return;
                     }
@@ -800,16 +804,20 @@ QString CloudCrossSystemContext::toString() const
     return d->toString();
 }
 
-bool CloudCrossSystemContext::initializeConnectionWithUserInteraction()
+bool CloudCrossSystemContext::initializeConnection(bool allowUserInteraction)
 {
-    if (d->connectionProcess && d->connectionProcess->context->logonData.userInteractionAllowed)
+    if (allowUserInteraction)
     {
-        NX_DEBUG(this, "Connection with user interaction is already in progress");
-        return false;
+        if (d->connectionProcess && d->connectionProcess->context->logonData.userInteractionAllowed)
+        {
+            NX_DEBUG(this, "Connection with user interaction is already in progress");
+            return false;
+        }
+
+        d->connectionProcess.reset();
     }
 
-    d->connectionProcess.reset();
-    return d->ensureConnection(/*allowUserInteraction*/ true);
+    return d->ensureConnection(allowUserInteraction);
 }
 
 QnVirtualCameraResourcePtr CloudCrossSystemContext::createThumbCameraResource(
@@ -828,7 +836,7 @@ void CloudCrossSystemContext::cloudAuthorize()
 {
     if (!d->systemContext->connection())
     {
-        initializeConnectionWithUserInteraction();
+        initializeConnection(/*allowUserInteraction*/ true);
         return;
     }
 

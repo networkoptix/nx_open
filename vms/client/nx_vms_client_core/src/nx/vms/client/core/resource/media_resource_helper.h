@@ -33,7 +33,11 @@ class MediaResourceHelper: public ResourceHelper
     Q_PROPERTY(bool audioEnabled READ audioEnabled NOTIFY audioEnabledChanged)
     Q_PROPERTY(int livePreviewVideoQuality READ livePreviewVideoQuality
         NOTIFY livePreviewVideoQualityChanged)
-
+    Q_PROPERTY(bool needsCloudAuthorization READ needsCloudAuthorization
+        NOTIFY needsCloudAuthorizationChanged);
+    Q_PROPERTY(QString systemName READ systemName NOTIFY systemNameChanged)
+    Q_PROPERTY(QString qualifiedResourceName READ qualifiedResourceName
+        NOTIFY qualifiedResourceNameChanged)
     using base_type = ResourceHelper;
 
 public:
@@ -51,9 +55,13 @@ public:
     Q_INVOKABLE QPoint channelPosition(int channel) const;
     bool isVirtualCamera() const;
     bool audioEnabled() const;
+    bool needsCloudAuthorization() const;
+    QString systemName() const;
+    QString qualifiedResourceName() const;
     MediaPlayer::VideoQuality livePreviewVideoQuality() const;
     Q_INVOKABLE MediaPlayer::VideoQuality streamQuality(
         nx::vms::api::StreamIndex streamIndex) const;
+    Q_INVOKABLE void cloudAuthorize() const;
 
 signals:
     void serverNameChanged();
@@ -66,6 +74,9 @@ signals:
     void virtualCameraChanged();
     void audioEnabledChanged();
     void livePreviewVideoQualityChanged();
+    void needsCloudAuthorizationChanged();
+    void systemNameChanged();
+    void qualifiedResourceNameChanged();
 
 private:
     class Private;

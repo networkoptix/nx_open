@@ -1347,7 +1347,7 @@ void ConnectActionsHandler::onConnectToCloudSystemWithUserInteractionTriggered()
     if (!NX_ASSERT(context && context->status() == CloudCrossSystemContext::Status::connectionFailure))
         return;
 
-    context->initializeConnectionWithUserInteraction();
+    context->initializeConnection(/*allowUserInteraction*/ true);
 }
 
 void ConnectActionsHandler::at_reconnectAction_triggered()

@@ -77,7 +77,7 @@ void CrossSystemLayoutResource::makeSystemConnectionsWithUserInteraction()
     for (const auto& systemId: systemIds)
     {
         if (auto crossSystem = manager->systemContext(systemId))
-            crossSystem->initializeConnectionWithUserInteraction();
+            crossSystem->initializeConnection(/*allowUserInteraction*/ false);
     }
 }
 

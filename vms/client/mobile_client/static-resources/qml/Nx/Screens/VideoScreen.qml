@@ -83,6 +83,7 @@ Page
             ((showOfflineStatus
                 || controller.cameraOffline
                 || controller.cameraUnauthorized
+                || controller.needsCloudAuthorization
                 || controller.failed
                 || controller.noVideoStreams)
                 && !controller.mediaPlayer.playing)
@@ -130,7 +131,7 @@ Page
         {
             if (cameraWarningVisible)
             {
-                if (controller.serverOffline)
+                if (controller.serverOffline || controller.needsCloudAuthorization)
                 {
                     windowContext.ui.windowHelpers.exitFullscreen()
                     controlsVisible = false
@@ -143,6 +144,7 @@ Page
             }
             else
             {
+                showUi()
                 d.controlsVisible = true
             }
         }
@@ -171,7 +173,7 @@ Page
         }
     }
 
-    title: controller.resourceHelper.resourceName
+    title: controller.resourceHelper.qualifiedResourceName
     toolBar.opacity: d.uiOpacity
     toolBar.visible: opacity > 0
     titleLabelOpacity: d.cameraUiOpacity
@@ -445,9 +447,13 @@ Page
 
                     MouseArea
                     {
+                        z: -1
                         anchors.fill: parent
                         onClicked: toggleUi()
                     }
+
+                    onButtonClicked:
+                        controller.resourceHelper.cloudAuthorize()
                 }
             }
         }

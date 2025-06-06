@@ -70,7 +70,8 @@ void CredentialsHelper::clearSavedPasswords()
 
 core::OauthClient* CredentialsHelper::createOauthClient(
     const QString& token,
-    const QString& user) const
+    const QString& user,
+    bool forced) const
 {
     const core::OauthClientType type = token.isEmpty()
         ? core::OauthClientType::loginCloud
@@ -87,7 +88,7 @@ core::OauthClient* CredentialsHelper::createOauthClient(
     }
 
     connect(result, &core::OauthClient::authDataReady, this,
-        [result]()
+        [result, forced]()
         {
             const auto authData = result->authData();
             if (authData.empty())
@@ -96,8 +97,9 @@ core::OauthClient* CredentialsHelper::createOauthClient(
                 return;
             }
 
-            appContext()->cloudStatusWatcher()->setAuthData(
-                authData, core::CloudStatusWatcher::AuthMode::login);
+            appContext()->cloudStatusWatcher()->setAuthData(authData, forced
+                ? core::CloudStatusWatcher::AuthMode::forced
+                : core::CloudStatusWatcher::AuthMode::login);
         });
     return result;
 }

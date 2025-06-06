@@ -20,6 +20,7 @@ NxObject
     readonly property alias resource: resourceHelper.resource
     readonly property alias systemContext: systemContextAccessor.systemContext
     readonly property bool serverOffline: windowContext.sessionManager.hasReconnectingSession
+    readonly property alias needsCloudAuthorization: resourceHelper.needsCloudAuthorization
     readonly property bool cameraOffline:
         mediaPlayer.liveMode
             && resourceHelper.resourceStatus === API.ResourceStatus.offline
@@ -50,8 +51,14 @@ NxObject
             return "defaultPasswordAlert"
         if (hasOldFirmware)
             return "oldFirmwareAlert"
-        if (cameraUnauthorized)
-            return "cameraUnauthorized"
+        if (needsCloudAuthorization)
+        {
+            return appContext.cloudStatusWatcher.status != CloudStatusWatcher.Offline
+                ? "needsCloudAuthorization"
+                : "preloader"
+        }
+        if ((resource?.flags & ResourceFlag.cross_system) && (resource?.flags & ResourceFlag.fake))
+            return "preloader"
         if (cameraOffline)
             return "cameraOffline"
         if (noVideoStreams)
