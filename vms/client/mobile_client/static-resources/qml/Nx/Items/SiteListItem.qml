@@ -267,6 +267,8 @@ Item
 
         TapHandler
         {
+            id: tapHandler
+
             onSingleTapped:
             {
                 if (control.tapEnabled)
@@ -277,6 +279,15 @@ Item
                 if (control.editEnabled)
                     control.editClicked()
             }
+        }
+
+        MaterialEffect
+        {
+            anchors.fill: parent
+            clip: true
+            radius: parent.radius
+            mouseArea: tapHandler
+            rippleSize: 160
         }
     }
 }

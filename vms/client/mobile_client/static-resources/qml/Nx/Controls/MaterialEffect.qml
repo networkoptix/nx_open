@@ -70,7 +70,7 @@ Item
                 _currentRipple.fadeIn(mouseArea.mouseX, mouseArea.mouseY)
         }
 
-        function onReleased()
+        function releaseAt(x, y)
         {
             if (_currentRipple)
             {
@@ -82,15 +82,19 @@ Item
             {
                 var ripple = rippleComponent.createObject(materialEffect)
                 fadeOutAnimation.duration = ripple.scaleDuration
-                if (centered || mouseArea.mouseX == undefined || mouseArea.mouseY == undefined)
+                if (centered || x === undefined || y === undefined)
                     ripple.splash(width / 2, height / 2)
                 else
-                    ripple.splash(mouseArea.mouseX, mouseArea.mouseY)
+                    ripple.splash(x, y)
             }
 
             fadeInAnimation.complete()
             fadeOutAnimation.start()
         }
+
+        function onReleased() { releaseAt(mouseArea.mouseX, mouseArea.mouseY) }
+
+        function onTapped(eventPoint, button) { releaseAt(eventPoint.x, eventPoint.y) }
     }
 
     Rectangle
