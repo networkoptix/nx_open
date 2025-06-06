@@ -165,7 +165,7 @@ bool File::openFile()
         const auto fileName = fileNameQString.toStdString();
     #endif
 
-    m_file.open(fileName, std::ios_base::in | std::ios_base::out);
+    m_file.open(fileName, std::ios::in | std::ios::out | std::ios::binary);
     if (!m_file.fail())
     {
         // File exists, prepare to append.
@@ -179,7 +179,7 @@ bool File::openFile()
     if (!directory.exists())
         directory.mkpath(QLatin1String("."));
 
-    m_file.open(fileName, std::ios_base::out);
+    m_file.open(fileName, std::ios::out | std::ios::binary);
     if (m_file.fail())
         return false;
     m_fileInfo.refresh();
