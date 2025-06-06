@@ -33,6 +33,7 @@ public:
     void setTranscoderQuality(Qn::StreamQuality quality);
     void addRecordingContext(const QString& fileName, const QnStorageResourcePtr& storage);
     bool addRecordingContext(const QString& fileName);
+    void forceAudioTranscoding() { m_forceAudioTranscoding = true; }
     QString fixedFileName() const;
 
     // It used to skip some video frames inside GOP when transcoding is used
@@ -58,10 +59,12 @@ private:
     std::unique_ptr<QnFfmpegAudioTranscoder> m_audioTranscoder;
     Qn::StreamQuality m_transcodeQuality = Qn::StreamQuality::normal;
     int m_transcoderFixedFrameRate = 0;
-    AVCodecID m_lastCompressionType = AV_CODEC_ID_NONE;
+    AVCodecID m_lastVideoCodec = AV_CODEC_ID_NONE;
+    AVCodecID m_lastAudioCodec = AV_CODEC_ID_NONE;
     MediaSigner m_signer;
     bool m_stitchTimestampGaps = true;
     TimestampCorrector m_timestampStitcher;
+    bool m_forceAudioTranscoding = false;
 
 private:
     virtual void adjustMetaData(QnAviArchiveMetadata& metaData) const override;

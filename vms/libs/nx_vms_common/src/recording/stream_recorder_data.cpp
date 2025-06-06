@@ -34,8 +34,10 @@ QString Error::toString() const
             return tr("Invalid audio codec information.");
         case Code::incompatibleCodec:
             return tr("Video or audio codec is incompatible with the selected format.");
-        case Code::transcodingRequired:
+        case Code::videoTranscodingRequired:
             return tr("Video transcoding required.");
+        case Code::audioTranscodingRequired:
+            return tr("Audio transcoding required.");
         case Code::fileWrite:
             return tr("File write error.");
         case Code::invalidResourceType:

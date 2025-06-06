@@ -114,7 +114,6 @@ bool QnFfmpegAudioTranscoder::open(const CodecParametersConstPtr& context)
         NX_WARNING(this, "Could not find encoder for codec %1.", m_codecId);
         return false;
     }
-
     m_encoderCtx = avcodec_alloc_context3(avCodec);
     m_encoderCtx->sample_fmt = avCodec->sample_fmts[0] != AV_SAMPLE_FMT_NONE ? avCodec->sample_fmts[0] : AV_SAMPLE_FMT_S16;
 
@@ -138,8 +137,21 @@ bool QnFfmpegAudioTranscoder::open(const CodecParametersConstPtr& context)
         NX_WARNING(this, "Could not initialize audio encoder.");
         return false;
     }
+    return openDecoder(context);
+}
 
-    avCodec = avcodec_find_decoder(context->getCodecId());
+void QnFfmpegAudioTranscoder::closeDecoder()
+{
+    if (m_decoderCtx)
+        avcodec_free_context(&m_decoderCtx);
+
+    m_isOpened = false;
+}
+
+bool QnFfmpegAudioTranscoder::openDecoder(const CodecParametersConstPtr& context)
+{
+    closeDecoder();
+    AVCodec* avCodec = avcodec_find_decoder(context->getCodecId());
     if (!avCodec)
     {
         NX_WARNING(this, "Could not find decoder for codec %1.", context->getCodecId());
@@ -181,6 +193,23 @@ bool QnFfmpegAudioTranscoder::initResampler()
 int QnFfmpegAudioTranscoder::transcodePacket(
     const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
+    if (m_decoderCtx && media && m_decoderCtx->codec_id != media->compressionType)
+    {
+        NX_DEBUG(this, "Input audio codec changed from: %1 to %2",
+            m_decoderCtx->codec_id, media->compressionType);
+
+        if (!openDecoder(media->context))
+        {
+            NX_WARNING(this,
+                "Failed to reinitialize audio transcoder when codec changed from: %1 to %2",
+                m_decoderCtx->codec_id,
+                media->compressionType);
+            return -1;
+        }
+    }
+    if (!m_isOpened)
+        return -1;
+
     if (result)
         result->reset();
 
@@ -290,6 +319,7 @@ bool QnFfmpegAudioTranscoder::receivePacket(QnAbstractMediaDataPtr* const result
             return false;
         }
     }
+
     return true;
 }
 

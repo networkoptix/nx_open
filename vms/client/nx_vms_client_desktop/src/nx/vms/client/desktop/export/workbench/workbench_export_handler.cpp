@@ -210,7 +210,7 @@ public:
     }
 
     Uuid createExportContext(Settings settings,
-        const QnResourcePtr& resource, bool saveExistingLayout, bool forceTranscoding)
+        const QnResourcePtr& resource, bool saveExistingLayout)
     {
         const auto& manager = q->context()->instance<workbench::LocalNotificationsManager>();
         QString fullPath = fileName(settings).completeFileName();
@@ -221,8 +221,14 @@ public:
         const auto progressDialog = new ProgressDialog(q->mainWindowWidget());
         progressDialog->setText(fullPath);
         progressDialog->setCancelText(saveExistingLayout ? tr("Stop Saving") : tr("Stop Export"));
-        if (forceTranscoding)
-            progressDialog->setInfoText(tr("Transcoding is required. Export session restarted."));
+
+        if (auto mediaSettings = std::get_if<ExportMediaSettings>(&settings))
+        {
+            if (mediaSettings->forceVideoTranscoding)
+                progressDialog->setInfoText(tr("Video transcoding is required. Export session restarted."));
+            else if (mediaSettings->forceAudioTranscoding)
+                progressDialog->setInfoText(tr("Audio transcoding is required. Export session restarted."));
+        }
 
         // Adding with ActionRole to make sure button is added to the left of "Cancel".
         auto minimizeButton = new QPushButton(tr("Minimize"), progressDialog);
@@ -408,7 +414,7 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
     if (!d->runningExports.contains(info.id))
         return;
 
-    const auto exportContext = d->runningExports.take(info.id);
+    auto exportContext = d->runningExports.take(info.id);
     context()->instance<workbench::LocalNotificationsManager>()->remove(info.id);
 
     d->startingExportMessageBox.reset(); //< Close "Starting Export..." messagebox if exists.
@@ -419,6 +425,7 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
         dialog->deleteLater();
     }
 
+    auto mediaSettings = std::get_if<ExportMediaSettings>(&exportContext.settings);
     switch (info.status)
     {
         case ExportProcessStatus::success:
@@ -439,15 +446,21 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
             break;
         }
         case ExportProcessStatus::failure:
-            if (info.error == ExportProcessError::transcodingRequired
-                && !exportContext.transcodingSettings().forceTranscoding)
+            if ((mediaSettings && info.error == ExportProcessError::videoTranscodingRequired
+                && !mediaSettings->forceVideoTranscoding)
+                || (info.error == ExportProcessError::audioTranscodingRequired
+                && !mediaSettings->forceAudioTranscoding))
             {
+                if (info.error == ExportProcessError::audioTranscodingRequired)
+                    mediaSettings->forceAudioTranscoding = true;
+                if (info.error == ExportProcessError::videoTranscodingRequired)
+                    mediaSettings->forceVideoTranscoding = true;
+
                 // Run export again with forced transcoding
                 auto exportToolInstance = prepareExportTool(
                     exportContext.settings,
                     exportContext.resource,
-                    exportContext.saveExistingLayout,
-                    /*forceTranscoding*/  true);
+                    exportContext.saveExistingLayout);
                 runExport(std::move(exportToolInstance));
             }
             else
@@ -666,19 +679,16 @@ void WorkbenchExportHandler::runExport(ExportToolInstance&& context)
 WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExportTool(
     Settings settings,
     const QnResourcePtr& resource,
-    bool saveExistingLayout, bool forceTranscoding)
+    bool saveExistingLayout)
 {
-    const auto exportId = d->createExportContext(
-        settings, resource, saveExistingLayout, forceTranscoding);
+    const auto exportId = d->createExportContext(settings, resource, saveExistingLayout);
     std::unique_ptr<AbstractExportTool> tool;
     if (auto mediaSettings = std::get_if<ExportMediaSettings>(&settings))
     {
-        mediaSettings->transcodingSettings.forceTranscoding = forceTranscoding;
         tool.reset(new ExportMediaTool(*mediaSettings, resource.dynamicCast<QnMediaResource>()));
     }
     else if (auto layoutSettings = std::get_if<ExportLayoutSettings>(&settings))
     {
-        layoutSettings->transcodingSettings.forceTranscoding = forceTranscoding;
         tool.reset(new ExportLayoutTool(*layoutSettings, resource.dynamicCast<LayoutResource>()));
     }
     else
@@ -729,14 +739,14 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
                 }
                 exportId = d->createExportContext(layoutSettings,
                     layout->toSharedPointer(),
-                    /*saveExistingLayout*/ false, /*forceTranscoding*/ false);
+                    /*saveExistingLayout*/ false);
                 tool.reset(new ExportLayoutTool(layoutSettings, layout));
             }
             else
             {
                 exportId = d->createExportContext(settings,
                     dialog.mediaResource()->toResourcePtr(),
-                    /*saveExistingLayout*/ false, /*forceTranscoding*/ false);
+                    /*saveExistingLayout*/ false);
 
                 tool.reset(new ExportMediaTool(settings, dialog.mediaResource()));
             }
@@ -748,8 +758,7 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
             exportId = d->createExportContext(
                 settings,
                 dialog.layout()->toSharedPointer(),
-                /*saveExistingLayout*/ false,
-                /*forceTranscoding*/ false);
+                /*saveExistingLayout*/ false);
             tool.reset(new ExportLayoutTool(settings, dialog.layout()));
             break;
         }
@@ -875,7 +884,7 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
     exportTool.reset(new ExportLayoutTool(layoutSettings, layout));
 
     nx::Uuid exportId = d->createExportContext(layoutSettings, layout,
-        /*saveExistingLayout*/ true, /*forceTranscoding*/ false);
+        /*saveExistingLayout*/ true);
 
     runExport(std::make_pair(exportId, std::move(exportTool)));
 }

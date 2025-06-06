@@ -32,7 +32,8 @@ enum class ExportProcessError
     incompatibleCodec,
     fileAccess,
     dataNotFound,
-    transcodingRequired,
+    videoTranscodingRequired,
+    audioTranscodingRequired,
     encryptedArchive,
     temporaryUnavailable,
 };

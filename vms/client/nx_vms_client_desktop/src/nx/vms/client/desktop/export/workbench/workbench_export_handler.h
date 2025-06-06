@@ -49,7 +49,7 @@ private:
     ExportToolInstance prepareExportTool(
         Settings settings,
         const QnResourcePtr& resource,
-        bool saveExistingLayout, bool forceTranscoding);
+        bool saveExistingLayout);
 
     void runExport(ExportToolInstance&& context);
 

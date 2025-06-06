@@ -95,10 +95,17 @@ struct ExportMediaTool::Private
                 dataProvider->pleaseStop();
             });
 
+        nx::core::transcoding::Settings transcodingSettings = settings.transcodingSettings;
+        if (settings.forceVideoTranscoding)
+            transcodingSettings.forceTranscoding = true;
+        if (settings.forceAudioTranscoding)
+            exportRecorder->forceAudioTranscoding();
+
         nx::core::transcoding::FilterChain filters(
-            settings.transcodingSettings,
+            transcodingSettings,
             mediaResource->getDewarpingParams(),
             mediaResource->getVideoLayout());
+
         exportRecorder->setTranscodeFilters(filters);
         exportRecorder->setPreciseStartPosition(startTimeUs);
 

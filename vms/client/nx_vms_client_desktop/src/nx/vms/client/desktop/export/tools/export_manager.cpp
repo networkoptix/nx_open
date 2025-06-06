@@ -157,8 +157,11 @@ QString ExportProcess::errorString(ExportProcessError error)
         case ExportProcessError::incompatibleCodec:
             return tr("Video or audio codec is incompatible with selected format.");
 
-        case ExportProcessError::transcodingRequired:
+        case ExportProcessError::videoTranscodingRequired:
             return tr("Video transcoding required.");
+
+        case ExportProcessError::audioTranscodingRequired:
+            return tr("Audio transcoding required.");
 
         case ExportProcessError::fileAccess:
             return tr("File write error.");

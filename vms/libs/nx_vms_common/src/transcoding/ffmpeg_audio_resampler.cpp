@@ -26,6 +26,20 @@ FfmpegAudioResampler::~FfmpegAudioResampler()
 
 bool FfmpegAudioResampler::init(const Config& config)
 {
+    if (!initSwr(config))
+        return false;
+
+    m_buffer.init(
+        FfmpegAudioBuffer::Config{config.dstChannelCount, config.dstSampleFormat});
+    return true;
+}
+
+bool FfmpegAudioResampler::initSwr(const Config& config)
+{
+    NX_DEBUG(this, "Initialize: target channels: %1, "
+        "source sample rate: %2, target sample rate: %3",
+        config.dstChannelCount, config.srcSampleRate, config.dstSampleRate);
+
     m_samplePts.clear();
     m_config = config;
     m_swrContext = swr_alloc_set_opts(
@@ -52,13 +66,22 @@ bool FfmpegAudioResampler::init(const Config& config)
         m_swrContext = nullptr;
         return false;
     }
-    m_buffer.init(
-        FfmpegAudioBuffer::Config{config.dstChannelCount, config.dstSampleFormat});
     return true;
 }
 
 bool FfmpegAudioResampler::pushFrame(AVFrame* inputFrame)
 {
+    if (inputFrame->sample_rate != m_config.srcSampleRate
+        || inputFrame->format != m_config.srcSampleFormat
+        || inputFrame->channel_layout != m_config.srcChannelLayout)
+    {
+        NX_DEBUG(this, "Source audio foramt changed, reinit resampler");
+        m_config.srcSampleRate = inputFrame->sample_rate;
+        m_config.srcSampleFormat = (AVSampleFormat)inputFrame->format;
+        m_config.srcChannelLayout = inputFrame->channel_layout;
+        if (!initSwr(m_config))
+            return false;
+    }
     uint64_t outSampleCount = swr_get_out_samples(m_swrContext, inputFrame->nb_samples);
 
     uint8_t** sampleBuffer = m_buffer.startWriting(outSampleCount);

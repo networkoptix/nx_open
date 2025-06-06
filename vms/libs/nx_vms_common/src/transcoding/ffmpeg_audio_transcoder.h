@@ -83,6 +83,8 @@ public:
     bool receivePacket(QnAbstractMediaDataPtr* const result);
 
 private:
+    bool openDecoder(const CodecParametersConstPtr& context);
+    void closeDecoder();
     void tuneContextsWithMedia(
         AVCodecContext* inCtx,
         AVCodecContext* outCtx,

@@ -26,7 +26,8 @@ struct NX_VMS_COMMON_API Error
         invalidResourceType,
         dataNotFound,
         resourceNotFound,
-        transcodingRequired,
+        videoTranscodingRequired,
+        audioTranscodingRequired,
         encryptedArchive,
         temporaryUnavailable,
     };

@@ -16,6 +16,8 @@ struct ExportMediaSettings
     QnTimePeriod period;
     Filename fileName;
     qint64 timelapseFrameStepMs = 0; //< 0 means disabled timelapse.
+    bool forceAudioTranscoding = false;
+    bool forceVideoTranscoding = false;
 
     nx::core::transcoding::Settings transcodingSettings;
 };
