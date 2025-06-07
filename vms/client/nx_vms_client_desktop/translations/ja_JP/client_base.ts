@@ -3395,7 +3395,7 @@ License Key: %2</source>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>パニック録画モードでは、すべてのカメラの録画設定について、FPSと映像品質が最大値に切り替わります。</translation>
+      <translation>緊急録画モードでは、すべてのカメラの録画設定について、FPSと映像品質が最大値に切り替わります。</translation>
     </message>
   </context>
   <context>

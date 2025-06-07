@@ -1216,7 +1216,7 @@
     </message>
     <message>
       <source>Log in to the system to configure how to open layouts</source>
-      <translation>レイアウトを開く方法を設定するにはシステムにログインしてください</translation>
+      <translation>レイアウトを開く設定を行うには、システムにログインしてください。</translation>
     </message>
   </context>
   <context>

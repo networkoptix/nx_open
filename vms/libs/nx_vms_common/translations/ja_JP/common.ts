@@ -1765,19 +1765,19 @@
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation>ブックマーク</translation>
+      <translation>ブックマーク付与</translation>
     </message>
     <message>
       <source>Panic recording</source>
-      <translation>パニック録画</translation>
+      <translation>緊急録画実行</translation>
     </message>
     <message>
       <source>Write to log</source>
-      <translation>ログ書込み</translation>
+      <translation>ログ書き込み</translation>
     </message>
     <message>
       <source>Repeat sound</source>
-      <translation>サウンド繰返し</translation>
+      <translation>サウンド繰り返し</translation>
     </message>
     <message>
       <source>Play sound</source>
@@ -1793,7 +1793,7 @@
     </message>
     <message>
       <source>Show text overlay</source>
-      <translation>テキストオーバーレイを表示</translation>
+      <translation>テキストオーバーレイ表示</translation>
     </message>
     <message>
       <source>Show on Alarm Layout</source>
@@ -2115,7 +2115,7 @@
     </message>
     <message>
       <source>Send email</source>
-      <translation>メールを送信</translation>
+      <translation>メール通知送信</translation>
     </message>
     <message>
       <source>Acknowledge</source>
@@ -2140,7 +2140,7 @@
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation>フルスクリーン表示</translation>
+      <translation>フルスクリーン表示開始</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
@@ -2148,7 +2148,7 @@
     </message>
     <message>
       <source>Open layout</source>
-      <translation>レイアウトを開く</translation>
+      <translation>レイアウト展開</translation>
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
@@ -2201,11 +2201,11 @@
     </message>
     <message>
       <source>Show desktop notification</source>
-      <translation>デスクトップ通知を表示</translation>
+      <translation>デスクトップ通知表示</translation>
     </message>
     <message>
       <source>Send mobile notification</source>
-      <translation>モバイル通知を送信</translation>
+      <translation>モバイル通知送信</translation>
     </message>
     <message>
       <source>Consumption</source>
@@ -2296,7 +2296,7 @@
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation>HTTP(S) リクエストを実行</translation>
+      <translation>HTTP(S) リクエスト送信</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
