@@ -101,6 +101,10 @@
       <source>I/O module</source>
       <translation>I/O 模組</translation>
     </message>
+    <message>
+      <source>Information required</source>
+      <translation type="unfinished">Information required</translation>
+    </message>
   </context>
   <context>
     <name>CameraSettingsScreen</name>
@@ -1118,6 +1122,14 @@
     <message>
       <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
       <translation>請先於桌面用戶端上輸入密碼以解密此錄影資料，或請您的站點管理員協助。</translation>
+    </message>
+    <message>
+      <source>Information required</source>
+      <translation type="unfinished">Information required</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
     </message>
   </context>
   <context>

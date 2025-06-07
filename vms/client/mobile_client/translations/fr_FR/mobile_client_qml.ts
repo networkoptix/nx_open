@@ -101,6 +101,10 @@
       <source>I/O module</source>
       <translation>Module I/O</translation>
     </message>
+    <message>
+      <source>Information required</source>
+      <translation type="unfinished">Information required</translation>
+    </message>
   </context>
   <context>
     <name>CameraSettingsScreen</name>
@@ -1119,6 +1123,14 @@
     <message>
       <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
       <translation>Saisissez le mot de passe de cryptage sur le client de bureau pour décrypter cette archive ou demandez de l’aide à l’administrateur de votre site.</translation>
+    </message>
+    <message>
+      <source>Information required</source>
+      <translation type="unfinished">Information required</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
     </message>
   </context>
   <context>

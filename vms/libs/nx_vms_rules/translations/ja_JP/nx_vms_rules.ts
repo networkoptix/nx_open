@@ -541,7 +541,7 @@
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation>フルスクリーン表示</translation>
+      <translation>フルスクリーン表示開始</translation>
     </message>
     <message>
       <source>Set for</source>
@@ -574,7 +574,7 @@
     </message>
     <message>
       <source>Omit logging</source>
-      <translation>ログ書込みを省略</translation>
+      <translation>ログに記録しない</translation>
     </message>
     <message>
       <source>And Source</source>
@@ -836,7 +836,7 @@
     </message>
     <message>
       <source>Show Desktop Notification</source>
-      <translation>デスクトップ通知を表示</translation>
+      <translation>デスクトップ通知表示</translation>
     </message>
   </context>
   <context>
@@ -858,7 +858,7 @@
     <name>nx::vms::rules::OpenLayoutAction</name>
     <message>
       <source>Open Layout</source>
-      <translation>レイアウトを開く</translation>
+      <translation>レイアウト展開</translation>
     </message>
   </context>
   <context>
@@ -876,7 +876,7 @@
     <name>nx::vms::rules::PanicRecordingAction</name>
     <message>
       <source>Panic Recording</source>
-      <translation>パニック録画</translation>
+      <translation>緊急録画実行</translation>
     </message>
   </context>
   <context>
@@ -944,7 +944,7 @@
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation>モバイル通知を送信</translation>
+      <translation>モバイル通知送信</translation>
     </message>
     <message>
       <source>Add Source Device name to Body</source>
@@ -959,7 +959,7 @@
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation>サウンド繰返し</translation>
+      <translation>サウンド繰り返し</translation>
     </message>
   </context>
   <context>
@@ -1026,7 +1026,7 @@
     </message>
     <message>
       <source>Send Email</source>
-      <translation>メールを送信</translation>
+      <translation>メール通知送信</translation>
     </message>
     <message>
       <source>Additional Recipients</source>
@@ -1277,7 +1277,7 @@
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show Text Overlay</source>
-      <translation>テキストオーバーレイを表示</translation>
+      <translation>テキストオーバーレイ表示</translation>
     </message>
     <message>
       <source>Custom Text</source>
@@ -1315,7 +1315,7 @@
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
       <source>Write to Log</source>
-      <translation>ログ書込み</translation>
+      <translation>ログ書き込み</translation>
     </message>
   </context>
 </TS>

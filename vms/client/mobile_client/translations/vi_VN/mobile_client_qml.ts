@@ -101,6 +101,10 @@
       <source>I/O module</source>
       <translation>Mô-đun I/O</translation>
     </message>
+    <message>
+      <source>Information required</source>
+      <translation type="unfinished">Information required</translation>
+    </message>
   </context>
   <context>
     <name>CameraSettingsScreen</name>
@@ -1118,6 +1122,14 @@
     <message>
       <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
       <translation>Nhập mật khẩu mã hóa trên Desktop Client để giải mã kho lưu trữ này hoặc yêu cầu quản trị viên Chi nhánh trợ giúp.</translation>
+    </message>
+    <message>
+      <source>Information required</source>
+      <translation type="unfinished">Information required</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
     </message>
   </context>
   <context>

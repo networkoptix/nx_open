@@ -7239,7 +7239,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Some data and settings may not be supported for the new camera</source>
-      <translation type="unfinished">Some data and settings may not be supported for the new camera</translation>
+      <translation>Noen data og innstillinger er kanskje ikke kompatible med det nye kameraet</translation>
     </message>
   </context>
   <context>
@@ -8078,9 +8078,9 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      <translation>
+        <numerusform>Hendelseslogg for perioden fra %1 til %2 – Viser de første %n hendelsene. For å finne spesifikke hendelser, juster datoperioden eller bruk flere filtre.</numerusform>
+        <numerusform/>
       </translation>
     </message>
   </context>

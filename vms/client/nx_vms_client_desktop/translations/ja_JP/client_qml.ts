@@ -766,7 +766,7 @@ Select an Integration to begin configuring its parameters.</source>
     <name>EventTestDialog</name>
     <message>
       <source>Event Test</source>
-      <translation type="unfinished">Event Test</translation>
+      <translation>イベントテスト</translation>
     </message>
     <message>
       <source>Test</source>
@@ -1403,7 +1403,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Log in to the site to configure how to open layouts</source>
-      <translation>レイアウトを開く方法を設定するには、サイトにログインしてください。</translation>
+      <translation>レイアウトを開く設定を行うには、サイトにログインしてください。</translation>
     </message>
   </context>
   <context>
@@ -3105,7 +3105,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Test events...</source>
-      <translation type="unfinished">Test events...</translation>
+      <translation>イベントをテスト...</translation>
     </message>
   </context>
   <context>

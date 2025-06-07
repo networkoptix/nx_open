@@ -780,7 +780,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <name>EventTestDialog</name>
     <message>
       <source>Event Test</source>
-      <translation type="unfinished">Event Test</translation>
+      <translation>Test wydarzenia</translation>
     </message>
     <message>
       <source>Test</source>
@@ -3146,7 +3146,7 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     </message>
     <message>
       <source>Test events...</source>
-      <translation type="unfinished">Test events...</translation>
+      <translation>Testowe wydarzenia...</translation>
     </message>
   </context>
   <context>

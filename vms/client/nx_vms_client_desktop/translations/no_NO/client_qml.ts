@@ -3116,7 +3116,7 @@ Trykk Alt + Klikk for å følge objektet</translation>
     </message>
     <message>
       <source>Test events...</source>
-      <translation type="unfinished">Test events...</translation>
+      <translation>Test hendelser...</translation>
     </message>
   </context>
   <context>

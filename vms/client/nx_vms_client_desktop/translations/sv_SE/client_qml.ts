@@ -770,7 +770,7 @@ Välj en integration för att börja konfigurera dess parametrar.</translation>
     <name>EventTestDialog</name>
     <message>
       <source>Event Test</source>
-      <translation type="unfinished">Event Test</translation>
+      <translation>Händelsetest</translation>
     </message>
     <message>
       <source>Test</source>
@@ -3116,7 +3116,7 @@ Tryck på Alt + Klicka för att följa objektet</translation>
     </message>
     <message>
       <source>Test events...</source>
-      <translation type="unfinished">Test events...</translation>
+      <translation>Testa händelser...</translation>
     </message>
   </context>
   <context>
