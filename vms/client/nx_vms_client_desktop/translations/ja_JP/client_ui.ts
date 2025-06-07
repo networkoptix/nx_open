@@ -1018,7 +1018,7 @@
     </message>
     <message>
       <source>Omit Logging</source>
-      <translation>ログ書込みを省略</translation>
+      <translation>ログに記録しない</translation>
     </message>
   </context>
   <context>
