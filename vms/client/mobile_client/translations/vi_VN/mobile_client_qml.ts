@@ -1129,7 +1129,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Đăng nhập</translation>
     </message>
   </context>
   <context>

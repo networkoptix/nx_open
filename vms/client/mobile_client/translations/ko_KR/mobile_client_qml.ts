@@ -1129,7 +1129,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>로그인</translation>
     </message>
   </context>
   <context>

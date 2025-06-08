@@ -1130,7 +1130,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Нэвтрэх</translation>
     </message>
   </context>
   <context>

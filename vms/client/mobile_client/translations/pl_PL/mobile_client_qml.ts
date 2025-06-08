@@ -103,7 +103,7 @@
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>Wymagane informacje</translation>
     </message>
   </context>
   <context>
@@ -1128,11 +1128,11 @@
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>Wymagane informacje</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Zaloguj się</translation>
     </message>
   </context>
   <context>
