@@ -18,7 +18,16 @@ Dialog
     id: root
 
     property var dialog: null
-    property var events: []
+    property var events: [] //< All the available events.
+    property var availableStates: []
+    property var eventReasons: []
+    property var eventLevels: []
+    property var boolStates: ["false", "true"]
+
+    property var servers: {}
+    property var devices: {}
+
+    property var properties: []
 
     width: 700
     height: 400
@@ -63,17 +72,7 @@ Dialog
                 if (currentIndex === -1)
                     return
 
-                const eventProperties = root.dialog.getEventProperties(model[currentIndex].type)
-                const eventPropertyMetatypes = root.dialog.getEventPropertyMetatypes(model[currentIndex].type)
-                for (let propertyName of Object.keys(eventProperties))
-                {
-                    const row = {
-                        "name": propertyName,
-                        "value": JSON.stringify(eventProperties[propertyName]),
-                        "type": eventPropertyMetatypes[propertyName]}
-
-                    eventPropertiesModel.appendRow(row)
-                }
+                root.dialog.onEventSelected(root.events[currentIndex].type)
             }
         }
 
@@ -93,12 +92,15 @@ Dialog
             model: TableModel
             {
                 id: eventPropertiesModel
-                TableModelColumn { display: "name" }
-                TableModelColumn { display: "value"}
+                TableModelColumn { display: "name"; whatsThis: "type" }
+                TableModelColumn { display: "value"; whatsThis: "type" }
+
+                rows: Array.from(root.properties)
             }
 
             delegate: DelegateChooser
             {
+                role: "whatsThis"
                 DelegateChoice
                 {
                     column: 0
@@ -106,8 +108,40 @@ Dialog
                 }
                 DelegateChoice
                 {
+                    roleValue: "state"
+                    delegate: comboBoxComponent
+                }
+                DelegateChoice
+                {
+                    roleValue: "eventReason"
+                    delegate: comboBoxComponent
+                }
+                DelegateChoice
+                {
+                    roleValue: "eventLevel"
+                    delegate: comboBoxComponent
+                }
+                DelegateChoice
+                {
+                    roleValue: "bool"
+                    delegate: comboBoxComponent
+                }
+                DelegateChoice
+                {
+                    roleValue: "device"
+                    delegate: resourceDelegate
+                }
+                DelegateChoice
+                {
+                    roleValue: "server"
+                    delegate: resourceDelegate
+                }
+                DelegateChoice
+                {
+                    column: 1
                     BasicSelectableTableCellDelegate
                     {
+                        tableView: eventPropertiesTableView
                         TableView.editDelegate: TextField
                         {
                             anchors.fill: parent
@@ -137,13 +171,6 @@ Dialog
 
                                 eventPropertiesTableView.editing = false
                             }
-                        }
-
-                        Component.onCompleted:
-                        {
-                            // This workaround is caused by the qt bug described here
-                            // https://bugreports.qt.io/browse/QTBUG-136658
-                            tableView = eventPropertiesTableView
                         }
                     }
                 }
@@ -228,6 +255,100 @@ Dialog
         {
             buttonLayout: DialogButtonBox.KdeLayout
             standardButtons: DialogButtonBox.Ok
+        }
+    }
+
+    Component
+    {
+        id: comboBoxComponent
+
+        BasicSelectableTableCellDelegate
+        {
+            tableView: eventPropertiesTableView
+            TableView.editDelegate: ComboBox
+            {
+                anchors.fill: parent
+
+                model:
+                {
+                    switch (whatsThis)
+                    {
+                        case "state": return root.availableStates
+                        case "eventReason": return root.eventReasons
+                        case "eventLevel": return root.eventLevels
+                        case "bool": return root.boolStates
+                        default: return []
+                    }
+                }
+
+                popup.onClosed:
+                {
+                    eventPropertiesTableView.closeEditor()
+                }
+
+                Component.onCompleted:
+                {
+                    eventPropertiesTableView.editing = true
+                    currentIndex = find(JSON.parse(display))
+                    popup.open()
+                }
+
+                Component.onDestruction:
+                {
+                    if (currentIndex === -1)
+                        return
+
+                    display = JSON.stringify(currentText)
+                    eventPropertiesTableView.editing = false
+                }
+            }
+        }
+    }
+
+    Component
+    {
+        id: resourceDelegate
+
+        BasicSelectableTableCellDelegate
+        {
+            tableView: eventPropertiesTableView
+            TableView.editDelegate: ComboBox
+            {
+                anchors.fill: parent
+                textRole: "name"
+                valueRole: "value"
+
+                model:
+                {
+                    switch (whatsThis)
+                    {
+                        case "server": return root.servers
+                        case "device": return root.devices
+                        default: return []
+                    }
+                }
+
+                popup.onClosed:
+                {
+                    eventPropertiesTableView.closeEditor()
+                }
+
+                Component.onCompleted:
+                {
+                    eventPropertiesTableView.editing = true
+                    currentIndex = indexOfValue(JSON.parse(display))
+                    popup.open()
+                }
+
+                Component.onDestruction:
+                {
+                    if (currentIndex === -1)
+                        return
+
+                    display = JSON.stringify(currentValue)
+                    eventPropertiesTableView.editing = false
+                }
+            }
         }
     }
 }

@@ -5,7 +5,9 @@
 #include <QtCore/QJsonObject>
 
 #include <api/server_rest_connection.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/qobject.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
@@ -31,6 +33,50 @@ QSet<QByteArray> propertyNames(nx::vms::rules::BasicEvent* event)
     return properties;
 }
 
+QStringList getAvailableStates(const vms::rules::ItemDescriptor& descriptor)
+{
+    QStringList availableStates;
+    if (descriptor.flags.testFlag(vms::rules::ItemFlag::instant))
+        availableStates.push_back(toString(vms::rules::State::instant));
+
+    if (descriptor.flags.testFlag(vms::rules::ItemFlag::prolonged))
+    {
+        availableStates.push_back(toString(vms::rules::State::started));
+        availableStates.push_back(toString(vms::rules::State::stopped));
+    }
+
+    return availableStates;
+}
+
+// Returns simplified data types.
+QString type(const QMetaType& metaType, const QString& name)
+{
+    const auto metaTypeId = metaType.id();
+    if (qMetaTypeId<nx::vms::api::rules::State>() == metaTypeId)
+        return "state";
+
+    if (qMetaTypeId<nx::vms::api::EventReason>() == metaTypeId)
+        return "eventReason";
+
+    if (qMetaTypeId<nx::vms::api::EventLevel>() == metaTypeId)
+        return "eventLevel";
+
+    if (qMetaTypeId<bool>() == metaTypeId)
+        return "bool";
+
+    if (qMetaTypeId<nx::Uuid>() == metaTypeId)
+    {
+        if (name == vms::rules::utils::kServerIdFieldName)
+            return "server";
+
+        if (name == vms::rules::utils::kDeviceIdFieldName)
+            return "device";
+
+    }
+
+    return "string";
+}
+
 } // namespace
 
 EventTestDialog::EventTestDialog(QWidget* parent)
@@ -49,41 +95,75 @@ EventTestDialog::EventTestDialog(QWidget* parent)
         events.push_back(QVariantMap{{"type", event}, {"display", descriptor.displayName.value()}});
 
     QmlProperty<QVariantList>(rootObjectHolder(), "events") = events;
-}
 
-QVariantMap EventTestDialog::getEventProperties(const QString& eventType) const
-{
-    const auto event =
-        systemContext()->vmsRulesEngine()->buildEvent({{nx::vms::rules::utils::kType, eventType}});
+    QStringList eventReasons;
+    for (auto reason: reflect::enumeration::allEnumValues<nx::vms::api::EventReason>())
+        eventReasons.push_back(toString(reason));
 
-    QVariantMap result;
-    const auto serializedProperties =
-        vms::rules::serializeProperties(event.get(), propertyNames(event.get()));
-    for (const auto& [k, v]: serializedProperties.asKeyValueRange())
-        result.insert(k, v);
+    QmlProperty<QStringList>(rootObjectHolder(), "eventReasons") = eventReasons;
 
-    if (auto serverIdIt = result.find(vms::rules::utils::kServerIdFieldName); serverIdIt != result.end())
-        serverIdIt.value() = QJsonValue{currentServer()->getId().toSimpleString()};
+    QStringList eventLevels;
+    for (auto level: reflect::enumeration::allEnumValues<nx::vms::api::EventLevel>())
+        eventLevels.push_back(toString(level));
 
-    return result;
-}
+    QmlProperty<QStringList>(rootObjectHolder(), "eventLevels") = eventLevels;
 
-QVariantMap EventTestDialog::getEventPropertyMetatypes(const QString& eventType) const
-{
-    const auto event =
-        systemContext()->vmsRulesEngine()->buildEvent({{nx::vms::rules::utils::kType, eventType}});
-
-    QVariantMap result;
-    const auto eventMetaObject = event->metaObject();
-    for (const auto& propertyName: propertyNames(event.get()))
+    QVariantList servers;
+    for (const auto& server: systemContext()->resourcePool()->servers())
     {
-        const auto property =
-            eventMetaObject->property(eventMetaObject->indexOfProperty(propertyName));
+        servers.push_back(
+            QVariantMap{{"name", server->getName()}, {"value", server->getId().toSimpleString()}});
+    }
+    QmlProperty<QVariantList>(rootObjectHolder(), "servers") = servers;
 
-        result.insert(propertyName, property.typeName());
+    QVariantList devices;
+    for (const auto& device: systemContext()->resourcePool()->getAllCameras())
+    {
+        devices.push_back(
+            QVariantMap{
+                {"name", device->getName()},
+                {"value", device->getId().toSimpleString()},
+                {"parent", device->getParentId().toSimpleString()}});
+    }
+    QmlProperty<QVariantList>(rootObjectHolder(), "devices") = devices;
+}
+
+void EventTestDialog::onEventSelected(const QString& eventType)
+{
+    const auto engine = systemContext()->vmsRulesEngine();
+    const auto descriptor = engine->eventDescriptor(eventType);
+    const auto event = engine->buildEvent({{nx::vms::rules::utils::kType, eventType}});
+    const auto properties = propertyNames(event.get());
+    const auto eventMetaObject = event->metaObject();
+
+    auto serializedProperties =
+        vms::rules::serializeProperties(event.get(), properties);
+
+    const auto availableStates = getAvailableStates(descriptor.value());
+    QmlProperty<QStringList>(rootObjectHolder(), "availableStates") = availableStates;
+
+    if (auto stateIt = serializedProperties.find(vms::rules::utils::kStateFieldName);
+        stateIt != serializedProperties.end())
+    {
+        *stateIt = QJsonValue{availableStates.first()};
     }
 
-    return result;
+    if (auto serverIdIt = serializedProperties.find(vms::rules::utils::kServerIdFieldName);
+        serverIdIt != serializedProperties.end())
+    {
+        *serverIdIt = QJsonValue{currentServer()->getId().toSimpleString()};
+    }
+
+    QVariantList propertiesModel;
+    for (const auto& propertyName: properties)
+    {
+        propertiesModel.push_back(QVariantMap{
+            {"name", propertyName},
+            {"value", serializedProperties.value(propertyName).toJson(QJsonDocument::Compact)},
+            {"type", type(eventMetaObject->property(eventMetaObject->indexOfProperty(propertyName)).metaType(), propertyName)}});
+    }
+
+    QmlProperty<QVariantList>(rootObjectHolder(), "properties") = propertiesModel;
 }
 
 void EventTestDialog::testEvent(const QString& event)
@@ -116,7 +196,7 @@ void EventTestDialog::testEvent(const QString& event)
                 const auto& error = result.error();
                 errorDescription = nx::format("Error id - %1").arg(error.errorId);
                 if (!error.errorString.isEmpty())
-                    errorDescription += nx::format(" , description - %2").arg(error.errorString);
+                    errorDescription += nx::format(": %2").arg(error.errorString);
             }
 
             emit eventSent(success, errorDescription);

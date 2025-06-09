@@ -14,8 +14,8 @@ class EventTestDialog: public QmlDialogWrapper, public CurrentSystemContextAware
 public:
     explicit EventTestDialog(QWidget* parent);
 
-    Q_INVOKABLE QVariantMap getEventProperties(const QString& eventType) const;
-    Q_INVOKABLE QVariantMap getEventPropertyMetatypes(const QString& eventType) const;
+    Q_INVOKABLE void onEventSelected(const QString& eventType);
+
     Q_INVOKABLE void testEvent(const QString& event);
 
     static constexpr auto kDebugActionName = "Event Test dialog";
