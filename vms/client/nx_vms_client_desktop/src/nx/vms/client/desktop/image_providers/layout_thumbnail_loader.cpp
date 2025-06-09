@@ -344,7 +344,13 @@ struct LayoutThumbnailLoader::Private
         switch (status)
         {
             case core::ThumbnailStatus::NoData:
-                return {};
+                if (!exportAllowed)
+                    return {};
+
+                thumbnailWidget = (isOnline || msecSinceEpoch != DATETIME_NOW)
+                    ? noDataWidget.get()
+                    : offlineWidget.get();
+                break;
 
             case core::ThumbnailStatus::Invalid:
                 thumbnailWidget = noDataWidget.get();
