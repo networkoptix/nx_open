@@ -119,8 +119,8 @@ private:
 
     mutable nx::Mutex m_mutex;
 
-    std::unique_ptr<QThread> m_thread = nullptr;
-    std::unique_ptr<QTimer> m_timer = nullptr;
+    std::unique_ptr<QThread> m_thread;
+    std::unique_ptr<QTimer> m_timer;
 };
 
 } // namespace nx::vms::time

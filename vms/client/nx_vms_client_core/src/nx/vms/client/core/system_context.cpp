@@ -137,8 +137,6 @@ void SystemContext::setSession(std::shared_ptr<RemoteSession> session)
 
         // Make sure existing session will be terminated outside of the mutex.
         std::swap(d->session, session);
-        if (session)
-            session->close();
     }
     if (d->session && d->sessionTimeoutWatcher)
         d->sessionTimeoutWatcher->sessionStarted(d->session);

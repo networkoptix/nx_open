@@ -137,6 +137,18 @@ bool systemContainsChannelPartnerUser(nx::vms::client::desktop::SystemContext* s
         [](const UserResourcePtr& user) { return userIsChannelPartner(user); });
 }
 
+void resetSession(SystemContext* system, std::shared_ptr<core::RemoteSession> session = {})
+{
+    // Prevent old session destruction during change.
+    auto oldSession = system->session();
+    NX_VERBOSE(NX_SCOPE_TAG, "Change session %1 -> %2", oldSession, session);
+    if (oldSession)
+        oldSession->close();
+
+    appContext()->networkModule()->setSession(session);
+    system->setSession(session);
+}
+
 } // namespace
 
 QString toString(ConnectActionsHandler::LogicalState state)
@@ -900,8 +912,9 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
             MainWindowTitleBarState::SessionData(
                 session->sessionId(), serverModuleInformation, logonData));
     }
-    system()->setSession(session);
-    appContext()->networkModule()->setSession(session);
+
+    resetSession(system(), session);
+
     const auto welcomeScreen = mainWindow()->welcomeScreen();
     if (welcomeScreen) // Welcome Screen exists in the desktop mode only.
         welcomeScreen->connectionToSystemEstablished(systemId);
@@ -1582,8 +1595,7 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
 
     d->currentConnectionProcess.reset();
     statisticsModule()->certificates()->resetScenario();
-    appContext()->networkModule()->setSession({});
-    system()->setSession({});
+    resetSession(system());
 
     // Get ready for the next connection.
     d->warnMessagesDisplayed = false;

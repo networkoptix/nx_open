@@ -23,7 +23,6 @@ TimeSyncManager::TimeSyncManager(SystemContext* systemContext, const nx::Uuid& s
 
 TimeSyncManager::~TimeSyncManager()
 {
-    stop();
 }
 
 void TimeSyncManager::resync()

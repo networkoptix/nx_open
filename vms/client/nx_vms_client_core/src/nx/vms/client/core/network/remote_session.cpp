@@ -167,7 +167,10 @@ void RemoteSession::close()
         d->messageProcessor->disconnect(this);
 
     if (auto connection = this->connection())
+    {
         connection->messageBusConnection()->messageBus()->disconnect(this);
+        connection->timeSynchronizationManager()->stop();
+    }
 
     stopReconnecting();
 }

@@ -34,6 +34,7 @@ TimeSyncManager::TimeSyncManager(
     m_steadyClock(std::make_shared<SteadyClock>()),
     m_thread(new QThread())
 {
+    m_thread->setObjectName("TimeSyncManager");
     moveToThread(m_thread.get());
 
     connect(m_thread.get(), &QThread::started,
