@@ -406,23 +406,11 @@ bool QnLayoutsModel::lessThan(const QModelIndex& left, const QModelIndex& right)
     const auto leftType = left.data(QnLayoutsModelUnsorted::ItemTypeRole).value<ItemType>();
     const auto rightType = right.data(QnLayoutsModelUnsorted::ItemTypeRole).value<ItemType>();
 
-    if (leftType != rightType)
-        return leftType < rightType;
-
+    // "All Cameras" is the first item.
     if (leftType == ItemType::AllCameras)
+        return true;
+    if (rightType == ItemType::AllCameras)
         return false;
-
-    if (leftType == ItemType::Layout)
-    {
-        const auto leftLayout = left.data(LayoutResourceRole).value<QnLayoutResourcePtr>();
-        const auto rightLayout = right.data(LayoutResourceRole).value<QnLayoutResourcePtr>();
-
-        bool leftShared = leftLayout->isShared();
-        bool rightShared = rightLayout->isShared();
-
-        if (leftShared != rightShared)
-            return leftShared;
-    }
 
     const auto leftResource = left.data(ResourceRole).value<QnResourcePtr>();
     const auto rightResource = right.data(ResourceRole).value<QnResourcePtr>();
