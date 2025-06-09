@@ -35,7 +35,7 @@ TextButton
         {
             id: switchIcon
 
-            height: 16
+            height: 17
             anchors.verticalCenter: parent.verticalCenter
             checkState: button.checkState
             hovered: button.hovered
