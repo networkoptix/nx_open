@@ -401,7 +401,6 @@ VmsEventSearchWidget::VmsEventSearchWidget(WindowContext* context, QWidget* pare
 {
     setRelevantControls(
         Control::cameraSelector
-        | Control::cameraSelectionDisplay
         | Control::timeSelector
         | Control::previewsToggler);
     setPlaceholderPixmap(qnSkin->icon(kEventsPlaceholderIcon).pixmap(64, 64));

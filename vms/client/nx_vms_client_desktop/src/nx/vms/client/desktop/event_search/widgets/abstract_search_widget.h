@@ -68,7 +68,7 @@ public:
         footersToggler = 0x10,
         previewsToggler = 0x20,
 
-        defaults = cameraSelector | cameraSelectionDisplay | timeSelector | freeTextFilter | previewsToggler,
+        defaults = cameraSelector | timeSelector | freeTextFilter | previewsToggler,
         all = defaults | footersToggler
     };
     Q_DECLARE_FLAGS(Controls, Control)
