@@ -771,6 +771,9 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
             if (suppressBanner && !widget->isPlayingLive())
                 return false;
 
+            if (!widget->options().testFlag(QnResourceWidget::ControlPtz))
+                return false;
+
             m_ptzInstrument->toggleContinuousPtz(widget, direction, true);
             return true;
         };
