@@ -168,7 +168,6 @@ public:
     /**
      * Finds the process session (if the process has a valid session id).
      */
-    CloudUserSession* findProcessCloudUserSession(PidType pid);
     const CloudUserSession* findProcessCloudUserSession(PidType pid) const;
 
     bool operator==(const SharedMemoryData& other) const = default;

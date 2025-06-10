@@ -693,6 +693,7 @@ void CloudStatusWatcher::Private::updateRefreshToken(const std::string& refreshT
     if (!cloudConnection || m_authData.refreshToken == refreshToken)
         return;
 
+    NX_DEBUG(this, "Refresh token updated, length: %1", refreshToken.size());
     m_authData.refreshToken = refreshToken;
     issueAccessToken();
 }

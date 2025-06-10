@@ -124,14 +124,6 @@ SharedMemoryData::CloudUserSession* SharedMemoryData::addCloudUserSession(
     return empty;
 }
 
-SharedMemoryData::CloudUserSession* SharedMemoryData::findProcessCloudUserSession(PidType pid)
-{
-    auto process = findProcess(pid);
-    return (process && process->cloudUserName != CloudUserName{})
-        ? findCloudUserSession(process->cloudUserName)
-        : nullptr;
-}
-
 const SharedMemoryData::CloudUserSession* SharedMemoryData::findProcessCloudUserSession(
     PidType pid) const
 {

@@ -50,6 +50,8 @@ public:
         QObject* parent = nullptr);
     virtual ~SharedMemoryManager() override;
 
+    QString idForToStringFromPtr() const;
+
     /** Sets up the required signal-slot connections. */
     void connectToCloudStatusWatcher();
 
@@ -106,9 +108,6 @@ public:
      */
     bool isLastInstanceInCurrentSession() const;
 
-    /** Process queued client command (if any) and emit corresponding signal. */
-    void processEvents();
-
     /** Sets actual session id for the current client instance and creates session if needed. */
     void enterSession(const SessionId& sessionId);
 
@@ -121,19 +120,24 @@ public:
     /** Updates token of the current instance session. */
     void updateSessionToken(std::string token);
 
-    /** Updates refresh token for cloud user. */
-    void updateRefreshToken(std::string refreshToken);
-
     /** Notify all instances that they must logout from cloud. */
     void requestLogoutFromCloud();
 
     /** Update cloud layout resources by fetching the latest data. */
     void requestUpdateCloudLayouts();
 
+public: //< For testing.
+    /** Process queued client command (if any) and emit corresponding signal. */
+    void processEvents();
+
 signals:
     void clientCommandRequested(SharedMemoryData::Command command, const QByteArray& data);
     void sessionTokenChanged(const std::string& token);
     void refreshTokenChanged(const std::string& token);
+
+private:
+    /** Updates refresh token for cloud user. */
+    void updateRefreshToken(std::string refreshToken);
 
 private:
     struct Private;

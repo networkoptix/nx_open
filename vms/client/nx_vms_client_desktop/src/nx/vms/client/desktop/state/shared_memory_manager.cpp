@@ -53,9 +53,16 @@ struct SharedMemoryManager::Private
     {
     }
 
+    QString idForToStringFromPtr() const
+    {
+        return NX_FMT("pid: %1", currentProcessPid);
+    }
+
     auto* findCurrentProcess(auto& data) const
     {
-        return data.findProcess(currentProcessPid);
+        auto result = data.findProcess(currentProcessPid);
+        NX_ASSERT(result, "Current process is not registered: %1", currentProcessPid);
+        return result;
     }
 
     auto isRunning(bool isRunning) const
@@ -92,6 +99,8 @@ struct SharedMemoryManager::Private
 
     void registerCurrentInstance()
     {
+        NX_VERBOSE(this, "Register current instance");
+
         SharedMemoryLocker guard(memoryInterface);
         SharedMemoryData data = memoryInterface->data();
         if (data.addProcess(currentProcessPid))
@@ -102,9 +111,9 @@ struct SharedMemoryManager::Private
     {
         SharedMemoryLocker guard(memoryInterface);
         SharedMemoryData data = memoryInterface->data();
-        auto existing = findCurrentProcess(data);
 
-        if (!NX_ASSERT(existing, "Current instance is unregistered"))
+        auto existing = findCurrentProcess(data);
+        if (!existing)
             return;
 
         transform(existing);
@@ -113,6 +122,8 @@ struct SharedMemoryManager::Private
 
     void unregisterCurrentInstance()
     {
+        NX_VERBOSE(this, "Unregister current instance");
+
         updateCurrentInstance([](auto iter) { *iter = SharedMemoryData::Process(); });
     }
 
@@ -127,7 +138,7 @@ struct SharedMemoryManager::Private
         SharedMemoryLocker guard(memoryInterface);
         const SharedMemoryData data = memoryInterface->data();
         auto session = data.findProcessSession(currentProcessPid);
-        if (NX_ASSERT(session, "Session not found"))
+        if (NX_ASSERT(session, "Session not found for process: %1", currentProcessPid))
             sendCommandUnderLock(Command::saveWindowState, withinSession(session->id));
     }
 
@@ -138,7 +149,7 @@ struct SharedMemoryManager::Private
         bool modified = false;
 
         auto session = data.findProcessSession(currentProcessPid);
-        if (!NX_ASSERT(session, "Session not found"))
+        if (!NX_ASSERT(session, "Session not found for process: %1", currentProcessPid))
             return;
 
         for (auto& process: data.processes | isRunning(true) | otherWithinSession(session->id))
@@ -185,7 +196,7 @@ struct SharedMemoryManager::Private
         SharedMemoryLocker guard(memoryInterface);
         SharedMemoryData data = memoryInterface->data();
         auto instance = findCurrentProcess(data);
-        if (NX_ASSERT(instance, "Current instance is unregistered"))
+        if (instance)
         {
             auto command = instance->command;
             if (command != Command::none)
@@ -228,12 +239,11 @@ struct SharedMemoryManager::Private
         if (!data.findSession(sessionId))
             data.addSession(sessionId);
 
-        auto process = data.findProcess(currentProcessPid);
-        if (!NX_ASSERT(process, "Current process is not registered"))
+        auto process = findCurrentProcess(data);
+        if (!process)
             return;
 
-        NX_DEBUG(this, "Process %1 enters session %2",
-            process->pid, process->sessionId.toLogString());
+        NX_DEBUG(this, "Enter session %1", process->sessionId.toLogString());
         process->sessionId = sessionId;
 
         memoryInterface->setData(data);
@@ -244,7 +254,7 @@ struct SharedMemoryManager::Private
         SharedMemoryLocker guard(memoryInterface);
         auto data = memoryInterface->data();
         auto process = findCurrentProcess(data);
-        if (!NX_ASSERT(process, "Process is not registered"))
+        if (!process)
             return false;
 
         // In case of race condition current session can be already unregistered.
@@ -256,11 +266,13 @@ struct SharedMemoryManager::Private
 
         const auto sessionId = std::exchange(process->sessionId, {});
         auto session = data.findSession(sessionId);
-        if (!NX_ASSERT(session, "Session data inconsistency"))
+        if (!NX_ASSERT(session, "Session %1 data inconsistency in process: %2",
+            sessionId, currentProcessPid))
+        {
             return false;
+        }
 
-        NX_DEBUG(this, "Process %1 leaves session %2",
-            process->pid, process->sessionId.toLogString());
+        NX_DEBUG(this, "Leave session %1", process->sessionId.toLogString());
 
         const bool sessionIsStillActive = sessionHasOtherProcesses(data, sessionId);
         if (!sessionIsStillActive)
@@ -275,7 +287,7 @@ struct SharedMemoryManager::Private
         SharedMemoryLocker guard(memoryInterface);
         auto data = memoryInterface->data();
         auto session = data.findProcessSession(currentProcessPid);
-        if (!NX_ASSERT(session, "Session is not registered"))
+        if (!NX_ASSERT(session, "Session is not registered for process: %1", currentProcessPid))
             return;
 
         session->token = token;
@@ -287,12 +299,31 @@ struct SharedMemoryManager::Private
     {
         SharedMemoryLocker guard(memoryInterface);
         auto data = memoryInterface->data();
-        auto cloudUserSession = data.findProcessCloudUserSession(currentProcessPid);
-        if (!NX_ASSERT(cloudUserSession, "Cloud user is not registered in shared memory"))
+
+        auto process = findCurrentProcess(data);
+        if (!process)
             return;
+
+        NX_VERBOSE(this, "Updating refresh token length: %1, user: %2",
+            refreshToken.size(), process->cloudUserName);
+
+        if (!NX_ASSERT(!process->cloudUserName.empty(),
+            "Process %1 is not registered in cloud user session", currentProcessPid))
+        {
+            return;
+        }
+
+        auto cloudUserSession = data.findCloudUserSession(process->cloudUserName);
+        if (!NX_ASSERT(cloudUserSession, "Cannot find cloud session for process: %1, user: %2",
+            currentProcessPid, process->cloudUserName))
+        {
+            return;
+        }
 
         if (cloudUserSession->refreshToken == refreshToken)
             return;
+
+        NX_VERBOSE(this, "Updated refresh token for user: %1", process->cloudUserName);
 
         cloudUserSession->refreshToken = refreshToken;
         memoryInterface->setData(data);
@@ -307,11 +338,11 @@ struct SharedMemoryManager::Private
         if (!data.findCloudUserSession(cloudUserName))
             data.addCloudUserSession(cloudUserName);
 
-        auto process = data.findProcess(currentProcessPid);
-        if (!NX_ASSERT(process, "Current process is not registered"))
+        auto process = findCurrentProcess(data);
+        if (!process)
             return;
 
-        NX_DEBUG(this, "Process %1 enters cloud user %2", process->pid, process->cloudUserName);
+        NX_DEBUG(this, "Enter cloud session: %1", process->cloudUserName);
         process->cloudUserName = cloudUserName;
 
         memoryInterface->setData(data);
@@ -322,7 +353,7 @@ struct SharedMemoryManager::Private
         SharedMemoryLocker guard(memoryInterface);
         auto data = memoryInterface->data();
         auto process = findCurrentProcess(data);
-        if (!NX_ASSERT(process, "Process is not registered"))
+        if (!process)
             return;
 
         // In case of race condition current session can be already unregistered.
@@ -374,10 +405,17 @@ SharedMemoryManager::~SharedMemoryManager()
     d->unregisterCurrentInstance();
 }
 
+QString SharedMemoryManager::idForToStringFromPtr() const
+{
+    return d->idForToStringFromPtr();
+}
+
 void SharedMemoryManager::connectToCloudStatusWatcher()
 {
     if (auto cloudStatusWatcher = appContext()->cloudStatusWatcher())
     {
+        NX_DEBUG(this, "Connecting to CloudStatusWatcher");
+
         connect(cloudStatusWatcher,
             &nx::vms::client::core::CloudStatusWatcher::refreshTokenChanged,
             this,
@@ -389,6 +427,8 @@ void SharedMemoryManager::connectToCloudStatusWatcher()
             [this]()
             {
                 const auto username = appContext()->cloudStatusWatcher()->credentials().username;
+                NX_DEBUG(this, "Cloud login changed: %1", username);
+
                 if (username.empty())
                     d->leaveCloudUserSession();
                 else
@@ -410,7 +450,7 @@ int SharedMemoryManager::currentInstanceIndex() const
         if (data.processes[i].pid == d->currentProcessPid)
             return i;
     }
-    NX_ASSERT(false, "Current instance is not registered.");
+    NX_ASSERT(false, "Current process %1 is not registered", d->currentProcessPid);
     return -1;
 }
 
@@ -488,7 +528,10 @@ void SharedMemoryManager::processEvents()
 {
     auto [command, commandData] = d->takeCommand();
     if (command != SharedMemoryData::Command::none)
+    {
+        NX_VERBOSE(this, "Command requested: %1", command);
         emit clientCommandRequested(command, commandData);
+    }
 
     const auto data = d->readData();
     if (auto session = data.findProcessSession(d->currentProcessPid))
@@ -497,7 +540,10 @@ void SharedMemoryManager::processEvents()
         {
             d->lastSessionToken = session->token;
             if (!d->lastSessionToken.empty())
+            {
+                NX_VERBOSE(this, "Session token change detected");
                 emit sessionTokenChanged(d->lastSessionToken);
+            }
         }
     }
 
@@ -507,7 +553,10 @@ void SharedMemoryManager::processEvents()
         {
             d->lastRefreshToken = cloudUserSession->refreshToken;
             if (!d->lastRefreshToken.empty())
+            {
+                NX_VERBOSE(this, "Refresh token change detected");
                 emit refreshTokenChanged(d->lastRefreshToken);
+            }
         }
     }
 }
