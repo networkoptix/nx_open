@@ -7,6 +7,7 @@
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qobject.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -72,7 +73,21 @@ QString type(const QMetaType& metaType, const QString& name)
         if (name == vms::rules::utils::kDeviceIdFieldName)
             return "device";
 
+        if (name == vms::rules::utils::kUserIdFieldName)
+            return "user";
     }
+
+    if (qMetaTypeId<UuidList>() == metaTypeId)
+    {
+        if (name == vms::rules::utils::kDeviceIdsFieldName)
+            return "devices";
+    }
+
+    if (qMetaTypeId<std::chrono::seconds>() == metaTypeId)
+        return "seconds";
+
+    if (qMetaTypeId<double>() == metaTypeId)
+        return "double";
 
     return "string";
 }
@@ -98,7 +113,12 @@ EventTestDialog::EventTestDialog(QWidget* parent)
 
     QStringList eventReasons;
     for (auto reason: reflect::enumeration::allEnumValues<nx::vms::api::EventReason>())
+    {
+        if (reason == nx::vms::api::EventReason::none)
+            continue;
+
         eventReasons.push_back(toString(reason));
+    }
 
     QmlProperty<QStringList>(rootObjectHolder(), "eventReasons") = eventReasons;
 
@@ -115,6 +135,14 @@ EventTestDialog::EventTestDialog(QWidget* parent)
             QVariantMap{{"name", server->getName()}, {"value", server->getId().toSimpleString()}});
     }
     QmlProperty<QVariantList>(rootObjectHolder(), "servers") = servers;
+
+    QVariantList users;
+    for (const auto& user: systemContext()->resourcePool()->getResources<QnUserResource>())
+    {
+        users.push_back(
+            QVariantMap{{"name", user->getName()}, {"value", user->getId().toSimpleString()}});
+    }
+    QmlProperty<QVariantList>(rootObjectHolder(), "users") = users;
 
     QVariantList devices;
     for (const auto& device: systemContext()->resourcePool()->getAllCameras())
@@ -154,8 +182,20 @@ void EventTestDialog::onEventSelected(const QString& eventType)
         *serverIdIt = QJsonValue{currentServer()->getId().toSimpleString()};
     }
 
+    if (auto userIdIt = serializedProperties.find(vms::rules::utils::kUserIdFieldName);
+        userIdIt != serializedProperties.end())
+    {
+        *userIdIt = QJsonValue{systemContext()->user()->getId().toSimpleString()};
+    }
+
+    if (auto reasonIt = serializedProperties.find(vms::rules::utils::kReasonFieldName);
+        reasonIt != serializedProperties.end())
+    {
+        *reasonIt = QJsonValue{toString(nx::vms::api::EventReason::networkNoFrame)};
+    }
+
     QVariantList propertiesModel;
-    for (const auto& propertyName: properties)
+    for (const auto& propertyName: std::set<QByteArray>(properties.cbegin(), properties.cend()))
     {
         propertiesModel.push_back(QVariantMap{
             {"name", propertyName},

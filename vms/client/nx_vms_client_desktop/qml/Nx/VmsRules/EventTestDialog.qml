@@ -26,6 +26,17 @@ Dialog
 
     property var servers: {}
     property var devices: {}
+    property var users: {}
+
+    readonly property var typeToModel: {
+        "state": root.availableStates,
+        "eventReason": root.eventReasons,
+        "eventLevel": root.eventLevels,
+        "bool": root.boolStates,
+        "server": root.servers,
+        "device": root.devices,
+        "user": root.users,
+        "devices": root.devices }
 
     property var properties: []
 
@@ -138,6 +149,69 @@ Dialog
                 }
                 DelegateChoice
                 {
+                    roleValue: "user"
+                    delegate: resourceDelegate
+                }
+                DelegateChoice
+                {
+                    roleValue: "devices"
+                    delegate: resourcesDelegate
+                }
+                DelegateChoice
+                {
+                    roleValue: "seconds"
+                    BasicSelectableTableCellDelegate
+                    {
+                        tableView: eventPropertiesTableView
+                        TableView.editDelegate: SpinBox
+                        {
+                            value: JSON.parse(display)
+                            from: 0
+                            to: 999
+                            editable: true
+
+                            Component.onCompleted:
+                            {
+                                eventPropertiesTableView.editing = true
+                            }
+
+                            Component.onDestruction:
+                            {
+                                display = JSON.stringify(value)
+                                eventPropertiesTableView.editing = false
+                            }
+                        }
+                    }
+                }
+                DelegateChoice
+                {
+                    roleValue: "double"
+                    BasicSelectableTableCellDelegate
+                    {
+                        tableView: eventPropertiesTableView
+                        TableView.editDelegate: DoubleSpinBox
+                        {
+                            dValue: JSON.parse(display)
+                            dFrom: 0
+                            dTo: 999
+                            dStepSize: 0.1
+                            editable: true
+
+                            Component.onCompleted:
+                            {
+                                eventPropertiesTableView.editing = true
+                            }
+
+                            Component.onDestruction:
+                            {
+                                display = JSON.stringify(dValue)
+                                eventPropertiesTableView.editing = false
+                            }
+                        }
+                    }
+                }
+                DelegateChoice
+                {
                     column: 1
                     BasicSelectableTableCellDelegate
                     {
@@ -201,6 +275,8 @@ Dialog
             {
                 eventPropertiesTableView.closeEditor()
 
+                enabled = false
+
                 var result = {}
                 for (let i = 0; i < eventPropertiesModel.rowCount; ++i)
                 {
@@ -214,8 +290,6 @@ Dialog
                 // result["timestamp"] = Date.now() * 1000 //< Should we set timestamp here?
 
                 root.dialog.testEvent(JSON.stringify(result))
-
-                enabled = false
             }
         }
     }
@@ -268,19 +342,7 @@ Dialog
             TableView.editDelegate: ComboBox
             {
                 anchors.fill: parent
-
-                model:
-                {
-                    switch (whatsThis)
-                    {
-                        case "state": return root.availableStates
-                        case "eventReason": return root.eventReasons
-                        case "eventLevel": return root.eventLevels
-                        case "bool": return root.boolStates
-                        default: return []
-                    }
-                }
-
+                model: typeToModel[whatsThis] ?? []
                 popup.onClosed:
                 {
                     eventPropertiesTableView.closeEditor()
@@ -317,16 +379,7 @@ Dialog
                 anchors.fill: parent
                 textRole: "name"
                 valueRole: "value"
-
-                model:
-                {
-                    switch (whatsThis)
-                    {
-                        case "server": return root.servers
-                        case "device": return root.devices
-                        default: return []
-                    }
-                }
+                model: typeToModel[whatsThis] ?? []
 
                 popup.onClosed:
                 {
@@ -346,6 +399,53 @@ Dialog
                         return
 
                     display = JSON.stringify(currentValue)
+                    eventPropertiesTableView.editing = false
+                }
+            }
+        }
+    }
+
+    Component
+    {
+        id: resourcesDelegate
+
+        BasicSelectableTableCellDelegate
+        {
+            tableView: eventPropertiesTableView
+            TableView.editDelegate: MultiSelectionComboBox
+            {
+                anchors.fill: parent
+                textRole: "name"
+                model: ListModel {}
+
+                Component.onCompleted:
+                {
+                    eventPropertiesTableView.editing = true
+
+                    let selectedDevices = JSON.parse(display)
+                    for (let i of root.devices)
+                    {
+                        model.append({
+                            "name": i.name,
+                            "checked": selectedDevices.includes(i.value),
+                            "value": i.value})
+                    }
+
+                    Qt.callLater(() => openPopup()) //< Direct `openPopup()` call does not work.
+                }
+
+                Component.onDestruction:
+                {
+                    let selectedDevices = []
+                    for (let i = 0; i < model.count; ++i)
+                    {
+                        const modelItem = model.get(i)
+                        if (modelItem.checked)
+                            selectedDevices.push(modelItem.value)
+                    }
+
+                    display = JSON.stringify(selectedDevices)
+
                     eventPropertiesTableView.editing = false
                 }
             }
