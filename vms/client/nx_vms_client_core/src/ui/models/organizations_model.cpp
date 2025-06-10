@@ -631,6 +631,13 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
                     return false;
                 break;
             }
+            case OrganizationsModel::IsAccessibleThroughOrgRole:
+            {
+                auto id = d->proxyModel->data(
+                    d->mapToProxyModel(index),
+                    QnSystemsModel::SystemIdRoleId).toString();
+                return !!d->nodes.find(nx::Uuid::fromStringSafe(id));
+            }
         }
         return d->proxyModel->data(d->mapToProxyModel(index), role);
     }
@@ -673,6 +680,8 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
             return node->state == api::SaasState::suspended;
         case QnSystemsModel::IsSaasShutDown:
             return node->state == api::SaasState::shutdown;
+        case IsAccessibleThroughOrgRole:
+            return true;
         default:
             if (node->type == OrganizationsModel::System && d->proxyModel)
             {
@@ -1217,7 +1226,8 @@ bool OrganizationsFilterModel::filterAcceptsRow(
 
     if (m_hideOrgSystemsFromSites
         && sourceIndex.data(OrganizationsModel::IsFromSitesRole).toBool()
-        && !sourceIndex.data(QnSystemsModel::IsSaasUninitialized).toBool())
+        && !sourceIndex.data(QnSystemsModel::IsSaasUninitialized).toBool()
+        && sourceIndex.data(OrganizationsModel::IsAccessibleThroughOrgRole).toBool())
     {
         return false;
     }

@@ -46,6 +46,7 @@ public:
         SectionRole,
         IsLoadingRole,
         IsFromSitesRole,
+        IsAccessibleThroughOrgRole,
 
         RolesCount
     };
