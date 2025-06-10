@@ -6240,11 +6240,15 @@ If you intended to move analytics data to another storage location, please conta
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Transcoding is required. Export session restarted.</source>
+        <source>Minimize</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Minimize</source>
+        <source>Video transcoding is required. Export session restarted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio transcoding is required. Export session restarted.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8210,6 +8214,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Unlock this portion of the archive to export its contents.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Audio transcoding required.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
