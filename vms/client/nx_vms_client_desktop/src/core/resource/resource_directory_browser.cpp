@@ -119,11 +119,16 @@ void LocalResourceProducer::updateFileLayoutResource(const QString& path)
     if (auto fileLayout = resourcePool()->getResourceByUrl(path)
         .dynamicCast<QnFileLayoutResource>())
     {
+        NX_ASSERT(m_updateFileLayoutHelper);
+        const auto connectionType = (QThread::currentThread() == m_updateFileLayoutHelper->thread())
+            ? Qt::DirectConnection
+            : Qt::BlockingQueuedConnection;
+
         // Remove layouts items in the main thread.
         QMetaObject::invokeMethod(m_updateFileLayoutHelper,
-            "startUpdateLayout",
-            Qt::BlockingQueuedConnection,
-            Q_ARG(QnFileLayoutResourcePtr, fileLayout));
+            &UpdateFileLayoutHelper::startUpdateLayout,
+            connectionType,
+            fileLayout);
 
         QString password = layout::password(fileLayout);
         QnFileLayoutResourcePtr updatedLayout =
@@ -136,9 +141,9 @@ void LocalResourceProducer::updateFileLayoutResource(const QString& path)
 
         // Update source layout using loaded layout in the main thread.
         QMetaObject::invokeMethod(m_updateFileLayoutHelper,
-            "finishUpdateLayout",
-            Qt::BlockingQueuedConnection,
-            Q_ARG(QnFileLayoutResourcePtr, updatedLayout));
+            &UpdateFileLayoutHelper::finishUpdateLayout,
+            connectionType,
+            updatedLayout);
     }
 }
 
