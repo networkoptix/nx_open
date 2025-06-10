@@ -3,6 +3,7 @@
 #include "debug_info_storage.h"
 
 #include <QMap>
+#include <QRegularExpression>
 #include <QStringList>
 
 #include <nx/reflect/to_string.h>
@@ -32,7 +33,7 @@ public:
     Private(DebugInfoStorage* parent):
         q(parent)
     {
-        const QString filterList(ini().debugInfoFilter);
+        const QStringList filterList(QString(ini().debugInfoFilter).split(QRegularExpression("\\s|,|;")));
         const auto addFieldToFilter = [filterList, this](const DebugInfoStorage::Field& key)
         {
             if (filterList.contains(toString(key)))

@@ -225,7 +225,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         " * \"iss\",\n"
         " * \"requests_per_min\",\n"
         " * \"developer_build\".\n"
-        "Fields can be combined using space, comma or any other separator."
+        "Fields can be combined using space, comma or semicolon."
     );
 
     NX_INI_STRING("", harFile,
