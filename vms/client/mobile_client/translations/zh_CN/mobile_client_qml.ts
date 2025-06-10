@@ -133,6 +133,46 @@
     </message>
   </context>
   <context>
+    <name>CloudConnectionHelpSheet</name>
+    <message>
+      <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to the %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to the %1</translation>
+    </message>
+    <message>
+      <source>Log in to the site in %1</source>
+      <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
+      <translation type="unfinished">Log in to the site in %1</translation>
+    </message>
+    <message>
+      <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+    </message>
+    <message>
+      <source>Follow the steps of wizard</source>
+      <translation type="unfinished">Follow the steps of wizard</translation>
+    </message>
+    <message>
+      <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to the %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to the %1</translation>
+    </message>
+    <message>
+      <source>Connect to %1 by site owner’s account</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
+    </message>
+    <message>
+      <source>Open Site Settings page and click “change” link next to the owner&apos;s name</source>
+      <translation type="unfinished">Open Site Settings page and click “change” link next to the owner&apos;s name</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>确定</translation>
+    </message>
+  </context>
+  <context>
     <name>ComboBox</name>
     <message>
       <source>Cancel</source>
@@ -484,24 +524,16 @@
       <translation type="unfinished">No Sites</translation>
     </message>
     <message>
-      <source>We did not find any sites in this organization</source>
-      <translation type="unfinished">We did not find any sites in this organization</translation>
-    </message>
-    <message>
-      <source>We did not find any sites in this folder</source>
-      <translation type="unfinished">We did not find any sites in this folder</translation>
-    </message>
-    <message>
-      <source>How to connect sites?</source>
-      <translation type="unfinished">How to connect sites?</translation>
-    </message>
-    <message>
       <source>Nothing found</source>
       <translation>未找到内容</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
       <translation type="unfinished">Try changing the search parameters</translation>
+    </message>
+    <message>
+      <source>How to connect?</source>
+      <translation type="unfinished">How to connect?</translation>
     </message>
   </context>
   <context>
@@ -984,6 +1016,17 @@
     <message>
       <source>SHUTDOWN</source>
       <translation type="unfinished">SHUTDOWN</translation>
+    </message>
+  </context>
+  <context>
+    <name>SitePlaceholderScreen</name>
+    <message>
+      <source>Access to Resources Denied</source>
+      <translation type="unfinished">Access to Resources Denied</translation>
+    </message>
+    <message>
+      <source>Sites in the Suspended or Shutdown state are not available</source>
+      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
     </message>
   </context>
   <context>

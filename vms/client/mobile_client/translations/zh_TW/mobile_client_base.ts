@@ -21,11 +21,6 @@
   <context>
     <name>QnCloudSystemInformationWatcher</name>
     <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>系統所有者: %1</translation>
-    </message>
-    <message>
       <source>Your Site</source>
       <translation>您的站點 (Site)</translation>
     </message>

@@ -780,7 +780,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventTestDialog</name>
     <message>
       <source>Event Test</source>
-      <translation type="unfinished">Event Test</translation>
+      <translation>Тест события</translation>
     </message>
     <message>
       <source>Test</source>
@@ -3146,7 +3146,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Test events...</source>
-      <translation type="unfinished">Test events...</translation>
+      <translation>Тестировать события...</translation>
     </message>
   </context>
   <context>

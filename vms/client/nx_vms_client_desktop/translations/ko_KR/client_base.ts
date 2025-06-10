@@ -6139,12 +6139,16 @@ If you intended to move analytics data to another storage location, please conta
       <translation>내보내기 중지</translation>
     </message>
     <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>트랜스 코딩이 필요합니다. 내보내기 세션이 다시 시작되었습니다.</translation>
-    </message>
-    <message>
       <source>Minimize</source>
       <translation>최소화</translation>
+    </message>
+    <message>
+      <source>Video transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>
@@ -8081,6 +8085,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
       <translation>아카이브의 이 부분을 잠금 해제하여 콘텐츠를 내보낼 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation type="unfinished">Audio transcoding required.</translation>
     </message>
   </context>
   <context>

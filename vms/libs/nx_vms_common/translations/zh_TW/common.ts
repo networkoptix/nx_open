@@ -1398,6 +1398,10 @@
       <source>File write error.</source>
       <translation>檔案寫入錯誤.</translation>
     </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation type="unfinished">Audio transcoding required.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::common::SystemSettings</name>

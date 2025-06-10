@@ -6139,12 +6139,16 @@ If you intended to move analytics data to another storage location, please conta
       <translation>停止匯出</translation>
     </message>
     <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>需要重新編碼。已重啟匯出。</translation>
-    </message>
-    <message>
       <source>Minimize</source>
       <translation>最小化</translation>
+    </message>
+    <message>
+      <source>Video transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>
@@ -7109,20 +7113,20 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
+      <translation>因伺服器目前無法連線，因此使用攝影機置換操作。</translation>
     </message>
     <message>
       <source>%1 will be removed from the site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the site and replaced by the selected camera</translation>
+      <translation>%1將被從站點移除並以所選攝影機取代</translation>
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+      <translation>檢查攝影機中的資料是否可以轉移到新的攝影機。</translation>
     </message>
     <message>
       <source>Some data and settings may not be supported for the new camera</source>
-      <translation type="unfinished">Some data and settings may not be supported for the new camera</translation>
+      <translation>某些資料和設定可能新攝影機無法支援</translation>
     </message>
   </context>
   <context>
@@ -8081,6 +8085,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
       <translation>解鎖這一部分的存檔以匯出其內容。</translation>
+    </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation type="unfinished">Audio transcoding required.</translation>
     </message>
   </context>
   <context>

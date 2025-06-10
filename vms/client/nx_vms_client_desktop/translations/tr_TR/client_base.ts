@@ -6241,12 +6241,16 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Aktarmayı durdur</translation>
     </message>
     <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>Kod dönüştürme gerekli. Dışa aktarma oturumu yeniden başlatıldı.</translation>
-    </message>
-    <message>
       <source>Minimize</source>
       <translation>Küçült</translation>
+    </message>
+    <message>
+      <source>Video transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>
@@ -8211,6 +8215,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
       <translation>İçeriğini dışa aktarmak için arşivin bu bölümünün kilidini açın.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation type="unfinished">Audio transcoding required.</translation>
     </message>
   </context>
   <context>

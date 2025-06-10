@@ -6242,12 +6242,16 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Arresta l'esportazione</translation>
     </message>
     <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>È richiesta la transcodifica. Sessione di esportazione riavviata.</translation>
-    </message>
-    <message>
       <source>Minimize</source>
       <translation>Minimizzare</translation>
+    </message>
+    <message>
+      <source>Video transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>
@@ -8212,6 +8216,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
       <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation type="unfinished">Audio transcoding required.</translation>
     </message>
   </context>
   <context>

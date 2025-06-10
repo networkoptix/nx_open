@@ -103,7 +103,7 @@
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>需要資訊</translation>
     </message>
   </context>
   <context>
@@ -130,6 +130,46 @@
     <message>
       <source>Channel Partner</source>
       <translation>通路夥伴</translation>
+    </message>
+  </context>
+  <context>
+    <name>CloudConnectionHelpSheet</name>
+    <message>
+      <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to the %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to the %1</translation>
+    </message>
+    <message>
+      <source>Log in to the site in %1</source>
+      <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
+      <translation type="unfinished">Log in to the site in %1</translation>
+    </message>
+    <message>
+      <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+    </message>
+    <message>
+      <source>Follow the steps of wizard</source>
+      <translation type="unfinished">Follow the steps of wizard</translation>
+    </message>
+    <message>
+      <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to the %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to the %1</translation>
+    </message>
+    <message>
+      <source>Connect to %1 by site owner’s account</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
+    </message>
+    <message>
+      <source>Open Site Settings page and click “change” link next to the owner&apos;s name</source>
+      <translation type="unfinished">Open Site Settings page and click “change” link next to the owner&apos;s name</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>確定</translation>
     </message>
   </context>
   <context>
@@ -484,24 +524,16 @@
       <translation>沒有站點</translation>
     </message>
     <message>
-      <source>We did not find any sites in this organization</source>
-      <translation>我們在此組織中沒有找到任何站點</translation>
-    </message>
-    <message>
-      <source>We did not find any sites in this folder</source>
-      <translation>我們在此資料夾中沒有找到任何站點</translation>
-    </message>
-    <message>
-      <source>How to connect sites?</source>
-      <translation>如何連結站點？</translation>
-    </message>
-    <message>
       <source>Nothing found</source>
       <translation>未找到任何內容</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
       <translation>嘗試更改搜尋參數</translation>
+    </message>
+    <message>
+      <source>How to connect?</source>
+      <translation type="unfinished">How to connect?</translation>
     </message>
   </context>
   <context>
@@ -987,6 +1019,17 @@
     </message>
   </context>
   <context>
+    <name>SitePlaceholderScreen</name>
+    <message>
+      <source>Access to Resources Denied</source>
+      <translation type="unfinished">Access to Resources Denied</translation>
+    </message>
+    <message>
+      <source>Sites in the Suspended or Shutdown state are not available</source>
+      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+    </message>
+  </context>
+  <context>
     <name>SslCertificateDialog</name>
     <message>
       <source>Common name</source>
@@ -1125,7 +1168,7 @@
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>需要資訊</translation>
     </message>
     <message>
       <source>Log In</source>
