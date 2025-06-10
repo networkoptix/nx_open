@@ -81,9 +81,9 @@ BaseBottomSheet
 
         Header
         {
-            text: qsTr("If the site is <font color='%2'>not connected</a> to the %1",
-                "%1 is the short cloud name (like 'Cloud')")
-                    .arg(Branding.shortCloudName())
+            text: qsTr("If the site is <font color='%2'>not connected</a> to %1",
+                "%1 is the cloud name (like 'Nx Cloud')")
+                    .arg(Branding.cloudName())
                     .arg(ColorTheme.colors.brand)
         }
 
@@ -99,8 +99,8 @@ BaseBottomSheet
         {
             step: 2
             text: qsTr("Click \"Connect Site to %1\" in the %1 tab in Site Administration",
-                "%1 is the short cloud name (like 'Cloud')")
-                    .arg(Branding.shortCloudName())
+                "%1 is the cloud name (like 'Nx Cloud')")
+                    .arg(Branding.cloudName())
         }
 
         Step
@@ -117,9 +117,9 @@ BaseBottomSheet
 
         Header
         {
-            text: qsTr("If the site is <font color='%2'>connected</a> to the %1",
-                "%1 is the short cloud name (like 'Cloud')")
-                    .arg(Branding.shortCloudName())
+            text: qsTr("If the site is <font color='%2'>connected</a> to %1",
+                "%1 is the cloud name (like 'Nx Cloud')")
+                    .arg(Branding.cloudName())
                     .arg(ColorTheme.colors.brand)
         }
 
@@ -127,14 +127,14 @@ BaseBottomSheet
         {
             step: 1
             text: qsTr("Connect to %1 by site owner’s account",
-                "%1 is the short cloud name (like 'Cloud')")
-                    .arg(Branding.shortCloudName())
+                "%1 is the cloud name (like 'Nx Cloud')")
+                    .arg(Branding.cloudName())
         }
 
         Step
         {
             step: 2
-            text: qsTr("Open Site Settings page and click “change” link next to the owner's name")
+            text: qsTr("Open Site Settings page and click \"change\" link next to the owner's name")
         }
 
         Step
