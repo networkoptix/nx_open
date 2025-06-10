@@ -1472,10 +1472,6 @@ QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) cons
         case PreviewTimeRole:
             return QVariant::fromValue(previewParams(track).timestamp);
 
-        case TimestampMsRole:
-            return QVariant::fromValue(duration_cast<milliseconds>(
-                microseconds(track.firstAppearanceTimeUs)).count());
-
         case PreviewStreamSelectionRole:
         {
             using namespace nx::vms::api;

@@ -325,8 +325,7 @@ void EventRibbon::Private::updateTile(int index)
     widget->setTitle(title);
     widget->setTitleColor(modelIndex.data(Qt::ForegroundRole).value<QColor>());
     widget->setIconPath(modelIndex.data(core::DecorationPathRole).value<QString>());
-    widget->setTimestampMs(modelIndex.data(core::TimestampMsRole)
-        .value<std::chrono::milliseconds>());
+    widget->setTimestamp(modelIndex.data(core::TimestampRole).value<std::chrono::microseconds>());
     widget->setDescription(tileDescription);
     widget->setFooterText(modelIndex.data(Qn::AdditionalTextRole).toString());
     widget->setAttributeList(modelIndex.data(core::AnalyticsAttributesRole)
@@ -410,8 +409,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     const bool precisePreview = !previewCropRect.isEmpty()
         || modelIndex.data(core::ForcePrecisePreviewRole).toBool();
 
-    const auto objectTrackId = modelIndex.data(
-		core::ObjectTrackIdRole).value<nx::Uuid>();
+    const auto objectTrackId = modelIndex.data(core::ObjectTrackIdRole).value<nx::Uuid>();
 
     nx::api::ResourceImageRequest request;
     request.resource = previewResource;

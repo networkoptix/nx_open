@@ -334,9 +334,6 @@ QVariant BookmarkSearchListModel::data(const QModelIndex& index, int role) const
         case PreviewTimeRole:
             return QVariant::fromValue(duration_cast<microseconds>(bookmark.startTimeMs));
 
-        case TimestampMsRole:
-            return QVariant::fromValue(bookmark.startTimeMs.count());
-
         case DurationRole:
             return QVariant::fromValue(bookmark.durationMs);
 
@@ -375,7 +372,7 @@ QVariant BookmarkSearchListModel::data(const QModelIndex& index, int role) const
                     api::BookmarkShareFilter::shared | api::BookmarkShareFilter::accessible)
                 && systemContext()->moduleInformation().organizationId;
         default:
-            return {};
+            return base_type::data(index, role);
     }
 }
 

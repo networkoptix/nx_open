@@ -471,10 +471,6 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
         case core::TimestampRole:
             return QVariant::fromValue(event->timestamp()); //< Microseconds.
 
-        case core::TimestampTextRole:
-        case core::TimestampMsRole:
-            return base_type::data(index, role);
-
         case core::ObjectTrackIdRole:
             return event->property("objectTrackId");
 
@@ -507,7 +503,7 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
             return HelpTopic::Id::Empty;
 
         default:
-            return {};
+            return base_type::data(index, role);
     }
 }
 
