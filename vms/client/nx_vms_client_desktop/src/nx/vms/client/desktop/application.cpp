@@ -58,6 +58,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/rlimit.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/help/help_handler.h>
@@ -499,6 +501,12 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     /* Write out settings. */
     appContext()->localSettings()->audioVolume = nx::audio::AudioDevice::instance()->volume();
     nx::audio::AudioDevice::instance()->deinitialize();
+
+    // A workaround to ensure no cross-system connections are made after subsequent stopAll call.
+    if (auto csw = applicationContext->cloudStatusWatcher())
+        csw->suppressCloudInteraction({});
+    if (auto ccsm = applicationContext->cloudCrossSystemManager())
+        ccsm->resetCloudSystems(/*enableCloudSystems*/ false);
 
     // Stop all long runnables before destroying window context.
     applicationContext->stopAll();

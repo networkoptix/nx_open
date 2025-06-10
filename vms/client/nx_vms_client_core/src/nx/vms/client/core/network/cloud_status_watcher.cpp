@@ -448,7 +448,7 @@ bool CloudStatusWatcher::Private::updateSystemsInternal(int triesCount)
     auto handler = nx::utils::AsyncHandlerExecutor(this).bind(
         [this, triesCount](ResultCode result, const SystemDataExList& systemsList)
         {
-            if (!cloudConnection)
+            if (!cloudConnection || !checkSuppressed())
                 return;
 
             QnCloudSystemList cloudSystems;

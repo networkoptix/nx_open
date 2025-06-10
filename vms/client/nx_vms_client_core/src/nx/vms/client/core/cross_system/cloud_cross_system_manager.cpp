@@ -91,7 +91,7 @@ void CloudCrossSystemManager::setConnectingAutomatically(bool value)
     d->connectingAutomatically = value;
 }
 
-void CloudCrossSystemManager::debugResetCloudSystems(bool enableCloudSystems)
+void CloudCrossSystemManager::resetCloudSystems(bool enableCloudSystems)
 {
     if (enableCloudSystems)
         d->setCloudSystems(appContext()->cloudStatusWatcher()->cloudSystems());

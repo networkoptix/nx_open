@@ -566,13 +566,13 @@ struct ApplicationContext::Private
         registerDebugAction("Cross-site contexts reset",
             [this](auto)
             {
-                q->cloudCrossSystemManager()->debugResetCloudSystems(/*enableCloudSystems*/ false);
+                q->cloudCrossSystemManager()->resetCloudSystems(/*enableCloudSystems*/ false);
             });
 
         registerDebugAction("Cross-site contexts restore",
             [this](auto)
             {
-                q->cloudCrossSystemManager()->debugResetCloudSystems(/*enableCloudSystems*/ true);
+                q->cloudCrossSystemManager()->resetCloudSystems(/*enableCloudSystems*/ true);
             });
 
         connect(q->cloudCrossSystemManager(),

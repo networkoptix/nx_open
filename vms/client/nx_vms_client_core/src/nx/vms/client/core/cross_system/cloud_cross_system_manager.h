@@ -30,7 +30,7 @@ public:
     bool connectingAutomatically() const;
     void setConnectingAutomatically(bool value);
 
-    void debugResetCloudSystems(bool enableCloudSystems);
+    void resetCloudSystems(bool enableCloudSystems);
 
 signals:
     void systemFound(const QString& systemId);

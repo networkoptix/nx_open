@@ -43,6 +43,7 @@ extern "C" {
 #include <nx/utils/rlimit.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
@@ -393,6 +394,12 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     }
 
     int result = runApplication(&application);
+
+    // A workaround to ensure no cross-system connections are made after subsequent stopAll call.
+    if (auto csw = applicationContext->cloudStatusWatcher())
+        csw->suppressCloudInteraction({});
+    if (auto ccsm = applicationContext->cloudCrossSystemManager())
+        ccsm->resetCloudSystems(/*enableCloudSystems*/ false);
 
     // Stop all long runnables before destroying application context.
     applicationContext->stopAll();
