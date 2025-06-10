@@ -106,9 +106,7 @@ public:
             {
                 return
                 {
-                    tr("%1 user login is temporarily unavailable",
-                        "%1 is the short cloud name (like Cloud)")
-                        .arg(nx::branding::shortCloudName()),
+                    tr("Failed to access site"),
                     serverCloudIsNotReady() + html::kLineBreak + contactAdministrator()
                 };
             }
