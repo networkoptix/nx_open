@@ -20,7 +20,7 @@ struct CloudCrossSystemManager::Private
     CloudCrossSystemManager* const q;
     nx::utils::ScopedConnections connections;
     std::map<QString, CloudCrossSystemContextPtr> cloudSystems;
-    bool connectingAutomatically = false;
+    std::unique_ptr<CloudCrossSystemRequestScheduler> scheduler;
 
     void setCloudSystems(const QnCloudSystemList& currentCloudSystems);
     void requestCloudAuthorization();
@@ -36,6 +36,8 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
     if (ini().disableCrossSiteConnections)
         return;
 
+    d->scheduler = std::make_unique<CloudCrossSystemRequestScheduler>();
+
     d->connections << connect(
         appContext()->cloudStatusWatcher(), &core::CloudStatusWatcher::statusChanged, this,
         [this](auto status)
@@ -44,9 +46,14 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
 
             // Leaving system list as is in case of Cloud going offline.
             if (status == core::CloudStatusWatcher::Online)
+            {
                 d->setCloudSystems(appContext()->cloudStatusWatcher()->cloudSystems());
+            }
             else if (status == core::CloudStatusWatcher::LoggedOut)
+            {
                 d->setCloudSystems({});
+                d->scheduler->reset();
+            }
         });
 
     d->connections << connect(
@@ -81,14 +88,14 @@ CloudCrossSystemContext* CloudCrossSystemManager::systemContext(const QString& s
         : iter->second.get();
 }
 
-bool CloudCrossSystemManager::connectingAutomatically() const
+CloudCrossSystemRequestScheduler* CloudCrossSystemManager::scheduler()
 {
-    return d->connectingAutomatically;
+    return d->scheduler.get();
 }
 
-void CloudCrossSystemManager::setConnectingAutomatically(bool value)
+void CloudCrossSystemManager::setPriority(const QString& systemId, Priority priority)
 {
-    d->connectingAutomatically = value;
+    d->scheduler->setPriority(systemId, (int)priority);
 }
 
 void CloudCrossSystemManager::resetCloudSystems(bool enableCloudSystems)

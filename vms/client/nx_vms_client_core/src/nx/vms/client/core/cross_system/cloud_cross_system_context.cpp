@@ -18,10 +18,11 @@
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/client/core/application_context.h>
-#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/cross_system/cross_system_access_controller.h>
+#include <nx/vms/client/core/cross_system/private/grouped_task_queue.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/logon_data_helpers.h>
@@ -128,11 +129,8 @@ struct CloudCrossSystemContext::Private
             return;
         }
 
-        if (appContext()->cloudCrossSystemManager()->connectingAutomatically())
-        {
-            ensureConnection();
-            setupAutomaticReconnection();
-        }
+        ensureConnection();
+        setupAutomaticReconnection();
 
         tokenUpdater = std::make_unique<core::CloudSessionTokenUpdater>(q);
         connect(
@@ -302,46 +300,14 @@ struct CloudCrossSystemContext::Private
         emit q->statusChanged(oldStatus);
     }
 
-    /** Returns true if new connection is started. */
-    bool ensureConnection(bool allowUserInteraction = false)
+    void makeConnection(
+        GroupedTaskQueue::PromisePtr promise,
+        const core::LogonData& logonData,
+        bool allowUserInteraction = false)
     {
-        if (!systemDescription->isOnline())
-            return false;
-
-        if (status == Status::unsupportedPermanently)
-            return false;
-
-        if (status == Status::unsupportedTemporary && !is2FaCompatible())
-            return false;
-
-        if (systemContext->connection())
-            return false;
-
-        NX_VERBOSE(this, "Ensure connection exists");
-        if (qnCloudStatusWatcher->status() != core::CloudStatusWatcher::Online)
-        {
-            NX_VERBOSE(this, "Cloud status failure: %1", qnCloudStatusWatcher->status());
-            return false;
-        }
-
-        if (connectionProcess)
-        {
-            NX_VERBOSE(this, "Connection is already in progress");
-            return false;
-        }
-
-        auto logonData = core::cloudLogonData(systemDescription);
-        if (!logonData)
-        {
-            NX_VERBOSE(this, "Endpoint was not found");
-            return false;
-        }
-
-        logonData->purpose = core::LogonData::Purpose::connectInCrossSystemMode;
-        logonData->userInteractionAllowed = allowUserInteraction;
-
         auto handleConnection =
-            [this, allowUserInteraction](core::RemoteConnectionFactory::ConnectionOrError result)
+            [this, allowUserInteraction, promise](
+                core::RemoteConnectionFactory::ConnectionOrError result)
             {
                 if (auto connection = std::get_if<core::RemoteConnectionPtr>(&result))
                 {
@@ -383,16 +349,66 @@ struct CloudCrossSystemContext::Private
                 connectionProcess.reset();
             };
 
+        connectionProcess = appContext()->networkModule()->connectionFactory()->connect(
+            logonData, std::move(handleConnection), systemContext.get());
+    }
+
+    /** Returns true if new connection is started. */
+    bool ensureConnection(bool allowUserInteraction = false)
+    {
+        if (!systemDescription->isOnline())
+            return false;
+
+        if (status == Status::unsupportedPermanently)
+            return false;
+
+        if (status == Status::unsupportedTemporary && !is2FaCompatible())
+            return false;
+
+        if (systemContext->connection())
+            return false;
+
+        NX_VERBOSE(this, "Ensure connection exists");
+        if (qnCloudStatusWatcher->status() != core::CloudStatusWatcher::Online)
+        {
+            NX_VERBOSE(this, "Cloud status failure: %1", qnCloudStatusWatcher->status());
+            return false;
+        }
+
+        if (connectionProcess)
+        {
+            NX_VERBOSE(this, "Connection is already in progress");
+            return false;
+        }
+
+        auto logonData = core::cloudLogonData(systemDescription);
+        if (!logonData)
+        {
+            NX_VERBOSE(this, "Endpoint was not found");
+            return false;
+        }
+        logonData->purpose = core::LogonData::Purpose::connectInCrossSystemMode;
+        logonData->userInteractionAllowed = allowUserInteraction;
+
         // To prevent icons and overlays blinking update status to the connecting state only when
         // the system is not initialized or when a user initiated reconnection process(system
         // status items and cross system cameras changes current icons to the loading icon)
         if (status == Status::uninitialized || allowUserInteraction)
             updateStatus(Status::connecting);
 
-        NX_VERBOSE(this, "Initialize new connection");
+        const auto scheduler = appContext()->cloudCrossSystemManager()->scheduler();
+        if (scheduler->hasTasks(systemDescription->cloudId()))
+            return false;
 
-        connectionProcess = appContext()->networkModule()->connectionFactory()->connect(
-            *logonData, handleConnection, systemContext.get());
+        NX_VERBOSE(this, "Initialize new connection");
+        scheduler->add(
+            systemDescription->cloudId(),
+            [this, logonData, allowUserInteraction](GroupedTaskQueue::PromisePtr promise)
+            {
+                if (NX_ASSERT(!connectionProcess && !systemContext->connection()))
+                    makeConnection(promise, *logonData, allowUserInteraction);
+            },
+            systemDescription->name());
 
         return true;
     }
@@ -425,8 +441,8 @@ struct CloudCrossSystemContext::Private
 
         dataLoader = std::make_unique<CloudCrossSystemContextDataLoader>(
             connection->serverApi(),
-            QString::fromStdString(connection->credentials().username),
-            connection->moduleInformation().version);
+            systemDescription,
+            QString::fromStdString(connection->credentials().username));
 
         QObject::connect(dataLoader.get(),
             &CloudCrossSystemContextDataLoader::ready,

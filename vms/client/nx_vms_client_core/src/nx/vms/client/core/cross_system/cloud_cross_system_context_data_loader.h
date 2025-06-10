@@ -13,6 +13,7 @@
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/api/data/user_model.h>
+#include <nx/vms/client/core/system_finder/system_description_fwd.h>
 
 namespace rest {
 
@@ -36,8 +37,8 @@ class NX_VMS_CLIENT_CORE_API CloudCrossSystemContextDataLoader: public QObject
 public:
     CloudCrossSystemContextDataLoader(
         rest::ServerConnectionPtr connection,
+        core::SystemDescriptionPtr description,
         const QString& username,
-        nx::utils::SoftwareVersion version,
         QObject* parent = nullptr);
     virtual ~CloudCrossSystemContextDataLoader() override;
 

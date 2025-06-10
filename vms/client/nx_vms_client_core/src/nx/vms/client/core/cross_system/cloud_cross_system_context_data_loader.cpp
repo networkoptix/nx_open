@@ -14,9 +14,13 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/json/qt_containers_reflect.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
 
 using namespace std::chrono;
 using namespace nx::vms::api;
+using HttpHeaders = nx::network::http::HttpHeaders;
 
 namespace nx::vms::client::core {
 
@@ -31,12 +35,13 @@ static const nx::utils::SoftwareVersion kUserGroupsApiSupportedVersion(6, 0);
 struct CloudCrossSystemContextDataLoader::Private
 {
     CloudCrossSystemContextDataLoader* const q;
+    CloudCrossSystemRequestScheduler* scheduler;
     rest::ServerConnectionPtr const connection;
+    core::SystemDescriptionPtr description;
     const QString username;
-    const nx::utils::SoftwareVersion version;
     bool doRequestUser = true;
+    bool isFirstTime = true;
 
-    std::optional<rest::Handle> currentRequest;
     std::optional<UserModel> user;
     std::optional<UserGroupDataList> userGroups;
     std::optional<ServerInformationV1List> servers;
@@ -52,23 +57,16 @@ struct CloudCrossSystemContextDataLoader::Private
     * version higher than v2 unless you are implementing versioning.
     */
 
-    rest::Handle requestUser()
+    void requestUser(GroupedTaskQueue::PromisePtr promise)
     {
         NX_VERBOSE(this, "Requesting user");
         auto callback = nx::utils::guarded(q,
-            [this](
-                bool success,
-                ::rest::Handle requestId,
-                QByteArray data,
-                nx::network::http::HttpHeaders /*headers*/)
+            [this, promise](bool success, ::rest::Handle, QByteArray data, HttpHeaders)
             {
-                NX_ASSERT(currentRequest && *currentRequest == requestId);
-                currentRequest = std::nullopt;
-
                 if (!success)
                 {
-                     NX_WARNING(this, "User request failed");
-                     return;
+                    NX_WARNING(this, "User request failed");
+                    return;
                 }
 
                 UserModel result;
@@ -79,30 +77,24 @@ struct CloudCrossSystemContextDataLoader::Private
                 }
 
                 NX_VERBOSE(this, "User loaded successfully, username: %1", result.name);
+
                 user = result;
-                requestData();
+                updateStatus();
             });
 
-        return connection->getRawResult(
+        connection->getRawResult(
             QString("/rest/v3/users/") + QUrl::toPercentEncoding(username),
             {},
             std::move(callback),
             q->thread());
     }
 
-    rest::Handle requestUserGroups()
+    void requestUserGroups(GroupedTaskQueue::PromisePtr promise)
     {
         NX_VERBOSE(this, "Requesting userGroups");
         auto callback = nx::utils::guarded(q,
-            [this](
-                bool success,
-                ::rest::Handle requestId,
-                QByteArray data,
-                nx::network::http::HttpHeaders /*headers*/)
+            [this, promise](bool success, ::rest::Handle, QByteArray data, HttpHeaders)
             {
-                NX_ASSERT(currentRequest && *currentRequest == requestId);
-                currentRequest = std::nullopt;
-
                 if (!success)
                 {
                     NX_WARNING(this, "UserGroups request failed");
@@ -118,32 +110,29 @@ struct CloudCrossSystemContextDataLoader::Private
 
                 NX_VERBOSE(this, "UserGroups loaded successfully");
                 userGroups = result;
-                requestData();
+                updateStatus();
             });
 
-        return connection->getRawResult(
+        connection->getRawResult(
             QString("/rest/v3/userGroups/"),
             {},
             std::move(callback),
             q->thread());
     }
 
-    rest::Handle requestServers()
+    void requestServers(GroupedTaskQueue::PromisePtr promise)
     {
         NX_VERBOSE(this, "Updating servers");
         auto callback = nx::utils::guarded(q,
-            [this](
+            [this, promise](
                 bool success,
-                ::rest::Handle requestId,
+                ::rest::Handle,
                 ::rest::ErrorOrData<ServerInformationV1List> result)
             {
-                NX_ASSERT(currentRequest && *currentRequest == requestId);
-                currentRequest = std::nullopt;
-
                 if (!success)
                 {
-                     NX_WARNING(this, "Servers request failed");
-                     return;
+                    NX_WARNING(this, "Servers request failed");
+                    return;
                 }
 
                 if (!result)
@@ -153,33 +142,27 @@ struct CloudCrossSystemContextDataLoader::Private
                 }
 
                 NX_VERBOSE(this, "Received %1 servers", result->size());
+
                 servers = *result;
-                requestData();
+                updateStatus();
             });
 
-        return connection->getServersInfo(
+        connection->getServersInfo(
             /*onlyFreshInfo*/ false,
             std::move(callback),
             q->thread());
     }
 
-    rest::Handle requestServersTaxonomyDescriptors()
+    void requestTaxonomyDescriptors(GroupedTaskQueue::PromisePtr promise)
     {
         NX_VERBOSE(this, "Updating servers taxonomy descriptors data");
-        auto callback =
-            [this](
-                bool success,
-                ::rest::Handle requestId,
-                QByteArray data,
-                nx::network::http::HttpHeaders /*headers*/)
+        auto callback = nx::utils::guarded(q,
+            [this, promise](bool success, ::rest::Handle, QByteArray data, HttpHeaders)
             {
-                NX_ASSERT(currentRequest && *currentRequest == requestId);
-                currentRequest = std::nullopt;
-
                 if (!success)
                 {
-                     NX_WARNING(this, "Servers taxonomy descriptors request failed");
-                     return;
+                    NX_WARNING(this, "Servers taxonomy descriptors request failed");
+                    return;
                 }
 
                 auto [result, deserializationResult] =
@@ -196,34 +179,28 @@ struct CloudCrossSystemContextDataLoader::Private
                 NX_VERBOSE(this, "Servers taxonomy descriptors received");
 
                 serversTaxonomyDescriptors = result;
-                requestData();
-            };
+                updateStatus();
+            }
+        );
 
-        return connection->getRawResult(
+        connection->getRawResult(
             QString("/rest/v2/servers?_with=id,parameters.%1")
                 .arg(nx::analytics::kDescriptorsProperty),
             {},
-            callback,
+            std::move(callback),
             q);
     }
 
-    rest::Handle requestServerFootageData()
+    void requestServerFootageData(GroupedTaskQueue::PromisePtr promise)
     {
         NX_VERBOSE(this, "Updating server footage data");
         auto callback = nx::utils::guarded(q,
-            [this](
-                bool success,
-                ::rest::Handle requestId,
-                QByteArray data,
-                nx::network::http::HttpHeaders /*headers*/)
+            [this, promise](bool success, ::rest::Handle, QByteArray data, HttpHeaders)
             {
-                NX_ASSERT(currentRequest && *currentRequest == requestId);
-                currentRequest = std::nullopt;
-
                 if (!success)
                 {
-                     NX_WARNING(this, "Server footage request failed");
-                     return;
+                    NX_WARNING(this, "Server footage request failed");
+                    return;
                 }
 
                 ServerFootageDataList result;
@@ -234,34 +211,28 @@ struct CloudCrossSystemContextDataLoader::Private
                 }
 
                 NX_VERBOSE(this, "Received %1 server footage entries", result.size());
+
                 serverFootageData = result;
-                requestData();
+                updateStatus();
             });
 
-        return connection->getRawResult(
+        connection->getRawResult(
             "/ec2/getCameraHistoryItems",
             {},
-            callback,
+            std::move(callback),
             q->thread());
     }
 
-    rest::Handle requestSystemSettings()
+    void requestSystemSettings(GroupedTaskQueue::PromisePtr promise)
     {
         NX_VERBOSE(this, "Updating system settings");
         auto callback = nx::utils::guarded(q,
-            [this](
-                bool success,
-                ::rest::Handle requestId,
-                QByteArray data,
-                nx::network::http::HttpHeaders /*headers*/)
+            [this, promise](bool success, ::rest::Handle, QByteArray data, HttpHeaders)
             {
-                NX_ASSERT(currentRequest && *currentRequest == requestId);
-                currentRequest = std::nullopt;
-
                 if (!success)
                 {
-                     NX_WARNING(this, "System settings request failed");
-                     return;
+                    NX_WARNING(this, "System settings request failed");
+                    return;
                 }
 
                 auto [result, deserializationResult] =
@@ -278,34 +249,27 @@ struct CloudCrossSystemContextDataLoader::Private
                 NX_VERBOSE(this, "System settings received");
 
                 systemSettings = result;
-                requestData();
+                updateStatus();
             }
         );
 
-        return connection->getRawResult(
+        connection->getRawResult(
             "/rest/v2/system/settings",
             {},
-            callback,
+            std::move(callback),
             q->thread());
     }
 
-    rest::Handle requestLicenses()
+    void requestLicenses(GroupedTaskQueue::PromisePtr promise)
     {
         NX_VERBOSE(this, "Updating licenses");
         auto callback = nx::utils::guarded(q,
-            [this](
-                bool success,
-                ::rest::Handle requestId,
-                QByteArray data,
-                nx::network::http::HttpHeaders /*headers*/)
+            [this, promise](bool success, ::rest::Handle, QByteArray data, HttpHeaders)
             {
-                NX_ASSERT(currentRequest && *currentRequest == requestId);
-                currentRequest = std::nullopt;
-
                 if (!success)
                 {
-                     NX_WARNING(this, "Licenses request failed");
-                     return;
+                    NX_WARNING(this, "Licenses request failed");
+                    return;
                 }
 
                 auto [result, deserializationResult] =
@@ -322,34 +286,27 @@ struct CloudCrossSystemContextDataLoader::Private
                 NX_VERBOSE(this, "Licenses received");
 
                 licenses = result;
-                requestData();
+                updateStatus();
             }
         );
 
-        return connection->getRawResult(
+        connection->getRawResult(
             "/rest/v2/licenses",
             {},
-            callback,
+            std::move(callback),
             q->thread());
     }
 
-    rest::Handle requestCameras()
+    void requestCameras(GroupedTaskQueue::PromisePtr promise)
     {
         NX_VERBOSE(this, "Updating cameras");
         auto callback = nx::utils::guarded(q,
-            [this](
-                bool success,
-                ::rest::Handle requestId,
-                QByteArray data,
-                nx::network::http::HttpHeaders /*headers*/)
+            [this, promise](bool success, ::rest::Handle, QByteArray data, HttpHeaders)
             {
-                NX_ASSERT(currentRequest && *currentRequest == requestId);
-                currentRequest = std::nullopt;
-
                 if (!success)
                 {
-                     NX_WARNING(this, "Cameras request failed");
-                     return;
+                    NX_WARNING(this, "Cameras request failed");
+                    return;
                 }
 
                 CameraDataExList result;
@@ -360,78 +317,105 @@ struct CloudCrossSystemContextDataLoader::Private
                 }
 
                 NX_VERBOSE(this, "Received %1 cameras", result.size());
-                bool firstTime = !cameras;
                 cameras = result;
                 camerasRefreshTimer.restart();
-                if (firstTime)
-                    emit q->ready();
-                else
+
+                if (!isFirstTime)
                     emit q->camerasUpdated();
+
+                updateStatus();
             });
 
-        return connection->getRawResult(
+        connection->getRawResult(
             "/ec2/getCamerasEx",
             {},
-            callback,
+            std::move(callback),
             q->thread());
     }
 
     void requestData()
     {
-        if (currentRequest)
+        if (scheduler->hasTasks(description->cloudId()))
+            return;
+
+        auto addTask =
+            [this](auto function, const QString& id)
+            {
+                scheduler->add(
+                    description->cloudId(),
+                    function,
+                    nx::format("%1_%2", description->name(), id));
+            };
+
+        if (!user && doRequestUser)
+            addTask([this](auto promise) { requestUser(promise); }, "user");
+
+        if (!userGroups && description->version() >= kUserGroupsApiSupportedVersion)
+            addTask([this](auto promise) { requestUserGroups(promise); }, "groups");
+
+        if (!servers)
+            addTask([this](auto promise) { requestServers(promise); }, "servers");
+
+        if (!serversTaxonomyDescriptors)
+            addTask([this](auto promise) { requestTaxonomyDescriptors(promise); }, "taxonomy");
+
+        if (!serverFootageData)
+            addTask([this](auto promise) { requestServerFootageData(promise); }, "footage");
+
+        if (!systemSettings)
+            addTask([this](auto promise) { requestSystemSettings(promise); }, "settings");
+
+        const bool updateLicenses = !licenses && user
+            && user->permissions.testFlag(nx::vms::api::GlobalPermission::powerUser);
+
+        if (updateLicenses)
+            addTask([this](auto promise) { requestLicenses(promise); }, "licenses");
+
+        const bool updateCameras = !cameras
+            || camerasRefreshTimer.hasExpired(milliseconds(kCamerasRefreshPeriod).count());
+
+        if (updateCameras)
+            addTask([this](auto promise) { requestCameras(promise); }, "cameras");
+    }
+
+    bool isDataNeeded()
+    {
+        return (!user && doRequestUser)
+            || !servers
+            || !serversTaxonomyDescriptors
+            || !serverFootageData
+            || !systemSettings
+            || (!licenses
+                && user && user->permissions.testFlag(nx::vms::api::GlobalPermission::powerUser))
+            || (!userGroups && description->version() >= kUserGroupsApiSupportedVersion)
+            || !cameras
+            || camerasRefreshTimer.hasExpired(milliseconds(kCamerasRefreshPeriod).count());
+    }
+
+    void updateStatus()
+    {
+        if (!isDataNeeded() && isFirstTime)
         {
-            NX_VERBOSE(this, "Request %1 is in progress", *currentRequest);
-        }
-        else if (!user && doRequestUser)
-        {
-            currentRequest = requestUser();
-        }
-        else if (!userGroups && version >= kUserGroupsApiSupportedVersion)
-        {
-            currentRequest = requestUserGroups();
-        }
-        else if (!servers)
-        {
-            currentRequest = requestServers();
-        }
-        else if (!serversTaxonomyDescriptors)
-        {
-            currentRequest = requestServersTaxonomyDescriptors();
-        }
-        else if (!serverFootageData)
-        {
-            currentRequest = requestServerFootageData();
-        }
-        else if (!systemSettings)
-        {
-            currentRequest = requestSystemSettings();
-        }
-        else if (!licenses && user
-            && user->permissions.testFlag(nx::vms::api::GlobalPermission::powerUser))
-        {
-            currentRequest = requestLicenses();
-        }
-        else if (!cameras
-            || camerasRefreshTimer.hasExpired(milliseconds(kCamerasRefreshPeriod).count()))
-        {
-            currentRequest = requestCameras();
+            emit q->ready();
+            isFirstTime = false;
         }
     }
 };
 
 CloudCrossSystemContextDataLoader::CloudCrossSystemContextDataLoader(
     rest::ServerConnectionPtr connection,
+    core::SystemDescriptionPtr description,
     const QString& username,
-    nx::utils::SoftwareVersion version,
     QObject* parent)
     :
     QObject(parent),
     d(new Private{
         .q = this,
+        .scheduler = appContext()->cloudCrossSystemManager()->scheduler(),
         .connection = connection,
+        .description = description,
         .username = username,
-        .version = version
-        })
+    })
 {
 }
 

@@ -129,6 +129,12 @@ QVariant CloudSystemStatusItem::data(int role) const
             return QString();
 
         case core::DecorationPathRole:
+            // Currently dynamic creation of items is not supported yet, so use requesting data
+            // with Qt::DecorationPathRole as a sign that item is visible/expanded and set the
+            // system priority to high.
+            appContext()->cloudCrossSystemManager()->setPriority(
+                d->systemId, core::CloudCrossSystemManager::Priority::high);
+
             return d->customIcon();
 
         case Qn::NodeTypeRole:

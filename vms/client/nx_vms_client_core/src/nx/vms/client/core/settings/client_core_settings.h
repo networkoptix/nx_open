@@ -106,6 +106,11 @@ public:
     // FIXME: #sivanov Rename `Hadrware` -> `Hardware` and implement option migration.
     Property<bool> enableHardwareDecoding{this, "enableHadrwareDecoding", true};
 
+    Property<int> maxCloudConnections{this, "maxCloudConnections", 20,
+        "Maximum number of Cloud Site connections that can run simultaneously. Once this limit is "
+        "reached, additional connections will be established one at a time. This parameter helps "
+        "to limit the number of concurrent network requests, reducing overall network load."};
+
     /** Adapter for the cloudCredentials property. */
     CloudAuthData cloudAuthData() const;
 

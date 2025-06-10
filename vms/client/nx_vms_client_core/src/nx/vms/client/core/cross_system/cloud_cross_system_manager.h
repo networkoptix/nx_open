@@ -7,6 +7,8 @@
 #include <network/cloud_system_data.h>
 #include <nx/utils/impl_ptr.h>
 
+#include "cloud_cross_system_request_scheduler.h"
+
 namespace nx::vms::client::core {
 
 class CloudCrossSystemContext;
@@ -19,16 +21,21 @@ class NX_VMS_CLIENT_CORE_API CloudCrossSystemManager: public QObject
     Q_OBJECT
 
 public:
+    enum class Priority
+    {
+        low,
+        medium,
+        high,
+    };
+
+public:
     explicit CloudCrossSystemManager(QObject* parent = nullptr);
     virtual ~CloudCrossSystemManager() override;
 
     QStringList cloudSystems() const;
     CloudCrossSystemContext* systemContext(const QString& systemId) const;
-
-    /** Whether connections with all systems are immediately initiated. */
-    // TODO: To be removed in VMS-54744.
-    bool connectingAutomatically() const;
-    void setConnectingAutomatically(bool value);
+    CloudCrossSystemRequestScheduler* scheduler();
+    void setPriority(const QString& systemId, Priority priority);
 
     void resetCloudSystems(bool enableCloudSystems);
 
