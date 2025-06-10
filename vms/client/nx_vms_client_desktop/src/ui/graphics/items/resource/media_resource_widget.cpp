@@ -411,7 +411,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     connect(this, &QnResourceWidget::zoomRectChanged, this,
         &QnMediaResourceWidget::updateFisheye);
 
-    connect(d.get(), &MediaResourceWidgetPrivate::stateChanged, this,
+    const auto updateVisualComponents =
         [this]
         {
             const bool animate = animationAllowed();
@@ -419,7 +419,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(
             updateStatusOverlay(animate);
             updateOverlayButton();
             updateButtonsVisibility();
-        });
+        };
+
+    connect(d.get(), &MediaResourceWidgetPrivate::stateChanged,
+        this, updateVisualComponents);
+
+    connect(d.get(), &MediaResourceWidgetPrivate::isIoModuleChanged,
+        this, updateVisualComponents);
 
     connect(d.get(), &MediaResourceWidgetPrivate::analyticsSupportChanged, this,
         &QnMediaResourceWidget::updateButtonsVisibility);
@@ -429,7 +435,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(
 
     if (d->camera)
     {
-        auto updateStatus = [this]
+        const auto updateStatus =
+            [this]
             {
                 const bool animate = animationAllowed();
                 updateIoModuleVisibility(animate);

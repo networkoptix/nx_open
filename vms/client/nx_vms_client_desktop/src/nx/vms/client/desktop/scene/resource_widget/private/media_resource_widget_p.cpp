@@ -183,6 +183,16 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
                 this, &MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
         }
 
+        connect(camera.get(), &core::CameraResource::isIOModuleChanged, this,
+            [this]
+            {
+                if (this->isIoModule == camera->isIOModule())
+                    return;
+
+                this->isIoModule = camera->isIOModule();
+                emit isIoModuleChanged();
+            });
+
         updateAccess();
         updateIsAnalyticsSupported();
 

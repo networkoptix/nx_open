@@ -30,14 +30,6 @@ class WidgetAnalyticsController;
 class MediaResourceWidgetPrivate: public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool hasVideo MEMBER hasVideo CONSTANT)
-    Q_PROPERTY(bool isIoModule MEMBER isIoModule CONSTANT)
-    Q_PROPERTY(bool isPlayingLive READ isPlayingLive WRITE setIsPlayingLive NOTIFY stateChanged)
-    Q_PROPERTY(bool isOffline READ isOffline WRITE setIsOffline NOTIFY stateChanged)
-    Q_PROPERTY(bool isUnauthorized READ isUnauthorized WRITE setIsUnauthorized NOTIFY stateChanged)
-    // TODO: should mismatchedCertificate property be added here?
-    Q_PROPERTY(nx::vms::license::UsageStatus
-        licenseStatus READ licenseStatus NOTIFY licenseStatusChanged)
 
     using base_type = QObject;
     using AccessController = nx::vms::client::core::AccessController;
@@ -47,7 +39,7 @@ public:
     const QnMediaResourcePtr mediaResource;
     const core::CameraResourcePtr camera;
     const bool hasVideo;
-    const bool isIoModule;
+    bool isIoModule;
     bool isExportedLayout = false;
     bool isPreviewSearchLayout = false;
     bool isAnalyticsSupported = false;
@@ -114,6 +106,7 @@ signals:
     void stateChanged();
     void licenseStatusChanged();
     void analyticsSupportChanged();
+    void isIoModuleChanged();
 
 private:
     void updateIsPlayingLive();
