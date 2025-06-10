@@ -727,4 +727,105 @@ NX_UTILS_API std::string half(const std::string& str)
     return str.substr(0, str.size() / 2) + "...";
 }
 
+QString normalizeSpaces(const QString& input)
+{
+    if (input.isEmpty())
+        return input;
+
+    QString result;
+    result.reserve(input.length());
+    bool inQuotes = false;
+    bool lastWasSpace = true;
+
+    for (const auto& c: input)
+    {
+        if (c == '"')
+        {
+            inQuotes = !inQuotes;
+            result += c;
+            lastWasSpace = false;
+            continue;
+        }
+
+        if (inQuotes || !c.isSpace())
+        {
+            result += c;
+            lastWasSpace = false;
+            continue;
+        }
+
+        if (!lastWasSpace)
+            result += ' ';
+        lastWasSpace = true;
+    }
+
+    return lastWasSpace ? result.left(result.length() - 1) : result;
+}
+
+QString quoteDelimitedTokens(const QString& input, const QStringList& delimiters)
+{
+    if (input.isEmpty())
+        return input;
+
+    const auto processToken = [](const QString& token, int quoteCount)
+    {
+        if (token.isEmpty())
+            return QString();
+
+        auto trimmed = normalizeSpaces(token.trimmed());
+        if ((trimmed.contains(' ') && !(trimmed.startsWith('"') && trimmed.endsWith('"')))
+            || quoteCount > 2)
+        {
+            trimmed = '"' + trimmed + '"';
+        }
+
+        return trimmed;
+    };
+
+    QStringList result;
+    QString currentToken;
+    int quoteCount = 0;
+
+    for (int i = 0; i < input.length(); ++i)
+    {
+        const auto& c = input[i];
+
+        if (c == '"')
+        {
+            quoteCount++;
+            currentToken += c;
+            continue;
+        }
+
+        if (quoteCount % 2 == 0)
+        {
+            bool isDelimiter = false;
+            for (const auto& delim: delimiters)
+            {
+                if (input.mid(i).startsWith(delim))
+                {
+                    if (!currentToken.isEmpty())
+                        result << processToken(currentToken, quoteCount);
+                    result << delim;
+                    currentToken.clear();
+                    i += delim.length() - 1;
+                    quoteCount = 0;
+                    isDelimiter = true;
+                    break;
+                }
+            }
+            if (isDelimiter)
+                continue;
+        }
+
+        if (!currentToken.isEmpty() || !c.isSpace())
+            currentToken += c;
+    }
+
+    if (!currentToken.isEmpty())
+        result << processToken(currentToken, quoteCount);
+
+    return result.join(" ");
+}
+
 } // namespace nx::utils

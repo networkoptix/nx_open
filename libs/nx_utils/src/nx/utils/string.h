@@ -298,4 +298,12 @@ NX_UTILS_API std::string toHex(
  */
 NX_UTILS_API std::string half(const std::string& str);
 
+/**
+ * Quotes text tokens that contain spaces and are not already quoted, preserving specified delimiters.
+ * @param input Input text to process
+ * @param delimiters List of delimiter tokens (e.g. {"OR", "AND"})
+ * @return Formatted string with quoted tokens where needed
+ */
+NX_UTILS_API QString quoteDelimitedTokens( const QString& input, const QStringList& delimiters);
+
 } // namespace nx::utils

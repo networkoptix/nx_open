@@ -443,4 +443,151 @@ R"json({"random":"10","random float":"37.234","bool":"true","date":"1991-06-12",
 
 INSTANTIATE_TEST_SUITE_P(String, JsonFormatting, ::testing::ValuesIn(kJsonFormatInput));
 
+//-------------------------------------------------------------------------------------------------
+
+struct QuoteDelimitedTokensInput
+{
+    QString input;
+    QStringList delimiters;
+    QString expected;
+};
+
+class QuoteDelimitedTokens:
+    public ::testing::Test,
+    public ::testing::WithParamInterface<QuoteDelimitedTokensInput>
+{
+};
+
+TEST_P(QuoteDelimitedTokens, validateFormat)
+{
+    const QuoteDelimitedTokensInput input = GetParam();
+    EXPECT_EQ(
+        quoteDelimitedTokens(input.input, input.delimiters),
+        input.expected);
+}
+
+static std::vector<QuoteDelimitedTokensInput> kQuoteDelimitedTokensInput{
+    // Basic cases
+    {
+        "", // empty input
+        {"OR", "AND"},
+        ""
+    },
+    {
+        "simple", // single word
+        {"OR", "AND"},
+        "simple"
+    },
+    {
+        "hello world", // two words
+        {"OR", "AND"},
+        "\"hello world\""
+    },
+
+    // Cases with delimiters
+    {
+        "hello world OR test case", // basic OR case
+        {"OR", "AND"},
+        "\"hello world\" OR \"test case\""
+    },
+    {
+        "a b AND c d OR e f", // multiple delimiters
+        {"OR", "AND"},
+        "\"a b\" AND \"c d\" OR \"e f\""
+    },
+
+    // Cases with quotes
+    {
+        "\"quoted text\" OR simple", // already quoted
+        {"OR", "AND"},
+        "\"quoted text\" OR simple"
+    },
+    {
+        "\"hello world\" AND \"test case\"", // all quoted
+        {"OR", "AND"},
+        "\"hello world\" AND \"test case\""
+    },
+
+    // Custom delimiters
+    {
+        "a b XOR c d", // custom delimiter
+        {"XOR"},
+        "\"a b\" XOR \"c d\""
+    },
+    {
+        "word1 PLUS word2 MINUS word3", // multiple custom delimiters
+        {"PLUS", "MINUS"},
+        "word1 PLUS word2 MINUS word3"
+    },
+
+    // Edge cases
+    {
+        "OR AND", // only delimiters
+        {"OR", "AND"},
+        "OR AND"
+    },
+    {
+        "\"complex quoted\" OR \"text with AND\" AND simple", // nested delimiters in quotes
+        {"OR", "AND"},
+        "\"complex quoted\" OR \"text with AND\" AND simple"
+    },
+    {
+        "hello   world    OR    test", // multiple spaces
+        {"OR"},
+        "\"hello world\" OR test"
+    },
+
+    // Mixed quoted and unquoted cases
+    {
+        "\"first part\" second part OR test", // mixed quotes before delimiter
+        {"OR"},
+        "\"\"first part\" second part\" OR test"
+    },
+    {
+        "test OR \"quoted part\" unquoted part", // mixed quotes after delimiter
+        {"OR"},
+        "test OR \"\"quoted part\" unquoted part\""
+    },
+    {
+        "a \"b c\" d AND \"e f\" g h OR i", // mixed quotes with multiple delimiters
+        {"AND", "OR"},
+        "\"a \"b c\" d\" AND \"\"e f\" g h\" OR i"
+    },
+    {
+        "\"a b\" c d XOR e \"f g\" h", // mixed quotes on both sides
+        {"XOR"},
+        "\"\"a b\" c d\" XOR \"e \"f g\" h\""
+    },
+
+    // Multiple spaces cases
+    {
+        "\"quoted   text     here\" OR test", // multiple spaces in quotes
+        {"OR"},
+        "\"quoted   text     here\" OR test"  // preserve multiple spaces in quotes
+    },
+    {
+        "hello   world     test OR simple", // multiple spaces without quotes
+        {"OR"},
+        "\"hello world test\" OR simple"   // normalize multiple spaces
+    },
+    {
+        "test OR \"quoted    part\"   \"second     part\"", // varying spaces
+        {"OR"},
+        "test OR \"\"quoted    part\" \"second     part\"\"" // preserve in quotes, normalize between
+    },
+    {
+        "test OR \"quoted    part\"\"second     part\"", // without space
+        {"OR"},
+        "test OR \"\"quoted    part\"\"second     part\"\"" // preserve in quotes
+    },
+    {
+        "\"text   with    spaces\" AND normal   text    here", // mixed multiple spaces
+        {"AND"},
+        "\"text   with    spaces\" AND \"normal text here\"" // preserve in quotes, normalize outside
+    }
+};
+
+INSTANTIATE_TEST_SUITE_P(String, QuoteDelimitedTokens,
+    ::testing::ValuesIn(kQuoteDelimitedTokensInput));
+
 } // namespace nx::utils::test

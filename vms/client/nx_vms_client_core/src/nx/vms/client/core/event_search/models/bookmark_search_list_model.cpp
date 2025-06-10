@@ -10,6 +10,7 @@
 #include <nx/utils/algorithm/comparator.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/utils/string.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
@@ -40,6 +41,11 @@ std::set<nx::Uuid> idsFromCameras(const QnVirtualCameraResourceSet& cameras)
     for (const auto& camera: cameras)
         result.insert(camera->getId());
     return result;
+}
+
+QString formatFilterText(const QString& text)
+{
+    return utils::quoteDelimitedTokens(text, {"OR", "AND"});
 }
 
 QString parseHyperlinks(const QString& text)
@@ -191,13 +197,10 @@ bool BookmarkSearchListModel::Private::requestFetch(
 
     auto filter = QnCameraBookmarkSearchFilter{
         .centralTimePointMs = duration_cast<milliseconds>(request.centralPointUs),
-        .text = textFilter->text().trimmed(),
+        .text = formatFilterText(textFilter->text().trimmed()),
         .limit = q->maximumCount(),
         .orderBy = QnBookmarkSortOrder(BookmarkSortField::startTime, sortOrder),
         .cameras = idsFromCameras(q->cameraSet().cameras())};
-
-    if (filter.text.indexOf(' ') > 0 && !filter.text.startsWith("\""))
-        filter.text = "\"" + filter.text + "\"";
 
     if (const auto& interestTimePeriod = q->interestTimePeriod())
     {
