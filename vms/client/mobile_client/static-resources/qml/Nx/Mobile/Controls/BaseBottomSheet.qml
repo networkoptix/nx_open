@@ -30,6 +30,7 @@ Popup
         : Popup.NoAutoClose
 
     modal: true
+    focus: true
 
     leftPadding: 0
     rightPadding: 0
