@@ -89,6 +89,8 @@ void FfmpegMuxer::closeFfmpegContext()
         m_initialized = false;
         m_ioContext.reset();
         m_formatCtx->pb = nullptr;
+        m_audioCodecParameters = nullptr;
+        m_videoCodecParameters = nullptr;
         avformat_close_input(&m_formatCtx);
     }
 }
