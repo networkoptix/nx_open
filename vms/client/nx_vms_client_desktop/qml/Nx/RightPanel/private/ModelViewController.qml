@@ -137,7 +137,9 @@ NxObject
                     request.direction === EventSearch.FetchDirection.newer
                         ? TableView.AlignTop
                         : TableView.AlignBottom,
-                    -view.topMargin)
+                    request.direction === EventSearch.FetchDirection.newer
+                        ? -view.topMargin
+                        : view.topMargin)
             }
             else if (view instanceof GridView)
             {
