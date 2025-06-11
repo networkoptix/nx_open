@@ -30,7 +30,6 @@ void registerRuleHandlers(
         std::make_unique<EventLogHandlerOldFilter>(serverModule, serverConnector));
 
     /**%apidoc GET /rest/v{4-}/events/manifest/events
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
      * %jsonrpc[result] all
      * %caption Get Event manifest
      * %ingroup Events
@@ -42,7 +41,6 @@ void registerRuleHandlers(
         std::make_unique<EventManifestHandler>(engine));
 
     /**%apidoc GET /rest/v{4-}/events/manifest/actions
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
      * %jsonrpc[result] all
      * %caption Get Action manifest
      * %ingroup Events
@@ -174,10 +172,9 @@ void registerRuleHandlers(
         std::make_unique<SoftTriggerHandler>(serverModule->systemContext(), serverConnector));
 
     /**%apidoc POST /rest/v{4-}/events/rules
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
      * <br/>
-     * A rule can only handle events that are created after the rule itself is created.
-     * For example, if an Generic event was created and entered the 'started' state before a rule
+     * An Event Rule can only handle events that are created after the rule itself is created.
+     * For example, if an Generic Event was created and entered the 'started' state before a rule
      * was created, that later-created rule cannot handle the event when it subsequently moves to
      * the 'stopped' state.
      * %caption Create Rule
@@ -189,47 +186,53 @@ void registerRuleHandlers(
      * %return:{RuleV4}
      *
      **%apidoc PUT /rest/v{4-}/events/rules/{id}
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
+     * Replaces all fields of the specified Event Record record stored in the Site.
      * %caption Replace Rule
      * %ingroup Events
      * %struct RuleV4
+     * %param:uuid id Event Rule id. Can be obtained from "id" field via
+     *     `GET /rest/v{4-}/events/rules`.
      * %param[ref] _strict,_ticket
      * %permissions Power User.
      * %return:{RuleV4}
      *
      **%apidoc PATCH /rest/v{4-}/events/rules/{id}
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
+     * Modifies certain fields of the specified Event Rule record stored in the Site.
      * %caption Modify Rule
      * %ingroup Events
      * %struct[opt] RuleV4
+     * %param:uuid id Event Rule id. Can be obtained from "id" field via
+     *     `GET /rest/v{4-}/events/rules`.
      * %param[ref] _strict,_ticket
      * %permissions Power User.
      * %return:{RuleV4}
      *
      **%apidoc GET /rest/v{4-}/events/rules/{id}
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
+     * Retrieves the specified Event Rule record stored in the Site.
      * %jsonrpc subscribe
      * %caption Get Rule
      * %ingroup Events
-     * %param:string id
+     * %param:uuid id Event Rule id. Can be obtained from "id" field via
+     *     `GET /rest/v{4-}/events/rules`.
      * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Power User.
      * %return:{RuleV4}
      *
      **%apidoc GET /rest/v{4-}/events/rules
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
+     * Retrieves all Event Rule records stored in the Site.
      * %jsonrpc subscribe
-     * %caption Get all Rules
+     * %caption Get Rules
      * %ingroup Events
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Power User.
      * %return:{RuleV4List}
      *
      **%apidoc DELETE /rest/v{4-}/events/rules/{id}
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
-     * %caption Remove Rule
+     * Deletes the specified Event Rule record from the Site.
+     * %caption Delete Rule
      * %ingroup Events
-     * %param:string id
+     * %param:uuid id Event Rule id. Can be obtained from "id" field via
+     *     `GET /rest/v{4-}/events/rules`.
      * %param[ref] _strict,_ticket
      * %permissions Power User.
      */
@@ -238,8 +241,7 @@ void registerRuleHandlers(
             serverModule->directConnection()->queryProcessor(), serverModule->systemContext()));
 
     /**%apidoc POST /rest/v{4-}/events/rules/%2A/reset
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
-     * %caption Reset all rules to default
+     * %caption Reset all Event Rules
      * %ingroup Events
      * %param[ref] _strict,_ticket
      * %permissions Power User.
