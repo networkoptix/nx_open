@@ -1400,7 +1400,7 @@
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>音声のトランスコーディングが必要です。</translation>
     </message>
   </context>
   <context>

@@ -765,7 +765,7 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     <name>EventTestDialog</name>
     <message>
       <source>Event Test</source>
-      <translation type="unfinished">Event Test</translation>
+      <translation>Tes Event</translation>
     </message>
     <message>
       <source>Test</source>
@@ -3101,7 +3101,7 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     </message>
     <message>
       <source>Test events...</source>
-      <translation type="unfinished">Test events...</translation>
+      <translation>Tes event...</translation>
     </message>
   </context>
   <context>

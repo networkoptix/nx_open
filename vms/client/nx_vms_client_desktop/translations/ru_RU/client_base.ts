@@ -6453,7 +6453,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>Требуется транскодирование видео. Экспорт перезапущен.</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
@@ -8481,7 +8481,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Требуется транскодирование аудио.</translation>
     </message>
   </context>
   <context>

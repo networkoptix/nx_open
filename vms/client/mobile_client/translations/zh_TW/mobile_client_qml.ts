@@ -151,7 +151,7 @@
     </message>
     <message>
       <source>Follow the steps of wizard</source>
-      <translation type="unfinished">Follow the steps of wizard</translation>
+      <translation>依照精靈的步驟操作</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to the %1</source>
@@ -161,7 +161,7 @@
     <message>
       <source>Connect to %1 by site owner’s account</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
+      <translation>以站點所有者的帳號連接至 %1</translation>
     </message>
     <message>
       <source>Open Site Settings page and click “change” link next to the owner&apos;s name</source>

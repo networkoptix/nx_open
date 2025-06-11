@@ -103,7 +103,7 @@
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>Informasi diperlukan</translation>
     </message>
   </context>
   <context>
@@ -137,35 +137,35 @@
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to the %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to the %1</translation>
+      <translation>Jika site &lt;font color=&apos;%2&apos;&gt;tidak terkoneksi&lt;/a&gt; ke %1</translation>
     </message>
     <message>
       <source>Log in to the site in %1</source>
       <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
-      <translation type="unfinished">Log in to the site in %1</translation>
+      <translation>Masuk ke site di %1</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+      <translation>Klik &quot;Koneksikan Site ke %1&quot; di tab %1 di Administrasi Site</translation>
     </message>
     <message>
       <source>Follow the steps of wizard</source>
-      <translation type="unfinished">Follow the steps of wizard</translation>
+      <translation>Ikuti langkah-langkah wizard</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to the %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to the %1</translation>
+      <translation>Jika site &lt;font color=&apos;%2&apos;&gt;terkoneksi&lt;/a&gt; ke %1</translation>
     </message>
     <message>
       <source>Connect to %1 by site owner’s account</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
+      <translation>Koneksikan ke %1 melalui akun pemilik site</translation>
     </message>
     <message>
       <source>Open Site Settings page and click “change” link next to the owner&apos;s name</source>
-      <translation type="unfinished">Open Site Settings page and click “change” link next to the owner&apos;s name</translation>
+      <translation>Buka halaman Pengaturan Site dan klik link “ubah” di samping nama pemilik&apos;</translation>
     </message>
     <message>
       <source>OK</source>
@@ -533,7 +533,7 @@
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>Bagaimana cara mengkoneksikan?</translation>
     </message>
   </context>
   <context>
@@ -1022,11 +1022,11 @@
     <name>SitePlaceholderScreen</name>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Akses ke Resources Ditolak</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Site dalam status Disuspensi atau Dimatikan tidak tersedia di</translation>
     </message>
   </context>
   <context>
@@ -1168,7 +1168,7 @@
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>Informasi diperlukan</translation>
     </message>
     <message>
       <source>Log In</source>

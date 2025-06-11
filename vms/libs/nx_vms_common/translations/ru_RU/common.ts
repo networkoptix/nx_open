@@ -1610,7 +1610,7 @@
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Требуется транскодирование видео.</translation>
     </message>
   </context>
   <context>

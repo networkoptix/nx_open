@@ -151,7 +151,7 @@
     </message>
     <message>
       <source>Follow the steps of wizard</source>
-      <translation type="unfinished">Follow the steps of wizard</translation>
+      <translation>Følg trinnene i veiviseren</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to the %1</source>
@@ -534,7 +534,7 @@
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>Hvordan koble til?</translation>
     </message>
   </context>
   <context>
@@ -1027,7 +1027,7 @@
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Systemer i Suspendert eller "Shutdown"-tilstand er ikke tilgjengelig</translation>
     </message>
   </context>
   <context>
@@ -1169,7 +1169,7 @@
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>Informasjon påkrevd</translation>
     </message>
     <message>
       <source>Log In</source>
