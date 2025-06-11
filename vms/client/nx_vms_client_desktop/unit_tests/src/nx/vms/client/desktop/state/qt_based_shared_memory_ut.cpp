@@ -8,6 +8,12 @@
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {
+
+bool operator<(const SessionId& r, const SessionId& l)
+{
+    return r.serialized() < l.serialized();
+}
+
 namespace test {
 
 namespace {
@@ -20,7 +26,7 @@ QString randomString()
 SharedMemoryData generateRandomData()
 {
     SharedMemoryData result;
-    QSet<SessionId> sessionsToAdd;
+    std::set<SessionId> sessionsToAdd;
     for (auto& data: result.processes)
     {
         data.pid = nx::utils::random::number<SharedMemoryData::PidType>();

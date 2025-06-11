@@ -7,6 +7,7 @@
 
 #include <client/client_runtime_settings.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/state/window_geometry_manager.h>
@@ -171,6 +172,9 @@ void ClientStateHandler::connectionToSystemEstablished(
 
     d->sessionId = sessionId;
 
+    NX_DEBUG(this, "Connection established, session: %1, mode: %2",
+        sessionId.toLogString(), (int) d->startupParameters.mode);
+
     switch (d->startupParameters.mode)
     {
         case StartupParameters::Mode::cleanStartup:
@@ -229,6 +233,8 @@ void ClientStateHandler::clientDisconnected()
 
     if (!NX_ASSERT(d->sessionId))
         return;
+
+    NX_DEBUG(this, "Client disconnected, session: %1", d->sessionId.toLogString());
 
     d->startupParameters = {};
     d->sessionState = {};
@@ -390,6 +396,11 @@ void ClientStateHandler::setStatisticsModules(
 
 void ClientStateHandler::storeSystemSpecificState()
 {
+    if (!NX_ASSERT(d->sessionId))
+        return;
+
+    NX_VERBOSE(this, "Store system-specific state, session: %1", d->sessionId.toLogString());
+
     const auto state = serializeState(ClientStateDelegate::Substate::systemSpecificParameters);
     d->clientStateStorage.writeSystemSubstate(d->sessionId, state);
 }
@@ -411,6 +422,8 @@ void ClientStateHandler::loadClientState(
     ClientStateDelegate::SubstateFlags flags,
     bool applyState)
 {
+    NX_VERBOSE(this, "Load client state, flags: %1, apply: %2", flags, applyState);
+
     if (!NX_ASSERT(qnRuntime->isDesktopMode()))
         return;
 

@@ -800,9 +800,6 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                 connect(d->reconnectDialog, &QDialog::rejected, this,
                     [this, sessionId]()
                     {
-                        if (system()->user())
-                            appContext()->clientStateHandler()->clientDisconnected();
-
                         if (ini().enableMultiSystemTabBar)
                             mainWindow()->titleBarStateStore()->removeSession(sessionId);
 
@@ -1221,7 +1218,7 @@ void ConnectActionsHandler::connectToCloudSystem(
 
 void ConnectActionsHandler::at_connectAction_triggered()
 {
-    NX_VERBOSE(this, "Connect to server triggered");
+    NX_DEBUG(this, "Connect to server triggered, state: %1", d->logicalState);
 
     const auto actionParameters = menu()->currentParameters(sender());
 
@@ -1265,6 +1262,9 @@ void ConnectActionsHandler::at_connectAction_triggered()
         NX_VERBOSE(this, "Forcefully cleaning the state");
         disconnectFromServer(DisconnectFlag::Force);
     }
+
+    // Make sure we are disconnected now.
+    NX_ASSERT(d->logicalState == LogicalState::disconnected, "Unexpected state: %1", d->logicalState);
 
     if (logonData)
     {
@@ -1409,7 +1409,7 @@ void ConnectActionsHandler::at_disconnectAction_triggered()
     if (parameters.hasArgument(Qn::ForceRole) && parameters.argument(Qn::ForceRole).toBool())
         flags |= DisconnectFlag::Force;
 
-    NX_DEBUG(this, "Disconnecting from the server");
+    NX_DEBUG(this, "Disconnect action triggered");
 
     const std::shared_ptr<RemoteSession> session = system()->session();
     if (!session)
@@ -1417,12 +1417,8 @@ void ConnectActionsHandler::at_disconnectAction_triggered()
 
     const SessionId sessionId = session->sessionId();
 
-    const bool wasLoggedIn = !system()->user().isNull();
     if (!disconnectFromServer(flags))
         return;
-
-    if (wasLoggedIn)
-        appContext()->clientStateHandler()->clientDisconnected();
 
     if (const auto stateStore = mainWindow()->titleBarStateStore())
         stateStore->removeSession(sessionId);
@@ -1560,20 +1556,27 @@ void ConnectActionsHandler::at_logoutFromCloud()
 
 bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
 {
-    NX_INFO(this, "Disconnecting from the current server (flags %1)", int(flags));
     const bool force = flags.testFlag(DisconnectFlag::Force);
+    const bool wasLoggedIn = !system()->user().isNull();
+    NX_INFO(this, "Disconnect from server, state: %1, login: %2, flags: %3",
+        d->logicalState, wasLoggedIn, (int) flags);
 
     if (flags.testFlag(DisconnectFlag::ClearAutoLogin))
         appContext()->localSettings()->lastUsedConnection = {};
 
     windowContext()->system()->userSettings()->saveImmediately();
 
-    appContext()->clientStateHandler()->storeSystemSpecificState();
+    if (wasLoggedIn)
+        appContext()->clientStateHandler()->storeSystemSpecificState();
+
     if (!windowContext()->workbenchStateManager()->tryClose(force))
     {
         NX_ASSERT(!force, "Forced exit must close connection");
         return false;
     }
+
+    if (wasLoggedIn)
+        appContext()->clientStateHandler()->clientDisconnected();
 
     if (flags.testFlag(DisconnectFlag::SwitchingServer)
         || flags.testFlag(DisconnectFlag::SwitchingSystemTabs))
