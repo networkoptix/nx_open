@@ -22,7 +22,7 @@ struct PushIpcData
 
     /**
      *  Stores data to the secured storage.
-     *  @user Currently logged cloud user.
+     *  @user Currently logged cloud user. Converts it to the lowercase while storing.
      *  @refreshToken Refresh token of the current connection to the cloud.
      *  @password Password for the compatibility with servers with version < 5.0.
      */
@@ -70,6 +70,10 @@ struct PushIpcData
 
 private:
     PushIpcData() = delete;
+
+    static void storeImpl(const std::string& user,
+        const std::string& cloudRefreshToken,
+        const std::string& password);
 };
 
 } // namespace nx::vms::client::mobile::details

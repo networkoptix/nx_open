@@ -2,14 +2,27 @@
 
 #include "push_ipc_data.h"
 
-#include <QtCore/QtGlobal>
+#include <cctype>
 
-#if !defined(Q_OS_IOS) && !defined(Q_OS_ANDROID)
+#include <QtCore/QtGlobal>
 
 namespace nx::vms::client::mobile::details {
 
 void PushIpcData::store(
-    const std::string& /*user*/,
+    const std::string& user,
+    const std::string& cloudRefreshToken,
+    const std::string& password)
+{
+    auto lowercasedUser = user;
+    std::transform(lowercasedUser.begin(), lowercasedUser.end(), lowercasedUser.begin(),
+        [](unsigned char c) { return std::tolower(c); });
+
+    storeImpl(lowercasedUser, cloudRefreshToken, password);
+}
+
+#if !defined(Q_OS_IOS) && !defined(Q_OS_ANDROID)
+
+void PushIpcData::storeImpl(const std::string& /*user*/,
     const std::string& /*cloudRefreshToken*/,
     const std::string& /*password*/)
 {
@@ -48,18 +61,18 @@ void PushIpcData::removeAccessToken(const std::string& /*cloudSystemId*/)
 }
 
 bool PushIpcData::cloudLoggerOptions(
-    std::string& logSessionId,
-    std::chrono::milliseconds& sessionEndTime)
+    std::string& /*logSessionId*/,
+    std::chrono::milliseconds& /*sessionEndTime*/)
 {
     return false;
 }
 
 void PushIpcData::setCloudLoggerOptions(
-    const std::string& logSessionId,
-    const std::chrono::milliseconds& sessionEndTime)
+    const std::string& /*logSessionId*/,
+    const std::chrono::milliseconds& /*sessionEndTime*/)
 {
 }
 
-} // namespace nx::vms::client::mobile::details
-
 #endif
+
+} // namespace nx::vms::client::mobile::details

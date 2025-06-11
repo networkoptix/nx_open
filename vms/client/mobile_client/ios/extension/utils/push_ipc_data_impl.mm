@@ -114,7 +114,7 @@ NSMutableDictionary* dataToDictionary(NSData* data, const NSString* logTag)
 
 namespace nx::vms::client::mobile::details {
 
-void PushIpcData::store(
+void PushIpcData::storeImpl(
     const std::string& user,
     const std::string& cloudRefreshToken,
     const std::string& password)

@@ -178,7 +178,7 @@ public class PushMessageManager
             return;
         }
 
-        if (context.targets.indexOf("\"" + localData.user + "\"") == -1)
+        if (context.targets.toLowerCase().indexOf("\"" + localData.user + "\"") == -1)
         {
             Logger.error(kLogTag, "current user is not in targets, omitting notification.");
             return;
