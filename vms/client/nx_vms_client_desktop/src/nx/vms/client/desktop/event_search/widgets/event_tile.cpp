@@ -461,6 +461,8 @@ void EventTile::setPlaceholder(const QString& text)
 
     if (!text.isEmpty())
        setImageProvider(nullptr, /*forceUpdate*/ true);
+
+    d->updatePreviewsVisibility();
 }
 
 void EventTile::setForcePreviewLoader(bool force)

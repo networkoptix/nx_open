@@ -499,9 +499,7 @@ namespace Qn
         SetPassword,
         UnlockEncryptedArchive,
         Authorize,
-
-        /** Provides information about required actions. */
-        RequestInformation
+        LogIn,
     };
 
     /**

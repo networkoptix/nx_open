@@ -82,7 +82,7 @@ const OverlayInfoMap& overlayInfo()
                 QnStatusOverlayWidget::tr("CONNECTION LOST"),
                 kPaidIconPath}},
         {Qn::InformationRequiredOverlay,
-            {QnStatusOverlayWidget::ErrorStyle::white,
+            {QnStatusOverlayWidget::ErrorStyle::red,
                 QnStatusOverlayWidget::tr("INFORMATION REQUIRED"),
                 kRestrictIconPath}},
         {Qn::NoDataOverlay,
@@ -445,7 +445,7 @@ QnStatusOverlayController::getButtonCaptions(const QnResourcePtr& resource)
     result.insert(toInt(Qn::ResourceOverlayButton::MoreLicenses), tr("Activate License"));
     result.insert(toInt(Qn::ResourceOverlayButton::SetPassword), tr("Set"));
     result.insert(toInt(Qn::ResourceOverlayButton::UnlockEncryptedArchive), tr("Unlock"));
-    result.insert(toInt(Qn::ResourceOverlayButton::RequestInformation), tr("Provide"));
+    result.insert(toInt(Qn::ResourceOverlayButton::LogIn), tr("Log In"));
     result.insert(toInt(Qn::ResourceOverlayButton::Authorize), tr("Authorize"));
 
     if (resource)

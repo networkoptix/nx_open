@@ -165,6 +165,7 @@ struct CloudCrossSystemContext::Private
     bool automaticReconnection = false;
     bool needsCloudAuthorization = false;
     int retryCount = 0;
+    std::optional<core::RemoteConnectionError> connectionError;
 
     void setupAutomaticReconnection()
     {
@@ -312,10 +313,12 @@ struct CloudCrossSystemContext::Private
                 if (auto connection = std::get_if<core::RemoteConnectionPtr>(&result))
                 {
                     NX_VERBOSE(this, "Connection successfully established");
+                    connectionError.reset();
                     initializeContext(*connection);
                 }
                 else if (const auto error = std::get_if<core::RemoteConnectionError>(&result))
                 {
+                    connectionError = *error;
                     if (error->code == core::RemoteConnectionErrorCode::truncatedSessionToken
                         && allowUserInteraction && retryCount == 0)
                     {
@@ -834,6 +837,12 @@ bool CloudCrossSystemContext::initializeConnection(bool allowUserInteraction)
     }
 
     return d->ensureConnection(allowUserInteraction);
+}
+
+std::optional<nx::vms::client::core::RemoteConnectionError>
+    CloudCrossSystemContext::connectionError() const
+{
+    return d->connectionError;
 }
 
 QnVirtualCameraResourcePtr CloudCrossSystemContext::createThumbCameraResource(

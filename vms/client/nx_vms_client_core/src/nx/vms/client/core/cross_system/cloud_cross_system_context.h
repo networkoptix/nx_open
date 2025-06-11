@@ -69,6 +69,12 @@ public:
      */
     bool initializeConnection(bool allowUserInteraction);
 
+    /**
+     * @return Error code and description if last connection attempt was unsuccessful,
+     *     nullopt otherwise.
+     */
+    std::optional<core::RemoteConnectionError> connectionError() const;
+
     QnVirtualCameraResourcePtr createThumbCameraResource(const nx::Uuid& id, const QString& name);
 
     bool needsCloudAuthorization();

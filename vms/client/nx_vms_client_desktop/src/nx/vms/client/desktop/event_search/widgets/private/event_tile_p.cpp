@@ -370,7 +370,8 @@ void EventTile::Private::updatePreviewsVisibility()
             q->ui->imagePreviewWidget->parentWidget()->show();
             return;
         }
-        else if (q->ui->imagePreviewWidget->imageProvider())
+        else if (q->ui->imagePreviewWidget->imageProvider()
+            || !q->ui->imagePreviewWidget->placeholder().isEmpty())
         {
             q->ui->videoPreviewWidget->hide();
             q->ui->imagePreviewWidget->show();

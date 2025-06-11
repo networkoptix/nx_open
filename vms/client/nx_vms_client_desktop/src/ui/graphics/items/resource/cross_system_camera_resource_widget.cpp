@@ -19,23 +19,34 @@
 #include <ui/graphics/items/overlays/status_overlay_controller.h>
 #include <ui/workbench/workbench_context.h>
 
+using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
 
 struct QnCrossSystemCameraWidget::Private
 {
-    nx::vms::client::core::CrossSystemCameraResourcePtr crossSystemCamera;
-    nx::vms::client::core::CloudCrossSystemContext* context;
+    core::CrossSystemCameraResourcePtr crossSystemCamera;
+    core::CloudCrossSystemContext* context;
 
     Qn::ResourceStatusOverlay calculateStatusOverlay() const
     {
         if (NX_ASSERT(context) && context->systemDescription()->isOnline())
         {
             const auto status = context->status();
-            if (status == nx::vms::client::core::CloudCrossSystemContext::Status::connecting)
+            if (status == core::CloudCrossSystemContext::Status::connecting)
                 return Qn::ResourceStatusOverlay::LoadingOverlay;
 
-            if (status == nx::vms::client::core::CloudCrossSystemContext::Status::connectionFailure)
+            if (status == core::CloudCrossSystemContext::Status::connectionFailure)
+            {
+                if (const auto error = context->connectionError())
+                {
+                    if (error->code == core::RemoteConnectionErrorCode::certificateRejected
+                        || error->code == core::RemoteConnectionErrorCode::truncatedSessionToken)
+                    {
+                        return Qn::ResourceStatusOverlay::InformationRequiredOverlay;
+                    }
+                }
                 return Qn::ResourceStatusOverlay::UnauthorizedOverlay;
+            }
 
             return Qn::ResourceStatusOverlay::InformationRequiredOverlay;
         }
@@ -45,14 +56,14 @@ struct QnCrossSystemCameraWidget::Private
 };
 
 QnCrossSystemCameraWidget::QnCrossSystemCameraWidget(
-    nx::vms::client::desktop::SystemContext* systemContext,
-    nx::vms::client::desktop::WindowContext* windowContext,
+    desktop::SystemContext* systemContext,
+    desktop::WindowContext* windowContext,
     QnWorkbenchItem* item,
     QGraphicsItem* parent)
     :
     QnMediaResourceWidget(systemContext, windowContext, item, parent),
     d(new Private{QnMediaResourceWidget::resource().dynamicCast<
-        nx::vms::client::core::CrossSystemCameraResource>()})
+        core::CrossSystemCameraResource>()})
 {
     NX_ASSERT(d->crossSystemCamera);
     const auto systemId = d->crossSystemCamera->systemId();
@@ -63,7 +74,7 @@ QnCrossSystemCameraWidget::QnCrossSystemCameraWidget(
         this,
         [this](Qn::ResourceOverlayButton button)
         {
-            if (button != Qn::ResourceOverlayButton::RequestInformation)
+            if (button != Qn::ResourceOverlayButton::LogIn)
                 return;
 
             if (!d->crossSystemCamera)
@@ -116,7 +127,7 @@ Qn::ResourceOverlayButton QnCrossSystemCameraWidget::calculateOverlayButton(
         return Qn::ResourceOverlayButton::Empty; // VMS-58843: Temporarily not supported.
 
     if (statusOverlay == Qn::ResourceStatusOverlay::InformationRequiredOverlay)
-        return Qn::ResourceOverlayButton::RequestInformation;
+        return Qn::ResourceOverlayButton::LogIn;
 
     if (d->crossSystemCamera && d->crossSystemCamera->hasFlags(Qn::fake))
         return Qn::ResourceOverlayButton::Empty;
