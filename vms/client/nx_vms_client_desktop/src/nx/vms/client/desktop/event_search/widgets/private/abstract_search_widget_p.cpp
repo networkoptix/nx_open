@@ -411,6 +411,7 @@ void AbstractSearchWidgetPrivate::setupViewportHeader()
 
     updateInformationToolTip();
 
+    m_togglePreviewsButton->setVisible(!isVisibleModelEmpty());
     m_togglePreviewsButton->setChecked(ui->ribbon->previewsEnabled());
     m_togglePreviewsButton->setIcon(qnSkin->icon(kCheckedImageIcon));
 
@@ -646,7 +647,8 @@ void AbstractSearchWidgetPrivate::updateCameraDisplaying()
     const auto resource = q->navigator()->currentResource();
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
 
-    ui->cameraDisplayingButton->setIcon(qnSkin->icon(camera ? kDeviceIcon : kPlayIcon));
+    ui->cameraDisplayingButton->setIcon(
+        qnSkin->icon((!resource || camera) ? kDeviceIcon : kPlayIcon));
 
     if (resource)
     {
@@ -923,6 +925,7 @@ void AbstractSearchWidgetPrivate::tryFetchData()
     }
 
     updatePlaceholderVisibility();
+    m_togglePreviewsButton->setVisible(!isVisibleModelEmpty());
 }
 
 void AbstractSearchWidgetPrivate::setIndicatorVisible(FetchDirection direction, bool value)
@@ -939,6 +942,7 @@ void AbstractSearchWidgetPrivate::setIndicatorVisible(FetchDirection direction, 
 void AbstractSearchWidgetPrivate::handleItemCountChanged()
 {
     updatePlaceholderVisibility();
+    m_togglePreviewsButton->setVisible(!isVisibleModelEmpty());
 
     const auto itemCount = m_mainModel->rowCount();
     ui->ribbon->viewportHeader()->setVisible(!m_placeholderVisible && itemCount > 0);
@@ -950,10 +954,14 @@ void AbstractSearchWidgetPrivate::handleItemCountChanged()
         m_itemCounterLabel->setText(q->itemCounterText(itemCount));
 }
 
+bool AbstractSearchWidgetPrivate::isVisibleModelEmpty() const
+{
+    return (m_visualModel->rowCount() == 0 && m_dataFetched) || m_mainModel->isFilterDegenerate();
+}
+
 void AbstractSearchWidgetPrivate::updatePlaceholderVisibility()
 {
-    m_placeholderVisible =
-        (m_visualModel->rowCount() == 0 && m_dataFetched) || m_mainModel->isFilterDegenerate();
+    m_placeholderVisible = isVisibleModelEmpty();
 
     if (m_placeholderVisible)
         m_placeholderWidget->setText(q->placeholderText(m_mainModel->isConstrained()));

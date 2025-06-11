@@ -63,6 +63,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubs
 };
 
 NX_DECLARE_COLORIZED_ICON(kSystemIcon, "20x20/Outline/system.svg", kIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kNotificationIcon, "20x20/Outline/event_rules.svg", kIconSubstitutions)
 
 nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
     {QnIcon::Normal, {.primary = "dark16"}}};
@@ -262,6 +263,7 @@ void NotificationListWidget::Private::setupFilterSystemsButton()
 
 void NotificationListWidget::Private::setupFilterNotificationsButton()
 {
+    m_filterNotificationsButton->setIcon(qnSkin->icon(kNotificationIcon));
     m_filterNotificationsButton->setFlat(true);
     m_filterNotificationsButton->setSelectable(false);
     m_filterNotificationsButton->setDeactivatable(true);

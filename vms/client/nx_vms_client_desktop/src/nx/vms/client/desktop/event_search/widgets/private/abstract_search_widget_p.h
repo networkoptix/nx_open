@@ -106,6 +106,7 @@ private:
 
     void updateDeviceDependentActions();
     void updatePlaceholderVisibility();
+    bool isVisibleModelEmpty() const;
 
     QString currentDeviceText() const;
     QString singleDeviceText(
