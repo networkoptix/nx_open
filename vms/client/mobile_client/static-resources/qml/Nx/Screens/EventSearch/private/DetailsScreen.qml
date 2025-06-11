@@ -188,6 +188,7 @@ Page
             x: parent.width - width - orientationModeButton.width - goToCameraButton.width
             y: parent.height - height
 
+            visible: isDownloadAvailable && !preview.cannotDecryptMedia
             enabled: preview.player && !preview.cannotDecryptMedia
             resource: preview.resource
             positionMs: preview.startTimeMs

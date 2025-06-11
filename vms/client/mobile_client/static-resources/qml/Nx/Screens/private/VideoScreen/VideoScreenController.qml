@@ -36,7 +36,7 @@ NxObject
     readonly property bool tooManyConnections:
         mediaPlayer.error === MediaPlayer.TooManyConnections
     readonly property bool cannotDecryptMedia:
-        mediaPlayer.error === MediaPlayer.CannotDecryptMediaError
+        mediaPlayer.error === MediaPlayer.CannotDecryptMedia
     readonly property bool noVideo: noVideoStreams || !resourceHelper.hasVideo
     readonly property bool ioModuleWarning:
          noVideo && resourceHelper.isIoModule && !resourceHelper.audioSupported

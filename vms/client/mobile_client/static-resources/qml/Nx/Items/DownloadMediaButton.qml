@@ -15,8 +15,9 @@ IconButton
     property real positionMs: 0
     property real durationMs: 0
     property alias menuOpened: durationOptionsMenu.opened
+    property alias isDownloadAvailable: mediaDownloadBackend.isDownloadAvailable
 
-    visible: mediaDownloadBackend.isDownloadAvailable
+    visible: isDownloadAvailable
     icon.source: lp("/images/download.svg")
     padding: 0
 
