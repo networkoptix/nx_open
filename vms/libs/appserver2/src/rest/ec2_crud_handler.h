@@ -15,8 +15,6 @@
 
 namespace ec2 {
 
-NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(DoesMethodExist_validateNotifyId, validateNotifyId);
-
 template<
     typename Derived,
     typename Filter,
@@ -60,16 +58,16 @@ public:
     std::vector<Model> read(Filter filter, const nx::network::rest::Request& request)
     {
         using namespace details;
-        using nx::utils::model::getId;
 
         auto processor = m_queryProcessor->getAccess(
             static_cast<const Derived*>(this)->prepareAuditRecord(request));
-        validateType(processor, filter, m_objectType);
+        auto id = nx::utils::model::getId(filter);
+        validateType(processor, id, m_objectType);
 
         // `std::type_identity` (or similar) can be used to pass the read type info and avoid
         // useless `readType` object instantiation.
         const auto query =
-            [this, &request, id = getId(filter), &processor](const auto& readType)
+            [this, &request, id, &processor](const auto& readType)
             {
                 using Arg = std::decay_t<decltype(readType)>;
                 using Output = std::conditional_t<nx::utils::Is<std::vector, Arg>(), Arg, std::vector<Arg>>;
@@ -120,7 +118,7 @@ public:
 
         auto processor = m_queryProcessor->getAccess(
             static_cast<const Derived*>(this)->prepareAuditRecord(request));
-        validateType(processor, id, m_objectType);
+        validateType(processor, nx::utils::model::getId(id), m_objectType);
 
         std::promise<Result> promise;
         processor.processCustomUpdateAsync(
@@ -151,7 +149,7 @@ public:
         {
             std::promise<Result> promise;
             auto processor = m_queryProcessor->getAccess(this->prepareAuditRecord(request));
-            validateType(processor, data, m_objectType);
+            validateType(processor, nx::utils::model::getId(data), m_objectType);
             validateResourceTypeId(data);
             processor.processCustomUpdateAsync(
                 ApiCommand::CompositeSave,
@@ -220,12 +218,13 @@ protected:
         using namespace details;
         auto processor = m_queryProcessor->getAccess(this->prepareAuditRecord(request));
         const auto& mainDbItem = std::get<0>(items);
-        validateType(processor, mainDbItem, m_objectType);
+        auto id = nx::utils::model::getId(mainDbItem);
+        validateType(processor, id, m_objectType);
         validateResourceTypeId(mainDbItem);
         static_cast<Derived*>(this)->checkSavePermission(request.userSession.access, mainDbItem);
         using IgnoredDbType = std::decay_t<decltype(mainDbItem)>;
         auto update =
-            [id = nx::utils::model::getId(mainDbItem)](auto&& x, auto& copy, auto* list)
+            [id](auto&& x, auto& copy, auto* list)
             {
                 using DbType = std::decay_t<decltype(x)>;
                 Result result;
@@ -269,26 +268,27 @@ protected:
             throwError(std::move(result));
     }
 
+    bool isValidType(const nx::Uuid& id) const
+    {
+        if constexpr (m_objectType == ApiObject_NotDefined)
+            return true;
+
+        const auto objectType =
+            m_queryProcessor->getAccess(nx::network::rest::kSystemSession).getObjectType(id);
+        return objectType == ApiObject_NotDefined || objectType == m_objectType;
+    }
+
 protected:
     QueryProcessor* const m_queryProcessor;
 
 private:
-    bool isValidType(const nx::Uuid& id) const
-    {
-        const auto objectType = m_queryProcessor->getAccess(nx::network::rest::kSystemSession).getObjectType(id);
-        return objectType == ApiObject_NotDefined || objectType == m_objectType;
-    }
-
     template<typename T>
-    bool validateId(const T& id)
+    void validateType(const auto& processor, const T& id, ApiObjectType requiredType)
     {
-        if constexpr (DoesMethodExist_validateNotifyId<Derived>::value)
+        if (!static_cast<Derived*>(this)->isValidType(id))
         {
-            return static_cast<Derived*>(this)->validateNotifyId(id);
-        }
-        else
-        {
-            return isValidType(id);
+            throw nx::network::rest::Exception::notFound(
+                NX_FMT("Object type %1 is not found", nx::reflect::json::serialize(id)));
         }
     }
 
@@ -302,7 +302,7 @@ private:
             const auto id =
                 getId(static_cast<const QnTransaction<DeleteInput>&>(transaction).params);
 
-            if (validateId(id))
+            if (static_cast<Derived*>(this)->isValidType(id))
             {
                 NX_VERBOSE(this, "Notify %1 for %2", id, transaction.command);
                 SubscriptionHandler::notify(nx::toString(id), NotifyType::delete_, /*data*/ {});
@@ -318,7 +318,7 @@ private:
                     return false;
 
                 const auto id = getId(static_cast<const QnTransaction<T>&>(transaction).params);
-                if (validateId(id))
+                if (static_cast<Derived*>(this)->isValidType(id))
                 {
                     NX_VERBOSE(this, "Notify %1 for %2", id, transaction.command);
                     SubscriptionHandler::notify(nx::toString(id), NotifyType::update, /*data*/ {});

@@ -346,28 +346,10 @@ constexpr ApiObjectType commandToObjectType(ApiCommand::Value deleteCommand)
             return ApiObject_AnalyticsPlugin;
         case ApiCommand::removeAnalyticsEngine:
             return ApiObject_AnalyticsEngine;
+        case ApiCommand::removeVmsRule:
+            return ApiObject_VmsRule;
         default:
             return ApiObject_NotDefined;
-    }
-}
-
-template<typename T>
-void validateType(const auto& processor, const T& data, ApiObjectType requiredType)
-{
-    if constexpr (idExists<T>::value)
-    {
-        const auto& id = data.id;
-        if constexpr (std::is_same_v<std::decay_t<decltype(id)>, nx::Uuid>)
-        {
-            if (requiredType == ApiObject_NotDefined)
-                return;
-
-            const auto objectType = processor.getObjectType(id);
-            if (objectType == ApiObject_NotDefined || objectType == requiredType)
-                return;
-
-            throw nx::network::rest::Exception::notFound(NX_FMT("Object type %1 is not found", id));
-        }
     }
 }
 

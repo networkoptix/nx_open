@@ -316,6 +316,11 @@ public:
     StorageParentId(const nx::Uuid& id): nx::Uuid(id) {}
     StorageParentId(const QString& id): nx::Uuid(id) {}
 };
+inline void serialize(
+    nx::reflect::json::SerializationContext* context, const StorageParentId& value)
+{
+    serialize(context, static_cast<const nx::Uuid&>(value));
+}
 
 struct StorageFilter: IdData
 {
