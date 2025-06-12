@@ -4167,16 +4167,16 @@ License Key: %2</source>
       <translation>ロック解除</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation>提供</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation>認証</translation>
     </message>
     <message>
       <source>Set</source>
       <translation>設定</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
     </message>
   </context>
   <context>

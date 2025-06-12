@@ -57,11 +57,6 @@
       <translation>恢復與%1的連線並請重試</translation>
     </message>
     <message>
-      <source>%1 user login is temporarily unavailable</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 帳戶登入暫時無法使用</translation>
-    </message>
-    <message>
       <source>The server is incompatible.</source>
       <translation>此伺服器的版本與目前使用的客戶端不相容。</translation>
     </message>
@@ -188,6 +183,10 @@
     <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation>此使用者已被站點管理員停用。</translation>
+    </message>
+    <message>
+      <source>Failed to access site</source>
+      <translation>未能連接站點</translation>
     </message>
   </context>
   <context>

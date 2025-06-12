@@ -4211,16 +4211,16 @@ Chave de licença: %2</translation>
       <translation>Desbloquear</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation>Fornecer</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation type="unfinished">Authorize</translation>
     </message>
     <message>
       <source>Set</source>
       <translation>Definir</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
     </message>
   </context>
   <context>

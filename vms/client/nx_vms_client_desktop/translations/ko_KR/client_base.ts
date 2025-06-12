@@ -4167,16 +4167,16 @@ License Key: %2</source>
       <translation>해제</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation>제공하기</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation>권한부여</translation>
     </message>
     <message>
       <source>Set</source>
       <translation>세트</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
     </message>
   </context>
   <context>

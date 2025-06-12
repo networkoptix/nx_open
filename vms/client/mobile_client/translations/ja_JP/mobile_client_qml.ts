@@ -135,41 +135,41 @@
   <context>
     <name>CloudConnectionHelpSheet</name>
     <message>
-      <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to the %1</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>サイトが %1 に &lt;font color=&apos;%2&apos;&gt;接続されていない&lt;/a&gt; 場合</translation>
-    </message>
-    <message>
       <source>Log in to the site in %1</source>
       <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
       <translation>%1 でサイトにログインしてください。</translation>
-    </message>
-    <message>
-      <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>サイト管理の %1 タブで、&quot;サイトを %1 に接続&quot; をクリックしてください。</translation>
     </message>
     <message>
       <source>Follow the steps of wizard</source>
       <translation>ウィザードの手順に従ってください。</translation>
     </message>
     <message>
-      <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to the %1</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>サイトが %1 に &lt;font color=&apos;%2&apos;&gt;接続されている&lt;/a&gt; 場合</translation>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</translation>
+    </message>
+    <message>
+      <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+    </message>
+    <message>
+      <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</translation>
     </message>
     <message>
       <source>Connect to %1 by site owner’s account</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>サイトオーナーのアカウントにより、%1 に接続されました。</translation>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
     </message>
     <message>
-      <source>Open Site Settings page and click “change” link next to the owner&apos;s name</source>
-      <translation>サイト設定ページを開き、オーナー名の横にある「変更」リンクをクリックしてください。</translation>
-    </message>
-    <message>
-      <source>OK</source>
-      <translation>OK</translation>
+      <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
+      <translation type="unfinished">Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</translation>
     </message>
   </context>
   <context>

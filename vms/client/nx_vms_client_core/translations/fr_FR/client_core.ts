@@ -57,11 +57,6 @@
       <translation>Restaurer la connexion à %1 et réessayer</translation>
     </message>
     <message>
-      <source>%1 user login is temporarily unavailable</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>La connexion de l'utilisateur %1 est temporairement indisponible</translation>
-    </message>
-    <message>
       <source>The server is incompatible.</source>
       <translation>Le serveur est incompatible.</translation>
     </message>
@@ -188,6 +183,10 @@
     <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation>Cet utilisateur a été désactivé par un administrateur du site.</translation>
+    </message>
+    <message>
+      <source>Failed to access site</source>
+      <translation type="unfinished">Failed to access site</translation>
     </message>
   </context>
   <context>

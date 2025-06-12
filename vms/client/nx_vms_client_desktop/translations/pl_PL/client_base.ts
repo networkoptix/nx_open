@@ -4299,16 +4299,16 @@ Klucz licencyjny: %2</translation>
       <translation>Odblokuj</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation>Dostarczać</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation>Autoryzacja</translation>
     </message>
     <message>
       <source>Set</source>
       <translation>Ustaw</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
     </message>
   </context>
   <context>
@@ -6452,11 +6452,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>Transkodowanie wideo jest wymagane. Sesja eksportu została zrestartowana.</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
+      <translation>Transkodowanie dźwięku jest wymagane. Sesja eksportu została zrestartowana.</translation>
     </message>
   </context>
   <context>
@@ -8480,7 +8480,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Wymagane transkodowanie dźwięku.</translation>
     </message>
   </context>
   <context>

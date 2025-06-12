@@ -135,41 +135,41 @@
   <context>
     <name>CloudConnectionHelpSheet</name>
     <message>
-      <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to the %1</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to the %1</translation>
-    </message>
-    <message>
       <source>Log in to the site in %1</source>
       <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
-      <translation type="unfinished">Log in to the site in %1</translation>
-    </message>
-    <message>
-      <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+      <translation>Zaloguj się do witryny w %1</translation>
     </message>
     <message>
       <source>Follow the steps of wizard</source>
       <translation>Postępuj zgodnie z instrukcjami kreatora</translation>
     </message>
     <message>
-      <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to the %1</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to the %1</translation>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</translation>
+    </message>
+    <message>
+      <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+    </message>
+    <message>
+      <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</translation>
     </message>
     <message>
       <source>Connect to %1 by site owner’s account</source>
-      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation type="unfinished">Connect to %1 by site owner’s account</translation>
     </message>
     <message>
-      <source>Open Site Settings page and click “change” link next to the owner&apos;s name</source>
-      <translation type="unfinished">Open Site Settings page and click “change” link next to the owner&apos;s name</translation>
-    </message>
-    <message>
-      <source>OK</source>
-      <translation>OK</translation>
+      <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
+      <translation type="unfinished">Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</translation>
     </message>
   </context>
   <context>
@@ -536,7 +536,7 @@
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>Jak się połączyć?</translation>
     </message>
   </context>
   <context>
@@ -1025,11 +1025,11 @@
     <name>SitePlaceholderScreen</name>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Dostęp do zasobów zabroniony</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Witryny w stanie zawieszenia lub zamknięcia są niedostępne</translation>
     </message>
   </context>
   <context>

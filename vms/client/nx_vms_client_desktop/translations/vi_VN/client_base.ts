@@ -4167,16 +4167,16 @@ Khóa giấy phép: %2</translation>
       <translation>Mở khóa</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation>Cung cấp</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation>Ủy quyền</translation>
     </message>
     <message>
       <source>Set</source>
       <translation>Đặt</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
     </message>
   </context>
   <context>

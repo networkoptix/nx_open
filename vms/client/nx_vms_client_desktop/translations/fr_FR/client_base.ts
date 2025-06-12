@@ -4211,16 +4211,16 @@ Clé de licence : %2</translation>
       <translation>Déverrouiller</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation>Fournir</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation>Autoriser</translation>
     </message>
     <message>
       <source>Set</source>
       <translation>Régler</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation type="unfinished">Log In</translation>
     </message>
   </context>
   <context>

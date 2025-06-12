@@ -57,11 +57,6 @@
       <translation>Gjenopprett tilkoblingen til %1 og prøv igjen</translation>
     </message>
     <message>
-      <source>%1 user login is temporarily unavailable</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 brukerinnlogging er midlertidig utilgjengelig</translation>
-    </message>
-    <message>
       <source>The server is incompatible.</source>
       <translation>Serveren er inkompatibel.</translation>
     </message>
@@ -188,6 +183,10 @@
     <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation>Denne brukeren har blitt deaktivert av en sideadministrator.</translation>
+    </message>
+    <message>
+      <source>Failed to access site</source>
+      <translation type="unfinished">Failed to access site</translation>
     </message>
   </context>
   <context>
