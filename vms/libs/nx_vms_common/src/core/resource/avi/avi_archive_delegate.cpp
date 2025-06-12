@@ -154,7 +154,7 @@ bool QnAviArchiveDelegate::readFailed() const
 
 QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 {
-    if (!findStreams() || m_eofReached)
+    if (!m_streamsFound || m_eofReached)
         return QnAbstractMediaDataPtr();
 
     QnAbstractMediaDataPtr data;
@@ -345,7 +345,7 @@ qint64 QnAviArchiveDelegate::seekWithFallback(qint64 time, bool findIFrame)
 
 qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
-    if (!findStreams())
+    if (!m_streamsFound)
         return kSeekError;
 
     const auto endTime = this->endTime();
@@ -528,8 +528,6 @@ std::optional<QnAviArchiveMetadata> QnAviArchiveDelegate::metadata() const
 
 bool QnAviArchiveDelegate::hasVideo() const
 {
-    auto nonConstThis = const_cast<QnAviArchiveDelegate*> (this);
-    nonConstThis->findStreams();
     return m_hasVideo;
 }
 
@@ -728,7 +726,7 @@ bool QnAviArchiveDelegate::setAudioChannel(unsigned num)
     if (!m_formatContext)
         return false;
 
-    if (!m_streamsFound && !findStreams())
+    if (!m_streamsFound)
         return false;
 
     // Convert num to absolute track number.
@@ -760,14 +758,6 @@ bool QnAviArchiveDelegate::setAudioChannel(unsigned num)
         }
     }
     return false;
-}
-
-AVFormatContext* QnAviArchiveDelegate::getFormatContext()
-{
-    if (!m_streamsFound && !findStreams())
-        return nullptr;
-
-    return m_formatContext;
 }
 
 bool QnAviArchiveDelegate::isStreamsFound() const
