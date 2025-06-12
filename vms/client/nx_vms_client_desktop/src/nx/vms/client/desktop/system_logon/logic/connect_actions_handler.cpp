@@ -244,6 +244,7 @@ struct ConnectActionsHandler::Private
         else
         {
             needReconnectToLastCloudSystem = true;
+            q->updatePreloaderVisibility();
             if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::Online)
                 reconnectToLastCloudSystemIfNeeded();
         }
@@ -1126,7 +1127,8 @@ void ConnectActionsHandler::updatePreloaderVisibility()
     if (!welcomeScreen)
         return;
 
-    NX_VERBOSE(this, "Updating preloder visibility for state \"%1\"...", d->logicalState);
+    NX_VERBOSE(this, "Update preloader visibility, state: %1, reconnect: %2",
+        d->logicalState, d->needReconnectToLastCloudSystem);
 
     const auto resourceModeAction = action(menu::ResourcesModeAction);
 
@@ -1135,7 +1137,7 @@ void ConnectActionsHandler::updatePreloaderVisibility()
         case LogicalState::disconnected:
         {
             // Show welcome screen, hide preloader.
-            welcomeScreen->setGlobalPreloaderVisible(false);
+            welcomeScreen->setGlobalPreloaderVisible(d->needReconnectToLastCloudSystem);
             welcomeScreen->setConnectingToSystem(/*systemId*/ {});
             resourceModeAction->setChecked(false);
             break;
@@ -1143,7 +1145,7 @@ void ConnectActionsHandler::updatePreloaderVisibility()
         case LogicalState::connecting:
         {
             // Show welcome screen, show preloader.
-            welcomeScreen->setGlobalPreloaderVisible(true);
+            welcomeScreen->setGlobalPreloaderVisible(!welcomeScreen->connectingTileExists());
             resourceModeAction->setChecked(false);
             break;
         }
@@ -1153,11 +1155,11 @@ void ConnectActionsHandler::updatePreloaderVisibility()
             welcomeScreen->setConnectingToSystem(/*systemId*/ {});
             welcomeScreen->setGlobalPreloaderVisible(false);
             resourceModeAction->setChecked(true); //< Hides welcome screen
-            welcomeScreen->setGlobalPreloaderEnabled(true);
             break;
         }
         default:
         {
+            NX_ASSERT(this, "Unexpected logical state: %1", d->logicalState);
             break;
         }
     }

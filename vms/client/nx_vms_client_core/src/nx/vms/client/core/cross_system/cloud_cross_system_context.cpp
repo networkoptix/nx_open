@@ -67,6 +67,19 @@ struct ContextRemover
     }
 };
 
+nx::log::Level level(nx::vms::client::core::RemoteConnectionErrorCode code)
+{
+    using Code = nx::vms::client::core::RemoteConnectionErrorCode;
+
+    switch (code)
+    {
+        case Code::truncatedSessionToken:
+            return nx::log::Level::verbose;
+    }
+
+    return nx::log::Level::warning;
+}
+
 } // namespace
 
 struct CloudCrossSystemContext::Private
@@ -331,7 +344,8 @@ struct CloudCrossSystemContext::Private
 
                     retryCount = 0;
 
-                    NX_WARNING(this, "Error while establishing connection %1", error->code);
+                    NX_UTILS_LOG(level(error->code), this,
+                        "Error while establishing connection %1", error->code);
 
                     auto status = Status::connectionFailure;
 

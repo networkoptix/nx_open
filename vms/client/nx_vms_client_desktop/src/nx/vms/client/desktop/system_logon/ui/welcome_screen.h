@@ -49,11 +49,6 @@ class WelcomeScreen: public QQuickWidget, public WindowContextAware
         WRITE setGlobalPreloaderVisible
         NOTIFY globalPreloaderVisibleChanged)
 
-    Q_PROPERTY(bool globalPreloaderEnabled
-        READ globalPreloaderEnabled
-        WRITE setGlobalPreloaderEnabled
-        NOTIFY globalPreloaderEnabledChanged)
-
     Q_PROPERTY(QString message READ message WRITE setMessage NOTIFY messageChanged)
 
     Q_PROPERTY(int simpleModeTilesNumber READ simpleModeTilesNumber CONSTANT)
@@ -89,12 +84,7 @@ public: // Properties
     void setConnectingToSystem(const QString& value);
 
     bool globalPreloaderVisible() const;
-
     void setGlobalPreloaderVisible(bool value);
-
-    bool globalPreloaderEnabled() const;
-
-    Q_INVOKABLE void setGlobalPreloaderEnabled(bool value);
 
     void setMessage(const QString& message);
 
@@ -165,7 +155,6 @@ signals:
     void gridEnabledChanged();
     void resetAutoLogin();
     void globalPreloaderVisibleChanged(bool visible);
-    void globalPreloaderEnabledChanged();
     void messageChanged();
     void openTile(const QString& systemId, const QString& errorMessage = "",
         bool isLoginError = false);

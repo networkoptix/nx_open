@@ -287,7 +287,6 @@ Rectangle
 
         alignToCenter: !welcomeScreen.complexVisibilityMode
         hideActionEnabled: welcomeScreen.complexVisibilityMode
-        onTileClicked: context.setGlobalPreloaderEnabled(false)
         onLockInterface: locked => { globalInterfaceLock.enabled = locked }
         onSetOpenedTileModalityInterfaceLock:
             enabled =>
@@ -432,8 +431,7 @@ Rectangle
 
         anchors.fill: parent
         color: parent.color
-        enabled: context.globalPreloaderEnabled
-        visible: enabled && context.globalPreloaderVisible
+        visible: context.globalPreloaderVisible
     }
 
     Connections

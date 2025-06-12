@@ -151,6 +151,8 @@ WelcomeScreen::~WelcomeScreen()
 
 void WelcomeScreen::connectionToSystemEstablished(const QString& systemId)
 {
+    NX_VERBOSE(this, "Connected to system: %1", systemId);
+
     emit closeTile(systemId);
 }
 
@@ -247,6 +249,7 @@ void WelcomeScreen::openConnectingTile(std::optional<RemoteConnectionErrorCode> 
     executeLater(
         [this, systemId, errorMessage, isLoginError]()
         {
+            NX_VERBOSE(this, "Open tile, system: %1, login error: %2", systemId, isLoginError);
             emit openTile(systemId, errorMessage, isLoginError);
         },
         this);
@@ -276,6 +279,8 @@ bool WelcomeScreen::connectingTileExists() const
 
 void WelcomeScreen::setConnectingToSystem(const QString& value)
 {
+    NX_VERBOSE(this, "Connecting to system: %1", value);
+
     m_connectingSystemId = value;
 }
 
@@ -289,22 +294,10 @@ void WelcomeScreen::setGlobalPreloaderVisible(bool value)
     if (value == m_globalPreloaderVisible)
         return;
 
+    NX_VERBOSE(this, "Set preloader visible: %1", value);
+
     m_globalPreloaderVisible = value;
     emit globalPreloaderVisibleChanged(value);
-}
-
-bool WelcomeScreen::globalPreloaderEnabled() const
-{
-    return m_globalPreloaderEnabled;
-}
-
-void WelcomeScreen::setGlobalPreloaderEnabled(bool value)
-{
-    if (value == m_globalPreloaderEnabled)
-        return;
-
-    m_globalPreloaderEnabled = value;
-    emit globalPreloaderEnabledChanged();
 }
 
 void WelcomeScreen::setMessage(const QString& message)
