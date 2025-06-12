@@ -1140,7 +1140,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>Costum</translation>
+      <translation>Personalizzato</translation>
     </message>
   </context>
   <context>
@@ -4211,16 +4211,16 @@ License Key: %2</translation>
       <translation>Sbloccare</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation type="unfinished">Provide</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation type="unfinished">Authorize</translation>
     </message>
     <message>
       <source>Set</source>
       <translation type="unfinished">Set</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation>Accedi</translation>
     </message>
   </context>
   <context>

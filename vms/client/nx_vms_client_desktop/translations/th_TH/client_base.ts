@@ -4167,16 +4167,16 @@ License Key: %2</translation>
       <translation type="unfinished">Unlock</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation type="unfinished">Provide</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation>อนุญาต</translation>
     </message>
     <message>
       <source>Set</source>
       <translation type="unfinished">Set</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation>เข้าสู่ระบบ</translation>
     </message>
   </context>
   <context>

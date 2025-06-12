@@ -4167,16 +4167,16 @@ Kunci Lisensi: %2</translation>
       <translation>Buka kunci</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation>Menyediakan</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation>Otorisasi</translation>
     </message>
     <message>
       <source>Set</source>
       <translation>Setel</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation>Masuk</translation>
     </message>
   </context>
   <context>

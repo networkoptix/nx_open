@@ -4211,16 +4211,16 @@ Licensnyckel: %2</translation>
       <translation>Lås upp</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation>Förse</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation>Auktorisera</translation>
     </message>
     <message>
       <source>Set</source>
       <translation>Ställ in</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation>Logga in</translation>
     </message>
   </context>
   <context>

@@ -1140,7 +1140,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>Tilpasset</translation>
+      <translation>Egendefinert</translation>
     </message>
   </context>
   <context>
@@ -4211,16 +4211,16 @@ Lisensnøkkel: %2</translation>
       <translation>Lås opp</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation>Oppgi</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation>Autorisere</translation>
     </message>
     <message>
       <source>Set</source>
       <translation>Bruk</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation>Logg inn</translation>
     </message>
   </context>
   <context>

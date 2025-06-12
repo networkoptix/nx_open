@@ -4210,16 +4210,16 @@ License Key: %2</source>
       <translation>Kilidi Aç</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation>Sağlamak</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation>Yetkilendir</translation>
     </message>
     <message>
       <source>Set</source>
       <translation>Ayarla</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation>Oturum Aç</translation>
     </message>
   </context>
   <context>

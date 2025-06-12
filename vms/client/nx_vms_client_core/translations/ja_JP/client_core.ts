@@ -57,11 +57,6 @@
       <translation>%1 への接続を復旧した後、再度お試しください。</translation>
     </message>
     <message>
-      <source>%1 user login is temporarily unavailable</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 ユーザーのログインは一時的に利用できません</translation>
-    </message>
-    <message>
       <source>The server is incompatible.</source>
       <translation>サーバーに互換性がありません。</translation>
     </message>
@@ -188,6 +183,10 @@
     <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation>このユーザーはサイト管理者によって無効にされています。</translation>
+    </message>
+    <message>
+      <source>Failed to access site</source>
+      <translation>サイトへのアクセスに失敗しました</translation>
     </message>
   </context>
   <context>

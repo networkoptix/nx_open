@@ -4211,16 +4211,16 @@ License Key: %2</translation>
       <translation>Ontgrendelen</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation type="unfinished">Provide</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation type="unfinished">Authorize</translation>
     </message>
     <message>
       <source>Set</source>
       <translation>Instellen</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation>Aanmelden</translation>
     </message>
   </context>
   <context>

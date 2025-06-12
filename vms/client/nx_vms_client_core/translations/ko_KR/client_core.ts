@@ -57,11 +57,6 @@
       <translation>%1에 대한 연결을 복원하고 다시 시도하십시오.</translation>
     </message>
     <message>
-      <source>%1 user login is temporarily unavailable</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 사용자 로그인을 일시적으로 사용할 수 없습니다</translation>
-    </message>
-    <message>
       <source>The server is incompatible.</source>
       <translation>서버가 호환되지 않습니다.</translation>
     </message>
@@ -188,6 +183,10 @@
     <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation type="unfinished">This user has been disabled by a site administrator.</translation>
+    </message>
+    <message>
+      <source>Failed to access site</source>
+      <translation type="unfinished">Failed to access site</translation>
     </message>
   </context>
   <context>

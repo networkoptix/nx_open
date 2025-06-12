@@ -57,11 +57,6 @@
       <translation>Pulihkan koneksi ke %1 dan coba lagi</translation>
     </message>
     <message>
-      <source>%1 user login is temporarily unavailable</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 login pengguna untuk sementara tidak tersedia</translation>
-    </message>
-    <message>
       <source>The server is incompatible.</source>
       <translation>Server tidak kompatibel.</translation>
     </message>
@@ -188,6 +183,10 @@
     <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation>User ini telah dinonaktifkan oleh administrator site.</translation>
+    </message>
+    <message>
+      <source>Failed to access site</source>
+      <translation>Gagal mengakses site</translation>
     </message>
   </context>
   <context>

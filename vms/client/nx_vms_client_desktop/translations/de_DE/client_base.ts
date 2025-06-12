@@ -4211,16 +4211,16 @@ Lizenzschlüssel: %2</translation>
       <translation>Freigeben</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation>Bereitstellung</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation type="unfinished">Authorize</translation>
     </message>
     <message>
       <source>Set</source>
       <translation>Übernehmen</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation>Anmelden</translation>
     </message>
   </context>
   <context>

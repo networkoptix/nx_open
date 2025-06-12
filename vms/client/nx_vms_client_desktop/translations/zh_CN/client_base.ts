@@ -4167,16 +4167,16 @@ License Key: %2</translation>
       <translation>解锁</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation type="unfinished">Provide</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation type="unfinished">Authorize</translation>
     </message>
     <message>
       <source>Set</source>
       <translation type="unfinished">Set</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation>登录</translation>
     </message>
   </context>
   <context>

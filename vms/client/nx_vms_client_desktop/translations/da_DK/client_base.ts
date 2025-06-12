@@ -4211,16 +4211,16 @@ Licensnøgle: %2</translation>
       <translation>Lås op</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation type="unfinished">Provide</translation>
-    </message>
-    <message>
       <source>Authorize</source>
       <translation type="unfinished">Authorize</translation>
     </message>
     <message>
       <source>Set</source>
       <translation type="unfinished">Set</translation>
+    </message>
+    <message>
+      <source>Log In</source>
+      <translation>Log ind</translation>
     </message>
   </context>
   <context>

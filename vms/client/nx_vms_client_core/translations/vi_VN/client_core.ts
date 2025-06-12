@@ -57,11 +57,6 @@
       <translation>Khôi phục kết nối với %1 và thử lại</translation>
     </message>
     <message>
-      <source>%1 user login is temporarily unavailable</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 người dùng đăng nhập tạm thời không khả dụng</translation>
-    </message>
-    <message>
       <source>The server is incompatible.</source>
       <translation>Máy chủ không tương thích.</translation>
     </message>
@@ -188,6 +183,10 @@
     <message>
       <source>This user has been disabled by a site administrator.</source>
       <translation>Người dùng này đã bị quản trị viên Chi nhánh vô hiệu hóa.</translation>
+    </message>
+    <message>
+      <source>Failed to access site</source>
+      <translation>Không thể truy cập Chi nhánh</translation>
     </message>
   </context>
   <context>
