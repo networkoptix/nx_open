@@ -64,8 +64,11 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject* parent):
         {
             auto future = m_filterWatcher->future();
 
-            if (!NX_ASSERT(future.isValid() && future.isFinished()))
+            if (!future.isValid() || !future.isFinished())
+            {
+                NX_VERBOSE(this, "Invalid or cancelled future on finished signal");
                 return;
+            }
 
             auto bookmarks = future.results();
 
