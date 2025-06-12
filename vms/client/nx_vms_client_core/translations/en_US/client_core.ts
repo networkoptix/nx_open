@@ -57,11 +57,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>%1 user login is temporarily unavailable</source>
-        <comment>%1 is the short cloud name (like Cloud)</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>The server is incompatible.</source>
         <translation></translation>
     </message>
@@ -188,6 +183,10 @@
     <message>
         <source>This user has been disabled by a site administrator.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Failed to access site</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

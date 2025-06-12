@@ -4210,16 +4210,16 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
-        <source>Provide</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Authorize</source>
         <translation></translation>
     </message>
     <message>
         <source>Set</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Log In</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
