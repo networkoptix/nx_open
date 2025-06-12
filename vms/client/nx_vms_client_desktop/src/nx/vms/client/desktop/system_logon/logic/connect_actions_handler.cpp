@@ -583,9 +583,6 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                 connect(d->reconnectDialog, &QDialog::rejected, this,
                     [this]()
                     {
-                        if (context()->user())
-                            appContext()->clientStateHandler()->clientDisconnected();
-
                         disconnectFromServer(DisconnectFlag::Force);
                         if (!qnRuntime->isDesktopMode())
                             menu()->trigger(ui::action::DelayedForcedExitAction);
@@ -909,7 +906,7 @@ void ConnectActionsHandler::updatePreloaderVisibility()
 
 void ConnectActionsHandler::at_connectAction_triggered()
 {
-    NX_VERBOSE(this, "Connect to server triggered");
+    NX_DEBUG(this, "Connect to server triggered, state: %1", d->logicalState);
 
     const auto actionParameters = menu()->currentParameters(sender());
 
@@ -943,6 +940,9 @@ void ConnectActionsHandler::at_connectAction_triggered()
         NX_VERBOSE(this, "Forcefully cleaning the state");
         disconnectFromServer(DisconnectFlag::Force);
     }
+
+    // Make sure we are disconnected now.
+    NX_ASSERT(d->logicalState == LogicalState::disconnected, "Unexpected state: %1", d->logicalState);
 
     if (actionParameters.hasArgument(Qn::LogonDataRole))
     {
@@ -1126,13 +1126,10 @@ void ConnectActionsHandler::at_disconnectAction_triggered()
     if (parameters.hasArgument(Qn::ForceRole) && parameters.argument(Qn::ForceRole).toBool())
         flags |= DisconnectFlag::Force;
 
-    NX_DEBUG(this, "Disconnecting from the server");
-    const bool wasLoggedIn = (bool) context()->user();
+    NX_DEBUG(this, "Disconnect action triggered");
+
     if (!disconnectFromServer(flags))
         return;
-
-    if (wasLoggedIn)
-        appContext()->clientStateHandler()->clientDisconnected();
 
     menu()->trigger(ui::action::RemoveSystemFromTabBarAction);
     emit mainWindow()->welcomeScreen()->dropConnectingState();
@@ -1267,18 +1264,25 @@ void ConnectActionsHandler::at_logoutFromCloud()
 
 bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
 {
-    NX_INFO(this, "Disconnecting from the current server (flags %1)", int(flags));
     const bool force = flags.testFlag(DisconnectFlag::Force);
+    const bool wasLoggedIn = !context()->user().isNull();
+    NX_INFO(this, "Disconnect from server, state: %1, login: %2, flags: %3",
+        d->logicalState, wasLoggedIn, (int) flags);
 
     if (flags.testFlag(DisconnectFlag::ClearAutoLogin))
         appContext()->localSettings()->lastUsedConnection = {};
 
-    appContext()->clientStateHandler()->storeSystemSpecificState();
+    if (wasLoggedIn)
+        appContext()->clientStateHandler()->storeSystemSpecificState();
+
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force))
     {
         NX_ASSERT(!force, "Forced exit must close connection");
         return false;
     }
+
+    if (wasLoggedIn)
+        appContext()->clientStateHandler()->clientDisconnected();
 
     if (flags.testFlag(DisconnectFlag::SwitchingServer))
     {

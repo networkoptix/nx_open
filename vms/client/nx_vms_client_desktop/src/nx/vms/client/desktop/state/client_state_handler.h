@@ -146,7 +146,7 @@ public:
         core::LogonData logonData);
 
     /**
-     * Handle state saving on explicit disconnect. System-specific state will be updated.
+     * Clear session state and ID.
      */
     void clientDisconnected();
 

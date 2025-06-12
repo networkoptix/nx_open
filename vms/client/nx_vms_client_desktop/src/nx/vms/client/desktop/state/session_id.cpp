@@ -17,10 +17,12 @@ QByteArray makeSessionId(const QString& systemId, const QString& userName)
     return hash.result();
 }
 
+const QByteArray kEmptySessionId = makeSessionId(QString(), QString());
+
 } // namespace
 
 SessionId::SessionId():
-    SessionId(QString(), QString())
+    m_bytes(kEmptySessionId)
 {
     // Actual values for the empty session id must correspond to empty system and user ids.
 }
@@ -31,6 +33,16 @@ SessionId::SessionId(const QString& systemId, const QString& userId):
     m_userId(userId)
 {
     NX_ASSERT(m_bytes.size() == SessionId::kDataSize);
+}
+
+bool SessionId::isEmpty() const
+{
+    return m_bytes == kEmptySessionId;
+}
+
+SessionId::operator bool() const
+{
+    return !isEmpty();
 }
 
 SessionId SessionId::deserialized(const QByteArray& serializedValue)

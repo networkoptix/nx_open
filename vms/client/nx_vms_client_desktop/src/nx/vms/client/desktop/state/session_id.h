@@ -21,6 +21,9 @@ struct NX_VMS_CLIENT_DESKTOP_API SessionId
     SessionId();
     SessionId(const QString& systemId, const QString& userId);
 
+    bool isEmpty() const;
+    explicit operator bool() const;
+
     static SessionId deserialized(const QByteArray& serializedValue);
     QByteArray serialized() const;
 
