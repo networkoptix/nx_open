@@ -135,18 +135,8 @@
 <context>
     <name>CloudConnectionHelpSheet</name>
     <message>
-        <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to the %1</source>
-        <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Log in to the site in %1</source>
         <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
-        <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -154,21 +144,31 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to the %1</source>
-        <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Connect to %1 by site owner’s account</source>
-        <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open Site Settings page and click “change” link next to the owner&apos;s name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>OK</source>
+        <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
