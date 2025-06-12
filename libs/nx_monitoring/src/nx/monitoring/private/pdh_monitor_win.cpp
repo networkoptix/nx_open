@@ -51,6 +51,11 @@ bool parseDiskDescription(LPCWSTR description, int* id, LPCWSTR* partitions)
     return true;
 }
 
+QString formatDword(DWORD dword)
+{
+    return QString("0x%1").arg(dword, 8, 16, '0');
+}
+
 } // namespace
 
 #define INVOKE(expression) \
@@ -84,6 +89,11 @@ bool PdhMonitor::collectMonitoringData()
         addTotalCpuLoadCounter();
         addGpuTimeCounter();
         addDiskTimeCounter();
+
+        // Collect data twice on first run to init CPU counters, according to
+        // PdhGetFormattedCounterValue manual.
+        if (m_query != INVALID_HANDLE_VALUE)
+            INVOKE(PdhCollectQueryData(m_query));
     }
 
     if (m_query == INVALID_HANDLE_VALUE)
@@ -141,23 +151,19 @@ void PdhMonitor::addTotalCpuLoadCounter()
 
     const QString cpuQuery =
         nx::format("\\%1(_Total)\\%2", perfName(kProcessor), perfName(kProcessorTime));
-    if (INVOKE(PdhAddCounter(m_query,
-        reinterpret_cast<LPCWSTR>(cpuQuery.utf16()), 0, &m_totalCpuCounter)) == ERROR_SUCCESS)
+
+    if (!checkCountersExist(cpuQuery))
     {
-        if (checkCountersExist(cpuQuery))
-        {
-            // Skip the initial invalid zero value.
-            PDH_FMT_COUNTERVALUE counterVal;
-            PdhGetFormattedCounterValue(m_totalCpuCounter, PDH_FMT_DOUBLE, nullptr, &counterVal);
-        }
-        else
-        {
-            NX_INFO(this, "No cpu performance counters for query.");
-            m_totalCpuCounter = INVALID_HANDLE_VALUE;
-        }
-    }
-    else
         m_totalCpuCounter = INVALID_HANDLE_VALUE;
+        return;
+    }
+
+    if (INVOKE(PdhAddCounter(m_query,
+        reinterpret_cast<LPCWSTR>(cpuQuery.utf16()), 0, &m_totalCpuCounter)) != ERROR_SUCCESS)
+    {
+        NX_WARNING(this, "No CPU performance counters for: %1", cpuQuery);
+        m_totalCpuCounter = INVALID_HANDLE_VALUE;
+    }
 }
 
 void PdhMonitor::addGpuTimeCounter()
@@ -421,14 +427,14 @@ bool PdhMonitor::checkCountersExist(const QString& query) const
         &countersNumber,
         /* Expand all wildcards */ 0);
 
-    if (status != ERROR_SUCCESS)
+    if (status != ERROR_SUCCESS && status != PDH_MORE_DATA)
     {
         if (status == PDH_INVALID_PATH)
-             NX_WARNING(this, "Error in PdhExpandWildCardPathW: invalid query.");
+            NX_WARNING(this, "Error in PdhExpandWildCardPathW[%1]: invalid query.", query);
         else if (status == PDH_CSTATUS_NO_OBJECT)
-             NX_WARNING(this, "Error in PdhExpandWildCardPathW: no pdh object.");
+            NX_WARNING(this, "Error in PdhExpandWildCardPathW[%1]: no pdh object.", query);
         else
-             NX_WARNING(this, "Error in PdhExpandWildCardPathW.");
+            checkError(NX_FMT("PdhExpandWildCardPathW[%1]", query).toUtf8().constData(), status);
     }
 
     return countersNumber > 0;
@@ -467,12 +473,12 @@ DWORD PdhMonitor::checkError(const char* expression, DWORD status) const
         while (message.endsWith('\n') || message.endsWith('\r'))
             message.truncate(message.size() - 1);
 
-        NX_WARNING(this, "Error in %1: %2 (%3).", function, status, message);
+        NX_WARNING(this, "Error in %1: %2 (%3)", function, formatDword(status), message);
         LocalFree(buffer);
     }
     else
     {
-        NX_WARNING(this, "Error in %1: %2.", function, status);
+        NX_WARNING(this, "Error in %1: %2", function, formatDword(status));
     }
 
     return status;
