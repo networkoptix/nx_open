@@ -37,7 +37,7 @@ struct SystemContext::Private
 
     SystemContext* const q;
 
-    std::unique_ptr<QnPtzControllerPool> ptzControllerPool;
+    mutable std::unique_ptr<QnPtzControllerPool> ptzControllerPool;
     std::unique_ptr<UserWatcher> userWatcher;
     std::unique_ptr<WatermarkWatcher> watermarkWatcher;
     std::unique_ptr<ServerTimeWatcher> serverTimeWatcher;

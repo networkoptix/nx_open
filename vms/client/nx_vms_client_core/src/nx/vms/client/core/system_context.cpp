@@ -50,7 +50,6 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->serverRuntimeEventConnector = std::make_unique<ServerRuntimeEventConnector>();
             d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->cameraDataManager = std::make_unique<CameraDataManager>(this);
-            d->ptzControllerPool = std::make_unique<ptz::ControllerPool>(this);
             d->userWatcher = std::make_unique<UserWatcher>(this);
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
             d->serverStorageManager = std::make_unique<QnServerStorageManager>(this);
@@ -70,7 +69,6 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
         case Mode::crossSystem:
         {
             d->videoCache = std::make_unique<VideoCache>(this);
-            d->ptzControllerPool = std::make_unique<CrossSystemPtzControllerPool>(this);
             d->userWatcher = std::make_unique<UserWatcher>(this);
             d->cameraBookmarksManager = std::make_unique<QnCameraBookmarksManager>(this);
             d->cameraDataManager = std::make_unique<CameraDataManager>(this);
@@ -231,6 +229,18 @@ QnClientMessageProcessor* SystemContext::clientMessageProcessor() const
 
 QnPtzControllerPool* SystemContext::ptzControllerPool() const
 {
+    if (!NX_ASSERT(qApp->thread() == QThread::currentThread()))
+        return d->ptzControllerPool.get();
+
+    if (!d->ptzControllerPool)
+    {
+        SystemContext* context = const_cast<SystemContext*>(this);
+        if (mode() == Mode::crossSystem)
+            d->ptzControllerPool = std::make_unique<CrossSystemPtzControllerPool>(context);
+        else
+            d->ptzControllerPool = std::make_unique<ptz::ControllerPool>(context);
+    }
+
     return d->ptzControllerPool.get();
 }
 
