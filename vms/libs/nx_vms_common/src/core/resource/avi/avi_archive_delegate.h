@@ -100,8 +100,6 @@ private:
     bool initMetadata();
     void fillVideoLayout();
 
-    AVFormatContext* getFormatContext();
-
     bool findStreams();
     CodecParametersConstPtr getCodecContext(AVStream* stream);
     bool reopen() override;
