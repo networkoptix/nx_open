@@ -6814,12 +6814,16 @@ If you intended to move analytics data to another storage location, please conta
       <translation>停止匯出</translation>
     </message>
     <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>需要重新編碼。已重啟匯出。</translation>
-    </message>
-    <message>
       <source>Minimize</source>
       <translation>最小化</translation>
+    </message>
+    <message>
+      <source>Video transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>
@@ -8773,6 +8777,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
       <translation>解鎖這一部分的存檔以匯出其內容。</translation>
+    </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation type="unfinished">Audio transcoding required.</translation>
     </message>
   </context>
   <context>

@@ -1324,6 +1324,10 @@
       <source>File write error.</source>
       <translation>Error penulisan file.</translation>
     </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation>Diperlukan transcoding audio.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::common::SystemSettings</name>

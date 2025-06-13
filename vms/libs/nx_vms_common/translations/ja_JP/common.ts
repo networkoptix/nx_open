@@ -1324,6 +1324,10 @@
       <source>File write error.</source>
       <translation>ファイル書き込みエラー。</translation>
     </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation>音声のトランスコーディングが必要です。</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::common::SystemSettings</name>

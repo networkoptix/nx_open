@@ -6932,12 +6932,16 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
       <translation>Atura l'exportació</translation>
     </message>
     <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>La transcodificació és necessària. La sessió d'exportació s'ha reiniciat.</translation>
-    </message>
-    <message>
       <source>Minimize</source>
       <translation>Minimitza</translation>
+    </message>
+    <message>
+      <source>Video transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>
@@ -8919,6 +8923,10 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
       <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation type="unfinished">Audio transcoding required.</translation>
     </message>
   </context>
   <context>

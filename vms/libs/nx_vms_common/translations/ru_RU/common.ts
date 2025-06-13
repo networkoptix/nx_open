@@ -1501,6 +1501,10 @@
       <source>File write error.</source>
       <translation>Ошибка записи файла.</translation>
     </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation>Требуется транскодирование видео.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::common::SystemSettings</name>

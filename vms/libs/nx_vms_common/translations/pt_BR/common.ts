@@ -1383,6 +1383,10 @@
       <source>File write error.</source>
       <translation>Erro de gravação de arquivo.</translation>
     </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation type="unfinished">Audio transcoding required.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::common::SystemSettings</name>

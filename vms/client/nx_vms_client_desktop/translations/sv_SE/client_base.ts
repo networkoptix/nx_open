@@ -6932,12 +6932,16 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Stoppa export</translation>
     </message>
     <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>Omkodning krävs. Exportera sessionen startas om.</translation>
-    </message>
-    <message>
       <source>Minimize</source>
       <translation>Minimera</translation>
+    </message>
+    <message>
+      <source>Video transcoding is required. Export session restarted.</source>
+      <translation>Videoomkodning krävs. Exportsessionen har startats om.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding is required. Export session restarted.</source>
+      <translation>Ljudomkodning krävs. Exportsessionen har startats om.</translation>
     </message>
   </context>
   <context>
@@ -8919,6 +8923,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
       <translation>Lås upp den här delen av arkivet för att exportera dess innehåll.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation>Ljudomkodning krävs.</translation>
     </message>
   </context>
   <context>

@@ -6932,12 +6932,16 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Export stoppen</translation>
     </message>
     <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>Transcodering is vereist. Exportsessie opnieuw gestart.</translation>
-    </message>
-    <message>
       <source>Minimize</source>
       <translation>Minimaliseren</translation>
+    </message>
+    <message>
+      <source>Video transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>
@@ -8919,6 +8923,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
       <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation type="unfinished">Audio transcoding required.</translation>
     </message>
   </context>
   <context>

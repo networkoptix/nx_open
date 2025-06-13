@@ -1501,6 +1501,10 @@
       <source>File write error.</source>
       <translation>Chyba při zápisu souboru.</translation>
     </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation type="unfinished">Audio transcoding required.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::common::SystemSettings</name>

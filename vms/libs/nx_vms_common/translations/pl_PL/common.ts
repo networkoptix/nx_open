@@ -1501,6 +1501,10 @@
       <source>File write error.</source>
       <translation>Błąd zapisu pliku.</translation>
     </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation>Wymagane transkodowanie dźwięku.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::common::SystemSettings</name>

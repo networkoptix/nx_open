@@ -1383,6 +1383,10 @@
       <source>File write error.</source>
       <translation>Filskrivningsfel.</translation>
     </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation>Omkodning av ljud krävs.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::common::SystemSettings</name>

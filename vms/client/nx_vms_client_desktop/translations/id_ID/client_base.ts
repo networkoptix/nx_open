@@ -6814,12 +6814,16 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <translation>Hentikan Ekspor</translation>
     </message>
     <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>Transkode diperlukan. Sesi ekspor direstart.</translation>
-    </message>
-    <message>
       <source>Minimize</source>
       <translation>Minimalkan</translation>
+    </message>
+    <message>
+      <source>Video transcoding is required. Export session restarted.</source>
+      <translation>Transcoding video diperlukan. Sesi ekspor direstart.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding is required. Export session restarted.</source>
+      <translation>Transcoding audio diperlukan. Sesi ekspor direstart.</translation>
     </message>
   </context>
   <context>
@@ -8773,6 +8777,10 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
       <translation>Buka kunci bagian archive ini untuk mengekspor isinya.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation>Diperlukan transcoding audio.</translation>
     </message>
   </context>
   <context>

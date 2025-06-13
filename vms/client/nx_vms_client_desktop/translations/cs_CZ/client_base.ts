@@ -7168,12 +7168,16 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Zastavit export</translation>
     </message>
     <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>Je vyžadováno překódování. Export relace restartován.</translation>
-    </message>
-    <message>
       <source>Minimize</source>
       <translation>Minimalizovat</translation>
+    </message>
+    <message>
+      <source>Video transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>
@@ -9211,6 +9215,10 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
       <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation type="unfinished">Audio transcoding required.</translation>
     </message>
   </context>
   <context>

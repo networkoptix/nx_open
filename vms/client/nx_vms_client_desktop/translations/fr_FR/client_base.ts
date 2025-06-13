@@ -6932,12 +6932,16 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Arrêter l'exportation</translation>
     </message>
     <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>Un transcodage est nécessaire. La session d'exportation a redémarré.</translation>
-    </message>
-    <message>
       <source>Minimize</source>
       <translation>Minimiser</translation>
+    </message>
+    <message>
+      <source>Video transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding is required. Export session restarted.</source>
+      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
     </message>
   </context>
   <context>
@@ -8919,6 +8923,10 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
       <translation>Déverrouillez cette partie de l'archive pour exporter son contenu.</translation>
+    </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation type="unfinished">Audio transcoding required.</translation>
     </message>
   </context>
   <context>

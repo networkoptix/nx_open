@@ -6814,12 +6814,16 @@ If you intended to move analytics data to another storage location, please conta
       <translation>エクスポートを停止</translation>
     </message>
     <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>トランスコーディングが必要です。エクスポートセッションを再起動しました。</translation>
-    </message>
-    <message>
       <source>Minimize</source>
       <translation>最小化</translation>
+    </message>
+    <message>
+      <source>Video transcoding is required. Export session restarted.</source>
+      <translation>映像のトランスコーディングが必要です。エクスポートセッションを再起動しました。</translation>
+    </message>
+    <message>
+      <source>Audio transcoding is required. Export session restarted.</source>
+      <translation>音声のトランスコーディングが必要です。エクスポートセッションを再起動しました。</translation>
     </message>
   </context>
   <context>
@@ -8775,6 +8779,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
       <translation>エクスポートするには、アーカイブのこの部分をロック解除してください。</translation>
+    </message>
+    <message>
+      <source>Audio transcoding required.</source>
+      <translation>音声のトランスコーディングが必要です。</translation>
     </message>
   </context>
   <context>
