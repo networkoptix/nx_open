@@ -156,6 +156,8 @@ T.ComboBox
                         control.editText = text
                 }
 
+                inputMethodHints: control.inputMethodHints
+
                 onAccepted: control.accepted()
 
                 background: null

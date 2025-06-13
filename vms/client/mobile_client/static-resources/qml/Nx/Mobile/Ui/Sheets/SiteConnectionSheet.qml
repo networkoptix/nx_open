@@ -85,6 +85,8 @@ BottomSheet
         popupTitle: qsTr("Log in as")
         labelText: qsTr("Login")
 
+        inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
+
         enabled: !d.connectingNow
         onCurrentIndexChanged: d.resetErrors()
     }
