@@ -165,7 +165,7 @@
     <message>
       <source>Connect to %1 by site owner’s account</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
+      <translation>以站點所有者的帳號連接至 %1</translation>
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>

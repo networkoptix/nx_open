@@ -4176,7 +4176,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>ログイン</translation>
     </message>
   </context>
   <context>

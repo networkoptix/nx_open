@@ -4220,7 +4220,7 @@ Licensnøgle: %2</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Log ind</translation>
     </message>
   </context>
   <context>

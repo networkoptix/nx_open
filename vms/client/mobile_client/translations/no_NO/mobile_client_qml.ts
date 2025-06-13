@@ -160,7 +160,7 @@
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</translation>
+      <translation>Hvis systemet er &lt;font color=&apos;%2&apos;&gt; koblet&lt;/a&gt; til %1</translation>
     </message>
     <message>
       <source>Connect to %1 by site owner’s account</source>

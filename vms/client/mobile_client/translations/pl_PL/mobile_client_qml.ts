@@ -150,26 +150,26 @@
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</translation>
+      <translation>Jeżeli witryna &lt;font color=&apos;%2&apos;&gt;nie jest połączona&lt;/a&gt; z %1</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+      <translation>Kliknij &quot;Połącz witrynę z %1&quot; na karcie %1 w Administracji witryną</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</translation>
+      <translation>Jeżeli witryna &lt;font color=&apos;%2&apos;&gt;jest połączona&lt;/a&gt; z %1</translation>
     </message>
     <message>
       <source>Connect to %1 by site owner’s account</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
+      <translation>Połącz się z %1 za pomocą konta właściciela witryny</translation>
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
-      <translation type="unfinished">Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</translation>
+      <translation>Otwórz stronę Ustawienia witryny i kliknij „zmień” obok nazwy właściciela</translation>
     </message>
   </context>
   <context>

@@ -137,7 +137,7 @@
     <message>
       <source>Log in to the site in %1</source>
       <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
-      <translation type="unfinished">Log in to the site in %1</translation>
+      <translation>Logga in på webbplatsen i %1</translation>
     </message>
     <message>
       <source>Follow the steps of wizard</source>
@@ -150,26 +150,26 @@
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</translation>
+      <translation>Om webbplatsen &lt;font color=&apos;%2&apos;&gt;inte är ansluten&lt;/a&gt; till %1</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+      <translation>Klicka på &quot;Anslut webbplats till %1&quot; på fliken %1 i Webbplatsadministration</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</translation>
+      <translation>Om webbplatsen är &lt;font color=&apos;%2&apos;&gt;ansluten&lt;/a&gt; till %1</translation>
     </message>
     <message>
       <source>Connect to %1 by site owner’s account</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
+      <translation>Ansluten till %1 med systemägarens konto</translation>
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
-      <translation type="unfinished">Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</translation>
+      <translation>Öppna sidan Webbplatsinställningar och klicka på länken &quot;ändra&quot; bredvid ägarens namn&amp;apos</translation>
     </message>
   </context>
   <context>
@@ -534,7 +534,7 @@
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>Hur ansluter man?</translation>
     </message>
   </context>
   <context>
@@ -1023,11 +1023,11 @@
     <name>SitePlaceholderScreen</name>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Åtkomst till resurser nekad</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Webbplatser i avstängt eller avstängt tillstånd är inte tillgängliga</translation>
     </message>
   </context>
   <context>

@@ -4220,7 +4220,7 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Logga in</translation>
     </message>
   </context>
   <context>
@@ -6247,11 +6247,11 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>Videoomkodning krävs. Exportsessionen har startats om.</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
+      <translation>Ljudomkodning krävs. Exportsessionen har startats om.</translation>
     </message>
   </context>
   <context>
@@ -7012,7 +7012,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
-      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
+      <translation>Endast kamera- eller serverperioder som uppstod efter aktivering av detta alternativ kommer att importeras automatiskt. Observera: om du inaktiverar det här alternativet kommer alla offline-perioder som ännu inte har importerats att gå förlorade och inte kan återställas senare.</translation>
     </message>
   </context>
   <context>
@@ -7230,12 +7230,12 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
+      <translation>Kamerabytet är inte möjligt eftersom servern inte är tillgänglig.</translation>
     </message>
     <message>
       <source>%1 will be removed from the site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the site and replaced by the selected camera</translation>
+      <translation>%1 kommer att tas bort från webbplatsen och ersättas av den valda kameran</translation>
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
@@ -7243,7 +7243,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Some data and settings may not be supported for the new camera</source>
-      <translation type="unfinished">Some data and settings may not be supported for the new camera</translation>
+      <translation>Vissa data och inställningar kanske inte stöds för den nya kameran</translation>
     </message>
   </context>
   <context>
@@ -8082,9 +8082,9 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      <translation>
+        <numerusform>Händelselogg för perioden från %1 till %2 - Visar de första %n händelserna. För att hitta specifika händelser, justera datumintervallet eller använd ytterligare filter</numerusform>
+        <numerusform>Händelselogg för perioden från %1 till %2 - Visar de första %n händelserna. För att hitta specifika händelser, justera datumintervallet eller använd ytterligare filter</numerusform>
       </translation>
     </message>
   </context>
@@ -8219,7 +8219,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Ljudomkodning krävs.</translation>
     </message>
   </context>
   <context>

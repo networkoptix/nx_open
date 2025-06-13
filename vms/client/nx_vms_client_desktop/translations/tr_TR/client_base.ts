@@ -4219,7 +4219,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Oturum Aç</translation>
     </message>
   </context>
   <context>

@@ -4220,7 +4220,7 @@ Chave de licença: %2</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Entrar</translation>
     </message>
   </context>
   <context>
