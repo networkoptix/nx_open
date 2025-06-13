@@ -185,8 +185,16 @@ Page
         {
             id: downloadButton
 
-            x: parent.width - width - orientationModeButton.width - goToCameraButton.width
-            y: parent.height - height
+            parent: mainWindow.isPortraitLayout
+                ? preview
+                : playbackPanel
+
+            x: mainWindow.isPortraitLayout
+                ? parent.width - width - orientationModeButton.width - goToCameraButton.width
+                : orientationModeButton.x - width
+            y: mainWindow.isPortraitLayout
+                ? parent.height - height
+                : (parent.height - height) / 2
 
             visible: isDownloadAvailable && !preview.cannotDecryptMedia
             enabled: preview.player && !preview.cannotDecryptMedia
@@ -460,8 +468,7 @@ Page
         visible: !preview.cannotDecryptMedia
         x: mainWindow.isPortraitLayout
             ? 16
-            : parent.width - width - 16
-                -(mainWindow.isPortraitLayout ? 0 : orientationModeButton.width + 16)
+            : (downloadButton.visible ? downloadButton.x : orientationModeButton.x) - width - 16
         y: mainWindow.isPortraitLayout
             ? parent.height - height - 14
             : (parent.height - height) / 2
