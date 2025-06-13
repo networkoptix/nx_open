@@ -8,10 +8,13 @@
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/i18n/scoped_locale.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/std_string_utils.h>
 #include <transaction/fix_transaction_input_from_api.h>
 #include <transaction/transaction_descriptor.h>
 
 #include "details.h"
+
+namespace nx::utils { NX_UTILS_API std::string sha3_256(const std::string_view& data); }
 
 namespace ec2 {
 
@@ -209,6 +212,39 @@ public:
             ->checkSavePermissionFunc(m_queryProcessor->systemContext(), access, copy);
         if (!r)
             throwError(std::move(r));
+    }
+
+    template<typename T>
+    std::string calculateEtag(const T& item) const
+    {
+        return nx::utils::toHex(nx::utils::sha3_256(nx::reflect::json::serialize(item)));
+    }
+
+    template<typename T>
+    std::string calculateEtag(const std::vector<T>& list) const
+    {
+        if (list.empty())
+        {
+            return
+                []
+                {
+                    static auto etag = nx::utils::toHex(nx::utils::sha3_256({}));
+                    return etag;
+                }();
+        }
+
+        if (list.size() == 1)
+            return calculateEtag(list.front());
+
+        auto it = list.begin();
+        auto xored = nx::utils::sha3_256(nx::reflect::json::serialize(*it));
+        for (++it; it != list.end(); ++it)
+        {
+            auto next = nx::utils::sha3_256(nx::reflect::json::serialize(*it));
+            for (size_t i = 0; i < xored.size(); ++i)
+                xored[i] ^= next[i];
+        }
+        return nx::utils::toHex(xored);
     }
 
 protected:
