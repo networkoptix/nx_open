@@ -199,6 +199,20 @@ protected:
         const auto format = request.responseFormatOrThrow();
         Response response{
             responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
+        if constexpr (requires(Derived* d) { d->calculateEtag(data); })
+        {
+            if (auto etag = static_cast<Derived*>(this)->calculateEtag(data); !etag.empty())
+            {
+                const bool notModified = etag
+                    == nx::network::http::getHeaderValue(request.httpHeaders(), "If-None-Match");
+                nx::network::http::insertHeader(&response.httpHeaders, {"ETag", std::move(etag)});
+                if (notModified)
+                {
+                    response.statusCode = nx::network::http::StatusCode::notModified;
+                    return response;
+                }
+            }
+        }
         if (useReflect(request))
         {
             detail::filter(&data, filters);

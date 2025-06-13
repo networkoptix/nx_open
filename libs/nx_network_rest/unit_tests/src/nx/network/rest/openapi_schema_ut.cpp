@@ -17,6 +17,8 @@
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/rest_api_versions.h>
 
+namespace nx::utils { NX_UTILS_API std::string sha3_256(const std::string_view& data); }
+
 namespace nx::network::rest::json::test {
 
 NX_REFLECTION_INSTRUMENT(NestedTestData, (id)(name))
@@ -58,6 +60,53 @@ public:
         }
 
         void create(Model, const Request&) {}
+    };
+
+    template<typename Model>
+    class MockCrudEtagHandler: public CrudHandler<MockCrudEtagHandler<Model>>
+    {
+    public:
+        std::vector<Model> read(IdData, const Request&)
+        {
+            Model model;
+            model.name = "\u0414\u043e\u043c";
+            return {std::move(model)};
+        }
+
+        void create(Model, const Request&) {}
+
+        template<typename T>
+        std::string calculateEtag(const T& item) const
+        {
+            return nx::utils::toHex(nx::utils::sha3_256(nx::reflect::json::serialize(item)));
+        }
+
+        template<typename T>
+        std::string calculateEtag(const std::vector<T>& list) const
+        {
+            if (list.empty())
+            {
+                return
+                    []
+                    {
+                        static auto etag = nx::utils::toHex(nx::utils::sha3_256({}));
+                        return etag;
+                    }();
+            }
+
+            if (list.size() == 1)
+                return calculateEtag(list.front());
+
+            auto it = list.begin();
+            auto xored = nx::utils::sha3_256(nx::reflect::json::serialize(*it));
+            for (++it; it != list.end(); ++it)
+            {
+                auto next = nx::utils::sha3_256(nx::reflect::json::serialize(*it));
+                for (size_t i = 0; i < xored.size(); ++i)
+                    xored[i] ^= next[i];
+            }
+            return nx::utils::toHex(xored);
+        }
     };
 
     class MockBase64Handler: public CrudHandler<MockBase64Handler>
@@ -621,6 +670,16 @@ TEST_P(OpenApiSchemaTest, PerformanceCrudGet)
     pool.setSchemas(m_schemas);
     pool.registerHandler(PathRouter::replaceVersionWithRegex("rest/v{3-}/layouts/:id?"),
         GlobalPermission::none, std::make_unique<MockCrudHandler<LayoutData>>());
+    testPerformance(
+        &pool, {lit("GET /rest/{version}/layouts/%1 HTTP/1.1").arg(nx::Uuid::createUuid().toSimpleString())});
+}
+
+TEST_P(OpenApiSchemaTest, PerformanceCrudEtagGet)
+{
+    HandlerPool pool;
+    pool.setSchemas(m_schemas);
+    pool.registerHandler(PathRouter::replaceVersionWithRegex("rest/v{3-}/layouts/:id?"),
+        GlobalPermission::none, std::make_unique<MockCrudEtagHandler<LayoutData>>());
     testPerformance(
         &pool, {lit("GET /rest/{version}/layouts/%1 HTTP/1.1").arg(nx::Uuid::createUuid().toSimpleString())});
 }
