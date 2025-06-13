@@ -186,7 +186,7 @@
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation>サイトへのアクセスに失敗しました</translation>
+      <translation>サイトへのアクセスに失敗しました。</translation>
     </message>
   </context>
   <context>

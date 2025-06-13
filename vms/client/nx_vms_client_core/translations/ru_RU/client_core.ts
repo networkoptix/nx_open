@@ -186,7 +186,7 @@
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation type="unfinished">Failed to access site</translation>
+      <translation>Не удалось получить доступ к сайту</translation>
     </message>
   </context>
   <context>
