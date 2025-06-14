@@ -186,7 +186,7 @@
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>このグループのメンバーには無制限のサイト権限があります。管理者は、パワーユーザーの作成および変更、サイトの統合、 %1 への接続および解除ができます。</translation>
+      <translation>このグループのメンバーには無制限のサイト権限が付与されます。管理者は、パワーユーザーの作成および変更、サイトの統合、 %1 への接続および解除ができます。</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
