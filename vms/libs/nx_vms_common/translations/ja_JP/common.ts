@@ -229,7 +229,7 @@
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>このグループのメンバーには無制限のシステム権限があります。管理者は、パワーユーザーの作成および変更、システムの統合、 %1 への接続および解除ができます。</translation>
+      <translation>このグループのメンバーには無制限のシステム権限が付与されます。管理者は、パワーユーザーの作成および変更、システムの統合、 %1 への接続および解除ができます。</translation>
     </message>
   </context>
   <context>
