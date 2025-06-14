@@ -16,10 +16,6 @@
       <translation>Ny webbplats</translation>
     </message>
     <message>
-      <source>Your Site</source>
-      <translation>Din webbplats</translation>
-    </message>
-    <message>
       <source>Owner: %1</source>
       <comment>%1 is a user/company name</comment>
       <translation>Ägare: %1</translation>

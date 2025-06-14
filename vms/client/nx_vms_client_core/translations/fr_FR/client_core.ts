@@ -16,10 +16,6 @@
       <translation>Nouveau site</translation>
     </message>
     <message>
-      <source>Your Site</source>
-      <translation>Votre Site</translation>
-    </message>
-    <message>
       <source>Owner: %1</source>
       <comment>%1 is a user/company name</comment>
       <translation>Propriétaire: %1</translation>

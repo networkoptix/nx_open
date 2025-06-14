@@ -16,10 +16,6 @@
       <translation>Chi nhánh mới</translation>
     </message>
     <message>
-      <source>Your Site</source>
-      <translation>Chi nhánh của bạn</translation>
-    </message>
-    <message>
       <source>Owner: %1</source>
       <comment>%1 is a user/company name</comment>
       <translation>Chủ sở hữu: %1</translation>

@@ -16,10 +16,6 @@
       <translation type="unfinished">New Site</translation>
     </message>
     <message>
-      <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
-    </message>
-    <message>
       <source>Owner: %1</source>
       <comment>%1 is a user/company name</comment>
       <translation type="unfinished">Owner: %1</translation>

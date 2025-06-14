@@ -16,10 +16,6 @@
       <translation>Ny side</translation>
     </message>
     <message>
-      <source>Your Site</source>
-      <translation>Din side</translation>
-    </message>
-    <message>
       <source>Owner: %1</source>
       <comment>%1 is a user/company name</comment>
       <translation>Eier: %1</translation>

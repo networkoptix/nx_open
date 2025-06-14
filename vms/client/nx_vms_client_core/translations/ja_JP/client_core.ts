@@ -16,10 +16,6 @@
       <translation>新規サイト</translation>
     </message>
     <message>
-      <source>Your Site</source>
-      <translation>自分のサイト</translation>
-    </message>
-    <message>
       <source>Owner: %1</source>
       <comment>%1 is a user/company name</comment>
       <translation>オーナー: %1</translation>
