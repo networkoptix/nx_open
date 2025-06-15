@@ -380,6 +380,10 @@
       <source>Other results</source>
       <translation type="unfinished">Other results</translation>
     </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::OrganizationsModel</name>

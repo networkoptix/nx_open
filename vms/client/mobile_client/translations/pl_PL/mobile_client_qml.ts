@@ -517,29 +517,6 @@
     </message>
   </context>
   <context>
-    <name>OrganizationScreen</name>
-    <message>
-      <source>Search</source>
-      <translation>Szukaj</translation>
-    </message>
-    <message>
-      <source>No Sites</source>
-      <translation>Brak witryn</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Nic nie znaleziono</translation>
-    </message>
-    <message>
-      <source>Try changing the search parameters</source>
-      <translation>Spróbuj zmienić parametry wyszukiwania</translation>
-    </message>
-    <message>
-      <source>How to connect?</source>
-      <translation>Jak się połączyć?</translation>
-    </message>
-  </context>
-  <context>
     <name>PasswordTextField</name>
     <message>
       <source>Password</source>
@@ -817,10 +794,6 @@
       <translation>Nie znaleźliśmy żadnych organizacji. Spróbuj skontaktować się z działem wsparcia</translation>
     </message>
     <message>
-      <source>No Sites Found</source>
-      <translation>Nie znaleziono żadnych witryn</translation>
-    </message>
-    <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
       <translation>Nie znaleźliśmy żadnych witryn w Twojej sieci lokalnej. Spróbuj dodać serwery ręcznie lub zaloguj się konto w chmurze</translation>
     </message>
@@ -835,6 +808,18 @@
     <message>
       <source>Partners</source>
       <translation>Partnerzy</translation>
+    </message>
+    <message>
+      <source>No Sites</source>
+      <translation type="unfinished">No Sites</translation>
+    </message>
+    <message>
+      <source>How to connect?</source>
+      <translation type="unfinished">How to connect?</translation>
+    </message>
+    <message>
+      <source>Folder is empty</source>
+      <translation type="unfinished">Folder is empty</translation>
     </message>
   </context>
   <context>
@@ -992,6 +977,17 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Pole Hasło nie może być puste</translation>
+    </message>
+  </context>
+  <context>
+    <name>SiteList</name>
+    <message>
+      <source>Nothing Found</source>
+      <translation type="unfinished">Nothing Found</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
     </message>
   </context>
   <context>

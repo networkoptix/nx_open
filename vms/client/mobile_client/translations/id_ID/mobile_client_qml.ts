@@ -514,29 +514,6 @@
     </message>
   </context>
   <context>
-    <name>OrganizationScreen</name>
-    <message>
-      <source>Search</source>
-      <translation>Cari</translation>
-    </message>
-    <message>
-      <source>No Sites</source>
-      <translation>Tidak Ada Site</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Tidak ada yang ditemukan</translation>
-    </message>
-    <message>
-      <source>Try changing the search parameters</source>
-      <translation>Coba ubah parameter pencarian</translation>
-    </message>
-    <message>
-      <source>How to connect?</source>
-      <translation>Bagaimana cara mengkoneksikan?</translation>
-    </message>
-  </context>
-  <context>
     <name>PasswordTextField</name>
     <message>
       <source>Password</source>
@@ -814,10 +791,6 @@
       <translation>Kami tidak&apos; menemukan organisasi apa pun, coba hubungi support</translation>
     </message>
     <message>
-      <source>No Sites Found</source>
-      <translation>Tidak Ada Site Ditemukan</translation>
-    </message>
-    <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
       <translation>Kami tidak&apos; menemukan site apa pun di jaringan lokal Anda, coba tambahkan server secara manual atau masuk ke akun cloud Anda</translation>
     </message>
@@ -832,6 +805,18 @@
     <message>
       <source>Partners</source>
       <translation>Partner</translation>
+    </message>
+    <message>
+      <source>No Sites</source>
+      <translation type="unfinished">No Sites</translation>
+    </message>
+    <message>
+      <source>How to connect?</source>
+      <translation type="unfinished">How to connect?</translation>
+    </message>
+    <message>
+      <source>Folder is empty</source>
+      <translation type="unfinished">Folder is empty</translation>
     </message>
   </context>
   <context>
@@ -989,6 +974,17 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Bidang kata sandi tidak boleh kosong</translation>
+    </message>
+  </context>
+  <context>
+    <name>SiteList</name>
+    <message>
+      <source>Nothing Found</source>
+      <translation type="unfinished">Nothing Found</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
     </message>
   </context>
   <context>

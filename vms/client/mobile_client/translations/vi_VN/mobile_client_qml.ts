@@ -514,29 +514,6 @@
     </message>
   </context>
   <context>
-    <name>OrganizationScreen</name>
-    <message>
-      <source>Search</source>
-      <translation>Tìm kiếm</translation>
-    </message>
-    <message>
-      <source>No Sites</source>
-      <translation>Không có Chi nhánh</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Không tìm thấy kết quả nào</translation>
-    </message>
-    <message>
-      <source>Try changing the search parameters</source>
-      <translation>Hãy thử thay đổi các tham số tìm kiếm</translation>
-    </message>
-    <message>
-      <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
-    </message>
-  </context>
-  <context>
     <name>PasswordTextField</name>
     <message>
       <source>Password</source>
@@ -814,10 +791,6 @@
       <translation>Chúng tôi không tìm thấy bất kỳ tổ chức nào, hãy thử liên hệ với bộ phận hỗ trợ</translation>
     </message>
     <message>
-      <source>No Sites Found</source>
-      <translation>Không tìm thấy Chi nhánh nào</translation>
-    </message>
-    <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
       <translation>Chúng tôi không tìm thấy bất kỳ Chi nhánh nào trong mạng cục bộ, hãy thử thêm máy chủ theo cách thủ công hoặc đăng nhập vào tài khoản đám mây của bạn</translation>
     </message>
@@ -832,6 +805,18 @@
     <message>
       <source>Partners</source>
       <translation>Đối tác</translation>
+    </message>
+    <message>
+      <source>No Sites</source>
+      <translation type="unfinished">No Sites</translation>
+    </message>
+    <message>
+      <source>How to connect?</source>
+      <translation type="unfinished">How to connect?</translation>
+    </message>
+    <message>
+      <source>Folder is empty</source>
+      <translation type="unfinished">Folder is empty</translation>
     </message>
   </context>
   <context>
@@ -989,6 +974,17 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Mật khẩu không được để trống</translation>
+    </message>
+  </context>
+  <context>
+    <name>SiteList</name>
+    <message>
+      <source>Nothing Found</source>
+      <translation type="unfinished">Nothing Found</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
     </message>
   </context>
   <context>

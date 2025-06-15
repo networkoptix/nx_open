@@ -515,29 +515,6 @@
     </message>
   </context>
   <context>
-    <name>OrganizationScreen</name>
-    <message>
-      <source>Search</source>
-      <translation>Sök</translation>
-    </message>
-    <message>
-      <source>No Sites</source>
-      <translation>Inga sajter</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Ingenting hittades</translation>
-    </message>
-    <message>
-      <source>Try changing the search parameters</source>
-      <translation>Försök att ändra sökparametrar</translation>
-    </message>
-    <message>
-      <source>How to connect?</source>
-      <translation>Hur ansluter man?</translation>
-    </message>
-  </context>
-  <context>
     <name>PasswordTextField</name>
     <message>
       <source>Password</source>
@@ -815,10 +792,6 @@
       <translation>Vi hittade&apos;inga organisationer, försök kontakta supporten</translation>
     </message>
     <message>
-      <source>No Sites Found</source>
-      <translation>Inga platser hittades</translation>
-    </message>
-    <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
       <translation>Vi hittade inga webbplatser på ditt lokala nätverk, försök lägga till servrar manuellt eller logga in på ditt molnkonto</translation>
     </message>
@@ -833,6 +806,18 @@
     <message>
       <source>Partners</source>
       <translation>Partners</translation>
+    </message>
+    <message>
+      <source>No Sites</source>
+      <translation type="unfinished">No Sites</translation>
+    </message>
+    <message>
+      <source>How to connect?</source>
+      <translation type="unfinished">How to connect?</translation>
+    </message>
+    <message>
+      <source>Folder is empty</source>
+      <translation type="unfinished">Folder is empty</translation>
     </message>
   </context>
   <context>
@@ -990,6 +975,17 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Lösenordsfältet får inte vara tomt</translation>
+    </message>
+  </context>
+  <context>
+    <name>SiteList</name>
+    <message>
+      <source>Nothing Found</source>
+      <translation type="unfinished">Nothing Found</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
     </message>
   </context>
   <context>

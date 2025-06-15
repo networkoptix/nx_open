@@ -514,29 +514,6 @@
     </message>
   </context>
   <context>
-    <name>OrganizationScreen</name>
-    <message>
-      <source>Search</source>
-      <translation>搜尋</translation>
-    </message>
-    <message>
-      <source>No Sites</source>
-      <translation>沒有站點</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>未找到任何內容</translation>
-    </message>
-    <message>
-      <source>Try changing the search parameters</source>
-      <translation>嘗試更改搜尋參數</translation>
-    </message>
-    <message>
-      <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
-    </message>
-  </context>
-  <context>
     <name>PasswordTextField</name>
     <message>
       <source>Password</source>
@@ -814,10 +791,6 @@
       <translation>我們沒有找到任何組織，請聯絡技術支援</translation>
     </message>
     <message>
-      <source>No Sites Found</source>
-      <translation>未找到站點</translation>
-    </message>
-    <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
       <translation>我們在你的區域網路沒有找到任何站點，試著手動加入伺服器或登入你的cloud帳號</translation>
     </message>
@@ -832,6 +805,18 @@
     <message>
       <source>Partners</source>
       <translation>合作夥伴</translation>
+    </message>
+    <message>
+      <source>No Sites</source>
+      <translation type="unfinished">No Sites</translation>
+    </message>
+    <message>
+      <source>How to connect?</source>
+      <translation type="unfinished">How to connect?</translation>
+    </message>
+    <message>
+      <source>Folder is empty</source>
+      <translation type="unfinished">Folder is empty</translation>
     </message>
   </context>
   <context>
@@ -989,6 +974,17 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>密碼欄位不能為空</translation>
+    </message>
+  </context>
+  <context>
+    <name>SiteList</name>
+    <message>
+      <source>Nothing Found</source>
+      <translation type="unfinished">Nothing Found</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
     </message>
   </context>
   <context>

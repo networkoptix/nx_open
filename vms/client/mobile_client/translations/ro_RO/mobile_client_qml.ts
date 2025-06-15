@@ -516,29 +516,6 @@
     </message>
   </context>
   <context>
-    <name>OrganizationScreen</name>
-    <message>
-      <source>Search</source>
-      <translation type="unfinished">Search</translation>
-    </message>
-    <message>
-      <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
-    </message>
-    <message>
-      <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
-    </message>
-    <message>
-      <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
-    </message>
-  </context>
-  <context>
     <name>PasswordTextField</name>
     <message>
       <source>Password</source>
@@ -816,10 +793,6 @@
       <translation type="unfinished">We didn&apos;t find any organizations, try contacting support</translation>
     </message>
     <message>
-      <source>No Sites Found</source>
-      <translation type="unfinished">No Sites Found</translation>
-    </message>
-    <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
       <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</translation>
     </message>
@@ -834,6 +807,18 @@
     <message>
       <source>Partners</source>
       <translation type="unfinished">Partners</translation>
+    </message>
+    <message>
+      <source>No Sites</source>
+      <translation type="unfinished">No Sites</translation>
+    </message>
+    <message>
+      <source>How to connect?</source>
+      <translation type="unfinished">How to connect?</translation>
+    </message>
+    <message>
+      <source>Folder is empty</source>
+      <translation type="unfinished">Folder is empty</translation>
     </message>
   </context>
   <context>
@@ -991,6 +976,17 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation type="unfinished">Password field cannot be empty</translation>
+    </message>
+  </context>
+  <context>
+    <name>SiteList</name>
+    <message>
+      <source>Nothing Found</source>
+      <translation type="unfinished">Nothing Found</translation>
+    </message>
+    <message>
+      <source>Try changing the search parameters</source>
+      <translation type="unfinished">Try changing the search parameters</translation>
     </message>
   </context>
   <context>
