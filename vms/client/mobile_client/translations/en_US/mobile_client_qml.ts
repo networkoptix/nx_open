@@ -515,29 +515,6 @@
     </message>
 </context>
 <context>
-    <name>OrganizationScreen</name>
-    <message>
-        <source>Search</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>No Sites</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Nothing found</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Try changing the search parameters</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>How to connect?</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>PasswordTextField</name>
     <message>
         <source>Password</source>
@@ -815,10 +792,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>No Sites Found</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
         <translation></translation>
     </message>
@@ -832,6 +805,18 @@
     </message>
     <message>
         <source>Partners</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Sites</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How to connect?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder is empty</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -989,6 +974,17 @@
     </message>
     <message>
         <source>Password field cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SiteList</name>
+    <message>
+        <source>Nothing Found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try changing the search parameters</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

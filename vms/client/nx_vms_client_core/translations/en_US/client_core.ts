@@ -372,6 +372,10 @@
         <source>Other results</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Try changing the search parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::core::OrganizationsModel</name>
