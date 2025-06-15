@@ -57,7 +57,7 @@ namespace QnFusion {
      * \fn invoke
      *
      * This set of overloaded functions presents an interface for invoking
-     * setters and getters returned by member adaptors.
+     * setters and getters returned by member adapters.
      */
 
     template<class Base, class Derived, class T>

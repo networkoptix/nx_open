@@ -237,7 +237,7 @@ AnalyticsOverlayWidget::Private::Private(AnalyticsOverlayWidget* q):
 
 void AnalyticsOverlayWidget::Private::handleContentUpdated()
 {
-    // For implementing a correct widget licecycle the following code should be called here:
+    // For implementing a correct widget lifecycle the following code should be called here:
     //   q->update();
     // However this widget is only used on main scene which is redrawn at fixed rate.
     // Calls to update() are useless here and lead to increased CPU/GPU consumption.

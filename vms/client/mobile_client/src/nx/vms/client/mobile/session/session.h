@@ -52,7 +52,7 @@ public:
          */
         loading = static_cast<int>(QnConnectionState::Connected),
 
-        /** Occures only if initial connection process was successful.*/
+        /** Occurs only if initial connection process was successful.*/
         reconnecting = static_cast<int>(QnConnectionState::Reconnecting),
 
         /** Connection was successful, all needed information was received from the server. */
@@ -120,7 +120,7 @@ public:
      * @param connectionData Data for connection.
      * @param supposedSystemName Represents supposed system name which in some cases we are able
      * to predict before connection is done.
-     * @param callback Callback to signalize if initial connection is successfull or not.
+     * @param callback Callback to signalize if initial connection is successful or not.
      * @param parent Object parent. Used to initialize common module aware stuff.
      */
     static Holder create(

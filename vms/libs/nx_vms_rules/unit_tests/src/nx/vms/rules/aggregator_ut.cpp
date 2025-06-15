@@ -223,7 +223,7 @@ TEST_F(AggregatorTest, splitFunctionWorksProperly)
     adjustTime(kAggregationInterval);
 
     const auto aggregatedEvents = aggregator.popEvents();
-    // As all the events are aggegated by the event type, expects only one aggregated event here.
+    // As all the events are aggregated by the event type, expects only one aggregated event here.
     ASSERT_EQ(aggregatedEvents.size(), 1);
     // 2 "a" events and 4 "b" events were aggregated.
     ASSERT_EQ(aggregatedEvents.front()->count(), 6);

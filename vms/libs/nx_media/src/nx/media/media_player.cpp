@@ -198,7 +198,7 @@ public:
     // Timer for delayed call to presentNextFrame().
     QTimer* const execTimer;
 
-    // Timer for miscs periodic tasks
+    // Timer for misc periodic tasks
     QTimer* const miscTimer;
 
     // Last seek position. UTC time in msec.

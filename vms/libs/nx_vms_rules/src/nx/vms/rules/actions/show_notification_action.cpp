@@ -34,7 +34,7 @@ const ItemDescriptor& NotificationAction::manifest()
                     .validationPolicy = kBookmarkManagementValidationPolicy
                 }.toVariantMap()),
             makeFieldDescriptor<ActionFlagField>(utils::kAcknowledgeFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("Force Acknowledgement")),
+                NX_DYNAMIC_TRANSLATABLE(tr("Force Acknowledgment")),
                 "Specifies whether the user must manually acknowledge this event "
                 "on the event tile and create a bookmark."),
             utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),

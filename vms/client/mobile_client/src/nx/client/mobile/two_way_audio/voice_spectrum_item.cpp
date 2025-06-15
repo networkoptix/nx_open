@@ -185,7 +185,7 @@ int VoiceSpectrumItem::VisualizerDataGenerator::linesCount() const
     if (totalLineWidth > 0)
         return m_width / totalLineWidth;
 
-    NX_ASSERT(false, "Wrong line paramaters");
+    NX_ASSERT(false, "Wrong line parameters");
     return 0;
 }
 

@@ -50,7 +50,7 @@ void setAttrValue(
 struct SystemRegistrationData
 {
     /**%apidoc If specified, then an attempt to assign this id will be made.
-     * If the id was alredy taken, an error is raised.
+     * If the id was already taken, an error is raised.
      */
     std::optional<std::string> id = std::nullopt;
 

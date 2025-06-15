@@ -228,7 +228,7 @@ bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& constData)
     }
     else
     {
-        // Non-EOF empty packet means a "filler" packet. Is is used by NVR devices with their own
+        // Non-EOF empty packet means a "filler" packet. Is used by NVR devices with their own
         // archive in case when this archive plays synchronously across several cameras. Sometimes
         // a channel may stop and wait for another, but the connection to devices stays opened.
         m_eofPacketCounter = 0;

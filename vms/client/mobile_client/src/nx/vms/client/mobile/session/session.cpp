@@ -50,7 +50,7 @@ namespace {
 using namespace std::chrono;
 
 /**
- * Detects if error is fatal and there is no sense trying to reconect to the system.
+ * Detects if error is fatal and there is no sense trying to reconnect to the system.
  */
 bool isFatalError(RemoteConnectionErrorCode result)
 {
@@ -630,7 +630,7 @@ void Session::Private::handleFatalErrorOccurred(
     NX_DEBUG(this, "handleFatalErrorOccurred(): called");
 
     // Make sure fatal error handler is called outside the constructor of the session to
-    // allow all signals be connectected and handled.
+    // allow all signals be connected and handled.
     const auto fatalErrorHandler = nx::utils::guarded(this,
         [this, errorCode, moduleInformation]()
         {
