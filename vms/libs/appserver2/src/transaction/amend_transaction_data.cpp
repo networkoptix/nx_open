@@ -182,7 +182,7 @@ bool amendOutputDataIfNeeded(
     if (accessData == nx::network::rest::kSystemAccess || accessManager->hasPowerUserPermissions(accessData))
     {
         NX_VERBOSE(
-            kLogTag, "%1: Decyphering url '%2' password",
+            kLogTag, "%1: Deciphering url '%2' password",
             __func__, url.toDisplayString(QUrl::RemovePassword));
         url.setPassword(nx::crypt::decodeStringFromHexStringAES128CBC((url.password())));
     }

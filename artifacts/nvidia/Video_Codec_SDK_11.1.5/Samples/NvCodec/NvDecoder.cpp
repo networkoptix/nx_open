@@ -243,7 +243,7 @@ int NvDecoder::HandleVideoSequence(CUVIDEOFORMAT *pVideoFormat)
     else if (m_eChromaFormat == cudaVideoChromaFormat_422)
         m_eOutputFormat = cudaVideoSurfaceFormat_NV12;  // no 4:2:2 output format supported yet so make 420 default
 
-    // Check if output format supported. If not, check falback options
+    // Check if output format supported. If not, check fallback options
     if (!(decodecaps.nOutputFormatMask & (1 << m_eOutputFormat)))
     {
         if (decodecaps.nOutputFormatMask & (1 << cudaVideoSurfaceFormat_NV12))
@@ -278,7 +278,7 @@ int NvDecoder::HandleVideoSequence(CUVIDEOFORMAT *pVideoFormat)
     // AV1 has max width/height of sequence in sequence header
     if (pVideoFormat->codec == cudaVideoCodec_AV1 && pVideoFormat->seqhdr_data_length > 0)
     {
-        // dont overwrite if it is already set from cmdline or reconfig.txt
+        // don't overwrite if it is already set from cmdline or reconfig.txt
         if (!(m_nMaxWidth > pVideoFormat->coded_width || m_nMaxHeight > pVideoFormat->coded_height))
         {
             CUVIDEOFORMATEX *vidFormatEx = (CUVIDEOFORMATEX *)pVideoFormat;
@@ -398,7 +398,7 @@ int NvDecoder::ReconfigureDecoder(CUVIDEOFORMAT *pVideoFormat)
     reconfigParams.ulWidth = m_videoFormat.coded_width = pVideoFormat->coded_width;
     reconfigParams.ulHeight = m_videoFormat.coded_height = pVideoFormat->coded_height;
 
-    // Dont change display rect and get scaled output from decoder. This will help display app to present apps smoothly
+    // Don't change display rect and get scaled output from decoder. This will help display app to present apps smoothly
     reconfigParams.display_area.bottom = m_displayRect.b;
     reconfigParams.display_area.top = m_displayRect.t;
     reconfigParams.display_area.left = m_displayRect.l;
@@ -409,7 +409,7 @@ int NvDecoder::ReconfigureDecoder(CUVIDEOFORMAT *pVideoFormat)
     // If external reconfigure is called along with resolution change even if post processing params is not changed,
     // do full reconfigure params update
     if ((m_bReconfigExternal && bDecodeResChange) || m_bReconfigExtPPChange) {
-        // update display rect and target resolution if requested explicitely
+        // update display rect and target resolution if requested explicitly
         m_bReconfigExternal = false;
         m_bReconfigExtPPChange = false;
         m_videoFormat = *pVideoFormat;
@@ -505,11 +505,10 @@ int NvDecoder::HandlePictureDisplay(CUVIDPARSERDISPINFO *pDispInfo) {
     unsigned int nSrcPitch = 0;
     CUDA_DRVAPI_CALL(NvidiaDriverApiProxy::instance().cuCtxPushCurrent(m_cuContext));
 
-
     uint8_t *pDecodedFrame = m_frameQueue.getFreeFrame();
     if (pDecodedFrame == nullptr)
     {
-        NX_WARNING(this, "Not enought frame buffers!");
+        NX_WARNING(this, "Not enough frame buffers!");
         throw NVDECException::makeNVDECException("Out of memory", CUDA_ERROR_OUT_OF_MEMORY, __FUNCTION__, __FILE__, __LINE__);
         return 1;
     }

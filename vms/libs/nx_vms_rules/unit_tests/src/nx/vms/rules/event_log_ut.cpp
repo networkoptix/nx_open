@@ -221,7 +221,7 @@ TEST_F(EventLogTest, event_deviceDisconnected)
 }
 
 //-------------------------------------------------------------------------------------------------
-// Device IP Confict
+// Device IP Conflict
 
 TEST_F(EventLogTest, event_deviceIpConflict)
 {
@@ -466,7 +466,6 @@ TEST_F(EventLogTest, event_integrationDiagnostic_deviceAgent)
 
     thenSourceIs(kExpectedText, kExpectedIcon, kCamera1Id);
 }
-
 
 TEST_F(EventLogTest, event_integrationDiagnostic_plugin)
 {

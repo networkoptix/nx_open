@@ -275,7 +275,7 @@ void setGraphicsSettingsEarly(const QnStartupParameters& startupParams)
         }
 
         // Pass special env variables to enable vulkan video decoding.
-        // This sould be done before creation of vulkan instance.
+        // This should be done before creation of vulkan instance.
         static const char* kEnableVulkanVideoIntel = "ANV_VIDEO_DECODE";
         static const char* kEnableVulkanVideoAmd = "RADV_PERFTEST";
 
@@ -561,7 +561,6 @@ int runApplication(int argc, char** argv)
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, lit("/etc/xdg"));
     QSettings::setPath(QSettings::NativeFormat, QSettings::SystemScope, lit("/etc/xdg"));
 #endif
-
 
 #ifdef Q_OS_MAC
     mac_restoreFileAccess();

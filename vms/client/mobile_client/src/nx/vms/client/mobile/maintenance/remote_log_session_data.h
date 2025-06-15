@@ -10,7 +10,7 @@ namespace nx::vms::client::mobile {
 
 struct RemoteLogSessionData
 {
-    qint64 endTimeMs; //< End time of remote loggin session, in milliseconds since epoch.
+    qint64 endTimeMs; //< End time of remote login session, in milliseconds since epoch.
     std::string sessionId;
 };
 NX_REFLECTION_INSTRUMENT(RemoteLogSessionData, (endTimeMs)(sessionId))

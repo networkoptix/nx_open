@@ -422,7 +422,6 @@ INSTANTIATE_TEST_SUITE_P(CommonSet,
     ActionFieldTest,
     ::testing::ValuesIn(kFormatResults));
 
-
 TEST_F(ActionFieldTest, TargetUsersField)
 {
     UuidSelection selection;
@@ -487,7 +486,7 @@ TEST_F(ActionFieldTest, EventParametersHelperVisibleValuesAnyEvent)
     auto visibleElements = utils::EventParameterHelper::instance()->getVisibleEventParameters(
         utils::type<TestEvent>(), systemContext(), {});
     ASSERT_FALSE(visibleElements.empty());
-    // List dont have parameters for soft trigger.
+    // List doesn't have parameters for soft trigger.
     ASSERT_FALSE(visibleElements.contains("user.name"));
     // List has element related to generic or analytics event.
     ASSERT_TRUE(visibleElements.contains("event.caption"));

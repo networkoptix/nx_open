@@ -133,7 +133,7 @@ bool DeviceHandle::createDevice(int width, int height, mfxU32 adapterNumber)
         D3DFMT_X8R8G8B8);
     if (FAILED(hr))
     {
-        NX_DEBUG(this, "Failed to check format converison nv12->rgb, error code %1",
+        NX_DEBUG(this, "Failed to check format conversion nv12->rgb, error code %1",
             std::system_category().message(hr));
         return false;
     }
