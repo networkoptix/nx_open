@@ -315,6 +315,7 @@ NX_REFLECTION_ENUM_CLASS(AccountChangedEventType,
     enabled2Fa,
     disabled2Fa,
     passwordChanged,
+    systemSharingsChanged,
     other);
 
 struct AccountChangedEvent

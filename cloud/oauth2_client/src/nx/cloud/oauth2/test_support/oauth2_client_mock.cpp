@@ -12,8 +12,8 @@ namespace nx::cloud::oauth2::client::test {
 
 using namespace db::api;
 
-Oauth2ClientMock::Oauth2ClientMock(Oauth2ClientMockManager& manager):
-    m_manager(manager)
+Oauth2ClientMock::Oauth2ClientMock(Oauth2ClientMockManager& manager, bool dummyMode /* = false */):
+    m_manager(manager), m_dummyMode(dummyMode)
 {
 }
 
@@ -22,6 +22,9 @@ void Oauth2ClientMock::issueToken(
     nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)>
         completionHandler)
 {
+    if (m_dummyMode)
+        return completionHandler(db::api::ResultCode::ok, IssueTokenResponse{});
+
     Oauth2ClientMockManager::RequestPath path = {
         api::kOauthTokenPath, nx::network::http::Method::post};
     processRequest<IssueTokenRequest, IssueTokenResponse>(
@@ -33,6 +36,9 @@ void Oauth2ClientMock::issueAuthorizationCode(
     nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)>
         completionHandler)
 {
+    if (m_dummyMode)
+        return completionHandler(db::api::ResultCode::ok, IssueCodeResponse{});
+
     Oauth2ClientMockManager::RequestPath path = {
         api::kOauthTokenPath, nx::network::http::Method::post};
     processRequest<IssueTokenRequest, IssueCodeResponse>(
@@ -44,6 +50,9 @@ void Oauth2ClientMock::issuePasswordResetCode(
     nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)>
         completionHandler)
 {
+    if (m_dummyMode)
+        return completionHandler(db::api::ResultCode::ok, IssueCodeResponse{});
+
     Oauth2ClientMockManager::RequestPath path = {
         api::kOauthPasswordResetCodePath, nx::network::http::Method::post};
     processRequest<IssuePasswordResetCodeRequest, IssueCodeResponse>(
@@ -55,6 +64,9 @@ void Oauth2ClientMock::introspectToken(
     nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::TokenIntrospectionResponse)>
         completionHandler)
 {
+    if (m_dummyMode)
+        return completionHandler(db::api::ResultCode::ok, TokenIntrospectionResponse{});
+
     Oauth2ClientMockManager::RequestPath path = {
         api::kOauthIntrospectPath, nx::network::http::Method::post};
     processRequest<TokenIntrospectionRequest, TokenIntrospectionResponse>(
@@ -63,6 +75,9 @@ void Oauth2ClientMock::introspectToken(
 
 void Oauth2ClientMock::logout(nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler)
 {
+    if (m_dummyMode)
+        return completionHandler(db::api::ResultCode::ok);
+
     Oauth2ClientMockManager::RequestPath path = {
         api::kOauthLogoutPath, nx::network::http::Method::delete_};
     processRequest<void>(path, std::move(completionHandler), Oauth2MockResult{});
@@ -72,6 +87,9 @@ void Oauth2ClientMock::clientLogout(
     const std::string& clientId,
     nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler)
 {
+    if (m_dummyMode)
+        return completionHandler(db::api::ResultCode::ok);
+
     Oauth2ClientMockManager::RequestPath path = {
         nx::network::http::rest::substituteParameters(api::kOauthClientLogoutPath, {clientId}),
         nx::network::http::Method::delete_};
@@ -82,6 +100,9 @@ void Oauth2ClientMock::getJwtPublicKeys(
     nx::MoveOnlyFunc<void(db::api::ResultCode, std::vector<nx::network::jwk::Key>)>
         completionHandler)
 {
+    if (m_dummyMode)
+        return completionHandler(db::api::ResultCode::ok, std::vector<nx::network::jwk::Key>{});
+
     Oauth2ClientMockManager::RequestPath path = {
         api::kOauthJwksPath, nx::network::http::Method::get};
     processRequest<std::vector<nx::network::jwk::Key>>(path, std::move(completionHandler), Oauth2MockResult{});
@@ -91,6 +112,9 @@ void Oauth2ClientMock::getJwtPublicKeyByKid(
     const std::string& kid,
     nx::MoveOnlyFunc<void(db::api::ResultCode, nx::network::jwk::Key)> completionHandler)
 {
+    if (m_dummyMode)
+        return completionHandler(db::api::ResultCode::ok, nx::network::jwk::Key{});
+
     Oauth2ClientMockManager::RequestPath path = {
         nx::network::http::rest::substituteParameters(api::kOauthJwkByIdPath, {kid}),
         nx::network::http::Method::get};
@@ -101,6 +125,9 @@ void Oauth2ClientMock::introspectSession(
     const std::string& session,
     nx::MoveOnlyFunc<void(db::api::ResultCode, api::GetSessionResponse)> completionHandler)
 {
+    if (m_dummyMode)
+        return completionHandler(db::api::ResultCode::ok, api::GetSessionResponse{});
+
     Oauth2ClientMockManager::RequestPath path = {
         nx::network::http::rest::substituteParameters(api::kOauthSessionPath, {session}),
         nx::network::http::Method::get};
@@ -111,6 +138,9 @@ void Oauth2ClientMock::introspectSession(
 void Oauth2ClientMock::markSessionMfaVerified(
     const std::string& sessionId, nx::MoveOnlyFunc<void(db::api::ResultCode)> handler)
 {
+    if (m_dummyMode)
+        return handler(db::api::ResultCode::ok);
+
     Oauth2ClientMockManager::RequestPath path = {
         nx::network::http::rest::substituteParameters(api::kOauthSessionPath, {sessionId}),
         nx::network::http::Method::post};
@@ -124,34 +154,6 @@ void Oauth2ClientMock::notifyAccountUpdated(
 {
     // We don't want to check this handler in most cdb tests
     return completionHandler(db::api::ResultCode::ok);
-}
-
-
-void Oauth2ClientMock::internalLogout(
-    const std::string&, nx::MoveOnlyFunc<void(db::api::ResultCode)>)
-{
-    throw std::logic_error("not implemented");
-}
-
-void Oauth2ClientMock::internalIssueToken(
-    const std::optional<std::string>&,
-    const network::SocketAddress&,
-    const nx::cloud::db::api::IssueTokenRequest&,
-    nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)>)
-{
-    throw std::logic_error("not implemented");
-}
-
-void Oauth2ClientMock::internalClientLogout(
-    const std::string&, const std::string&, nx::MoveOnlyFunc<void(db::api::ResultCode)>)
-{
-    throw std::logic_error("not implemented");
-}
-
-void Oauth2ClientMock::internalGetSession(const std::string&,
-    nx::MoveOnlyFunc<void(db::api::ResultCode, nx::cloud::db::api::AuthSession)>)
-{
-    throw std::logic_error("not implemented");
 }
 
 void Oauth2ClientMockManager::setResponse(const RequestPath& requestPath, const Response& response)

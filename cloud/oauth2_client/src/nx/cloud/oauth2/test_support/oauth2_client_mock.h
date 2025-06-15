@@ -55,7 +55,9 @@ struct Oauth2MockResult
 class NX_OAUTH2_CLIENT_API Oauth2ClientMock: public AbstractOauth2Client
 {
 public:
-    Oauth2ClientMock(Oauth2ClientMockManager& manager);
+
+    // In the dummy mode it doesn't perform any checks, just returns 200 OK.
+    Oauth2ClientMock(Oauth2ClientMockManager& manager, bool dummyMode = false);
 
     void issueToken(
         const db::api::IssueTokenRequest& request,
@@ -97,25 +99,6 @@ public:
         nx::MoveOnlyFunc<void(db::api::ResultCode, api::GetSessionResponse)>
             completionHandler) override;
 
-    void internalClientLogout(
-        const std::string& email,
-        const std::string& clienId,
-        nx::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
-
-    void internalLogout(
-        const std::string& email, nx::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
-
-    void internalIssueToken(
-        const std::optional<std::string>& hostName,
-        const network::SocketAddress& clientEndpoint,
-        const nx::cloud::db::api::IssueTokenRequest& request,
-        nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)> handler) override;
-
-    void internalGetSession(
-        const std::string& sessionId,
-        nx::MoveOnlyFunc<void(db::api::ResultCode, nx::cloud::db::api::AuthSession)>
-            handler) override;
-
     void markSessionMfaVerified(
         const std::string& sessionId,
         nx::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
@@ -139,6 +122,7 @@ protected:
 
 private:
     Oauth2ClientMockManager& m_manager;
+    bool m_dummyMode = false;
 };
 
 template<class Request, class Response, class CompletionHandler>
