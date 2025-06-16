@@ -271,6 +271,7 @@ private:
     mutable nx::Mutex m_stopMutex;
     nx::WaitCondition m_stopWaitCond;
     mutable std::optional<bool> m_hasVideo;
+    mutable std::optional<AudioLayoutConstPtr> m_audioLayout;
 
     qint64 determineDisplayTime(bool reverseMode);
     void internalJumpTo(qint64 mksec);
