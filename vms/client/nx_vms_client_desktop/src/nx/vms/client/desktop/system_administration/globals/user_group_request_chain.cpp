@@ -193,7 +193,7 @@ public:
     void gatherRequests(std::vector<api::JsonRpcRequest>& requests, size_t maxRequests);
 
     template<typename Result, typename Callback>
-    void runRequests(const std::vector<api::JsonRpcRequest>& requests, Callback&& onSuccess);
+    void runRequests(std::vector<api::JsonRpcRequest> requests, Callback&& onSuccess);
 
     template <typename T, typename Result>
     std::function<void(const T&)> request(std::function<void(const Result&)> callback);
@@ -304,7 +304,7 @@ void UserGroupRequestChain::Private::gatherRequests(
 
 template<typename Result, typename Callback>
 void UserGroupRequestChain::Private::runRequests(
-    const std::vector<api::JsonRpcRequest>& requests, Callback&& onSuccess)
+    std::vector<api::JsonRpcRequest> requests, Callback&& onSuccess)
 {
     if (!q->connectedServerApi())
     {
@@ -316,7 +316,7 @@ void UserGroupRequestChain::Private::runRequests(
 
     currentRequest = q->connectedServerApi()->jsonRpcBatchCall(
         q->tokenHelper(),
-        requests,
+        std::move(requests),
         nx::utils::guarded(
             q,
             [this, onSuccess = std::move(onSuccess)](
@@ -398,7 +398,7 @@ std::function<void(const T&)> UserGroupRequestChain::Private::request(
 
             gatherRequests<T>(requests, kMaxRequestsPerBatch);
 
-            runRequests<Result>(requests,
+            runRequests<Result>(std::move(requests),
                 [callback = std::move(callback)](const Result& result)
                 {
                     callback(result);
@@ -417,7 +417,7 @@ std::function<void(const T&)> UserGroupRequestChain::Private::request(
 
             gatherRequests<T>(requests, kMaxRequestsPerBatch);
 
-            runRequests<void>(requests,
+            runRequests<void>(std::move(requests),
                 [callback = std::move(callback)]
                 {
                     callback();

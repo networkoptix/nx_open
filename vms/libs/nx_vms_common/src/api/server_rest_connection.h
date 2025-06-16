@@ -847,7 +847,7 @@ public:
 
     Handle jsonRpcBatchCall(
         nx::vms::common::SessionTokenHelperPtr helper,
-        const std::vector<nx::vms::api::JsonRpcRequest>& requests,
+        std::vector<nx::vms::api::JsonRpcRequest> requests,
         JsonRpcBatchResultCallback&& callback,
         nx::utils::AsyncHandlerExecutor executor = {},
         std::optional<Timeouts> timeouts = {});

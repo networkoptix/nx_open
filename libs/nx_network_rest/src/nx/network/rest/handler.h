@@ -110,8 +110,8 @@ public:
         delete_
     };
 
-    using SubscriptionCallback = nx::MoveOnlyFunc<void(
-        const QString& id, NotifyType, const std::shared_ptr<rapidjson::Document>& payload)>;
+    using SubscriptionCallback =
+        nx::MoveOnlyFunc<void(const QString& id, NotifyType, rapidjson::Document* payload)>;
 
     virtual nx::utils::Guard subscribe(const Request&, SubscriptionCallback)
     {

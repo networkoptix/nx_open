@@ -28,7 +28,7 @@ template<
 >
 class CrudHandler:
     public nx::network::rest::CrudHandler<Derived>,
-    public nx::network::rest::SubscriptionHandler<std::shared_ptr<rapidjson::Document>>
+    public nx::network::rest::SubscriptionHandler<rapidjson::Document>
 {
 public:
     using base_type = nx::network::rest::CrudHandler<Derived>;
@@ -178,7 +178,7 @@ public:
         if (it->isEmpty())
             throw Exception::invalidParameter(this->m_idParamName, *it);
 
-        if (auto c = request.jsonRpcContext(); c && c->crud == json_rpc::Crud::all)
+        if (const auto& c = request.jsonRpcContext(); c && c->crud == json_rpc::Crud::all)
             return QString("*");
 
         if (nx::Uuid::isUuidString(*it))

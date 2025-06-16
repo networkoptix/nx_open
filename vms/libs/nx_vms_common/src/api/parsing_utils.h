@@ -350,7 +350,7 @@ public:
     {
         if (!response.error && response.result)
         {
-            result = parseJsonValue<T>(response.result, &success);
+            result = parseJsonValue<T>(&response.result.value(), &success);
             return;
         }
 

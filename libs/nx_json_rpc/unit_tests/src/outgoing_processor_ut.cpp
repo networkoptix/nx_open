@@ -9,12 +9,12 @@ namespace nx::json_rpc::test {
 
 TEST(OutgoingProcessor, batchRequest)
 {
-    std::vector<Request> requests{
-        Request::create(1, "method1", QJsonObject{}),
-        Request::create("2", "method2", QJsonArray{})};
-    std::vector<Response> responses{
-        Response::makeResult("2", QJsonArray{}),
-        Response::makeResult(1, QJsonObject{})};
+    std::vector<Request> requests;
+    requests.emplace_back(Request::create(1, "method1", QJsonObject{}));
+    requests.emplace_back(Request::create("2", "method2", QJsonArray{}));
+    std::vector<Response> responses;
+    responses.emplace_back(Response::makeResult("2", QJsonArray{}));
+    responses.emplace_back(Response::makeResult(1, QJsonObject{}));
     auto responseJson{nx::json::serialized(responses, /*stripDefault*/ false)};
 
     detail::OutgoingProcessor processor(
@@ -25,8 +25,8 @@ TEST(OutgoingProcessor, batchRequest)
                 "{\"jsonrpc\":\"2.0\",\"id\":\"2\",\"method\":\"method2\",\"params\":[]}]");
         });
     std::vector<Response> expectedResponses;
-    processor.processBatchRequest(
-        requests, [&expectedResponses](auto value) { expectedResponses = std::move(value); });
+    processor.processBatchRequest(std::move(requests),
+        [&expectedResponses](auto value) { expectedResponses = std::move(value); });
     processor.onResponse(std::move(responseJson));
     ASSERT_EQ(
         nx::reflect::json::serialize(expectedResponses[0]),

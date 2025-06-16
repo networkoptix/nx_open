@@ -418,6 +418,11 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
         // ADL call.
         return deserialize(ctx, data);
     }
+    else if constexpr (std::is_same_v<T, rapidjson::Value>)
+    {
+        *data = std::move(ctx.value);
+        return {};
+    }
     else
     {
         reportUnsupportedType<T, false>();
@@ -489,7 +494,7 @@ private:
             std::optional<T> data;
             if constexpr (HasGet<WrappedField>::value)
             {
-                data = field.get(*m_data);
+                data = std::move(field.get(*m_data));
                 if (!data)
                     data.emplace(createDefault<T>());
             }

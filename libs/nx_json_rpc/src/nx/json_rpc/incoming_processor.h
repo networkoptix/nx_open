@@ -15,7 +15,7 @@ class NX_JSON_RPC_API IncomingProcessor
 {
 public:
     using ResponseHandler = nx::MoveOnlyFunc<void(Response)>;
-    using RequestHandler = nx::MoveOnlyFunc<void(const Request&, ResponseHandler)>;
+    using RequestHandler = nx::MoveOnlyFunc<void(Request, ResponseHandler)>;
 
     IncomingProcessor(RequestHandler handler = {}): m_handler(std::move(handler)) {}
     void processRequest(
@@ -24,12 +24,12 @@ public:
 private:
     struct BatchRequest
     {
-        std::unordered_map<Request*, std::unique_ptr<Request>> requests;
+        std::vector<bool> requests;
         std::vector<Response> responses;
         nx::MoveOnlyFunc<void(std::string)> handler;
     };
 
-    void onBatchResponse(BatchRequest* batchRequest, Request* request, Response response);
+    void onBatchResponse(BatchRequest* batchRequest, int request, Response response);
 
     void processBatchRequest(
         rapidjson::Document list, nx::MoveOnlyFunc<void(std::string)> handler);
@@ -40,7 +40,6 @@ private:
 private:
     RequestHandler m_handler;
     std::unordered_map<BatchRequest*, std::unique_ptr<BatchRequest>> m_batchRequests;
-    std::unordered_map<Request*, std::unique_ptr<Request>> m_requests;
 };
 
 } // namespace nx::json_rpc::detail

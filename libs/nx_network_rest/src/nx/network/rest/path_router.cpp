@@ -92,7 +92,7 @@ Handler* PathRouter::findHandlerOrThrow(Request* request, const QString& pathIgn
         return nullptr;
 
     bool needModify = true;
-    if (auto context = request->jsonRpcContext())
+    if (const auto& context = request->jsonRpcContext())
     {
         if (context->subs)
         {

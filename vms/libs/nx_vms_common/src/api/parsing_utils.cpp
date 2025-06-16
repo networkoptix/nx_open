@@ -32,35 +32,32 @@ nx::reflect::DeserializationResult deserializeResponse(
     rest::JsonRpcResultType* data,
     [[maybe_unused]] nx::reflect::json::DeserializationFlag skipErrors)
 {
-    auto document{std::make_shared<rapidjson::Document>()};
-    document->Parse(json.data(), json.size());
-    if (document->HasParseError())
+    rapidjson::Document document;
+    document.Parse(json.data(), json.size());
+    if (document.HasParseError())
     {
         return nx::reflect::DeserializationResult(
-            false, nx::reflect::json_detail::parseErrorToString(*document), std::string(json));
+            false, nx::reflect::json_detail::parseErrorToString(document), std::string(json));
     }
 
-    if (document->IsObject())
+    if (document.IsObject())
     {
-        nx::json_rpc::Response response{std::move(document)};
-        auto r{response.deserialize(*response.document)};
+        nx::json_rpc::Response response{document.GetAllocator()};
+        auto r{nx::reflect::json::deserialize({document.Move()}, &response)};
         if (r)
-        {
             *data = std::move(response);
-            return {};
-        }
         return r;
     }
 
-    if (!document->IsArray())
+    if (!document.IsArray())
         return nx::reflect::DeserializationResult(false, "Must be array or object", std::string{json});
 
     std::vector<nx::json_rpc::Response> responses;
-    responses.reserve(document->Size());
-    for (int i = 0; i < (int) document->Size(); ++i)
+    responses.reserve(document.Size());
+    for (int i = 0; i < (int) document.Size(); ++i)
     {
-        nx::json_rpc::Response response{.document = document};
-        auto r{response.deserialize((*document)[i])};
+        nx::json_rpc::Response response{document.GetAllocator()};
+        auto r{nx::reflect::json::deserialize({document[i]}, &response)};
         if (!r)
         {
             return nx::reflect::DeserializationResult(false,
@@ -71,7 +68,7 @@ nx::reflect::DeserializationResult deserializeResponse(
         }
         responses.push_back(std::move(response));
     }
-    *data = responses;
+    *data = std::move(responses);
     return {};
 }
 

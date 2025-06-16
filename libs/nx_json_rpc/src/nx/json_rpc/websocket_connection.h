@@ -22,8 +22,7 @@ class NX_JSON_RPC_API WebSocketConnection: public nx::network::aio::BasicPollabl
 public:
     using base_type = nx::network::aio::BasicPollable;
     using ResponseHandler = nx::MoveOnlyFunc<void(Response)>;
-    using RequestHandler = nx::MoveOnlyFunc<
-        void(const Request&, ResponseHandler, WebSocketConnection*)>;
+    using RequestHandler = nx::MoveOnlyFunc<void(Request, ResponseHandler, WebSocketConnection*)>;
     using OnDone = nx::MoveOnlyFunc<void(SystemError::ErrorCode, WebSocketConnection*)>;
 
     WebSocketConnection(

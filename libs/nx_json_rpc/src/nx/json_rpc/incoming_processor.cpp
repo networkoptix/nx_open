@@ -7,12 +7,12 @@
 namespace nx::json_rpc {
 
 static std::variant<Request, Response> deserialize(
-    rapidjson::Value& value, std::shared_ptr<rapidjson::Document> document)
+    rapidjson::Document::AllocatorType allocator, rapidjson::Value& value)
 {
-    Request request{std::move(document)};
-    auto r{request.deserialize(value)};
+    Request request{allocator};
+    auto r{nx::reflect::json::deserialize({value}, &request)};
     if (r)
-        return request;
+        return std::variant<Request, Response>{std::move(request)};
 
     return Response::makeError(request.responseId(), Error::invalidRequest,
         r.firstNonDeserializedField
@@ -45,8 +45,7 @@ void IncomingProcessor::processRequest(
         return processBatchRequest(std::move(data), std::move(handler));
     }
 
-    auto holder = std::make_shared<rapidjson::Document>(std::move(data));
-    auto requestOrError = deserialize(*holder, holder);
+    auto requestOrError = deserialize(data.GetAllocator(), data);
     if (std::holds_alternative<Response>(requestOrError))
         return sendResponse(std::get<Response>(std::move(requestOrError)), handler);
 
@@ -60,14 +59,13 @@ void IncomingProcessor::processRequest(
             handler);
     }
 
-    auto request = std::make_unique<Request>(std::move(jsonRpcRequest));
-    auto requestPtr = request.get();
-    m_requests.emplace(requestPtr, std::move(request));
-    NX_DEBUG(this, "Start %1 %2", (void*) requestPtr, idWithMethod(*requestPtr));
-    m_handler(*requestPtr,
-        [this, requestPtr, handler = std::move(handler)](auto response)
+    static std::atomic<uint64_t> request;
+    auto index = request.fetch_add(1);
+    NX_DEBUG(this, "Start #%1 %2", index, idWithMethod(jsonRpcRequest));
+    m_handler(std::move(jsonRpcRequest),
+        [this, index, handler = std::move(handler)](auto response)
         {
-            NX_ASSERT(m_requests.erase(requestPtr), "Failed to find request %1", (void*) requestPtr);
+            NX_DEBUG(this, "End #%1", index);
             sendResponse(std::move(response), handler);
         });
 }
@@ -76,13 +74,11 @@ void IncomingProcessor::processBatchRequest(
     rapidjson::Document list, nx::MoveOnlyFunc<void(std::string)> handler)
 {
     std::vector<Response> responses;
-    std::unordered_map<Request*, std::unique_ptr<Request>> requests;
-    std::vector<Request*> requestPtrs;
-    auto holder = std::make_shared<rapidjson::Document>(std::move(list));
-    for (auto it = holder->Begin(); it != holder->End(); ++it)
+    std::vector<Request> requests;
+    for (auto it = list.Begin(); it != list.End(); ++it)
     {
         auto& item = *it;
-        auto requestOrError = deserialize(item, holder);
+        auto requestOrError = deserialize(list.GetAllocator(), item);
         if (std::holds_alternative<Response>(requestOrError))
         {
             responses.emplace_back(std::get<Response>(std::move(requestOrError)));
@@ -92,10 +88,7 @@ void IncomingProcessor::processBatchRequest(
         auto jsonRpcRequest = std::get<Request>(std::move(requestOrError));
         if (m_handler)
         {
-            auto request = std::make_unique<Request>(std::move(jsonRpcRequest));
-            auto requestPtr = request.get();
-            requests.emplace(requestPtr, std::move(request));
-            requestPtrs.push_back(requestPtr);
+            requests.push_back(std::move(jsonRpcRequest));
         }
         else
         {
@@ -113,27 +106,28 @@ void IncomingProcessor::processBatchRequest(
         return;
     }
 
-    auto batchRequest = std::make_unique<BatchRequest>();
-    batchRequest->requests = std::move(requests);
+    auto batchRequest = std::make_unique<BatchRequest>(
+        BatchRequest{.requests = std::vector<bool>(requests.size(), true)});
     batchRequest->responses = std::move(responses);
     batchRequest->handler = std::move(handler);
     auto batchRequestPtr = batchRequest.get();
     m_batchRequests.emplace(batchRequestPtr, std::move(batchRequest));
-    for (const auto requestPtr: requestPtrs)
+    int index = 0;
+    for (auto& request: requests)
     {
-        NX_DEBUG(this, "Start %1 in %2", requestPtr, batchRequestPtr);
-        m_handler(*requestPtr,
-            [this, batchRequestPtr, requestPtr](auto response)
+        NX_DEBUG(this, "Start %1 request in %2", index, batchRequestPtr);
+        m_handler(std::move(request),
+            [this, batchRequestPtr, index](auto response)
             {
-                onBatchResponse(batchRequestPtr, requestPtr, std::move(response));
+                onBatchResponse(batchRequestPtr, index, std::move(response));
             });
+        ++index;
     }
 }
 
-void IncomingProcessor::onBatchResponse(
-    BatchRequest* batchRequest, Request* request, Response response)
+void IncomingProcessor::onBatchResponse(BatchRequest* batchRequest, int request, Response response)
 {
-    NX_DEBUG(this, "Received response %1 for %2 in %3",
+    NX_DEBUG(this, "Received response %1 for %2 request in %3",
         response.result
             ? "id " + nx::reflect::json::serialize(response.id)
             : "error " + nx::reflect::json::serialize(response),
@@ -146,9 +140,12 @@ void IncomingProcessor::onBatchResponse(
     if (!std::holds_alternative<std::nullptr_t>(response.id) || response.error)
         it->second->responses.push_back(std::move(response));
 
-    NX_ASSERT(
-        it->second->requests.erase(request), "Failed to find %1 in %2", request, batchRequest);
-    if (it->second->requests.empty())
+    if (NX_ASSERT(it->second->requests[request],
+        "Response for %1 in %2 is already processed", request, batchRequest))
+    {
+        it->second->requests[request] = false;
+    }
+    if (it->second->requests == std::vector<bool>(it->second->requests.size()))
     {
         auto responses = std::move(it->second->responses);
         auto handler = std::move(it->second->handler);

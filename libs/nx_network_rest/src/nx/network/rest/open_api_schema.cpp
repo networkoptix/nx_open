@@ -815,14 +815,14 @@ void OpenApiSchema::validateOrThrow(const QJsonObject& path,
             rapidjson::Value* params = nullptr;
             if (request->jsonRpcContext())
             {
-                params = request->jsonRpcContext()->request.params;
-                if (!params)
+                if (!request->jsonRpcContext()->request.params)
                 {
                     if (isRequired(body))
                         throw Exception::badRequest("Missing request content");
                     return;
                 }
 
+                params = &request->jsonRpcContext()->request.params.value();
                 json::validateParameters(
                     getObject(getObject(getObject(body, "content"), "application/json"), "schema"),
                     *params, /*name*/ {}, &unused);

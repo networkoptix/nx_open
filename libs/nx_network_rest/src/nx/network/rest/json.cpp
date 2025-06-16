@@ -655,13 +655,27 @@ void filter(rapidjson::Document* value, const nx::utils::DotNotationString& with
 
 } // namespace details
 
-QJsonValue serialized(rapidjson::Value& data)
+QJsonValue serialized(const rapidjson::Value& data)
 {
-    QJsonValue value;
-    const auto r{
-        nx::reflect::json::deserialize(nx::reflect::json::DeserializationContext{data}, &value)};
-    NX_ASSERT(r, "%1", r.toString());
-    return value;
+    if (data.IsObject() || data.IsArray())
+    {
+        auto document = QJsonDocument::fromJson(
+            QByteArray::fromStdString(nx::reflect::json_detail::getStringRepresentation(data)));
+        if (data.IsObject())
+            return document.object();
+        return document.array();
+    }
+    if (data.IsString())
+        return QJsonValue(data.GetString());
+    if (data.IsBool())
+        return QJsonValue(data.GetBool());
+    if (data.IsInt64())
+        return QJsonValue((qint64) data.GetInt64());
+    if (data.IsInt())
+        return QJsonValue(data.GetInt());
+    if (data.IsNumber())
+        return QJsonValue(data.GetDouble());
+    return {};
 }
 
 QByteArray serialized(const QJsonValue& value, Qn::SerializationFormat format)

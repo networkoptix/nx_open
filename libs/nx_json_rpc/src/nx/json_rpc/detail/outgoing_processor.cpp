@@ -200,14 +200,14 @@ void OutgoingProcessor::onResponse(rapidjson::Document data)
         return;
     }
 
-    Response response{.document = std::make_shared<rapidjson::Document>(std::move(data))};
-    if (!response.deserialize(*response.document))
+    Response response{.allocator = data.GetAllocator()};
+    if (!nx::reflect::json::deserialize({data}, &response))
     {
         NX_DEBUG(this,
             "Failed to deserialize response: %1",
-            nx::reflect::json_detail::getStringRepresentation(*response.document));
+            nx::reflect::json_detail::getStringRepresentation(data));
         response.error =
-            Error{Error::parseError, "Failed to deserialize response", &*response.document};
+            Error{Error::parseError, "Failed to deserialize response", std::move(data.Move())};
     }
 
     if (std::holds_alternative<std::nullptr_t>(response.id))
@@ -216,7 +216,7 @@ void OutgoingProcessor::onResponse(rapidjson::Document data)
         {
             NX_DEBUG(this,
                 "Apply %1 response to any previously sent request",
-                nx::reflect::json_detail::getStringRepresentation(*response.document));
+                nx::reflect::json_detail::getStringRepresentation(data));
             auto handler = std::move(m_awaitingResponses.begin()->second);
             m_awaitingResponses.clear();
             if (handler)
@@ -226,7 +226,7 @@ void OutgoingProcessor::onResponse(rapidjson::Document data)
         {
             NX_DEBUG(this,
                 "Ignore null or invalid response: %1",
-                nx::reflect::json_detail::getStringRepresentation(*response.document));
+                nx::reflect::json_detail::getStringRepresentation(data));
         }
         return;
     }
@@ -244,7 +244,7 @@ void OutgoingProcessor::onResponse(rapidjson::Document data)
 
     NX_DEBUG(this,
         "Ignore response without request: %1",
-        nx::reflect::json_detail::getStringRepresentation(*response.document));
+        nx::reflect::json_detail::getStringRepresentation(data));
 }
 
 void OutgoingProcessor::onArrayResponse(rapidjson::Document list)
@@ -252,18 +252,14 @@ void OutgoingProcessor::onArrayResponse(rapidjson::Document list)
     std::set<Key> batchResponseKeys;
     std::unordered_map<Id, Response> idResponses;
     std::vector<Response> nullResponses;
-    auto holder{std::make_shared<rapidjson::Document>(std::move(list))};
-    for (int i = 0; i < (int) holder->Size(); ++i)
+    for (int i = 0; i < (int) list.Size(); ++i)
     {
-        Response response{.document = holder};
-        if (!response.deserialize((*holder)[i]))
+        Response response{.allocator = list.GetAllocator()};
+        if (auto r = nx::reflect::json::deserialize({list[i]}, &response); !r)
         {
-            NX_DEBUG(this,
-                "Failed to deserialize response item %1: %2", i,
-                nx::reflect::json_detail::getStringRepresentation(*holder));
-            response.error = Error{Error::parseError,
-                NX_FMT("Failed to deserialize response item %1", i).toStdString(),
-                &*holder};
+            auto message = NX_FMT("Failed to deserialize response item %1: %2", i, r.toString());
+            NX_DEBUG(this, message);
+            response.error = Error{Error::parseError, message.toStdString()};
             nullResponses.push_back(std::move(response));
             continue;
         }
@@ -280,7 +276,7 @@ void OutgoingProcessor::onArrayResponse(rapidjson::Document list)
         {
             NX_DEBUG(this,
                 "Ignore not-requested batch response item %1: %2", i,
-                nx::reflect::json_detail::getStringRepresentation(*holder));
+                nx::reflect::json_detail::getStringRepresentation(list[i]));
             continue;
         }
 
@@ -310,7 +306,7 @@ void OutgoingProcessor::onArrayResponse(rapidjson::Document list)
     {
         NX_DEBUG(this,
             "Ignore null or invalid batch response: %1",
-            nx::reflect::json_detail::getStringRepresentation(*holder));
+            nx::reflect::json_detail::getStringRepresentation(list));
         return;
     }
 
@@ -318,7 +314,7 @@ void OutgoingProcessor::onArrayResponse(rapidjson::Document list)
     {
         NX_DEBUG(this,
             "Mixed ids of %1 batch requests in response: %1", batchResponseKeys,
-            nx::reflect::json_detail::getStringRepresentation(*holder));
+            nx::reflect::json_detail::getStringRepresentation(list));
     }
 
     for (Key batchResponseKey: batchResponseKeys)
