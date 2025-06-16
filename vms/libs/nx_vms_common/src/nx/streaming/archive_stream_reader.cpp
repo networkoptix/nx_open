@@ -235,9 +235,13 @@ bool QnArchiveStreamReader::hasVideo() const
 
 AudioLayoutConstPtr QnArchiveStreamReader::getDPAudioLayout() const
 {
-    if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
-        m_delegate->open(resource(), m_archiveIntegrityWatcher);
-    return m_delegate->getAudioLayout();
+    if (!m_audioLayout.has_value())
+    {
+        if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
+            m_delegate->open(resource(), m_archiveIntegrityWatcher);
+        m_audioLayout = m_delegate->getAudioLayout();
+    }
+    return *m_audioLayout;
 }
 
 bool QnArchiveStreamReader::init()
