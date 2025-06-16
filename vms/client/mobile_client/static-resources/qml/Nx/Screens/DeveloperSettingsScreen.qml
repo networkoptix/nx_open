@@ -1,18 +1,19 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import QtQuick.Controls 2.15 as QuickControls
+import QtQuick
+import QtQuick.Controls as QuickControls
 
-import Nx.Controls 1.0
-import Nx.Core 1.0
-import Nx.Dialogs 1.0
-import Nx.Settings 1.0
-import Nx.Ui 1.0
+import Nx.Controls
+import Nx.Core
+import Nx.Dialogs
+import Nx.Screens
+import Nx.Settings
+import Nx.Ui
 
-import nx.vms.client.core 1.0
-import nx.vms.client.mobile 1.0
+import nx.vms.client.core
+import nx.vms.client.mobile
 
-Page
+BaseSettingsScreen
 {
     id: settingsScreen
     objectName: "developerSettingsScreen"
@@ -29,6 +30,8 @@ Page
     Column
     {
         spacing: 16
+
+        width: parent.width
 
         Button
         {
@@ -101,7 +104,11 @@ Page
 
         Row
         {
+            id: customCloudHostRow
+
             spacing: 8
+            visible: !supportMetaOrganizations.visible
+                || !appContext.settings.supportMetaOrganizations
 
             TextField
             {
@@ -158,6 +165,28 @@ Page
                     return
 
                 appContext.settings.ignoreCustomization = value
+                d.openRestartDialog()
+            }
+        }
+
+        LabeledSwitch
+        {
+            id: supportMetaOrganizations
+
+            width: parent.width
+            text: "Show Meta Organizations"
+            visible: Branding.customization() == "default"
+            checkState: appContext.settings.supportMetaOrganizations ? Qt.Checked : Qt.Unchecked
+            onCheckStateChanged:
+            {
+                const value = checkState != Qt.Unchecked
+                if (value == appContext.settings.supportMetaOrganizations)
+                    return
+
+                appContext.settings.supportMetaOrganizations = value
+                appContext.settings.customCloudHost = value
+                    ? "meta.nxvms.com"
+                    : ""
                 d.openRestartDialog()
             }
         }

@@ -53,6 +53,8 @@ public:
 
         IgnoreCustomization,
 
+        SupportMetaOrganizations,
+
         // Beta features and settings flags.
         UseDownloadVideoFeature,
 
@@ -143,6 +145,11 @@ private:
             bool,
             ignoreCustomization, setIgnoreCustomization,
             IgnoreCustomization, false)
+
+        QN_DECLARE_RW_PROPERTY(
+            bool,
+            supportMetaOrganizations, setSupportMetaOrganizations,
+            SupportMetaOrganizations, false)
 
         QN_DECLARE_RW_PROPERTY(
             bool,

@@ -53,4 +53,9 @@ QString QmlProxy::defaultLocale()
     return nx::branding::defaultLocale();
 }
 
+QString QmlProxy::customization()
+{
+    return nx::branding::customization();
+}
+
 } // namespace nx::branding

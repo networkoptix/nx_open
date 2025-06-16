@@ -68,6 +68,9 @@ QmlSettingsAdaptor::QmlSettingsAdaptor(QObject* parent):
                 case QnMobileClientSettings::ShowHowShareWorksNotification:
                     emit showHowShareWorksNotificationChanged();
 
+                case QnMobileClientSettings::SupportMetaOrganizations:
+                    emit supportMetaOrganizationsChanged();
+
                 default:
                     break;
             }
@@ -184,6 +187,17 @@ bool QmlSettingsAdaptor::ignoreCustomization() const
 void QmlSettingsAdaptor::setIgnoreCustomization(bool value)
 {
     qnSettings->setIgnoreCustomization(value);
+    qnSettings->save();
+}
+
+bool QmlSettingsAdaptor::supportMetaOrganizations() const
+{
+    return qnSettings->supportMetaOrganizations();
+}
+
+void QmlSettingsAdaptor::setSupportMetaOrganizations(bool value)
+{
+    qnSettings->setSupportMetaOrganizations(value);
     qnSettings->save();
 }
 

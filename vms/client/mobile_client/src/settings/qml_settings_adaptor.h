@@ -55,6 +55,11 @@ class QmlSettingsAdaptor: public QObject
         WRITE setIgnoreCustomization
         NOTIFY ignoreCustomizationChanged)
 
+    Q_PROPERTY(bool supportMetaOrganizations
+        READ supportMetaOrganizations
+        WRITE setSupportMetaOrganizations
+        NOTIFY supportMetaOrganizationsChanged)
+
     Q_PROPERTY(QString locale
         READ locale
         WRITE setLocale
@@ -127,6 +132,9 @@ public:
     bool ignoreCustomization() const;
     void setIgnoreCustomization(bool value);
 
+    bool supportMetaOrganizations() const;
+    void setSupportMetaOrganizations(bool value);
+
     QString locale() const;
     void setLocale(const QString& value);
 
@@ -158,6 +166,7 @@ signals:
     void forceTrafficLoggingChanged();
     void customCloudHostChanged();
     void ignoreCustomizationChanged();
+    void supportMetaOrganizationsChanged();
     void localeChanged();
     void serverTimeModeChanged();
     void showCameraInfoChanged();
