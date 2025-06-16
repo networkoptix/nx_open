@@ -53,6 +53,8 @@ public:
 
     QUuid toQUuid() const;
 
+    std::optional<std::chrono::milliseconds> timeSinceEpoch() const;
+
     bool operator<(const Uuid& other) const;
     bool operator>(const Uuid& other) const;
 
@@ -77,6 +79,9 @@ public:
 
     /** Constructs a Uuid from pool of id's. Pool is determined by base id and individual offset. */
     static Uuid createUuidFromPool(const QUuid &baseId, uint offset);
+
+    /** Constructs a Uuid v7 with custom time. */
+    static Uuid createUuidV7(std::chrono::milliseconds timeSinceEpoch);
 
     /**
      * Constructs a Uuid from string representation.
