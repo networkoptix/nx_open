@@ -42,7 +42,7 @@ NX_REFLECTION_ENUM_CLASS(Subs,
 
 struct Context
 {
-    nx::json_rpc::Request request;
+    nx::json_rpc::Request& request;
     std::weak_ptr<nx::json_rpc::WebSocketConnection> connection;
     bool subscribed = false;
 
@@ -96,6 +96,7 @@ public:
 
     const std::optional<Content>& content() const { return m_content; }
     const std::optional<json_rpc::Context>& jsonRpcContext() const { return m_jsonRpcContext; }
+    std::optional<json_rpc::Context>& jsonRpcContext() { return m_jsonRpcContext; }
     void updateContent(QJsonValue value);
     void resetParamsCache() { m_paramsCache.reset(); }
     const nx::network::http::Request* httpRequest() const { return m_httpRequest; };
@@ -524,7 +525,7 @@ std::tuple<T, Request::NxReflectFields> Request::parseContentByReflectOrThrow() 
     else if (m_jsonRpcContext && m_jsonRpcContext->request.params)
     {
         if (m_jsonRpcContext->request.params->IsObject())
-            removeFieldsFromParams(fields, m_jsonRpcContext->request.params);
+            removeFieldsFromParams(fields, &m_jsonRpcContext->request.params.value());
         else if (!m_jsonRpcContext->request.params->IsArray())
             throw Exception::invalidParameter("params", "Must be a structured value");
         const nx::reflect::json::DeserializationContext deserializationContext{

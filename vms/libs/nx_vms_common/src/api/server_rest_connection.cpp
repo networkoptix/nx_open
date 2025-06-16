@@ -1524,12 +1524,12 @@ using JsonRpcResponseIdType = decltype(nx::vms::api::JsonRpcResponse::id);
 std::tuple<
     std::unordered_set<JsonRpcRequestIdType>,
     std::vector<nx::vms::api::JsonRpcResponse>>
-extractJsonRpcExpired(const rest::ErrorOrData<JsonRpcResultType>& result)
+extractJsonRpcExpired(rest::ErrorOrData<JsonRpcResultType>& result)
 {
     if (!result)
         return {};
 
-    const auto responseArray = std::get_if<
+    auto responseArray = std::get_if<
         std::vector<nx::vms::api::JsonRpcResponse>>(&*result);
 
     if (!responseArray)
@@ -1537,7 +1537,7 @@ extractJsonRpcExpired(const rest::ErrorOrData<JsonRpcResultType>& result)
 
     std::unordered_set<JsonRpcRequestIdType> ids;
 
-    for (const auto& response: *responseArray)
+    for (auto& response: *responseArray)
     {
         if (isSessionExpiredError(response))
         {
@@ -1548,12 +1548,12 @@ extractJsonRpcExpired(const rest::ErrorOrData<JsonRpcResultType>& result)
         }
     }
 
-    return {std::move(ids), *responseArray};
+    return {std::move(ids), std::move(*responseArray)};
 }
 
 bool mergeJsonRpcResults(
     std::vector<nx::vms::api::JsonRpcResponse>& originalResponse,
-    const rest::ErrorOrData<JsonRpcResultType>& result)
+    rest::ErrorOrData<JsonRpcResultType> result)
 {
     if (!result)
     {
@@ -1574,12 +1574,12 @@ bool mergeJsonRpcResults(
         return true;
     }
 
-    const auto responseArray = std::get_if<std::vector<nx::vms::api::JsonRpcResponse>>(&*result);
+    auto responseArray = std::get_if<std::vector<nx::vms::api::JsonRpcResponse>>(&*result);
     if (!responseArray)
     {
         // This should not happen because original requests were valid. But handle it anyway.
 
-        if (const auto error = std::get_if<nx::vms::api::JsonRpcResponse>(&*result))
+        if (auto error = std::get_if<nx::vms::api::JsonRpcResponse>(&*result))
         {
             // For all requests with expired session fill in error from single json-rpc response.
             for (auto& response: originalResponse)
@@ -1587,7 +1587,7 @@ bool mergeJsonRpcResults(
                 if (isSessionExpiredError(response))
                 {
                     response.result = {};
-                    response.error = error->error;
+                    response.error = std::move(error->error);
                 }
             }
             return true;
@@ -1596,9 +1596,9 @@ bool mergeJsonRpcResults(
     }
 
     // Build a map for faster response replacement.
-    std::unordered_map<JsonRpcResponseIdType, const nx::vms::api::JsonRpcResponse*> idToResponse;
+    std::unordered_map<JsonRpcResponseIdType, nx::vms::api::JsonRpcResponse*> idToResponse;
 
-    for (const auto& response: *responseArray)
+    for (auto& response: *responseArray)
     {
         if (!std::holds_alternative<std::nullptr_t>(response.id))
             idToResponse.insert({response.id, &response});
@@ -1609,8 +1609,8 @@ bool mergeJsonRpcResults(
     for (auto& response: originalResponse)
     {
         // Replace original response with the new one if it has the same id.
-        if (const auto it = idToResponse.find(response.id); it != idToResponse.end())
-            response = *it->second;
+        if (auto it = idToResponse.find(response.id); it != idToResponse.end())
+            response = std::move(*it->second);
     }
 
     return true;
@@ -1619,9 +1619,9 @@ bool mergeJsonRpcResults(
 class JsonRpcResultContext: public BaseResultContext
 {
 public:
-    JsonRpcResultContext(const std::vector<nx::vms::api::JsonRpcRequest>& requests):
+    JsonRpcResultContext(std::vector<nx::vms::api::JsonRpcRequest> requests):
         result(nx::utils::unexpected(nx::network::rest::Result::notImplemented())),
-        requestData(requests)
+        requestData(std::move(requests))
     {
     }
 
@@ -1644,12 +1644,16 @@ public:
             return;
         }
 
-        if (!expiredIds.empty() && mergeJsonRpcResults(originalResponse, parsedResult))
+        if (!expiredIds.empty() && mergeJsonRpcResults(originalResponse, std::move(parsedResult)))
         {
             // Even if the new request failed, it is still
             // considered as json-rpc success.
             success = true;
-            result = originalResponse;
+            std::vector<nx::vms::api::JsonRpcResponse> responses;
+            responses.reserve(originalResponse.size());
+            for (const auto& r: originalResponse)
+                responses.emplace_back(r.copy());
+            result = std::move(responses);
             expiredIds.clear(); //< isSessionExpired() should return false so request can proceed.
             return;
         }
@@ -1668,7 +1672,7 @@ public:
         for (const auto& request: requestData)
         {
             if (expiredIds.contains(request.id))
-                newRequests.emplace_back(request);
+                newRequests.emplace_back(request.copy());
         }
         fixedRequest.messageBody = nx::reflect::json::serialize(newRequests);
 
@@ -1702,7 +1706,7 @@ private:
 
 Handle ServerConnection::jsonRpcBatchCall(
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
-    const std::vector<nx::vms::api::JsonRpcRequest>& requests,
+    std::vector<nx::vms::api::JsonRpcRequest> requests,
     JsonRpcBatchResultCallback&& callback,
     nx::utils::AsyncHandlerExecutor executor,
     std::optional<Timeouts> timeouts)
@@ -1723,10 +1727,10 @@ Handle ServerConnection::jsonRpcBatchCall(
             {
                 if (result)
                 {
-                    if (const auto responseArray = std::get_if<
+                    if (auto responseArray = std::get_if<
                         std::vector<nx::vms::api::JsonRpcResponse>>(&*result))
                     {
-                        callback(success, requestId, *responseArray);
+                        callback(success, requestId, std::move(*responseArray));
                         return;
                     }
                 }
@@ -1736,22 +1740,27 @@ Handle ServerConnection::jsonRpcBatchCall(
 
             if (!result)
             {
-                callback(success, requestId, {nx::json_rpc::Response::makeError(
-                    std::nullptr_t{},
+                std::vector<nx::json_rpc::Response> response;
+                response.emplace_back(nx::json_rpc::Response::makeError(std::nullptr_t{},
                     nx::json_rpc::Error::applicationError,
                     result.error().errorString.toStdString(),
-                    result.error())});
+                    result.error()));
+                callback(success, requestId, std::move(response));
                 return;
             }
 
-            if (const auto singleResponse = std::get_if<nx::vms::api::JsonRpcResponse>(&*result))
-                callback(success, requestId, {*singleResponse});
+            if (auto singleResponse = std::get_if<nx::vms::api::JsonRpcResponse>(&*result))
+            {
+                std::vector<nx::json_rpc::Response> response;
+                response.emplace_back(std::move(*singleResponse));
+                callback(success, requestId, std::move(response));
+            }
         };
 
     return d->executeRequest(
         tokenHelper,
         request,
-        std::make_unique<JsonRpcResultContext>(requests),
+        std::make_unique<JsonRpcResultContext>(std::move(requests)),
         [callback = std::move(internalCallback)](
             std::unique_ptr<BaseResultContext> resultContext, rest::Handle handle)
         {

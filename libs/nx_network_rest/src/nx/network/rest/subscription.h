@@ -23,7 +23,7 @@ public:
     using AddMonitor = nx::MoveOnlyFunc<nx::utils::Guard()>;
     using NotifyType = Handler::NotifyType;
     using SubscriptionCallback =
-        nx::MoveOnlyFunc<void(const QString& id, NotifyType, const Data& data)>;
+        nx::MoveOnlyFunc<void(const QString& id, NotifyType, Data* data)>;
 
     SubscriptionHandler(AddMonitor addMonitor): m_addMonitor(std::move(addMonitor)) {}
     virtual ~SubscriptionHandler()
@@ -58,7 +58,7 @@ public:
         return guard;
     }
 
-    void notify(const QString& id, NotifyType notifyType, const Data& data)
+    void notify(const QString& id, NotifyType notifyType, Data data)
     {
         std::set<std::shared_ptr<SubscriptionCallback>> holder1;
         std::set<std::shared_ptr<SubscriptionCallback>> holder2;
@@ -70,9 +70,9 @@ public:
                 holder2 = it->second;
         }
         for (auto callback: holder1)
-            (*callback)(id, notifyType, data);
+            (*callback)(id, notifyType, &data);
         for (auto callback: holder2)
-            (*callback)(id, notifyType, data);
+            (*callback)(id, notifyType, &data);
     }
 
     void setAddMonitor(AddMonitor addMonitor)

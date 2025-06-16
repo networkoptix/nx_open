@@ -495,10 +495,7 @@ void Request::renameParameter(const QString& oldName, const QString& newName)
     {
         auto it = m_jsonRpcContext->request.params->FindMember(oldName.toStdString());
         if (NX_ASSERT(it != m_jsonRpcContext->request.params->MemberEnd()))
-        {
-            it->name.SetString(
-                newName.toStdString(), m_jsonRpcContext->request.document->GetAllocator());
-        }
+            it->name.SetString(newName.toStdString(), m_jsonRpcContext->request.allocator);
     }
     if (!m_paramsCache)
         m_paramsCache = calculateParams();

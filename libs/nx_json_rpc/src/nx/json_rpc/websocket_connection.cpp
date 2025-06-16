@@ -71,10 +71,10 @@ WebSocketConnection::WebSocketConnection(
 void WebSocketConnection::setRequestHandler(RequestHandler requestHandler)
 {
     m_incomingProcessor = std::make_unique<IncomingProcessor>(
-        [this, requestHandler = std::move(requestHandler)](const auto& request, auto responseHandler)
+        [this, requestHandler = std::move(requestHandler)](auto request, auto responseHandler)
         {
             requestHandler(
-                request,
+                std::move(request),
                 [this, handler = std::move(responseHandler)](auto response) mutable
                 {
                     dispatch([response = std::move(response), handler = std::move(handler)]() mutable
