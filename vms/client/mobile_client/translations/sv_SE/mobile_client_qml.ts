@@ -809,15 +809,15 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Inga sajter</translation>
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>Hur ansluter man?</translation>
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation type="unfinished">Folder is empty</translation>
+      <translation>Mappen är tom</translation>
     </message>
   </context>
   <context>
@@ -981,11 +981,11 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Inget hittades</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Försök att ändra sökparametrar</translation>
     </message>
   </context>
   <context>

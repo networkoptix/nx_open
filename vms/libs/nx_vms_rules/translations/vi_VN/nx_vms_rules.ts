@@ -831,12 +831,12 @@
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-      <source>Force Acknowledgement</source>
-      <translation>Buộc xác nhận</translation>
-    </message>
-    <message>
       <source>Show Desktop Notification</source>
       <translation>Hiển thị thông báo trên màn hình</translation>
+    </message>
+    <message>
+      <source>Force Acknowledgment</source>
+      <translation>Bắt buộc</translation>
     </message>
   </context>
   <context>

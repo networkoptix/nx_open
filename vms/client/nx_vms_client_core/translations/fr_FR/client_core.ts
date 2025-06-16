@@ -374,7 +374,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Essayez de modifier les paramètres de recherche</translation>
     </message>
   </context>
   <context>

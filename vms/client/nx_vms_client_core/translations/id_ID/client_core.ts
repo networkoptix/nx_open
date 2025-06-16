@@ -372,7 +372,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Coba ubah parameter pencarian</translation>
     </message>
   </context>
   <context>

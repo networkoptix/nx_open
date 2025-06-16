@@ -809,7 +809,7 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Aucun site</translation>
     </message>
     <message>
       <source>How to connect?</source>
@@ -817,7 +817,7 @@
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation type="unfinished">Folder is empty</translation>
+      <translation>Le dossier est vide</translation>
     </message>
   </context>
   <context>
@@ -981,11 +981,11 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Rien trouvé</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Essayez de modifier les paramètres de recherche</translation>
     </message>
   </context>
   <context>

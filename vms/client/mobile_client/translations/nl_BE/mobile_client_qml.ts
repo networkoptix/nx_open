@@ -981,7 +981,7 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Niets gevonden</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>

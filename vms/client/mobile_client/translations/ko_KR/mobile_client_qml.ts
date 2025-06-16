@@ -816,7 +816,7 @@
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation type="unfinished">Folder is empty</translation>
+      <translation>폴더가 비어 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -980,11 +980,11 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>결과 없음</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>검색 매개변수를 변경해보세요</translation>
     </message>
   </context>
   <context>

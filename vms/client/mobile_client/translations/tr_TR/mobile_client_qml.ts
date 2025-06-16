@@ -817,7 +817,7 @@
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation type="unfinished">Folder is empty</translation>
+      <translation>Klasör boş</translation>
     </message>
   </context>
   <context>
@@ -981,11 +981,11 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Hiçbir şey Bulunamadı</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Arama parametrelerini değiştirmeyi deneyin</translation>
     </message>
   </context>
   <context>

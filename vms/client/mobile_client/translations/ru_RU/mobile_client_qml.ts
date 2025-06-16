@@ -815,7 +815,7 @@
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>Как подключиться?</translation>
     </message>
     <message>
       <source>Folder is empty</source>
@@ -983,11 +983,11 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Ничего не найдено</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Попробуйте изменить параметры поиска</translation>
     </message>
   </context>
   <context>

@@ -372,7 +372,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Hãy thử thay đổi các tham số tìm kiếm</translation>
     </message>
   </context>
   <context>

@@ -831,12 +831,12 @@
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-      <source>Force Acknowledgement</source>
-      <translation>確認を強制する</translation>
-    </message>
-    <message>
       <source>Show Desktop Notification</source>
       <translation>デスクトップ通知表示</translation>
+    </message>
+    <message>
+      <source>Force Acknowledgment</source>
+      <translation>要確認</translation>
     </message>
   </context>
   <context>

@@ -842,12 +842,12 @@
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-      <source>Force Acknowledgement</source>
-      <translation>Tvinga bekräftelse</translation>
-    </message>
-    <message>
       <source>Show Desktop Notification</source>
       <translation>Visa skrivbordsavisering</translation>
+    </message>
+    <message>
+      <source>Force Acknowledgment</source>
+      <translation>Tvinga bekräftelse</translation>
     </message>
   </context>
   <context>

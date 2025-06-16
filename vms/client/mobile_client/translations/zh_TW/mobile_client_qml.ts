@@ -808,7 +808,7 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>沒有站點</translation>
     </message>
     <message>
       <source>How to connect?</source>
@@ -816,7 +816,7 @@
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation type="unfinished">Folder is empty</translation>
+      <translation>資料夾為空</translation>
     </message>
   </context>
   <context>
@@ -980,11 +980,11 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>找不到任何內容</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>嘗試更改搜尋參數</translation>
     </message>
   </context>
   <context>

@@ -980,7 +980,7 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>无搜寻结果</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>

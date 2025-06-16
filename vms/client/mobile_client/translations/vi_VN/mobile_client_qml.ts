@@ -808,7 +808,7 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Không có Chi nhánh</translation>
     </message>
     <message>
       <source>How to connect?</source>
@@ -816,7 +816,7 @@
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation type="unfinished">Folder is empty</translation>
+      <translation>Thư mục rỗng</translation>
     </message>
   </context>
   <context>
@@ -980,11 +980,11 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Không tìm thấy kết quả</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Hãy thử thay đổi các tham số tìm kiếm</translation>
     </message>
   </context>
   <context>

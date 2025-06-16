@@ -983,7 +983,7 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Нічого не знайдено</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>

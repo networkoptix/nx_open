@@ -816,7 +816,7 @@
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation type="unfinished">Folder is empty</translation>
+      <translation>โฟลเดอร์ว่างเปล่า</translation>
     </message>
   </context>
   <context>
@@ -980,11 +980,11 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>ไม่พบสิ่งใด!</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>ลองเปลี่ยนพารามิเตอร์การค้นหา</translation>
     </message>
   </context>
   <context>

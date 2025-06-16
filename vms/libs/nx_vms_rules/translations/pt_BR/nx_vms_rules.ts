@@ -842,12 +842,12 @@
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-      <source>Force Acknowledgement</source>
-      <translation>Forçar reconhecimento</translation>
-    </message>
-    <message>
       <source>Show Desktop Notification</source>
       <translation type="unfinished">Show Desktop Notification</translation>
+    </message>
+    <message>
+      <source>Force Acknowledgment</source>
+      <translation>Forçar reconhecimento</translation>
     </message>
   </context>
   <context>
