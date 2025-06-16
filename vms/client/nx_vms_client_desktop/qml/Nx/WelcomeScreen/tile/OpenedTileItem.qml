@@ -299,7 +299,7 @@ Item
 
                     flat: true
                     backgroundColor: ColorTheme.colors.dark5
-                    icon.source: "image://skin/20x20/Outline/close_medium.svg"
+                    icon.source: "image://skin/16x16/Outline/close.svg"
                     activeFocusOnTab: false
 
                     enabled: !openedTileItem.isConnecting
