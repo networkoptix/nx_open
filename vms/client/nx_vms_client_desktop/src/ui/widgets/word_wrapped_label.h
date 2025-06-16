@@ -4,6 +4,16 @@
 
 #include <QtWidgets/QLabel>
 
+/**
+ * Originally the class was created to hide QLabel::heightForWidth() method, which starts to return
+ * non-default values if QLabel::wordWrap property is set to true.
+ *
+ * There was an unsuccessful attempt to add heightForWidth() / hasHeightForWidth() methods to the
+ * class near release of 6.1. It worked fine for the label height calculation and text wrapping in
+ * simple dialogs. But it caused problems in the complex layouts with multiple alert bars, e.g.
+ * Expert page of Camera settings. See VMS-58011 for the details.
+ */
+
 class QnWordWrappedLabel: public QWidget
 {
     Q_OBJECT
@@ -20,8 +30,6 @@ public:
 
     virtual QSize sizeHint() const override;
     virtual QSize minimumSizeHint() const override;
-    virtual int heightForWidth(int width) const override;
-    virtual bool hasHeightForWidth() const override;
 
     QString text() const;
     void setText(const QString& value);
@@ -43,6 +51,8 @@ signals:
 
 protected:
     virtual void showEvent(QShowEvent* event) override;
+    virtual void resizeEvent(QResizeEvent* event) override;
+
 
 private:
     void ensureInitialized();
