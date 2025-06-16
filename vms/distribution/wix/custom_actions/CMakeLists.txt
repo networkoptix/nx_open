@@ -19,8 +19,8 @@ add_compile_options(/MT)
 
 nx_add_target(wix_custom_actions LIBRARY
     NO_MOC
+    RC_FILE "CustomActions.rc"
     ADDITIONAL_SOURCES
-        "${CMAKE_CURRENT_LIST_DIR}/CustomActions.rc"
         "${CMAKE_CURRENT_LIST_DIR}/CustomActions.def"
     PRIVATE_LIBS
         userenv

@@ -95,34 +95,33 @@ function(nx_add_target name type)
 
     set(sources ${sources} ${NX_ADDITIONAL_SOURCES} ${NX_OTHER_RESOURCES} ${NX_OTHER_SOURCES})
 
+    set(rc_file)
     if(WINDOWS)
         build_source_groups("${CMAKE_CURRENT_SOURCE_DIR}" "${sources}" "src")
+
+        # Initialize RC file which contains version metainformation.
+        if(NOT NX_NO_RC_FILE)
+            if(NX_RC_FILE)
+                set(rc_source_file "${NX_RC_FILE}")
+                set(rc_filename "${NX_RC_FILE}")
+                get_filename_component(rc_filename ${rc_source_file} NAME)
+                set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${rc_filename}")
+            else()
+                set(rc_filename "project.rc")
+                if("${type}" STREQUAL "LIBRARY")
+                    set(rc_filename "library.rc")
+                endif()
+                set(rc_source_file "${open_source_root}/cmake/${rc_filename}")
+                set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${name}.rc")
+            endif()
+            configure_file(
+                "${rc_source_file}"
+                "${rc_file}")
+            nx_store_known_file(${rc_file})
+        endif()
     endif()
 
     if("${type}" STREQUAL "EXECUTABLE")
-        set(rc_file)
-        if(WINDOWS)
-            if(NOT NX_NO_RC_FILE)
-                if(NX_RC_FILE)
-                    set(rc_source_file "${NX_RC_FILE}")
-                    set(rc_filename "${NX_RC_FILE}")
-                    get_filename_component(rc_filename ${rc_source_file} NAME)
-                    set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${rc_filename}")
-                else()
-                    find_file(rc_source_file project.rc
-                        PATHS
-                            "${CMAKE_SOURCE_DIR}/cmake"
-                            "${CMAKE_SOURCE_DIR}/open/cmake"
-                        REQUIRED)
-                    set(rc_file "${CMAKE_CURRENT_BINARY_DIR}/${name}.rc")
-                endif()
-                configure_file(
-                    "${rc_source_file}"
-                    "${rc_file}")
-                nx_store_known_file(${rc_file})
-            endif()
-        endif()
-
         add_executable(${name} ${sources} "${rc_file}")
         set_target_properties(${name} PROPERTIES SKIP_BUILD_RPATH OFF)
 
@@ -155,7 +154,7 @@ function(nx_add_target name type)
                 set(NX_LIBRARY_TYPE STATIC)
             endif()
         endif()
-        add_library(${name} ${NX_LIBRARY_TYPE} ${sources})
+        add_library(${name} ${NX_LIBRARY_TYPE} ${sources} "${rc_file}")
         if(NX_NO_API_MACROS AND (BUILD_SHARED_LIBS OR "${NX_LIBRARY_TYPE}" STREQUAL "SHARED") AND
             CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
             set_target_properties(${name} PROPERTIES CXX_VISIBILITY_PRESET default)
