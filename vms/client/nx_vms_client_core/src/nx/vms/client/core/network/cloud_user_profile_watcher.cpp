@@ -6,20 +6,19 @@
 #include <QtGui/QImage>
 #include <QtGui/QPainter>
 
+#include <nx/cloud/db/api/account_data.h>
 #include <nx/cloud/db/api/account_manager.h>
 #include <nx/cloud/db/client/cdb_connection.h>
-#include <nx/utils/async_handler_executor.h>
-#include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/core/application_context.h>
-#include <nx/vms/client/core/network/cloud_status_watcher.h>
-#include <nx/vms/client/core/skin/color_theme.h>
-
 #include <nx/cloud/db/client/cdb_request_path.h>
-#include <nx/cloud/db/api/account_data.h>
-
+#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/coro/task_utils.h>
 #include <nx/utils/coro/when_all.h>
-#include "nx/vms/client/core/network/cloud_api.h"
+#include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/network/cloud_api.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/skin/color_theme.h>
 
 namespace nx::vms::client::core {
 
@@ -70,7 +69,9 @@ CloudUserProfileWatcher::~CloudUserProfileWatcher()
 
 QString CloudUserProfileWatcher::fullName() const
 {
-    return m_fullName;
+    return m_statusWatcher->status() == CloudStatusWatcher::Offline
+        ? appContext()->coreSettings()->lastCloudFullName()
+        : m_fullName;
 }
 
 bool CloudUserProfileWatcher::accountBelongsToOrganization() const
@@ -87,7 +88,7 @@ QUrl CloudUserProfileWatcher::avatarUrl() const
     static constexpr auto kAvatarSize = 128;
     static constexpr auto kAvatarInitialsFontPixelSize = 48;
 
-    if (m_fullName.isEmpty())
+    if (fullName().isEmpty())
         return {};
 
     QImage image(kAvatarSize, kAvatarSize, QImage::Format_RGBA8888_Premultiplied);
@@ -100,7 +101,7 @@ QUrl CloudUserProfileWatcher::avatarUrl() const
     painter.setPen(Qt::NoPen);
     painter.drawEllipse(0, 0, kAvatarSize, kAvatarSize);
 
-    QString initials = getInitials(m_fullName);
+    QString initials = getInitials(fullName());
 
     painter.setPen(Qt::black);
     auto font = painter.font();
@@ -148,6 +149,7 @@ nx::coro::FireAndForget CloudUserProfileWatcher::run()
         if (m_fullName != accountData->fullName)
         {
             m_fullName = QString::fromStdString(accountData->fullName);
+            appContext()->coreSettings()->lastCloudFullName = m_fullName;
             emit fullNameChanged();
             emit avatarUrlChanged();
         }

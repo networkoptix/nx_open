@@ -63,6 +63,8 @@ public:
     SecureProperty<SerializableCredentials> cloudCredentials{
         this, "cloudCredentials"};
 
+    SecureProperty<QString> lastCloudFullName{this, "lastCloudFullName"};
+
     struct PreferredCloudServer;
     using PreferredCloudServers = QList<PreferredCloudServer>;
 
