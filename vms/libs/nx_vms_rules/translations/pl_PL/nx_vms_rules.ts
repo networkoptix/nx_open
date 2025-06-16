@@ -864,12 +864,12 @@
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-      <source>Force Acknowledgement</source>
-      <translation>Wymuszaj potwierdzenie</translation>
-    </message>
-    <message>
       <source>Show Desktop Notification</source>
       <translation>Pokaż powiadomienie na pulpicie</translation>
+    </message>
+    <message>
+      <source>Force Acknowledgment</source>
+      <translation>Wymuszaj potwierdzenie</translation>
     </message>
   </context>
   <context>

@@ -831,12 +831,12 @@
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-      <source>Force Acknowledgement</source>
-      <translation>Force Acknowledgment</translation>
-    </message>
-    <message>
       <source>Show Desktop Notification</source>
       <translation>Tampilkan Notifikasi Desktop</translation>
+    </message>
+    <message>
+      <source>Force Acknowledgment</source>
+      <translation>Paksa Acknowledgment</translation>
     </message>
   </context>
   <context>

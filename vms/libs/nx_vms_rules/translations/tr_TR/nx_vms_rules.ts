@@ -842,12 +842,12 @@
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-      <source>Force Acknowledgement</source>
-      <translation>Onaya Zorla</translation>
-    </message>
-    <message>
       <source>Show Desktop Notification</source>
       <translation>Masaüstü Bildirimini Göster</translation>
+    </message>
+    <message>
+      <source>Force Acknowledgment</source>
+      <translation>İlerleme Bildirimi</translation>
     </message>
   </context>
   <context>
