@@ -53,6 +53,7 @@ MessageBarBlock::MessageBarBlock(QWidget* parent):
     d(new Private())
 {
     auto layout = new QVBoxLayout;
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     layout->setContentsMargins({});
     layout->setSpacing(1);
     setLayout(layout);
@@ -83,25 +84,6 @@ void MessageBarBlock::setMessageBars(const std::vector<BarDescription>& descs)
     }
 
     d->barsDescriptions = descs;
-    update();
-}
-
-QSize CommonMessageBar::minimumSizeHint() const
-{
-    // Minimum size is counted as severity icon plus margins.
-    return {style::Metrics::kDefaultIconSize + style::Metrics::kMessageBarContentMargins.left()
-            + style::Metrics::kMessageBarContentMargins.right(),
-        style::Metrics::kDefaultIconSize + style::Metrics::kMessageBarContentMargins.top()
-            + style::Metrics::kMessageBarContentMargins.bottom()};
-}
-
-QSize MessageBarBlock::minimumSizeHint() const
-{
-    // Minimum size is counted as severity icon plus margins.
-    return {style::Metrics::kDefaultIconSize + style::Metrics::kMessageBarContentMargins.left()
-            + style::Metrics::kMessageBarContentMargins.right(),
-        (style::Metrics::kDefaultIconSize + style::Metrics::kMessageBarContentMargins.top()
-            + style::Metrics::kMessageBarContentMargins.bottom()) * (int)d->bars.size()};
 }
 
 CommonMessageBar::CommonMessageBar(QWidget* parent, const BarDescription& description):
@@ -143,7 +125,6 @@ CommonMessageBar::CommonMessageBar(QWidget* parent, const BarDescription& descri
     d->buttonsHorizontalLayout->setSpacing(style::Metrics::kStandardPadding);
     d->buttonsHorizontalLayout->addStretch();
     verticalLayout()->addLayout(d->buttonsHorizontalLayout);
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 }
 
 CommonMessageBar::~CommonMessageBar()
