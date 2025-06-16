@@ -175,6 +175,14 @@ QUuid Uuid::toQUuid() const
     return m_uuid;
 }
 
+std::optional<std::chrono::milliseconds> Uuid::timeSinceEpoch() const
+{
+    if (m_uuid.version() != QUuid::UnixEpoch)
+        return {};
+    uint64_t msNumber = (uint64_t(m_uuid.data1) << 16) | m_uuid.data2;
+    return std::chrono::milliseconds(msNumber);
+}
+
 bool Uuid::operator<(const Uuid& other) const
 {
     return compare(m_uuid, other.m_uuid) == Qt::strong_ordering::less;
@@ -255,6 +263,18 @@ Uuid Uuid::createUuidFromPool(const QUuid &baseId, uint offset)
     QUuid result = baseId;
     result.data1 += offset;
     return Uuid(result);
+}
+
+Uuid Uuid::createUuidV7(std::chrono::milliseconds timeSinceEpoch)
+{
+    Uuid result;
+    result.m_uuid = QUuid::createUuidV7();
+    uint64_t msNumber = timeSinceEpoch.count();
+    // Do the same is in https://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/plugin/quuid_p.h
+    // Counter part of the time is from qt system_clock nanosec part is left as is.
+    result.m_uuid.data1 = (uint) (msNumber >> 16);
+    result.m_uuid.data2 = (ushort) msNumber;
+    return result;
 }
 
 Uuid Uuid::fromString(const std::string_view& value)
