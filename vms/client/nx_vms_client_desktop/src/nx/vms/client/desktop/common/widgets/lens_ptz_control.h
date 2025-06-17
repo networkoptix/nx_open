@@ -44,7 +44,7 @@ public:
     void setValue(const Value& val);
 
     // Handlers for additional rotation buttons.
-    // Note: we should track on/off state for both cw/ccw buttons.
+    // Note: we should track on/off state for both clockwise/counterclockwise  buttons.
     // It solves problems when we can press both buttons simultaneously, i.e
     // in case of multitouch or when this buttons are binded to the keyboard.
     void onRotationButtonCounterClockWise(bool pressed);
@@ -118,7 +118,7 @@ protected:
     void drawHandler(QPainter* painter, const Handler& handler) const;
     void drawButton(QPainter* painter, const Button& button) const;
 
-    // Converts screen cordinates to local coordinates, relative to control's center.
+    // Converts screen coordinates to local coordinates, relative to control's center.
     QPointF screenToLocal(const QPointF& pos) const;
 
     enum State

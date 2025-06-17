@@ -237,7 +237,6 @@ enum IDType
      */
     SelectTimeServerAction,
 
-
     /* Right panel actions */
 
     /**
@@ -529,7 +528,6 @@ enum IDType
      * Closes all layouts but the one provided.
      */
     CloseAllButThisLayoutAction,
-
 
     /* Resource actions. */
 

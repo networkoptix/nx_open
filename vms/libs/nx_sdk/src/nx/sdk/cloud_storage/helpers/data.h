@@ -728,7 +728,7 @@ struct AttributeSearchCondition
      */
     bool isNegative = false;
 
-    /** If it is set to true, then the value should be matched from the begining. */
+    /** If it is set to true, then the value should be matched from the beginning. */
     bool matchesFromStart = false;
 
     /** If it is set to true, then the value should be matched till the end. */

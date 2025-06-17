@@ -3196,7 +3196,7 @@ void ActionHandler::confirmAnalyticsStorageLocation()
                     if (a->isBackup() && !b->isBackup())
                         return false;
 
-                    // Take the storage with the most space avaliable first.
+                    // Take the storage with the most space available first.
                     return a->getFreeSpace() > b->getFreeSpace();
                 });
 

@@ -55,7 +55,7 @@ QString toString(mfxStatus status)
 
         /* warnings >0 */
         case MFX_WRN_IN_EXECUTION:
-            return QString("the previous asynchrous operation is in execution");
+            return QString("the previous asynchronous operation is in execution");
         case MFX_WRN_DEVICE_BUSY:
             return QString("the HW acceleration device is busy");
         case MFX_WRN_VIDEO_PARAM_CHANGED:

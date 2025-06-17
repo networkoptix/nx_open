@@ -62,7 +62,6 @@ Yunhong Gu, last updated 02/28/2012
 
 using namespace std;
 
-
 CUDTUnited* CUDT::s_UDTUnited = nullptr;
 
 const UDTSOCKET UDT::INVALID_SOCK = CUDT::INVALID_SOCK;
@@ -76,20 +75,19 @@ const int32_t CMsgNo::m_iMaxMsgNo = 0x1FFFFFFF;
 
 static constexpr auto kConnectionBrokenTimeout = std::chrono::seconds(5);
 
-
 /*
 static const int CTRL_HANDSHAKE = 0;            //000 - Handshake
 static const int CTRL_KEEP_ALIVE = 1;           //001 - Keep-alive
-static const int CTRL_ACK = 2;                  //010 - Acknowledgement
+static const int CTRL_ACK = 2;                  //010 - Acknowledgment
 static const int CTRL_LOSS_REPORT = 3;          //011 - Loss Report
 static const int CTRL_CONGESTION_WARNING = 4;   //100 - Congestion Warning
 static const int CTRL_SHUTDOWN = 5;             //101 - Shutdown
-static const int CTRL_ACK2 = 6;                 //110 - Acknowledgement of Acknowledgement
+static const int CTRL_ACK2 = 6;                 //110 - Acknowledgment of Acknowledgment
 static const int CTRL_MSG_DROP = 7;             //111 - Msg drop request
 static const int CTRL_ACK_SPECIAL_ERROR = 8;    //1000 - acknowledge the peer side a special error
-static const int CTRL_RESERVED = 32767;         //0x7FFF - Resevered for future use
+static const int CTRL_RESERVED = 32767;         //0x7FFF - Reserved for future use
 
-// Mimimum recv flight flag size is 32 packets
+// Minimum recv flight flag size is 32 packets
 constexpr const int kMinRecvWindowSize = 32;
 */
 
@@ -464,7 +462,7 @@ void CUDT::open()
 {
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
 
-    // Initial sequence number, loss, acknowledgement, etc.
+    // Initial sequence number, loss, acknowledgment, etc.
     m_iPktSize = m_iMSS - 28;
     m_iPayloadSize = m_iPktSize - kPacketHeaderSize;
 
@@ -660,7 +658,7 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
             if (result.get() == ConnectState::done)
                 break;
 
-            // new request/response should be sent out immediately on receving a response
+            // new request/response should be sent out immediately on receiving a response
             m_llLastReqTime = std::chrono::microseconds::zero();
         }
 
@@ -678,7 +676,7 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
             error = Error(OsErrorCode::connectionRefused);
         else if (1002 == m_ConnRes.m_iReqType)                          // connection request rejected
             error = Error(OsErrorCode::connectionRefused);
-        else if ((!m_bRendezvous) && (m_iISN != m_ConnRes.m_iISN))      // secuity check
+        else if ((!m_bRendezvous) && (m_iISN != m_ConnRes.m_iISN))      // security check
             error = Error(OsErrorCode::connectionRefused, UDT::ProtocolError::handshakeFailure);
         else if (!internalConnectResult.ok()) // Otherwise, success will be reported to the caller
             error = internalConnectResult.error();
@@ -772,7 +770,7 @@ Result<ConnectState> CUDT::connect(const CPacket* response)
     if (auto result = s_UDTUnited->connect_complete(m_SocketId); !result.ok())
         return result.error();
 
-    // acknowledde any waiting epolls to write
+    // acknowledge any waiting epolls to write
     s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_OUT, true);
 
     return Result<ConnectState>(ConnectState::done);
@@ -811,7 +809,7 @@ Result<> CUDT::connect(const detail::SocketAddress& peer, CHandShake* hs)
     m_iSndLastAck2 = m_iISN;
     m_ullSndLastAck2Time = CTimer::getTime();
 
-    // this is a reponse handshake
+    // this is a response handshake
     hs->m_iReqType = -1;
 
     // get local IP address and send the peer its IP address (because UDP cannot get local IP address)
@@ -875,7 +873,7 @@ void CUDT::close()
         }
     }
 
-    // remove this socket from the snd queue
+    // remove this socket from the send queue
     if (m_bConnected)
         sndQueue().sndUList().remove(this);
 
@@ -892,7 +890,7 @@ void CUDT::close()
     // Inform the threads handler to stop.
     setIsClosing(true);
 
-    // Signal the sender and recver if they are waiting for data.
+    // Signal the sender and receiver if they are waiting for data.
     releaseSynch();
 
     m_bListening = false;
@@ -1015,10 +1013,10 @@ Result<int> CUDT::send(const char* data, int len)
     if (0 == m_pSndBuffer->getCurrBufSize())
         m_llSndDurationCounter = CTimer::getTime();
 
-    // insert the user buffer into the sening list
+    // insert the user buffer into the sending list
     m_pSndBuffer->addBuffer(data, size);
 
-    // insert this socket to snd list if it is not on the list yet
+    // insert this socket to send list if it is not on the list yet
     sndQueue().sndUList().update(shared_from_this(), false);
 
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
@@ -1168,10 +1166,10 @@ Result<int> CUDT::sendmsg(const char* data, int len, std::chrono::milliseconds t
     if (0 == m_pSndBuffer->getCurrBufSize())
         m_llSndDurationCounter = CTimer::getTime();
 
-    // insert the user buffer into the sening list
+    // insert the user buffer into the sending list
     m_pSndBuffer->addBuffer(data, len, ttl, inorder);
 
-    // insert this socket to the snd list if it is not on the list yet
+    // insert this socket to the send list if it is not on the list yet
     sndQueue().sndUList().update(shared_from_this(), false);
 
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
@@ -1338,7 +1336,7 @@ Result<int64_t> CUDT::sendfile(fstream& ifs, int64_t& offset, int64_t size, int 
             offset += sentsize;
         }
 
-        // insert this socket to snd list if it is not on the list yet
+        // insert this socket to send list if it is not on the list yet
         sndQueue().sndUList().update(shared_from_this(), false);
     }
 
@@ -1524,7 +1522,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
 {
     switch (pkttype)
     {
-        case ControlPacketType::Acknowledgement: //010 - Acknowledgement
+        case ControlPacketType::Acknowledgement: //010 - Acknowledgment
         {
             auto ctrlpkt = std::make_unique<CPacket>();
 
@@ -1624,7 +1622,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
             break;
         }
 
-        case ControlPacketType::AcknowledgementOfAcknowledgement: //110 - Acknowledgement of Acknowledgement
+        case ControlPacketType::AcknowledgementOfAcknowledgement: //110 - Acknowledgment of Acknowledgment
         {
             auto ctrlpkt = std::make_unique<CPacket>();
             ctrlpkt->pack(pkttype, lparam);
@@ -1682,7 +1680,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
                 }
             }
 
-            // update next NAK time, which should wait enough time for the retansmission, but not too long
+            // update next NAK time, which should wait enough time for the retransmission, but not too long
             m_ullNAKInt = (m_iRTT + 4 * m_iRTTVar) * m_ullCPUFrequency;
             int rcv_speed = m_pRcvTimeWindow->getPktRcvSpeed();
             if (rcv_speed > 0)
@@ -1760,7 +1758,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
             break;
         }
 
-        case ControlPacketType::Reserved: //0x7FFF - Resevered for future use
+        case ControlPacketType::Reserved: //0x7FFF - Reserved for future use
             break;
 
         default:
@@ -1778,7 +1776,7 @@ void CUDT::processCtrl(const CPacket* ctrlpkt)
 
     switch (ctrlpkt->getType())
     {
-        case ControlPacketType::Acknowledgement: //010 - Acknowledgement
+        case ControlPacketType::Acknowledgement: //010 - Acknowledgment
         {
             int32_t ack;
 
@@ -1798,7 +1796,7 @@ void CUDT::processCtrl(const CPacket* ctrlpkt)
             // read ACK seq. no.
             ack = ctrlpkt->getAckSeqNo();
 
-            // send ACK acknowledgement
+            // send ACK acknowledgment
             // number of ACK2 can be much less than number of ACK
             const auto now = CTimer::getTime();
             if ((currtime - m_ullSndLastAck2Time > m_iSYNInterval) || (ack == m_iSndLastAck2))
@@ -1857,10 +1855,10 @@ void CUDT::processCtrl(const CPacket* ctrlpkt)
                     m_SendBlockCond.notify_all();
             }
 
-            // acknowledde any waiting epolls to write
+            // acknowledge any waiting epolls to write
             s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_OUT, true);
 
-            // insert this socket to snd list if it is not on the list yet
+            // insert this socket to send list if it is not on the list yet
             sndQueue().sndUList().update(shared_from_this(), false);
 
             // Update RTT
@@ -1894,7 +1892,7 @@ void CUDT::processCtrl(const CPacket* ctrlpkt)
             break;
         }
 
-        case ControlPacketType::AcknowledgementOfAcknowledgement: //110 - Acknowledgement of Acknowledgement
+        case ControlPacketType::AcknowledgementOfAcknowledgement: //110 - Acknowledgment of Acknowledgment
         {
             int32_t ack;
             int rtt = -1;
@@ -2035,7 +2033,7 @@ void CUDT::processCtrl(const CPacket* ctrlpkt)
             //performing ACK on existing data to provide data already-in-buffer to recv
             checkTimers(true);
 
-            // Signal the sender and recver if they are waiting for data.
+            // Signal the sender and receiver if they are waiting for data.
             releaseSynch();
             CTimer::triggerEvent();
 
@@ -2058,7 +2056,7 @@ void CUDT::processCtrl(const CPacket* ctrlpkt)
             //int err_type = packet.getAddInfo();
 
             // currently only this error is signalled from the peer side
-            // if recvfile() failes (e.g., due to disk fail), blcoked sendfile/send should return immediately
+            // if recvfile() fails (e.g., due to disk fail), blocked sendfile/send should return immediately
             // giving the app a chance to fix the issue
 
             m_bPeerHealth = false;
@@ -2339,7 +2337,7 @@ void CUDT::checkTimers(bool forceAck)
             m_iBrokenCounter = 30;
             m_bShutdown = false;
 
-            // update snd U list to remove this socket
+            // update send U list to remove this socket
             sndQueue().sndUList().update(shared_from_this());
 
             releaseSynch();
@@ -2350,8 +2348,8 @@ void CUDT::checkTimers(bool forceAck)
             return;
         }
 
-        // sender: Insert all the packets sent after last received acknowledgement into the sender loss list.
-        // recver: Send out a keep-alive packet
+        // sender: Insert all the packets sent after last received acknowledgment into the sender loss list.
+        // receiver: Send out a keep-alive packet
         if (m_pSndBuffer->getCurrBufSize() > 0)
         {
             if ((CSeqNo::incseq(m_iSndCurrSeqNo) != m_iSndLastAck) && (m_pSndLossList->getLossLength() == 0))

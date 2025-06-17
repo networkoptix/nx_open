@@ -253,7 +253,6 @@ NovMetadata ExportLayoutTool::prepareLayoutAndMetadata()
     return metadata;
 }
 
-
 bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
 {
     // NOV-file metadata.
@@ -370,7 +369,6 @@ bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
             NX_ASSERT(std::is_sorted(periods.cbegin(), periods.cend()));
             periods.encode(data);
         }
-
 
         auto fileName = nx::format("chunk_%1.bin", fileNameForResource(resource));
         if (!writeData(fileName, data))

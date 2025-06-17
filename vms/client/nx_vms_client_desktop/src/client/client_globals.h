@@ -80,7 +80,6 @@ namespace Qn
         /** Whether item swithing is manual role for Showreel review layout. */
         ShowreelIsManualRole,
 
-
         //-------------------------------------------------------------------------------------------------
         // Layout-based roles. Their numeric values must be kept intact to maintain external video
         // wall integrations. Video Wall Control protocol uses these IDs to pass messages about
@@ -390,7 +389,7 @@ namespace Qn
         SelectedGroupFullyMatchesFilter,            /**< Role indicating whether selected group fully matches current search filter, always true for empty search string. (bool). */
 
         AnalyticsEngineNameRole,                    /**< Role for related analytics engine name. (QString) */
-        AnalyticsObjectTypeIdRole,                  /**< Role for type Id of Anlytics Object. (QString) */
+        AnalyticsObjectTypeIdRole,                  /**< Role for type Id of Analytics Object. (QString) */
 
         /**
          * Role for passing existing remote connection.
@@ -515,7 +514,6 @@ namespace Qn
         OldFrameRendered,   /**< No new frames available, old frame was rendered. */
         NewFrameRendered    /**< New frame was rendered. */
     };
-
 
     /**
      * Flags describing the client light mode.

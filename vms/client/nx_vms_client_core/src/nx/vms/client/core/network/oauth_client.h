@@ -65,7 +65,7 @@ public:
      */
     void setSystemName(const QString& value);
 
-    /** Final authetication data. */
+    /** Final authentication data. */
     const CloudAuthData& authData() const;
 
     /** Bind to cloud parameters. */

@@ -61,7 +61,7 @@ struct Facade
     static auto id(const Type& data)
     {
         // We have different event types, related to the server or camera with different
-        // parameters. Each distinct event is charactarized by it's event data so we can rely
+        // parameters. Each distinct event is characterized by it's event data so we can rely
         // on it when creating unique identifier of the event.
         return nx::Uuid::fromArbitraryData(QJson::serialized(data.eventData));
     }
@@ -73,7 +73,7 @@ struct Facade
 
     static bool equal(const Type& /*left*/, const Type& /*right*/)
     {
-        return false; //< Data is unchangable.
+        return false; //< Data is unchangeable.
     }
 };
 
@@ -137,7 +137,6 @@ struct VmsEventSearchListModel::Private
 
     QTimer liveUpdateTimer;
     MultiRequestIdHolder multiRequestIdHolder;
-
 
     Private(VmsEventSearchListModel* q);
 
@@ -323,7 +322,7 @@ bool VmsEventSearchListModel::Private::requestFetch(
             return;
         }
 
-        // We can have here duplicated events as the server returns the list of occured actions.
+        // We can have here duplicated events as the server returns the list of occurred actions.
         // So the trick is to leave only unique events and as we generate unique id for each event
         // we can just remove duplicates here.
         core::removeDuplicateItems<Facade>(data, data.begin(), data.end());

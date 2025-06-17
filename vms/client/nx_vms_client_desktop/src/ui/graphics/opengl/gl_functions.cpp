@@ -158,7 +158,6 @@ public:
         }
 #endif
 
-
 #ifdef Q_OS_LINUX
         QDir atiProcDir("/proc/ati");
         if(atiProcDir.exists()) /* Checking for fglrx driver. */
@@ -186,7 +185,6 @@ private:
 
 typedef QnGlContextData<QnGlFunctionsPrivate, QnGlContextDataForwardingFactory<QnGlFunctionsPrivate> > QnGlFunctionsPrivateStorage;
 Q_GLOBAL_STATIC(QnGlFunctionsPrivateStorage, qn_glFunctionsPrivateStorage);
-
 
 // -------------------------------------------------------------------------------------------------
 

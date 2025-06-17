@@ -560,7 +560,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     else if (!draw)
         m_lastIgnoreTime = data->timestamp;
 
-
     m_isLive = data->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE);
     const bool needReinitDecoders = m_needReinitDecoders.exchange(false);
 
@@ -587,7 +586,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
 
     QnAbstractVideoDecoder* dec = nullptr;
     {
-        // Check can we use one more HW decoder or HW accelersation is disabled.
+        // Check can we use one more HW decoder or HW acceleration is disabled.
         if (data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
         {
             if (shouldUpdateDecoder(data, m_reverseMode))
@@ -790,7 +789,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(
     QnFrameScaler::DownscaleFactor forceScaleFactor)
 {
     {
-        //  Clear previos frame, since decoder clear it on decode call
+        // Clear previous frame, since decoder clears it on decode call.
         NX_MUTEX_LOCKER lock(&m_lastDisplayedFrameMutex);
         if (m_lastDisplayedFrame && m_lastDisplayedFrame->isExternalData())
             m_lastDisplayedFrame.reset();

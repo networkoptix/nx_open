@@ -798,7 +798,7 @@ void MultiServerUpdatesWidget::setUpdateTarget(
     m_finishingForcefully = false;
 
     // TODO: We should collect all these changes to a separate state-structure.
-    // TODO: We should split state flags more consistenly.
+    // TODO: We should split state flags more consistently.
 }
 
 nx::Uuid MultiServerUpdatesWidget::clientPeerId() const
@@ -998,7 +998,7 @@ void MultiServerUpdatesWidget::atCheckInstallState()
 
 bool MultiServerUpdatesWidget::tryClose(bool /*force*/)
 {
-    // Should we cancell all pending ations on exit?
+    // Should we cancel all pending actions on exit?
     //if(m_updateTool)
     //    m_updateTool->cancelAll();
     return true;

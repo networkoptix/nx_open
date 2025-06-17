@@ -70,7 +70,6 @@ class IpAddressValidator: public QValidator{
 
 };
 
-
 QnIpLineEdit::QnIpLineEdit(QWidget *parent):
     base_type(parent){
     setValidator(new IpAddressValidator());

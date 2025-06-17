@@ -213,7 +213,7 @@ bool HwVideoDecoder::initializeHardware(const QnConstCompressedVideoDataPtr& dat
     if (m_mtDecodingPolicy != MultiThreadDecodePolicy::disabled)
     {
         m_decoderContext->thread_count = std::min(kMaxDecodeThread, av_cpu_count());
-        NX_DEBUG(this, "Hardware becoder thread_count: %1(used in case of software fallback)",
+        NX_DEBUG(this, "Hardware decoder thread_count: %1(used in case of software fallback)",
             m_decoderContext->thread_count);
     }
 

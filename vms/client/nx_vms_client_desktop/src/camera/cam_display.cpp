@@ -684,7 +684,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_any;
     if (channel > 0 && m_display[0]) // if device has more than one channel
     {
-        // this here to avoid situation where different channels have different down scale factor; it might lead to diffrent size
+        // this here to avoid situation where different channels have different down scale factor; it might lead to different size
         scaleFactor = m_display[0]->getCurrentDownscaleFactor(); // [0] - master channel
     }
     if (vd->flags & QnAbstractMediaData::MediaFlags_StillImage)
@@ -1015,7 +1015,10 @@ void QnCamDisplay::onReaderResumed()
 void QnCamDisplay::onPrevFrameOccurred()
 {
     if (getDisplayedTime() != DATETIME_NOW)
-        m_doNotChangeDisplayTime = true; // do not move display time to jump position because jump pos given approximatly
+    {
+        // Do not move display time to jump position because jump pos given approximately.
+        m_doNotChangeDisplayTime = true;
+    }
     NX_MUTEX_LOCKER lock( &m_audioChangeMutex );
     m_audioDisplay->clearDeviceBuffer();
 }
@@ -1166,7 +1169,7 @@ bool QnCamDisplay::useSync(QnConstAbstractMediaDataPtr md)
 
 void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
 {
-    // Put analytics/motion packets directly to their conumers to save space in the dataQueue.
+    // Put analytics/motion packets directly to their consumers to save space in the dataQueue.
     if (const auto& metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data))
     {
         if (metadata->metadataType == MetadataType::ObjectDetection
@@ -1209,7 +1212,7 @@ bool QnCamDisplay::canAcceptData() const
     if (m_isRealTimeSource)
         return QnAbstractDataConsumer::canAcceptData();
     else if (m_processedPackets < m_dataQueue.maxSize())
-        return m_dataQueue.size() <= m_processedPackets; // slowdown slightly to improve a lot of seek perfomance
+        return m_dataQueue.size() <= m_processedPackets; // slowdown slightly to improve a lot of seek performance
     else
         return QnAbstractDataConsumer::canAcceptData();
 }
@@ -1628,7 +1631,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             doDelayForAudio(ad, speed);
         }
 
-        // we synch video to the audio; so just put audio in player with out thinking
+        // we sync video to the audio; so just put audio in player with out thinking
         if (m_playAudio && qAbs(speed-1.0) < FPS_EPS)
         {
             NX_VERBOSE(this, "Sync video to audio for resource %1. "
@@ -1695,7 +1698,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             if (channel >= CL_MAX_CHANNELS)
                 return result;
 
-            // this is the only point to addreff;
+            // this is the only point to addref;
             // video data can escape from this object only if displayed or in case of clearVideoQueue
             // so release ref must be in both places
 
@@ -1790,7 +1793,7 @@ bool QnCamDisplay::processVideoData(QnCompressedVideoDataPtr incoming, int chann
 
         if (m_lastAudioPacketTime != m_syncAudioTime)
         {
-            // Sync audio time prevent stopping video, if audio track is disapearred.
+            // Sync audio time prevent stopping video, if audio track is disappeared.
             m_syncAudioTime = m_lastAudioPacketTime;
         }
 
@@ -1964,7 +1967,8 @@ void QnCamDisplay::enqueueVideo(QnCompressedVideoDataPtr vd)
     {
         NX_WARNING(this, "Video buffer overflow!");
         dequeueVideo(vd->channelNumber);
-        // some protection for very large difference between video and audio tracks. Need to improve sync logic for this case (now a lot of glithces)
+        // Some protection for very large difference between video and audio tracks. Need to improve
+        // sync logic for this case (now a lot of glitches).
         m_videoBufferOverflow = true;
     }
 }
@@ -2201,7 +2205,7 @@ bool QnCamDisplay::isBuffering() const
         return false;
     // for offline resource at LIVE position no any data. Check it
     if (!isRealTimeSource())
-        return true; // if archive position then buffering mark should be resetted event for offline resource
+        return true; // if archive position then buffering mark should be reset event for offline resource
     return m_resource->isOnline();
 }
 

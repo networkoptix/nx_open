@@ -38,7 +38,6 @@ written by
 Yunhong Gu, last updated 02/28/2012
 *****************************************************************************/
 
-
 #ifndef __UDT_CCC_H__
 #define __UDT_CCC_H__
 
@@ -46,7 +45,6 @@ Yunhong Gu, last updated 02/28/2012
 
 #include "udt.h"
 #include "packet.h"
-
 
 class UDT_API CCC
 {
@@ -87,7 +85,7 @@ public:
     // Functionality:
     //    Callback function to be called when a loss report is received.
     // Parameters:
-    //    0) [in] losslist: list of sequence number of packets, in the format describled in packet.cpp.
+    //    0) [in] losslist: list of sequence number of packets, in the format described in packet.cpp.
     //    1) [in] size: length of the loss list.
     // Returned value:
     //    None.
@@ -135,7 +133,7 @@ public:
 protected:
 
     // Functionality:
-    //    Set periodical acknowldging and the ACK period.
+    //    Set periodical acknowledging and the ACK period.
     // Parameters:
     //    0) [in] msINT: the period to send an ACK.
     // Returned value:
@@ -144,7 +142,7 @@ protected:
     void setACKTimer(std::chrono::microseconds msINT);
 
     // Functionality:
-    //    Set packet-based acknowldging and the number of packets to send an ACK.
+    //    Set packet-based acknowledging and the number of packets to send an ACK.
     // Parameters:
     //    0) [in] pktINT: the number of packets to send an ACK.
     // Returned value:

@@ -35,7 +35,7 @@ struct WindowContext::Private
     std::unique_ptr<RemoteLogManager> remoteLogManager;
     std::unique_ptr<UiController> uiController;
 
-    // TODO: #ynikitenkov Move to the application contex.
+    // TODO: #ynikitenkov Move to the application context.
     std::unique_ptr<QnMobileClientUriHandler> uriHandler;
 
     QPointer<QQuickWindow> mainWindow;

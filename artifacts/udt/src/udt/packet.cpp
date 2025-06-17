@@ -38,7 +38,6 @@ written by
 Yunhong Gu, last updated 02/12/2011
 *****************************************************************************/
 
-
 //////////////////////////////////////////////////////////////////////////////
 //    0                   1                   2                   3
 //    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -92,15 +91,16 @@ Yunhong Gu, last updated 02/12/2011
 //      1: Keep-alive
 //              Add. Info:    Undefined
 //              Control Info: None
-//      2: Acknowledgement (ACK)
+//      2: Acknowledgment (ACK)
 //              Add. Info:    The ACK sequence number
-//              Control Info: The sequence number to which (but not include) all the previous packets have beed received
+//              Control Info: The sequence number to which (but not include) all the previous
+//                            packets have been received
 //              Optional:     RTT
 //                            RTT Variance
 //                            available receiver buffer size (in bytes)
 //                            advertised flow window size (number of packets)
 //                            estimated bandwidth (number of packets per second)
-//      3: Negative Acknowledgement (NAK)
+//      3: Negative Acknowledgment (NAK)
 //              Add. Info:    Undefined
 //              Control Info: Loss list (see loss list coding below)
 //      4: Congestion/Delay Warning
@@ -109,13 +109,13 @@ Yunhong Gu, last updated 02/12/2011
 //      5: Shutdown
 //              Add. Info:    Undefined
 //              Control Info: None
-//      6: Acknowledgement of Acknowledement (ACK-square)
+//      6: Acknowledgment of Acknowledgment (ACK-square)
 //              Add. Info:    The ACK sequence number
 //              Control Info: None
 //      7: Message Drop Request
 //              Add. Info:    Message ID
 //              Control Info: first sequence number of the message
-//                            last seqeunce number of the message
+//                            last sequence number of the message
 //      8: Error Signal from the Peer Side
 //              Add. Info:    Error code
 //              Control Info: None
@@ -135,13 +135,12 @@ Yunhong Gu, last updated 02/12/2011
 //   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //
 //   Loss List Field Coding:
-//      For any consectutive lost seqeunce numbers that the differnece between
+//      For any consecutive lost sequence numbers that the difference between
 //      the last and first is more than 1, only record the first (a) and the
 //      the last (b) sequence numbers in the loss list field, and modify the
 //      the first bit of a to 1.
-//      For any single loss or consectutive loss less than 2 packets, use
+//      For any single loss or consecutive loss less than 2 packets, use
 //      the original sequence numbers in the field.
-
 
 #include <cstring>
 #include "log.h"
@@ -176,7 +175,7 @@ std::string to_string(ControlPacketType packetType)
 
 //-------------------------------------------------------------------------------------------------
 
-// Set up the aliases in the constructure
+// Set up the aliases in the constructor
 CPacket::CPacket():
     m_iSeqNo((int32_t&)(m_nHeader[0])),
     m_iMsgNo((int32_t&)(m_nHeader[1])),
@@ -222,18 +221,18 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, int payloadSize)
     // Set additional information and control information field
     switch (pkttype)
     {
-        case ControlPacketType::Acknowledgement: //0010 - Acknowledgement (ACK)
+        case ControlPacketType::Acknowledgement: //0010 - Acknowledgment (ACK)
                                           // ACK packet seq. no.
             if (NULL != lparam)
                 m_nHeader[1] = *(int32_t *)lparam;
 
             // data ACK seq. no.
-            // optional: RTT (microsends), RTT variance (microseconds) advertised flow window size (packets), and estimated link capacity (packets per second)
+            // optional: RTT (microseconds), RTT variance (microseconds) advertised flow window size (packets), and estimated link capacity (packets per second)
             m_payloadSize = payloadSize;
 
             break;
 
-        case ControlPacketType::AcknowledgementOfAcknowledgement: //0110 - Acknowledgement of Acknowledgement (ACK-2)
+        case ControlPacketType::AcknowledgementOfAcknowledgement: //0110 - Acknowledgment of Acknowledgment (ACK-2)
                                                            // ACK packet seq. no.
             m_nHeader[1] = *(int32_t *)lparam;
 

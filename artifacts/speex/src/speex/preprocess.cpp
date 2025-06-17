@@ -31,7 +31,6 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 /*
    Recommended papers:
 
@@ -256,7 +255,6 @@ struct SpeexPreprocessState_ {
 #endif
 };
 
-
 static void conj_window(spx_word16_t *w, int len)
 {
    int i;
@@ -289,7 +287,6 @@ static void conj_window(spx_word16_t *w, int len)
       w[i]=spx_sqrt(SHL32(EXTEND32(tmp),15));
    }
 }
-
 
 #ifdef FIXED_POINT
 /* This function approximates the gain function
@@ -419,7 +416,6 @@ EXPORT SpeexPreprocessState *speex_preprocess_state_init(int frame_size, int sam
          break;
       }
    }
-
 
    if (st->ps_size < 3*st->frame_size/4)
       st->ps_size = st->ps_size * 3 / 2;
@@ -834,7 +830,7 @@ EXPORT int speex_preprocess_run(SpeexPreprocessState *st, spx_int16_t *x)
    compute_gain_floor(st->noise_suppress, effective_echo_suppress, st->noise+N, st->echo_noise+N, st->gain_floor+N, M);
 
    /* Compute Ephraim & Malah gain speech probability of presence for each critical band (Bark scale)
-      Technically this is actually wrong because the EM gaim assumes a slightly different probability
+      Technically this is actually wrong because the EM gain assumes a slightly different probability
       distribution */
    for (i=N;i<N+M;i++)
    {
@@ -1046,7 +1042,6 @@ EXPORT void speex_preprocess_estimate_update(SpeexPreprocessState *st, spx_int16
       st->reverb_estimate[i] = MULT16_32_Q15(st->reverb_decay, st->reverb_estimate[i]);
 }
 
-
 EXPORT int speex_preprocess_ctl(SpeexPreprocessState *state, int request, void *ptr)
 {
    int i;
@@ -1214,4 +1209,3 @@ EXPORT int speex_preprocess_ctl(SpeexPreprocessState *state, int request, void *
 #ifdef FIXED_DEBUG
 long long spx_mips=0;
 #endif
-

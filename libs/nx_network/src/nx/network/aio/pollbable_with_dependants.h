@@ -13,7 +13,7 @@ namespace nx::network::aio {
 
 /**
  * nx::network::aio::BasicPollable implementation that offers some convenience for managing
- * dependant nx::network::aio::BasicPollable objects.
+ * dependent nx::network::aio::BasicPollable objects.
  */
 template<typename Base>
 requires std::is_base_of_v<nx::network::aio::BasicPollable, Base>
@@ -63,7 +63,7 @@ protected:
     }
 
     /**
-     * Tells about an existing dependant object.
+     * Tells about an existing dependent object.
      * The dependant will be
      * - bound to new AIO thread when latter is changed
      * - asked to cancel its I/O when this is doing that

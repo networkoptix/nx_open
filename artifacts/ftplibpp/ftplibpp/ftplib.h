@@ -19,7 +19,7 @@
  * Note: ftplib, on which ftplibpp was originally based upon used to be    *
  * licensed as GPL 2.0 software, as of Jan. 26th 2013 its author Thomas    *
  * Pfau allowed the distribution of ftplib via LGPL. Thus the license of   *
- * ftplibpp changed aswell.                                                *
+ * ftplibpp changed as well.                                                *
  ***************************************************************************/
 
 #ifndef FTPLIB_H
@@ -86,7 +86,6 @@ typedef int (*FtpCallbackIdle)(void *arg);
 typedef void (*FtpCallbackLog)(char *str, void* arg, bool out);
 //SSL
 typedef bool (*FtpCallbackCert)(void *arg, X509 *cert);
-
 
 struct ftphandle {
 	char *cput,*cget;

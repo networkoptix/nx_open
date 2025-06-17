@@ -18,7 +18,7 @@ struct NX_VMS_COMMON_API ConfigureSystemData: public PasswordData
     nx::vms::api::Timestamp tranLogTime;
     int port = 0;
 
-    // The server from a claster A that call /api/configure to the the server on a claster B.
+    // The server from a cluster A that call /api/configure to the server on a cluster B.
     nx::vms::api::MediaServerData foreignServer;
     std::vector<nx::vms::api::UserData> foreignUsers;
     nx::vms::api::ResourceParamDataList foreignSettings;

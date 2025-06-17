@@ -185,7 +185,7 @@ public:
     }
 
 protected:
-    // can be overriden by child class implementations to perform private configuration.
+    // can be overridden by child class implementations to perform private configuration.
     virtual bool configureListenerInternal(SocketServerType* /*listener*/){ return true; }
 
     std::list<std::unique_ptr<SocketServerType>>& listeners()

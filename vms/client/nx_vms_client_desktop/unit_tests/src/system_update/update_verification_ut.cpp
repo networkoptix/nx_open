@@ -69,7 +69,6 @@ const QString packagesForSystemSupportTest = R"(
 
 } // namespace
 
-
 namespace nx::vms::client::desktop::test {
 
 using namespace system_update::test;
@@ -247,7 +246,7 @@ TEST_F(UpdateVerificationTest, testForkedVersion)
     contents.resetVerification();
 
     // Both servers have equal version, but the client is older.
-    // In VMS-14494 one server had no package avaliable, but it had desired version already.
+    // In VMS-14494 one server had no package available, but it had desired version already.
     // We should ignore this server as well;
     contents.sourceType = UpdateSourceType::internetSpecific;
     makeServer(Version("4.0.0.28524"));

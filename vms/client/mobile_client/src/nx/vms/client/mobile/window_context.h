@@ -49,7 +49,7 @@ class WindowContext: public core::WindowContext
         READ logManager
         CONSTANT)
 
-    // Depricated classes.
+    // Deprecated classes.
     Q_PROPERTY(QnMobileClientUiController* depricatedUiController
         READ depricatedUiController
         CONSTANT)

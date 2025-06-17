@@ -419,7 +419,6 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
         lit("%1 screenshots done for %2 seconds").arg(count).arg((endTime - startTime) / 1000));
 }
 
-
 void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     const auto actionParameters = menu()->currentParameters(sender());
     QString filename = actionParameters.argument<QString>(Qn::FileNameRole);
@@ -463,7 +462,7 @@ std::vector<QnCustomFileDialog::FileFilter> QnWorkbenchScreenshotHandler::genera
     {
         const QnCustomFileDialog::FileFilter jpgFilter{tr("JPEG Image"), {"jpg", "jpeg"}};
 
-        // Depending on the latest screenshot parameters put the JPEG filter to the begining or
+        // Depending on the latest screenshot parameters put the JPEG filter to the beginning or
         // the end of the filter list.
         if (QFileInfo(appContext()->localSettings()->lastScreenshotParams().filename)
             .fileName().endsWith("png"))

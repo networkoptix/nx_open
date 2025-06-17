@@ -148,7 +148,7 @@ private:
     QJSValue wrapQVariant(QVariant value);
 
     /**
-     * Blocks the current thread until the asyncronious operation, e.g drag and drop finishes its
+     * Blocks the current thread until the asynchronous operation, e.g drag and drop finishes its
      * execution.
      */
     void ensureAsyncActionFinished();

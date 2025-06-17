@@ -78,7 +78,7 @@ TEST_F(Buffer, data_shared_implicitely)
     assertEqual(one, two);
     assertSameMemoryIsUsedToHoldData(one, two);
 
-    // Non-const method invokation.
+    // Non-const method invocation.
     two.data();
 
     assertEqual(one, two);

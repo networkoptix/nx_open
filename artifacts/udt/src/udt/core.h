@@ -384,7 +384,7 @@ public:
     static constexpr int ERROR = -1;                      // socket api error returned value
 
 private: // Identification
-    // Mimimum recv buffer size is 32 packets
+    // Minimum recv buffer size is 32 packets
     static constexpr int kMinRecvBufferSize = 32;
     //Rcv buffer MUST NOT be bigger than Flight Flag size
     static constexpr int kDefaultRecvBufferSize =
@@ -407,8 +407,8 @@ private: // Packet sizes
 
 private: // Options
     int m_iMSS = UDT::kDefaultMSS;                // Maximum Segment Size, in bytes
-    bool m_bSynSending = true;                          // Sending syncronization mode
-    bool m_bSynRecving = true;                          // Receiving syncronization mode
+    bool m_bSynSending = true;                          // Sending synchronization mode
+    bool m_bSynRecving = true;                          // Receiving synchronization mode
     int m_iFlightFlagSize = UDT::kDefaultRecvWindowSize;                       // Maximum number of packets in flight from the peer side
     int m_iSndBufSize = kDefaultSendBufferSize;                           // Maximum UDT sender buffer size
     int m_iRcvBufSize = kDefaultRecvBufferSize;                           // Maximum UDT receiver buffer size
@@ -526,8 +526,8 @@ private: // Trace
 
     // last performance sample time.
     std::chrono::microseconds m_LastSampleTime = std::chrono::microseconds::zero();
-    int64_t m_llTraceSent = 0;                      // number of pakctes sent in the last trace interval
-    int64_t m_llTraceRecv = 0;                      // number of pakctes received in the last trace interval
+    int64_t m_llTraceSent = 0;                      // number of packets sent in the last trace interval
+    int64_t m_llTraceRecv = 0;                      // number of packets received in the last trace interval
     int m_iTraceSndLoss = 0;                        // number of lost packets in the last trace interval (sender side)
     int m_iTraceRcvLoss = 0;                        // number of lost packets in the last trace interval (receiver side)
     int m_iTraceRetrans = 0;                        // number of retransmitted packets in the last trace interval

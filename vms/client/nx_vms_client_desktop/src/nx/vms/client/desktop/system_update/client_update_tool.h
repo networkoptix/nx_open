@@ -123,7 +123,7 @@ public:
 
     /**
      * Tells applauncher to install update package.
-     * It will work only if tool is in state State::readyInstall. This is asyncronous call.
+     * It will work only if tool is in state State::readyInstall. This is asynchronous call.
      * You should subscribe to 'updateStateChanged' to get notification.
      * @return true if success
      */

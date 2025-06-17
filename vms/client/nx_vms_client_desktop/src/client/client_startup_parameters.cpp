@@ -136,7 +136,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.stateFileName, kStateFileKey);
 
     // TODO: #sivanov Reimplement wide-char command-line parsing.
-    // This is a temporary solution to avoid massive refactoring before release. More correclty is
+    // This is a temporary solution to avoid massive refactoring before release. More correctly is
     // to process this in the main.cpp (using wmain entry) and pass arguments as QStringList to the
     // module runApplication routine.
     #if defined(Q_OS_WIN)

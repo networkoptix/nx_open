@@ -21,7 +21,7 @@ const QByteArray kLineSplit("\n");
 class LogFile: public ::testing::Test
 {
 public:
-    // TODO: Use temp directory from TestOptions when avaliable.
+    // TODO: Use temp directory from TestOptions when available.
     LogFile():
         m_basePath(nx::format("%1/log%2").args(
             TestOptions::temporaryDirectoryPath(), nx::utils::random::number()))

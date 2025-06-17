@@ -32,14 +32,14 @@ class QQuickWidget;
 /*!
     - loads decoded picture from system memory to opengl texture(s)
     - tracks usage of texture(s) by GUI thread
-    - opengl context must be created before instanciation of this class
+    - opengl context must be created before instantiation of this class
     - supports multiple opengl textures (one is being loaded to by decoder thread, another is used for rendering by GUI thread)
 
     \note All methods are thread-safe
     \note GUI thread does not get blocked by decoder thread if \a asyncDepth > 0
     \note this class provides decoded picture to renderer in order they were passed to it
     \note Single instance of \a DecodedPictureToOpenGLUploader can manage decoded pictures of same type.
-        Calling \a uploadDecodedPicture with pictures of different types may lead to undefined behavour
+        Calling \a uploadDecodedPicture with pictures of different types may lead to undefined behavior
 */
 class DecodedPictureToOpenGLUploader
 :
@@ -119,7 +119,7 @@ public:
         ~UploadedPicture();
     };
 
-    //!Calls \a getUploadedPicture at initialiation and \a pictureDrawingFinished before destruction
+    //!Calls \a getUploadedPicture at initialization and \a pictureDrawingFinished before destruction
     class ScopedPictureLock
     {
     public:
@@ -140,9 +140,9 @@ public:
         \param mainContext Application's main gl context. Used to find address of opengl extension functions. Required, because \a QnGlFunctions is tied to \a QGLContext.
             In future, this parameter should be removed (this will required \a QnGlFunctions refactoring)
         \param mainContextHandle System-dependent handle of \a mainContext. This argument is introduced to allow \a DecodedPictureToOpenGLUploader
-            instanciation from non-GUI thread (since we can get gl context handle only in GUI thread)
+            instantiation from non-GUI thread (since we can get gl context handle only in GUI thread)
         \param asyncDepth Number of additional uploaded picture textures to allocate so that decrease wait for rendering by decoder thread
-        If \a asyncDepth is 0, only one uploded picture data is allocated so \a uploadDecodedPicture will block while GUI thread renders picture
+        If \a asyncDepth is 0, only one uploaded picture data is allocated so \a uploadDecodedPicture will block while GUI thread renders picture
 
         \note If \a asyncDepth is 0 then it is possible that getUploadedPicture() will return nullptr (if the only gl buffer is currently used for uploading)
     */
@@ -197,7 +197,7 @@ public:
     qreal opacity() const;
     void setOpacity( qreal opacity );
     /*!
-        In this method occures cleanup of all resources. Object is unusable futher...
+        In this method occurs cleanup of all resources. Object is unusable further...
     */
     void beforeDestroy();
     void setYV12ToRgbShaderUsed( bool yv12SharedUsed );
@@ -211,9 +211,9 @@ public:
     void setImageCorrection(const nx::vms::api::ImageCorrectionData& value);
     nx::vms::api::ImageCorrectionData getImageCorrection() const;
 
-    //!Loads picture with dat stored in \a planes to opengl \a dest
+    //!Loads picture with data stored in \a planes to opengl \a dest
     /*!
-        \note Method is re-enterable
+        \note Method is reentrant
         \return false, if failed to make \a glContext current. Otherwise, true
     */
     bool uploadDataToGl(

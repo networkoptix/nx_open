@@ -222,7 +222,7 @@ TEST_F(EventParametersTest, EventParametersModelFilter)
             model.filter(filter);
         };
 
-    // Set filter to begining of the event parameter.
+    // Set filter to beginning of the event parameter.
     whenSetFilter("{");
 
     // Check that model contains default values.
@@ -234,11 +234,11 @@ TEST_F(EventParametersTest, EventParametersModelFilter)
     // Check that model contains only that value.
     thenRowCountIs(model, 1);
 
-    // Set filter to begining of group.
+    // Set filter to beginning of group.
     whenSetFilter("{group");
     thenNumberOfGroupsIs(model, 2);
 
-    // Set filter to begining of group in differnt case.
+    // Set filter to beginning of group in different case.
     whenSetFilter("{GROUP");
     thenNumberOfGroupsIs(model, 2);
 

@@ -51,7 +51,7 @@ void assignField(const SaasServiceParameters& parameters, const Field<T>& field)
     catch (const std::bad_variant_access& ex)
     {
         NX_WARNING(NX_SCOPE_TAG,
-            "Unexpected type for analitics service parameter. %1", ex.what());
+            "Unexpected type for analytics service parameter. %1", ex.what());
     }
 }
 

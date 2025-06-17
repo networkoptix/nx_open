@@ -41,7 +41,6 @@ Yunhong Gu, last updated 08/20/2010
 #ifndef __UDT_EPOLL_H__
 #define __UDT_EPOLL_H__
 
-
 #include <map>
 #include <memory>
 #include <mutex>
@@ -50,7 +49,6 @@ Yunhong Gu, last updated 08/20/2010
 #include "common.h"
 #include "result.h"
 #include "udt.h"
-
 
 class EpollImpl;
 

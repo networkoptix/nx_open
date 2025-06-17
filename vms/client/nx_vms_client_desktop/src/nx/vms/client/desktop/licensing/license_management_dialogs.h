@@ -72,7 +72,7 @@ class LicenseDeactivationDialogs
 
 public:
     /**
-     * Warn about failed deactivation. No licenses can bbe deactivated.
+     * Warn about failed deactivation. No licenses can be deactivated.
      */
     static void deactivationError(
         QWidget* parent,

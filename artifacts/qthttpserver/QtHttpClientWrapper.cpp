@@ -122,7 +122,7 @@ void QtHttpClientWrapper::onClientDataReceived (void) {
                 default: { break; }
             }
             switch (m_parsingStatus) { // handle parsing status end/error
-                case RequestParsed: { // a valid request has ben fully parsed
+                case RequestParsed: { // a valid request has been fully parsed
                     QtHttpReply reply (m_serverHandle);
                     connect (&reply, &QtHttpReply::requestSendHeaders,
                              this, &QtHttpClientWrapper::onReplySendHeadersRequested);
@@ -132,7 +132,7 @@ void QtHttpClientWrapper::onClientDataReceived (void) {
                     m_parsingStatus = sendReplyToClient (&reply);
                     break;
                 }
-                case ParsingError: { // there was an error durin one of parsing steps
+                case ParsingError: { // there was an error during one of parsing steps
                     m_sockClient->readAll (); // clear remaining buffer to ignore content
                     QtHttpReply reply (m_serverHandle);
                     reply.setStatusCode (QtHttpReply::BadRequest);

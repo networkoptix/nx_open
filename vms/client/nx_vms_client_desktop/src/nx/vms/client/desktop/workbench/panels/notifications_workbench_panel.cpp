@@ -169,7 +169,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     setHelpTopic(m_widget, HelpTopic::Id::NotificationsPanel);
 
     action(menu::ToggleNotificationsAction)->setChecked(settings.state == Qn::PaneState::Opened);
-    m_showButton->setTransform(QTransform::fromScale(-1, 1)); // Achtung! Flips button horizontally.
+    m_showButton->setTransform(QTransform::fromScale(-1, 1)); //< Flips button horizontally.
     connect(action(menu::ToggleNotificationsAction), &QAction::toggled,
         this, [this](bool opened) { if (!m_blockAction) setOpened(opened); });
 

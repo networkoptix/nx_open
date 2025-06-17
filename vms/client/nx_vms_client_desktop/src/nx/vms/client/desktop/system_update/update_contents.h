@@ -72,7 +72,7 @@ struct NX_VMS_CLIENT_DESKTOP_API UpdateContents
     QDir storageDir;
     /** A list of files to be uploaded. */
     QStringList filesToUpload;
-    /** Information for the clent update. */
+    /** Information for the client update. */
     std::optional<update::Package> clientPackage;
 
     common::update::Information info;

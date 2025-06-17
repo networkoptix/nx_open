@@ -292,8 +292,8 @@ void QnBookmarkMergeHelper::addBookmark(const QnCameraBookmark &bookmark)
 {
     /* Here we perform a simplified bookmark merge.
      * In contradiction to the main algorithm this one won't change the bookmarks tree topology.
-     * E.g. it won't merge existing clusters that weren't merged before beacuse of big spacing between them
-     * which became filled by the added bookmark.
+     * E.g. it won't merge existing clusters that weren't merged before because of big spacing
+     * between them which became filled by the added bookmark.
      * Instead such bookmark will be appended to the left or right cluster if possible.
      */
 
@@ -355,8 +355,8 @@ void QnBookmarkMergeHelper::removeBookmark(const QnCameraBookmark &bookmark)
 {
     /* Here we perform simple bookmark removal.
      * In contradiction to the main merge algorithm here we don't change the bookmarks tree topology.
-     * E.g. we don't split existing clusters that should be split beacuse of big spacing between their child items.
-     * Instead we only adjust its bounds.
+     * E.g. we don't split existing clusters that should be split because of big spacing between
+     * their child items. Instead we only adjust its bounds.
      */
 
     Q_D(QnBookmarkMergeHelper);
@@ -412,7 +412,6 @@ void QnBookmarkMergeHelper::removeBookmark(const QnCameraBookmark &bookmark)
         parent = parent->parent;
     }
 }
-
 
 int QnBookmarkMergeHelperPrivate::detailLevel(milliseconds msecsPerDPix) const
 {
@@ -533,7 +532,6 @@ BookmarkItemList QnBookmarkMergeHelperPrivate::childrenForItem(const BookmarkIte
 
     return result;
 }
-
 
 QnTimelineBookmarkItem BookmarkItem::toTimelineBookmarkItem() const
 {

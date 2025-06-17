@@ -303,7 +303,7 @@ void extractParametersToFields(DeviceModelV4* m)
 
 // Fields that marked as `readonly` for apidoc must not be included here, because they are ignored
 // by the Schema, hence are not initialized (empty). Having such fields in the `kExtractedOnRequest`
-// list will result in creating the corresponding `parameters["field_name"]` with default emtpy
+// list will result in creating the corresponding `parameters["field_name"]` with default empty
 // value.
 void moveFieldsToParameters(DeviceModelV1Base* m)
 {
@@ -314,7 +314,7 @@ void moveFieldsToParameters(DeviceModelV1Base* m)
 
 // Fields that marked as `readonly` for apidoc must not be included here, because they are ignored
 // by the Schema, hence are not initialized (empty). Having such fields in the `kExtractedOnRequest`
-// list will result in creating the corresponding `parameters["field_name"]` with default emtpy
+// list will result in creating the corresponding `parameters["field_name"]` with default empty
 // value.
 void moveFieldsToParameters(DeviceModelV3Base* m)
 {

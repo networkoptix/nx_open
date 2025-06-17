@@ -56,7 +56,7 @@ TEST_F(CSndUList, no_recursive_lock_when_CSndUList_gets_CUDT_ownership)
 
         threadStarted.get_future().wait();
 
-        // NOTE: Trying to acheive the situation when sndUList().pop() owns the m_u object.
+        // NOTE: Trying to achieve the situation when sndUList().pop() owns the m_u object.
         // (it locks weak_ptr inside).
         m_u.reset();
 

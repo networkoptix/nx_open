@@ -77,7 +77,7 @@ void Server::registerRequestHandlers(
     /**%apidoc POST /placeholder/maintenance/log/loggers
      * Adds a new logger. On success, the logger will write to the file specified on the host
      * filesystem.<br/>
-     * Note that logging can slow down the applcation significantly, especially, debug/verbose
+     * Note that logging can slow down the application significantly, especially, debug/verbose
      * logging. So, consider logging carefully and delete loggers when they are not needed anymore.<br/>
      * For short-term logging, consider using the log stream API.
      * %caption Add logger

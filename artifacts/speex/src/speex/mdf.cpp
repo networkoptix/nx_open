@@ -127,11 +127,9 @@ static const spx_float_t VAR_BACKTRACK = 4.f;
 #define TOP16(x) (x)
 #endif
 
-
 #define PLAYBACK_DELAY 2
 
 void speex_echo_get_residual(SpeexEchoState *st, spx_word32_t *Yout, int len);
-
 
 /** Speex echo cancellation state. */
 struct SpeexEchoState_ {
@@ -1052,7 +1050,6 @@ EXPORT void speex_echo_cancellation(SpeexEchoState *st, const spx_int16_t *in, c
       power_spectrum_accum(st->X+speak*N, st->Xf, N);
    }
 
-
    /* Smooth far end energy estimate over time */
    for (j=0;j<=st->frame_size;j++)
       st->power[j] = MULT16_32_Q15(ss_1,st->power[j]) + 1 + MULT16_32_Q15(ss,st->Xf[j]);
@@ -1077,7 +1074,7 @@ EXPORT void speex_echo_cancellation(SpeexEchoState *st, const spx_int16_t *in, c
    Pyy = FLOAT_SQRT(Pyy);
    Pey = FLOAT_DIVU(Pey,Pyy);
 
-   /* Compute correlation updatete rate */
+   /* Compute correlation update rate */
    tmp32 = MULT16_32_Q15(st->beta0,Syy);
    if (tmp32 > MULT16_32_Q15(st->beta_max,See))
       tmp32 = MULT16_32_Q15(st->beta_max,See);
@@ -1171,7 +1168,6 @@ EXPORT void speex_echo_cancellation(SpeexEchoState *st, const spx_int16_t *in, c
       }
       for (i=0;i<=st->frame_size;i++)
          st->power_1[i] = FLOAT_SHL(FLOAT_DIV32(EXTEND32(adapt_rate),ADD32(st->power[i],10)),WEIGHT_SHIFT+1);
-
 
       /* How much have we adapted so far? */
       st->sum_adapt = ADD32(st->sum_adapt,adapt_rate);
