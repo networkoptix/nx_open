@@ -458,6 +458,12 @@ void Session::Private::handleErrorReply(
     static constexpr milliseconds kInitialConnectionTimeoutMs = 10s;
     static constexpr seconds kRetryDelay(3);
 
+    if (m_wasConnected && errorCode == core::RemoteConnectionErrorCode::forbiddenRequest)
+    {
+        handleFatalErrorOccurred(errorCode, moduleInformation);
+        return;
+    }
+
     if (isFatalError(errorCode))
     {
         handleFatalErrorOccurred(errorCode, moduleInformation);
