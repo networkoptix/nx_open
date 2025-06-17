@@ -26,6 +26,7 @@ public:
 
     void add(const QString& cloudSystemId, GroupedTaskQueue::TaskPtr request);
     void add(
+        QObject* context,
         const QString& cloudSystemId,
         GroupedTaskQueue::TaskFunction&& request,
         const QString& requestId);

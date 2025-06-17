@@ -2,6 +2,7 @@
 
 #include "cloud_cross_system_request_scheduler.h"
 
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 
@@ -54,13 +55,14 @@ void CloudCrossSystemRequestScheduler::setPriority(const QString& cloudSystemId,
 }
 
 void CloudCrossSystemRequestScheduler::add(
+    QObject* context,
     const QString& cloudSystemId,
     GroupedTaskQueue::TaskFunction&& request,
     const QString& requestId)
 {
     add(/*group*/ cloudSystemId,
-        std::make_shared<GroupedTaskQueue::Task>(
-        std::move(request), requestId));
+        std::make_shared<GroupedTaskQueue::Task>(nx::utils::guarded(context, std::move(request)),
+        requestId));
 }
 
 bool CloudCrossSystemRequestScheduler::hasTasks(const QString& cloudSystemId) const
