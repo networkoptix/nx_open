@@ -618,23 +618,33 @@ Page
 
     Component.onCompleted: resetSearch()
 
-    function goInto(current)
+    QtObject
+    {
+        id: d
+        property var listPosition: new Map()
+        readonly property var kRootId: NxGlobals.uuid("")
+    }
+
+    function goInto(newIndex)
     {
         endSearch()
 
-        const rootType = accessor.getData(current, "type")
+        const currentId = accessor.getData(siteList.currentRoot, "nodeId") ?? d.kRootId
+        d.listPosition.set(currentId, siteList.contentY)
+
+        const rootType = accessor.getData(newIndex, "type")
 
         if (rootType === OrganizationsModel.System)
         {
-            openSystem(current)
+            openSystem(newIndex)
             return
         }
 
         siteListContainer.slideLeft(() => {
-            linearizationListModel.sourceRoot = current
-            sessionsScreen.rootIndex = current
+            linearizationListModel.sourceRoot = newIndex
+            sessionsScreen.rootIndex = newIndex
             sessionsScreen.rootType = rootType
-            siteList.currentRoot = current
+            siteList.currentRoot = newIndex
         })
     }
 
@@ -651,8 +661,13 @@ Page
             const newIndex = linearizationListModel.sourceRoot
                 && linearizationListModel.sourceRoot.parent
 
+            const currentId = accessor.getData(siteList.currentRoot, "nodeId") ?? d.kRootId
+            d.listPosition.delete(currentId)
+
             if (newIndex.row === -1)
             {
+                sessionsScreen.rootIndex = newIndex
+                sessionsScreen.rootType = accessor.getData(newIndex, "type")
                 linearizationListModel.sourceRoot = Qt.binding(
                     () => localSitesVisible
                         && !sessionsScreen.searching
@@ -660,16 +675,16 @@ Page
                             ? organizationsModel.sitesRoot
                             : sessionsScreen.rootIndex)
                 siteList.currentRoot = linearizationListModel.sourceRoot
-                sessionsScreen.rootIndex = newIndex
-                sessionsScreen.rootType = accessor.getData(newIndex, "type")
             }
             else
             {
-                linearizationListModel.sourceRoot = newIndex
-                siteList.currentRoot = newIndex
                 sessionsScreen.rootIndex = newIndex
                 sessionsScreen.rootType = accessor.getData(newIndex, "type")
+                linearizationListModel.sourceRoot = newIndex
+                siteList.currentRoot = newIndex
             }
+            const newId = accessor.getData(newIndex, "nodeId") ?? d.kRootId
+            siteList.contentY = d.listPosition.get(newId) ?? 0
         })
     }
 
