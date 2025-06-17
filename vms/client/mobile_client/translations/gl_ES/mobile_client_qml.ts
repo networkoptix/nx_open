@@ -809,11 +809,11 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Sen sitios</translation>
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>Como conectar?</translation>
     </message>
     <message>
       <source>Folder is empty</source>

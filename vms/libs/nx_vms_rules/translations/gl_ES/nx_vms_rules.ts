@@ -847,7 +847,7 @@
     </message>
     <message>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>Forzar recoñecemento</translation>
     </message>
   </context>
   <context>

@@ -811,7 +811,7 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Нет сайтов</translation>
     </message>
     <message>
       <source>How to connect?</source>
@@ -819,7 +819,7 @@
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation type="unfinished">Folder is empty</translation>
+      <translation>Папка пуста</translation>
     </message>
   </context>
   <context>
