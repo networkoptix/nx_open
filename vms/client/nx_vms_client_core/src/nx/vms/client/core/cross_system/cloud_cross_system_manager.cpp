@@ -101,9 +101,14 @@ void CloudCrossSystemManager::setPriority(const QString& systemId, Priority prio
 void CloudCrossSystemManager::resetCloudSystems(bool enableCloudSystems)
 {
     if (enableCloudSystems)
+    {
         d->setCloudSystems(appContext()->cloudStatusWatcher()->cloudSystems());
+    }
     else
+    {
         d->setCloudSystems({});
+        d->scheduler->reset();
+    }
 }
 
 // ------------------------------------------------------------------------------------------------

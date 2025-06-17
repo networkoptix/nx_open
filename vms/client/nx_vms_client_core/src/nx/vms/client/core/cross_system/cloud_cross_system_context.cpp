@@ -418,7 +418,7 @@ struct CloudCrossSystemContext::Private
             return false;
 
         NX_VERBOSE(this, "Initialize new connection");
-        scheduler->add(
+        scheduler->add(q,
             systemDescription->cloudId(),
             [this, logonData, allowUserInteraction](GroupedTaskQueue::PromisePtr promise)
             {

@@ -341,7 +341,7 @@ struct CloudCrossSystemContextDataLoader::Private
         auto addTask =
             [this](auto function, const QString& id)
             {
-                scheduler->add(
+                scheduler->add(q,
                     description->cloudId(),
                     function,
                     nx::format("%1_%2", description->name(), id));
