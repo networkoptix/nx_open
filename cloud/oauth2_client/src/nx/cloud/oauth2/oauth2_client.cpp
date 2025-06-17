@@ -143,6 +143,11 @@ void Oauth2Client::notifyAccountUpdated(
         std::move(completionHandler));
 }
 
+void Oauth2Client::setCredentials(network::http::Credentials credentials)
+{
+    httpClientOptions().setCredentials(credentials);
+}
+
 Oauth2ClientFactory::Oauth2ClientFactory():
     base_type([](const nx::Url& url,
         const std::optional<nx::network::http::Credentials>& credentials)

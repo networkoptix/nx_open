@@ -107,6 +107,8 @@ public:
         const db::api::AccountChangedEvent& /*event*/,
         nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
 
+     void setCredentials(network::http::Credentials credentials) override;
+
 protected:
     template <class Request, class Response, class CompletionHandler>
     void processRequest(

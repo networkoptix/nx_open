@@ -156,6 +156,10 @@ void Oauth2ClientMock::notifyAccountUpdated(
     return completionHandler(db::api::ResultCode::ok);
 }
 
+void Oauth2ClientMock::setCredentials(network::http::Credentials)
+{
+}
+
 void Oauth2ClientMockManager::setResponse(const RequestPath& requestPath, const Response& response)
 {
     m_responses[requestPath] = response;
