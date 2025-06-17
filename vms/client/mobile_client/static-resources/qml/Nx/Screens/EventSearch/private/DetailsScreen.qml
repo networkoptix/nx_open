@@ -461,6 +461,8 @@ Page
 
     Text
     {
+        id: timestampText
+
         parent: mainWindow.isPortraitLayout
             ? preview
             : playbackPanel
