@@ -54,7 +54,6 @@ namespace {
 
 // ------------------------------------------------------------------------------
 
-
 // ------------------------- AndroidAudioDecoderPrivate -------------------------
 
 class AndroidAudioDecoderPrivate: public QObject

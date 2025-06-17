@@ -147,7 +147,6 @@ QString getCompleteBaseName(const QString& fileName)
 
 } // namespace
 
-
 SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
     m_clientVersion(appContext()->version())
 {
@@ -415,7 +414,6 @@ void SelfUpdater::updateApplauncher()
             if (!runMinilaucher())
                 NX_ERROR(this, "Could not run applauncher again!");
         });
-
 
     static const int kKillApplauncherRetries = 10;
     static const int kRetryMs = 100;
@@ -888,7 +886,7 @@ void SelfUpdater::updateMinilauncherIconsOnWindows(bool hasAdminRights)
     if (desktopShortcutUpdated || startMenuShortcutUpdated)
     {
         // Explorer caches program icons, so it doesn't need to parse binaries repeatedly.
-        // Unfortunatelly, it doesn't make an icon obsolete when the original file is updated.
+        // Unfortunately, it doesn't make an icon obsolete when the original file is updated.
         // There are two ways to clear this cache: either delete iconcache database,
         // which may be located in at least three different locations (Win 7 / 8 / 10)
         // and may be inaccessible for writing while the Explorer is running,

@@ -257,7 +257,6 @@ void appendSOS(std::vector<uint8_t>& buffer)
     buffer.push_back(0); //< successive approx.
 }
 
-
 /**
  * Generate a frame and scan headers that can be prepended to the RTP/JPEG data payload to produce
  * a JPEG compressed image in the interchange format (except for possible trailing garbage and

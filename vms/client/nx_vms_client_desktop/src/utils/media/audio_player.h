@@ -85,7 +85,7 @@ public:
 public slots:
     //!Overrides QnLongRunnable::pleaseStop
     virtual void pleaseStop() override;
-    //!Openes data source for playback and initializes internal data
+    //!Opens data source for playback and initializes internal data
     /*!
         \param dataSource MUST be opened for reading
         \note \a dataSource is removed in any case (event if this method fails)
@@ -93,7 +93,7 @@ public slots:
         \note Ownership of \a dataSource is passed to this object. \a dataSource is destroyed after playback done
     */
     bool open( QIODevice* dataSource );
-    //!Openes file for playback and initializes internal data
+    //!Opens file for playback and initializes internal data
     /*!
         If there is opened file, it's being closed first
     */

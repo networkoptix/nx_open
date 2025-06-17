@@ -35,5 +35,5 @@ int androidKeyboardHeight();
 /** Explicitly requests audio recording permissions if they are not granted yet. */
 void requestRecordAudioPermissionIfNeeded();
 
-/** Set exlusion area for the back gesture. */
+/** Set exclusion area for the back gesture. */
 void setAndroidGestureExclusionArea(int startY, int height);

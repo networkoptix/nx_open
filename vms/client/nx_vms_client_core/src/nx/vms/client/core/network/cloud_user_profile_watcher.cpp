@@ -30,7 +30,7 @@ using namespace std::chrono;
 static constexpr auto kErrorRetryDelay = 5s;
 static constexpr auto kUpdateDelay = 20s;
 
-// Converts QImage to data URL, encoiding as PNG in base64.
+// Converts QImage to data URL, encoding as PNG in base64.
 QUrl imageToUrl(const QImage& image)
 {
     QByteArray byteArray;

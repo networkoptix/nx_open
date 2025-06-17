@@ -18,10 +18,10 @@ TEST(Semaphore, SingleThread)
     semaphore.acquire(0); //< Does nothing.
     ASSERT_EQ(semaphore.available(), 2);
 
-    semaphore.acquire(); //< Aquires 1.
+    semaphore.acquire(); //< Acquires 1.
     ASSERT_EQ(semaphore.available(), 1);
 
-    semaphore.acquire(1); //< Aquires 1.
+    semaphore.acquire(1); //< Acquires 1.
     ASSERT_EQ(semaphore.available(), 0);
 
     ASSERT_TRUE(semaphore.tryAcquire(0)); //< Does nothing.

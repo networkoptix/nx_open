@@ -194,7 +194,7 @@ private:
 
         archiveReader->setCycleMode(false);
         archiveReader->setQuality(MEDIA_Quality_High, true);
-        // Additing filtering is required in case of.AVI export.
+        // Addition of filtering is required in case of.AVI export.
         archiveReader->addMediaFilter(std::make_shared<H2645Mp4ToAnnexB>());
 
         if (auto rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*>

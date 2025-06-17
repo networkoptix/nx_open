@@ -383,7 +383,7 @@ public:
     Q_INVOKABLE static QRectF movedInto(const QRectF& rect, const QRectF& target);
 
     /**
-     * Get abosulute point coordinates by its relative coordinates in the rectangle.
+     * Get absolute point coordinates by its relative coordinates in the rectangle.
      */
     Q_INVOKABLE static QPointF subPoint(const QRectF& rect, const QPointF& relativePoint);
     Q_INVOKABLE static QRectF subRect(const QRectF& rect, const QRectF& relativeSubRect);

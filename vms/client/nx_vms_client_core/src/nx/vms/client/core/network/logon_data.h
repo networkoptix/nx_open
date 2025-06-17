@@ -52,7 +52,7 @@ struct NX_VMS_CLIENT_CORE_API LogonData
     std::optional<QString> expectedCloudSystemId;
 
     /**
-     * Allow user interaction in the UI thread (like displaying dialog about certifcate mismatch).
+     * Allow user interaction in the UI thread (like displaying dialog about certificate mismatch).
      */
     bool userInteractionAllowed = true;
 

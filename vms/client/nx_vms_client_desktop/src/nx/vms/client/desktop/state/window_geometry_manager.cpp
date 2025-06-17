@@ -229,7 +229,7 @@ WindowGeometryState WindowGeometryManager::calculateDefaultGeometry() const
 
     // Safe option: place the window in top-left corner of the screen.
     window.geometry = QRect(screenRect.left(), screenRect.top(), windowWidth, windowHeight);
-    // Adjust window position if the screen is large enought.
+    // Adjust window position if the screen is large enough.
     if (screenRect.width() >= windowWidth && screenRect.height() >= windowHeight)
         window.geometry.moveCenter(screenRect.center());
 

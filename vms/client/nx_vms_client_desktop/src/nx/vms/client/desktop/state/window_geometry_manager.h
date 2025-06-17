@@ -27,7 +27,6 @@ public:
     virtual QList<QRect> suitableSurface() const = 0;
     virtual int windowScreen() const = 0;
 
-
 // TODO: coordinates: logical, physical
 // TODO: is fullscreen? (+ macos) - maximize
 // TODO: screen number
@@ -76,7 +75,7 @@ public:
     void setWindowGeometry(const WindowGeometryState& value);
 
     /**
-     * Check if the given window geometry is compatitible with the current system screen configuration.
+     * Check if the given window geometry is compatible with the current system screen configuration.
      */
     bool isValid(const WindowGeometryState& value) const;
 

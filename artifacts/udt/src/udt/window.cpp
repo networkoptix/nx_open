@@ -86,7 +86,7 @@ int CACKWindow::acknowledge(int32_t seq, int32_t& ack)
 
         for (int i = m_iTail, n = m_iHead; i < n; ++i)
         {
-            // looking for indentical ACK Seq. No.
+            // looking for identical ACK Seq. No.
             if (seq == m_piACKSeqNo[i])
             {
                 // return the Data ACK it carried
@@ -114,7 +114,7 @@ int CACKWindow::acknowledge(int32_t seq, int32_t& ack)
     // Head has exceeded the physical window boundary, so it is behind tail
     for (int j = m_iTail, n = m_iHead + m_iSize; j < n; ++j)
     {
-        // looking for indentical ACK seq. no.
+        // looking for identical ACK seq. no.
         if (seq == m_piACKSeqNo[j % m_iSize])
         {
             // return Data ACK
@@ -203,7 +203,7 @@ int CPktTimeWindow::getPktRcvSpeed() const
         ++p;
     }
 
-    // claculate speed, or return 0 if not enough valid value
+    // calculate speed, or return 0 if not enough valid value
     if (count > (m_iAWSize >> 1))
         return (int)ceil(1000000.0 / (sum / count));
     else

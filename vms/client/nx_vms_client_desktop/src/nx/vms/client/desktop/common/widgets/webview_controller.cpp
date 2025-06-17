@@ -88,7 +88,7 @@ QUrl urlFromResource(const QnResourcePtr& resource)
 }
 
 /**
- * Allows to monitor if certain number of attemps is exceeded withing a time perdiod.
+ * Allows to monitor if certain number of attempts is exceeded withing a time period.
  */
 class AttemptCounter
 {

@@ -133,7 +133,7 @@ void DeviceAdditionDialog::initializeControls()
 
     ui->foundDevicesTable->setModel(m_sortModel);
 
-    // Monitor focus and change accent button accodringly.
+    // Monitor focus and change accent button accordingly.
     QWidget* const filteredWidgets[] = {
         ui->searchButton,
         ui->startAddressEdit,

@@ -13,7 +13,7 @@ namespace nx::vms::client::mobile {
  * When back gesture in Android 10 is happened QML MouseArea hangs because of the bug
  * in the implementation. This is C++ part of workaround.
  * QTBUG-60698: Fixed in 5.9
- * QTBUG-90440: Arised in 5.15 and has not been fixed yet.
+ * QTBUG-90440: Arose in 5.15 and has not been fixed yet.
  * TODO: #ynikitenkov Check if the newest version of Qt fixes it.
  */
 class BackGestureWorkaround: public QObject

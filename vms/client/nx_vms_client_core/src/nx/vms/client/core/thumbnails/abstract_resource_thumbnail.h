@@ -90,7 +90,7 @@ public:
     qreal aspectRatio() const;
 
     /**
-     * Rotation obtained from the resource, in steps of 90 degrees ccw.
+     * Rotation obtained from the resource, in steps of 90 degrees counterclockwise.
      * Should be applied to the image.
      */
     int rotationQuadrants() const;

@@ -77,7 +77,7 @@ FilterBank *filterbank_new(int banks, spx_word32_t sampling, int len, int type)
    bank->bank_right = (int*)av_mallocz(len*sizeof(int));
    bank->filter_left = (spx_word16_t*)av_mallocz(len*sizeof(spx_word16_t));
    bank->filter_right = (spx_word16_t*)av_mallocz(len*sizeof(spx_word16_t));
-   /* Think I can safely disable normalisation that for fixed-point (and probably float as well) */
+   /* Think I can safely disable normalization that for fixed-point (and probably float as well) */
 #ifndef FIXED_POINT
    bank->scaling = (float*)av_mallocz(banks*sizeof(float));
 #endif
@@ -109,7 +109,7 @@ FilterBank *filterbank_new(int banks, spx_word32_t sampling, int len, int type)
       bank->filter_right[i] = val;
    }
 
-   /* Think I can safely disable normalisation for fixed-point (and probably float as well) */
+   /* Think I can safely disable normalization for fixed-point (and probably float as well) */
 #ifndef FIXED_POINT
    for (i=0;i<bank->nb_banks;i++)
       bank->scaling[i] = 0;
@@ -152,7 +152,7 @@ void filterbank_compute_bank32(FilterBank *bank, spx_word32_t *ps, spx_word32_t 
       id = bank->bank_right[i];
       mel[id] += MULT16_32_P15(bank->filter_right[i],ps[i]);
    }
-   /* Think I can safely disable normalisation that for fixed-point (and probably float as well) */
+   /* Think I can safely disable normalization that for fixed-point (and probably float as well) */
 #ifndef FIXED_POINT
    /*for (i=0;i<bank->nb_banks;i++)
       mel[i] = MULT16_32_P15(Q15(bank->scaling[i]),mel[i]);
@@ -174,7 +174,6 @@ void filterbank_compute_psd16(FilterBank *bank, spx_word16_t *mel, spx_word16_t 
       ps[i] = EXTRACT16(PSHR32(tmp,15));
    }
 }
-
 
 #ifndef FIXED_POINT
 void filterbank_compute_bank(FilterBank *bank, float *ps, float *mel)

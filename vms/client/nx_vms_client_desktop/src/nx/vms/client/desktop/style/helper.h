@@ -54,8 +54,7 @@ struct Metrics
 
     static constexpr QSize kButtonSwitchSize{33, 17};
 
-
-    /** Margin between switch subcontrol and right side of a control, eg. push button. */
+    /** Margin between switch subcontrol and right side of a control, e.g. push button. */
     static constexpr int kSwitchMargin = 4;
 
     /** Default separator item size. */

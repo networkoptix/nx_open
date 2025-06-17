@@ -58,7 +58,7 @@ Yunhong Gu, last updated 08/01/2009
 #include "socket_addresss.h"
 
 #ifdef _WIN32
-// Windows compability
+// Windows compatibility
 typedef HANDLE pthread_t;
 typedef HANDLE pthread_mutex_t;
 typedef HANDLE pthread_cond_t;
@@ -66,7 +66,7 @@ typedef DWORD pthread_key_t;
 #endif
 
 #ifndef _WIN32
-// Use these functions intead of POSIX to ensure monotonic waits on every UNIX platform:
+// Use these functions instead of POSIX to ensure monotonic waits on every UNIX platform:
 int pthread_cond_init_monotonic(pthread_cond_t* condition);
 
 int pthread_cond_wait_monotonic_timeout(
@@ -106,7 +106,7 @@ public:
     void sleep(std::chrono::microseconds interval);
 
     // Functionality:
-    //    Seelp until CC "nexttime".
+    //    Sleep until CC "nexttime".
     // Parameters:
     //    0) [in] nexttime: next time the caller is waken up.
     // Returned value:
@@ -124,7 +124,7 @@ public:
     void interrupt();
 
     // Functionality:
-    //    trigger the clock for a tick, for better granuality in no_busy_waiting timer.
+    //    trigger the clock for a tick, for better granularity in no_busy_waiting timer.
     // Parameters:
     //    None.
     // Returned value:
@@ -192,7 +192,7 @@ private:
     uint64_t getTimeInMicroSec();
 
 private:
-    std::chrono::microseconds m_ullSchedTime;             // next schedulled time
+    std::chrono::microseconds m_ullSchedTime;             // next scheduled time
 
                                          //#ifdef _WIN32
                                          //   OSVERSIONINFO m_winVersion;
@@ -215,7 +215,7 @@ private:
 
 // UDT Sequence Number 0 - (2^31 - 1)
 
-// seqcmp: compare two seq#, considering the wraping
+// seqcmp: compare two seq#, considering the wrapping
 // seqlen: length from the 1st to the 2nd seq#, including both
 // seqoff: offset from the 2nd to the 1st seq#
 // incseq: increase the seq# by 1

@@ -535,7 +535,6 @@ Qn::LicenseType QnLicense::type() const
     return Qn::LC_Invalid;
 }
 
-
 QnLicensePtr QnLicense::createSaasLocalRecordingLicense()
 {
     static const QByteArray kSaasLocalRecordingKey("saasLocalRecording");
@@ -655,7 +654,6 @@ bool QnLicense::isSaas() const
 {
     return orderType() == "saas";
 }
-
 
 //-------------------------------------------------------------------------------------------------
 // QnLicensePool

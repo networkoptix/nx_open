@@ -147,7 +147,7 @@ private:
     int32_t m_iNextMsgNo;                // next message number
 
     int m_iSize;                // buffer size (number of packets)
-    int m_iMSS;                          // maximum seqment/packet size
+    int m_iMSS;                          // maximum segment/packet size
 
     int m_iCount;            // number of used blocks
 
@@ -220,14 +220,14 @@ public:
     // Parameters:
     //    None.
     // Returned value:
-    //    size of valid (continous) data for reading.
+    //    size of valid (continuous) data for reading.
 
     int getRcvDataSize() const;
 
     // Functionality:
     //    mark the message to be dropped from the message list.
     // Parameters:
-    //    0) [in] msgno: message nuumer.
+    //    0) [in] msgno: message number.
     // Returned value:
     //    None.
 
@@ -239,7 +239,7 @@ public:
     //    0) [out] data: buffer to write the message into.
     //    1) [in] len: size of the buffer.
     // Returned value:
-    //    actuall size of data read.
+    //    actual size of data read.
 
     int readMsg(char* data, int len);
 

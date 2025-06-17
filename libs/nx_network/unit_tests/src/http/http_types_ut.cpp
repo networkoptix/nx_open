@@ -266,7 +266,6 @@ TEST(HttpTypesHeaderVia, parse)
     EXPECT_EQ(via.entries[1].receivedBy, "nowhere.com");
     EXPECT_EQ(via.entries[1].comment, "(Apache/1.1)");
 
-
     via.entries.clear();
     EXPECT_TRUE(via.parse("1.0 ricky, 1.1 ethel, 1.1 fred, 1.0 lucy"));
     EXPECT_EQ(via.entries.size(), 4U);
@@ -287,7 +286,6 @@ TEST(HttpTypesHeaderVia, parse)
     EXPECT_EQ(via.entries[3].receivedBy, "lucy");
     EXPECT_TRUE(via.entries[3].comment.empty());
 
-
     via.entries.clear();
     EXPECT_TRUE(via.parse("HTTP/1.0 ricky"));
     EXPECT_EQ(via.entries.size(), 1U);
@@ -295,18 +293,14 @@ TEST(HttpTypesHeaderVia, parse)
     EXPECT_EQ(via.entries[0].protoVersion, "1.0");
     EXPECT_EQ(via.entries[0].receivedBy, "ricky");
 
-
     via.entries.clear();
     EXPECT_FALSE(via.parse("HTTP/1.0, test"));
-
 
     via.entries.clear();
     EXPECT_TRUE(via.parse(""));
 
-
     via.entries.clear();
     EXPECT_FALSE(via.parse("h"));
-
 
     via.entries.clear();
     EXPECT_TRUE(via.parse("h g"));
@@ -315,7 +309,6 @@ TEST(HttpTypesHeaderVia, parse)
     EXPECT_EQ(via.entries[0].protoVersion, "h");
     EXPECT_EQ(via.entries[0].receivedBy, "g");
     EXPECT_TRUE(via.entries[0].comment.empty());
-
 
     via.entries.clear();
     EXPECT_TRUE(via.parse("  h  g   ,    h   z   mm , p/v  ps"));
@@ -333,9 +326,8 @@ TEST(HttpTypesHeaderVia, parse)
     EXPECT_EQ(via.entries[2].receivedBy, "ps");
     EXPECT_TRUE(via.entries[2].comment.empty());
 
-
     via.entries.clear();
-    EXPECT_TRUE(via.parse("1.0 fred, 1.1 nowhere.com (Apache/1.1) Commanch Whooyanch"));
+    EXPECT_TRUE(via.parse("1.0 fred, 1.1 nowhere.com (Apache/1.1) Comanch Tribe"));
     EXPECT_EQ(via.entries.size(), 2U);
     EXPECT_FALSE(via.entries[0].protoName);
     EXPECT_EQ(via.entries[0].protoVersion, "1.0");
@@ -343,8 +335,7 @@ TEST(HttpTypesHeaderVia, parse)
     EXPECT_TRUE(via.entries[0].comment.empty());
     EXPECT_EQ(via.entries[1].protoVersion, "1.1");
     EXPECT_EQ(via.entries[1].receivedBy, "nowhere.com");
-    EXPECT_EQ(via.entries[1].comment, "(Apache/1.1) Commanch Whooyanch");
-
+    EXPECT_EQ(via.entries[1].comment, "(Apache/1.1) Comanch Tribe");
 
     via.entries.clear();
     EXPECT_TRUE(via.parse("1.1 {47bf37a0-72a6-2890-b967-5da9c390d28a}"));
@@ -353,7 +344,6 @@ TEST(HttpTypesHeaderVia, parse)
     EXPECT_EQ(via.entries[0].protoVersion, "1.1");
     EXPECT_EQ(via.entries[0].receivedBy, "{47bf37a0-72a6-2890-b967-5da9c390d28a}");
     EXPECT_TRUE(via.entries[0].comment.empty());
-
 
     via.entries.clear();
     EXPECT_FALSE(via.parse(" "));

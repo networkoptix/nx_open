@@ -515,7 +515,7 @@ menu::Parameters QnWorkbenchNavigator::currentParameters(menu::ActionScope scope
 bool QnWorkbenchNavigator::isLiveSupported() const
 {
     // TODO: #sivanov Just return cached value. Even better: replace m_lastLiveSupported with a
-    // direct call to m_timeSlider (and store calclated value only once).
+    // direct call to m_timeSlider (and store calculated value only once).
     const bool value = calculateIsLiveSupported();
     NX_ASSERT(value == m_lastLiveSupported);
     return value;
@@ -2544,7 +2544,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     const auto watcher = workbenchContext()->instance<QnTimelineBookmarksWatcher>();
     QnCameraBookmarkList bookmarks = watcher->bookmarksAtPosition(position);
     if (!bookmarks.empty())
-        parameters.setArgument(core::CameraBookmarkRole, bookmarks.front()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
+        parameters.setArgument(core::CameraBookmarkRole, bookmarks.front()); // TODO: #dklychkov Implement sub-menus for the case when there are more than 1 bookmark at the position
 
     QScopedPointer<QMenu> menu(manager->newMenu(
         menu::TimelineScope, mainWindowWidget(), parameters));

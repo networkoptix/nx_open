@@ -123,7 +123,7 @@ public:
         SubstateFlags /*flags*/,
         const QStringList& /*resources*/) override
     {
-        // Just return an empty current state without saving and modyfying
+        // Just return an empty current state without saving and modifying
         return;
     }
 
@@ -177,7 +177,7 @@ struct Workbench::Private
     bool inLayoutChangeProcess = false;
 
     /**
-     * Whether workbench is in intended clear process. Flag is used to avoid unneccesary new tab
+     * Whether workbench is in intended clear process. Flag is used to avoid unnecessary new tab
      * creation on resources deletion.
      */
     bool inClearProcess = false;
@@ -266,7 +266,7 @@ Workbench::Workbench(WindowContext* windowContext, QObject* parent):
     connect(appContext()->unifiedResourcePool(), &core::UnifiedResourcePool::resourcesRemoved, this,
         [this](const QnResourceList& resources) { d->handleResourcesRemoved(resources); });
 
-    // Only currenly connected context resources are checked actually.
+    // Only currently connected context resources are checked actually.
     const auto cachingController = qobject_cast<CachingAccessController*>(
         system()->accessController());
     if (NX_ASSERT(cachingController))

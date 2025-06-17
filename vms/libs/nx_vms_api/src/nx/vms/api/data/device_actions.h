@@ -162,7 +162,7 @@ struct DeviceFootageRequest
     /**%apidoc[opt] Chunk type. */
     TimePeriodContentType periodType = TimePeriodContentType::recording;
 
-    // TODO: Combine motion and anayltics below to std::optional<std::variant> when query parameter
+    // TODO: Combine motion and analytics below to std::optional<std::variant> when query parameter
     // with oneOf will be correctly processed by Swagger UI.
 
     /**%apidoc:stringArray

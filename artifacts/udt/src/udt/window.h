@@ -41,13 +41,11 @@ Yunhong Gu, last updated 01/22/2011
 #ifndef __UDT_WINDOW_H__
 #define __UDT_WINDOW_H__
 
-
 #ifndef _WIN32
 #include <sys/time.h>
 #include <time.h>
 #endif
 #include "udt.h"
-
 
 /**
  * NOTE: Not thread-safe.
@@ -69,7 +67,7 @@ public:
     void store(int32_t seq, int32_t ack);
 
     // Functionality:
-    //    Search the ACK-2 "seq" in the window, find out the DATA "ack" and caluclate RTT .
+    //    Search the ACK-2 "seq" in the window, find out the DATA "ack" and calculate RTT .
     // Parameters:
     //    0) [in] seq: ACK-2 seq. no.
     //    1) [out] ack: the DATA ACK no. that matches the ACK-2 no.
@@ -84,7 +82,7 @@ private:
     std::vector<std::chrono::microseconds> m_pTimestamp;      // The timestamp when the ACK was sent
 
     int m_iSize;                 // Size of the ACK history window
-    int m_iHead;                 // Pointer to the lastest ACK record
+    int m_iHead;                 // Pointer to the latest ACK record
     int m_iTail;                 // Pointer to the oldest ACK record
 
 private:
@@ -113,7 +111,7 @@ public:
     int getMinPktSndInt() const;
 
     // Functionality:
-    //    Calculate the packes arrival speed.
+    //    Calculate the packets arrival speed.
     // Parameters:
     //    None.
     // Returned value:
@@ -193,6 +191,5 @@ private:
     CPktTimeWindow(const CPktTimeWindow&);
     CPktTimeWindow &operator=(const CPktTimeWindow&);
 };
-
 
 #endif

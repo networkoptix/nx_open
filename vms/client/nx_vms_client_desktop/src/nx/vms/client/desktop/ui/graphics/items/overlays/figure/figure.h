@@ -80,7 +80,7 @@ public:
      * Returns figure-specific rectangle which represents visible bounding rectangle,
      * in local coordinate system. Derived figures may return any visual rectangle,
      * even unrelated to the actual points.
-     * @param scale Scale to be appied to the rectangle.
+     * @param scale Scale to be applied to the rectangle.
      * @return Rectangle, which width and height != 0.
      */
     virtual QRectF visualRect(const QSizeF& scale) const;

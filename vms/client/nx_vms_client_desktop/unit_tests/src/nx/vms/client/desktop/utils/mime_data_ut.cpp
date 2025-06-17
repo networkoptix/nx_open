@@ -63,7 +63,7 @@ TEST_F(MimeDataTest, mimeDataConversionsAreCorrect)
     MimeData restoredMimeData(qtMimeData.get());
 
     // Ensure that resources, entities, arguments and custom type MIME data remain unchanged after
-    // consversions.
+    // conversions.
     ASSERT_EQ(restoredMimeData.resources(), resources);
     ASSERT_EQ(restoredMimeData.entities(), entities);
     ASSERT_EQ(restoredMimeData.arguments(), arguments);

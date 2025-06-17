@@ -40,7 +40,7 @@ private:
     QModelIndex m_lastHoveredButtonIndex;   /* Stores model index of item button that was hovered last  */
     QRect m_lastHoveredButtonRect;          /* Stores rectangle of item button that was hovered last    */
 
-    QModelIndex m_lastPressedIndex;         /* Stores model index of description areea that was pressed */
+    QModelIndex m_lastPressedIndex;         /* Stores model index of description area that was pressed */
     enum {
         kNotCaptured,           /* Mouse is not captured */
         kCapturedByDescription, /* Mouse is captured after pressing description area outside of its button */

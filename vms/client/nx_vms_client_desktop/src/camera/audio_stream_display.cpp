@@ -291,7 +291,6 @@ void QnAudioStreamDisplay::playCurrentBuffer()
 
         //data->dataProvider->setNeedSleep(true); //< need to introduce delay again
 
-
         if (data->compressionType == AV_CODEC_ID_NONE)
         {
             NX_ERROR(this, "putdata: unknown codec type...");

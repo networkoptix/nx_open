@@ -239,7 +239,6 @@ State LayoutSettingsDialogStateReducer::loadLayout(State state, const QnLayoutRe
     state.fixedSize = layout->fixedSize();
     state.fixedSizeEnabled = !state.fixedSize.isEmpty();
 
-
     if (layout->hasCellAspectRatio())
     {
         const auto spacing = layout->cellSpacing();

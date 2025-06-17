@@ -85,7 +85,7 @@ QVector<IntersectionWithLine> getSegmentsIntersections(
     return intersections;
 }
 
-// Returns list of intersected rectangular zone projections on horizontal layout axe.
+// Returns list of intersected rectangular zone projections on horizontal layout axis.
 QVector<Zone> getForbiddenZoned(const QPolygonF& layoutRect, const Lines& edges)
 {
     const QLineF top(layoutRect[0], layoutRect[1]);

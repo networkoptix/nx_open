@@ -80,7 +80,7 @@ public:
 
     void expectConnect(const nx::Uuid& id, const nx::network::SocketAddress& endpoint)
     {
-        NX_INFO(this, nx::format("Excpecting connect to %1 on %2").args(id, endpoint));
+        NX_INFO(this, nx::format("Expecting connect to %1 on %2").args(id, endpoint));
 
         NX_MUTEX_LOCKER lock(&m_mutex);
         const auto start = std::chrono::steady_clock::now();
@@ -93,7 +93,7 @@ public:
 
     void expectDisconnect(const nx::Uuid& id)
     {
-        NX_INFO(this, nx::format("Excpecting disconnect of %1").arg(id));
+        NX_INFO(this, nx::format("Expecting disconnect of %1").arg(id));
 
         NX_MUTEX_LOCKER lock(&m_mutex);
         const auto start = std::chrono::steady_clock::now();
@@ -133,7 +133,7 @@ public:
 
     void expectNoChanges()
     {
-        NX_INFO(this, "Excpecting no changes");
+        NX_INFO(this, "Expecting no changes");
 
         NX_MUTEX_LOCKER lock(&m_mutex);
         ASSERT_FALSE(waitCondition(kExpectNoChanesDelay)) << "Unexpected event";
@@ -141,7 +141,7 @@ public:
 
     void expectPossibleChange()
     {
-        NX_INFO(this, "Excpecting possible address change");
+        NX_INFO(this, "Expecting possible address change");
 
         NX_MUTEX_LOCKER lock(&m_mutex);
         waitCondition(kExpectNoChanesDelay);
@@ -195,7 +195,7 @@ protected:
 private:
     struct Server
     {
-        // Server should be stopped before destroing the data.
+        // Server should be stopped before destroying the data.
         nx::Lockable<nx::vms::api::ModuleInformation> info;
         nx::network::http::TestHttpServer http;
 
@@ -366,7 +366,7 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     expectDisconnect(id); //< Cloud address does not match endpoint.
 
     setCloudSystemId(cloudEndpoint.original, cloudSystemId);
-    expectConnect(id, cloudEndpoint.alias);  //< Cloud endpoint is connectable now.
+    expectConnect(id, cloudEndpoint.alias);  //< Cloud endpoint is connectible now.
 
     const DnsAlias newDnsEndpoint(addMediaserver(id), "local-domain-name-2.com");
     connector->newEndpoints({newDnsEndpoint.alias}, id);
@@ -374,7 +374,7 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
 
     removeMediaserver(cloudEndpoint.original);
     removeMediaserver(newDnsEndpoint.original);
-    expectDisconnect(id); //< Finally no endpoints avaliable.
+    expectDisconnect(id); //< Finally no endpoints available.
 }
 
 TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
@@ -408,7 +408,7 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
     expectConnect(id, endpoint4); //< Automatic switch from blocked endpoint.
 }
 
-// This unit test is just for easy debug agains real mediaserver.
+// This unit test is just for easy debug against real mediaserver.
 TEST_F(DiscoveryModuleConnector, DISABLED_RealLocalServer)
 {
     connector->newEndpoints({ nx::network::SocketAddress("127.0.0.1:7001") }, nx::Uuid());
@@ -426,7 +426,7 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpointsByStrings)
 
     connector->newEndpoints({firstEndpoint2}, firstId);
     connector->setForbiddenEndpoints({firstEndpoint1.toString()}, firstId);
-    expectConnect(firstId, firstEndpoint2); //< Switch to a single avaliable.
+    expectConnect(firstId, firstEndpoint2); //< Switch to a single available.
 
     const auto secondId = nx::Uuid::createUuid();
     const auto secondEndpoint1 = addMediaserver(secondId);
@@ -437,7 +437,7 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpointsByStrings)
 
     connector->newEndpoints({secondEndpoint2}, secondId);
     connector->setForbiddenEndpoints({secondEndpoint1.toString()}, secondId);
-    expectConnect(secondId, secondEndpoint2); //< Switch to a single avaliable.
+    expectConnect(secondId, secondEndpoint2); //< Switch to a single available.
 }
 
 } // namespace nx::vms::discovery::test

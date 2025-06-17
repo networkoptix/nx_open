@@ -15,8 +15,8 @@ TEST(KeyedListTest, basics)
     // Pushing elements:
     ASSERT_TRUE(list.push_back(1, "value 1"));
     ASSERT_TRUE(list.push_back(10, "value 10"));
-    ASSERT_FALSE(list.push_back(10, "value 10 again")); //< Duplucate push back.
-    ASSERT_FALSE(list.push_front(1, "value 1 again")); //< Duplucate push front.
+    ASSERT_FALSE(list.push_back(10, "value 10 again")); //< Duplicate push back.
+    ASSERT_FALSE(list.push_front(1, "value 1 again")); //< Duplicate push front.
 
     ASSERT_TRUE(list.push_back(0, "value 0"));
     ASSERT_TRUE(list.push_back(5, "value 5"));

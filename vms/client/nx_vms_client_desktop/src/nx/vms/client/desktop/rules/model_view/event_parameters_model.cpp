@@ -168,12 +168,11 @@ void EventParametersModel::filter(const QString& filter)
     if (filter.size() == 1 && EventParameterHelper::isStartOfEventParameter(filter.front()))
     {
         setDefaultVisibleElements();
-        return; //< It's begining of event parameter, no filter is required.
+        return; //< It's beginning of event parameter, no filter is required.
     }
 
     if (d->visibleElements.empty() || filter.isEmpty())
         return;
-
 
     if (!EventParameterHelper::isStartOfEventParameter(filter.front()))
     {

@@ -51,7 +51,7 @@ bool objectMatches(const QObject* object, QJSValue properties)
         return false;
 
     // Important! Add only QWidget-related checks here.
-    // Everythin else goes to core::testkit::utils::objectMatches
+    // Everything else goes to core::testkit::utils::objectMatches
 
     if (properties.hasOwnProperty("toolTip"))
     {

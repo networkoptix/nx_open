@@ -256,7 +256,7 @@ void ServerCertificateViewer::setCertificateData(
 
     // The warning banner affects layout of certificate view tabs: the General tab should have
     // some free space at the bottom when the banner is hidden, while tab Details should use
-    // the whole avaliable space. One of the possible solutions here is to set the minimum size
+    // the whole available space. One of the possible solutions here is to set the minimum size
     // of some tab depending on the banner state.
     auto minHeight = ui->detailsTab->sizeHint().height();
     if (mode != Mode::mismatch)

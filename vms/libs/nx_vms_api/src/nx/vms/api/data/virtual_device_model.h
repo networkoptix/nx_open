@@ -124,7 +124,7 @@ struct NX_VMS_API VirtualDeviceLock: FlexibleId
      */
     std::chrono::milliseconds ttlMs;
 
-    /**%apidoc Id of a user to acquire the lock for. Should only be used by an admininstrator. */
+    /**%apidoc Id of a user to acquire the lock for. Should only be used by an administrator. */
     std::optional<nx::Uuid> userId;
 };
 #define VirtualDeviceLock_Fields FlexibleId_Fields(ttlMs)(userId)

@@ -11,7 +11,7 @@
 //!Associative thread-safe container, which allows to lock elements from accessing from other threads
 /*!
     \note All methods are thread-safe
-    \note All operations on locked element MUST occur from locking thread, otherwise undefined behavour can occur
+    \note All operations on locked element MUST occur from locking thread, otherwise undefined behavior can occur
 */
 template<class KeyType, class MappedType>
 class SafePool
@@ -234,7 +234,7 @@ public:
 
     //!Erases locked element
     /*!
-        \note Element MUST be locked by calling thread, otherwise undefined behavour can occur
+        \note Element MUST be locked by calling thread, otherwise undefined behavior can occur
     */
     void eraseAndUnlock( const iterator& it )
     {
@@ -289,9 +289,9 @@ public:
         m_cond.wakeAll();
     }
 
-    //!Atommically builds list of keys of all elements in dictionary
+    //!Atomically builds list of keys of all elements in dictionary
     /*!
-        \note There is no garantee that any item will not be removed by any other thread in any moment
+        \note There is no guarantee that any item will not be removed by any other thread in any moment
     */
     std::vector<KeyType> keys() const
     {

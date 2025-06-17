@@ -16,7 +16,7 @@ class NX_VMS_CLIENT_CORE_API AbstractSystemFinder: public QObject
 public:
     using QObject::QObject;
 
-    /** Full list of discivered systems. */
+    /** Full list of discovered systems. */
     virtual SystemDescriptionList systems() const = 0;
 
     /**

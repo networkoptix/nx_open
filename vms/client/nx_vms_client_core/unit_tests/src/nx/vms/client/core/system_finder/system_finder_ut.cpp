@@ -239,14 +239,14 @@ TEST_F(SystemFinderTest, disconnectFromCloudWhileTwoConnectedSystemsWithSameIdAr
 // VMS-53746: Disconnecting from the cloud should not make systems disappear even if they online.
 TEST_F(SystemFinderTest, disconnectFromCloudShouldNotClearOfflineSystems)
 {
-    // We know about local system existance, which is offline right now.
+    // We know about local system existence, which is offline right now.
     givenRecentSystem(kLocalId1);
     // Then user connects to the cloud and gets the same system info, including cloud id.
     givenCloudSystem({.cloudId = kCloudId1, .localId = kLocalId1, .online = false});
     thenSystemCountIs(1);
     whenLogoutFromCloud();
 
-    // Recent system info should still be avialable.
+    // Recent system info should still be available.
     thenSystemCountIs(1);
 }
 

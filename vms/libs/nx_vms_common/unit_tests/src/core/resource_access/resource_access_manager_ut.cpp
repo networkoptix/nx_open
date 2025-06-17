@@ -539,7 +539,7 @@ TEST_F(ResourceAccessManagerTest, canPushMyScreen)
     ASSERT_TRUE(resourceAccessManager()->canCreateLayout(m_currentUser, layoutData));
 }
 
-// User can push it's own screen on exising videowall layout.
+// User can push it's own screen on existing videowall layout.
 TEST_F(ResourceAccessManagerTest, canPushMyScreenOnExistingLayout)
 {
     loginAs(kLiveViewersGroupId);
@@ -1547,7 +1547,7 @@ TEST_F(ResourceAccessManagerTest, checkShareLayoutToParentRole)
     ASSERT_TRUE(hasPermissions(user, target, Qn::ReadPermission));
 }
 
-// VMAXes without licences:
+// VMAXes without licenses:
 // Viewing live: temporary allowed
 // Viewing footage: temporary allowed
 // Export video: temporary allowed
@@ -1574,7 +1574,7 @@ TEST_F(ResourceAccessManagerTest, checkVMaxWithoutLicense)
     ASSERT_TRUE(hasPermissions(user, camera, Qn::ExportPermission));
 }
 
-// NVRs without licences:
+// NVRs without licenses:
 // Viewing live: allowed
 // Viewing footage: forbidden
 // Export video: forbidden

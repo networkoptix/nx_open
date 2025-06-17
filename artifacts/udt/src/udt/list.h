@@ -94,7 +94,7 @@ public:
 
 private:
     std::vector<int32_t> m_piData1;                  // sequence number starts
-    std::vector<int32_t> m_piData2;                  // seqnence number ends
+    std::vector<int32_t> m_piData2;                  // sequence number ends
     std::vector<int> m_piNext;                       // next node in the list
 
     int m_iHead = -1;                         // first node
@@ -205,6 +205,5 @@ private:
     CRcvLossList(const CRcvLossList&);
     CRcvLossList& operator=(const CRcvLossList&);
 };
-
 
 #endif

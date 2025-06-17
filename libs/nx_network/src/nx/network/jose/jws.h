@@ -124,7 +124,7 @@ nx::utils::expected<TokenEncodeResult<std::decay_t<Payload>>, std::string /*erro
 
 /**
  * Decode token header and payload without verifying.
- * Note: the token signature is ommited by this function. Use verifyToken to verify the signature.
+ * Note: the token signature is omitted by this function. Use verifyToken to verify the signature.
  */
 template<typename Payload>
 nx::utils::expected<Token<Payload>, std::string /*err*/> decodeToken(const std::string_view encoded)

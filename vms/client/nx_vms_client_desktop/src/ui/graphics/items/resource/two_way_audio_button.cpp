@@ -314,7 +314,7 @@ void TwoWayAudioButton::paint(QPainter* painter, const QStyleOptionGraphicsItem*
             static constexpr int kColorBlinkTimeoutMs = 200;
             if (d->hintState == HintState::pressed && d->stateTimer.hasExpired(kColorBlinkTimeoutMs))
             {
-                // Set correct color and aviod blink from pressed to
+                // Set correct color and avoid blink from pressed to
                 return core::colorTheme()->color("camera.twoWayAudio.background.pressed");
             }
 

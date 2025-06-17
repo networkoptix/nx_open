@@ -34,7 +34,7 @@ rest::Handle requestUpdateStatus(
         executor);
 }
 
-// When we receive update infrmation via a 5.0 (or older) Server, it will not recognize the
+// When we receive update information via a 5.0 (or older) Server, it will not recognize the
 // `customClient` component and its related `customClientVariant` field (unless we backported the
 // necessary changes into a patch release). After parsing the update information it will get
 // `unknown` as the component. This function is a workaround. If the update package file name

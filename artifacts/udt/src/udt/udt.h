@@ -59,7 +59,6 @@ Yunhong Gu, last updated 01/18/2011
 #include <string>
 #include <vector>
 
-
 ////////////////////////////////////////////////////////////////////////////////
 
 //if compiling on VC6.0 or pre-WindowsXP systems
@@ -67,7 +66,6 @@ Yunhong Gu, last updated 01/18/2011
 
 //if compiling with MinGW, it only works on XP or above
 //use -D_WIN32_WINNT=0x0501
-
 
 #ifdef _WIN32
 #ifndef __MINGW__
@@ -149,7 +147,7 @@ enum UDTOpt
     UDT_REUSEADDR,    // reuse an existing port or create a new one
     UDT_MAXBW,        // maximum bandwidth (bytes per second) that the connection can use
     UDT_STATE,        // current socket state, see UDTSTATUS, read only
-    UDT_EVENT,        // current avalable events associated with the socket
+    UDT_EVENT,        // current available events associated with the socket
     UDT_SNDDATA,        // size of data in the sending buffer
     UDT_RCVDATA        // size of data available for recv
 };

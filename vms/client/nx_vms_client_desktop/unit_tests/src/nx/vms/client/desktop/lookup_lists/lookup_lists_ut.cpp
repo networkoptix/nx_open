@@ -84,7 +84,7 @@ public:
         whenRemoveColumn(columnToDelete);
 
         // Check that previously added entry with one column is deleted,
-        // since this row is now comletely empty.
+        // since this row is now completely empty.
         const auto newRowCountNumber = initalRowNumbers - 1;
         thenRowCountIs(newRowCountNumber, m_entriesModel.get());
 
@@ -141,7 +141,6 @@ protected:
             resultRows.push_back(entry);
         }
     }
-
 
     void givenLookupListEntriesProxyModel(const LookupListData& data)
     {
@@ -778,7 +777,7 @@ TEST_F(LookupListTests, revert_import)
     // Check that there are no fixup required.
     thenFixUpIsNotRequired();
 
-    // Check that number of rows incresead.
+    // Check that number of rows increased.
     thenImportModelRowCountIs(initialRowCount + countOfAdditions);
 
     whenRevertImport();
@@ -834,7 +833,6 @@ TEST_F(LookupListTests, validate_float_number_value_with_limit)
     checkValidationOfEmptyRowWithOneIncorrect("FloatNumberWithLimit", "0.1", "1.987");
     // Value more than max.
     checkValidationOfEmptyRowWithOneIncorrect("FloatNumberWithLimit", "11.1", "1.987");
-
 
     // Check type with limit only in min value. Value less than min.
     checkValidationOfEmptyRowWithOneIncorrect("FloatNumberWithMinLimit", "1.49", "19");
@@ -1008,7 +1006,7 @@ TEST_F(LookupListTests, change_lookup_list)
     // Add new correct entry.
     whenAddEntries({correctRow()});
 
-    // Check that row was added successfuly.
+    // Check that row was added successfully.
     thenRowCountIs(rowCountBeforeChange + 1, m_entriesModel.get());
 
     // Remove one column from new model.

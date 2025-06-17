@@ -237,7 +237,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     // Flags here can be removed when designers approve the resulting approach.
 
     NX_INI_FLAG(false, startPlaybackOnTileNavigation,
-        "[Design] Whether to start the playback if the timeline navigation occured after Right\n"
+        "[Design] Whether to start the playback if the timeline navigation occurred after Right\n"
         "Panel tile click or double click.");
 
     NX_INI_FLAG(false, enableSyncedChunksForExtraContent,

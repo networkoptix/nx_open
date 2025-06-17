@@ -161,7 +161,7 @@ Result<> UdpChannel::setUDPSockOpt()
     if (0 != ::setsockopt(m_iSocket, SOL_SOCKET, SO_SNDBUF, (char*)&m_iSndBufSize, sizeof(int)))
         ::setsockopt(m_iSocket, SOL_SOCKET, SO_SNDBUF, (char*)&maxsize, sizeof(int));
 #else
-    // for other systems, if requested is greated than maximum, the maximum value will be automactally used
+    // for other systems, if requested is greater than maximum, the maximum value will be automatically used
     if ((0 != ::setsockopt(m_iSocket, SOL_SOCKET, SO_RCVBUF, (char*)&m_iRcvBufSize, sizeof(int))) ||
         (0 != ::setsockopt(m_iSocket, SOL_SOCKET, SO_SNDBUF, (char*)&m_iSndBufSize, sizeof(int))))
     {

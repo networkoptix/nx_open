@@ -42,7 +42,7 @@ struct ActionDescriptor
     std::map<QString, QString> parameters;
 
     // In the future we may want to specify some conditions when this action should be executed.
-    // A possible and backward-compatitible way to do so is to add some field like "state" here,
+    // A possible and backward-compatible way to do so is to add some field like "state" here,
     // which should specify button state, applied modifiers and so on.
 };
 NX_REFLECTION_INSTRUMENT(ActionDescriptor, (id)(parameters));

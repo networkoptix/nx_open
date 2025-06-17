@@ -233,7 +233,7 @@ void Engine::doQueryBookmarks(
 {
     try
     {
-        NX_OUTPUT << __func__ << ": Quering bookmarks with filter '" << filter << "'";
+        NX_OUTPUT << __func__ << ": Querying bookmarks with filter '" << filter << "'";
         std::lock_guard lock(m_mutex);
         if (!m_dataManager)
             throw std::logic_error("Plugin has not been properly initialized");
@@ -278,7 +278,7 @@ void Engine::doQueryMotionTimePeriods(
 {
     try
     {
-        NX_OUTPUT << __func__ << ": Quering motion with filter '" << filter;
+        NX_OUTPUT << __func__ << ": Querying motion with filter '" << filter;
         std::lock_guard lock(m_mutex);
         if (!m_dataManager)
             throw std::logic_error("Plugin has not been properly initialized");
@@ -286,7 +286,7 @@ void Engine::doQueryMotionTimePeriods(
         const auto motionData =
             m_dataManager->queryMotion(nx::sdk::cloud_storage::MotionFilter(filter));
         *outResult = nx::sdk::Result<nx::sdk::IString*>(new nx::sdk::String(motionData));
-        NX_OUTPUT << __func__ << ": Successfully fetched some moiton: '" << motionData << "'";
+        NX_OUTPUT << __func__ << ": Successfully fetched some motion: '" << motionData << "'";
     }
     catch (const std::exception& e)
     {
@@ -303,7 +303,7 @@ void Engine::doQueryAnalytics(
 {
     try
     {
-        NX_OUTPUT << __func__ << ": Quering analytics with filter '" << filter << "'";
+        NX_OUTPUT << __func__ << ": Querying analytics with filter '" << filter << "'";
         std::lock_guard lock(m_mutex);
         if (!m_dataManager)
             throw std::logic_error("Plugin has not been properly initialized");
@@ -328,7 +328,7 @@ void Engine::doQueryAnalyticsTimePeriods(
 {
     try
     {
-        NX_OUTPUT << __func__ << ": Quering analytics periods with filter '" << filter;
+        NX_OUTPUT << __func__ << ": Querying analytics periods with filter '" << filter;
         std::lock_guard lock(m_mutex);
         if (!m_dataManager)
             throw std::logic_error("Plugin has not been properly initialized");

@@ -312,7 +312,7 @@ void NavigationWidget::updateJumpButtonsTooltips()
     action(menu::JumpToEndAction)->setText(hasPeriods ? tr("Next Chunk") : tr("To End"));
     m_jumpForwardButton->setToolTip(action(menu::JumpToEndAction)->toolTip());
 
-    // TODO: #sivanov Remove this once buttonwidget <-> action enabled sync is implemented. OR when
+    // TODO: #sivanov Remove this once button widget <-> action enabled sync is implemented. OR when
     // we disable actions and not buttons.
     updatePlaybackButtonsEnabled();
 }

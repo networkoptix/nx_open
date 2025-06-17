@@ -73,7 +73,7 @@ void SetupWizardDialogPrivate::openUrlInBrowser(const QString &urlString)
 
 void SetupWizardDialogPrivate::connectUsingLocalAdmin(const QString& password, bool /*dummy*/)
 {
-    // Second parameter is kept for compatibilty reasons and should be removed with corresponding
+    // Second parameter is kept for compatibility reasons and should be removed with corresponding
     // changes in webadmin.
     localPassword = password;
 }

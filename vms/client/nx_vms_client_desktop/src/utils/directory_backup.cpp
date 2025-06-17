@@ -118,7 +118,7 @@ bool recursiveBackupImpl(const QString& sourceDirectory, const QString& targetDi
             return false;
     }
 
-    // Bakups files in current firectory
+    // Backups files in current directory
     const auto filesBackup = SingleDirectoryBackupPtr(
         new QnDirectoryBackup(sourceDirectory, filters, targetDirectory));
     if (!filesBackup->backup(behavior))

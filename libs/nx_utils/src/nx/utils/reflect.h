@@ -89,7 +89,7 @@ inline rapidjson::Value& getField(
         return it->value;
 
     NX_ASSERT(false, "No field '%1' in %2 (%3)", key.s, toString(object), assertMessage);
-    return object[key.s]; //< Use rapidjson::Value::Object adhoc.
+    return object[key.s]; //< Use rapidjson::Value::Object ad hoc.
 }
 
 inline const rapidjson::Value& getField(
@@ -101,7 +101,7 @@ inline const rapidjson::Value& getField(
         return it->value;
 
     NX_ASSERT(false, "No field '%1' in %2 (%3)", key.s, toString(object), assertMessage);
-    return object[key.s]; //< Use rapidjson::Value::Object adhoc.
+    return object[key.s]; //< Use rapidjson::Value::Object ad hoc.
 }
 
 inline rapidjson::Value::Object getObject(

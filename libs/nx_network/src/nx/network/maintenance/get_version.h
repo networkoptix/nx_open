@@ -23,7 +23,7 @@ NX_NETWORK_API Version getVersion();
 // GetVersion
 
 /**
- * An HTTP handler that returns the VMS version by default. It can be overriden to return a
+ * An HTTP handler that returns the VMS version by default. It can be overridden to return a
  * different version, e.g. the Cloud version, if the server is running on a cloud service.
  */
 class GetVersion:

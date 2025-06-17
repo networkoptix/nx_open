@@ -26,7 +26,7 @@ public:
     ObjectLookupField(common::SystemContext* context, const FieldDescriptor* descriptor);
 
     /*
-     * Check type dependent value. If the check type is linked with attributes - atributes string,
+     * Check type dependent value. If the check type is linked with attributes - attributes string,
      * lookup list id otherwise.
      */
     QString value() const;

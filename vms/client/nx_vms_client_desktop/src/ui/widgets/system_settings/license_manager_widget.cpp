@@ -701,7 +701,7 @@ bool LicenseManagerWidget::activateLicense()
                     auto res = result.error();
                     if (res.errorId == nx::network::rest::ErrorId::serviceUnavailable)
                     {
-                        NX_VERBOSE(this, "Network error occured activating license key.");
+                        NX_VERBOSE(this, "Network error occurred activating license key.");
                         handleDownloadError();
                     }
                     else

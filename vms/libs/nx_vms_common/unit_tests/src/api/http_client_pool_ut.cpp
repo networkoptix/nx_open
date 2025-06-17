@@ -200,8 +200,8 @@ TEST_F(HttpClientPoolTest, terminateTest)
         "/test",
         [&](RequestContext, RequestProcessedHandler handler)
         {
-            // This is a durty huck which causes server to respond with delay so client pool have
-            // enough time to cancel requests.
+            // Use workaround to cause server to respond with delay so client pool have enough time
+            // to cancel requests.
             auto delayedTimer = std::make_shared<nx::network::aio::Timer>(
                 nx::network::SocketGlobals::aioService().getCurrentAioThread());
             delayedTimer->start(
