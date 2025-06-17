@@ -3,6 +3,7 @@
 #pragma once
 
 #include <vector>
+#include <chrono>
 
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -51,3 +52,13 @@ QN_FUSION_DECLARE_FUNCTIONS(QnBounds, (json)(ubjson)(xml)(csv_record))
 QN_FUSION_DECLARE_FUNCTIONS(TwoWayAudioParams, (json)(ubjson)(xml)(csv_record))
 
 typedef std::vector<QnBounds> QnBoundsList;
+
+struct UnauthorizedTimeoutLimits
+{
+    std::chrono::seconds min = std::chrono::minutes(1);
+    // For many vendors, the unblocking period lasts 5 minutes, so the default value is set slightly higher.
+    std::chrono::seconds max = std::chrono::minutes(6);
+};
+
+#define UnauthorizedTimeoutLimits_Fields (min)(max)
+QN_FUSION_DECLARE_FUNCTIONS(UnauthorizedTimeoutLimits, (json) (ubjson) (xml) (csv_record))
