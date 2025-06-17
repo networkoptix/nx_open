@@ -43,6 +43,7 @@ public:
             ResourceDataKey::kAdvancedParameterOverloads);
         registerKey<ptz::Override>(ptz::Override::kPtzOverrideKey);
         registerKey<QVector<bool>>("hasDualStreaming");
+        registerKey<UnauthorizedTimeoutLimits>(ResourceDataKey::kUnauthorizedTimeoutLimitsSec);
     }
 
 protected:

@@ -7,3 +7,4 @@
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnHttpConfigureRequest, (json), QnHttpConfigureRequest_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBounds, (json), QnBounds_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TwoWayAudioParams, (json), TwoWayAudioParams_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(UnauthorizedTimeoutLimits, (json), UnauthorizedTimeoutLimits_Fields)

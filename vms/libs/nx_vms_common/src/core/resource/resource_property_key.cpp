@@ -51,7 +51,7 @@ const QString kHighStreamAvailableBitrates("highStreamAvailableBitrates");
 const QString kLowStreamAvailableBitrates("lowStreamAvailableBitrates");
 const QString kHighStreamBitrateBounds("highStreamBitrateBounds");
 const QString kLowStreamBitrateBounds("lowStreamBitrateBounds");
-const QString kUnauthorizedTimeoutSec("unauthorizedTimeoutSec");
+const QString kUnauthorizedTimeoutLimitsSec("unauthorizedTimeoutLimitsSec");
 const QString kAdvancedParameterOverloads("advancedParameterOverloads");
 const QString kShouldAppearAsSingleChannel("shouldAppearAsSingleChannel");
 const QString kPreStreamConfigureRequests("preStreamConfigureRequests");
@@ -143,6 +143,8 @@ const QString kPreferNativeApiForRemoteArchiveSynchronization(
 
 const QString kOnvifForcePtzGetCompatibleConfigurationsSupported(
     "onvifForcePtzGetCompatibleConfigurationsSupported");
+
+const QString kUseFirstDefaultCredentials("useFirstDefaultCredentials");
 
 } // namespace ResourceDataKey
 

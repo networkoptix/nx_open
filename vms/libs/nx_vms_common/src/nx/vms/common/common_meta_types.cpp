@@ -211,6 +211,7 @@ void initializeMetatypesInternal()
     qRegisterMetaType<TwoWayAudioParams>();
     qRegisterMetaType<QnBounds>();
     qRegisterMetaType<QnCameraAdvancedParameterOverload>();
+    qRegisterMetaType<UnauthorizedTimeoutLimits>();
 
     qRegisterMetaType<system_health::MessageType>();
 
@@ -233,6 +234,7 @@ void initializeMetatypesInternal()
     QnJsonSerializer::registerSerializer<QnBounds>();
     QnJsonSerializer::registerSerializer<std::vector<QString>>();
     QnJsonSerializer::registerSerializer<nx::vms::common::ptz::Override>();
+    QnJsonSerializer::registerSerializer<UnauthorizedTimeoutLimits>();
 
     QnJsonSerializer::registerSerializer<std::vector<QnCameraAdvancedParameterOverload>>();
     QnJsonSerializer::registerSerializer<nx::vms::api::CameraTraits>();

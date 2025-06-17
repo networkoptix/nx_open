@@ -86,7 +86,7 @@ NX_VMS_COMMON_API extern const QString kHighStreamAvailableBitrates;
 NX_VMS_COMMON_API extern const QString kLowStreamAvailableBitrates;
 NX_VMS_COMMON_API extern const QString kHighStreamBitrateBounds;
 NX_VMS_COMMON_API extern const QString kLowStreamBitrateBounds;
-NX_VMS_COMMON_API extern const QString kUnauthorizedTimeoutSec;
+NX_VMS_COMMON_API extern const QString kUnauthorizedTimeoutLimitsSec;
 NX_VMS_COMMON_API extern const QString kAdvancedParameterOverloads;
 NX_VMS_COMMON_API extern const QString kShouldAppearAsSingleChannel;
 NX_VMS_COMMON_API extern const QString kPreStreamConfigureRequests;
@@ -195,6 +195,8 @@ NX_VMS_COMMON_API extern const QString kPreferNativeApiForRemoteArchiveSynchroni
 
 // Force enable/disable check for compatible configurations in Onvif PTZ.
 NX_VMS_COMMON_API extern const QString kOnvifForcePtzGetCompatibleConfigurationsSupported;
+
+NX_VMS_COMMON_API extern const QString kUseFirstDefaultCredentials;
 
 } // namespace ResourceDataKey
 
