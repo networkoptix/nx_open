@@ -14,6 +14,19 @@
 
 namespace nx::vms::client::core {
 
+// From channel_partners/src/partners/models.py in cloud_portal repository.
+inline const nx::Uuid kChannelPartnerAdministratorId{"00000000-0000-4000-8000-000000000001"};
+inline const nx::Uuid kChannelPartnerManagerId{"00000000-0000-4000-8000-000000000002"};
+inline const nx::Uuid kChannelPartnerReportsViewerId{"00000000-0000-4000-8000-000000000003"};
+
+inline const nx::Uuid kOrganizationAdministratorId{"00000000-0000-4000-8000-000000000001"};
+inline const nx::Uuid kOrganizationSystemAdministratorId{"00000000-0000-4000-8000-000000000002"};
+inline const nx::Uuid kOrganizationPowerUserId{"00000000-0000-4000-8000-000000000003"};
+inline const nx::Uuid kOrganizationSystemHealthViewerId{"00000000-0000-4000-8000-000000000004"};
+inline const nx::Uuid kOrganizationAdvancedViewerId{"00000000-0000-4000-8000-000000000005"};
+inline const nx::Uuid kOrganizationViewerId{"00000000-0000-4000-8000-000000000006"};
+inline const nx::Uuid kOrganizationLiveViewerId{"00000000-0000-4000-8000-000000000007"};
+
 struct ChannelPartner
 {
     nx::Uuid id;
@@ -21,10 +34,12 @@ struct ChannelPartner
     int partnerCount = 0;
     api::SaasState state = api::SaasState::uninitialized;
     api::SaasState effectiveState = api::SaasState::uninitialized;
+    std::vector<nx::Uuid> ownRolesIds;
 
     bool operator==(const ChannelPartner&) const = default;
 };
-NX_REFLECTION_INSTRUMENT(ChannelPartner, (id)(name)(partnerCount)(state)(effectiveState))
+NX_REFLECTION_INSTRUMENT(ChannelPartner, (id)(name)(partnerCount)(state)(effectiveState) \
+    (ownRolesIds))
 
 struct ChannelPartnerList
 {
@@ -45,10 +60,13 @@ struct Organization
     nx::Uuid channelPartner;
     api::SaasState state = api::SaasState::uninitialized;
     api::SaasState effectiveState = api::SaasState::uninitialized;
+    std::string channelPartnerAccessLevel; //< Either UUID or "**REDACTED**".
+    std::vector<nx::Uuid> ownRolesIds;
 
     bool operator==(const Organization& other) const = default;
 };
-NX_REFLECTION_INSTRUMENT(Organization, (id)(name)(systemCount)(channelPartner)(state)(effectiveState))
+NX_REFLECTION_INSTRUMENT(Organization, (id)(name)(systemCount)(channelPartner)(state) \
+    (effectiveState)(channelPartnerAccessLevel)(ownRolesIds));
 
 struct OrganizationList
 {

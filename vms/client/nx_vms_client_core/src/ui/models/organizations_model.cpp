@@ -163,12 +163,42 @@ struct TreeNode
     api::SaasState state = api::SaasState::uninitialized;
     OrganizationsModel::NodeType type = OrganizationsModel::None;
     bool loading = false;
+    bool accessible = true;
 
 private:
     TreeNode* parent = nullptr;
     std::vector<std::unique_ptr<TreeNode>> children;
     Map& idToNode;
 };
+
+bool canAccess(const Organization& org)
+{
+    return !std::ranges::contains(org.ownRolesIds, kOrganizationSystemHealthViewerId);
+}
+
+bool canAccess(const ChannelPartner& cp)
+{
+    return !std::ranges::contains(cp.ownRolesIds, kChannelPartnerReportsViewerId);
+}
+
+// Checks if the organization can be accessed within the parent channel partner.
+bool canAccess(const Organization& org, const ChannelPartner& parentCp)
+{
+    const QSet<nx::Uuid> cpRolesIds(parentCp.ownRolesIds.begin(), parentCp.ownRolesIds.end());
+    if (cpRolesIds.contains(kChannelPartnerReportsViewerId))
+        return false;
+
+    const auto accessLevel = nx::Uuid::fromStringSafe(org.channelPartnerAccessLevel);
+
+    if (accessLevel != kOrganizationSystemAdministratorId
+        && (cpRolesIds.contains(kChannelPartnerAdministratorId)
+            || cpRolesIds.contains(kChannelPartnerManagerId)))
+    {
+        return false;
+    }
+
+    return true;
+}
 
 } // namespace
 
@@ -278,8 +308,7 @@ struct OrganizationsModel::Private
             if (node->name != QString::fromStdString(partner.name))
             {
                 node->name = QString::fromStdString(partner.name);
-                auto cpIndex = q->createIndex(node->row(), 0, node);
-                q->dataChanged(cpIndex, cpIndex);
+                notifyNodeUpdate(node);
             }
         }
 
@@ -325,8 +354,7 @@ struct OrganizationsModel::Private
             {
                 node->name = QString::fromStdString(org.name);
                 node->systemCount = org.systemCount;
-                auto orgIndex = q->createIndex(node->row(), 0, node);
-                q->dataChanged(orgIndex, orgIndex);
+                notifyNodeUpdate(node);
             }
         }
 
@@ -362,8 +390,7 @@ struct OrganizationsModel::Private
                     {
                         node->name = QString::fromStdString(group.name);
                         node->systemCount = group.systemCount;
-                        auto groupIndex = q->createIndex(node->row(), 0, node);
-                        q->dataChanged(groupIndex, groupIndex);
+                        notifyNodeUpdate(node);
                     }
                     setNodeGroups(node, group.children);
                 }
@@ -522,6 +549,55 @@ struct OrganizationsModel::Private
     coro::Task<bool> loadChannelPartnerOrgsAsync(ChannelPartnerList cpList);
 
     void clearCloudData();
+
+    void notifyNodeUpdate(const TreeNode* node, const QList<int>& roles = {})
+    {
+        if (!node)
+            return;
+
+        const auto index = q->createIndex(node->row(), 0, node);
+        q->dataChanged(index, index, roles);
+    }
+
+    void updateNodeAccess(TreeNode* node, bool accessible)
+    {
+        if (node->accessible == accessible)
+            return;
+
+        QList<int> updateRoles;
+
+        node->accessible = accessible;
+        updateRoles << OrganizationsModel::IsAccessDeniedRole;
+
+        if (!accessible && node->loading)
+        {
+            node->loading = false;
+            updateRoles << OrganizationsModel::IsLoadingRole;
+        }
+
+        notifyNodeUpdate(node, updateRoles);
+    }
+
+    template <typename T, typename... P>
+        requires ((std::is_same_v<T, struct ChannelPartner>
+                || std::is_same_v<T, struct Organization>)
+            && (sizeof...(P) == 0
+                || std::is_same_v<std::tuple<P...>, std::tuple<struct ChannelPartner>>))
+    void removeInaccessibleItems(std::vector<T>* items, P... params)
+    {
+        items->erase(
+            std::remove_if(
+                items->begin(),
+                items->end(),
+                [&](const auto& item)
+                {
+                    const bool accessible = canAccess(item, params...);
+                    if (auto node = this->nodes.find(item.id))
+                        updateNodeAccess(node, accessible);
+                    return !accessible;
+                }),
+            items->end());
+    }
 };
 
 OrganizationsModel::OrganizationsModel(QObject* parent):
@@ -682,6 +758,8 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
             return node->state == api::SaasState::shutdown;
         case IsAccessibleThroughOrgRole:
             return true;
+        case IsAccessDeniedRole:
+            return !node->accessible;
         default:
             if (node->type == OrganizationsModel::System && d->proxyModel)
             {
@@ -766,7 +844,9 @@ QHash<int, QByteArray> OrganizationsModel::roleNames() const
         {SytemCountRole, "systemCount"},
         {SectionRole, "section"},
         {IsLoadingRole, "isLoading"},
-        {IsFromSitesRole, "isFromSites"}
+        {IsFromSitesRole, "isFromSites"},
+        {IsAccessibleThroughOrgRole, "isAccessibleThroughOrg"},
+        {IsAccessDeniedRole, "isAccessDenied"},
     };
 
     auto roles = QnSystemsModel::kRoleNames;
@@ -861,8 +941,7 @@ coro::Task<bool> OrganizationsModel::Private::loadOrgAsync(struct Organization o
     if (auto node = nodes.find(org.id); node && node->loading)
     {
         node->loading = false;
-        auto orgIndex = q->createIndex(node->row(), 0, node);
-        q->dataChanged(orgIndex, orgIndex, {OrganizationsModel::IsLoadingRole});
+        notifyNodeUpdate(node, {OrganizationsModel::IsLoadingRole});
     }
 
     co_return true;
@@ -893,37 +972,38 @@ coro::Task<bool> OrganizationsModel::Private::loadChannelPartnerOrgsAsync(Channe
     for (const auto& cp: cpList.results)
     {
         loadOrgTasks.push_back(
-            [](auto self, auto cpId) -> coro::Task<bool>
+            [](auto self, const auto& cp) -> coro::Task<bool>
             {
                 auto cpOrgList = co_await cloudGet<OrganizationList>(
                     self->statusWatcher,
                     nx::format(
                         "/partners/api/v3/channel_partners/%1/organizations/",
-                        cpId.toSimpleStdString()).toStdString());
+                        cp.id.toSimpleStdString()).toStdString());
 
                 if (!cpOrgList)
                 {
                     NX_WARNING(self,
                         "Error getting organizations of %1: %2",
-                        cpId,
+                        cp.id,
                         cloud::db::api::toString(cpOrgList.error()));
                     co_return false;
                 }
 
-                self->setOrganizations(*cpOrgList, cpId);
+                self->setOrganizations(*cpOrgList, cp.id);
+
+                // Show inaccessible organizations but don't load them.
+                self->removeInaccessibleItems(&cpOrgList->results, cp);
 
                 const bool result = co_await self->loadOrgListAsync(std::move(*cpOrgList));
 
-                if (auto node = self->nodes.find(cpId); node && node->loading)
+                if (auto node = self->nodes.find(cp.id); node && node->loading)
                 {
                     node->loading = false;
-                    auto orgIndex = self->q->createIndex(node->row(), 0, node);
-                    self->q->dataChanged(
-                        orgIndex, orgIndex, {OrganizationsModel::IsLoadingRole});
+                    self->notifyNodeUpdate(node, {OrganizationsModel::IsLoadingRole});
                 }
 
                 co_return result;
-            }(this, cp.id));
+            }(this, cp));
     }
 
     auto results = co_await nx::coro::runAll(std::move(loadOrgTasks), kMaxConcurrentRequests);
@@ -975,6 +1055,9 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
             continue;
         }
 
+        // Hide inaccessible channel partners.
+        removeInaccessibleItems(&channelPartnerList->results);
+
         setHasChannelPartners(!channelPartnerList->results.empty());
         setChannelPartners(*channelPartnerList);
 
@@ -997,6 +1080,9 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
         setOrganizations(*orgList, root->id);
         setHasOrganizations(!orgList->results.empty());
         setTopLevelLoading(false);
+
+        // Show inaccessible organizations but don't load them.
+        removeInaccessibleItems(&orgList->results);
 
         co_await loadOrgListAsync(std::move(*orgList));
 

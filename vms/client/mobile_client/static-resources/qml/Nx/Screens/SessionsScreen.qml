@@ -443,6 +443,14 @@ Page
                 if (sessionsScreen.state === "inPartnerOrOrg"
                     && rootType == OrganizationsModel.Organization)
                 {
+                    if (accessor.getData(sessionsScreen.rootIndex, "isAccessDenied") ?? false)
+                    {
+                        return {
+                            imageSource: "image://skin/64x64/Outline/no_access.svg?primary=light10",
+                            text: qsTr("Access to Resources Denied"),
+                            description: qsTr("Sites in the Suspended or Shutdown state are not available"),
+                        }
+                    }
                     return {
                         imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10",
                         text: kNoSites,

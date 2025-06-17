@@ -47,6 +47,7 @@ public:
         IsLoadingRole,
         IsFromSitesRole,
         IsAccessibleThroughOrgRole,
+        IsAccessDeniedRole,
 
         RolesCount
     };
