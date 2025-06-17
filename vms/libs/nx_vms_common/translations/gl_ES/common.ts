@@ -1610,7 +1610,7 @@
     </message>
     <message>
       <source>Site name.</source>
-      <translation type="unfinished">Site name.</translation>
+      <translation>Nome do sitio.</translation>
     </message>
     <message>
       <source>Last master Site merge ID.</source>
