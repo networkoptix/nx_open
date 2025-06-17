@@ -153,15 +153,6 @@ private:
     QMultiMap<QString, QString> m_values;
 };
 
-struct NX_NETWORK_REST_API Content
-{
-    nx::network::http::header::ContentType type;
-    QByteArray body;
-
-    std::optional<QJsonValue> parse() const;
-    QJsonValue parseOrThrow() const;
-};
-
 template<typename T>
 Params::Fields Params::deserializeOrThrow(T* data) const
 {

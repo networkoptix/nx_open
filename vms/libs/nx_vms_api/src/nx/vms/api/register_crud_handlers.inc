@@ -3081,9 +3081,13 @@ static void registerMiscRestHandlers(
      * %jsonrpc[unused]
      * %caption JSON-RPC (HTTP)
      * %ingroup Utilities
+     * %param:{ClientExtensions} #0[].extensions
+     * %param:{ClientExtensions} #1.extensions
      * %param[ref] _ticket
      * %permissions Depends on Resource access rights.
      * %return:{std::variant<std::vector<Response>, Response>}
+     *     %param:{ClientExtensions} #0[].extensions
+     *     %param:{ClientExtensions} #1.extensions
      *
      **%apidoc GET /jsonrpc
      * Allows executing API requests in the JSON RPC format over a WebSocket. For more information

@@ -8,6 +8,7 @@
 #include <nx/reflect/urlencoded/deserializer.h>
 #include <nx/utils/void.h>
 
+#include "content.h"
 #include "exception.h"
 #include "json.h"
 #include "nx_network_rest_ini.h"

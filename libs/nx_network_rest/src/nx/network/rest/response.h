@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "params.h"
+#include "content.h"
 #include "result.h"
 
 namespace nx::network::rest {

@@ -125,8 +125,9 @@ bool isSuccessCode(Value statusCode)
 
 bool isSuccessCode(int statusCode)
 {
-    return (statusCode >= ok && statusCode <= lastSuccessCode) ||
-            statusCode == switchingProtocols;
+    return (statusCode >= ok && statusCode <= lastSuccessCode)
+        || statusCode == switchingProtocols
+        || statusCode == notModified;
 }
 
 bool isMessageBodyAllowed(int statusCode)

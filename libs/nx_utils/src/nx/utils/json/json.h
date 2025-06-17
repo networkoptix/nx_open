@@ -15,7 +15,7 @@ namespace details {
 class NX_UTILS_API Composer: public nx::reflect::AbstractComposer<::rapidjson::Document>
 {
 public:
-    Composer()
+    Composer(rapidjson::Document::AllocatorType* allocator = nullptr): m_value(allocator)
     {
         setSerializeFlags((/*jsonSerializeChronoDurationAsNumber*/ 1 << 0u)
             | (/*jsonSerializeInt64AsString*/ 1 << 1u));
@@ -70,6 +70,7 @@ private:
 class NX_UTILS_API StripDefaultComposer: public Composer
 {
 public:
+    using Composer::Composer;
     virtual void startArray() override;
     virtual void endArray(int = 0) override;
     virtual void startObject() override;
@@ -130,24 +131,35 @@ struct SerializationContextBase
 struct SerializationContext: details::SerializationContextBase
 {
     details::Composer composer;
+
+    SerializationContext(rapidjson::Document::AllocatorType* allocator = nullptr):
+        composer(allocator)
+    {
+    }
 };
 
 struct StripDefaultSerializationContext: details::SerializationContextBase
 {
     details::StripDefaultComposer composer;
+
+    StripDefaultSerializationContext(rapidjson::Document::AllocatorType* allocator = nullptr):
+        composer(allocator)
+    {
+    }
 };
 
 template<typename T>
-::rapidjson::Document serialized(const T& value, bool stripDefault)
+::rapidjson::Document serialized(
+    const T& value, bool stripDefault, rapidjson::Document::AllocatorType* allocator = nullptr)
 {
     if (!stripDefault)
     {
-        SerializationContext context;
+        SerializationContext context{allocator};
         nx::reflect::BasicSerializer::serializeAdl(&context, value);
         return context.composer.take();
     }
 
-    StripDefaultSerializationContext context;
+    StripDefaultSerializationContext context{allocator};
     nx::reflect::BasicSerializer::serializeAdl(&context, value);
     auto result{context.composer.take()};
     if (!result.IsNull())
