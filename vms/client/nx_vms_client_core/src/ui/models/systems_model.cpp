@@ -391,18 +391,10 @@ bool QnSystemsModel::lessThan(const QModelIndex& sourceLeft, const QModelIndex& 
     if (leftIsLocalhost != rightIsLocalhost)
         return leftIsLocalhost;
 
-    static const QCollator collator =
-        []()
-        {
-            QCollator collator;
-            collator.setCaseSensitivity(Qt::CaseInsensitive);
-            collator.setNumericMode(true);
-            return collator;
-        }();
-
-    const int namesOrder = collator.compare(
+    const int namesOrder = nx::utils::naturalStringCompare(
         sourceLeft.data(QnSystemsModel::SystemNameRoleId).toString(),
-        sourceRight.data(QnSystemsModel::SystemNameRoleId).toString());
+        sourceRight.data(QnSystemsModel::SystemNameRoleId).toString(),
+        Qt::CaseInsensitive);
 
     if (namesOrder != 0)
         return namesOrder < 0;
