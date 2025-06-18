@@ -9,6 +9,7 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_camera_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/resource/screen_recording/desktop_data_provider_wrapper.h>
 #include <nx/vms/client/desktop/settings/screen_recording_settings.h>
 
 #include "desktop_data_provider.h"
@@ -52,9 +53,10 @@ static AudioLayoutConstPtr emptyAudioLayout(new AudioLayout());
 AudioLayoutConstPtr WindowsDesktopResource::getAudioLayout(
     const QnAbstractStreamDataProvider* dataProvider) const
 {
-    auto provider = dynamic_cast<const core::DesktopDataProviderBase*>(dataProvider);
-    if (provider && provider->getAudioLayout())
-        return provider->getAudioLayout();
+    using namespace nx::vms::client::desktop;
+    auto provider = dynamic_cast<const DesktopDataProviderWrapper*>(dataProvider);
+    if (provider && provider->owner()->getAudioLayout())
+        return provider->owner()->getAudioLayout();
     return emptyAudioLayout;
 }
 

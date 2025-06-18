@@ -123,7 +123,7 @@ bool AudioEncoder::open(
         NX_WARNING(this, "Failed to initialize audio encoder, codec not found: %1", codecId);
         return false;
     }
-
+    m_sourceformat = format;
     m_encoderContext = avcodec_alloc_context3(codec);
     m_encoderContext->sample_fmt = codec->sample_fmts[0] != AV_SAMPLE_FMT_NONE
         ? codec->sample_fmts[0] : format;
@@ -175,7 +175,7 @@ bool AudioEncoder::sendFrame(uint8_t* data, int size)
     m_inputFrame->extended_data = m_inputFrame->data;
     m_inputFrame->nb_samples = size;
     m_inputFrame->sample_rate = m_encoderContext->sample_rate;
-    m_inputFrame->format = m_encoderContext->sample_fmt;
+    m_inputFrame->format = m_sourceformat;
     m_inputFrame->ch_layout = m_encoderContext->ch_layout;
     m_inputFrame->pts = m_ptsUs;
     m_ptsUs += (kTimeScale * m_inputFrame->nb_samples) / m_inputFrame->sample_rate;

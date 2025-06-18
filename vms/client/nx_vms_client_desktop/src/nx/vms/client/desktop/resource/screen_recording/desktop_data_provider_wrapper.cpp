@@ -15,6 +15,9 @@ DesktopDataProviderWrapper::DesktopDataProviderWrapper(
 DesktopDataProviderWrapper::~DesktopDataProviderWrapper()
 {}
 
+void DesktopDataProviderWrapper::pleaseStop()
+{}
+
 void DesktopDataProviderWrapper::putData(const QnAbstractDataPacketPtr& /*data*/)
 {}
 
