@@ -553,4 +553,14 @@ void CameraHotspotItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     base_type::mouseReleaseEvent(event);
 }
 
+QVariant CameraHotspotItem::itemChange(
+    QGraphicsItem::GraphicsItemChange change,
+    const QVariant& value)
+{
+    if (change == QGraphicsItem::ItemVisibleChange && !value.toBool() && d->tooltip)
+        d->tooltip->hide();
+
+    return base_type::itemChange(change, value);
+}
+
 } // namespace nx::vms::client::desktop
