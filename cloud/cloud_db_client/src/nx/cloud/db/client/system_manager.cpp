@@ -120,9 +120,9 @@ void SystemManager::getSystems(
 void SystemManager::shareSystem(
     const std::string& systemId,
     api::ShareSystemRequest sharingData,
-    std::function<void(api::ResultCode, api::SystemSharing)> completionHandler)
+    std::function<void(api::ResultCode, api::CdbSystemSharing)> completionHandler)
 {
-    m_requestsExecutor->makeAsyncCall<api::SystemSharing>(
+    m_requestsExecutor->makeAsyncCall<api::CdbSystemSharing>(
         nx::network::http::Method::post,
         nx::network::http::rest::substituteParameters(kSystemUsersPathV2, {systemId}),
         {}, //query

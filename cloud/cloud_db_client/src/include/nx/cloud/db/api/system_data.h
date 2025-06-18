@@ -377,9 +377,9 @@ NX_REFLECTION_ENUM_CLASS(UserType,
 )
 
 /**
- * Describes an account to system relation.
+ * Describes an account to system relation in CDB.
  */
-struct SystemSharing: ShareSystemRequest
+struct CdbSystemSharing: public ShareSystemRequest
 {
     using base_type = ShareSystemRequest;
 
@@ -419,6 +419,41 @@ struct SystemSharing: ShareSystemRequest
     // Internal attribute. Gives a hint to the UI whether to show the user in the list or not.
     std::optional<bool> hidden;
 
+    bool operator==(const CdbSystemSharing& rhs) const
+    {
+        return std::tie(static_cast<const base_type&>(*this), systemId, accountId, accountFullName)
+            == std::tie(
+                static_cast<const base_type&>(rhs),
+                rhs.systemId,
+                rhs.accountId,
+                rhs.accountFullName);
+    }
+
+    bool operator<(const CdbSystemSharing& rhs) const
+    {
+        return std::tie(static_cast<const base_type&>(*this), systemId, accountId, accountFullName)
+            < std::tie(
+                static_cast<const base_type&>(rhs),
+                rhs.systemId,
+                rhs.accountId,
+                rhs.accountFullName);
+    }
+};
+
+
+#define CdbSystemSharing_Fields (systemId)(accountId)(accountFullName)(accountFirstName)\
+    (accountLastName)(locale)(usageFrequency)(lastLoginTime)\
+    (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId)(type)(readonly)(hidden)
+
+NX_REFLECTION_INSTRUMENT(CdbSystemSharing, CdbSystemSharing_Fields)
+
+/**
+ * Describes an account to system relation.
+ */
+struct SystemSharing: public CdbSystemSharing
+{
+    using base_type = CdbSystemSharing;
+
     /**%apidoc List of roles assigned to user by organization
      * This field is presented only in cdb/v2/systems API
      */
@@ -426,39 +461,19 @@ struct SystemSharing: ShareSystemRequest
 
     bool operator==(const SystemSharing& rhs) const
     {
-        return std::tie(
-            static_cast<const base_type&>(*this),
-                   systemId,
-                   accountId,
-                   accountFullName,
-                   orgRoleIds)
-            == std::tie(static_cast<const base_type&>(rhs), rhs.systemId, rhs.accountId,
-                rhs.accountFullName, rhs.orgRoleIds);
+        return std::tie(static_cast<const base_type&>(*this), orgRoleIds)
+            == std::tie(static_cast<const base_type&>(rhs), orgRoleIds);
     }
 
     bool operator<(const SystemSharing& rhs) const
     {
-        return std::tie(
-            static_cast<const base_type&>(*this),
-            systemId,
-            accountId,
-            accountFullName,
-            orgRoleIds)
-            < std::tie(
-            static_cast<const base_type&>(rhs),
-            rhs.systemId,
-            rhs.accountId,
-            rhs.accountFullName,
-            rhs.orgRoleIds);
+        return std::tie(static_cast<const base_type&>(*this), orgRoleIds)
+            < std::tie(static_cast<const base_type&>(rhs), orgRoleIds);
     }
 };
 
-#define SystemSharing_Fields (systemId)(accountId)(accountFullName)(accountFirstName)\
-    (accountLastName)(locale)(usageFrequency)(lastLoginTime)\
-    (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId)(type)(readonly)(hidden)(orgRoleIds)
-
-NX_REFLECTION_INSTRUMENT(SystemSharing, (systemId)(accountId)(accountFullName)(accountFirstName)\
-    (accountLastName)(locale)(usageFrequency)(lastLoginTime)(type)(readonly)(hidden)(orgRoleIds))
+#define SystemSharing_Fields (orgRoleIds)
+NX_REFLECTION_INSTRUMENT(SystemSharing, (orgRoleIds))
 
 using SystemSharingList = std::vector<SystemSharing>;
 

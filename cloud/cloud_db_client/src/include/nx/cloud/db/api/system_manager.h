@@ -71,7 +71,7 @@ public:
     virtual void shareSystem(
         const std::string& systemId,
         ShareSystemRequest sharingData,
-        std::function<void(ResultCode, SystemSharing)> completionHandler) = 0;
+        std::function<void(ResultCode, CdbSystemSharing)> completionHandler) = 0;
 
     /**
      * Revokes user with given email from accessing system with the specified systemId.

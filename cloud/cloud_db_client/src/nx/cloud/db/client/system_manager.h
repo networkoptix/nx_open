@@ -45,7 +45,7 @@ public:
     virtual void shareSystem(
         const std::string& systemId,
         api::ShareSystemRequest sharingData,
-        std::function<void(api::ResultCode, api::SystemSharing)> completionHandler) override;
+        std::function<void(api::ResultCode, api::CdbSystemSharing)> completionHandler) override;
 
     virtual void revokeUserAccessDeprecated(
         const std::string& systemId,
