@@ -94,7 +94,10 @@ Item
 
         function onReleased() { releaseAt(mouseArea.mouseX, mouseArea.mouseY) }
 
-        function onTapped(eventPoint, button) { releaseAt(eventPoint.x, eventPoint.y) }
+        function onTapped(eventPoint, button)
+        {
+            releaseAt(eventPoint.position.x, eventPoint.position.y)
+        }
     }
 
     Rectangle
