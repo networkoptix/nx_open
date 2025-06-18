@@ -188,55 +188,55 @@
     </message>
     <message>
       <source>Motion mask should be in range: x in [0, %1], y in [0, %2], width in [1, %3], height in [1, %4]</source>
-      <translation type="unfinished">Motion mask should be in range: x in [0, %1], y in [0, %2], width in [1, %3], height in [1, %4]</translation>
+      <translation>A máscara de movemento debería estar dentro do rango: x en [0, %1], y en [0, %2], ancho en [1, %3], alto en [1, %4]</translation>
     </message>
     <message>
       <source>Set %1 `scheduleEnabled` to true is forbidden: no license to enable recording.</source>
-      <translation type="unfinished">Set %1 `scheduleEnabled` to true is forbidden: no license to enable recording.</translation>
+      <translation>Prohíbese definir %1 `programaciónhabilitada` como verdadeiro: non hai licenza para activar a gravación.</translation>
     </message>
     <message>
       <source>It is forbidden to enable cloud backup for %1 since SaaS service is not active.</source>
-      <translation type="unfinished">It is forbidden to enable cloud backup for %1 since SaaS service is not active.</translation>
+      <translation>Está prohibido activar a copia de seguridade na nube para %1 xa que o servizo SaaS non está activo.</translation>
     </message>
     <message>
       <source>It is forbidden to enable cloud backup for %1 because there is no appropriate SaaS service license.</source>
-      <translation type="unfinished">It is forbidden to enable cloud backup for %1 because there is no appropriate SaaS service license.</translation>
+      <translation>Está prohibido activar a copia de seguridade na nube para %1 porque non existe a licenza de servizo SaaS axeitada.</translation>
     </message>
     <message>
       <source>There is not enough save permissions</source>
-      <translation type="unfinished">There is not enough save permissions</translation>
+      <translation>Non hai suficientes permisos de gardado</translation>
     </message>
     <message>
       <source>Device %1 not found</source>
-      <translation type="unfinished">Device %1 not found</translation>
+      <translation>Non se atopou o dispositivo %1</translation>
     </message>
     <message>
       <source>There is no license for camera %1</source>
-      <translation type="unfinished">There is no license for camera %1</translation>
+      <translation>Non hai licenza para a cámara %1</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s attributes.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s attributes.</translation>
+      <translation>O usuario &apos;%1(%2)&apos; non ten permiso para modificar os atributos do servidor.</translation>
     </message>
     <message>
       <source>User %1 with %2 permissions has no %3 permissions.</source>
-      <translation type="unfinished">User %1 with %2 permissions has no %3 permissions.</translation>
+      <translation>O usuario %1 con permisos %2 non ten permisos %3 .</translation>
     </message>
     <message>
       <source>User %1 does not have %2 access to %3.</source>
-      <translation type="unfinished">User %1 does not have %2 access to %3.</translation>
+      <translation>O usuario %1 non ten acceso %2 a %3.</translation>
     </message>
     <message>
       <source>Resource %1 does not exist.</source>
-      <translation type="unfinished">Resource %1 does not exist.</translation>
+      <translation>O recurso %1 non existe.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to create a new Server.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to create a new Server.</translation>
+      <translation>O usuario &apos;%1(%2)&apos; non ten permiso para crear un novo servidor.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s settings.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify the Server&apos;s settings.</translation>
+      <translation>O usuario &apos;%1(%2)&apos; non ten permiso para modificar a configuración do servidor.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2) is not permitted to create new User Groups.&apos;</source>
@@ -244,57 +244,57 @@
     </message>
     <message>
       <source>Creation of a non-local (%1) User Group is forbidden for VMS.</source>
-      <translation type="unfinished">Creation of a non-local (%1) User Group is forbidden for VMS.</translation>
+      <translation>A creación dun grupo de usuarios non local (%1) está prohibida para VMS.</translation>
     </message>
     <message>
       <source>Cannot modify the built-in User Group %1(%2).</source>
-      <translation type="unfinished">Cannot modify the built-in User Group %1(%2).</translation>
+      <translation>Non se pode modificar o grupo de usuarios integrado %1(%2).</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to modify User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to modify User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</translation>
+      <translation>O usuario &apos;%1(%2)&apos; non ten permiso para modificar o grupo de usuarios &apos;%3(%4)&apos; cos dereitos de %5.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to delete User Groups.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to delete User Groups.</translation>
+      <translation>O usuario &apos;%1(%2)&apos; non ten permiso para eliminar grupos de usuarios.</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to delete the User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</source>
-      <translation type="unfinished">User &apos;%1(%2)&apos; is not permitted to delete the User Group &apos;%3(%4)&apos; with &apos;%5&apos; rights.</translation>
+      <translation>O usuario &apos;%1(%2)&apos; non ten permiso para borrar o grupo de usuarios &apos;%3(%4)&apos; cos dereitos de %5.</translation>
     </message>
     <message>
       <source>Removing User Group is forbidden because it is still used by &apos;%1&apos;.</source>
-      <translation type="unfinished">Removing User Group is forbidden because it is still used by &apos;%1&apos;.</translation>
+      <translation>Non se permite eliminar o grupo de usuarios porque aínda o usa &apos;%1&apos;.</translation>
     </message>
     <message>
       <source>Removing User Group is forbidden because it is still inherited by &apos;%1&apos;.</source>
-      <translation type="unfinished">Removing User Group is forbidden because it is still inherited by &apos;%1&apos;.</translation>
+      <translation>Non se pode eliminar o grupo de usuarios porque aínda o herda &apos;%1&apos;.</translation>
     </message>
     <message>
       <source>Cannot delete the built-in User Group %1(%2).</source>
-      <translation type="unfinished">Cannot delete the built-in User Group %1(%2).</translation>
+      <translation>Non se pode eliminar o grupo de usuarios integrado %1(%2).</translation>
     </message>
     <message>
       <source>User %1 is not allowed to modify the Showreel with parentId %2.</source>
-      <translation type="unfinished">User %1 is not allowed to modify the Showreel with parentId %2.</translation>
+      <translation>O usuario %1 non ten permiso para modificar o Showreel co ID parental %2.</translation>
     </message>
     <message>
       <source>Modifying of %1 entries out of %2 is not allowed for %3.</source>
       <comment>%3 is a C++ type name</comment>
-      <translation type="unfinished">Modifying of %1 entries out of %2 is not allowed for %3.</translation>
+      <translation>Non se permite a modificación das entradas %1 de %2 para %3.</translation>
     </message>
     <message>
       <source>%1 storage can be only in the backup storage pool.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 storage can be only in the backup storage pool.</translation>
+      <translation>O almacenamento %1 só pode estar no grupo de almacenamento de copia de seguridade.</translation>
     </message>
     <message>
       <source>Changing storage URL is prohibited.</source>
-      <translation type="unfinished">Changing storage URL is prohibited.</translation>
+      <translation>Está prohibido cambiar o URL de almacenamento.</translation>
     </message>
     <message>
       <source>Removal of the User with readonly attribute is forbidden for VMS.</source>
-      <translation type="unfinished">Removal of the User with readonly attribute is forbidden for VMS.</translation>
+      <translation>A eliminación do usuario co atributo de só lectura está prohibida para VMS.</translation>
     </message>
     <message>
       <source>the User %1 doesn&apos;t have &apos;generateEvents&apos; permission</source>

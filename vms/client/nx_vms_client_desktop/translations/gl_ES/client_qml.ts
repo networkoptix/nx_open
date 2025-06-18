@@ -1285,7 +1285,7 @@
     </message>
     <message>
       <source>Configure</source>
-      <translation type="unfinished">Configure</translation>
+      <translation>Configurar</translation>
     </message>
     <message>
       <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>

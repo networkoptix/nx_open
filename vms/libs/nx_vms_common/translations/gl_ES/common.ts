@@ -5,11 +5,11 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>Contido JSON non válido.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>Tipo de contido non compatible.</translation>
     </message>
   </context>
   <context>
@@ -35,15 +35,15 @@
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>Non se pode acceder ao servidor LDAP. Por favor, téntao de novo máis tarde.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
+      <translation>%1 aínda non é accesible. Por favor, téntao de novo máis tarde.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+      <translation>O usuario está bloqueado debido a varios intentos fallidos. Por favor, téntao de novo máis tarde.</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your system administrator.</source>
@@ -51,7 +51,7 @@
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation type="unfinished">The session key is invalid or expired.</translation>
+      <translation>A clave de sesión non é válida ou caducou.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
@@ -63,19 +63,19 @@
     </message>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Este usuario non existe ou non pode iniciar sesión.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Preséntase máis dun usuario co mesmo inicio de sesión.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>Non se pode verificar o certificado SSL/TLS do servidor LDAP.</translation>
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>A clave do ticket non é válida ou caducou.</translation>
     </message>
     <message>
       <source>Wrong password</source>
@@ -83,7 +83,7 @@
     </message>
     <message>
       <source>No credentials provided when required by endpoint.</source>
-      <translation type="unfinished">No credentials provided when required by endpoint.</translation>
+      <translation>Non se proporcionaron credenciais cando o punto final o require.</translation>
     </message>
   </context>
   <context>
@@ -95,14 +95,14 @@
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Cámara eliminada</translation>
     </message>
   </context>
   <context>
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation>Apoio rexional / de licenza</translation>
+      <translation>o teu soporte rexional / de licenza</translation>
     </message>
   </context>
   <context>
@@ -469,7 +469,7 @@
     <name>QnCameraNamesWatcher</name>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Cámara eliminada</translation>
     </message>
   </context>
   <context>
@@ -1190,31 +1190,31 @@
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation type="unfinished">Missing required parameter: %1.</translation>
+      <translation>Falta o parámetro obrigatorio: %1.</translation>
     </message>
     <message>
       <source>Failed to process request.</source>
-      <translation type="unfinished">Failed to process request.</translation>
+      <translation>Non se puido procesar a solicitude.</translation>
     </message>
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Forbidden.</translation>
+      <translation>Prohibido.</translation>
     </message>
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Conflict.</translation>
+      <translation>Conflito.</translation>
     </message>
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>Solicitude incorrecta.</translation>
     </message>
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not implemented.</translation>
+      <translation>Non implementado.</translation>
     </message>
     <message>
       <source>Not found.</source>
@@ -1223,15 +1223,15 @@
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Erro interno.</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
-      <translation type="unfinished">Unsupported media type.</translation>
+      <translation>Tipo de medio non compatible.</translation>
     </message>
     <message>
       <source>Service unavailable.</source>
-      <translation type="unfinished">Service unavailable.</translation>
+      <translation>Servizo non dispoñible.</translation>
     </message>
     <message>
       <source>Unauthorized.</source>
@@ -1239,21 +1239,21 @@
     </message>
     <message>
       <source>Session expired.</source>
-      <translation type="unfinished">Session expired.</translation>
+      <translation>A sesión caducou.</translation>
     </message>
     <message>
       <source>Invalid parameter `%1`: %2.</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
+      <translation>Parámetro non válido `%1`: %2.</translation>
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>Requírese autorización de sesión.</translation>
     </message>
     <message>
       <source>Not allowed.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not allowed.</translation>
+      <translation>Non permitido.</translation>
     </message>
   </context>
   <context>
@@ -1329,7 +1329,7 @@
     <name>nx::recording::Error</name>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Erro interno</translation>
     </message>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
@@ -1392,35 +1392,35 @@
     <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Anonymous statistics report allowed</source>
-      <translation type="unfinished">Anonymous statistics report allowed</translation>
+      <translation>Informe estatístico anónimo permitido</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time</source>
-      <translation type="unfinished">Anonymous statistics report last time</translation>
+      <translation>Informe estatístico anónimo da última vez</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version</source>
-      <translation type="unfinished">Anonymous statistics report last version</translation>
+      <translation>Informe estatístico anónimo da última versión</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
-      <translation type="unfinished">Anonymous statistics report last number</translation>
+      <translation>Estatísticas anónimas informan do último número</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
-      <translation type="unfinished">Anonymous statistics time cycle</translation>
+      <translation>Ciclo temporal de estatísticas anónimas</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update</source>
-      <translation type="unfinished">Anonymous statistics report delay after update</translation>
+      <translation>As estatísticas anónimas informan dun atraso despois da actualización</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL</translation>
+      <translation>URL do servidor de informes estatísticos anónimos</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings</source>
-      <translation type="unfinished">Anonymous statistics report Client settings</translation>
+      <translation>Informe estatístico anónimo Configuración de cliente</translation>
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
@@ -1428,7 +1428,7 @@
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h)</translation>
+      <translation>Tempo de espera da conexión proxy (segundos, 1s-1h)</translation>
     </message>
     <message>
       <source>Time synchronization enabled</source>
@@ -1436,11 +1436,11 @@
     </message>
     <message>
       <source>Primary time synchronization Server ID</source>
-      <translation type="unfinished">Primary time synchronization Server ID</translation>
+      <translation>ID do servidor de sincronización de hora principal</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds)</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds)</translation>
+      <translation>Diferenza máxima entre o tempo local e o da fonte (milisegundos)</translation>
     </message>
     <message>
       <source>OS time change check period</source>
@@ -1464,7 +1464,7 @@
     </message>
     <message>
       <source>Cloud authorization key</source>
-      <translation type="unfinished">Cloud authorization key</translation>
+      <translation>Clave de autorización na nube</translation>
     </message>
     <message>
       <source>System name</source>
@@ -1480,15 +1480,15 @@
     </message>
     <message>
       <source>Disable Device vendors</source>
-      <translation type="unfinished">Disable Device vendors</translation>
+      <translation>Desactivar os provedores de dispositivos</translation>
     </message>
     <message>
       <source>Optimize Camera settings</source>
-      <translation type="unfinished">Optimize Camera settings</translation>
+      <translation>Optimizar a configuración da cámara</translation>
     </message>
     <message>
       <source>Thumbnails auto-update</source>
-      <translation type="unfinished">Thumbnails auto-update</translation>
+      <translation>Actualización automática das miniaturas</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
@@ -1508,7 +1508,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
-      <translation type="unfinished">Audit trail period (days, 14-730)</translation>
+      <translation>Período de rexistro de auditoría (días, 14-730)</translation>
     </message>
     <message>
       <source>Event log period (days)</source>
@@ -1516,47 +1516,47 @@
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption)</translation>
+      <translation>Forzar HTTPS (cifrado do tráfico de datos)</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption)</translation>
+      <translation>Forzar o cifrado do tráfico de vídeo (RTSPS)</translation>
     </message>
     <message>
       <source>Enable auto-discovery</source>
-      <translation type="unfinished">Enable auto-discovery</translation>
+      <translation>Activar a detección automática</translation>
     </message>
     <message>
       <source>Enable auto-update notifications</source>
-      <translation type="unfinished">Enable auto-update notifications</translation>
+      <translation>Activar as notificacións de actualización automática</translation>
     </message>
     <message>
       <source>Enable update notifications</source>
-      <translation type="unfinished">Enable update notifications</translation>
+      <translation>Activar as notificacións de actualización</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping</source>
-      <translation type="unfinished">Enable UPNP port-mapping</translation>
+      <translation>Activar o mapeo de portos UPNP</translation>
     </message>
     <message>
       <source>Backup settings</source>
-      <translation type="unfinished">Backup settings</translation>
+      <translation>Axustes da copia de seguridade</translation>
     </message>
     <message>
       <source>Cloud host override</source>
-      <translation type="unfinished">Cloud host override</translation>
+      <translation>Anulación do aloxamento na nube</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont</source>
-      <translation type="unfinished">Enable RTSP for Arecont</translation>
+      <translation>Habilitar RTSP para Arecont</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher</translation>
+      <translation>Habilitar o buscador secuencial Flir ONVIF</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB)</translation>
+      <translation>Tamaño máximo da cola P2P (bytes, 32-512 MB)</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB)</source>
@@ -1704,7 +1704,7 @@
     </message>
     <message>
       <source>Enable cross-domain policy</source>
-      <translation type="unfinished">Enable cross-domain policy</translation>
+      <translation>Habilitar a política interdominios</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P</source>
@@ -1736,7 +1736,7 @@
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages)</translation>
+      <translation>Expoñer os contrasinais dos dispositivos almacenados no VMS para os administradores (para páxinas web)</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
@@ -1793,7 +1793,7 @@
     </message>
     <message>
       <source>Organization Id</source>
-      <translation type="unfinished">Organization Id</translation>
+      <translation>ID da organización</translation>
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
@@ -1809,11 +1809,11 @@
     </message>
     <message>
       <source>Device storage information update interval</source>
-      <translation type="unfinished">Device storage information update interval</translation>
+      <translation>Intervalo de actualización da información de almacenamento do dispositivo</translation>
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL</source>
-      <translation type="unfinished">Anonymous Crash Report Server API URL</translation>
+      <translation>URL da API do servidor de informes de erros anónimos</translation>
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>
@@ -2039,7 +2039,7 @@
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Fonte: %1</translation>
     </message>
     <message>
       <source>Caption: %1</source>
@@ -2173,7 +2173,7 @@
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Selecciona polo menos un usuario/a</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -2193,7 +2193,7 @@
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Recoñecer</translation>
     </message>
     <message>
       <source>Analytics Event</source>
@@ -2506,23 +2506,23 @@
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>A gravación nas canles %n foi detida debido ao uso excesivo do servizo.</numerusform>
+        <numerusform>A gravación nas canles %n foi detida debido ao uso excesivo do servizo.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>A copia de seguridade do almacenamento na nube nas canles %n foi detida debido ao uso excesivo do servizo.</numerusform>
+        <numerusform>A copia de seguridade do almacenamento na nube nas canles %n foi detida debido ao uso excesivo do servizo.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>O uso do servizo de integración de pago nas canles %n foi interrompido debido ao uso excesivo do servizo.</numerusform>
+        <numerusform>O uso do servizo de integración de pago nas canles %n foi interrompido debido ao uso excesivo do servizo.</numerusform>
       </translation>
     </message>
     <message>
