@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>O teu sitio</translation>
     </message>
     <message>
       <source>Owner: %1</source>
@@ -187,7 +187,7 @@
     </message>
     <message>
       <source>This user has been disabled by a site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a site administrator.</translation>
+      <translation>Esta persoa usuaria foi desactivada por unha persoa administradora do sitio.</translation>
     </message>
   </context>
   <context>
