@@ -537,20 +537,6 @@ Page
 
         visible: organizationsModel.topLevelLoading || currentRootLoading
 
-        Connections
-        {
-            target: accessor
-            function updateVisibility()
-            {
-                loadingIndicator.currentRootLoading =
-                    sessionsScreen.rootIndex !== NxGlobals.invalidModelIndex()
-                    && accessor.getData(sessionsScreen.rootIndex, "isLoading")
-            }
-            function onDataChanged() { updateVisibility() }
-            function onRowsInserted() { updateVisibility() }
-            function onRowsRemoved() { updateVisibility() }
-        }
-
         component MaskItem: Rectangle
         {
             radius: 8
@@ -625,6 +611,32 @@ Page
         readonly property var kRootId: NxGlobals.uuid("")
     }
 
+    Connections
+    {
+        target: accessor
+        function updateVisibility()
+        {
+            const isCurrentRootInvalid =
+                sessionsScreen.rootIndex === NxGlobals.invalidModelIndex()
+                || NxGlobals.fromPersistent(sessionsScreen.rootIndex)
+                    === NxGlobals.invalidModelIndex()
+
+            loadingIndicator.currentRootLoading =
+                !isCurrentRootInvalid
+                && accessor.getData(sessionsScreen.rootIndex, "isLoading")
+
+            if (isCurrentRootInvalid)
+            {
+                sessionsScreen.rootType = undefined
+                sessionsScreen.rootIndex = NxGlobals.invalidModelIndex()
+                d.listPosition.clear()
+            }
+        }
+        function onDataChanged() { updateVisibility() }
+        function onRowsInserted() { updateVisibility() }
+        function onRowsRemoved() { updateVisibility() }
+    }
+
     function goInto(newIndex)
     {
         endSearch()
@@ -639,6 +651,8 @@ Page
             openSystem(newIndex)
             return
         }
+
+        newIndex = NxGlobals.toPersistent(newIndex)
 
         siteListContainer.slideLeft(() => {
             linearizationListModel.sourceRoot = newIndex
@@ -678,7 +692,7 @@ Page
             }
             else
             {
-                sessionsScreen.rootIndex = newIndex
+                sessionsScreen.rootIndex = NxGlobals.toPersistent(newIndex)
                 sessionsScreen.rootType = accessor.getData(newIndex, "type")
                 linearizationListModel.sourceRoot = newIndex
                 siteList.currentRoot = newIndex
