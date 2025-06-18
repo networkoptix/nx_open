@@ -4596,7 +4596,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Path</source>
-      <translation type="unfinished">Path</translation>
+      <translation>Ruta</translation>
     </message>
     <message>
       <source>Type</source>
@@ -11660,7 +11660,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>
-      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+      <translation>O usuario co correo electrónico especificado xa ten acceso de administrador a través do socio/partner de canle</translation>
     </message>
   </context>
   <context>
@@ -12628,7 +12628,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>Atributos</translation>
     </message>
   </context>
   <context>

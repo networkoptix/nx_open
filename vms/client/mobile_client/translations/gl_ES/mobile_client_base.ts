@@ -24,7 +24,7 @@
     <name>QnCloudSystemInformationWatcher</name>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>O teu sitio</translation>
     </message>
   </context>
   <context>

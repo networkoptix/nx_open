@@ -886,7 +886,7 @@
     </message>
     <message>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Engadir dispositivos</translation>
     </message>
     <message>
       <source>Default</source>
@@ -1144,7 +1144,7 @@
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>Site Settings</source>
-      <translation type="unfinished">Site Settings</translation>
+      <translation>Configuración do sitio</translation>
     </message>
   </context>
   <context>
@@ -1644,7 +1644,7 @@
     <name>NewDeviceAdditionDialog</name>
     <message>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Engadir dispositivos</translation>
     </message>
     <message>
       <source>to</source>
