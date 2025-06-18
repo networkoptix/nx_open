@@ -206,16 +206,16 @@
     </message>
     <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Device Disconnected</numerusform>
-        <numerusform>Device Disconnected</numerusform>
+      <translation>
+        <numerusform>Dispositivo desconectado</numerusform>
+        <numerusform>Dispositivo desconectado</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Camera Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Camera Disconnected</numerusform>
-        <numerusform>Camera Disconnected</numerusform>
+      <translation>
+        <numerusform>Cámara desconectada</numerusform>
+        <numerusform>Cámara desconectada</numerusform>
       </translation>
     </message>
     <message>
@@ -245,9 +245,9 @@
     </message>
     <message numerus="yes">
       <source>Device IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Device IP Conflict</numerusform>
-        <numerusform>Device IP Conflict</numerusform>
+      <translation>
+        <numerusform>Conflito de IP do dispositivo</numerusform>
+        <numerusform>Conflito de IP do dispositivo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -784,7 +784,7 @@
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Servizos de integración de pago desactivados</translation>
     </message>
     <message>
       <source>Services issue</source>
@@ -792,23 +792,23 @@
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>A gravación nas canles %n foi detida debido ao uso excesivo do servizo.</numerusform>
+        <numerusform>A gravación nas canles %n foi detida debido ao uso excesivo do servizo.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>A copia de seguridade do almacenamento na nube nas canles %n foi detida debido ao uso excesivo do servizo.</numerusform>
+        <numerusform>A copia de seguridade do almacenamento na nube nas canles %n foi detida debido ao uso excesivo do servizo.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>O uso do servizo de integración de pago nas canles %n foi interrompido debido ao uso excesivo do servizo.</numerusform>
+        <numerusform>O uso do servizo de integración de pago nas canles %n foi interrompido debido ao uso excesivo do servizo.</numerusform>
       </translation>
     </message>
   </context>
@@ -1068,7 +1068,7 @@
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Fonte: %1</translation>
     </message>
     <message>
       <source>Plugin: %1</source>

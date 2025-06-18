@@ -604,7 +604,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>File</source>
-      <translation type="unfinished">File</translation>
+      <translation>Ficheiro</translation>
     </message>
     <message>
       <source>File Folder</source>

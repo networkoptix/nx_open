@@ -3218,7 +3218,7 @@ Clave de licenza: %2</translation>
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is the cloud login name (like user@domain.com</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>Iniciado sesión como %1</translation>
     </message>
   </context>
   <context>
@@ -3591,7 +3591,7 @@ Clave de licenza: %2</translation>
     <name>QnExecPtzPresetPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Seleccionar exactamente unha cámara</translation>
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
@@ -3631,7 +3631,7 @@ Clave de licenza: %2</translation>
     <name>QnFullscreenCameraPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Seleccionar exactamente unha cámara</translation>
     </message>
   </context>
   <context>
@@ -4806,13 +4806,13 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation type="unfinished">Invalid email address %1</translation>
+      <translation>Enderezo de correo electrónico non válido %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      <translation>
+        <numerusform>%n de %1 os enderezos de correo electrónico adicionais non son válidos</numerusform>
+        <numerusform>%n de %1 os enderezos de correo electrónico adicionais non son válidos</numerusform>
       </translation>
     </message>
     <message>
@@ -5532,7 +5532,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Saber máis</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -6573,11 +6573,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>SourcePickerWidgetStrings</name>
     <message>
       <source>Select at least one Server</source>
-      <translation type="unfinished">Select at least one Server</translation>
+      <translation>Selecciona polo menos un servidor</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Selecciona polo menos un usuario/a</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -6833,7 +6833,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Selecciona polo menos un usuario/a</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -8046,11 +8046,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Movemento + baixa resolución</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Obxectos + baixa resolución</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
@@ -8202,7 +8202,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Erro interno.</translation>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
@@ -8280,7 +8280,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Click to Show Cameras</source>
-      <translation type="unfinished">Click to Show Cameras</translation>
+      <translation>Fai clic para mostrar as cámaras</translation>
     </message>
   </context>
   <context>
@@ -8308,12 +8308,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 (Copy)</source>
       <comment>Original name will be substituted</comment>
-      <translation type="unfinished">%1 (Copy)</translation>
+      <translation>%1 (Copiar)</translation>
     </message>
     <message>
       <source>%1 (Copy %2)</source>
       <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation type="unfinished">%1 (Copy %2)</translation>
+      <translation>%1 (Copiar %2)</translation>
     </message>
   </context>
   <context>
@@ -8504,7 +8504,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
     <message>
       <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
+      <translation>Cámara descoñecida</translation>
     </message>
   </context>
   <context>
@@ -8655,7 +8655,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Feito</translation>
     </message>
     <message>
       <source>Aborted</source>
@@ -8906,7 +8906,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Erro interno</translation>
     </message>
     <message>
       <source>Video transcoding required.</source>
@@ -10294,7 +10294,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Recoñecer</translation>
     </message>
   </context>
   <context>
@@ -10316,11 +10316,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>Non tes notificacións</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <translation>Axustes das notificacións</translation>
     </message>
   </context>
   <context>
@@ -10377,7 +10377,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Saber máis</translation>
     </message>
   </context>
   <context>
@@ -10687,7 +10687,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Learn more...</source>
-      <translation type="unfinished">Learn more...</translation>
+      <translation>Saber máis...</translation>
     </message>
   </context>
   <context>
@@ -10746,7 +10746,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Rendemento</translation>
     </message>
     <message>
       <source>Native</source>
@@ -10765,63 +10765,63 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::RecordingStatusHelper</name>
     <message>
       <source>Not recording</source>
-      <translation type="unfinished">Not recording</translation>
+      <translation>Non se está a gravar</translation>
     </message>
     <message>
       <source>Recording everything</source>
-      <translation type="unfinished">Recording everything</translation>
+      <translation>Gravando todo</translation>
     </message>
     <message>
       <source>Recording motion only</source>
-      <translation type="unfinished">Recording motion only</translation>
+      <translation>Gravación só de movemento</translation>
     </message>
     <message>
       <source>Recording motion and low quality</source>
-      <translation type="unfinished">Recording motion and low quality</translation>
+      <translation>Gravando de movemento e baixa calidade</translation>
     </message>
     <message>
       <source>Continuous</source>
-      <translation type="unfinished">Continuous</translation>
+      <translation>Continuo</translation>
     </message>
     <message>
       <source>Motion only</source>
-      <translation type="unfinished">Motion only</translation>
+      <translation>Só movemento</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Movemento + baixa resolución</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
-      <translation type="unfinished">Recording motion and objects</translation>
+      <translation>Gravando movemento e obxectos</translation>
     </message>
     <message>
       <source>Recording objects only</source>
-      <translation type="unfinished">Recording objects only</translation>
+      <translation>Gravando só obxectos</translation>
     </message>
     <message>
       <source>Recording motion, objects and low quality</source>
-      <translation type="unfinished">Recording motion, objects and low quality</translation>
+      <translation>Gravando de movemento, obxectos e baixa calidade</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
-      <translation type="unfinished">Recording objects and low quality</translation>
+      <translation>Gravando obxectos e baixa calidade</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Movemento, Obxectos</translation>
     </message>
     <message>
       <source>Objects only</source>
-      <translation type="unfinished">Objects only</translation>
+      <translation>Só obxectos</translation>
     </message>
     <message>
       <source>Motion, Objects + Lo-Res</source>
-      <translation type="unfinished">Motion, Objects + Lo-Res</translation>
+      <translation>Movemento, obxectos + baixa resolución</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Obxectos + baixa resolución</translation>
     </message>
   </context>
   <context>
@@ -10952,7 +10952,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
-      <translation type="unfinished">Device IP Conflict</translation>
+      <translation>Conflito de IP do dispositivo</translation>
     </message>
     <message numerus="yes">
       <source>+%n values</source>
@@ -11028,7 +11028,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Movemento, Obxectos</translation>
     </message>
     <message>
       <source>Motion, Objects
@@ -11186,7 +11186,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Learn more.</source>
-      <translation type="unfinished">Learn more.</translation>
+      <translation>Saber máis.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
@@ -11334,7 +11334,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>Non hai servidores axeitados</translation>
     </message>
   </context>
   <context>
@@ -11401,7 +11401,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>internal error</source>
-      <translation type="unfinished">internal error</translation>
+      <translation>erro interno</translation>
     </message>
     <message>
       <source>unknown status</source>
@@ -11915,7 +11915,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Erro interno</translation>
     </message>
     <message>
       <source>Connection failure</source>
@@ -12358,7 +12358,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>Fallou a exportación</translation>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
@@ -12673,7 +12673,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item.</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item.</translation>
+      <translation>Non se pode atopar un widget correspondente ao elemento especificado.</translation>
     </message>
     <message>
       <source>Cannot find an item with the specified ID</source>
@@ -12721,7 +12721,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::EditVmsRuleDialog</name>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Horario</translation>
     </message>
     <message>
       <source>Delete</source>
