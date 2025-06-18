@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Site Servers</source>
-      <translation type="unfinished">Site Servers</translation>
+      <translation>Servidores do sitio</translation>
     </message>
   </context>
   <context>
@@ -131,11 +131,11 @@
     </message>
     <message>
       <source>with</source>
-      <translation type="unfinished">with</translation>
+      <translation>con</translation>
     </message>
     <message>
       <source>Simultaneous Streams</source>
-      <translation type="unfinished">Simultaneous Streams</translation>
+      <translation>Fluxos simultáneos</translation>
     </message>
   </context>
   <context>
@@ -228,7 +228,7 @@
     </message>
     <message>
       <source>Site actions</source>
-      <translation type="unfinished">Site actions</translation>
+      <translation>Accións do sitio</translation>
     </message>
   </context>
   <context>
@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>Mbps</source>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -416,7 +416,7 @@
     </message>
     <message>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Xerar</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -528,11 +528,11 @@
     </message>
     <message>
       <source>Use site presets</source>
-      <translation type="unfinished">Use site presets</translation>
+      <translation>Usar predefinicións do sitio</translation>
     </message>
     <message>
       <source>Native camera presets will not be available.</source>
-      <translation type="unfinished">Native camera presets will not be available.</translation>
+      <translation>Os axustes preestablecidos nativos da cámara non estarán dispoñibles.</translation>
     </message>
   </context>
   <context>
@@ -606,7 +606,7 @@
     </message>
     <message>
       <source>Restreaming Link</source>
-      <translation type="unfinished">Restreaming Link</translation>
+      <translation>Ligazón de retransmisión</translation>
     </message>
   </context>
   <context>
@@ -760,7 +760,7 @@
     </message>
     <message>
       <source>This site is connected to</source>
-      <translation type="unfinished">This site is connected to</translation>
+      <translation>Este sitio está conectado a</translation>
     </message>
   </context>
   <context>
@@ -823,7 +823,7 @@
     </message>
     <message>
       <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
+      <translation>Crear unha copia de seguridade dos datos de xestión do sitio ou restaurar os datos de xestión do sitio dende unha copia de seguridade existente</translation>
     </message>
   </context>
   <context>
@@ -1137,7 +1137,7 @@
     </message>
     <message>
       <source>Connect to the previous site on startup</source>
-      <translation type="unfinished">Connect to the previous site on startup</translation>
+      <translation>Conectar co sitio anterior ao iniciar</translation>
     </message>
   </context>
   <context>
@@ -1297,7 +1297,7 @@
     </message>
     <message>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Xerar</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1320,7 +1320,7 @@
     </message>
     <message>
       <source>User&apos;s local layouts</source>
-      <translation type="unfinished">User&apos;s local layouts</translation>
+      <translation>Deseños locais do usuario&apos;</translation>
     </message>
   </context>
   <context>
@@ -1489,7 +1489,7 @@
     </message>
     <message>
       <source>Open files folder</source>
-      <translation type="unfinished">Open files folder</translation>
+      <translation>Abrir cartafol de ficheiros</translation>
     </message>
   </context>
   <context>
@@ -1544,11 +1544,11 @@
     </message>
     <message>
       <source>Show timestamp on LIVE</source>
-      <translation type="unfinished">Show timestamp on LIVE</translation>
+      <translation>Mostrar a marca de tempo en LIVE</translation>
     </message>
     <message>
       <source>Custom Background Image</source>
-      <translation type="unfinished">Custom Background Image</translation>
+      <translation>Imaxe de fondo personalizada</translation>
     </message>
   </context>
   <context>
@@ -1656,7 +1656,7 @@
     </message>
     <message>
       <source>Address or Subnet Mask</source>
-      <translation type="unfinished">Address or Subnet Mask</translation>
+      <translation>Enderezo ou máscara de subrede</translation>
     </message>
     <message>
       <source>Port</source>
@@ -1684,16 +1684,16 @@
     </message>
     <message>
       <source>Find Devices</source>
-      <translation type="unfinished">Find Devices</translation>
+      <translation>Atopar dispositivos</translation>
     </message>
     <message>
       <source>
               Enter address, subnet range or subnet mask, login and password
               and click on the &quot;Search&quot; button
           </source>
-      <translation type="unfinished">
-              Enter address, subnet range or subnet mask, login and password
-              and click on the &quot;Search&quot; button
+      <translation>
+              Introduza o enderezo, o rango de subrede ou a máscara de subrede, o nome de usuario e o contrasinal
+              e prema no botón &quot;Buscar&quot;
           </translation>
     </message>
   </context>
@@ -1751,7 +1751,7 @@
     </message>
     <message>
       <source>Signature</source>
-      <translation type="unfinished">Signature</translation>
+      <translation>Sinatura</translation>
     </message>
   </context>
   <context>
@@ -1781,7 +1781,7 @@
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Notificacións do sitio</translation>
     </message>
   </context>
   <context>
@@ -1917,7 +1917,7 @@
     </message>
     <message>
       <source>Removing this connection option could lead to Site malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
+      <translation>Eliminar esta opción de conexión podería provocar un mal funcionamento do sitio.</translation>
     </message>
   </context>
   <context>
@@ -2088,11 +2088,11 @@
     </message>
     <message>
       <source>Organization&apos;s limits violation</source>
-      <translation type="unfinished">Organization&apos;s limits violation</translation>
+      <translation>Violación dos límites da organización&apos;</translation>
     </message>
     <message>
       <source>Service Allocation</source>
-      <translation type="unfinished">Service Allocation</translation>
+      <translation>Asignación de servizos</translation>
     </message>
   </context>
   <context>
@@ -2202,27 +2202,27 @@
     </message>
     <message>
       <source>Video Redaction</source>
-      <translation type="unfinished">Video Redaction</translation>
+      <translation>Redacción de vídeo</translation>
     </message>
     <message>
       <source>Configure...</source>
-      <translation type="unfinished">Configure...</translation>
+      <translation>Configurar...</translation>
     </message>
     <message>
       <source>Blur</source>
-      <translation type="unfinished">Blur</translation>
+      <translation>Desenfoque</translation>
     </message>
     <message>
       <source>Exclude Cameras</source>
-      <translation type="unfinished">Exclude Cameras</translation>
+      <translation>Excluír cámaras</translation>
     </message>
     <message>
       <source>Apply session duration to Cloud users</source>
-      <translation type="unfinished">Apply session duration to Cloud users</translation>
+      <translation>Aplicar a duración da sesión aos usuarios da nube</translation>
     </message>
     <message>
       <source>Remote Access Tool</source>
-      <translation type="unfinished">Remote Access Tool</translation>
+      <translation>Ferramenta de acceso remoto</translation>
     </message>
     <message>
       <source>Administrators</source>
@@ -2303,11 +2303,11 @@
     </message>
     <message>
       <source>Remote Access</source>
-      <translation type="unfinished">Remote Access</translation>
+      <translation>Acceso Remoto</translation>
     </message>
     <message>
       <source>Enable hardware decoding</source>
-      <translation type="unfinished">Enable hardware decoding</translation>
+      <translation>Activar a descodificación por hardware</translation>
     </message>
   </context>
   <context>
@@ -2598,11 +2598,11 @@
     </message>
     <message>
       <source>Every</source>
-      <translation type="unfinished">Every</translation>
+      <translation>Cada</translation>
     </message>
     <message>
       <source>Force open in a dedicated window</source>
-      <translation type="unfinished">Force open in a dedicated window</translation>
+      <translation>Forzar a apertura nunha ventá dedicada</translation>
     </message>
   </context>
   <context>
@@ -2617,7 +2617,7 @@
     </message>
     <message>
       <source>Off</source>
-      <translation type="unfinished">Off</translation>
+      <translation>Apagado</translation>
     </message>
     <message>
       <source>Schedule</source>

@@ -81,15 +81,15 @@
     </message>
     <message>
       <source>Only one Starter license is allowed per Site.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+      <translation>Só se permite unha licenza de inicio por sitio.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+      <translation>Só se permite unha licenza NVR por sitio.</translation>
     </message>
     <message>
       <source>Only one license of this type is allowed per Site.</source>
-      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
+      <translation>Só se permite unha licenza deste tipo por sitio.</translation>
     </message>
   </context>
 </TS>

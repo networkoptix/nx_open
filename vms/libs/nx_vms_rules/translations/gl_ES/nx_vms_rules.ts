@@ -5,7 +5,7 @@
     <name>BasicAction</name>
     <message>
       <source>Tooltip text</source>
-      <translation type="unfinished">Tooltip text</translation>
+      <translation>Texto de información sobre ferramentas</translation>
     </message>
   </context>
   <context>
@@ -13,7 +13,7 @@
     <message>
       <source>On %1 --&gt; %2</source>
       <comment>%1 is the event name, %2 is the action name</comment>
-      <translation type="unfinished">On %1 --&gt; %2</translation>
+      <translation>En %1 --&gt; %2</translation>
     </message>
   </context>
   <context>
@@ -85,23 +85,23 @@
     </message>
     <message>
       <source>Invalid field type is provided</source>
-      <translation type="unfinished">Invalid field type is provided</translation>
+      <translation>Proporcionouse un tipo de campo non válido</translation>
     </message>
     <message>
       <source>Unexpected validation policy</source>
-      <translation type="unfinished">Unexpected validation policy</translation>
+      <translation>Política de validación inesperada</translation>
     </message>
     <message>
       <source>Select at least one Server</source>
-      <translation type="unfinished">Select at least one Server</translation>
+      <translation>Selecciona polo menos un servidor</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Selecciona polo menos un usuario/a</translation>
     </message>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Seleccionar exactamente unha cámara</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -113,11 +113,11 @@
     </message>
     <message>
       <source>Not all servers are suitable</source>
-      <translation type="unfinished">Not all servers are suitable</translation>
+      <translation>Non todos os servidores son axeitados</translation>
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>Non hai servidores axeitados</translation>
     </message>
     <message>
       <source>At</source>
@@ -141,11 +141,11 @@
     </message>
     <message>
       <source>Pre-Recording</source>
-      <translation type="unfinished">Pre-Recording</translation>
+      <translation>Pregravación</translation>
     </message>
     <message>
       <source>Post-Recording</source>
-      <translation type="unfinished">Post-Recording</translation>
+      <translation>Posgravación</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -169,7 +169,7 @@
     </message>
     <message>
       <source>Event Devices</source>
-      <translation type="unfinished">Event Devices</translation>
+      <translation>Dispositivos de eventos</translation>
     </message>
     <message>
       <source>Of Type</source>
@@ -186,19 +186,19 @@
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
       <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
-      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+      <translation>Débese proporcionar o valor do campo %1 para a política de validación dada</translation>
     </message>
     <message>
       <source>Chosen local layout can only be shown to its owner %1</source>
-      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+      <translation>O deseño local escollido só se lle pode mostrar á persoa propietaria %1</translation>
     </message>
     <message>
       <source>None of selected users have access to the selected layout</source>
-      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+      <translation>Ningún dos usuarios seleccionados ten acceso ao deseño seleccionado</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Algúns usuarios/as non teñen acceso ao deseño seleccionado</translation>
     </message>
     <message>
       <source>For</source>
@@ -206,47 +206,47 @@
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected devices were removed</numerusform>
-        <numerusform>Selected devices were removed</numerusform>
+      <translation>
+        <numerusform>Elimináronse os dispositivos seleccionados</numerusform>
+        <numerusform>Elimináronse os dispositivos seleccionados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
-        <numerusform>Selected cameras were removed</numerusform>
+      <translation>
+        <numerusform>Elimináronse as cámaras seleccionadas</numerusform>
+        <numerusform>Elimináronse as cámaras seleccionadas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected servers were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected servers were removed</numerusform>
-        <numerusform>Selected servers were removed</numerusform>
+      <translation>
+        <numerusform>Elimináronse os servidores seleccionados</numerusform>
+        <numerusform>Elimináronse os servidores seleccionados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected layouts were removed</numerusform>
-        <numerusform>Selected layouts were removed</numerusform>
+      <translation>
+        <numerusform>Elimináronse os deseños seleccionados</numerusform>
+        <numerusform>Elimináronse os deseños seleccionados</numerusform>
       </translation>
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
-      <translation type="unfinished">Time value cannot be less than zero</translation>
+      <translation>O valor do tempo non pode ser inferior a cero</translation>
     </message>
     <message>
       <source>Duration cannot be less than zero</source>
-      <translation type="unfinished">Duration cannot be less than zero</translation>
+      <translation>A duración non pode ser inferior a cero</translation>
     </message>
     <message>
       <source>Value cannot be less than %1</source>
-      <translation type="unfinished">Value cannot be less than %1</translation>
+      <translation>O valor non pode ser inferior a %1</translation>
     </message>
     <message>
       <source>Value cannot be more than %1</source>
-      <translation type="unfinished">Value cannot be more than %1</translation>
+      <translation>O valor non pode ser superior a %1</translation>
     </message>
     <message>
       <source>To Users</source>
@@ -258,23 +258,23 @@
     </message>
     <message>
       <source>Field &quot;%1&quot; should be an object</source>
-      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+      <translation>O campo &quot;%1&quot; debería ser un obxecto</translation>
     </message>
     <message>
       <source>Unable to deserialize properties for field: %1</source>
-      <translation type="unfinished">Unable to deserialize properties for field: %1</translation>
+      <translation>Non se puideron deserializar as propiedades para o campo: %1</translation>
     </message>
     <message>
       <source>Event: %1 is not registered</source>
-      <translation type="unfinished">Event: %1 is not registered</translation>
+      <translation>O evento: %1 non está rexistrado</translation>
     </message>
     <message>
       <source>Action: %1 is not registered</source>
-      <translation type="unfinished">Action: %1 is not registered</translation>
+      <translation>Acción: %1 non está rexistrada</translation>
     </message>
     <message>
       <source>Rule validation failed: %1</source>
-      <translation type="unfinished">Rule validation failed: %1</translation>
+      <translation>Fallou a validación da regra: %1</translation>
     </message>
     <message>
       <source>Caption</source>
@@ -294,43 +294,43 @@
     </message>
     <message>
       <source>Select Integration Action</source>
-      <translation type="unfinished">Select Integration Action</translation>
+      <translation>Seleccionar acción de integración</translation>
     </message>
     <message>
       <source>Integration not found for Integration Action %1</source>
-      <translation type="unfinished">Integration not found for Integration Action %1</translation>
+      <translation>Non se atopou a integración para a acción de integración %1</translation>
     </message>
     <message>
       <source>Unsupported JSON value type in key %1</source>
-      <translation type="unfinished">Unsupported JSON value type in key %1</translation>
+      <translation>Tipo de valor JSON non compatible na clave %1</translation>
     </message>
     <message>
       <source>Total number of events</source>
-      <translation type="unfinished">Total number of events</translation>
+      <translation>Número total de eventos</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Recoñecer</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ActionTextFieldValidator</name>
     <message>
       <source>Empty text is not allowed</source>
-      <translation type="unfinished">Empty text is not allowed</translation>
+      <translation>Non se permite texto baleiro</translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation type="unfinished">Invalid email address %1</translation>
+      <translation>Enderezo de correo electrónico non válido %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      <translation>
+        <numerusform>%n de %1 os enderezos de correo electrónico adicionais non son válidos</numerusform>
+        <numerusform>%n de %1 os enderezos de correo electrónico adicionais non son válidos</numerusform>
       </translation>
     </message>
   </context>
@@ -347,14 +347,14 @@
     </message>
     <message>
       <source>And attributes</source>
-      <translation type="unfinished">And attributes</translation>
+      <translation>E atributos</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
       <source>Analytics event type is not selected</source>
-      <translation type="unfinished">Analytics event type is not selected</translation>
+      <translation>Non se seleccionou o tipo de evento de análise</translation>
     </message>
   </context>
   <context>
@@ -381,7 +381,7 @@
     <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
       <source>Analytics object type is not selected</source>
-      <translation type="unfinished">Analytics object type is not selected</translation>
+      <translation>Non se seleccionou o tipo de obxecto de análise</translation>
     </message>
   </context>
   <context>
@@ -426,18 +426,18 @@
     </message>
     <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
+      <translation>Sinal de entrada na cámara</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DeviceDisconnectedEvent</name>
     <message>
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation>Dispositivo desconectado</translation>
     </message>
     <message>
       <source>Camera Disconnected</source>
-      <translation type="unfinished">Camera Disconnected</translation>
+      <translation>Cámara desconectada</translation>
     </message>
     <message>
       <source>Device</source>
@@ -449,30 +449,30 @@
     </message>
     <message>
       <source>Device disconnected</source>
-      <translation type="unfinished">Device disconnected</translation>
+      <translation>Dispositivo desconectado</translation>
     </message>
     <message>
       <source>Camera disconnected</source>
-      <translation type="unfinished">Camera disconnected</translation>
+      <translation>Cámara desconectada</translation>
     </message>
     <message>
       <source>I/O Module disconnected</source>
-      <translation type="unfinished">I/O Module disconnected</translation>
+      <translation>Módulo de E/S (I/O) desconectado</translation>
     </message>
     <message>
       <source>Device disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Device disconnected at %1</translation>
+      <translation>Dispositivo desconectado ás %1</translation>
     </message>
     <message>
       <source>Camera disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Camera disconnected at %1</translation>
+      <translation>Cámara desconectada ás %1</translation>
     </message>
     <message>
       <source>I/O Module disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">I/O Module disconnected at %1</translation>
+      <translation>Módulo de E/S (I/O) desconectado en %1</translation>
     </message>
   </context>
   <context>
@@ -493,7 +493,7 @@
     </message>
     <message>
       <source>Device IP Conflict</source>
-      <translation type="unfinished">Device IP Conflict</translation>
+      <translation>Conflito de IP do dispositivo</translation>
     </message>
     <message>
       <source>Camera IP Conflict</source>
@@ -624,7 +624,7 @@
     </message>
     <message>
       <source>Custom headers</source>
-      <translation type="unfinished">Custom headers</translation>
+      <translation>Cabeceiras personalizadas</translation>
     </message>
   </context>
   <context>
@@ -854,11 +854,11 @@
     <name>nx::vms::rules::ObjectLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>A lista non está seleccionada</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>A lista co ID dado &apos;%1&apos; non existe</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
@@ -1099,11 +1099,11 @@
     </message>
     <message>
       <source>%1 Failure</source>
-      <translation type="unfinished">%1 Failure</translation>
+      <translation>%1 Fallo</translation>
     </message>
     <message>
       <source>The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</source>
-      <translation type="unfinished">The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</translation>
+      <translation>Atopouse que a base de datos local estaba corrompida e non se puido recuperar. Inicializouse unha nova base de datos baleira. Gardouse unha copia de seguridade da base de datos corrompida como referencia.</translation>
     </message>
   </context>
   <context>
@@ -1114,7 +1114,7 @@
     </message>
     <message>
       <source>%1 Started</source>
-      <translation type="unfinished">%1 Started</translation>
+      <translation>%1 Comezado</translation>
     </message>
   </context>
   <context>
@@ -1136,11 +1136,11 @@
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
       <source>Site HTTP(S) Request</source>
-      <translation type="unfinished">Site HTTP(S) Request</translation>
+      <translation>Solicitude HTTP(S) do sitio</translation>
     </message>
     <message>
       <source>Endpoint</source>
-      <translation type="unfinished">Endpoint</translation>
+      <translation>Punto final</translation>
     </message>
     <message>
       <source>Content</source>
@@ -1159,7 +1159,7 @@
     </message>
     <message>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Icona</translation>
     </message>
     <message>
       <source>By</source>
@@ -1167,14 +1167,14 @@
     </message>
     <message>
       <source>User: %1</source>
-      <translation type="unfinished">User: %1</translation>
+      <translation>Usuaria/o: %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SoundFieldValidator</name>
     <message>
       <source>Sound is not selected</source>
-      <translation type="unfinished">Sound is not selected</translation>
+      <translation>O son non está seleccionado</translation>
     </message>
   </context>
   <context>
@@ -1196,7 +1196,7 @@
     <name>nx::vms::rules::StateFieldValidator</name>
     <message>
       <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
-      <translation type="unfinished">`%1` state is not valid for the `%2` event and `%3` action with the given parameters</translation>
+      <translation>O estado `%1` non é válido para o evento `%2` e a acción `%3` cos parámetros dados</translation>
     </message>
   </context>
   <context>
@@ -1247,18 +1247,18 @@
     </message>
     <message>
       <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
+      <translation>Non hai suficiente velocidade de disco duro/SSD/rede para gravar a %1.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetDeviceFieldValidator</name>
     <message>
       <source>Failed to get event descriptor</source>
-      <translation type="unfinished">Failed to get event descriptor</translation>
+      <translation>Non se puido obter o descritor do evento</translation>
     </message>
     <message>
       <source>Event does not have source camera</source>
-      <translation type="unfinished">Event does not have source camera</translation>
+      <translation>O evento non ten cámara de orixe</translation>
     </message>
   </context>
   <context>
@@ -1272,19 +1272,19 @@
     <name>nx::vms::rules::TextLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>A lista non está seleccionada</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>A lista co ID dado &apos;%1&apos; non existe</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; is not a generic list</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; is not a generic list</translation>
+      <translation>A lista co ID dado &apos;%1&apos; non é unha lista xenérica</translation>
     </message>
     <message>
       <source>Invalid UUID string</source>
-      <translation type="unfinished">Invalid UUID string</translation>
+      <translation>Cadea UUID non válida</translation>
     </message>
   </context>
   <context>
@@ -1299,30 +1299,30 @@
     </message>
     <message>
       <source>Show To</source>
-      <translation type="unfinished">Show To</translation>
+      <translation>Mostrar a</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
       <source>Url cannot be empty</source>
-      <translation type="unfinished">Url cannot be empty</translation>
+      <translation>A URL non pode estar baleira</translation>
     </message>
     <message>
       <source>Url must be valid</source>
-      <translation type="unfinished">Url must be valid</translation>
+      <translation>A URL debe ser válida</translation>
     </message>
     <message>
       <source>Url should not contains user or password</source>
-      <translation type="unfinished">Url should not contains user or password</translation>
+      <translation>A URL non debe conter o usuario nin o contrasinal</translation>
     </message>
     <message>
       <source>Endpoint cannot be empty</source>
-      <translation type="unfinished">Endpoint cannot be empty</translation>
+      <translation>O punto final (extremo) non pode estar baleiro</translation>
     </message>
     <message>
       <source>Endpoint mustn&apos;t contains any space</source>
-      <translation type="unfinished">Endpoint mustn&apos;t contains any space</translation>
+      <translation>O punto final (extremo) no debe conter ningún espacio</translation>
     </message>
   </context>
   <context>

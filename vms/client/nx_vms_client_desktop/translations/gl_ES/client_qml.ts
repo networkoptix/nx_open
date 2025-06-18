@@ -238,11 +238,11 @@
     </message>
     <message>
       <source>Switch to table view</source>
-      <translation type="unfinished">Switch to table view</translation>
+      <translation>Cambiar á vista de táboa</translation>
     </message>
     <message>
       <source>Switch to card view</source>
-      <translation type="unfinished">Switch to card view</translation>
+      <translation>Cambiar á vista de tarxeta</translation>
     </message>
   </context>
   <context>
@@ -647,7 +647,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>CustomHttpHeadersDialog</name>
     <message>
       <source>Custom HTTP headers</source>
-      <translation type="unfinished">Custom HTTP headers</translation>
+      <translation>Cabeceiras HTTP personalizadas</translation>
     </message>
     <message>
       <source>Add</source>
@@ -770,7 +770,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>EventTestDialog</name>
     <message>
       <source>Event Test</source>
-      <translation type="unfinished">Event Test</translation>
+      <translation>Proba de eventos</translation>
     </message>
     <message>
       <source>Test</source>
@@ -871,7 +871,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Filter</source>
-      <translation type="unfinished">Filter</translation>
+      <translation>Filtrar</translation>
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
@@ -933,7 +933,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Angle</source>
-      <translation type="unfinished">Angle</translation>
+      <translation>Ángulo</translation>
     </message>
     <message>
       <source>Camera roll correction</source>
@@ -1178,12 +1178,12 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">BUILT-IN</translation>
+      <translation>INTEGRADO</translation>
     </message>
     <message>
       <source>CUSTOM</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">CUSTOM</translation>
+      <translation>PERSONALIZADO</translation>
     </message>
   </context>
   <context>
@@ -1486,11 +1486,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>Ningún usuario ou grupo coincide coa configuración de sincronización e engádese á base de datos do sitio. Asegúrate de que os parámetros e filtros do servidor LDAP estean configurados correctamente.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
+      <translation>Por favor, ten coidado ao modificar a configuración de LDAP. Unha configuración incorrecta podería interromper a dispoñibilidade do sitio para un gran número de usuarios simultaneamente.</translation>
     </message>
   </context>
   <context>
@@ -1549,27 +1549,27 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>LookupListImportDialog</name>
     <message>
       <source>Import List</source>
-      <translation type="unfinished">Import List</translation>
+      <translation>Lista de exportación</translation>
     </message>
     <message>
       <source>Import Options</source>
-      <translation type="unfinished">Import Options</translation>
+      <translation>Importar opcións</translation>
     </message>
     <message>
       <source>File:</source>
-      <translation type="unfinished">File:</translation>
+      <translation>Ficheiro:</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Explorar...</translation>
     </message>
     <message>
       <source>Separator:</source>
-      <translation type="unfinished">Separator:</translation>
+      <translation>Separador:</translation>
     </message>
     <message>
       <source>Data contains header</source>
-      <translation type="unfinished">Data contains header</translation>
+      <translation>Os datos conteñen a cabeceira</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -1585,31 +1585,31 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Importing</source>
-      <translation type="unfinished">Importing</translation>
+      <translation>Importando</translation>
     </message>
     <message>
       <source>Could not open file</source>
-      <translation type="unfinished">Could not open file</translation>
+      <translation>Non se puido abrir o ficheiro</translation>
     </message>
     <message>
       <source>Please ensure that file exists and you have access to selected file</source>
-      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+      <translation>Por favor, asegúrate de que o ficheiro existe e de que tes acceso ao ficheiro seleccionado</translation>
     </message>
     <message>
       <source>Fixing imported entries</source>
-      <translation type="unfinished">Fixing imported entries</translation>
+      <translation>Corrixindo entradas importadas</translation>
     </message>
     <message>
       <source>Could not import selected file</source>
-      <translation type="unfinished">Could not import selected file</translation>
+      <translation>Non se puido importar o ficheiro seleccionado</translation>
     </message>
     <message>
       <source>The file appears to be empty.</source>
-      <translation type="unfinished">The file appears to be empty.</translation>
+      <translation>Parece que o ficheiro está baleiro.</translation>
     </message>
     <message>
       <source>Please ensure the selected file exists and you have access.</source>
-      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+      <translation>Por favor, asegúrate de que o ficheiro seleccionado existe e de que tes acceso a el.</translation>
     </message>
   </context>
   <context>
@@ -1648,23 +1648,23 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>New List...</source>
-      <translation type="unfinished">New List...</translation>
+      <translation>Nova lista...</translation>
     </message>
     <message>
       <source>Could not save file</source>
-      <translation type="unfinished">Could not save file</translation>
+      <translation>Non foi posíbel gardar o ficheiro</translation>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>
-      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+      <translation>Por favor, asegúrate de ter acceso ao cartafol seleccionado e espazo suficiente en disco</translation>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>Fallou a exportación</translation>
     </message>
     <message>
       <source>Export Selected</source>
-      <translation type="unfinished">Export Selected</translation>
+      <translation>Exportar o seleccionado</translation>
     </message>
   </context>
   <context>
@@ -1750,11 +1750,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>NotificationsPanel</name>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>Non tes notificacións</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <translation>Axustes das notificacións</translation>
     </message>
   </context>
   <context>
@@ -1779,9 +1779,9 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>with %n attributes</numerusform>
-        <numerusform>with %n attributes</numerusform>
+      <translation>
+        <numerusform>con %n atributos</numerusform>
+        <numerusform>con %n atributos</numerusform>
       </translation>
     </message>
     <message>
@@ -1828,7 +1828,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Integration pairing code</source>
-      <translation type="unfinished">Integration pairing code</translation>
+      <translation>Código de emparellamento de integración</translation>
     </message>
   </context>
   <context>
@@ -1920,15 +1920,15 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>Permissions</name>
     <message>
       <source>Required permission group</source>
-      <translation type="unfinished">Required permission group</translation>
+      <translation>Grupo de permisos requirido</translation>
     </message>
     <message>
       <source>View Permissions</source>
-      <translation type="unfinished">View Permissions</translation>
+      <translation>Ver permisos</translation>
     </message>
     <message>
       <source>Hide Permissions</source>
-      <translation type="unfinished">Hide Permissions</translation>
+      <translation>Ocultar permisos</translation>
     </message>
   </context>
   <context>
@@ -1959,18 +1959,18 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>PixelationIntensityDialog</name>
     <message>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Intensidade</translation>
     </message>
   </context>
   <context>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Seleccionar obxectos</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Todos os obxectos</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2063,14 +2063,14 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Filter by</source>
-      <translation type="unfinished">Filter by</translation>
+      <translation>Filtrar por</translation>
     </message>
   </context>
   <context>
     <name>PreviewTableView</name>
     <message>
       <source>Select attribute</source>
-      <translation type="unfinished">Select attribute</translation>
+      <translation>Seleccionar atributo</translation>
     </message>
   </context>
   <context>
@@ -2085,7 +2085,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Feito</translation>
     </message>
   </context>
   <context>
@@ -2203,15 +2203,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
-      <translation type="unfinished">Server is not configured for remote access feature</translation>
+      <translation>O servidor non está configurado para a funcionalidade de acceso remoto</translation>
     </message>
     <message>
       <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
-      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+      <translation>A ferramenta de acceso remoto está desactivada actualmente. Por favor, actívaa ou ponte en contacto co teu administrador para activala.</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Saber máis</translation>
     </message>
     <message>
       <source>Unknown</source>
@@ -2219,19 +2219,19 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
-      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+      <translation>Conectar a aplicación cliente %1 a localhost:%2</translation>
     </message>
     <message>
       <source>Local port</source>
-      <translation type="unfinished">Local port</translation>
+      <translation>Porto local</translation>
     </message>
     <message>
       <source>An error occurred</source>
-      <translation type="unfinished">An error occurred</translation>
+      <translation>Produciuse un erro</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Nome de usuaria/o</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2239,7 +2239,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Remote access is unavailable</source>
-      <translation type="unfinished">Remote access is unavailable</translation>
+      <translation>O acceso remoto non está dispoñible</translation>
     </message>
   </context>
   <context>
@@ -2439,19 +2439,19 @@ Press Alt + Click to follow object</translation>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>O sitio web foi suspendido. Para activar/desactivar o uso da integración no dispositivo actual, o sitio web debe estar en estado activo. Por favor, ponte en contacto co teu partner/socio de canle para obter máis detalles</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>O sitio web foi suspendido. Para activar/desactivar o uso da integración para algún dispositivo, o sitio web debe estar en estado activo. Por favor, ponte en contacto co teu partner/socio de canle para obter máis detalles</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>O sitio web foi suspendido. Para activar o uso da integración no dispositivo actual, o sitio web debe estar en estado activo. Por favor, ponte en contacto co teu partner/socio de canle para obter máis detalles</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>O sitio foi pechado. Para activar este uso de integración para algún dispositivo, o sitio debe estar en estado activo. Por favor, ponte en contacto co teu partner/socio de canle para obter máis detalles</translation>
     </message>
   </context>
   <context>
@@ -2527,11 +2527,11 @@ Press Alt + Click to follow object</translation>
     <name>SettingsTab</name>
     <message>
       <source>Accept API Integrations registration requests</source>
-      <translation type="unfinished">Accept API Integrations registration requests</translation>
+      <translation>Aceptar solicitudes de rexistro de integracións de API</translation>
     </message>
     <message>
       <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</translation>
+      <translation>Activar as solicitudes de rexistro de integracións da API permite que terceiros envíen solicitudes de aprobación a través da integración. Aínda que existen garantías, non se recomenda o uso prolongado. Supervisa o uso con coidadiño e desactiva esta opción despois de instalar todas as integracións necesarias.</translation>
     </message>
   </context>
   <context>
@@ -2728,19 +2728,19 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No Favorite Sites</source>
-      <translation type="unfinished">No Favorite Sites</translation>
+      <translation>Sen sitios favoritos</translation>
     </message>
     <message>
       <source>No Hidden Sites</source>
-      <translation type="unfinished">No Hidden Sites</translation>
+      <translation>Sen sitios ocultos</translation>
     </message>
     <message>
       <source>You can add site to the favorites from the context menu</source>
-      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
+      <translation>Podes engadir o sitio aos favoritos desde o menú contextual</translation>
     </message>
     <message>
       <source>You can hide sites from the main list from the context menu</source>
-      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
+      <translation>Podes ocultar sitios da lista principal desde o menú contextual</translation>
     </message>
   </context>
   <context>
@@ -2902,7 +2902,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>O sitio engadido será visible rapidamente para as persoas usuarias que xa teñan unha conta na nube, mentres que as persoas usuarias que non teñan unha conta na nube recibirán instrucións por correo electrónico.</translation>
     </message>
     <message>
       <source>Notification Language</source>
@@ -3050,7 +3050,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Interface Language</source>
-      <translation type="unfinished">Interface Language</translation>
+      <translation>Idioma da interface</translation>
     </message>
   </context>
   <context>
@@ -3065,7 +3065,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Todos os sitios web</translation>
     </message>
   </context>
   <context>
@@ -3104,7 +3104,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Horario</translation>
     </message>
     <message>
       <source>Enable</source>
@@ -3116,7 +3116,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Test events...</source>
-      <translation type="unfinished">Test events...</translation>
+      <translation>Eventos de proba...</translation>
     </message>
   </context>
   <context>

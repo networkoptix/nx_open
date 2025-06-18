@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>Click to Show Cameras</source>
-      <translation type="unfinished">Click to Show Cameras</translation>
+      <translation>Fai clic para mostrar as cámaras</translation>
     </message>
   </context>
   <context>
@@ -271,19 +271,19 @@
     <message>
       <source>%1 (Copy)</source>
       <comment>Original name will be substituted</comment>
-      <translation type="unfinished">%1 (Copy)</translation>
+      <translation>%1 (Copiar)</translation>
     </message>
     <message>
       <source>%1 (Copy %2)</source>
       <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation type="unfinished">%1 (Copy %2)</translation>
+      <translation>%1 (Copiar %2)</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::CrossSystemCameraResource</name>
     <message>
       <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
+      <translation>Cámara descoñecida</translation>
     </message>
   </context>
   <context>
@@ -370,7 +370,7 @@
     <name>nx::vms::client::core::OrganizationsFilterModel</name>
     <message>
       <source>Other results</source>
-      <translation type="unfinished">Other results</translation>
+      <translation>Outros resultados</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -393,70 +393,70 @@
     </message>
     <message>
       <source>Partners</source>
-      <translation>Partners</translation>
+      <translation>Partners/Socios</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::RecordingStatusHelper</name>
     <message>
       <source>Not recording</source>
-      <translation type="unfinished">Not recording</translation>
+      <translation>Non se está a gravar</translation>
     </message>
     <message>
       <source>Recording everything</source>
-      <translation type="unfinished">Recording everything</translation>
+      <translation>Gravando todo</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
-      <translation type="unfinished">Recording motion and objects</translation>
+      <translation>Gravando movemento e obxectos</translation>
     </message>
     <message>
       <source>Recording motion only</source>
-      <translation type="unfinished">Recording motion only</translation>
+      <translation>Gravación só de movemento</translation>
     </message>
     <message>
       <source>Recording objects only</source>
-      <translation type="unfinished">Recording objects only</translation>
+      <translation>Gravando só obxectos</translation>
     </message>
     <message>
       <source>Recording motion, objects and low quality</source>
-      <translation type="unfinished">Recording motion, objects and low quality</translation>
+      <translation>Gravando de movemento, obxectos e baixa calidade</translation>
     </message>
     <message>
       <source>Recording motion and low quality</source>
-      <translation type="unfinished">Recording motion and low quality</translation>
+      <translation>Gravando de movemento e baixa calidade</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
-      <translation type="unfinished">Recording objects and low quality</translation>
+      <translation>Gravando obxectos e baixa calidade</translation>
     </message>
     <message>
       <source>Continuous</source>
-      <translation type="unfinished">Continuous</translation>
+      <translation>Continuo</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Movemento, Obxectos</translation>
     </message>
     <message>
       <source>Motion only</source>
-      <translation type="unfinished">Motion only</translation>
+      <translation>Só movemento</translation>
     </message>
     <message>
       <source>Objects only</source>
-      <translation type="unfinished">Objects only</translation>
+      <translation>Só obxectos</translation>
     </message>
     <message>
       <source>Motion, Objects + Lo-Res</source>
-      <translation type="unfinished">Motion, Objects + Lo-Res</translation>
+      <translation>Movemento, obxectos + baixa resolución</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Movemento + baixa resolución</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Obxectos + baixa resolución</translation>
     </message>
   </context>
   <context>

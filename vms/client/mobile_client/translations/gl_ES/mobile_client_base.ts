@@ -76,7 +76,7 @@
     <message>
       <source>Expires in %1</source>
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
-      <translation type="unfinished">Expires in %1</translation>
+      <translation>Caduca en %1</translation>
     </message>
     <message>
       <source>Error</source>
@@ -84,7 +84,7 @@
     </message>
     <message>
       <source>Cannot share bookmark.</source>
-      <translation type="unfinished">Cannot share bookmark.</translation>
+      <translation>Non se pode compartir o marcador.</translation>
     </message>
   </context>
   <context>

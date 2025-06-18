@@ -67,7 +67,7 @@
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation type="unfinished">your Regional / License support</translation>
+      <translation>Apoio rexional / de licenza</translation>
     </message>
   </context>
   <context>
@@ -254,14 +254,14 @@
     <name>QnCameraAnalyticsEventsPolicy</name>
     <message>
       <source>Analytics events are not available for %1</source>
-      <translation type="unfinished">Analytics events are not available for %1</translation>
+      <translation>Os eventos de análise non están dispoñibles para %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsObjectsPolicy</name>
     <message>
       <source>Analytics objects are not available for %1</source>
-      <translation type="unfinished">Analytics objects are not available for %1</translation>
+      <translation>Os obxectos de análise non están dispoñibles para %1</translation>
     </message>
   </context>
   <context>
@@ -598,11 +598,11 @@
     <name>QnLayoutAccessValidationPolicy</name>
     <message>
       <source>Users do not have access to the selected layout</source>
-      <translation type="unfinished">Users do not have access to the selected layout</translation>
+      <translation>As persoas usuarias non teñen acceso ao deseño seleccionado</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Algunhas das persoas usuarias non teñen acceso ao deseño seleccionado</translation>
     </message>
   </context>
   <context>
@@ -912,22 +912,22 @@
     </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
-      <translation type="unfinished">
-        <numerusform>%n Local recording services</numerusform>
-        <numerusform>%n Local recording services</numerusform>
+      <translation>
+        <numerusform>%n Servizos de gravación locais</numerusform>
+        <numerusform>%n Servizos de gravación locais</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Local recording services</numerusform>
-        <numerusform>%n/%1 Local recording services</numerusform>
+      <translation>
+        <numerusform>%n/%1 Servizos de gravación locais</numerusform>
+        <numerusform>%n/%1 Servizos de gravación locais</numerusform>
       </translation>
     </message>
     <message>
       <source>Local recording services</source>
-      <translation type="unfinished">Local recording services</translation>
+      <translation>Servizos de gravación locais</translation>
     </message>
   </context>
   <context>
@@ -1197,9 +1197,9 @@
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
+      <translation>
+        <numerusform>meses</numerusform>
+        <numerusform>meses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1301,9 +1301,9 @@
     <message numerus="yes">
       <source>Months</source>
       <comment>Capitalized full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>Months</numerusform>
-        <numerusform>Months</numerusform>
+      <translation>
+        <numerusform>Meses</numerusform>
+        <numerusform>Meses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1353,7 +1353,7 @@
     </message>
     <message>
       <source>Live view</source>
-      <translation type="unfinished">Live view</translation>
+      <translation>Vista en directo</translation>
     </message>
   </context>
   <context>
@@ -1364,7 +1364,7 @@
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Contact your channel partner for assistance.</translation>
+      <translation>Ponte en contacto co teu partner/socio de canle para obter axuda.</translation>
     </message>
   </context>
   <context>
@@ -1470,7 +1470,7 @@
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Requírese transcodificación de audio.</translation>
     </message>
   </context>
   <context>
@@ -1514,55 +1514,55 @@
     </message>
     <message>
       <source>Anonymous statistics report allowed.</source>
-      <translation type="unfinished">Anonymous statistics report allowed.</translation>
+      <translation>Informe estatístico anónimo permitido.</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time.</source>
-      <translation type="unfinished">Anonymous statistics report last time.</translation>
+      <translation>Informe estatístico anónimo da última vez.</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version.</source>
-      <translation type="unfinished">Anonymous statistics report last version.</translation>
+      <translation>Informe estatístico anónimo da última versión.</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number.</source>
-      <translation type="unfinished">Anonymous statistics report last number.</translation>
+      <translation>Estatísticas anónimas informan do último número.</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle.</source>
-      <translation type="unfinished">Anonymous statistics time cycle.</translation>
+      <translation>Ciclo temporal de estatísticas anónimas.</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update.</source>
-      <translation type="unfinished">Anonymous statistics report delay after update.</translation>
+      <translation>As estatísticas anónimas informan dun atraso despois da actualización.</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL.</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL.</translation>
+      <translation>URL do servidor de informes estatísticos anónimos.</translation>
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL.</source>
-      <translation type="unfinished">Anonymous Crash Report Server API URL.</translation>
+      <translation>URL da API do servidor de informes de erros anónimos.</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings.</source>
-      <translation type="unfinished">Anonymous statistics report Client settings.</translation>
+      <translation>Informe estatístico anónimo Configuración de cliente.</translation>
     </message>
     <message>
       <source>Device storage information update interval.</source>
-      <translation type="unfinished">Device storage information update interval.</translation>
+      <translation>Intervalo de actualización da información de almacenamento do dispositivo.</translation>
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h).</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h).</translation>
+      <translation>Intervalo de actualización activa do sitio (segundos, 1s-1h).</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h).</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h).</translation>
+      <translation>Tempo de espera da conexión proxy (segundos, 1s-1h).</translation>
     </message>
     <message>
       <source>Proxy connection access policy.</source>
-      <translation type="unfinished">Proxy connection access policy.</translation>
+      <translation>Política de acceso á conexión proxy.</translation>
     </message>
     <message>
       <source>Time synchronization enabled.</source>
@@ -1570,11 +1570,11 @@
     </message>
     <message>
       <source>Primary time synchronization Server ID.</source>
-      <translation type="unfinished">Primary time synchronization Server ID.</translation>
+      <translation>ID do servidor de sincronización de hora principal.</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds).</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds).</translation>
+      <translation>Diferenza máxima entre o tempo local e o da fonte (milisegundos).</translation>
     </message>
     <message>
       <source>OS time change check period.</source>
@@ -1594,19 +1594,19 @@
     </message>
     <message>
       <source>Organization Id.</source>
-      <translation type="unfinished">Organization Id.</translation>
+      <translation>ID da organización.</translation>
     </message>
     <message>
       <source>Cloud Site ID.</source>
-      <translation type="unfinished">Cloud Site ID.</translation>
+      <translation>ID do sitio na nube.</translation>
     </message>
     <message>
       <source>Cloud authorization key.</source>
-      <translation type="unfinished">Cloud authorization key.</translation>
+      <translation>Clave de autorización na nube.</translation>
     </message>
     <message>
       <source>Enable 2FA for the Site.</source>
-      <translation type="unfinished">Enable 2FA for the Site.</translation>
+      <translation>Activar a autenticación en dous pasos (2FA) para o sitio.</translation>
     </message>
     <message>
       <source>Site name.</source>
@@ -1614,23 +1614,23 @@
     </message>
     <message>
       <source>Last master Site merge ID.</source>
-      <translation type="unfinished">Last master Site merge ID.</translation>
+      <translation>ID da última combinación do sitio principal.</translation>
     </message>
     <message>
       <source>Last slave Site merge ID.</source>
-      <translation type="unfinished">Last slave Site merge ID.</translation>
+      <translation>ID de fusión do último sitio escravo.</translation>
     </message>
     <message>
       <source>Disable Device vendors.</source>
-      <translation type="unfinished">Disable Device vendors.</translation>
+      <translation>Desactivar os provedores de dispositivos.</translation>
     </message>
     <message>
       <source>Optimize Camera settings.</source>
-      <translation type="unfinished">Optimize Camera settings.</translation>
+      <translation>Optimizar a configuración da cámara.</translation>
     </message>
     <message>
       <source>Thumbnails auto-update.</source>
-      <translation type="unfinished">Thumbnails auto-update.</translation>
+      <translation>Actualización automática das miniaturas.</translation>
     </message>
     <message>
       <source>Send plain-text emails.</source>
@@ -1646,7 +1646,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730).</source>
-      <translation type="unfinished">Audit trail period (days, 14-730).</translation>
+      <translation>Período de rexistro de auditoría (días, 14-730).</translation>
     </message>
     <message>
       <source>Event log period (days).</source>
@@ -1654,59 +1654,59 @@
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
-      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
+      <translation>Número máximo de marcadores. Un valor menor ou igual a 0 é infinito.</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption).</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption).</translation>
+      <translation>Forzar HTTPS (cifrado do tráfico de datos).</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption).</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption).</translation>
+      <translation>Forzar o cifrado do tráfico de vídeo (RTSPS).</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
-      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages).</translation>
+      <translation>Expoñer os contrasinais dos dispositivos almacenados no VMS para os administradores (para páxinas web).</translation>
     </message>
     <message>
       <source>Enable auto-discovery.</source>
-      <translation type="unfinished">Enable auto-discovery.</translation>
+      <translation>Activar a detección automática.</translation>
     </message>
     <message>
       <source>Enable auto-update notifications.</source>
-      <translation type="unfinished">Enable auto-update notifications.</translation>
+      <translation>Activar as notificacións de actualización automática.</translation>
     </message>
     <message>
       <source>Enable update notifications.</source>
-      <translation type="unfinished">Enable update notifications.</translation>
+      <translation>Activar as notificacións de actualización.</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping.</source>
-      <translation type="unfinished">Enable UPNP port-mapping.</translation>
+      <translation>Activar o mapeo de portos UPNP.</translation>
     </message>
     <message>
       <source>Backup settings.</source>
-      <translation type="unfinished">Backup settings.</translation>
+      <translation>Axustes da copia de seguridade.</translation>
     </message>
     <message>
       <source>Cloud host override.</source>
-      <translation type="unfinished">Cloud host override.</translation>
+      <translation>Anulación do aloxamento na nube.</translation>
     </message>
     <message>
       <source>Enable cross-domain policy.</source>
-      <translation type="unfinished">Enable cross-domain policy.</translation>
+      <translation>Habilitar a política interdominios.</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont.</source>
-      <translation type="unfinished">Enable RTSP for Arecont.</translation>
+      <translation>Habilitar RTSP para Arecont.</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher.</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher.</translation>
+      <translation>Habilitar o buscador secuencial Flir ONVIF.</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB).</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB).</translation>
+      <translation>Tamaño máximo da cola P2P (bytes, 32-512 MB).</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB).</source>

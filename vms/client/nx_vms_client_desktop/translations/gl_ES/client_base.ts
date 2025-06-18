@@ -1883,7 +1883,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Developer Build</source>
-      <translation type="unfinished">Developer Build</translation>
+      <translation>Compilación do desenvolvedor</translation>
     </message>
   </context>
   <context>
@@ -1980,7 +1980,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
-      <translation type="unfinished">Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</translation>
+      <translation>Nota: a mellora da imaxe non está dispoñible cando a decodificación de vídeo por hardware está activada.</translation>
     </message>
   </context>
   <context>
@@ -2106,16 +2106,16 @@ Clave de licenza: %2</translation>
     </message>
     <message numerus="yes">
       <source>This server is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This server is removed from Site</numerusform>
-        <numerusform>This server is removed from Site</numerusform>
+      <translation>
+        <numerusform>Este servidor foi eliminado do sitio</numerusform>
+        <numerusform>Este servidor foi eliminado do sitio</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>This user is removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>This user is removed from Site</numerusform>
-        <numerusform>This user is removed from Site</numerusform>
+      <translation>
+        <numerusform>Este usuario foi eliminado do sitio</numerusform>
+        <numerusform>Este usuario foi eliminado do sitio</numerusform>
       </translation>
     </message>
   </context>
@@ -3481,14 +3481,14 @@ Clave de licenza: %2</translation>
     </message>
     <message numerus="yes">
       <source>Set for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n devices</numerusform>
-        <numerusform>Set for %n devices</numerusform>
+      <translation>
+        <numerusform>Configurar para dispositivos %n</numerusform>
+        <numerusform>Configurar para dispositivos %n</numerusform>
       </translation>
     </message>
     <message>
       <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation type="unfinished">Cloud authorization request should only be performed for cloud cross system resources</translation>
+      <translation>A solicitude de autorización na nube só debe realizarse para recursos entre sistemas na nube</translation>
     </message>
   </context>
   <context>
@@ -3951,7 +3951,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Creado</translation>
     </message>
     <message>
       <source>Creator</source>
@@ -4283,19 +4283,19 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
-      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+      <translation>Non se pode acceder a esta cámara. Executa o diagnóstico da cámara no cliente de escritorio para obter máis información.</translation>
     </message>
     <message>
       <source>Access to this camera requires authorization credentials.</source>
-      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+      <translation>O acceso a esta cámara require credenciais de autorización.</translation>
     </message>
     <message>
       <source>CONNECTION LOST</source>
-      <translation type="unfinished">CONNECTION LOST</translation>
+      <translation>CONEXIÓN PERDIDA</translation>
     </message>
     <message>
       <source>NOT ACTIVATED</source>
-      <translation type="unfinished">NOT ACTIVATED</translation>
+      <translation>NON ACTIVADO</translation>
     </message>
   </context>
   <context>
@@ -4477,11 +4477,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud storage cannot be enabled.</source>
-      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+      <translation>Non se pode activar o almacenamento na nube.</translation>
     </message>
     <message>
       <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
-      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+      <translation>Para activalo, engade %1 servizos máis axeitados ou reduce o número de cámaras con copia de seguridade activada.</translation>
     </message>
     <message>
       <source>Insufficient services</source>
@@ -4489,23 +4489,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
-      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+      <translation>Todos os almacenamentos de copia de seguridade que non estean na nube desactivaranse cando se active a copia de seguridade na nube. Os dispositivos configurados con &quot;Todos os axustes de arquivo&quot; cambiarán a &quot;Movemento, Obxecto e Marcadores&quot;</translation>
     </message>
     <message>
       <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
-      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
+      <translation>Dispositivos configurados con &quot;Todos os axustes de arquivo&quot; cambiarán a &quot;Movemento, Obxecto e Marcadores&quot; cando estea activada a copia de seguridade na nube</translation>
     </message>
     <message>
       <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</translation>
+      <translation>A copia de seguridade na nube detívose porque o sitio web foi pechado. Debe estar activo para realizar unha copia de seguridade no almacenamento na nube. Ponte en contacto co teu partner/socio de canle para obter axuda.</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>A copia de seguridade na nube continúa, pero o sitio está suspendido actualmente. Debe estar activo para modificar a configuración da copia de seguridade ou para activar a localización do almacenamento na nube. Ponte en contacto co teu partner/socio de canle para obter axuda.</translation>
     </message>
     <message>
       <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>O sitio debe estar activo para activar a localización do almacenamento na nube. Ponte en contacto co teu partner/socio de canle para obter axuda.</translation>
     </message>
     <message>
       <source>Site suspended</source>
@@ -4576,7 +4576,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>rede</translation>
     </message>
     <message>
       <source>smb</source>
@@ -5021,15 +5021,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording disabled</source>
-      <translation type="unfinished">Recording disabled</translation>
+      <translation>Gravación desactivada</translation>
     </message>
     <message>
       <source>Cloud storage backup disabled</source>
-      <translation type="unfinished">Cloud storage backup disabled</translation>
+      <translation>Copia de seguridade do almacenamento na nube desactivada</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Servizos de integración de pago desactivados</translation>
     </message>
   </context>
   <context>
@@ -5415,7 +5415,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cannot find compatible client version: %1</source>
-      <translation type="unfinished">Cannot find compatible client version: %1</translation>
+      <translation>Non se pode atopar a versión do cliente compatible: %1</translation>
     </message>
   </context>
   <context>
@@ -5878,30 +5878,30 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n removed devices</source>
-      <translation type="unfinished">
-        <numerusform>%n removed devices</numerusform>
-        <numerusform>%n removed devices</numerusform>
+      <translation>
+        <numerusform>%n dispositivos eliminados</numerusform>
+        <numerusform>%n dispositivos eliminados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n removed cameras</numerusform>
-        <numerusform>%n removed cameras</numerusform>
+      <translation>
+        <numerusform>%n cámaras eliminadas</numerusform>
+        <numerusform>%n cámaras eliminadas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed servers</source>
-      <translation type="unfinished">
-        <numerusform>%n removed servers</numerusform>
-        <numerusform>%n removed servers</numerusform>
+      <translation>
+        <numerusform>%n servidores eliminados</numerusform>
+        <numerusform>%n servidores eliminados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n removed layouts</numerusform>
-        <numerusform>%n removed layouts</numerusform>
+      <translation>
+        <numerusform>%n deseños eliminados</numerusform>
+        <numerusform>%n deseños eliminados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5913,52 +5913,52 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n devices more</source>
-      <translation type="unfinished">
-        <numerusform>%n devices more</numerusform>
-        <numerusform>%n devices more</numerusform>
+      <translation>
+        <numerusform>%n dispositivos máis</numerusform>
+        <numerusform>%n dispositivos máis</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras more</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras more</numerusform>
-        <numerusform>%n cameras more</numerusform>
+      <translation>
+        <numerusform>%n cámaras máis</numerusform>
+        <numerusform>%n cámaras máis</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers more</source>
-      <translation type="unfinished">
-        <numerusform>%n servers more</numerusform>
-        <numerusform>%n servers more</numerusform>
+      <translation>
+        <numerusform>%n máis servidores</numerusform>
+        <numerusform>%n máis servidores</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts more</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts more</numerusform>
-        <numerusform>%n layouts more</numerusform>
+      <translation>
+        <numerusform>%n máis deseños</numerusform>
+        <numerusform>%n máis deseños</numerusform>
       </translation>
     </message>
     <message>
       <source>Removed subject</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">Removed subject</translation>
+      <translation>Asunto eliminado</translation>
     </message>
     <message>
       <source>Removed device</source>
-      <translation type="unfinished">Removed device</translation>
+      <translation>Dispositivo eliminado</translation>
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Cámara eliminada</translation>
     </message>
     <message>
       <source>Removed server</source>
-      <translation type="unfinished">Removed server</translation>
+      <translation>Servidor eliminado</translation>
     </message>
     <message>
       <source>Removed layout</source>
-      <translation type="unfinished">Removed layout</translation>
+      <translation>Deseño eliminado</translation>
     </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
@@ -6247,11 +6247,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>É necesaria a transcodificación de vídeo. Reiniciouse a sesión de exportación.</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
+      <translation>É necesaria a transcodificación de audio. Reiniciouse a sesión de exportación.</translation>
     </message>
   </context>
   <context>
@@ -6701,7 +6701,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site is currently suspended</source>
-      <translation type="unfinished">Site is currently suspended</translation>
+      <translation>O sitio está suspendido actualmente</translation>
     </message>
   </context>
   <context>
@@ -6735,19 +6735,19 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 more suitable cloud storage services are required to activate back up for all selected devices</source>
       <comment>%1 is the number of cameras for which there are not enough licenses in the cloud storage.</comment>
-      <translation type="unfinished">%1 more suitable cloud storage services are required to activate back up for all selected devices</translation>
+      <translation>%1 requírense servizos de almacenamento na nube máis axeitados para activar a copia de seguridade en todos os dispositivos seleccionados</translation>
     </message>
     <message>
       <source>But you can still use a common switch to enable backups for those cameras for which this is possible</source>
-      <translation type="unfinished">But you can still use a common switch to enable backups for those cameras for which this is possible</translation>
+      <translation>Pero aínda podes usar un interruptor común para activar copias de seguridade para aquelas cámaras para as que isto sexa posible</translation>
     </message>
     <message>
       <source>Backup will not be activated for %1 devices: </source>
-      <translation type="unfinished">Backup will not be activated for %1 devices: </translation>
+      <translation>A copia de seguridade non se activará para os dispositivos %1: </translation>
     </message>
     <message>
       <source>%1 suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">%1 suitable cloud storage services are required to activate backup for them.</translation>
+      <translation>%1 requírense servizos de almacenamento na nube axeitados para activar a copia de seguridade para eles.</translation>
     </message>
   </context>
   <context>
@@ -6796,15 +6796,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the site should be in active state. %1</translation>
+      <translation>Para realizar unha copia de seguridade nun almacenamento na nube, o sitio debe estar en estado activo. %1</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>A copia de seguridade na nube continúa, pero o sitio está suspendido actualmente. Debe estar activa para modificar a configuración &quot;De que se debe facer unha copia de seguridade&quot; e &quot;de Calidade&quot; dun dispositivo ou para activar a copia de seguridade na nube. Tamén podes desactivala. %1</translation>
     </message>
     <message>
       <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
-      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
+      <translation>O número de dispositivos seleccionados para a copia de seguridade supera os servizos dispoñibles. Engade servizos adicionais ou reduce o número de dispositivos configurados para a copia de seguridade. O %1 o sitio limitará automaticamente o número de dispositivos dos que se fixo unha copia de seguridade para que coincida cos servizos dispoñibles</translation>
     </message>
   </context>
   <context>
@@ -6883,15 +6883,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>Solicitude de chamada</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>Solicitude de chamada perdida</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Fonte: %1</translation>
     </message>
   </context>
   <context>
@@ -7004,15 +7004,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</source>
-      <translation type="unfinished">To avoid irreversible changes in the archive, it is recommended to disable &quot;Keep camera time settings&quot; before enabling &quot;Import video automatically&quot;.</translation>
+      <translation>Para evitar cambios irreversibles no arquivo, recoméndase desactivar &quot;Manter a configuración da hora da cámara&quot; antes de activar &quot;Importar vídeo automaticamente&quot;.</translation>
     </message>
     <message>
       <source>Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</source>
-      <translation type="unfinished">Enabling this setting may lead to irreversible changes in the archive. It is not recommended to enable it while &quot;Import video automatically&quot; is active</translation>
+      <translation>Activar esta configuración pode levar a cambios irreversibles no arquivo. Non se recomenda activala mentres &quot;Importar vídeo automaticamente&quot; estea activo</translation>
     </message>
     <message>
       <source>Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</source>
-      <translation type="unfinished">Only camera or server offline periods that occurred after enabling this option will be imported automatically. Please note: if you disable this option, any offline periods that have not yet been imported will be lost and cannot be recovered later.</translation>
+      <translation>Só se importarán automaticamente os períodos sen conexión da cámara ou do servidor que se produciran despois de activar esta opción. Ten en conta que, se desactiva esta opción, calquera período sen conexión que aínda non se importase perderase e non se poderá recuperar máis tarde.</translation>
     </message>
   </context>
   <context>
@@ -7069,7 +7069,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Color</source>
-      <translation type="unfinished">Color</translation>
+      <translation>Cor</translation>
     </message>
     <message>
       <source>Pointed</source>
@@ -7096,7 +7096,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
-      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+      <translation>Detectouse un dispositivo con capacidades de panorámica, inclinación e/ou zoom. Calquera cambio no campo de visión mediante o uso de predefinicións ou movemento pode facer que o punto de acceso deixe de ser relevante.</translation>
     </message>
   </context>
   <context>
@@ -7123,7 +7123,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use this link to add the camera to another site</source>
-      <translation type="unfinished">Use this link to add the camera to another site</translation>
+      <translation>Usa esta ligazón para engadir a cámara a outro sitio</translation>
     </message>
   </context>
   <context>
@@ -7230,20 +7230,20 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the server is unavailable.</translation>
+      <translation>A operación de substitución da cámara non é posible porque o servidor non está dispoñible.</translation>
     </message>
     <message>
       <source>%1 will be removed from the site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the site and replaced by the selected camera</translation>
+      <translation>%1 será eliminado do sitio e substituído pola cámara seleccionada</translation>
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
-      <translation type="unfinished">Checking if the data from the camera can be transferred to the new one.</translation>
+      <translation>Comprobando se os datos da cámara se poden transferir á nova.</translation>
     </message>
     <message>
       <source>Some data and settings may not be supported for the new camera</source>
-      <translation type="unfinished">Some data and settings may not be supported for the new camera</translation>
+      <translation>É posible que algúns datos e configuracións non sexan compatibles coa nova cámara</translation>
     </message>
   </context>
   <context>
@@ -7278,11 +7278,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+      <translation>A gravación continúa, pero o sitio está suspendido actualmente. Debe estar activo para cambiar a configuración de gravación dun dispositivo ou para activar a gravación. Ponte en contacto co teu partner/socio de canle para obter axuda.</translation>
     </message>
     <message>
       <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
+      <translation>Detívose a gravación porque o sitio web foi pechado. Debe estar activo para activar a gravación nun dispositivo. Ponte en contacto co teu partner/socio de canle para obter axuda.</translation>
     </message>
   </context>
   <context>
@@ -7701,11 +7701,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Channel Partner users have access to this site</source>
-      <translation type="unfinished">Channel Partner users have access to this site</translation>
+      <translation>Os usuarios de partner/socios de canle teñen acceso a este sitio</translation>
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</source>
-      <translation type="unfinished">Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Learn more&lt;/a&gt;</translation>
+      <translation>O acceso dos usuarios dos partner/socios de canle&apos; xestiónase a nivel de organización e non son visibles na xestión de usuarios do sitio.&lt;br/&gt;&lt;br/&gt;&lt;a href=&quot;%1&quot;&gt;Máis información&lt;/a&gt;</translation>
     </message>
   </context>
   <context>
@@ -8073,18 +8073,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server cannot answer in reasonable time. Consider narrowing period or filter.</source>
-      <translation type="unfinished">Server cannot answer in reasonable time. Consider narrowing period or filter.</translation>
+      <translation>O servidor non pode responder nun tempo razoable. Considere restrinxir o período ou o filtro.</translation>
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Todos os servidores están fóra de liña. Os rexistros non están dispoñibles.</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+      <translation>
+        <numerusform>Rexistro de eventos para o período de %1 a %2: mostra os primeiros %n eventos. Para atopar eventos específicos, por favor, axusta o intervalo de datas ou aplica filtros adicionais</numerusform>
+        <numerusform>Rexistro de eventos para o período de %1 a %2: mostra os primeiros %n eventos. Para atopar eventos específicos, por favor, axusta o intervalo de datas ou aplica filtros adicionais</numerusform>
       </translation>
     </message>
   </context>
@@ -8219,7 +8219,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Requírese transcodificación de audio.</translation>
     </message>
   </context>
   <context>
@@ -8638,11 +8638,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::IntegrationSettingsWatcher</name>
     <message>
       <source>API Integrations approval requests are permitted</source>
-      <translation type="unfinished">API Integrations approval requests are permitted</translation>
+      <translation>Permítense solicitudes de aprobación de integracións de API</translation>
     </message>
     <message>
       <source>API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</translation>
+      <translation>As solicitudes de rexistro de integracións da API están activadas. Aínda que existen medidas de seguridade, non se recomenda o uso prolongado. Considera a posibilidade de desactivar esta opción despois de instalar todas as integracións necesarias.</translation>
     </message>
   </context>
   <context>
@@ -9001,7 +9001,7 @@ Lembra devolver o nivel de rexistro á súa configuración predeterminada despoi
     </message>
     <message>
       <source>&lt;None&gt;</source>
-      <translation type="unfinished">&lt;None&gt;</translation>
+      <translation>&lt;None&gt;</translation>
     </message>
   </context>
   <context>
@@ -9215,11 +9215,11 @@ O rendemento do sitio web está degradado.</translation>
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
       <source>This group has been assigned at organization level and can be managed only at organization level</source>
-      <translation type="unfinished">This group has been assigned at organization level and can be managed only at organization level</translation>
+      <translation>Este grupo foi asignado a nivel de organización e só se pode xestionar a nivel de organización</translation>
     </message>
     <message>
       <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
-      <translation type="unfinished">The user has been assigned to this group at organization level and can be unassigned only at organization level</translation>
+      <translation>O usuario foi asignado a este grupo a nivel de organización e só se pode desasignar a ese nivel</translation>
     </message>
   </context>
   <context>
@@ -9909,7 +9909,7 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Notificacións do sitio</translation>
     </message>
   </context>
   <context>
@@ -10563,7 +10563,7 @@ Aínda podes cambiar a calidade e os FPS directamente na cámara.</translation>
     <message>
       <source>Mbps</source>
       <comment>Megabits per seconds</comment>
-      <translation type="unfinished">Mbps</translation>
+      <translation>Mbps</translation>
     </message>
   </context>
   <context>
@@ -10803,7 +10803,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>Detalles do certificado</translation>
     </message>
   </context>
   <context>
@@ -11118,23 +11118,23 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>A gravación nas canles %n foi detida debido ao uso excesivo do servizo.</numerusform>
+        <numerusform>A gravación nas canles %n foi detida debido ao uso excesivo do servizo.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>A copia de seguridade do almacenamento na nube nas canles %n foi detida debido ao uso excesivo do servizo.</numerusform>
+        <numerusform>A copia de seguridade do almacenamento na nube nas canles %n foi detida debido ao uso excesivo do servizo.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>O uso do servizo de integración de pago nas canles %n foi interrompido debido ao uso excesivo do servizo.</numerusform>
+        <numerusform>O uso do servizo de integración de pago nas canles %n foi interrompido debido ao uso excesivo do servizo.</numerusform>
       </translation>
     </message>
   </context>
@@ -11209,7 +11209,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Creado</translation>
     </message>
     <message>
       <source>Creator</source>
@@ -11506,11 +11506,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Organization user</source>
-      <translation type="unfinished">Organization user</translation>
+      <translation>Usuario da organización</translation>
     </message>
     <message>
       <source>Channel Partner user</source>
-      <translation type="unfinished">Channel Partner user</translation>
+      <translation>Usuario de partner/socio de canle</translation>
     </message>
   </context>
   <context>
@@ -12267,7 +12267,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>In progress...</source>
-      <translation type="unfinished">In progress...</translation>
+      <translation>En curso...</translation>
     </message>
   </context>
   <context>
@@ -12381,11 +12381,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>Non se pode atopar un widget correspondente ao elemento especificado</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
-      <translation type="unfinished">Cannot maximize the item</translation>
+      <translation>Non se pode maximizar o elemento</translation>
     </message>
   </context>
   <context>
@@ -12583,14 +12583,14 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
     <message>
       <source>No custom headers</source>
-      <translation type="unfinished">No custom headers</translation>
+      <translation>Sen cabeceiras personalizadas</translation>
     </message>
     <message numerus="yes">
       <source>%n custom headers</source>
       <comment>%n is a number of custom headers</comment>
-      <translation type="unfinished">
-        <numerusform>%n custom headers</numerusform>
-        <numerusform>%n custom headers</numerusform>
+      <translation>
+        <numerusform>%n cabeceiras personalizadas</numerusform>
+        <numerusform>%n cabeceiras personalizadas</numerusform>
       </translation>
     </message>
   </context>
@@ -12598,15 +12598,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::IntegrationActionParametersPickerWidget</name>
     <message>
       <source>No settings model</source>
-      <translation type="unfinished">No settings model</translation>
+      <translation>Sen modelo de configuración</translation>
     </message>
     <message>
       <source>No parameters</source>
-      <translation type="unfinished">No parameters</translation>
+      <translation>Sen parámetros</translation>
     </message>
     <message>
       <source>Parameters set</source>
-      <translation type="unfinished">Parameters set</translation>
+      <translation>Parámetros configurados</translation>
     </message>
   </context>
   <context>
@@ -12745,7 +12745,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::SoundPicker</name>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Xestionar</translation>
     </message>
   </context>
   <context>
@@ -12805,30 +12805,30 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error: %1</source>
-      <translation type="unfinished">Delete rule error: %1</translation>
+      <translation>Erro ao eliminar a regra: %1</translation>
     </message>
     <message>
       <source>Save rule error: %1</source>
-      <translation type="unfinished">Save rule error: %1</translation>
+      <translation>Erro ao gardar a regra: %1</translation>
     </message>
     <message>
       <source>Reset rules error: %1</source>
-      <translation type="unfinished">Reset rules error: %1</translation>
+      <translation>Erro ao restablecer as regras: %1</translation>
     </message>
     <message numerus="yes">
       <source>Some of the rules were not enabled</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the rules were not enabled</numerusform>
-        <numerusform>Some of the rules were not enabled</numerusform>
+      <translation>
+        <numerusform>Algunhas das regras non estaban activadas</numerusform>
+        <numerusform>Algunhas das regras non estaban activadas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
       <comment>Form depends on invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      <translation>
+        <numerusform>Algunhas das regras seleccionadas non se poden activar porque teñen parámetros incorrectos. Por favor, corríxeas e activa a regra de novo.</numerusform>
+        <numerusform>Algunhas das regras seleccionadas non se poden activar porque teñen parámetros incorrectos. Por favor, corríxeas e activa a regra de novo.</numerusform>
       </translation>
     </message>
   </context>
@@ -12859,12 +12859,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
-      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
+      <translation>O número de dispositivos que usan este servizo supera a capacidade dispoñible. Engade máis servizos ou desactiva os servizos nalgúns dispositivos.</translation>
     </message>
     <message>
       <source>On %1, the system will automatically disable the service on some devices.</source>
       <comment>%1 will be substituted with date and time</comment>
-      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
+      <translation>En %1, o sistema desactivará automaticamente o servizo nalgúns dispositivos.</translation>
     </message>
   </context>
   <context>

@@ -19,7 +19,7 @@
     <name>AppInfoScreen</name>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>Información da aplicación</translation>
     </message>
   </context>
   <context>
@@ -103,7 +103,7 @@
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>Información requirida</translation>
     </message>
   </context>
   <context>
@@ -129,7 +129,7 @@
     <name>ChannelPartner</name>
     <message>
       <source>Channel Partner</source>
-      <translation>Partner da canle</translation>
+      <translation>Partner/Socio da canle</translation>
     </message>
   </context>
   <context>
@@ -137,7 +137,7 @@
     <message>
       <source>Log in to the site in %1</source>
       <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
-      <translation type="unfinished">Log in to the site in %1</translation>
+      <translation>Inicia sesión no sitio en %1</translation>
     </message>
     <message>
       <source>Follow the steps of wizard</source>
@@ -150,17 +150,17 @@
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</translation>
+      <translation>Se o sitio &lt;font color=&apos;%2&apos;&gt;non está conectado&lt;/a&gt; a %1</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
+      <translation>Fai clic en &quot;Conectar o sitio a %1&quot; na pestana %1 en Administración do sitio</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</translation>
+      <translation>Se o sitio está &lt;font color=&apos;%2&apos;&gt;conectado&lt;/a&gt; a %1</translation>
     </message>
     <message>
       <source>Connect to %1 by site owner’s account</source>
@@ -169,7 +169,7 @@
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
-      <translation type="unfinished">Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</translation>
+      <translation>Abre a páxina de configuración do sitio e fai clic na ligazón &quot;cambiar&quot; que está xunto ao nome do propietario&apos;</translation>
     </message>
   </context>
   <context>
@@ -227,7 +227,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>Compartir abre o diálogo de novos marcadores para xerar unha ligazón de reprodución despois de configurar as opcións de compartir</translation>
     </message>
   </context>
   <context>
@@ -314,14 +314,14 @@
     <name>EventSearchItem</name>
     <message>
       <source>SHARED</source>
-      <translation type="unfinished">SHARED</translation>
+      <translation>COMPARTIDO</translation>
     </message>
   </context>
   <context>
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
-      <translation type="unfinished">Looking for</translation>
+      <translation>Buscando</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -396,7 +396,7 @@
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>Non volver mostrar esta venta</translation>
     </message>
   </context>
   <context>
@@ -477,7 +477,7 @@
     <name>MenuScreen</name>
     <message>
       <source>App Settings</source>
-      <translation type="unfinished">App Settings</translation>
+      <translation>Axustes da App</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -486,7 +486,7 @@
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>Iniciado sesión como %1</translation>
     </message>
   </context>
   <context>
@@ -529,7 +529,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Rendemento</translation>
     </message>
     <message>
       <source>Enable hardware acceleration</source>
@@ -758,7 +758,7 @@
     </message>
     <message>
       <source>Host: Port</source>
-      <translation type="unfinished">Host: Port</translation>
+      <translation>Host: Porto</translation>
     </message>
   </context>
   <context>
@@ -789,15 +789,15 @@
     </message>
     <message>
       <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation type="unfinished">We didn&apos;t find any organizations, try contacting support</translation>
+      <translation>Non&apos; atopamos ninguhna organización, proba a poñerte en contacto co servizo de asistencia</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</translation>
+      <translation>Non&apos; atopamos ningún sitio na túa rede local, proba a engadir servidores manualmente ou inicia sesión na túa conta na nube.</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually</translation>
+      <translation>Non&apos; atopamos ningún sitio na túa rede local, proba a engadir servidores manualmente</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -860,18 +860,18 @@
     </message>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Rendemento</translation>
     </message>
     <message>
       <source>AppInfo</source>
-      <translation type="unfinished">AppInfo</translation>
+      <translation>Información da aplicación</translation>
     </message>
   </context>
   <context>
     <name>ShareBookmarkSheet</name>
     <message>
       <source>New Bookmark</source>
-      <translation type="unfinished">New Bookmark</translation>
+      <translation>Novo marcador</translation>
     </message>
     <message>
       <source>Name</source>
@@ -887,7 +887,7 @@
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation type="unfinished">Protect with Password (optional)</translation>
+      <translation>Protexer con contrasinal (opcional)</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -895,11 +895,11 @@
     </message>
     <message>
       <source>Create &amp; Share</source>
-      <translation type="unfinished">Create &amp; Share</translation>
+      <translation>Crear e compartir</translation>
     </message>
     <message>
       <source>Save &amp; Share</source>
-      <translation type="unfinished">Save &amp; Share</translation>
+      <translation>Gardar e compartir</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
@@ -919,7 +919,7 @@
     </message>
     <message>
       <source>Shared link options</source>
-      <translation type="unfinished">Shared link options</translation>
+      <translation>Opcións de ligazón compartida</translation>
     </message>
     <message>
       <source>Sharing</source>
@@ -927,11 +927,11 @@
     </message>
     <message>
       <source>Select Lifetime</source>
-      <translation type="unfinished">Select Lifetime</translation>
+      <translation>Seleccionar de por vida</translation>
     </message>
     <message>
       <source>Share Link</source>
-      <translation type="unfinished">Share Link</translation>
+      <translation>Compartir ligazón</translation>
     </message>
   </context>
   <context>
@@ -946,7 +946,7 @@
     </message>
     <message>
       <source>Log in as</source>
-      <translation type="unfinished">Log in as</translation>
+      <translation>Iniciar sesión como</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1004,7 +1004,7 @@
     </message>
     <message>
       <source>NEW</source>
-      <translation type="unfinished">NEW</translation>
+      <translation>NOVO</translation>
     </message>
     <message>
       <source>SUSPENDED</source>
@@ -1019,11 +1019,11 @@
     <name>SitePlaceholderScreen</name>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Acceso aos recursos denegado</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Os sitios en estado Suspendido ou Pechado non están dispoñibles</translation>
     </message>
   </context>
   <context>
@@ -1059,7 +1059,7 @@
     <message>
       <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Open %1</translation>
+      <translation>Abrir %1</translation>
     </message>
   </context>
   <context>
@@ -1165,7 +1165,7 @@
     </message>
     <message>
       <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
+      <translation>Información requirida</translation>
     </message>
     <message>
       <source>Log In</source>
