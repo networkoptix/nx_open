@@ -1086,6 +1086,8 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
 
         co_await loadOrgListAsync(std::move(*orgList));
 
+        emit q->fullTreeLoaded();
+
         // Delay before next update.
         co_await coro::qtTimer(kUpdateDelay);
     }

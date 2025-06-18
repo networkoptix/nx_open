@@ -129,6 +129,7 @@ signals:
     void topLevelLoadingChanged();
     void hasChannelPartnersChanged();
     void hasOrganizationsChanged();
+    void fullTreeLoaded();
 
 private:
     struct Private;

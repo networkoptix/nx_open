@@ -631,7 +631,28 @@ Page
             resetSearch()
     }
 
-    Component.onCompleted: resetSearch()
+    Component.onCompleted:
+    {
+        resetSearch()
+    }
+
+    Connections
+    {
+        target: organizationsModel
+
+        function onFullTreeLoaded()
+        {
+            if (sessionsScreen.rootIndex === NxGlobals.invalidModelIndex()
+                && appGlobalState.lastOpenedNodeId !== NxGlobals.uuid(""))
+            {
+                const nodeIndex =
+                    organizationsModel.indexFromNodeId(appGlobalState.lastOpenedNodeId)
+                appGlobalState.lastOpenedNodeId = NxGlobals.uuid("")
+                if (nodeIndex !== NxGlobals.invalidModelIndex())
+                    goInto(nodeIndex.parent)
+            }
+        }
+    }
 
     QtObject
     {
@@ -773,6 +794,7 @@ Page
 
     function openSystem(current)
     {
+        appGlobalState.lastOpenedNodeId = accessor.getData(current, "nodeId")
         const isFactory = accessor.getData(current, "isFactorySystem")
         if (isFactory)
         {

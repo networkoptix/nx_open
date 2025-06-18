@@ -168,6 +168,13 @@ Controls.ApplicationWindow
         }
     }
 
+    NxObject
+    {
+        id: appGlobalState
+
+        property var lastOpenedNodeId: NxGlobals.uuid("")
+    }
+
     Android10BackGestureWorkaround
     {
         workaroundParentItem: contentItem
