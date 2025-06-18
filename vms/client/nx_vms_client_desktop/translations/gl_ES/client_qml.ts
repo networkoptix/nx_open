@@ -740,7 +740,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>Atributos</translation>
     </message>
     <message>
       <source>Select type</source>

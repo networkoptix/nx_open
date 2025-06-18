@@ -187,20 +187,20 @@
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation type="unfinished">Site Health Viewers</translation>
+      <translation>Visores do estado (saúde) do sitio</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+      <translation>Os membros deste grupo teñen privilexios de sistema ilimitados. Os administradores poden crear e modificar usuarios avanzados, fusionar sistemas e conectar ou desconectar o sitio a %1.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Os membros deste grupo poden, ademais dos permisos concedidos polo grupo de visores avanzados, controlar a maior parte da configuración do sitio, pero non se lles permite cambiar ningunha configuración relacionada co administrador, como eliminar ou cambiar os seus propios grupos e permisos, e non poden crear nin crear nin editar outros usuarios avanzados.</translation>
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Os membros deste grupo poden ver a información de Monitorización do estado do sitio e a carga do procesador do servidor en tempo real (Monitorización do servidor).</translation>
     </message>
   </context>
   <context>
@@ -1233,7 +1233,7 @@
     <message>
       <source>Days</source>
       <comment>Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>Días</translation>
     </message>
     <message>
       <source>Wks</source>
@@ -1285,9 +1285,9 @@
     <message numerus="yes">
       <source>Days</source>
       <comment>Capitalized fapitalized full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
+      <translation>
+        <numerusform>Días</numerusform>
+        <numerusform>Días</numerusform>
       </translation>
     </message>
     <message numerus="yes">

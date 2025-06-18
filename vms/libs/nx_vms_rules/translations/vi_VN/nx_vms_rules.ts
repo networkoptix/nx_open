@@ -442,11 +442,11 @@
     </message>
     <message>
       <source>Device disconnected</source>
-      <translation type="unfinished">Device disconnected</translation>
+      <translation>Thiết bị đã ngắt kết nối</translation>
     </message>
     <message>
       <source>Camera disconnected</source>
-      <translation type="unfinished">Camera disconnected</translation>
+      <translation>Camera bị ngắt kết nối</translation>
     </message>
     <message>
       <source>I/O Module disconnected</source>
