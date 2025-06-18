@@ -1082,7 +1082,7 @@
     <message>
       <source>Days</source>
       <comment>Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>Días</translation>
     </message>
     <message>
       <source>Wks</source>
@@ -1134,9 +1134,9 @@
     <message numerus="yes">
       <source>Days</source>
       <comment>Capitalized fapitalized full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
+      <translation>
+        <numerusform>Días</numerusform>
+        <numerusform>Días</numerusform>
       </translation>
     </message>
     <message numerus="yes">

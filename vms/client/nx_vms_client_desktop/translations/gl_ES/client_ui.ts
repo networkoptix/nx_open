@@ -172,7 +172,7 @@
     <name>AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Attributes:</source>
-      <translation type="unfinished">Attributes:</translation>
+      <translation>Atributos:</translation>
     </message>
     <message>
       <source>Object Type:</source>
@@ -1111,7 +1111,7 @@
     </message>
     <message>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Engadir dispositivos</translation>
     </message>
     <message>
       <source>Default</source>
@@ -2063,7 +2063,7 @@
     <name>PopupBusinessActionWidget</name>
     <message>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>Forzar recoñecemento</translation>
     </message>
     <message>
       <source>Use custom text:</source>
