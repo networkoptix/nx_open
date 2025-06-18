@@ -55,7 +55,7 @@
     <name>BookmarkFacadeStrings</name>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Cámara eliminada</translation>
     </message>
     <message>
       <source>Site Event</source>
@@ -67,7 +67,7 @@
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation>Apoio rexional / de licenza</translation>
+      <translation>o teu soporte rexional / de licenza</translation>
     </message>
   </context>
   <context>
@@ -530,7 +530,7 @@
     <name>QnCameraNamesWatcher</name>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Cámara eliminada</translation>
     </message>
   </context>
   <context>
@@ -565,7 +565,7 @@
     <name>QnExecPtzPresetPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Seleccionar exactamente unha cámara</translation>
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
@@ -583,7 +583,7 @@
     <name>QnFullscreenCameraPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Seleccionar exactamente unha cámara</translation>
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
@@ -1061,7 +1061,7 @@
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Selecciona polo menos un usuario/a</translation>
     </message>
   </context>
   <context>
@@ -1414,7 +1414,7 @@
     <name>nx::recording::Error</name>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Erro interno</translation>
     </message>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
@@ -1710,15 +1710,15 @@
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB).</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB).</translation>
+      <translation>Tamaño máximo de P2P para todos os clientes (bytes, 32-512 MB).</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB).</source>
-      <translation type="unfinished">Max record queue size (bytes, 6-96MB).</translation>
+      <translation>Tamaño máximo da cola de rexistros (bytes, 6-96 MB).</translation>
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000).</source>
-      <translation type="unfinished">Max record queue size (elements, 250-4000).</translation>
+      <translation>Tamaño máximo da cola de rexistros (elementos, 250-4000).</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds).</source>
@@ -1726,55 +1726,55 @@
     </message>
     <message>
       <source>Max RTSP connection duration (seconds).</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds).</translation>
+      <translation>Duración máxima da conexión RTSP (segundos).</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching.</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching.</translation>
+      <translation>Activar a perforación de UDP con conexión á nube.</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage.</source>
-      <translation type="unfinished">Enable cloud-connect relays usage.</translation>
+      <translation>Activar o uso de retransmisións de conexión á nube.</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays.</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays.</translation>
+      <translation>Forzar SSL para os relés de conexión á nube.</translation>
     </message>
     <message>
       <source>Enable recording on EDGE.</source>
-      <translation type="unfinished">Enable recording on EDGE.</translation>
+      <translation>Activar a gravación en EDGE.</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P.</source>
-      <translation type="unfinished">Enable WebSocket for P2P.</translation>
+      <translation>Activar WebSocket para P2P.</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</translation>
+      <translation>Número máximo de fíos para a sincronización remota de arquivos (&lt;=0 - automático, máx. 32).</translation>
     </message>
     <message>
       <source>Update releases.json file URL.</source>
-      <translation type="unfinished">Update releases.json file URL.</translation>
+      <translation>Actualizar o URL do ficheiro lanzamentos.json.</translation>
     </message>
     <message>
       <source>Target update information.</source>
-      <translation type="unfinished">Target update information.</translation>
+      <translation>Información de actualización do obxectivo.</translation>
     </message>
     <message>
       <source>Installed update information.</source>
-      <translation type="unfinished">Installed update information.</translation>
+      <translation>Información de actualización instalada.</translation>
     </message>
     <message>
       <source>Downloader peers for files.</source>
-      <translation type="unfinished">Downloader peers for files.</translation>
+      <translation>Pares do descargador para os arquivos.</translation>
     </message>
     <message>
       <source>Client update settings.</source>
-      <translation type="unfinished">Client update settings.</translation>
+      <translation>Configuración da actualización de cliente.</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization.</source>
-      <translation type="unfinished">Thread count limit for camera archive synchronization.</translation>
+      <translation>Límite de número de fíos para a sincronización do arquivo da cámara.</translation>
     </message>
     <message>
       <source>Watermark settings.</source>
@@ -1782,31 +1782,31 @@
     </message>
     <message>
       <source>Pixelation settings.</source>
-      <translation type="unfinished">Pixelation settings.</translation>
+      <translation>Configuración de pixelación.</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds).</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds).</translation>
+      <translation>Duración do token de sesión de autorización (segundos).</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens.</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens.</translation>
+      <translation>Aplicar o límite de sesión para os tokens da nube.</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server.</source>
-      <translation type="unfinished">Session token count limit on a single Server.</translation>
+      <translation>Límite de reconto de tokens de sesión nun único servidor.</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server.</source>
-      <translation type="unfinished">Max session token count per user on single Server.</translation>
+      <translation>Número máximo de tokens de sesión por usuario nun único servidor.</translation>
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud).</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud).</translation>
+      <translation>Intervalo de actualización para a caché de tokens de sesión remota (outros servidores e nube).</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud).</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud).</translation>
+      <translation>Tempo de espera para a caché de tokens de sesión remota (outros servidores e nube).</translation>
     </message>
     <message>
       <source>Default video codec.</source>
@@ -1814,7 +1814,7 @@
     </message>
     <message>
       <source>Default codec for export video.</source>
-      <translation type="unfinished">Default codec for export video.</translation>
+      <translation>Códec predeterminado para exportar vídeo.</translation>
     </message>
     <message>
       <source>Low quality screen video codec.</source>
@@ -1826,7 +1826,7 @@
     </message>
     <message>
       <source>URI for resource_data.json automatic update.</source>
-      <translation type="unfinished">URI for resource_data.json automatic update.</translation>
+      <translation>URL para a actualización automática de datos_de_recursos.json.</translation>
     </message>
     <message>
       <source>Meta data storage change policy.</source>
@@ -1834,99 +1834,99 @@
     </message>
     <message>
       <source>Persistent Servers for update storage.</source>
-      <translation type="unfinished">Persistent Servers for update storage.</translation>
+      <translation>Servidores persistentes para o almacenamento de actualizacións.</translation>
     </message>
     <message>
       <source>Persistent Servers where updates are stored.</source>
-      <translation type="unfinished">Persistent Servers where updates are stored.</translation>
+      <translation>Servidores persistentes onde se almacenan as actualizacións.</translation>
     </message>
     <message>
       <source>VMS Server version specific features.</source>
-      <translation type="unfinished">VMS Server version specific features.</translation>
+      <translation>Funcionalidades específicas da versión do servidor VMS.</translation>
     </message>
     <message>
       <source>Default locale for new users.</source>
-      <translation type="unfinished">Default locale for new users.</translation>
+      <translation>Configuración local predeterminada para novos usuarios.</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording.</source>
-      <translation type="unfinished">Additional local FS storage types for recording.</translation>
+      <translation>Tipos adicionais de almacenamento FS local para gravación.</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device.</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device.</translation>
+      <translation>Manter o estado do porto de E/S (I/O) activado cando o servidor se conecta ao dispositivo.</translation>
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4MB).</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4MB).</translation>
+      <translation>Tamaño do búfer multimedia (KB, 10KB-4MB).</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB).</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB).</translation>
+      <translation>Tamaño do búfer multimedia para dispositivos só de son (KB, 1KB-1MB).</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure.</source>
-      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure.</translation>
+      <translation>Forzar os permisos do punto de montaxe do almacenamento da base de datos de análise en caso de fallo.</translation>
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds).</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds).</translation>
+      <translation>Comproba os permisos de transmisión de vídeo no servidor VMS, período (milisegundos).</translation>
     </message>
     <message>
       <source>Storage encryption enabled.</source>
-      <translation type="unfinished">Storage encryption enabled.</translation>
+      <translation>Cifrado de almacenamento activado.</translation>
     </message>
     <message>
       <source>Current storage encryption key.</source>
-      <translation type="unfinished">Current storage encryption key.</translation>
+      <translation>Clave de cifrado do almacenamento actual.</translation>
     </message>
     <message>
       <source>Show Servers in the Resource Tree for non-admins.</source>
-      <translation type="unfinished">Show Servers in the Resource Tree for non-admins.</translation>
+      <translation>Mostrar os servidores na árbore de recursos para os non administradores.</translation>
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</source>
-      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</translation>
+      <translation>Cabeceira HTTP: Servidor, variables compatibles: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
       <source>HTTP header: Origin.</source>
-      <translation type="unfinished">HTTP header: Origin.</translation>
+      <translation>Cabeceira HTTP: orixe.</translation>
     </message>
     <message>
       <source>HTTP header: X-Frame-Options.</source>
-      <translation type="unfinished">HTTP header: X-Frame-Options.</translation>
+      <translation>Cabeceira HTTP: opcións de X-Frame.</translation>
     </message>
     <message>
       <source>Use only HTTPS for cameras.</source>
-      <translation type="unfinished">Use only HTTPS for cameras.</translation>
+      <translation>Usa só HTTPS para as cámaras.</translation>
     </message>
     <message>
       <source>Allow Power User editing Security Settings.</source>
-      <translation type="unfinished">Allow Power User editing Security Settings.</translation>
+      <translation>Permitir que o usuario avanzado edite a configuración de seguridade.</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (insecure).</source>
-      <translation type="unfinished">Enable deprecated API functions (insecure).</translation>
+      <translation>Activar funcións da API obsoletas (inseguras).</translation>
     </message>
     <message>
       <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
-      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
+      <translation>Activar as autenticacións HTTP Basic e Digest obsoletas (non seguras).</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery.</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery.</translation>
+      <translation>Expoñer enderezos IP para a detección automática.</translation>
     </message>
     <message>
       <source>Show mouse timeline preview.</source>
-      <translation type="unfinished">Show mouse timeline preview.</translation>
+      <translation>Mostrar a vista previa da liña de tempo do rato.</translation>
     </message>
     <message>
       <source>LDAP settings.</source>
-      <translation type="unfinished">LDAP settings.</translation>
+      <translation>Configuración de LDAP.</translation>
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
-      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+      <translation>Configuración SMTP. Esta configuración só é visible para usuarios avanzados.</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>

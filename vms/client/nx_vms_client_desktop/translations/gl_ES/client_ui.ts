@@ -939,7 +939,7 @@
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Todos os servidores están fóra de liña. Os rexistros non están dispoñibles.</translation>
     </message>
     <message>
       <source>Event Rules...</source>
@@ -1059,7 +1059,7 @@
     <name>FilenamePanel</name>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Explorar...</translation>
     </message>
   </context>
   <context>
@@ -1186,7 +1186,7 @@
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Explorar...</translation>
     </message>
   </context>
   <context>
@@ -1246,7 +1246,7 @@
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Explorar...</translation>
     </message>
     <message>
       <source>Clear</source>
@@ -1361,7 +1361,7 @@
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Explorar...</translation>
     </message>
     <message>
       <source>License will be bound to the current server</source>
@@ -1500,7 +1500,7 @@
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Explorar...</translation>
     </message>
     <message>
       <source>Language</source>
@@ -1520,7 +1520,7 @@
     </message>
     <message>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Intensidade</translation>
     </message>
     <message>
       <source>Show additional info in tree</source>
@@ -1743,7 +1743,7 @@
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Nome de usuaria/o</translation>
     </message>
     <message>
       <source>Mail from</source>
@@ -1762,7 +1762,7 @@
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Nome de usuaria/o</translation>
     </message>
     <message>
       <source>Sign in to web page</source>
@@ -1996,7 +1996,7 @@
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Explorar...</translation>
     </message>
     <message>
       <source>Source</source>
@@ -2031,11 +2031,11 @@
     <name>RecordingThresholdWidget</name>
     <message>
       <source>Pre-Recording</source>
-      <translation type="unfinished">Pre-Recording</translation>
+      <translation>Pregravación</translation>
     </message>
     <message>
       <source>Post-Recording</source>
-      <translation type="unfinished">Post-Recording</translation>
+      <translation>Posgravación</translation>
     </message>
   </context>
   <context>
@@ -2111,7 +2111,7 @@
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Movemento + baixa resolución</translation>
     </message>
     <message>
       <source>Do Not Record</source>
@@ -2621,7 +2621,7 @@
     </message>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Horario</translation>
     </message>
     <message>
       <source>Note: Schedule is based on server time.</source>

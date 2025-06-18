@@ -2790,7 +2790,7 @@ Clave de licenza: %2</translation>
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is the cloud login name (like user@domain.com</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>Iniciado sesión como %1</translation>
     </message>
   </context>
   <context>
@@ -4804,7 +4804,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Saber máis</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -7425,11 +7425,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Movemento + baixa resolución</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Obxectos + baixa resolución</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
@@ -7566,7 +7566,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Erro interno.</translation>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
@@ -7946,7 +7946,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Feito</translation>
     </message>
     <message>
       <source>Aborted</source>
@@ -8203,7 +8203,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Erro interno</translation>
     </message>
     <message>
       <source>Video transcoding required.</source>
@@ -9774,7 +9774,7 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Feito</translation>
     </message>
     <message>
       <source>Aborted</source>
@@ -9864,7 +9864,7 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Recoñecer</translation>
     </message>
   </context>
   <context>
@@ -9878,7 +9878,7 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>Non tes notificacións</translation>
     </message>
     <message>
       <source>Current Site</source>
@@ -10210,7 +10210,7 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>Learn more...</source>
-      <translation type="unfinished">Learn more...</translation>
+      <translation>Saber máis...</translation>
     </message>
     <message>
       <source>Auto-refresh integration</source>
@@ -10258,7 +10258,7 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>Performance</source>
-      <translation type="unfinished">Performance</translation>
+      <translation>Rendemento</translation>
     </message>
     <message>
       <source>Native</source>
@@ -10446,7 +10446,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Movemento, Obxectos</translation>
     </message>
     <message>
       <source>Motion, Objects
@@ -10632,7 +10632,7 @@ Aínda podes cambiar a calidade e os FPS directamente na cámara.</translation>
     </message>
     <message>
       <source>Learn more.</source>
-      <translation type="unfinished">Learn more.</translation>
+      <translation>Saber máis.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
@@ -10824,7 +10824,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>Non hai servidores axeitados</translation>
     </message>
   </context>
   <context>
@@ -10891,7 +10891,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>internal error</source>
-      <translation type="unfinished">internal error</translation>
+      <translation>erro interno</translation>
     </message>
     <message>
       <source>unknown status</source>
@@ -11414,7 +11414,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Erro interno</translation>
     </message>
     <message>
       <source>Connection failure</source>
@@ -12020,7 +12020,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>Fallou a exportación</translation>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
@@ -12525,7 +12525,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::EditVmsRuleDialog</name>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Horario</translation>
     </message>
     <message>
       <source>Delete</source>

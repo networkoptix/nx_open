@@ -1462,7 +1462,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Configure</source>
-      <translation type="unfinished">Configure</translation>
+      <translation>Configurar</translation>
     </message>
     <message>
       <source>Search Bases</source>
