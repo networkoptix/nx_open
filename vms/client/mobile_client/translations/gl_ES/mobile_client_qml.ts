@@ -414,7 +414,7 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Todos os sitios web</translation>
     </message>
     <message>
       <source>Selected Sites</source>
