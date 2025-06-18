@@ -737,7 +737,7 @@
     </message>
     <message>
       <source>Filter</source>
-      <translation type="unfinished">Filter</translation>
+      <translation>Filtrar</translation>
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
@@ -792,7 +792,7 @@
     </message>
     <message>
       <source>Angle</source>
-      <translation type="unfinished">Angle</translation>
+      <translation>Ángulo</translation>
     </message>
     <message>
       <source>Camera roll correction</source>
