@@ -4680,7 +4680,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Creado</translation>
     </message>
     <message>
       <source>Creator</source>
@@ -5320,11 +5320,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>rede</translation>
     </message>
     <message>
       <source>usb</source>
-      <translation type="unfinished">usb</translation>
+      <translation>USB</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -6937,11 +6937,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>É necesaria a transcodificación de vídeo. Reiniciouse a sesión de exportación.</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
+      <translation>É necesaria a transcodificación de audio. Reiniciouse a sesión de exportación.</translation>
     </message>
   </context>
   <context>
@@ -7729,7 +7729,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Color</source>
-      <translation type="unfinished">Color</translation>
+      <translation>Cor</translation>
     </message>
     <message>
       <source>Pointed</source>
@@ -8926,7 +8926,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Requírese transcodificación de audio.</translation>
     </message>
   </context>
   <context>
@@ -11321,7 +11321,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>Detalles do certificado</translation>
     </message>
   </context>
   <context>
@@ -11733,7 +11733,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Creado</translation>
     </message>
     <message>
       <source>Creator</source>
@@ -12922,7 +12922,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::SoundPicker</name>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Xestionar</translation>
     </message>
   </context>
   <context>

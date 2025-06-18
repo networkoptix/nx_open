@@ -553,7 +553,7 @@
     </message>
     <message>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Xerar</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1571,7 +1571,7 @@
     </message>
     <message>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Xerar</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1594,7 +1594,7 @@
     </message>
     <message>
       <source>User&apos;s local layouts</source>
-      <translation type="unfinished">User&apos;s local layouts</translation>
+      <translation>Deseños locais do usuario&apos;</translation>
     </message>
   </context>
   <context>
@@ -2736,7 +2736,7 @@
     </message>
     <message>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Icona</translation>
     </message>
   </context>
   <context>
@@ -3027,7 +3027,7 @@
     </message>
     <message>
       <source>Off</source>
-      <translation type="unfinished">Off</translation>
+      <translation>Apagado</translation>
     </message>
     <message>
       <source>Schedule</source>
