@@ -8861,7 +8861,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>&lt;None&gt;</source>
-      <translation>&lt;無&gt;</translation>
+      <translation>&lt;None&gt;</translation>
     </message>
   </context>
   <context>
