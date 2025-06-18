@@ -50,9 +50,12 @@ Item
 
                 width: grid.cellWidth
                 height: grid.cellHeight
+                enabled: model.date <= new Date()
 
                 Rectangle
                 {
+                    id: archiveHighlight
+
                     anchors.bottom: parent.bottom
                     anchors.bottomMargin: 3
                     width: parent.width + 3
@@ -64,6 +67,8 @@ Item
 
                 Rectangle
                 {
+                    id: currentDate
+
                     anchors.centerIn: parent
                     width: 40
                     height: 40
@@ -74,6 +79,8 @@ Item
 
                 Text
                 {
+                    id: calendarDate
+
                     anchors.centerIn: parent
                     text: model.display
                     color:
@@ -81,7 +88,7 @@ Item
                         if (calendarDay.current)
                             return ColorTheme.colors.dark3
 
-                        return clickArea.enabled ? ColorTheme.colors.light1 : ColorTheme.colors.dark15
+                        return enabled ? ColorTheme.colors.light1 : ColorTheme.colors.dark15
                     }
 
                     font.pixelSize: 16
@@ -92,7 +99,6 @@ Item
                     id: clickArea
 
                     anchors.fill: parent
-                    enabled: model.date <= new Date()
                     onClicked: control.picked(model.date.getTime() - displayOffset)
                 }
             }
