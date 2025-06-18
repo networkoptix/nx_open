@@ -246,6 +246,7 @@ void ScreenRecordingActionHandler::stopRecordingInternal()
     {
         m_recorder->stop();
         m_dataProvider->removeDataProcessor(m_recorder.data());
+        m_dataProvider->pleaseStop();
     }
 
     m_recorder.reset();

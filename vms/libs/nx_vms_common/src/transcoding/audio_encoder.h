@@ -50,6 +50,7 @@ private:
     AVCodecContext* m_encoderContext = nullptr;
     CodecParametersPtr m_codecParams;
     std::unique_ptr<FfmpegAudioResampler> m_resampler;
+    AVSampleFormat m_sourceformat{};
 };
 
 } // namespace nx::media::ffmpeg

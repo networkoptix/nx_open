@@ -184,7 +184,7 @@ void ExportStorageStreamRecorder::updateSignatureAttr(StorageContext* context)
     const auto systemContext = SystemContext::fromResource(m_resource);
     QByteArray signature =
         QnSignHelper::addSignatureFiller(m_signer.buildSignature(
-            systemContext->licensePool(), systemContext->connection()->moduleInformation().id));
+            systemContext->licensePool(), systemContext->currentServerId()));
 
     //New metadata is stored as json, so signature is written base64 - encoded.
     const bool metadataUpdated = updateInFile(file.data(),

@@ -23,6 +23,7 @@ public:
     virtual ~DesktopDataProviderWrapper();
 
     virtual void start(Priority priority = InheritPriority) override;
+    virtual void pleaseStop() override;
     bool isInitialized() const;
     QString lastErrorStr() const;
     virtual bool canAcceptData() const override;

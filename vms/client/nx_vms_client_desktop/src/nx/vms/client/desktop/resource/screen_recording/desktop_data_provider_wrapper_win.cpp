@@ -17,6 +17,11 @@ DesktopDataProviderWrapper::~DesktopDataProviderWrapper()
     m_owner->removeDataProcessor(this);
 }
 
+void DesktopDataProviderWrapper::pleaseStop()
+{
+    m_owner->pleaseStop();
+}
+
 bool DesktopDataProviderWrapper::canAcceptData() const
 {
     auto dataProcessors = m_dataprocessors.lock();
