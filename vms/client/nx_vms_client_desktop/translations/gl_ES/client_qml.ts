@@ -658,7 +658,7 @@
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>Atributos</translation>
     </message>
   </context>
   <context>

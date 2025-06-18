@@ -1326,7 +1326,7 @@
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>Cần phải chuyển mã âm thanh.</translation>
     </message>
   </context>
   <context>

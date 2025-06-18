@@ -5348,7 +5348,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Path</source>
-      <translation type="unfinished">Path</translation>
+      <translation>Ruta</translation>
     </message>
     <message>
       <source>Type</source>
@@ -8535,7 +8535,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Edit camera settings</source>
-      <translation type="unfinished">Edit camera settings</translation>
+      <translation>Editar a configuración da cámara</translation>
     </message>
     <message>
       <source>View event log</source>
@@ -12783,7 +12783,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>Atributos</translation>
     </message>
     <message>
       <source>From</source>
