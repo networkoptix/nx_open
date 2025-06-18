@@ -45,6 +45,7 @@ FocusScope
             property bool maskedMode: true
 
             focus: true
+            enabled: !control.hasSecretValue
             passwordCharacter: "*"
             showActionButton: !control.hasSecretValue && textInput.focus && textInput.text
             actionButtonImage.sourcePath: maskedMode
@@ -64,14 +65,6 @@ FocusScope
                 if (activeFocus && !control.hasSecretValue)
                     textInput.selectAll()
             }
-
-            Keys.onPressed:
-                (event)=>
-                {
-                    // Clear "secret" on any valuable input.
-                    if (CoreUtils.isCharKeyPressed(event) && control.hasSecretValue)
-                        control.resetState(/*hasSecretValue*/ false)
-                }
 
             onAccepted: control.accepted()
         }

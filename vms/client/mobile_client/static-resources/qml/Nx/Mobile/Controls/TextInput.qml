@@ -52,7 +52,7 @@ T.TextField
         owner: control
     }
 
-    Keys.onPressed: (event) => fieldBackground.handleKeyPressedEvent(event)
+    onTextChanged: control.errorText = ""
 
     // TODO #ynikitenkov Add Nx.Mobile.IconButton
     ColoredImage
@@ -74,8 +74,6 @@ T.TextField
             onClicked: control.actionButtonAction()
         }
     }
-
-    onEnabledChanged: focus = false
 
     Component.onCompleted: TextInputWorkaround.setup(control)
 }

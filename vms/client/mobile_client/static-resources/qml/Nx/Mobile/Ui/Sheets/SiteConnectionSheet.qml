@@ -65,7 +65,7 @@ BottomSheet
         backgroundMode: FieldBackground.Mode.Light
 
         width: parent.width
-        labelText: qsTr("Address")
+        labelText: qsTr("Host:Port")
 
         inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
 
@@ -235,7 +235,8 @@ BottomSheet
                                 case SessionManager.UserTemporaryLockedOutConnectionStatus:
                                     // Fallthrough.
                                 case SessionManager.UnauthorizedConnectionStatus:
-                                    if (errorCode == SessionManager.UnauthorizedConnectionStatus)
+                                    if (errorCode === SessionManager.UnauthorizedConnectionStatus
+                                        || errorCode === SessionManager.LocalSessionExiredStatus)
                                     {
                                         passwordInput.errorText = errorMessage
                                         passwordInput.forceActiveFocus()
@@ -250,6 +251,7 @@ BottomSheet
                                 default:
                                     addressField.errorText = errorMessage
                                     addressField.forceActiveFocus()
+                                    addressField.visible = true
                                     break
                             }
                         }
@@ -278,6 +280,7 @@ BottomSheet
 
     onOpenedChanged:
         windowContext.depricatedUiController.avoidHandlingConnectionStuff = sheet.opened
+
     Component.onDestruction:
         windowContext.depricatedUiController.avoidHandlingConnectionStuff = false
 }

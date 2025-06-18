@@ -25,12 +25,6 @@ Rectangle
     property int mode: FieldBackground.Mode.Dark
     property bool compactLabelMode: owner.activeFocus || !!owner.text
 
-    function handleKeyPressedEvent(event)
-    {
-        if (CoreUtils.isCharKeyPressed(event))
-            control.errorText = ""
-    }
-
     opacity: enabled ? 1 : 0.3
 
     radius: 6

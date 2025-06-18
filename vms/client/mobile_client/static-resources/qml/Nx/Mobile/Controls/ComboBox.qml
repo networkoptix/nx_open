@@ -148,10 +148,12 @@ T.ComboBox
                     : ColorTheme.transparent(ColorTheme.colors.light4, 0.3)
 
                 text: control.editText
+                topPadding: 0
                 leftPadding: 0
                 rightPadding: 0
                 onTextChanged:
                 {
+                    control.errorText = ""
                     if (control.editText !== text)
                         control.editText = text
                 }
@@ -161,7 +163,6 @@ T.ComboBox
                 onAccepted: control.accepted()
 
                 background: null
-                Q.Keys.onPressed: (event) => fieldBackground.handleKeyPressedEvent(event)
             }
         }
 
