@@ -43,6 +43,8 @@ protected:
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual QVariant itemChange(
+        QGraphicsItem::GraphicsItemChange change, const QVariant& value) override;
 
 private:
     struct Private;
