@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import QtQuick.Layouts
 
 import Nx.Core
@@ -112,6 +113,9 @@ Page
                 systemTabs.visible: !sessionsScreen.searching
                     && !loadingIndicator.visible
                     && cloudUserProfileWatcher.isOrgUser
+                    && (organizationsModel.hasChannelPartners
+                        || organizationsModel.hasOrganizations)
+
                 searchField.visible: true
             }
         },
@@ -244,6 +248,17 @@ Page
 
         anchors.fill: parent
 
+        RectangularShadow
+        {
+            anchors.fill: systemTabs
+            blur: 24
+            spread: 0
+            cached: true
+            color: Qt.rgba(0, 0, 0, 0.7)
+            z: 1
+            visible: systemTabs.visible
+        }
+
         Rectangle
         {
             id: systemTabs
@@ -256,9 +271,12 @@ Page
 
             visible: !sessionsScreen.searching && !organizationsModel.topLevelLoading
                 && cloudUserProfileWatcher.isOrgUser
+                && (organizationsModel.hasChannelPartners
+                    || organizationsModel.hasOrganizations)
 
             ButtonGroup
             {
+                id: tabGroup
                 buttons: systemTabsRow.children
             }
 
@@ -301,13 +319,13 @@ Page
                     id: partnersTabButton
                     text: qsTr("Partners")
                     visible: organizationsModel.hasChannelPartners
-                        && sessionsScreen.rootType !== OrganizationsModel.ChannelPartner
                 }
 
                 TabButton
                 {
                     id: organizationsTabButton
                     text: qsTr("Organizations")
+                    visible: organizationsModel.hasOrganizations
                 }
 
                 TabButton
@@ -322,18 +340,29 @@ Page
                 if (organizationsModel.topLevelLoading)
                     return
 
-                if (sessionsScreen.rootType === OrganizationsModel.ChannelPartner)
-                {
-                    organizationsTabButton.checked = true
+                if (!systemTabs.visible)
                     return
+
+                // Avoid switching tabs when selected tab is already visible.
+                if (tabGroup.checkedButton?.visible)
+                    return
+
+                // Select appropriate tab based on the current state.
+                if (cloudUserProfileWatcher.isOrgUser)
+                {
+                    if (organizationsModel.hasChannelPartners)
+                    {
+                        partnersTabButton.checked = true
+                        return
+                    }
+                    if (organizationsModel.hasOrganizations)
+                    {
+                        organizationsTabButton.checked = true
+                        return
+                    }
                 }
 
-                if (!cloudUserProfileWatcher.isOrgUser)
-                    sitesTabButton.checked = true
-                else if (organizationsModel.hasChannelPartners)
-                    partnersTabButton.checked = true
-                else
-                    organizationsTabButton.checked = true
+                sitesTabButton.checked = true
             }
 
             Connections
@@ -680,6 +709,13 @@ Page
 
             if (newIndex.row === -1)
             {
+                if (sessionsScreen.rootType === OrganizationsModel.ChannelPartner)
+                    partnersTabButton.checked = true
+                else if (sessionsScreen.rootType === OrganizationsModel.Organization)
+                    organizationsTabButton.checked = true
+                else
+                    sitesTabButton.checked = true
+
                 sessionsScreen.rootIndex = newIndex
                 sessionsScreen.rootType = accessor.getData(newIndex, "type")
                 linearizationListModel.sourceRoot = Qt.binding(
