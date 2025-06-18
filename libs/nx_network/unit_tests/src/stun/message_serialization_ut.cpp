@@ -239,7 +239,7 @@ TEST(StunMessageSerialization, serialization3)
     stun::Message response(stun::Header(
         stun::MessageClass::errorResponse,
         stun::MethodType::bindingMethod,
-        "abra-kadabra"));
+        "abra-cadabra"));
 
     // TODO: verify with RFC
     response.newAttribute< stun::attrs::ErrorCode >(
