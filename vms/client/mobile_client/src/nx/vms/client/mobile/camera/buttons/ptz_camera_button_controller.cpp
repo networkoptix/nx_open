@@ -15,10 +15,11 @@
 namespace nx::vms::client::mobile {
 
 using CameraButtonData = core::CameraButtonData;
+using OptionalCameraButtonData = core::OptionalCameraButtonData;
 
 namespace {
 
-core::OptionalCameraButtonData buttonFromCamera(
+OptionalCameraButtonData buttonFromCamera(
     core::SystemContext* context,
     const QnVirtualCameraResourcePtr& currentCamera)
 {
