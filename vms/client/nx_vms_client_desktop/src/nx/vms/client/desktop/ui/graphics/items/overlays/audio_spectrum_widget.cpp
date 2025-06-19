@@ -66,7 +66,7 @@ AudioSpectrumWidget::AudioSpectrumWidget(
         .inactiveColor = core::colorTheme()->color("camera.audioOnly.visualizer.inactive")
     })
 {
-    NX_ASSERT(display && display->camDisplay());
+    NX_ASSERT(display);
 
     // Init pixmaps.
     QSize pixmapSize = core::Geometry::eroded(kLeftGeometry, kLeftInternalMargins).size();

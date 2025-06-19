@@ -136,6 +136,7 @@ private:
     const QPointer<AccessController> m_accessController;
     const AccessController::NotifierPtr m_accessNotifier;
 
+    bool m_playbackSupported = true;
     bool m_isPlayingLive = false;
     bool m_isOffline = false;
     bool m_isUnauthorized = false;

@@ -1249,6 +1249,9 @@ void QnMediaResourceWidget::updatePtzController()
 
 qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
 {
+    if (!hasVideo())
+        return kInvalidAspectRatio;
+
     if (!placeholderPixmap().isNull() && zoomTargetWidget() && !zoomRect().isValid())
         return Geometry::aspectRatio(placeholderPixmap().size());
 
