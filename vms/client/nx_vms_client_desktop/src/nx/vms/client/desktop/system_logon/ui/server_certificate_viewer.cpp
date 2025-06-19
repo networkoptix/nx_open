@@ -226,6 +226,9 @@ void ServerCertificateViewer::setCertificateData(
 {
     NX_ASSERT(!certificates.empty());
     m_certificates = nx::network::ssl::completeCertificateChain(certificates);
+    m_rootCertificateIsTrusted = !m_certificates.empty()
+        && nx::network::ssl::verifyBySystemCertificates(
+            nx::network::ssl::CertificateChainView{m_certificates.front().x509()}, {});
 
     setWindowTitle(calculateDialogTitle(mode));
 
@@ -296,7 +299,7 @@ void ServerCertificateViewer::showSelectedCertificate()
 
     // Update certificate warnings state.
     ui->issuedWidget->setCurrentWidget(
-        cert.issuer() == cert.subject() ? ui->selfSignedPage : ui->issuerPage);
+        m_rootCertificateIsTrusted || cert.issuer() != cert.subject() ? ui->issuerPage : ui->selfSignedPage);
     ui->expiresWidget->setCurrentWidget(
         expiresAt.count() > QDateTime::currentSecsSinceEpoch() ? ui->expiresPage : ui->expiredPage);
 }
