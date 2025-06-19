@@ -20,7 +20,8 @@ struct CloudCrossSystemManager::Private
     CloudCrossSystemManager* const q;
     nx::utils::ScopedConnections connections;
     std::map<QString, CloudCrossSystemContextPtr> cloudSystems;
-    std::unique_ptr<CloudCrossSystemRequestScheduler> scheduler;
+    std::unique_ptr<CloudCrossSystemRequestScheduler> scheduler =
+        std::make_unique<CloudCrossSystemRequestScheduler>();
 
     void setCloudSystems(const QnCloudSystemList& currentCloudSystems);
     void requestCloudAuthorization();
@@ -35,8 +36,6 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
 {
     if (ini().disableCrossSiteConnections)
         return;
-
-    d->scheduler = std::make_unique<CloudCrossSystemRequestScheduler>();
 
     d->connections << connect(
         appContext()->cloudStatusWatcher(), &core::CloudStatusWatcher::statusChanged, this,
