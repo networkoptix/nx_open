@@ -80,6 +80,7 @@ private:
 private:
     QScopedPointer<Ui::ServerCertificateViewer> ui;
     std::vector<nx::network::ssl::Certificate> m_certificates;
+    bool m_rootCertificateIsTrusted = false;
     QnMediaServerResourcePtr m_server;
     BusyIndicatorButton* m_okButton = nullptr;
     QPushButton *viewPinnedButton = nullptr;
