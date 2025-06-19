@@ -132,17 +132,9 @@ QnAbstractStreamDataProvider* CameraResource::createDataProvider(Qn::ConnectionR
     if (!needRtsp)
         return {};
 
-    const auto context = dynamic_cast<nx::vms::client::core::SystemContext*>(systemContext());
-    if (!NX_ASSERT(context))
-        return nullptr;
-
-    const auto credentials = context->connection()
-        ? context->connection()->credentials()
-        : nx::network::http::Credentials();
-
     const auto camera = toSharedPointer(this);
     const auto result = new QnArchiveStreamReader(camera);
-    const auto delegate = new QnRtspClientArchiveDelegate(result, credentials, "ClientCamera");
+    const auto delegate = new QnRtspClientArchiveDelegate(result, "ClientCamera");
 
     delegate->setCamera(camera);
     result->setArchiveDelegate(delegate);
@@ -152,16 +144,6 @@ QnAbstractStreamDataProvider* CameraResource::createDataProvider(Qn::ConnectionR
 
     connect(delegate, &QnRtspClientArchiveDelegate::needUpdateTimeLine,
         this, &CameraResource::footageAdded);
-
-    if (auto connection = context->connection())
-    {
-        connect(connection.get(), &RemoteConnection::credentialsChanged, delegate,
-            [delegate, connectionPtr = std::weak_ptr<RemoteConnection>(connection)]
-            {
-                if (auto connection = connectionPtr.lock())
-                    delegate->updateCredentials(connection->credentials());
-            });
-    }
 
     result->setRole(role);
     return result;

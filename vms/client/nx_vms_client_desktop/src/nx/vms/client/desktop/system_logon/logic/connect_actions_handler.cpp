@@ -384,7 +384,7 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
                 return;
             }
 
-            auto existingCredentials = system()->connectionCredentials();
+            auto existingCredentials = system()->credentials();
 
             QString mainText = system()->userWatcher()->user()->isTemporary()
                 ? tr("Enter access link to continue your session")

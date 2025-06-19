@@ -6,6 +6,7 @@
 #include <QtCore/QThreadPool>
 
 #include <api/common_message_processor.h>
+#include <nx/network/http/auth_tools.h>
 #include <utils/common/long_runable_cleanup.h>
 
 #include "private/system_context_data_p.h"
@@ -138,6 +139,12 @@ std::shared_ptr<ec2::AbstractECConnection> SystemContext::messageBusConnection()
         return d->messageProcessor->connection();
 
     return nullptr;
+}
+
+nx::network::http::Credentials SystemContext::credentials() const
+{
+    NX_ASSERT(false, "Credentials exist for the client-side contexts only");
+    return {};
 }
 
 QnCommonMessageProcessor* SystemContext::messageProcessor() const

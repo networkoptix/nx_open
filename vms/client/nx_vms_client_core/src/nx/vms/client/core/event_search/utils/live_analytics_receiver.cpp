@@ -70,10 +70,7 @@ void LiveAnalyticsReceiver::Private::setCamera(const QnVirtualCameraResourcePtr&
         return;
 
     m_reader.reset(new QnArchiveStreamReader(m_camera));
-    m_reader->setArchiveDelegate(new QnRtspClientArchiveDelegate(
-        m_reader.get(),
-        SystemContext::fromResource(m_camera)->connectionCredentials(),
-        "AnalyticsPanel"));
+    m_reader->setArchiveDelegate(new QnRtspClientArchiveDelegate(m_reader.get(), "AnalyticsPanel"));
     m_reader->setStreamDataFilter(vms::api::StreamDataFilter::objects);
     m_reader->addDataProcessor(this);
     m_reader->start();

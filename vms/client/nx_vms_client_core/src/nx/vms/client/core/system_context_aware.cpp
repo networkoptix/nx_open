@@ -59,9 +59,9 @@ QnCameraBookmarksManager* SystemContextAware::cameraBookmarksManager() const
     return systemContext()->cameraBookmarksManager();
 }
 
-nx::network::http::Credentials SystemContextAware::connectionCredentials() const
+nx::network::http::Credentials SystemContextAware::credentials() const
 {
-    return systemContext()->connectionCredentials();
+    return systemContext()->credentials();
 }
 
 std::shared_ptr<RemoteSession> SystemContextAware::session() const

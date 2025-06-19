@@ -194,7 +194,7 @@ void MergeSystemsTool::mergeSystemDryRun(const Context& ctx)
     const auto context = desktop::SystemContext::fromResource(ctx.proxy);
     nx::network::http::Credentials credentials;
     if (NX_ASSERT(context))
-        credentials = context->connectionCredentials();
+        credentials = context->credentials();
 
     m_requestManager->mergeSystem(
         ctx.proxy,

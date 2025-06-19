@@ -93,7 +93,7 @@ SessionRefreshDialog::SessionRefreshDialog(
 
         auto loginField = new InputField(this);
         loginField->setEnabled(false);
-        loginField->setText(QString::fromStdString(system()->connectionCredentials().username));
+        loginField->setText(QString::fromStdString(system()->credentials().username));
         addCustomWidget(loginField);
 
         // Password input and label.
@@ -211,7 +211,7 @@ void SessionRefreshDialog::refreshSession()
     {
         nx::vms::api::LoginSessionRequest loginRequest;
         loginRequest.username = QString::fromStdString(
-            system()->connectionCredentials().username);
+            system()->credentials().username);
         loginRequest.password = m_passwordField->text();
 
         lockUi(true);
@@ -228,7 +228,7 @@ void SessionRefreshDialog::refreshSession()
 void SessionRefreshDialog::validatePassword(const nx::vms::api::LoginSessionRequest& loginRequest)
 {
     const nx::network::http::AuthToken currentToken =
-        system()->connectionCredentials().authToken;
+        system()->credentials().authToken;
 
     NX_ASSERT(currentToken.isPassword());
     if (loginRequest.password == currentToken.value)

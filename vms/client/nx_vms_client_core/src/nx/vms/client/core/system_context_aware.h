@@ -62,7 +62,7 @@ public:
 
     QnCameraBookmarksManager* cameraBookmarksManager() const;
 
-    nx::network::http::Credentials connectionCredentials() const;
+    nx::network::http::Credentials credentials() const;
 
     std::shared_ptr<RemoteSession> session() const;
 };

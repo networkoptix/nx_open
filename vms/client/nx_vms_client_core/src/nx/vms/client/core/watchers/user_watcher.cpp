@@ -21,7 +21,7 @@ UserWatcher::UserWatcher(SystemContext* systemContext, QObject* parent):
         [this](const QnResourceList&)
         {
             const auto username = QString::fromStdString(
-                this->systemContext()->connectionCredentials().username);
+                this->systemContext()->credentials().username);
 
             if (!m_user && !username.isEmpty())
             {

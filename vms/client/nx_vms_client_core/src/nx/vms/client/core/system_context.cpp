@@ -126,6 +126,8 @@ nx::vms::api::ModuleInformation SystemContext::moduleInformation() const
 
 void SystemContext::setSession(std::shared_ptr<RemoteSession> session)
 {
+    const auto oldConnection = connection();
+
     if (d->sessionTimeoutWatcher)
         d->sessionTimeoutWatcher->sessionStopped();
 
@@ -141,16 +143,22 @@ void SystemContext::setSession(std::shared_ptr<RemoteSession> session)
 
     d->initializeIoPortsInterface();
 
+    d->handleConnectionChanged(oldConnection, connection());
+
     emit remoteIdChanged(currentServerId());
 }
 
-void SystemContext::setConnection(RemoteConnectionPtr connection)
+void SystemContext::setConnection(RemoteConnectionPtr value)
 {
+    const auto oldConnection = connection();
     NX_ASSERT(!d->connection);
     NX_ASSERT(!d->session);
-    d->connection = connection;
+
+    d->connection = value;
 
     d->initializeIoPortsInterface();
+
+    d->handleConnectionChanged(oldConnection, connection());
 }
 
 nx::Uuid SystemContext::currentServerId() const
@@ -190,7 +198,7 @@ QString SystemContext::cloudSystemId() const
     return currentConnection ? currentConnection->moduleInformation().cloudSystemId : QString{};
 }
 
-nx::network::http::Credentials SystemContext::connectionCredentials() const
+nx::network::http::Credentials SystemContext::credentials() const
 {
     if (auto connection = this->connection())
         return connection->credentials();
