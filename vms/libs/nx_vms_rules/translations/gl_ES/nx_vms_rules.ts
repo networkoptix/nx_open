@@ -252,9 +252,9 @@
     </message>
     <message numerus="yes">
       <source>Camera IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Camera IP Conflict</numerusform>
-        <numerusform>Camera IP Conflict</numerusform>
+      <translation>
+        <numerusform>Conflito de IP da cámara</numerusform>
+        <numerusform>Conflito de IP da cámara</numerusform>
       </translation>
     </message>
   </context>
