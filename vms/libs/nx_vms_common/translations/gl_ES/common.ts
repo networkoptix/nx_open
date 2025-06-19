@@ -1599,15 +1599,15 @@
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB)</translation>
+      <translation>Tamaño máximo de P2P para todos os clientes (bytes, 32-512 MB)</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation type="unfinished">Max record queue size (bytes, 6-96MB)</translation>
+      <translation>Tamaño máximo da cola de rexistros (bytes, 6-96 MB)</translation>
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000)</source>
-      <translation type="unfinished">Max record queue size (elements, 250-4000)</translation>
+      <translation>Tamaño máximo da cola de rexistros (elementos, 250-4000)</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds)</source>
@@ -1615,39 +1615,39 @@
     </message>
     <message>
       <source>Max RTSP connection duration (seconds)</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
+      <translation>Duración máxima da conexión RTSP (segundos)</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching</translation>
+      <translation>Activar a perforación de UDP con conexión á nube</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage</source>
-      <translation type="unfinished">Enable cloud-connect relays usage</translation>
+      <translation>Activar o uso de retransmisións de conexión á nube</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays</translation>
+      <translation>Forzar SSL para os relés de conexión á nube</translation>
     </message>
     <message>
       <source>Enable recording on EDGE</source>
-      <translation type="unfinished">Enable recording on EDGE</translation>
+      <translation>Activar a gravación en EDGE</translation>
     </message>
     <message>
       <source>Target update information</source>
-      <translation type="unfinished">Target update information</translation>
+      <translation>Información de actualización do obxectivo</translation>
     </message>
     <message>
       <source>Installed update information</source>
-      <translation type="unfinished">Installed update information</translation>
+      <translation>Información de actualización instalada</translation>
     </message>
     <message>
       <source>Downloader peers for files</source>
-      <translation type="unfinished">Downloader peers for files</translation>
+      <translation>Pares do descargador para os arquivos</translation>
     </message>
     <message>
       <source>Client update settings</source>
-      <translation type="unfinished">Client update settings</translation>
+      <translation>Configuración da actualización de cliente</translation>
     </message>
     <message>
       <source>Watermark settings</source>
@@ -1655,19 +1655,19 @@
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
-      <translation type="unfinished">Session token count limit on a single Server</translation>
+      <translation>Límite de reconto de tokens de sesión nun único servidor</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server</source>
-      <translation type="unfinished">Max session token count per user on single Server</translation>
+      <translation>Número máximo de tokens de sesión por usuario nun único servidor</translation>
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Intervalo de actualización para a caché de tokens de sesión remota (outros servidores e nube)</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Tempo de espera para a caché de tokens de sesión remota (outros servidores e nube)</translation>
     </message>
     <message>
       <source>Default video codec</source>
@@ -1675,7 +1675,7 @@
     </message>
     <message>
       <source>Default codec for export video</source>
-      <translation type="unfinished">Default codec for export video</translation>
+      <translation>Códec predeterminado para exportar vídeo</translation>
     </message>
     <message>
       <source>Low quality screen video codec</source>
@@ -1687,7 +1687,7 @@
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
-      <translation type="unfinished">URI for resource_data.json automatic update</translation>
+      <translation>URL para a actualización automática de datos_de_recursos.json</translation>
     </message>
     <message>
       <source>Meta data storage change policy</source>
@@ -1695,23 +1695,23 @@
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
-      <translation type="unfinished">Persistent Servers for update storage</translation>
+      <translation>Servidores persistentes para o almacenamento de actualizacións</translation>
     </message>
     <message>
       <source>Persistent Servers where updates are stored</source>
-      <translation type="unfinished">Persistent Servers where updates are stored</translation>
+      <translation>Servidores persistentes onde se almacenan as actualizacións</translation>
     </message>
     <message>
       <source>VMS Server version specific features</source>
-      <translation type="unfinished">VMS Server version specific features</translation>
+      <translation>Funcionalidades específicas da versión do servidor VMS</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>
-      <translation type="unfinished">Additional local FS storage types for recording</translation>
+      <translation>Tipos adicionais de almacenamento FS local para gravación</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure</translation>
+      <translation>Forzar os permisos do punto de montaxe do almacenamento da base de datos de análise en caso de fallo</translation>
     </message>
     <message>
       <source>Check video stream period (milliseconds)</source>
@@ -1719,23 +1719,23 @@
     </message>
     <message>
       <source>Storage encryption enabled</source>
-      <translation type="unfinished">Storage encryption enabled</translation>
+      <translation>Cifrado de almacenamento activado</translation>
     </message>
     <message>
       <source>Current storage encryption key</source>
-      <translation type="unfinished">Current storage encryption key</translation>
+      <translation>Clave de cifrado do almacenamento actual</translation>
     </message>
     <message>
       <source>HTTP header: Origin</source>
-      <translation type="unfinished">HTTP header: Origin</translation>
+      <translation>Cabeceira HTTP: orixe</translation>
     </message>
     <message>
       <source>HTTP header: X-Frame-Options</source>
-      <translation type="unfinished">HTTP header: X-Frame-Options</translation>
+      <translation>Cabeceira HTTP: opcións de X-Frame</translation>
     </message>
     <message>
       <source>Show mouse timeline preview</source>
-      <translation type="unfinished">Show mouse timeline preview</translation>
+      <translation>Mostrar a vista previa da liña de tempo do rato</translation>
     </message>
     <message>
       <source>Language for Cloud notifications</source>
@@ -1743,7 +1743,7 @@
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4MB)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4MB)</translation>
+      <translation>Tamaño do búfer multimedia (KB, 10KB-4MB)</translation>
     </message>
     <message>
       <source>Enable cross-domain policy</source>
@@ -1751,27 +1751,27 @@
     </message>
     <message>
       <source>Enable WebSocket for P2P</source>
-      <translation type="unfinished">Enable WebSocket for P2P</translation>
+      <translation>Activar WebSocket para P2P</translation>
     </message>
     <message>
       <source>Show Servers in the Resource Tree for non-admins</source>
-      <translation type="unfinished">Show Servers in the Resource Tree for non-admins</translation>
+      <translation>Mostrar os servidores na árbore de recursos para os non administradores</translation>
     </message>
     <message>
       <source>Use only HTTPS for cameras</source>
-      <translation type="unfinished">Use only HTTPS for cameras</translation>
+      <translation>Usa só HTTPS para as cámaras</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
+      <translation>Expoñer enderezos IP para a detección automática</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device</translation>
+      <translation>Manter o estado do porto de E/S (I/O) activado cando o servidor se conecta ao dispositivo</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
+      <translation>Tamaño do búfer multimedia para dispositivos só de son (KB, 1KB-1MB)</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
@@ -1779,11 +1779,11 @@
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</translation>
+      <translation>Número máximo de fíos para a sincronización remota de arquivos (&lt;=0 - automático, máx. 32)</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization</source>
-      <translation type="unfinished">Thread count limit for camera archive synchronization</translation>
+      <translation>Límite de número de fíos para a sincronización do arquivo da cámara</translation>
     </message>
     <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
@@ -1799,11 +1799,11 @@
     </message>
     <message>
       <source>Update releases.json file URL</source>
-      <translation type="unfinished">Update releases.json file URL</translation>
+      <translation>Actualizar o URL do ficheiro lanzamentos.json</translation>
     </message>
     <message>
       <source>LDAP settings</source>
-      <translation type="unfinished">LDAP settings</translation>
+      <translation>Configuración de LDAP</translation>
     </message>
     <message>
       <source>SMTP settings</source>
@@ -1811,7 +1811,7 @@
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds)</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
+      <translation>Duración do token de sesión de autorización (segundos)</translation>
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
@@ -1819,11 +1819,11 @@
     </message>
     <message>
       <source>Allow Power User editing Security Settings</source>
-      <translation type="unfinished">Allow Power User editing Security Settings</translation>
+      <translation>Permitir que o usuario avanzado edite a configuración de seguridade</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (insecure)</source>
-      <translation type="unfinished">Enable deprecated API functions (insecure)</translation>
+      <translation>Activar funcións da API obsoletas (inseguras)</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
@@ -1844,7 +1844,7 @@
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
-      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</translation>
+      <translation>Cabeceira HTTP: Servidor, variables compatibles: $vmsName, $vmsVersion, $company, $compatibility</translation>
     </message>
     <message>
       <source>Device storage information update interval</source>
@@ -1884,11 +1884,11 @@
     </message>
     <message>
       <source>Pixelation settings</source>
-      <translation type="unfinished">Pixelation settings</translation>
+      <translation>Configuración de pixelación</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens</translation>
+      <translation>Aplicar o límite de sesión para os tokens da nube</translation>
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
@@ -2520,24 +2520,24 @@
     </message>
     <message>
       <source>LDAP Sync Issue</source>
-      <translation type="unfinished">LDAP Sync Issue</translation>
+      <translation>Problema de sincronización LDAP</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
+      <translation>
+        <numerusform>%1 (%n veces)</numerusform>
+        <numerusform>%1 (%n veces)</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to connect to the LDAP server.</source>
-      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+      <translation>Non se puido conectar co servidor LDAP.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a %1 timeout.</source>
       <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+      <translation>Non se puido completar a sincronización dentro dun tempo de espera %1.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a given timeout.</source>
@@ -2545,15 +2545,15 @@
     </message>
     <message>
       <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+      <translation>Ningunha conta de usuario no servidor LDAP coincide coa configuración de sincronización.</translation>
     </message>
     <message>
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
+      <translation>Non se atoparon algúns usuarios ou grupos LDAP na base de datos LDAP.</translation>
     </message>
     <message>
       <source>Services Issue</source>
-      <translation type="unfinished">Services Issue</translation>
+      <translation>Problema de servizos</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has license migration issue</source>
@@ -2598,15 +2598,15 @@
     </message>
     <message>
       <source>Failed to migrate licenses.</source>
-      <translation type="unfinished">Failed to migrate licenses.</translation>
+      <translation>Non se puideron migrar as licenzas.</translation>
     </message>
     <message>
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation type="unfinished">Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</translation>
+      <translation>Omitiuse a importación de licenzas. Programarase automaticamente outro intento de migración para máis tarde.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>Non se puido forzar o uso do tempo da cámara porque ten demasiado atraso. No seu lugar, usarase o tempo do sitio.</translation>
     </message>
     <message>
       <source>Call Request</source>
