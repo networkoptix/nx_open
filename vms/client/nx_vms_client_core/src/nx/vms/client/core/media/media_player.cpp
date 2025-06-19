@@ -58,15 +58,6 @@ MediaPlayer::~MediaPlayer()
 {
 }
 
-nx::network::http::Credentials MediaPlayer::connectionCredentials(
-    nx::vms::common::SystemContext* systemContext) const
-{
-    if (!systemContext)
-        return {};
-
-    return systemContext->as<SystemContext>()->connectionCredentials();
-}
-
 QnResource* MediaPlayer::rawResource() const
 {
     return resource().data();

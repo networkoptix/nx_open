@@ -11,6 +11,24 @@
 
 namespace nx::vms::client::core {
 
+void SystemContext::Private::handleConnectionChanged(const RemoteConnectionPtr& oldConnection,
+    const RemoteConnectionPtr& newConnection)
+{
+    if (oldConnection == newConnection)
+        return;
+
+    if (oldConnection)
+        oldConnection->disconnect(q);
+
+    if (newConnection)
+    {
+        connect(newConnection.get(), &RemoteConnection::credentialsChanged,
+            q, &SystemContext::credentialsChanged);
+    }
+
+    emit q->credentialsChanged();
+}
+
 void SystemContext::Private::initializeIoPortsInterface()
 {
     if (q->moduleInformation().id.isNull())

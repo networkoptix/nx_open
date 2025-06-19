@@ -867,10 +867,7 @@ bool Player::Private::createArchiveReader()
         if (!NX_ASSERT(systemContext))
             return false;
 
-        auto rtspArchiveDelegate = new QnRtspClientArchiveDelegate(
-            reader.get(),
-            q->connectionCredentials(systemContext),
-            tag);
+        auto rtspArchiveDelegate = new QnRtspClientArchiveDelegate(reader.get(), tag);
         rtspArchiveDelegate->setCamera(camera);
         archiveDelegate = rtspArchiveDelegate;
     }
@@ -1078,16 +1075,6 @@ void Player::setResourceInternal(const QnResourcePtr& resource)
 {
     d->resource = resource;
     d->isLocalFile = resource && resource->hasFlags(Qn::local_media);
-}
-
-nx::network::http::Credentials Player::connectionCredentials(
-    nx::vms::common::SystemContext* systemContext) const
-{
-    if (!systemContext)
-        return {};
-
-    const auto connection = systemContext->messageBusConnection();
-    return connection ? connection->credentials() : nx::network::http::Credentials{};
 }
 
 Player::State Player::playbackState() const

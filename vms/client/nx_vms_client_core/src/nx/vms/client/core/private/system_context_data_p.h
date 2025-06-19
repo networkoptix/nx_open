@@ -35,6 +35,9 @@ struct SystemContext::Private
 {
     void initializeIoPortsInterface();
 
+    void handleConnectionChanged(const RemoteConnectionPtr& oldConnection,
+        const RemoteConnectionPtr& newConnection);
+
     SystemContext* const q;
 
     mutable std::unique_ptr<QnPtzControllerPool> ptzControllerPool;

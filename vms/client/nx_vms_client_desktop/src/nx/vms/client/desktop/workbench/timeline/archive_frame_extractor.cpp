@@ -358,13 +358,8 @@ ArchiveFrameExtractor::ArchiveFrameExtractor(
         if (!NX_ASSERT(context))
             return;
 
-        nx::network::http::Credentials credentials;
-        if (auto connection = context->connection())
-            credentials = context->connection()->credentials();
-
         auto rtspDelegate = std::make_unique<QnRtspClientArchiveDelegate>(
             /*archiveStreamReader*/ nullptr,
-            std::move(credentials),
             "ArchiveFrameExtractor",
             sleepIfEmptySocket);
         rtspDelegate->setCamera(cameraResource);

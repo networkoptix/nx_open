@@ -170,7 +170,7 @@ bool ContextCurrentUserWatcher::isReconnectRequired(const QnUserResourcePtr &use
     if (!m_reconnectOnPasswordChange)
         return false;
 
-    const auto credentials = systemContext()->connectionCredentials();
+    const auto credentials = systemContext()->credentials();
     const bool bearerAuthIsUsed =
         (credentials.authToken.type == nx::network::http::AuthTokenType::bearer);
 

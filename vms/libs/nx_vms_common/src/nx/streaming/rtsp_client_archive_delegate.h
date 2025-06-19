@@ -29,6 +29,7 @@ class QnNxRtpParser;
 /**
  * Implements QnAbstractArchiveDelegate interface for accessing media data in server archive via
  * RTSP session.
+ * TODO: Move to the client core library.
  */
 class NX_VMS_COMMON_API QnRtspClientArchiveDelegate: public QnAbstractArchiveDelegate
 {
@@ -36,7 +37,6 @@ class NX_VMS_COMMON_API QnRtspClientArchiveDelegate: public QnAbstractArchiveDel
 public:
     QnRtspClientArchiveDelegate(
         QnArchiveStreamReader* reader,
-        nx::network::http::Credentials credentials,
         const QString& rtpLogTag,
         bool sleepIfEmptySocket = false);
 
@@ -44,7 +44,6 @@ public:
 
     // TODO: #sivanov Pass credentials to constructor or using separate setter.
     void setCamera(const QnVirtualCameraResourcePtr& camera);
-    void updateCredentials(const nx::network::http::Credentials& credentials);
 
     virtual bool open(
         const QnResourcePtr& resource,
@@ -201,8 +200,6 @@ private:
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
 
     QMap<int, QSharedPointer<nx::rtp::QnNxRtpParser>> m_parsers;
-
-    nx::network::http::Credentials m_credentials;
 
     std::atomic_flag m_footageUpToDate;
     std::atomic_flag m_currentServerUpToDate;

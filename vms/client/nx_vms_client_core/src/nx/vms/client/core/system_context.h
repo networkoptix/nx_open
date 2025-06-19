@@ -136,7 +136,7 @@ public:
     /**
      * Credentials we are using to authorize the connection.
      */
-    nx::network::http::Credentials connectionCredentials() const;
+    virtual nx::network::http::Credentials credentials() const override;
 
     /** API interface of the currently connected server. */
     rest::ServerConnectionPtr connectedServerApi() const;

@@ -100,7 +100,6 @@ struct ArchiveTimeCheckInfo
 
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(
     QnArchiveStreamReader* reader,
-    nx::network::http::Credentials credentials,
     const QString& rtpLogTag,
     bool sleepIfEmptySocket)
     :
@@ -112,7 +111,6 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(
             .disableKeepAlive = true,
             .sleepIfEmptySocket = sleepIfEmptySocket})),
     m_reader(reader),
-    m_credentials(std::move(credentials)),
     m_rtpLogTag(rtpLogTag),
     m_sleepIfEmptySocket(sleepIfEmptySocket)
 {
@@ -160,7 +158,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr& ca
 
     m_server = camera->getParentServer();
 
-    auto context = camera->systemContext();
+    const auto context = camera->systemContext();
     auto maxSessionDuration = context->globalSettings()->maxRtspConnectDuration();
     if (maxSessionDuration.count() > 0)
         m_maxSessionDurationMs = maxSessionDuration;
@@ -191,6 +189,22 @@ void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr& ca
             m_footageUpToDate.clear();
         });
 
+    m_cameraConnections << connect(context,
+        &nx::vms::common::SystemContext::credentialsChanged,
+        this,
+        [this, context]()
+        {
+            const auto credentials = context->credentials();
+            if (credentials.username.empty())
+                return; //< Do not update to empty credentials since there can be just connection loss.
+
+            if (m_rtspSession->getCredentials() == credentials)
+                return;
+
+            if (!m_camera->flags().testFlag(Qn::fake))
+                setupRtspSession(m_camera, m_server, m_rtspSession.get());
+        });
+
     if (camera->hasFlags(Qn::cross_system | Qn::fake))
     {
         m_cameraConnections << connect(m_camera.get(), &QnResource::flagsChanged, this,
@@ -209,13 +223,6 @@ void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr& ca
 void QnRtspClientArchiveDelegate::invalidateServer()
 {
     m_currentServerUpToDate.clear();
-}
-
-void QnRtspClientArchiveDelegate::updateCredentials(
-    const nx::network::http::Credentials& credentials)
-{
-    m_credentials = credentials;
-    setupRtspSession(m_camera, m_server, m_rtspSession.get());
 }
 
 QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate()
@@ -1103,12 +1110,13 @@ bool QnRtspClientArchiveDelegate::setupRtspSession(
     if (auditId.isNull())
         return false;
 
-    session->setCredentials(m_credentials, nx::network::http::header::AuthScheme::digest);
+    const auto credentials = context->credentials();
+    session->setCredentials(credentials, nx::network::http::header::AuthScheme::digest);
     session->setAdditionAttribute(
         Qn::EC2_RUNTIME_GUID_HEADER_NAME, auditId.toSimpleByteArray());
     session->setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1");
     session->setAdditionAttribute(
-        Qn::CUSTOM_USERNAME_HEADER_NAME, QString::fromStdString(m_credentials.username).toUtf8());
+        Qn::CUSTOM_USERNAME_HEADER_NAME, QString::fromStdString(credentials.username).toUtf8());
 
     session->resetProxyAddr();
 

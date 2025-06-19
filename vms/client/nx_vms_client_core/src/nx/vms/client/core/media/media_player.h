@@ -44,10 +44,6 @@ signals:
     void failedChanged();
     void noVideoStreamsChanged();
 
-protected:
-    virtual nx::network::http::Credentials connectionCredentials(
-        nx::vms::common::SystemContext* systemContext) const override;
-
 private:
     QnResource* rawResource() const;
     void setRawResource(QnResource* value);

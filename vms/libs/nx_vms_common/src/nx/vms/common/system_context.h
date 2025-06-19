@@ -35,7 +35,11 @@ namespace nx::metric { struct Storage; }
 namespace nx::vms::discovery { class Manager; }
 namespace nx::vms::event { class RuleManager; }
 namespace nx::vms::rules { class Engine; }
-namespace nx::network::http { class ClientPool; }
+
+namespace nx::network::http {
+class ClientPool;
+class Credentials;
+} // namespace nx::network::http
 
 namespace nx::vms::common {
 
@@ -142,6 +146,11 @@ public:
      * Interface for the Message Bus connection.
      */
     std::shared_ptr<ec2::AbstractECConnection> messageBusConnection() const;
+
+    /**
+     * Return current connection credentials. Actual only for client-side contexts only.
+     */
+    virtual nx::network::http::Credentials credentials() const;
 
     QnCommonMessageProcessor* messageProcessor() const;
 
@@ -272,6 +281,9 @@ public:
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
+
+signals:
+    void credentialsChanged();
 
 private:
     AbstractCertificateVerifier* verifier() const;

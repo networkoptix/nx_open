@@ -351,8 +351,6 @@ signals:
 
 protected:
     virtual void setResourceInternal(const QnResourcePtr& resource);
-    virtual nx::network::http::Credentials connectionCredentials(
-        nx::vms::common::SystemContext* systemContext) const;
 
     //Function for tests.
     void testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader);

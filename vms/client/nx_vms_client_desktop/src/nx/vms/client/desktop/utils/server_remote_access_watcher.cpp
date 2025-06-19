@@ -139,7 +139,7 @@ void ServerRemoteAccessWatcher::updateRemoteAccess(const ServerResourcePtr& serv
             targetPorts.insert(*configuration.port);
     }
 
-    BearerAuthorization header(systemContext()->connectionCredentials().authToken.value);
+    BearerAuthorization header(systemContext()->credentials().authToken.value);
     gateway->enforceHeadersFor(address, {{kProxyAuthorization, header.toString()}});
 
     auto forwardedPorts = gateway->forward(address,

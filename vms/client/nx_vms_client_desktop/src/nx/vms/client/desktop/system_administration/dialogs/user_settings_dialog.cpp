@@ -563,7 +563,7 @@ struct UserSettingsDialog::Private
                 }
                 else if (q->originalState().allowInsecure && !state.allowInsecure)
                 {
-                    const auto credentials = q->systemContext()->connectionCredentials();
+                    const auto credentials = q->systemContext()->credentials();
                     NX_ASSERT(credentials.authToken.isPassword());
                     const auto password = credentials.authToken.value;
                     if (NX_ASSERT(!password.empty()))
@@ -1276,7 +1276,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
         // Disabling digest authentication.
         else if (d->user->shouldDigestAuthBeUsed() && !userData.isHttpDigestEnabled.value_or(false))
         {
-            const auto credentials = systemContext()->connectionCredentials();
+            const auto credentials = systemContext()->credentials();
             if (NX_ASSERT(credentials.authToken.isPassword()))
                 actualPassword = QString::fromStdString(credentials.authToken.value);
         }
@@ -1348,7 +1348,7 @@ void UserSettingsDialog::refreshToken(const QString& password)
 
     nx::vms::api::LoginSessionRequest loginRequest;
     loginRequest.username = QString::fromStdString(
-        systemContext()->connectionCredentials().username);
+        systemContext()->credentials().username);
     loginRequest.password = password;
 
     auto callback = nx::utils::guarded(

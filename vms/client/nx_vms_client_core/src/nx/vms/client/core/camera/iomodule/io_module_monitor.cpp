@@ -222,7 +222,7 @@ bool IOModuleMonitor::open()
         requestUrl.setPort(route.addr.port);
     }
 
-    d->httpClient->setCredentials(systemContext->connectionCredentials());
+    d->httpClient->setCredentials(systemContext->credentials());
     d->httpClient->doGet(requestUrl);
     return true;
 }

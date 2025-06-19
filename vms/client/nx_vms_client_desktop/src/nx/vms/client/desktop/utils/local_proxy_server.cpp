@@ -116,7 +116,7 @@ void VmsServerConnector::connectTo(const SocketAddress& address, DoneCallback on
         .toUrl();
 
     // Set credentials from current server connection.
-    m_httpClient->setCredentials(connectionCredentials());
+    m_httpClient->setCredentials(credentials());
 
     // Prepare the request headers and send the request.
     HttpHeaders headers;
