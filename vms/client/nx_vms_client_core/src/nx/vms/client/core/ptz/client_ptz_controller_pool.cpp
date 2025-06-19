@@ -3,7 +3,6 @@
 #include "client_ptz_controller_pool.h"
 
 #include <core/resource/camera_resource.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/resource/camera_resource.h>
 #include <utils/common/delete_later.h>
@@ -23,12 +22,6 @@ ControllerPool::ControllerPool(common::SystemContext* systemContext, QObject* pa
 void ControllerPool::registerResource(const QnResourcePtr &resource)
 {
     base_type::registerResource(resource);
-
-    if (auto server = resource.dynamicCast<QnMediaServerResource>())
-    {
-        reinitServerCameras(server);
-        return;
-    }
 
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (!camera)
@@ -92,15 +85,6 @@ void ControllerPool::cacheCameraPresets(const QnResourcePtr &resource)
 
     QnPtzTourList tours;
     controller->getTours(&tours);
-}
-
-void ControllerPool::reinitServerCameras(const QnMediaServerResourcePtr& server)
-{
-    for (auto camera: server->resourcePool()->getAllCameras(server, /*ignoreDesktopCameras*/ true))
-    {
-        if (controller(camera))
-            updateController(camera);
-    }
 }
 
 } // namespace ptz
