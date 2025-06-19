@@ -13,6 +13,8 @@ namespace nx::network::rest {
 
 void Handler::validateAndAmend(Request* request, http::HttpHeaders* headers)
 {
+    if (request->jsonRpcContext() && request->jsonRpcContext()->subscribed)
+        return;
     if (NX_ASSERT(m_schemas) && request->method() != nx::network::http::Method::options)
         m_schemas->validateOrThrow(request, headers);
 }

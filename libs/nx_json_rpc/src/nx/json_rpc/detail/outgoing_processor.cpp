@@ -200,7 +200,7 @@ void OutgoingProcessor::onResponse(rapidjson::Document data)
         return;
     }
 
-    Response response{.allocator = data.GetAllocator()};
+    Response response{std::move(data.GetAllocator())};
     if (!nx::reflect::json::deserialize({data}, &response))
     {
         NX_DEBUG(this,
@@ -254,7 +254,7 @@ void OutgoingProcessor::onArrayResponse(rapidjson::Document list)
     std::vector<Response> nullResponses;
     for (int i = 0; i < (int) list.Size(); ++i)
     {
-        Response response{.allocator = list.GetAllocator()};
+        Response response{list.GetAllocator()};
         if (auto r = nx::reflect::json::deserialize({list[i]}, &response); !r)
         {
             auto message = NX_FMT("Failed to deserialize response item %1: %2", i, r.toString());

@@ -9,7 +9,7 @@ namespace nx::json_rpc {
 static std::variant<Request, Response> deserialize(
     rapidjson::Document::AllocatorType allocator, rapidjson::Value& value)
 {
-    Request request{allocator};
+    Request request{std::move(allocator)};
     auto r{nx::reflect::json::deserialize({value}, &request)};
     if (r)
         return std::variant<Request, Response>{std::move(request)};
