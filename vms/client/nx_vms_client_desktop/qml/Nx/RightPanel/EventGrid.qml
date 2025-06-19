@@ -29,6 +29,9 @@ GridView
     property real rowSpacing: 2
 
     property real scrollStepSize: 20
+    property real scrollableWidth: 0
+    property real scrollableHeight: 0
+    property real scrollBarWidth: 0
 
     property var hoveredItem: null
 
@@ -37,12 +40,14 @@ GridView
 
     topMargin: 14
     leftMargin: 8
-    rightMargin: 8 + scrollBar.width - columnSpacing
+    rightMargin: 8 + scrollBarWidth - columnSpacing
     bottomMargin: 8 - rowSpacing
 
     boundsBehavior: Flickable.StopAtBounds
     interactive: false
     clip: true
+    width: scrollableWidth
+    height: Math.max(contentHeight, scrollableHeight)
 
     function currentCentralPointUs()
     {
@@ -74,22 +79,6 @@ GridView
         return validCount
             ? timestampSum / count * 1000
             : d.currentTimeUs()
-    }
-
-    ScrollBar.vertical: ScrollBar
-    {
-        id: scrollBar
-        stepSize: view.scrollStepSize / view.contentHeight
-    }
-
-    Rectangle
-    {
-        id: scrollbarPlaceholder
-
-        parent: scrollBar.parent
-        anchors.fill: scrollBar
-        color: ColorTheme.colors.dark5
-        visible: view.visibleArea.heightRatio >= 1.0
     }
 
     delegate: TileLoader
@@ -137,24 +126,6 @@ GridView
 
     header: Component { Column { width: parent.width }}
     footer: Component { Column { width: parent.width }}
-
-    MouseArea
-    {
-        id: mouseArea
-
-        acceptedButtons: Qt.NoButton
-        anchors.fill: parent
-        hoverEnabled: false
-        z: -1
-
-        AdaptiveMouseWheelTransmission { id: gearbox }
-
-        onWheel: (wheel) =>
-        {
-            // TODO: imlement pixel scrolling for high precision touchpads.
-            scrollBar.scrollBySteps(gearbox.transform(-wheel.angleDelta.y / 120.0))
-        }
-    }
 
     NxObject
     {
