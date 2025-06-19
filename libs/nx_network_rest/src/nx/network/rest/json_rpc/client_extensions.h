@@ -5,7 +5,7 @@
 #include <nx/json_rpc/messages.h>
 #include <nx/network/rest/response.h>
 
-namespace nx::vms::api::json_rpc {
+namespace nx::network::rest::json_rpc {
 
 struct ClientExtensions
 {
@@ -29,7 +29,7 @@ inline nx::json_rpc::Request to(
     if (payload.data || payload.extensions)
     {
         auto document = nx::json::serialized(payload, /*stripDefault*/ false);
-        result.allocator = document.GetAllocator();
+        result.allocator = std::move(document.GetAllocator());
         if (payload.data)
             result.params = std::move(document["data"].Move());
         if (payload.extensions)
@@ -38,7 +38,26 @@ inline nx::json_rpc::Request to(
     return result;
 }
 
-NX_VMS_API nx::json_rpc::Response to(
+template<typename T>
+inline Payload<T> from(nx::json_rpc::Request origin)
+{
+    Payload<T> result;
+    if (origin.params)
+    {
+        T data;
+        if (nx::reflect::json::deserialize({*origin.params}, &data))
+            result.data = std::move(data);
+    }
+    if (origin.extensions)
+    {
+        ClientExtensions data;
+        if (nx::reflect::json::deserialize({*origin.extensions}, &data))
+            result.extensions = std::move(data);
+    }
+    return result;
+}
+
+NX_NETWORK_REST_API nx::json_rpc::Response to(
     nx::json_rpc::ResponseId id, nx::network::rest::Response response);
 
 struct Error
@@ -82,4 +101,4 @@ inline Response<T> from(nx::json_rpc::Response origin)
     return result;
 }
 
-} // namespace nx::vms::api::json_rpc
+} // namespace nx::network::rest::json_rpc

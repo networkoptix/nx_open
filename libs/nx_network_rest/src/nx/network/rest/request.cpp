@@ -8,6 +8,7 @@
 #include <nx/utils/json/qjson.h>
 
 #include "audit.h"
+#include "json_rpc/client_extensions.h"
 
 namespace nx::network::rest {
 
@@ -152,6 +153,16 @@ Request::Request(
         m_decodedPath = '/' + m_decodedPath;
         if (!m_apiVersion)
             m_apiVersion = apiVersionOrThrow(m_decodedPath);
+        if (m_jsonRpcContext->request.extensions)
+        {
+            json_rpc::ClientExtensions e;
+            if (nx::reflect::json::deserialize({*m_jsonRpcContext->request.extensions}, &e)
+                && e.etag)
+            {
+                nx::network::http::insertHeader(
+                    &m_httpHeaders, {"If-None-Match", std::move(*e.etag)});
+            }
+        }
         return;
     }
 
@@ -495,7 +506,7 @@ void Request::renameParameter(const QString& oldName, const QString& newName)
     {
         auto it = m_jsonRpcContext->request.params->FindMember(oldName.toStdString());
         if (NX_ASSERT(it != m_jsonRpcContext->request.params->MemberEnd()))
-            it->name.SetString(newName.toStdString(), m_jsonRpcContext->request.allocator);
+            it->name.SetString(newName.toStdString(), *m_jsonRpcContext->request.allocator);
     }
     if (!m_paramsCache)
         m_paramsCache = calculateParams();

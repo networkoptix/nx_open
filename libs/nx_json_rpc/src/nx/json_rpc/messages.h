@@ -46,8 +46,10 @@ T deserializedOrThrow(rapidjson::Value& value, std::string_view name)
  */
 struct NX_JSON_RPC_API Request
 {
-    /**%apidoc[unused] Holder of allocator for parsed params field. The allocator is refcounted. */
-    rapidjson::Document::AllocatorType allocator{/*chunkSize*/ 0};
+    /**%apidoc[unused]
+     * Holder of allocator for parsed params and extensions fields. The allocator is refcounted.
+     */
+    std::optional<rapidjson::Document::AllocatorType> allocator;
 
     /**%apidoc
      * %value "2.0"
@@ -113,9 +115,14 @@ struct NX_JSON_RPC_API Request
 
     Request copy() const
     {
-        Request r{.allocator = allocator, .id = id, .method = method};
+        Request r{.id = id, .method = method};
+        // Use new allocator as copy is usually required for another thread.
+        if (params || extensions)
+            r.allocator = rapidjson::Document::AllocatorType{};
         if (params)
-            r.params = rapidjson::Value(*params, r.allocator, /*copyConstStrings*/ true);
+            r.params = rapidjson::Value(*params, *r.allocator, /*copyConstStrings*/ true);
+        if (extensions)
+            r.extensions = rapidjson::Value(*extensions, *r.allocator, /*copyConstStrings*/ true);
         return r;
     }
 };
@@ -124,7 +131,7 @@ NX_REFLECTION_INSTRUMENT(Request, nx_json_rpc_Request_Fields)
 inline nx::reflect::DeserializationResult deserialize(
     const nx::reflect::json::DeserializationContext& context, Request* data)
 {
-    NX_ASSERT(data->allocator.Shared());
+    NX_ASSERT(data->allocator);
     return nx::reflect::json_detail::deserialize(context, data);
 }
 
@@ -173,9 +180,9 @@ NX_REFLECTION_INSTRUMENT(Error, nx_json_rpc_Error_Fields)
 struct NX_JSON_RPC_API Response
 {
     /**%apidoc[unused]
-     * Holder of allocator for parsed result and error.data fields. The allocator is refcounted.
+     * Holder of allocator for parsed result or error.data fields. The allocator is refcounted.
      */
-    rapidjson::Document::AllocatorType allocator{/*chunkSize*/ 0};
+    std::optional<rapidjson::Document::AllocatorType> allocator;
 
     /**%apidoc
      * %value "2.0"
@@ -201,7 +208,7 @@ struct NX_JSON_RPC_API Response
     static Response makeError(ResponseId id, int code, std::string message, rapidjson::Document serialized)
     {
         return {
-            .allocator = serialized.GetAllocator(),
+            .allocator = std::move(serialized.GetAllocator()),
             .id = std::move(id),
             .error = Error{code, std::move(message), std::move(serialized.Move())}};
     }
@@ -232,18 +239,25 @@ struct NX_JSON_RPC_API Response
 
     Response copy() const
     {
-        Response r{.allocator = allocator, .id = id};
-        if (result)
-            r.result = rapidjson::Value(*result, r.allocator, /*copyConstStrings*/ true);
+        Response r{.id = id};
+        // Use new allocator as copy is usually required for another thread.
+        if (result || (error && error->data) || extensions)
+            r.allocator = rapidjson::Document::AllocatorType{};
         if (error)
         {
             r.error = Error{.code = error->code, .message = error->message};
             if (error->data)
             {
                 r.error->data =
-                    rapidjson::Value(*error->data, r.allocator, /*copyConstStrings*/ true);
+                    rapidjson::Value(*error->data, *r.allocator, /*copyConstStrings*/ true);
             }
         }
+        else if (result)
+        {
+            r.result = rapidjson::Value(*result, *r.allocator, /*copyConstStrings*/ true);
+        }
+        if (extensions)
+            r.extensions = rapidjson::Value(*extensions, *r.allocator, /*copyConstStrings*/ true);
         return r;
     }
 };
@@ -252,8 +266,11 @@ NX_REFLECTION_INSTRUMENT(Response, nx_json_rpc_Response_Fields)
 inline nx::reflect::DeserializationResult deserialize(
     const nx::reflect::json::DeserializationContext& context, Response* data)
 {
-    NX_ASSERT(data->allocator.Shared());
-    return nx::reflect::json_detail::deserialize(context, data);
+    NX_ASSERT(data->allocator);
+    auto r = nx::reflect::json_detail::deserialize(context, data);
+    if (data->error && data->result)
+        data->result.reset(); //< Ignore result in case of error.
+    return r;
 }
 
 } // namespace nx::json_rpc

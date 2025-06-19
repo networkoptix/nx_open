@@ -4,7 +4,7 @@
 
 #include <nx/utils/json/qjson.h>
 
-namespace nx::vms::api::json_rpc {
+namespace nx::network::rest::json_rpc {
 
 namespace {
 
@@ -61,8 +61,11 @@ nx::json_rpc::Response to(nx::json_rpc::ResponseId id, nx::network::rest::Respon
             result.result = rapidjson::Value{};
         if (auto e = extensions(&response.httpHeaders))
         {
-            result.extensions = std::move(nx::json::serialized(
-                *e, /*stripDefault*/ false, body ? &result.allocator : nullptr).Move());
+            auto document = nx::json::serialized(
+                *e, /*stripDefault*/ false, body ? &*result.allocator : nullptr);
+            if (!result.allocator)
+                result.allocator = std::move(document.GetAllocator());
+            result.extensions = std::move(document.Move());
         }
     }
     else
@@ -76,4 +79,4 @@ nx::json_rpc::Response to(nx::json_rpc::ResponseId id, nx::network::rest::Respon
     return result;
 }
 
-} // namespace nx::vms::api::json_rpc
+} // namespace nx::network::rest::json_rpc

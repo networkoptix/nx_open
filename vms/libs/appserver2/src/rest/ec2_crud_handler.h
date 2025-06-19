@@ -2,19 +2,20 @@
 
 #pragma once
 
+#include <nx/network/rest/collection_hash.h>
 #include <nx/network/rest/crud_handler.h>
 #include <nx/network/rest/subscription.h>
 #include <nx/utils/crud_model.h>
+#include <nx/utils/data_structures/time_out_cache.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/i18n/scoped_locale.h>
+#include <nx/utils/lockable.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std_string_utils.h>
 #include <transaction/fix_transaction_input_from_api.h>
 #include <transaction/transaction_descriptor.h>
 
 #include "details.h"
-
-namespace nx::utils { NX_UTILS_API std::string sha3_256(const std::string_view& data); }
 
 namespace ec2 {
 
@@ -32,6 +33,8 @@ class CrudHandler:
 {
 public:
     using base_type = nx::network::rest::CrudHandler<Derived>;
+    using Request = nx::network::rest::Request;
+    using ResponseAttributes = nx::network::rest::ResponseAttributes;
 
     template<typename... Args>
     CrudHandler(QueryProcessor* queryProcessor, Args&&... args):
@@ -58,7 +61,8 @@ public:
         return {};
     }
 
-    std::vector<Model> read(Filter filter, const nx::network::rest::Request& request)
+    std::vector<Model> read(
+        Filter filter, const Request& request, ResponseAttributes* responseAttributes)
     {
         using namespace details;
 
@@ -91,6 +95,7 @@ public:
                 return output;
             };
 
+        std::vector<Model> result;
         if constexpr (fromDbTypesExists<Model>::value)
         {
             const auto logGuard = logTime("Query and Convert from DB types");
@@ -101,7 +106,7 @@ public:
                     return std::make_tuple(query(readTypes)...);
                 },
                 typename Model::DbReadTypes());
-            return Model::fromDbTypes(
+            result = Model::fromDbTypes(
                 std::apply(
                     [readFuture](auto&&... futures) -> typename Model::DbListTypes
                     {
@@ -111,17 +116,38 @@ public:
         }
         else
         {
-            return readFuture(query(Model()));
+            result = readFuture(query(Model()));
         }
+        return updateCombinedEtag(std::move(id), std::move(result), request, responseAttributes);
     }
 
-    void delete_(DeleteInput id, const nx::network::rest::Request& request)
+    void delete_(DeleteInput id, const Request& request, ResponseAttributes* responseAttributes)
     {
         using namespace details;
+        using namespace nx::utils::model;
 
-        auto processor = m_queryProcessor->getAccess(
-            static_cast<const Derived*>(this)->prepareAuditRecord(request));
-        validateType(processor, nx::utils::model::getId(id), m_objectType);
+        auto d = static_cast<Derived*>(this);
+        nx::utils::Guard guard;
+        if (responseAttributes)
+        {
+            auto lock = m_etags.lock();
+            if (auto etags = lock->getValue(request.userSession.access.userId))
+            {
+                nx::network::http::insertOrReplaceHeader(&responseAttributes->httpHeaders,
+                    {"ETag", nx::utils::toHex(etags->get().remove(d->subscriptionId(getId(id))))});
+            }
+            else
+            {
+                // CollectionHash for all items.
+                guard = nx::utils::Guard([&]() { d->read({}, request, responseAttributes); });
+            }
+        }
+
+        if (request.jsonRpcContext() && request.jsonRpcContext()->subscribed)
+            return; //< Do nothing as this is a notification for a WebSocket connection.
+
+        auto processor = m_queryProcessor->getAccess(d->prepareAuditRecord(request));
+        validateType(processor, getId(id), m_objectType);
 
         std::promise<Result> promise;
         processor.processCustomUpdateAsync(
@@ -181,23 +207,21 @@ public:
         if (const auto& c = request.jsonRpcContext(); c && c->crud == json_rpc::Crud::all)
             return QString("*");
 
+        auto d = static_cast<Derived*>(this);
         if (nx::Uuid::isUuidString(*it))
         {
             const auto id = nx::Uuid::fromStringSafe(*it);
-            return id.isNull() ? QString("*") : nx::toString(id);
+            return id.isNull() ? QString("*") : d->subscriptionId(id);
         }
 
-        if constexpr (requires(Derived* d) { d->flexibleIdToId(*it); })
+        if constexpr (requires { d->flexibleIdToId(*it); })
         {
-            if (const auto id = static_cast<Derived*>(this)->flexibleIdToId(*it); id.isNull())
+            if (const auto id = d->flexibleIdToId(*it); id.isNull())
                 throw Exception::notFound(NX_FMT("Resource '%1' is not found", *it));
             else
-                return nx::toString(id);
+                return d->subscriptionId(id);
         }
-        else
-        {
-            return *it;
-        }
+        return d->subscriptionId(*it);
     }
 
     template<typename T>
@@ -214,40 +238,58 @@ public:
             throwError(std::move(r));
     }
 
-    template<typename T>
-    std::string calculateEtag(const T& item) const
+    static bool checkEtag(bool useId, const std::string& etagIn, const std::string& etagOut)
     {
-        return nx::utils::toHex(nx::utils::sha3_256(nx::reflect::json::serialize(item)));
-    }
-
-    template<typename T>
-    std::string calculateEtag(const std::vector<T>& list) const
-    {
-        if (list.empty())
-        {
-            return
-                []
-                {
-                    static auto etag = nx::utils::toHex(nx::utils::sha3_256({}));
-                    return etag;
-                }();
-        }
-
-        if (list.size() == 1)
-            return calculateEtag(list.front());
-
-        auto it = list.begin();
-        auto xored = nx::utils::sha3_256(nx::reflect::json::serialize(*it));
-        for (++it; it != list.end(); ++it)
-        {
-            auto next = nx::utils::sha3_256(nx::reflect::json::serialize(*it));
-            for (size_t i = 0; i < xored.size(); ++i)
-                xored[i] ^= next[i];
-        }
-        return nx::utils::toHex(xored);
+        using Checker = nx::network::rest::CollectionHash;
+        return Checker::check(useId ? Checker::item : Checker::list,
+            nx::utils::fromHex(etagIn), nx::utils::fromHex(etagOut));
     }
 
 protected:
+    template<typename Id, typename Data>
+    std::vector<Data> updateCombinedEtag(Id id, std::vector<Data> result,
+        const Request& request, ResponseAttributes* responseAttributes)
+    {
+        if (!responseAttributes)
+            return result;
+
+        auto d = static_cast<Derived*>(this);
+        if (id == Id{})
+        {
+            std::vector<nx::network::rest::CollectionHash::Item> data;
+            data.reserve(result.size());
+            for (const auto& item: result)
+            {
+                data.emplace_back(d->subscriptionId(nx::utils::model::getId(item)),
+                    nx::reflect::json::serialize(item));
+            }
+            nx::network::rest::CollectionHash etags;
+            nx::network::http::insertOrReplaceHeader(&responseAttributes->httpHeaders,
+                {"ETag", nx::utils::toHex(etags.calculate(std::move(data)))});
+            m_etags.lock()->put(request.userSession.access.userId, std::move(etags));
+        }
+        else if (!result.empty())
+        {
+            nx::network::rest::CollectionHash::Item item{
+                d->subscriptionId(id), nx::reflect::json::serialize(result.front())};
+            auto lock = m_etags.lock();
+            auto etags = lock->getValue(request.userSession.access.userId);
+            if (etags)
+            {
+                nx::network::http::insertOrReplaceHeader(&responseAttributes->httpHeaders,
+                    {"ETag", nx::utils::toHex(etags->get().calculate(std::move(item)))});
+            }
+            else
+            {
+                lock.unlock();
+                d->read({}, request, responseAttributes); //< CollectionHash for all items.
+                if constexpr (requires { result = d->read(id, request, responseAttributes); })
+                    result = d->read(std::move(id), request, responseAttributes);
+            }
+        }
+        return result;
+    }
+
     template<typename T>
     void updateDbTypes(T items, const nx::network::rest::Request& request)
     {
@@ -309,9 +351,20 @@ protected:
         if constexpr (m_objectType == ApiObject_NotDefined)
             return true;
 
+        if (id.isNull())
+            return true;
+
         const auto objectType =
             m_queryProcessor->getAccess(nx::network::rest::kSystemSession).getObjectType(id);
         return objectType == ApiObject_NotDefined || objectType == m_objectType;
+    }
+
+    static QString subscriptionId(QString id) { return id; }
+    static QString subscriptionId(const nx::Uuid& id) { return id.toSimpleString(); }
+
+    void notify(const QString& id, NotifyType notifyType)
+    {
+        SubscriptionHandler::notify(id, notifyType, /*data*/ {});
     }
 
 protected:
@@ -335,13 +388,14 @@ private:
 
         if (DeleteCommand == transaction.command)
         {
+            auto d = static_cast<Derived*>(this);
             const auto id =
                 getId(static_cast<const QnTransaction<DeleteInput>&>(transaction).params);
 
-            if (static_cast<Derived*>(this)->isValidType(id))
+            if (d->isValidType(id))
             {
                 NX_VERBOSE(this, "Notify %1 for %2", id, transaction.command);
-                SubscriptionHandler::notify(nx::toString(id), NotifyType::delete_, /*data*/ {});
+                notify(d->subscriptionId(id), NotifyType::delete_);
             }
             return;
         }
@@ -353,11 +407,12 @@ private:
                 if (getUpdateCommand<T>() != transaction.command)
                     return false;
 
+                auto d = static_cast<Derived*>(this);
                 const auto id = getId(static_cast<const QnTransaction<T>&>(transaction).params);
-                if (static_cast<Derived*>(this)->isValidType(id))
+                if (d->isValidType(id))
                 {
                     NX_VERBOSE(this, "Notify %1 for %2", id, transaction.command);
-                    SubscriptionHandler::notify(nx::toString(id), NotifyType::update, /*data*/ {});
+                    notify(d->subscriptionId(id), NotifyType::update);
                 }
                 return true;
             });
@@ -374,6 +429,8 @@ private:
 
 private:
     static constexpr ApiObjectType m_objectType = details::commandToObjectType(DeleteCommand);
+    nx::Lockable<nx::utils::TimeOutCache<nx::Uuid, nx::network::rest::CollectionHash>> m_etags{
+        /*expirationPeriod*/ std::chrono::seconds{60}, /*maxSize*/ 100};
 };
 
 } // namespace ec2

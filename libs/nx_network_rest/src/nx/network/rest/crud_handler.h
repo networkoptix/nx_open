@@ -199,13 +199,22 @@ protected:
         const auto format = request.responseFormatOrThrow();
         Response response{
             responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
-        if constexpr (requires(Derived* d) { d->calculateEtag(data); })
+        if (auto it = response.httpHeaders.find("ETag"); it != response.httpHeaders.end())
         {
-            if (auto etag = static_cast<Derived*>(this)->calculateEtag(data); !etag.empty())
+            auto etag = nx::network::http::getHeaderValue(request.httpHeaders(), "If-None-Match");
+            if (!etag.empty())
             {
-                const bool notModified = etag
-                    == nx::network::http::getHeaderValue(request.httpHeaders(), "If-None-Match");
-                nx::network::http::insertHeader(&response.httpHeaders, {"ETag", std::move(etag)});
+                bool notModified = false;
+                auto d = static_cast<const Derived*>(this);
+                if constexpr (requires { d->checkEtag(/*useId*/ false, etag, it->second); })
+                {
+                    const bool useId = idParam(request).value || m_idParamName.isEmpty();
+                    notModified = d->checkEtag(useId, etag, it->second);
+                }
+                else
+                {
+                    notModified = etag == it->second;
+                }
                 if (notModified)
                 {
                     response.statusCode = nx::network::http::StatusCode::notModified;
@@ -213,6 +222,9 @@ protected:
                 }
             }
         }
+        if constexpr (std::is_same_v<Void, Data>)
+            return response;
+
         if (useReflect(request))
         {
             detail::filter(&data, filters);
@@ -387,7 +399,7 @@ protected:
     }
 
     template<typename Model>
-    Model mergedModel(bool useId, const Request& request, ResponseAttributes* responseAttributes)
+    Model mergedModel(bool useId, const Request& request)
     {
         const bool useReflect = this->useReflect(request);
         Request::ParseInfo parseInfo;
@@ -411,15 +423,15 @@ protected:
             if constexpr (std::is_base_of_v<Model, ReadType>)
             {
                 Model existing{(request.forceSystemAccess(),
-                    call(&Derived::read, std::move(id), request, responseAttributes))};
+                    call(&Derived::read, std::move(id), request, /*responseAttributes*/ nullptr))};
                 d->mergeModel(request, &model, &existing, std::move(parseInfo));
                 if (useReflect)
                     return existing;
             }
             else if constexpr (std::is_base_of_v<Model, ReadItemType>)
             {
-                Model existing{(request.forceSystemAccess(),
-                    readById(std::move(id), request, responseAttributes, ErrorId::notFound))};
+                Model existing{(request.forceSystemAccess(), readById(
+                    std::move(id), request, /*responseAttributes*/ nullptr, ErrorId::notFound))};
                 d->mergeModel(request, &model, &existing, std::move(parseInfo));
                 if (useReflect)
                     return existing;
@@ -553,7 +565,7 @@ Response CrudHandler<Derived>::executePost(const Request& request)
         else
         {
             call(&Derived::create, std::move(model), request, &responseAttributes);
-            return {responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
+            return response(Void{}, request, std::move(responseAttributes));
         }
     }
     else
@@ -585,7 +597,7 @@ Response CrudHandler<Derived>::executeDelete(const Request& request)
             }
             call(&Derived::delete_, std::move(id), request, &responseAttributes);
         }
-        return {responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
+        return response(Void{}, request, std::move(responseAttributes));
     }
     else
     {
@@ -620,8 +632,7 @@ Response CrudHandler<Derived>::executePut(const Request& request)
                         return response(detail::front(std::move(result)),
                             request, std::move(responseAttributes));
                     }
-                    return {
-                        responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
+                    return response(Void{}, request, std::move(responseAttributes));
                 }
                 else
                 {
@@ -650,10 +661,7 @@ Response CrudHandler<Derived>::executePut(const Request& request)
                     if constexpr (HasGetId<Model>::value)
                     {
                         if (!m_features.testFlag(CrudFeature::fastUpdate))
-                        {
-                            return responseById(
-                                id, request, std::move(responseAttributes));
-                        }
+                            return responseById(id, request, std::move(responseAttributes));
                     }
                 }
                 else
@@ -661,7 +669,7 @@ Response CrudHandler<Derived>::executePut(const Request& request)
                     call(&Derived::update, std::move(model), request, &responseAttributes);
                 }
 
-                return {responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
+                return response(Void{}, request, std::move(responseAttributes));
             }
         }
 
@@ -683,7 +691,7 @@ Response CrudHandler<Derived>::executePut(const Request& request)
                     return response(std::move(result), request, std::move(responseAttributes));
                 }
             }
-            return {responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
+            return response(Void{}, request, std::move(responseAttributes));
         }
     }
     else
@@ -702,11 +710,11 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
         const auto d = static_cast<Derived*>(this);
         using Model = detail::FunctionArgumentType<&Derived::update, 0>;
         using Result = typename nx::utils::FunctionTraits<&Derived::update>::ReturnType;
-        ResponseAttributes responseAttributes;
         const bool useId = idParam(request).value || m_idParamName.isEmpty();
-        Model model = mergedModel<Model>(useId, request, &responseAttributes);
+        Model model = mergedModel<Model>(useId, request);
         if constexpr (DoesMethodExist_fillMissingParams<Derived>::value)
             d->fillMissingParams(&model, request);
+        ResponseAttributes responseAttributes;
         if constexpr (!std::is_same_v<Result, void>)
         {
             auto result =
@@ -733,7 +741,7 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
             {
                 call(&Derived::update, std::move(model), request, &responseAttributes);
             }
-            return {responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
+            return response(Void{}, request, std::move(responseAttributes));
         }
     }
     else
