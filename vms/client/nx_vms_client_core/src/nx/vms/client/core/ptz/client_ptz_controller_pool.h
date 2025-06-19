@@ -24,7 +24,6 @@ protected:
 
 private:
     void cacheCameraPresets(const QnResourcePtr& resource);
-    void reinitServerCameras(const QnMediaServerResourcePtr& server);
 };
 
 } // namespace ptz
