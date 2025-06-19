@@ -114,6 +114,8 @@ public:
     };
     Q_DECLARE_FLAGS(AspectRatioFlags, AspectRatioFlag)
 
+    static constexpr qreal kInvalidAspectRatio = -1.0;
+
     enum class SelectionState
     {
         invalid,

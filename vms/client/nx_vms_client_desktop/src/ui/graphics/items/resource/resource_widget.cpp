@@ -105,8 +105,6 @@ const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION_MS;
 const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION_MS * 3;
 #endif
 
-const float noAspectRatio = -1.0;
-
 void splitFormat(const QString &format, QString *left, QString *right)
 {
     int index = format.indexOf(QLatin1Char('\t'));
@@ -1453,8 +1451,8 @@ Qn::RenderStatus QnResourceWidget::paintChannelBackground(QPainter* painter, int
 float QnResourceWidget::defaultAspectRatio() const
 {
     if (item())
-        return item()->data(Qn::ItemAspectRatioRole, noAspectRatio);
-    return noAspectRatio;
+        return item()->data(Qn::ItemAspectRatioRole, kInvalidAspectRatio);
+    return kInvalidAspectRatio;
 }
 
 // -------------------------------------------------------------------------- //

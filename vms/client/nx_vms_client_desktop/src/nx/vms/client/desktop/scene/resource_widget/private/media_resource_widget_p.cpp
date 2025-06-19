@@ -244,6 +244,7 @@ void MediaResourceWidgetPrivate::setDisplay(const QnResourceDisplayPtr& display)
         camDisplay()->disconnect(this);
 
     m_display = display;
+    m_playbackSupported = m_display && (m_display->camDisplay() != nullptr);
 
     if (anlyticsEnabledForWidget)
         AnalyticsAvailabilityWatcher::instance().setAnalyticsEnabled(m_display, this, true);
@@ -430,7 +431,8 @@ void MediaResourceWidgetPrivate::setIsPlayingLive(bool value)
 
 void MediaResourceWidgetPrivate::updateIsOffline()
 {
-    setIsOffline(m_isPlayingLive && (resource->getStatus() == nx::vms::api::ResourceStatus::offline));
+    const bool isOffline = (resource->getStatus() == nx::vms::api::ResourceStatus::offline);
+    setIsOffline(isOffline && (m_isPlayingLive || !m_playbackSupported));
 }
 
 void MediaResourceWidgetPrivate::setIsOffline(bool value)
@@ -444,7 +446,9 @@ void MediaResourceWidgetPrivate::setIsOffline(bool value)
 
 void MediaResourceWidgetPrivate::updateIsUnauthorized()
 {
-    setIsUnauthorized(m_isPlayingLive && (resource->getStatus() == nx::vms::api::ResourceStatus::unauthorized));
+    const bool isUnauthorized =
+        (resource->getStatus() == nx::vms::api::ResourceStatus::unauthorized);
+    setIsUnauthorized(isUnauthorized && (m_isPlayingLive || !m_playbackSupported));
 }
 
 void MediaResourceWidgetPrivate::setIsUnauthorized(bool value)
