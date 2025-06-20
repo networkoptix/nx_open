@@ -432,25 +432,28 @@ void EntryImpl::write()
 
         if (!m_responseBody.empty())
         {
-            auto it = m_responseHeaders.find("Content-Type");
-            if (it->second == "application/json"
-                || it->second.starts_with("application/xml")
-                || it->second.starts_with("text/"))
+            if (const auto it = m_responseHeaders.find("Content-Type");
+                it != m_responseHeaders.end())
             {
-                responseInfo["content"] = QVariantMap{
-                    {"size", (int) m_responseBody.size()},
-                    {"mimeType", QString::fromStdString(it->second)},
-                    {"text", QString::fromUtf8(m_responseBody)}
-                };
-            }
-            else if (it->second.starts_with("image/"))
-            {
-                responseInfo["content"] = QVariantMap{
-                    {"size", (int) m_responseBody.size()},
-                    {"mimeType", QString::fromStdString(it->second)},
-                    {"text", m_responseBody.toBase64().c_str()},
-                    {"encoding", "base64"}
-                };
+                if (it->second == "application/json"
+                    || it->second.starts_with("application/xml")
+                    || it->second.starts_with("text/"))
+                {
+                    responseInfo["content"] = QVariantMap{
+                        {"size", (int) m_responseBody.size()},
+                        {"mimeType", QString::fromStdString(it->second)},
+                        {"text", QString::fromUtf8(m_responseBody)}
+                    };
+                }
+                else if (it->second.starts_with("image/"))
+                {
+                    responseInfo["content"] = QVariantMap{
+                        {"size", (int) m_responseBody.size()},
+                        {"mimeType", QString::fromStdString(it->second)},
+                        {"text", m_responseBody.toBase64().c_str()},
+                        {"encoding", "base64"}
+                    };
+                }
             }
         }
 
