@@ -1216,15 +1216,15 @@
     <name>FileExtensions</name>
     <message>
         <source>Pictures</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Video</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>All Files</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3485,10 +3485,6 @@ License Key: %2</source>
             <numerusform>Set for %n devices</numerusform>
         </translation>
     </message>
-    <message>
-        <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>QnMessageBox</name>
@@ -4219,7 +4215,7 @@ License Key: %2</source>
     </message>
     <message>
         <source>Log In</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6225,31 +6221,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Saving layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Exporting video</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Stop Saving</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Stop Export</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Minimize</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Video transcoding is required. Export session restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Audio transcoding is required. Export session restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6275,102 +6271,102 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
     <message>
         <source>Hide information</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Show information</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Hide thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Show thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Last day</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Last 7 days</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Last 30 days</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected on Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any time</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Devices on layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cameras on layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Choose devices...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Choose cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Selected media</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>none</source>
         <comment>No currently selected camera</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n chosen devices</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n chosen device</numerusform>
             <numerusform>%n chosen devices</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n chosen cameras</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n chosen camera</numerusform>
             <numerusform>%n chosen cameras</numerusform>
         </translation>
     </message>
     <message>
         <source>Chosen device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Chosen camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7228,20 +7224,20 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>The Camera Replacement operation is not possible as the server is unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 will be removed from the site and replaced by the selected camera</source>
         <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Checking if the data from the camera can be transferred to the new one.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Some data and settings may not be supported for the new camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8217,7 +8213,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Audio transcoding required.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12034,7 +12030,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
         <source>%n bookmarks</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n bookmark</numerusform>
             <numerusform>%n bookmarks</numerusform>
         </translation>
