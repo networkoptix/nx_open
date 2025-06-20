@@ -5,7 +5,7 @@
     <name>ActionButtonsHint</name>
     <message>
       <source>Disabled by schedule</source>
-      <translation>Desactivado pola programación</translation>
+      <translation>Desactivado por horario programado</translation>
     </message>
   </context>
   <context>
@@ -34,11 +34,11 @@
     </message>
     <message>
       <source>Video Download</source>
-      <translation type="unfinished">Video Download</translation>
+      <translation>Descarga de vídeo</translation>
     </message>
     <message>
       <source>Ability to download video</source>
-      <translation type="unfinished">Ability to download video</translation>
+      <translation>Capacidade para descargar vídeo</translation>
     </message>
     <message>
       <source>Speedup connections</source>
@@ -54,11 +54,11 @@
     </message>
     <message>
       <source>Maximum decoders count</source>
-      <translation type="unfinished">Maximum decoders count</translation>
+      <translation>Número máximo de descodificadores</translation>
     </message>
     <message>
       <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+      <translation>Mellorar o rendemento da descodificación de vídeo usando o máximo número de descodificadores de hardware</translation>
     </message>
   </context>
   <context>
@@ -231,7 +231,7 @@
     <message>
       <source>Enter your %1 account password to connect to the Site</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
+      <translation>Introduce o contrasinal da túa conta %1 para conectarte ao sitio</translation>
     </message>
   </context>
   <context>
@@ -333,7 +333,7 @@
     <name>OfflineDummy</name>
     <message>
       <source>You are not connected to any Site</source>
-      <translation type="unfinished">You are not connected to any Site</translation>
+      <translation>Non estás conectado a ningún sitio</translation>
     </message>
   </context>
   <context>
@@ -418,11 +418,11 @@
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation type="unfinished">Selected Sites</translation>
+      <translation>Sitios seleccionados</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation type="unfinished">At least one site has to be selected</translation>
+      <translation>Hai que seleccionar polo menos un sitio</translation>
     </message>
   </context>
   <context>
@@ -622,7 +622,7 @@
     </message>
     <message>
       <source>No Sites found</source>
-      <translation type="unfinished">No Sites found</translation>
+      <translation>Non se atoparon sitios</translation>
     </message>
   </context>
   <context>
@@ -697,7 +697,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <translation>As notificacións están desactivadas na configuración do dispositivo</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -705,15 +705,15 @@
     </message>
     <message>
       <source>Early access to new features</source>
-      <translation type="unfinished">Early access to new features</translation>
+      <translation>Acceso anticipado a novas funcións</translation>
     </message>
     <message>
       <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <translation>Activar a alternativa do descodificador de software</translation>
     </message>
     <message>
       <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <translation>Descodifica algúns formatos de vídeo pouco comúns usando un descodificador de software</translation>
     </message>
   </context>
   <context>
@@ -877,7 +877,7 @@
     </message>
     <message>
       <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
+      <translation>Introduce o contrasinal de cifrado no cliente de escritorio para descifrar este arquivo ou solicita axuda ao administrador do sitio.</translation>
     </message>
   </context>
   <context>

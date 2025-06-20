@@ -48,7 +48,7 @@
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
-      <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
+      <translation>Non se pode conectar co sitio &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Unknown</source>
@@ -70,18 +70,18 @@
     </message>
     <message>
       <source>Session duration limit can be changed by the site administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the site administrators</translation>
+      <translation>O límite de duración da sesión pode ser modificado polas persoas administradoras do sitio</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::MediaDownloadBackend</name>
     <message>
       <source>Can&apos;t download video</source>
-      <translation type="unfinished">Can&apos;t download video</translation>
+      <translation>Non se pode descargar o vídeo</translation>
     </message>
     <message>
       <source>Please check a network connection.</source>
-      <translation type="unfinished">Please check a network connection.</translation>
+      <translation>Por favor, comproba a túa conexión de rede.</translation>
     </message>
   </context>
   <context>
