@@ -34,6 +34,16 @@ NX_VMS_API extern const QString kMetadataStorageIdKey;
 NX_VMS_API extern const QString kTimeZoneInformation;
 NX_VMS_API extern const QString kPortForwardingConfigurations;
 
+namespace detail {
+
+// To use safely in different DLL to define global QStrings.
+inline constexpr char kAnalyticsTaxonomyDescriptorsValue[] = "analyticsTaxonomyDescriptors";
+
+} // namespace detail
+
+// Must not be present in response for rest/v4.
+inline const QString kAnalyticsTaxonomyDescriptors = detail::kAnalyticsTaxonomyDescriptorsValue;
+
 } // namespace server_properties
 
 namespace user_properties {
