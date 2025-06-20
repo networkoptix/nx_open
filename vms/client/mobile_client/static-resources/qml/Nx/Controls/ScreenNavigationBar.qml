@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 
 import Nx.Controls
 import Nx.Core
@@ -31,18 +32,11 @@ Rectangle
     width: parent.width
     height:d.kBarSize
 
-    Row
+    RowLayout
     {
-        x: spacing / 2
         y: (control.height - d.buttonSize.height) / 2
-        width: parent.width - spacing + 1
+        width: parent.width
         height: d.buttonSize.height
-
-        spacing:
-        {
-            const buttonsCount = repeater.model.length
-            return (parent.width - buttonsCount * d.buttonSize.width) / buttonsCount
-        }
 
         Repeater
         {
@@ -58,6 +52,9 @@ Rectangle
 
                 readonly property bool isSelected: d.currentIndex === index
 
+                Layout.alignment: Qt.AlignCenter
+
+                visible: modelData.visible ?? true
                 width: d.buttonSize.width
                 height: d.buttonSize.height
 
@@ -135,6 +132,8 @@ Rectangle
                 "objectName": "switchToEventSearchMenuScreenButton",
                 "iconSource": "image://skin/navigation/event_search_button.svg",
                 "screenId": Controller.EventSearchMenuScreen,
+                "visible": windowContext.mainSystemContext?.hasSearchObjectsPermission
+                    || windowContext.mainSystemContext?.hasViewBookmarksPermission,
                 "openScreen": () => Workflow.openEventSearchMenuScreen()
             },
             {
