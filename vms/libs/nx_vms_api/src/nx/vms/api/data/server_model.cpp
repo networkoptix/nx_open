@@ -325,6 +325,11 @@ std::vector<Model> fromDbTypes(typename Model::DbListTypes all)
             parametersPerServer.erase(parameters);
         }
 
+        if constexpr (!std::is_same_v<Model, ServerModelV1>)
+        {
+            s.parameters.erase(server_properties::kAnalyticsTaxonomyDescriptors);
+        }
+
         if (!storages.empty())
         {
             auto [begin, end] = storages.equal_range(ServerIdAsParentId(s));

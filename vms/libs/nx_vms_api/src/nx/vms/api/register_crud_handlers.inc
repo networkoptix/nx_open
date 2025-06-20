@@ -1836,6 +1836,31 @@ static void registerServerRestHandlers(
      */
     reg("rest/v{4-}/servers/:serverId/audit", GlobalPermission::administrator,
         std::make_unique<AuditHandler>(serverModule, serverConnector));
+
+    /**%apidoc GET /rest/v{4-}/servers/{id}/analyticsTaxonomyDescriptors
+     * %caption Get Server Taxonomy data
+     * %ingroup Servers
+     * %param:string id Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers`,
+     *     or be `this` to refer to the current Server.
+     *     %example this
+     * %param[ref] _format,_stripDefault,_language,_pretty,_with
+     * %param[ref] _strict,_ticket
+     * %permissions Any User.
+     * %return:{Descriptors} Get Taxonomy descriptors for the Servers.
+     *
+     **%apidoc GET /rest/v{4-}/servers/%2A/analyticsTaxonomyDescriptors
+     * %jsonrpc[result] all
+     * %caption Get Servers' Taxonomy data
+     * %ingroup Servers
+     * %struct ServerValueOrArrayFilter
+     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_with
+     * %param[ref] _strict,_ticket
+     * %permissions Any User.
+     * %return:{std::map<nx::Uuid, Descriptors>} Get Taxonomy descriptors for all Servers.
+     */
+    reg("rest/v{4-}/servers/:id/analyticsTaxonomyDescriptors",
+        GlobalPermission::none,
+        std::make_unique<ServerAnalyticsDescriptorsHandler>(serverModule->systemContext()));
 }
 
 static void registerDeviceHandlers(

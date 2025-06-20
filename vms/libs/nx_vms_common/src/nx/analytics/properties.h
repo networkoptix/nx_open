@@ -4,6 +4,8 @@
 
 #include <QtCore/QString>
 
+#include <nx/vms/api/data/resource_property_key.h>
+
 namespace nx::analytics {
 
 static const QString kPluginDescriptorsProperty("pluginDescriptors");
@@ -14,6 +16,7 @@ static const QString kObjectTypeDescriptorsProperty("objectTypeDescriptors");
 static const QString kEnumTypeDescriptorsProperty("enumTypeDescriptors");
 static const QString kColorTypeDescriptorsProperty("colorTypeDescriptors");
 
-static const QString kDescriptorsProperty("analyticsTaxonomyDescriptors");
+static const QString kDescriptorsProperty(
+    nx::vms::api::server_properties::detail::kAnalyticsTaxonomyDescriptorsValue);
 
 } // namespace nx::analytics

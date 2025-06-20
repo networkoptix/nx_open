@@ -19,6 +19,11 @@
 
 namespace nx::vms::api::analytics {
 
+/**%apidoc
+ * %param:string groupId
+ * %param:string provider
+ * %param:boolean hasTypeEverBeenSupportedInThisScope
+ */
 struct DescriptorScope
 {
     nx::Uuid engineId;
@@ -102,6 +107,9 @@ struct BaseDescriptor
 #define nx_vms_api_analytics_BaseDescriptor_Fields (id)(name)
 NX_REFLECTION_INSTRUMENT(BaseDescriptor, nx_vms_api_analytics_BaseDescriptor_Fields);
 
+/**%apidoc
+ * %param:{std::vector<DescriptorScope>} scopes
+ */
 struct BaseScopedDescriptor: BaseDescriptor
 {
     BaseScopedDescriptor() = default;
