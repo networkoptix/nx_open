@@ -171,14 +171,19 @@ private:
     Map& idToNode;
 };
 
+inline bool containsId(const std::vector<nx::Uuid>& ids, const nx::Uuid& id)
+{
+    return std::find(ids.begin(), ids.end(), id) != ids.end();
+}
+
 bool canAccess(const Organization& org)
 {
-    return !std::ranges::contains(org.ownRolesIds, kOrganizationSystemHealthViewerId);
+    return !containsId(org.ownRolesIds, kOrganizationSystemHealthViewerId);
 }
 
 bool canAccess(const ChannelPartner& cp)
 {
-    return !std::ranges::contains(cp.ownRolesIds, kChannelPartnerReportsViewerId);
+    return !containsId(cp.ownRolesIds, kChannelPartnerReportsViewerId);
 }
 
 // Checks if the organization can be accessed within the parent channel partner.
