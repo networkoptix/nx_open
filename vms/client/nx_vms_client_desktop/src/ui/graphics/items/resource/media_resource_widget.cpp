@@ -3172,8 +3172,7 @@ void QnMediaResourceWidget::processCloudAuthorizationRequest()
     const auto camera = d->camera.dynamicCast<nx::vms::client::core::CrossSystemCameraResource>();
     if (!camera)
     {
-        NX_ASSERT(false, tr("Cloud authorization request should only be performed "
-                            "for cloud cross system resources"));
+        NX_ASSERT(false, "Cloud authorization request is actual for cross-site resources only");
         return;
     }
 

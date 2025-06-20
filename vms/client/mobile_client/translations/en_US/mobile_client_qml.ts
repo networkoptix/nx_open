@@ -819,6 +819,14 @@
         <source>Folder is empty</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Access to Resources Denied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sites in the Suspended or Shutdown state are not available</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SettingsScreen</name>
