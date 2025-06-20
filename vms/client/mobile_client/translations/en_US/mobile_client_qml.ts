@@ -941,10 +941,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Log in as</source>
         <translation type="unfinished"></translation>
     </message>
@@ -974,6 +970,10 @@
     </message>
     <message>
         <source>Password field cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Host:Port</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
