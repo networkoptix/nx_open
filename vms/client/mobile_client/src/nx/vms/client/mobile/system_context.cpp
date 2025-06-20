@@ -247,6 +247,12 @@ SystemContext::SystemContext(WindowContext* context,
             }
         });
 
+    connect(accessController(), &core::AccessController::permissionsMaybeChanged,
+        this, &SystemContext::hasSearchObjectsPermissionChanged);
+
+    connect(accessController(), &core::AccessController::permissionsMaybeChanged,
+        this, &SystemContext::hasViewBookmarksPermissionChanged);
+
     d->eventRulesWatcher = std::make_unique<nx::client::mobile::EventRulesWatcher>(this);
 
     initializeConnectionUserInteractionDelegate(this);

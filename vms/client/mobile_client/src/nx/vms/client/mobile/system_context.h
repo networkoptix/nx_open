@@ -42,6 +42,12 @@ class SystemContext: public core::SystemContext,
         READ twoWayAudioController
         CONSTANT)
 
+    Q_PROPERTY(bool hasViewBookmarksPermission
+        READ hasViewBookmarksPermission NOTIFY hasViewBookmarksPermissionChanged)
+
+    Q_PROPERTY(bool hasSearchObjectsPermission
+        READ hasSearchObjectsPermission NOTIFY hasSearchObjectsPermissionChanged)
+
 public:
     /**
      * @see nx::vms::client::core::SystemContext
@@ -76,6 +82,10 @@ public:
     Q_INVOKABLE bool hasViewBookmarksPermission();
 
     Q_INVOKABLE bool hasSearchObjectsPermission();
+
+signals:
+    void hasViewBookmarksPermissionChanged();
+    void hasSearchObjectsPermissionChanged();
 
 private:
     struct Private;
