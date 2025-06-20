@@ -232,7 +232,9 @@ QIODevice* QnStorageResource::open(const QString& fileName, QIODevice::OpenMode 
 
 void QnStorageResource::setRuntimeStatusFlags(nx::vms::api::StorageRuntimeFlags flags)
 {
-    m_runtimeStatusFlags = flags;
+    const auto oldFlags = m_runtimeStatusFlags.exchange(flags);
+    if (flags != oldFlags)
+        emit runtimeFlagsChanged(toSharedPointer(this));
 }
 
 nx::vms::api::StorageRuntimeFlags QnStorageResource::runtimeStatusFlags() const

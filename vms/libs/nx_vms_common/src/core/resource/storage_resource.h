@@ -89,6 +89,7 @@ signals:
     void isBackupChanged(const QnResourcePtr& resource);
     void spaceLimitChanged(const QnResourcePtr& resource);
     void typeChanged(const QnResourcePtr& resource);
+    void runtimeFlagsChanged(const QnStorageResourcePtr& storage);
 protected:
     virtual QIODevice* openInternal(const QString &fileName, QIODevice::OpenMode openMode) = 0;
 private:

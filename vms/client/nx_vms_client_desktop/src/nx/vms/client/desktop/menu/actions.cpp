@@ -996,8 +996,8 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Archive filter..."))
         .childFactory(new ChunksFilterActionFactory(manager))
         .condition(condition::hasPermissionsForResources(Qn::ViewFootagePermission)
+            && condition::hasFlags(Qn::cross_system, MatchMode::none)
             && condition::parentServerHasActiveBackupStorage());
-
 
     factory()
         .flags(Slider)

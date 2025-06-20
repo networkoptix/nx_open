@@ -5,6 +5,7 @@
 #include <api/media_server_statistics_manager.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <nx/vms/client/desktop/bookmarks/bookmark_tags_watcher.h>
+#include <nx/vms/client/desktop/camera/storage_location_camera_controller.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
 #include <nx/vms/client/desktop/network/server_port_watcher.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
@@ -65,6 +66,7 @@ struct SystemContext::Private
     std::unique_ptr<ServerRemoteAccessWatcher> serverRemoteAccessWatcher;
     std::unique_ptr<ServerPortWatcher> serverPortWatcher;
     std::unique_ptr<UserNotificationSettingsManager> userNotificationSettingsManager;
+    std::unique_ptr<StorageLocationCameraController> storageLocationCameraController;
 };
 
 } // namespace nx::vms::client::desktop
