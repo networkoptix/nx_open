@@ -6,7 +6,7 @@
     <message>
       <source>Language Name</source>
       <comment>Language name that will be displayed to the user.</comment>
-      <translation>Gallego</translation>
+      <translation>Nome do idioma</translation>
     </message>
   </context>
   <context>
@@ -146,39 +146,39 @@
     </message>
     <message>
       <source>If this error persists, please contact your site administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your site administrator.</translation>
+      <translation>Se este erro persiste, por favor, ponte en contacto co administrador do sitio.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>Está prohibido iniciar sesión como usuario %1 no sitio cando está apagado. Aínda podes conectarte como usuario local.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>Está prohibido iniciar sesión como usuario %1 no sitio nun estado suspendido. Aínda podes conectarte como usuario local.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this site with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this site with %2 user</translation>
+      <translation>Inicia sesión en %1 para iniciar sesión neste sitio co usuario %2</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a site administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a site administrator.</translation>
+      <translation>O límite de duración da sesión pode ser modificado polas persoas administradoras do sistema.</translation>
     </message>
     <message>
       <source>Your access to this site has expired.</source>
-      <translation type="unfinished">Your access to this site has expired.</translation>
+      <translation>O teu acceso a este sitio caducou.</translation>
     </message>
     <message>
       <source>Please contact the site administrator to regain access.</source>
-      <translation type="unfinished">Please contact the site administrator to regain access.</translation>
+      <translation>Por favor, ponte en contacto co administrador do sitio para recuperar o acceso.</translation>
     </message>
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>Para iniciar sesión neste sitio, desactiva &quot;Solicita un código de verificación cada vez que inicies sesión coa túa conta %1&quot; na túa %2.</translation>
     </message>
     <message>
       <source>This user has been disabled by a site administrator.</source>
@@ -244,15 +244,15 @@
     </message>
     <message>
       <source>Review the certificate to ensure you trust the server you are connecting to.</source>
-      <translation type="unfinished">Review the certificate to ensure you trust the server you are connecting to.</translation>
+      <translation>Revisa o certificado para asegurarte de que confías no servidor ao que te estás conectando.</translation>
     </message>
     <message>
       <source>Review the certificates of the servers to ensure you trust the site you are connecting to.</source>
-      <translation type="unfinished">Review the certificates of the servers to ensure you trust the site you are connecting to.</translation>
+      <translation>Revisa os certificados dos servidores para asegurarte de que confías no sitio ao que te estás conectando.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</translation>
+      <translation>Isto pode deberse a un certificado de servidor caducado ou a un certificado non válido. Ponte en contacto co administrador do sitio para máis información.</translation>
     </message>
   </context>
   <context>
@@ -310,7 +310,7 @@
     <message>
       <source>Site (%1)</source>
       <comment>%1 is ip and port of the site</comment>
-      <translation type="unfinished">Site (%1)</translation>
+      <translation>Sitio (%1)</translation>
     </message>
   </context>
   <context>
@@ -463,7 +463,7 @@
     <name>nx::vms::client::core::SingleSystemDescription</name>
     <message>
       <source>Unnamed Site</source>
-      <translation type="unfinished">Unnamed Site</translation>
+      <translation>Sitio sen nome</translation>
     </message>
   </context>
   <context>

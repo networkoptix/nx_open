@@ -5,7 +5,7 @@
     <name>AccessRightHelper</name>
     <message>
       <source>View Live</source>
-      <translation type="unfinished">View Live</translation>
+      <translation>Ver en directo</translation>
     </message>
     <message>
       <source>Play Audio</source>
@@ -13,15 +13,15 @@
     </message>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>Ver arquivo</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>Exportar arquivo</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
-      <translation type="unfinished">View Bookmarks</translation>
+      <translation>Ver marcadores</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>User Input</source>
-      <translation type="unfinished">User Input</translation>
+      <translation>Entrada de usuario</translation>
     </message>
     <message>
       <source>Edit Settings</source>
@@ -60,7 +60,7 @@
     <message>
       <source>Site Event</source>
       <comment>Shows that the bookmark was created by a site event</comment>
-      <translation type="unfinished">Site Event</translation>
+      <translation>Evento do sitio</translation>
     </message>
   </context>
   <context>
@@ -569,14 +569,14 @@
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
-      <translation type="unfinished">%1 has no PTZ presets</translation>
+      <translation>%1 non ten predefinicións PTZ</translation>
     </message>
   </context>
   <context>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>Servidores que admiten diagnóstico de ventiladores</translation>
     </message>
   </context>
   <context>
@@ -587,11 +587,11 @@
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
-      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+      <translation>Esta cámara non está actualmente no deseño seleccionado</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
+      <translation>Esta cámara non está actualmente nalgúns dos deseños seleccionados</translation>
     </message>
   </context>
   <context>
@@ -934,55 +934,55 @@
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>Servidores que admiten monitorización PoE</translation>
     </message>
   </context>
   <context>
     <name>QnRequiredAccessRightPolicy</name>
     <message numerus="yes">
       <source>%n groups</source>
-      <translation type="unfinished">
-        <numerusform>%n groups</numerusform>
-        <numerusform>%n groups</numerusform>
+      <translation>
+        <numerusform>Grupos %n</numerusform>
+        <numerusform>Grupos %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
-        <numerusform>%n users</numerusform>
-        <numerusform>%n users</numerusform>
+      <translation>
+        <numerusform>%n usuarios</numerusform>
+        <numerusform>%n usuarios</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
       <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
-      <translation type="unfinished">%1 and %2 do not have %3 permission for some of selected cameras</translation>
+      <translation>%1 e %2 non teñen permiso %3 para algunhas das cámaras seleccionadas</translation>
     </message>
     <message numerus="yes">
       <source>%n groups do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+      <translation>
+        <numerusform>Os grupos %n non teñen permiso %1 para algunhas das cámaras seleccionadas</numerusform>
+        <numerusform>Os grupos %n non teñen permiso %1 para algunhas das cámaras seleccionadas</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 group does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of selected user group, %2 is the permission name</comment>
-      <translation type="unfinished">%1 group does not have %2 permission for some of selected cameras</translation>
+      <translation>O grupo %1 non ten permiso %2 para algunhas das cámaras seleccionadas</translation>
     </message>
     <message numerus="yes">
       <source>%n users do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+      <translation>
+        <numerusform>%n os usuarios non teñen permiso %1 para algunhas das cámaras seleccionadas</numerusform>
+        <numerusform>%n os usuarios non teñen permiso %1 para algunhas das cámaras seleccionadas</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation type="unfinished">%1 user does not have %2 permission for some of selected cameras</translation>
+      <translation>O usuario %1 non ten permisos %2 para algunhas das cámaras seleccionadas</translation>
     </message>
   </context>
   <context>
@@ -1057,7 +1057,7 @@
     <name>QnSubjectValidationPolicy</name>
     <message>
       <source>None of selected user roles contain users</source>
-      <translation type="unfinished">None of selected user roles contain users</translation>
+      <translation>Ningún dos roles de usuario seleccionados contén usuarios</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1330,11 +1330,11 @@
     <name>QnUsersWithEmailValidationPolicy</name>
     <message>
       <source>Email address is not set for all the selected users.</source>
-      <translation type="unfinished">Email address is not set for all the selected users.</translation>
+      <translation>O enderezo de correo electrónico non está configurado para todos os usuarios seleccionados.</translation>
     </message>
     <message>
       <source>Email address is not set for some selected users.</source>
-      <translation type="unfinished">Email address is not set for some selected users.</translation>
+      <translation>O enderezo de correo electrónico non está configurado para algúns usuarios seleccionados.</translation>
     </message>
   </context>
   <context>
@@ -1506,11 +1506,11 @@
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
-      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+      <translation>ID do sitio local; nulo significa que o sitio aínda non está configurado.</translation>
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+      <translation>Activar ou desactivar a creación de novas solicitudes de rexistro de integración</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed.</source>
