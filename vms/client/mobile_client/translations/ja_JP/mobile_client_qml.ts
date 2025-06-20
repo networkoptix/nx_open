@@ -940,10 +940,6 @@
       <translation>サイトに接続</translation>
     </message>
     <message>
-      <source>Address</source>
-      <translation>アドレス</translation>
-    </message>
-    <message>
       <source>Log in as</source>
       <translation>ログイン:</translation>
     </message>
@@ -974,6 +970,10 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>パスワード欄に入力してください</translation>
+    </message>
+    <message>
+      <source>Host:Port</source>
+      <translation type="unfinished">Host:Port</translation>
     </message>
   </context>
   <context>

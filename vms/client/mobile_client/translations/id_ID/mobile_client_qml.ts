@@ -940,10 +940,6 @@
       <translation>Koneksikan ke Site</translation>
     </message>
     <message>
-      <source>Address</source>
-      <translation>Alamat</translation>
-    </message>
-    <message>
       <source>Log in as</source>
       <translation>Masuk sebagai</translation>
     </message>
@@ -974,6 +970,10 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Bidang kata sandi tidak boleh kosong</translation>
+    </message>
+    <message>
+      <source>Host:Port</source>
+      <translation type="unfinished">Host:Port</translation>
     </message>
   </context>
   <context>

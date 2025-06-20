@@ -940,10 +940,6 @@
       <translation type="unfinished">Connect to Site</translation>
     </message>
     <message>
-      <source>Address</source>
-      <translation>주소</translation>
-    </message>
-    <message>
       <source>Log in as</source>
       <translation type="unfinished">Log in as</translation>
     </message>
@@ -974,6 +970,10 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>비밀번호는 필수 정보입니다.</translation>
+    </message>
+    <message>
+      <source>Host:Port</source>
+      <translation type="unfinished">Host:Port</translation>
     </message>
   </context>
   <context>

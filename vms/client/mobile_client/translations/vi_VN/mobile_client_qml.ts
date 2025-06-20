@@ -940,10 +940,6 @@
       <translation>Kết nối với Chi nhánh</translation>
     </message>
     <message>
-      <source>Address</source>
-      <translation>Địa chỉ</translation>
-    </message>
-    <message>
       <source>Log in as</source>
       <translation>Đăng nhập với tên</translation>
     </message>
@@ -974,6 +970,10 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Mật khẩu không được để trống</translation>
+    </message>
+    <message>
+      <source>Host:Port</source>
+      <translation type="unfinished">Host:Port</translation>
     </message>
   </context>
   <context>

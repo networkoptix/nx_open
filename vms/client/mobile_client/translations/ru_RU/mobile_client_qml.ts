@@ -943,10 +943,6 @@
       <translation>Подключиться к cайту</translation>
     </message>
     <message>
-      <source>Address</source>
-      <translation>Адрес</translation>
-    </message>
-    <message>
       <source>Log in as</source>
       <translation>Войти как</translation>
     </message>
@@ -977,6 +973,10 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation type="unfinished">Password field cannot be empty</translation>
+    </message>
+    <message>
+      <source>Host:Port</source>
+      <translation type="unfinished">Host:Port</translation>
     </message>
   </context>
   <context>

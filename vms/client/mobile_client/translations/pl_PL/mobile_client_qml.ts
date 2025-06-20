@@ -943,10 +943,6 @@
       <translation>Połącz z witryną</translation>
     </message>
     <message>
-      <source>Address</source>
-      <translation>Adres</translation>
-    </message>
-    <message>
       <source>Log in as</source>
       <translation type="unfinished">Log in as</translation>
     </message>
@@ -977,6 +973,10 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Pole Hasło nie może być puste</translation>
+    </message>
+    <message>
+      <source>Host:Port</source>
+      <translation type="unfinished">Host:Port</translation>
     </message>
   </context>
   <context>

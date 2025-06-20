@@ -809,7 +809,7 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Ingen systemer</translation>
     </message>
     <message>
       <source>How to connect?</source>
@@ -941,10 +941,6 @@
       <translation type="unfinished">Connect to Site</translation>
     </message>
     <message>
-      <source>Address</source>
-      <translation>Adresse</translation>
-    </message>
-    <message>
       <source>Log in as</source>
       <translation type="unfinished">Log in as</translation>
     </message>
@@ -975,6 +971,10 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Passordfeltet kan ikke være tomt</translation>
+    </message>
+    <message>
+      <source>Host:Port</source>
+      <translation type="unfinished">Host:Port</translation>
     </message>
   </context>
   <context>

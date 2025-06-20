@@ -941,10 +941,6 @@
       <translation>Anslut till sajten</translation>
     </message>
     <message>
-      <source>Address</source>
-      <translation>Adress</translation>
-    </message>
-    <message>
       <source>Log in as</source>
       <translation>Logga in som</translation>
     </message>
@@ -975,6 +971,10 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Lösenordsfältet får inte vara tomt</translation>
+    </message>
+    <message>
+      <source>Host:Port</source>
+      <translation type="unfinished">Host:Port</translation>
     </message>
   </context>
   <context>

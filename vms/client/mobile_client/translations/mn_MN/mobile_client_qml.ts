@@ -941,10 +941,6 @@
       <translation type="unfinished">Connect to Site</translation>
     </message>
     <message>
-      <source>Address</source>
-      <translation>Хаяг</translation>
-    </message>
-    <message>
       <source>Log in as</source>
       <translation type="unfinished">Log in as</translation>
     </message>
@@ -975,6 +971,10 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Талбар хоосон байж болохгүй</translation>
+    </message>
+    <message>
+      <source>Host:Port</source>
+      <translation type="unfinished">Host:Port</translation>
     </message>
   </context>
   <context>

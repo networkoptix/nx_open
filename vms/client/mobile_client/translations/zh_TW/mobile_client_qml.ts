@@ -940,10 +940,6 @@
       <translation>連線到站點</translation>
     </message>
     <message>
-      <source>Address</source>
-      <translation>位址</translation>
-    </message>
-    <message>
       <source>Log in as</source>
       <translation>登入身份</translation>
     </message>
@@ -974,6 +970,10 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>密碼欄位不能為空</translation>
+    </message>
+    <message>
+      <source>Host:Port</source>
+      <translation type="unfinished">Host:Port</translation>
     </message>
   </context>
   <context>
