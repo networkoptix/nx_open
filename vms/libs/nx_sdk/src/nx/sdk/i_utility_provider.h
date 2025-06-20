@@ -89,7 +89,7 @@ public:
     virtual void subscribeForCloudTokenUpdate(ICloudTokenSubscriber* subscriber) = 0;
 };
 
-class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider3>
+class IUtilityProvider4: public Interface<IUtilityProvider4, IUtilityProvider3>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider4"); }
@@ -139,6 +139,14 @@ public:
             requestDomainName, url, httpMethod, mimeType, requestBody, callback.get());
     }
 };
-using IUtilityProvider4 = IUtilityProvider;
+
+class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider4>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider5"); }
+
+    virtual IString* cloudSystemId() const = 0;
+};
+using IUtilityProvider5 = IUtilityProvider;
 
 } // namespace nx::sdk
