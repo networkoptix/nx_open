@@ -30,12 +30,12 @@ QList<QAction*> ChunksFilterActionFactory::newActions(
     auto actionGroup = new QActionGroup(parent);
     actionGroup->setExclusive(true);
 
-    auto cameraDataManager = appContext()->currentSystemContext()->cameraDataManager();
+    auto systemContext = appContext()->currentSystemContext();
 
-    const auto currentMode = cameraDataManager->storageLocation();
+    const auto currentMode = systemContext->cameraDataManager()->storageLocation();
 
     auto addAction =
-        [this, actionGroup, parent, currentMode, cameraDataManager]
+        [this, actionGroup, parent, currentMode, systemContext]
         (StorageLocation mode, const QString& text)
         {
             auto action = new QAction(parent);
@@ -43,11 +43,10 @@ QList<QAction*> ChunksFilterActionFactory::newActions(
             action->setCheckable(true);
             action->setChecked(currentMode == mode);
             connect(action, &QAction::triggered, this,
-                [this, mode, cameraDataManager]
+                [this, mode, systemContext]
                 {
-                    cameraDataManager->setStorageLocation(mode);
-                    workbenchContext()->instance<StorageLocationCameraController>()
-                        ->setStorageLocation(mode);
+                    systemContext->cameraDataManager()->setStorageLocation(mode);
+                    systemContext->storageLocationCameraController()->setStorageLocation(mode);
                 });
             actionGroup->addAction(action);
         };

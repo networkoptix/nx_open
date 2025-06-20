@@ -1290,8 +1290,13 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
             {
                 if (auto camDisplay = mediaWidget->camDisplay())
                     appContext()->radassController()->registerConsumer(camDisplay);
-                if (auto display = mediaWidget->display())
-                    context()->instance<StorageLocationCameraController>()->registerConsumer(display);
+                if (auto display = mediaWidget->display(); display && mediaWidget->systemContext()
+                    && mediaWidget->systemContext()->storageLocationCameraController())
+                {
+                    mediaWidget->systemContext()
+                       ->storageLocationCameraController()
+                       ->registerConsumer(display);
+                }
             }
 
         }
@@ -1352,8 +1357,12 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item)
     {
         if (auto camDisplay = mediaWidget->camDisplay())
             appContext()->radassController()->unregisterConsumer(camDisplay);
-        if (auto display = mediaWidget->display())
-            context()->instance<StorageLocationCameraController>()->unregisterConsumer(display);
+        if (auto display = mediaWidget->display(); display && mediaWidget->systemContext()
+            && mediaWidget->systemContext()->storageLocationCameraController())
+        {
+            mediaWidget->systemContext()->storageLocationCameraController()->unregisterConsumer(
+                display);
+        }
     }
 
     delete widget;

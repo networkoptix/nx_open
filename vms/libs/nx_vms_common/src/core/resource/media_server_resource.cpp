@@ -848,3 +848,15 @@ void QnMediaServerResource::setHardwareDecodingEnabled(bool value)
         value == kHardwareDecodingEnabledDefaultValue ? QString() : QnLexical::serialized(value)
     );
 }
+
+bool QnMediaServerResource::hasActiveBackupStorages() const
+{
+    return std::ranges::any_of(getStorages(),
+        [](const auto& storageResource)
+        {
+            const auto statusFlags = storageResource->runtimeStatusFlags();
+            return !statusFlags.testFlag(nx::vms::api::StorageRuntimeFlag::disabled)
+                && storageResource->isBackup()
+                && storageResource->isUsedForWriting();
+        });
+}

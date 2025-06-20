@@ -2618,25 +2618,6 @@ ConditionWrapper hardwareVideoDecodingDisabled()
         });
 }
 
-namespace {
-
-bool hasActiveBackupStorage(const QnMediaServerResourcePtr& server)
-{
-    if (!server)
-        return false;
-
-    return std::ranges::any_of(server->getStorages(),
-        [](const auto& storageResource)
-        {
-            const auto statusFlags = storageResource->runtimeStatusFlags();
-            return !statusFlags.testFlag(nx::vms::api::StorageRuntimeFlag::disabled)
-                && storageResource->isBackup()
-                && storageResource->isUsedForWriting();
-        });
-}
-
-} // namespace
-
 ConditionWrapper parentServerHasActiveBackupStorage()
 {
     return new ResourcesCondition(
@@ -2645,7 +2626,8 @@ ConditionWrapper parentServerHasActiveBackupStorage()
             return std::ranges::any_of(resources.filtered<QnVirtualCameraResource>(),
                 [](const auto& camera)
                 {
-                    return hasActiveBackupStorage(camera->getParentServer());
+                    return camera->getParentServer()
+                        && camera->getParentServer()->hasActiveBackupStorages();
                 });
         });
 }

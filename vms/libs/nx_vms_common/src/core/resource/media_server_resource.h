@@ -179,6 +179,8 @@ public:
     bool isHardwareDecodingEnabled() const;
     void setHardwareDecodingEnabled(bool value);
 
+    bool hasActiveBackupStorages() const;
+
 protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
     virtual void atPropertyChanged(const QnResourcePtr& self, const QString& key);
