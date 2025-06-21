@@ -3486,10 +3486,6 @@ Licensnyckel: %2</translation>
         <numerusform>Ställ in för %n enheter</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation>Begäran om molnbehörighet ska endast utföras för molnöverskridande systemresurser</translation>
-    </message>
   </context>
   <context>
     <name>QnMessageBox</name>

@@ -3485,10 +3485,6 @@ License Key: %2</source>
         <numerusform>Set for %n devices</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation type="unfinished">Cloud authorization request should only be performed for cloud cross system resources</translation>
-    </message>
   </context>
   <context>
     <name>QnMessageBox</name>

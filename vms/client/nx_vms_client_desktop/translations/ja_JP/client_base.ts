@@ -3453,10 +3453,6 @@ License Key: %2</source>
         <numerusform>%n デバイスに設定</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation>クラウド認証リクエストは、クラウドのクロスシステムリソースに対してのみ実行する必要があります。</translation>
-    </message>
   </context>
   <context>
     <name>QnMessageBox</name>

@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>Xestión de rexistros</translation>
     </message>
     <message>
       <source>Download</source>
@@ -204,7 +204,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detalles</translation>
     </message>
     <message>
       <source>Audit Trail</source>
@@ -539,7 +539,7 @@
     <name>CameraHotspotsSettingsWidget</name>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Puntos de interese</translation>
     </message>
     <message>
       <source>Add</source>
@@ -613,7 +613,7 @@
     <name>CameraLicensePanelWidget</name>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Activar licenza...</translation>
     </message>
   </context>
   <context>
@@ -678,7 +678,7 @@
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Activar licenza...</translation>
     </message>
     <message>
       <source>Copying Schedule</source>
@@ -878,7 +878,7 @@
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Deter</translation>
     </message>
     <message>
       <source>Add all Devices</source>
@@ -1044,7 +1044,7 @@
     <name>FailoverWidget</name>
     <message>
       <source>Failover</source>
-      <translation type="unfinished">Failover</translation>
+      <translation>Conmutación por erro</translation>
     </message>
     <message>
       <source>Server Location ID:</source>
@@ -1201,7 +1201,7 @@
     </message>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Sen imaxe</translation>
     </message>
   </context>
   <context>
@@ -1373,7 +1373,7 @@
     </message>
     <message>
       <source>Activate License</source>
-      <translation type="unfinished">Activate License</translation>
+      <translation>Activar licenza</translation>
     </message>
     <message>
       <source>Internet Activation</source>
@@ -1808,7 +1808,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detalles</translation>
     </message>
     <message>
       <source>No Tour Selected</source>
@@ -1839,7 +1839,7 @@
     </message>
     <message>
       <source>Hotkey:</source>
-      <translation type="unfinished">Hotkey:</translation>
+      <translation>Tecla de atallo:</translation>
     </message>
   </context>
   <context>
@@ -2061,11 +2061,11 @@
     </message>
     <message>
       <source>rewind for</source>
-      <translation type="unfinished">rewind for</translation>
+      <translation>retroceder para</translation>
     </message>
     <message>
       <source>Live</source>
-      <translation type="unfinished">Live</translation>
+      <translation>En vivo</translation>
     </message>
   </context>
   <context>
@@ -2269,7 +2269,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detalles</translation>
     </message>
   </context>
   <context>
@@ -2405,7 +2405,7 @@
     </message>
     <message>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Seleccionar usuarias/os</translation>
     </message>
     <message>
       <source>Nothing matches your search.</source>
@@ -2586,7 +2586,7 @@
     </message>
     <message>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>Avanzado</translation>
     </message>
     <message>
       <source>Allow using Client API</source>

@@ -133,7 +133,7 @@
     </message>
     <message>
       <source>Connection failed</source>
-      <translation type="unfinished">Connection failed</translation>
+      <translation>Fallou a conexión</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>

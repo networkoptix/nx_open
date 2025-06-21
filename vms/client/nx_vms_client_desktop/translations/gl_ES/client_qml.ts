@@ -272,7 +272,7 @@
     <name>AnalyticsSettingsMenu</name>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Complementos</translation>
     </message>
     <message>
       <source>API Integrations</source>
@@ -376,9 +376,9 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Usuarios</numerusform>
+        <numerusform>%n Usuarios</numerusform>
       </translation>
     </message>
     <message>
@@ -450,35 +450,35 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>CameraSelector</name>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Calquera dispositivo</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Calquera cámara</translation>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Dispositivos en deseño</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Cámaras en deseño</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Dispositivo seleccionado</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Cámara seleccionada</translation>
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Escoller dispositivos...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Escoller cámaras...</translation>
     </message>
     <message>
       <source>none</source>
@@ -486,25 +486,25 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n dispositivos escollidos</numerusform>
+        <numerusform>%n dispositivos escollidos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n cámaras escollidas</numerusform>
+        <numerusform>%n cámaras escollidas</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Dispositivo escollido</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Cámara escollida</translation>
     </message>
   </context>
   <context>
@@ -628,19 +628,19 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>CounterBlock</name>
     <message>
       <source>Hide information</source>
-      <translation type="unfinished">Hide information</translation>
+      <translation>Ocultar información</translation>
     </message>
     <message>
       <source>Show information</source>
-      <translation type="unfinished">Show information</translation>
+      <translation>Mostrar información</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation type="unfinished">Hide thumbnails</translation>
+      <translation>Ocultar miniaturas</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation type="unfinished">Show thumbnails</translation>
+      <translation>Mostrar miniaturas</translation>
     </message>
   </context>
   <context>
@@ -670,7 +670,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>DewarpingSettings</name>
     <message>
       <source>Dewarping</source>
-      <translation type="unfinished">Dewarping</translation>
+      <translation>Corrección de distorsión</translation>
     </message>
     <message>
       <source>Fisheye</source>
@@ -1198,7 +1198,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>Importar dende dispositivos</translation>
     </message>
   </context>
   <context>
@@ -1616,7 +1616,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>LookupListsDialog</name>
     <message>
       <source>Lookup Lists</source>
-      <translation type="unfinished">Lookup Lists</translation>
+      <translation>Listas de busca</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1988,7 +1988,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>Plugins</name>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Complementos</translation>
     </message>
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
@@ -2355,7 +2355,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourcePreview</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>SEN DATOS</translation>
     </message>
     <message>
       <source>OUTDATED</source>
@@ -2568,7 +2568,7 @@ Press Alt + Click to follow object</translation>
     <name>StatusOverlay</name>
     <message>
       <source>Diagnostics</source>
-      <translation type="unfinished">Diagnostics</translation>
+      <translation>Diagnósticos</translation>
     </message>
     <message>
       <source>Enable</source>
@@ -2576,7 +2576,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation type="unfinished">Activate License</translation>
+      <translation>Activar licenza</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -2584,7 +2584,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation type="unfinished">I/O Module Settings</translation>
+      <translation>Axustes do módulo I/O (E/S)</translation>
     </message>
     <message>
       <source>Device Settings</source>
@@ -2592,13 +2592,13 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>Configurar para esta cámara</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>Definir para todas as cámaras %n</numerusform>
+        <numerusform>Definir para todas as cámaras %n</numerusform>
       </translation>
     </message>
     <message>
@@ -2611,7 +2611,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
-      <translation type="unfinished">Please check authentication information</translation>
+      <translation>Por favor, comproba a información de autenticación</translation>
     </message>
     <message>
       <source>No signal</source>
@@ -2790,7 +2790,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation type="unfinished">Selected on Timeline</translation>
+      <translation>Seleccionado na liña de tempo</translation>
     </message>
     <message>
       <source>Time is unavailable due to DST changes</source>

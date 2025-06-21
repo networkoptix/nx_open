@@ -3453,10 +3453,6 @@ Kunci Lisensi: %2</translation>
         <numerusform>Ditetapkan untuk %n perangkat</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation>Permintaan otorisasi cloud hanya boleh dilakukan untuk resources lintas sistem cloud</translation>
-    </message>
   </context>
   <context>
     <name>QnMessageBox</name>

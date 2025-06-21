@@ -3453,10 +3453,6 @@ License Key: %2</source>
         <numerusform>為 %n 台裝置設定</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation>雲端授權請求僅應針對雲端跨系統資源執行</translation>
-    </message>
   </context>
   <context>
     <name>QnMessageBox</name>
