@@ -104,7 +104,7 @@
     <name>QQuickWebEngineView</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Deter</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
@@ -183,7 +183,7 @@
     <name>QWebEnginePage</name>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Deter</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>

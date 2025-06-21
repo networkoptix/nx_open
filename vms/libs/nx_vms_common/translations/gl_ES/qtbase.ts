@@ -1076,7 +1076,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Pictures</source>
-      <translation type="unfinished">Pictures</translation>
+      <translation>Imaxes</translation>
     </message>
     <message>
       <source>Temporary Directory</source>

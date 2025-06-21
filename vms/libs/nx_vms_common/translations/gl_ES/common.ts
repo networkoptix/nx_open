@@ -91,7 +91,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Evento do sistema</translation>
     </message>
     <message>
       <source>Removed camera</source>
@@ -1264,7 +1264,7 @@
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integración</translation>
     </message>
     <message>
       <source>Cloud storage</source>
@@ -2146,7 +2146,7 @@
     </message>
     <message>
       <source>stop</source>
-      <translation type="unfinished">stop</translation>
+      <translation>deter</translation>
     </message>
     <message>
       <source>While %1</source>
@@ -2162,14 +2162,14 @@
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Usuarios</numerusform>
+        <numerusform>%n Usuarios</numerusform>
       </translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Todas as persoas usuarias</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -2442,9 +2442,9 @@
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>Grupos %n</numerusform>
+        <numerusform>Grupos %n</numerusform>
       </translation>
     </message>
     <message>
