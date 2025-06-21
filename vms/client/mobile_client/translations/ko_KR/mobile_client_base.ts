@@ -19,13 +19,6 @@
     </message>
   </context>
   <context>
-    <name>PtzCameraButtonController</name>
-    <message>
-      <source>Control PTZ</source>
-      <translation>PTZ 제어</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudSystemInformationWatcher</name>
     <message>
       <source>Owner: %1</source>
@@ -80,6 +73,13 @@
     <message>
       <source>Please check a network connection.</source>
       <translation>인터넷 연결을 확인하세요</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::mobile::PtzCameraButtonController</name>
+    <message>
+      <source>Control PTZ</source>
+      <translation type="unfinished">Control PTZ</translation>
     </message>
   </context>
   <context>
