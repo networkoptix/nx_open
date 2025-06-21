@@ -341,7 +341,15 @@ Page
                     return
 
                 if (!systemTabs.visible)
+                {
+                    // If no tabs are going to be visible, select the Sites tab.
+                    if (!organizationsModel.hasChannelPartners
+                        && !organizationsModel.hasOrganizations)
+                    {
+                        sitesTabButton.checked = true
+                    }
                     return
+                }
 
                 // Avoid switching tabs when selected tab is already visible.
                 if (tabGroup.checkedButton?.visible)
