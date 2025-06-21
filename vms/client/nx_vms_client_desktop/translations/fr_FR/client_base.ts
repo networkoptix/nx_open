@@ -3486,10 +3486,6 @@ Clé de licence : %2</translation>
         <numerusform>Défini pour %n appareils</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation>La demande d'autorisation cloud ne doit être effectuée que pour les ressources inter-systèmes cloud</translation>
-    </message>
   </context>
   <context>
     <name>QnMessageBox</name>

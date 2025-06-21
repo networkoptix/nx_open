@@ -96,11 +96,11 @@
     </message>
     <message>
       <source>Added</source>
-      <translation type="unfinished">Added</translation>
+      <translation>Engadido</translation>
     </message>
     <message>
       <source>Adding</source>
-      <translation type="unfinished">Adding</translation>
+      <translation>Engadindo</translation>
     </message>
   </context>
   <context>
@@ -2874,7 +2874,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Log In...</source>
-      <translation type="unfinished">Log In...</translation>
+      <translation>Iniciar sesión...</translation>
     </message>
     <message>
       <source>Your session has expired</source>
@@ -2882,7 +2882,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
-      <translation type="unfinished">Please sign in again with your link to continue</translation>
+      <translation>Volve iniciar sesión coa túa ligazón para continuar</translation>
     </message>
     <message>
       <source>Site is not compatible with two-factor authentication</source>
@@ -2972,29 +2972,29 @@ Clave de licenza: %2</translation>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
-      <translation type="unfinished">Overwrite existing file?</translation>
+      <translation>Sobrescribir o ficheiro existente?</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Non se puido sobrescribir o ficheiro</translation>
     </message>
   </context>
   <context>
     <name>QnGLCheckerInstrument</name>
     <message>
       <source>Video card drivers are outdated or not installed</source>
-      <translation type="unfinished">Video card drivers are outdated or not installed</translation>
+      <translation>Os controladores da tarxeta de vídeo están desactualizados ou non están instalados</translation>
     </message>
     <message>
       <source>%1 may not work properly.</source>
-      <translation type="unfinished">%1 may not work properly.</translation>
+      <translation>Pode que %1 non funcione correctamente.</translation>
     </message>
   </context>
   <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Folder already added</source>
-      <translation type="unfinished">Folder already added</translation>
+      <translation>Cartafol xa engadido</translation>
     </message>
     <message>
       <source>None</source>
@@ -3002,7 +3002,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>Automático (%1)</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -3017,11 +3017,11 @@ Clave de licenza: %2</translation>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
       <source>Open Event Log</source>
-      <translation type="unfinished">Open Event Log</translation>
+      <translation>Abrir rexistro de eventos</translation>
     </message>
     <message>
       <source>Open Bookmarks List</source>
-      <translation type="unfinished">Open Bookmarks List</translation>
+      <translation>Abrir a lista de marcadores</translation>
     </message>
     <message>
       <source>Event Rules</source>
@@ -3041,27 +3041,27 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Device List</source>
-      <translation type="unfinished">Device List</translation>
+      <translation>Lista de dispositivos</translation>
     </message>
     <message>
       <source>Camera List</source>
-      <translation type="unfinished">Camera List</translation>
+      <translation>Lista de cámaras</translation>
     </message>
     <message>
       <source>Open Event Rules Management</source>
-      <translation type="unfinished">Open Event Rules Management</translation>
+      <translation>Abri Xestión de regras de eventos</translation>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
-      <translation type="unfinished">Open Audit Trail Log</translation>
+      <translation>Abrir rexistro de seguimento de auditoría</translation>
     </message>
     <message>
       <source>Open Device List</source>
-      <translation type="unfinished">Open Device List</translation>
+      <translation>Abrir a lista de dispositivos</translation>
     </message>
     <message>
       <source>Open Camera List</source>
-      <translation type="unfinished">Open Camera List</translation>
+      <translation>Abrir a lista de cámaras</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -3076,7 +3076,7 @@ Clave de licenza: %2</translation>
     <name>QnHistogramWidget</name>
     <message>
       <source>Gamma %1</source>
-      <translation type="unfinished">Gamma %1</translation>
+      <translation>Gamma %1</translation>
     </message>
   </context>
   <context>
@@ -3087,7 +3087,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Default state</source>
-      <translation type="unfinished">Default state</translation>
+      <translation>Estado predeterminado</translation>
     </message>
     <message>
       <source>Name</source>
@@ -3106,12 +3106,12 @@ Clave de licenza: %2</translation>
     <message>
       <source>Input</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Input</translation>
+      <translation>Entrada</translation>
     </message>
     <message>
       <source>Output</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Output</translation>
+      <translation>Saída</translation>
     </message>
     <message>
       <source>Invalid</source>
@@ -3121,16 +3121,16 @@ Clave de licenza: %2</translation>
     <message>
       <source>Grounded circuit</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Grounded circuit</translation>
+      <translation>Circuíto conectado a terra</translation>
     </message>
     <message>
       <source>Invalid state</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Invalid state</translation>
+      <translation>Estado non válido</translation>
     </message>
     <message>
       <source>On click</source>
-      <translation type="unfinished">On click</translation>
+      <translation>Cando prema</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -3139,17 +3139,17 @@ Clave de licenza: %2</translation>
     <message>
       <source>Open circuit</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Open circuit</translation>
+      <translation>Circuíto aberto</translation>
     </message>
     <message>
       <source>Toggle state</source>
       <comment>IO Output Port Action</comment>
-      <translation type="unfinished">Toggle state</translation>
+      <translation>Alternar estado</translation>
     </message>
     <message>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
-      <translation type="unfinished">Impulse</translation>
+      <translation>Impulso</translation>
     </message>
     <message>
       <source>ID</source>
@@ -3160,22 +3160,22 @@ Clave de licenza: %2</translation>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>Por favor, introduce un valor.</translation>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>Por favor, insire un contrasinal.</translation>
     </message>
   </context>
   <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
       <source>Failed to turn off I/O port %1</source>
-      <translation type="unfinished">Failed to turn off I/O port %1</translation>
+      <translation>Non se puido desactivar o porto de E/S (I/O) %1</translation>
     </message>
     <message>
       <source>Failed to turn on I/O port %1</source>
-      <translation type="unfinished">Failed to turn on I/O port %1</translation>
+      <translation>Non se puido activar o porto de E/S (I/O) %1</translation>
     </message>
   </context>
   <context>
@@ -3292,7 +3292,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Not verified</source>
-      <translation type="unfinished">Not verified</translation>
+      <translation>Sen verificar</translation>
     </message>
   </context>
   <context>
@@ -3315,16 +3315,16 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>Envía a clave de licenza e o ID de hardware proporcionados ao teu soporte rexional/de licenzas para obter un ficheiro de clave de activación.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>Envía a clave de licenza e o ID de hardware proporcionados ao teu soporte rexional / de licenzas (%1) para obter un ficheiro de clave de activación.</translation>
     </message>
     <message>
       <source>Text Files</source>
-      <translation type="unfinished">Text Files</translation>
+      <translation>Ficheiros de texto</translation>
     </message>
   </context>
   <context>
@@ -3335,27 +3335,27 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation type="unfinished">Look and Feel</translation>
+      <translation>Aparencia e comportamento</translation>
     </message>
     <message>
       <source>Screen Recording</source>
-      <translation type="unfinished">Screen Recording</translation>
+      <translation>Gravación de pantalla</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>Avanzado</translation>
     </message>
     <message>
       <source>Restart required</source>
-      <translation type="unfinished">Restart required</translation>
+      <translation>É necesario reiniciar</translation>
     </message>
     <message>
       <source>Restart Now</source>
-      <translation type="unfinished">Restart Now</translation>
+      <translation>Reiniciar agora</translation>
     </message>
     <message>
       <source>Restart Later</source>
-      <translation type="unfinished">Restart Later</translation>
+      <translation>Reiniciar máis tarde</translation>
     </message>
     <message>
       <source>Some changes will take effect only after %1 restart</source>
@@ -3485,10 +3485,6 @@ Clave de licenza: %2</translation>
         <numerusform>Configurar para dispositivos %n</numerusform>
         <numerusform>Configurar para dispositivos %n</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation>A solicitude de autorización na nube só debe realizarse para recursos entre sistemas na nube</translation>
     </message>
   </context>
   <context>
@@ -3649,21 +3645,21 @@ Clave de licenza: %2</translation>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation type="unfinished">
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
+      <translation>
+        <numerusform>Esta configuración predefinida activarase despois de %n minutos de inactividade</numerusform>
+        <numerusform>Esta configuración predefinida activarase despois de %n minutos de inactividade</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation type="unfinished">
-        <numerusform>Tour has %n identical positions</numerusform>
-        <numerusform>Tour has %n identical positions</numerusform>
+      <translation>
+        <numerusform>A visita guiada ten %n posicións idénticas</numerusform>
+        <numerusform>A visita guiada ten %n posicións idénticas</numerusform>
       </translation>
     </message>
     <message>
       <source>less than a minute</source>
-      <translation type="unfinished">less than a minute</translation>
+      <translation>menos de 1 minuto</translation>
     </message>
     <message>
       <source>Invalid tour</source>
@@ -4339,19 +4335,19 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>Últimos 60 minutos</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>Últimas 24 horas</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>Período máis longo dispoñible</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>Previsión dispoñible só para cámaras con gravación activada.</translation>
     </message>
   </context>
   <context>
@@ -4366,35 +4362,35 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
-      <translation type="unfinished">Depending on the total size of the archive, reindexing can take up to several hours.</translation>
+      <translation>Dependendo do tamaño total do arquivo, a reindexación pode levar ata varias horas.</translation>
     </message>
     <message>
       <source>Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</source>
-      <translation type="unfinished">Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</translation>
+      <translation>A reindexación só é necesaria se os cartafoles de arquivo foron movidos, renomeados ou eliminados.</translation>
     </message>
     <message>
       <source>You can cancel this operation at any moment without data loss.</source>
-      <translation type="unfinished">You can cancel this operation at any moment without data loss.</translation>
+      <translation>Podes cancelar esta operación en calquera momento sen perda de datos.</translation>
     </message>
     <message>
       <source>Continue anyway?</source>
-      <translation type="unfinished">Continue anyway?</translation>
+      <translation>Continuar de todos os xeitos?</translation>
     </message>
     <message>
       <source>Hard disk load will increase significantly</source>
-      <translation type="unfinished">Hard disk load will increase significantly</translation>
+      <translation>A carga do disco duro aumentará significativamente</translation>
     </message>
     <message>
       <source>Archive reindexing completed</source>
-      <translation type="unfinished">Archive reindexing completed</translation>
+      <translation>Reindexación do arquivo completada</translation>
     </message>
     <message>
       <source>Backup reindexing completed</source>
-      <translation type="unfinished">Backup reindexing completed</translation>
+      <translation>Reindexación da copia de seguridade completada</translation>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
-      <translation type="unfinished">Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</translation>
+      <translation>A reindexación pode solucionar problemas co arquivo ou a copia de seguridade se se perdeu ou danou, ou se se substituíu algún hardware.</translation>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
@@ -4415,28 +4411,28 @@ Clave de licenza: %2</translation>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Os datos analíticos actuais non se moverán automaticamente a outra localización e serán inaccesibles. Podes conservalos e movelos manualmente máis tarde ou eliminalos permanentemente.
+Se tiñas intención de mover os datos analíticos a outra localización de almacenamento, ponte en contacto co servizo de asistencia antes de continuar.</translation>
     </message>
     <message>
       <source>Insufficient permissions to store analytics data.</source>
-      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+      <translation>Permisos insuficientes para almacenar datos analíticos.</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Os datos de análise poden ocupar moito espazo. Recomendámosche escoller outra localización para eles en lugar da partición do sistema.</translation>
     </message>
     <message>
       <source>Analytics and motion data will continue to be stored on the disabled storage</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage</translation>
+      <translation>Os datos analíticos e de movemento seguirán almacenándose no almacenamento desactivado</translation>
     </message>
     <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>A gravación na localización de almacenamento desactivada deterase. Non obstante, a eliminación de imaxes desactualizadas continuará.</translation>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>Activouse a gravación no almacenamento USB</translation>
     </message>
     <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
@@ -4516,7 +4512,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnStorageListModel</name>
     <message>
       <source>Invalid storage</source>
-      <translation type="unfinished">Invalid storage</translation>
+      <translation>Almacenamento non válido</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -4528,15 +4524,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 (Checking...)</source>
-      <translation type="unfinished">%1 (Checking...)</translation>
+      <translation>%1 (Comprobando...)</translation>
     </message>
     <message>
       <source>%1 (Scanning... %2%)</source>
-      <translation type="unfinished">%1 (Scanning... %2%)</translation>
+      <translation>%1 (Escaneando... %2%)</translation>
     </message>
     <message>
       <source>%1 (Rebuilding... %2%)</source>
-      <translation type="unfinished">%1 (Rebuilding... %2%)</translation>
+      <translation>%1 (Reconstruíndo... %2%)</translation>
     </message>
     <message>
       <source>Loading...</source>
@@ -4552,7 +4548,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
-      <translation type="unfinished">Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
+      <translation>Demasiado pequenas e as particións do sistema están reservadas e non se usan para escribir se hai espazo de almacenamento dabondo dispoñible.</translation>
     </message>
     <message>
       <source>Reserved</source>
@@ -4564,15 +4560,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>óptico</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>intercambio</translation>
     </message>
     <message>
       <source>network</source>
@@ -4580,15 +4576,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>smb</source>
-      <translation type="unfinished">smb</translation>
+      <translation>smb</translation>
     </message>
     <message>
       <source>Use to store analytics and motion data</source>
-      <translation type="unfinished">Use to store analytics and motion data</translation>
+      <translation>Úsase para almacenar análises e datos de movemento</translation>
     </message>
     <message>
       <source>Stores analytics and motion data</source>
-      <translation type="unfinished">Stores analytics and motion data</translation>
+      <translation>Almacena datos analíticos e de movemento</translation>
     </message>
     <message>
       <source>cloud</source>
@@ -4604,7 +4600,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Purpose</source>
-      <translation type="unfinished">Purpose</translation>
+      <translation>Finalidade</translation>
     </message>
     <message>
       <source>Size</source>
@@ -4651,30 +4647,30 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnStorageRebuildWidget</name>
     <message>
       <source>Fast Backup Scan...</source>
-      <translation type="unfinished">Fast Backup Scan...</translation>
+      <translation>Escaneado rápido de copia de seguridade...</translation>
     </message>
     <message>
       <source>Fast Archive Scan...</source>
-      <translation type="unfinished">Fast Archive Scan...</translation>
+      <translation>Escaneado rápido de arquivos...</translation>
     </message>
     <message>
       <source>Reindexing Backup...</source>
-      <translation type="unfinished">Reindexing Backup...</translation>
+      <translation>Reindexando a copia de seguridade...</translation>
     </message>
     <message>
       <source>Reindexing Archive...</source>
-      <translation type="unfinished">Reindexing Archive...</translation>
+      <translation>Reindexando o arquivo...</translation>
     </message>
   </context>
   <context>
     <name>QnStorageUrlDialog</name>
     <message>
       <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-      <translation type="unfinished">\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
+      <translation>\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
     </message>
     <message>
       <source>Network Shared Resource</source>
-      <translation type="unfinished">Network Shared Resource</translation>
+      <translation>Recurso compartido en rede</translation>
     </message>
     <message>
       <source>Invalid credentials for external storage</source>
@@ -4900,7 +4896,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
+      <translation>Chamando...</translation>
     </message>
     <message>
       <source>Missed call</source>
@@ -5036,19 +5032,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnSystemSettingsWidget</name>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
-      <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
+      <translation>Non inclúe ningunha información persoal e é completamente anónimo.</translation>
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+      <translation>Activar a detección automática de dispositivos e servidores e a comprobación automatizada do estado dos dispositivos</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+      <translation>Activar a detección automática de cámaras e servidores e a comprobación automatizada do estado das cámaras</translation>
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>Se a conmutación por erro está activada, o servidor aínda pode solicitar actualizacións do estado da cámara independentemente desta configuración.</translation>
     </message>
     <message>
       <source>When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</source>
@@ -5071,26 +5067,26 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnTableExportHelper</name>
     <message>
       <source>Close all programs which may use this file and try again</source>
-      <translation type="unfinished">Close all programs which may use this file and try again</translation>
+      <translation>Pecha todos os programas que poidan usar este ficheiro e téntao de novo</translation>
     </message>
     <message>
       <source>File used by another process</source>
-      <translation type="unfinished">File used by another process</translation>
+      <translation>Ficheiro usado por outro proceso</translation>
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>Ficheiro HTML</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
+      <translation>Ficheiro de folla de cálculo (CSV)</translation>
     </message>
   </context>
   <context>
     <name>QnTimeSlider</name>
     <message>
       <source>No thumbnails available</source>
-      <translation type="unfinished">No thumbnails available</translation>
+      <translation>Non hai miniaturas dispoñibles</translation>
     </message>
   </context>
   <context>
@@ -5728,7 +5724,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Sen definir</translation>
     </message>
     <message>
       <source>Lst</source>
@@ -5851,9 +5847,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>Grupos %n</numerusform>
+        <numerusform>Grupos %n</numerusform>
       </translation>
     </message>
     <message>
@@ -6076,9 +6072,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n groups</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups</numerusform>
-        <numerusform>Delete %n groups</numerusform>
+      <translation>
+        <numerusform>Borrar %n grupos</numerusform>
+        <numerusform>Borrar %n grupos</numerusform>
       </translation>
     </message>
     <message>
@@ -6109,7 +6105,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Todas as persoas usuarias</translation>
     </message>
     <message>
       <source>Users with Digest Authentication</source>
@@ -6133,9 +6129,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n users</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n users</numerusform>
-        <numerusform>Delete %n users</numerusform>
+      <translation>
+        <numerusform>Queres eliminar %n usuarios</numerusform>
+        <numerusform>Queres eliminar %n usuarios</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6321,11 +6317,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Dispositivo seleccionado</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Cámara seleccionada</translation>
     </message>
     <message>
       <source>Choose devices...</source>
@@ -6766,7 +6762,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Storage Management</source>
-      <translation type="unfinished">Storage Management</translation>
+      <translation>Xestión de almacenamento</translation>
     </message>
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
@@ -6811,11 +6807,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BackupStatusWidget</name>
     <message>
       <source>Backup process will ignore existing footage. Only further recording will be backed up.</source>
-      <translation type="unfinished">Backup process will ignore existing footage. Only further recording will be backed up.</translation>
+      <translation>O proceso de copia de seguridade ignorará as gravacións existentes. Só se copiará a copia de seguridade das gravacións posteriores.</translation>
     </message>
     <message>
       <source>Skip backup for existing footage?</source>
-      <translation type="unfinished">Skip backup for existing footage?</translation>
+      <translation>Omitir a copia de seguridade das imaxes existentes?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -6823,30 +6819,30 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
-      <translation type="unfinished">Applies only to the cameras connected to current server.</translation>
+      <translation>Só se aplica ás cámaras conectadas ao servidor actual.</translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
+      <translation>
+        <numerusform>A copia de seguridade está activada para %n dispositivos</numerusform>
+        <numerusform>A copia de seguridade está activada para %n dispositivos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+      <translation>
+        <numerusform>A copia de seguridade está activada para %n cámaras</numerusform>
+        <numerusform>A copia de seguridade está activada para %n cámaras</numerusform>
       </translation>
     </message>
     <message>
       <source>The progress will be displayed once the backup process starts</source>
-      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+      <translation>O progreso mostrarase unha vez que se inicie o proceso de copia de seguridade</translation>
     </message>
     <message>
       <source>Footage from these cameras is backed up through to %1 %2</source>
       <comment>%1 and %2 will be replaced respectively by the date and time in the site format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+      <translation>As imaxes destas cámaras están copiadas ata %1 %2</translation>
     </message>
   </context>
   <context>
@@ -6857,21 +6853,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>%n marcadores</numerusform>
+        <numerusform>%n marcadores</numerusform>
       </translation>
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Selecciona un intervalo de tempo na liña de tempo e fai clic co botón dereito na sección resaltada para crear un marcador</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CallNotificationsListModel::Private</name>
     <message>
       <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
+      <translation>Chamando...</translation>
     </message>
     <message>
       <source>Open</source>
@@ -6898,15 +6894,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
     <message>
       <source>Loading values...</source>
-      <translation type="unfinished">Loading values...</translation>
+      <translation>Cargando valores...</translation>
     </message>
     <message>
       <source>Applying changes...</source>
-      <translation type="unfinished">Applying changes...</translation>
+      <translation>Aplicando cambios...</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Forzar a detección de movemento</translation>
     </message>
   </context>
   <context>
@@ -6936,30 +6932,30 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
+      <translation>Axuda a solucionar problemas de calidade de imaxe nalgunhas cámaras; noutras provocará un aumento significativo da taxa de bits.</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a camera for quick identification and access</translation>
+      <translation>Número personalizado que se pode asignar a unha cámara para unha identificación e acceso rápidos</translation>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
-      <translation type="unfinished">
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
-        <numerusform>This ID is already used on the following %n cameras:</numerusform>
+      <translation>
+        <numerusform>Este ID xa se usa nas seguintes %n cámaras:</numerusform>
+        <numerusform>Este ID xa se usa nas seguintes %n cámaras:</numerusform>
       </translation>
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
+      <translation>O servidor non modificará a configuración das cámaras, recibirá e usará o fluxo da cámara tal cal.</translation>
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>Multidifusión</translation>
     </message>
     <message>
       <source>Use if supported</source>
-      <translation type="unfinished">Use if supported</translation>
+      <translation>Usar se é compatible</translation>
     </message>
     <message>
       <source>Never</source>
@@ -6967,19 +6963,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Forzar a detección de movemento</translation>
     </message>
     <message>
       <source>Pan</source>
-      <translation type="unfinished">Pan</translation>
+      <translation>Panorámica</translation>
     </message>
     <message>
       <source>Pan &amp; Tilt</source>
-      <translation type="unfinished">Pan &amp; Tilt</translation>
+      <translation>Panorámica e inclinación</translation>
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
-      <translation type="unfinished">Server will not push time settings to the camera.</translation>
+      <translation>O servidor non enviará a configuración de hora á cámara.</translation>
     </message>
     <message>
       <source>default</source>
@@ -6996,7 +6992,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
-      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</translation>
+      <translation>A configuración de calidade e taxa de fotogramas (FPS) na programación de gravación deixará de ser irrelevante</translation>
     </message>
     <message>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on performance</source>
@@ -7019,15 +7015,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraHotspotItem</name>
     <message>
       <source>Open Camera</source>
-      <translation type="unfinished">Open Camera</translation>
+      <translation>Abrir cámara</translation>
     </message>
     <message>
       <source>Open Camera in new Tab</source>
-      <translation type="unfinished">Open Camera in new Tab</translation>
+      <translation>Abrir a cámara nunha nova pestana</translation>
     </message>
     <message>
       <source>Open Camera in place</source>
-      <translation type="unfinished">Open Camera in place</translation>
+      <translation>Abrir a cámara no seu lugar</translation>
     </message>
     <message>
       <source>Open Layout in new Tab</source>
@@ -7042,15 +7038,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>Puntiagudo</translation>
     </message>
     <message>
       <source>Place Hotspot</source>
-      <translation type="unfinished">Place Hotspot</translation>
+      <translation>Lugar de interese</translation>
     </message>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>SEN DATOS</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
@@ -7073,7 +7069,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>Puntiagudo</translation>
     </message>
     <message>
       <source>Target resource does not exist</source>
@@ -7111,15 +7107,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>I/O Module Rules</source>
-      <translation type="unfinished">I/O Module Rules</translation>
+      <translation>Regras do módulo de I/O (E/S)</translation>
     </message>
     <message>
       <source>More Info</source>
-      <translation type="unfinished">More Info</translation>
+      <translation>Máis información</translation>
     </message>
     <message>
       <source>Less Info</source>
-      <translation type="unfinished">Less Info</translation>
+      <translation>Menos información</translation>
     </message>
     <message>
       <source>Use this link to add the camera to another site</source>
@@ -7130,16 +7126,16 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
     <message numerus="yes">
       <source>Use License</source>
-      <translation type="unfinished">
-        <numerusform>Use License</numerusform>
-        <numerusform>Use License</numerusform>
+      <translation>
+        <numerusform>Licenza de uso</numerusform>
+        <numerusform>Licenza de uso</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use Service</source>
-      <translation type="unfinished">
-        <numerusform>Use Service</numerusform>
-        <numerusform>Use Service</numerusform>
+      <translation>
+        <numerusform>Usar servizo</numerusform>
+        <numerusform>Usar servizo</numerusform>
       </translation>
     </message>
   </context>
@@ -7147,23 +7143,23 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
     <message>
       <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>A detección de movemento só funcionará cando se estea a ver a cámara. Activa a gravación para que funcione todo o tempo.</translation>
     </message>
     <message>
       <source>Maximum number of motion detection rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of motion detection rectangles for current camera is reached</translation>
+      <translation>Alcanzouse o número máximo de rectángulos de detección de movemento para a cámara actual</translation>
     </message>
     <message>
       <source>Maximum number of ignore motion rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of ignore motion rectangles for current camera is reached</translation>
+      <translation>Alcanzouse o número máximo de rectángulos de movemento ignorado para a cámara actual</translation>
     </message>
     <message>
       <source>Maximum number of detect motion rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of detect motion rectangles for current camera is reached</translation>
+      <translation>Alcanzouse o número máximo de rectángulos de detección de movemento para a cámara actual</translation>
     </message>
     <message>
       <source>Reset motion regions to default?</source>
-      <translation type="unfinished">Reset motion regions to default?</translation>
+      <translation>Restablecer as rexións de movemento aos valores predeterminados?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -7179,11 +7175,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Forzar a detección de movemento</translation>
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for</source>
-      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for</translation>
+      <translation>Selecciona áreas na vista previa para definir a sensibilidade escollida</translation>
     </message>
     <message>
       <source>Choose a motion detection sensitivity and select some areas on the preview to set it for</source>
@@ -7305,7 +7301,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select Device</source>
-      <translation type="unfinished">Select Device</translation>
+      <translation>Seleccionar dispositivo</translation>
     </message>
     <message>
       <source>Select Camera</source>
@@ -7340,7 +7336,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>Avanzado</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -7393,7 +7389,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation type="unfinished">I/O Module Settings</translation>
+      <translation>Axustes do módulo I/O (E/S)</translation>
     </message>
     <message>
       <source>I/O Modules Settings</source>
@@ -7401,7 +7397,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Dewarping</source>
-      <translation type="unfinished">Dewarping</translation>
+      <translation>Corrección de distorsión</translation>
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
@@ -7437,11 +7433,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Complementos</translation>
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Puntos de interese</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -7643,31 +7639,31 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ConnectActionsHandler</name>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+      <translation>O muro de vídeo eliminouse do servidor e pecharase.</translation>
     </message>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
-      <translation type="unfinished">Could not connect to server. Video Wall will be closed.</translation>
+      <translation>Non se puido conectar co servidor. O muro de vídeo pecharase.</translation>
     </message>
     <message>
       <source>Could not connect to server. Application will be closed.</source>
-      <translation type="unfinished">Could not connect to server. Application will be closed.</translation>
+      <translation>Non se puido conectar co servidor. A aplicación pecharase.</translation>
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation type="unfinished">Failed to connect to the selected server</translation>
+      <translation>Fallou a conexión co servidor seleccionado</translation>
     </message>
     <message>
       <source>Re-authentication required</source>
-      <translation type="unfinished">Re-authentication required</translation>
+      <translation>Requírese a reautenticación</translation>
     </message>
     <message>
       <source>Enter password to continue your session</source>
-      <translation type="unfinished">Enter password to continue your session</translation>
+      <translation>Introduce o contrasinal para continuar a sesión</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again to continue.</translation>
+      <translation>A túa sesión caducou. Inicia sesión de novo para continuar.</translation>
     </message>
     <message>
       <source>OK</source>
@@ -7676,15 +7672,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter access link to continue your session</source>
-      <translation type="unfinished">Enter access link to continue your session</translation>
+      <translation>Introduce a ligazón de acceso para continuar a sesión</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again with your link to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again with your link to continue.</translation>
+      <translation>A túa sesión caducou. Inicia sesión de novo coa túa ligazón para continuar.</translation>
     </message>
     <message>
       <source>Authentication details are incorrect</source>
-      <translation type="unfinished">Authentication details are incorrect</translation>
+      <translation>Os detalles de autenticación son incorrectos</translation>
     </message>
     <message>
       <source>Login to %1</source>
@@ -7712,12 +7708,12 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Erro interno. Por favor, téntao de novo máis tarde.</translation>
     </message>
     <message>
       <source>None of your Servers has connection to %1.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">None of your Servers has connection to %1.</translation>
+      <translation>Ningún dos teus servidores ten conexión a %1.</translation>
     </message>
     <message>
       <source>Local Site owner is absent or disabled.</source>
@@ -7758,11 +7754,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
     <message>
       <source>Configuring Server</source>
-      <translation type="unfinished">Configuring Server</translation>
+      <translation>Configuración do servidor</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
-      <translation type="unfinished">Total amount of licenses will decrease</translation>
+      <translation>O número total de licenzas diminuirá</translation>
     </message>
     <message>
       <source>Enter password...</source>
@@ -7770,7 +7766,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Administrator password</source>
-      <translation type="unfinished">Administrator password</translation>
+      <translation>Contrasinal de administrador</translation>
     </message>
     <message>
       <source>Merge Server to the Site</source>
@@ -7803,11 +7799,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Test Failed</source>
-      <translation type="unfinished">Test Failed</translation>
+      <translation>Fallou a proba</translation>
     </message>
     <message>
       <source>Request timeout</source>
-      <translation type="unfinished">Request timeout</translation>
+      <translation>Tempo de espera da solicitude</translation>
     </message>
     <message>
       <source>New Site</source>
@@ -7818,38 +7814,38 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CopyScheduleCameraSelectionDialog</name>
     <message>
       <source>Recording cannot be enabled for some cameras.</source>
-      <translation type="unfinished">Recording cannot be enabled for some cameras.</translation>
+      <translation>Non se pode activar a gravación para algunhas cámaras.</translation>
     </message>
     <message>
       <source>Schedule settings are not compatible with some devices.</source>
-      <translation type="unfinished">Schedule settings are not compatible with some devices.</translation>
+      <translation>A configuración do calendario non é compatible con algúns dispositivos.</translation>
     </message>
     <message>
       <source>Copy archive length settings</source>
-      <translation type="unfinished">Copy archive length settings</translation>
+      <translation>Copiar a configuración da lonxitude do arquivo</translation>
     </message>
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
-      <translation type="unfinished">Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</translation>
+      <translation>A programación de gravación contén modos de gravación que non son compatibles coas cámaras seleccionadas. Os modos de gravación non compatibles cambiarán a &quot;Gravar sempre&quot;.</translation>
     </message>
     <message>
       <source>Recording will not be enabled on some cameras.</source>
-      <translation type="unfinished">Recording will not be enabled on some cameras.</translation>
+      <translation>A gravación non estará activada nalgunhas cámaras.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>Establecer contrasinal</translation>
     </message>
     <message>
       <source>This camera requires password to be set up</source>
-      <translation type="unfinished">This camera requires password to be set up</translation>
+      <translation>Esta cámara require un contrasinal para configurarse</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up</translation>
+      <translation>Algunhas das cámaras seleccionadas requiren contrasinal para configurarse</translation>
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your site administrator to do it.</source>
@@ -7895,19 +7891,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::DeviceAdditionDialog</name>
     <message>
       <source>Start address</source>
-      <translation type="unfinished">Start address</translation>
+      <translation>Enderezo de inicio</translation>
     </message>
     <message>
       <source>End address</source>
-      <translation type="unfinished">End address</translation>
+      <translation>Enderezo final</translation>
     </message>
     <message>
       <source>IP / Hostname / RTSP link / UDP link</source>
-      <translation type="unfinished">IP / Hostname / RTSP link / UDP link</translation>
+      <translation>IP / Nome do servidor / Ligazón RTSP / Ligazón UDP</translation>
     </message>
     <message>
       <source>Examples:</source>
-      <translation type="unfinished">Examples:</translation>
+      <translation>Exemplos:</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -7915,18 +7911,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Device search failed</source>
-      <translation type="unfinished">Device search failed</translation>
+      <translation>Fallou a busca de dispositivos</translation>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to add %n devices</numerusform>
-        <numerusform>Failed to add %n devices</numerusform>
+      <translation>
+        <numerusform>Non se puideron engadir %n dispositivos</numerusform>
+        <numerusform>Non se puideron engadir %n dispositivos</numerusform>
       </translation>
     </message>
     <message>
       <source>Scan</source>
-      <translation type="unfinished">Scan</translation>
+      <translation>Escanear</translation>
     </message>
     <message>
       <source>Search</source>
@@ -7934,11 +7930,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Initializing scan...</source>
-      <translation type="unfinished">Initializing scan...</translation>
+      <translation>Inicializando escaneo...</translation>
     </message>
     <message>
       <source>Scanning online hosts...</source>
-      <translation type="unfinished">Scanning online hosts...</translation>
+      <translation>Escaneando servidores en liña...</translation>
     </message>
     <message>
       <source>Checking host...</source>
@@ -8330,15 +8326,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
+      <translation>Non se recomenda o formato AVI para exportar unha gravación con pista de audio.</translation>
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
-      <translation type="unfinished">Export is not available: This camera does not have a video archive for the selected time period.</translation>
+      <translation>A exportación non está dispoñible: esta cámara non ten un arquivo de vídeo para o período de tempo seleccionado.</translation>
     </message>
     <message>
       <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
-      <translation type="unfinished">You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</translation>
+      <translation>Non tes permiso para exportar o arquivo dalgunhas das cámaras seleccionadas. O vídeo desas cámaras non se exportará ao ficheiro resultante.</translation>
     </message>
   </context>
   <context>
@@ -8346,7 +8342,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Exported: %1</source>
       <comment>Duration will be substituted</comment>
-      <translation type="unfinished">Exported: %1</translation>
+      <translation>Exportado: %1</translation>
     </message>
   </context>
   <context>
@@ -8365,7 +8361,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Sen conmutación por erro</translation>
     </message>
   </context>
   <context>
@@ -8430,15 +8426,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
     <message>
       <source>Force secure authentication?</source>
-      <translation type="unfinished">Force secure authentication?</translation>
+      <translation>Forzar a autenticación segura?</translation>
     </message>
     <message>
       <source>To revert this change user password reset will be required.</source>
-      <translation type="unfinished">To revert this change user password reset will be required.</translation>
+      <translation>Para reverter este cambio, será necesario restablecer o contrasinal de usuario.</translation>
     </message>
     <message>
       <source>Do not show this message again</source>
-      <translation type="unfinished">Do not show this message again</translation>
+      <translation>Non mostrar esta mensaxe de novo</translation>
     </message>
     <message>
       <source>Enable</source>
@@ -8461,16 +8457,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n novo</numerusform>
+        <numerusform>%n novo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>%n dispositivos en total</numerusform>
+        <numerusform>%n dispositivos en total</numerusform>
       </translation>
     </message>
   </context>
@@ -8478,29 +8474,29 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::GlobalPermissionsModel</name>
     <message>
       <source>View event log</source>
-      <translation type="unfinished">View event log</translation>
+      <translation>Ver o rexistro de eventos</translation>
     </message>
     <message>
       <source>Generate events</source>
-      <translation type="unfinished">Generate events</translation>
+      <translation>Xerar eventos</translation>
     </message>
     <message>
       <source>%1 group</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">%1 group</translation>
+      <translation>Grupo %1</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
-        <numerusform>%1 and %n more groups</numerusform>
+      <translation>
+        <numerusform>%1 e %n grupos máis</numerusform>
+        <numerusform>%1 e %n grupos máis</numerusform>
       </translation>
     </message>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>Herda o permiso %1 de</translation>
     </message>
     <message>
       <source>View video without redaction</source>
@@ -8511,11 +8507,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::GroupSettingsDialog</name>
     <message>
       <source>Delete failed</source>
-      <translation type="unfinished">Delete failed</translation>
+      <translation>Fallou a eliminación</translation>
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>Aplicar os cambios?</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -8527,7 +8523,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New Group %1</source>
-      <translation type="unfinished">New Group %1</translation>
+      <translation>Novo grupo %1</translation>
     </message>
     <message>
       <source>Save changes</source>
@@ -8535,7 +8531,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>Introduce o contrasinal da túa conta</translation>
     </message>
     <message>
       <source>Save</source>
@@ -8547,7 +8543,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Delete groups</source>
-      <translation type="unfinished">Delete groups</translation>
+      <translation>Borrar grupos</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -8555,30 +8551,30 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Group name cannot be empty</source>
-      <translation type="unfinished">Group name cannot be empty</translation>
+      <translation>O nome do grupo non pode estar baleiro</translation>
     </message>
     <message>
       <source>Group with the same name already exists</source>
-      <translation type="unfinished">Group with the same name already exists</translation>
+      <translation>Xa existe un grupo co mesmo nome</translation>
     </message>
     <message>
       <source>Failed to apply changes to %1 group</source>
-      <translation type="unfinished">Failed to apply changes to %1 group</translation>
+      <translation>Non se puideron aplicar os cambios ao grupo %1</translation>
     </message>
     <message>
       <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
-      <translation type="unfinished">Current group is a member of all groups selected on this tab and inherits permissions from each of them.</translation>
+      <translation>O grupo actual é membro de todos os grupos seleccionados nesta pertana e herda os permisos de cada un deles.</translation>
     </message>
     <message>
       <source>Select one or multiple groups from which the current group will inherit permissions</source>
-      <translation type="unfinished">Select one or multiple groups from which the current group will inherit permissions</translation>
+      <translation>Selecciona un ou varios grupos dos que o grupo actual herdará os permisos</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Fai clic na icona para ler máis</translation>
     </message>
   </context>
   <context>
@@ -8589,14 +8585,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 degrees</source>
-      <translation type="unfinished">%1 degrees</translation>
+      <translation>%1 graos</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
-      <translation type="unfinished">Select file...</translation>
+      <translation>Seleccionar ficheiro...</translation>
     </message>
     <message>
       <source>Error</source>
@@ -8604,14 +8600,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Image cannot be loaded.</source>
-      <translation type="unfinished">Image cannot be loaded.</translation>
+      <translation>Non se pode cargar a imaxe.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::IncompatibleServersActionHandler</name>
     <message>
       <source>It will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>Aparecerá na árbore de recursos cando remate a sincronización da base de datos.</translation>
     </message>
     <message>
       <source>Sites will be merged shortly</source>
@@ -8660,7 +8656,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>Copiar a localización da ligazón</translation>
     </message>
   </context>
   <context>
@@ -8671,7 +8667,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter Layout Name:</source>
-      <translation type="unfinished">Enter Layout Name:</translation>
+      <translation>Introduce o nome do deseño:</translation>
     </message>
     <message>
       <source>Save Layout As Cloud</source>
@@ -8683,49 +8679,49 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter the name of the layout to create:</source>
-      <translation type="unfinished">Enter the name of the layout to create:</translation>
+      <translation>Introduce o nome do deseño a crear:</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LayoutBackgroundSettingsWidget</name>
     <message>
       <source>cells</source>
-      <translation type="unfinished">cells</translation>
+      <translation>células</translation>
     </message>
     <message>
       <source>No picture</source>
-      <translation type="unfinished">No picture</translation>
+      <translation>Sen imaxe</translation>
     </message>
     <message>
       <source>Error while loading picture</source>
-      <translation type="unfinished">Error while loading picture</translation>
+      <translation>Erro ao cargar a imaxe</translation>
     </message>
     <message>
       <source>Error while uploading picture</source>
-      <translation type="unfinished">Error while uploading picture</translation>
+      <translation>Erro ao cargar a imaxe</translation>
     </message>
     <message>
       <source>Select file...</source>
-      <translation type="unfinished">Select file...</translation>
+      <translation>Seleccionar ficheiro...</translation>
     </message>
     <message>
       <source>Picture cannot be read</source>
-      <translation type="unfinished">Picture cannot be read</translation>
+      <translation>Non se pode ler a imaxe</translation>
     </message>
     <message>
       <source>Picture cannot be loaded</source>
-      <translation type="unfinished">Picture cannot be loaded</translation>
+      <translation>Non se pode cargar a imaxe</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LayoutGeneralSettingsWidget</name>
     <message>
       <source>cells</source>
-      <translation type="unfinished">cells</translation>
+      <translation>células</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+      <translation>Número personalizado que se pode asignar a un deseño para unha identificación e acceso rápidos</translation>
     </message>
     <message>
       <source>This ID is already in use. Use Generate button to find a free ID.</source>
@@ -8740,14 +8736,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>Fondo</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>SEN DATOS</translation>
     </message>
     <message>
       <source>DISABLED</source>
@@ -8758,7 +8754,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LdapSettingsWidget</name>
     <message>
       <source>Disconnect LDAP server?</source>
-      <translation type="unfinished">Disconnect LDAP server?</translation>
+      <translation>Desconectar o servidor LDAP?</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -8770,7 +8766,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>Introduce o contrasinal da túa conta</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -8778,7 +8774,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connection failed</source>
-      <translation type="unfinished">Connection failed</translation>
+      <translation>Fallou a conexión</translation>
     </message>
     <message>
       <source>Remove existing LDAP users and groups?</source>
@@ -9023,7 +9019,7 @@ Lembra devolver o nivel de rexistro á súa configuración predeterminada despoi
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>Introduce o contrasinal da túa conta</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -9254,7 +9250,7 @@ O rendemento do sitio web está degradado.</translation>
     </message>
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
-      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
+      <translation>Recoméndase contactar con %1 antes de continuar.</translation>
     </message>
     <message>
       <source>Merge Sites</source>
@@ -9291,15 +9287,15 @@ O rendemento do sitio web está degradado.</translation>
     </message>
     <message>
       <source>Remote</source>
-      <translation type="unfinished">Remote</translation>
+      <translation>Remoto</translation>
     </message>
     <message>
       <source>Current (%1)</source>
-      <translation type="unfinished">Current (%1)</translation>
+      <translation>Actual (%1)</translation>
     </message>
     <message>
       <source>Remote (%1)</source>
-      <translation type="unfinished">Remote (%1)</translation>
+      <translation>Remoto (%1)</translation>
     </message>
     <message>
       <source>Success</source>
@@ -9310,27 +9306,27 @@ O rendemento do sitio web está degradado.</translation>
     <name>nx::vms::client::desktop::MergeSystemsTool</name>
     <message>
       <source>The password or user name is invalid.</source>
-      <translation type="unfinished">The password or user name is invalid.</translation>
+      <translation>O contrasinal ou o nome de usuario non son válidos.</translation>
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
-      <translation type="unfinished">This user does not have permissions for the requested operation.</translation>
+      <translation>Este usuario non ten permisos para a operación solicitada.</translation>
     </message>
     <message>
       <source>Cannot create database backup.</source>
-      <translation type="unfinished">Cannot create database backup.</translation>
+      <translation>Non se pode crear unha copia de seguridade da base de datos.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
-      <translation type="unfinished">Merge anyway?</translation>
+      <translation>Fusionar de todos os xeitos?</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate is invalid.</translation>
+      <translation>Non se puido establecer a conexión co servidor. O certificado do servidor non é válido.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate was rejected.</translation>
+      <translation>Non se puido establecer a conexión co servidor. O certificado do servidor foi rexeitado.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -9406,23 +9402,23 @@ O rendemento do sitio web está degradado.</translation>
     <name>nx::vms::client::desktop::MotionStreamAlerts</name>
     <message>
       <source>Current stream has high resolution. Analyzing it for motion increases CPU load.</source>
-      <translation type="unfinished">Current stream has high resolution. Analyzing it for motion increases CPU load.</translation>
+      <translation>A transmisión actual ten alta resolución. Analizala para detectar movemento aumenta a carga da CPU.</translation>
     </message>
     <message>
       <source>Motion detection for some cameras will not be working because the remaining stream has too high resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for some cameras will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>A detección de movemento para algunhas cámaras non funcionará porque a transmisión restante ten unha resolución demasiado alta.
+Podes forzala, pero pode aumentar significativamente a carga da CPU.</translation>
     </message>
     <message>
       <source>Motion detection for this camera will not be working because the remaining stream has too high resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>A detección de movemento para esta cámara non funcionará porque a transmisión restante ten unha resolución demasiado alta.
+Podes forzala, pero pode aumentar significativamente a carga da CPU.</translation>
     </message>
     <message>
       <source>Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
@@ -9441,90 +9437,90 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>Download in External Browser</source>
-      <translation type="unfinished">Download in External Browser</translation>
+      <translation>Descargar nun navegador externo</translation>
     </message>
     <message>
       <source>Copy Link to Clipboard</source>
-      <translation type="unfinished">Copy Link to Clipboard</translation>
+      <translation>Copia a ligazón no portapapeis</translation>
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation type="unfinished">You have already installed this version.</translation>
+      <translation>Xa tes instalada esta versión.</translation>
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>Compilación non atopada</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation type="unfinished">Cannot update from the selected file</translation>
+      <translation>Non se pode actualizar desde o ficheiro seleccionado</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation type="unfinished">Invalid update information</translation>
+      <translation>Información de actualización non válida</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+      <translation>Non é posible cambiar a versións anteriores</translation>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Non se atopou o ficheiro de actualización</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation type="unfinished">Upgrade package is broken</translation>
+      <translation>O paquete de actualización está roto</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation type="unfinished">Missing update package for some servers</translation>
+      <translation>Falta o paquete de actualización para algúns servidores</translation>
     </message>
     <message>
       <source>No update package available</source>
-      <translation type="unfinished">No update package available</translation>
+      <translation>Non hai ningún paquete de actualización dispoñible</translation>
     </message>
     <message>
       <source>Select Update File...</source>
-      <translation type="unfinished">Select Update File...</translation>
+      <translation>Seleccionar Actualizar ficheiro...</translation>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>Actualizar ficheiros</translation>
     </message>
     <message>
       <source>Some servers are offline and will not be updated. Skip them?</source>
-      <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
+      <translation>Algúns servidores están fóra de liña e non se actualizarán. Queres omitilos?</translation>
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+      <translation>
+        <numerusform>Falta o paquete de actualización para o cliente e os servidores %n</numerusform>
+        <numerusform>Falta o paquete de actualización para o cliente e os servidores %n</numerusform>
       </translation>
     </message>
     <message>
       <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
+      <translation>Falta o paquete de actualización para o cliente</translation>
     </message>
     <message>
       <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
+      <translation>Non hai servidores en liña para actualizar.</translation>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+      <translation>Cancelar a actualización e eliminar todos os datos descargados?</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+      <translation>A versión do sistema operativo do cliente xa non é compatible. Actualízao a unha versión compatible.</translation>
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
+      <translation>Non se puido iniciar a actualización</translation>
     </message>
     <message>
       <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
+      <translation>Non se puido cancelar a actualización</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
@@ -9751,22 +9747,22 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>Device search failed</source>
-      <translation type="unfinished">Device search failed</translation>
+      <translation>Fallou a busca de dispositivos</translation>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to add %n devices</numerusform>
-        <numerusform>Failed to add %n devices</numerusform>
+      <translation>
+        <numerusform>Non se puideron engadir %n dispositivos</numerusform>
+        <numerusform>Non se puideron engadir %n dispositivos</numerusform>
       </translation>
     </message>
     <message>
       <source>Initializing scan...</source>
-      <translation type="unfinished">Initializing scan...</translation>
+      <translation>Inicializando escaneo...</translation>
     </message>
     <message>
       <source>Scanning online hosts...</source>
-      <translation type="unfinished">Scanning online hosts...</translation>
+      <translation>Escaneando servidores en liña...</translation>
     </message>
     <message>
       <source>Checking host...</source>
@@ -9871,9 +9867,9 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
     <message numerus="yes">
       <source>%n notifications</source>
-      <translation type="unfinished">
-        <numerusform>%n notifications</numerusform>
-        <numerusform>%n notifications</numerusform>
+      <translation>
+        <numerusform>%n notificacións</numerusform>
+        <numerusform>%n notificacións</numerusform>
       </translation>
     </message>
     <message>
@@ -9931,7 +9927,7 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     <name>nx::vms::client::desktop::ObjectTrackingButton</name>
     <message>
       <source>Object tracking is ON</source>
-      <translation type="unfinished">Object tracking is ON</translation>
+      <translation>O seguimento de obxectos está activado</translation>
     </message>
   </context>
   <context>
@@ -9945,70 +9941,70 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation type="unfinished">Sign In</translation>
+      <translation>Iniciar sesión</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
       <source>The server is taking too long to respond</source>
-      <translation type="unfinished">The server is taking too long to respond</translation>
+      <translation>O servidor está tardando demasiado en responder</translation>
     </message>
     <message>
       <source>No update task</source>
-      <translation type="unfinished">No update task</translation>
+      <translation>Sen tarefa de actualización</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation type="unfinished">Ready to download update</translation>
+      <translation>Listo para descargar a actualización</translation>
     </message>
     <message>
       <source>Downloading update</source>
-      <translation type="unfinished">Downloading update</translation>
+      <translation>Descargando a actualización</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
-      <translation type="unfinished">Ready to restart to the new version</translation>
+      <translation>Listo para reiniciar coa nova versión</translation>
     </message>
     <message>
       <source>Installing update</source>
-      <translation type="unfinished">Installing update</translation>
+      <translation>Instalando a actualización</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Instalado</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation type="unfinished">Waiting for peer data</translation>
+      <translation>Agardando polos datos dos pares</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation type="unfinished">There is not enough space to download update files.</translation>
+      <translation>Non hai espazo dabondo para descargar os ficheiros de actualización.</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation type="unfinished">There is not enough space to extract update files.</translation>
+      <translation>Non hai espazo dabondo para extraer os ficheiros de actualización.</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>Non se puideron descargar os paquetes de actualización.</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation type="unfinished">Update contents are invalid.</translation>
+      <translation>O contido da actualización non é válido.</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation type="unfinished">Update archive is corrupted.</translation>
+      <translation>O arquivo de actualización está corrompido.</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation type="unfinished">Update files cannot be extracted.</translation>
+      <translation>Non se poden extraer os ficheiros de actualización.</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation type="unfinished">Internal downloader error.</translation>
+      <translation>Erro interno do descargador.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -10016,19 +10012,19 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation type="unfinished">Unexpected error code.</translation>
+      <translation>Código de erro inesperado.</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation type="unfinished">Ready to install update</translation>
+      <translation>Listo para instalar a actualización</translation>
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>Non se atopou o paquete de actualización.</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>Non hai espazo dabondo para instalar a actualización.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
@@ -10036,33 +10032,33 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Esta versión do sistema operativo xa non é compatible.</translation>
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>Fallou a instalación da actualización.</translation>
     </message>
     <message>
       <source>Update file verification failed.</source>
-      <translation type="unfinished">Update file verification failed.</translation>
+      <translation>Fallou a verificación do ficheiro de actualización.</translation>
     </message>
     <message>
       <source>Verifying update</source>
-      <translation type="unfinished">Verifying update</translation>
+      <translation>Verificando a actualización</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PlaybackPositionItem</name>
     <message>
       <source>video is paused</source>
-      <translation type="unfinished">video is paused</translation>
+      <translation>o vídeo está en pausa</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
-      <translation type="unfinished">Disconnected</translation>
+      <translation>Desconectado</translation>
     </message>
     <message>
       <source>Connected</source>
@@ -10070,11 +10066,11 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>Powered</source>
-      <translation type="unfinished">Powered</translation>
+      <translation>Alimentado</translation>
     </message>
     <message>
       <source>Unexpected</source>
-      <translation type="unfinished">Unexpected</translation>
+      <translation>Inesperado</translation>
     </message>
     <message>
       <source>Empty</source>
@@ -10091,7 +10087,7 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Consumo</translation>
     </message>
     <message>
       <source>Status</source>
@@ -10099,23 +10095,23 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>Power</source>
-      <translation type="unfinished">Power</translation>
+      <translation>Enerxía</translation>
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>Dispositivo descoñecido</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>Dispositivo descoñecido %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsWidget</name>
     <message>
       <source>Attention! Power limit exceeded</source>
-      <translation type="unfinished">Attention! Power limit exceeded</translation>
+      <translation>Atención! Límite de potencia superado</translation>
     </message>
   </context>
   <context>
@@ -10130,7 +10126,7 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>URL cannot be empty.</source>
-      <translation type="unfinished">URL cannot be empty.</translation>
+      <translation>A URL non pode estar baleira.</translation>
     </message>
     <message>
       <source>Wrong URL format.</source>
@@ -10146,7 +10142,7 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>Ao usar o proxy de todos os contidos, calquera servizo ou dispositivo na rede do servidor expónse aos usuarios desta páxina web</translation>
     </message>
     <message>
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
@@ -10174,7 +10170,7 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>New Web Page</source>
-      <translation type="unfinished">New Web Page</translation>
+      <translation>Nova páxina web</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
@@ -10190,7 +10186,7 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>New Integration</source>
-      <translation type="unfinished">New Integration</translation>
+      <translation>Nova integración</translation>
     </message>
     <message>
       <source>Edit Integration</source>
@@ -10278,7 +10274,7 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     <message>
       <source>%1 layout</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation type="unfinished">%1 layout</translation>
+      <translation>%1 deseño</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more layouts</source>
@@ -10319,7 +10315,7 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     <name>nx::vms::client::desktop::ResourceGroupingActionHandler</name>
     <message>
       <source>Maximum level of nesting is reached</source>
-      <translation type="unfinished">Maximum level of nesting is reached</translation>
+      <translation>Alcanzouse o nivel máximo de aniñamento</translation>
     </message>
   </context>
   <context>
@@ -10377,16 +10373,16 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n obxectos</numerusform>
+        <numerusform>%n obxectos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n notifications</source>
-      <translation type="unfinished">
-        <numerusform>%n notifications</numerusform>
-        <numerusform>%n notifications</numerusform>
+      <translation>
+        <numerusform>%n notificacións</numerusform>
+        <numerusform>%n notificacións</numerusform>
       </translation>
     </message>
   </context>
@@ -10461,98 +10457,98 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Objects
  + Low-Res</source>
-      <translation type="unfinished">Objects
- + Low-Res</translation>
+      <translation>Obxectos
+ + Baixa resolución</translation>
     </message>
     <message>
       <source>Motion Only</source>
-      <translation type="unfinished">Motion Only</translation>
+      <translation>Só movemento</translation>
     </message>
     <message>
       <source>Motion
  + Low-Res</source>
-      <translation type="unfinished">Motion
- + Low-Res</translation>
+      <translation>Movemento
+ + Baixa resolución</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected devices</translation>
+      <translation>A detección de movemento está desactivada para algúns dos dispositivos seleccionados</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>
-      <translation type="unfinished">Motion detection is disabled for this camera</translation>
+      <translation>A detección de movemento está desactivada para esta cámara</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected cameras</translation>
+      <translation>A detección de movemento está desactivada para algunhas das cámaras seleccionadas</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Algúns dos dispositivos seleccionados só teñen unha transmisión. As gravacións con e sen movemento compartirán a mesma resolución ou calidade.</translation>
     </message>
     <message>
       <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Esta cámara só ten unha transmisión. As gravacións con e sen movemento compartirán a mesma resolución ou calidade.</translation>
     </message>
     <message>
       <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Algunhas das cámaras seleccionadas só teñen unha transmisión. As gravacións con e sen movemento compartirán a mesma resolución ou calidade.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected devices</translation>
+      <translation>A detección de obxectos está desactivada para algúns dos dispositivos seleccionados</translation>
     </message>
     <message>
       <source>Object detection is disabled for this camera</source>
-      <translation type="unfinished">Object detection is disabled for this camera</translation>
+      <translation>A detección de obxectos está desactivada para esta cámara</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected cameras</translation>
+      <translation>A detección de obxectos está desactivada para algunhas das cámaras seleccionadas</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected devices</translation>
+      <translation>A detección de movemento e obxectos está desactivada para algúns dos dispositivos seleccionados</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this camera</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this camera</translation>
+      <translation>A detección de movemento e obxectos está desactivada para esta cámara</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected cameras</translation>
+      <translation>A detección de movemento e obxectos está desactivada para algunhas das cámaras seleccionadas</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>
-      <translation type="unfinished">Motion detection is disabled for this I/O module</translation>
+      <translation>A detección de movemento está desactivada para este módulo de E/S (I/O)</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected I/O modules</translation>
+      <translation>A detección de movemento está desactivada para algúns dos módulos de E/S (I/O) seleccionados</translation>
     </message>
     <message>
       <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Este módulo de E/S (I/O) só ten unha transmisión. As gravacións con e sen movemento compartirán a mesma resolución ou calidade.</translation>
     </message>
     <message>
       <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Algúns dos módulos de E/S (I/O) seleccionados só teñen unha transmisión. As gravacións con e sen movemento compartirán a mesma resolución ou calidade.</translation>
     </message>
     <message>
       <source>Object detection is disabled for this I/O module</source>
-      <translation type="unfinished">Object detection is disabled for this I/O module</translation>
+      <translation>A detección de obxectos está desactivada para este módulo de E/S (I/O)</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected I/O modules</translation>
+      <translation>A detección de movemento está desactivada para algúns dos módulos de E/S (I/O) seleccionados</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this I/O module</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this I/O module</translation>
+      <translation>A detección de movemento e obxectos está desactivada para este módulo de E/S (I/O)</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected I/O modules</translation>
+      <translation>A detección de movemento e obxectos está desactivada para algúns dos módulos de E/S (I/O) seleccionados</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
@@ -10612,11 +10608,11 @@ Aínda podes cambiar a calidade e os FPS directamente na cámara.</translation>
     </message>
     <message>
       <source>Archive encryption password</source>
-      <translation type="unfinished">Archive encryption password</translation>
+      <translation>Contrasinal de cifrado do arquivo</translation>
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
-      <translation type="unfinished">Failed to set archive encryption password</translation>
+      <translation>Non se puido definir o contrasinal de cifrado do arquivo</translation>
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
@@ -10628,7 +10624,7 @@ Aínda podes cambiar a calidade e os FPS directamente na cámara.</translation>
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>Os usuarios locais e LDAP pecharán sesión automaticamente se a súa sesión supera a duración especificada.</translation>
     </message>
     <message>
       <source>Learn more.</source>
@@ -10637,19 +10633,19 @@ Aínda podes cambiar a calidade e os FPS directamente na cámara.</translation>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
-      <translation type="unfinished">
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+      <translation>
+        <numerusform>%n de %1 usuarios poden usar a autenticación resumida (non segura).</numerusform>
+        <numerusform>%n de %1 usuarios poden usar a autenticación resumida (non segura).</numerusform>
       </translation>
     </message>
     <message>
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
+      <translation>A duración máxima recomendada das sesións de usuario é %1</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
+      <translation>As marcas de auga mostraranse sobre vídeos en directo, arquivados e exportados só para usuarios non avanzados. Nin ti nin outros usuarios avanzados as veredes.</translation>
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
@@ -10657,7 +10653,7 @@ Aínda podes cambiar a calidade e os FPS directamente na cámara.</translation>
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost</translation>
+      <translation>Perderase a conexión con cámaras que non admitan HTTPS</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
@@ -10704,30 +10700,30 @@ Precaución: este contrasinal non se pode restablecer. Se o perdes, o arquivo se
     <name>nx::vms::client::desktop::ServerCertificateError</name>
     <message>
       <source>Failed to connect to server</source>
-      <translation type="unfinished">Failed to connect to server</translation>
+      <translation>Fallou a conexión co servidor</translation>
     </message>
     <message>
       <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
+      <translation>Ver certificado</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
       <source>The certificate was presented by %1</source>
-      <translation type="unfinished">The certificate was presented by %1</translation>
+      <translation>O certificado foi entregado por %1</translation>
     </message>
     <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
-      <translation type="unfinished">This certificate does not match the certificate %1 is pinned to.</translation>
+      <translation>Este certificado non coincide co certificado ao que está fixado %1.</translation>
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
-      <translation type="unfinished">This is a custom certificate installed on %1</translation>
+      <translation>Este é un certificado personalizado instalado en %1</translation>
     </message>
     <message>
       <source>Pin this certificate to %1?</source>
-      <translation type="unfinished">Pin this certificate to %1?</translation>
+      <translation>Fixar este certificado a %1?</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -10735,29 +10731,29 @@ Precaución: este contrasinal non se pode restablecer. Se o perdes, o arquivo se
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
-      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
+      <translation>O certificado xérase automaticamente e está fixado a %1</translation>
     </message>
     <message>
       <source>Server ID: %1</source>
-      <translation type="unfinished">Server ID: %1</translation>
+      <translation>ID do servidor: %1</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you did not modify %2 Server SSL certificate.</translation>
+      <translation>Pode que alguén estea a suplantar a %1 para roubar a túa información persoal.
+Non fixes este certificado se non modificaches o Certificado SSL do servidor %2.</translation>
     </message>
     <message>
       <source>Custom Certificate</source>
-      <translation type="unfinished">Custom Certificate</translation>
+      <translation>Certificado personalizado</translation>
     </message>
     <message>
       <source>Auto-generated Certificate</source>
-      <translation type="unfinished">Auto-generated Certificate</translation>
+      <translation>Certificado xerado automaticamente</translation>
     </message>
     <message>
       <source>Unknown Certificate</source>
-      <translation type="unfinished">Unknown Certificate</translation>
+      <translation>Certificado descoñecido</translation>
     </message>
     <message>
       <source>OK</source>
@@ -10765,26 +10761,26 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
-      <translation type="unfinished">Contact a user with Administrators permissions to resolve this issue.</translation>
+      <translation>Ponte en contacto cun usuario con permisos de administrador para resolver este problema.</translation>
     </message>
     <message>
       <source>Not Part Of Certificate</source>
-      <translation type="unfinished">Not Part Of Certificate</translation>
+      <translation>Non forma parte do certificado</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
-      <translation type="unfinished">View pinned certificate</translation>
+      <translation>Ver certificado fixado</translation>
     </message>
     <message>
       <source>Pin to this certificate</source>
-      <translation type="unfinished">Pin to this certificate</translation>
+      <translation>Fixar a este certificado</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>Conectar de todos os xeitos</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -11094,15 +11090,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Add more services or fix overuse by stopping using services for some devices.</source>
-      <translation type="unfinished">Add more services or fix overuse by stopping using services for some devices.</translation>
+      <translation>Engade máis servizos ou corrixe o uso excesivo deixando de usar servizos para algúns dispositivos.</translation>
     </message>
     <message>
       <source>If no action is taken, required number of services will be released automatically on %1.</source>
-      <translation type="unfinished">If no action is taken, required number of services will be released automatically on %1.</translation>
+      <translation>Se non se toma ningunha medida, o número requirido de servizos liberarase automaticamente o %1.</translation>
     </message>
     <message>
       <source>Some features may not be available.</source>
-      <translation type="unfinished">Some features may not be available.</translation>
+      <translation>É posible que algunhas funcións non estean dispoñibles.</translation>
     </message>
     <message>
       <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
@@ -11178,18 +11174,18 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Fai dobre clic para engadir cámaras ao deseño actual ou preme Ctrl+clic para abrir nunha nova pestana</numerusform>
+        <numerusform>Fai dobre clic para engadir cámaras ao deseño actual ou preme Ctrl+clic para abrir nunha nova pestana</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>Non hai ningún arquivo dispoñible</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
-      <translation type="unfinished">Failed to execute plugin action</translation>
+      <translation>Fallou a execución da acción do complemento</translation>
     </message>
     <message>
       <source>Name</source>
@@ -11201,11 +11197,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Start time</source>
-      <translation type="unfinished">Start time</translation>
+      <translation>Hora de inicio</translation>
     </message>
     <message>
       <source>Length</source>
-      <translation type="unfinished">Length</translation>
+      <translation>Duración</translation>
     </message>
     <message>
       <source>Created</source>
@@ -11213,7 +11209,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Creator</source>
-      <translation type="unfinished">Creator</translation>
+      <translation>Creador</translation>
     </message>
     <message>
       <source>Tags</source>
@@ -11244,7 +11240,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>Zona horaria</translation>
     </message>
     <message>
       <source>Date</source>
@@ -11252,7 +11248,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>Hora do sistema operativo do servidor</translation>
     </message>
     <message>
       <source>VMS Time</source>
@@ -11263,31 +11259,31 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Hora, común e sincronizada entre todos os servidores. Pode ser diferente coa hora do sistema operativo en calquera servidor en particular.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>Sincronizado con Internet</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Sincronizado coa hora local no servidor seleccionado</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>Non sincronizado. Cada servidor usa a súa propia hora local.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>Igual á hora local do servidor</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>Sen conexión a Internet. Non se está sincronizando a hora.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>O servidor horario está desconectado. A hora non se está sincronizando.</translation>
     </message>
   </context>
   <context>
@@ -11320,50 +11316,50 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>Non se puido abrir o ficheiro &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>Non se puido calcular md5 para o ficheiro &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>Non se puido crear a subida no servidor: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>Non se puido subir o fragmento de ficheiro ao servidor</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>Non se puido comprobar o ficheiro subido no servidor</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>O ficheiro corrompeuse ao subirse ao servidor</translation>
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>O ficheiro remoto &quot;%1&quot; está corrompido</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>O servidor xa ten este ficheiro &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserGroupListModel</name>
     <message>
       <source>LDAP group</source>
-      <translation type="unfinished">LDAP group</translation>
+      <translation>Grupo LDAP</translation>
     </message>
     <message>
       <source>Built-in group</source>
-      <translation type="unfinished">Built-in group</translation>
+      <translation>Grupo integrado</translation>
     </message>
     <message>
       <source>Custom group</source>
-      <translation type="unfinished">Custom group</translation>
+      <translation>Grupo personalizado</translation>
     </message>
     <message>
       <source>Name</source>
@@ -11375,11 +11371,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Group is not found in the LDAP database.</source>
-      <translation type="unfinished">Group is not found in the LDAP database.</translation>
+      <translation>Non se atopou o grupo na base de datos LDAP.</translation>
     </message>
     <message>
       <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
-      <translation type="unfinished">Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</translation>
+      <translation>O grupo ten outro grupo como membro principal e como membro secundario, ou forma parte dunha cadea de referencia circular deste tipo. Isto pode levar a un cálculo incorrecto dos permisos.</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11398,19 +11394,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UserGroupRequestChain</name>
     <message>
       <source>Invalid JSON</source>
-      <translation type="unfinished">Invalid JSON</translation>
+      <translation>JSON non válido</translation>
     </message>
     <message>
       <source>Invalid request</source>
-      <translation type="unfinished">Invalid request</translation>
+      <translation>Solicitude non válida</translation>
     </message>
     <message>
       <source>Method not found</source>
-      <translation type="unfinished">Method not found</translation>
+      <translation>Método non atopado</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
-      <translation type="unfinished">Invalid parameters</translation>
+      <translation>Parámetros non válidos</translation>
     </message>
     <message>
       <source>Internal error</source>
@@ -11418,35 +11414,35 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Connection failure</source>
-      <translation type="unfinished">Connection failure</translation>
+      <translation>Fallo de conexión</translation>
     </message>
     <message>
       <source>Invalid encoding</source>
-      <translation type="unfinished">Invalid encoding</translation>
+      <translation>Codificación non válida</translation>
     </message>
     <message>
       <source>Invalid encoding charset</source>
-      <translation type="unfinished">Invalid encoding charset</translation>
+      <translation>Conxunto de caracteres de codificación non válido</translation>
     </message>
     <message>
       <source>Application Error</source>
-      <translation type="unfinished">Application Error</translation>
+      <translation>Erro da aplicación</translation>
     </message>
     <message>
       <source>Transport Error</source>
-      <translation type="unfinished">Transport Error</translation>
+      <translation>Erro de transporte</translation>
     </message>
     <message>
       <source>Server error code %1</source>
-      <translation type="unfinished">Server error code %1</translation>
+      <translation>Código de erro do servidor %1</translation>
     </message>
     <message>
       <source>Reserved error code %1</source>
-      <translation type="unfinished">Reserved error code %1</translation>
+      <translation>Código de erro reservado %1</translation>
     </message>
     <message>
       <source>Unknown error code %1</source>
-      <translation type="unfinished">Unknown error code %1</translation>
+      <translation>Código de erro descoñecido %1</translation>
     </message>
     <message>
       <source>Site Error</source>
@@ -11486,15 +11482,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. Users are not able to log in.</translation>
+      <translation>O servidor LDAP está desconectado. Os usuarios non poden iniciar sesión.</translation>
     </message>
     <message>
       <source>User is not found in the LDAP database.</source>
-      <translation type="unfinished">User is not found in the LDAP database.</translation>
+      <translation>Non se atopou a persoa usuaria na base de datos LDAP.</translation>
     </message>
     <message>
       <source>Temporary user</source>
-      <translation type="unfinished">Temporary user</translation>
+      <translation>Usuario temporal</translation>
     </message>
     <message>
       <source>Full Name</source>
@@ -11537,15 +11533,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>%1 O usuario co correo electrónico especificado xa existe.</translation>
     </message>
     <message>
       <source>Save user</source>
-      <translation type="unfinished">Save user</translation>
+      <translation>Gardar usuario</translation>
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>Introduce o contrasinal da túa conta</translation>
     </message>
     <message>
       <source>Save</source>
@@ -11557,7 +11553,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>Aplicar os cambios?</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -11565,7 +11561,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Copy Access Link</source>
-      <translation type="unfinished">Copy Access Link</translation>
+      <translation>Copiar ligazón de acceso</translation>
     </message>
     <message>
       <source>Invalid current password</source>
@@ -11573,7 +11569,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Email cannot be empty</source>
-      <translation type="unfinished">Email cannot be empty</translation>
+      <translation>O correo electrónico non pode estar baleiro</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>
@@ -11581,27 +11577,27 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed</translation>
+      <translation>Só se permiten letras, números e símbolos %1</translation>
     </message>
     <message>
       <source>User with specified login already exists</source>
-      <translation type="unfinished">User with specified login already exists</translation>
+      <translation>O usuario co inicio de sesión especificado xa existe</translation>
     </message>
     <message>
       <source>Are you sure you want to terminate access link?</source>
-      <translation type="unfinished">Are you sure you want to terminate access link?</translation>
+      <translation>Seguro que queres cancelar a ligazón de acceso?</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Rematar</translation>
     </message>
     <message>
       <source>Terminate access link</source>
-      <translation type="unfinished">Terminate access link</translation>
+      <translation>Remata a ligazón de acceso</translation>
     </message>
     <message>
       <source>Create access link</source>
-      <translation type="unfinished">Create access link</translation>
+      <translation>Crear ligazón de acceso</translation>
     </message>
     <message>
       <source>Create</source>
@@ -11609,19 +11605,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Nova ligazón - %1</translation>
     </message>
     <message>
       <source>Access link has been successfully created!</source>
-      <translation type="unfinished">Access link has been successfully created!</translation>
+      <translation>A ligazón de acceso creouse correctamente!</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
-      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended. Some actions may not work.</translation>
+      <translation>Non se recomenda conceder permisos amplos ao usuario temporal. É posible que algunhas accións non funcionen.</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended.</source>
-      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended.</translation>
+      <translation>Non se recomenda conceder permisos amplos ao usuario temporal.</translation>
     </message>
     <message>
       <source>and</source>
@@ -11630,29 +11626,29 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Nova/o usuaria/o</translation>
     </message>
     <message>
       <source>User %1 has been successfully created!</source>
-      <translation type="unfinished">User %1 has been successfully created!</translation>
+      <translation>O usuario %1 foi creado correctamente!</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Obtendo ligazón...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Asegúrate de que este ordenador sexa capaz de conectarse ao %1</translation>
     </message>
     <message>
       <source>in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">in %1</translation>
+      <translation>en %1</translation>
     </message>
     <message>
       <source>Copy the Access Link and share it with intended user</source>
-      <translation type="unfinished">Copy the Access Link and share it with intended user</translation>
+      <translation>Copia a ligazón de acceso e compártea co usuario previsto</translation>
     </message>
     <message>
       <source>This will instantly remove an access to the site for this user</source>
@@ -11667,7 +11663,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>
     <message>
       <source>Select Version</source>
-      <translation type="unfinished">Select Version</translation>
+      <translation>Seleccionar versión</translation>
     </message>
     <message>
       <source>Version</source>
@@ -11675,7 +11671,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Invalid version.</source>
-      <translation type="unfinished">Invalid version.</translation>
+      <translation>Versión non válida.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -11683,7 +11679,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation type="unfinished">The password is incorrect.</translation>
+      <translation>O contrasinal é incorrecto.</translation>
     </message>
   </context>
   <context>
@@ -11860,22 +11856,22 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::VirtualCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>Só se detecta movemento durante a carga do vídeo.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>Activar ou desactivar esta configuración non cambia nada no arquivo existente.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::VirtualCameraUploadWidget</name>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>Outro usuario está a subir imaxes a esta cámara.</translation>
     </message>
     <message>
       <source>User %1 is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User %1 is currently uploading footage to this camera.</translation>
+      <translation>O usuario %1 está a subir imaxes a esta cámara.</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
@@ -11885,19 +11881,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Finalizing %1...</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">Finalizing %1...</translation>
+      <translation>Finalizando %1...</translation>
     </message>
     <message>
       <source>Uploading %1...</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">Uploading %1...</translation>
+      <translation>Cargando %1...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::VirtualCameraWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>Non se puido enviar a solicitude ao servidor.</translation>
     </message>
   </context>
   <context>
@@ -11908,13 +11904,13 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Tenta cambiar os filtros ou crear unha regra de evento</translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
-      <translation type="unfinished">
-        <numerusform>%n events</numerusform>
-        <numerusform>%n events</numerusform>
+      <translation>
+        <numerusform>%n eventos</numerusform>
+        <numerusform>%n eventos</numerusform>
       </translation>
     </message>
   </context>
@@ -11922,19 +11918,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
     <message>
       <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
+      <translation>Abrir esta integración?</translation>
     </message>
     <message>
       <source>Open this web page?</source>
-      <translation type="unfinished">Open this web page?</translation>
+      <translation>Abrir esta páxina web?</translation>
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integración</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Páxina web</translation>
     </message>
     <message>
       <source>You try to open the
@@ -11942,10 +11938,10 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
 but this integration presented an untrusted certificate auth.
 We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
+      <translation>Tentas abrir o
 %1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+pero esta integración presentou unha autenticación de certificado non fiable.
+Recomendámosche que non abras esta integración. Se comprendes os riscos, podes abrir a integración.</translation>
     </message>
     <message>
       <source>You try to open the
@@ -11953,25 +11949,25 @@ We recommend you not to open this integration. If you understand the risks, you 
 but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">You try to open the
+      <translation>Tentas abrir a
 %1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
+pero esta páxina web presentou unha autenticación de certificado non fiable.
+Recomendámosche que non abras esta páxina web. Se comprendes os riscos, podes abrir a páxina web.</translation>
     </message>
     <message>
       <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <translation>Conectarse igualmente</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WebViewController</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+      <translation>O proxy %1 require un nome de usuario e un contrasinal.</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Seleccionar cartafol para cargar</translation>
     </message>
     <message>
       <source>Developer Tools</source>
@@ -11990,22 +11986,22 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::WeekTimeScheduleDialog</name>
     <message>
       <source>Empty schedule is not allowed</source>
-      <translation type="unfinished">Empty schedule is not allowed</translation>
+      <translation>Non se permite unha programación baleira</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WelcomeScreen</name>
     <message>
       <source>Are you sure you want to hide this tile?</source>
-      <translation type="unfinished">Are you sure you want to hide this tile?</translation>
+      <translation>Seguro que queres ocultar este mosaico?</translation>
     </message>
     <message>
       <source>You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</source>
-      <translation type="unfinished">You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</translation>
+      <translation>Poderás acceder ao menú de inicio de sesión %1 en calquera momento facendo clic na icona da nube no panel de navegación.</translation>
     </message>
     <message>
       <source>Hide</source>
-      <translation type="unfinished">Hide</translation>
+      <translation>Agochar</translation>
     </message>
     <message>
       <source>Unable to connect to the site because it has become offline</source>
@@ -12016,7 +12012,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message>
       <source>Export completed</source>
-      <translation type="unfinished">Export completed</translation>
+      <translation>Exportación completada</translation>
     </message>
     <message>
       <source>Export failed</source>
@@ -12024,41 +12020,41 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>Non se pode exportar o período seleccionado para a cámara actual.</translation>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Pódense exportar varios marcadores só como deseño.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
-      <translation type="unfinished">Local files not allowed for Multi-Video export</translation>
+      <translation>Ficheiros locais non permitidos para a exportación de varios vídeos</translation>
     </message>
     <message>
       <source>Please remove all local files from the layout and try again.</source>
-      <translation type="unfinished">Please remove all local files from the layout and try again.</translation>
+      <translation>Por favor, elimina todos os ficheiros locais do deseño e téntao de novo.</translation>
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>Iniciando a exportación...</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation type="unfinished">Saving failed</translation>
+      <translation>Produciuse un erro ao gardar</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation type="unfinished">Starting saving...</translation>
+      <translation>Comezando a gardar...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>Estamos a preparar os ficheiros para o proceso de exportación. Por favor, agarda uns segundos.</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>%n marcadores</numerusform>
+        <numerusform>%n marcadores</numerusform>
       </translation>
     </message>
   </context>
@@ -12066,15 +12062,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
     <message>
       <source>%1 version available</source>
-      <translation type="unfinished">%1 version available</translation>
+      <translation>Versión %1 dispoñible</translation>
     </message>
     <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation type="unfinished">Major issues have been fixed. Update is strongly recommended.</translation>
+      <translation>Corrixíronse problemas importantes. Recoméndase encarecidamente a actualización.</translation>
     </message>
     <message>
       <source>Updates</source>
-      <translation type="unfinished">Updates</translation>
+      <translation>Actualizacións</translation>
     </message>
     <message>
       <source>Release Notes...</source>
@@ -12082,7 +12078,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>%1 Version is available</source>
-      <translation type="unfinished">%1 Version is available</translation>
+      <translation>%1 A versión está dispoñible</translation>
     </message>
     <message>
       <source>Skip Version</source>
@@ -12112,7 +12108,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::backup_settings_view::BackupSettingsViewStrings</name>
     <message>
       <source>All archive</source>
-      <translation type="unfinished">All archive</translation>
+      <translation>Todo o arquivo</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -12128,15 +12124,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>High-Res</source>
-      <translation type="unfinished">High-Res</translation>
+      <translation>Alta resolución</translation>
     </message>
     <message>
       <source>Low-Res</source>
-      <translation type="unfinished">Low-Res</translation>
+      <translation>Baixa resolución</translation>
     </message>
     <message>
       <source>All streams</source>
-      <translation type="unfinished">All streams</translation>
+      <translation>Todas as transmisións</translation>
     </message>
   </context>
   <context>
@@ -12169,7 +12165,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Presentacións</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -12181,15 +12177,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Local Files</source>
-      <translation type="unfinished">Local Files</translation>
+      <translation>Ficheiros locais</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation type="unfinished">All Cameras &amp; Resources</translation>
+      <translation>Todas as cámaras e recursos</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
-      <translation type="unfinished">All Shared Layouts</translation>
+      <translation>Todos os deseños compartidos</translation>
     </message>
     <message>
       <source>Cameras &amp; Resources</source>
@@ -12201,11 +12197,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Monitores de saúde</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Video Walls / Muros</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -12213,7 +12209,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Páxinas web e integracións</translation>
     </message>
     <message>
       <source>Other Sites</source>
@@ -12228,7 +12224,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>New Group %1</source>
-      <translation type="unfinished">New Group %1</translation>
+      <translation>Novo grupo %1</translation>
     </message>
   </context>
   <context>
@@ -12239,7 +12235,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>In progress... (%1 left)</source>
-      <translation type="unfinished">In progress... (%1 left)</translation>
+      <translation>En progreso... (%1 esquerda)</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -12255,7 +12251,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Imported up to</source>
-      <translation type="unfinished">Imported up to</translation>
+      <translation>Importado ata</translation>
     </message>
     <message>
       <source>Status</source>
@@ -12274,21 +12270,21 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
     <message>
       <source>Latest</source>
-      <translation type="unfinished">Latest</translation>
+      <translation>Mais Recente</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
     <message>
       <source>Overlapped ID...</source>
-      <translation type="unfinished">Overlapped ID...</translation>
+      <translation>Identificación superposta...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
-      <translation type="unfinished">No Action</translation>
+      <translation>Sen acción</translation>
     </message>
     <message>
       <source>Focus Near</source>
@@ -12300,23 +12296,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Autofocus</source>
-      <translation type="unfinished">Autofocus</translation>
+      <translation>Enfoque automático</translation>
     </message>
     <message>
       <source>Go to PTZ Position</source>
-      <translation type="unfinished">Go to PTZ Position</translation>
+      <translation>Ir á posición PTZ</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>Establecer a pantalla completa</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
-      <translation type="unfinished">Next Camera on Layout</translation>
+      <translation>Seguinte cámara no deseño</translation>
     </message>
     <message>
       <source>Previous Camera on Layout</source>
-      <translation type="unfinished">Previous Camera on Layout</translation>
+      <translation>Cámara anterior no deseño</translation>
     </message>
     <message>
       <source>Open Layout</source>
@@ -12324,7 +12320,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Modifier</source>
-      <translation type="unfinished">Modifier</translation>
+      <translation>Modificador</translation>
     </message>
     <message>
       <source>Multiple</source>
@@ -12335,11 +12331,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation type="unfinished">Select Layout...</translation>
+      <translation>Seleccionar deseño...</translation>
     </message>
     <message>
       <source>Button</source>
-      <translation type="unfinished">Button</translation>
+      <translation>Botón</translation>
     </message>
     <message>
       <source>Selected Layout</source>
@@ -12350,7 +12346,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
     <message>
       <source>Resource is not available for the usage with JS API</source>
-      <translation type="unfinished">Resource is not available for the usage with JS API</translation>
+      <translation>O recurso non está dispoñible para o seu uso coa API de JS</translation>
     </message>
     <message>
       <source>Resource not found</source>
@@ -12365,19 +12361,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
       <source>Cannot specify a media parameters for the resource without media stream.</source>
-      <translation type="unfinished">Cannot specify a media parameters for the resource without media stream.</translation>
+      <translation>Non se poden especificar parámetros multimedia para o recurso sen fluxo multimedia.</translation>
     </message>
     <message>
       <source>Cannot add the resource to the layout</source>
-      <translation type="unfinished">Cannot add the resource to the layout</translation>
+      <translation>Non se pode engadir o recurso ao deseño</translation>
     </message>
     <message>
       <source>Cannot find an item with the specified ID</source>
-      <translation type="unfinished">Cannot find an item with the specified ID</translation>
+      <translation>Non se pode atopar un elemento co ID especificado</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified ID.</source>
-      <translation type="unfinished">Cannot find a resource with the specified ID.</translation>
+      <translation>Non se pode atopar un recurso co ID especificado.</translation>
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
@@ -12408,12 +12404,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ preset</comment>
-      <translation type="unfinished">%1 (active)</translation>
+      <translation>%1 (activo)</translation>
     </message>
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
-      <translation type="unfinished">%1 (active)</translation>
+      <translation>%1 (activo)</translation>
     </message>
   </context>
   <context>
@@ -12447,7 +12443,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Regions of Interest</source>
-      <translation type="unfinished">Regions of Interest</translation>
+      <translation>Rexións de interese</translation>
     </message>
     <message>
       <source>Hotspots</source>
@@ -12455,33 +12451,33 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Toolbar</source>
-      <translation type="unfinished">Toolbar</translation>
+      <translation>Barra de ferramentas</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::menu::ShowreelSettingsFactory</name>
     <message>
       <source>Switch with Hotkeys</source>
-      <translation type="unfinished">Switch with Hotkeys</translation>
+      <translation>Cambiar con teclas de atallo</translation>
     </message>
     <message>
       <source>Switch on Timer</source>
-      <translation type="unfinished">Switch on Timer</translation>
+      <translation>Acender temporizador</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::menu::ShowreelTextFactory</name>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Deter visita guiada</translation>
     </message>
     <message>
       <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
+      <translation>Parar a presentación</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Comezar a visita guiada</translation>
     </message>
     <message>
       <source>Start Showreel</source>
@@ -12492,33 +12488,33 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::AnalyticsEventTypePicker</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics events can be set up on a certain cameras.</translation>
+      <translation>Os eventos de análise pódense configurar en determinadas cámaras.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
+      <translation>Escolle as cámaras usando o botón de arriba para ver a lista de eventos compatibles.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::AnalyticsObjectAttributesPicker</name>
     <message>
       <source>Event will trigger only if there are matches any of attributes.</source>
-      <translation type="unfinished">Event will trigger only if there are matches any of attributes.</translation>
+      <translation>O evento só se activará se hai coincidencias con algún dos atributos.</translation>
     </message>
     <message>
       <source>You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation type="unfinished">You can see the names of the attributes and their values on the Objects tab.</translation>
+      <translation>Podes ver os nomes dos atributos e os seus valores na pestana Obxectos.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::AnalyticsObjectTypePicker</name>
     <message>
       <source>Analytics object detection can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics object detection can be set up on a certain cameras.</translation>
+      <translation>A detección de obxectos de análise pódese configurar en determinadas cámaras.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
+      <translation>Escolle as cámaras usando o botón de arriba para ver a lista de eventos compatibles.</translation>
     </message>
   </context>
   <context>
@@ -12533,19 +12529,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>WHEN</source>
-      <translation type="unfinished">WHEN</translation>
+      <translation>CANDO</translation>
     </message>
     <message>
       <source>EVENT</source>
-      <translation type="unfinished">EVENT</translation>
+      <translation>EVENTO</translation>
     </message>
     <message>
       <source>DO</source>
-      <translation type="unfinished">DO</translation>
+      <translation>FACER</translation>
     </message>
     <message>
       <source>ACTION</source>
-      <translation type="unfinished">ACTION</translation>
+      <translation>ACCIÓN</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -12624,7 +12620,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
     <message>
       <source>Has attributes</source>
-      <translation type="unfinished">Has attributes</translation>
+      <translation>Ten atributos</translation>
     </message>
     <message>
       <source>Attributes</source>
@@ -12635,7 +12631,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::OptionalDurationPicker</name>
     <message>
       <source>Once in</source>
-      <translation type="unfinished">Once in</translation>
+      <translation>Unha vez dentro</translation>
     </message>
     <message>
       <source>For</source>
@@ -12662,11 +12658,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Comment</source>
-      <translation type="unfinished">Comment</translation>
+      <translation>Comentar</translation>
     </message>
     <message>
       <source>No source</source>
-      <translation type="unfinished">No source</translation>
+      <translation>Sen fonte</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -12692,7 +12688,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No target</source>
-      <translation type="unfinished">No target</translation>
+      <translation>Sen obxectivo</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
@@ -12703,7 +12699,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Todas as persoas usuarias</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
@@ -12738,7 +12734,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::SingleTargetLayoutPicker</name>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+      <translation>Buscas un deseño local? Selecciona só un usuario da lista &quot;Mostrar a&quot; para mostrar os seus deseños locais como unha opción aquí.</translation>
     </message>
   </context>
   <context>
@@ -12771,15 +12767,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
     <message>
       <source>Contains keywords</source>
-      <translation type="unfinished">Contains keywords</translation>
+      <translation>Contén palabras clave</translation>
     </message>
     <message>
       <source>Contains list entries</source>
-      <translation type="unfinished">Contains list entries</translation>
+      <translation>Contén entradas da lista</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Palabras clave separadas por espazo</translation>
     </message>
     <message>
       <source>From</source>
@@ -12798,7 +12794,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
     <message>
       <source>Lookup lists network request failed</source>
-      <translation type="unfinished">Lookup lists network request failed</translation>
+      <translation>Fallou a solicitude de rede de listas de busca</translation>
     </message>
   </context>
   <context>
@@ -12855,7 +12851,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Used</source>
-      <translation type="unfinished">Used</translation>
+      <translation>Usado</translation>
     </message>
     <message>
       <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
@@ -12886,14 +12882,14 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Calquera plugin/complemento</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Todas as persoas usuarias</translation>
     </message>
     <message>
       <source>Users</source>
@@ -12901,12 +12897,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Custom Users</source>
-      <translation type="unfinished">Custom Users</translation>
+      <translation>Usuarios personalizados</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>%1 usuarios</translation>
     </message>
   </context>
   <context>
@@ -12917,11 +12913,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Name is necessary</source>
-      <translation type="unfinished">Name is necessary</translation>
+      <translation>O nome é necesario</translation>
     </message>
     <message>
       <source>Reason is necessary</source>
-      <translation type="unfinished">Reason is necessary</translation>
+      <translation>A razón é necesaria</translation>
     </message>
     <message>
       <source>Name</source>
@@ -12933,33 +12929,33 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Reason for deactivation</source>
-      <translation type="unfinished">Reason for deactivation</translation>
+      <translation>Motivo da desactivación</translation>
     </message>
     <message>
       <source>- Choose one -</source>
-      <translation type="unfinished">- Choose one -</translation>
+      <translation>- Escolle un -</translation>
     </message>
     <message>
       <source>I am upgrading my machine</source>
-      <translation type="unfinished">I am upgrading my machine</translation>
+      <translation>Estou actualizando a miña máquina</translation>
     </message>
     <message>
       <source>I accidentally assigned the license to a wrong machine</source>
-      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
+      <translation>Asignei accidentalmente a licenza a unha máquina incorrecta</translation>
     </message>
     <message>
       <source>Other Reason</source>
-      <translation type="unfinished">Other Reason</translation>
+      <translation>Outra razón</translation>
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Por favor, completa o seguinte para a desactivación da licenza</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>Ten en conta que cada clave de licenza pode desactivarse un máximo de %n veces.</numerusform>
+        <numerusform>Ten en conta que cada clave de licenza pode desactivarse un máximo de %n veces.</numerusform>
       </translation>
     </message>
   </context>
@@ -12967,9 +12963,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Usuarios</numerusform>
+        <numerusform>%n Usuarios</numerusform>
       </translation>
     </message>
   </context>
@@ -12977,56 +12973,56 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>O deseño está cheo</translation>
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation type="unfinished">Failed to change password</translation>
+      <translation>Non se puido cambiar o contrasinal</translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n devices</numerusform>
-        <numerusform>Failed to move %n devices</numerusform>
+      <translation>
+        <numerusform>Non se puideron mover %n dispositivos</numerusform>
+        <numerusform>Non se puideron mover %n dispositivos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n cameras</numerusform>
-        <numerusform>Failed to move %n cameras</numerusform>
+      <translation>
+        <numerusform>Non se puideron mover %n cámaras</numerusform>
+        <numerusform>Non se puideron mover %n cámaras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n I/O Modules</numerusform>
-        <numerusform>Failed to move %n I/O Modules</numerusform>
+      <translation>
+        <numerusform>Non se puideron mover %n módulos de E/S (I/O)</numerusform>
+        <numerusform>Non se puideron mover %n módulos de E/S (I/O)</numerusform>
       </translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; is not responding.</source>
-      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
+      <translation>O servidor &quot;%1&quot; non responde.</translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>O servidor &quot;%1&quot; non pode acceder a %n dispositivos. Queres movelos de todos os xeitos?</numerusform>
+        <numerusform>O servidor &quot;%1&quot; non pode acceder a %n dispositivos. Queres movelos de todos os xeitos?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>O servidor &quot;%1&quot; non pode acceder a %n cámaras. Queres movelas de todos os xeitos?</numerusform>
+        <numerusform>O servidor &quot;%1&quot; non pode acceder a %n cámaras. Queres movelas de todos os xeitos?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>O servidor &quot;%1&quot; non pode acceder %n módulos de E/S (I/O). Queres movelos de todos os xeitos?</numerusform>
+        <numerusform>O servidor &quot;%1&quot; non pode acceder %n módulos de E/S (I/O). Queres movelos de todos os xeitos?</numerusform>
       </translation>
     </message>
     <message>
@@ -13035,82 +13031,82 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
-      <translation type="unfinished">Layout is locked and cannot be changed</translation>
+      <translation>O deseño está bloqueado e non se pode cambiar</translation>
     </message>
     <message>
       <source>Open File</source>
-      <translation type="unfinished">Open File</translation>
+      <translation>Abrir ficheiro</translation>
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Todos compatibles</translation>
     </message>
     <message>
       <source>Too short period selected</source>
-      <translation type="unfinished">Too short period selected</translation>
+      <translation>Seleccionouse un período demasiado curto</translation>
     </message>
     <message>
       <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-      <translation type="unfinished">Cannot perform Preview Search. Please select a period of 15 seconds or longer.</translation>
+      <translation>Non se pode realizar a busca de vista previa. Seleccione un período de 15 segundos ou máis.</translation>
     </message>
     <message>
       <source>Preview Search for %1</source>
-      <translation type="unfinished">Preview Search for %1</translation>
+      <translation>Vista previa Busca de %1</translation>
     </message>
     <message>
       <source>Confirm files deleting</source>
-      <translation type="unfinished">Confirm files deleting</translation>
+      <translation>Confirmar a eliminación de ficheiros</translation>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation type="unfinished">
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+      <translation>
+        <numerusform>Seguro que queres eliminar permanentemente estes %n ficheiros?</numerusform>
+        <numerusform>Seguro que queres eliminar permanentemente estes %n ficheiros?</numerusform>
       </translation>
     </message>
     <message>
       <source>There is another user with the same name</source>
-      <translation type="unfinished">There is another user with the same name</translation>
+      <translation>Hai outra persoa usuaria co mesmo nome</translation>
     </message>
     <message>
       <source>Updating Background...</source>
-      <translation type="unfinished">Updating Background...</translation>
+      <translation>Actualizando o fondo...</translation>
     </message>
     <message>
       <source>Image processing may take a few moments. Please be patient.</source>
-      <translation type="unfinished">Image processing may take a few moments. Please be patient.</translation>
+      <translation>O procesamento da imaxe pode tardar uns intres. Por favor, ten paciencia.</translation>
     </message>
     <message>
       <source>Failed to upload image</source>
-      <translation type="unfinished">Failed to upload image</translation>
+      <translation>Non se puido cargar a imaxe</translation>
     </message>
     <message>
       <source>Beta version %1</source>
-      <translation type="unfinished">Beta version %1</translation>
+      <translation>Versión beta %1</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Por favor, actualíza á seguinte versión ou parche dispoñible unha vez que estea dispoñible.</translation>
     </message>
     <message>
       <source>Failed to open server web page</source>
-      <translation type="unfinished">Failed to open server web page</translation>
+      <translation>Non se puido abrir a páxina web do servidor</translation>
     </message>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Non se puido cambiar o contrasinal en %n cámaras de %1</numerusform>
+        <numerusform>Non se puido cambiar o contrasinal en %n cámaras de %1</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Esta compilación é só para fins de proba.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>Abrir a configuración do servidor</translation>
     </message>
     <message>
       <source>OK</source>
@@ -13118,45 +13114,45 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>Confirmar a localización de almacenamento dos datos analíticos en &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>a partición máis grande dispoñible</translation>
     </message>
     <message>
       <source>Window configuration saved</source>
-      <translation type="unfinished">Window configuration saved</translation>
+      <translation>Configuración da ventá gardada</translation>
     </message>
     <message>
       <source>This build is for demo purposes only.</source>
-      <translation type="unfinished">This build is for demo purposes only.</translation>
+      <translation>Esta versión é só para fins de demostración.</translation>
     </message>
     <message>
       <source>It cannot be upgraded to subsequent builds as they become available.</source>
-      <translation type="unfinished">It cannot be upgraded to subsequent builds as they become available.</translation>
+      <translation>Non se pode actualizar a versións posteriores a medida que estean dispoñibles.</translation>
     </message>
     <message>
       <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
       <comment>%1 is the product name</comment>
-      <translation type="unfinished">To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</translation>
+      <translation>Para actualizar, desinstala %1 antes de instalar unha versión actualizada (perderanse todos os datos).</translation>
     </message>
     <message>
       <source>%1 Beta</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 Beta</translation>
+      <translation>%1 Beta</translation>
     </message>
     <message>
       <source>Undo replacement completed successfully!</source>
-      <translation type="unfinished">Undo replacement completed successfully!</translation>
+      <translation>Desfacer a substitución completouse correctamente!</translation>
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
-      <translation type="unfinished">Some settings may not be transferred from the replaced camera due to compatibility issues.</translation>
+      <translation>É posible que algúns axustes non se poidan transferir da cámara substituída debido a problemas de compatibilidade.</translation>
     </message>
     <message>
       <source>Confirm undo replacement?</source>
-      <translation type="unfinished">Confirm undo replacement?</translation>
+      <translation>Confirmar desfacer a substitución?</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -13164,19 +13160,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
-      <translation type="unfinished">There are no suitable cameras for replacement on the Server &quot;%1&quot;</translation>
+      <translation>Non hai cámaras axeitadas para substitución no servidor &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Not enough access rights</source>
-      <translation type="unfinished">Not enough access rights</translation>
+      <translation>Non hai suficientes dereitos de acceso</translation>
     </message>
     <message>
       <source>You do not have permissions to open this camera on the layout</source>
-      <translation type="unfinished">You do not have permissions to open this camera on the layout</translation>
+      <translation>Non tes permisos para abrir esta cámara no deseño</translation>
     </message>
     <message>
       <source>You do not have permissions to open some of selected cameras on the layout</source>
-      <translation type="unfinished">You do not have permissions to open some of selected cameras on the layout</translation>
+      <translation>Non tes permisos para abrir algunhas das cámaras seleccionadas no deseño</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
@@ -13193,23 +13189,23 @@ Pode seleccionar outra localización de almacenamento na pestana &quot;Xestión 
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation type="unfinished">Save File As...</translation>
+      <translation>Gardar ficheiro como...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Non se puido sobrescribir o ficheiro</translation>
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation type="unfinished">Failed to save file</translation>
+      <translation>Non se puido gardar o ficheiro</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation type="unfinished">%1 folder is blocked for writing.</translation>
+      <translation>O cartafol %1 está bloqueado para a escritura.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Descargando ficheiro...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -13217,29 +13213,29 @@ Pode seleccionar outra localización de almacenamento na pestana &quot;Xestión 
     </message>
     <message>
       <source>Stop file downloading?</source>
-      <translation type="unfinished">Stop file downloading?</translation>
+      <translation>Deter a descarga do ficheiro?</translation>
     </message>
     <message>
       <source>File downloaded</source>
-      <translation type="unfinished">File downloaded</translation>
+      <translation>Ficheiro descargado</translation>
     </message>
     <message>
       <source>File downloading failed</source>
-      <translation type="unfinished">File downloading failed</translation>
+      <translation>Fallou a descarga do ficheiro</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::ControlWidget</name>
     <message>
       <source>NVR cameras do not support not-synchronized playback</source>
-      <translation type="unfinished">NVR cameras do not support not-synchronized playback</translation>
+      <translation>As cámaras NVR non admiten a reprodución non sincronizada</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::NavigationWidget</name>
     <message>
       <source>Speed Down</source>
-      <translation type="unfinished">Speed Down</translation>
+      <translation>Reducir a velocidade</translation>
     </message>
     <message>
       <source>Previous Frame</source>
@@ -13247,7 +13243,7 @@ Pode seleccionar outra localización de almacenamento na pestana &quot;Xestión 
     </message>
     <message>
       <source>Speed Up</source>
-      <translation type="unfinished">Speed Up</translation>
+      <translation>Acelerar</translation>
     </message>
     <message>
       <source>Next Frame</source>
@@ -13255,7 +13251,7 @@ Pode seleccionar outra localización de almacenamento na pestana &quot;Xestión 
     </message>
     <message>
       <source>Previous Chunk</source>
-      <translation type="unfinished">Previous Chunk</translation>
+      <translation>Fragmento anterior</translation>
     </message>
     <message>
       <source>To Start</source>
@@ -13263,7 +13259,7 @@ Pode seleccionar outra localización de almacenamento na pestana &quot;Xestión 
     </message>
     <message>
       <source>Next Chunk</source>
-      <translation type="unfinished">Next Chunk</translation>
+      <translation>Seguinte fragmento</translation>
     </message>
     <message>
       <source>To End</source>
@@ -13271,65 +13267,65 @@ Pode seleccionar outra localización de almacenamento na pestana &quot;Xestión 
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>
-      <translation type="unfinished">Rewind is not available for VMAX</translation>
+      <translation>O rebobinado non está dispoñible para VMAX</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::SpeedSlider</name>
     <message>
       <source>%1x</source>
-      <translation type="unfinished">%1x</translation>
+      <translation>%1x</translation>
     </message>
     <message>
       <source>Paused</source>
-      <translation type="unfinished">Paused</translation>
+      <translation>En pausa</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::workbench::timeline::VolumeSlider</name>
     <message>
       <source>Muted</source>
-      <translation type="unfinished">Muted</translation>
+      <translation>Silenciado</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::update::desktop::ClientUpdateManager</name>
     <message>
       <source>Restart Client</source>
-      <translation type="unfinished">Restart Client</translation>
+      <translation>Reiniciar cliente</translation>
     </message>
     <message>
       <source>Updates Settings</source>
-      <translation type="unfinished">Updates Settings</translation>
+      <translation>Configuración de actualizacións</translation>
     </message>
     <message>
       <source>Client update is installed</source>
-      <translation type="unfinished">Client update is installed</translation>
+      <translation>A actualización do cliente está instalada</translation>
     </message>
     <message>
       <source>Client is updated to version %1. Restart %2 to finish update.</source>
       <comment>%1 is a version like &apos;4.3.0&apos;, %2 is a VMS name like &apos;Nx Witness&apos;</comment>
-      <translation type="unfinished">Client is updated to version %1. Restart %2 to finish update.</translation>
+      <translation>O cliente actualizouse á versión %1. Reinicie %2 para rematar a actualización.</translation>
     </message>
     <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>
-      <translation type="unfinished">New client-only updates will be installed automatically. You can change this in the settings.</translation>
+      <translation>As novas actualizacións só para clientes instalaranse automaticamente. Podes cambiar isto na configuración.</translation>
     </message>
     <message>
       <source>Cannot check for update.</source>
-      <translation type="unfinished">Cannot check for update.</translation>
+      <translation>Non se pode comprobar se hai actualizacións.</translation>
     </message>
     <message>
       <source>Client update package is broken.</source>
-      <translation type="unfinished">Client update package is broken.</translation>
+      <translation>O paquete de actualización do cliente está danado.</translation>
     </message>
     <message>
       <source>Client update package is missing for current platform.</source>
-      <translation type="unfinished">Client update package is missing for current platform.</translation>
+      <translation>Falta o paquete de actualización do cliente para a plataforma actual.</translation>
     </message>
     <message>
       <source>Cannot check Client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Cannot check Client update availability. Check your internet connection and try again.</translation>
+      <translation>Non se pode comprobar a dispoñibilidade das actualizacións do cliente. Comproba a túa conexión a internet e téntao de novo.</translation>
     </message>
     <message>
       <source>Client auto-updates</source>
@@ -13340,7 +13336,7 @@ Pode seleccionar outra localización de almacenamento na pestana &quot;Xestión 
     <name>runApplication</name>
     <message>
       <source>Would you like to try switching to DirectX?</source>
-      <translation type="unfinished">Would you like to try switching to DirectX?</translation>
+      <translation>Queres probar a cambiar a DirectX?</translation>
     </message>
   </context>
 </TS>

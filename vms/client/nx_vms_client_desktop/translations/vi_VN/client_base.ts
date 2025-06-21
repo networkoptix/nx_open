@@ -3453,10 +3453,6 @@ Khóa giấy phép: %2</translation>
         <numerusform>Thiết lập cho %n thiết bị</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation>Yêu cầu ủy quyền đám mây chỉ nên được thực hiện cho các tài nguyên chéo các hệ thống đám mây</translation>
-    </message>
   </context>
   <context>
     <name>QnMessageBox</name>

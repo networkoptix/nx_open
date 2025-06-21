@@ -1345,7 +1345,7 @@
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Integración</translation>
     </message>
     <message>
       <source>Cloud storage</source>

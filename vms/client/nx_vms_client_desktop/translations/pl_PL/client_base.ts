@@ -3552,10 +3552,6 @@ Klucz licencyjny: %2</translation>
         <numerusform>Set for %n devices</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Cloud authorization request should only be performed for cloud cross system resources</source>
-      <translation>Żądanie autoryzacji w chmurze powinno być wykonywane tylko dla zasobów międzysystemowych w chmurze</translation>
-    </message>
   </context>
   <context>
     <name>QnMessageBox</name>
