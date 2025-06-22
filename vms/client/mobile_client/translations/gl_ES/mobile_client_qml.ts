@@ -821,11 +821,11 @@
     </message>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Acceso aos recursos denegado</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Os sitios en estado Suspendido ou Pechado non están dispoñibles</translation>
     </message>
   </context>
   <context>

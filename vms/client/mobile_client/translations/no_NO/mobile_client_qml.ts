@@ -825,7 +825,7 @@
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Systemer i Suspendert eller "Shutdown"-tilstand er ikke tilgjengelig</translation>
     </message>
   </context>
   <context>

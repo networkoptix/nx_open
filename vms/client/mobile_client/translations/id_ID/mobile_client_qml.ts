@@ -820,11 +820,11 @@
     </message>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Akses ke Resources Ditolak</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+      <translation>Site dalam status Disuspensi atau Dimatikan tidak tersedia di</translation>
     </message>
   </context>
   <context>
