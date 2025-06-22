@@ -153,7 +153,7 @@
     <name>AnalyticsSdkEventWidget</name>
     <message>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Palabras clave separadas por espazo</translation>
     </message>
     <message>
       <source>Caption contains:</source>
@@ -649,7 +649,7 @@
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Páxina web</translation>
     </message>
     <message>
       <source>Web Page Port</source>
@@ -711,7 +711,7 @@
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Páxina web</translation>
     </message>
     <message>
       <source>Primary Stream</source>
@@ -927,7 +927,7 @@
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Presentacións</translation>
     </message>
     <message>
       <source>Read more on the help page</source>
@@ -1006,7 +1006,7 @@
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Palabras clave separadas por espazo</translation>
     </message>
     <message>
       <source>Caption contains:</source>
@@ -1315,7 +1315,7 @@
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Sen conmutación por erro</translation>
     </message>
   </context>
   <context>
@@ -1778,7 +1778,7 @@
     <name>LookAndFeelPreferencesWidget</name>
     <message>
       <source>Look and Feel</source>
-      <translation type="unfinished">Look and Feel</translation>
+      <translation>Aparencia e comportamento</translation>
     </message>
     <message>
       <source>Background Image</source>
@@ -2036,7 +2036,7 @@
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Palabras clave separadas por espazo</translation>
     </message>
     <message>
       <source>Description contains:</source>
@@ -2105,7 +2105,7 @@
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Comezar a visita guiada</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2215,7 +2215,7 @@
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
-      <translation type="unfinished">Do not show this message again</translation>
+      <translation>Non mostrar esta mensaxe de novo</translation>
     </message>
   </context>
   <context>
@@ -2493,7 +2493,7 @@
     </message>
     <message>
       <source>Motion Only</source>
-      <translation type="unfinished">Motion Only</translation>
+      <translation>Só movemento</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>

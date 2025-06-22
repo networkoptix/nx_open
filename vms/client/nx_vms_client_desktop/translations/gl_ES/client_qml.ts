@@ -87,7 +87,7 @@
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Actualizacións automáticas do cliente</translation>
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
@@ -550,7 +550,7 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Fai clic na icona para ler máis</translation>
     </message>
   </context>
   <context>
@@ -677,7 +677,7 @@
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Tenta cambiar os filtros ou crear unha regra de evento</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -1312,7 +1312,7 @@
     <name>LeftPanel</name>
     <message>
       <source>Local Files</source>
-      <translation type="unfinished">Local Files</translation>
+      <translation>Ficheiros locais</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -1356,7 +1356,7 @@
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation type="unfinished">Select Camera...</translation>
+      <translation>Seleccionar cámara...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
@@ -1364,7 +1364,7 @@
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Selecciona un intervalo de tempo na liña de tempo e fai clic co botón dereito na sección resaltada para crear un marcador</translation>
     </message>
   </context>
   <context>
@@ -1460,7 +1460,7 @@
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Nova ligazón - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
@@ -1884,7 +1884,7 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>Herda o permiso %1 de</translation>
     </message>
     <message>
       <source>Already inherited from</source>
@@ -1930,7 +1930,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Páxinas web e integracións</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -1938,11 +1938,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Monitores de saúde</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Video Walls / Muros</translation>
     </message>
   </context>
   <context>
@@ -1990,11 +1990,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Presentacións</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Video Walls / Muros</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -2002,7 +2002,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Local Files</source>
-      <translation type="unfinished">Local Files</translation>
+      <translation>Ficheiros locais</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -2355,7 +2355,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Hide</source>
-      <translation type="unfinished">Hide</translation>
+      <translation>Agochar</translation>
     </message>
     <message>
       <source>Show</source>
@@ -2415,7 +2415,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateDialog</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Nova/o usuaria/o</translation>
     </message>
     <message>
       <source>General</source>
@@ -2442,7 +2442,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateTab</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Nova/o usuaria/o</translation>
     </message>
     <message>
       <source>Type</source>
@@ -2608,11 +2608,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Rematar</translation>
     </message>
     <message>
       <source>New Link...</source>
-      <translation type="unfinished">New Link...</translation>
+      <translation>Nova ligazón...</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
@@ -2625,12 +2625,12 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Obtendo ligazón...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Asegúrate de que este ordenador sexa capaz de conectarse ao %1</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
