@@ -81,7 +81,7 @@
     <name>nx::vms::client::mobile::PtzCameraButtonController</name>
     <message>
       <source>Control PTZ</source>
-      <translation type="unfinished">Control PTZ</translation>
+      <translation>PTZ kontrolü</translation>
     </message>
   </context>
   <context>
