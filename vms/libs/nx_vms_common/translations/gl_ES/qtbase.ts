@@ -659,11 +659,11 @@ Do you want to delete it anyway?</translation>
     <name>QFileSystemModel</name>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation type="unfinished">%1 GB</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>%1 MB</source>

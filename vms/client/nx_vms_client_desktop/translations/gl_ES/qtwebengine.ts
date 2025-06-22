@@ -279,7 +279,7 @@
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Seleccionar cartafol para cargar</translation>
     </message>
   </context>
   <context>

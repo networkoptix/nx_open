@@ -548,7 +548,7 @@
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>Establecer a pantalla completa</translation>
     </message>
     <message>
       <source>Set for</source>
@@ -901,7 +901,7 @@
     <name>nx::vms::rules::PoeOverBudgetEvent</name>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Consumo</translation>
     </message>
     <message>
       <source>Server</source>
@@ -1125,7 +1125,7 @@
     </message>
     <message>
       <source>Alarm: %1</source>
-      <translation type="unfinished">Alarm: %1</translation>
+      <translation>Alarma: %1</translation>
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
