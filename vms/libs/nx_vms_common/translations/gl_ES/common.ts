@@ -2279,7 +2279,7 @@
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Consumo</translation>
     </message>
     <message>
       <source>Device was disconnected</source>

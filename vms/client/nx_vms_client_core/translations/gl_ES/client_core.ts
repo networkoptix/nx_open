@@ -121,7 +121,7 @@
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
+      <translation>Erro interno. Por favor, téntao de novo máis tarde.</translation>
     </message>
     <message>
       <source>If this error persists, please contact your system administrator.</source>

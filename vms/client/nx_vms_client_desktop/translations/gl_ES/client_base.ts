@@ -4506,11 +4506,11 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation type="unfinished">%1 GB</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>Current Bitrate</source>
@@ -4664,11 +4664,11 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Start time</source>
-      <translation type="unfinished">Start time</translation>
+      <translation>Hora de inicio</translation>
     </message>
     <message>
       <source>Length</source>
-      <translation type="unfinished">Length</translation>
+      <translation>Duración</translation>
     </message>
     <message>
       <source>Tags</source>
@@ -4684,7 +4684,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Creator</source>
-      <translation type="unfinished">Creator</translation>
+      <translation>Creador</translation>
     </message>
     <message>
       <source>Description</source>
@@ -4703,7 +4703,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>Todos os dispositivos</translation>
     </message>
     <message>
       <source>All Cameras</source>
@@ -5088,7 +5088,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>NO EXPORT PERMISSION</source>
-      <translation type="unfinished">NO EXPORT PERMISSION</translation>
+      <translation>SEN PERMISO DE EXPORTACIÓN</translation>
     </message>
     <message>
       <source>SYSTEM SHUT DOWN</source>
@@ -5128,7 +5128,7 @@ Clave de licenza: %2</translation>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
       </translation>
@@ -5140,7 +5140,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>Últimos 5 minutos</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
@@ -5740,7 +5740,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     <name>QnValidatorStrings</name>
     <message>
       <source>Email cannot be empty</source>
-      <translation type="unfinished">Email cannot be empty</translation>
+      <translation>O correo electrónico non pode estar baleiro</translation>
     </message>
     <message>
       <source>Email is not valid</source>
@@ -5827,7 +5827,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Delete bookmark?</source>
-      <translation type="unfinished">Delete bookmark?</translation>
+      <translation>Borrar marcador?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
@@ -6697,7 +6697,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>Esta versión do sistema operativo xa non é compatible</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
@@ -7934,7 +7934,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
+      <translation>Seleccionar cámara</translation>
     </message>
     <message>
       <source>No cameras available</source>
@@ -7965,7 +7965,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Páxina web</translation>
     </message>
     <message>
       <source>Expert</source>
@@ -8034,7 +8034,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Motion Only</source>
-      <translation type="unfinished">Motion Only</translation>
+      <translation>Só movemento</translation>
     </message>
     <message>
       <source>Objects Only</source>
@@ -8851,14 +8851,14 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message numerus="yes">
       <source>%n events</source>
-      <translation type="unfinished">
-        <numerusform>%n events</numerusform>
-        <numerusform>%n events</numerusform>
+      <translation>
+        <numerusform>%n eventos</numerusform>
+        <numerusform>%n eventos</numerusform>
       </translation>
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Tenta cambiar os filtros ou crear unha regra de evento</translation>
     </message>
   </context>
   <context>
@@ -9642,7 +9642,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation type="unfinished">Downloading file...</translation>
+      <translation>Descargando ficheiro...</translation>
     </message>
     <message>
       <source>Pending download...</source>
@@ -9796,7 +9796,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation type="unfinished">Systems will be merged shortly</translation>
+      <translation>Os sistemas fusionaranse en breve</translation>
     </message>
     <message>
       <source>Failed to merge Systems</source>
@@ -10615,7 +10615,7 @@ Podes forzala, pero pode aumentar significativamente a carga da CPU.</translatio
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Páxina web</translation>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
@@ -10855,14 +10855,14 @@ Podes forzala, pero pode aumentar significativamente a carga da CPU.</translatio
     <message>
       <source>%1 group</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">%1 group</translation>
+      <translation>Grupo %1</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
-        <numerusform>%1 and %n more groups</numerusform>
+      <translation>
+        <numerusform>%1 e %n grupos máis</numerusform>
+        <numerusform>%1 e %n grupos máis</numerusform>
       </translation>
     </message>
   </context>
@@ -10907,16 +10907,16 @@ Podes forzala, pero pode aumentar significativamente a carga da CPU.</translatio
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>%n marcadores</numerusform>
+        <numerusform>%n marcadores</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
-      <translation type="unfinished">
-        <numerusform>%n events</numerusform>
-        <numerusform>%n events</numerusform>
+      <translation>
+        <numerusform>%n eventos</numerusform>
+        <numerusform>%n eventos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -11416,7 +11416,7 @@ Non fixes este certificado se non modificaches o Certificado SSL do servidor %2.
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Instalado</translation>
     </message>
     <message>
       <source>Installing...</source>
