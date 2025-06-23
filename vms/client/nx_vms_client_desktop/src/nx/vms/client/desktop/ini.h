@@ -230,7 +230,12 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
 
     NX_INI_STRING("", harFile,
         "[Dev] Path to HAR file. If empty, HAR logging is disabled. "
-        "The file will be created in the same directory as log files.");
+        "If path is relative then the file will be created in the same directory as log files.\n"
+        "Placeholders %T, %P, %N and %V in the file name will be replaced with the following values:\n"
+        " * %T - current date/time in format yyyy-MM-dd_HH-mm-ss-zzz\n"
+        " * %P - process id\n"
+        " * %N - client name\n"
+        " * %V - client version\n");
 
     // ---------------------------------------------------------------------------------------------
     // Design section

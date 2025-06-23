@@ -30,7 +30,7 @@ void onAboutToBlock()
         onAboutToBlockHandler();
 }
 
-QString formatFileName(QString name, const QDir& defaultDir)
+QString formatFileName(QString name, FormatFilePattern formatPattern, const QDir& defaultDir)
 {
     name.replace(
         QRegularExpression(QLatin1String("%T")),
@@ -46,17 +46,25 @@ QString formatFileName(QString name, const QDir& defaultDir)
         QRegularExpression(QLatin1String("%P")),
         QString::number(processId));
 
-    name.replace(
-        QRegularExpression(QLatin1String("%N")),
-        nx::branding::desktopClientInternalName());
+    if (formatPattern == FormatFilePattern::desktopClient)
+    {
+        name.replace(
+            QRegularExpression(QLatin1String("%N")),
+            nx::branding::desktopClientInternalName());
 
-    name.replace(
-        QRegularExpression(QLatin1String("%V")),
-        QCoreApplication::applicationVersion());
+        name.replace(
+            QRegularExpression(QLatin1String("%V")),
+            QCoreApplication::applicationVersion());
+    }
 
     return QFileInfo(name).isAbsolute()
         ? name
         : defaultDir.absoluteFilePath(name);
+}
+
+QString formatFileName(QString name, const QDir& defaultDir)
+{
+    return formatFileName(std::move(name), FormatFilePattern::desktopClient, defaultDir);
 }
 
 } // namespace nx::utils::debug
