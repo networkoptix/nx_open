@@ -127,11 +127,16 @@ struct ExportLayoutTool::Private
                 setStatus(ExportProcessStatus::cancelled);
                 break;
             default:
-                NX_ASSERT(false, "Should never get here");
+                NX_ASSERT(false, "Should never get here. Status: %1, last error: %2",
+                    (int)status, (int)lastError);
                 break;
         }
         if (status != ExportProcessStatus::success)
         {
+            NX_VERBOSE(this,
+                "Export finished with error, temp file is removed. Status: %1, last error: %2",
+                (int)status, (int)lastError);
+
             QFile::remove(actualFilename);
         }
         else
@@ -188,7 +193,8 @@ bool ExportLayoutTool::prepareStorage()
     else
 #endif
     {
-        QFile::remove(d->actualFilename);
+        if (QFile::remove(d->actualFilename))
+            NX_VERBOSE(this, "Temp file is removed");
     }
 
     auto fileStorage = new QnLayoutFileStorageResource(d->actualFilename);
@@ -486,6 +492,8 @@ bool ExportLayoutTool::exportNextCamera()
         }
         else
         {
+            NX_VERBOSE(this, "Data not found");
+
             d->lastError = ExportProcessError::dataNotFound;
             finishExport(false);
         }
@@ -496,8 +504,14 @@ bool ExportLayoutTool::exportNextCamera()
     return exportMediaResource(d->resources.dequeue());
 }
 
-void ExportLayoutTool::finishExport(bool /*success*/)
+void ExportLayoutTool::finishExport(bool success)
 {
+    if (!success)
+    {
+        NX_VERBOSE(this, "Export failed. Status: %1, last error: %2",
+            (int)d->status, (int)d->lastError);
+    }
+
     d->finishExport();
 }
 
@@ -545,6 +559,8 @@ void ExportLayoutTool::at_camera_exportFinished(const std::optional<nx::recordin
     d->lastError = convertError(status);
     if (d->lastError == ExportProcessError::dataNotFound)
     {
+        NX_VERBOSE(this, "Data not found: %1", d->resources.head()->getName());
+
         d->lastError = ExportProcessError::noError;
         exportNextCamera();
         return;

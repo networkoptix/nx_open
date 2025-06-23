@@ -423,6 +423,10 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
     }
 
     auto mediaSettings = std::get_if<ExportMediaSettings>(&exportContext.settings);
+
+    NX_VERBOSE(this, "Export finished: %1, status: %2, error: %3",
+        exportContext.fileName().name, (int)info.status, ExportProcess::errorString(info.error));
+
     switch (info.status)
     {
         case ExportProcessStatus::success:
@@ -440,6 +444,7 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
             break;
         }
         case ExportProcessStatus::failure:
+        {
             if ((mediaSettings && info.error == ExportProcessError::videoTranscodingRequired
                 && !mediaSettings->forceVideoTranscoding)
                 || (info.error == ExportProcessError::audioTranscodingRequired
@@ -464,12 +469,16 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
                     ExportProcess::errorString(info.error));
             }
             break;
-
+        }
         case ExportProcessStatus::cancelled:
+        {
             break;
-
+        }
         default:
-            NX_ASSERT(false, "Invalid state");
+        {
+            NX_ASSERT(false, "Invalid state: %1, %2",
+                (int)info.status, ExportProcess::errorString(info.error));
+        }
     }
 }
 
