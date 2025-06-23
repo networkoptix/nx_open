@@ -119,7 +119,6 @@ function openVideoScreen(resource, screenshotUrl, xHint, yHint, timestamp, camer
         }
     if (camerasModel)
         properties["camerasModel"] = camerasModel
-    stackView.setScaleTransitionHint(xHint, yHint)
     stackView.pushScreen(Qt.resolvedUrl("../Screens/VideoScreen.qml"), properties)
 }
 
