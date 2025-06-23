@@ -178,7 +178,13 @@ void QnSystemAdministrationDialog::applyChanges()
             NX_ASSERT(requestId == d->currentRequest || d->currentRequest == 0);
             d->currentRequest = 0;
 
-            if (!response)
+            if (response)
+            {
+                const auto errors = systemSettings()->update(d->editableSystemSettings);
+                if (!errors.empty())
+                    NX_WARNING(this, "Failed to update system settings: %1", errors);
+            }
+            else
             {
                 auto error = response.error();
 
@@ -198,11 +204,6 @@ void QnSystemAdministrationDialog::applyChanges()
                 QnSessionAwareMessageBox::critical(
                     this, tr("Failed to save site settings"), error.errorString);
             }
-
-            // Dialog buttons will be updated after all requests are complete.
-            // Loading the curreng settings state to match UI state and avoid hasChanges() to
-            // return true.
-            loadDataToUi();
         };
 
     d->currentRequest = connectedServerApi()->patchSystemSettings(

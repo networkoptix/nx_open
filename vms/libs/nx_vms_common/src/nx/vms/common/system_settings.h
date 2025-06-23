@@ -173,6 +173,17 @@ public:
 
     bool takeFromSettings(QSettings* settings, const QnResourcePtr& mediaServer);
 
+    // Settings save/load methods.
+
+    using Errors = std::set<nx::vms::api::SystemSettingName>;
+    Errors update(const nx::vms::api::SaveableSystemSettings& value);
+    Errors update(const nx::vms::api::SystemSettings& value);
+    nx::vms::api::SystemSettings apiSettings() const;
+    nx::vms::api::SystemSettings apiSettings(
+        const std::vector<nx::vms::api::SystemSettingName>& names) const;
+
+    // Setting value read/write methods.
+
     QSet<QString> disabledVendorsSet() const;
     QString disabledVendors() const;
     void setDisabledVendors(QString disabledVendors);
@@ -550,13 +561,6 @@ public:
 
     std::chrono::seconds cloudPollingInterval() const;
     void setCloudPollingInterval(std::chrono::seconds value);
-
-    using Errors = std::set<nx::vms::api::SystemSettingName>;
-    Errors update(const nx::vms::api::SaveableSystemSettings& value);
-    Errors update(const nx::vms::api::SystemSettings& value);
-    nx::vms::api::SystemSettings apiSettings() const;
-    nx::vms::api::SystemSettings apiSettings(
-        const std::vector<nx::vms::api::SystemSettingName>& names) const;
 
     bool isAllowRegisteringIntegrationsEnabled() const;
     void setAllowRegisteringIntegrationsEnabled(bool value);
