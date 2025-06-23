@@ -86,11 +86,11 @@ void CInfoBlock::convert(const detail::SocketAddress& addr, uint32_t ip[])
 {
     if (addr.family() == AF_INET)
     {
-        ip[0] = addr.v4().sin_addr.s_addr;
+        ip[0] = addr.v4()->sin_addr.s_addr;
         ip[1] = ip[2] = ip[3] = 0;
     }
     else
     {
-        memcpy((char*)ip, (char*)addr.v6().sin6_addr.s6_addr, 16);
+        memcpy((char*)ip, (const char*)addr.v6()->sin6_addr.s6_addr, 16);
     }
 }

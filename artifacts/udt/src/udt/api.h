@@ -54,7 +54,7 @@ Yunhong Gu, last updated 09/28/2010
 #include "queue.h"
 #include "cache.h"
 #include "epoll.h"
-#include "socket_addresss.h"
+#include "socket_address.h"
 
 class CUDT;
 class Multiplexer;

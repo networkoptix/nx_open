@@ -11,7 +11,7 @@
 #include <gtest/gtest.h>
 
 #include <udt/channel.h>
-#include <udt/socket_addresss.h>
+#include <udt/socket_address.h>
 #include <udt/udt.h>
 
 namespace udt::test {

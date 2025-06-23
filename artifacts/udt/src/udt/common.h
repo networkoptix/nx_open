@@ -55,7 +55,7 @@ Yunhong Gu, last updated 08/01/2009
 #include <cstdlib>
 
 #include "udt.h"
-#include "socket_addresss.h"
+#include "socket_address.h"
 
 #ifdef _WIN32
 // Windows compatibility

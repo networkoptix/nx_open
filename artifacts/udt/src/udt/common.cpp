@@ -415,14 +415,15 @@ void CIPAddress::ntop(const sockaddr* addr, uint32_t ip[4], int ver)
 
 void CIPAddress::pton(detail::SocketAddress* addr, const uint32_t ip[4], int ver)
 {
+    addr->setFamily(ver);
     if (AF_INET == ver)
     {
-        sockaddr_in* a = &addr->v4();
+        sockaddr_in* a = addr->v4();
         a->sin_addr.s_addr = ip[0];
     }
     else
     {
-        sockaddr_in6* a = &addr->v6();
+        sockaddr_in6* a = addr->v6();
         for (int i = 0; i < 4; ++i)
         {
             a->sin6_addr.s6_addr[i * 4] = ip[i] & 0xFF;
