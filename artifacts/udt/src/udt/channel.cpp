@@ -224,9 +224,11 @@ void UdpChannel::setRcvBufSize(int size)
 
 detail::SocketAddress UdpChannel::getSockAddr() const
 {
-    detail::SocketAddress socketAddress;
-    ::getsockname(m_iSocket, socketAddress.get(), &socketAddress.length());
-    return socketAddress;
+    sockaddr_storage addr;
+    socklen_t addrlen = sizeof(addr);
+    return ::getsockname(m_iSocket, reinterpret_cast<sockaddr*>(&addr), &addrlen) == -1
+        ? detail::SocketAddress()
+        : detail::SocketAddress(&addr, addrlen);
 }
 
 Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, std::unique_ptr<CPacket> packet)
@@ -253,12 +255,14 @@ std::optional<detail::SocketAddress> UdpChannel::recvfrom(CPacket* packet)
 {
     assert(m_iSocket != INVALID_UDP_SOCKET);
 
-    detail::SocketAddress addr(AF_INET6);
+    sockaddr_storage addr;  // Large enough for both IPv4 and IPv6
+    socklen_t addr_len = sizeof(addr);
+
     int res = ::recvfrom(
         m_iSocket,
         packet->buffer(), packet->bufferSize(),
         0 /*flags*/,
-        addr.get(), &addr.length());
+        reinterpret_cast<struct sockaddr*> (&addr), &addr_len);
 
     if (res < kPacketHeaderSize)
         return std::nullopt;
@@ -268,7 +272,7 @@ std::optional<detail::SocketAddress> UdpChannel::recvfrom(CPacket* packet)
     // convert into local host order
     decodePacket(packet);
 
-    return addr;
+    return detail::SocketAddress(&addr, addr_len);
 }
 
 Result<void> UdpChannel::shutdown()

@@ -236,18 +236,21 @@ protected:
         if (ipVersion() == AF_INET)
         {
             localAddress.setFamily(ipVersion());
-            inet_pton(AF_INET, "127.0.0.1", &(localAddress.v4().sin_addr.s_addr));
+            inet_pton(AF_INET, "127.0.0.1", &(localAddress.v4()->sin_addr.s_addr));
         }
         else
         {
             localAddress.setFamily(ipVersion());
-            localAddress.v6().sin6_addr = in6addr_loopback;
+            localAddress.v6()->sin6_addr = in6addr_loopback;
         }
 
         ASSERT_EQ(0, bind(m_udpServer, localAddress.get(), localAddress.size()));
+        sockaddr_storage addr;
+        socklen_t addrlen = sizeof(addr);
         ASSERT_EQ(0, getsockname(
             m_udpServer,
-            m_rawUdpReceiverAddress.get(), &m_rawUdpReceiverAddress.length()));
+            reinterpret_cast<sockaddr*>(&addr), &addrlen));
+        m_rawUdpReceiverAddress = detail::SocketAddress(&addr, addrlen);
 
         m_rawUdpReceiverThread =
             std::thread([this]() { rawUdpReceiverFunc(); });

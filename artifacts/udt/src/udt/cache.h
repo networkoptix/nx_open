@@ -47,7 +47,7 @@ Yunhong Gu, last updated 01/27/2011
 
 #include "common.h"
 #include "detail/lru_cache.h"
-#include "socket_addresss.h"
+#include "socket_address.h"
 #include "udt.h"
 
 template<typename T>

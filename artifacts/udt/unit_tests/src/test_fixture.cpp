@@ -140,17 +140,21 @@ void BasicFixture::givenListeningServerSocket()
     if (m_ipVersion == AF_INET)
     {
         localAddress.setFamily(m_ipVersion);
-        inet_pton(AF_INET, "127.0.0.1", &(localAddress.v4().sin_addr.s_addr));
+        inet_pton(AF_INET, "127.0.0.1", &(localAddress.v4()->sin_addr.s_addr));
     }
     else
     {
         localAddress.setFamily(m_ipVersion);
-        localAddress.v6().sin6_addr = in6addr_loopback;
+        localAddress.v6()->sin6_addr = in6addr_loopback;
     }
 
     ASSERT_EQ(0, UDT::bind(m_serverSocket, localAddress.get(), localAddress.size()));
     ASSERT_EQ(0, UDT::listen(m_serverSocket, 127));
-    ASSERT_EQ(0, UDT::getsockname(m_serverSocket, m_serverAddress.get(), (int*) &m_serverAddress.length()));
+
+    sockaddr_storage addr;
+    int addrlen = sizeof(addr);
+    ASSERT_EQ(0, UDT::getsockname(m_serverSocket, reinterpret_cast<sockaddr*>(&addr), &addrlen));
+    m_serverAddress = detail::SocketAddress(&addr, addrlen);
 }
 
 void BasicFixture::startAcceptingAsync()

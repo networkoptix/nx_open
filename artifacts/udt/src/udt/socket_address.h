@@ -19,18 +19,18 @@ namespace detail {
 class UDT_API SocketAddress
 {
 public:
-    SocketAddress(int family = AF_INET6);
+    SocketAddress();
 
     /**
      * Copies from addr.
      */
+    SocketAddress(const sockaddr_storage* addr, socklen_t addrLen);
     SocketAddress(const sockaddr* addr, int addrLen);
 
     struct sockaddr* get();
     const struct sockaddr* get() const;
 
     socklen_t size() const;
-    socklen_t& length();
 
     int family() const;
     void setFamily(int val);
@@ -48,23 +48,19 @@ public:
      */
     void copy(uint32_t ip[]) const;
 
-    sockaddr_in& v4();
-    const sockaddr_in& v4() const;
+    sockaddr_in* v4();
+    const sockaddr_in* v4() const;
 
-    sockaddr_in6& v6();
-    const sockaddr_in6& v6() const;
+    sockaddr_in6* v6();
+    const sockaddr_in6* v6() const;
 
     bool operator==(const SocketAddress& right) const;
 
     std::string toString() const;
 
 private:
-    union {
-        sockaddr_in v4;
-        sockaddr_in6 v6;
-    } m_address;
-
-    socklen_t m_length;
+    sockaddr_storage m_address;
+    socklen_t m_length = 0;
 };
 
 } // namespace detail

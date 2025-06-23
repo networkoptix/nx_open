@@ -48,7 +48,7 @@ Yunhong Gu, last updated 01/27/2011
 #include "udt.h"
 #include "packet.h"
 #include "result.h"
-#include "socket_addresss.h"
+#include "socket_address.h"
 
 class UDT_API AbstractUdpChannel
 {
