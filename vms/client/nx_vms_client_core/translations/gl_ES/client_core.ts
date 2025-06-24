@@ -10,7 +10,7 @@
     <message>
       <source>System (%1)</source>
       <comment>%1 is ip and port of system</comment>
-      <translation type="unfinished">System (%1)</translation>
+      <translation>Sistema (%1)</translation>
     </message>
   </context>
   <context>
@@ -24,7 +24,7 @@
     <name>QnSystemDescription</name>
     <message>
       <source>Unnamed System</source>
-      <translation type="unfinished">Unnamed System</translation>
+      <translation>Sistema sen nome</translation>
     </message>
   </context>
   <context>
@@ -47,27 +47,27 @@
     <name>RemoteConnectionErrorStrings</name>
     <message>
       <source>Client version: %1</source>
-      <translation type="unfinished">Client version: %1</translation>
+      <translation>Versión do cliente: %1</translation>
     </message>
     <message>
       <source>Server version: %1.</source>
-      <translation type="unfinished">Server version: %1.</translation>
+      <translation>Versión do servidor: %1.</translation>
     </message>
     <message>
       <source>Incompatible server</source>
-      <translation type="unfinished">Incompatible server</translation>
+      <translation>Servidor incompatible</translation>
     </message>
     <message>
       <source>Server has a different version:</source>
-      <translation type="unfinished">Server has a different version:</translation>
+      <translation>O servidor ten unha versión diferente:</translation>
     </message>
     <message>
       <source>You will be asked to restart the client in compatibility mode.</source>
-      <translation type="unfinished">You will be asked to restart the client in compatibility mode.</translation>
+      <translation>Pediráseche que reinicies o cliente no modo de compatibilidade.</translation>
     </message>
     <message>
       <source>Invalid certificate</source>
-      <translation type="unfinished">Invalid certificate</translation>
+      <translation>Certificado non válido</translation>
     </message>
     <message>
       <source>Restore the connection to %1 and try again</source>
@@ -77,27 +77,27 @@
     <message>
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user login is temporarily unavailable</translation>
+      <translation>O inicio de sesión de %1 usuario non está dispoñible temporalmente</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
-      <translation type="unfinished">The server is incompatible.</translation>
+      <translation>O servidor é incompatible.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>Conéctate a este servidor desde un navegador web ou a través dun cliente de escritorio para configuralo</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out</source>
-      <translation type="unfinished">LDAP Server connection timed out</translation>
+      <translation>Esgotouse o tempo de espera da conexión ao servidor LDAP</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out.</source>
-      <translation type="unfinished">LDAP Server connection timed out.</translation>
+      <translation>Esgotouse o tempo de espera da conexión ao servidor LDAP.</translation>
     </message>
     <message>
       <source>Session expired. Re-enter your password.</source>
-      <translation type="unfinished">Session expired. Re-enter your password.</translation>
+      <translation>A sesión caducou. Volve introducir o teu contrasinal.</translation>
     </message>
     <message>
       <source>Invalid login or password</source>
@@ -105,11 +105,11 @@
     </message>
     <message>
       <source>Incorrect username or password.</source>
-      <translation type="unfinished">Incorrect username or password.</translation>
+      <translation>Contrasinal ou nome de usuario incorrecto.</translation>
     </message>
     <message>
       <source>User is disabled</source>
-      <translation type="unfinished">User is disabled</translation>
+      <translation>Usuaria/o desactivada/o</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -117,7 +117,7 @@
     </message>
     <message>
       <source>Compatibility mode for versions lower than %1 is not supported.</source>
-      <translation type="unfinished">Compatibility mode for versions lower than %1 is not supported.</translation>
+      <translation>Non se admite o modo de compatibilidade para versións anteriores a %1.</translation>
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
@@ -125,16 +125,16 @@
     </message>
     <message>
       <source>If this error persists, please contact your system administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your system administrator.</translation>
+      <translation>Se este erro persiste, póñase en contacto co administrador do sistema.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check your internet connection or try again later.</translation>
+      <translation>A conexión a %1 aínda non está lista. Comproba a túa conexión a internet ou inténtao de novo máis tarde.</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
-      <translation type="unfinished">Connection to the server could not be established. Try again later.</translation>
+      <translation>Non se puido establecer a conexión co servidor. Téntao de novo máis tarde.</translation>
     </message>
     <message>
       <source>Your session has expired</source>
@@ -143,16 +143,16 @@
     <message>
       <source>Please log in to %1 again.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Please log in to %1 again.</translation>
+      <translation>Volva iniciar sesión en %1.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this system with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this system with %2 user</translation>
+      <translation>Inicia sesión en %1 para iniciar sesión neste sistema co usuario %2</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a system administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a system administrator.</translation>
+      <translation>O límite de duración da sesión pode ser modificado polas persoas administradoras do sistema.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
@@ -160,7 +160,7 @@
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many login attempts. Try again in a minute.</translation>
+      <translation>Demasiados intentos de inicio de sesión. Téntao de novo nun minuto, por favor.</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
@@ -169,7 +169,7 @@
     <message>
       <source>You can enable two-factor authentication in your %1.</source>
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">You can enable two-factor authentication in your %1.</translation>
+      <translation>Podes activar a autenticación en dous pasos no teu %1.</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -177,11 +177,11 @@
     </message>
     <message>
       <source>Your access to this system has expired.</source>
-      <translation type="unfinished">Your access to this system has expired.</translation>
+      <translation>O teu acceso a este sistema caducou.</translation>
     </message>
     <message>
       <source>Please contact the system administrator to regain access.</source>
-      <translation type="unfinished">Please contact the system administrator to regain access.</translation>
+      <translation>Por favor, ponte en contacto co administrador do sistema para recuperar o acceso.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
@@ -191,12 +191,12 @@
     <message>
       <source>Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the system in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>Está prohibido iniciar sesión como usuario %1 no sistema cando estea apagado. Aínda podes conectarte como usuario local.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the system in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>Está prohibido iniciar sesión no sistema como usuario %1 nun estado suspendido. Aínda podes conectarte como usuario local.</translation>
     </message>
     <message>
       <source>To log in to this System, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
@@ -205,62 +205,62 @@
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">The server&apos;s certificate was rejected.</translation>
+      <translation>O certificado do servidor foi rexeitado.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
     <message>
       <source>Server certificate is invalid.</source>
-      <translation type="unfinished">Server certificate is invalid.</translation>
+      <translation>O certificado do servidor non é válido.</translation>
     </message>
     <message>
       <source>Connecting to %1 for the first time?</source>
-      <translation type="unfinished">Connecting to %1 for the first time?</translation>
+      <translation>Conectándote a %1 por primeira vez?</translation>
     </message>
     <message>
       <source>help article</source>
-      <translation type="unfinished">help article</translation>
+      <translation>artigo de axuda</translation>
     </message>
     <message>
       <source>Read this %1 to learn more about certificate validation.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">Read this %1 to learn more about certificate validation.</translation>
+      <translation>Le isto %1 para saber máis sobre a validación de certificados.</translation>
     </message>
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      <translation>
+        <numerusform>Non se pode verificar a identidade de %n servidores</numerusform>
+        <numerusform>Non se pode verificar a identidade de %n servidores</numerusform>
       </translation>
     </message>
     <message>
       <source>Review the certificates of the servers from this system.</source>
-      <translation type="unfinished">Review the certificates of the servers from this system.</translation>
+      <translation>Revisa os certificados dos servidores deste sistema.</translation>
     </message>
     <message>
       <source>To learn more about the current problem read this %1.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
+      <translation>Para saber máis sobre o problema actual, lee isto %1.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your system administrator for further investigation.</translation>
+      <translation>Isto pode deberse a un certificado de servidor caducado ou a un certificado non válido. Ponte en contacto co administrador do sitio para máis información.</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>
-      <translation type="unfinished">Cannot verify the identity of %1</translation>
+      <translation>Non se pode verificar a identidade de %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
-      <translation type="unfinished">Sample format of input device %1 is not supported.</translation>
+      <translation>Non se admite o formato de mostra do dispositivo de entrada %1.</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
-      <translation type="unfinished">Primary audio device is not selected.</translation>
+      <translation>Non se seleccionou o dispositivo de son principal.</translation>
     </message>
   </context>
 </TS>
