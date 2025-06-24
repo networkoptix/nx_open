@@ -200,7 +200,7 @@ FetchedData<Container> makeFetchedDataInternal(
     const auto currentReferenceTimeEndIt = std::upper_bound(currentRefTimeIt, currentEndIt,
         centralPoint, upperBound);
 
-    // Move existing items "lower" for the "newer" fetch dirction and "upper" for the "older" one.
+    // Move existing items "lower" for the "newer" fetch direction and "upper" for the "older" one.
 
     const auto moveToBackIf =
         [](auto begin, auto end, auto predicate)
@@ -233,7 +233,7 @@ FetchedData<Container> makeFetchedDataInternal(
 
 } // namespace detail
 
-/** Implmentation section */
+/** Implementation section */
 template<typename Facade,
     typename Container,
     typename CurrentContainer>

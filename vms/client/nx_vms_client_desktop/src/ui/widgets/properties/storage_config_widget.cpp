@@ -829,7 +829,7 @@ QnStorageConfigWidget::StorageConfigWarningFlags
             flags.setFlag(cloudBackupStopped);
         }
 
-        // Storage enabled state wasn's affected, skipping further checks.
+        // Storage enabled state wasn't affected, skipping further checks.
         if (storageInfo.isUsed == storageResource->isUsedForWriting())
             continue;
 

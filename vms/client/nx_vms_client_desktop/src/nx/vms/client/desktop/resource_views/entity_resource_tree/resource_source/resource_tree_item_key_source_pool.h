@@ -71,12 +71,12 @@ public:
         const QnResourceAccessSubject& accessSubject);
 
     /**
-     * Provides all layout resouces accessible by user including intercom and cloud layouts.
+     * Provides all layout resources accessible by user including intercom and cloud layouts.
      */
     UniqueResourceSourcePtr layoutsSource(const QnUserResourcePtr& user);
 
     /**
-     * Provides all layout resouces accessible by user except intercom and cloud layouts.
+     * Provides all layout resources accessible by user except intercom and cloud layouts.
      */
     UniqueResourceSourcePtr allLayoutsSource(const QnUserResourcePtr& user);
 

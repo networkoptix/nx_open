@@ -16,7 +16,7 @@ EntityItemModel::EntityItemModel(int columnCount):
     base_type(nullptr),
     m_columnCount(std::max(columnCount, 1))
 {
-    NX_ASSERT(columnCount > 0, "Invalide column count provided, resulting model has one column");
+    NX_ASSERT(columnCount > 0, "Invalid column count provided, resulting model has one column");
 }
 
 EntityItemModel::~EntityItemModel()

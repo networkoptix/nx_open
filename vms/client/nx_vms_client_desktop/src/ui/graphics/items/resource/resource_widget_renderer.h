@@ -156,7 +156,6 @@ public:
     void setScreenshotInterface(ScreenshotInterface* value);
     void setHistogramConsumer(QnHistogramConsumer* value);
 
-
 signals:
     void canBeDestroyed();
     /** This signal is emitted whenever the source geometry is changed. */
@@ -181,7 +180,7 @@ private:
         QRectF displayRect{0, 0, 1, 1};
     };
 
-    /** Renderering contexts that are used to render the channels. */
+    /** Rendering contexts that are used to render the channels. */
     QVector<RenderingContext> m_renderingContexts;
 
     /** Current source size, in square pixels. */

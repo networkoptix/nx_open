@@ -22,7 +22,7 @@ namespace nx::vms::client::core {
  * This function is introduced to allow access from QML to enumeration constants not accessible
  * using standard QML methods: lowercase non-class enum constants (e.g. of legacy enums kept intact
  * for API backwards compatibility) or constants of enums without associated Qt meta information
- * (for example, namespace-level enums from different header files when it's not desireable to
+ * (for example, namespace-level enums from different header files when it's not desirable to
  * put them all into one super-header with the namespace metaobject - like "qnamespace.h").
  *
  * `qmlName` must start with a capital letter.

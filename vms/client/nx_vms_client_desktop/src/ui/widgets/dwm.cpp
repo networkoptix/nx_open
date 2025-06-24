@@ -441,7 +441,6 @@ bool QnDwm::widgetEvent(QEvent *event) {
     return false;
 }
 
-
 bool QnDwm::widgetNativeEvent(const QByteArray &eventType, void *message, long *result) {
     Q_UNUSED(eventType)
 #ifdef QN_HAS_DWM

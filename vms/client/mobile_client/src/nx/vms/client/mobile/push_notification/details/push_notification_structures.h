@@ -66,7 +66,7 @@ struct LocalPushSettings
      * Represents current token data used for push notification delivering process.
      * Invalid token means that the user was logged out from the cloud (himself or forcefully by
      * the cloud request) or he just logged in and hasn't turned push notifications on yet.
-     * Valid token data means that current user has succesfully turned push notifications on
+     * Valid token data means that current user has successfully turned push notifications on
      * at least once previously (until he logged out from the cloud on device).
      */
     TokenData tokenData;

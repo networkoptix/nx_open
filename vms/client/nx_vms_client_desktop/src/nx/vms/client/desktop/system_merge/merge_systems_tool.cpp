@@ -303,7 +303,7 @@ void MergeSystemsTool::at_serverInfoReceived(Context& ctx,
 
         if (auto status = verifyTargetCertificate(ctx); status != MergeSystemsStatus::ok)
         {
-            NX_VERBOSE(this, "Server certificate verificaton status: %1", status);
+            NX_VERBOSE(this, "Server certificate verification status: %1", status);
             reportSystemFound(ctx, status, {}, true);
 
             return;

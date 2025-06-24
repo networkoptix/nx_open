@@ -112,7 +112,7 @@ public:
 
     /**
     * Send CONNECT request to proxy with target address in request line.
-    * Connected socket can be extracted and used in new AsyncClient for proxified request.
+    * Connected socket can be extracted and used in new AsyncClient for proxyfied request.
     */
     void doConnect(std::unique_ptr<nx::network::http::AsyncClient> client,
         const nx::Url& proxyUrl,

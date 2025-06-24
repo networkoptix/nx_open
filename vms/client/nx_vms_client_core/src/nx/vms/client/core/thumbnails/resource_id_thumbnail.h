@@ -40,7 +40,7 @@ public:
     virtual ~ResourceIdentificationThumbnail() override;
 
     /**
-     * A delay between assigning a resoure and performing initial thumbnail load.
+     * A delay between assigning a resource and performing initial thumbnail load.
      * Randomized by `requestScatter`.
      */
     std::chrono::milliseconds preloadDelay() const;

@@ -485,7 +485,7 @@ public:
         QStringList minMax = range.split(',');
         if (minMax.size() != 3)
             return;
-        // TODO: Impelemt it, when a proper value infrastructure implemented for this case.
+        // TODO: Implement it, when a proper value infrastructure implemented for this case.
     }
 
 protected:

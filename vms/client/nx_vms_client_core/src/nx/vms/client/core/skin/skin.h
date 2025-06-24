@@ -54,7 +54,6 @@ public:
         const QString& checkedIconPath,
         const SvgIconColorer::ThemeSubstitutions& checkedThemeSubstitutions);
 
-
     ~ColorizedIconDeclaration();
 
     QString sourceFile() const;
@@ -132,7 +131,7 @@ public:
     bool addGeneratedPixmap(const QString& name, const QPixmap& pixmap);
 
     /**
-     * Loads pixmap with appropriate size according to current hidpi settings.
+     * Loads pixmap with appropriate size according to current hi-dpi settings.
      * @param desiredSize is used for svg images only, this size may be corrected internally
      *     if `correctDevicePixelRatio` is set to true.
      **/

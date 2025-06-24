@@ -305,7 +305,7 @@ void JoystickButtonSettingsModel::Private::initDeviceData(const Device* device)
     deviceConnections << connect(device, &Device::initializedButtonsNumberChanged, q,
         [this, device]
         {
-            // It is unlikely situation, therefore this inafficiency is permissible.
+            // It is unlikely situation, therefore this inefficiency is permissible.
             q->beginResetModel();
             initializedButtonsNumber = device->initializedButtonsNumber();
             getModifierButtonName(description, device);

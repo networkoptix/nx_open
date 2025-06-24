@@ -104,7 +104,7 @@ void ItemViewDragAndDropScrollAssist::setupScrollAssist(
     if (scrollArea != itemView
         && !scrollArea->findChildren<QAbstractItemView*>().contains(itemView))
     {
-        NX_ASSERT(false, "Item view isn't related to the provieded scroll area.");
+        NX_ASSERT(false, "Item view isn't related to the provided scroll area.");
         return;
     }
 

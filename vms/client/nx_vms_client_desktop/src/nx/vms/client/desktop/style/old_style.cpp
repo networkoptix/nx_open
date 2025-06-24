@@ -229,7 +229,7 @@ bool OldStyle::drawItemViewItemControl(
     if (!editor)
         return false;
 
-    // If an editor is opened, don'h draw item's text. Editor background may be transparent, and
+    // If an editor is opened, don't draw item's text. Editor background may be transparent, and
     // item text will shine through.
 
     auto localOption = *itemOption;

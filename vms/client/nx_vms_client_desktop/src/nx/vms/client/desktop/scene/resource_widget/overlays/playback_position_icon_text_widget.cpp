@@ -213,7 +213,7 @@ void PlaybackPositionIconTextWidget::setText(const QString& text)
 void PlaybackPositionIconTextWidget::setIcon(const QPixmap& icon)
 {
     // No pixmap comparison here for the early return.
-    // Since QPixmap hasn't operator== defined, pixmaps will be implicitely converted to the
+    // Since QPixmap hasn't operator== defined, pixmaps will be implicitly converted to the
     // QCursor instances to perform comparison. This is not what was expected in general and also
     // may lead to a lot of warnings reported which even may cause significant performance drop.
     if (d->iconPixmap.isNull() && icon.isNull())

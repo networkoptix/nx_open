@@ -131,7 +131,7 @@ public:
     /** Returns status of GUI thread */
     Q_INVOKABLE QJSValue guiThreadStatus();
 
-    /** Enables hightlight for UI elements under cursor. */
+    /** Enables highlight for UI elements under cursor. */
     void setHighlightEnabled(bool enabled = true);
 
     /** A pointer to created TestKit instance. */

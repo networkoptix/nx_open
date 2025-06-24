@@ -413,7 +413,7 @@ void QnSortFilterListModelPrivate::handleSourceDataChanged(
 
     if (!topLeft.isValid() || !bottomRight.isValid())
     {
-        NX_ASSERT(false, "Invalid indicies");
+        NX_ASSERT(false, "Invalid indices");
         return;
     }
 

@@ -724,7 +724,7 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
         return;
     bool isSyncReader = reader->resource()->hasFlags(Qn::sync);
 
-    // Use seek for live too. to clear curent buffer
+    // Use seek for live too. to clear current buffer
     if (!reader->isEnabled() && !value)
     {
         reader->setNavDelegate(0);

@@ -604,7 +604,7 @@ bool ScreenGrabber::dataToFrame(
     {
         if (roundWidth != m_tmpFrameWidth || height != m_tmpFrameHeight)
             allocateTmpFrame(roundWidth, height, AV_PIX_FMT_YUV420P);
-#if 0 // Perfomance test
+#if 0 // Performance test
         QTime t1, t2;
         t1.start();
         for (int i = 0; i < 1000; ++i)

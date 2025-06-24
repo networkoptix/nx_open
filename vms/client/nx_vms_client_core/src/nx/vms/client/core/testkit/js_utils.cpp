@@ -42,7 +42,7 @@ QJsonObject makeResponse(const QJSValue& result)
 
     // Complex values like QObject don't have JSON representation,
     // so we need to provide additional type information.
-    // For convinience type information is provided for all values.
+    // For convenience type information is provided for all values.
 
     // Make sure "result" field always exists.
     if (jsonResult.isUndefined())

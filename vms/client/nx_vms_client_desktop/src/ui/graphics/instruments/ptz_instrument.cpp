@@ -990,7 +990,6 @@ void PtzInstrument::processPtzClick(const QPointF& pos)
     if (!target() || m_skipNextAction)
         return;
 
-
     /* Don't animate for virtual cameras as it looks bad. */
     if (m_movement != VirtualMovement)
     {
@@ -1050,7 +1049,6 @@ void PtzInstrument::processPtzDoubleClick()
         emit doubleClicked(target());
     }
 }
-
 
 // -------------------------------------------------------------------------- //
 // Handlers

@@ -430,7 +430,7 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
             else
             {
                 const auto error = errorOrData.error();
-                NX_ERROR(this, "Can't rebuld archive, error: %1, text: %2",
+                NX_ERROR(this, "Can't rebuild archive, error: %1, text: %2",
                     error.errorId, error.errorString);
 
                 at_archiveRebuildReply(success, handle, {});
@@ -461,7 +461,7 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
             {
                 if (!errorOrEmpty)
                 {
-                    NX_ERROR(this, "Can't cancel archive rebuld, error: %1, text: %2",
+                    NX_ERROR(this, "Can't cancel archive rebuild, error: %1, text: %2",
                         errorOrEmpty.error().errorId, errorOrEmpty.error().errorString);
                 }
 
@@ -691,7 +691,7 @@ void QnServerStorageManager::at_storageSpaceReply(
         // Skipping storages that are really present in the server resource pool.
         // They will be deleted on storageRemoved transaction.
         const auto clientStorage = storage.dynamicCast<QnClientStorageResource>();
-        NX_ASSERT(clientStorage, "Only client storage intances must exist on the client side.");
+        NX_ASSERT(clientStorage, "Only client storage instances must exist on the client side.");
         if (clientStorage && clientStorage->isActive())
             continue;
 

@@ -45,6 +45,5 @@ INSTANTIATE_TEST_SUITE_P(UrlFromUserInput,
     ConnectionUrlParserTest,
     ::testing::ValuesIn(testData));
 
-
 } // namespace test
 } // namespace nx::vms::client::desktop

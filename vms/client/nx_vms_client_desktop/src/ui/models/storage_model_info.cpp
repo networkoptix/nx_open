@@ -53,7 +53,7 @@ QnStorageModelInfo::QnStorageModelInfo(const QnStorageResourcePtr& storage)
         nx::vms::api::StoragePersistentFlag::dbReady))
     , archiveMode(storage->storageArchiveMode())
 {
-    // QnClientStorageResource which was instantitated on the client side and is not
+    // QnClientStorageResource which was instantiated on the client side and is not
     // represented in the database has null storageArchiveMode property.
     if (archiveMode == nx::vms::api::StorageArchiveMode::undefined)
     {

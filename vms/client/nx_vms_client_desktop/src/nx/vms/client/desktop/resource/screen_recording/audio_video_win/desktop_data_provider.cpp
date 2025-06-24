@@ -108,7 +108,7 @@ int EncodedAudioInfo::nameToWaveIndex()
         WAVEINCAPS wic;
         if(waveInGetDevCaps(i, &wic, sizeof(WAVEINCAPS)) == MMSYSERR_NOERROR)
         {
-            // This may look like "Microphone (Realtec Hi".
+            // This may look like "Microphone (Realtek Hi".
             QString tmp = QString((const QChar *) wic.szPname);
             if (name.startsWith(tmp))
             {
@@ -677,7 +677,6 @@ void DesktopDataProvider::putAudioData()
             d->audioFramesCount = 0;
         }
 
-
         d->audioFramesCount++;
 
         // todo: add audio resample here
@@ -697,7 +696,7 @@ void DesktopDataProvider::putAudioData()
             int stereoPacketSize = d->frameSize * 2 * ai->m_audioFormat.bytesPerSample();
             /*
             // first mono to left, second mono to right
-            // may be it is mode usefull?
+            // may be it is mode useful?
             if (d->audioFormat.channels() == 1 && d->audioFormat2.channels() == 1)
             {
                 monoToStereo((qint16*) d->tmpAudioBuffer1.data.data(), buffer1, buffer2, stereoPacketSize/4);

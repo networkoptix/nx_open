@@ -18,7 +18,7 @@ namespace nx::vms::client::desktop {
  * its frame rendering by calling registerFrame() slot.
  * Values are updated with the interval of PerfomanceMonitor class.
  * Visibility has the same value for all instances (show/hide application-wise) and is controlled
- * via globlal PerfomanceMonitor instance.
+ * via global PerfomanceMonitor instance.
  */
 class PerformanceInfo: public QObject
 {

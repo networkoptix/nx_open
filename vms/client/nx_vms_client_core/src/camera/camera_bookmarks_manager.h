@@ -127,8 +127,8 @@ public:
     int getBookmarkTagsAsync(int maxTags, BookmarkTagsCallbackType callback);
 
 signals:
-    /* TODO: #dklychkov #2.6 #bookmarks Implement notification transactions bor bookmarks which will call these signals. */
-    // So far these signals are emited when the user does something locally.
+    /* TODO: #dklychkov #2.6 #bookmarks Implement notification transactions for bookmarks which will call these signals. */
+    // So far these signals are emitted when the user does something locally.
     /// @brief                  This signal is emitted when new bookmark was added.
     void bookmarkAdded(const QnCameraBookmark &bookmark);
     /// @brief                  This signal is emitted when the bookmark was updated.

@@ -102,7 +102,7 @@ public:
     StreamSynchronizationState streamSynchronizationState() const;
 
     /**
-     * Set cameras syncronization state. It will be used when this layout become current. If it
+     * Set cameras synchronization state. It will be used when this layout become current. If it
      * already is, no changes would be applied.
      */
     void setStreamSynchronizationState(StreamSynchronizationState value);

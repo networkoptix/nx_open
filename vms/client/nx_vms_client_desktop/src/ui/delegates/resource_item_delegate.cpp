@@ -767,7 +767,7 @@ void QnResourceItemDelegate::paintExtraStatus(
 
     QRect extraIconRect(iconRect);
 
-    // Check if there are too much icons for this indentaion level.
+    // Check if there are too much icons for this indentation level.
     const auto shiftIconLeft =
         [&extraIconRect]
         {

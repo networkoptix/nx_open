@@ -24,7 +24,7 @@ public:
     explicit TimeDurationWidget(QWidget *parent = nullptr);
     virtual ~TimeDurationWidget() override;
 
-    // Add duration usffix to dropdown box
+    // Add duration suffix to dropdown box
     // This should be called before setValue
     void addDurationSuffix(QnTimeStrings::Suffix suffix);
 

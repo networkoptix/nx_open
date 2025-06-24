@@ -57,7 +57,7 @@ public:
      * Variations for build number:
      *  - Full build number, "4.0.0.20000".
      *  - Specific build number "10821". Appears when we waiting for response for specific build.
-     *  - No version avalilable, "-----". Often happens if we have Error::networkError
+     *  - No version available, "-----". Often happens if we have Error::networkError
      *      or Error::httpError report. Can happen when source=internet
      */
     struct VersionReport
@@ -94,7 +94,7 @@ public:
         bool operator==(const VersionReport& another) const;
     };
 
-    /** Incapsulates all the state for control panel. */
+    /** Encapsulates all the state for control panel. */
     struct ControlPanelState
     {
         bool actionEnabled = true;
@@ -368,7 +368,7 @@ private:
     void syncVersionReport(const VersionReport& report);
 
     /**
-     * UI synhronization. This functions are ment to be called from loadDataToUi.
+     * UI synchronization. This functions are meant to be called from loadDataToUi.
      * Do not call them from anywhere else.
      */
     void syncUpdateCheckToUi();
@@ -473,7 +473,7 @@ private:
     /** Watchdog timer for the case when update has taken too long. */
     std::unique_ptr<QTimer> m_longUpdateWarningTimer;
 
-    /** Timer for updating interal state and synching it with UI. */
+    /** Timer for updating internal state and syncing it with UI. */
     std::unique_ptr<QTimer> m_stateCheckTimer;
 
     /**

@@ -177,8 +177,8 @@ void RecursiveMembersModel::setMembersCache(MembersCache* cache)
                 return; //< Ignore top level updates.
 
             // Here a subject is either inserted or removed. If the total number of rows did not
-            // change then the modification happend outside the scope of current group and we can
-            // ingnore row updates. However, to calculate the total number of rows we still need to
+            // change then the modification happened outside the scope of current group and we can
+            // ignore row updates. However, to calculate the total number of rows we still need to
             // call loadData().
             loadData(/*updateAllRows*/ false);
         };

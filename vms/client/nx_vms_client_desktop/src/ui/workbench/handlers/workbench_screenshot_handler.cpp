@@ -90,7 +90,7 @@ QString QnScreenshotParameters::timeString(bool forFilename) const
         ? nx::vms::time::Format::filename_date
         : nx::vms::time::Format::dd_MM_yyyy_hh_mm_ss;
 
-    // FIXME: #sivanov Looks supicious, but probably kLatestThumbnail never happens in real life.
+    // FIXME: #sivanov Looks suspicious, but probably kLatestThumbnail never happens in real life.
     if (utcTimestamp == nx::api::ImageRequest::kLatestThumbnail)
         return nx::vms::time::toString(QTime::currentTime(), timeFormat);
 

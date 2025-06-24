@@ -295,7 +295,7 @@ QnWorkbenchController::QnWorkbenchController(
 
     display()->setLayer(m_dropInstrument->surface(), QnWorkbenchDisplay::BackLayer);
 
-    // Handle all clicks queued to avoid crash in the instument scene items enumeration code if
+    // Handle all clicks queued to avoid crash in the instrument scene items enumeration code if
     // clicked item is destroyed in the handler (e.g. because of layout switching).
     connect(m_itemLeftClickInstrument,
         &ClickInstrument::itemPressed,
@@ -577,7 +577,7 @@ bool QnWorkbenchController::eventFilter(QObject* watched, QEvent* event)
             if (!widget->isSelected())
                 mainWindow()->scene()->clearSelection();
 
-            // Explicitely disabled actions cannot be triggered in Qt6.
+            // Explicitly disabled actions cannot be triggered in Qt6.
             menu()->action(menu::RemoveLayoutItemFromSceneAction)->setEnabled(true);
             menu()->trigger(menu::RemoveLayoutItemFromSceneAction, widget);
             event->ignore();
@@ -781,7 +781,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
     const auto shift =
         [this](ShiftDirection direction) -> bool
         {
-            // Check that it can be rewinded or fast forwarded in general.
+            // Check that it can be rewound or fast forwarded in general.
             if (!navigator()->canJump() ||
                 (navigator()->isLive() && direction == ShiftDirection::fastForward))
             {
@@ -1386,7 +1386,7 @@ void QnWorkbenchController::at_zoomTargetChanged(
 
     auto currentLayout = workbench()->currentLayoutResource();
 
-    // Unpin existing item to free worbench grid place for the new item.
+    // Unpin existing item to free workbench grid place for the new item.
     existing.flags = 0;
     currentLayout->updateItem(existing);
 
@@ -1785,7 +1785,6 @@ void QnWorkbenchController::at_toggleInfoAction_triggered()
     for (QnResourceWidget* widget: widgets)
         widget->setInfoVisible(!visible, animate);
 }
-
 
 void QnWorkbenchController::at_maximizeItemAction_triggered()
 {

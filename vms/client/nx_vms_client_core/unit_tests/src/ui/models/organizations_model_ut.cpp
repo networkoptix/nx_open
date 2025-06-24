@@ -14,7 +14,7 @@ namespace {
 // Helper function to recursively dump the tree structure of a model into a QStringList.
 // Each line in the list represents a node in the tree, with indentation based on the level of
 // the node in the hierarchy. Section information is appended after ": " and newlines are replaced
-// with "<br>" for better readability in the outout.
+// with "<br>" for better readability in the output.
 void dumpTree(
     QStringList& result,
     const QAbstractItemModel& model,

@@ -64,7 +64,7 @@ const QString kSpecificKey = "specific";
 
 /**
  * Data structure that aggregates several stateful elements.
- * Also provides comparison operators for ASSERT_* macroses.
+ * Also provides comparison operators for ASSERT_* macros.
  */
 struct Session
 {

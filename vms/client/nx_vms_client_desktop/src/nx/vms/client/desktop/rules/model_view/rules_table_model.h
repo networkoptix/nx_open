@@ -109,7 +109,7 @@ private:
     // given resources list.
     bool hasAnyOf(int row, const QList<nx::Uuid>& resourceIds) const;
 
-    // Returns whether the given the rule at rhe given row has resources.
+    // Returns whether the given the rule at the given row has resources.
     bool hasResources(int row);
 };
 

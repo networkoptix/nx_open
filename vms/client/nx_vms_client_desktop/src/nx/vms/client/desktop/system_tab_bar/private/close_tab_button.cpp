@@ -96,4 +96,4 @@ CloseTabButton* CloseTabButton::createForTab(QTabBar* tabBar, int index)
     return button;
 }
 
-} // namespace nx::vms::client::desttop
+} // namespace nx::vms::client::desktop

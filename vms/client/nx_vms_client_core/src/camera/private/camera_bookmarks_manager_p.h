@@ -48,7 +48,7 @@ public:
     int getBookmarksAsync(const QnCameraBookmarkSearchFilter& filter, BookmarksCallbackType callback);
 
     /**
-     *  Gathers bookmarks around specified time point using usual bookmarks request. Heuristicly
+     *  Gathers bookmarks around specified time point using usual bookmarks request. Heuristically
      *  extends (or shrinks) request time period to find appropriate data. Tries it maxTriesCount
      *  times maximum.
      */

@@ -306,7 +306,7 @@ void ApplicationContext::closeWindow()
     if (!NX_ASSERT(d->windowContext))
         return;
 
-    // Make sure all QML instances are destroyed before window contexts is dissapeared.
+    // Make sure all QML instances are destroyed before window contexts is disappeared.
     const auto window = d->windowContext->mainWindow();
     window->deleteLater();
     QObject::connect(window, &QObject::destroyed, qApp, &QGuiApplication::quit);

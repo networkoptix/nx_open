@@ -32,7 +32,7 @@ private:
 
 /**
  * QML item for rendering data painted on nx::pathkit::RhiPaintDevice.
- * Rendering is perfromed under all QML elements in the QML window.
+ * Rendering is performed under all QML elements in the QML window.
  * See https://doc.qt.io/qt-6/qtquick-scenegraph-rhiunderqml-example.html
  */
 class RhiRenderingItem: public QQuickItem

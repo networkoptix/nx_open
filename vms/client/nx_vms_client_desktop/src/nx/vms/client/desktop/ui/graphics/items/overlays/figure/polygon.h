@@ -22,7 +22,7 @@ public:
     virtual FigurePtr clone() const override;
 
 protected:
-    /** Contructor for derived types, like box, etc.*/
+    /** Constructor for derived types, like box, etc.*/
     Polygon(
         FigureType type,
         const Points& points,

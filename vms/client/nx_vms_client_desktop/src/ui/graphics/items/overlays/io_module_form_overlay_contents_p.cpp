@@ -339,7 +339,7 @@ void QnIoModuleFormOverlayContentsPrivate::Layout::setGeometry(const QRectF& rec
 
         /* Column cannot take less space than kMinimumItemWidth
          * if there's enough space for another column,
-         * but can be shrinked to its width hint otherwise: */
+         * but can be shrunk to its width hint otherwise: */
         switch (state)
         {
             case kBothNarrow:

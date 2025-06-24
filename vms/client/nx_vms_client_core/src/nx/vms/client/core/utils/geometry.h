@@ -261,7 +261,7 @@ public:
         Qt::Alignment alignment = Qt::AlignCenter);
 
     /**
-     * Expands an infinitely small rectanglr with the given aspect ratio to the given maximal
+     * Expands an infinitely small rectangle with the given aspect ratio to the given maximal
      *     rectangle.
      *
      * @param aspectRatio Aspect ratio.

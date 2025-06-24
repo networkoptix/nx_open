@@ -29,11 +29,11 @@ public:
     /**
      * @param mediaParams The structure that describes the type of non-rectilinear projection used
      *     to yield source image, as well as its parameters and calibration data.
-     * @param itemParams The structure that desctibes parameters used to transform source image to
-     *     to the new one with rectilinear or equrectangular projection type.
+     * @param itemParams The structure that describes parameters used to transform source image to
+     *     to the new one with rectilinear or equirectangular projection type.
      * @param frameAspectRatio The aspect ratio of the source image required to obtain effective
      *     pixel aspect ratio. 1:1 AR corresponds to 1:1 PAR for fisheye type projection and 2:1 AR
-     *     corresponds to 1:1 PAR for 360 degree equrectangular projection type.
+     *     corresponds to 1:1 PAR for 360 degree equirectangular projection type.
      */
     DewarpingTransform(
         const nx::vms::api::dewarping::MediaData& mediaParams,

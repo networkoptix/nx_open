@@ -292,7 +292,6 @@ std::future<UpdateContents> ServerUpdateTool::takeUpdateCheckFromFile()
     return std::move(m_checkFileUpdate);
 }
 
-
 void ServerUpdateTool::changeUploadState(OfflineUpdateState newState)
 {
     if (m_offlineUpdaterState == newState)
@@ -332,7 +331,7 @@ void ServerUpdateTool::readUpdateManifest(
     if (!QJson::deserialize(buf, &result.info))
     {
         NX_ERROR(typeid(ServerUpdateTool),
-            "readUpdateManifest(%1) - failed to deserealize update data", path);
+            "readUpdateManifest(%1) - failed to deserialize update data", path);
         return;
     }
 
@@ -359,7 +358,7 @@ void ServerUpdateTool::atExtractFilesFinished(nx::zip::Extractor::Error code)
 
     NX_VERBOSE(this, "atExtractFilesFinished() status = Ready");
 
-    // Find a subfolter containing update manifest
+    // Find a subfolder containing update manifest
     QDir packageDir = findFolderForFile(m_outputDir, kPackageIndexFile);
     contents.storageDir = packageDir;
 
@@ -866,7 +865,7 @@ bool ServerUpdateTool::requestStopAction()
     const auto connection = connectedServerApi();
     if (!connection)
     {
-        NX_ERROR(this, "requestStopAction() - no conenction to the server.");
+        NX_ERROR(this, "requestStopAction() - no connection to the server.");
         emit cancelUpdateComplete(false, toString(InternalError::noConnection));
         return false;
     }

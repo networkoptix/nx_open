@@ -1329,7 +1329,7 @@ enum IDType
     DebugDecrementCounterAction,
 
     /**
-     * Toggles element hightlighting for UI elements under cursor.
+     * Toggles element highlighting for UI elements under cursor.
      */
     DebugToggleElementHighlight,
 
@@ -1417,7 +1417,7 @@ enum IDType
     GoToLayoutItemAction,
 
     /**
-     * Toggles rised state of the current layout item.
+     * Toggles raised state of the current layout item.
      */
     RaiseCurrentItemAction,
 
@@ -1477,7 +1477,7 @@ enum IDType
     InitialResourcesReceivedEvent,
 
     /**
-     * Bookmarks info is fetched from from the server.
+     * Bookmarks info is fetched from the server.
      */
     BookmarksPrefetchEvent,
 

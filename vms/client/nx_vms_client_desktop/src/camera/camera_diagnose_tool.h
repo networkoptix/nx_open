@@ -29,7 +29,7 @@ namespace CameraDiagnostics
 
         \note Diagnose stops on first error
         \note Diagnostics is done in separate thread
-        \note Class methods are reenterable
+        \note Class methods are reentrant
     */
     class DiagnoseTool:
         public QObject,
@@ -83,7 +83,7 @@ namespace CameraDiagnostics
             \param stepType Value from CameraDiagnostics::Step::Value enumeration
         */
         void diagnosticsStepResult(int stepType, bool result, const QString &errorMessage );
-        //!Emmitted on diagnostics done (with any result)
+        //!Emitted on diagnostics done (with any result)
         /*!
             \param finalStep Value from CameraDiagnostics::Step::Value enumeration
             \param result \a true, if diagnostics found no errors

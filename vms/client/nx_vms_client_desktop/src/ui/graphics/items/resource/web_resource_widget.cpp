@@ -340,7 +340,7 @@ QString QnWebResourceWidget::calculateDetailsText() const
     NX_ASSERT(m_webEngineView);
     static constexpr int kMaxUrlDisplayLength = 96;
     // Truncating URL if it is too long to display properly
-    // I could strip query part from URL, but some sites, like youtibe will be stripped too much
+    // I could strip query part from URL, but some sites, like youtube will be stripped too much
     QString details = m_webEngineView->url().toString();
     return nx::utils::elideString(details, kMaxUrlDisplayLength);
 }

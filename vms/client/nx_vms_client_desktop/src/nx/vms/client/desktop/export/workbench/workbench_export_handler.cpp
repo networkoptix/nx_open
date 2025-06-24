@@ -329,7 +329,7 @@ public:
                 return layout;
             }
             default:
-                NX_ASSERT(false, "Unsuported format");
+                NX_ASSERT(false, "Unsupported format");
                 return {};
         }
     }
@@ -708,7 +708,7 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
     }
     else
     {
-        NX_ASSERT(0, "Unexpectd data type for export settings");
+        NX_ASSERT(0, "Unexpected data type for export settings");
         return {};
     }
 
@@ -784,7 +784,6 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
     return std::make_pair(exportId, std::move(tool));
 }
 
-
 void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
 {
     // Lines are intentionally untranslatable for developer-only functionality.
@@ -830,7 +829,7 @@ void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Wonderfull legacy
+// Wonderful legacy
 
 bool WorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr& layout) const
 {

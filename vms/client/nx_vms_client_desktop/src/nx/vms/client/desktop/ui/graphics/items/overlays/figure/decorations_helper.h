@@ -36,7 +36,7 @@ std::optional<LabelPosition> getLabelPosition(
     qreal bottomMargin);
 
 /*
- * Returns poliline edge start point index. The edge is framed by triangle direction markers.
+ * Returns polyline edge start point index. The edge is framed by triangle direction markers.
  * Edge end point index is "start index + 1".
  */
 int directionMarksEdgeStartPointIndex(const Polyline* figure);

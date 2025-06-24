@@ -45,7 +45,7 @@ public:
     int dotLagMs() const;
     void setDotLagMs(int lag);
 
-    /** Minumum opacity time, in milliseconds: */
+    /** Minimum opacity time, in milliseconds: */
     unsigned int downTimeMs() const;
     void setDownTimeMs(unsigned int ms);
 
@@ -53,7 +53,7 @@ public:
     unsigned int fadeInTimeMs() const;
     void setFadeInTimeMs(unsigned int ms);
 
-    /** Maxumum opacity time, in milliseconds: */
+    /** Maximum opacity time, in milliseconds: */
     unsigned int upTimeMs() const;
     void setUpTimeMs(unsigned int ms);
 

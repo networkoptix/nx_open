@@ -9,9 +9,9 @@ namespace nx::vms::client::desktop {
 
 /**
  * Runs a SOCKS5 local (accepts only localhost connections) proxy server that allows to tunnel
- * a connection throught any vms servers to its resources.
+ * a connection through any vms servers to its resources.
  * Example: if a camera C belongs to a server S, then the connection is tunneled via S to C.
- * In orded to do so the login for SOCKS5 server should be the uuid string value of C,
+ * In order to do so the login for SOCKS5 server should be the uuid string value of C,
  * and the password should be the SOCKS5 server generated password string.
  */
 class LocalProxyServer: public QObject, public Singleton<LocalProxyServer>

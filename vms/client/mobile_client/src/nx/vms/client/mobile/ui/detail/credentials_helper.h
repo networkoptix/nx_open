@@ -35,7 +35,7 @@ public:
 
     Q_INVOKABLE void clearSavedPasswords();
 
-    /** Create Oauth client with the specfied token and optional user. */
+    /** Create Oauth client with the specified token and optional user. */
     Q_INVOKABLE nx::vms::client::core::OauthClient* createOauthClient(
         const QString& token,
         const QString& user,

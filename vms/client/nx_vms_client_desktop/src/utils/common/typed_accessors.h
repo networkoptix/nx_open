@@ -36,7 +36,6 @@ struct QnAbstractExternalSetter
     virtual void operator () (Object*, const T&) const = 0;
 };
 
-
 /* Abstract member access bases */
 /* ---------------------------- */
 
@@ -61,7 +60,6 @@ protected:
 private:
     Object* m_object;
 };
-
 
 /* Field access */
 /* ------------ */
@@ -122,7 +120,6 @@ private:
     ExternalSetter m_fieldSetter;
 };
 
-
 /* Member function access */
 /* ---------------------- */
 
@@ -177,7 +174,6 @@ public:
 private:
     ExternalSetter m_methodSetter;
 };
-
 
 /* Automatically selected member access */
 /* ------------------------------------ */
@@ -246,7 +242,6 @@ using QnMemberExternalGetter = typename detail::QnMemberExternalGetterTypeSelect
 template<class T, class Object, class SetMember>
 using QnMemberExternalSetter = typename detail::QnMemberExternalSetterTypeSelector<T, Object, SetMember>::type;
 
-
 /* Access via functor */
 /* ------------------ */
 
@@ -293,7 +288,6 @@ public:
 private:
     Functor m_functor;
 };
-
 
 /* Direct variable access */
 /* ---------------------- */
@@ -354,7 +348,6 @@ using QnGlobalScopeGetter = typename detail::QnGlobalScopeGetterTypeSelector<T, 
 
 template<class T, class Set>
 using QnGlobalScopeSetter = typename detail::QnGlobalScopeSetterTypeSelector<T, Set>::type;
-
 
 /* Automatically selected access */
 /* ----------------------------- */
@@ -420,7 +413,6 @@ using QnExternalGetter = typename detail::QnExternalGetterTypeSelector<T, Object
 
 template<class T, class Object, class Set>
 using QnExternalSetter = typename detail::QnExternalSetterTypeSelector<T, Object, Set>::type;
-
 
 /* Getter/setter utility aggregators with move semantics: */
 /* ------------------------------------------------------ */
@@ -496,7 +488,6 @@ public:
 private:
     std::unique_ptr<const ExternalSetter> m_setter;
 };
-
 
 /* Typed accessor template */
 /* ----------------------- */

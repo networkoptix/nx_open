@@ -119,7 +119,7 @@ void MediaOutputShaderData::loadOpacity(qreal opacity)
 {
     switch (key.format)
     {
-        // TODO: match color tranformation matrices with Qt.
+        // TODO: match color transformation matrices with Qt.
         case MediaOutputShaderProgram::Format::nv12:
         case MediaOutputShaderProgram::Format::yv12:
         case MediaOutputShaderProgram::Format::yva12:

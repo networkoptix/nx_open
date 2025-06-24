@@ -66,7 +66,7 @@ protected:
         }
         else
         {
-            // Only error state must be shown by the widget. Intermidiate state warning must be shown
+            // Only error state must be shown by the widget. Intermediate state warning must be shown
             // by the resource selection dialog.
             resetErrorStyle(m_selectButton);
             PlainFieldPickerWidget<F>::setValidity({});

@@ -36,7 +36,7 @@ struct NX_VMS_CLIENT_CORE_API LogonData
     Purpose purpose = Purpose::connect;
 
     /**
-     * Id of the Server we expect to connect. Reqired to avoid passing stored credentials to
+     * Id of the Server we expect to connect. Required to avoid passing stored credentials to
      * another Server on the same endpoint.
      */
     std::optional<nx::Uuid> expectedServerId = std::nullopt;

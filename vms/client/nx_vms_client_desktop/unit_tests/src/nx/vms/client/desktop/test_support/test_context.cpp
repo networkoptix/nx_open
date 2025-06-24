@@ -23,7 +23,7 @@ static std::unique_ptr<ApplicationContext> sAppContext;
 Context::Context()
 {
     NX_ASSERT(appContext(), "Desktop client System Context heavily depends on Application Context "
-        "existance. Use AppContextBasedTest as a base class instead.");
+        "existence. Use AppContextBasedTest as a base class instead.");
 }
 
 Context::~Context()

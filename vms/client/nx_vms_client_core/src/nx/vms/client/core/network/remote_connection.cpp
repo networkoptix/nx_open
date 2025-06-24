@@ -278,7 +278,7 @@ nx::Uuid RemoteConnection::auditId() const
 void RemoteConnection::updateModuleInformation(
     const nx::vms::api::ModuleInformation& moduleInformation)
 {
-    // Some fields like cloudSystemId can be different (eg. while the server is being connected to
+    // Some fields like cloudSystemId can be different (e.g. while the server is being connected to
     // the cloud) and that's OK.
     NX_ASSERT(d->moduleInformation.id == moduleInformation.id
         && d->moduleInformation.localSystemId == moduleInformation.localSystemId

@@ -603,7 +603,7 @@ struct RadassController::Private
         const auto speed = display->getSpeed();
         if (isFastForwardOrRevMode(speed))
         {
-            NX_VERBOSE(this, "%1 is in FF/Rew, swithing to LQ immediately.", *consumer);
+            NX_VERBOSE(this, "%1 is in FF/Rew, switching to LQ immediately.", *consumer);
             gotoLowQuality(consumer, LqReason::performanceInFf, speed, lock);
             return;
         }

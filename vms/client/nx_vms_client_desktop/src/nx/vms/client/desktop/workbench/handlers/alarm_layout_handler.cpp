@@ -228,7 +228,7 @@ void AlarmLayoutHandler::openCamerasInAlarmLayout(
     if (cameras.isEmpty())
         return;
 
-    // Stop showreel if it is runing. Should be executed before layout is created because tour
+    // Stop showreel if it is running. Should be executed before layout is created because tour
     // stopping clears all existing workbench layouts.
     if (switchToLayoutNeeded)
     {

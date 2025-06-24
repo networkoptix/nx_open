@@ -138,7 +138,6 @@ public:
         return group.id;
     }
 
-
     void removeUser(const nx::Uuid& id)
     {
         auto resourcePool = systemContext()->resourcePool();
@@ -398,7 +397,7 @@ TEST_F(MembersModelTest, removeAndAddParentForUser)
 
 TEST_F(MembersModelTest, allowedMembers)
 {
-    // Check that group4 cannot have members that are already its parents (direct or inderect).
+    // Check that group4 cannot have members that are already its parents (direct or indirect).
     m_model->setGroupId(m_group4);
 
     static const QStringList kAllowedMembers = {
@@ -417,7 +416,7 @@ TEST_F(MembersModelTest, allowedMembers)
 
 TEST_F(MembersModelTest, allowedParents)
 {
-    // Check that group2 cannot have parents that are already its members (direct or inderect)
+    // Check that group2 cannot have parents that are already its members (direct or indirect)
     // and cannot be a part of Administrators or Power Users because of temporary user member.
     m_model->setGroupId(m_group2);
 

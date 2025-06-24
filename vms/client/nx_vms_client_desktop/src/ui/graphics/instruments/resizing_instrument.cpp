@@ -327,7 +327,7 @@ void ResizingInstrument::dragMove(DragInfo* info)
     /* Recalculate new position.
      * Note that changes in size may change item's transformation =>
      * we have to calculate position after setting the size. */
-    // TODO: totally evil copypasta
+    // TODO: totally evil copypaste
     if (m_section != Qt::TitleBarArea)
     {
         newPos = widget->pos()
@@ -413,7 +413,6 @@ void ResizingInstrument::getWidgetAndFrameSection(
     }
     if (!widgetNearby)
         return;
-
 
     widget = widgetNearby;
     section = queryFrameSection(view, widget, pos, m_outerEffectRadius);

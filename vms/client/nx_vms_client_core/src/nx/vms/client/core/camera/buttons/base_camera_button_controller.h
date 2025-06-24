@@ -26,7 +26,7 @@ public:
     /**
      * Constructs controller with specified parameters.
      * @param buttonGroup Buttons grouping number.
-     * @param requiredPermissions Permissions reqiured for all the buttons of the controller.
+     * @param requiredPermissions Permissions required for all the buttons of the controller.
      * @param parent Parent class.
      */
     BaseCameraButtonController(
@@ -76,7 +76,7 @@ protected:
     void removeActiveAction(const nx::Uuid& buttonId);
 
     /**
-     *  Virtual function to be imple,emted in subclasses which is used to activate or deactivate
+     *  Virtual function to be implemented in subclasses which is used to activate or deactivate
      *  action. Returns 'true' if state could be changed, otherwise 'false'.
      */
     virtual bool setButtonActionState(const CameraButtonData& button, ActionState state);

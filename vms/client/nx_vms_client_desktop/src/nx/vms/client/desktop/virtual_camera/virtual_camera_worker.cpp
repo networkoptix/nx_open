@@ -22,7 +22,7 @@ namespace nx::vms::client::desktop {
 
 namespace {
 /**
- * Using TTL of 10 mins for uploads. This shall be enough even for the most extreme cases.
+ * Using TTL of 10 minutes for uploads. This shall be enough even for the most extreme cases.
  * Also note that undershooting is not a problem here as a file that's currently open won't be
  * deleted.
  */

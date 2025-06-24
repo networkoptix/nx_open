@@ -210,7 +210,7 @@ QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(
             }
 
             // why?
-            // we need to do so ( introduce some hysteresis )coz downscaling changes resolution not proportionally some time( cut vertical size a bit )
+            // we need to do so (introduce some hysteresis) coz downscaling changes resolution not proportionally some time( cut vertical size a bit )
             // so it may be a loop downscale => changed aspect ratio => upscale => changed aspect ratio => downscale.
         }
         m_prevSrcWidth = srcWidth;
@@ -545,7 +545,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
         return Status_Displayed;
 
     {
-        //  Clear previos frame, since decoder clear it on decode call
+        // Clear previous frame, since decoder clear it on decode call.
         NX_MUTEX_LOCKER lock(&m_lastDisplayedFrameMutex);
         if (m_lastDisplayedFrame && m_lastDisplayedFrame->isExternalData())
             m_lastDisplayedFrame.reset();
