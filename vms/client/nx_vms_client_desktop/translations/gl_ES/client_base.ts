@@ -4342,7 +4342,7 @@ Clave de licenza: %2</translation>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
       <translation>
-        <numerusform>A visita guiada ten %n posicións idénticas</numerusform>
+        <numerusform>O percorrido ten %n posicións idénticas</numerusform>
         <numerusform>A visita guiada ten %n posicións idénticas</numerusform>
       </translation>
     </message>

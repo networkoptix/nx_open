@@ -511,7 +511,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Show </source>
-      <translation type="unfinished">Show </translation>
+      <translation>Mostrar </translation>
     </message>
     <message>
       <source>&amp;Rename</source>

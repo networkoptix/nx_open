@@ -130,7 +130,7 @@
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB (terabytes)</translation>
     </message>
     <message>
       <source>PB</source>
@@ -1361,7 +1361,7 @@
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Requírese transcodificación de vídeo.</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
@@ -1369,19 +1369,19 @@
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>Non se exportaron datos.</translation>
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Desbloquea esta parte do arquivo para exportar o seu contido.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>O arquivo non está dispoñible agora. Por favor, téntao de novo máis tarde.</translation>
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Erro de escritura do ficheiro.</translation>
     </message>
   </context>
   <context>
@@ -2173,7 +2173,7 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Disparador suave</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
@@ -2410,7 +2410,7 @@
     </message>
     <message>
       <source>Also show source camera</source>
-      <translation type="unfinished">Also show source camera</translation>
+      <translation>Tamén mostrar a cámara de orixe</translation>
     </message>
     <message>
       <source>Source camera</source>
@@ -2418,23 +2418,23 @@
     </message>
     <message>
       <source>Also show on source camera</source>
-      <translation type="unfinished">Also show on source camera</translation>
+      <translation>Tamén mostrar na cámara de orixe</translation>
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>Tamén configurar na cámara de orixe</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>Tamén activar na cámara de orixe</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>Tamén gravar a cámara de orixe</translation>
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <translation>Tamén reproducir na cámara de orixe</translation>
     </message>
     <message numerus="yes">
       <source>%n Groups</source>

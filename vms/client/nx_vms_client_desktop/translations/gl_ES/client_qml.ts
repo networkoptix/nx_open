@@ -1305,7 +1305,7 @@
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</translation>
+      <translation>Ningún usuario ou grupo coincide coa configuración de sincronización e engádese á base de datos do sistema. Asegúrate de que os parámetros do servidor LDAP e as bases de busca estean configurados correctamente.</translation>
     </message>
   </context>
   <context>
@@ -1332,7 +1332,7 @@
     </message>
     <message>
       <source>Events</source>
-      <translation type="unfinished">Events</translation>
+      <translation>Eventos</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -1344,15 +1344,15 @@
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation type="unfinished">Select a camera to see its motion events</translation>
+      <translation>Selecciona unha cámara para ver os seus eventos de movemento</translation>
     </message>
     <message>
       <source>No motion detected</source>
-      <translation type="unfinished">No motion detected</translation>
+      <translation>Non se detectou movemento</translation>
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Tenta cambiar os filtros ou activar a gravación de movemento</translation>
     </message>
     <message>
       <source>Select Camera...</source>
@@ -1371,29 +1371,29 @@
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+      <translation>A liña non é válida. Elimina as autointerseccións para continuar.</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Esta liña require polo menos %n puntos.</numerusform>
+        <numerusform>Esta liña require polo menos %n puntos.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the line.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
+      <translation>Fai clic no último punto para rematar de debuxar a liña.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Alcanzouse o número máximo de puntos (%n puntos).</numerusform>
+        <numerusform>Alcanzouse o número máximo de puntos (%n puntos).</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
+      <translation>Fai clic en cada frecha para alternar a dirección desexada.</translation>
     </message>
   </context>
   <context>
@@ -1415,7 +1415,7 @@
     <name>LookupListTableCellDelegate</name>
     <message>
       <source>ANY</source>
-      <translation type="unfinished">ANY</translation>
+      <translation>CALQUERA</translation>
     </message>
   </context>
   <context>
@@ -1438,7 +1438,7 @@
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Crear novo...</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -1453,7 +1453,7 @@
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation type="unfinished">Select an area on the video to filter results</translation>
+      <translation>Selecciona unha zona do vídeo para filtrar os resultados</translation>
     </message>
   </context>
   <context>
@@ -1464,7 +1464,7 @@
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>A ligazón anterior será invalidada unha vez que se emita unha nova</translation>
     </message>
     <message>
       <source>Create</source>
@@ -1475,15 +1475,15 @@
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>Sen listas</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>Aínda non creaches ningunha lista. Coas listas podes almacenar varios valores para usalos nas regras de eventos. Crea unha nova lista para comezar a engadir entradas.</translation>
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Crear novo...</translation>
     </message>
   </context>
   <context>
@@ -1501,7 +1501,7 @@
     <name>ObjectSizeConstraints</name>
     <message>
       <source>Size Constraints</source>
-      <translation type="unfinished">Size Constraints</translation>
+      <translation>Restricións de tamaño</translation>
     </message>
   </context>
   <context>
@@ -1512,7 +1512,7 @@
     </message>
     <message>
       <source>URL or Host:Port</source>
-      <translation type="unfinished">URL or Host:Port</translation>
+      <translation>URL ou Host:Porto</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1535,7 +1535,7 @@
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>Aprobar</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1546,7 +1546,7 @@
     <name>ParentGroupsTab</name>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Engadir grupo</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1554,28 +1554,28 @@
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>Aínda non hai grupos personalizados</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Non se atoparon grupos</translation>
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Cambiar os criterios de busca ou crear un novo grupo</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Sen grupos</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>Usa os controis da esquerda para engadir a un grupo</translation>
     </message>
     <message>
       <source>Member of</source>
       <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
-      <translation type="unfinished">Member of</translation>
+      <translation>Membro de</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -1585,7 +1585,7 @@
     <message>
       <source>Built-in</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Integrado</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1597,7 +1597,7 @@
     <name>PasswordChangeDialog</name>
     <message>
       <source>Change password - %1</source>
-      <translation type="unfinished">Change password - %1</translation>
+      <translation>Cambiar contrasinal - %1</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1605,7 +1605,7 @@
     </message>
     <message>
       <source>Current password</source>
-      <translation type="unfinished">Current password</translation>
+      <translation>Contrasinal actual</translation>
     </message>
     <message>
       <source>New password</source>
@@ -1624,31 +1624,31 @@
     <name>PermissionSummary</name>
     <message>
       <source>No custom permissions</source>
-      <translation type="unfinished">No custom permissions</translation>
+      <translation>Sen permisos personalizados</translation>
     </message>
   </context>
   <context>
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>Non se atoparon recursos</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>Engadir automaticamente permisos dependentes</translation>
     </message>
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>Usa %1 ou %2 para seleccionar varios recursos ou %3 para borrar a selección</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
-      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</translation>
+      <translation>A táboa Recursos ofréceche unha visión xeral dos permisos de usuario ou grupo e permíteche asignar permisos para recursos específicos.</translation>
     </message>
     <message>
       <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>Se seleccionas un permiso que depende doutro permiso, ambos permisos concederanse automaticamente.</translation>
     </message>
   </context>
   <context>
@@ -1659,14 +1659,14 @@
     </message>
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>Os complementos, plugins, son programas que se executan no servidor %1 para permitir integracións sen fisuras coa análise de vídeo.</translation>
     </message>
   </context>
   <context>
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>Non hai ningún complemento instalado</translation>
     </message>
     <message>
       <source>Server is offline</source>
@@ -1684,24 +1684,24 @@
     <name>Polygon</name>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+      <translation>O polígono non é válido. Elimina as autointerseccións para continuar.</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Este polígono require polo menos %n puntos.</numerusform>
+        <numerusform>Este polígono require polo menos %n puntos.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+      <translation>Fai clic no último punto para rematar de debuxar o polígono.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Alcanzouse o número máximo de puntos (%n puntos).</numerusform>
+        <numerusform>Alcanzouse o número máximo de puntos (%n puntos).</numerusform>
       </translation>
     </message>
   </context>
@@ -1716,19 +1716,19 @@
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
-      <translation type="unfinished">No Preview</translation>
+      <translation>Sen vista previa</translation>
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation type="unfinished">Select the object to display the preview</translation>
+      <translation>Selecciona o obxecto para mostrar a vista previa</translation>
     </message>
     <message>
       <source>Show on Layout</source>
-      <translation type="unfinished">Show on Layout</translation>
+      <translation>Mostrar no deseño</translation>
     </message>
     <message>
       <source>Preview is not available for the selected object</source>
-      <translation type="unfinished">Preview is not available for the selected object</translation>
+      <translation>A vista previa non está dispoñible para o obxecto seleccionado</translation>
     </message>
   </context>
   <context>
@@ -1747,12 +1747,12 @@
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation type="unfinished">Drag over any part of the video
-to activate PTZ</translation>
+      <translation>Arrastra sobre calquera parte do vídeo
+para activar o PTZ</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation type="unfinished">Go to Local Settings to enable a drag marker over the center of the video</translation>
+      <translation>Vaia a Configuración local para activar un marcador de arrastre sobre o centro do vídeo</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
@@ -2642,14 +2642,14 @@ prema Alt + Clic para seguir o obxecto</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>O inicio de sesión deste usuario duplica o inicio de sesión doutro usuario. Ningún deles pode iniciar sesión. Para resolver este problema, podes cambiar o inicio de sesión do usuario ou desactivar ou eliminar usuarios con inicios de sesión duplicados.</translation>
     </message>
   </context>
   <context>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
-      <translation type="unfinished">Hidden</translation>
+      <translation>Oculto</translation>
     </message>
     <message>
       <source>All Systems</source>
@@ -2657,18 +2657,18 @@ prema Alt + Clic para seguir o obxecto</translation>
     </message>
     <message>
       <source>Favorites</source>
-      <translation type="unfinished">Favorites</translation>
+      <translation>Favoritos</translation>
     </message>
   </context>
   <context>
     <name>VmsRulesDialog</name>
     <message>
       <source>Vms Rules</source>
-      <translation type="unfinished">Vms Rules</translation>
+      <translation>Regras de VMS</translation>
     </message>
     <message>
       <source>Add Rule</source>
-      <translation type="unfinished">Add Rule</translation>
+      <translation>Engadir regra</translation>
     </message>
     <message>
       <source>Duplicate</source>
@@ -2680,7 +2680,7 @@ prema Alt + Clic para seguir o obxecto</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Sen entradas</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -2688,18 +2688,18 @@ prema Alt + Clic para seguir o obxecto</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>Restablecer os valores predeterminados...</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Official Website</source>
-      <translation type="unfinished">Official Website</translation>
+      <translation>Sitio web oficial</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>
-      <translation type="unfinished">Help &amp; User Manual</translation>
+      <translation>Axuda e manual do usuario</translation>
     </message>
     <message>
       <source>Support</source>
@@ -2707,28 +2707,28 @@ prema Alt + Clic para seguir o obxecto</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>Non tes acceso a %1. Por favor, comproba a túa conexión a internet.</translation>
     </message>
   </context>
   <context>
     <name>XAxis</name>
     <message>
       <source>Move the joystick left and right several times.</source>
-      <translation type="unfinished">Move the joystick left and right several times.</translation>
+      <translation>Move o joystick á esquerda e á dereita varias veces.</translation>
     </message>
   </context>
   <context>
     <name>YAxis</name>
     <message>
       <source>Move the joystick up and down several times.</source>
-      <translation type="unfinished">Move the joystick up and down several times.</translation>
+      <translation>Move o joystick varias veces cara arriba e cara abaixo.</translation>
     </message>
   </context>
   <context>
     <name>ZAxis</name>
     <message>
       <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
+      <translation>Xira o joystick varias veces en sentido horario e antihorario.</translation>
     </message>
   </context>
 </TS>
