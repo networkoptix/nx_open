@@ -59,6 +59,21 @@ Page
                     selection: screen.controller.searchSetup.cameraSelection,
                     cameras: screen.controller.searchSetup.selectedCamerasIds})
             }
+
+            SwitchSelector
+            {
+                visible: controller?.bookmarkSearchSetup ?? false
+
+                text: qsTr("Shared Only")
+                checkState: (controller?.bookmarkSearchSetup?.searchSharedOnly ?? false)
+                    ? Qt.Checked
+                    : Qt.Unchecked
+                onCheckStateChanged:
+                {
+                    if (controller && controller.bookmarkSearchSetup)
+                        controller.bookmarkSearchSetup.searchSharedOnly = checkState === Qt.Checked
+                }
+            }
         }
     }
 
@@ -92,6 +107,15 @@ Page
         Connections
         {
             target: controller.analyticsSearchSetup
+            function onParametersChanged()
+            {
+                d.hasChanges = true
+            }
+        }
+
+        Connections
+        {
+            target: controller.bookmarkSearchSetup
             function onParametersChanged()
             {
                 d.hasChanges = true

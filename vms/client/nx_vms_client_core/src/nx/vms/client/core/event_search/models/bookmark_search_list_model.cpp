@@ -32,6 +32,9 @@ using namespace std::chrono;
 
 namespace {
 
+static const api::BookmarkShareFilters kSharedBookmarkFilters = api::BookmarkShareFilter::shared
+    | api::BookmarkShareFilter::accessible;
+
 const auto sPredicate = nx::utils::algorithm::Comparator(
     /*ascending*/ false, &QnCameraBookmark::startTimeMs, &QnCameraBookmark::guid);
 
@@ -90,6 +93,8 @@ QString parseHyperlinks(const QString& text)
 struct BookmarkSearchListModel::Private
 {
     BookmarkSearchListModel* const q;
+
+    bool searchSharedOnly = false;
 
     nx::utils::ScopedConnection bookmarkAddedConnection;
     nx::utils::ScopedConnection bookmarkUpdatedConnection;
@@ -200,7 +205,11 @@ bool BookmarkSearchListModel::Private::requestFetch(
         .text = formatFilterText(textFilter->text().trimmed()),
         .limit = q->maximumCount(),
         .orderBy = QnBookmarkSortOrder(BookmarkSortField::startTime, sortOrder),
-        .cameras = idsFromCameras(q->cameraSet().cameras())};
+        .shareFilter = searchSharedOnly
+            ? kSharedBookmarkFilters
+            : api::BookmarkShareFilter::none,
+        .cameras = idsFromCameras(q->cameraSet().cameras())
+    };
 
     if (const auto& interestTimePeriod = q->interestTimePeriod())
     {
@@ -371,12 +380,25 @@ QVariant BookmarkSearchListModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue(bookmark.tags);
         case IsSharedBookmark:
             return bookmark.shareable()
-                && bookmark.bookmarkMatchesFilter(
-                    api::BookmarkShareFilter::shared | api::BookmarkShareFilter::accessible)
+                && bookmark.bookmarkMatchesFilter(kSharedBookmarkFilters)
                 && systemContext()->moduleInformation().organizationId;
         default:
             return base_type::data(index, role);
     }
+}
+
+bool BookmarkSearchListModel::searchSharedOnly() const
+{
+    return d->searchSharedOnly;
+}
+
+void BookmarkSearchListModel::setSearchSharedOnly(const bool value)
+{
+    if (value == d->searchSharedOnly)
+        return;
+
+    d->searchSharedOnly = value;
+    emit searchSharedOnlyChanged();
 }
 
 bool BookmarkSearchListModel::requestFetch(

@@ -8,6 +8,8 @@
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
+#include <nx/vms/client/core/event_search/utils/bookmark_search_setup.h>
 #include <nx/vms/client/core/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/core/event_search/utils/event_search_utils.h>
 #include <nx/vms/client/mobile/system_context.h>
@@ -42,13 +44,16 @@ public:
     ParametersVisualizationModel* const q;
     nx::utils::ScopedConnections analyticsConnections;
     nx::utils::ScopedConnections connections;
-    QPointer<AnalyticsSearchSetup> analyticsSetup = nullptr;
-    QPointer<CommonObjectSearchSetup> setup = nullptr;
+    nx::utils::ScopedConnections bookmarkConnections;
+    QPointer<AnalyticsSearchSetup> analyticsSetup;
+    QPointer<CommonObjectSearchSetup> setup;
+    QPointer<BookmarkSearchSetup> bookmarkSearchSetup;
 
     using Items = std::vector<Item>;
     Items items;
 
 private:
+    void addBookmarkFilterValue(Items& result);
     void addTimeFilterValue(Items& result);
     void addCameraFilterValue(Items& result);
     void addPluginFilterValue(Items& result);
@@ -83,6 +88,12 @@ void ParametersVisualizationModel::Private::update()
 
     const ParametersVisualizationModel::ScopedReset resetGuard(q);
     items = newItems;
+}
+
+void ParametersVisualizationModel::Private::addBookmarkFilterValue(Items& result)
+{
+    if (bookmarkSearchSetup && bookmarkSearchSetup->searchSharedOnly())
+        result.push_back({tr("Shared Only")});
 }
 
 void ParametersVisualizationModel::Private::addTimeFilterValue(Items& result)
@@ -276,6 +287,30 @@ void ParametersVisualizationModel::setSearchSetup(CommonObjectSearchSetup* value
     d->update();
 
     emit searchSetupChanged();
+}
+
+BookmarkSearchSetup* ParametersVisualizationModel::bookmarkSearchSetup() const
+{
+    return d->bookmarkSearchSetup;
+}
+
+void ParametersVisualizationModel::setBookmarkSearchSetup(BookmarkSearchSetup* value)
+{
+    if (d->bookmarkSearchSetup == value)
+        return;
+
+    d->bookmarkConnections = {};
+    d->bookmarkSearchSetup = value;
+
+    if (d->bookmarkSearchSetup)
+    {
+        d->bookmarkConnections.add(connect(
+            d->bookmarkSearchSetup, &BookmarkSearchSetup::parametersChanged,
+            this, [this](){ d->update(); }));
+    }
+    d->update();
+
+    emit bookmarkSearchSetupChanged();
 }
 
 int ParametersVisualizationModel::rowCount(const QModelIndex& parent) const

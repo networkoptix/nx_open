@@ -21,6 +21,7 @@
 #include <nx/vms/client/core/event_search/models/bookmark_search_list_model.h>
 #include <nx/vms/client/core/event_search/models/event_search_model_adapter.h>
 #include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
+#include <nx/vms/client/core/event_search/utils/bookmark_search_setup.h>
 #include <nx/vms/client/core/network/helpers.h>
 #include <nx/vms/client/core/network/network_manager.h>
 #include <nx/vms/client/core/network/network_module.h>
@@ -310,6 +311,19 @@ core::AnalyticsSearchSetup* SystemContext::createAnalyticsSearchSetup(
     using namespace nx::vms::client::core;
     if (const auto analyticsModel = qobject_cast<AnalyticsSearchListModel*>(model->searchModel()))
         return new AnalyticsSearchSetup(analyticsModel);
+
+    return nullptr;
+}
+
+core::BookmarkSearchSetup* SystemContext::createBookmarkSearchSetup(
+    core::EventSearchModelAdapter* model)
+{
+    if (!model)
+        return nullptr;
+
+    using namespace nx::vms::client::core;
+    if (const auto bookmarksModel = qobject_cast<BookmarkSearchListModel*>(model->searchModel()))
+        return new core::BookmarkSearchSetup(bookmarksModel);
 
     return nullptr;
 }

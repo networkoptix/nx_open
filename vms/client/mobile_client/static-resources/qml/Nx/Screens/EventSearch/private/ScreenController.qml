@@ -29,6 +29,9 @@ NxObject
     property AnalyticsSearchSetup analyticsSearchSetup: controller.analyticsSearchMode
         ? windowContext.mainSystemContext.createAnalyticsSearchSetup(searchModel)
         : null
+    property BookmarkSearchSetup bookmarkSearchSetup: controller.analyticsSearchMode
+        ? null
+        : windowContext.mainSystemContext.createBookmarkSearchSetup(searchModel)
 
     function requestUpdate(direction)
     {

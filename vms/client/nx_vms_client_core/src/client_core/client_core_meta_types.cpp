@@ -42,6 +42,7 @@
 #include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/core/event_search/models/event_search_model_adapter.h>
 #include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
+#include <nx/vms/client/core/event_search/utils/bookmark_search_setup.h>
 #include <nx/vms/client/core/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/core/event_search/utils/event_search_utils.h>
 #include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
@@ -204,6 +205,7 @@ void registerQmlTypesInternal()
     EventSearch::registerQmlTypes();
     ResourceIdentificationThumbnail::registerQmlType();
     AnalyticsSearchSetup::registerQmlType();
+    BookmarkSearchSetup::registerQmlType();
     TextFilterSetup::registerQmlType();
     MediaPlayer::registerQmlTypes();
     EventSearchModelAdapter::registerQmlType();

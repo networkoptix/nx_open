@@ -35,12 +35,18 @@ public:
 
     virtual QVariant data(const QModelIndex& index, int role) const override;
 
+    bool searchSharedOnly() const;
+    void setSearchSharedOnly(const bool value);
+
 protected:
     virtual bool requestFetch(
         const FetchRequest& request,
         const FetchCompletionHandler& completionHandler) override;
 
     virtual void clearData() override;
+
+signals:
+    void searchSharedOnlyChanged();
 
 private:
     virtual void setSystemContext(SystemContext* systemContext) override;

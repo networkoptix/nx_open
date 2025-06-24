@@ -17,13 +17,13 @@ class QnResourceDiscoveryManager;
 
 namespace nx::client::mobile { class EventRulesWatcher; }
 
-namespace nx::vms::client::core
-{
+namespace nx::vms::client::core {
 class EventSearchModelAdapter;
 class TwoWayAudioController;
 class CommonObjectSearchSetup;
 class AnalyticsSearchSetup;
-}
+class BookmarkSearchSetup;
+} // namespace nx::vms::client::core
 
 namespace nx::vms::client::mobile {
 
@@ -71,12 +71,15 @@ public:
 
     // Invokables.
 
-    Q_INVOKABLE core::EventSearchModelAdapter* createSearchModel(bool analyticsMode);
+    Q_INVOKABLE nx::vms::client::core::EventSearchModelAdapter* createSearchModel(bool analyticsMode);
 
-    Q_INVOKABLE core::CommonObjectSearchSetup* createSearchSetup(
+    Q_INVOKABLE nx::vms::client::core::CommonObjectSearchSetup* createSearchSetup(
         core::EventSearchModelAdapter* model);
 
-    Q_INVOKABLE core::AnalyticsSearchSetup* createAnalyticsSearchSetup(
+    Q_INVOKABLE nx::vms::client::core::AnalyticsSearchSetup* createAnalyticsSearchSetup(
+        core::EventSearchModelAdapter* model);
+
+    Q_INVOKABLE nx::vms::client::core::BookmarkSearchSetup* createBookmarkSearchSetup(
         core::EventSearchModelAdapter* model);
 
     Q_INVOKABLE bool hasViewBookmarksPermission();
