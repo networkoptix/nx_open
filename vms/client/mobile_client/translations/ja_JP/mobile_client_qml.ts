@@ -870,8 +870,8 @@
       <translation>パフォーマンス</translation>
     </message>
     <message>
-      <source>AppInfo</source>
-      <translation>アプリ情報</translation>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>

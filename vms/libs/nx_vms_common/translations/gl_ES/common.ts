@@ -95,7 +95,7 @@
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB (terabytes)</translation>
     </message>
     <message>
       <source>PB</source>
@@ -1446,7 +1446,7 @@
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>Requírese transcodificación de vídeo.</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
@@ -1454,19 +1454,19 @@
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>Non se exportaron datos.</translation>
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Desbloquea esta parte do arquivo para exportar o seu contido.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>O arquivo non está dispoñible agora. Por favor, téntao de novo máis tarde.</translation>
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>Erro de escritura do ficheiro.</translation>
     </message>
     <message>
       <source>Audio transcoding required.</source>

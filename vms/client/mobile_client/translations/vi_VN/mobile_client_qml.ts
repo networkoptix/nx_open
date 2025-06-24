@@ -870,8 +870,8 @@
       <translation>Hiệu suất</translation>
     </message>
     <message>
-      <source>AppInfo</source>
-      <translation>Thông tin ứng dụng</translation>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>

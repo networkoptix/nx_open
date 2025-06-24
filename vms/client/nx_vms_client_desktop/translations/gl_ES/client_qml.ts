@@ -1497,29 +1497,29 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+      <translation>A liña non é válida. Elimina as autointerseccións para continuar.</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Esta liña require polo menos %n puntos.</numerusform>
+        <numerusform>Esta liña require polo menos %n puntos.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the line.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
+      <translation>Fai clic no último punto para rematar de debuxar a liña.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Alcanzouse o número máximo de puntos (%n puntos).</numerusform>
+        <numerusform>Alcanzouse o número máximo de puntos (%n puntos).</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
+      <translation>Fai clic en cada frecha para alternar a dirección desexada.</translation>
     </message>
   </context>
   <context>
@@ -1644,7 +1644,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Sen entradas</translation>
     </message>
     <message>
       <source>New List...</source>
@@ -1675,22 +1675,22 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation type="unfinished">Select an area on the video to filter results</translation>
+      <translation>Selecciona unha zona do vídeo para filtrar os resultados</translation>
     </message>
   </context>
   <context>
     <name>MotionPanel</name>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation type="unfinished">Select a camera to see its motion events</translation>
+      <translation>Selecciona unha cámara para ver os seus eventos de movemento</translation>
     </message>
     <message>
       <source>No motion detected</source>
-      <translation type="unfinished">No motion detected</translation>
+      <translation>Non se detectou movemento</translation>
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Tenta cambiar os filtros ou activar a gravación de movemento</translation>
     </message>
     <message>
       <source>Select Camera...</source>
@@ -1724,7 +1724,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>A ligazón anterior será invalidada unha vez que se emita unha nova</translation>
     </message>
     <message>
       <source>Create</source>
@@ -1735,7 +1735,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>Sen listas</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
@@ -1835,7 +1835,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>ParentGroupsTab</name>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Engadir grupo</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1847,15 +1847,15 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Non se atoparon grupos</translation>
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Cambiar os criterios de busca ou crear un novo grupo</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Sen grupos</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
@@ -3042,7 +3042,7 @@ prema Alt + Clic para seguir o obxecto</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>O inicio de sesión deste usuario duplica o inicio de sesión doutro usuario. Ningún deles pode iniciar sesión. Para resolver este problema, podes cambiar o inicio de sesión do usuario ou desactivar ou eliminar usuarios con inicios de sesión duplicados.</translation>
     </message>
     <message>
       <source>Notification Language</source>
@@ -3057,11 +3057,11 @@ prema Alt + Clic para seguir o obxecto</translation>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
-      <translation type="unfinished">Hidden</translation>
+      <translation>Oculto</translation>
     </message>
     <message>
       <source>Favorites</source>
-      <translation type="unfinished">Favorites</translation>
+      <translation>Favoritos</translation>
     </message>
     <message>
       <source>All Sites</source>
@@ -3072,7 +3072,7 @@ prema Alt + Clic para seguir o obxecto</translation>
     <name>VmsRulesDialog</name>
     <message>
       <source>Add Rule</source>
-      <translation type="unfinished">Add Rule</translation>
+      <translation>Engadir regra</translation>
     </message>
     <message>
       <source>Duplicate</source>
@@ -3084,7 +3084,7 @@ prema Alt + Clic para seguir o obxecto</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Sen entradas</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -3092,7 +3092,7 @@ prema Alt + Clic para seguir o obxecto</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>Restablecer os valores predeterminados...</translation>
     </message>
     <message>
       <source>Event Rules</source>
@@ -3123,11 +3123,11 @@ prema Alt + Clic para seguir o obxecto</translation>
     <name>WelcomeScreen</name>
     <message>
       <source>Official Website</source>
-      <translation type="unfinished">Official Website</translation>
+      <translation>Sitio web oficial</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>
-      <translation type="unfinished">Help &amp; User Manual</translation>
+      <translation>Axuda e manual do usuario</translation>
     </message>
     <message>
       <source>Support</source>
@@ -3135,28 +3135,28 @@ prema Alt + Clic para seguir o obxecto</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>Non tes acceso a %1. Por favor, comproba a túa conexión a internet.</translation>
     </message>
   </context>
   <context>
     <name>XAxis</name>
     <message>
       <source>Move the joystick left and right several times.</source>
-      <translation type="unfinished">Move the joystick left and right several times.</translation>
+      <translation>Move o joystick á esquerda e á dereita varias veces.</translation>
     </message>
   </context>
   <context>
     <name>YAxis</name>
     <message>
       <source>Move the joystick up and down several times.</source>
-      <translation type="unfinished">Move the joystick up and down several times.</translation>
+      <translation>Move o joystick varias veces cara arriba e cara abaixo.</translation>
     </message>
   </context>
   <context>
     <name>ZAxis</name>
     <message>
       <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
+      <translation>Xira o joystick varias veces en sentido horario e antihorario.</translation>
     </message>
   </context>
 </TS>

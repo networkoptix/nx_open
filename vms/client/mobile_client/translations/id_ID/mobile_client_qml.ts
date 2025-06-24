@@ -870,8 +870,8 @@
       <translation>Performa</translation>
     </message>
     <message>
-      <source>AppInfo</source>
-      <translation>InfoAplikasi</translation>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>

@@ -254,7 +254,7 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Disparador suave</translation>
     </message>
     <message>
       <source>Field &quot;%1&quot; should be an object</source>
@@ -1151,7 +1151,7 @@
     <name>nx::vms::rules::SoftTriggerEvent</name>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Disparador suave</translation>
     </message>
     <message>
       <source>Name</source>
@@ -1185,7 +1185,7 @@
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Texto</translation>
     </message>
     <message>
       <source>At Device</source>

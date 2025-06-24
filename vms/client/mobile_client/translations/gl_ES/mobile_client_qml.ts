@@ -871,8 +871,8 @@
       <translation>Rendemento</translation>
     </message>
     <message>
-      <source>AppInfo</source>
-      <translation>Información da aplicación</translation>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>

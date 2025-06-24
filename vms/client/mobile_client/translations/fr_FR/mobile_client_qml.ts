@@ -871,8 +871,8 @@
       <translation>Performance</translation>
     </message>
     <message>
-      <source>AppInfo</source>
-      <translation>Infos de l'application</translation>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>

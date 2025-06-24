@@ -873,8 +873,8 @@
       <translation>Производительность</translation>
     </message>
     <message>
-      <source>AppInfo</source>
-      <translation>О приложении</translation>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>
