@@ -873,8 +873,8 @@
       <translation>Wydajność</translation>
     </message>
     <message>
-      <source>AppInfo</source>
-      <translation type="unfinished">AppInfo</translation>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>
@@ -984,7 +984,7 @@
     </message>
     <message>
       <source>Host:Port</source>
-      <translation type="unfinished">Host:Port</translation>
+      <translation>Host:Port</translation>
     </message>
   </context>
   <context>

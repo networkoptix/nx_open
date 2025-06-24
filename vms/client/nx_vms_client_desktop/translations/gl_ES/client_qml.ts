@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>Engadir entrada</translation>
     </message>
     <message>
       <source>Add</source>
@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP - Configuración avanzada</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>Atributo de inicio de sesión</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -32,23 +32,23 @@
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>Membresía</translation>
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>Tempo de espera da busca</translation>
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>Para activar a autenticación de resumo para os usuarios LDAP que xa están engadidos á base de datos VMS, debes activala directamente na configuración destes usuarios.</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>Para desactivar a autenticación de resumo para os usuarios LDAP que xa están engadidos á base de datos VMS, debes activala directamente na configuración destes usuarios.</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
-      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+      <translation>Permitir a autenticación insegura (resumo) para usuarios importados</translation>
     </message>
     <message>
       <source>General</source>
@@ -56,15 +56,15 @@
     </message>
     <message>
       <source>Synchronize Users</source>
-      <translation type="unfinished">Synchronize Users</translation>
+      <translation>Sincronizar usuarios</translation>
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation type="unfinished">Sync Interval</translation>
+      <translation>Intervalo de sincronización</translation>
     </message>
     <message>
       <source>Group Members Attribute</source>
-      <translation type="unfinished">Group Members Attribute</translation>
+      <translation>Atributo dos membros do grupo</translation>
     </message>
     <message>
       <source>Proxy LDAP requests via server</source>
@@ -79,7 +79,7 @@
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Configuración avanzada de actualización</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -87,7 +87,7 @@
     </message>
     <message>
       <source>Notify about available updates</source>
-      <translation type="unfinished">Notify about available updates</translation>
+      <translation>Notificar sobre as actualizacións dispoñibles</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
@@ -95,31 +95,31 @@
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
-      <translation type="unfinished">Turn this option on to make connected clients update automatically to the latest compatible version.</translation>
+      <translation>Activa esta opción para que os clientes conectados se actualicen automaticamente á última versión compatible.</translation>
     </message>
     <message>
       <source>Connecting clients will be automatically updated to the new version when it’s available.</source>
-      <translation type="unfinished">Connecting clients will be automatically updated to the new version when it’s available.</translation>
+      <translation>Os clientes que se conecten actualizaranse automaticamente á nova versión cando estea dispoñible.</translation>
     </message>
     <message>
       <source>All connecting clients are updating to version %1.</source>
-      <translation type="unfinished">All connecting clients are updating to version %1.</translation>
+      <translation>Todos os clientes que se conectan están a actualizar á versión %1.</translation>
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
-      <translation type="unfinished">Connecting clients will be updated to version %1 on %2.</translation>
+      <translation>Os clientes que se conecten actualizaranse á versión %1 o %2.</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>Comprobar se hai actualizacións</translation>
     </message>
     <message>
       <source>Speed up this update</source>
-      <translation type="unfinished">Speed up this update</translation>
+      <translation>Acelerar esta actualización</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Estás a usar un cliente personalizado. Ponte en contacto con %1 para obter as instrucións de actualización.</translation>
     </message>
     <message>
       <source>Offline client updates</source>
@@ -150,7 +150,7 @@
     <name>AnalyticsEventSelector</name>
     <message>
       <source>Event Type</source>
-      <translation type="unfinished">Event Type</translation>
+      <translation>Tipo de evento</translation>
     </message>
     <message>
       <source>All</source>
@@ -198,7 +198,7 @@
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
-      <translation type="unfinished">Advanced Object Search</translation>
+      <translation>Busca avanzada de obxectos</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -249,15 +249,15 @@
     <name>AnalyticsSettings</name>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>A analítica da cámara só funcionará cando se estea visualizando a cámara. Activa a gravación para que funcione todo o tempo.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
-      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
+      <translation>Consulta a Configuración da Cámara para configurar este complemento.</translation>
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
-      <translation type="unfinished">This plugin has no settings for this camera.</translation>
+      <translation>Este plugin non ten configuracións para esta cámara.</translation>
     </message>
     <message>
       <source>Check Site Administration settings to configure this plugin.</source>
@@ -276,7 +276,7 @@
     </message>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Integracións de API</translation>
     </message>
   </context>
   <context>
@@ -292,23 +292,23 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>ApiIntegrations</name>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Integracións de API</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation type="unfinished">API Integrations interact with %1 Server via REST API and exchange metadata</translation>
+      <translation>As integracións da API interactúan co servidor %1 a través da API REST e intercambian metadatos</translation>
     </message>
     <message>
       <source>New requests</source>
-      <translation type="unfinished">New requests</translation>
+      <translation>Novas solicitudes</translation>
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
-      <translation type="unfinished">API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</translation>
+      <translation>A integración da API pode activarse despois de verificar o código recibido do provedor de integración. As novas solicitudes poden desactivarse para evitar interaccións non desexadas.</translation>
     </message>
     <message>
       <source>Enable %1?</source>
-      <translation type="unfinished">Enable %1?</translation>
+      <translation>Activar %1?</translation>
     </message>
     <message>
       <source>This Integration will be able to:
@@ -316,23 +316,23 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
  • get access to archive
  • process video streams
  • exchange metadata over the network</source>
-      <translation type="unfinished">This Integration will be able to:
- • change settings on cameras
- • get access to archive
- • process video streams
- • exchange metadata over the network</translation>
+      <translation>Esta integración poderá:
+ • cambiar a configuración das cámaras
+ • obter acceso ao arquivo
+ • procesar fluxos de vídeo
+ • intercambiar metadatos a través da rede</translation>
     </message>
     <message>
       <source>Enable Integration</source>
-      <translation type="unfinished">Enable Integration</translation>
+      <translation>Activar a integración</translation>
     </message>
     <message>
       <source>Remove %1?</source>
-      <translation type="unfinished">Remove %1?</translation>
+      <translation>Eliminar %1?</translation>
     </message>
     <message>
       <source>This will remove Integration request</source>
-      <translation type="unfinished">This will remove Integration request</translation>
+      <translation>Isto eliminará a solicitude de integración</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -340,7 +340,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Remove Request</source>
-      <translation type="unfinished">Remove Request</translation>
+      <translation>Eliminar solicitude</translation>
     </message>
   </context>
   <context>
@@ -358,7 +358,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>AutoTextField</name>
     <message>
       <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
+      <translation>Este campo non pode estar baleiro</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -369,9 +369,9 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>BatchUserEditDialog</name>
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
-      <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
-        <numerusform>Batch Edit - %n Users</numerusform>
+      <translation>
+        <numerusform>Edición por lotes - %n Usuarios</numerusform>
+        <numerusform>Edición por lotes - %n Usuarios</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -384,7 +384,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <message>
       <source>User status</source>
       <comment>Whether users are enabled or disabled</comment>
-      <translation type="unfinished">User status</translation>
+      <translation>Estado do usuario</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -396,11 +396,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
-      <translation type="unfinished">Insecure (digest) authentication</translation>
+      <translation>Autenticación insegura (resumo)</translation>
     </message>
     <message>
       <source>keep current value</source>
-      <translation type="unfinished">keep current value</translation>
+      <translation>manter o valor actual</translation>
     </message>
   </context>
   <context>
@@ -436,14 +436,14 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>ButtonSettingsDelegate</name>
     <message>
       <source>Hotkey %1</source>
-      <translation type="unfinished">Hotkey %1</translation>
+      <translation>Tecla de atallo %1</translation>
     </message>
   </context>
   <context>
     <name>Buttons</name>
     <message>
       <source>Press each button several times and write the names of these buttons in the table below.</source>
-      <translation type="unfinished">Press each button several times and write the names of these buttons in the table below.</translation>
+      <translation>Preme cada botón varias veces e escribe os nomes destes botóns na táboa seguinte.</translation>
     </message>
   </context>
   <context>
@@ -515,15 +515,15 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Unreachable</source>
-      <translation type="unfinished">Unreachable</translation>
+      <translation>Inalcanzable</translation>
     </message>
     <message>
       <source>Incompatible</source>
-      <translation type="unfinished">Incompatible</translation>
+      <translation>Incompatible</translation>
     </message>
     <message>
       <source>Pending</source>
-      <translation type="unfinished">Pending</translation>
+      <translation>Pendente</translation>
     </message>
     <message>
       <source>Suspended</source>
@@ -563,15 +563,15 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>ConnectionSettingsDialog</name>
     <message>
       <source>LDAP - Connection Settings</source>
-      <translation type="unfinished">LDAP - Connection Settings</translation>
+      <translation>LDAP - Configuración da conexión</translation>
     </message>
     <message>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>Servidor</translation>
     </message>
     <message>
       <source>Login DN</source>
-      <translation type="unfinished">Login DN</translation>
+      <translation>DN de inicio de sesión</translation>
     </message>
     <message>
       <source>Password</source>
@@ -579,11 +579,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
-      <translation type="unfinished">Ignore LDAP server certificate errors</translation>
+      <translation>Ignorar erros de certificado do servidor LDAP</translation>
     </message>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Proba</translation>
     </message>
     <message>
       <source>Connecting...</source>
@@ -591,15 +591,15 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Use StartTLS</source>
-      <translation type="unfinished">Use StartTLS</translation>
+      <translation>Usar StartTLS</translation>
     </message>
     <message>
       <source>Host cannot be empty</source>
-      <translation type="unfinished">Host cannot be empty</translation>
+      <translation>O servidor non pode estar baleiro</translation>
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation type="unfinished">Login DN cannot be empty</translation>
+      <translation>O DN de inicio de sesión non pode estar baleiro</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -607,7 +607,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
+      <translation>Para permitir que os usuarios de LDAP inicien sesión en %1, é necesario establecer unha conexión entre %1 e un servidor LDAP corporativo.</translation>
     </message>
   </context>
   <context>
@@ -678,7 +678,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation type="unfinished">360° Equirectangular</translation>
+      <translation>360° equirectangular</translation>
     </message>
   </context>
   <context>
@@ -704,11 +704,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>
-      <translation type="unfinished">List Settings</translation>
+      <translation>Configuración da lista</translation>
     </message>
     <message>
       <source>New List</source>
-      <translation type="unfinished">New List</translation>
+      <translation>Nova lista</translation>
     </message>
     <message>
       <source>Name</source>
@@ -716,7 +716,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Column Name</source>
-      <translation type="unfinished">Column Name</translation>
+      <translation>Nome da columna</translation>
     </message>
     <message>
       <source>OK</source>
@@ -774,7 +774,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Proba</translation>
     </message>
   </context>
   <context>
@@ -822,15 +822,15 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation type="unfinished">Figure</translation>
+      <translation>Figura</translation>
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>Premer para engadir</translation>
     </message>
     <message>
       <source>Display on video</source>
-      <translation type="unfinished">Display on video</translation>
+      <translation>Mostrar en vídeo</translation>
     </message>
   </context>
   <context>
@@ -852,7 +852,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>FigureView</name>
     <message>
       <source>NO PREVIEW</source>
-      <translation type="unfinished">NO PREVIEW</translation>
+      <translation>SEN VISTA PREVIA</translation>
     </message>
   </context>
   <context>
@@ -863,11 +863,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Base DN</source>
-      <translation type="unfinished">Base DN</translation>
+      <translation>DN base</translation>
     </message>
     <message>
       <source>Base DN cannot be empty</source>
-      <translation type="unfinished">Base DN cannot be empty</translation>
+      <translation>O DN da base non pode estar baleiro</translation>
     </message>
     <message>
       <source>Filter</source>
@@ -875,11 +875,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
-      <translation type="unfinished">The Base DN sets the starting point for LDAP searches and synchronization.</translation>
+      <translation>O DN base define o punto de partida para as buscas e sincronización LDAP.</translation>
     </message>
     <message>
       <source>Edit Search Base</source>
-      <translation type="unfinished">Edit Search Base</translation>
+      <translation>Editar a base de busca</translation>
     </message>
     <message>
       <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
@@ -897,39 +897,39 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>FisheyeDewarpingSettings</name>
     <message>
       <source>Image is not round</source>
-      <translation type="unfinished">Image is not round</translation>
+      <translation>A imaxe non é redonda</translation>
     </message>
     <message>
       <source>Image might be too dim</source>
-      <translation type="unfinished">Image might be too dim</translation>
+      <translation>A imaxe pode estar demasiado escura</translation>
     </message>
     <message>
       <source>Invalid input image</source>
-      <translation type="unfinished">Invalid input image</translation>
+      <translation>Imaxe de entrada non válida</translation>
     </message>
     <message>
       <source>Show grid</source>
-      <translation type="unfinished">Show grid</translation>
+      <translation>Mostrar grella</translation>
     </message>
     <message>
       <source>Auto Calibration</source>
-      <translation type="unfinished">Auto Calibration</translation>
+      <translation>Calibración automática</translation>
     </message>
     <message>
       <source>Mount</source>
-      <translation type="unfinished">Mount</translation>
+      <translation>Montar</translation>
     </message>
     <message>
       <source>Ceiling</source>
-      <translation type="unfinished">Ceiling</translation>
+      <translation>Teito</translation>
     </message>
     <message>
       <source>Wall</source>
-      <translation type="unfinished">Wall</translation>
+      <translation>Muro</translation>
     </message>
     <message>
       <source>Floor/table</source>
-      <translation type="unfinished">Floor/table</translation>
+      <translation>Chan/mesa</translation>
     </message>
     <message>
       <source>Angle</source>
@@ -937,23 +937,23 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation type="unfinished">Camera roll correction</translation>
+      <translation>Corrección do rolo da cámara</translation>
     </message>
     <message>
       <source>Lens projection</source>
-      <translation type="unfinished">Lens projection</translation>
+      <translation>Proxección de lente</translation>
     </message>
     <message>
       <source>Equidistant</source>
-      <translation type="unfinished">Equidistant</translation>
+      <translation>Equidistante</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation type="unfinished">Stereographic</translation>
+      <translation>Estereográfico</translation>
     </message>
     <message>
       <source>Equisolid</source>
-      <translation type="unfinished">Equisolid</translation>
+      <translation>Equisólido</translation>
     </message>
     <message>
       <source>Size</source>
@@ -961,19 +961,19 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>X Offset</source>
-      <translation type="unfinished">X Offset</translation>
+      <translation>Desprazamento X</translation>
     </message>
     <message>
       <source>Y Offset</source>
-      <translation type="unfinished">Y Offset</translation>
+      <translation>Desprazamento Y</translation>
     </message>
     <message>
       <source>Ellipticity</source>
-      <translation type="unfinished">Ellipticity</translation>
+      <translation>Elipticidade</translation>
     </message>
     <message>
       <source>Auto calibration failed</source>
-      <translation type="unfinished">Auto calibration failed</translation>
+      <translation>Fallou a calibración automática</translation>
     </message>
   </context>
   <context>
@@ -1029,15 +1029,15 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Permisos globais</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Membros</translation>
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Engadir grupo</translation>
     </message>
   </context>
   <context>
@@ -1063,7 +1063,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>GroupEditDialog</name>
     <message>
       <source>Group - %1</source>
-      <translation type="unfinished">Group - %1</translation>
+      <translation>Grupo - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -1079,11 +1079,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Permisos globais</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Membros</translation>
     </message>
   </context>
   <context>
@@ -1106,7 +1106,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Membros</translation>
     </message>
     <message>
       <source>Users</source>
@@ -1118,15 +1118,15 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
-      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+      <translation>O grupo ten outro grupo como membro principal e como membro secundario, ou forma parte dunha cadea de referencia circular deste tipo. Resolve esta cadea para evitar o cálculo incorrecto dos permisos.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <translation>Cando a sincronización continua co servidor LDAP está desactivada, os grupos non se sincronizan automaticamente. Para actualizar este grupo, inicia unha sincronización manual.</translation>
     </message>
     <message>
       <source>This group is not found in the LDAP database.</source>
-      <translation type="unfinished">This group is not found in the LDAP database.</translation>
+      <translation>Este grupo non se atopa na base de datos LDAP.</translation>
     </message>
     <message>
       <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
@@ -1145,19 +1145,19 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>No members</source>
-      <translation type="unfinished">No members</translation>
+      <translation>Sen membros</translation>
     </message>
     <message>
       <source>Use controls on the left to add members</source>
-      <translation type="unfinished">Use controls on the left to add members</translation>
+      <translation>Usa os controis da esquerda para engadir membros</translation>
     </message>
     <message>
       <source>Members summary</source>
-      <translation type="unfinished">Members summary</translation>
+      <translation>Resumo dos membros</translation>
     </message>
     <message>
       <source>Inherits membership in current group</source>
-      <translation type="unfinished">Inherits membership in current group</translation>
+      <translation>Herda a pertenza ao grupo actual</translation>
     </message>
   </context>
   <context>
@@ -1168,7 +1168,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Sen grupos</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -1191,7 +1191,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <message>
       <source>Hold %1 to activate actions</source>
       <comment>Leave %1 as is. It will be replaced to button name.</comment>
-      <translation type="unfinished">Hold %1 to activate actions</translation>
+      <translation>Mantén pulsado %1 para activar accións</translation>
     </message>
   </context>
   <context>
@@ -1205,48 +1205,48 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Detectado por</translation>
     </message>
   </context>
   <context>
     <name>Initial</name>
     <message>
       <source>Select the joystick.</source>
-      <translation type="unfinished">Select the joystick.</translation>
+      <translation>Selecciona o joystick.</translation>
     </message>
     <message>
       <source>No devices connected.</source>
-      <translation type="unfinished">No devices connected.</translation>
+      <translation>Non hai dispositivos conectados.</translation>
     </message>
   </context>
   <context>
     <name>InsecureBanner</name>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</translation>
+      <translation>A autenticación resumo está obsoleta e desactivarase na próxima versión; só se debe usar cando non se poida usar a autenticación de portador predeterminada.</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
+      <translation>A autenticación resumo está obsoleta e desactivarase na próxima versión; só se debe usar cando non se poida usar a autenticación de portador predeterminada. Os nomes de usuario deben estar compostos unicamente por letras minúsculas.</translation>
     </message>
   </context>
   <context>
     <name>IntegrationHeader</name>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Servizos insuficientes</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
       <comment>Required integration count</comment>
-      <translation type="unfinished">
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+      <translation>
+        <numerusform>requírense %n servizos de integración axeitados para activar a integración</numerusform>
+        <numerusform>requírense %n servizos de integración axeitados para activar a integración</numerusform>
       </translation>
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>0 servizos axeitados dispoñibles</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1258,7 +1258,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>Servizos requiridos</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -1267,7 +1267,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <message>
       <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Hai máis cámaras que usan esta integración que servizos dispoñibles. Por favor, desactiva a integración para algunhas cámaras ou engade servizos máis axeitados. Se non, farase automaticamente en %1</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -1286,11 +1286,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>Transmisión da cámara</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>Seleccionar a transmisión de vídeo da cámara para a súa análise</translation>
     </message>
     <message>
       <source>Usage</source>
@@ -1320,7 +1320,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
-      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
+      <translation>Consulta a Configuración da Cámara para configurar este complemento.</translation>
     </message>
   </context>
   <context>
@@ -1331,7 +1331,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Previous Object</source>
-      <translation type="unfinished">Previous Object</translation>
+      <translation>Obxecto anterior</translation>
     </message>
     <message>
       <source>Pause</source>
@@ -1343,11 +1343,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Next Object</source>
-      <translation type="unfinished">Next Object</translation>
+      <translation>Obxecto seguinte</translation>
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>Repetir activar/desactivar</translation>
     </message>
   </context>
   <context>
@@ -1373,38 +1373,38 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>joystick</source>
-      <translation type="unfinished">joystick</translation>
+      <translation>joystick</translation>
     </message>
     <message>
       <source>Basic Actions</source>
-      <translation type="unfinished">Basic Actions</translation>
+      <translation>Accións básicas</translation>
     </message>
     <message>
       <source>With Modifier</source>
-      <translation type="unfinished">With Modifier</translation>
+      <translation>Con modificador</translation>
     </message>
     <message>
       <source>This model is not supported</source>
-      <translation type="unfinished">This model is not supported</translation>
+      <translation>Este modelo non é compatible</translation>
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>Restablecer a predeterminado</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsTab</name>
     <message>
       <source>Pan and Tilt</source>
-      <translation type="unfinished">Pan and Tilt</translation>
+      <translation>Panorámica e inclinación</translation>
     </message>
     <message>
       <source>Zoom In / Zoom Out</source>
-      <translation type="unfinished">Zoom In / Zoom Out</translation>
+      <translation>Achegar / Afastar zoom</translation>
     </message>
     <message>
       <source>Select Camera on Layout</source>
-      <translation type="unfinished">Select Camera on Layout</translation>
+      <translation>Seleccionar cámara no deseño</translation>
     </message>
     <message>
       <source>Log in to the site to configure how to open layouts</source>
@@ -1415,14 +1415,14 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>LabeledItem</name>
     <message>
       <source>Default value:</source>
-      <translation type="unfinished">Default value:</translation>
+      <translation>Valor predeterminado:</translation>
     </message>
   </context>
   <context>
     <name>LdapSettings</name>
     <message>
       <source>ONLINE</source>
-      <translation type="unfinished">ONLINE</translation>
+      <translation>EN LIÑA</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1438,7 +1438,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Last Sync</source>
-      <translation type="unfinished">Last Sync</translation>
+      <translation>Última sincronización</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -1458,7 +1458,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Not configured yet</source>
-      <translation type="unfinished">Not configured yet</translation>
+      <translation>Non configurado aínda</translation>
     </message>
     <message>
       <source>Configure</source>
@@ -1466,15 +1466,15 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Search Bases</source>
-      <translation type="unfinished">Search Bases</translation>
+      <translation>Bases de busca</translation>
     </message>
     <message>
       <source>Add Search Base</source>
-      <translation type="unfinished">Add Search Base</translation>
+      <translation>Engadir base de busca</translation>
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one search base to synchronize users and groups</translation>
+      <translation>Especificar polo menos unha base de busca para sincronizar usuarios e grupos</translation>
     </message>
     <message>
       <source>Connect your Site to an LDAP server for easier user management</source>
@@ -1497,29 +1497,29 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+      <translation>A liña non é válida. Elimina as autointerseccións para continuar.</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Esta liña require polo menos %n puntos.</numerusform>
+        <numerusform>Esta liña require polo menos %n puntos.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the line.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
+      <translation>Fai clic no último punto para rematar de debuxar a liña.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Alcanzouse o número máximo de puntos (%n puntos).</numerusform>
+        <numerusform>Alcanzouse o número máximo de puntos (%n puntos).</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
+      <translation>Fai clic en cada frecha para alternar a dirección desexada.</translation>
     </message>
   </context>
   <context>
@@ -1644,7 +1644,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Sen entradas</translation>
     </message>
     <message>
       <source>New List...</source>
@@ -1675,22 +1675,22 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation type="unfinished">Select an area on the video to filter results</translation>
+      <translation>Selecciona unha zona do vídeo para filtrar os resultados</translation>
     </message>
   </context>
   <context>
     <name>MotionPanel</name>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation type="unfinished">Select a camera to see its motion events</translation>
+      <translation>Selecciona unha cámara para ver os seus eventos de movemento</translation>
     </message>
     <message>
       <source>No motion detected</source>
-      <translation type="unfinished">No motion detected</translation>
+      <translation>Non se detectou movemento</translation>
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Tenta cambiar os filtros ou activar a gravación de movemento</translation>
     </message>
     <message>
       <source>Select Camera...</source>
@@ -1724,7 +1724,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>A ligazón anterior será invalidada unha vez que se emita unha nova</translation>
     </message>
     <message>
       <source>Create</source>
@@ -1735,15 +1735,15 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>Sen listas</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>Aínda non creaches ningunha lista. Coas listas podes almacenar varios valores para usalos nas regras de eventos. Crea unha nova lista para comezar a engadir entradas.</translation>
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Crear novo...</translation>
     </message>
   </context>
   <context>
@@ -1772,7 +1772,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>ObjectSizeConstraints</name>
     <message>
       <source>Size Constraints</source>
-      <translation type="unfinished">Size Constraints</translation>
+      <translation>Restricións de tamaño</translation>
     </message>
   </context>
   <context>
@@ -1797,7 +1797,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>URL or Host:Port</source>
-      <translation type="unfinished">URL or Host:Port</translation>
+      <translation>URL ou Host:Porto</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1820,7 +1820,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>Aprobar</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1835,7 +1835,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>ParentGroupsTab</name>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Engadir grupo</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1843,28 +1843,28 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>Aínda non hai grupos personalizados</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Non se atoparon grupos</translation>
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Cambiar os criterios de busca ou crear un novo grupo</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Sen grupos</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>Usa os controis da esquerda para engadir a un grupo</translation>
     </message>
     <message>
       <source>Member of</source>
       <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
-      <translation type="unfinished">Member of</translation>
+      <translation>Membro de</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -1874,7 +1874,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <message>
       <source>Built-in</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Integrado</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1886,7 +1886,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>PasswordChangeDialog</name>
     <message>
       <source>Change password - %1</source>
-      <translation type="unfinished">Change password - %1</translation>
+      <translation>Cambiar contrasinal - %1</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1894,7 +1894,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Current password</source>
-      <translation type="unfinished">Current password</translation>
+      <translation>Contrasinal actual</translation>
     </message>
     <message>
       <source>New password</source>
@@ -1913,7 +1913,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>PermissionSummary</name>
     <message>
       <source>No custom permissions</source>
-      <translation type="unfinished">No custom permissions</translation>
+      <translation>Sen permisos personalizados</translation>
     </message>
   </context>
   <context>
@@ -1935,24 +1935,24 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>Non se atoparon recursos</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>Engadir automaticamente permisos dependentes</translation>
     </message>
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>Usa %1 ou %2 para seleccionar varios recursos ou %3 para borrar a selección</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
-      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</translation>
+      <translation>A táboa Recursos ofréceche unha visión xeral dos permisos de usuario ou grupo e permíteche asignar permisos para recursos específicos.</translation>
     </message>
     <message>
       <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>Se seleccionas un permiso que depende doutro permiso, ambos permisos concederanse automaticamente.</translation>
     </message>
   </context>
   <context>
@@ -2121,56 +2121,56 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
-      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
+      <translation>Podes activar esta guía de novo indo a Configuración local &gt; Avanzado &gt; Restablecer todos os avisos</translation>
     </message>
     <message>
       <source>Introducing
 New PTZ controls</source>
-      <translation type="unfinished">Introducing
-New PTZ controls</translation>
+      <translation>Presentamos
+Novos controis PTZ</translation>
     </message>
     <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag
-mouse pointer while pressing
-Shift key to use Advanced PTZ</translation>
+      <translation>Fai clic, fai dobre clic ou arrastra o punteiro do rato
+mentres premes a tecla Maiús
+para usar PTZ avanzado</translation>
     </message>
     <message>
       <source>Here is a quick guide
 on what has changed.</source>
-      <translation type="unfinished">Here is a quick guide
-on what has changed.</translation>
+      <translation>Aquí tes unha guía rápida
+sobre o que cambiou.</translation>
     </message>
     <message>
       <source>To use Target Lock Tracking,
 Press Alt + Click to follow object</source>
-      <translation type="unfinished">To use Target Lock Tracking,
-Press Alt + Click to follow object</translation>
+      <translation>Para usar o seguimento de bloqueo de obxectivo,
+prema Alt + Clic para seguir o obxecto</translation>
     </message>
   </context>
   <context>
     <name>QuickIntervalPanel</name>
     <message>
       <source>today</source>
-      <translation type="unfinished">today</translation>
+      <translation>hoxe</translation>
     </message>
     <message>
       <source>-1 hour</source>
-      <translation type="unfinished">-1 hour</translation>
+      <translation>-1 hora</translation>
     </message>
     <message>
       <source>-24 hours</source>
-      <translation type="unfinished">-24 hours</translation>
+      <translation>-24 horas</translation>
     </message>
     <message>
       <source>-7 days</source>
-      <translation type="unfinished">-7 days</translation>
+      <translation>-7 días</translation>
     </message>
     <message>
       <source>-30 days</source>
-      <translation type="unfinished">-30 days</translation>
+      <translation>-30 días</translation>
     </message>
   </context>
   <context>
@@ -2258,32 +2258,32 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Has %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Has %1 permission</translation>
+      <translation>Ten permiso %1</translation>
     </message>
     <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 and dependent permissions</translation>
+      <translation>Engadir %1 e permisos dependentes</translation>
     </message>
     <message>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 permission</translation>
+      <translation>Engadir permiso %1</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+      <translation>Eliminar %1 e os permisos dependentes</translation>
     </message>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 permission</translation>
+      <translation>Eliminar o permiso %1</translation>
     </message>
     <message>
       <source>Also inherits it from</source>
       <comment>&apos;it&apos; refers to a permission</comment>
-      <translation type="unfinished">Also inherits it from</translation>
+      <translation>Tamén o herda de</translation>
     </message>
     <message>
       <source>Inherits %1 permission from</source>
@@ -2292,29 +2292,29 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Already inherited from</source>
-      <translation type="unfinished">Already inherited from</translation>
+      <translation>Xa herdado de</translation>
     </message>
     <message>
       <source>Will stay inherited from</source>
-      <translation type="unfinished">Will stay inherited from</translation>
+      <translation>Permanecerá herdado de</translation>
     </message>
   </context>
   <context>
     <name>ResourceBrowser</name>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Sen ficheiros locais</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-      <translation type="unfinished">Drag video files or images to the client window, or add local media folder through the Local Settings dialog</translation>
+      <translation>Arrastra ficheiros de vídeo ou imaxes á ventá do cliente ou engade un cartafol multimedia local a través do diálogo Configuración local</translation>
     </message>
   </context>
   <context>
     <name>ResourceFilterButton</name>
     <message>
       <source>Available by Permissions</source>
-      <translation type="unfinished">Available by Permissions</translation>
+      <translation>Dispoñible por permisos</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -2359,7 +2359,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>OUTDATED</source>
-      <translation type="unfinished">OUTDATED</translation>
+      <translation>DESACTUALIZADO</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
@@ -2409,7 +2409,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
-      <translation type="unfinished">Preview is outdated</translation>
+      <translation>A vista previa está desactualizada</translation>
     </message>
   </context>
   <context>
@@ -2428,7 +2428,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Events</source>
-      <translation type="unfinished">Events</translation>
+      <translation>Eventos</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2447,7 +2447,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation>O sitio web foi suspendido. Para activar o uso da integración no dispositivo actual, o sitio web debe estar en estado activo. Por favor, ponte en contacto co teu partner/socio de canle para obter máis detalles</translation>
+      <translation>O sitio foi pechado. Para activar este uso de integración no dispositivo actual, o sitio debe estar en estado activo. Por favor, ponte en contacto co teu partner/socio de canle para obter máis detalles</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
@@ -2458,15 +2458,15 @@ Press Alt + Click to follow object</translation>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
-      <translation type="unfinished">Choose file to save</translation>
+      <translation>Escolle o ficheiro para gardar</translation>
     </message>
     <message>
       <source>JSON files (*.json)</source>
-      <translation type="unfinished">JSON files (*.json)</translation>
+      <translation>Ficheiros JSON (*.json)</translation>
     </message>
     <message>
       <source>File to save the results:</source>
-      <translation type="unfinished">File to save the results:</translation>
+      <translation>Ficheiro para gardar os resultados:</translation>
     </message>
   </context>
   <context>
@@ -2480,7 +2480,7 @@ Press Alt + Click to follow object</translation>
     <name>SecurityOverlay</name>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>Sen acceso</translation>
     </message>
   </context>
   <context>
@@ -2494,7 +2494,7 @@ Press Alt + Click to follow object</translation>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+      <translation>Identificador da liña de tempo, que se crea cando se retrocede no tempo nun NVR remoto. A nova liña de tempo pode solaparse coa existente.</translation>
     </message>
     <message>
       <source>Select</source>
@@ -2509,18 +2509,18 @@ Press Alt + Click to follow object</translation>
     <name>SensitivityItem</name>
     <message>
       <source>Sensitivity</source>
-      <translation type="unfinished">Sensitivity</translation>
+      <translation>Sensibilidade</translation>
     </message>
   </context>
   <context>
     <name>SettingsDialog</name>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>Introducir parámetros</translation>
     </message>
     <message>
       <source>This action requires some parameters to be filled.</source>
-      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+      <translation>Esta acción require que se completen algúns parámetros.</translation>
     </message>
   </context>
   <context>
@@ -2538,26 +2538,26 @@ Press Alt + Click to follow object</translation>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
-      <translation type="unfinished">MAX</translation>
+      <translation>MÁX</translation>
     </message>
     <message>
       <source>MIN</source>
-      <translation type="unfinished">MIN</translation>
+      <translation>MIN</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation type="unfinished">Set minimum and maximum object size.</translation>
+      <translation>Definir o tamaño mínimo e máximo do obxecto.</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
-      <translation type="unfinished">Minimum object size cannot be greater than maximum.</translation>
+      <translation>O tamaño mínimo do obxecto non pode ser maior que o máximo.</translation>
     </message>
   </context>
   <context>
     <name>SphereDewarpingSettings</name>
     <message>
       <source>Horizon correction</source>
-      <translation type="unfinished">Horizon correction</translation>
+      <translation>Corrección do horizonte</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -2615,7 +2615,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No signal</source>
-      <translation type="unfinished">No signal</translation>
+      <translation>Sen sinal</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
@@ -2623,15 +2623,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation type="unfinished">Server unavailable</translation>
+      <translation>Servidor non dispoñible</translation>
     </message>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>Sen acceso</translation>
     </message>
     <message>
       <source>Device disabled</source>
-      <translation type="unfinished">Device disabled</translation>
+      <translation>Dispositivo desactivado</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -2639,7 +2639,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <translation>Non se pode descifrar o contido multimedia</translation>
     </message>
     <message>
       <source>Password required</source>
@@ -2658,7 +2658,7 @@ Press Alt + Click to follow object</translation>
     <name>StringEditor</name>
     <message>
       <source>Min 3 characters</source>
-      <translation type="unfinished">Min 3 characters</translation>
+      <translation>Mínimo 3 caracteres</translation>
     </message>
   </context>
   <context>
@@ -2676,11 +2676,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Always</source>
-      <translation type="unfinished">Always</translation>
+      <translation>Sempre</translation>
     </message>
     <message>
       <source>On Log In</source>
-      <translation type="unfinished">On Log In</translation>
+      <translation>Ao iniciar sesión</translation>
     </message>
   </context>
   <context>
@@ -2688,31 +2688,31 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Valid from %1 to %2 (by server time)</source>
       <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time)</translation>
+      <translation>Válido desde %1 ata %2 (segundo a hora do servidor)</translation>
     </message>
     <message>
       <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
       <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time) or for %3 after login</translation>
+      <translation>Válido desde %1 ata %2 (segundo a hora do servidor) ou durante %3 despois do inicio de sesión</translation>
     </message>
   </context>
   <context>
     <name>TemporaryLinkSettings</name>
     <message>
       <source>Link Valid Until</source>
-      <translation type="unfinished">Link Valid Until</translation>
+      <translation>Ligazón válida ata</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+      <translation>A ligazón permanecerá accesible ata a data especificada (incluíndo, segundo a hora do servidor)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation type="unfinished">Revoke access after login</translation>
+      <translation>Revogar o acceso despois de iniciar sesión</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+      <translation>O acceso pode ser revogado antes se o período de validez da ligazón remata</translation>
     </message>
     <message>
       <source>In</source>
@@ -2755,7 +2755,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Show</source>
-      <translation type="unfinished">Show</translation>
+      <translation>Mostrar</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2763,11 +2763,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Add to Favorites</source>
-      <translation type="unfinished">Add to Favorites</translation>
+      <translation>Engadir a favoritos</translation>
     </message>
     <message>
       <source>Remove from Favorites</source>
-      <translation type="unfinished">Remove from Favorites</translation>
+      <translation>Eliminar dos favoritos</translation>
     </message>
   </context>
   <context>
@@ -2794,7 +2794,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Time is unavailable due to DST changes</source>
-      <translation type="unfinished">Time is unavailable due to DST changes</translation>
+      <translation>A hora non está dispoñible debido aos cambios do horario de verán</translation>
     </message>
   </context>
   <context>
@@ -2827,7 +2827,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Permisos globais</translation>
     </message>
     <message>
       <source>Add User</source>
@@ -2874,11 +2874,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Permitir a autenticación insegura (resumo)</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
-      <translation type="unfinished">You need to specify only user&apos;s email address.</translation>
+      <translation>Só tes que especificar o enderezo de correo electrónico da persoa usuaria.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2886,15 +2886,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access</source>
-      <translation type="unfinished">Access</translation>
+      <translation>Acceso</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation type="unfinished">Regular user with credentials</translation>
+      <translation>Usuario normal con credenciais</translation>
     </message>
     <message>
       <source>Temporary with link</source>
-      <translation type="unfinished">Temporary with link</translation>
+      <translation>Temporal con ligazón</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2913,7 +2913,7 @@ Press Alt + Click to follow object</translation>
     <name>UserEditDialog</name>
     <message>
       <source>User - %1</source>
-      <translation type="unfinished">User - %1</translation>
+      <translation>Usuario - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -2929,23 +2929,23 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Permisos globais</translation>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">This user has not yet signed up for %1</translation>
+      <translation>Este usuario aínda non se rexistrou en %1</translation>
     </message>
   </context>
   <context>
     <name>UserEnabledSwitch</name>
     <message>
       <source>Enabled user</source>
-      <translation type="unfinished">Enabled user</translation>
+      <translation>Usuario habilitado</translation>
     </message>
     <message>
       <source>Disabled user</source>
-      <translation type="unfinished">Disabled user</translation>
+      <translation>Usuario deshabilitado</translation>
     </message>
   </context>
   <context>
@@ -2980,15 +2980,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
-      <translation type="unfinished">Set password to enable insecure authentication</translation>
+      <translation>Definir contrasinal para activar a autenticación non segura</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Permitir a autenticación insegura (resumo)</translation>
     </message>
     <message>
       <source>This user is not found in LDAP database and is not able to log in.</source>
-      <translation type="unfinished">This user is not found in LDAP database and is not able to log in.</translation>
+      <translation>Este usuario non se atopa na base de datos LDAP e non pode iniciar sesión.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2996,15 +2996,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>O acceso caduca</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Ligazón de acceso</translation>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>Copiar ligazón</translation>
     </message>
     <message>
       <source>Terminate</source>
@@ -3016,7 +3016,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
-      <translation type="unfinished">No valid link for this user</translation>
+      <translation>Non hai ningunha ligazón válida para este usuario</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -3034,15 +3034,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
+      <translation>O servidor LDAP está desconectado. O usuario non pode iniciar sesión.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>Cando a sincronización continua co servidor LDAP está desactivada, a pertenza dos usuarios a grupos non se sincroniza automaticamente. Para actualizar esta información, inicia unha sincronización manual.</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>O inicio de sesión deste usuario duplica o inicio de sesión doutro usuario. Ningún deles pode iniciar sesión. Para resolver este problema, podes cambiar o inicio de sesión do usuario ou desactivar ou eliminar usuarios con inicios de sesión duplicados.</translation>
     </message>
     <message>
       <source>Notification Language</source>
@@ -3057,11 +3057,11 @@ Press Alt + Click to follow object</translation>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
-      <translation type="unfinished">Hidden</translation>
+      <translation>Oculto</translation>
     </message>
     <message>
       <source>Favorites</source>
-      <translation type="unfinished">Favorites</translation>
+      <translation>Favoritos</translation>
     </message>
     <message>
       <source>All Sites</source>
@@ -3072,7 +3072,7 @@ Press Alt + Click to follow object</translation>
     <name>VmsRulesDialog</name>
     <message>
       <source>Add Rule</source>
-      <translation type="unfinished">Add Rule</translation>
+      <translation>Engadir regra</translation>
     </message>
     <message>
       <source>Duplicate</source>
@@ -3084,7 +3084,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Sen entradas</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -3092,7 +3092,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>Restablecer os valores predeterminados...</translation>
     </message>
     <message>
       <source>Event Rules</source>
@@ -3123,11 +3123,11 @@ Press Alt + Click to follow object</translation>
     <name>WelcomeScreen</name>
     <message>
       <source>Official Website</source>
-      <translation type="unfinished">Official Website</translation>
+      <translation>Sitio web oficial</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>
-      <translation type="unfinished">Help &amp; User Manual</translation>
+      <translation>Axuda e manual do usuario</translation>
     </message>
     <message>
       <source>Support</source>
@@ -3135,28 +3135,28 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>Non tes acceso a %1. Por favor, comproba a túa conexión a internet.</translation>
     </message>
   </context>
   <context>
     <name>XAxis</name>
     <message>
       <source>Move the joystick left and right several times.</source>
-      <translation type="unfinished">Move the joystick left and right several times.</translation>
+      <translation>Move o joystick á esquerda e á dereita varias veces.</translation>
     </message>
   </context>
   <context>
     <name>YAxis</name>
     <message>
       <source>Move the joystick up and down several times.</source>
-      <translation type="unfinished">Move the joystick up and down several times.</translation>
+      <translation>Move o joystick varias veces cara arriba e cara abaixo.</translation>
     </message>
   </context>
   <context>
     <name>ZAxis</name>
     <message>
       <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
+      <translation>Xira o joystick varias veces en sentido horario e antihorario.</translation>
     </message>
   </context>
 </TS>

@@ -870,7 +870,7 @@
       <translation>パフォーマンス</translation>
     </message>
     <message>
-      <source>AppInfo</source>
+      <source>App Info</source>
       <translation>アプリ情報</translation>
     </message>
   </context>

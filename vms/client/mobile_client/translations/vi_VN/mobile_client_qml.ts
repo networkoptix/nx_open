@@ -870,7 +870,7 @@
       <translation>Hiệu suất</translation>
     </message>
     <message>
-      <source>AppInfo</source>
+      <source>App Info</source>
       <translation>Thông tin ứng dụng</translation>
     </message>
   </context>

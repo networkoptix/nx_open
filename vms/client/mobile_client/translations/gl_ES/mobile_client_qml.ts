@@ -789,15 +789,15 @@
     </message>
     <message>
       <source>We didn&apos;t find any organizations, try contacting support</source>
-      <translation>Non&apos; atopamos ninguhna organización, proba a poñerte en contacto co servizo de asistencia</translation>
+      <translation>Non atopamos ninguhna organización, por favor, proba a poñerte en contacto co servizo de asistencia</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation>Non&apos; atopamos ningún sitio na túa rede local, proba a engadir servidores manualmente ou inicia sesión na túa conta na nube.</translation>
+      <translation>Non atopamos ningún sitio na túa rede local, por favor, proba a engadir servidores manualmente ou inicia sesión na túa conta na nube.</translation>
     </message>
     <message>
       <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation>Non&apos; atopamos ningún sitio na túa rede local, proba a engadir servidores manualmente</translation>
+      <translation>Non atopamos ningún sitio na túa rede local, por favor, proba a engadir servidores manualmente</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -871,8 +871,8 @@
       <translation>Rendemento</translation>
     </message>
     <message>
-      <source>AppInfo</source>
-      <translation>Información da aplicación</translation>
+      <source>App Info</source>
+      <translation type="unfinished">App Info</translation>
     </message>
   </context>
   <context>

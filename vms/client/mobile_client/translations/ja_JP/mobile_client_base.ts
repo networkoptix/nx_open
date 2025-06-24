@@ -47,7 +47,7 @@
     <name>nx::vms::client::mobile::PtzCameraButtonController</name>
     <message>
       <source>Control PTZ</source>
-      <translation>PTZの制御</translation>
+      <translation>PTZ制御</translation>
     </message>
   </context>
   <context>

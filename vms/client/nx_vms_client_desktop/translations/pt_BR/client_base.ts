@@ -1140,7 +1140,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>Personalizado</translation>
+      <translation>Personalizadas</translation>
     </message>
   </context>
   <context>

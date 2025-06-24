@@ -1140,7 +1140,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>Custom</translation>
+      <translation type="unfinished">Custom</translation>
     </message>
   </context>
   <context>

@@ -871,8 +871,8 @@
       <translation>Prestanda</translation>
     </message>
     <message>
-      <source>AppInfo</source>
-      <translation>Appinfo</translation>
+      <source>App Info</source>
+      <translation>Appinformation</translation>
     </message>
   </context>
   <context>

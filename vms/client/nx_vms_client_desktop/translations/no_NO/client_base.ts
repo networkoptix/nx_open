@@ -1140,7 +1140,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>Tilpasset</translation>
+      <translation>Egendefinert</translation>
     </message>
   </context>
   <context>
