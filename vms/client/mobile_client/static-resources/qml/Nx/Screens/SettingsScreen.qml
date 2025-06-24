@@ -129,7 +129,7 @@ BaseSettingsScreen
         id: appInfoOption
 
         width: parent.width
-        text: qsTr("AppInfo")
+        text: qsTr("App Info")
         extraText: appContext.appInfo.version()
         icon: "image://skin/24x24/Solid/info.svg?primary=light1"
         showIndicator: false
