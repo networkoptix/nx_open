@@ -6819,11 +6819,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Video transcoding is required. Export session restarted.</translation>
+      <translation>需要影像轉碼，已重新啟動匯出。</translation>
     </message>
     <message>
       <source>Audio transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Audio transcoding is required. Export session restarted.</translation>
+      <translation>需要音訊轉碼，已重新啟動匯出。</translation>
     </message>
   </context>
   <context>
@@ -8780,7 +8780,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>需要音訊轉碼。</translation>
     </message>
   </context>
   <context>

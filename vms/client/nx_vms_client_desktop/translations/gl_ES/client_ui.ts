@@ -165,7 +165,7 @@
     </message>
     <message>
       <source>Event Type:</source>
-      <translation type="unfinished">Event Type:</translation>
+      <translation>Tipo de evento:</translation>
     </message>
   </context>
   <context>
@@ -292,7 +292,7 @@
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Unlimited</source>
@@ -361,7 +361,7 @@
     <name>BookmarkOverlaySettingsWidget</name>
     <message>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>Información de marcador</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -458,7 +458,7 @@
     </message>
     <message>
       <source>Use event source camera</source>
-      <translation type="unfinished">Use event source camera</translation>
+      <translation>Usar a cámara de orixe do evento</translation>
     </message>
   </context>
   <context>
@@ -481,7 +481,7 @@
     </message>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Proba</translation>
     </message>
   </context>
   <context>
@@ -499,7 +499,7 @@
     <name>CameraAdvancedParamsWidget</name>
     <message>
       <source>Category</source>
-      <translation type="unfinished">Category</translation>
+      <translation>Categoría</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -771,7 +771,7 @@
     </message>
     <message>
       <source>Sensitivity</source>
-      <translation type="unfinished">Sensitivity</translation>
+      <translation>Sensibilidade</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -852,7 +852,7 @@
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>Seleccionar cámaras</translation>
     </message>
   </context>
   <context>
@@ -1025,7 +1025,7 @@
     <name>CustomSettingsWidget</name>
     <message>
       <source>Category</source>
-      <translation type="unfinished">Category</translation>
+      <translation>Categoría</translation>
     </message>
   </context>
   <context>
@@ -1107,7 +1107,7 @@
     </message>
     <message>
       <source>Add all Devices</source>
-      <translation type="unfinished">Add all Devices</translation>
+      <translation>Engadir todos os dispositivos</translation>
     </message>
     <message>
       <source>Add Devices</source>
@@ -1137,7 +1137,7 @@
     <name>EulaDialog</name>
     <message>
       <source>Copy to Clipboard</source>
-      <translation type="unfinished">Copy to Clipboard</translation>
+      <translation>Copiar ao portapapeis</translation>
     </message>
     <message>
       <source>I Do Not Agree</source>
@@ -1228,7 +1228,7 @@
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Exportar axustes</translation>
     </message>
     <message>
       <source>Make read-only</source>
@@ -1239,7 +1239,7 @@
     <name>ExportMediaSettingsWidget</name>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Exportar axustes</translation>
     </message>
     <message>
       <source>Apply Filters</source>
@@ -1277,7 +1277,7 @@
     </message>
     <message>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Exportar axustes</translation>
     </message>
     <message>
       <source>Multi Video</source>
@@ -1704,7 +1704,7 @@
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>Servidor</translation>
     </message>
     <message>
       <source>Port</source>
@@ -1720,7 +1720,7 @@
     </message>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Proba</translation>
     </message>
     <message>
       <source>Use Credentials</source>
@@ -1747,7 +1747,7 @@
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>Restablecer a predeterminado</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1888,7 +1888,7 @@
     </message>
     <message>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Configuración avanzada de actualización</translation>
     </message>
     <message>
       <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
@@ -1915,7 +1915,7 @@
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>Seleccionar deseños</translation>
     </message>
   </context>
   <context>
@@ -2086,7 +2086,7 @@
     </message>
     <message>
       <source>Events</source>
-      <translation type="unfinished">Events</translation>
+      <translation>Eventos</translation>
     </message>
   </context>
   <context>
@@ -2290,7 +2290,7 @@
     <name>RapidReviewSettingsWidget</name>
     <message>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Revisión rápida</translation>
     </message>
     <message>
       <source>Initial video length</source>
@@ -2302,7 +2302,7 @@
     </message>
     <message>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>Velocidade</translation>
     </message>
     <message>
       <source>Frames interval</source>
@@ -2310,7 +2310,7 @@
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>Restablecer velocidade</translation>
     </message>
   </context>
   <context>
@@ -2383,7 +2383,7 @@
     </message>
     <message>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>Pantalla</translation>
     </message>
     <message>
       <source>Additional Options</source>
@@ -2641,7 +2641,7 @@
     <name>ServerSelectionDialog</name>
     <message>
       <source>Select Servers</source>
-      <translation type="unfinished">Select Servers</translation>
+      <translation>Seleccionar servidores</translation>
     </message>
   </context>
   <context>
@@ -2853,7 +2853,7 @@
     <name>TextOverlaySettingsWidget</name>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Texto</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2891,7 +2891,7 @@
     <name>TimestampOverlaySettingsWidget</name>
     <message>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>Marca de tempo</translation>
     </message>
     <message>
       <source>Font Size</source>
@@ -2914,7 +2914,7 @@
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Engadir grupo</translation>
     </message>
     <message>
       <source>Del</source>
@@ -2955,7 +2955,7 @@
     </message>
     <message>
       <source>Sensitivity</source>
-      <translation type="unfinished">Sensitivity</translation>
+      <translation>Sensibilidade</translation>
     </message>
   </context>
   <context>
