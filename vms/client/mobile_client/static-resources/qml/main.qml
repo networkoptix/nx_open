@@ -141,7 +141,7 @@ Controls.ApplicationWindow
         readonly property string warningText:
         {
             if (windowContext.sessionManager.hasReconnectingSession)
-                return qsTr("Server offline. Reconnecting...")
+                return qsTr("Connection lost. Reconnecting...")
             return showCloudOfflineWarning
                 ? qsTr("Cannot connect to %1", "%1 is the short cloud name (like 'Cloud')")
                     .arg(appContext.appInfo.cloudName())
