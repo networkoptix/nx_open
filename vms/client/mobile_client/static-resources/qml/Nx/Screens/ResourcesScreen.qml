@@ -41,7 +41,9 @@ Page
         anchors.centerIn: parent
 
         padding: 0
-        icon.source: lp("/images/search.png")
+        icon.source: "image://skin/24x24/Outline/search.svg?primary=light10"
+        icon.width: 24
+        icon.height: 24
         enabled: camerasGrid.enabled
         opacity: windowContext.sessionManager.hasReconnectingSession ? 0.2 : 1.0
         onClicked: searchToolBar.open()
