@@ -821,7 +821,7 @@
     </message>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Tilgang til ressurser nektet</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
