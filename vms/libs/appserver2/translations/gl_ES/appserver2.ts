@@ -103,7 +103,7 @@
     </message>
     <message>
       <source>Forbidden to modify User&apos;s &apos;type&apos; from &apos;%1&apos; to &apos;%2&apos;.</source>
-      <translation>Prohibido modificar o tipo de usuario&apos;s &apos;&apos; de &apos;%1&apos; a &apos;%2&apos;.</translation>
+      <translation>Prohibido modificar o tipo de usuario de &apos;%1&apos; a &apos;%2&apos;.</translation>
     </message>
     <message>
       <source>Invalid temporary token</source>
