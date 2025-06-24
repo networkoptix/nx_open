@@ -310,9 +310,11 @@ struct OrganizationsModel::Private
             }
             prevIds.erase(partner.id);
             auto node = nodes.find(partner.id);
-            if (node->name != QString::fromStdString(partner.name))
+            if (node->name != QString::fromStdString(partner.name)
+                || node->state != partner.effectiveState)
             {
                 node->name = QString::fromStdString(partner.name);
+                node->state = partner.effectiveState;
                 notifyNodeUpdate(node);
             }
         }
@@ -355,10 +357,12 @@ struct OrganizationsModel::Private
             if (!node)
                 continue;
             if (node->name != QString::fromStdString(org.name)
-                || node->systemCount != org.systemCount)
+                || node->systemCount != org.systemCount
+                || node->state != org.effectiveState)
             {
                 node->name = QString::fromStdString(org.name);
                 node->systemCount = org.systemCount;
+                node->state = org.effectiveState;
                 notifyNodeUpdate(node);
             }
         }
