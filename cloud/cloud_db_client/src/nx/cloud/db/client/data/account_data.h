@@ -38,7 +38,7 @@ NX_REFLECTION_INSTRUMENT(AccountRegistrationSettings, AccountRegistrationSetting
 
 #define AccountRegistrationData_Fields \
     (email)(passwordHa1)(password)(fullName)\
-    (firstName)(lastName)(customization)(settings)
+    (firstName)(lastName)(customization)(settings)(locale)
 
 NX_REFLECTION_INSTRUMENT(AccountRegistrationData, AccountRegistrationData_Fields)
 

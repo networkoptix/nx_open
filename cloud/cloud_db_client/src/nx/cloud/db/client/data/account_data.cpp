@@ -21,6 +21,7 @@ MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, fullName)
 MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, firstName)
 MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, lastName)
 MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, customization)
+MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, locale)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountRegistrationData* const accountData)
 {
@@ -38,6 +39,8 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountRegistrationData* const 
         urlQuery.queryItemValue(AccountRegistrationData_lastName_field).toStdString();
     accountData->customization =
         urlQuery.queryItemValue(AccountRegistrationData_customization_field).toStdString();
+    accountData->locale =
+        urlQuery.queryItemValue(AccountRegistrationData_locale_field).toStdString();
 
     return !accountData->email.empty();
 }
@@ -65,6 +68,9 @@ void serializeToUrlQuery(const AccountRegistrationData& data, QUrlQuery* const u
     urlQuery->addQueryItem(
         AccountRegistrationData_customization_field,
         QString::fromStdString(data.customization));
+    urlQuery->addQueryItem(
+        AccountRegistrationData_locale_field,
+        QString::fromStdString(data.locale));
 }
 
 

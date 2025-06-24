@@ -62,6 +62,11 @@ struct AccountRegistrationData
 
     /**%apidoc Account security options. */
     AccountRegistrationSettings settings;
+
+    /**%apidoc Account locale.
+     * ISO 639-1 locale code paired with ISO 3166-1 alpha-2 country code via underscore: `en_GB`, `fr_FR` and so on.
+     */
+    std::string locale;
 };
 
 enum class PasswordHashType
