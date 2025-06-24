@@ -11,7 +11,7 @@ class QPainter;
 
 namespace nx::vms::client::desktop::figure {
 
-/** Incapsulates drawing functionality for the figures. */
+/** Encapsulates drawing functionality for the figures. */
 class Renderer
 {
 public:

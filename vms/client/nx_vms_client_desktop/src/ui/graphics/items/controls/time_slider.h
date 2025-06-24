@@ -285,7 +285,7 @@ public:
 
     bool positionMarkerVisible() const;
 
-    // Deduces live preview tooltip visibility and position quering mouse coordinates. Lazy.
+    // Deduces live preview tooltip visibility and position querying mouse coordinates. Lazy.
     void updateLivePreview();
 
     /**

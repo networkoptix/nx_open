@@ -41,7 +41,7 @@ protected:
     {
         int min = 0; // Possible values: -N, 0, etc.
         int max = 0; // Possible values: N, etc.
-        int mid = 0; // Neutural joystick position. Some value in between min and max.
+        int mid = 0; // Neutral joystick position. Some value in between min and max.
         int bounce = 0; // Minimum significant zero point deviation in percent of the full range.
 
         // The factor by which the raw axis position value should be multiplied to get

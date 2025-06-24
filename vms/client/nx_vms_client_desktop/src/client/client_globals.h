@@ -77,7 +77,7 @@ namespace Qn
         ShowreelItemDelayMsRole,
         /** Item order role for Showreel review layout. */
         ShowreelItemOrderRole,
-        /** Whether item swithing is manual role for Showreel review layout. */
+        /** Whether item switching is manual role for Showreel review layout. */
         ShowreelIsManualRole,
 
         //-------------------------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ namespace Qn
         /** Time label display. Value of type bool. */
         LayoutTimeLabelsRole = 282,
 
-        /** Overriden layout's permissions. Value of type int (Qn::Permissions). */
+        /** Overridden layout's permissions. Value of type int (Qn::Permissions). */
         LayoutPermissionsRole = 283,
 
         /** Selected items. Value of type QVector<nx::Uuid>. */

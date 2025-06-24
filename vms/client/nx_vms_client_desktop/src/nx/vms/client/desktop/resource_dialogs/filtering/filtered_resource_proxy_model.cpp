@@ -21,7 +21,7 @@ bool FilteredResourceProxyModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& sourceParent) const
 {
-    // Make a filter string from escaped fixed string regexp pattern (eg "a\ b" -> "a b") so that
+    // Make a filter string from escaped fixed string regexp pattern (e.g. "a\ b" -> "a b") so that
     // the function search_helper::matches() can split the filter string into words.
     static const QRegularExpression escapedRx("\\\\(.)");
     const auto filterString = filterRegularExpression().pattern().replace(escapedRx, "\\1");

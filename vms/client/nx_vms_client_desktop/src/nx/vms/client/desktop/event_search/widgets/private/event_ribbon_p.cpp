@@ -1368,7 +1368,7 @@ void EventRibbon::Private::fadeOut(EventTile* widget)
     animator->setEasingCurve(qnWorkbenchAnimations->easing(kAnimationId));
     animator->setDuration(qnWorkbenchAnimations->timeLimit(kAnimationId));
 
-    // When animator is destroyed, curtain destrution should be requested before widget->hide(),
+    // When animator is destroyed, curtain destruction should be requested before widget->hide(),
     // otherwise the animator->stop() will be called with partially destroyed animator.
     createFadeCurtain(widget, animator);
 

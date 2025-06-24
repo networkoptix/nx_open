@@ -5,7 +5,7 @@
 #include <core/resource/resource_fwd.h>
 
 /**
- * This module provides some functions fo working with encrypted layouts in client.
+ * This module provides some functions for working with encrypted layouts in client.
  * Some of them could be in QnLayoutResource, but it knows nothing about data roles
  * which contain password information.
  */

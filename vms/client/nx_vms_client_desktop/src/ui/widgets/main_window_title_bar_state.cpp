@@ -361,7 +361,7 @@ public:
 
     virtual void createInheritedState(DelegateState*, SubstateFlags, const QStringList&) override
     {
-        // Just return an empty current state without saving and modyfying.
+        // Just return an empty current state without saving and modifying.
         return;
     }
 

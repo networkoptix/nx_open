@@ -249,7 +249,7 @@ void QnCloudManagementWidget::disconnectFromCloud()
 
             if (success && reply)
             {
-                NX_DEBUG(this, "Cloud unbind succeded");
+                NX_DEBUG(this, "Cloud unbind succeeded");
                 onDisconnectSuccess();
                 return;
             }

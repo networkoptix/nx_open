@@ -1745,7 +1745,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         if (!flushCurrentBuffer && needBuffering(vTime))
         //if (m_audioDisplay->isBuffering() || m_audioDisplay->msInBuffer() < m_audioBufferSize / 10)
         {
-            // audio is not playinf yet; video must not be played as well
+            // audio is not playing yet; video must not be played as well
             enqueueVideo(vd);
             return result;
         }

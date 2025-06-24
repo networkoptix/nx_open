@@ -253,7 +253,6 @@ void LicenseActivationDialogs::invalidKeyFile(QWidget* parent)
     );
 }
 
-
 void LicenseActivationDialogs::licenseAlreadyActivated(
     QWidget* parent,
     const QString& hardwareId,

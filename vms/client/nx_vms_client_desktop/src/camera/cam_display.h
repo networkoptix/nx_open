@@ -163,7 +163,7 @@ protected:
     // puts in queue and returns first in queue
     QnCompressedVideoDataPtr nextInOutVideodata(QnCompressedVideoDataPtr incoming, int channel);
 
-    // this function doest not changes any quues; it just returns time of next frame been displayed
+    // this function doest not change any queues; it just returns time of next frame been displayed
     quint64 nextVideoImageTime(QnCompressedVideoDataPtr incoming, int channel) const;
 
     quint64 nextVideoImageTime(int channel) const;

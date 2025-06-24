@@ -410,7 +410,7 @@ bool checkLayoutSizeIsEnough(const QPolygonF& layoutRect, qreal labelWidth)
 }
 
 /**
- * Creates rectangle, postioned to posTransform position and angle.
+ * Creates rectangle, positioned to posTransform position and angle.
  *
  * @param reflected If the value is False,
  *     top left angle (point #0) is positioned to posTransform,

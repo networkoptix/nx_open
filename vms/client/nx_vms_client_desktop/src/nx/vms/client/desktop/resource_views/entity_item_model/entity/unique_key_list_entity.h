@@ -33,7 +33,7 @@ inline bool isNull(QString string) { return string.isEmpty(); };
  * complexity of transformation function and performance of produced items is user
  * responsibility.
  * @tparam Key type, must provide operator==() and global qHash() function.
- * @note Any null non-integral keys are inacceptable.
+ * @note Any null non-integral keys are unacceptable.
  */
 template <class Key>
 class UniqueKeyListEntity: public AbstractEntity

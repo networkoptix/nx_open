@@ -33,7 +33,7 @@ public:
 
     /**
      * Constructor. Composes group entity from the given head item and nested entity.
-     * @param headItem Any valid item. Null input is inacceptable and will lead to creation of
+     * @param headItem Any valid item. Null input is unacceptable and will lead to creation of
      *     degenerate entity with zero rows, in this case ownership of nested entity will be
      *     transferred to the group anyway, but then it will be immediately discarded. Group
      *     takes ownership of the head item.

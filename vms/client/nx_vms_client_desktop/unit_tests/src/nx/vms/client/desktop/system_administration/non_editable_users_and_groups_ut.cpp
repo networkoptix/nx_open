@@ -433,7 +433,7 @@ TEST_F(NonEditableUsersAndGroupsTest, nonUniqueUserRenameMakesGroupEditable)
     ASSERT_FALSE(canEditParents(user1));
     ASSERT_FALSE(canEditParents(user2));
 
-    // Add one of the duplicate users to the group - this makes the group imposible to delete
+    // Add one of the duplicate users to the group - this makes the group impossible to delete
     // because it cannot be removed form parent groups list of this user.
     updateUser(user1, {group});
     ASSERT_FALSE(isGroupRemovable(group));
@@ -464,7 +464,7 @@ TEST_F(NonEditableUsersAndGroupsTest, nonUniqueUserDisableMakesGroupEditable)
     // Disable one of the duplicates.
     enableUser(user2, false);
     ASSERT_TRUE(isGroupRemovable(group));
-    // Both users are editabled because only of the duplicates (user1) is enabled.
+    // Both users are editable because only one of the duplicates (user1) is enabled.
     ASSERT_TRUE(canEditParents(user1));
     ASSERT_TRUE(canEditParents(user2));
 }

@@ -335,7 +335,6 @@ struct RemoteConnectionFactoryRequestsManager::Private
         return future.get();
     }
 
-
     Request makeRequestWithCredentials(ContextPtr context) const;
     nx::vms::api::UserModelV1 getUserModel(ContextPtr context) const;
     nx::vms::api::UserModelV1 getUserModelDeprecated(ContextPtr context) const;

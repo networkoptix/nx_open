@@ -42,7 +42,7 @@ WebViewDialog::WebViewDialog(
 
     buttonBox->setVisible(buttons != QDialogButtonBox::NoButton);
 
-    // Set some resonable size to avoid completely shrinked dialog.
+    // Set some reasonable size to avoid completely shrunk dialog.
     resize(kBaseDialogSize);
 }
 

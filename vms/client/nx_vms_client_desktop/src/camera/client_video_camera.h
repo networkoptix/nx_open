@@ -30,7 +30,7 @@ public:
 
     QnMediaResourcePtr resource();
 
-    // this function must be called if stream was interupted or so; to synch audio and video again
+    // this function must be called if stream was interrupted or so; to sync audio and video again
     //void streamJump(qint64 time);
 
     void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);

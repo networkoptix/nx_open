@@ -731,7 +731,6 @@ void ResourceTreeModelAdapter::setAutoExpandedNodes(
     d->autoExpandedNodes = value.value_or(QSet<ResourceTree::ExpandedNodeId>());
 }
 
-
 ResourceTreeModelSquishFacade* ResourceTreeModelAdapter::squishFacade()
 {
     return d->squishFacade;

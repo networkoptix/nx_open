@@ -9,7 +9,7 @@
  * This class implements a workaround for Linux X11 Gnome Launcher
  * that override fullscreen when it works in 3D mode (e.g. in Unity shell).
  * This class hides launcher when application activates and
- * resores launcher when application loses focus.
+ * restores launcher when application loses focus.
  */
 class QnX11LauncherWorkaround: public QObject {
     Q_OBJECT

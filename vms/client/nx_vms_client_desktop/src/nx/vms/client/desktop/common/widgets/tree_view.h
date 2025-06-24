@@ -102,7 +102,7 @@ signals:
     /** Emitted when the widget gets focus. */
     void gotFocus(Qt::FocusReason reason);
 
-    /** Emitted when the widget losts focus. */
+    /** Emitted when the widget loses focus. */
     void lostFocus(Qt::FocusReason reason);
 
 protected:

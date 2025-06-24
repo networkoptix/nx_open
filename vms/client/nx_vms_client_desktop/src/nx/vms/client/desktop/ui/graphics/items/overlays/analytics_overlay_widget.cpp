@@ -468,7 +468,7 @@ void AnalyticsOverlayWidget::paint(
     QPainterPath figurePath;
 
     // That's Ok if there are less than 3 points, since we just fading away all other areas
-    // and highligting tooltip and non-polygon representation only. For real polygons we also
+    // and highlighting tooltip and non-polygon representation only. For real polygons we also
     // highlight their internal area.
     const auto figurePoints = figure->points(size());
     const auto& figurePolygon = QPolygonF(figurePoints).translated(it->figureItem->pos());

@@ -154,7 +154,7 @@ struct ExportMediaTool::Private
 
         // Minor optimization.
         dataProvider->removeDataProcessor(exportRecorder.data());
-        //dataProvider->pleaseStop(); //< Will be stoped after export recorder stop.
+        //dataProvider->pleaseStop(); //< Will be stopped after export recorder stop.
 
         exportRecorder->pleaseStop();
     }

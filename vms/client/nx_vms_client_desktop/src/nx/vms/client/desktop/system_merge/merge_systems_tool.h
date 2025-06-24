@@ -31,7 +31,7 @@ class MergeSystemRequestsManager;
  * 3.1 Show license deactivation warning in case of license conflict.
  * 4. Send merge request to current system, using target info, token and certificate.
  *
- * Requests in steps 1, 2 and 3 are proxified to target server via currently connected one.
+ * Requests in steps 1, 2 and 3 are proxyfied to target server via currently connected one.
  */
 class MergeSystemsTool: public QObject
 {

@@ -160,13 +160,13 @@ State ExportSettingsDialogStateReducer::loadSettings(State state,
     const LocalSettings* localSettings,
     const QString& cacheDirLocation)
 {
-    // TODO: #sivanov Persistent and runtime settings should be splitted better.
+    // TODO: #sivanov Persistent and runtime settings should be split better.
     const auto timeZone = state.exportMediaPersistentSettings.timestampOverlay.timeZone;
     state.exportMediaPersistentSettings = state.bookmarkName.isEmpty()
         ? localSettings->exportMediaSettings()
         : localSettings->exportBookmarkSettings();
 
-    // Restore runtime option, overridden by persisten settings.
+    // Restore runtime option, overridden by persistent settings.
     state.exportMediaPersistentSettings.timestampOverlay.timeZone = timeZone;
 
     if (state.bookmarkName.isEmpty())

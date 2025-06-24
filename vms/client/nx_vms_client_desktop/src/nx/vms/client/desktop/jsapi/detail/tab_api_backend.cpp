@@ -246,7 +246,7 @@ void TabApiBackend::Private::updateLayoutItemData(
 
     auto layoutResource = layout->resource();
 
-    // We always skip focuse state for newly added items to preserve selection on layout.
+    // We always skip focus state for newly added items to preserve selection on layout.
     layoutResource->setItemData(itemId, Qn::ItemSkipFocusOnAdditionRole, true);
 
     if (!params.media)
@@ -446,7 +446,7 @@ std::optional<MediaParams> TabApiBackend::Private::itemMediaParams(QnWorkbenchIt
             const auto windowValue = layoutResource->itemData(itemId,
                 Qn::ItemSliderWindowRole);
             if (!selectionValue.isValid() || !windowValue.isValid())
-                return false; //< We suppose these values should be set simultaniously.
+                return false; //< We suppose these values should be set simultaneously.
 
             const auto selection = selectionValue.value<QnTimePeriod>();
             result.timelineSelection = TimeWindowFromPeriod(selection);
@@ -476,7 +476,7 @@ std::optional<MediaParams> TabApiBackend::Private::itemMediaParams(QnWorkbenchIt
             // Slider window and selection are the same for the all items on a synced layout.
             if (focused)
             {
-                // We have a foused media widget so time slider has correct
+                // We have a focused media widget so time slider has correct
                 // representation (not null) for all items on a synced layout.
                 fillFromTimeSlider();
             }

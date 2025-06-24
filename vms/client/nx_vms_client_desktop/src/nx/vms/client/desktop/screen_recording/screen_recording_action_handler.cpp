@@ -57,7 +57,7 @@ ScreenRecordingActionHandler::ScreenRecordingActionHandler(
     WindowContextAware(windowContext)
 {
     const auto screenRecordingAction = action(menu::ToggleScreenRecordingAction);
-    NX_CRITICAL(screenRecordingAction, "Handler must be creatd only if action exists.");
+    NX_CRITICAL(screenRecordingAction, "Handler must be created only if action exists.");
     connect(screenRecordingAction, &QAction::triggered, this,
         [this](bool checked)
         {

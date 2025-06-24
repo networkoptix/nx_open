@@ -30,7 +30,7 @@ class SystemContext;
 
 /**
  * Central storage class for all transactions-related classes. Owns message bus, query processor,
- * (de)serializers, etc. Creates instanses of RemoteConnection and provides an access to the
+ * (de)serializers, etc. Creates instances of RemoteConnection and provides an access to the
  * mentioned classes.
  */
 class NX_VMS_CLIENT_CORE_API RemoteConnectionFactory: public ec2::AbstractECConnectionFactory
@@ -70,7 +70,7 @@ public:
         std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate> delegate);
 
     /**
-     * Access to user interaction delegate to re-use it in the separate server cetificate watcher
+     * Access to user interaction delegate to re-use it in the separate server certificate watcher
      * class. When server certificate changes, we should display totally the same dialogs as when
      * connecting to the system.
      */

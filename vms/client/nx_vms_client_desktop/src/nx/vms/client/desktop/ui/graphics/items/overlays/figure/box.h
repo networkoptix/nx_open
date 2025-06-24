@@ -14,7 +14,7 @@ class Box: public Polygon
 public:
     /**
      * Creates box figure.
-     * @param points Should contain top left and bottom right values ony.
+     * @param points Should contain top left and bottom right values only.
      */
     Box(
         const Points& points,

@@ -94,7 +94,7 @@ public:
     /** Notify about connection problems when deactivating licenses. */
     static void networkError(QWidget* parent);
 
-    /** Warn about licenes server error while deactivating licenses. */
+    /** Warn about licenses server error while deactivating licenses. */
     static void licensesServerError(QWidget* parent, const QnLicenseList& licenses);
 
     /** Warn about failure while removing deactivated license. */

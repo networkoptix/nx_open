@@ -22,7 +22,7 @@ public:
 
     static void setRetainSizeWhenHidden(QWidget* widget, bool value);
 
-    /** Clears specified menu and, unline QMenu::clear, deletes all owned submenus. */
+    /** Clears specified menu and, unlike QMenu::clear, deletes all owned submenus. */
     static void clearMenu(QMenu* menu);
 
     /** Unlike QWidget::graphicsProxyWidget finds proxy recursively. */

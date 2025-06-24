@@ -10,7 +10,7 @@
 
 namespace nx::vms::client::desktop {
 /**
- * A model for displaying a list of servers in the system for preffered LDAP sync server selection.
+ * A model for displaying a list of servers in the system for preferred LDAP sync server selection.
  * The first row of the model is a special value "Auto" with null server id.
  */
 class NX_VMS_CLIENT_DESKTOP_API ServerListModel:

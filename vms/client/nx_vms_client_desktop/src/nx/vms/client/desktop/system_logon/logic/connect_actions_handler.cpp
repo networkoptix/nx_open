@@ -1327,7 +1327,7 @@ void ConnectActionsHandler::at_connectAction_triggered()
         const bool passwordIsAlreadySaved = savedCredentials
             && !savedCredentials->authToken.empty();
 
-        // In most cases we will connect succesfully by this url. So we can store it.
+        // In most cases we will connect successfully by this url. So we can store it.
         const bool storePasswordForTile = appContext()->localSettings()->saveCredentialsAllowed()
             && (passwordIsAlreadySaved || appContext()->localSettings()->autoLogin())
             && !isTemporaryUser;

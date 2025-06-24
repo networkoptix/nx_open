@@ -197,7 +197,6 @@ void ScheduleSettingsWidget::setStore(CameraSettingsDialogStore* store)
         });
 }
 
-
 void ScheduleSettingsWidget::setScheduleCellPainter(ScheduleCellPainter* cellPainter)
 {
     ui->recordAlwaysButton->setCellPainter(cellPainter);

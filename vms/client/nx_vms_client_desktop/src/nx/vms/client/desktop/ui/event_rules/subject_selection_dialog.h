@@ -42,7 +42,7 @@ public:
     struct CustomizableOptions
     {
         // Initializes options with values suitable for Cloud users selection dialog.
-        // TODO: #spanasenko Refactor the whole dialog customizaion.
+        // TODO: #spanasenko Refactor the whole dialog customization.
         static CustomizableOptions cloudUsers();
 
         QString userListHeader;

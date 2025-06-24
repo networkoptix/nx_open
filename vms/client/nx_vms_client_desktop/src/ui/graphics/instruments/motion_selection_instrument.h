@@ -32,7 +32,7 @@ public:
     /**
      * \param multiSelectionModifiers   Additional keyboard modifiers that must be
      *                                  pressed for the new selection to be added
-     *                                  to existing selection. Defalts to <tt>Qn::ControlModifier</tt>.
+     *                                  to existing selection. Defaults to <tt>Qn::ControlModifier</tt>.
      */
     void setMultiSelectionModifiers(Qt::KeyboardModifiers multiSelectionModifiers);
     Qt::KeyboardModifiers multiSelectionModifiers() const;

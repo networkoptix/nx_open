@@ -89,7 +89,7 @@ private:
         READ isCloudSession
         NOTIFY isCloudSessionChanged)
 
-    /** Reresents system name of the session. */
+    /** Represents system name of the session. */
     Q_PROPERTY(QString systemName
         READ systemName
         NOTIFY systemNameChanged)

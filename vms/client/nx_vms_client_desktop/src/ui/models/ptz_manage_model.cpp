@@ -211,7 +211,6 @@ bool QnPtzManageModel::setHotkeyInternal(int hotkey, const QString &id) {
     return true;
 }
 
-
 int QnPtzManageModel::rowCount(const QModelIndex &parent) const {
     if(parent.isValid())
         return 0;
@@ -630,7 +629,7 @@ QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int col
     case Qn::PtzTourRole:
         return QVariant::fromValue<QnPtzTour>(tourModel.tour);
     case Qn::ValidRole:
-        // TODO: some gradations required: fully invalid, only warning (eg. hotkey duplicates)
+        // TODO: some gradations required: fully invalid, only warning (e.g. hotkey duplicates)
         return tourIsValid(tourModel);
     case Qn::HelpTopicIdRole:
         return HelpTopic::Id::PtzManagement_Tour;

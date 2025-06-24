@@ -128,7 +128,7 @@ public:
     void removeLayout(const core::LayoutResourcePtr& resource);
 
     /**
-     * Remove thes resources' layouts if exists.
+     * Remove these resources' layouts if exists.
      */
     void removeLayouts(const core::LayoutResourceList& resources);
 
@@ -189,7 +189,7 @@ public:
     bool isInLayoutChangeProcess() const;
 
     /**
-     * Whether workbench is in intended clear process. Flag is used to avoid unneccesary new tab
+     * Whether workbench is in intended clear process. Flag is used to avoid unnecessary new tab
      * creation on resources deletion.
      */
     bool inClearProcess() const;

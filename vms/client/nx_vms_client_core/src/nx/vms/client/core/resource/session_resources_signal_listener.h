@@ -13,7 +13,7 @@
 namespace nx::vms::client::core {
 
 /**
- * Utility for the coinvinient handling of the resources changes. Intended for use when we need to
+ * Utility for the convenient handling of the resources changes. Intended for use when we need to
  * listen some signals from all resources of a kind and only while the client is connected to a
  * System. Useful when something is to be recalculated depending on all certain resources data.
  *

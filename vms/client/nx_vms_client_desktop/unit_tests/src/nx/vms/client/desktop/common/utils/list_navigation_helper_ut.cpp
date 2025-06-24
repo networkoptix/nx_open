@@ -134,7 +134,7 @@ TEST_F(ListNavigationHelperTest, navigateTo)
     navigator.navigateTo(index(2), Qt::NoModifier);
     checkSelectedLineIs(1);
 
-    // Juas as navigation to an index that is not selectable.
+    // Just as navigation to an index that is not selectable.
     navigator.navigateTo(index(3), Qt::NoModifier);
     checkSelectedLineIs(1);
 }

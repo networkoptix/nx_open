@@ -18,7 +18,6 @@
 
 namespace nx::vms::client::desktop {
 
-
 class SharedMemoryInterface
 {
 public:
@@ -56,7 +55,7 @@ public:
     void connectToCloudStatusWatcher();
 
     /**
-     * Index of the current client instance. Clients are receving indices by the start order. If
+     * Index of the current client instance. Clients are receiving indices by the start order. If
      * some client was closed, it's index become free and can be taken by any client started after.
      */
     int currentInstanceIndex() const;
@@ -90,7 +89,7 @@ public:
     /**
      * Iterates over client instances of the current session and requests them to load state
      * from hard drive. Assigned states are removed from the states list.
-     * The current instance woldn't take a state to load and woldn't receive loadState command.
+     * The current instance wouldn't take a state to load and wouldn't receive loadState command.
      */
     void assignStatesToOtherInstances(QStringList* windowStates);
 

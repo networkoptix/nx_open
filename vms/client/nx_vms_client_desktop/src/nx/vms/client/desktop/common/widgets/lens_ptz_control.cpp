@@ -36,7 +36,7 @@ const qreal kSensitivity = 0.02;
 // Minimal size for joystick circle.
 constexpr int  kMinCircleSize = 176;
 
-// Time period to read updates for ptzr control.
+// Time period to read updates for ptz control.
 constexpr int  kUpdatePeriod = 33;
 
 // Increments to be applied when we press appropriate button.

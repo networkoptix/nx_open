@@ -1626,7 +1626,7 @@ void LogsManagementWatcher::applySettings(
 
 nx::log::Level LogsManagementWatcher::defaultLogLevel()
 {
-    // We don't use the constant from logs_settings.h because it is build-type denepdent.
+    // We don't use the constant from logs_settings.h because it is build-type dependent.
     return nx::log::Level::info;
 }
 

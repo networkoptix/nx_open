@@ -28,7 +28,7 @@ public:
     void initWithCurrentActiveJoystick();
 
 signals:
-    void resetToDefault(); //< For connecting labmda to QML item signal.
+    void resetToDefault(); //< For connecting lambda to QML item signal.
 
 private:
     struct Private;

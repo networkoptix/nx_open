@@ -118,7 +118,6 @@ LookupListPreviewProcessor::PreviewBuildResult LookupListPreviewProcessor::build
             line.emplace_back(value);
         }
 
-
         if (!line.empty() && hasNotEmptyValue)
             newData.push_back(std::move(line));
         ++lineIndex;

@@ -26,12 +26,12 @@ public:
 
     /**
      * Checks if bounding rect of the figure intersects with the given one. Specified rectangle
-     * is supposed to be in the relateive (from 0 to 1) coordinates.
+     * is supposed to be in the relative (from 0 to 1) coordinates.
      */
     bool intersects(const QRectF& rect) const;
 
     /**
-     * Represents rectangle of the target scene in relative coordintaes.
+     * Represents rectangle of the target scene in relative coordinates.
      * Default scene rectangle is Rect((0,0), (1, 1)).
      * After custom scene rectangle is set all coordinates become updated.
      */

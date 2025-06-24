@@ -15,8 +15,8 @@ namespace nx::vms::client::desktop::workbench::timeline {
 
 /**
  * Represents timeline Thumbnail Panel rectangle. Is responsible for listening events only,
- * while real thumbnails painting is peformed by QnTimeSlider for historical reasons.
- * Takes care of all coordinate and time position convertations between QnTimeSlider and
+ * while real thumbnails painting is performed by QnTimeSlider for historical reasons.
+ * Takes care of all coordinate and time position conversions between QnTimeSlider and
  * Thumbnail Panel coordinate systems.
  */
 class ThumbnailPanel: public GraphicsWidget, public HelpTopicQueryable

@@ -30,4 +30,4 @@ VideowallMatricesEntity::VideowallMatricesEntity(
 }
 
 } // namespace entity_resource_tree
-} // namesace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop

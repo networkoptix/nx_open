@@ -82,7 +82,7 @@ void Device::updateStickAxisLimits(const JoystickDescriptor& modelInfo)
     m_axisLimits[xIndex] = parseAxisLimits(modelInfo.xAxis, m_axisLimits[xIndex]);
     m_axisLimits[yIndex] = parseAxisLimits(modelInfo.yAxis, m_axisLimits[yIndex]);
     m_axisLimits[zIndex] = parseAxisLimits(modelInfo.zAxis, m_axisLimits[zIndex]);
-    // Initialize stick position by zeroes (all three axes are in neutral position).
+    // Initialize stick position by zeros (all three axes are in neutral position).
     m_stickPosition.fill(0);
 }
 

@@ -107,7 +107,7 @@ QPixmap LoadingIndicator::createPixmap(double progress)
     g.setColorAt(0.1, c2);
     g.setColorAt(0.9, c3);
 
-    // The internal ellipse is substracted from the external one by Qt::OddEvenFill fill rule.
+    // The internal ellipse is subtracted from the external one by Qt::OddEvenFill fill rule.
     QPainterPath path;
     path.setFillRule(Qt::OddEvenFill);
     path.addEllipse(kCenter, kExternalRadius, kExternalRadius);

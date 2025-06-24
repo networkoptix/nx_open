@@ -69,7 +69,7 @@ enum CoreItemDataRole
     IsHighlightedRole,
 
     ObjectTitleRole,                /** Role for analytics object title (QString). */
-    HasTitleImageRole,              /** Role for analytics object title image presense (bool). */
+    HasTitleImageRole,              /** Role for analytics object title image presence (bool). */
 
     CoreItemDataRoleCount
 };

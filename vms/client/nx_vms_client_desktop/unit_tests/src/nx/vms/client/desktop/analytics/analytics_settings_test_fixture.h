@@ -74,7 +74,7 @@ private:
 using AnalyticsSettingsMockApiInterfacePtr = std::shared_ptr<AnalyticsSettingsMockApiInterface>;
 
 /**
- * Class for convinient checks if listener dataChanged signal was emitted.
+ * Class for convenient checks if listener dataChanged signal was emitted.
  */
 class ListenerNotifier: public QObject
 {

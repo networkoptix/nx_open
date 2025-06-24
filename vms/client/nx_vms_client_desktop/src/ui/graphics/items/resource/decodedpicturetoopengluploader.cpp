@@ -104,7 +104,6 @@ private:
 
 static BitrateCalculator bitrateCalculator;
 
-
 // -------------------------------------------------------------------------- //
 // DecodedPictureToOpenGLUploaderPrivate
 // -------------------------------------------------------------------------- //
@@ -258,7 +257,7 @@ public:
     }
 
     /*!
-        \return true, If uinitialized texture, false is already initialized
+        \return true, If uninitialized texture, false is already initialized
     */
     bool ensureInitialized(int width, int height, int stride, int pixelSize, GLint internalFormat, int internalFormatPixelSize, int fillValue) {
         NX_ASSERT(m_renderer.data() != nullptr);
@@ -407,14 +406,12 @@ public:
     QSharedPointer<DecodedPictureToOpenGLUploaderPrivate> m_renderer;
 };
 
-
 //////////////////////////////////////////////////////////
 // QnGlRendererTexturePack
 //////////////////////////////////////////////////////////
 static const size_t MAX_PLANE_COUNT = 4;
 static const size_t Y_PLANE_INDEX = 0;
 static const size_t A_PLANE_INDEX = 3;
-
 
 //!Set of gl textures containing planes of single picture
 class QnGlRendererTexturePack
@@ -468,7 +465,6 @@ private:
     AVPixelFormat m_format;
 };
 
-
 //////////////////////////////////////////////////////////
 // DecodedPictureToOpenGLUploader::UploadedPicture
 //////////////////////////////////////////////////////////
@@ -478,7 +474,6 @@ DecodedPictureToOpenGLUploader::UploadedPicture::PBOData::PBOData()
     sizeBytes( 0 )
 {
 }
-
 
 AVPixelFormat DecodedPictureToOpenGLUploader::UploadedPicture::colorFormat() const
 {
@@ -590,7 +585,6 @@ DecodedPictureToOpenGLUploader::UploadedPicture::~UploadedPicture()
     delete m_texturePack;
     m_texturePack = nullptr;
 }
-
 
 //////////////////////////////////////////////////////////
 // DecodedPictureToOpenGLUploader::ScopedPictureLock
@@ -713,7 +707,6 @@ private:
     bool m_success;
 };
 
-
 //////////////////////////////////////////////////////////
 // DecodedPicturesDeleter
 //////////////////////////////////////////////////////////
@@ -735,7 +728,6 @@ public:
 private:
     DecodedPictureToOpenGLUploader* const m_uploader;
 };
-
 
 //////////////////////////////////////////////////////////
 // DecodedPictureToOpenGLUploader
@@ -921,7 +913,6 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
     emptyPictureBuf->m_skippingForbidden = false;
     emptyPictureBuf->m_displayedRect = displayedRect;
     emptyPictureBuf->m_onScreenSize = onScreenSize;
-
 
     //have go through upload thread, since opengl uploading does not scale good on Intel HD Graphics and
         //it does not matter on PCIe graphics card due to high video memory bandwidth

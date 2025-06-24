@@ -38,7 +38,7 @@ private:
      * Connects to the target system if needed.
      * @param startupParameters Client command line parameters.
      * @param haveInputFiles Whether some of the parameters were parsed as a file.
-     * @return Whether connection to the system was requsted in the command line. Does not check if
+     * @return Whether connection to the system was requested in the command line. Does not check if
      *     the connection itself was successful.
      */
     bool connectToSystemIfNeeded(
@@ -50,7 +50,7 @@ private:
 
     /**
      * Connects to the cloud if needed.
-     * @return Whether connection to the cloud was requsted in the command line. Does not check if
+     * @return Whether connection to the cloud was requested in the command line. Does not check if
      *     the connection itself was successful.
      */
     bool connectToCloudIfNeeded(const QnStartupParameters& startupParameters);

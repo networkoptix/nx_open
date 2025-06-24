@@ -85,7 +85,7 @@ struct NotificationTabModel::Private
 
         // We cannot connect fully valid handler to modelReset event.
         // This handler is for actual baseModel behavior.
-        // Model is resetted in case of system disconnecting. It is just clearing.
+        // Model is reset in case of system disconnecting. It is just clearing.
         connect(baseModel, &QAbstractItemModel::modelAboutToBeReset, separatorModel,
             [baseModel, separatorModel]
             {

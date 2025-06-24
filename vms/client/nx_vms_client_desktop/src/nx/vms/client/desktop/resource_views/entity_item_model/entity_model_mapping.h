@@ -154,7 +154,7 @@ public:
      *     system.
      * @param end Last index of item chain that will be moved in the source own coordinate
      *     system.
-     * @param desination Valid pointer to the destination entity, may be same as source as well.
+     * @param destination Valid pointer to the destination entity, may be same as source as well.
      * @param row Index before which items will be inserted in the destination own coordinate
      *     system.
      */

@@ -334,7 +334,7 @@ TEST_F(UpdateVerificationTest, regularUpdateWithoutErrors)
     ClientVerificationData clientData = makeClientData(Version("4.0.0.28523"));
     makeServer(Version("4.0.0.28523"));
 
-    // Expecting that both client and server should be updatedm without any verification errors.
+    // Expecting that both client and server should be updated without any verification errors.
     verifyUpdateContents(contents, getAllServers(), clientData, options);
     EXPECT_EQ(contents.error, common::update::InformationError::noError);
     EXPECT_TRUE(contents.needClientUpdate);

@@ -109,7 +109,7 @@ public:
 
     /**
      * Expose QObject properties and slots/signals to the page JavaScript.
-     * Lifetime of the object is controlled by its creator. Sutable for separate web views
+     * Lifetime of the object is controlled by its creator. Suitable for separate web views
      * which are not stored between runs.
      * Supports complex domain-like naming, like "nx.area.management".
      */

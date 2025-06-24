@@ -141,7 +141,7 @@ void SelectableTextButton::setDeactivatable(bool value)
 
         anchorWidgetToParent(d->deactivateButton.data(),
             Qt::TopEdge | Qt::RightEdge | Qt::BottomEdge,
-            {0, 2, 0, 1}); //< TODO: @pprivalov there are a number of hardcodedmagic numbers, try to deal with them.
+            {0, 2, 0, 1}); //< TODO: @pprivalov there are a number of hardcoded magic numbers, try to deal with them.
 
         connect(d->deactivateButton.data(), &CloseButton::clicked,
             [this]() { setState(State::deactivated); });
@@ -171,7 +171,6 @@ void SelectableTextButton::setAccented(bool accented)
         d->deactivateButton->setAccented(accented);
     update();
 }
-
 
 void SelectableTextButton::deactivate()
 {

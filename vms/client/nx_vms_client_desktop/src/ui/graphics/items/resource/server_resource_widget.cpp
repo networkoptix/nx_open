@@ -363,7 +363,6 @@ private:
     qreal m_cachedProgress = 0.0;
 };
 
-
 // -------------------------------------------------------------------------- //
 // StatisticsOverlayWidget
 // -------------------------------------------------------------------------- //
@@ -446,7 +445,7 @@ protected:
             const auto r = painter->device()->devicePixelRatio();
             const QSize graphSize = QSize(inner.width() + xStep, inner.height()) * r;
 
-            // Draw all data into a (slighty wider) pixmap when the data is updated and then just
+            // Draw all data into a (slightly wider) pixmap when the data is updated and then just
             // move the pixmap from right to left while waiting for the next update.
             if (m_graphPixmap.size() != graphSize)
                 m_graphPixmap = getGraphPixmap(inner.size(), r, xStep);
@@ -844,7 +843,6 @@ void QnServerResourceWidget::updateHoverKey() {
 
     m_statisticsOverlayWidget->updateData();
 }
-
 
 // -------------------------------------------------------------------------- //
 // Handlers

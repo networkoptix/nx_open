@@ -166,7 +166,6 @@ void EventParameterCompleter::Private::triggerCompleter()
         QPoint{textEditRect.right(), cursorRect.bottom()}});
 }
 
-
 void EventParameterCompleter::Private::initPopup(QAbstractItemView* popup)
 {
     popup->installEventFilter(q);
@@ -209,7 +208,6 @@ void EventParameterCompleter::Private::replaceCurrentWordWithCompleted(
     }
 }
 
-
 EventParameterCompleter::~EventParameterCompleter()
 {
 }
@@ -221,7 +219,7 @@ void EventParameterCompleter::setModel(EventParametersModel* model)
 
     d->completerModel = model;
     model->setParent(d->completer);
-    // Previous model is deleted, when settting a new one.
+    // Previous model is deleted, when setting a new one.
     d->completer->setModel(d->completerModel);
 }
 
@@ -265,7 +263,7 @@ bool EventParameterCompleter::eventFilter(QObject* obj, QEvent* event)
     if (event->type() == QEvent::KeyPress)
     {
         // It is required to handle such event here, otherwise new line is added in the text
-        // editor instead of applying choosen completion string.
+        // editor instead of applying chosen completion string.
         auto keyEvent = static_cast<QKeyEvent*>(event);
         switch (keyEvent->key())
         {

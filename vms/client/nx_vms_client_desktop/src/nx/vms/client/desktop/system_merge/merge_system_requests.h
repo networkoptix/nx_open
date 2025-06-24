@@ -20,7 +20,7 @@ namespace nx::vms::client::desktop {
 
 /**
  * Helper class for sending requests related to system merge process.
- * Implements HTTP CONNECT proxifying via current server.
+ * Implements HTTP CONNECT proxyfying via current server.
  */
 class MergeSystemRequestsManager
 {

@@ -19,7 +19,7 @@ struct CommonObjectSearchSetup::Private
 void CommonObjectSearchSetup::registerQmlType()
 {
     qmlRegisterUncreatableType<CommonObjectSearchSetup>("Nx.Mobile", 1, 0,
-        "CommonObjectSearchSetup", "Can't instantinate CommonObjectSearchSetup object");
+        "CommonObjectSearchSetup", "Can't instantiate CommonObjectSearchSetup object");
 }
 
 CommonObjectSearchSetup::CommonObjectSearchSetup(

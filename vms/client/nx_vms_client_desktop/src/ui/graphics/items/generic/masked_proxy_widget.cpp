@@ -38,7 +38,6 @@ qreal sceneDevicePixelRatio(const QGraphicsScene* scene)
 
 } // namespace
 
-
 QnMaskedProxyWidget::QnMaskedProxyWidget(QGraphicsItem* parent, Qt::WindowFlags windowFlags):
     QGraphicsProxyWidget(parent, windowFlags),
     m_updatesEnabled(true),

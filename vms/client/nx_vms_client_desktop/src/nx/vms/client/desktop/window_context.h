@@ -86,7 +86,7 @@ public:
 
     /**
      * Manager of menu actions. Creates all actions, which are visible in all context menus (and
-     * also some other, which are used for convinience). Provides interface to send action from a
+     * also some other, which are used for convenience). Provides interface to send action from a
      * single source to any number of receivers using QAction mechanism. Implements complex way of
      * condition checking for those actions.
      */

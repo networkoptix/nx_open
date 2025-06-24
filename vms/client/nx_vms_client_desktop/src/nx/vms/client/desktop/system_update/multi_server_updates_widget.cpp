@@ -1336,7 +1336,7 @@ void MultiServerUpdatesWidget::atStartUpdateComplete(bool success, const QString
             m_clientUpdateTool->setUpdateTarget(m_updateInfo);
             // Start download process.
             // Move to state 'Downloading'
-            // At this state should check remote state untill everything is complete.
+            // At this state should check remote state until everything is complete.
             // TODO: We have the case when all mediaservers have installed update.
             if (!m_updateInfo.manualPackages.empty())
                 m_serverUpdateTool->startManualDownloads(m_updateInfo);
@@ -2673,7 +2673,7 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
             break;
     }
 
-    // Making this button invisible for now, until a proper mediaserver selection is impelemented.
+    // Making this button invisible for now, until a proper mediaserver selection is implemented.
     //ui->advancedUpdateSettings->setVisible(storageSettingsVisible);
     //ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn,
     //    !storageSettingsVisible || !m_showStorageSettings);

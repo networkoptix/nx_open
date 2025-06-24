@@ -21,8 +21,8 @@ namespace nx::vms::client::desktop {
  * The only valid way to show is to call showForEncryptionData() method.
  * Checks password for validity on client side and sends valid password to server upon Decrypt
  * button pressed.
- * accepted() signal emitted after setting password request responce received from server
- * (regardless of successfull or not).
+ * accepted() signal emitted after setting password request response received from server
+ * (regardless of successful or not).
  * rejected() signal emitted upon pressing Cancel button by user only.
  * The dialog will be automatically closed on client disconnect.
  */

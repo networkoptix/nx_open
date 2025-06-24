@@ -32,7 +32,7 @@ public:
     QPixmap currentPixmap() const;
 
     /**
-     * Creates a pixmap for the given progess value.
+     * Creates a pixmap for the given progress value.
      * The progress should be a value between 0.0 and 1.0
      */
     static QPixmap createPixmap(double progress = 0.0);

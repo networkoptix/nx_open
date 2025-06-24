@@ -74,7 +74,7 @@ public:
 
     /**
      * Path to an image. Have greater priority than setInput(QImage)
-     * @param filename Full path as used in currect OS.
+     * @param filename Full path as used in current OS.
      */
     void setInput(const QString& filename);
 

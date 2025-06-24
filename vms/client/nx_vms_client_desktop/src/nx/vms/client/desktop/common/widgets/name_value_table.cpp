@@ -106,7 +106,7 @@ public:
 
     virtual ~SharedOffscreenRenderer() override
     {
-        // Ther's a comment in the Qt sources: "the standard pattern is to destroy
+        // There's a comment in the Qt sources: "the standard pattern is to destroy
         // the rendercontrol before the QQuickWindow", so lets do it this way.
         renderControl.reset();
 

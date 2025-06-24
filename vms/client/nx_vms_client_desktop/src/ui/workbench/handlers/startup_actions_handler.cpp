@@ -377,7 +377,7 @@ void StartupActionsHandler::handleStartupParameters()
     if (!NX_ASSERT(!context()->user()))
         submitDelayedDrops();
 
-    // Show beta version for all publication types except releases and montly patches.
+    // Show beta version for all publication types except releases and monthly patches.
     const bool nonPublicVersion =
         nx::build_info::publicationType() != nx::build_info::PublicationType::patch
         && nx::build_info::publicationType() != nx::build_info::PublicationType::release;

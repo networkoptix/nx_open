@@ -225,7 +225,7 @@ void FailoverWidget::updateMaxCamerasSettings()
     if (d->server->getServerFlags().testFlag(vms::api::SF_Edge))
         maxCameras = kEdgeServerMaxCameras;   //edge server
     else if (d->server->getServerFlags().testFlag(vms::api::SF_ArmServer))
-        maxCameras = kArmServerMaxCameras;   //generic ARM based servre
+        maxCameras = kArmServerMaxCameras;   //generic ARM based server
     else
         maxCameras = kPcServerMaxCameras;    //PC server
     ui->maxCamerasSpinBox->setMaximum(maxCameras);

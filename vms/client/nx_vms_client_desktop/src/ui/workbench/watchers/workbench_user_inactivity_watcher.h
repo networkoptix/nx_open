@@ -15,7 +15,7 @@
  * the user activity. The user is considered as inactive when he idle
  * for a period specified by idleTimeoutMSecs() or the main window
  * is minimized for the same period.
- * When the user state changes the signal stateChanged() is emmited.
+ * When the user state changes the signal stateChanged() is emitted.
  */
 class QnWorkbenchUserInactivityWatcher : public QObject, public QnWorkbenchContextAware
 {
@@ -34,7 +34,7 @@ public:
     bool isEnabled() const;
     void setEnabled(bool enable);
 
-    /** Time period in milliseconds which specifies an idle period after wich the user
+    /** Time period in milliseconds which specifies an idle period after which the user
      *  is considered as inactive. */
     quint64 idleTimeoutMSecs() const;
     void setIdleTimeoutMSecs(quint64 msecs);
@@ -52,7 +52,7 @@ public:
     virtual bool eventFilter(QObject *object, QEvent *event);
 
 signals:
-    /** This signal is emmited when user activity state has been changed. */
+    /** This signal is emitted when user activity state has been changed. */
     void stateChanged(bool userIsActive);
 
 protected:

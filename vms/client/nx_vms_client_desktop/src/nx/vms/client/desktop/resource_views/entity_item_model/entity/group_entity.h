@@ -26,13 +26,13 @@ public:
      * Constructor. Makes group entity with head item only, suitable when nested entity
      * can't be created by the moment of group instantiation and will be installed later.
      * @param headItem Any item, ownership of item will be transferred to the entity. Null input
-     *     is inacceptable and will lead to creation of dummy head item.
+     *     is unacceptable and will lead to creation of dummy head item.
      */
     GroupEntity(AbstractItemPtr headItem);
 
     /**
      * Constructor. Composes group entity from the given head item and nested entity.
-     * @param headItem Any valid item. Null input is inacceptable and will to creation of
+     * @param headItem Any valid item. Null input is unacceptable and will to creation of
      *     dummy head item. Group takes ownership of the head item.
      * @param nestedEntity Any valid entity, null one is either acceptable. Group takes
      *     ownership of the nested entity.
@@ -41,7 +41,7 @@ public:
 
     /**
      * Constructor.
-     * @param headItem Any valid item. Null input is inacceptable and will to creation of
+     * @param headItem Any valid item. Null input is unacceptable and will to creation of
      *     dummy head item. Group takes ownership of the head item.
      * @param nestedEntityCreator Factory function which creates nested entity at the moment of
      *     instantiation, and later, when data change notification for given role will be received

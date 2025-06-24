@@ -75,7 +75,7 @@ public:
                 "Direct Accessible System"));
     }
 
-    /** Have a record about a system we connected recenlty (only local id is stored). */
+    /** Have a record about a system we connected recently (only local id is stored). */
     void givenRecentSystem(nx::Uuid localId)
     {
         systemFinder->recentFinder->addSystem(

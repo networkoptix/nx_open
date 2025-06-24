@@ -23,7 +23,7 @@ struct StatisticsSender::Private
 
     bool canSendStatistics() const
     {
-        // Exclude developers from the statisics.
+        // Exclude developers from the statistics.
         if (nx::build_info::publicationType() == nx::build_info::PublicationType::local)
             return false;
 

@@ -417,7 +417,7 @@ bool ExportStorageStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md
     {
         m_isLayoutsInitialised = true;
 
-        // Panoramic video streams will transcoded to single video, so use defult video layout.
+        // Panoramic video streams will transcoded to single video, so use default video layout.
         QnConstResourceVideoLayoutPtr videoLayout;
         if (isTranscodingEnabled())
             videoLayout.reset(new QnDefaultResourceVideoLayout());

@@ -36,7 +36,7 @@ public:
     Q_ENUM(Result)
 
     /**
-     * Analyze souce image and compute fisheye parameters.
+     * Analyze source image and compute fisheye parameters.
      */
     Q_INVOKABLE void analyzeFrameAsync(QImage frame);
 
