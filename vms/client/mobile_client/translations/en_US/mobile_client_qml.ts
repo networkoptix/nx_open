@@ -871,7 +871,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>AppInfo</source>
+        <source>App Info</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
