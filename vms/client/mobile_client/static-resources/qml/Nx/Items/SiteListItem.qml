@@ -203,16 +203,20 @@ Item
                 {
                     id: issueLabel
 
+                    readonly property bool showSaasState: control.isFromSites
+                        ? control.cloudSystem
+                        : control.type !== OrganizationsModel.System
+
                     visible: text !== ""
 
                     Layout.alignment: Qt.AlignBaseline
 
                     color:
                     {
-                        if (control.saasSuspended)
+                        if (showSaasState && control.saasSuspended)
                             return ColorTheme.colors.yellow_core
 
-                        if (control.saasShutDown)
+                        if (showSaasState && control.saasShutDown)
                             return ColorTheme.colors.red_core
 
                         if (control.factorySystem)
@@ -236,10 +240,6 @@ Item
                         {
                             return ""
                         }
-
-                        const showSaasState = control.isFromSites
-                            ? control.cloudSystem
-                            : control.type !== OrganizationsModel.System
 
                         if (showSaasState && control.saasSuspended)
                             return qsTr("SUSPENDED")
