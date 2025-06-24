@@ -42,6 +42,7 @@ const QString kDurationMsParam = lit("durationMs");
 const QString kTagParam = lit("tag");
 const QString kEventRuleIdParam = lit("rule_id");
 const QString kCentralTimePointMs = lit("centralTimePointMs");
+const QString kShareFilterParam = lit("shareFilter");
 
 nx::network::rest::Params bookmarksToParam(const nx::vms::common::CameraBookmark& bookmark)
 {
@@ -147,6 +148,9 @@ void nx::vms::common::GetBookmarksRequestData::loadFromParams(
         filter.creationStartTimeMs = milliseconds(nx::utils::parseDateTimeMsec(param));
     if (QString param = params.value(QnCameraBookmark::kCreationEndTimeParam); !param.isEmpty())
         filter.creationEndTimeMs = milliseconds(nx::utils::parseDateTimeMsec(param));
+
+    if (const QString& param = params.value(kShareFilterParam); !param.isEmpty())
+        nx::reflect::fromString(param.toStdString(), &filter.shareFilter);
 }
 
 nx::network::rest::Params nx::vms::common::GetBookmarksRequestData::toParams() const
@@ -172,6 +176,9 @@ nx::network::rest::Params nx::vms::common::GetBookmarksRequestData::toParams() c
 
     if (filter.centralTimePointMs)
         result.insert(kCentralTimePointMs, QnLexical::serialized(*filter.centralTimePointMs));
+
+    if (filter.shareFilter)
+        result.insert(kShareFilterParam, nx::reflect::toString(filter.shareFilter));
 
     return result;
 }
