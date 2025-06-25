@@ -68,6 +68,11 @@ QRandomGenerator64 getRandomGenerator(
     return QRandomGenerator64((const quint32*) seed.data(), seed.size() / sizeof(quint32));
 }
 
+bool isSuitableDay(const QDate& day)
+{
+    return day.dayOfWeek() <= Qt::Wednesday || day.dayOfWeek() == Qt::Sunday;
+};
+
 } // namespace
 
 class ClientUpdateManager::Private: public QObject, public QnWorkbenchContextAware
@@ -266,7 +271,7 @@ void ClientUpdateManager::Private::checkUpdateTime()
 
     const auto now = qnSyncTime->currentDateTime();
 
-    if (const int day = now.date().dayOfWeek(); day >= Qt::Thursday && day <= Qt::Saturday)
+    if (!isSuitableDay(now.date()))
     {
         NX_VERBOSE(this,
             "Updates are prohibited on Thursdays, Fridays and Saturdays. "
@@ -783,6 +788,11 @@ bool ClientUpdateManager::isPlannedUpdateDatePassed() const
         && qnSyncTime->currentDateTime() >= plannedUpdateDate();
 }
 
+bool ClientUpdateManager::isTodaySuitableForUpdate() const
+{
+    return isSuitableDay(qnSyncTime->currentDateTime().date());
+}
+
 QUrl ClientUpdateManager::releaseNotesUrl() const
 {
     return d->updateContents.info.releaseNotesUrl;
@@ -797,12 +807,6 @@ ClientUpdateManager::UpdateDate ClientUpdateManager::calculateUpdateDate(
     // independently on the Client timezone. Thus all QDateTime <-> std::chrono conversion calls
     // must be done with QTimeZone::UTC specification.
     // Also this function should not depend on the current date.
-
-    const auto isSuitableDay =
-        [](const QDate& day)
-        {
-            return day.dayOfWeek() <= Qt::Wednesday || day.dayOfWeek() == Qt::Sunday;
-        };
 
     const auto qdt =
         [](milliseconds ts) { return QDateTime::fromMSecsSinceEpoch(ts.count(), QTimeZone::UTC); };
