@@ -29,7 +29,7 @@ public:
         std::chrono::milliseconds tilePreviewLoadIntervalMs = std::chrono::milliseconds(0);
 
         // A delay after which preview may be requested again after receiving "NO DATA".
-        std::chrono::milliseconds previewReloadDelayMs = std::chrono::milliseconds(30);
+        std::chrono::seconds previewReloadDelayMs = std::chrono::seconds(30);
 
         int maxSimultaneousPreviewLoadsArm = 3;
     };
