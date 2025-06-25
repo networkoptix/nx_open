@@ -53,7 +53,7 @@ public:
 
 private:
     AbstractAttribute* m_proxiedAttribute = nullptr;
-    ProxyObjectType* m_proxyObjectType = nullptr;
+    std::unique_ptr<ProxyObjectType> m_proxyObjectType;
     std::set<nx::Uuid> m_supportByEngine;
     QString m_prefix;
     QString m_rootParentTypeId;

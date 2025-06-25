@@ -36,7 +36,7 @@ class NX_VMS_COMMON_API AbstractObjectEventType: public QObject
 
 public:
 
-    AbstractObjectEventType(QObject* parent = nullptr): QObject(parent) {}
+    AbstractObjectEventType(): QObject() {}
 
     virtual QString id() const = 0;
     virtual QString name() const = 0;
@@ -58,10 +58,9 @@ public:
         EntityType entityType,
         DescriptorType& descriptor,
         QString typeName,
-        AbstractResourceSupportProxy* resourceSupportProxy,
-        QObject* parent = nullptr)
+        AbstractResourceSupportProxy* resourceSupportProxy)
         :
-        AbstractObjectEventType(parent),
+        AbstractObjectEventType(),
             m_entityType(entityType),
             m_descriptor(descriptor),
             m_typeName(std::move(typeName)),

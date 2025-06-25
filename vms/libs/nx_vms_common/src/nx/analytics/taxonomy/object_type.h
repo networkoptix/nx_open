@@ -29,8 +29,7 @@ class NX_VMS_COMMON_API ObjectType:
 public:
     ObjectType(
         nx::vms::api::analytics::ObjectTypeDescriptor objectTypeDescriptor,
-        AbstractResourceSupportProxy* resourceSupportProxy,
-        QObject* parent = nullptr);
+        AbstractResourceSupportProxy* resourceSupportProxy);
 
     virtual bool isNonIndexable() const;
     virtual bool isLiveOnly() const;

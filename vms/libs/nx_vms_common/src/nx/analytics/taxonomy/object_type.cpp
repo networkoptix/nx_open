@@ -8,15 +8,13 @@ namespace nx::analytics::taxonomy {
 
 ObjectType::ObjectType(
     ObjectTypeDescriptor objectTypeDescriptor,
-    AbstractResourceSupportProxy* resourceSupportProxy,
-    QObject* parent)
+    AbstractResourceSupportProxy* resourceSupportProxy)
     :
     base_type(
         EntityType::objectType,
         objectTypeDescriptor,
         kObjectTypeDescriptorTypeName,
-        resourceSupportProxy,
-        parent)
+        resourceSupportProxy)
 {
 }
 
