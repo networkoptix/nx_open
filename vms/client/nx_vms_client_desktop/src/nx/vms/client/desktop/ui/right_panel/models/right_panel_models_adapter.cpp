@@ -981,7 +981,7 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
 
     const auto settings = core::VisibleItemDataDecoratorModel::Settings {
         .tilePreviewLoadIntervalMs = std::chrono::milliseconds(ini().tilePreviewLoadIntervalMs),
-        .previewReloadDelayMs = std::chrono::milliseconds(ini().rightPanelPreviewReloadDelay),
+        .previewReloadDelayMs = std::chrono::seconds(ini().rightPanelPreviewReloadDelay),
         .maxSimultaneousPreviewLoadsArm = ini().maxSimultaneousTilePreviewLoadsArm};
 
     const auto visualItemDecorator = new core::VisibleItemDataDecoratorModel(settings, this);
