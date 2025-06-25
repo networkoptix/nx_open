@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <QString>
 
 namespace nx {
 namespace utils {
