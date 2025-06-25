@@ -2653,7 +2653,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         if (!NX_ASSERT(d->camera) || !d->camera->isScheduleEnabled())
             return Qn::IoModuleDisabledOverlay;
 
-        Qn::Permissions requiredPermissions = Qn::UserInputPermissions;
+        Qn::Permissions requiredPermissions = Qn::ViewContentPermission;
         if (hasVideo() || hasAudio())
         {
             requiredPermissions |= d->isPlayingLive()
