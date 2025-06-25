@@ -1993,14 +1993,14 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
       <comment>%1 is like Nx Witness</comment>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>Os complementos, plugins, son programas que se executan no servidor %1 para permitir integracións sen fisuras coa análise de vídeo.</translation>
     </message>
   </context>
   <context>
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>Non hai ningún complemento instalado</translation>
     </message>
     <message>
       <source>Server is offline</source>
@@ -2018,24 +2018,24 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>Polygon</name>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+      <translation>O polígono non é válido. Elimina as autointerseccións para continuar.</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Este polígono require polo menos %n puntos.</numerusform>
+        <numerusform>Este polígono require polo menos %n puntos.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+      <translation>Fai clic no último punto para rematar de debuxar o polígono.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Alcanzouse o número máximo de puntos (%n puntos).</numerusform>
+        <numerusform>Alcanzouse o número máximo de puntos (%n puntos).</numerusform>
       </translation>
     </message>
   </context>
@@ -2043,19 +2043,19 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
-      <translation type="unfinished">No Preview</translation>
+      <translation>Sen vista previa</translation>
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation type="unfinished">Select the object to display the preview</translation>
+      <translation>Selecciona o obxecto para mostrar a vista previa</translation>
     </message>
     <message>
       <source>Show on Layout</source>
-      <translation type="unfinished">Show on Layout</translation>
+      <translation>Mostrar no deseño</translation>
     </message>
     <message>
       <source>Preview is not available for the selected object</source>
-      <translation type="unfinished">Preview is not available for the selected object</translation>
+      <translation>A vista previa non está dispoñible para o obxecto seleccionado</translation>
     </message>
     <message>
       <source>Copy</source>
@@ -2104,20 +2104,20 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation type="unfinished">Drag over any part of the video
-to activate PTZ</translation>
+      <translation>Arrastra sobre calquera parte do vídeo
+para activar o PTZ</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation type="unfinished">Go to Local Settings to enable a drag marker over the center of the video</translation>
+      <translation>Vaia a Configuración local para activar un marcador de arrastre sobre o centro do vídeo</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
+      <translation>Preme as teclas de frecha para moverte. Usa as teclas máis e menos para ampliar.</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation type="unfinished">Use mouse wheel to zoom</translation>
+      <translation>Usa a roda do rato para facer zoom</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>

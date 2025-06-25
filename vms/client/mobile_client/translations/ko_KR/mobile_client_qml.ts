@@ -1236,13 +1236,13 @@
   <context>
     <name>main</name>
     <message>
-      <source>Server offline. Reconnecting...</source>
-      <translation>서버 오프 라인입니다. 다시 연결중...</translation>
-    </message>
-    <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>%1에 연결할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Connection lost. Reconnecting...</source>
+      <translation type="unfinished">Connection lost. Reconnecting...</translation>
     </message>
   </context>
 </TS>

@@ -1236,13 +1236,13 @@
   <context>
     <name>main</name>
     <message>
-      <source>Server offline. Reconnecting...</source>
-      <translation>服务器离线。尝试重新连接中...</translation>
-    </message>
-    <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>无法连接到 %1</translation>
+    </message>
+    <message>
+      <source>Connection lost. Reconnecting...</source>
+      <translation type="unfinished">Connection lost. Reconnecting...</translation>
     </message>
   </context>
 </TS>

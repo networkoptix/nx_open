@@ -5,30 +5,30 @@
     <name>nx::vms::license::UsageHelper</name>
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
-      <translation type="unfinished">
-        <numerusform>%n %2 are used out of %1.</numerusform>
-        <numerusform>%n %2 are used out of %1.</numerusform>
+      <translation>
+        <numerusform>%n %2 úsanse fóra de %1.</numerusform>
+        <numerusform>%n %2 úsanse fóra de %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
-      <translation type="unfinished">
-        <numerusform>%n %2 will be used out of %1.</numerusform>
-        <numerusform>%n %2 will be used out of %1.</numerusform>
+      <translation>
+        <numerusform>%n %2 usarase fóra de %1.</numerusform>
+        <numerusform>%n %2 usarase fóra de %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
-      <translation type="unfinished">
-        <numerusform>Activate %n more %1.</numerusform>
-        <numerusform>Activate %n more %1.</numerusform>
+      <translation>
+        <numerusform>Activar %n máis %1.</numerusform>
+        <numerusform>Activar %n máis %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
-      <translation type="unfinished">
-        <numerusform>%n more %1 will be used.</numerusform>
-        <numerusform>%n more %1 will be used.</numerusform>
+      <translation>
+        <numerusform>Usarase %n máis %1.</numerusform>
+        <numerusform>Usarase %n máis %1.</numerusform>
       </translation>
     </message>
   </context>
@@ -36,15 +36,15 @@
     <name>nx::vms::license::Validator</name>
     <message>
       <source>Invalid signature</source>
-      <translation type="unfinished">Invalid signature</translation>
+      <translation>Sinatura non válida</translation>
     </message>
     <message>
       <source>Server with matching Hardware ID not found</source>
-      <translation type="unfinished">Server with matching Hardware ID not found</translation>
+      <translation>Non se atopou o servidor co ID de hardware correspondente</translation>
     </message>
     <message>
       <source>Invalid customization</source>
-      <translation type="unfinished">Invalid customization</translation>
+      <translation>Personalización non válida</translation>
     </message>
     <message>
       <source>License is expired</source>
@@ -53,27 +53,27 @@
     <message>
       <source>License is not validated by %1</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">License is not validated by %1</translation>
+      <translation>A licenza non está validada por %1</translation>
     </message>
     <message>
       <source>Invalid type</source>
-      <translation type="unfinished">Invalid type</translation>
+      <translation>Tipo non válido</translation>
     </message>
     <message>
       <source>You already have one active Starter license.</source>
-      <translation type="unfinished">You already have one active Starter license.</translation>
+      <translation>Xa tes unha licenza de inicio, Starter, activa.</translation>
     </message>
     <message>
       <source>You already have one active NVR license.</source>
-      <translation type="unfinished">You already have one active NVR license.</translation>
+      <translation>Xa tes unha licenza de NVR activa.</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
-      <translation type="unfinished">You already have one active license of the same type.</translation>
+      <translation>Xa tes unha licenza activa do mesmo tipo.</translation>
     </message>
     <message>
       <source>This license type requires higher software version</source>
-      <translation type="unfinished">This license type requires higher software version</translation>
+      <translation>Este tipo de licenza require unha versión de software superior</translation>
     </message>
     <message>
       <source>Unknown error</source>
