@@ -1142,9 +1142,9 @@
     <message numerus="yes">
       <source>Weeks</source>
       <comment>Capitalized full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>Weeks</numerusform>
-        <numerusform>Weeks</numerusform>
+      <translation>
+        <numerusform>Semanas</numerusform>
+        <numerusform>Semanas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1158,9 +1158,9 @@
     <message numerus="yes">
       <source>Years</source>
       <comment>Capitalized full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>Years</numerusform>
-        <numerusform>Years</numerusform>
+      <translation>
+        <numerusform>Anos</numerusform>
+        <numerusform>Anos</numerusform>
       </translation>
     </message>
   </context>
@@ -1168,11 +1168,11 @@
     <name>QnTranscoder</name>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
-      <translation type="unfinished">OpenCLTranscode is not implemented.</translation>
+      <translation>OpenCLTranscode non está implementado.</translation>
     </message>
     <message>
       <source>Unknown transcode method</source>
-      <translation type="unfinished">Unknown transcode method</translation>
+      <translation>Método de transcodificación descoñecido</translation>
     </message>
   </context>
   <context>
@@ -1183,7 +1183,7 @@
     </message>
     <message>
       <source>Multiple groups</source>
-      <translation type="unfinished">Multiple groups</translation>
+      <translation>Múltiples grupos</translation>
     </message>
   </context>
   <context>
@@ -1260,7 +1260,7 @@
     <name>ServiceTypeDisplayStringHelper</name>
     <message>
       <source>Local recording</source>
-      <translation type="unfinished">Local recording</translation>
+      <translation>Gravación local</translation>
     </message>
     <message>
       <source>Integration</source>
@@ -1268,18 +1268,18 @@
     </message>
     <message>
       <source>Cloud storage</source>
-      <translation type="unfinished">Cloud storage</translation>
+      <translation>Almacenamento na nube</translation>
     </message>
   </context>
   <context>
     <name>StringsHelper</name>
     <message>
       <source>Contact your channel partner for details.</source>
-      <translation type="unfinished">Contact your channel partner for details.</translation>
+      <translation>Ponte en contacto co teu partner/socio de canle para obter máis detalles.</translation>
     </message>
     <message>
       <source>Check internet connection between VMS and license server.</source>
-      <translation type="unfinished">Check internet connection between VMS and license server.</translation>
+      <translation>Comproba a conexión a internet entre o VMS e o servidor de licenzas.</translation>
     </message>
   </context>
   <context>
@@ -1293,35 +1293,35 @@
     <name>TimeFormat</name>
     <message>
       <source>just now</source>
-      <translation type="unfinished">just now</translation>
+      <translation>agora mesmo</translation>
     </message>
     <message>
       <source>yesterday</source>
-      <translation type="unfinished">yesterday</translation>
+      <translation>onte</translation>
     </message>
     <message>
       <source>a week ago</source>
-      <translation type="unfinished">a week ago</translation>
+      <translation>hai unha semana</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes ago</numerusform>
-        <numerusform>%n minutes ago</numerusform>
+      <translation>
+        <numerusform>hai %n minutos</numerusform>
+        <numerusform>hai %n minutos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours ago</source>
-      <translation type="unfinished">
-        <numerusform>%n hours ago</numerusform>
-        <numerusform>%n hours ago</numerusform>
+      <translation>
+        <numerusform>hai %n horas</numerusform>
+        <numerusform>hai %n horas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days ago</source>
-      <translation type="unfinished">
-        <numerusform>%n days ago</numerusform>
-        <numerusform>%n days ago</numerusform>
+      <translation>
+        <numerusform>hai %n días</numerusform>
+        <numerusform>hai %n días</numerusform>
       </translation>
     </message>
   </context>
@@ -1333,31 +1333,31 @@
     </message>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation type="unfinished">Corresponding container in FFMPEG library was not found.</translation>
+      <translation>Non se atopou o contedor correspondente na biblioteca FFMPEG.</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation type="unfinished">Could not create output file for video recording.</translation>
+      <translation>Non se puido crear o ficheiro de saída para a gravación de vídeo.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation type="unfinished">Could not allocate output stream for recording.</translation>
+      <translation>Non se puido asignar o fluxo de saída para a gravación.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation type="unfinished">Could not allocate output audio stream.</translation>
+      <translation>Non se puido asignar o fluxo de audio de saída.</translation>
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+      <translation>Non se puido asignar o fluxo de metadatos de saída.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
-      <translation type="unfinished">Invalid audio codec information.</translation>
+      <translation>Información do códec de audio non válida.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with the selected format.</translation>
+      <translation>O códec de vídeo ou audio non é compatible co formato seleccionado.</translation>
     </message>
     <message>
       <source>Video transcoding required.</source>
@@ -1365,7 +1365,7 @@
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
-      <translation type="unfinished">Invalid resource type for data export.</translation>
+      <translation>Tipo de recurso non válido para a exportación de datos.</translation>
     </message>
     <message>
       <source>No data exported.</source>
@@ -1424,7 +1424,7 @@
     </message>
     <message>
       <source>System alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">System alive update interval (seconds, 1s-1h)</translation>
+      <translation>Intervalo de actualización activa do sistema (segundos, 1s-1h)</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
@@ -1460,7 +1460,7 @@
     </message>
     <message>
       <source>Cloud System ID</source>
-      <translation type="unfinished">Cloud System ID</translation>
+      <translation>ID do sistema na nube</translation>
     </message>
     <message>
       <source>Cloud authorization key</source>
@@ -1472,11 +1472,11 @@
     </message>
     <message>
       <source>Last master System merge ID</source>
-      <translation type="unfinished">Last master System merge ID</translation>
+      <translation>Último ID de fusión do sistema mestre</translation>
     </message>
     <message>
       <source>Last slave System merge ID</source>
-      <translation type="unfinished">Last slave System merge ID</translation>
+      <translation>ID de fusión do último sistema escravo</translation>
     </message>
     <message>
       <source>Disable Device vendors</source>
@@ -1696,7 +1696,7 @@
     </message>
     <message>
       <source>Language for Cloud notifications</source>
-      <translation type="unfinished">Language for Cloud notifications</translation>
+      <translation>Idioma para as notificacións na nube</translation>
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4MB)</source>
@@ -1732,7 +1732,7 @@
     </message>
     <message>
       <source>Enable 2FA for the System</source>
-      <translation type="unfinished">Enable 2FA for the System</translation>
+      <translation>Activar a autenticación en dous pasos (2FA) para o sistema</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
@@ -1748,15 +1748,15 @@
     </message>
     <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>Rexistros máximos de eventos para manter na base de datos. A cantidade real de rexistros non eliminados pode ser ata un 20 % maior que o valor especificado.</translation>
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>Indica se se almacenan ou non na caché algúns fotogramas para a transmisión principal. Valores: &apos;si&apos; - sempre activado (pode usar moita RAM), &apos;non&apos; - sempre desactivado excepto cando o require a reprodución (por exemplo, HLS), &apos;auto&apos; - similar a &apos;non&apos;, pero activado cando se mellora a experiencia de usuario (por exemplo, cando algún complemento de Analytics está a funcionar na cámara).</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
+      <translation>Cantidade máxima de conexións HTTP usando transcodificación para o servidor. Chrome abre 2 conexións á vez e despois pecha a primeira. Recomendamos definir este valor do parámetro en 2 ou máis.</translation>
     </message>
     <message>
       <source>Update releases.json file URL</source>
@@ -1772,7 +1772,7 @@
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
-      <translation type="unfinished">Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</translation>
+      <translation>Lista separada por punto e coma de servidores designados para conectarse á nube. Os servidores que se atopan na parte superior da lista teñen maior prioridade. Se a lista está baleira, selecciónase automaticamente un servidor para a conexión á nube.</translation>
     </message>
     <message>
       <source>Allow Power User editing Security Settings</source>
@@ -1784,12 +1784,12 @@
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
-      <translation type="unfinished">Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</translation>
+      <translation>Número máximo de erros RTP consecutivos antes de que o servidor reconecte a sesión RTSP.</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
+      <translation>Activar funcións API obsoletas que emprega actualmente o software %1 (inseguro)</translation>
     </message>
     <message>
       <source>Organization Id</source>
@@ -1797,11 +1797,11 @@
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+      <translation>Intervalo entre as solicitudes HTTP de sondeo na nube para sincronizar os datos.</translation>
     </message>
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
-      <translation type="unfinished">Local System ID, null means the System is not set up yet.</translation>
+      <translation>ID do sistema local; nulo significa que o sistema aínda non está configurado.</translation>
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
@@ -1848,7 +1848,7 @@
     </message>
     <message>
       <source>Speak</source>
-      <translation type="unfinished">Speak</translation>
+      <translation>Falar</translation>
     </message>
     <message>
       <source>Execute PTZ preset</source>
@@ -1856,15 +1856,15 @@
     </message>
     <message>
       <source>Show text overlay</source>
-      <translation type="unfinished">Show text overlay</translation>
+      <translation>Mostrar a superposición de texto</translation>
     </message>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation type="unfinished">Show on Alarm Layout</translation>
+      <translation>Mostrar no deseño da alarma</translation>
     </message>
     <message>
       <source>Device output</source>
-      <translation type="unfinished">Device output</translation>
+      <translation>Saída do dispositivo</translation>
     </message>
     <message>
       <source>Camera output</source>
@@ -1872,7 +1872,7 @@
     </message>
     <message>
       <source>Device recording</source>
-      <translation type="unfinished">Device recording</translation>
+      <translation>Gravación do dispositivo</translation>
     </message>
     <message>
       <source>Camera recording</source>
@@ -1880,38 +1880,38 @@
     </message>
     <message>
       <source>Generic Event</source>
-      <translation type="unfinished">Generic Event</translation>
+      <translation>Evento xenérico</translation>
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Motion on Cameras</numerusform>
-        <numerusform>Motion on Cameras</numerusform>
+      <translation>
+        <numerusform>Movemento nas cámaras</numerusform>
+        <numerusform>Movemento nas cámaras</numerusform>
       </translation>
     </message>
     <message>
       <source>Network Issue</source>
-      <translation type="unfinished">Network Issue</translation>
+      <translation>Problema de rede</translation>
     </message>
     <message>
       <source>Server Failure</source>
-      <translation type="unfinished">Server Failure</translation>
+      <translation>Fallo do servidor</translation>
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation type="unfinished">Server Conflict</translation>
+      <translation>Conflito do servidor</translation>
     </message>
     <message>
       <source>Server Started</source>
-      <translation type="unfinished">Server Started</translation>
+      <translation>Servidor iniciado</translation>
     </message>
     <message>
       <source>License Issue</source>
-      <translation type="unfinished">License Issue</translation>
+      <translation>Problema de licenza</translation>
     </message>
     <message>
       <source>Any Server Issue</source>
-      <translation type="unfinished">Any Server Issue</translation>
+      <translation>Calquera problema do servidor</translation>
     </message>
     <message>
       <source>Any Event</source>

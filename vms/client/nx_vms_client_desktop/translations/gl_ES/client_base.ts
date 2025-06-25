@@ -4088,15 +4088,15 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation>Hi-Res</translation>
+      <translation>Alta resolución</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>EN VIVO</translation>
+      <translation>EN DIRECTO</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation>%1 (Xira &quot;%2&quot; está activa)</translation>
+      <translation>%1 (Percorrido &quot;%2&quot; está activa)</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -4104,7 +4104,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation>Lo-Res</translation>
+      <translation>Baixa resolución</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
@@ -10046,11 +10046,11 @@ Podes forzala, pero pode aumentar significativamente a carga da CPU.</translatio
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>As versións do sistema operativo dalgúns compoñentes xa non son compatibles. Elimínaos do sistema ou actualiza o seu sistema operativo a unha versión compatible.</translation>
+      <translation>As versións do sistema operativo dalgúns compoñentes xa non son compatibles. Por favor, elimínaos do sistema ou actualiza o steu sistema operativo a unha versión compatible.</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>A versión do sistema operativo do cliente xa non é compatible. Actualízao a unha versión compatible.</translation>
+      <translation>A versión do sistema operativo do cliente xa non é compatible. Por favor, actualízao a unha versión compatible.</translation>
     </message>
     <message>
       <source>Failed to start update</source>

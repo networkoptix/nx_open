@@ -11049,7 +11049,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost</source>
-      <translation>HTTPS に対応していないカメラとの接続は失われます</translation>
+      <translation>HTTPS に対応していないカメラとの接続は失われます。</translation>
     </message>
   </context>
   <context>
