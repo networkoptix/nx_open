@@ -2,6 +2,7 @@
 
 #include "openapi_schema_ut.h"
 
+#include <algorithm>
 #include <memory>
 
 #include <gtest/gtest.h>
@@ -282,6 +283,12 @@ NX_REFLECTION_INSTRUMENT(Base64Model, (param))
      */
     reg("rest/v{3-}/settings");
 
+    /**%apidoc POST /rest/v{3-}/test_unused
+     * %ingroup Test
+     * %struct TestDataUnused
+     */
+    reg("rest/v{3-}/test_unused");
+
     /**%apidoc GET /rest/v{3-}/base64/{param}/echo
      * %ingroup Test
      * %param:base64 param
@@ -475,6 +482,126 @@ TEST_P(OpenApiSchemaTest, Validate)
             throw;
         },
         Exception);
+}
+
+static const char* kTestJsonForUnused = R"json({
+    "list[0]": true,
+    "list.dot": true,
+    "map[0]": true,
+    "map.id": true,
+    "list": [
+        {"id": "id1", "list.1": true, "value": true}
+    ],
+    "map": {
+        "key.id": {"id": "id1", "map.id": true, "value": true},
+        "key[1]": {"id": "id1", "map[1]": true, "value": true}
+    },
+    "mapWithList": {
+        "key.id": [
+            {"id": "id1", "list.1": true, "value": true}
+        ]
+    }
+})json";
+static const char* kExpectedJsonForUnused = R"json({
+    "list": [
+        {
+            "id": "id1"
+        }
+    ],
+    "map": {
+        "key.id": {
+            "id": "id1"
+        },
+        "key[1]": {
+            "id": "id1"
+        }
+    },
+    "mapWithList": {
+        "key.id": [
+            {
+                "id": "id1"
+            }
+        ]
+    }
+})json";
+TEST_P(OpenApiSchemaTest, TestUnusedWithEscape)
+{
+    const std::vector<std::string> expectedPaths = {
+        "list.dot",
+        "list[0]",
+        "list[0].list.1",
+        "list[0].value",
+        "map.id",
+        "map.key.id.map.id",
+        "map.key.id.value",
+        "map.key[1].map[1]",
+        "map.key[1].value",
+        "mapWithList.key.id[0].list.1",
+        "mapWithList.key.id[0].value",
+        "map[0]"};
+    std::unique_ptr<Request> request =
+        restRequest({"POST /rest/{version}/test_unused HTTP/1.1"}, kTestJsonForUnused);
+    const auto decodedPath = request->decodedPath();
+    http::HttpHeaders headers{};
+    m_schemas->validateOrThrow(request.get(), &headers);
+    std::vector<std::string> actualPaths;
+
+    const std::string kPrefix = "199 - \"Unused parameter: '";
+    auto [first, last] = headers.equal_range("Warning");
+    for (const auto& [_, value]: std::ranges::subrange(first, last))
+    {
+        ASSERT_TRUE(value.starts_with(kPrefix));
+        ASSERT_TRUE(value.ends_with("'\""));
+        actualPaths.emplace_back(value.substr(kPrefix.size(), value.size() - kPrefix.size() - 2));
+    }
+    std::ranges::sort(actualPaths);
+    EXPECT_EQ(actualPaths, expectedPaths);
+    EXPECT_EQ(nx::utils::formatJsonString(request->content()->body).toStdString(),
+        kExpectedJsonForUnused);
+
+    ASSERT_THROW(
+        try
+        {
+            const char *kMissingRequiredParamData = R"json({"map": { "key.1": {}}})json";
+            m_schemas->validateOrThrow(
+                restRequest({"POST /rest/{version}/test_unused HTTP/1.1"},
+                    kMissingRequiredParamData).get());
+        }
+        catch (const Exception& e)
+        {
+            ASSERT_EQ(e.message().toStdString(), "Missing required parameter: map.key.1.id.");
+            throw;
+        },
+        Exception);
+
+    // Json rpc.
+    const auto rpcMethod = NX_FMT("rest.%1.test_unused.create", GetParam()).toStdString();
+    QJsonObject data;
+    ASSERT_TRUE(QJson::deserialize(QByteArray{kTestJsonForUnused}, &data));
+    nx::json_rpc::Request jsonRpcRequest = nx::json_rpc::Request::create(
+        /*id*/ {}, rpcMethod, data);
+    auto requestWithRpc =
+        std::make_unique<Request>(json_rpc::Context{jsonRpcRequest}, kSystemSession);
+    requestWithRpc->setDecodedPathOrThrow(decodedPath);
+    headers.clear();
+    actualPaths.clear();
+
+    m_schemas->validateOrThrow(requestWithRpc.get(), &headers);
+    auto [firstRpc, lastRpc] = headers.equal_range("Warning");
+    for (const auto& [_, value]: std::ranges::subrange(firstRpc, lastRpc))
+    {
+        ASSERT_TRUE(value.starts_with(kPrefix));
+        ASSERT_TRUE(value.ends_with("'\""));
+        actualPaths.emplace_back(value.substr(kPrefix.size(), value.size() - kPrefix.size() - 2));
+    }
+    std::ranges::sort(actualPaths);
+    EXPECT_EQ(actualPaths, expectedPaths);
+
+    const auto& params = requestWithRpc->jsonRpcContext()->request.params;
+    ASSERT_TRUE(params);
+    const auto paramsWithoutUnused =
+        nx::utils::formatJsonString(nx::reflect::json::serialize(*params));
+    EXPECT_EQ(paramsWithoutUnused, kExpectedJsonForUnused);
 }
 
 TEST_P(OpenApiSchemaTest, Postprocess)
