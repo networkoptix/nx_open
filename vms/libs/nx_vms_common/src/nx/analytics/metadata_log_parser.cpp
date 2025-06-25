@@ -86,7 +86,7 @@ bool MetadataLogParser::parseRectLine(
     if (!parseFloat(lineStream, line, "height", &height))
         return false;
     if (height < 0 || y + height > 1)
-        return warning(nx::format("\"height\" should be in range [0..1 - y], but is %2").args(width));
+        return warning(nx::format("\"height\" should be in range [0..1 - y], but is %2").args(height));
 
     *outRect = QRectF(x, y, width, height);
     return true;
