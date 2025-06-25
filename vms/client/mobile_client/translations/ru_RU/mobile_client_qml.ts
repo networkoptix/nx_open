@@ -1245,7 +1245,7 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>Соединение потеряно. Выполняется повторное подключение...</translation>
     </message>
   </context>
 </TS>

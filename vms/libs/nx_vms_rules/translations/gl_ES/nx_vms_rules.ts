@@ -21,31 +21,31 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n veces, primeiro: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n veces, primeiro: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
+      <translation>
+        <numerusform>Primeira aparición: %1 en %2 (%n veces o total)</numerusform>
+        <numerusform>Primeira aparición: %1 en %2 (%n veces o total)</numerusform>
       </translation>
     </message>
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">Time: %1 on %2</translation>
+      <translation>Tempo: %1 en %2</translation>
     </message>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>Evento descoñecido</translation>
     </message>
     <message>
       <source>Unknown action</source>
-      <translation type="unfinished">Unknown action</translation>
+      <translation>Acción descoñecida</translation>
     </message>
     <message>
       <source>Any event</source>
@@ -157,11 +157,11 @@
     </message>
     <message>
       <source>Volume</source>
-      <translation type="unfinished">Volume</translation>
+      <translation>Volume</translation>
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Retroceder</translation>
     </message>
     <message>
       <source>On Layout</source>
@@ -250,7 +250,7 @@
     </message>
     <message>
       <source>To Users</source>
-      <translation type="unfinished">To Users</translation>
+      <translation>Para os usuarios</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -290,7 +290,7 @@
     </message>
     <message>
       <source>Method</source>
-      <translation type="unfinished">Method</translation>
+      <translation>Método</translation>
     </message>
     <message>
       <source>Select Integration Action</source>
@@ -552,7 +552,7 @@
     </message>
     <message>
       <source>Set for</source>
-      <translation type="unfinished">Set for</translation>
+      <translation>Definir para</translation>
     </message>
   </context>
   <context>
@@ -566,7 +566,7 @@
     <name>nx::vms::rules::FanErrorEvent</name>
     <message>
       <source>Fan Failure</source>
-      <translation type="unfinished">Fan Failure</translation>
+      <translation>Fallo do ventilador</translation>
     </message>
     <message>
       <source>Fan failure at %1</source>
@@ -577,19 +577,19 @@
     <name>nx::vms::rules::GenericEvent</name>
     <message>
       <source>Generic Event</source>
-      <translation type="unfinished">Generic Event</translation>
+      <translation>Evento xenérico</translation>
     </message>
     <message>
       <source>Omit logging</source>
-      <translation type="unfinished">Omit logging</translation>
+      <translation>Omitir rexistro</translation>
     </message>
     <message>
       <source>And Source</source>
-      <translation type="unfinished">And Source</translation>
+      <translation>E Fonte</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation type="unfinished">Generic Event at %1</translation>
+      <translation>Evento xenérico en %1</translation>
     </message>
     <message>
       <source>Related devices:</source>
@@ -604,11 +604,11 @@
     <name>nx::vms::rules::HttpAction</name>
     <message>
       <source>Content type</source>
-      <translation type="unfinished">Content type</translation>
+      <translation>Tipo de contido</translation>
     </message>
     <message>
       <source>HTTP(S) Request</source>
-      <translation type="unfinished">HTTP(S) Request</translation>
+      <translation>Solicitude HTTP(S)</translation>
     </message>
     <message>
       <source>URL</source>
@@ -677,7 +677,7 @@
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
       <source>For Plugin</source>
-      <translation type="unfinished">For Plugin</translation>
+      <translation>Para o complemento</translation>
     </message>
     <message>
       <source>And Level Is</source>
@@ -739,7 +739,7 @@
     <name>nx::vms::rules::LicenseIssueEvent</name>
     <message>
       <source>License Issue</source>
-      <translation type="unfinished">License Issue</translation>
+      <translation>Problema de licenza</translation>
     </message>
     <message>
       <source>Not enough licenses on %1</source>
@@ -759,24 +759,24 @@
     <name>nx::vms::rules::MotionEvent</name>
     <message>
       <source>Motion on %1</source>
-      <translation type="unfinished">Motion on %1</translation>
+      <translation>Movemento en %1</translation>
     </message>
     <message>
       <source>Motion on Camera</source>
-      <translation type="unfinished">Motion on Camera</translation>
+      <translation>Movemento na cámara</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NetworkIssueEvent</name>
     <message>
       <source>Network Issue</source>
-      <translation type="unfinished">Network Issue</translation>
+      <translation>Problema de rede</translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
+      <translation>
+        <numerusform>Non se recibiron datos durante os últimos %n segundos.</numerusform>
+        <numerusform>Non se recibiron datos durante os últimos %n segundos.</numerusform>
       </translation>
     </message>
     <message>
@@ -789,7 +789,7 @@
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation type="unfinished">RTP packet loss detected.</translation>
+      <translation>Detectouse a perda de paquetes RTP.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
@@ -797,21 +797,21 @@
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>O dispositivo non responde ás solicitudes de rede.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+      <translation>O enderezo %1 xa está a ser usado por %2 no fluxo primario.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on secondary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+      <translation>O enderezo %1 xa está a ser usado por %2 no fluxo secundario.</translation>
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
-      <translation type="unfinished">Multicast address conflict detected.</translation>
+      <translation>Detectouse un conflito de enderezos de multidifusión.</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
@@ -819,15 +819,15 @@
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>A conexión coa cámara (transmisión principal) pechouse inesperadamente.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>A conexión coa cámara (transmisión secundaria) pechouse inesperadamente.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>A conexión co dispositivo pechouse inesperadamente.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
@@ -836,14 +836,14 @@
     <message>
       <source>Network Issue at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Network Issue at %1</translation>
+      <translation>Problema de rede en %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Show Desktop Notification</source>
-      <translation type="unfinished">Show Desktop Notification</translation>
+      <translation>Mostrar notificación de escritorio</translation>
     </message>
     <message>
       <source>Force Acknowledgment</source>
@@ -887,14 +887,14 @@
     <name>nx::vms::rules::PanicRecordingAction</name>
     <message>
       <source>Panic Recording</source>
-      <translation type="unfinished">Panic Recording</translation>
+      <translation>Gravación de pánico</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PlaySoundAction</name>
     <message>
       <source>Play Sound</source>
-      <translation type="unfinished">Play Sound</translation>
+      <translation>Reproducir son</translation>
     </message>
   </context>
   <context>
@@ -1203,47 +1203,47 @@
     <name>nx::vms::rules::StorageIssueEvent</name>
     <message>
       <source>Storage Issue at %1</source>
-      <translation type="unfinished">Storage Issue at %1</translation>
+      <translation>Problema de almacenamento en %1</translation>
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation type="unfinished">Storage Issue</translation>
+      <translation>Problema de almacenamento</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>Produciuse un erro de E/S (I/O) en %1.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>O disco HDD/SSD &quot;%1&quot; está cheo. O disco contén demasiados datos que non xestiona o VMS.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>O disco do sistema &quot;%1&quot; está case cheo.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>O almacenamento de análises &quot;%1&quot; está sen conexión.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>O almacenamento de análises &quot;%1&quot; está case cheo.</translation>
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
-      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+      <translation>Fallou a copia de seguridade do arquivo. Non se puido facer unha copia de seguridade do ficheiro %1.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>Almacenamento de análises &quot;%1&quot; erro na base de datos: Permisos insuficientes no punto de montaxe.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Non se pode inicializar o cifrado AES mentres a gravación está activada no arquivo multimedia. Os datos escríbense sen cifrar.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>Erro RAID: %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
@@ -1291,11 +1291,11 @@
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show Text Overlay</source>
-      <translation type="unfinished">Show Text Overlay</translation>
+      <translation>Mostrar a superposición de texto</translation>
     </message>
     <message>
       <source>Custom Text</source>
-      <translation type="unfinished">Custom Text</translation>
+      <translation>Texto personalizado</translation>
     </message>
     <message>
       <source>Show To</source>
@@ -1329,7 +1329,7 @@
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
       <source>Write to Log</source>
-      <translation type="unfinished">Write to Log</translation>
+      <translation>Escribe para rexistrarte</translation>
     </message>
   </context>
 </TS>

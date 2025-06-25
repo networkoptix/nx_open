@@ -1200,7 +1200,7 @@
     </message>
     <message>
       <source>LIVE</source>
-      <translation>EN VIVO</translation>
+      <translation>EN DIRECTO</translation>
     </message>
   </context>
   <context>
@@ -1243,7 +1243,7 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>Perdeuse a conexión, reconectando...</translation>
     </message>
   </context>
 </TS>
