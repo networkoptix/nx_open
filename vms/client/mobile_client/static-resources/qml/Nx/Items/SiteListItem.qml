@@ -34,7 +34,7 @@ Item
     property string text: ""
     property int counter: -1
 
-    readonly property bool tapEnabled: control.type != OrganizationsModel.System || running
+    readonly property bool active: control.type != OrganizationsModel.System || running
     property bool editEnabled: false
 
     signal clicked()
@@ -76,7 +76,7 @@ Item
     Rectangle
     {
         anchors.fill: parent
-        color: control.tapEnabled ? ColorTheme.colors.dark8 : ColorTheme.colors.dark6
+        color: control.active ? ColorTheme.colors.dark8 : ColorTheme.colors.dark6
         radius: 8
 
         Item
@@ -94,7 +94,7 @@ Item
                 textFormat: Text.StyledText
 
                 text: control.title
-                color: control.tapEnabled ? ColorTheme.colors.light4 : ColorTheme.colors.dark16
+                color: control.active ? ColorTheme.colors.light4 : ColorTheme.colors.dark16
                 font.pixelSize: 18
 
                 visible: control.type == OrganizationsModel.System
@@ -178,7 +178,7 @@ Item
 
                     color:
                     {
-                        if (!control.tapEnabled)
+                        if (!control.active)
                             return ColorTheme.colors.dark16
 
                         return control.type == OrganizationsModel.System
@@ -271,7 +271,7 @@ Item
 
             onSingleTapped:
             {
-                if (control.tapEnabled)
+                if (control.running || !control.cloudSystem)
                     control.clicked()
             }
             onLongPressed:
