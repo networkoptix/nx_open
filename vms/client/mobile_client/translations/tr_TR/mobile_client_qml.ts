@@ -1237,13 +1237,13 @@
   <context>
     <name>main</name>
     <message>
-      <source>Server offline. Reconnecting...</source>
-      <translation>Sunucu çevrimdışı. Yeniden bağlanıyor...</translation>
-    </message>
-    <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>%1 e bağlanılamıyor</translation>
+    </message>
+    <message>
+      <source>Connection lost. Reconnecting...</source>
+      <translation type="unfinished">Connection lost. Reconnecting...</translation>
     </message>
   </context>
 </TS>

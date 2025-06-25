@@ -1739,11 +1739,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>Aínda non creaches ningunha lista. Coas listas podes almacenar varios valores para usalos nas regras de eventos. Crea unha nova lista para comezar a engadir entradas.</translation>
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Crear novo...</translation>
     </message>
   </context>
   <context>
@@ -1772,7 +1772,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>ObjectSizeConstraints</name>
     <message>
       <source>Size Constraints</source>
-      <translation type="unfinished">Size Constraints</translation>
+      <translation>Restricións de tamaño</translation>
     </message>
   </context>
   <context>
@@ -1797,7 +1797,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>URL or Host:Port</source>
-      <translation type="unfinished">URL or Host:Port</translation>
+      <translation>URL ou Host:Porto</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1820,7 +1820,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>Aprobar</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1843,7 +1843,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>Aínda non hai grupos personalizados</translation>
     </message>
     <message>
       <source>No groups found</source>
@@ -1859,12 +1859,12 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>Usa os controis da esquerda para engadir a un grupo</translation>
     </message>
     <message>
       <source>Member of</source>
       <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
-      <translation type="unfinished">Member of</translation>
+      <translation>Membro de</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -1874,7 +1874,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <message>
       <source>Built-in</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Integrado</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1886,7 +1886,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>PasswordChangeDialog</name>
     <message>
       <source>Change password - %1</source>
-      <translation type="unfinished">Change password - %1</translation>
+      <translation>Cambiar contrasinal - %1</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1894,7 +1894,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Current password</source>
-      <translation type="unfinished">Current password</translation>
+      <translation>Contrasinal actual</translation>
     </message>
     <message>
       <source>New password</source>
@@ -1913,7 +1913,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>PermissionSummary</name>
     <message>
       <source>No custom permissions</source>
-      <translation type="unfinished">No custom permissions</translation>
+      <translation>Sen permisos personalizados</translation>
     </message>
   </context>
   <context>
@@ -1935,24 +1935,24 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>Non se atoparon recursos</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>Engadir automaticamente permisos dependentes</translation>
     </message>
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>Usa %1 ou %2 para seleccionar varios recursos ou %3 para borrar a selección</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
-      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</translation>
+      <translation>A táboa Recursos ofréceche unha visión xeral dos permisos de usuario ou grupo e permíteche asignar permisos para recursos específicos.</translation>
     </message>
     <message>
       <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>Se seleccionas un permiso que depende doutro permiso, ambos permisos concederanse automaticamente.</translation>
     </message>
   </context>
   <context>
@@ -1993,14 +1993,14 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
       <comment>%1 is like Nx Witness</comment>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>Os complementos, plugins, son programas que se executan no servidor %1 para permitir integracións sen fisuras coa análise de vídeo.</translation>
     </message>
   </context>
   <context>
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>Non hai ningún complemento instalado</translation>
     </message>
     <message>
       <source>Server is offline</source>
@@ -2018,24 +2018,24 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>Polygon</name>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+      <translation>O polígono non é válido. Elimina as autointerseccións para continuar.</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Este polígono require polo menos %n puntos.</numerusform>
+        <numerusform>Este polígono require polo menos %n puntos.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+      <translation>Fai clic no último punto para rematar de debuxar o polígono.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Alcanzouse o número máximo de puntos (%n puntos).</numerusform>
+        <numerusform>Alcanzouse o número máximo de puntos (%n puntos).</numerusform>
       </translation>
     </message>
   </context>
@@ -2043,19 +2043,19 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
-      <translation type="unfinished">No Preview</translation>
+      <translation>Sen vista previa</translation>
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation type="unfinished">Select the object to display the preview</translation>
+      <translation>Selecciona o obxecto para mostrar a vista previa</translation>
     </message>
     <message>
       <source>Show on Layout</source>
-      <translation type="unfinished">Show on Layout</translation>
+      <translation>Mostrar no deseño</translation>
     </message>
     <message>
       <source>Preview is not available for the selected object</source>
-      <translation type="unfinished">Preview is not available for the selected object</translation>
+      <translation>A vista previa non está dispoñible para o obxecto seleccionado</translation>
     </message>
     <message>
       <source>Copy</source>
@@ -2104,20 +2104,20 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation type="unfinished">Drag over any part of the video
-to activate PTZ</translation>
+      <translation>Arrastra sobre calquera parte do vídeo
+para activar o PTZ</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation type="unfinished">Go to Local Settings to enable a drag marker over the center of the video</translation>
+      <translation>Vaia a Configuración local para activar un marcador de arrastre sobre o centro do vídeo</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
+      <translation>Preme as teclas de frecha para moverte. Usa as teclas máis e menos para ampliar.</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation type="unfinished">Use mouse wheel to zoom</translation>
+      <translation>Usa a roda do rato para facer zoom</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
