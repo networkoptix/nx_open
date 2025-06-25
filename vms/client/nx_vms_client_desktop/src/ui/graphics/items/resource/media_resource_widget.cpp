@@ -1125,7 +1125,10 @@ void QnMediaResourceWidget::createButtons()
                 Qn::MotionSearchButton);
 
             if (motionSearchButton->isClicked() && on)
+            {
                 selectThisWidget(true);
+                action(menu::ToggleTimelineAction)->setChecked(true);
+            }
 
             setMotionSearchModeEnabled(on);
         });
