@@ -46,6 +46,7 @@ public:
     Q_INVOKABLE void checkForUpdates();
     Q_INVOKABLE void speedUpCurrentUpdate();
     Q_INVOKABLE bool isPlannedUpdateDatePassed() const;
+    Q_INVOKABLE bool isTodaySuitableForUpdate() const;
     Q_INVOKABLE QUrl releaseNotesUrl() const;
 
     struct UpdateDate
