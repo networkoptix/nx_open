@@ -72,4 +72,22 @@ struct ArrayOrdererTestResponse
 };
 NX_REFLECTION_INSTRUMENT(ArrayOrdererTestResponse, (map))
 
+struct NestedTestDataUnused
+{
+    std::string id;
+    /**%apidoc[readonly] */
+    std::optional<bool> value;
+};
+NX_REFLECTION_INSTRUMENT(NestedTestDataUnused, (id))
+struct TestDataUnused
+{
+    /**%apidoc[opt] */
+    std::vector<NestedTestDataUnused> list;
+    /**%apidoc[opt] */
+    std::map<std::string, NestedTestDataUnused> map;
+    /**%apidoc[opt] */
+    std::map<std::string, std::vector<NestedTestDataUnused>> mapWithList;
+};
+NX_REFLECTION_INSTRUMENT(TestDataUnused, (list)(map)(mapWithList))
+
 } // namespace nx::network::rest::json::test

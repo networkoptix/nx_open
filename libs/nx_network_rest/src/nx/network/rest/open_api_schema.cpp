@@ -5,6 +5,7 @@
 #include <deque>
 
 #include <QtCore/QFile>
+#include <QtCore/QUrl>
 
 #include <nx/utils/json.h>
 
@@ -17,6 +18,23 @@ namespace {
 
 using namespace nx::utils::json;
 using namespace nx::network::rest;
+
+QString escapeName(const QString& name)
+{
+    static const QByteArray kInclude = ".";
+    static const QByteArray kExclude;
+    return QUrl::toPercentEncoding(name, kExclude, kInclude);
+}
+
+QString unescapeName(const QString& name)
+{
+    return QUrl::fromPercentEncoding(name.toUtf8());
+}
+
+std::string unescapeName(const std::string& name)
+{
+    return QUrl::fromPercentEncoding(QByteArray(name)).toStdString();
+}
 
 void merge(QJsonObject* to, QJsonObject from)
 {
@@ -345,8 +363,8 @@ void validateParameters(const QJsonObject& schema,
                 break;
             }
         }
-
-        const auto fieldName = name.isEmpty() ? field.key() : name + '.' + field.key();
+        const auto fieldName =
+            name.isEmpty() ? escapeName(field.key()) : name + '.' + escapeName(field.key());
         if (const auto fieldSchema = properties.find(field.key()); fieldSchema != properties.end())
         {
             const QJsonObject fieldObj = fieldSchema->toObject();
@@ -367,7 +385,7 @@ void validateParameters(const QJsonObject& schema,
         if (NX_ASSERT(!requiredName.isEmpty(), name))
         {
             throw Exception::missingParameter(
-                name.isEmpty() ? requiredName : name + '.' + requiredName);
+                name.isEmpty() ? requiredName : unescapeName(name) + '.' + requiredName);
         }
     }
 }
@@ -381,7 +399,8 @@ void validateParameters(const QJsonObject& schema,
         return;
     QJsonObject additionalSchema;
     QString typeName;
-    const auto nameForError = [&name] { return name.isEmpty() ? QString("Request body") : name; };
+    const auto nameForError =
+        [&name] { return name.isEmpty() ? QString("Request body") : unescapeName(name); };
     if (const auto type = schema.find("type"); type == schema.end())
     {
         additionalSchema = optObject(schema, "additionalProperties", nameForError());
@@ -417,7 +436,7 @@ void validateParameters(const QJsonObject& schema,
         {
             for (auto field = object.begin(); field != object.end(); ++field)
             {
-                QString keyName = field.key();
+                QString keyName = escapeName(field.key());
                 validateParameters(
                     additionalSchema,
                     field.value(),
@@ -473,9 +492,10 @@ void validateObjectParameters(
     auto required = optArray(schema, "required", name);
     for (auto field = object.MemberBegin(); field != object.MemberEnd(); ++field)
     {
-        const std::string fieldName{field->name.GetString(), field->name.GetStringLength()};
-        const auto fieldNameQ{QString::fromStdString(fieldName)};
-        const auto nestedName{name.isEmpty() ? fieldNameQ : name + '.' + fieldNameQ};
+        const auto fieldNameQ =
+            QString::fromUtf8(field->name.GetString(), (int) field->name.GetStringLength());
+        const auto nestedName{
+            name.isEmpty() ? escapeName(fieldNameQ) : name + '.' + escapeName(fieldNameQ)};
         if (const auto fieldSchema = properties.find(fieldNameQ); fieldSchema != properties.end())
         {
             for (auto requiredValue = required.begin(); requiredValue != required.end();
@@ -507,7 +527,7 @@ void validateObjectParameters(
         if (NX_ASSERT(!requiredName.isEmpty(), requiredName))
         {
             throw Exception::missingParameter(
-                name.isEmpty() ? requiredName : name + '.' + requiredName);
+                name.isEmpty() ? requiredName : unescapeName(name) + '.' + requiredName);
         }
     }
 }
@@ -534,7 +554,8 @@ void validateParameters(
         typeName = type->toString();
     }
 
-    const auto nameForError = [&name] { return name.isEmpty() ? QString("Request body") : name; };
+    const auto nameForError =
+        [&name] { return name.isEmpty() ? QString("Request body") : unescapeName(name); };
     if (value.IsNull())
         throw Exception::badRequest(NX_FMT("`%1` must not be null", nameForError()));
 
@@ -549,8 +570,8 @@ void validateParameters(
         {
             for (auto field = value.MemberBegin(); field != value.MemberEnd(); ++field)
             {
-                const QByteArray fieldName{
-                    field->name.GetString(), (int) field->name.GetStringLength()};
+                const auto fieldName = escapeName(QString::fromUtf8(
+                    field->name.GetString(), (int) field->name.GetStringLength()));
                 const auto nestedName{name.isEmpty() ? fieldName : name + '.' + fieldName};
                 validateParameters(additionalSchema, field->value, nestedName, unused);
             }
@@ -636,9 +657,10 @@ void removePathFromValue(const QString& path, QJsonValue* value)
                 return;
 
             QJsonObject obj = value->toObject();
-            NX_ASSERT(obj.contains(path));
+            const auto originalPath = unescapeName(path);
+            NX_ASSERT(obj.contains(originalPath));
 
-            obj.remove(path);
+            obj.remove(originalPath);
             *value = std::move(obj);
             return;
         }
@@ -669,7 +691,7 @@ void removePathFromValue(const QString& path, QJsonValue* value)
         if (!NX_ASSERT(bracketIndex != -1))
             return;
 
-        const QString arrayName = head.first(bracketIndex);
+        const QString arrayName = unescapeName(head.first(bracketIndex));
         const auto arrayIndex =
             head.sliced(bracketIndex + 1, head.length() - bracketIndex - 2).toInt();
 
@@ -692,10 +714,10 @@ void removePathFromValue(const QString& path, QJsonValue* value)
 
         return;
     }
-
-    QJsonValue childValue = obj.value(head);
+    const auto originalHead = unescapeName(head);
+    QJsonValue childValue = obj.value(originalHead);
     removePathFromValue(tail, &childValue);
-    obj.insert(head, childValue);
+    obj.insert(originalHead, childValue);
     *value = std::move(obj);
 }
 
@@ -708,8 +730,11 @@ void removePathFromValue(const std::string& path, rapidjson::Value* value)
         {
             if (NX_ASSERT(value->IsObject()))
             {
-                if (auto it = value->FindMember(path); NX_ASSERT(it != value->MemberEnd()))
+                if (auto it = value->FindMember(unescapeName(path));
+                    NX_ASSERT(it != value->MemberEnd()))
+                {
                     value->RemoveMember(it);
+                }
             }
             return;
         }
@@ -726,7 +751,7 @@ void removePathFromValue(const std::string& path, rapidjson::Value* value)
         if (!NX_ASSERT(bracketIndex != std::string::npos))
             return;
 
-        const auto arrayName{head.substr(0, bracketIndex)};
+        const auto arrayName{unescapeName(head.substr(0, bracketIndex))};
         const auto arrayIndex =
             std::stoul(head.substr(bracketIndex + 1, head.length() - bracketIndex - 2));
 
@@ -742,7 +767,7 @@ void removePathFromValue(const std::string& path, rapidjson::Value* value)
 
     if (NX_ASSERT(value->IsObject()))
     {
-        if (auto it = value->FindMember(head); it != value->MemberEnd())
+        if (auto it = value->FindMember(unescapeName(head)); it != value->MemberEnd())
             removePathFromValue(tail, &it->value);
     }
 }
@@ -861,7 +886,8 @@ void OpenApiSchema::validateOrThrow(const QJsonObject& path,
                 for (const QString& u: unused)
                 {
                     headers->emplace("Warning",
-                        nx::format("199 - \"Unused parameter: '%1'\"", u).toStdString());
+                        nx::format("199 - \"Unused parameter: '%1'\"", unescapeName(u))
+                            .toStdString());
                 }
             }
 
@@ -871,8 +897,8 @@ void OpenApiSchema::validateOrThrow(const QJsonObject& path,
             const bool isStrict = request->params().value("_strict", "false") != "false";
             if (isStrict)
             {
-                throw Exception::badRequest(
-                    nx::format("Parameter '%1' is not allowed by the Schema.", unused[0]));
+                throw Exception::badRequest(nx::format(
+                    "Parameter '%1' is not allowed by the Schema.", unescapeName(unused[0])));
             }
 
             if (params)
