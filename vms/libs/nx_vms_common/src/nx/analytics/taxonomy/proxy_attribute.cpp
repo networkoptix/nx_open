@@ -27,7 +27,7 @@ ProxyAttribute::ProxyAttribute(
 
     if (m_proxiedAttribute->type() == Type::object)
     {
-        m_proxyObjectType = new ProxyObjectType(
+        m_proxyObjectType = std::make_unique<ProxyObjectType>(
             m_proxiedAttribute->objectType(),
             std::move(attributeSupportInfoTree.nestedAttributeSupportInfo),
             m_resourceSupportProxy,
@@ -76,7 +76,7 @@ AbstractEnumType* ProxyAttribute::enumType() const
 ObjectType* ProxyAttribute::objectType() const
 {
     if (m_proxyObjectType)
-       return m_proxyObjectType;
+       return m_proxyObjectType.get();
 
     if (NX_ASSERT(m_proxiedAttribute))
         return m_proxiedAttribute->objectType();
