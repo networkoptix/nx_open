@@ -1237,13 +1237,13 @@
 <context>
     <name>main</name>
     <message>
-        <source>Server offline. Reconnecting...</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Cannot connect to %1</source>
         <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
         <translation></translation>
+    </message>
+    <message>
+        <source>Connection lost. Reconnecting...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
