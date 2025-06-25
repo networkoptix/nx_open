@@ -87,7 +87,7 @@
     <message>
       <source>User full name is controlled by the %1.</source>
       <comment>%1 is the short Cloud name</comment>
-      <translation type="unfinished">User full name is controlled by the %1.</translation>
+      <translation>O nome completo do usuario está controlado polo %1.</translation>
     </message>
     <message>
       <source>Creating an Administrator user is not allowed.</source>
@@ -240,7 +240,7 @@
     </message>
     <message>
       <source>User &apos;%1(%2) is not permitted to create new User Groups.&apos;</source>
-      <translation type="unfinished">User &apos;%1(%2) is not permitted to create new User Groups.&apos;</translation>
+      <translation>O usuario &apos;%1(%2)&apos; non ten permiso para crear novos grupos de usuarios.</translation>
     </message>
     <message>
       <source>Creation of a non-local (%1) User Group is forbidden for VMS.</source>
@@ -298,7 +298,7 @@
     </message>
     <message>
       <source>the User %1 doesn&apos;t have &apos;generateEvents&apos; permission</source>
-      <translation type="unfinished">the User %1 doesn&apos;t have &apos;generateEvents&apos; permission</translation>
+      <translation>O usuario %1 non ten permisos &apos;para xenerarEventos&apos;</translation>
     </message>
   </context>
 </TS>

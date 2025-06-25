@@ -1756,11 +1756,11 @@ para activar o PTZ</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
+      <translation>Preme as teclas de frecha para moverte. Usa as teclas máis e menos para ampliar.</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation type="unfinished">Use mouse wheel to zoom</translation>
+      <translation>Usa a roda do rato para facer zoom</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
