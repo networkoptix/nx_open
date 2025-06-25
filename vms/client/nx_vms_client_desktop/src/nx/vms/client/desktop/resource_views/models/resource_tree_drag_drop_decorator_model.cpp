@@ -459,7 +459,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         return true;
     }
 
-    // Add media resources to layout.
+    // Drop resources that can be displayed at the scene to the layout.
     if (hasResourceFlags(index, Qn::layout))
     {
         const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>();
@@ -473,8 +473,7 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
 
                 const auto accessController =
                     SystemContext::fromResource(resource)->accessController();
-                return accessController->
-                    hasAnyPermission(resource, Qn::ViewLivePermission | Qn::ViewFootagePermission);
+                return accessController->hasPermissions(resource, Qn::ViewContentPermission);
             });
         if (droppable.isEmpty())
             return true;
