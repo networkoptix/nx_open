@@ -121,7 +121,7 @@
     </message>
     <message>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>Ás</translation>
     </message>
     <message>
       <source>To</source>
@@ -129,11 +129,11 @@
     </message>
     <message>
       <source>Occurs At</source>
-      <translation type="unfinished">Occurs At</translation>
+      <translation>Ocorre ás</translation>
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Comezar cando</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -165,7 +165,7 @@
     </message>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>No deseño</translation>
     </message>
     <message>
       <source>Event Devices</source>
@@ -173,15 +173,15 @@
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>De tipo</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>E lenda</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>E Descrición</translation>
     </message>
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
@@ -343,7 +343,7 @@
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%1 en %2</translation>
     </message>
     <message>
       <source>And attributes</source>
@@ -361,20 +361,20 @@
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
     <message>
       <source>Object detected</source>
-      <translation type="unfinished">Object detected</translation>
+      <translation>Obxecto detectado</translation>
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation type="unfinished">Analytics Object Detected</translation>
+      <translation>Obxecto de análise detectado</translation>
     </message>
     <message>
       <source>And Object</source>
-      <translation type="unfinished">And Object</translation>
+      <translation>E obxecto</translation>
     </message>
     <message>
       <source>%1 at %2</source>
       <comment>Object %1 is detected at camera %2</comment>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%1 en %2</translation>
     </message>
   </context>
   <context>
@@ -388,41 +388,41 @@
     <name>nx::vms::rules::BookmarkAction</name>
     <message>
       <source>Create Bookmark</source>
-      <translation type="unfinished">Create Bookmark</translation>
+      <translation>Crear un marcador</translation>
     </message>
     <message>
       <source>Add Tags</source>
-      <translation type="unfinished">Add Tags</translation>
+      <translation>Engadir etiquetas</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BuzzerAction</name>
     <message>
       <source>Buzzer</source>
-      <translation type="unfinished">Buzzer</translation>
+      <translation>Zumbador</translation>
     </message>
     <message>
       <source>Action Throttling</source>
-      <translation type="unfinished">Action Throttling</translation>
+      <translation>Acción de regulación</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::CameraInputEvent</name>
     <message>
       <source>Input Port: %1</source>
-      <translation type="unfinished">Input Port: %1</translation>
+      <translation>Porto de entrada: %1</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation type="unfinished">Input on %1</translation>
+      <translation>Entrada en %1</translation>
     </message>
     <message>
       <source>Input Signal on Device</source>
-      <translation type="unfinished">Input Signal on Device</translation>
+      <translation>Sinal de entrada no dispositivo</translation>
     </message>
     <message>
       <source>With ID</source>
-      <translation type="unfinished">With ID</translation>
+      <translation>Con identificación, ID</translation>
     </message>
     <message>
       <source>Input Signal on Camera</source>
@@ -479,17 +479,17 @@
     <name>nx::vms::rules::DeviceIpConflictEvent</name>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation type="unfinished">Conflicting Address: %1</translation>
+      <translation>Enderezo en conflito: %1</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Device IP Conflict at %1</translation>
+      <translation>Conflito de IP do dispositivo en %1</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Camera IP Conflict at %1</translation>
+      <translation>Conflito de IP da cámara en %1</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
@@ -514,11 +514,11 @@
     <name>nx::vms::rules::DeviceOutputAction</name>
     <message>
       <source>Output ID</source>
-      <translation type="unfinished">Output ID</translation>
+      <translation>ID de saída</translation>
     </message>
     <message>
       <source>Device Output</source>
-      <translation type="unfinished">Device Output</translation>
+      <translation>Saída do dispositivo</translation>
     </message>
   </context>
   <context>
@@ -533,7 +533,7 @@
     </message>
     <message>
       <source>Camera Recording</source>
-      <translation type="unfinished">Camera Recording</translation>
+      <translation>Gravación da cámara</translation>
     </message>
     <message>
       <source>On</source>
@@ -681,7 +681,7 @@
     </message>
     <message>
       <source>And Level Is</source>
-      <translation type="unfinished">And Level Is</translation>
+      <translation>E o nivel é</translation>
     </message>
     <message>
       <source>Integration Diagnostic at %1</source>
@@ -909,7 +909,7 @@
     </message>
     <message>
       <source>PoE Over Budget</source>
-      <translation type="unfinished">PoE Over Budget</translation>
+      <translation>PoE por riba do orzamento</translation>
     </message>
     <message>
       <source>PoE over budget on %1</source>
@@ -932,15 +932,15 @@
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation type="unfinished">Execute PTZ Preset</translation>
+      <translation>Executar predefinición PTZ</translation>
     </message>
     <message>
       <source>PTZ Preset</source>
-      <translation type="unfinished">PTZ Preset</translation>
+      <translation>Preaxustes PTZ</translation>
     </message>
     <message>
       <source>Execute to users</source>
-      <translation type="unfinished">Execute to users</translation>
+      <translation>Executar para os usuarios</translation>
     </message>
   </context>
   <context>
@@ -951,26 +951,26 @@
     </message>
     <message>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>Corpo</translation>
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation type="unfinished">Send Mobile Notification</translation>
+      <translation>Enviar notificación ao móbil</translation>
     </message>
     <message>
       <source>Add Source Device name to Body</source>
-      <translation type="unfinished">Add Source Device name to Body</translation>
+      <translation>Engadir o nome do dispositivo de orixe ao corpo</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>Son</translation>
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation type="unfinished">Repeat Sound</translation>
+      <translation>Repetir son</translation>
     </message>
   </context>
   <context>
@@ -1036,22 +1036,22 @@
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>Mensaxe de correo electrónico</translation>
     </message>
     <message>
       <source>Send Email</source>
-      <translation type="unfinished">Send Email</translation>
+      <translation>Enviar correo electrónico</translation>
     </message>
     <message>
       <source>Additional Recipients</source>
-      <translation type="unfinished">Additional Recipients</translation>
+      <translation>Destinatarios adicionais</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerCertificateErrorEvent</name>
     <message>
       <source>Server Certificate Error</source>
-      <translation type="unfinished">Server Certificate Error</translation>
+      <translation>Erro do certificado do servidor</translation>
     </message>
     <message>
       <source>%1 certificate error</source>
@@ -1063,7 +1063,7 @@
     <name>nx::vms::rules::ServerConflictEvent</name>
     <message>
       <source>Server Conflict</source>
-      <translation type="unfinished">Server Conflict</translation>
+      <translation>Conflito do servidor</translation>
     </message>
     <message>
       <source>%1 Conflict</source>
@@ -1087,15 +1087,15 @@
     <name>nx::vms::rules::ServerFailureEvent</name>
     <message>
       <source>Server Failure</source>
-      <translation type="unfinished">Server Failure</translation>
+      <translation>Fallo do servidor</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>Perdeuse a conexión co servidor.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>O servidor parou inesperadamente.</translation>
     </message>
     <message>
       <source>%1 Failure</source>
@@ -1110,7 +1110,7 @@
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
       <source>Server Started</source>
-      <translation type="unfinished">Server Started</translation>
+      <translation>Servidor iniciado</translation>
     </message>
     <message>
       <source>%1 Started</source>
@@ -1121,7 +1121,7 @@
     <name>nx::vms::rules::ShowOnAlarmLayoutAction</name>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation type="unfinished">Show on Alarm Layout</translation>
+      <translation>Mostrar no deseño da alarma</translation>
     </message>
     <message>
       <source>Alarm: %1</source>
@@ -1129,7 +1129,7 @@
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
-      <translation type="unfinished">Force Alarm Layout Opening</translation>
+      <translation>Forzar a apertura do deseño da alarma</translation>
     </message>
   </context>
   <context>
@@ -1163,7 +1163,7 @@
     </message>
     <message>
       <source>By</source>
-      <translation type="unfinished">By</translation>
+      <translation>Por</translation>
     </message>
     <message>
       <source>User: %1</source>
@@ -1181,7 +1181,7 @@
     <name>nx::vms::rules::SpeakAction</name>
     <message>
       <source>Speak</source>
-      <translation type="unfinished">Speak</translation>
+      <translation>Falar</translation>
     </message>
     <message>
       <source>Text</source>
@@ -1189,7 +1189,7 @@
     </message>
     <message>
       <source>At Device</source>
-      <translation type="unfinished">At Device</translation>
+      <translation>No dispositivo</translation>
     </message>
   </context>
   <context>

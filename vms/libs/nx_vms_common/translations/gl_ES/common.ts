@@ -40,7 +40,7 @@
     <name>ArchiveDuration</name>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>sen datos para a previsión</translation>
     </message>
     <message>
       <source>empty</source>
@@ -48,7 +48,7 @@
     </message>
     <message>
       <source>less than an hour</source>
-      <translation type="unfinished">less than an hour</translation>
+      <translation>menos dunha hora</translation>
     </message>
   </context>
   <context>
@@ -75,22 +75,22 @@
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation type="unfinished">B</translation>
+      <translation>B</translation>
     </message>
     <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
-      <translation type="unfinished">KB</translation>
+      <translation>KB</translation>
     </message>
     <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
-      <translation type="unfinished">MB</translation>
+      <translation>MB</translation>
     </message>
     <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
-      <translation type="unfinished">GB</translation>
+      <translation>GB</translation>
     </message>
     <message>
       <source>TB</source>
@@ -100,12 +100,12 @@
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation type="unfinished">PB</translation>
+      <translation>PB</translation>
     </message>
     <message numerus="yes">
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Byte(s)</numerusform>
         <numerusform>Byte(s)</numerusform>
       </translation>
@@ -113,7 +113,7 @@
     <message numerus="yes">
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kilobyte(s)</numerusform>
         <numerusform>Kilobyte(s)</numerusform>
       </translation>
@@ -121,7 +121,7 @@
     <message numerus="yes">
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Megabyte(s)</numerusform>
         <numerusform>Megabyte(s)</numerusform>
       </translation>
@@ -129,7 +129,7 @@
     <message numerus="yes">
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gigabyte(s)</numerusform>
         <numerusform>Gigabyte(s)</numerusform>
       </translation>
@@ -137,7 +137,7 @@
     <message numerus="yes">
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Terabyte(s)</numerusform>
         <numerusform>Terabyte(s)</numerusform>
       </translation>
@@ -145,7 +145,7 @@
     <message numerus="yes">
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Petabyte(s)</numerusform>
         <numerusform>Petabyte(s)</numerusform>
       </translation>
@@ -290,15 +290,15 @@
     </message>
     <message>
       <source>Server has been stopped.</source>
-      <translation type="unfinished">Server has been stopped.</translation>
+      <translation>O servidor foi detido.</translation>
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
-      <translation type="unfinished">Media stream is opened but no media data was received.</translation>
+      <translation>Abriuse o fluxo multimedia pero non se recibiron datos multimedia.</translation>
     </message>
     <message>
       <source>Unknown error. Please contact support.</source>
-      <translation type="unfinished">Unknown error. Please contact support.</translation>
+      <translation>Erro interno. Por favor, ponte en contacto co servizo de asistencia.</translation>
     </message>
     <message>
       <source>(unknown)</source>
@@ -306,207 +306,207 @@
     </message>
     <message>
       <source>Server %1 is not available.</source>
-      <translation type="unfinished">Server %1 is not available.</translation>
+      <translation>O servidor %1 non está dispoñible.</translation>
     </message>
     <message>
       <source>Check that Server is up and running.</source>
-      <translation type="unfinished">Check that Server is up and running.</translation>
+      <translation>Comproba que o servidor estea funcionando.</translation>
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
+      <translation>Recibíuse unha resposta incorrecta do servidor %1: &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
-      <translation type="unfinished">Check if Server is up and has the proper version.</translation>
+      <translation>Comprobe se o servidor está activo e ten a versión correcta.</translation>
     </message>
     <message>
       <source>Cannot connect to http port %1.</source>
-      <translation type="unfinished">Cannot connect to http port %1.</translation>
+      <translation>Non se pode conectar ao porto http %1.</translation>
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation type="unfinished">Finally, try to update firmware. If the problem persists, please contact support.</translation>
+      <translation>Finalmente, tenta actualizar o firmware. Se o problema persiste, por favor, ponte en contacto co servizo de asistencia.</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
-      <translation type="unfinished">Failed to configure parameter %1.</translation>
+      <translation>Non se puido configurar o parámetro %1.</translation>
     </message>
     <message>
       <source>Please contact support.</source>
-      <translation type="unfinished">Please contact support.</translation>
+      <translation>Por favor, ponte en contacto co servizo de atención ao cliente.</translation>
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
+      <translation>Produciuse un erro de entrada/saída. Mensaxe do sistema operativo: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
-      <translation type="unfinished">Parameters:</translation>
+      <translation>Parámetros:</translation>
     </message>
     <message>
       <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-      <translation type="unfinished">Please try to reboot the device, then restore factory defaults on the web-page.</translation>
+      <translation>Por favor, tenta reiniciar o dispositivo e logo restaura os valores predeterminados de fábrica na páxina web.</translation>
     </message>
     <message>
       <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-      <translation type="unfinished">Please try to reboot the camera, then restore factory defaults on the web-page.</translation>
+      <translation>Por favor, tenta reiniciar a cámara e logo restaura os valores predeterminados de fábrica na páxina web.</translation>
     </message>
     <message>
       <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-      <translation type="unfinished">Make sure the device is plugged into the network. Try to reboot the device.</translation>
+      <translation>Asegúrate de que o dispositivo estea conectado á rede. Tenta reinicialo.</translation>
     </message>
     <message>
       <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-      <translation type="unfinished">Make sure the camera is plugged into the network. Try to reboot the camera.</translation>
+      <translation>Asegúrate de que a cámara estea conectada á rede. Tenta reiniciala.</translation>
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>A solicitude do dispositivo &quot;%1&quot; fallou co erro &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>A solicitude da cámara &quot;%1&quot; fallou cun erro &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
-      <translation type="unfinished">Unknown device issue.</translation>
+      <translation>Problema descoñecido co dispositivo.</translation>
     </message>
     <message>
       <source>Unknown camera issue.</source>
-      <translation type="unfinished">Unknown camera issue.</translation>
+      <translation>Problema descoñecido coa cámara.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open device issues dialog for more details.</translation>
+      <translation>Demasiados erros multimedia. Por favor, abre o diálogo de problemas do dispositivo para obter máis detalles.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open camera issues dialog for more details.</translation>
+      <translation>Demasiados erros multimedia. Por favor, abre o diálogo de problemas da cámara para obter máis detalles.</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-      <translation type="unfinished">Please try to reboot the I/O module, then restore factory defaults on the web-page.</translation>
+      <translation>Por favor, tenta reiniciar o módulo de E/S (I/O) e, a seguir, restaura os valores predeterminados de fábrica na páxina web.</translation>
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-      <translation type="unfinished">Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</translation>
+      <translation>Asegúrate de que o módulo de E/S (I/O) estea conectado á rede. Tenta reinicialo.</translation>
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>A solicitude do módulo de E/S &quot;%1&quot; fallou co erro &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation type="unfinished">Unknown I/O module issue.</translation>
+      <translation>Problema descoñecido co módulo de E/S (I/O).</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open I/O module issues dialog for more details.</translation>
+      <translation>Demasiados erros nos medios. Por avor, abre o diálogo de problemas do módulo de E/S (I/O) para obter máis detalles.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
-      <translation type="unfinished">Device initialization process is in progress.</translation>
+      <translation>O proceso de inicialización do dispositivo está en curso.</translation>
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation type="unfinished">Camera initialization process is in progress.</translation>
+      <translation>O proceso de inicialización da cámara está en curso.</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
-      <translation type="unfinished">I/O Module initialization process is in progress.</translation>
+      <translation>O proceso de inicialización do módulo de E/S (I/O) está en curso.</translation>
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-      <translation type="unfinished">Make sure port %1 is accessible (e.g. forwarded).</translation>
+      <translation>Asegúrate de que o porto %1 sexa accesible (por exemplo, reenviado).</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the device web-page.</translation>
+      <translation>Se non axuda, restablece os valores predeterminados de fábrica na páxina web do dispositivo.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the camera web-page.</translation>
+      <translation>Se non axuda, restablece os valores predeterminados de fábrica na páxina web da cámara.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the I/O module web-page.</translation>
+      <translation>Se non axuda, restaure os valores predeterminados de fábrica na páxina web do módulo de E/S (I/O).</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-      <translation type="unfinished">Cannot open media URL %1. Failed to connect to media port %2.</translation>
+      <translation>Non se pode abrir o URL multimedia %1. Non se puido conectar co porto multimedia %2.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation type="unfinished">Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</translation>
+      <translation>Non se pode abrir o URL multimedia %1. A conexión ao porto %2 pechouse inesperadamente.</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse device response. URL %1, request name %2.</translation>
+      <translation>Non se puido analizar a resposta do dispositivo. URL %1, nome da solicitude %2.</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse camera response. URL %1, request name %2.</translation>
+      <translation>Non se puido analizar a resposta da cámara. URL %1, nome da solicitude %2.</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse I/O module response. URL %1, request name %2.</translation>
+      <translation>Non se puido analizar a resposta do módulo de E/S (I/O). URL %1, nome da solicitude %2.</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation type="unfinished">No supported media tracks at URL %1.</translation>
+      <translation>Non hai pistas multimedia compatibles no URL %1.</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation type="unfinished">Not authorized. URL %1.</translation>
+      <translation>Non autorizado. URL %1.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation type="unfinished">Cannot open media URL %1. Unsupported media protocol %2.</translation>
+      <translation>Non se pode abrir o URL multimedia %1. Protocolo multimedia non compatible %2.</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>Restaurouse a cámara desde o arquivo. Elimina a cámara e engádea de novo para ver o vídeo en directo.</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+      <translation>Actualiza o firmware. A versión mínima compatible é %1. A versión actual é %2</translation>
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation type="unfinished">Plugin error. %1</translation>
+      <translation>Erro do complemento, plugin. %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation type="unfinished">Plugin is unavailable</translation>
+      <translation>O complemento non está dispoñible</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation type="unfinished">Internal server error. %1</translation>
+      <translation>Erro interno do servidor. %1</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Device Settings (error &quot;%1&quot;).</translation>
+      <translation>Se está desactivado, tenta activar a Gravación e reducir os FPS na Configuración do dispositivo (erro &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording and decrease FPS in Camera Settings (error &quot;%1&quot;).</translation>
+      <translation>Se está desactivado, tenta activar a Gravación e reducir os FPS na Configuración da Cámara (erro &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
-      <translation type="unfinished">If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</translation>
+      <translation>Se está desactivado, tenta activar a gravación na configuración do módulo de E/S (I/O) (erro &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the device. Details: &quot;%1&quot;.</translation>
+      <translation>Recibíronse datos non válidos do dispositivo. Detalles: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the camera. Details: &quot;%1&quot;.</translation>
+      <translation>Recibíronse datos non válidos da cámara. Detalles: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module. Details: &quot;%1&quot;.</translation>
+      <translation>Recibíronse datos non válidos do módulo de E/S (I/O). Detalles: &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -621,7 +621,7 @@
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmáx</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -641,35 +641,35 @@
     </message>
     <message>
       <source>Analog Licenses</source>
-      <translation type="unfinished">Analog Licenses</translation>
+      <translation>Licenzas analóxicas</translation>
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation type="unfinished">Professional Licenses</translation>
+      <translation>Licenzas profesionais</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation type="unfinished">Edge Licenses</translation>
+      <translation>Licenzas perimetrais</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
-      <translation type="unfinished">Vmax Licenses</translation>
+      <translation>Licenzas de Vmax</translation>
     </message>
     <message>
       <source>Analog Encoder Licenses</source>
-      <translation type="unfinished">Analog Encoder Licenses</translation>
+      <translation>Licenzas de codificadores analóxicos</translation>
     </message>
     <message>
       <source>Video Wall Licenses</source>
-      <translation type="unfinished">Video Wall Licenses</translation>
+      <translation>Licenzas de Video Wall</translation>
     </message>
     <message>
       <source>I/O Module Licenses</source>
-      <translation type="unfinished">I/O Module Licenses</translation>
+      <translation>Licenzas de módulos de E/S (I/O)</translation>
     </message>
     <message>
       <source>Start Licenses</source>
-      <translation type="unfinished">Start Licenses</translation>
+      <translation>Licenzas de inicio</translation>
     </message>
     <message>
       <source>Invalid</source>
@@ -677,11 +677,11 @@
     </message>
     <message>
       <source>Invalid Licenses</source>
-      <translation type="unfinished">Invalid Licenses</translation>
+      <translation>Licenzas non válidas</translation>
     </message>
     <message>
       <source>Free</source>
-      <translation type="unfinished">Free</translation>
+      <translation>Gratuita</translation>
     </message>
     <message>
       <source>Time</source>
@@ -689,7 +689,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>Licenzas de tempo</translation>
     </message>
     <message>
       <source>Bridge</source>
@@ -697,190 +697,190 @@
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation type="unfinished">Bridge Licenses</translation>
+      <translation>Licenzas de ponte (Bridge)</translation>
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Time Licenses</numerusform>
-        <numerusform>%n Time Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licenzas de tempo</numerusform>
+        <numerusform>%n Licenzas de tempo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Analog Licenses</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licenzas analóxicas</numerusform>
+        <numerusform>%n Licenzas analóxicas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Professional Licenses</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licenzas profesionais</numerusform>
+        <numerusform>%n Licenzas profesionais</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Edge Licenses</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licenzas perimetrais</numerusform>
+        <numerusform>%n Licenzas perimetrais</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Vmax Licenses</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licenzas de Vmax</numerusform>
+        <numerusform>%n Licenzas de Vmax</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Analog Encoder Licenses</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licenzas de codificador analóxico</numerusform>
+        <numerusform>%n Licenzas de codificador analóxico</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Video Wall Licenses</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licenzas de Video Wall</numerusform>
+        <numerusform>%n Licenzas de Video Wall</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Module Licenses</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licenzas de módulos de E/S (I/O)</numerusform>
+        <numerusform>%n Licenzas de módulos de E/S (I/O)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Start Licenses</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licenzas de inicio</numerusform>
+        <numerusform>%n Licenzas de inicio</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Bridge Licenses</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licenzas de ponte (Bridge)</numerusform>
+        <numerusform>%n Licenzas de ponte (Bridge)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Invalid Licenses</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licenzas non válidas</numerusform>
+        <numerusform>%n Licenzas non válidas</numerusform>
       </translation>
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>Licenzas gratuítas</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licenzas gratuítas</numerusform>
+        <numerusform>%n Licenzas gratuítas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Time Licenses</numerusform>
-        <numerusform>%n/%1 Time Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licenzas de tempo</numerusform>
+        <numerusform>%n/%1 Licenzas de tempo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Analog Licenses</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licenzas analóxicas</numerusform>
+        <numerusform>%n/%1 Licenzas analóxicas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Professional Licenses</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licenzas profesionais</numerusform>
+        <numerusform>%n/%1 Licenzas profesionais</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Edge Licenses</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licenzas perimetrais, Edge</numerusform>
+        <numerusform>%n/%1 Licenzas perimetrais, Edge</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licenzas de Vmax</numerusform>
+        <numerusform>%n/%1 Licenzas de Vmax</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licenzas de codificador analóxico</numerusform>
+        <numerusform>%n/%1 Licenzas de codificador analóxico</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licenzas de Video Wall</numerusform>
+        <numerusform>%n/%1 Licenzas de Video Wall</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licenzas de módulos de E/S (I/O)</numerusform>
+        <numerusform>%n/%1 Licenzas de módulos de E/S (I/O)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Start Licenses</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licenzas de inicio</numerusform>
+        <numerusform>%n/%1 Licenzas de inicio</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licenzas gratuítas</numerusform>
+        <numerusform>%n/%1 Licenzas gratuítas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licenzas de ponte (Bridge)</numerusform>
+        <numerusform>%n/%1 Licenzas de ponte (Bridge)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licenzas non válidas</numerusform>
+        <numerusform>%n/%1 Licenzas non válidas</numerusform>
       </translation>
     </message>
     <message>
@@ -889,21 +889,21 @@
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation type="unfinished">NVR Licenses</translation>
+      <translation>Licenzas de NVR</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n NVR Licenses</numerusform>
-        <numerusform>%n NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licenzas de NVR</numerusform>
+        <numerusform>%n Licenzas de NVR</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 NVR Licenses</numerusform>
-        <numerusform>%n/%1 NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licenzas de NVR</numerusform>
+        <numerusform>%n/%1 Licenzas de NVR</numerusform>
       </translation>
     </message>
     <message>
@@ -1003,30 +1003,30 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n Módulos de E/S (I/O)</numerusform>
+        <numerusform>%n Módulos de E/S (I/O)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n Módulos de E/S (I/O)</numerusform>
+        <numerusform>%n Módulos de E/S (I/O)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
+      <translation>
+        <numerusform>%n Dispositivos</numerusform>
+        <numerusform>%n Dispositivos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
+      <translation>
+        <numerusform>%n dispositivos</numerusform>
+        <numerusform>%n dispositivos</numerusform>
       </translation>
     </message>
   </context>
@@ -1038,19 +1038,19 @@
     </message>
     <message>
       <source>FREE License</source>
-      <translation type="unfinished">FREE License</translation>
+      <translation>Licenza GRATUÍTA</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
-      <translation type="unfinished">Licensed To: %1</translation>
+      <translation>Licenciado para: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation type="unfinished">Watermark: %1</translation>
+      <translation>Marca de auga: %1</translation>
     </message>
     <message>
       <source>Hardware ID: %1</source>
-      <translation type="unfinished">Hardware ID: %1</translation>
+      <translation>ID do hardware: %1</translation>
     </message>
   </context>
   <context>
@@ -1069,47 +1069,47 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation type="unfinished">ms</translation>
+      <translation>ms</translation>
     </message>
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation type="unfinished">m</translation>
+      <translation>m</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation type="unfinished">h</translation>
+      <translation>h</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation type="unfinished">d</translation>
+      <translation>d</translation>
     </message>
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation type="unfinished">w</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation type="unfinished">M</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation type="unfinished">y</translation>
+      <translation>a</translation>
     </message>
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">msec</translation>
+      <translation>mseg</translation>
     </message>
     <message>
       <source>sec</source>
@@ -1119,12 +1119,12 @@
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation type="unfinished">min</translation>
+      <translation>mínimo</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation type="unfinished">hrs</translation>
+      <translation>horas</translation>
     </message>
     <message>
       <source>days</source>
@@ -1134,32 +1134,32 @@
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation type="unfinished">wks</translation>
+      <translation>sem</translation>
     </message>
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation type="unfinished">mos</translation>
+      <translation>meses</translation>
     </message>
     <message>
       <source>yrs</source>
       <comment>Long suffix for displaying years</comment>
-      <translation type="unfinished">yrs</translation>
+      <translation>anos</translation>
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
+      <translation>
+        <numerusform>milisegundos</numerusform>
+        <numerusform>milisegundos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
+      <translation>
+        <numerusform>segundos</numerusform>
+        <numerusform>segundos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1189,9 +1189,9 @@
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
+      <translation>
+        <numerusform>semanas</numerusform>
+        <numerusform>semanas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1205,30 +1205,30 @@
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
+      <translation>
+        <numerusform>anos</numerusform>
+        <numerusform>anos</numerusform>
       </translation>
     </message>
     <message>
       <source>Msec</source>
       <comment>Capitalized long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">Msec</translation>
+      <translation>Mseg</translation>
     </message>
     <message>
       <source>Sec</source>
       <comment>Capitalized long suffix for displaying seconds</comment>
-      <translation type="unfinished">Sec</translation>
+      <translation>Seg</translation>
     </message>
     <message>
       <source>Min</source>
       <comment>Capitalized long suffix for displaying minutes</comment>
-      <translation type="unfinished">Min</translation>
+      <translation>Mínimo</translation>
     </message>
     <message>
       <source>Hrs</source>
       <comment>Capitalized long suffix for displaying hours</comment>
-      <translation type="unfinished">Hrs</translation>
+      <translation>Horas</translation>
     </message>
     <message>
       <source>Days</source>
@@ -1238,48 +1238,48 @@
     <message>
       <source>Wks</source>
       <comment>Capitalized long suffix for displaying weeks</comment>
-      <translation type="unfinished">Wks</translation>
+      <translation>Semanas</translation>
     </message>
     <message>
       <source>Mos</source>
       <comment>Capitalized long suffix for displaying months</comment>
-      <translation type="unfinished">Mos</translation>
+      <translation>Meses</translation>
     </message>
     <message>
       <source>Yrs</source>
       <comment>Capitalized long suffix for displaying years</comment>
-      <translation type="unfinished">Yrs</translation>
+      <translation>Anos</translation>
     </message>
     <message numerus="yes">
       <source>Milliseconds</source>
       <comment>Capitalized full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>Milliseconds</numerusform>
-        <numerusform>Milliseconds</numerusform>
+      <translation>
+        <numerusform>Milisegundos</numerusform>
+        <numerusform>Milisegundos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Seconds</source>
       <comment>Capitalized full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>Seconds</numerusform>
-        <numerusform>Seconds</numerusform>
+      <translation>
+        <numerusform>Segundos</numerusform>
+        <numerusform>Segundos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Minutes</source>
       <comment>Capitalized full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>Minutes</numerusform>
-        <numerusform>Minutes</numerusform>
+      <translation>
+        <numerusform>Minutos</numerusform>
+        <numerusform>Minutos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Hours</source>
       <comment>Capitalized full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>Hours</numerusform>
-        <numerusform>Hours</numerusform>
+      <translation>
+        <numerusform>Horas</numerusform>
+        <numerusform>Horas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
