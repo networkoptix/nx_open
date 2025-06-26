@@ -5,7 +5,7 @@ import QtQuick.Controls
 
 import Nx.Core
 
-Popup
+Drawer
 {
     id: control
 
@@ -13,15 +13,14 @@ Popup
 
     property bool closeAutomatically: true
 
-    parent: Overlay.overlay
+    edge: Qt.BottomEdge
 
-    y: parent.height - height - d.keyboardHeight
     width: parent.width
     height:
     {
         const maxHeight = Math.min(
             flickable.contentHeight + control.topPadding + control.bottomPadding,
-            parent.height - windowContext.ui.measurements.deviceStatusBarHeight - d.keyboardHeight)
+            parent.height - windowContext.ui.measurements.deviceStatusBarHeight)
         return maxHeight
     }
 
@@ -41,7 +40,7 @@ Popup
         const customPadding = d.keyboardHeight > 0
             ? 0
             : windowParams.bottomMargin
-        return 20 + customPadding
+        return 20 + customPadding + d.keyboardHeight
     }
 
     background: Item
@@ -122,19 +121,29 @@ Popup
 
         function ensureVisible(item)
         {
-            if (!item || moving || dragging)
-                return
+            // If for some reason user drags content or it jumps up or down (like with keyboard),
+            // and we have this information with delay - we try to ensure that focused field is
+            // visible after some reasonable delay.
+            const ensureItemVisible =
+                () =>
+                {
+                    if (!item || moving || dragging)
+                        return
 
-            const ypos = item.mapToItem(contentItem, 0, 0).y
-            const ext = item.height + ypos
-            if (ypos < contentY
-                || ypos > contentY + height
-                || ext < contentY
-                || ext > contentY + height)
-            {
-                contentY = Math.max(0,
-                    Math.min(ypos - height + item.height, contentHeight - height))
-            }
+                    const ypos = item.mapToItem(contentItem, 0, 0).y
+                    const ext = item.height + ypos
+                    if (ypos < contentY
+                        || ypos > contentY + height
+                        || ext < contentY
+                        || ext > contentY + height)
+                    {
+                        contentY = Math.max(0,
+                            Math.min(ypos - height + item.height, contentHeight - height))
+                    }
+                }
+
+            const kReasonableDelayMs = 500
+            CoreUtils.executeDelayed(ensureItemVisible, kReasonableDelayMs, flickable)
         }
     }
 
