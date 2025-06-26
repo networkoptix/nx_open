@@ -799,10 +799,10 @@ void QnMediaResourceWidget::initStatusOverlayController()
                     processEncryptedArchiveUnlockRequst();
                     break;
                 case Qn::ResourceOverlayButton::Authorize:
-                    if (d->camera.dynamicCast<nx::vms::client::core::CrossSystemCameraResource>())
-                        processCloudAuthorizationRequest();
-                    else
-                        processAuthorizationRequest();
+                    processAuthorizationRequest();
+                    break;
+                case Qn::ResourceOverlayButton::LogIn:
+                    processCloudAuthorizationRequest();
                     break;
                 default:
                     NX_ASSERT("Unexpected button type");
