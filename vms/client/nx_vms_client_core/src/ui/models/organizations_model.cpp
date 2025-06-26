@@ -195,7 +195,7 @@ bool canAccess(const Organization& org, const ChannelPartner& parentCp)
 
     const auto accessLevel = nx::Uuid::fromStringSafe(org.channelPartnerAccessLevel);
 
-    if (accessLevel != kOrganizationSystemAdministratorId
+    if (accessLevel != kOrganizationAdministratorId
         && (cpRolesIds.contains(kChannelPartnerAdministratorId)
             || cpRolesIds.contains(kChannelPartnerManagerId)))
     {
