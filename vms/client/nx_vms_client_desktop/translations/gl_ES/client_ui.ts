@@ -969,18 +969,18 @@
     </message>
     <message>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
+      <translation>Rotación, corrección de deformación, mellora da imaxe, etc.</translation>
     </message>
     <message>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
+      <translation>Aplicar filtros e engadir superposicións require transcodificación, o que aumentará o uso da CPU e pode levar un tempo considerable.</translation>
     </message>
   </context>
   <context>
     <name>ExportPasswordWidget</name>
     <message>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>Protexer con contrasinal</translation>
     </message>
     <message>
       <source>Password</source>
@@ -995,7 +995,7 @@
     </message>
     <message>
       <source>Single Camera</source>
-      <translation type="unfinished">Single Camera</translation>
+      <translation>Cámara única</translation>
     </message>
     <message>
       <source>Export Settings</source>
@@ -1003,21 +1003,21 @@
     </message>
     <message>
       <source>Multi Video</source>
-      <translation type="unfinished">Multi Video</translation>
+      <translation>Vídeo múltiple</translation>
     </message>
   </context>
   <context>
     <name>FailoverPriorityDialog</name>
     <message>
       <source>Failover Priority</source>
-      <translation type="unfinished">Failover Priority</translation>
+      <translation>Prioridade de conmutación por erro</translation>
     </message>
   </context>
   <context>
     <name>FailoverPriorityPickerWidget</name>
     <message>
       <source>Set priority:</source>
-      <translation type="unfinished">Set priority:</translation>
+      <translation>Definir prioridade:</translation>
     </message>
     <message>
       <source>Low</source>
@@ -1033,7 +1033,7 @@
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
-      <translation type="unfinished">Select some devices to setup failover priority</translation>
+      <translation>Selecciona algúns dispositivos para configurar a prioridade de conmutación por erro</translation>
     </message>
     <message>
       <source>No Failover</source>
@@ -1077,19 +1077,19 @@
     </message>
     <message>
       <source>Auto Pause Video</source>
-      <translation type="unfinished">Auto Pause Video</translation>
+      <translation>Pausa automática de vídeo</translation>
     </message>
     <message>
       <source>after</source>
-      <translation type="unfinished">after</translation>
+      <translation>despois</translation>
     </message>
     <message>
       <source>Minutes of Inactivity</source>
-      <translation type="unfinished">Minutes of Inactivity</translation>
+      <translation>Minutos de inactividade</translation>
     </message>
     <message>
       <source>Add...</source>
-      <translation type="unfinished">Add...</translation>
+      <translation>Engadir...</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -1097,43 +1097,43 @@
     </message>
     <message>
       <source>Local Media Folders</source>
-      <translation type="unfinished">Local Media Folders</translation>
+      <translation>Cartafoles multimedia locais</translation>
     </message>
     <message>
       <source>Audio Input</source>
-      <translation type="unfinished">Audio Input</translation>
+      <translation>Entrada de son</translation>
     </message>
     <message>
       <source>First Source</source>
-      <translation type="unfinished">First Source</translation>
+      <translation>Primeira fonte</translation>
     </message>
     <message>
       <source>Second Source</source>
-      <translation type="unfinished">Second Source</translation>
+      <translation>Segunda fonte</translation>
     </message>
     <message>
       <source>Run Application when PC Boots up</source>
-      <translation type="unfinished">Run Application when PC Boots up</translation>
+      <translation>Executar a aplicación cando se inicia o PC</translation>
     </message>
     <message>
       <source>Startup</source>
-      <translation type="unfinished">Startup</translation>
+      <translation>Arrincar ao inicio</translation>
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
-      <translation type="unfinished">Automatically restore saved windows configuration</translation>
+      <translation>Restaurar automaticamente a configuración gardada de Windows</translation>
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
-      <translation type="unfinished">Play audio from all cameras on layout</translation>
+      <translation>Reproducir audio de todas as cámaras do deseño</translation>
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
-      <translation type="unfinished">Mute audio when the mic is active</translation>
+      <translation>Silenciar o son cando o micrófono estea activo</translation>
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+      <translation>Permitir que o computador entre en modo de suspensión en repouso</translation>
     </message>
     <message>
       <source>Connect to the previous site on startup</source>
@@ -1151,15 +1151,15 @@
     <name>ImageControlWidget</name>
     <message>
       <source>Image Control</source>
-      <translation type="unfinished">Image Control</translation>
+      <translation>Control de imaxe</translation>
     </message>
     <message>
       <source>Aspect ratio</source>
-      <translation type="unfinished">Aspect ratio</translation>
+      <translation>Relación de aspecto</translation>
     </message>
     <message>
       <source>Default rotation</source>
-      <translation type="unfinished">Default rotation</translation>
+      <translation>Rotación predeterminada</translation>
     </message>
   </context>
   <context>
@@ -1178,7 +1178,7 @@
     </message>
     <message>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>Opacidade</translation>
     </message>
     <message>
       <source>Default</source>
@@ -1193,11 +1193,11 @@
     <name>ImagePreviewDialog</name>
     <message>
       <source>Image View</source>
-      <translation type="unfinished">Image View</translation>
+      <translation>Vista de imaxe</translation>
     </message>
     <message>
       <source>Loading Image...Please Wait.</source>
-      <translation type="unfinished">Loading Image...Please Wait.</translation>
+      <translation>Cargando imaxe... Agarda, por favor.</translation>
     </message>
     <message>
       <source>No image</source>
@@ -1216,11 +1216,11 @@
     </message>
     <message>
       <source>Export date</source>
-      <translation type="unfinished">Export date</translation>
+      <translation>Data de exportación</translation>
     </message>
     <message>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Tamaño da fonte</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1235,14 +1235,14 @@
     </message>
     <message>
       <source>Enable tile interface</source>
-      <translation type="unfinished">Enable tile interface</translation>
+      <translation>Activar a interface de mosaico</translation>
     </message>
   </context>
   <context>
     <name>LayoutBackgroundSettingsWidget</name>
     <message>
       <source>Processing Image...Please Wait.</source>
-      <translation type="unfinished">Processing Image...Please Wait.</translation>
+      <translation>Procesando imaxe... Agarda, por favor.</translation>
     </message>
     <message>
       <source>Browse...</source>
@@ -1254,27 +1254,27 @@
     </message>
     <message>
       <source>View...</source>
-      <translation type="unfinished">View...</translation>
+      <translation>Ver...</translation>
     </message>
     <message>
       <source>Width:</source>
-      <translation type="unfinished">Width:</translation>
+      <translation>Ancho:</translation>
     </message>
     <message>
       <source>Keep Aspect Ratio</source>
-      <translation type="unfinished">Keep Aspect Ratio</translation>
+      <translation>Mantér a relación de aspecto</translation>
     </message>
     <message>
       <source>Opacity:</source>
-      <translation type="unfinished">Opacity:</translation>
+      <translation>Opacidade:</translation>
     </message>
     <message>
       <source>Height:</source>
-      <translation type="unfinished">Height:</translation>
+      <translation>Altura:</translation>
     </message>
     <message>
       <source>Crop to monitor aspect ratio</source>
-      <translation type="unfinished">Crop to monitor aspect ratio</translation>
+      <translation>Recortar para monitorizar a relación de aspecto</translation>
     </message>
   </context>
   <context>
@@ -1285,11 +1285,11 @@
     </message>
     <message>
       <source>Width</source>
-      <translation type="unfinished">Width</translation>
+      <translation>Ancho</translation>
     </message>
     <message>
       <source>Height</source>
-      <translation type="unfinished">Height</translation>
+      <translation>Altura</translation>
     </message>
     <message>
       <source>Logical ID</source>
@@ -1305,7 +1305,7 @@
     </message>
     <message>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>Tamaño mínimo da cuadrícula</translation>
     </message>
   </context>
   <context>
@@ -1316,7 +1316,7 @@
     </message>
     <message>
       <source>Shared layouts</source>
-      <translation type="unfinished">Shared layouts</translation>
+      <translation>Deseños compartidos</translation>
     </message>
     <message>
       <source>User&apos;s local layouts</source>
@@ -1327,7 +1327,7 @@
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
-      <translation type="unfinished">License Details</translation>
+      <translation>Detalles da licenza</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -1346,14 +1346,14 @@
     </message>
     <message>
       <source>License issues:</source>
-      <translation type="unfinished">License issues:</translation>
+      <translation>Problemas de licenza:</translation>
     </message>
   </context>
   <context>
     <name>LicenseWidget</name>
     <message>
       <source>Manual Activation</source>
-      <translation type="unfinished">Manual Activation</translation>
+      <translation>Activación manual</translation>
     </message>
     <message>
       <source>Select License File...</source>
@@ -1831,7 +1831,7 @@
     <name>PtzPresetDialog</name>
     <message>
       <source>Save Position</source>
-      <translation type="unfinished">Save Position</translation>
+      <translation>Gardar a posición</translation>
     </message>
     <message>
       <source>Name:</source>
