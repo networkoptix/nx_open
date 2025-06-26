@@ -9,8 +9,8 @@
 namespace nx::vms::rules {
 
 /** Macro for simple data field definition. */
-#define FIELD(type, getter, setter) \
-    Q_PROPERTY(type getter READ getter WRITE setter) \
+#define FIELD(type, getter, setter, ...) \
+    Q_PROPERTY(type getter READ getter WRITE setter __VA_ARGS__) \
 public: \
     type getter() const { return m_##getter; } \
     void setter(const type& val) { m_##getter = val; } \

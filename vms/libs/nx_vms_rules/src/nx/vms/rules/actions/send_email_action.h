@@ -19,7 +19,7 @@ class NX_VMS_RULES_API SendEmailAction: public nx::vms::rules::BasicAction
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)
     FIELD(std::chrono::microseconds, interval, setInterval)
     FIELD(QString, emails, setEmails)
-    FIELD(nx::email::Message, message, setMessage)
+    FIELD(nx::email::Message, message, setMessage, STORED false)
 
 public:
     static const ItemDescriptor& manifest();
