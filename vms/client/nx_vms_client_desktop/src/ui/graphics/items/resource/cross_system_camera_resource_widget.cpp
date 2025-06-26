@@ -45,10 +45,9 @@ struct QnCrossSystemCameraWidget::Private
                         return Qn::ResourceStatusOverlay::InformationRequiredOverlay;
                     }
                 }
-                return Qn::ResourceStatusOverlay::UnauthorizedOverlay;
             }
 
-            return Qn::ResourceStatusOverlay::InformationRequiredOverlay;
+            return Qn::ResourceStatusOverlay::UnauthorizedOverlay;
         }
 
         return Qn::OfflineOverlay;
@@ -112,7 +111,7 @@ int QnCrossSystemCameraWidget::calculateButtonsVisibility() const
 Qn::ResourceStatusOverlay QnCrossSystemCameraWidget::calculateStatusOverlay() const
 {
     if (NX_ASSERT(d->context) && d->context->needsCloudAuthorization())
-        return Qn::ResourceStatusOverlay::UnauthorizedOverlay;
+        return Qn::ResourceStatusOverlay::InformationRequiredOverlay;
 
     if (d->crossSystemCamera && d->crossSystemCamera->hasFlags(Qn::fake))
         return d->calculateStatusOverlay();
