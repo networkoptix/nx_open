@@ -453,6 +453,8 @@ Page
 
             visible: siteList.count == 0 && !loadingIndicator.visible
 
+            property bool isAdministrator: false
+
             readonly property var textData:
             {
                 const kNoSites = qsTr("No Sites")
@@ -488,11 +490,12 @@ Page
                             description: qsTr("Sites in the Suspended or Shutdown state are not available"),
                         }
                     }
+
                     return {
                         imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10",
                         text: kNoSites,
                         description: "",
-                        buttonText: qsTr("How to connect?"),
+                        buttonText: isAdministrator ? qsTr("How to connect?") : "",
                         buttonIconSource: "image://skin/24x24/Outline/cloud.svg?primary=dark1",
                         clickHandler: () => { cloudConnectionHelp.open() }
                     }
@@ -682,6 +685,10 @@ Page
             loadingIndicator.currentRootLoading =
                 !isCurrentRootInvalid
                 && accessor.getData(sessionsScreen.rootIndex, "isLoading")
+
+            emptyListPlaceholder.isAdministrator = Qt.binding(
+                () => sessionsScreen.rootIndex !== NxGlobals.invalidModelIndex()
+                    && accessor.getData(sessionsScreen.rootIndex, "isAdministrator"))
 
             if (isCurrentRootInvalid)
             {

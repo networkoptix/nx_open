@@ -48,6 +48,7 @@ public:
         IsFromSitesRole,
         IsAccessibleThroughOrgRole,
         IsAccessDeniedRole,
+        IsAdministratorRole,
 
         RolesCount
     };

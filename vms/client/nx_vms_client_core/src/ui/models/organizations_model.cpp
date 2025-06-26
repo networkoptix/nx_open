@@ -60,6 +60,7 @@ struct TreeNode
     {
         systemCount = org.systemCount;
         state = org.effectiveState;
+        orgOwnRoleIds = {org.ownRolesIds.begin(), org.ownRolesIds.end()};
         loading = true;
     }
 
@@ -157,10 +158,19 @@ struct TreeNode
         return children;
     }
 
+    bool hasOrganizationRole(const nx::Uuid& id) const
+    {
+        if (type == OrganizationsModel::Organization)
+            return orgOwnRoleIds.contains(id);
+
+        return parentNode() && parentNode()->hasOrganizationRole(id);
+    }
+
     nx::Uuid id;
     QString name;
     int systemCount = -1;
     api::SaasState state = api::SaasState::uninitialized;
+    std::unordered_set<nx::Uuid> orgOwnRoleIds;
     OrganizationsModel::NodeType type = OrganizationsModel::None;
     bool loading = false;
     bool accessible = true;
@@ -356,13 +366,19 @@ struct OrganizationsModel::Private
             auto node = nodes.find(org.id);
             if (!node)
                 continue;
+
+            const std::unordered_set<nx::Uuid> ownRoleIds =
+                {org.ownRolesIds.begin(), org.ownRolesIds.end()};
+
             if (node->name != QString::fromStdString(org.name)
                 || node->systemCount != org.systemCount
-                || node->state != org.effectiveState)
+                || node->state != org.effectiveState
+                || node->orgOwnRoleIds != ownRoleIds)
             {
                 node->name = QString::fromStdString(org.name);
                 node->systemCount = org.systemCount;
                 node->state = org.effectiveState;
+                node->orgOwnRoleIds = ownRoleIds;
                 notifyNodeUpdate(node);
             }
         }
@@ -759,6 +775,8 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
             return node->loading;
         case IsFromSitesRole:
             return false;
+        case IsAdministratorRole:
+            return node->hasOrganizationRole(kOrganizationAdministratorId);
         case QnSystemsModel::IsSaasUninitialized:
             return node->type == SitesNode;
         case QnSystemsModel::IsSaasSuspended:
@@ -856,6 +874,7 @@ QHash<int, QByteArray> OrganizationsModel::roleNames() const
         {IsFromSitesRole, "isFromSites"},
         {IsAccessibleThroughOrgRole, "isAccessibleThroughOrg"},
         {IsAccessDeniedRole, "isAccessDenied"},
+        {IsAdministratorRole, "isAdministrator"},
     };
 
     auto roles = QnSystemsModel::kRoleNames;
