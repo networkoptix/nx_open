@@ -97,8 +97,8 @@ TEST(LogLevelSettings, Parse)
     testParsing("info[x,y], verbose[a,b], none", Level::none,
         {{"x", Level::info}, {"y", Level::info}, {"a", Level::verbose}, {"b", Level::verbose}});
 
-    testParsing("verbose[First], WrongLevel[Second, Third], none[Foth]", kDefaultLevel,
-        {{"First", Level::verbose}, {"Foth", Level::none}});
+    testParsing("verbose[First], WrongLevel[Second, Third], none[Forth]", kDefaultLevel,
+        {{"First", Level::verbose}, {"Forth", Level::none}});
 
     testParsing("info, verbose[First, NoBracket", Level::info,
         {{"First", Level::verbose}, {"NoBracket", Level::verbose}});

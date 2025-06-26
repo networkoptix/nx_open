@@ -435,7 +435,7 @@ void WebSocket::gotFrame(FrameType type, nx::Buffer&& data, bool fin)
             setFailedState("Received 'close' control frame");
             break;
         default:
-            setFailedState(nx::format("Invaild frame type %1", (int) type));
+            setFailedState(nx::format("Invalid frame type %1", (int) type));
             NX_DEBUG(
                 this, "%1: Got frame with invalid type %2. Going to failed state.",
                 __func__, (int) type);

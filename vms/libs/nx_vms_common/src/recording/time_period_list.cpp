@@ -170,7 +170,6 @@ QnTimePeriodList QnTimePeriodList::intersectedPeriods(const QnTimePeriod &period
     return result;
 }
 
-
 qint64 QnTimePeriodList::duration() const
 {
     if (isEmpty())
@@ -605,7 +604,6 @@ void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeri
         if (eraseIter != periods.end())
             periods.erase(eraseIter, periods.end());
     }
-
 
     //NX_ASSERT(!periods.isEmpty(), "Empty list should be worked out earlier");
     if (periods.isEmpty())

@@ -390,7 +390,6 @@ TEST_F(QnCamLicenseUsageHelperTest, checkLicenseOverflowProposeDisable)
     ASSERT_FALSE(m_helper->isOverflowForCamera(camera));
 }
 
-
 /**
  *  Profiling test.
  */

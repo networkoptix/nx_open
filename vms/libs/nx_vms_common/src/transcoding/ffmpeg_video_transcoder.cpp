@@ -238,7 +238,6 @@ AVCodecParameters* QnFfmpegVideoTranscoder::getCodecParameters()
     return nullptr;
 }
 
-
 int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
     m_encodeTimer.restart();
@@ -294,7 +293,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     {
         if (!open(video))
         {
-            NX_WARNING(this, "Faield to open video transcoder");
+            NX_WARNING(this, "Failed to open video transcoder");
             return false;
         }
     }

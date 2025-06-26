@@ -251,7 +251,7 @@ struct NX_VMS_API ChannelPartner
     nx::Uuid id;
     QString name;
 
-    /**%apidoc Channel partner support information, addresses, pnone numbers etc. */
+    /**%apidoc Channel partner support information, addresses, phone numbers etc. */
     ChannelPartnerSupportInformation supportInformation;
 
     bool operator==(const ChannelPartner&) const = default;
@@ -291,7 +291,7 @@ NX_REFLECTION_ENUM_CLASS(SaasTierLimitName,
     /**%apidoc Whether Video Wall feature is enabled. */
     videowallEnabled,
 
-    /**%apidoc  Wheter cross-site features are enabled. For example: cross-site layouts.*/
+    /**%apidoc Whether cross-site features are enabled. For example: cross-site layouts.*/
     crossSiteFeaturesEnabled
 );
 

@@ -45,7 +45,7 @@ public:
     /**
      * @param timeout zero - no timeout
      * NOTE: Actual implementation MUST support connect request pipelining but
-     *   does not have to be neither thread-safe nor reenterable.
+     *   does not have to be neither thread-safe nor reentrant.
      */
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,

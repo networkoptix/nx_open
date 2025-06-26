@@ -70,4 +70,4 @@ TEST_F(GroupTest, groupsAreCorrect)
     makeSureGroupsAreCorrect();
 }
 
-} // namespace nx::analytics::taxoonomy
+} // namespace nx::analytics::taxonomy

@@ -387,7 +387,7 @@ signals:
     void resourcesAdded(const QnResourceList& resources);
 
     /**
-     * Emitted whenever any resource is removed from the pool. In case of batch removings is called
+     * Emitted whenever any resource is removed from the pool. In case of batch removing is called
      * for each resource separately.
      */
     [[deprecated]]

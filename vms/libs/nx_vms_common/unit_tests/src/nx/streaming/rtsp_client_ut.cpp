@@ -44,7 +44,7 @@ TEST(Sdp, SetupResponse2)
         "RTSP/1.0 200 OK\r\n"
         "CSeq: 25\r\n"
         "Session: 13816;timeout=50\r\n"
-        "Transport: RTP/AVP; multicast; estination=239.128.1.100; Server_Port=5564; ttl=15; Interleaved=2\r\n"
+        "Transport: RTP/AVP; multicast; destination=239.128.1.100; Server_Port=5564; ttl=15; Interleaved=2\r\n"
         "\r\n";
 
     QnRtspClient rtspClient(QnRtspClient::Config{});

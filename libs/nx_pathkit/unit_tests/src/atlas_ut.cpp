@@ -47,7 +47,6 @@ public:
             << "\" x2=\"" << x2 << "\" y2=\"" << y2 << "\" stroke=\"" << stroke << "\" />\n";
     }
 
-
 private:
     void addRect(int x, int y, int w, int h, const std::string& fill, const std::string& stroke)
     {

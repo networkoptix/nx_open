@@ -363,7 +363,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Reads from mutiple AbstractAttributeReader instances.
+ * Reads from multiple AbstractAttributeReader instances.
  */
 template<std::size_t kSize>
 class MultiReader:

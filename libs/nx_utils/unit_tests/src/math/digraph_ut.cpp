@@ -114,7 +114,6 @@ TEST(Digraph, loopDetection)
         ASSERT_EQ(edgeTravelled, generatePath(edges));
     }
 
-
     //removing vertice
 
     graph.removeVertice(1);

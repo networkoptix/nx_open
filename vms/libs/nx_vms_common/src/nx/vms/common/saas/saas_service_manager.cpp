@@ -392,7 +392,7 @@ QnLicensePtr ServiceManager::localRecordingLicenseV1Unsafe() const
     QnLicensePtr license = QnLicense::createSaasLocalRecordingLicense();
     if (m_data.state == SaasState::uninitialized || saasShutDown(m_data.state))
     {
-        // Dont use SAAS -> licenseV1 conversion for shutdown state.
+        // Don't use SAAS -> licenseV1 conversion for shutdown state.
         // Local recording will be stopped due there are no V1 licenses.
         return license;
     }

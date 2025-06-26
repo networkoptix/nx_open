@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 #include <transcoding/transcoding_utils.h>
 
-
 TEST(TranscodingUtils, findEncoderCodecIdTest)
 {
     ASSERT_EQ(nx::transcoding::findEncoderCodecId("mjpeg"), AV_CODEC_ID_MJPEG);
@@ -29,7 +28,7 @@ TEST(TranscodingUtils, adjustCodecRestrictions)
     ASSERT_EQ(nx::transcoding::adjustCodecRestrictions(AV_CODEC_ID_H263P, QSize(2048, 1152)), QSize(2048, 1152));
     ASSERT_EQ(nx::transcoding::adjustCodecRestrictions(AV_CODEC_ID_MPEG2VIDEO, QSize(2048, 1152)), QSize(2048, 1152));
 
-    // Should be croped to max allowed size
+    // Should be cropped to max allowed size
     ASSERT_EQ(nx::transcoding::adjustCodecRestrictions(AV_CODEC_ID_H263P, QSize(4096, 2304)), QSize(2048, 1152));
     ASSERT_EQ(nx::transcoding::adjustCodecRestrictions(AV_CODEC_ID_H263P, QSize(4096, 4096)), QSize(1152, 1152));
 

@@ -84,7 +84,6 @@ private:
         return decodeValue(result) > 0;
     }
 
-
     int decodeValue(qint64& value)
     {
         quint8 tmp[8];
@@ -128,7 +127,6 @@ private:
     qint64 m_lastValue;
 };
 
-
 /* Disable conversion wrapping for stream types as they are not convertible to anything
  * anyway. Also when wrapping is enabled, ADL fails to find template overloads. */
 
@@ -136,6 +134,5 @@ template<class Output>
 QnCompressedTimeReader<Output> *disable_user_conversions(QnCompressedTimeReader<Output> *value) {
     return value;
 }
-
 
 #endif // QN_COMPRESSED_TIME_READER_H

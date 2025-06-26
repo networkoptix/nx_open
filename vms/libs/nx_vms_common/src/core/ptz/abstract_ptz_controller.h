@@ -56,7 +56,7 @@ public:
      */
     virtual void initialize();
 
-    /** Mark meanful data invalid and forces to re-request it at some time. */
+    /** Mark meaningful data invalid and forces to re-request it at some time. */
     virtual void invalidate();
 
 public slots: //< Class is exposed to QML. All functions in section below are invokable

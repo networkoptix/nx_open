@@ -57,7 +57,7 @@ struct NX_VMS_API LicenseData: LicenseKey
      * </ul>
      * Additionally, other proprietary keys may appear in the License Block.
      * %// The following properties are intentionally left undocumented:
-     *     - SUPPORT (mising in struct DetailedLicenseData).
+     *     - SUPPORT (missing in struct DetailedLicenseData).
      *     - DEACTIVATIONS (missing in struct DetailedLicenseData).
      *     - ORDERTYPE (used also to denote SAAS).
      */

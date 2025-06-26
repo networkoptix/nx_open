@@ -429,7 +429,7 @@ struct NX_VMS_API DevicePtzOptions
      */
     std::optional<std::variant<qreal, PanTiltSensitivity>> panTiltSensitivity;
 
-    /**apidoc Preffered preset type */
+    /**apidoc Preferred preset type */
     std::optional<nx::vms::api::ptz::PresetType> presetType;
 
     /**%apidoc[readonly] Effective capabilities for use in `/rest/v{4-}/devices/{id}/ptz/`. */

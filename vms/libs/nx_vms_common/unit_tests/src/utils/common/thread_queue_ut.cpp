@@ -178,7 +178,7 @@ TEST_P(ThreadQueueFixture, Basic)
     }
 }
 
-// RandomAccess move ctor tranfers mutex ownership correctly.
+// RandomAccess move ctor transfers mutex ownership correctly.
 TEST_P(ThreadQueueFixture, MutexOwnershipTransfer)
 {
     auto& queue = getQueue();
@@ -297,7 +297,7 @@ TEST_P(ThreadQueueFixture, RemoveAllForward)
     ASSERT_EQ(access.size(), 0);
 }
 
-// Removing all queue elemnts backward.
+// Removing all queue elements backward.
 TEST_P(ThreadQueueFixture, RemoveAllBackward)
 {
     auto& queue = getQueue();

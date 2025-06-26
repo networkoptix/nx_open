@@ -154,7 +154,7 @@ TEST(Buffer, replace)
     ASSERT_EQ("Good morning, world", Buffer("Hello, world").replace(0, 5, "Good morning"));
     ASSERT_EQ("Hi, world", Buffer("Hello, world").replace(0, 5, "Hi"));
     ASSERT_EQ("Hello, beautiful world", Buffer("Hello, world").replace(7, 0, "beautiful "));
-    ASSERT_EQ("Chiao, mondo", Buffer("Hello, world").replace(0, buf.size(), "Chiao, mondo"));
+    ASSERT_EQ("Ciao, mondo", Buffer("Hello, world").replace(0, buf.size(), "Ciao, mondo"));
 }
 
 TEST(Buffer, iterating)

@@ -360,7 +360,7 @@ Result H264Parser::processData(
             }
             if (m_packetPerNal == 0)
             {
-                // FU_A first packetf
+                // FU_A first packet
                 --curPtr;
                 if (fixNalHeader)
                     *curPtr = nalUnitType;

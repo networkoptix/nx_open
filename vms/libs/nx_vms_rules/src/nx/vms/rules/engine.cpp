@@ -1038,7 +1038,7 @@ bool Engine::checkRunningEvent(nx::Uuid ruleId, const EventPtr& event)
             return false;
         }
 
-        // Appropriate `stopped` event must be removed from the watcher when the the engine
+        // Appropriate `stopped` event must be removed from the watcher when the engine
         // completely process the event - after all the action builders are called.
         runningEventWatcher.add(event);
     }

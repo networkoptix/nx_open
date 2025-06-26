@@ -31,7 +31,7 @@ public:
     /**
      * thread-to-worker dictionary is pre-allocated here.
      * @param aioService Pool of AIO threads.
-     * @param func Invoked to create a worker for a thread. Must be reenterable.
+     * @param func Invoked to create a worker for a thread. Must be reentrant.
      */
     AsyncObjectPool(AIOService* aioService, FactoryFunc func):
         m_factoryFunc(std::move(func))

@@ -78,7 +78,7 @@ ValidationResult TextWithFieldsValidator::validity(
                 return result;
             }
 
-            // TODO: #malofeev check the given endpoint exists on the site.
+            // TODO: #mmalofeev check the given endpoint exists on the site.
             if (text.contains(QRegularExpression((R"(\s)"))))
             {
                 result.validity = QValidator::State::Invalid;

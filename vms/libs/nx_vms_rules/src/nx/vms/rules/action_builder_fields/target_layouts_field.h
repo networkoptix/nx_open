@@ -12,7 +12,7 @@ struct TargetLayoutsFieldProperties
     /** Whether given field should be visible in the editor. */
     bool visible{true};
 
-    /** Value for the the just created field's `value` property. */
+    /** Value for the just created field's `value` property. */
     UuidSet value;
 
     bool allowEmptySelection{false};

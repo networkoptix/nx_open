@@ -59,7 +59,7 @@ AbstractCertificateVerifier::AbstractCertificateVerifier(QObject* parent): QObje
                 if (std::regex_match(fileInfo.baseName().toStdString(), regex))
                 {
                     NX_INFO(this,
-                        "Ignore built-in certificate %1 which matchs the filter %2",
+                        "Ignore built-in certificate %1 which matches the filter %2",
                         fileName, regexStr);
                     continue;
                 }

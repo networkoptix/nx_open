@@ -38,7 +38,6 @@ protected:
     }
 };
 
-
 TEST( TimePeriodCompressedSerializationTest, SerializeCompressedTimePeriodsUnsigned)
 {
 
@@ -68,7 +67,6 @@ TEST( TimePeriodCompressedSerializationTest, SerializeCompressedTimePeriodsUnsig
 
     ASSERT_TRUE( dstData == srcData );
 }
-
 
 // 2. signed stream test
 TEST( TimePeriodCompressedSerializationTest, SerializeCompressedTimePeriodsSigned)
@@ -144,7 +142,6 @@ TEST( TimePeriodCompressedSerializationTest, SerializeCompressedMultiServerPerio
 
         srcData.push_back(std::move(data));
     }
-
 
     QByteArray buffer = QnCompressedTime::serialized(srcData, false);
 

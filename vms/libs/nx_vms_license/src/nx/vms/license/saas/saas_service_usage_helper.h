@@ -115,7 +115,7 @@ public:
 
     /*
      * @return Services usage summary accumulated for cloud storage services with resolution
-     *     greater than or euqal to the given value.
+     *     greater than or equal to the given value.
      */
     nx::vms::api::LicenseSummaryData allInfoForResolution(int megapixels) const;
 

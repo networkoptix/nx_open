@@ -22,7 +22,6 @@ static const QString kValueEs("Hola!");
 static const QString kLocaleFr("fr_FR");
 static const QString kValueFr("Bonjour!");
 
-
 struct DataWithTranslatableString
 {
     TranslatableString field;

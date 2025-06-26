@@ -17,7 +17,7 @@ namespace nx::network::http {
 
 /**
  * Interface of an HTTP request handler class.
- * The implementation may choose to make the AbstractRequestHandler::serve re-enterable.
+ * The implementation may choose to make the AbstractRequestHandler::serve reentrant.
  */
 class NX_NETWORK_API AbstractRequestHandler
 {

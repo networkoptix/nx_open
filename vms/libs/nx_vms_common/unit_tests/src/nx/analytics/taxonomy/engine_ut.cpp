@@ -116,4 +116,4 @@ TEST_F(EngineTest, enginesAreCorrect)
     makeSureEnginesAreCorrect();
 }
 
-} // namespace nx::analytics::taxoonomy
+} // namespace nx::analytics::taxonomy

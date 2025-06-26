@@ -74,7 +74,7 @@ struct NX_VMS_COMMON_API EventParameters
     nx::Uuid eventResourceId;
 
     /**%apidoc[opt]
-     * Name of an arbitrary resource that caused the event. Usefull when there is no actual
+     * Name of an arbitrary resource that caused the event. Useful when there is no actual
      * Resource to fill `eventResourceId`. Used when `eventType` equals to `userDefinedEvent` only.
      */
     QString resourceName;

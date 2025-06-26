@@ -34,7 +34,7 @@ struct NX_VMS_API MediaData
     /**%apidoc Horizontal stretch. Value 1.0 means no stretch. */
     qreal hStretch = 1.0;
 
-    /**%apidoc Fisheye lens projestion type. */
+    /**%apidoc Fisheye lens projection type. */
     CameraProjection cameraProjection = CameraProjection::equidistant;
 
     /**%apidoc 360 degree spherical panorama horizon correction 1st angle, in degrees. */
@@ -122,7 +122,6 @@ NX_REFLECTION_INSTRUMENT(ViewData, ViewData_Fields)
 
 } // namespace dewarping
 } // namespace nx::vms::api
-
 
 // Compatibility-layer functions to maintain old way of (de)serializing in the server sql database.
 void NX_VMS_API serialize_field(const nx::vms::api::dewarping::MediaData& data, QVariant* target);
