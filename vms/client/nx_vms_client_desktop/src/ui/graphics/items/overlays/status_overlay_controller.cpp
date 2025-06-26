@@ -84,7 +84,7 @@ const OverlayInfoMap& overlayInfo()
         {Qn::InformationRequiredOverlay,
             {QnStatusOverlayWidget::ErrorStyle::red,
                 QnStatusOverlayWidget::tr("INFORMATION REQUIRED"),
-                kRestrictIconPath}},
+                kLockIconPath}},
         {Qn::NoDataOverlay,
             {QnStatusOverlayWidget::ErrorStyle::white,
                 QnStatusOverlayWidget::tr("NO DATA"),
