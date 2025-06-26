@@ -193,7 +193,7 @@ public:
             {
                 if (auto user = resource.dynamicCast<QnUserResource>())
                 {
-                    connect(user.get(), &QnUserResource::attributesChanged,
+                    connect(user.get(), &QnUserResource::attributesChanged, this,
                         [this](const QnResourcePtr& resource)
                         {
                             auto user = resource.dynamicCast<QnUserResource>();
@@ -399,7 +399,7 @@ void UserListModel::Private::resetUsers(const QnUserResourceList& value)
                 ++m_ldapUserCount;
         }
 
-        connect(user.get(), &QnUserResource::attributesChanged,
+        connect(user.get(), &QnUserResource::attributesChanged, this,
             [this](const QnResourcePtr& resource)
             {
                 auto user = resource.dynamicCast<QnUserResource>();
