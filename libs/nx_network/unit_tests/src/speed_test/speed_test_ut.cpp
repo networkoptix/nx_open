@@ -59,14 +59,14 @@ private:
 class TestFixture: public testing::Test
 {
 protected:
-	virtual void SetUp() override
-	{
+    virtual void SetUp() override
+    {
         m_testHttpServer = std::make_unique<nx::network::http::TestHttpServer>();
-		ASSERT_TRUE(m_testHttpServer->bindAndListen());
+        ASSERT_TRUE(m_testHttpServer->bindAndListen());
         m_speedTestServer.registerRequestHandlers(
             std::string(),
             &m_testHttpServer->httpMessageDispatcher());
-	}
+    }
 
     virtual void TearDown() override
     {
@@ -82,50 +82,50 @@ protected:
             .setEndpoint(m_testHttpServer->serverAddress());
     }
 
-	nx::Url validSpeedTestUrl() const
-	{
+    nx::Url validSpeedTestUrl() const
+    {
         return testHttpServerUrl();
-	}
+    }
 
-	nx::Url invalidSpeedTestUrl() const
-	{
-		return "http://127.0.0.1:1";
-	}
+    nx::Url invalidSpeedTestUrl() const
+    {
+        return "http://127.0.0.1:1";
+    }
 
-	void thenTestSucceeds()
-	{
-		auto errorCode = SystemError::noError;
-		std::tie(errorCode, m_result) = m_testDoneEvent.pop();
-		ASSERT_EQ(SystemError::noError, errorCode);
-	}
+    void thenTestSucceeds()
+    {
+        auto errorCode = SystemError::noError;
+        std::tie(errorCode, m_result) = m_testDoneEvent.pop();
+        ASSERT_EQ(SystemError::noError, errorCode);
+    }
 
-	void thenTestFails()
-	{
-		auto errorCode = SystemError::noError;
-		std::tie(errorCode, m_result) = m_testDoneEvent.pop();
-		ASSERT_NE(SystemError::noError, errorCode);
-	}
+    void thenTestFails()
+    {
+        auto errorCode = SystemError::noError;
+        std::tie(errorCode, m_result) = m_testDoneEvent.pop();
+        ASSERT_NE(SystemError::noError, errorCode);
+    }
 
-	void andTestResultIsValid()
-	{
-		ASSERT_TRUE(m_result);
-	}
+    void andTestResultIsValid()
+    {
+        ASSERT_TRUE(m_result);
+    }
 
-	void andTestResultIsInvalid()
-	{
-		ASSERT_FALSE(m_result);
-	}
+    void andTestResultIsInvalid()
+    {
+        ASSERT_FALSE(m_result);
+    }
 
 protected:
     std::unique_ptr<nx::network::http::TestHttpServer> m_testHttpServer;
-	UplinkSpeedTestServer m_speedTestServer;
+    UplinkSpeedTestServer m_speedTestServer;
     AbstractSpeedTester::Settings m_speedTestSettings{{}, 20, 5, std::chrono::seconds(30)};
 
-	nx::utils::SyncQueue<std::tuple<
-		SystemError::ErrorCode,
-		std::optional<nx::hpm::api::ConnectionSpeed>>> m_testDoneEvent;
+    nx::utils::SyncQueue<std::tuple<
+        SystemError::ErrorCode,
+        std::optional<nx::hpm::api::ConnectionSpeed>>> m_testDoneEvent;
 
-	std::optional<nx::hpm::api::ConnectionSpeed> m_result;
+    std::optional<nx::hpm::api::ConnectionSpeed> m_result;
 };
 
 class UplinkSpeedTester: public TestFixture
@@ -136,10 +136,10 @@ protected:
         m_speedTestSettings.url = url;
         m_speedTester = std::make_unique<speed_test::UplinkSpeedTester>(m_speedTestSettings);
         m_speedTester->start(
-			[this](auto&& ... args)
-			{
-				m_testDoneEvent.push(std::make_tuple(std::forward<decltype(args)>(args)...));
-			});
+            [this](auto&& ... args)
+            {
+                m_testDoneEvent.push(std::make_tuple(std::forward<decltype(args)>(args)...));
+            });
     }
 
 private:
@@ -148,9 +148,9 @@ private:
 
 TEST_F(UplinkSpeedTester, succeeds_with_valid_url)
 {
-	whenStartSpeedTest(validSpeedTestUrl());
-	thenTestSucceeds();
-	andTestResultIsValid();
+    whenStartSpeedTest(validSpeedTestUrl());
+    thenTestSucceeds();
+    andTestResultIsValid();
 }
 
 TEST_F(UplinkSpeedTester, fails_with_invalid_url)
@@ -381,7 +381,7 @@ TEST_F(UplinkSpeedReporter, fetches_speed_test_url_and_performs_test_and_reports
 
     whenSetSystemCredentials();
 
-    // Test is expected to run one extra time due to system crednetials being set
+    // Test is expected to run one extra time due to system credentials being set
     for (std::size_t i = 0; i < scheduleSize() + 1; ++i)
     {
         thenSpeedTestIsRun();

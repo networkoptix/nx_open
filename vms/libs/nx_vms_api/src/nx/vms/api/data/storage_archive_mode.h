@@ -28,7 +28,7 @@ NX_REFLECTION_ENUM_CLASS(StorageArchiveMode,
      * folder. In this mode server will watch other guid folder changes to timely be aware
      * of changes in those folders.
      * This mode is designed for shared NAS cases when multiple servers write to the same storage
-     * but it's desirable that each server also is aware of the neighbour folder contents.
+     * but it's desirable that each server also is aware of the neighbor folder contents.
      */
     shared,
 

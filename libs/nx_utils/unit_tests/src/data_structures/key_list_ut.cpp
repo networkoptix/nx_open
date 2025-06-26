@@ -16,7 +16,7 @@ TEST(KeyListTest, basics)
     ASSERT_TRUE(list.push_back(1));
     ASSERT_TRUE(list.push_back(10));
     ASSERT_FALSE(list.push_back(10)); //< Duplicate push back.
-    ASSERT_FALSE(list.push_front(1)); //< Duplucate push front.
+    ASSERT_FALSE(list.push_front(1)); //< Duplicate push front.
 
     ASSERT_TRUE(list.push_back(0));
     ASSERT_TRUE(list.push_front(5));

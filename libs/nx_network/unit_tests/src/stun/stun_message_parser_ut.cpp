@@ -602,7 +602,7 @@ TEST_F(StunMessageIntegrity, corrupted_integrity_is_not_verified)
 // it added zeroed MESSAGE-INTEGRITY when calculating the hmac.
 // This is wrong (see https://datatracker.ietf.org/doc/html/rfc8489#section-14.5),
 // but the backward compatibility between VMS and Cloud has to be preserved.
-// So, ths functionality has been kept as legacy.
+// So, this functionality has been kept as legacy.
 TEST_F(StunMessageIntegrity, legacy_integrity_verification)
 {
     givenSerializedMessageWithLegacyIntegrity();

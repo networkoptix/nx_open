@@ -436,7 +436,7 @@ struct ObjectTrackFilterFreeText
      *     <li>`param: expression`: Match if the Attribute with the name `param` is present and its
      *         value matches the expression specified after `:` using the same features as in the
      *         examples above.</li>
-     *     <li>`param: "complete"` or `param: $complete^`: Match if the the Attribute with the name
+     *     <li>`param: "complete"` or `param: $complete^`: Match if the Attribute with the name
      *         `param` is present and its value is exactly `complete` (without any prefix or
      *         suffix).</li>
      *     <li>NOTE: To specify an Attribute name which contains spaces, colons or other special

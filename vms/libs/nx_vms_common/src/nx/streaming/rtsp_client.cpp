@@ -1740,7 +1740,7 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
         m_serverInfo = nx::network::http::getHeaderValue(
             response.headers, nx::network::http::header::Server::NAME);
 
-        NX_VERBOSE(this, "Got Response response. url='%1', response= %2",
+        NX_VERBOSE(this, "Got response. url='%1', response= %2",
             request.requestLine.url, responseBuf);
 
         switch (response.statusLine.statusCode)

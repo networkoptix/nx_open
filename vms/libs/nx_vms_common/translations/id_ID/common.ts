@@ -1221,7 +1221,7 @@
     </message>
     <message numerus="yes">
       <source>Days</source>
-      <comment>Capitalized fapitalized full suffix for displaying days</comment>
+      <comment>Capitalized full suffix for displaying days</comment>
       <translation>
         <numerusform>Hari</numerusform>
       </translation>

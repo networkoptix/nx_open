@@ -117,7 +117,7 @@ struct NX_VMS_API BookmarkFilterBase
      * Time point around which bookmarks are going to be returned. If parameter is specified then
      * request returns nearest (by start time) limit/2 bookmarks before the split point and nearest
      * limit/2 bookmarks after.
-     * To derminate nearest bookmarks start time field is taken into consideration. If there are
+     * To determinate nearest bookmarks start time field is taken into consideration. If there are
      * bookmarks with the same start time then guid field is used to determine the order.
      * After bookmarks are gathered they are sorted by the specified _orderBy.
      * In case of ascending sorting (whatever the sorting _orderBy is) the split point is right

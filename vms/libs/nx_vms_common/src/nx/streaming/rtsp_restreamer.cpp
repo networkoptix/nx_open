@@ -250,7 +250,7 @@ CameraDiagnostics::Result RtspRestreamer::requestToken(
     }
     NX_VERBOSE(
         NX_SCOPE_TAG,
-        "Successfully set token credentionals for request %1",
+        "Successfully set token credentials for request %1",
         url.toString());
     return CameraDiagnostics::NoErrorResult();
 }

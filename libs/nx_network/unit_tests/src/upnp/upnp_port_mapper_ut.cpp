@@ -109,7 +109,7 @@ TEST_F(UpnpPortMapper, CheckMappings)
     EXPECT_TRUE(portMapper.disableMapping(7001, PortMapper::Protocol::tcp));
     EXPECT_EQ(portMapper.clientMock().mappingsCount(), 0U);
 
-    // This time mapping wount get restored.
+    // This time mapping wound get restored.
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
     EXPECT_EQ(portMapper.clientMock().mappings().size(), 0U);
 }

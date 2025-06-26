@@ -160,7 +160,7 @@ std::tuple<T, DeserializationResult> deserialize(
     else if (strCopy == "false")
         return {false, true};
     else
-        return {false, {false, "Failed to deserialze boolean", std::string{str}}};
+        return {false, {false, "Failed to deserialize boolean", std::string{str}}};
 }
 
 template<typename T>

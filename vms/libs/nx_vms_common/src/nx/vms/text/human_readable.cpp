@@ -125,7 +125,7 @@ struct PartDescriptor
     }
 };
 
-// Split given value by parts, descripted by units list. Returns true if at least one part was filled.
+// Split given value by parts, descriptored by units list. Returns true if at least one part was filled.
 template<typename Unit, typename Count>
 bool partition(qint64 value, std::vector<PartDescriptor<Unit, Count>>& units)
 {

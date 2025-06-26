@@ -99,7 +99,7 @@ public:
         // to mkv files. Will not be reordered in AbstractDataReorderer.
         MediaFlags_MetaDataBestShot     = 0x80000,
 
-        // Media packet from old archive version that should be BOM decoded before decrpyption
+        // Media packet from old archive version that should be BOM decoded before decryption
         // This flag can be removed in a 5.3
         MediaFlags_BomDecoding         = 0x100000,
 

@@ -235,7 +235,7 @@ struct HttpConnection
 // AsyncClientStopper
 
 /**
- * Helper class which signalyzes when AsyncClient is stopped and ready for deletion.
+ * Helper class which signalizes when AsyncClient is stopped and ready for deletion.
  */
 struct AsyncClientStopper
 {

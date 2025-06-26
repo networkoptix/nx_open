@@ -103,7 +103,7 @@ public:
     }
 
     /*
-     * Schedule new task if it doesn't exists or it is runing now.
+     * Schedule new task if it doesn't exists or it is running now.
      * Multiple calls schedule only one task but it is guarantee that
      * new task is scheduled after `restartOnceAsync` call.
      */

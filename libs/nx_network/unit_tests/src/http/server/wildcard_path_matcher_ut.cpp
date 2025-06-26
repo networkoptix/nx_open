@@ -62,4 +62,4 @@ TEST_F(HttpWildcardPathMatcher, no_match)
     assertNoMatch("/bar1");
 }
 
-} // namespace nx::rnetwork::http::test
+} // namespace nx::network::http::test

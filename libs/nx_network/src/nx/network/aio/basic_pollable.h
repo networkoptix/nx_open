@@ -105,7 +105,7 @@ public:
     virtual void pleaseStop(nx::MoveOnlyFunc<void()> completionHandler) override;
 
     /**
-     * If called within object's AIO thread (returned by getAioThread()) then cancells all
+     * If called within object's AIO thread (returned by getAioThread()) then cancels all
      * scheduled operations without blocking and returns immediately.
      * Otherwise, invokes BasicPollable::pleaseStop and waits for completion.
      * NOTE: In most cases, you don't need to override this.
@@ -149,7 +149,7 @@ public:
     void cancelPostedCalls(nx::MoveOnlyFunc<void()> completionHandler);
 
     /**
-     * When called from object's AIO thread, then cancells all posted calls immediately and returns.
+     * When called from object's AIO thread, then cancels all posted calls immediately and returns.
      * Otherwise, invokes BasicPollable::cancelPostedCalls and waits for its completion.
      */
     void cancelPostedCallsSync();

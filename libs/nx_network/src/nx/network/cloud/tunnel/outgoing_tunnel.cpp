@@ -208,7 +208,7 @@ void OutgoingTunnel::onTimer()
         {
             break;
         }
-        //operation timedout
+        //operation timed-out
         timedoutConnectOperations.emplace_back(std::move(it->second));
         m_connectHandlers.erase(it++);
     }
@@ -216,7 +216,7 @@ void OutgoingTunnel::onTimer()
     updateTimerIfNeededNonSafe(&lk, curTime);
 
     lk.unlock();
-    //triggering timedout operations
+    //triggering timed-out operations
     for (const auto& connectOperationContext: timedoutConnectOperations)
     {
         connectOperationContext.handler(

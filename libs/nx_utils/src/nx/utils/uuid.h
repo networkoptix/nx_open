@@ -74,7 +74,7 @@ public:
     static Uuid fromRfc4122(const QByteArray& bytes);
     static Uuid fromHardwareId(const QString& hwid);
 
-    /** Constructs a ramdom Uuid. */
+    /** Constructs a random Uuid. */
     static Uuid createUuid();
 
     /** Constructs a Uuid from pool of id's. Pool is determined by base id and individual offset. */

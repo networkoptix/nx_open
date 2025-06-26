@@ -69,7 +69,7 @@ QnFfmpegVideoDecoder::~QnFfmpegVideoDecoder(void)
 
 void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data)
 {
-    // Don't use multithread decoding for images, since then ffmpeg increases AVCodecContext->delay
+    // Don't use multithreaded decoding for images, since then ffmpeg increases AVCodecContext->delay
     // to more than 0 and does not output frames on single call decode(without flushing).
     if (m_useMtDecoding && !isImage(data))
         m_context->thread_count = std::min(kMaxDecodeThread, av_cpu_count());
@@ -475,7 +475,7 @@ void QnFfmpegVideoDecoder::setMultiThreadDecodePolicy(MultiThreadDecodePolicy va
 {
     if (m_mtDecodingPolicy != value)
     {
-        NX_VERBOSE(this, nx::format("Use multithread decoding policy %1").arg((int) value));
+        NX_VERBOSE(this, nx::format("Use multithreaded decoding policy %1").arg((int) value));
         m_mtDecodingPolicy = value;
         setMultiThreadDecoding(m_mtDecodingPolicy == MultiThreadDecodePolicy::enabled);
     }

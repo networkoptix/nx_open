@@ -5,7 +5,7 @@
 #include <nx/utils/bit_stream.h>
 #include <nx/utils/math/math.h>
 
-// convert AAC prifle to mpeg4 object type.
+// Convert AAC profile to mpeg4 object type.
 
 /*
 const int AACCodec::object_type[9] = {1, // 'AAC_MAIN' -> AAC Main
@@ -75,9 +75,9 @@ bool AdtsHeader::encodeToFfmpegExtradata(QByteArray* extradata) const
         writer.putBits(kAscObjectTypeLength, profile);
         writer.putBits(kAscSamplingIndexLength, mpeg4SamplingFrequencyIndex);
         writer.putBits(kAscChannelConfigLength, mpeg4ChannelConfiguration);
-        writer.putBit(0); //< Frame length - 1024 samples
-        writer.putBit(0); //< Does not depend on core coder
-        writer.putBit(0); //< Is not an extension
+        writer.putBit(0); //< Frame length - 1024 samples.
+        writer.putBit(0); //< Does not depend on core coder.
+        writer.putBit(0); //< Is not an extension.
 
         writer.flushBits();
     }
@@ -157,7 +157,7 @@ bool AACCodec::decodeFrame(quint8* buffer, quint8* end)
         /* adts_variable_header */
         bits.skipBit();          /* copyright_identification_bit */
         bits.skipBit();          /* copyright_identification_start */
-        // -- 32 bit getted
+        // -- 32 bit got
         int frameSize = bits.getBits(13) >> 2; /* aac_frame_length */
         //LTRACE(LT_DEBUG, 0, "decoded frame size: " << m_size);
         int adts_buffer_fullness = bits.getBits(11);       /* adts_buffer_fullness */

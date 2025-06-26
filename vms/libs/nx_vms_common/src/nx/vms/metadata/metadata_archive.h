@@ -79,7 +79,7 @@ static const int kGeometrySize = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 
         quint16 duration;
 
         /**%apidoc
-         * Addition record size in words. The word size dis efined in the IndexHeader. This field
+         * Addition record size in words. The word size is defined in the IndexHeader. This field
          * is used for Analytics data and is always zero for Motion data.
          */
         quint8 extraWords = 0;
@@ -186,7 +186,6 @@ public:
     QString physicalId() const;
     QString getFilePrefix(const QDate& datetime) const;
     bool supportVariousRecordSize(std::chrono::milliseconds timestamp);
-
 
     static constexpr quint32 kMinimalDurationMs = 125;
 protected:

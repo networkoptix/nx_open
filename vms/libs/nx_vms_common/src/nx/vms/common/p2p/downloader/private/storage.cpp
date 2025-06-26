@@ -54,7 +54,7 @@ Storage::Storage(const QDir& downloadsDirectory, QObject* parent):
     m_downloadsDirectory(downloadsDirectory)
 {
     QDir().mkpath(metadataDirectoryPath());
-    /* Cleanup expired files every 5 mins. */
+    /* Cleanup expired files every 5 minutes. */
     const auto timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Storage::cleanupExpiredFiles);
     timer->start(kCleanupPeriod);

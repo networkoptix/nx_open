@@ -116,7 +116,7 @@ QString QnTimeStrings::fullSuffixCapitalized(Suffix value, int count)
         case Suffix::Hours:
             return tr("Hours", "Capitalized full suffix for displaying hours", count);
         case Suffix::Days:
-            return tr("Days", "Capitalized fapitalized full suffix for displaying days", count);
+            return tr("Days", "Capitalized full suffix for displaying days", count);
         case Suffix::Weeks:
             return tr("Weeks", "Capitalized full suffix for displaying weeks", count);
         case Suffix::Months:

@@ -63,7 +63,6 @@ QImage getCachedimageByAspectRatio(double aspectRatio)
     return QImage();
 }
 
-
 QImage createAndCacheWatermarkImage(const Watermark& watermark, QSize size)
 {
     double aspectRatio = ((double) size.width()) / size.height();

@@ -309,7 +309,6 @@ void MimeProtoVersion::serialize(nx::Buffer* const dstBuffer) const
     nx::utils::buildString(dstBuffer, protocol, "/", version);
 }
 
-
 //-------------------------------------------------------------------------------------------------
 // class RequestLine.
 
@@ -748,7 +747,6 @@ bool isMessageBodyPresent(const Response& response)
 
     return true;
 }
-
 
 //-------------------------------------------------------------------------------------------------
 // class Message.
@@ -1199,7 +1197,6 @@ BasicAuthorization::BasicAuthorization(
     basic->password = userPassword;
 }
 
-
 DigestAuthorization::DigestAuthorization():
     Authorization(AuthScheme::digest)
 {
@@ -1455,7 +1452,6 @@ quint64 Range::totalRangeLength(size_t contentSize) const
     return totalLength;
 }
 
-
 //-------------------------------------------------------------------------------------------------
 // Content-Range.
 
@@ -1497,7 +1493,6 @@ std::string ContentRange::toString() const
         rangeSpec.start, '-', rangeEnd,
         suffix);
 }
-
 
 //-------------------------------------------------------------------------------------------------
 // Via.

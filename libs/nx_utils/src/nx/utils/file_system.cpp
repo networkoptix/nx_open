@@ -92,7 +92,7 @@ static Result moveToExisting(
             if (moveWithFallback(sourcePath, targetFilePath, replaceExisting))
             {
                 NX_VERBOSE(
-                    kLogTag, "%1: Sucessfully renamed %2 to %3",
+                    kLogTag, "%1: Successfully renamed %2 to %3",
                     __func__, sourcePath, targetFilePath);
                 return Result::ok;
             }
@@ -112,7 +112,7 @@ static Result moveToExisting(
     if (moveWithFallback(sourcePath, targetFilePath, replaceExisting))
     {
         NX_VERBOSE(
-            kLogTag, "%1: Target path does not exists. Sucessfully renamed %2 to %3",
+            kLogTag, "%1: Target path does not exists. Successfully renamed %2 to %3",
             __func__, sourcePath, targetFilePath);
         return Result::ok;
     }

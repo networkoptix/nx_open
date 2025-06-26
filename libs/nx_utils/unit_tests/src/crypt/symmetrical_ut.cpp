@@ -31,7 +31,7 @@ const std::vector<std::vector<uint8_t>> kVariableKeys = {
 };
 
 /**
- * The escaped unicode codepoints represent cyrillic letters, but they don't form coherent text,
+ * The escaped unicode codepoints represent Cyrillic letters, but they don't form coherent text,
  * it's only test data.
  */
 const std::vector<QByteArray> kTestData{

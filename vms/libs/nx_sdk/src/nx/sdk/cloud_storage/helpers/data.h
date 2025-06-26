@@ -346,7 +346,7 @@ struct Motion
     /**
      * Binary motion mask data. Encoded in base64.
      *
-     * This mask covers the frame as a 44x32 cells grid. Every non zero bit in the mask means thet
+     * This mask covers the frame as a 44x32 cells grid. Every non zero bit in the mask means that
      * motion was detected in that cell. So, the bit mask size is 44 * 32 = 1408 bits = 176 bytes
      * before encoding to base64. The mask is rotated by 90 degree. The very first bit of the mask
      * is the top-left corner bit. The next bit is for 1st column, 2nd row, etc.

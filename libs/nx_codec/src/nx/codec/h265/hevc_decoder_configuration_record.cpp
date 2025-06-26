@@ -137,7 +137,6 @@ bool HEVCDecoderConfigurationRecord::write(uint8_t* data, int size) const
     return true;
 }
 
-
 int HEVCDecoderConfigurationRecord::size() const
 {
     int result =

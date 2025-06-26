@@ -173,7 +173,7 @@ public:
         m_cacheList.clear();
     }
 
-    // @return a non invasive iterator (does not upate the keys access time).
+    // @return a non invasive iterator (does not update the keys access time).
     const_iterator begin() const
     {
         return m_cacheList.begin();

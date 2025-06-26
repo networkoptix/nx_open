@@ -48,7 +48,7 @@ protected:
                 if (allScheduledInvokationsCompleted(lock))
                 {
                     NX_DEBUG(this,
-                        "All required invokations completed, reseting within aio thread");
+                        "All required invocations completed, reseting within aio thread");
                     m_scheduler.reset();
                 }
             });
@@ -80,7 +80,7 @@ private:
     milliseconds m_period;
     std::set<milliseconds> m_schedule;
     std::unique_ptr<aio::Scheduler> m_scheduler;
-    std::map<milliseconds, int /*invokations*/> m_invokations;
+    std::map<milliseconds, int /*invocations*/> m_invokations;
     int m_requiredInvokations;
 };
 

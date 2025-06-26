@@ -138,7 +138,6 @@ public:
 
     QByteArray rawData() const;
 
-
     /**
      * @return true if any of tiers has overuse
      */
@@ -234,7 +233,7 @@ private:
     void setServices(const std::vector<nx::vms::api::SaasService>& services);
 
     /*
-     * @return purshase info by serviceId
+     * @return purchase info by serviceId
      */
     template <typename ServiceParamsType>
     std::map<nx::Uuid, ServiceParamsType> purchasedServices(const QString& serviceType) const;

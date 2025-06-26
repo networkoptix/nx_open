@@ -25,7 +25,7 @@ protected:
     std::chrono::milliseconds m_period;
     math::SumPerPeriod<int> m_sumPerPeriod;
     nx::utils::test::ScopedSyntheticMonotonicTime m_timeShift{
-        // Make it easier to reason about time passing by setting intial time to 0.
+        // Make it easier to reason about time passing by setting initial time to 0.
         std::chrono::steady_clock::time_point{}};
     int m_value = 0;
     int m_valueCount = 0;

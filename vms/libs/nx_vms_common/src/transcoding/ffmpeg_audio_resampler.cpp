@@ -76,7 +76,7 @@ bool FfmpegAudioResampler::pushFrame(AVFrame* inputFrame)
         || inputFrame->ch_layout.nb_channels != m_config.srcChannelLayout.nb_channels
         || inputFrame->ch_layout.order != m_config.srcChannelLayout.order)
     {
-        NX_DEBUG(this, "Source audio foramt changed, reinit resampler");
+        NX_DEBUG(this, "Source audio format changed, reinit resampler");
         m_config.srcSampleRate = inputFrame->sample_rate;
         m_config.srcSampleFormat = (AVSampleFormat)inputFrame->format;
         m_config.srcChannelLayout = inputFrame->ch_layout;

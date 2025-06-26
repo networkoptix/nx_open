@@ -134,7 +134,7 @@ struct FieldDescriptor
     QString description;
 
     /**%apidoc[opt]:object Optional properties corresponding to the actual field id. */
-    QVariantMap properties; //< TODO: #mmalofeev should properties required for the field initialisation be separated from the supportive properties?
+    QVariantMap properties; //< TODO: #mmalofeev should properties required for the field initialization be separated from the supportive properties?
 };
 #define nx_vms_rules_FieldDescriptor_Fields (type)(fieldName)(displayName)(description)(properties)
 NX_VMS_RULES_API void serialize(

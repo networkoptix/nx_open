@@ -194,7 +194,7 @@ public:
     int time_base_num;
     int time_base_den;
     int color_prim;       ///< 8bits, chroma coordinates of the color primaries
-        int transfer_char;    ///< 8bits, Opto-electronic transfer characteristics
+        int transfer_char;    ///< 8bits, optoelectronic transfer characteristics
     int matrix_coef;      ///< 8bits, Color primaries->YCbCr transform matrix
     int hrd_param_flag;
         int hrd_num_leaky_buckets;

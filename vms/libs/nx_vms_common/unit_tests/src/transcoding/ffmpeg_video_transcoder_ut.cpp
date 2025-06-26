@@ -67,7 +67,7 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(1280, 720));
     }
     {
-        // Use target resolution and codec resctriction.
+        // Use target resolution and codec restriction.
         QnFfmpegVideoTranscoder::Config config;
         config.targetCodecId = AV_CODEC_ID_H263P;
         config.sourceResolution = QSize(3820, 2160);
@@ -90,7 +90,7 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(2160, 4096));
     }
     {
-        // Use rotation and codec resctriction after rotation.
+        // Use rotation and codec restriction after rotation.
         QnFfmpegVideoTranscoder::Config config;
         config.targetCodecId = AV_CODEC_ID_H263P;
         config.sourceResolution = QSize(3820, 2160);

@@ -147,7 +147,7 @@ public:
 
         T&& result() { return std::move(*value); }
 
-        std::optional<T> value; // Allow non-default-constructible T (eg. std::expected).
+        std::optional<T> value; // Allow non-default-constructible T (e.g. std::expected).
     };
 
     using promise_type = std::conditional_t<std::is_same_v<T, void>, PromiseVoid, PromiseT>;

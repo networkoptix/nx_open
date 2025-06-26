@@ -170,7 +170,6 @@ TEST(NalUnits, find4BytesStartcodes)
     }
 }
 
-
 TEST(NalUnits, convertStartCodesToSizes)
 {
     // Simple.
@@ -255,7 +254,7 @@ TEST(NalUnits, convertStartCodesToSizes)
         ASSERT_EQ(converted[8], 0x00);
         ASSERT_EQ(converted[9], 0x05);
     }
-    // 3 bytes starcode
+    // 3 bytes startcode
     {
         uint8_t data[] = {
             0x00, 0x00, 0x01, 0x1c, 0xe8,

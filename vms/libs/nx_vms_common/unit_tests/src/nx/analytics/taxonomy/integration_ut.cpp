@@ -71,4 +71,4 @@ TEST_F(IntegrationTest, integrationsAreCorrect)
     makeSureIntegrationsAreCorrect();
 }
 
-} // namespace nx::analytics::taxoonomy
+} // namespace nx::analytics::taxonomy

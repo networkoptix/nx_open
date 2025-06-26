@@ -12,7 +12,6 @@ namespace nx::analytics::db {
 using namespace nx::common::metadata;
 static const int kMinTokenLength = 3;
 
-
 std::vector<TextSearchCondition> UserTextSearchExpressionParser::parse(const QString& text)
 {
     std::vector<TextSearchCondition> result;
@@ -92,7 +91,7 @@ void TextMatcher::parse(const QString& text)
     m_conditions = parser.parse(text);
     if (m_conditions.size() > 64)
     {
-        NX_WARNING(this, "Text matcher supports up to 64 condittions. %1 provided", m_conditions.size());
+        NX_WARNING(this, "Text matcher supports up to 64 conditions. %1 provided", m_conditions.size());
         m_conditions.erase(m_conditions.begin() + 64, m_conditions.end());
     }
 }
