@@ -10496,7 +10496,7 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost</source>
-      <translation>HTTPS に対応していないカメラとの接続は失われます</translation>
+      <translation>HTTPS に対応していないカメラとの接続は失われます。</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>

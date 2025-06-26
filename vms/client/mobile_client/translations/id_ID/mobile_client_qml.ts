@@ -1242,7 +1242,7 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>Koneksi putus. Sedang mengkoneksikan kembali...</translation>
     </message>
   </context>
 </TS>

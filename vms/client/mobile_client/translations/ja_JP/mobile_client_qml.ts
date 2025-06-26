@@ -1242,7 +1242,7 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>接続が失われました。再接続しています...</translation>
     </message>
   </context>
 </TS>

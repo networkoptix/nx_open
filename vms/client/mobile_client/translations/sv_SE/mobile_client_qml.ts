@@ -1243,7 +1243,7 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>Anslutning förlorad. Återansluter...</translation>
     </message>
   </context>
 </TS>

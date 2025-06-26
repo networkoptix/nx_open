@@ -14,9 +14,9 @@
     <message numerus="yes">
       <source>%n Object Attributes</source>
       <comment>%n is number of attributes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Atributos dos obxectos</numerusform>
-        <numerusform>%n Object Attributes</numerusform>
+        <numerusform>%n Atributos do obxecto</numerusform>
       </translation>
     </message>
   </context>
