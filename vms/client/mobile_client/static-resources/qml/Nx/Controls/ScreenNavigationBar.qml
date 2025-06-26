@@ -28,9 +28,9 @@ Rectangle
              === windowContext.depricatedUiController.currentScreen
 
     x: 0
-    y: windowParams.availableHeight - height
+    y: parent.height - height
     width: parent.width
-    height:d.kBarSize
+    height: d.kBarSize
 
     RowLayout
     {

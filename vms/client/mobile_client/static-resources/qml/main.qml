@@ -95,7 +95,6 @@ Controls.ApplicationWindow
     {
         id: topLevelWarning
 
-        x: -windowParams.leftMargin
         width: parent.width
         text: d.warningText
         opened: text.length
