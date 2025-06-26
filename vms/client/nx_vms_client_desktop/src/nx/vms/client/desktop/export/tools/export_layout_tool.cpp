@@ -546,7 +546,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
 }
 
 void ExportLayoutTool::at_camera_exportFinished(const std::optional<nx::recording::Error>& status,
-    const QString& /*filename*/)
+    const QString& filename)
 {
     if (d->status == ExportProcessStatus::cancelled)
         return;
@@ -554,7 +554,7 @@ void ExportLayoutTool::at_camera_exportFinished(const std::optional<nx::recordin
     d->lastError = convertError(status);
     if (d->lastError == ExportProcessError::dataNotFound)
     {
-        NX_VERBOSE(this, "Data not found: %1", d->resources.head()->getName());
+        NX_VERBOSE(this, "Data not found: %1", filename);
 
         d->lastError = ExportProcessError::noError;
         exportNextCamera();
@@ -565,6 +565,8 @@ void ExportLayoutTool::at_camera_exportFinished(const std::optional<nx::recordin
 
     if (d->lastError != ExportProcessError::noError)
     {
+        NX_VERBOSE(this, "An error ocurred: %1", filename);
+
         finishExport(false);
         return;
     }
