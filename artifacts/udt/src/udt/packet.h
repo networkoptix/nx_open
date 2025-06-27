@@ -227,7 +227,7 @@ public:
     int getMsgBoundary() const;
 
     // Functionality:
-    //    Read the message inorder delivery flag bit.
+    //    Read the message in-order delivery flag bit.
     // Parameters:
     //    None.
     // Returned value:

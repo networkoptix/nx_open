@@ -332,7 +332,7 @@ bool QuaZIODevice::atEnd() const
 
 qint64 QuaZIODevice::bytesAvailable() const
 {
-    // If we haven't recevied Z_STREAM_END, it means that
+    // If we haven't received Z_STREAM_END, it means that
     // we have at least one more input byte available.
     // Plus whatever QIODevice has buffered.
     return (d->atEnd ? 0 : 1) + QIODevice::bytesAvailable();

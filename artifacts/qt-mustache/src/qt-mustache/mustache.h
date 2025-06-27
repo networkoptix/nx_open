@@ -78,7 +78,7 @@ namespace Mustache
         * If canEval() returns true for a key, the renderer will pass the literal, unrendered
         * block of text for the section to eval() and replace the section with the result.
         *
-        * canEval() and eval() are equivalents for callable objects (eg. lambdas) in other
+        * canEval() and eval() are equivalents for callable objects (e.g. lambdas) in other
         * Mustache implementations.
         *
         * The default implementation always returns false.
@@ -261,7 +261,7 @@ namespace Mustache
         * moved to one past the end of the line. If @p tag is not standalone, it is
         * left unmodified.
         *
-        * A tag is standalone if it is the only non-whitespace token on the the line.
+        * A tag is standalone if it is the only non-whitespace token on the line.
         */
         static void expandTag(Tag& tag, const QString& content);
 

@@ -431,7 +431,7 @@ private:
     CCache<CInfoBlock>* m_pCache = nullptr;        // network information cache
 
     // Status
-    volatile bool m_bListening = false;                  // If the UDT entit is listening to connection
+    volatile bool m_bListening = false;                  // If the UDT entity is listening to connection
     volatile bool m_bConnecting = false;            // The short phase when connect() is called but not yet completed
     volatile bool m_bConnected = false;                  // Whether the connection is on or off
     volatile bool m_bClosing = false;                    // If the UDT entity is closing

@@ -19,7 +19,7 @@ static void freeFDSet(CustomFdSet* fdSet)
 }
 
 /**
- * Reallocs fdSet to be of size newSize while preseving existing data.
+ * Reallocs fdSet to be of size newSize while preserving existing data.
  * In case of allocation error *fdSet is freed and set to NULL.
  */
 static void reallocFDSet(CustomFdSet** fdSet, size_t newSize)

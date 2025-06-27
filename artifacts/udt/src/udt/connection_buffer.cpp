@@ -597,7 +597,7 @@ bool ReceiveBuffer::scanMsg(
 
         if (found)
         {
-            // the msg has to be ack'ed or it is allowed to read out of order, and was not read before
+            // the msg has to be acknowledged or it is allowed to read out of order, and was not read before
             if (!passack || !m_pUnit[q]->packet()->getMsgOrderFlag())
                 break;
 

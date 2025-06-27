@@ -98,7 +98,7 @@ int CSndLossList::insert(int32_t seqno1, int32_t seqno2)
         {
             m_iLastInsertPos = loc;
 
-            // first seqno is equivlent, compare the second
+            // first seqno is equivalent, compare the second
             if (-1 == m_piData2[loc])
             {
                 if (seqno2 != seqno1)
