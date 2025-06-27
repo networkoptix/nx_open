@@ -38,7 +38,7 @@ QnGraphicsStackedWidget::~QnGraphicsStackedWidget()
     /* d_ptr must be destructed before base_type destructor is called.
      * For that reason QScopedPointer is used. */
 
-    // We delete child widgets explicitly to prevent propogating graphics
+    // We delete child widgets explicitly to prevent propagating graphics
     // item events to partially deleted items.
     while(const auto widget = removeWidget(0))
         delete widget;

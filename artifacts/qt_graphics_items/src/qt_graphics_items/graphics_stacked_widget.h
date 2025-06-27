@@ -48,14 +48,14 @@ public:
 
     /** Add graphics widget to the end of the stack.
       * Takes ownership of the widget.
-      * Returns index of the widget in the stack or -1 if eigher
+      * Returns index of the widget in the stack or -1 if either
       *   nullptr or a widget already in the stack was passed. */
     int addWidget(QGraphicsWidget* widget);
 
     /** Insert graphics widget to the stack at specified position.
       * Takes ownership of the widget.
       * Index is first bounded to [0, count()].
-      * Returns bounded index or -1 if eigher nullptr
+      * Returns bounded index or -1 if either nullptr
       *   or a widget already in the stack was passed. */
     int insertWidget(int index, QGraphicsWidget* widget);
 

@@ -60,7 +60,7 @@ static QString qt_readEscapedFormatString(const QString &format, int *idx)
     ++i;
     if (i == format.size())
         return QString();
-    if (format.at(i).unicode() == '\'') { // "''" outside of a quoted stirng
+    if (format.at(i).unicode() == '\'') { // "''" outside of a quoted string
         ++i;
         return QLatin1String("'");
     }
@@ -167,7 +167,7 @@ QString QnDateTimeFormatter::dateTimeToString(const QString &format,
     NX_ASSERT(date || time);
     if ((date && !date->isValid()) || (time && !time->isValid()))
         return QString();
-    
+
     bool format_am_pm;
     bool format_day;
     getTimeFormatAPD(format, &format_am_pm, &format_day);
@@ -175,7 +175,6 @@ QString QnDateTimeFormatter::dateTimeToString(const QString &format,
         format_am_pm = false;
     if(!date)
         format_day = false;
-
 
     enum { AM, PM } am_pm = AM;
     int hour12 = time ? time->hour() : -1;

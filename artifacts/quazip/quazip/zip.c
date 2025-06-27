@@ -136,24 +136,24 @@ typedef struct
     bz_stream bstream;          /* bzLib stream structure for bziped */
 #endif
 
-    int  stream_initialised;    /* 1 is stream is initialised */
+    int  stream_initialised;    /* 1 is stream is initialized */
     uInt pos_in_buffered_data;  /* last written byte in buffered_data */
 
     ZPOS64_T pos_local_header;     /* offset of the local header of the file
-                                     currenty writing */
+                                     currently writing */
     char* central_header;       /* central header data for the current file */
     uLong size_centralExtra;
     uLong size_centralheader;   /* size of the central header for cur file */
     uLong size_centralExtraFree; /* Extra bytes allocated to the centralheader but that are not used */
     uLong flag;                 /* flag of the file currently writing */
 
-    int  method;                /* compression method of file currenty wr.*/
+    int  method;                /* compression method of file currently wr.*/
     int  raw;                   /* 1 for directly writing raw data */
     Byte buffered_data[Z_BUFSIZE];/* buffer contain compressed data to be writ*/
     uLong dosDate;
     uLong crc32;
     int  encrypt;
-    int  zip64;               /* Add ZIP64 extened information in the extra field */
+    int  zip64;               /* Add ZIP64 extended information in the extra field */
     ZPOS64_T pos_zip64extrainfo;
     ZPOS64_T totalCompressedData;
     ZPOS64_T totalUncompressedData;

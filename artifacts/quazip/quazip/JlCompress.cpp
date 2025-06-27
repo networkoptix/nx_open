@@ -55,7 +55,7 @@ bool JlCompress::compressFile(QuaZip* zip, QString fileName, QString fileDest) {
     inFile.setFileName(fileName);
     if(!inFile.open(QIODevice::ReadOnly)) return false;
 
-    // Apro il file risulato
+    // Apro il file risultato
     QuaZipFile outFile(zip);
     if(!outFile.open(QIODevice::WriteOnly, QuaZipNewInfo(fileDest, inFile.fileName()))) return false;
 
@@ -89,15 +89,14 @@ bool JlCompress::compressSubDir(QuaZip* zip, QString dir, QString origDir, bool 
     if (!directory.exists()) return false;
 
     QDir origDirectory(origDir);
-	if (dir != origDir) {
-		QuaZipFile dirZipFile(zip);
-		if (!dirZipFile.open(QIODevice::WriteOnly,
-			QuaZipNewInfo(origDirectory.relativeFilePath(dir) + "/", dir), 0, 0, 0)) {
-				return false;
-		}
-		dirZipFile.close();
-	}
-
+    if (dir != origDir) {
+        QuaZipFile dirZipFile(zip);
+        if (!dirZipFile.open(QIODevice::WriteOnly,
+            QuaZipNewInfo(origDirectory.relativeFilePath(dir) + "/", dir), 0, 0, 0)) {
+                return false;
+        }
+        dirZipFile.close();
+    }
 
     // Se comprimo anche le sotto cartelle
     if (recursive) {
@@ -440,4 +439,4 @@ QStringList JlCompress::extractFiles(QIODevice *ioDevice, QStringList files, QSt
 {
     QuaZip zip(ioDevice);
     return extractFiles(zip, files, dir);
-} 
+}

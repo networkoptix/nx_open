@@ -38,7 +38,6 @@ written by
 Yunhong Gu, last updated 01/12/2011
 *****************************************************************************/
 
-
 #ifndef __UDT_QUEUE_H__
 #define __UDT_QUEUE_H__
 
@@ -89,7 +88,7 @@ public:
     //    Update the timestamp of the UDT instance on the list.
     // Parameters:
     //    1) [in] u: pointer to the UDT instance
-    //    2) [in] resechedule: if the timestamp should be rescheduled
+    //    2) [in] reschedule: if the timestamp should be rescheduled
     // Returned value:
     //    None.
 
@@ -225,7 +224,7 @@ private:
     {
         UDTSOCKET id = -1;
         std::weak_ptr<CUDT> socket;
-        // UDT sonnection peer address
+        // UDT connection peer address
         detail::SocketAddress peerAddr;
         // the time that this request expires
         std::chrono::microseconds ttl = std::chrono::microseconds::zero();
@@ -367,13 +366,13 @@ private:
     CRcvUList m_rcvUList;
     // Hash table for UDT socket looking up
     SocketByIdDict m_socketByIdDict;
-    // UDP channel for receving packets
+    // UDP channel for receiving packets
     AbstractUdpChannel* m_channel = nullptr;
     // shared timer with the snd queue
     CTimer* m_timer = nullptr;
     const int m_iIPversion;
 
-    // closing the workder
+    // closing the worker
     volatile bool m_bClosing = false;
 
     // pointer to the (unique, if any) listening UDT entity

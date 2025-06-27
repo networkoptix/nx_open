@@ -376,7 +376,7 @@ QString Renderer::render(const QString& _template, int startPos, int endPos, Con
                 output += QString(" ").repeated(tag.indentation);
                 // Indenting the output to keep the parent indentation.
                 int posOfLF = partialContent.indexOf("\n", 0);
-                while (posOfLF > 0 && posOfLF < (partialContent.length() - 1)) { // .length() - 1 because we dont want indentation AFTER the last character if it's a LF
+                while (posOfLF > 0 && posOfLF < (partialContent.length() - 1)) { // .length() - 1 because we don't want indentation AFTER the last character if it's a LF
                     partialContent = partialContent.insert(posOfLF + 1, QString(" ").repeated(tag.indentation));
                     posOfLF = partialContent.indexOf("\n", posOfLF + 1);
                 }

@@ -197,7 +197,7 @@ void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
 
 std::unique_ptr<CPacket> CSndUList::pop(detail::SocketAddress& addr)
 {
-    // When this method destroyes CUDT, it must do it with no mutex lock.
+    // When this method destroys CUDT, it must do it with no mutex lock.
     std::shared_ptr<CUDT> u;
 
     std::lock_guard<std::mutex> lock(m_mutex);

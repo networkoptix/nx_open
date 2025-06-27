@@ -244,7 +244,7 @@ struct SpeexPreprocessState_ {
    float  max_increase_step; /**< Maximum increase in gain from one frame to another */
    float  max_decrease_step; /**< Maximum decrease in gain from one frame to another */
    float  prev_loudness;     /**< Loudness of previous frame */
-   float  init_max;          /**< Current gain limit during initialisation */
+   float  init_max;          /**< Current gain limit during initialization */
 #endif
    int    nb_adapt;          /**< Number of frames used for adaptation so far */
    int    was_speech;
