@@ -2043,7 +2043,9 @@ std::vector<NalUnitInfo> findNalUnitsMp4(const uint8_t* data, int32_t size)
 }
 
 std::vector<NalUnitInfo> findNalUnitsAnnexB(
-    const uint8_t* data, int32_t size, bool droppedFirstStartcode)
+    const uint8_t* data, int32_t size,
+    bool droppedFirstStartcode,
+    bool removeFinalTrailing)
 {
     std::vector<NalUnitInfo> result;
     const uint8_t* dataEnd = data + size;
@@ -2054,9 +2056,12 @@ std::vector<NalUnitInfo> findNalUnitsAnnexB(
         nextNaluStart = NALUnit::findNextNAL(naluStart, dataEnd);
         const uint8_t *naluEnd = nextNaluStart == dataEnd ? dataEnd : nextNaluStart - 3;
 
-        // skipping leading_zero_8bits and trailing_zero_8bits
-        while (naluEnd > naluStart && naluEnd[-1] == 0)
-            --naluEnd;
+        if (removeFinalTrailing || nextNaluStart != dataEnd)
+        {
+            // skipping leading_zero_8bits and trailing_zero_8bits
+            while (naluEnd > naluStart && naluEnd[-1] == 0)
+                --naluEnd;
+        }
 
         if (naluEnd > naluStart)
             result.emplace_back(NalUnitInfo{naluStart, int(naluEnd - naluStart)});

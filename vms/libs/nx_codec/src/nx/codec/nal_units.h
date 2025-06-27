@@ -557,7 +557,9 @@ struct NX_CODEC_API NalUnitInfo
 };
 
 NX_CODEC_API std::vector<NalUnitInfo> findNalUnitsAnnexB(
-    const uint8_t* data, int32_t size, bool droppedFirstStartcode = false);
+    const uint8_t* data, int32_t size,
+    bool droppedFirstStartcode = false,
+    bool removeFinalTrailing = true);
 
 NX_CODEC_API std::vector<NalUnitInfo> findNalUnitsMp4(
     const uint8_t* data, int32_t size);
