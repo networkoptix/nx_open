@@ -24,6 +24,7 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/analytics/taxonomy/utils.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
 #include <nx/vms/client/core/event_search/utils/live_analytics_receiver.h>
@@ -1256,19 +1257,34 @@ void AnalyticsSearchListModel::setAttributeFilters(const QStringList& value)
     emit attributeFiltersChanged();
 }
 
+/**
+ * Builds a search-query string that combines the currently selected attribute filters with the
+ * free-text filter and returns it in the exact format expected by the server.
+ *
+ * The server parses every right-hand side as a regex. For enum-type attributes (e.g. Gender) we
+ * force an exact literal match by quoting the value and adding anchors. Non-enum values stay as-is.
+ *
+ *     Gender=^"Man"$ Height=170...180 Hat!=true <free-text>
+ *
+ * Attribute pairs are joined with spaces; free text (if present) is appended after one more space.
+ */
 QString AnalyticsSearchListModel::combinedTextFilter() const
 {
     const auto freeText = NX_ASSERT(textFilter())
         ? textFilter()->text()
         : QString{};
 
-    const auto attributesText = attributeFilters().join(" ");
-    if (attributesText.isEmpty())
+    auto attributes = attributeFilters();
+    if (attributes.isEmpty())
         return freeText;
 
-    return freeText.isEmpty()
-        ? attributesText
-        : QString("%1 %2").arg(attributesText, freeText);
+    QString attributesText = attributes.join(" ");
+    if (!freeText.isEmpty())
+        attributesText.append(" " + freeText);
+    return analytics::taxonomy::makeEnumValuesExact(
+        attributesText,
+        systemContext()->analyticsAttributeHelper(),
+        selectedObjectTypes());
 }
 
 bool AnalyticsSearchListModel::isConstrained() const
