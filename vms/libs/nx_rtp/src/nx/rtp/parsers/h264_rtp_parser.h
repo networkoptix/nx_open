@@ -51,7 +51,7 @@ private:
     bool isBufferOverflow() const;
 
     void updateNalFlags(const quint8* data, int dataLen);
-    void handleSingleNalunitPacket(uint8_t* buffer, int offset, int size);
+    void handleSingleNalunitPacket(uint8_t* buffer, int offset, int size, bool removeTrailing);
 };
 
 } // namespace nx::rtp
