@@ -380,7 +380,7 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
 
     const bool smtpIsNotSet = hasPowerUserPermissions()
         && !(systemSettings()->emailSettings().isValid()
-        || systemSettings()->emailSettings().useCloudServiceToSendEmail);
+            || systemSettings()->emailSettings().useCloudServiceToSendEmail.value_or(false));
 
     switch (index)
     {
