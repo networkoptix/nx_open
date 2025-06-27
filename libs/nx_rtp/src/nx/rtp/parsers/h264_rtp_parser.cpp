@@ -370,7 +370,7 @@ Result H264Parser::processData(
                 // Some cameras send SPS and PPS together with IDR NAL unit in one fragmentation
                 // unit. So Try to find NAL units inside first FU unit.
                 handleSingleNalunitPacket(
-                    rtpBufferBase, int(curPtr - rtpBufferBase), int(bufferEnd - curPtr));
+                    rtpBufferBase, int(curPtr - rtpBufferBase), int(bufferEnd - curPtr), /*removeTrailing*/false);
             }
             else
             {
@@ -392,7 +392,9 @@ Result H264Parser::processData(
         {
             curPtr--;
             handleSingleNalunitPacket(
-                rtpBufferBase, int(curPtr - rtpBufferBase), int(bufferEnd - curPtr));
+                rtpBufferBase, int(curPtr - rtpBufferBase),
+                int(bufferEnd - curPtr),
+                /*removeTrailing*/true);
         }
     }
 
@@ -415,10 +417,10 @@ Result H264Parser::processData(
     return {true};
 }
 
-void H264Parser::handleSingleNalunitPacket(uint8_t* buffer, int offset, int size)
+void H264Parser::handleSingleNalunitPacket(uint8_t* buffer, int offset, int size, bool removeTrailing)
 {
     // Check data for other NAL units, some cameras send multiple units in Single NAL unit packet.
-    auto nalUnits = nx::media::nal::findNalUnitsAnnexB(buffer + offset, size, true);
+    auto nalUnits = nx::media::nal::findNalUnitsAnnexB(buffer + offset, size, true, removeTrailing);
     for (const auto& nalu: nalUnits)
     {
         m_chunks.addChunk(nalu.data - buffer, nalu.size, true);
