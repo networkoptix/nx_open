@@ -874,7 +874,7 @@
     </message>
     <message>
       <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <translation>Informacje o aplikacji</translation>
     </message>
   </context>
   <context>
@@ -1245,7 +1245,7 @@
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation type="unfinished">Connection lost. Reconnecting...</translation>
+      <translation>Połączenie utracone. Ponowne łączenie...</translation>
     </message>
   </context>
 </TS>
