@@ -337,7 +337,7 @@
     </message>
     <message>
       <source>It is forbidden to change Server deployment code</source>
-      <translation type="unfinished">It is forbidden to change Server deployment code</translation>
+      <translation>Il est interdit de modifier le code de déploiement du serveur</translation>
     </message>
   </context>
 </TS>
