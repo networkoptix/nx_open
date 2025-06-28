@@ -129,24 +129,8 @@ Page
 
         onCameraWarningVisibleChanged:
         {
-            if (cameraWarningVisible)
-            {
-                if (controller.serverOffline || controller.needsCloudAuthorization)
-                {
-                    windowContext.ui.windowHelpers.exitFullscreen()
-                    controlsVisible = false
-                    uiVisible = true
-                }
-                else if (controller.cameraOffline)
-                {
-                    showUi()
-                }
-            }
-            else
-            {
-                showUi()
-                d.controlsVisible = true
-            }
+            showUi()
+            d.controlsVisible = !(d.cameraWarningVisible && controller.serverOffline)
         }
 
         onApplicationActiveChanged:
@@ -230,7 +214,7 @@ Page
         {
             id: bookmarksMenuItem
             text: qsTr("Bookmarks")
-            visible: controller.systemContext.hasViewBookmarksPermission
+            visible: controller.systemContext?.hasViewBookmarksPermission ?? false
             height: visible ? implicitHeight : 0
             onTriggered: Workflow.openEventSearchScreen(controller.resource.id, camerasModel)
         }
@@ -239,7 +223,7 @@ Page
         {
             id: objectsMenuItem
             text: qsTr("Objects")
-            visible: controller.systemContext.hasSearchObjectsPermission
+            visible: controller.systemContext?.hasSearchObjectsPermission ?? false
             height: visible ? implicitHeight : 0
             onTriggered: Workflow.openEventSearchScreen(controller.resource.id, camerasModel, true)
         }

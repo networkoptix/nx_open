@@ -124,21 +124,6 @@ void QnAvailableCameraListModel::setLayout(const QnLayoutResourcePtr& layout)
     d->setLayout(layout);
 }
 
-QModelIndex QnAvailableCameraListModel::indexByResourceId(const nx::Uuid& resourceId) const
-{
-    Q_D(const QnAvailableCameraListModel);
-
-    const auto it = std::find_if(d->resources.cbegin(), d->resources.cend(),
-        [resourceId](const auto resource)
-        {
-            return resource->getId() == resourceId;
-        });
-
-    return it == d->resources.cend()
-        ? QModelIndex{}
-        : index(std::distance(d->resources.cbegin(), it));
-}
-
 bool QnAvailableCameraListModel::filterAcceptsResource(const QnResourcePtr& resource) const
 {
     if (!resource->hasFlags(Qn::live_cam))
@@ -150,7 +135,7 @@ bool QnAvailableCameraListModel::filterAcceptsResource(const QnResourcePtr& reso
     return true;
 }
 
-QnAvailableCameraListModelPrivate::QnAvailableCameraListModelPrivate(QnAvailableCameraListModel* parent) :
+QnAvailableCameraListModelPrivate::QnAvailableCameraListModelPrivate(QnAvailableCameraListModel* parent):
     q_ptr(parent)
 {
     resetResources();
@@ -310,10 +295,7 @@ void QnAvailableCameraListModelPrivate::at_layout_itemAdded(
     if (!NX_ASSERT(resource == layout && layout))
         return;
 
-    const auto pool = MobileContextAccessor(layout).resourcePool();
-    const auto camera = pool
-        ? pool->getResourceById<QnVirtualCameraResource>(item.resource.id)
-        : QnVirtualCameraResourcePtr{};
+    const auto camera = nx::vms::client::core::getResourceByDescriptor(item.resource);
 
     if (camera)
         addCamera(camera);
@@ -325,13 +307,10 @@ void QnAvailableCameraListModelPrivate::at_layout_itemRemoved(
     if (!NX_ASSERT(resource == layout && layout))
         return;
 
-    const auto pool = MobileContextAccessor(layout).resourcePool();
-    const auto camera = pool
-        ? pool->getResourceById<QnVirtualCameraResource>(item.resource.id)
-        : QnVirtualCameraResourcePtr{};
+    const auto camera = nx::vms::client::core::getResourceByDescriptor(item.resource);
 
     if (camera)
-        addCamera(camera);
+        removeCamera(camera);
 }
 
 void QnAvailableCameraListModelPrivate::handleResourceChanged(const QnResourcePtr& resource)

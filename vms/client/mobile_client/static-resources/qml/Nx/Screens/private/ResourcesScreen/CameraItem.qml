@@ -39,10 +39,13 @@ Control
         property int status: { API.ResourceStatus.offline }
 
         readonly property bool offline: status == API.ResourceStatus.offline
-        readonly property bool showTumbnailDummy: offline ||
-                               status == API.ResourceStatus.undefined ||
-                               status == API.ResourceStatus.unauthorized ||
-                               hasDefaultPassword || hasOldFirmware || ioModule
+        readonly property bool showThumbnailDummy: offline
+            || status == API.ResourceStatus.undefined
+            || needsCloudAuthorization
+            || unauthorized
+            || hasDefaultPassword
+            || hasOldFirmware
+            || ioModule
         readonly property bool unauthorized: status == API.ResourceStatus.unauthorized
         readonly property bool needsCloudAuthorization: mediaResourceHelper.needsCloudAuthorization
         readonly property bool hasDefaultPassword: mediaResourceHelper.hasDefaultCameraPassword
@@ -86,14 +89,14 @@ Control
             height: width * cameraItem.aspectRatio
 
 
-            color: d.showTumbnailDummy ? ColorTheme.colors.dark8 : ColorTheme.colors.dark4
+            color: d.showThumbnailDummy ? ColorTheme.colors.dark8 : ColorTheme.colors.dark4
 
             Item
             {
                 width: parent.width
                 height:
                 {
-                    const dummyModeOffset = d.showTumbnailDummy
+                    const dummyModeOffset = d.showThumbnailDummy
                         ? cameraInfo.height + cameraInfo.margin * 2
                         : 0
                     return parent.width * cameraItem.aspectRatio - dummyModeOffset
@@ -106,7 +109,7 @@ Control
                     anchors.centerIn: parent
                     state:
                     {
-                        if (d.showTumbnailDummy)
+                        if (d.showThumbnailDummy)
                             return "dummyContent"
 
                         const allowVideoContent = !initialLoadingTimer.running
