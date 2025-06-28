@@ -49,6 +49,11 @@ public:
         return wasLast;
     }
 
+    int removeAll(const T& key)
+    {
+        return m_hash.take(key);
+    }
+
     bool empty() const
     {
         return m_hash.empty();
@@ -62,6 +67,11 @@ public:
     QList<T> keys() const
     {
         return m_hash.keys();
+    }
+
+    qsizetype keyCount() const
+    {
+        return m_hash.size();
     }
 
     void clear()

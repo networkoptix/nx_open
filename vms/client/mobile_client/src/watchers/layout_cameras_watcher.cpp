@@ -5,6 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/range_adapters.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 
 namespace nx {
@@ -34,8 +35,8 @@ void LayoutCamerasWatcher::setLayout(const QnLayoutResourcePtr& layout)
 
         const auto cameras = m_cameras;
         m_cameras.clear();
-        m_countByCameraId.clear();
-        for (const auto& camera: cameras)
+
+        for (const auto& camera: nx::utils::keyRange(cameras))
             emit cameraRemoved(camera);
     }
 
@@ -60,7 +61,11 @@ void LayoutCamerasWatcher::setLayout(const QnLayoutResourcePtr& layout)
     const auto handleItemRemoved =
         [this](const QnLayoutResourcePtr&, const nx::vms::common::LayoutItemData& item)
         {
-            removeCamera(item.resource.id);
+            if (const auto camera = nx::vms::client::core::getResourceByDescriptor(
+                item.resource).dynamicCast<QnVirtualCameraResource>())
+            {
+                removeCamera(camera);
+            }
         };
 
     for (const auto& item: layout->getItems())
@@ -82,34 +87,44 @@ void LayoutCamerasWatcher::setLayout(const QnLayoutResourcePtr& layout)
         });
 }
 
-QHash<nx::Uuid, QnVirtualCameraResourcePtr> LayoutCamerasWatcher::cameras() const
+QnVirtualCameraResourceList LayoutCamerasWatcher::cameras() const
 {
-    return m_cameras;
+    return m_cameras.keys();
 }
 
 int LayoutCamerasWatcher::count() const
 {
-    return m_cameras.size();
+    return m_cameras.keyCount();
 }
 
 void LayoutCamerasWatcher::addCamera(const QnVirtualCameraResourcePtr& camera)
 {
-    const auto cameraId = camera->getId();
+    if (!m_cameras.insert(camera))
+        return;
 
-    m_cameras[cameraId] = camera;
-    if (m_countByCameraId.insert(cameraId))
-        emit cameraAdded(camera);
+    connect(camera.get(), &QnResource::flagsChanged, this,
+        [this](const QnResourcePtr& resource)
+        {
+            const auto camera = resource.objectCast<QnVirtualCameraResource>();
+            if (NX_ASSERT(camera) && camera->hasFlags(Qn::removed))
+            {
+                camera->disconnect(this);
+
+                if (NX_ASSERT(m_cameras.removeAll(camera) > 0))
+                    emit cameraRemoved(camera);
+            }
+        });
+
+    emit cameraAdded(camera);
 }
 
-void LayoutCamerasWatcher::removeCamera(const nx::Uuid& cameraId)
+void LayoutCamerasWatcher::removeCamera(const QnVirtualCameraResourcePtr& camera)
 {
-    if (m_countByCameraId.remove(cameraId))
-    {
-        const auto camera = m_cameras.take(cameraId);
-        NX_ASSERT(camera);
-        if (camera)
-            emit cameraRemoved(camera);
-    }
+    if (!m_cameras.remove(camera))
+        return;
+
+    camera->disconnect(this);
+    emit cameraRemoved(camera);
 }
 
 } // namespace mobile

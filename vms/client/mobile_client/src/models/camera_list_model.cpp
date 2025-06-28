@@ -2,6 +2,7 @@
 
 #include "camera_list_model.h"
 
+#include <QtCore/QPointer>
 #include <QtCore/QUrlQuery>
 
 #include <camera/camera_thumbnail_cache.h>
@@ -49,7 +50,7 @@ struct QnCameraListModel::Private: public QObject
 {
     Private(QnCameraListModel* q);
 
-    void handleThumbnailUpdated(const nx::Uuid& resourceId, const QString& thumbnailId);
+    void handleThumbnailUpdated(const QnVirtualCameraResourcePtr& camera);
     QModelIndex indexByResourceId(const nx::Uuid& resourceId) const;
 
     QnCameraListModel* const q;
@@ -67,8 +68,21 @@ QnCameraListModel::Private::Private(QnCameraListModel* q):
         [this](mobile::SystemContext* systemContext)
         {
             systemContextConnections[systemContext].reset(connect(
-                systemContext->cameraThumbnailCache(), &QnCameraThumbnailCache::thumbnailUpdated,
-                this, &QnCameraListModel::Private::handleThumbnailUpdated));
+                systemContext->cameraThumbnailCache(),
+                &QnCameraThumbnailCache::thumbnailUpdated,
+                this,
+                [this, systemContext = QPointer<core::SystemContext>(systemContext)](
+                    const nx::Uuid& resourceId)
+                {
+                    if (!systemContext)
+                        return;
+
+                    const auto camera = systemContext->resourcePool()->getResourceById<
+                        QnVirtualCameraResource>(resourceId);
+
+                    if (camera)
+                        handleThumbnailUpdated(camera);
+                }));
         });
 
     connect(model.get(), &QnAvailableCameraListModel::systemContextRemoved, this,
@@ -177,6 +191,9 @@ UuidList QnCameraListModel::selectedIds() const
 
 void QnCameraListModel::setSelectedIds(const UuidList& value)
 {
+    // TODO: #vkutin #ynikitenkov This doesn't support cross-system layouts and is unsafe.
+    // However, currently it's not used in "layout mode".
+
     const UuidSet newValues(value.begin(), value.end());
     if (newValues == d->selectedIds)
         return;
@@ -222,14 +239,10 @@ int QnCameraListModel::rowByResource(QnResource* rawResource) const
     if (!rawResource)
         return -1;
 
-    const auto resource = rawResource
-        ? rawResource->toSharedPointer()
-        : QnResourcePtr{};
+    const auto found = match(index(0, 0), core::RawResourceRole, QVariant::fromValue(rawResource),
+        /*hits*/ 1, Qt::MatchExactly);
 
-    const auto index = d->model->indexByResourceId(resource->getId());
-    return index.isValid()
-        ? mapFromSource(index).row()
-        : -1;
+    return found.empty() ? -1 : found.front().row();
 }
 
 nx::Uuid QnCameraListModel::resourceIdByRow(int row) const
@@ -324,19 +337,15 @@ bool QnCameraListModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourc
     return d->filterIds.contains(id);
 }
 
-void QnCameraListModel::Private::handleThumbnailUpdated(
-    const nx::Uuid& resourceId, const QString& /*thumbnailId*/)
+void QnCameraListModel::Private::handleThumbnailUpdated(const QnVirtualCameraResourcePtr& camera)
 {
-    const auto pool = mobile::SystemContextAccessor(indexByResourceId(resourceId)).resourcePool();
-    if (NX_ASSERT(pool))
-        model->refreshResource(pool->getResourceById(resourceId), core::ThumbnailRole);
+    model->refreshResource(camera, core::ThumbnailRole);
 }
 
 QModelIndex QnCameraListModel::Private::indexByResourceId(const nx::Uuid& resourceId) const
 {
-    const auto sourceIndex = model->indexByResourceId(resourceId);
-    if (!sourceIndex.isValid())
-        return {};
+    const auto found = q->match(q->index(0, 0), core::UuidRole, QVariant::fromValue(resourceId),
+        /*hits*/ 1, Qt::MatchExactly);
 
-    return q->mapFromSource(sourceIndex);
+    return found.empty() ? QModelIndex{} : found.front();
 }

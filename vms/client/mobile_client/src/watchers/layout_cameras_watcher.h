@@ -25,8 +25,8 @@ public:
     QnLayoutResourcePtr layout() const;
     void setLayout(const QnLayoutResourcePtr& layout);
 
-    QHash<nx::Uuid, QnVirtualCameraResourcePtr> cameras() const;
     int count() const;
+    QnVirtualCameraResourceList cameras() const;
 
 signals:
     void layoutChanged(const QnLayoutResourcePtr& layout);
@@ -36,12 +36,11 @@ signals:
 
 private:
     void addCamera(const QnVirtualCameraResourcePtr& camera);
-    void removeCamera(const nx::Uuid& cameraId);
+    void removeCamera(const QnVirtualCameraResourcePtr& camera);
 
 private:
     QnLayoutResourcePtr m_layout;
-    QHash<nx::Uuid, QnVirtualCameraResourcePtr> m_cameras;
-    QnCounterHash<nx::Uuid> m_countByCameraId;
+    QnCounterHash<QnVirtualCameraResourcePtr> m_cameras;
 };
 
 } // namespace mobile

@@ -48,7 +48,7 @@ Pane
                 lineHeight: 1.25
                 color: ColorTheme.colors.light16
                 wrapMode: Text.WordWrap
-                visible: text != ""
+                visible: !!text
             }
 
             Text
@@ -63,19 +63,18 @@ Pane
                 lineHeight: 1.25
                 color: ColorTheme.colors.dark16
                 wrapMode: Text.WordWrap
-                visible: text != ""
+                visible: !!text
             }
-        }
 
-        Button
-        {
-            id: button
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: compact ? 32 : 64
-            anchors.horizontalCenter: parent.horizontalCenter
-            padding: 16
-            onClicked: dummy.buttonClicked()
-            visible: text != ""
+            Button
+            {
+                id: button
+
+                padding: 16
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: !!text
+                onClicked: dummy.buttonClicked()
+            }
         }
     }
 }
