@@ -43,4 +43,4 @@ static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1'000'000ll * 3600*24*100;
  */
 NX_VMS_COMMON_API uint qt4Hash(const QString& key);
 
-NX_VMS_COMMON_API QString mksecToDateTime(qint64 valueUsec);
+NX_VMS_COMMON_API QString usecToDateTime(qint64 valueUsec);

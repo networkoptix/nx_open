@@ -31,7 +31,6 @@ public:
 
     virtual bool isSingleShotMode() const = 0;
 
-
     // Manual open. Open will be called automatically on first data access
     bool open(AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher);
 
@@ -112,7 +111,7 @@ public:
      */
     virtual std::chrono::microseconds currentTime() const = 0;
 
-    virtual bool jumpToEx(qint64 mksec, qint64 skipTime, bool bindPositionToPlaybackMask, qint64* outJumpTime, bool useDelegate = true) = 0;
+    virtual bool jumpToEx(qint64 usec, qint64 skipTime, bool bindPositionToPlaybackMask, qint64* outJumpTime, bool useDelegate = true) = 0;
     virtual bool isJumpProcessing() const = 0;
 
     void setRealtimeSpeed(float value) { m_realTimeSpeed = value; }
@@ -122,15 +121,15 @@ protected:
 
     virtual QnAbstractMediaDataPtr getNextData() = 0;
 signals:
-    void beforeJump(qint64 mksec);
-    void jumpOccurred(qint64 mksec, int sequence);
+    void beforeJump(qint64 usec);
+    void jumpOccurred(qint64 usec, int sequence);
     void streamAboutToBePaused();
     void streamPaused();
     void streamAboutToBeResumed();
     void streamResumed();
     void nextFrameOccurred();
     void prevFrameOccurred();
-    void skipFramesTo(qint64 mksec);
+    void skipFramesTo(qint64 usec);
     void waitForDataCanBeAccepted();
 protected:
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher = nullptr;

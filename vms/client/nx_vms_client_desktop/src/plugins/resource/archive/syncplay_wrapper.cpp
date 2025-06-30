@@ -147,26 +147,26 @@ void QnArchiveSyncPlayWrapper::pauseMedia()
     }
 }
 
-void QnArchiveSyncPlayWrapper::directJumpToNonKeyFrame(qint64 mksec)
+void QnArchiveSyncPlayWrapper::directJumpToNonKeyFrame(qint64 usec)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     NX_MUTEX_LOCKER lock( &d->timeMutex );
-    d->lastJumpTime = mksec;
+    d->lastJumpTime = usec;
     d->timer.restart();
     foreach(const ReaderInfo& info, d->readers)
     {
         if (!info.reader->isEnabled())
             continue;
         info.reader->setNavDelegate(0);
-        info.reader->directJumpToNonKeyFrame(mksec);
+        info.reader->directJumpToNonKeyFrame(usec);
         info.reader->setNavDelegate(this);
     }
 }
 
-void QnArchiveSyncPlayWrapper::setJumpTime(qint64 mksec)
+void QnArchiveSyncPlayWrapper::setJumpTime(qint64 usec)
 {
     Q_D(QnArchiveSyncPlayWrapper);
-    d->lastJumpTime = mksec;
+    d->lastJumpTime = usec;
     // keep camera sync after jump to live position (really in reverse mode cameras stay in archive)
     if (d->speed < 0 && d->lastJumpTime == DATETIME_NOW)
         d->lastJumpTime = qnSyncTime->currentUSecsSinceEpoch();
@@ -188,22 +188,22 @@ void QnArchiveSyncPlayWrapper::setSkipFramesToTime(qint64 skipTime)
     }
 }
 
-bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
+bool QnArchiveSyncPlayWrapper::jumpTo(qint64 usec,  qint64 skipTime)
 {
-    NX_VERBOSE(this, "Jump to %1 (skip %2)", mksecToDateTime(mksec), mksecToDateTime(skipTime));
+    NX_VERBOSE(this, "Jump to %1 (skip %2)", usecToDateTime(usec), usecToDateTime(skipTime));
 
     Q_D(QnArchiveSyncPlayWrapper);
     NX_MUTEX_LOCKER lock(&d->readerListMutex);
     {
         NX_MUTEX_LOCKER lock(&d->timeMutex);
-        setJumpTime(skipTime ? skipTime : mksec);
+        setJumpTime(skipTime ? skipTime : usec);
     }
     bool rez = false;
     foreach(const ReaderInfo& info, d->readers)
     {
         if (info.reader->isEnabled())
         {
-            rez |= info.reader->jumpToEx(mksec, skipTime,
+            rez |= info.reader->jumpToEx(usec, skipTime,
                 /*bindPositionToPlaybackMask*/ false,
                 nullptr, /*useDelegate*/ false);
         }
@@ -239,7 +239,7 @@ void QnArchiveSyncPlayWrapper::nextFrame()
     }
 }
 
-void QnArchiveSyncPlayWrapper::previousFrame(qint64 mksec)
+void QnArchiveSyncPlayWrapper::previousFrame(qint64 usec)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     NX_MUTEX_LOCKER lock( &d->timeMutex );
@@ -248,7 +248,7 @@ void QnArchiveSyncPlayWrapper::previousFrame(qint64 mksec)
         if (!info.reader->isEnabled())
             continue;
         info.reader->setNavDelegate(0);
-        info.reader->previousFrame(mksec);
+        info.reader->previousFrame(usec);
         info.reader->setNavDelegate(this);
     }
 }
@@ -432,16 +432,14 @@ void QnArchiveSyncPlayWrapper::reinitTime(qint64 newTime)
     d->timer.restart();
 }
 
-void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 /*mksec*/)
+void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 /*usec*/)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     NX_MUTEX_LOCKER lock( &d->timeMutex );
 }
 
-void QnArchiveSyncPlayWrapper::onJumpOccurred(qint64 mksec)
+void QnArchiveSyncPlayWrapper::onJumpOccurred(qint64 /*usec*/)
 {
-    Q_UNUSED(mksec)
-
     Q_D(QnArchiveSyncPlayWrapper);
 
     NX_MUTEX_LOCKER lock( &d->timeMutex );
