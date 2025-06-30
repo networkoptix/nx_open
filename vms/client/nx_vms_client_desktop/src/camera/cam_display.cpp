@@ -159,7 +159,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnAbstractArchiveStreamR
     m_fisheyeEnabled(false),
     m_channelsCount(0),
     m_lastQueuedVideoTime(AV_NOPTS_VALUE),
-    m_liveBufferSizeMkSec(initialLiveBufferMkSecs()),
+    m_liveBufferSizeUsec(initialLiveBufferUsec()),
     m_liveMaxLenReached(false),
     m_hasVideo(true)
 {
@@ -551,15 +551,15 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             // like NVR. Don't increase buffer for archive mode to make item synchronization more
             /// precise.
             if (m_liveMaxLenReached && vd->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE))
-                m_liveBufferSizeMkSec = qMin(maximumLiveBufferMkSecs(), m_liveBufferSizeMkSec * 1.2);
+                m_liveBufferSizeUsec = qMin(maximumLiveBufferUsec(), m_liveBufferSizeUsec * 1.2);
             m_liveMaxLenReached = false;
             NX_VERBOSE(this, "Increase live buffer size to %1 ms because of empty input buffer",
-                m_liveBufferSizeMkSec / 1000);
+                m_liveBufferSizeUsec / 1000);
             m_delay.afterdelay();
-            m_delay.addQuant(m_liveBufferSizeMkSec /2 - needToSleep); // realtime buffering for more smooth playback
+            m_delay.addQuant(m_liveBufferSizeUsec /2 - needToSleep); // realtime buffering for more smooth playback
             m_realTimeHurryUp = false;
         }
-        else if (queueLen > m_liveBufferSizeMkSec)
+        else if (queueLen > m_liveBufferSizeUsec)
         {
             m_liveMaxLenReached = true;
             if (!m_realTimeHurryUp)
@@ -567,7 +567,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             m_realTimeHurryUp = true;
         }
         else if (m_realTimeHurryUp
-            && queueLen <= m_liveBufferSizeMkSec / 2)
+            && queueLen <= m_liveBufferSizeUsec / 2)
         {
             NX_VERBOSE(this, "Half video buffer again. Turn no-delay mode off");
             m_realTimeHurryUp = false;
@@ -1193,7 +1193,7 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
 
         if (video->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE)
             && m_dataQueue.size() > 0
-            && video->timestamp - m_lastVideoPacketTime > m_liveBufferSizeMkSec)
+            && video->timestamp - m_lastVideoPacketTime > m_liveBufferSizeUsec)
         {
             m_delay.breakSleep();
         }
@@ -1996,7 +1996,7 @@ void QnCamDisplay::onRealTimeStreamHint(bool value)
     m_isRealTimeSource = value;
     if (m_isRealTimeSource)
     {
-        m_liveBufferSizeMkSec = initialLiveBufferMkSecs();
+        m_liveBufferSizeUsec = initialLiveBufferUsec();
         m_liveMaxLenReached = false;
         m_realTimeHurryUp = false;
         auto archive = dynamic_cast<QnAbstractMediaStreamDataProvider*>(sender());
@@ -2227,13 +2227,13 @@ QnMediaResourcePtr QnCamDisplay::resource() const
     return m_resource;
 }
 
-qint64 QnCamDisplay::initialLiveBufferMkSecs()
+qint64 QnCamDisplay::initialLiveBufferUsec()
 {
     return qMin(appContext()->localSettings()->initialLiveBufferMs() * 1000ll,
-        maximumLiveBufferMkSecs());
+        maximumLiveBufferUsec());
 }
 
-qint64 QnCamDisplay::maximumLiveBufferMkSecs()
+qint64 QnCamDisplay::maximumLiveBufferUsec()
 {
     return appContext()->localSettings()->maximumLiveBufferMs() * 1000ll;
 }

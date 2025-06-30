@@ -13,10 +13,10 @@ class QnAbstractNavigator
 public:
     virtual ~QnAbstractNavigator() = default;
 
-    virtual void directJumpToNonKeyFrame(qint64 mksec) = 0;
-    virtual bool jumpTo(qint64 mksec, qint64 skipTime) = 0;
+    virtual void directJumpToNonKeyFrame(qint64 usec) = 0;
+    virtual bool jumpTo(qint64 usec, qint64 skipTime) = 0;
     virtual void setSkipFramesToTime(qint64 skipTime) = 0;
-    virtual void previousFrame(qint64 mksec) = 0;
+    virtual void previousFrame(qint64 usec) = 0;
     virtual void nextFrame() = 0;
     virtual void pauseMedia() = 0;
     virtual void resumeMedia() = 0;

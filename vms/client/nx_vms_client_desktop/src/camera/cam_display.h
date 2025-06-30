@@ -208,8 +208,8 @@ private:
 
     int maxDataQueueSize(bool live) const;
 
-    static qint64 initialLiveBufferMkSecs();
-    static qint64 maximumLiveBufferMkSecs();
+    static qint64 initialLiveBufferUsec();
+    static qint64 maximumLiveBufferUsec();
 
     void moveTimestampTo(qint64 timestampUs);
     void processFillerPacket(
@@ -304,7 +304,7 @@ protected:
     int m_channelsCount;
 
     qint64 m_lastQueuedVideoTime;
-    int m_liveBufferSizeMkSec;
+    int m_liveBufferSizeUsec;
     bool m_liveMaxLenReached;
     bool m_hasVideo;
     nx::media::StreamEventPacket m_lastMediaEvent;

@@ -64,46 +64,46 @@ public:
     virtual AudioLayoutConstPtr getDPAudioLayout() const;
     virtual bool hasVideo() const override;
     void renameFileOnDestroy(const QString& newFileName);
-    //void jumpWithMarker(qint64 mksec, bool findIFrame, int marker);
+    //void jumpWithMarker(qint64 usec, bool findIFrame, int marker);
     void setMarker(int marker);
 
     /**
      * Jump to frame directly, ignoring start of GOP, i.e. no preliminary jump to preceding key
      * frame performed, so usually no possibility to correctly decode the frame.
      */
-    virtual void directJumpToNonKeyFrame(qint64 mksec) override;
+    virtual void directJumpToNonKeyFrame(qint64 usec) override;
 
     /** The same as jumpToEx() with bindPositionToPlaybackMask = true. */
-    virtual bool jumpTo(qint64 mksec, qint64 skipTime) override;
+    virtual bool jumpTo(qint64 usec, qint64 skipTime) override;
 
     /**
-     * Jump to frame at time specified by mksec. Actually, preliminary jump to preceding key
+     * Jump to frame at time specified by usec. Actually, preliminary jump to preceding key
      * frame performed, and all intermediate frames are read to allow normal decoding. All such
      * intermediate frames get MediaFlags_Ignore flag set. It is guaranteed that frames read are
-     * enough to decode frames up to including mksec.
+     * enough to decode frames up to including usec.
      * Note: jumping (forward or backward) within the GOP of current position causes
      * preliminary jump to preceding key frame again, despite it is not necessary for decoding.
      * Known bug: requesting a jump to first 1-4 (approximately) frames just after key frame
      * results in actual jump to the key frame and no further. The reason is not known yet.
-     * @param mksec Time to jump in microseconds.
+     * @param usec Time to jump in microseconds.
      * @param skipTime During jump, skip frames until skipTime provided, microseconds. Usual
-     *     usage is to pass skipTime equal to mksec.
+     *     usage is to pass skipTime equal to usec.
      * @param bindPositionToPlaybackMask Consider time interval provided to setPlaybackRange()
      *     and setPlaybackMask(); i.e. if true, jump outside them is not possible.
      *     If false, jumping outside playback range triggers reading all frames from start
-     *     of GOP to the frame specified by mksec and pausing the media just after reaching.
+     *     of GOP to the frame specified by usec and pausing the media just after reaching.
      * @param outJumpTime If not nullptr, actual jump time (after correction by playback mask),
      *     in microseconds, will be written by the pointer.
      * @param useDelegate If false, QnAbstractNavigator object provided to setNavDelegate() will
      *     not be used during jump.
-     * @return false if jump to the same mksec and skipTime is already performing right now.
+     * @return false if jump to the same usec and skipTime is already performing right now.
      */
-    virtual bool jumpToEx(qint64 mksec, qint64 skipTime, bool bindPositionToPlaybackMask, qint64* outJumpTime, bool useDelegate = true) override;
+    virtual bool jumpToEx(qint64 usec, qint64 skipTime, bool bindPositionToPlaybackMask, qint64* outJumpTime, bool useDelegate = true) override;
 
     virtual void setSkipFramesToTime(qint64 skipTime) override;
     virtual void nextFrame() override;
     void needMoreData();
-    virtual void previousFrame(qint64 mksec) override;
+    virtual void previousFrame(qint64 usec) override;
     virtual void pauseMedia() override;
     virtual bool isMediaPaused() const override;
     virtual void resumeMedia() override;
@@ -183,7 +183,7 @@ protected:
     bool openFormatContext();
     void setCurrentTime(qint64 value);
     QnAbstractMediaDataPtr createEmptyPacket(bool isReverseMode);
-    void beforeJumpInternal(qint64 mksec);
+    void beforeJumpInternal(qint64 usec);
 
 protected:
     qint64 m_currentTime;
@@ -271,10 +271,10 @@ private:
     mutable std::optional<AudioLayoutConstPtr> m_audioLayout;
 
     qint64 determineDisplayTime(bool reverseMode);
-    void internalJumpTo(qint64 mksec);
+    void internalJumpTo(qint64 usec);
     bool getNextVideoPacket();
     QnAbstractMediaDataPtr getNextPacket();
-    void channeljumpToUnsync(qint64 mksec, int channel, qint64 skipTime);
+    void channeljumpToUnsync(qint64 usec, int channel, qint64 skipTime);
     void setSkipFramesToTime(qint64 skipFramesToTime, bool keepLast);
     std::function<void()> m_endOfPlaybackHandler;
     std::function<void(const QString& errorString)> m_errorHandler;

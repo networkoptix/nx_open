@@ -191,8 +191,8 @@ public:
 
     /*
     * Start playing RTSP session.
-    * @param positionStart start position at mksec
-    * @param positionEnd end position at mksec
+    * @param positionStart start position at usec
+    * @param positionEnd end position at usec
     * @param scale playback speed
     */
     bool play(qint64 positionStart, qint64 positionEnd, double scale);

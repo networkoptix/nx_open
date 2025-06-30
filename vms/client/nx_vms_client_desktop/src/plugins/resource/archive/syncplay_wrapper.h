@@ -28,12 +28,12 @@ public:
     virtual qint64 expectedTime() const override;
 
     // nav delegate
-    virtual void directJumpToNonKeyFrame(qint64 mksec) override;
+    virtual void directJumpToNonKeyFrame(qint64 usec) override;
 
-    virtual bool jumpTo(qint64 mksec,  qint64 skipTime) override;
+    virtual bool jumpTo(qint64 usec,  qint64 skipTime) override;
     virtual void setSkipFramesToTime(qint64 skipTime) override;
 
-    virtual void previousFrame(qint64 mksec) override;
+    virtual void previousFrame(qint64 usec) override;
     virtual void nextFrame() override;
     virtual void pauseMedia() override;
     virtual void resumeMedia() override;
@@ -62,8 +62,8 @@ public slots:
     void onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value);
 
 private slots:
-    void onBeforeJump(qint64 mksec);
-    void onJumpOccurred(qint64 mksec);
+    void onBeforeJump(qint64 usec);
+    void onJumpOccurred(qint64 usec);
 
 private:
     void onConsumerBlocksReaderInternal(QnAbstractArchiveStreamReader* reader, bool value);
@@ -77,7 +77,7 @@ private:
     void erase(QnAbstractArchiveDelegate* value);
     qint64 getDisplayedTimeInternal(bool useEofItems = false) const;
     qint64 findTimeAtPlaybackMask(qint64 timeUsec);
-    void setJumpTime(qint64 mksec);
+    void setJumpTime(qint64 usec);
     qint64 maxArchiveTime() const;
     qint64 getCurrentTimeInternal() const;
 

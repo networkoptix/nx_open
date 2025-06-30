@@ -76,7 +76,7 @@ uint qt4Hash(const QString &key)
     return hash(key.unicode(), key.size());
 }
 
-QString mksecToDateTime(qint64 valueUsec)
+QString usecToDateTime(qint64 valueUsec)
 {
     if (valueUsec == DATETIME_NOW)
         return QStringLiteral("NOW");

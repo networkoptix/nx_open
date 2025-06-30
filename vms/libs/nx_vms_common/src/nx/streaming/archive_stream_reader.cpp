@@ -131,15 +131,15 @@ void QnArchiveStreamReader::needMoreData()
     m_singleShowWaitCond.wakeAll();
 }
 
-void QnArchiveStreamReader::previousFrame(qint64 mksec)
+void QnArchiveStreamReader::previousFrame(qint64 usec)
 {
-    --mksec;
+    --usec;
     if (m_navDelegate) {
-        m_navDelegate->previousFrame(mksec);
+        m_navDelegate->previousFrame(usec);
         return;
     }
     emit prevFrameOccurred();
-    jumpToPreviousFrame(mksec);
+    jumpToPreviousFrame(usec);
 }
 
 void QnArchiveStreamReader::resumeMedia()
@@ -1015,14 +1015,14 @@ void QnArchiveStreamReader::updateMetadataReaders(int channel, StreamDataFilters
         m_motionConnection[channel]->removeById(kMotionReaderId);
 }
 
-void QnArchiveStreamReader::internalJumpTo(qint64 mksec)
+void QnArchiveStreamReader::internalJumpTo(qint64 usec)
 {
     m_skippedMetadata.clear();
     m_nextData.reset();
     m_afterMotionData.reset();
     qint64 seekRez = 0;
-    if (mksec > 0 || resource()->hasFlags(Qn::live_cam)) {
-        seekRez = m_delegate->seek(mksec, !m_exactJumpToSpecifiedFrame);
+    if (usec > 0 || resource()->hasFlags(Qn::live_cam)) {
+        seekRez = m_delegate->seek(usec, !m_exactJumpToSpecifiedFrame);
     }
     else {
         // some local files can't correctly jump to 0
@@ -1035,7 +1035,7 @@ void QnArchiveStreamReader::internalJumpTo(qint64 mksec)
     m_wakeup = true;
     m_bottomIFrameTime = -1;
     m_lastGopSeekTime = -1;
-    m_topIFrameTime = seekRez != -1 ? seekRez : mksec;
+    m_topIFrameTime = seekRez != -1 ? seekRez : usec;
     m_IFrameAfterJumpFound = false;
     m_eof = false;
     m_afterBOFCounter = -1;
@@ -1185,22 +1185,22 @@ bool QnArchiveStreamReader::isSkippingFrames() const
     return m_skipFramesToTime != 0 || m_tmpSkipFramesToTime != 0;
 }
 
-void QnArchiveStreamReader::channeljumpToUnsync(qint64 mksec, int /*channel*/, qint64 skipTime)
+void QnArchiveStreamReader::channeljumpToUnsync(qint64 usec, int /*channel*/, qint64 skipTime)
 {
     m_singleQuantProcessed = false;
-    m_requiredJumpTime = m_lastSeekPosition = mksec;
+    m_requiredJumpTime = m_lastSeekPosition = usec;
     m_lastUsePreciseSeek = (skipTime != 0);
     m_tmpSkipFramesToTime = skipTime;
     m_singleShowWaitCond.wakeAll();
 }
 
-void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
+void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 usec)
 {
-    if (mksec == qint64(AV_NOPTS_VALUE))
+    if (usec == qint64(AV_NOPTS_VALUE))
         return;
 
     if (m_navDelegate) {
-        return m_navDelegate->directJumpToNonKeyFrame(mksec);
+        return m_navDelegate->directJumpToNonKeyFrame(usec);
     }
 
     bool useMutex = !m_externalLocked;
@@ -1208,10 +1208,10 @@ void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
         m_jumpMtx.lock();
 
     NX_VERBOSE(this, "Direct jump to non-key frame to %1",
-        nx::utils::timestampToDebugString(mksec));
-    beforeJumpInternal(mksec);
+        nx::utils::timestampToDebugString(usec));
+    beforeJumpInternal(usec);
     m_exactJumpToSpecifiedFrame = true;
-    channeljumpToUnsync(mksec, 0, mksec);
+    channeljumpToUnsync(usec, 0, usec);
 
     if (useMutex)
         m_jumpMtx.unlock();
@@ -1240,37 +1240,37 @@ void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipTime)
         QnLongRunnable::resume();
 }
 
-bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
+bool QnArchiveStreamReader::jumpTo(qint64 usec, qint64 skipTime)
 {
     resetRealtimeDelay();
-    return jumpToEx(mksec, skipTime, true, nullptr);
+    return jumpToEx(usec, skipTime, true, nullptr);
 }
 
 bool QnArchiveStreamReader::jumpToEx(
-    qint64 mksec,
+    qint64 usec,
     qint64 skipTime,
     bool bindPositionToPlaybackMask,
     qint64* outJumpTime,
     bool useDelegate)
 {
     if (useDelegate && m_navDelegate) {
-        return m_navDelegate->jumpTo(mksec, skipTime);
+        return m_navDelegate->jumpTo(usec, skipTime);
     }
 
-    NX_VERBOSE(this, "Set position %1 for device %2", mksecToDateTime(mksec), resource());
+    NX_VERBOSE(this, "Set position %1 for device %2", usecToDateTime(usec), resource());
 
-    qint64 newTime = mksec;
+    qint64 newTime = usec;
     if (bindPositionToPlaybackMask)
     {
         m_playbackMaskSync.lock();
-        newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);
+        newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(usec, m_speed >= 0);
         m_playbackMaskSync.unlock();
     }
 
     if (outJumpTime)
         *outJumpTime = newTime;
 
-    if (newTime != mksec)
+    if (newTime != usec)
         skipTime = 0;
 
     bool useMutex = !m_externalLocked;
@@ -1296,11 +1296,11 @@ bool QnArchiveStreamReader::jumpToEx(
     return needJump;
 }
 
-void QnArchiveStreamReader::beforeJumpInternal(qint64 mksec)
+void QnArchiveStreamReader::beforeJumpInternal(qint64 usec)
 {
-    NX_VERBOSE(this, "Before jump to %1", nx::utils::timestampToDebugString(mksec));
-    emit beforeJump(mksec);
-    m_delegate->beforeSeek(mksec);
+    NX_VERBOSE(this, "Before jump to %1", nx::utils::timestampToDebugString(usec));
+    emit beforeJump(usec);
+    m_delegate->beforeSeek(usec);
 }
 
 bool QnArchiveStreamReader::setStreamDataFilter(StreamDataFilters filter)
