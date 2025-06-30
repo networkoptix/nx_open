@@ -15,7 +15,7 @@ NxObject
 
     Connections
     {
-        target: windowContext.depricatedUiController
+        target: windowContext.deprecatedUiController
 
         function onConnectToServerScreenRequested(host, user, password, operationId)
         {
@@ -40,7 +40,7 @@ NxObject
 
     Binding
     {
-        target: windowContext.depricatedUiController
+        target: windowContext.deprecatedUiController
         property: "currentScreen"
         value: d.screenByName(stackView && stackView.currentItem
             ? stackView.currentItem.objectName

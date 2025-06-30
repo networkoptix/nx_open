@@ -320,10 +320,10 @@ Control
 
                 Connections
                 {
-                    target: windowContext.depricatedUiController
+                    target: windowContext.deprecatedUiController
                     function onCurrentScreenChanged()
                     {
-                        if (windowContext.depricatedUiController.currentScreen
+                        if (windowContext.deprecatedUiController.currentScreen
                             === Controller.ResourcesScreen)
                         {
                             mediaPlayer.playLive()

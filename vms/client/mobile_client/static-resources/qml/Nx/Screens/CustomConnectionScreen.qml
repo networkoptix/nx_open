@@ -280,12 +280,12 @@ Page
         if (!operationId.length)
             return;
 
-        windowContext.depricatedUiController.operationManager.finishOperation(operationId, success)
+        windowContext.deprecatedUiController.operationManager.finishOperation(operationId, success)
         operationId = ""
     }
     onVisibleChanged:
-        windowContext.depricatedUiController.avoidHandlingConnectionStuff = visible
+        windowContext.deprecatedUiController.avoidHandlingConnectionStuff = visible
     Component.onDestruction:
-        windowContext.depricatedUiController.avoidHandlingConnectionStuff = false
+        windowContext.deprecatedUiController.avoidHandlingConnectionStuff = false
 
 }

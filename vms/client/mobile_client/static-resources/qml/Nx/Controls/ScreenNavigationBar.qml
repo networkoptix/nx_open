@@ -25,7 +25,7 @@ Rectangle
     visible: d.currentIndex !== -1
         && windowContext.sessionManager.hasActiveSession
         && d.buttonModel[d.currentIndex].screenId
-             === windowContext.depricatedUiController.currentScreen
+             === windowContext.deprecatedUiController.currentScreen
 
     x: 0
     y: parent.height - height
@@ -94,14 +94,14 @@ Rectangle
 
     Connections
     {
-        target: windowContext.depricatedUiController
+        target: windowContext.deprecatedUiController
 
         function onCurrentScreenChanged()
         {
             for (let index = 0; index !== d.buttonModel.length; ++index)
             {
                 if (d.buttonModel[index].screenId
-                    === windowContext.depricatedUiController.currentScreen)
+                    === windowContext.deprecatedUiController.currentScreen)
                 {
                     d.currentIndex = index
                     return;

@@ -279,8 +279,8 @@ BottomSheet
     }
 
     onOpenedChanged:
-        windowContext.depricatedUiController.avoidHandlingConnectionStuff = sheet.opened
+        windowContext.deprecatedUiController.avoidHandlingConnectionStuff = sheet.opened
 
     Component.onDestruction:
-        windowContext.depricatedUiController.avoidHandlingConnectionStuff = false
+        windowContext.deprecatedUiController.avoidHandlingConnectionStuff = false
 }

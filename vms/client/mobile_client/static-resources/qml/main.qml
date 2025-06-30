@@ -20,7 +20,6 @@ Controls.ApplicationWindow
     readonly property bool hasNavigationBar:
         !!windowContext.ui.windowHelpers.navigationBarSize()
 
-
     readonly property bool isPortraitLayout: width <= height
 
     visible: true
@@ -196,8 +195,8 @@ Controls.ApplicationWindow
                 if (windowContext.ui.tryRestoreLastUsedConnection())
                     return
 
-                if (windowContext.depricatedUiController.currentScreen === Controller.UnknownScreen)
-                    windowContext.depricatedUiController.openSessionsScreen()
+                if (windowContext.deprecatedUiController.currentScreen === Controller.UnknownScreen)
+                    windowContext.deprecatedUiController.openSessionsScreen()
             };
 
         CoreUtils.executeLater(startupHandler, this)

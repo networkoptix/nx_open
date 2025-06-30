@@ -31,8 +31,8 @@ Sheet
             id: layoutItem
 
             property Resource layoutResource: model.resource
-            property bool isCurrent: windowContext.depricatedUiController.layout
-                ? windowContext.depricatedUiController.layout === layoutResource
+            property bool isCurrent: windowContext.deprecatedUiController.layout
+                ? windowContext.deprecatedUiController.layout === layoutResource
                 : model.itemType === QnLayoutsModel.AllCameras
 
             height: 48
@@ -120,7 +120,7 @@ Sheet
             onClicked:
             {
                 Workflow.openResourcesScreen()
-                windowContext.depricatedUiController.layout = layoutResource
+                windowContext.deprecatedUiController.layout = layoutResource
                 control.close()
             }
         }
