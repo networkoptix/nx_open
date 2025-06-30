@@ -411,13 +411,17 @@ QJsonArray parameterNames(const QJsonArray& list)
 {
     QJsonArray result;
 
+    // FIXME: #ekarpov This assumption is not correct, because we support `std::variant`.
+    //     For example: array of objects or strings.
     // Assume that list value types are the same.
     if (list.isEmpty() || !list.first().isObject())
         return result;
 
     for (const auto& item: list)
     {
-        NX_ASSERT(item.isObject());
+        if (!item.isObject())
+            continue;
+
         result.append(parameterNames(item.toObject()));
     }
     return result;
