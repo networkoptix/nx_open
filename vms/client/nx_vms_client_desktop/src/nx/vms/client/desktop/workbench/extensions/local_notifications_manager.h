@@ -3,12 +3,10 @@
 #pragma once
 
 #include <optional>
-#include <variant>
 
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QObject>
-#include <QtGui/QIcon>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>

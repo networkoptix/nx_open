@@ -30,15 +30,24 @@ static constexpr QSize kLoginDialogSize(1024, 768);
 bool kCloudLoginDialogIsDisplayed = false;
 constexpr int kCloseCheckIntervalMs = 250;
 
+Qt::WindowFlags makeWindowFlags(SessionRefreshFlags flags)
+{
+    Qt::WindowFlags result = {};
+    if (flags.testFlag(SessionRefreshFlag::stayOnTop))
+        result |= Qt::WindowStaysOnTopHint;
+
+    return result;
+}
+
 } // namespace
 
 OauthLoginDialog::OauthLoginDialog(
     QWidget* parent,
     core::OauthClientType clientType,
     const QString& cloudSystem,
-    Qt::WindowFlags flags)
+    SessionRefreshFlags flags)
 :
-    base_type(parent, flags),
+    base_type(parent, makeWindowFlags(flags)),
     d(new OauthLoginDialogPrivate(this, clientType, cloudSystem))
 {
     QSize size = kLoginDialogSize;
@@ -57,7 +66,7 @@ OauthLoginDialog::OauthLoginDialog(
 
     executeLater([this]() { loadPage(); }, this);
 
-    const auto helper = d->oauthClient();
+    auto helper = d->oauthClient();
     connect(helper, &core::OauthClient::authDataReady, this, &OauthLoginDialog::authDataReady);
     connect(helper, &core::OauthClient::bindToCloudDataReady, this, &OauthLoginDialog::bindToCloudDataReady);
     connect(helper, &core::OauthClient::cloudTokensReady, this, &OauthLoginDialog::cloudTokensReady);
@@ -69,37 +78,36 @@ OauthLoginDialog::~OauthLoginDialog()
 }
 
 nx::vms::client::core::CloudAuthData OauthLoginDialog::login(
-    QWidget* parent,
-    const QString& title,
-    core::OauthClientType clientType,
-    bool sessionAware,
-    const QString& cloudSystem,
-    Qt::WindowFlags flags,
-    std::function<bool()> closeCondition)
+    QWidget* parent, const QString& title, const LoginParams& params)
 {
     if (kCloudLoginDialogIsDisplayed)
         return {};
 
+    const bool sessionAware = params.flags.testFlag(SessionRefreshFlag::sessionAware);
+
     QScopedValueRollback<bool> guard(kCloudLoginDialogIsDisplayed, true);
 
     std::unique_ptr<OauthLoginDialog> dialog = !sessionAware
-        ? std::make_unique<OauthLoginDialog>(parent, clientType, cloudSystem, flags)
+        ? std::make_unique<OauthLoginDialog>(
+            parent, params.clientType, params.cloudSystem, params.flags)
         : std::make_unique<QnSessionAware<OauthLoginDialog>>(
-            parent, clientType, cloudSystem, flags);
+            parent, params.clientType, params.cloudSystem, params.flags);
+
     dialog->setWindowTitle(title);
+    dialog->setCredentials(params.credentials);
     connect(
         dialog.get(),
         &OauthLoginDialog::authDataReady,
         dialog.get(),
         &OauthLoginDialog::accept);
 
-    if (closeCondition)
+    if (params.closeCondition)
     {
         QTimer* timer = new QTimer(dialog.get());
         connect(timer,
             &QTimer::timeout,
             dialog.get(),
-            [closeCondition, dialog = dialog.get()]()
+            [closeCondition = params.closeCondition, dialog = dialog.get()]()
             {
                 if (closeCondition())
                     dialog->reject();

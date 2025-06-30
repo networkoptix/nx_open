@@ -97,8 +97,7 @@ void CloudActionsHandler::at_loginToCloudAction_triggered()
         mainWindowWidget(),
         tr("Login to %1", "%1 is the cloud name (like Nx Cloud)")
             .arg(nx::branding::cloudName()),
-        core::OauthClientType::loginCloud,
-        /*sessionAware*/ false);
+        OauthLoginDialog::LoginParams{.clientType = core::OauthClientType::loginCloud});
 
     const auto actionParameters = menu()->currentParameters(sender());
     const auto authMode = actionParameters.argument(Qn::ForceRole).toBool()

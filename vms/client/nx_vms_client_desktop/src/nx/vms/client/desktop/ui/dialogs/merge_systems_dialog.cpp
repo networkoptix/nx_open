@@ -338,7 +338,7 @@ void MergeSystemsDialog::at_mergeButton_clicked()
         tr("Merge", "Merge two Sites together (dialog button text)"),
         FreshSessionTokenHelper::ActionType::merge);
 
-    const auto ownerSessionToken = sessionTokenHelper->refreshToken();
+    const auto ownerSessionToken = sessionTokenHelper->refreshSession();
     if (!ownerSessionToken)
         return;
 

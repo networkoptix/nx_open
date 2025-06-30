@@ -237,6 +237,9 @@ struct RemoteConnectionFactory::Private
             context->logonData.address,
             nx::reflect::toString(context->logonData.purpose));
 
+        NX_DEBUG(this, "User name: %1, type: %2",
+            context->logonData.credentials.username, context->logonData.userType);
+
         if (context->expectedServerId())
             NX_DEBUG(this, "Expect Server ID %1.", *context->expectedServerId());
         else
@@ -629,6 +632,9 @@ struct RemoteConnectionFactory::Private
 
         if (!context->failed())
         {
+            NX_VERBOSE(this, "Received session info, user: %1, expires in: %2",
+                currentSession.username, currentSession.expiresInS);
+
             const auto tokenExpirationTime =
                 qnSyncTime->currentTimePoint() + currentSession.expiresInS;
 
@@ -682,6 +688,9 @@ struct RemoteConnectionFactory::Private
         nx::vms::api::LoginSession currentSession = requestsManager->getCurrentSession(context);
         if (!context->failed())
         {
+            NX_VERBOSE(this, "Received session info, user: %1, expires in: %2",
+                currentSession.username, currentSession.expiresInS);
+
             context->logonData.credentials.username = currentSession.username.toStdString();
             context->sessionTokenExpirationTime =
                 qnSyncTime->currentTimePoint() + currentSession.expiresInS;

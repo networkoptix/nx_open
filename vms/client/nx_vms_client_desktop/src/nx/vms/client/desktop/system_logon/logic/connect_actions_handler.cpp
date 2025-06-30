@@ -207,6 +207,13 @@ struct ConnectActionsHandler::Private
         if (!needReconnectToLastCloudSystem)
             return;
 
+        if (qnCloudStatusWatcher->status() != core::CloudStatusWatcher::Online)
+            return;
+
+        NX_DEBUG(this, "Try to reconnect to last cloud system: %1, login: %3",
+            lastAttemptedConnectCloudSystemId, qnCloudStatusWatcher->cloudLogin());
+        NX_ASSERT(this, !lastAttemptedConnectCloudSystemId.isEmpty());
+
         needReconnectToLastCloudSystem = false;
 
         q->connectToCloudSystem({
@@ -218,12 +225,11 @@ struct ConnectActionsHandler::Private
     void reconnectToCloudIfNeeded()
     {
         needReconnectToLastCloudSystem = true;
-        auto cloudAuthDataHelper = FreshSessionTokenHelper::makeFreshSessionTokenHelper(
+
+        auto cloudAuthDataHelper = std::make_unique<FreshSessionTokenHelper>(
             q->mainWindowWidget(),
             tr("Login to %1", "%1 is the cloud name (like Nx Cloud)")
                 .arg(nx::branding::cloudName()),
-            /*mainText*/ "",
-            /*actionText*/ "",
             FreshSessionTokenHelper::ActionType::issueRefreshToken);
 
         const auto newCloudAuthData = cloudAuthDataHelper->requestAuthData(
@@ -245,8 +251,7 @@ struct ConnectActionsHandler::Private
         {
             needReconnectToLastCloudSystem = true;
             q->updatePreloaderVisibility();
-            if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::Online)
-                reconnectToLastCloudSystemIfNeeded();
+            reconnectToLastCloudSystemIfNeeded();
         }
     }
 
@@ -378,7 +383,10 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
         this,
         [this]()
         {
-            if (system()->connection()->connectionInfo().isCloud())
+            const auto isCloud = system()->connection()->connectionInfo().isCloud();
+            NX_DEBUG(this, "Authentication requested, cloud: %1", isCloud);
+
+            if (isCloud)
             {
                 d->reconnectToCloudIfNeeded();
                 return;
@@ -567,15 +575,13 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
     connect(qnCloudStatusWatcher, &core::CloudStatusWatcher::statusChanged, this,
         [this]
         {
-            if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::Online)
-                d->reconnectToLastCloudSystemIfNeeded();
+            d->reconnectToLastCloudSystemIfNeeded();
         });
 
     connect(qnCloudStatusWatcher, &core::CloudStatusWatcher::refreshTokenChanged, this,
         [this]
         {
-            if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::Online)
-                d->reconnectToLastCloudSystemIfNeeded();
+            d->reconnectToLastCloudSystemIfNeeded();
         });
 }
 
@@ -1173,6 +1179,9 @@ void ConnectActionsHandler::connectToCloudSystem(
 
     if (!connectionInfo)
         return;
+
+    // To make sure the cache is valid for the user.
+    connectionInfo->credentials.username = qnCloudStatusWatcher->cloudLogin().toStdString();
 
     if (anyServer && nx::network::SocketGlobals::addressResolver().isCloudHostname(
         connectionInfo->address.address.toString()))

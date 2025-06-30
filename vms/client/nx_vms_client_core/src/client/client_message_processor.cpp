@@ -226,7 +226,7 @@ void QnClientMessageProcessor::onGotInitialNotification(const nx::vms::api::Full
     m_status.setState(QnConnectionState::Ready);
 
     auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(currentPeerId());
-    NX_ASSERT(currentServer);
+    NX_ASSERT(currentServer, "Current server %1 not found", currentPeerId());
 
     /* Get server time as soon as we setup connection. */
     qnSyncTime->resync();

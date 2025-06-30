@@ -39,17 +39,21 @@ ActionTypeInfo info(FreshSessionTokenHelper::ActionType actionType)
         case ActionType::updateSettings:
             return {core::OauthClientType::passwordApply};
         case ActionType::issueRefreshToken:
-            return {core::OauthClientType::loginCloud};
+            return {core::OauthClientType::renew};
     }
 
-    NX_ASSERT(false, "Unexpected action type");
+    NX_ASSERT(false, "Unexpected action type: %1", (int) actionType);
     return {core::OauthClientType::undefined};
 }
 
 } // namespace.
 
-FreshSessionTokenHelper::FreshSessionTokenHelper(QWidget* parent):
-    m_parent(parent)
+FreshSessionTokenHelper::FreshSessionTokenHelper(
+    QWidget* parent, const QString& title, ActionType action)
+    :
+    m_parent(parent),
+    m_title(title),
+    m_actionType(action)
 {
     NX_CRITICAL(m_parent);
 }
@@ -65,30 +69,18 @@ common::SessionTokenHelperPtr FreshSessionTokenHelper::makeHelper(
     const QString& actionText,
     ActionType actionType)
 {
-    auto result = new FreshSessionTokenHelper(parent);
-    result->m_title = title;
+    auto result = new FreshSessionTokenHelper(parent, title, actionType);
     result->m_mainText = mainText;
     result->m_actionText = actionText;
-    result->m_actionType = actionType;
     return common::SessionTokenHelperPtr(result);
 }
 
-FreshSessionTokenHelper* FreshSessionTokenHelper::makeFreshSessionTokenHelper(
-    QWidget* parent,
-    const QString& title,
-    const QString& mainText,
-    const QString& actionText,
-    ActionType actionType)
+void FreshSessionTokenHelper::setFlags(SessionRefreshFlags flags)
 {
-    auto result = new FreshSessionTokenHelper(parent);
-    result->m_title = title;
-    result->m_mainText = mainText;
-    result->m_actionText = actionText;
-    result->m_actionType = actionType;
-    return result;
+    m_flags = flags;
 }
 
-std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToken()
+std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshSession()
 {
     m_password = {};
 
@@ -106,14 +98,13 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToke
 
     if (connection->userType() == nx::vms::api::UserType::cloud)
     {
-        auto cloudAuthData = OauthLoginDialog::login(
-            m_parent,
-            m_title,
-            info(m_actionType).clientType,
-            /*sessionAware*/ true,
-            connection->moduleInformation().cloudSystemId,
-            Qt::WindowStaysOnTopHint
-        );
+        const auto params = OauthLoginDialog::LoginParams{
+            .clientType = info(m_actionType).clientType,
+            .flags = m_flags | SessionRefreshFlag::sessionAware | SessionRefreshFlag::stayOnTop,
+            .cloudSystem = connection->moduleInformation().cloudSystemId
+        };
+
+        auto cloudAuthData = OauthLoginDialog::login(m_parent, m_title, params);
 
         if (cloudAuthData.empty() || (cloudAuthData.needValidateToken
             && !OauthLoginDialog::validateToken(m_parent, m_title, cloudAuthData.credentials)))
@@ -162,15 +153,18 @@ core::CloudAuthData FreshSessionTokenHelper::requestAuthData(std::function<bool(
     if (!m_parent)
         return {};
 
-    const auto cloudAuthData = OauthLoginDialog::login(
-        m_parent,
-        m_title,
-        info(m_actionType).clientType,
-        /*sessionAware*/ false,
-        /*cloudSystem*/ {},
-        /*flags*/ {},
-        closeCondition
-    );
+    const auto login = qnCloudStatusWatcher->cloudLogin();
+    if (login.isEmpty())
+        return {};
+
+    const auto params = OauthLoginDialog::LoginParams{
+        .clientType = info(m_actionType).clientType,
+        .flags = m_flags,
+        .credentials = nx::network::http::Credentials(login.toStdString(), {}),
+        .closeCondition = closeCondition
+    };
+
+    const auto cloudAuthData = OauthLoginDialog::login(m_parent, m_title, params);
 
     if (cloudAuthData.needValidateToken
         && !OauthLoginDialog::validateToken(m_parent, m_title, cloudAuthData.credentials))
