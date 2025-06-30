@@ -113,7 +113,7 @@ Ptr<IMetadataPacket> DeviceAgent::generateEventMetadataPacket()
     const auto eventMetadataPacket = makePtr<EventMetadataPacket>();
     // Bind event metadata packet to the last video frame using a timestamp.
     eventMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
-    // Zero duration means that the event is not sustained, but momental.
+    // Zero duration means that the event is not sustained, but momentary.
     eventMetadataPacket->setDurationUs(0);
 
     // EventMetadata contains an information about event.

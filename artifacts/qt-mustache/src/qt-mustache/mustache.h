@@ -60,7 +60,7 @@ namespace Mustache
         virtual int listCount(const QString& key) const = 0;
 
         /** Set the current context to the value for @p key.
-        * If index is >= 0, set the current context to the @p index'th value
+        * If index is >= 0, set the current context to the @p index-th value
         * in the list value for @p key.
         */
         virtual void push(const QString& key, int index = -1) = 0;
@@ -279,5 +279,4 @@ namespace Mustache
 
     /** A convenience function which renders a template using the given data. */
     QString renderTemplate(const QString& templateString, const QVariantHash& args);
-
 };

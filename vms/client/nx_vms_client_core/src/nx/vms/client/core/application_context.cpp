@@ -57,7 +57,7 @@ char* qt_v4StackTraceForEngine(void* executionEngine);
 /*
  * Helper and "C" linkage exported function to get the most recent QML stacktrace in GDBMI format.
  * Sample GDB invocation: print nx_qmlStackTrace()
- * Sample CDB invocation: .call nx_vms_client_core!nx_qmlStackTrace() ; gh
+ * Sample CDB invocation: .call nx_vms_client_core!nx_qmlStackTrace();
  */
 NX_FORCE_EXPORT char* nx_qmlStackTrace()
 {

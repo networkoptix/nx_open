@@ -570,7 +570,7 @@ void ExportLayoutTool::at_camera_exportFinished(const std::optional<nx::recordin
 
     if (d->lastError != ExportProcessError::noError)
     {
-        NX_VERBOSE(this, "An error ocurred: %1", filename);
+        NX_VERBOSE(this, "An error occurred: %1", filename);
 
         finishExport(false);
         return;

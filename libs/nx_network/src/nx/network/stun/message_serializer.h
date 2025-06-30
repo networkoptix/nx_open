@@ -108,7 +108,7 @@ private:
 
     bool addFingerprint(MessageSerializerBuffer* buffer);
 
-    // Returns stun fingerprint(xor'ed crc32).
+    // Returns stun fingerprint(xor-ed crc32).
     std::uint32_t calcFingerprint(MessageSerializerBuffer* buffer);
 
 private:

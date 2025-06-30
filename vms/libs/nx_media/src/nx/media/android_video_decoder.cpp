@@ -85,7 +85,7 @@ static QString codecToString(AVCodecID codecId)
 }
 
 static void fillInputBuffer(
-    JNIEnv *env, jobject /*thiz*/, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity)
+    JNIEnv *env, jobject /*_this*/, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity)
 {
     void* bytes = env->GetDirectBufferAddress(buffer);
     void* srcData = (void*) srcDataPtr;
