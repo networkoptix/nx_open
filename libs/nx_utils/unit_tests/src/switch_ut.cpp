@@ -11,8 +11,8 @@ namespace nx::utils::test {
 static void expectVoice(const QString& animal, const QString& expectedVoice)
 {
     const auto voice = switch_(animal,
-        "cat", [] { return "mew"; },
-        "dog", [] { return "wof"; },
+        "cat", [] { return "meow"; },
+        "dog", [] { return "woof"; },
         default_, [] { return "unknown"; }
     );
 
@@ -21,8 +21,8 @@ static void expectVoice(const QString& animal, const QString& expectedVoice)
 
 TEST(Switch, StringToString)
 {
-    expectVoice("cat", "mew");
-    expectVoice("dog", "wof");
+    expectVoice("cat", "meow");
+    expectVoice("dog", "woof");
     expectVoice("parrot", "unknown");
     expectVoice("mouse", "unknown");
 }

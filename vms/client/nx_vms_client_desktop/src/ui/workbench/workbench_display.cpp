@@ -155,7 +155,7 @@ static constexpr qreal kEMappingRaisedWidgetViewportPercentage = 0.33;
 const qreal layerZSize = 10000000.0;
 
 /**
- * The amount that is added to maximal Z value each time a move to frontoperation is performed.
+ * The amount that is added to maximal Z value each time a move to front operation is performed.
  */
 const qreal zStep = 1.0;
 
@@ -605,7 +605,6 @@ void QnWorkbenchDisplay::initialize(QGraphicsScene* scene, QGraphicsView* view)
     /* Configure viewport animator. */
     m_viewportAnimator->setView(m_view);
 
-
     /* Set up curtain. */
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
@@ -1053,7 +1052,6 @@ void QnWorkbenchDisplay::updateSelectionFromTree()
     foreach(QGraphicsItem *item, m_scene->selectedItems())
         item->setSelected(false);
 }
-
 
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets() const
 {
@@ -1673,8 +1671,6 @@ QPointF QnWorkbenchDisplay::mapGlobalToGridF(const QPoint &globalPoint) const
     return mapViewportToGridF(m_view->mapFromGlobal(globalPoint));
 }
 
-
-
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: synchronizers
 // -------------------------------------------------------------------------- //
@@ -1999,7 +1995,6 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate)
     synchronizeGeometry(item, animate);
 }
 
-
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: handlers
 // -------------------------------------------------------------------------- //
@@ -2281,7 +2276,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
             if (mediaResourceWidget->item()->data(Qn::ItemPausedRole).toBool())
             {
                 archiveReader->pauseMedia();
-                archiveReader->setSpeed(0.0); // TODO: #vasilenko check that this call doesn't break anything.
+                archiveReader->setSpeed(0.0); // TODO: #rvasilenko check that this call doesn't break anything.
             }
 
             auto camDisplay = mediaResourceWidget->camDisplay();

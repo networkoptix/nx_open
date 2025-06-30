@@ -158,7 +158,6 @@ Skin::Skin(const QStringList& paths, QObject* parent):
     init(paths);
 }
 
-
 Skin::~Skin()
 {
     if (s_instance == this)
@@ -191,7 +190,7 @@ void Skin::init(const QStringList& paths)
 
     const qreal dpr = qApp->devicePixelRatio();
     const int cacheLimit = qRound(64 * 1024 // 64 MB
-        * dpr * dpr); // dpi-dcaled
+        * dpr * dpr); // dpi-scaled
     if (QPixmapCache::cacheLimit() < cacheLimit)
         QPixmapCache::setCacheLimit(cacheLimit);
 }

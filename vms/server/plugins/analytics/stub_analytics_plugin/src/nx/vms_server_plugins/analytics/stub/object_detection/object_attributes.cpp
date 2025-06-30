@@ -166,7 +166,7 @@ const std::map<std::string, std::map<std::string, std::string>> kObjectAttribute
         {
             {"Color", "Orange"},
             {"Speed", "250"},
-            {"Brand", "Cesna"},
+            {"Brand", "Cessna"},
             {"Model", "172"}
         }
     },

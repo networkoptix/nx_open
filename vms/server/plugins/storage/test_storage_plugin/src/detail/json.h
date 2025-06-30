@@ -34,7 +34,6 @@ struct JsonVal
     } u;
 };
 
-
 struct JsonVal jsonParseString(const char *str, char *errorBuf, int errorBufSize);
 
 /*creates empty (top-level) object*/

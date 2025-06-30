@@ -48,8 +48,8 @@ namespace {
         }
     }
 
-    void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity);
-    void readOutputBuffer(JNIEnv *env, jobject thiz, jlong cObject, jobject buffer, jint bufferSize);
+    void fillInputBuffer(JNIEnv *env, jobject _this, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity);
+    void readOutputBuffer(JNIEnv *env, jobject _this, jlong cObject, jobject buffer, jint bufferSize);
 }
 
 // ------------------------------------------------------------------------------
@@ -105,9 +105,9 @@ private:
 
 namespace {
 
-void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity)
+void fillInputBuffer(
+    JNIEnv *env, jobject /*_this*/, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity)
 {
-    Q_UNUSED(thiz);
     void* bytes = env->GetDirectBufferAddress(buffer);
     void* srcData = (void*)srcDataPtr;
     if (capacity < dataSize)
@@ -115,9 +115,9 @@ void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr
     memcpy(bytes, srcData, qMin(capacity, dataSize));
 }
 
-void readOutputBuffer(JNIEnv *env, jobject thiz, jlong cObject, jobject buffer, jint bufferSize)
+void readOutputBuffer(
+    JNIEnv* env, jobject /*_this*/, jlong cObject, jobject buffer, jint bufferSize)
 {
-    Q_UNUSED(thiz);
     AndroidAudioDecoderPrivate* decoder = static_cast<AndroidAudioDecoderPrivate*> ((void*) cObject);
     void* bytes = env->GetDirectBufferAddress(buffer);
     decoder->readOutputBuffer(bytes, bufferSize);
