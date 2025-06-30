@@ -14,16 +14,30 @@ function(nx_setup_ninja_preprocessor)
             # Prevent runing ninja_tool on generation stage.
             set(ENV{DISABLE_NINJA_TOOL} "true")
 
-            set(launcher_name "${open_build_utils_dir}/ninja/ninja_launcher")
-
-            if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-                string(APPEND launcher_name ".bat")
-            else()
-                string(APPEND launcher_name ".sh")
+            set(NX_NINJA_EXECUTABLE "ninja")
+            set(NX_NINJA_TOOL_DIR "${CMAKE_CURRENT_LIST_DIR}")
+            if(DEFINED CONAN_NINJA_ROOT)
+                set(NX_NINJA_EXECUTABLE "${CONAN_NINJA_ROOT}/bin/ninja")
+                if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+                    string(APPEND NX_NINJA_EXECUTABLE ".exe")
+                endif()
             endif()
+            if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+                set(scriptExtension "bat")
+            else()
+                set(scriptExtension "sh")
+            endif()
+            configure_file(
+                "${CMAKE_CURRENT_LIST_DIR}/ninja_launcher.${scriptExtension}.in"
+                "${CMAKE_CURRENT_BINARY_DIR}/ninja_launcher.${scriptExtension}"
+                @ONLY)
+
+            set(launcher_name  "${CMAKE_CURRENT_BINARY_DIR}/ninja_launcher.${scriptExtension}")
         else()
             find_program(launcher_name ninja)
         endif()
+
+        nx_store_known_files(${launcher_name})
 
         set(CMAKE_MAKE_PROGRAM ${launcher_name}
             CACHE FILEPATH "Path to ninja launcher"

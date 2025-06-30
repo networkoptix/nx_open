@@ -37,7 +37,7 @@ nx_init_distribution_flavor_list()
 
 include(cmake/utils.cmake)
 nx_init_known_files_list()
-include(cmake/ninja_tool.cmake)
+include(build_utils/ninja/ninja_tool.cmake)
 
 # "AUTO" is used to autodetect the build number from git.
 set(buildNumber "AUTO" CACHE STRING "Build number")

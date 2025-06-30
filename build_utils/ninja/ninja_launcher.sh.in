@@ -2,7 +2,7 @@
 
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-BASE_DIR=$(dirname "$0")
+BASE_DIR=@NX_NINJA_TOOL_DIR@
 if [[ $(uname) != "Darwin" ]]
 then
     BASE_DIR=$(readlink -f "${BASE_DIR}")
@@ -20,4 +20,4 @@ then
     fi
 fi
 
-ninja "$@"
+@NX_NINJA_EXECUTABLE@ "$@"
