@@ -40,7 +40,7 @@ struct WindowContext::Private
 
     QPointer<QQuickWindow> mainWindow;
 
-    std::unique_ptr<QnMobileClientUiController> depricatedUiController;
+    std::unique_ptr<QnMobileClientUiController> deprecatedUiController;
 
     QPointer<SystemContext> mainSystemContext;
 
@@ -51,7 +51,7 @@ struct WindowContext::Private
 
 void WindowContext::Private::initializeDepricatedClasses()
 {
-    depricatedUiController = std::make_unique<QnMobileClientUiController>(q);
+    deprecatedUiController = std::make_unique<QnMobileClientUiController>(q);
 }
 
 void WindowContext::Private::initializeMainWindow()
@@ -117,7 +117,7 @@ WindowContext::WindowContext(QObject* parent):
     d->initializeMainWindow();
     d->initializeCloudStatusHandling();
 
-    d->uriHandler = std::make_unique<QnMobileClientUriHandler>(d->depricatedUiController.get());
+    d->uriHandler = std::make_unique<QnMobileClientUriHandler>(d->deprecatedUiController.get());
 
     connect(appContext()->pushManager(), &PushNotificationManager::showPushActivateErrorMessage,
         d->uiController.get(), &UiController::showMessage);
@@ -170,9 +170,9 @@ RemoteLogManager* WindowContext::logManager() const
     return d->remoteLogManager.get();
 }
 
-QnMobileClientUiController* WindowContext::depricatedUiController() const
+QnMobileClientUiController* WindowContext::deprecatedUiController() const
 {
-    return d->depricatedUiController.get();
+    return d->deprecatedUiController.get();
 }
 
 } // namespace nx::vms::client::mobile

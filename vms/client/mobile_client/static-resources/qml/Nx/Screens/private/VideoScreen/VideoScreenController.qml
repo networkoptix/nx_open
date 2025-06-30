@@ -235,7 +235,7 @@ NxObject
             if (videoScreen.activePage)
                 return true
 
-            return windowContext.depricatedUiController.currentScreen === Controller.CameraSettingsScreen
+            return windowContext.deprecatedUiController.currentScreen === Controller.CameraSettingsScreen
                 && stackView.currentItem.audioController === audioController
         }
 

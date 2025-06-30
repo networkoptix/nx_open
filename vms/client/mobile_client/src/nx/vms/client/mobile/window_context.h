@@ -50,8 +50,8 @@ class WindowContext: public core::WindowContext
         CONSTANT)
 
     // Deprecated classes.
-    Q_PROPERTY(QnMobileClientUiController* depricatedUiController
-        READ depricatedUiController
+    Q_PROPERTY(QnMobileClientUiController* deprecatedUiController
+        READ deprecatedUiController
         CONSTANT)
 
 public:
@@ -71,8 +71,8 @@ public:
 
     RemoteLogManager* logManager() const;
 
-    // Deprivated classes
-    QnMobileClientUiController* depricatedUiController() const;
+    // Deprecated classes
+    QnMobileClientUiController* deprecatedUiController() const;
 
 signals:
     void mainSystemContextChanged();

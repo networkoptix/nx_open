@@ -51,7 +51,7 @@ Page
     ResourceHelper
     {
         id: layout
-        resource: windowContext.depricatedUiController.layout
+        resource: windowContext.deprecatedUiController.layout
 
         onResourceChanged:
         {
@@ -91,7 +91,7 @@ Page
 
         enabled: !windowContext.sessionManager.hasReconnectingSession && !loadingDummy.visible
 
-        layout: windowContext.depricatedUiController.layout
+        layout: windowContext.deprecatedUiController.layout
 
         keepStatuses: !windowContext.sessionManager.hasReconnectingSession && !windowContext.sessionManager.hasConnectedSession
 
@@ -107,9 +107,9 @@ Page
         anchors.fill: parent
         title: qsTr("No cameras available on this layout")
         buttonText: qsTr("Show all cameras")
-        onButtonClicked: windowContext.depricatedUiController.layout = null
+        onButtonClicked: windowContext.deprecatedUiController.layout = null
         visible: camerasGrid.count == 0
-                 && windowContext.depricatedUiController.layout
+                 && windowContext.deprecatedUiController.layout
                  && windowContext.sessionManager.hasActiveSession
     }
 
