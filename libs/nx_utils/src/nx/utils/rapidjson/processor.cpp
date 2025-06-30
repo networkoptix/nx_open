@@ -90,6 +90,12 @@ Processor::Processor(ConstBufferRefType data)
     m_curr = &(*m_data);
 }
 
+Processor::Processor(std::shared_ptr<::rapidjson::Document> data)
+{
+    m_data = std::move(data);
+    m_curr = &(*m_data);
+}
+
 std::string Processor::toStdString() const
 {
     ::rapidjson::StringBuffer buffer;
