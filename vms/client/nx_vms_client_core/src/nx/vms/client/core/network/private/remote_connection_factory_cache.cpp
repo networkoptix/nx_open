@@ -179,6 +179,8 @@ void RemoteConnectionFactoryCache::clearForCloudId(const QString& cloudId)
 
 void RemoteConnectionFactoryCache::clearForUser(const std::string& username)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "Clear cache for user: %1", username);
+
     auto cacheData =
         nx::vms::client::core::appContext()->coreSettings()->systemAuthenticationCacheData();
     std::erase_if(cacheData,

@@ -21,7 +21,7 @@ nx::coro::Task<std::optional<nx::network::http::AuthToken>> RequestRerunner::get
             qApp,
             [this, helper]()
             {
-                const auto token = helper->refreshToken();
+                const auto token = helper->refreshSession();
                 rerunRequests(token);
             },
             Qt::QueuedConnection);

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QtCore/QObject>
+#include <QtCore/QString>
 
 #include <nx/network/http/auth_tools.h>
 
@@ -14,10 +14,11 @@ namespace nx::vms::common {
 class NX_VMS_COMMON_API AbstractSessionTokenHelper
 {
 public:
-    AbstractSessionTokenHelper();
-    virtual ~AbstractSessionTokenHelper();
+    virtual ~AbstractSessionTokenHelper() = default;
 
-    virtual std::optional<nx::network::http::AuthToken> refreshToken() = 0;
+    /* Return access token. */
+    virtual std::optional<nx::network::http::AuthToken> refreshSession() = 0;
+
     virtual QString password() const = 0;
 };
 

@@ -55,6 +55,8 @@ void UserWatcher::setUser(const QnUserResourcePtr& user)
 
     m_user = user;
 
+    NX_VERBOSE(this, "User changed: %1", userName());
+
     emit userChanged(user);
     emit userNameChanged();
 }

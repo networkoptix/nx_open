@@ -7,6 +7,7 @@
 
 #include <nx/network/http/auth_tools.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
+#include <nx/vms/client/desktop/ui/dialogs/session_refresh_data.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
 
 namespace nx::vms::client::desktop {
@@ -31,7 +32,7 @@ public:
     };
 
 public:
-    FreshSessionTokenHelper(QWidget* parent);
+    FreshSessionTokenHelper(QWidget* parent, const QString& title, ActionType action);
     virtual ~FreshSessionTokenHelper() override;
 
     static common::SessionTokenHelperPtr makeHelper(
@@ -41,26 +42,22 @@ public:
         const QString& actionText, //< Action button text.
         ActionType actionType);
 
-    static FreshSessionTokenHelper* makeFreshSessionTokenHelper(
-        QWidget* parent,
-        const QString& title,
-        const QString& mainText,
-        const QString& actionText,
-        ActionType actionType);
+    void setFlags(SessionRefreshFlags flags);
 
-    std::optional<nx::network::http::AuthToken> refreshToken() override;
+    std::optional<nx::network::http::AuthToken> refreshSession() override;
+
     core::CloudAuthData requestAuthData(std::function<bool()> closeCondition = {});
 
     virtual QString password() const override;
 
 private:
-
     QPointer<QWidget> m_parent = nullptr;
     QString m_title;
     QString m_mainText;
     QString m_actionText;
     ActionType m_actionType = ActionType::updateSettings;
     QString m_password;
+    SessionRefreshFlags m_flags;
 };
 
 } // namespace nx::vms::client::desktop

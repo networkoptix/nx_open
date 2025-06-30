@@ -91,6 +91,8 @@ QnCommonMessageProcessor::~QnCommonMessageProcessor()
 
 void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
 {
+    NX_VERBOSE(this, "Init with connection: %1", connection);
+
     if (m_connection)
     {
         // Safety check in case connection will not be deleted instantly.

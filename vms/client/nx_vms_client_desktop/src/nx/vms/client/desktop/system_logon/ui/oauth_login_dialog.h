@@ -4,6 +4,8 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/network/oauth_client_constants.h>
+#include <nx/vms/client/desktop/ui/dialogs/session_refresh_data.h>
+#include <nx/vms/utils/abstract_session_token_helper.h>
 #include <ui/dialogs/common/dialog.h>
 
 namespace nx::network::http { class Credentials; }
@@ -24,15 +26,19 @@ class OauthLoginDialog: public QnDialog
     using base_type = QnDialog;
 
 public:
+    struct LoginParams
+    {
+        core::OauthClientType clientType;
+        SessionRefreshFlags flags;
+        QString cloudSystem;
+        nx::network::http::Credentials credentials;
+        std::function<bool()> closeCondition;
+    };
+
+public:
     /** Helper method for requesting fresh cloud auth data. */
     static nx::vms::client::core::CloudAuthData login(
-        QWidget* parent,
-        const QString& title,
-        core::OauthClientType clientType,
-        bool sessionAware,
-        const QString& cloudSystem = QString(),
-        Qt::WindowFlags flags = {},
-        std::function<bool()> closeCondition = {});
+        QWidget* parent, const QString& title, const LoginParams& params);
 
     /** Helper method for access token 2FA validation. */
     static bool validateToken(
@@ -44,7 +50,7 @@ public:
         QWidget* parent,
         core::OauthClientType clientType,
         const QString& cloudSystem = QString(),
-        Qt::WindowFlags flags = {});
+        SessionRefreshFlags flags = {});
 
     virtual ~OauthLoginDialog() override;
 

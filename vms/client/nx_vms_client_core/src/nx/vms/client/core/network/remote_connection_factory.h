@@ -94,7 +94,7 @@ public:
         SystemContext* systemContext,
         std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate>
             customUserInteractionDelegate = {},
-            bool ignoreCachedData = false);
+        bool ignoreCachedData = false);
 
     virtual void shutdown() override;
 

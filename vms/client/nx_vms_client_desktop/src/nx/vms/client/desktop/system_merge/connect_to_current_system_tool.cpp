@@ -9,7 +9,6 @@
 #include <network/system_helpers.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
@@ -260,7 +259,7 @@ void ConnectToCurrentSystemTool::systemFound(
         tr("Merge", "Merge Server to the current Site (dialog button text)"),
         FreshSessionTokenHelper::ActionType::merge);
 
-    auto ownerSessionToken = sessionTokenHelper->refreshToken();
+    auto ownerSessionToken = sessionTokenHelper->refreshSession();
     if (!ownerSessionToken)
     {
         cancel();

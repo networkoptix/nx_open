@@ -2,14 +2,12 @@
 
 #include "local_session_token_expiration_watcher.h"
 
-#include <QtGui/QAction>
-
-#include <nx/vms/client/core/network/network_module.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
+#include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/text/time_strings.h>
-#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -49,6 +47,8 @@ LocalSessionTokenExpirationWatcher::LocalSessionTokenExpirationWatcher(
 
 void LocalSessionTokenExpirationWatcher::notify(std::chrono::minutes timeLeft)
 {
+    NX_VERBOSE(this, "Notify session expires: %1", timeLeft);
+
     m_notification =
         m_notificationManager->add(
             tr("Your session expires soon"), "", /*cancellable*/ true);
