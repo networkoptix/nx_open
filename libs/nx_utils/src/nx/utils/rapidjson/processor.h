@@ -757,6 +757,7 @@ class NX_UTILS_API Processor
 {
 public:
     explicit Processor(ConstBufferRefType data);
+    explicit Processor(std::shared_ptr<::rapidjson::Document> data);
     Processor(const Processor& queryProcessor) = default;
 
     template<PredicateType Predicate>
