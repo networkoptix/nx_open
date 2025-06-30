@@ -7,6 +7,8 @@
 
 #include <core/resource/camera_resource.h>
 #include <nx/utils/math/math.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/log/log_main.h>
 
 namespace {
 
@@ -61,7 +63,8 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
         * qualityLevel / qualitySpread;
 
     // Use a predefined value for cameras which did not fill the resolution yet.
-    if (resolution.isEmpty())
+    const bool useDefaultResolution = resolution.isEmpty();
+    if (useDefaultResolution)
         resolution = kDefaultResolution;
 
     const float resolutionFactor = kResolutionFactorMultiplier * pow(
@@ -70,11 +73,33 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
 
     const float frameRateFactor = kFpsFactorMultiplier * fps;
 
-    const float bitrateMultiplyer = kBitrateMultiplierByCodec.value(codec, 1.0f);
+    const float bitrateMultiplier = kBitrateMultiplierByCodec.value(codec, 1.0f);
 
-    const float result = qualityFactor * resolutionFactor * frameRateFactor * bitrateMultiplyer;
+    float result = qualityFactor * resolutionFactor * frameRateFactor * bitrateMultiplier;
+    NX_DEBUG(NX_SCOPE_TAG,
+        "Bitrate factors bitrate=%1 Kbps: qualityFactor=%2, resolutionFactor=%3 (resolution=%4x%5), frameRateFactor=%6 (fps=%7), bitrateMultiplier=%8 (codec=%9)",
+        result,
+        qualityFactor,
+        resolutionFactor,
+        resolution.width(),
+        resolution.height(),
+        frameRateFactor,
+        fps,
+        bitrateMultiplier,
+        codec);
 
-    return std::round(std::max(kMaxSuggestedBitrateKbps, result));
+    result = std::max(kMaxSuggestedBitrateKbps, result);
+    NX_DEBUG(NX_SCOPE_TAG,
+        "Suggest bitrate for quality %1, %2 resolution %3x%4, fps %5, codec %6: %7 Kbps",
+        quality,
+        useDefaultResolution ? "default" : "",
+        resolution.width(),
+        resolution.height(),
+        fps,
+        codec,
+        result);
+
+    return std::round(result);
 }
 
 float CameraBitrateCalculator::suggestBitrateForQualityKbps(
@@ -88,17 +113,32 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
     if (streamCapability.defaultBitrateKbps > 0 && streamCapability.defaultFps > 0)
     {
         const auto coefficient = bitrateCoefficient(quality);
-        const auto bitrate = streamCapability.defaultBitrateKbps * coefficient;
-        return qBound(
+        const auto bitrate = qBound(
             streamCapability.minBitrateKbps,
-            bitrate * ((float)fps / streamCapability.defaultFps),
-            streamCapability.maxBitrateKbps);
+            streamCapability.defaultBitrateKbps * coefficient * ((float)fps / streamCapability.defaultFps),
+            streamCapability.maxBitrateKbps
+        );
+
+        NX_DEBUG(NX_SCOPE_TAG,
+            "Suggest bitrate for default bitrate %1 Kbps, min bitrate %2 Kbps, max bitrate %3 Kbps, quality %4, fps %5, default fps %6: %7 Kbps",
+            streamCapability.defaultBitrateKbps,
+            streamCapability.minBitrateKbps,
+            streamCapability.maxBitrateKbps,
+            quality,
+            fps,
+            streamCapability.defaultFps,
+            bitrate);
+
+        return bitrate;
     }
 
     auto result = suggestBitrateForQualityKbps(quality, resolution, fps, codec);
 
     if (useBitratePerGop && fps > 0)
-        result = result * (kDefaultBitratePerGop / (float)fps);
+    {
+        result = result * (kDefaultBitratePerGop / (float) fps);
+        NX_DEBUG(NX_SCOPE_TAG, "Adjusting bitrate per GOP: fps %1, result %2 Kbps", fps, result);
+    }
 
     if (streamCapability.maxBitrateKbps > 0)
     {
@@ -106,6 +146,12 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
             streamCapability.minBitrateKbps,
             result,
             streamCapability.maxBitrateKbps);
+
+        NX_DEBUG(NX_SCOPE_TAG,
+            "Clamped bitrate: [%1, %2], final %3 Kbps",
+            streamCapability.minBitrateKbps,
+            streamCapability.maxBitrateKbps,
+            result);
     }
 
     return result;
