@@ -53,6 +53,8 @@ FocusScope
                 : "image://skin/20x20/Outline/eye_open.svg?primary=light10"
             actionButtonImage.sourceSize: Qt.size(20, 20)
             actionButtonAction: () => { maskedMode = !maskedMode }
+            inputMethodHints: Qt.ImhSensitiveData | Qt.ImhPreferLatin | Qt.ImhNoPredictiveText
+                | Qt.ImhNoAutoUppercase
             echoMode: control.hasSecretValue || maskedMode
                 ? TextInput.Password
                 : TextInput.Normal
