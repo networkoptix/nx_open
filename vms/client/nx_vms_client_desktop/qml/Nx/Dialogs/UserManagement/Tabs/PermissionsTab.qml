@@ -231,6 +231,7 @@ Item
             property: "externalFilter"
             value: control.editingContext && control.editingContext.accessibleByPermissionsFilter
             when: control.editingContext && filterButton.withPermissionsOnly
+            delayed: true
         }
 
         PermissionsOperationContext
