@@ -58,23 +58,16 @@ QVariantMap SoftTriggerEvent::details(
 
     result[utils::kCaptionDetailName] = m_triggerName;
 
-    const QStringList detailing = this->detailing(context, detailLevel);
-    result[utils::kDescriptionDetailName] = detailing.join('\n');
-    result[utils::kDetailingDetailName] = detailing;
-    result[utils::kHtmlDetailsName] = QStringList{{
-        Strings::resource(context, deviceId(), detailLevel),
-        Strings::resource(context, m_userId)
-    }};
+    const QString user = Strings::resource(context, m_userId);
+    const QString userItem = tr("User: %1").arg(user);
+    result[utils::kDescriptionDetailName] = userItem;
 
-    return result;
-}
+    const QString source = Strings::resource(context, deviceId(), detailLevel);
+    const QString sourceItem = Strings::source(source);
 
-QStringList SoftTriggerEvent::detailing(common::SystemContext* context,
-    Qn::ResourceInfoLevel detailLevel) const
-{
-    QStringList result;
-    result << Strings::source(Strings::resource(context, deviceId(), detailLevel));
-    result << tr("User: %1").arg(Strings::resource(context, m_userId));
+    result[utils::kDetailingDetailName] = QStringList{{sourceItem, userItem}};
+    result[utils::kHtmlDetailsName] = QStringList{{source, user}};
+
     return result;
 }
 

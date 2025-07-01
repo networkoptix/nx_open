@@ -49,9 +49,9 @@ QVariantMap NetworkIssueEvent::details(
     utils::insertClientAction(result, nx::vms::rules::ClientAction::cameraSettings);
 
     result[utils::kCaptionDetailName] = manifest().displayName();
+    result[utils::kDescriptionDetailName] = reason;
 
     const QStringList detailing{{deviceName, reason}};
-    result[utils::kDescriptionDetailName] = detailing.join('\n');
     result[utils::kDetailingDetailName] = detailing;
     result[utils::kHtmlDetailsName] = detailing;
 

@@ -47,7 +47,6 @@ QVariantMap DeviceDisconnectedEvent::details(
 
     result[utils::kDetailingDetailName] = deviceName;
     result[utils::kHtmlDetailsName] = deviceName;
-    result[utils::kDescriptionDetailName] = deviceName;
 
     return result;
 }
