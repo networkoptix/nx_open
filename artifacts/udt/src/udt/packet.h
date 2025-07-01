@@ -110,11 +110,11 @@ enum class ControlPacketType
 {
     Handshake = 0,
     KeepAlive = 1,
-    Acknowledgement = 2,
+    Acknowledgment = 2,
     LossReport = 3,
     DelayWarning = 4,
     Shutdown = 5,
-    AcknowledgementOfAcknowledgement = 6,
+    AcknowledgmentOfAcknowledgment = 6,
     MsgDropRequest = 7,
     /** An error has happened to the peer side. */
     RemotePeerFailure = 8,
