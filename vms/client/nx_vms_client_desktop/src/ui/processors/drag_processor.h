@@ -46,7 +46,7 @@ class DragProcessor: public QObject
 public:
     enum State {
         Waiting,    /**< Waiting for the drag process to start. */
-        Prepairing, /**< Drag process started, waiting for actual drag to start. */
+        Preparing,  /**< Drag process started, waiting for actual drag to start. */
         Running     /**< Drag is in progress. */
     };
 
@@ -70,8 +70,8 @@ public:
         return m_state == Waiting;
     }
 
-    bool isPrepairing() const {
-        return m_state == Prepairing;
+    bool isPreparing() const {
+        return m_state == Preparing;
     }
 
     bool isRunning() const {
@@ -122,7 +122,6 @@ public:
 
     void widgetPaintEvent(QWidget *widget, QPaintEvent *event);
 
-
     /* Set of view-level event handler functions that are to be used from user code. */
 
     void mousePressEvent(QWidget *viewport, QMouseEvent *event, bool instantDrag = false);
@@ -133,7 +132,6 @@ public:
 
     void paintEvent(QWidget *viewport, QPaintEvent *event);
 
-
     /* Set of scene-level event handler functions that are to be used from user code. */
 
     void mousePressEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event, bool instantDrag = false);
@@ -142,7 +140,6 @@ public:
 
     void mouseReleaseEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event);
 
-
     /* Set of item-level event handler functions that are to be used from user code. */
 
     void mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event, bool instantDrag = false);
@@ -150,7 +147,6 @@ public:
     void mouseMoveEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event);
 
     void mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event);
-
 
     void redrag();
 
