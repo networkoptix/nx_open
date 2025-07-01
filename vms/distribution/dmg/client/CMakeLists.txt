@@ -196,16 +196,18 @@ if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
         list(APPEND misc_debug_dependencies testcamera)
     endif()
 
-    set(misc_debug_file "${distribution_output_dir}/${misc_debug_distribution_name}.zip")
-    nx_create_distribution_package(
-        PACKAGE_NAME "misc debug"
-        PACKAGE_TARGET misc_debug
-        PACKAGE_GENERATION_SCRIPT_NAME generate_misc_debug_package.py
-        OUTPUT_FILE ${misc_debug_file}
-        CONFIG_FILES ${distribution_config_file}
-        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        DEPENDENCIES ${misc_debug_dependencies}
-    )
+    if(misc_debug_dependencies)
+        set(misc_debug_file "${distribution_output_dir}/${misc_debug_distribution_name}.zip")
+        nx_create_distribution_package(
+            PACKAGE_NAME "misc debug"
+            PACKAGE_TARGET misc_debug
+            PACKAGE_GENERATION_SCRIPT_NAME generate_misc_debug_package.py
+            OUTPUT_FILE ${misc_debug_file}
+            CONFIG_FILES ${distribution_config_file}
+            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+            DEPENDENCIES ${misc_debug_dependencies}
+        )
+    endif()
 endif()
 
 nx_add_targets_to_strengthened(

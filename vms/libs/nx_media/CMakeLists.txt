@@ -6,14 +6,15 @@ set(additional_sources)
 set(additional_sources_include_dirs)
 set(artifacts_dir ${open_source_root}/artifacts)
 
-if(NOT APPLE AND arch STREQUAL "x64")
-    set(windows_or_linux_x64 TRUE)
+# Do not enable HW decoders for mobile client on any platform.
+if(NOT APPLE AND arch STREQUAL "x64" AND NOT "${productType}" STREQUAL "mobile")
+    set(enable_hw_decoders_by_default TRUE)
 else()
-    set(windows_or_linux_x64 FALSE)
+    set(enable_hw_decoders_by_default FALSE)
 endif()
 
-nx_option(withQuickSyncDecoder "Enable QuickSync hardware decoder" ${windows_or_linux_x64})
-nx_option(withNvidiaDecoder "Enable Nvidia hardware decoder" ${windows_or_linux_x64})
+nx_option(withQuickSyncDecoder "Enable QuickSync hardware decoder" ${enable_hw_decoders_by_default})
+nx_option(withNvidiaDecoder "Enable Nvidia hardware decoder" ${enable_hw_decoders_by_default})
 
 nx_configure_file(supported_decoders.h.in
     ${CMAKE_CURRENT_BINARY_DIR}/include/nx/media/supported_decoders.h)
