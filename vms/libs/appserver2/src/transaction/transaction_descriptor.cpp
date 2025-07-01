@@ -973,9 +973,26 @@ struct ModifyResourceAccess
     Result operator()(SystemContext* systemContext, const nx::network::rest::UserAccessData& accessData,
         const Param& param)
     {
-        NX_VERBOSE(this,
-            "Got modify resource request. Is system access: %1, Data type: %2, Data contents: %3",
-            hasSystemAccess(accessData), typeid(param), QJson::serialized(param));
+        if (nx::log::isToBeLogged(nx::log::Level::verbose))
+        {
+            auto serializeParam =
+                [](const auto& param)
+                {
+                    if constexpr(std::is_same_v<nx::vms::api::StorageData, Param>)
+                    {
+                        auto p = param;
+                        p.url = nx::utils::url::hidePassword(p.url);
+                        return QJson::serialized(p);
+                    }
+
+                    return QJson::serialized(param);
+                };
+
+            const auto serializedParam = serializeParam(param);
+            NX_VERBOSE(this,
+                "Got modify resource request. Is system access: %1, Data type: %2, Data contents: %3",
+                hasSystemAccess(accessData), typeid(param), serializedParam);
+        }
 
         if (hasSystemAccess(accessData))
             return Result();
