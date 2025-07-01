@@ -18,14 +18,17 @@ nx_generate_openapi_schema(
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/openapi_v3.json"
     VERBOSE "-verbose")
 
-nx_add_test(nx_network_rest_ut
-    ADDITIONAL_RESOURCES
-        ${CMAKE_CURRENT_BINARY_DIR}/openapi_v4.json
-        ${CMAKE_CURRENT_BINARY_DIR}/openapi_v3.json
-    PUBLIC_LIBS
-        nx_network_rest
-        nx_vms_api # nx_network_rest itself does not depend on nx_vms_api. This dependency is
-                   # needed to verify nx_vms_api structs against nx_network_rest.
-    PROJECT NXLIB
-    FOLDER common/tests
-)
+# ARM builds with productType=mobile do not include nx_vms_api library, but include nx_network_rest
+if(TARGET nx_vms_api)
+    nx_add_test(nx_network_rest_ut
+        ADDITIONAL_RESOURCES
+            ${CMAKE_CURRENT_BINARY_DIR}/openapi_v4.json
+            ${CMAKE_CURRENT_BINARY_DIR}/openapi_v3.json
+        PUBLIC_LIBS
+            nx_network_rest
+            nx_vms_api # nx_network_rest itself does not depend on nx_vms_api. This dependency is
+                    # needed to verify nx_vms_api structs against nx_network_rest.
+        PROJECT NXLIB
+        FOLDER common/tests
+    )
+endif()

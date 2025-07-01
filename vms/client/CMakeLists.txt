@@ -22,7 +22,7 @@ if(withDesktopClient)
     add_subdirectory(nx_vms_client_desktop)
 endif()
 
-if(withDesktopClient OR withTests)
+if(withDesktopClient OR (withMediaServer AND withTests))
     add_subdirectory(libvms_gateway_core)
 endif()
 
