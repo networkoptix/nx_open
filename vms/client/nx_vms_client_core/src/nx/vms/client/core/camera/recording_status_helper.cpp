@@ -94,8 +94,7 @@ std::pair<RecordingStatus, RecordingMetadataTypes> currentRecordingMode(
             }
         }
 
-        if (recordScheduled)
-            return {RecordingStatus::recordingScheduled, {RecordingMetadataType::none}};
+        return {RecordingStatus::recordingScheduled, {RecordingMetadataType::none}};
     }
 
     return {hasArchive(camera)
