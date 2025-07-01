@@ -128,7 +128,7 @@ void DragProcessor::transitionInternalHelper(State newState) {
     switch(newState) {
     case Waiting:
         switch(m_state) {
-        case Prepairing:
+        case Preparing:
             killDragTimer();
             m_state = Waiting;
             if(m_handler != nullptr)
@@ -136,7 +136,7 @@ void DragProcessor::transitionInternalHelper(State newState) {
             break;
         case Running:
             if(m_handler != nullptr) {
-                m_state = Prepairing;
+                m_state = Preparing;
                 m_handler->finishDrag(&m_info);
                 if(transitionCounter == m_transitionCounter) {
                     /* No nested transitions => go on. */
@@ -160,16 +160,16 @@ void DragProcessor::transitionInternalHelper(State newState) {
             m_info.m_item = nullptr;
         }
         break;
-    case Prepairing:
+    case Preparing:
         startDragTimer();
         switch(m_state) {
         case Waiting:
-            m_state = Prepairing;
+            m_state = Preparing;
             if(m_handler != nullptr)
                 m_handler->startDragProcess(&m_info);
             break;
         case Running:
-            m_state = Prepairing;
+            m_state = Preparing;
             if(m_handler != nullptr)
                 m_handler->finishDrag(&m_info);
             break;
@@ -181,7 +181,7 @@ void DragProcessor::transitionInternalHelper(State newState) {
         switch(m_state) {
         case Waiting:
             if(m_handler != nullptr) {
-                m_state = Prepairing;
+                m_state = Preparing;
                 m_handler->startDragProcess(&m_info);
                 if(transitionCounter == m_transitionCounter) {
                     /* No nested transitions => go on. */
@@ -192,7 +192,7 @@ void DragProcessor::transitionInternalHelper(State newState) {
                 m_state = Running;
             }
             break;
-        case Prepairing:
+        case Preparing:
             m_state = Running;
             killDragTimer();
             if(m_handler != nullptr)
@@ -316,7 +316,7 @@ void DragProcessor::mousePressEventInternal(T *object, Event *event, bool instan
         m_info.m_lastMouseItemPos = m_info.m_mousePressItemPos = m_info.m_mouseItemPos = itemPos(object, event);
 
         if(!instantDrag) {
-            transition(event, object, Prepairing);
+            transition(event, object, Preparing);
         } else {
             transition(event, object, Running);
 
@@ -366,7 +366,7 @@ void DragProcessor::mouseMoveEventInternal(T *object, Event *event) {
     }
 
     /* Check for drag distance. */
-    if (m_state == Prepairing) {
+    if (m_state == Preparing) {
         if ((m_info.m_mousePressScreenPos - screenPos(object, event)).manhattanLength() < m_startDragDistance) {
             return;
         } else {
@@ -533,8 +533,6 @@ void DragProcessor::mouseMoveEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent
 void DragProcessor::mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
     mouseReleaseEventInternal(item, event);
 }
-
-
 
 Qt::KeyboardModifiers DragInfo::modifiers() const {
     QEvent::Type type;
