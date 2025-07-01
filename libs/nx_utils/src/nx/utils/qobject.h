@@ -31,6 +31,7 @@ enum class PropertyAccess
     stored = 0x4,
 };
 Q_DECLARE_FLAGS(PropertyAccessFlags, PropertyAccess)
+Q_DECLARE_OPERATORS_FOR_FLAGS(PropertyAccessFlags)
 
 /**
  * Returns list of the object property and dynamic property names or empty list if the object is

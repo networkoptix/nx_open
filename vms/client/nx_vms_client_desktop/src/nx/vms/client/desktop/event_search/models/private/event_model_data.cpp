@@ -29,8 +29,8 @@ nx::vms::rules::AggregatedEventPtr EventModelData::event(core::SystemContext* co
     if (!m_event)
     {
         m_event = nx::vms::rules::AggregatedEventPtr::create(
-            context->vmsRulesEngine()->buildEvent(m_record.eventData),
-            m_record.aggregatedInfo);
+            context->vmsRulesEngine(),
+            m_record);
     }
 
     NX_ASSERT(m_event);
@@ -40,11 +40,7 @@ nx::vms::rules::AggregatedEventPtr EventModelData::event(core::SystemContext* co
 const QVariantMap& EventModelData::details(SystemContext* context) const
 {
     const auto detailLevel = appContext()->localSettings()->resourceInfoLevel();
-    if (m_details.empty())
-        m_details = event(context)->details(context, detailLevel);
-
-    NX_ASSERT(!m_details.empty());
-    return m_details;
+    return event(context)->details(context, detailLevel);
 }
 
 QString EventModelData::eventType() const

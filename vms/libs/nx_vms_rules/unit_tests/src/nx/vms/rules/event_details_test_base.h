@@ -2,11 +2,14 @@
 
 #pragma once
 
+#include <optional>
+
 #include <gtest/gtest.h>
 
 #include <QtCore/QString>
 
 #include <nx/utils/uuid.h>
+#include <nx/vms/rules/rules_fwd.h>
 
 namespace nx::vms::common { class SystemContext; }
 
@@ -44,6 +47,20 @@ protected:
     static void SetUpTestSuite();
     static void TearDownTestSuite();
     static common::SystemContext* systemContext();
+
+    void givenEvent(EventPtr event);
+
+    void whenEventsLimitSetTo(int value);
+
+    AggregatedEventPtr buildEvent();
+
+private:
+    void ensureAggregationIsValid() const;
+
+private:
+    std::vector<EventPtr> m_events;
+    std::optional<int> m_eventLimitOverload;
+    AggregatedEventPtr m_aggregatedEvent;
 };
 
 } // namespace nx::vms::rules::test

@@ -4,9 +4,12 @@
 
 #include <functional>
 
+#include <nx/vms/api/rules/aggregated_info.h>
+
 #include "basic_event.h"
 
 namespace nx::vms::common { class SystemContext; }
+namespace nx::vms::api::rules { struct EventLogRecord; }
 
 namespace nx::vms::rules {
 
@@ -17,15 +20,35 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API AggregatedEvent: public QObject
 {
     Q_OBJECT
+    using AggregatedInfo = api::rules::AggregatedInfo;
+    using EventLogRecord = api::rules::EventLogRecord;
 
 public:
     explicit AggregatedEvent(const EventPtr& event);
     explicit AggregatedEvent(std::vector<EventPtr>&& eventList);
 
     /** Constructor from the serialized data. */
-    AggregatedEvent(const EventPtr& event, nx::vms::api::rules::PropertyMap aggregatedInfo);
+    AggregatedEvent(Engine* engine, const EventLogRecord& record);
 
     ~AggregatedEvent() override = default;
+
+    static constexpr int kTotalEventsLimit = 10;
+
+    /**
+     * Take limited number of events from this aggregated instance.
+     *
+     * Take only `limit` of entries from the event list: half of the number from the beginning of
+     * the list, and the rest from the end of the list. Thus user will see when events started and
+     * when they ended.
+     */
+    std::pair<std::vector<EventPtr> /*firstEvents*/, std::vector<EventPtr> /*lastEvents*/>
+        takeLimitedAmount(int limit = kTotalEventsLimit) const;
+
+    /**
+     * Set new default limit of events used in the takeLimitedAmount function. Intended for usage
+     * in unit tests only.
+     */
+    void overloadDefaultEventLimit(int value);
 
     /** Returns property with the given name of the initial event. */
     QVariant property(const char* name) const;
@@ -40,7 +63,9 @@ public:
     State state() const;
 
     /** Returns initial event details plus aggregated details. */
-    QVariantMap details(common::SystemContext* context, Qn::ResourceInfoLevel detailLevel) const;
+    const QVariantMap& details(
+        common::SystemContext* context,
+        Qn::ResourceInfoLevel detailLevel) const;
 
     using Filter = std::function<EventPtr(const EventPtr&)>;
     /**
@@ -60,20 +85,33 @@ public:
 
     EventPtr initialEvent() const;
 
-    const std::vector<EventPtr>& aggregatedEvents() const;
+    /**
+     * Serialize data to the Event Log record format. Only a few fields are stored.
+     * @param record Record to store event data and aggregation data.
+     */
+    void storeToRecord(
+        EventLogRecord* record,
+        int limit = kTotalEventsLimit) const;
 
     nx::Uuid ruleId() const;
     void setRuleId(nx::Uuid ruleId);
 
 private:
     std::vector<EventPtr> m_aggregatedEvents;
+
+    /**
+    * When the event is constructed from the log record, m_aggregatedEvents may contain much less
+    * events than there were in the original aggregated event. Keep the total count separately.
+    */
+    const size_t m_count;
+
+    /** When provided, value passed to takeLimitedAmount function will be ignored. */
+    int m_eventLimitOverload = 0;
+
     nx::Uuid m_ruleId;
-    std::optional<nx::vms::api::rules::PropertyMap> m_aggregatedInfo;
 
     /** Cache of the details method call. */
     mutable std::map<Qn::ResourceInfoLevel, QVariantMap> m_detailsCache;
-
-    AggregatedEvent() = default;
 };
 
 } // namespace nx::vms::rules

@@ -82,9 +82,6 @@ public:
         common::SystemContext* context,
         Qn::ResourceInfoLevel detailLevel) const;
 
-    virtual nx::vms::api::rules::PropertyMap aggregatedInfo(
-        const AggregatedEvent& aggregatedEvent) const;
-
 protected:
     BasicEvent() = default;
 

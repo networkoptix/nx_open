@@ -73,11 +73,6 @@ QVariantMap BasicEvent::details(
     return result;
 }
 
-nx::vms::api::rules::PropertyMap BasicEvent::aggregatedInfo(const AggregatedEvent&) const
-{
-    return {};
-}
-
 QString BasicEvent::name(common::SystemContext* context) const
 {
     return Strings::eventName(context, type());

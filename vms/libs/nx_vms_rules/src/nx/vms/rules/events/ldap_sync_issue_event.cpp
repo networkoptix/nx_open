@@ -71,37 +71,6 @@ QVariantMap LdapSyncIssueEvent::details(
     return result;
 }
 
-nx::vms::api::rules::PropertyMap LdapSyncIssueEvent::aggregatedInfo(
-    const AggregatedEvent& aggregatedEvent) const
-{
-    nx::vms::api::rules::PropertyMap aggregatedInfo;
-    std::map<vms::api::EventReason, int> reasonToCount;
-    NX_ASSERT(!aggregatedEvent.aggregatedEvents().empty(), "Aggregated event cannot be empty.");
-    for (const auto& event: aggregatedEvent.aggregatedEvents())
-    {
-        const auto ldapSyncIssueEvent = event.dynamicCast<LdapSyncIssueEvent>();
-        if (!NX_ASSERT(ldapSyncIssueEvent, "Unexpected type of event: %1.", event->type()))
-            continue;
-
-        const auto reason = ldapSyncIssueEvent->reason();
-        if (!NX_ASSERT(isValidReason(reason), "Unexpected reason value: %1.", reason))
-            continue;
-
-        reasonToCount[reason]++;
-    }
-
-    NX_ASSERT(!reasonToCount.empty(), "At least one cause of an event is expected: %1.", type());
-
-    if (reasonToCount.size() == 1 && reasonToCount.begin()->second == 1)
-        return aggregatedInfo;
-
-    QnJsonContext context;
-    context.setSerializeMapToObject(true);
-    QJson::serialize(&context, reasonToCount, &aggregatedInfo[kReasonToCount]);
-
-    return aggregatedInfo;
-}
-
 QString LdapSyncIssueEvent::extendedCaption(common::SystemContext* context,
     Qn::ResourceInfoLevel detailLevel) const
 {

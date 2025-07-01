@@ -23,6 +23,7 @@
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/time/formatter.h>
 
+#include "aggregated_event.h"
 #include "engine.h"
 #include "field_types.h"
 #include "manifest.h"
@@ -121,9 +122,69 @@ QString Strings::resource(
     return resource ? QnResourceDisplayInfo(resource).toString(detailLevel) : QString();
 }
 
+QString Strings::removedResource(common::SystemContext* context,
+    nx::vms::rules::ResourceType type)
+{
+    switch (type)
+    {
+        case ResourceType::user:
+            return tr("Removed subject", "The subject is user or group");
+        case ResourceType::device:
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                context->resourcePool(), tr("Removed device"), tr("Removed camera"));
+        case ResourceType::server:
+            return tr("Removed server");
+        case ResourceType::layout:
+            return tr("Removed layout");
+        default:
+            NX_ASSERT(false, "Unexpected resource type: %1", type);
+            return {};
+    }
+}
+
 QString Strings::resourceIp(const QnResourcePtr& resource)
 {
     return resource ? QnResourceDisplayInfo(resource).host() : QString();
+}
+
+QString Strings::eventExtendedDescription(
+    AggregatedEventPtr event,
+    common::SystemContext* context,
+    Qn::ResourceInfoLevel detailLevel)
+{
+    static const QString kIndent = "  ";
+    static const QString kSpacer = "...";
+    static const QChar kLinesSeparator = '\n';
+
+    QStringList result;
+
+    auto details = event->details(context, detailLevel);
+    result.push_back(details[utils::kExtendedCaptionDetailName].toString());
+
+    auto addEvent =
+        [context, &result, &detailLevel](const EventPtr& event)
+        {
+            result.push_back(Strings::timestampTime(event->timestamp()));
+            auto eventDetails = event->details(context, detailLevel);
+            auto detailing = eventDetails[utils::kDetailingDetailName]
+                .template value<QStringList>();
+            for (const auto& line: detailing)
+                result.push_back(kIndent + line);
+        };
+
+    auto [firstEvents, lastEvents] = event->takeLimitedAmount();
+    for (const auto& event: firstEvents)
+        addEvent(event);
+
+    if (event->count() > firstEvents.size())
+    {
+        result.push_back(kSpacer);
+        for (const auto& event: lastEvents)
+            addEvent(event);
+        result.push_back({}); //< Add an empty line.
+        result.push_back(Strings::totalNumberOfEvents(QString::number(event->count())));
+    }
+    return result.join(kLinesSeparator);
 }
 
 QString Strings::urlForCamera(

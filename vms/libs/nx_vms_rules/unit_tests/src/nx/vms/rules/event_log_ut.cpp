@@ -5,6 +5,8 @@
 #include <QtCore/QDateTime>
 #include <QtNetwork/QHostAddress>
 
+#include <nx/vms/api/rules/event_log.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/events/builtin_events.h>
 #include <nx/vms/rules/manifest.h>
@@ -24,25 +26,33 @@ namespace nx::vms::rules::test {
 
 namespace {
 
-static const milliseconds kTimestamp1{QDateTime::currentMSecsSinceEpoch()};
-static const milliseconds kTimestamp2 = kTimestamp1 + 10s;
+/** Return timestamp from time like: "15:46:29" with an example date. */
+std::chrono::milliseconds makeTimestamp(const QString& time)
+{
+    static const QString kTimeFormat = "hh:mm:ss";
+    static const QDate kDate(2025, 10, 25); //< Date is not displayed in notifications.
+
+    const QDateTime dt(kDate, QTime::fromString(time, kTimeFormat));
+    return std::chrono::milliseconds(dt.toMSecsSinceEpoch());
+}
 
 } // namespace
 
 class EventLogTest: public EventDetailsTestBase
 {
-protected:
-    void givenEvent(EventPtr event)
-    {
-        m_events.push_back(std::move(event));
-    }
+    using EventLog = utils::EventLog;
 
-    void ensureAggregationIsValid()
+protected:
+    AggregatedEventPtr buildLogEvent()
     {
-        NX_ASSERT(!m_events.empty());
-        const auto aggregationKey = m_events[0]->aggregationKey();
-        for (int i = 1; i < m_events.size(); ++i)
-            NX_ASSERT(m_events[i]->aggregationKey() == aggregationKey);
+        if (!m_logEvent)
+        {
+            nx::vms::api::rules::EventLogRecord record;
+            buildEvent()->storeToRecord(&record);
+            m_logEvent = AggregatedEventPtr::create(systemContext()->vmsRulesEngine(), record);
+        }
+
+        return m_logEvent;
     }
 
     void thenSourceIs(
@@ -50,17 +60,12 @@ protected:
         std::pair<ResourceType, bool /*plural*/> expectedIcon,
         const UuidList& expectedResourceIds)
     {
-        NX_ASSERT(!m_events.empty());
-        ensureAggregationIsValid();
+        auto event = buildLogEvent();
 
-        std::vector<EventPtr> eventList;
-        std::swap(m_events, eventList);
-        const auto event = AggregatedEventPtr::create(std::move(eventList));
+        const auto resourceIds = EventLog::sourceResourceIds(event, systemContext());
 
-        const auto resourceIds = utils::eventSourceResourceIds(event, systemContext());
-
-        EXPECT_EQ(expectedText, utils::eventSourceText(event, systemContext(), Qn::RI_WithUrl));
-        EXPECT_EQ(expectedIcon, utils::eventSourceIcon(event, systemContext()));
+        EXPECT_EQ(expectedText, EventLog::sourceText(event, systemContext(), Qn::RI_WithUrl));
+        EXPECT_EQ(expectedIcon, EventLog::sourceIcon(event, systemContext()));
         EXPECT_EQ(expectedResourceIds, resourceIds);
     }
 
@@ -75,17 +80,79 @@ protected:
             UuidList{expectedResourceId});
     }
 
+    void thenDescriptionTooltipIs(const QString& expectedText)
+    {
+        auto event = buildLogEvent();
+        EXPECT_EQ(expectedText.trimmed(),
+            EventLog::descriptionTooltip(event, systemContext(), Qn::RI_WithUrl));
+    }
+
 private:
-    std::vector<EventPtr> m_events;
+    AggregatedEventPtr m_logEvent;
 };
 
 // FIXME: #sivanov Short plan:
 // - Add analytics engines to sources of the analytics events.
 // - Support multiple cameras in Generic / Soft Trigger events.
-// - Implement aggregation support.
 // - List cameras in Saas Issue / Server Conflict / Device IP Conflict / License Issue events.
 // - Decide what to do with Generic Events with different sources.
 // - Support removed devices.
+
+//-------------------------------------------------------------------------------------------------
+// Content tests
+
+TEST_F(EventLogTest, content_eventsPerDayLimit)
+{
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Server1 (localhost) Started
+15:46:01
+15:46:02
+...
+15:46:59
+15:47:00
+
+Total number of events: 60
+)";
+
+    auto timestamp = makeTimestamp("15:46:01");
+    for (int i = 0; i < 60; ++i)
+        givenEvent(QSharedPointer<ServerStartedEvent>::create(timestamp + (1s * i), kServerId));
+
+    whenEventsLimitSetTo(4);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
+}
+
+TEST_F(EventLogTest, content_singleEventMigration)
+{
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Server1 (localhost) Started
+15:46:01
+...
+
+Total number of events: 60
+)";
+
+    auto timestamp = makeTimestamp("15:46:01");
+    for (int i = 0; i < 60; ++i)
+        givenEvent(QSharedPointer<ServerStartedEvent>::create(timestamp + (1s * i), kServerId));
+
+    whenEventsLimitSetTo(1);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
+}
+
+TEST_F(EventLogTest, content_removedSource)
+{
+    static constexpr auto kExpectedSourceText = "Removed server";
+    static constexpr auto kExpectedSourceIcon = ResourceType::server;
+
+    const auto removedServerId = Uuid::createUuid();
+
+    givenEvent(QSharedPointer<ServerStartedEvent>::create(
+        makeTimestamp("15:46:29"),
+        removedServerId));
+
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, removedServerId);
+}
 
 //-------------------------------------------------------------------------------------------------
 // Analytics Event
@@ -94,18 +161,21 @@ TEST_F(EventLogTest, event_analytics)
 {
     static const nx::Uuid kEngine2Id = nx::Uuid::createUuid();
     static const QString kEventTypeId = "nx.LineCrossing";
-    static const nx::Uuid kObjectTrack1Id = nx::Uuid::createUuid();
-    static const nx::Uuid kObjectTrack2Id = nx::Uuid::createUuid();
-    static const QString kKey1 = "key1";
-    static const QString kKey2 = "key2";
-    static const QRectF kBoundingBox1(0.1, 0.2, 0.3, 0.4);
-    static const QRectF kBoundingBox2(0.5, 0.6, 0.7, 0.8);
 
-    static constexpr auto kExpectedText = "Entrance (10.0.0.1)";
-    static constexpr auto kExpectedIcon = ResourceType::device;
+    static constexpr auto kExpectedSourceText = "Entrance (10.0.0.1)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::device;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Analytics Event at Entrance (10.0.0.1)
+15:46:29
+  Caption: Caption 1
+  Description: Description 1
+15:48:30
+  Caption: Caption 2
+  Description: Description 2
+)";
 
     givenEvent(QSharedPointer<AnalyticsEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         State::started,
         "Caption 1",
         "Description 1",
@@ -113,13 +183,13 @@ TEST_F(EventLogTest, event_analytics)
         kEngine1Id,
         kEventTypeId,
         nx::common::metadata::Attributes(),
-        kObjectTrack1Id,
-        kKey1,
-        kBoundingBox1
+        /*objectTrackId*/ nx::Uuid::createUuid(),
+        /*key*/ QString{},
+        /*boundingBox*/ QRectF{}
     ));
 
     givenEvent(QSharedPointer<AnalyticsEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         State::started,
         "Caption 2",
         "Description 2",
@@ -127,12 +197,13 @@ TEST_F(EventLogTest, event_analytics)
         kEngine2Id,
         kEventTypeId, //< Event type is fixed in UI.
         nx::common::metadata::Attributes(),
-        kObjectTrack2Id,
-        kKey2,
-        kBoundingBox2
+        /*objectTrackId*/ nx::Uuid::createUuid(),
+        /*key*/ QString{},
+        /*boundingBox*/ QRectF{}
     ));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kCamera1Id);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kCamera1Id);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -143,33 +214,37 @@ TEST_F(EventLogTest, event_analyticsObject)
     static const nx::Uuid kEngine2Id = nx::Uuid::createUuid();
     static const QString kObjectTypeId1 = "nx.LicensePlate";
     static const QString kObjectTypeId2 = "nx.Face";
-    static const nx::Uuid kObjectTrackId1 = nx::Uuid::createUuid();
-    static const nx::Uuid kObjectTrackId2 = nx::Uuid::createUuid();
 
-    static constexpr auto kExpectedText = "Entrance (10.0.0.1)";
-    static constexpr auto kExpectedIcon = ResourceType::device;
+    static constexpr auto kExpectedSourceText = "Entrance (10.0.0.1)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::device;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Object detected at Entrance (10.0.0.1)
+15:46:29
+15:48:30
+)";
 
     givenEvent(QSharedPointer<AnalyticsObjectEvent>::create(
         State::started,
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         kCamera1Id,
         kEngine1Id,
         kObjectTypeId1,
-        kObjectTrackId1,
+        /*objectTrackId*/ nx::Uuid::createUuid(),
         nx::common::metadata::Attributes()
     ));
 
     givenEvent(QSharedPointer<AnalyticsObjectEvent>::create(
         State::started,
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         kCamera1Id,
         kEngine2Id,
         kObjectTypeId2, //< TODO: sivanov Probably fixed in UI.
-        kObjectTrackId2,
+        /*objectTrackId*/ nx::Uuid::createUuid(),
         nx::common::metadata::Attributes()
     ));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kCamera1Id);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kCamera1Id);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -177,24 +252,32 @@ TEST_F(EventLogTest, event_analyticsObject)
 
 TEST_F(EventLogTest, event_cameraInput)
 {
-    static constexpr auto kExpectedText = "Entrance (10.0.0.1)";
-    static constexpr auto kExpectedIcon = ResourceType::device;
+    static constexpr auto kExpectedSourceText = "Entrance (10.0.0.1)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::device;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Input on Entrance (10.0.0.1)
+15:46:29
+  Input Port: Port_1
+15:48:30
+  Input Port: Port_2
+)";
 
     givenEvent(QSharedPointer<CameraInputEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         State::started,
         kCamera1Id,
         "Port_1"
     ));
 
     givenEvent(QSharedPointer<CameraInputEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         State::started,
         kCamera1Id,
         "Port_2"
     ));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kCamera1Id);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kCamera1Id);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -202,22 +285,30 @@ TEST_F(EventLogTest, event_cameraInput)
 
 TEST_F(EventLogTest, event_deviceDisconnected)
 {
-    static constexpr auto kExpectedText = "Entrance (10.0.0.1)";
-    static constexpr auto kExpectedIcon = ResourceType::device;
+    static constexpr auto kExpectedSourceText = "Entrance (10.0.0.1)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::device;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Camera disconnected at Server1 (localhost)
+15:46:29
+  Entrance (10.0.0.1)
+15:48:30
+  Camera2 (10.0.0.2)
+)";
 
     givenEvent(QSharedPointer<DeviceDisconnectedEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         kCamera1Id,
         kServerId
     ));
 
     givenEvent(QSharedPointer<DeviceDisconnectedEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         kCamera2Id,
         kServerId
     ));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kCamera1Id);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kCamera1Id);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -225,11 +316,22 @@ TEST_F(EventLogTest, event_deviceDisconnected)
 
 TEST_F(EventLogTest, event_deviceIpConflict)
 {
-    static constexpr auto kExpectedText = "Server1 (localhost)";
-    static constexpr auto kExpectedIcon = ResourceType::server;
+    static constexpr auto kExpectedSourceText = "Server1 (localhost)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::server;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Camera IP Conflict at Server1 (localhost)
+15:46:29
+  Conflicting Address: 10.0.0.1
+  Camera #1: Entrance (2a:cf:c7:04:c7:c9)
+  Camera #2: Camera2 (51:dc:54:02:3a:8e)
+15:48:30
+  Conflicting Address: 10.0.0.2
+  Camera #1: Entrance (2a:cf:c7:04:c7:c9)
+  Camera #2: Camera2 (51:dc:54:02:3a:8e)
+)";
 
     givenEvent(QSharedPointer<DeviceIpConflictEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         kServerId,
         QList<DeviceIpConflictEvent::DeviceInfo>{
             {.id = kCamera1Id, .mac = kCamera1PhysicalId},
@@ -237,14 +339,15 @@ TEST_F(EventLogTest, event_deviceIpConflict)
         /*address*/ QHostAddress("10.0.0.1")));
 
     givenEvent(QSharedPointer<DeviceIpConflictEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         kServerId,
         QList<DeviceIpConflictEvent::DeviceInfo>{
             {.id = kCamera1Id, .mac = kCamera1PhysicalId},
             {.id = kCamera2Id, .mac = kCamera2PhysicalId}},
         /*address*/ QHostAddress("10.0.0.2")));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kServerId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kServerId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -252,18 +355,24 @@ TEST_F(EventLogTest, event_deviceIpConflict)
 
 TEST_F(EventLogTest, event_fanError)
 {
-    static constexpr auto kExpectedText = "Server1 (localhost)";
-    static constexpr auto kExpectedIcon = ResourceType::server;
+    static constexpr auto kExpectedSourceText = "Server1 (localhost)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::server;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Fan failure at Server1 (localhost)
+15:46:29
+15:48:30
+)";
 
     givenEvent(QSharedPointer<FanErrorEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         kServerId));
 
     givenEvent(QSharedPointer<FanErrorEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         kServerId));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kServerId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kServerId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -271,12 +380,19 @@ TEST_F(EventLogTest, event_fanError)
 
 TEST_F(EventLogTest, event_generic_withSourceOnly)
 {
-    static constexpr auto kExpectedText = "Source 1";
-    static constexpr auto kExpectedIcon = ResourceType::server;
+    static constexpr auto kExpectedSourceText = "Source 1";
+    static constexpr auto kExpectedSourceIcon = ResourceType::server;
     static const Uuid kExpectedResourceId = kServerId;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Generic Event at Server1 (localhost)
+15:46:29
+  Source: Source 1
+  Caption: Caption 1
+  Description: Description 1
+)";
 
     givenEvent(QSharedPointer<GenericEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         State::instant,
         /*caption*/ "Caption 1",
         /*description*/ "Description 1",
@@ -284,17 +400,27 @@ TEST_F(EventLogTest, event_generic_withSourceOnly)
         kServerId,
         UuidList{}));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kExpectedResourceId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kExpectedResourceId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 TEST_F(EventLogTest, event_generic_withSourceAndDevice)
 {
-    static constexpr auto kExpectedText = "Source 1";
-    static constexpr auto kExpectedIcon = ResourceType::device;
+    static constexpr auto kExpectedSourceText = "Source 1";
+    static constexpr auto kExpectedSourceIcon = ResourceType::device;
     static const Uuid kExpectedResourceId = kCamera1Id;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Generic Event at Server1 (localhost)
+15:46:29
+  Source: Source 1
+  Caption: Caption 1
+  Description: Description 1
+  Related cameras:
+  - Entrance (10.0.0.1)
+)";
 
     givenEvent(QSharedPointer<GenericEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         State::instant,
         /*caption*/ "Caption 1",
         /*description*/ "Description 1",
@@ -302,17 +428,26 @@ TEST_F(EventLogTest, event_generic_withSourceAndDevice)
         kServerId,
         UuidList{kCamera1Id}));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kExpectedResourceId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kExpectedResourceId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 TEST_F(EventLogTest, event_generic_withDevicesOnly)
 {
-    static constexpr auto kExpectedText = "Entrance (10.0.0.1)";
-    static constexpr auto kExpectedIcon = ResourceType::device;
+    static constexpr auto kExpectedSourceText = "Entrance (10.0.0.1)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::device;
     static const Uuid kExpectedResourceId = kCamera1Id;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Generic Event at Server1 (localhost)
+15:46:29
+  Caption: Caption 1
+  Description: Description 1
+  Related cameras:
+  - Entrance (10.0.0.1)
+)";
 
     givenEvent(QSharedPointer<GenericEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         State::instant,
         /*caption*/ "Caption 1",
         /*description*/ "Description 1",
@@ -320,17 +455,24 @@ TEST_F(EventLogTest, event_generic_withDevicesOnly)
         kServerId,
         UuidList{kCamera1Id}));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kExpectedResourceId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kExpectedResourceId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 TEST_F(EventLogTest, event_generic_withServerOnly)
 {
-    static constexpr auto kExpectedText = "Server1 (localhost)";
-    static constexpr auto kExpectedIcon = ResourceType::server;
+    static constexpr auto kExpectedSourceText = "Server1 (localhost)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::server;
     static const Uuid kExpectedResourceId = kServerId;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Generic Event at Server1 (localhost)
+15:46:29
+  Caption: Caption 1
+  Description: Description 1
+)";
 
     givenEvent(QSharedPointer<GenericEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         State::instant,
         /*caption*/ "Caption 1",
         /*description*/ "Description 1",
@@ -338,7 +480,8 @@ TEST_F(EventLogTest, event_generic_withServerOnly)
         kServerId,
         UuidList{}));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kExpectedResourceId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kExpectedResourceId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -346,22 +489,30 @@ TEST_F(EventLogTest, event_generic_withServerOnly)
 
 TEST_F(EventLogTest, event_ldapSyncIssue)
 {
-    static constexpr auto kExpectedText = "Server1 (localhost)";
-    static constexpr auto kExpectedIcon = ResourceType::server;
+    static constexpr auto kExpectedSourceText = "Server1 (localhost)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::server;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+LDAP Sync Issue at Server1 (localhost)
+15:46:29
+  Failed to complete the sync within a 5 minutes timeout.
+15:48:30
+  Failed to connect to the LDAP server.
+)";
 
     givenEvent(QSharedPointer<LdapSyncIssueEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         nx::vms::api::EventReason::failedToCompleteSyncWithLdap,
         5min,
         kServerId));
 
     givenEvent(QSharedPointer<LdapSyncIssueEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         nx::vms::api::EventReason::failedToConnectToLdap,
         30s,
         kServerId));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kServerId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kServerId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -369,20 +520,31 @@ TEST_F(EventLogTest, event_ldapSyncIssue)
 
 TEST_F(EventLogTest, event_licenseIssue)
 {
-    static constexpr auto kExpectedText = "Server1 (localhost)";
-    static constexpr auto kExpectedIcon = ResourceType::server;
+    static constexpr auto kExpectedSourceText = "Server1 (localhost)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::server;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Not enough licenses on Server1 (localhost)
+15:46:29
+  Recording has been disabled on the following cameras:
+  - Entrance (10.0.0.1)
+15:48:30
+  Recording has been disabled on the following cameras:
+  - Camera2 (10.0.0.2)
+  - Entrance (10.0.0.1)
+)";
 
     givenEvent(QSharedPointer<LicenseIssueEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         kServerId,
         /*disabledCameras*/ UuidSet{kCamera1Id}));
 
     givenEvent(QSharedPointer<LicenseIssueEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         kServerId,
         /*disabledCameras*/ UuidSet{kCamera1Id, kCamera2Id}));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kServerId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kServerId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -390,21 +552,27 @@ TEST_F(EventLogTest, event_licenseIssue)
 
 TEST_F(EventLogTest, event_motion)
 {
-    static constexpr auto kExpectedText = "Entrance (10.0.0.1)";
-    static constexpr auto kExpectedIcon = ResourceType::device;
+    static constexpr auto kExpectedSourceText = "Entrance (10.0.0.1)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::device;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Motion on Entrance (10.0.0.1)
+15:46:29
+15:48:30
+)";
 
     givenEvent(QSharedPointer<MotionEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         State::started,
         kCamera1Id
     ));
     givenEvent(QSharedPointer<MotionEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         State::started,
         kCamera1Id
     ));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kCamera1Id);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kCamera1Id);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -412,11 +580,20 @@ TEST_F(EventLogTest, event_motion)
 
 TEST_F(EventLogTest, event_networkIssue)
 {
-    static constexpr auto kExpectedText = "Entrance (10.0.0.1)";
-    static constexpr auto kExpectedIcon = ResourceType::device;
+    static constexpr auto kExpectedSourceText = "Entrance (10.0.0.1)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::device;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Network Issue at Server1 (localhost)
+15:46:29
+  Entrance (10.0.0.1)
+  Multicast address conflict detected. Address 10.0.0.1:5555 is already in use by testcamera on secondary stream.
+15:48:30
+  Camera2 (10.0.0.2)
+  No data received during last 5 seconds.
+)";
 
     givenEvent(QSharedPointer<NetworkIssueEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         kCamera1Id,
         kServerId,
         nx::vms::api::EventReason::networkMulticastAddressConflict,
@@ -427,7 +604,7 @@ TEST_F(EventLogTest, event_networkIssue)
         }));
 
     givenEvent(QSharedPointer<NetworkIssueEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         kCamera2Id,
         kServerId,
         nx::vms::api::EventReason::networkNoFrame,
@@ -435,7 +612,8 @@ TEST_F(EventLogTest, event_networkIssue)
             .timeout = 5s
         }));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kCamera1Id);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kCamera1Id);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -443,11 +621,18 @@ TEST_F(EventLogTest, event_networkIssue)
 
 TEST_F(EventLogTest, event_integrationDiagnostic_deviceAgent)
 {
-    static constexpr auto kExpectedText = "Entrance (10.0.0.1)";
-    static constexpr auto kExpectedIcon = ResourceType::device;
+    static constexpr auto kExpectedSourceText = "Entrance (10.0.0.1)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::device;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Integration Diagnostic at Entrance (10.0.0.1)
+15:46:29
+  Caption: Caption 1
+15:48:30
+  Description: Description 2
+)";
 
     givenEvent(QSharedPointer<IntegrationDiagnosticEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         "Caption 1",
         /*description*/ QString(),
         kCamera1Id,
@@ -456,7 +641,7 @@ TEST_F(EventLogTest, event_integrationDiagnostic_deviceAgent)
     ));
 
     givenEvent(QSharedPointer<IntegrationDiagnosticEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         /*caption*/ QString(),
         "Description 2",
         kCamera1Id,
@@ -464,17 +649,25 @@ TEST_F(EventLogTest, event_integrationDiagnostic_deviceAgent)
         nx::vms::api::EventLevel::info
     ));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kCamera1Id);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kCamera1Id);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 TEST_F(EventLogTest, event_integrationDiagnostic_plugin)
 {
-    static constexpr auto kExpectedText = "Engine1";
-    static constexpr auto kExpectedIcon = ResourceType::analyticsEngine;
+    static constexpr auto kExpectedSourceText = "Engine1";
+    static constexpr auto kExpectedSourceIcon = ResourceType::analyticsEngine;
     static const Uuid kExpectedResourceId = kEngine1Id;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Integration Diagnostic at Engine1
+15:46:29
+  Caption: Caption 1
+15:48:30
+  Description: Description 2
+)";
 
     givenEvent(QSharedPointer<IntegrationDiagnosticEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         "Caption 1",
         /*description*/ QString(),
         /*deviceId*/ nx::Uuid(),
@@ -483,7 +676,7 @@ TEST_F(EventLogTest, event_integrationDiagnostic_plugin)
     ));
 
     givenEvent(QSharedPointer<IntegrationDiagnosticEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         /*caption*/ QString(),
         "Description 2",
         /*deviceId*/ nx::Uuid(),
@@ -491,7 +684,8 @@ TEST_F(EventLogTest, event_integrationDiagnostic_plugin)
         nx::vms::api::EventLevel::info
     ));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kExpectedResourceId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kExpectedResourceId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -499,11 +693,22 @@ TEST_F(EventLogTest, event_integrationDiagnostic_plugin)
 
 TEST_F(EventLogTest, event_poeOverBudget)
 {
-    static constexpr auto kExpectedText = "Server1 (localhost)";
-    static constexpr auto kExpectedIcon = ResourceType::server;
+    static constexpr auto kExpectedSourceText = "Server1 (localhost)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::server;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+PoE over budget on Server1 (localhost)
+15:46:29
+  Current power consumption: 0.5 watts
+  Upper consumption limit: 0.3 watts
+  Lower consumption limit: 0.2 watts
+15:48:30
+  Current power consumption: 0.8 watts
+  Upper consumption limit: 0.2 watts
+  Lower consumption limit: 0.1 watts
+)";
 
     givenEvent(QSharedPointer<PoeOverBudgetEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         State::instant,
         kServerId,
         /*currentConsumptionW*/ 0.52,
@@ -511,14 +716,15 @@ TEST_F(EventLogTest, event_poeOverBudget)
         /*lowerLimitW*/ 0.18));
 
     givenEvent(QSharedPointer<PoeOverBudgetEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         State::instant,
         kServerId,
         /*currentConsumptionW*/ 0.85,
         /*upperLimitW*/ 0.2,
         /*lowerLimitW*/ 0.1));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kServerId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kServerId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -526,22 +732,34 @@ TEST_F(EventLogTest, event_poeOverBudget)
 
 TEST_F(EventLogTest, event_saasIssue)
 {
-    static constexpr auto kExpectedText = "Server1 (localhost)";
-    static constexpr auto kExpectedIcon = ResourceType::server;
+    static constexpr auto kExpectedSourceText = "Server1 (localhost)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::server;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Services Issue on Server1 (localhost)
+15:46:29
+  Failed to migrate licenses.
+  - key1
+  - key2
+15:48:30
+  Paid integration service usage on 2 channels was stopped due to service overuse.
+  - Entrance (10.0.0.1)
+  - Camera2 (10.0.0.2)
+)";
 
     givenEvent(QSharedPointer<SaasIssueEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         kServerId,
         /*licenseKeys*/ QStringList{"key1", "key2"},
         nx::vms::api::EventReason::licenseMigrationFailed));
 
     givenEvent(QSharedPointer<SaasIssueEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         kServerId,
         /*deviceIds*/ UuidList{kCamera1Id, kCamera2Id},
         nx::vms::api::EventReason::notEnoughIntegrationServices));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kServerId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kServerId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -549,18 +767,24 @@ TEST_F(EventLogTest, event_saasIssue)
 
 TEST_F(EventLogTest, event_serverCertificateError)
 {
-    static constexpr auto kExpectedText = "Server1 (localhost)";
-    static constexpr auto kExpectedIcon = ResourceType::server;
+    static constexpr auto kExpectedSourceText = "Server1 (localhost)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::server;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Server1 (localhost) certificate error
+15:46:29
+15:48:30
+)";
 
     givenEvent(QSharedPointer<ServerCertificateErrorEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         kServerId));
 
     givenEvent(QSharedPointer<ServerCertificateErrorEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         kServerId));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kServerId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kServerId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -568,13 +792,27 @@ TEST_F(EventLogTest, event_serverCertificateError)
 
 TEST_F(EventLogTest, event_serverConflict)
 {
-    static constexpr auto kExpectedText = "Server1 (localhost)";
-    static constexpr auto kExpectedIcon = ResourceType::server;
+    static constexpr auto kExpectedSourceText = "Server1 (localhost)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::server;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Server1 (localhost) Conflict
+15:46:29
+  Discovered a server with the same ID in the same local network:
+  Server: 10.0.1.15
+15:48:30
+  Servers in the same local network have conflict on the following devices:
+  Server: 10.0.1.15
+  - Entrance (10.0.0.1)
+  - a3:57:4a:fd:fa:08
+  Server: 10.0.1.16
+  - e8:4b:34:1c:6e:8b
+  - Camera2 (10.0.0.2)
+)";
 
     // Server1 (localhost) has the same ID as another server on 10.0.1.15. Found using multicast -
     // in the same network.
     givenEvent(QSharedPointer<ServerConflictEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         kServerId,
         CameraConflictList{.sourceServer="10.0.1.15"}));
 
@@ -582,7 +820,7 @@ TEST_F(EventLogTest, event_serverConflict)
     // pull video and control the same cameras. Servers required to be merged (or camera control
     // should be disabled on one of them).
     givenEvent(QSharedPointer<ServerConflictEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         kServerId,
         CameraConflictList{
             .sourceServer="localhost",
@@ -592,7 +830,8 @@ TEST_F(EventLogTest, event_serverConflict)
             }
         }));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kServerId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kServerId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -600,20 +839,28 @@ TEST_F(EventLogTest, event_serverConflict)
 
 TEST_F(EventLogTest, event_serverFailure)
 {
-    static constexpr auto kExpectedText = "Server1 (localhost)";
-    static constexpr auto kExpectedIcon = ResourceType::server;
+    static constexpr auto kExpectedSourceText = "Server1 (localhost)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::server;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Server1 (localhost) Failure
+15:46:29
+  Server stopped unexpectedly.
+15:48:30
+  Connection to server is lost.
+)";
 
     givenEvent(QSharedPointer<ServerFailureEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         kServerId,
         nx::vms::api::EventReason::serverStarted));
 
     givenEvent(QSharedPointer<ServerFailureEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         kServerId,
         nx::vms::api::EventReason::serverTerminated));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kServerId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kServerId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -621,18 +868,24 @@ TEST_F(EventLogTest, event_serverFailure)
 
 TEST_F(EventLogTest, event_serverStarted)
 {
-    static constexpr auto kExpectedText = "Server1 (localhost)";
-    static constexpr auto kExpectedIcon = ResourceType::server;
+    static constexpr auto kExpectedSourceText = "Server1 (localhost)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::server;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Server1 (localhost) Started
+15:46:29
+15:48:30
+)";
 
     givenEvent(QSharedPointer<ServerStartedEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         kServerId));
 
     givenEvent(QSharedPointer<ServerStartedEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         kServerId));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kServerId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kServerId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -640,12 +893,21 @@ TEST_F(EventLogTest, event_serverStarted)
 
 TEST_F(EventLogTest, event_softTrigger)
 {
-    static constexpr auto kExpectedText = "Entrance (10.0.0.1)";
-    static constexpr auto kExpectedIcon = ResourceType::device;
+    static constexpr auto kExpectedSourceText = "Entrance (10.0.0.1)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::device;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Soft Trigger Button 1
+15:46:29
+  Source: Entrance (10.0.0.1)
+  User: User1
+15:48:30
+  Source: Camera2 (10.0.0.2)
+  User: User2
+)";
 
     static const Uuid kTriggerId = Uuid::createUuid();
     givenEvent(QSharedPointer<SoftTriggerEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         State::instant,
         kTriggerId,
         kCamera1Id,
@@ -654,7 +916,7 @@ TEST_F(EventLogTest, event_softTrigger)
         "some_icon"));
 
     givenEvent(QSharedPointer<SoftTriggerEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         State::instant,
         kTriggerId,
         kCamera2Id,
@@ -662,7 +924,8 @@ TEST_F(EventLogTest, event_softTrigger)
         "Button 1",
         "some_icon"));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kCamera1Id);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kCamera1Id);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -670,22 +933,30 @@ TEST_F(EventLogTest, event_softTrigger)
 
 TEST_F(EventLogTest, event_storageIssue)
 {
-    static constexpr auto kExpectedText = "Server1 (localhost)";
-    static constexpr auto kExpectedIcon = ResourceType::server;
+    static constexpr auto kExpectedSourceText = "Server1 (localhost)";
+    static constexpr auto kExpectedSourceIcon = ResourceType::server;
+    static constexpr auto kExpectedDescriptionTooltip = R"(
+Storage Issue at Server1 (localhost)
+15:46:29
+  System disk "C" is almost full.
+15:48:30
+  I/O error has occurred at disk D.
+)";
 
     givenEvent(QSharedPointer<StorageIssueEvent>::create(
-        kTimestamp1,
+        makeTimestamp("15:46:29"),
         kServerId,
         nx::vms::api::EventReason::systemStorageFull,
         /*reasonText*/ "C"));
 
     givenEvent(QSharedPointer<StorageIssueEvent>::create(
-        kTimestamp2,
+        makeTimestamp("15:48:30"),
         kServerId,
         nx::vms::api::EventReason::storageIoError,
         /*reasonText*/ "disk D"));
 
-    thenSourceIs(kExpectedText, kExpectedIcon, kServerId);
+    thenSourceIs(kExpectedSourceText, kExpectedSourceIcon, kServerId);
+    thenDescriptionTooltipIs(kExpectedDescriptionTooltip);
 }
 
 } // namespace nx::vms::rules::test

@@ -24,9 +24,6 @@ struct SubstitutionContext
     AggregatedEventPtr event;
     std::optional<ItemDescriptor> manifest;
 
-    /** Custom parameters which will be passed to the substitution function. */
-    QVariantMap extraParameters;
-
     nx::vms::rules::State state;
     QString objectTypeId;
     // TODO: #vbutkevich. Remove once the server can collect all attributes for objectType.

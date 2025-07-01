@@ -14,54 +14,60 @@
 
 namespace nx::vms::rules::utils {
 
-/**
- * Event source icon. Returned in form of resource type and a flag whether plural form of icon
- * should be used.
- */
-NX_VMS_RULES_API std::pair<ResourceType, bool /*plural*/> eventSourceIcon(
-    const QVariantMap& eventDetails);
+struct NX_VMS_RULES_API EventLog
+{
+    /**
+     * Event source icon. Returned in form of resource type and a flag whether plural form of icon
+     * should be used.
+     */
+    static std::pair<ResourceType, bool /*plural*/> sourceIcon(const QVariantMap& eventDetails);
 
-/**
- * Event source icon. Returned in form of resource type and a flag whether plural form of icon
- * should be used.
- */
-NX_VMS_RULES_API std::pair<ResourceType, bool /*plural*/> eventSourceIcon(
-    const AggregatedEventPtr& event,
-    common::SystemContext* context);
+    /**
+     * Event source icon. Returned in form of resource type and a flag whether plural form of icon
+     * should be used.
+     */
+    static std::pair<ResourceType, bool /*plural*/> sourceIcon(
+        const AggregatedEventPtr& event, common::SystemContext* context);
 
-/**
- * Event source text. By default this is the device (if present) or server name where the event was
- * produced. Generic event may overwrite it.
- */
-NX_VMS_RULES_API QString eventSourceText(const QVariantMap& eventDetails);
+    /**
+     * Event source text. By default this is the device (if present) or server name where the event
+     * was produced. Generic event may overwrite it.
+     */
+    static QString sourceText(common::SystemContext* context, const QVariantMap& eventDetails);
 
-/**
- * Event source text. By default this is the device (if present) or server name where the event was
- * produced. Generic event may overwrite it.
- */
-NX_VMS_RULES_API QString eventSourceText(
-    const AggregatedEventPtr& event,
-    common::SystemContext* context,
-    Qn::ResourceInfoLevel detailLevel);
+    /**
+     * Event source text. By default this is the device (if present) or server name where the event
+     * was produced. Generic event may overwrite it.
+     */
+    static QString sourceText(const AggregatedEventPtr& event,
+        common::SystemContext* context,
+        Qn::ResourceInfoLevel detailLevel);
 
-/**
- * Event source resources. By default this is the device (if present) or server where the event was
- * produced. Some events may have several source resources - e.g. Soft Trigger for the aggregated
- * event may be produced on different cameras. Generic event may have any number of source devices
- * in a single instance. Integration diagnostic event may have engine resource as a source in
- * addition to devices - or only engine.
- */
-NX_VMS_RULES_API UuidList eventSourceResourceIds(const QVariantMap& eventDetails);
+    /**
+     * Event source resources. By default this is the device (if present) or server where the event
+     * was produced. Some events may have several source resources - e.g. Soft Trigger for the
+     * aggregated event may be produced on different cameras. Generic event may have any number of
+     * source devices in a single instance. Integration diagnostic event may have engine resource
+     * as a source in addition to devices - or only engine.
+     */
+    static UuidList sourceResourceIds(const QVariantMap& eventDetails);
 
-/**
- * Event source resources. By default this is the device (if present) or server where the event was
- * produced. Some events may have several source resources - e.g. Soft Trigger for the aggregated
- * event may be produced on different cameras. Generic event may have any number of source devices
- * in a single instance. Integration diagnostic event may have engine resource as a source in
- * addition to devices - or only engine.
- */
-NX_VMS_RULES_API UuidList eventSourceResourceIds(
-    const AggregatedEventPtr& event,
-    common::SystemContext* context);
+    /**
+     * Event source resources. By default this is the device (if present) or server where the event
+     * was produced. Some events may have several source resources - e.g. Soft Trigger for the
+     * aggregated event may be produced on different cameras. Generic event may have any number of
+     * source devices in a single instance. Integration diagnostic event may have engine resource
+     * as a source in addition to devices - or only engine.
+     */
+    static UuidList sourceResourceIds(
+        const AggregatedEventPtr& event, common::SystemContext* context);
+
+    /**
+     * Event description tooltip text. By default it contains the extended event description.
+     */
+    static QString descriptionTooltip(const AggregatedEventPtr& event,
+        common::SystemContext* context,
+        Qn::ResourceInfoLevel detailLevel);
+};
 
 } // namespace nx::vms::rules::utils
