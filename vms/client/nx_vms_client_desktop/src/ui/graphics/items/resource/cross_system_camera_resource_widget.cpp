@@ -8,6 +8,7 @@
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/cross_system/cross_system_camera_resource.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
@@ -35,16 +36,25 @@ struct QnCrossSystemCameraWidget::Private
             if (status == core::CloudCrossSystemContext::Status::connecting)
                 return Qn::ResourceStatusOverlay::LoadingOverlay;
 
+            if (context->systemDescription()->is2FaEnabled()
+                && !appContext()->cloudStatusWatcher()->is2FaEnabledForUser())
+            {
+                return Qn::ResourceStatusOverlay::TwoFADisabledOverlay;
+            }
+
             if (status == core::CloudCrossSystemContext::Status::connectionFailure)
             {
                 if (const auto error = context->connectionError())
                 {
                     if (error->code == core::RemoteConnectionErrorCode::certificateRejected
-                        || error->code == core::RemoteConnectionErrorCode::truncatedSessionToken)
+                        || error->code == core::RemoteConnectionErrorCode::truncatedSessionToken
+                        || error->code == core::RemoteConnectionErrorCode::unauthorized)
                     {
                         return Qn::ResourceStatusOverlay::InformationRequiredOverlay;
                     }
                 }
+
+                return Qn::ResourceStatusOverlay::ConnectionLostOverlay;
             }
 
             return Qn::ResourceStatusOverlay::UnauthorizedOverlay;
@@ -125,8 +135,14 @@ Qn::ResourceOverlayButton QnCrossSystemCameraWidget::calculateOverlayButton(
     if (statusOverlay == Qn::ResourceStatusOverlay::UnauthorizedOverlay)
         return Qn::ResourceOverlayButton::Empty; // VMS-58843: Temporarily not supported.
 
-    if (statusOverlay == Qn::ResourceStatusOverlay::InformationRequiredOverlay)
+    if (statusOverlay == Qn::ResourceStatusOverlay::TwoFADisabledOverlay)
+        return Qn::ResourceOverlayButton::SetUp2FA;
+
+    if (statusOverlay == Qn::ResourceStatusOverlay::InformationRequiredOverlay
+        || statusOverlay == Qn::ResourceStatusOverlay::ConnectionLostOverlay)
+    {
         return Qn::ResourceOverlayButton::LogIn;
+    }
 
     if (d->crossSystemCamera && d->crossSystemCamera->hasFlags(Qn::fake))
         return Qn::ResourceOverlayButton::Empty;
