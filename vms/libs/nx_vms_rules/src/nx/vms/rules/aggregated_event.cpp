@@ -8,30 +8,72 @@
 #include <QtCore/QVariant>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/qobject.h>
+#include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/time/formatter.h>
 
+#include "engine.h"
 #include "strings.h"
-#include "utils/event_details.h"
+#include "utils/serialization.h"
 
 namespace nx::vms::rules {
 
+using namespace nx::vms::api::rules;
+
 AggregatedEvent::AggregatedEvent(const EventPtr& event):
-    m_aggregatedEvents{event}
+    m_aggregatedEvents{event},
+    m_count(1)
 {
 }
 
 AggregatedEvent::AggregatedEvent(std::vector<EventPtr>&& eventList):
-    m_aggregatedEvents{std::move(eventList)}
+    m_aggregatedEvents{std::move(eventList)},
+    m_count(m_aggregatedEvents.size())
 {
 }
 
-AggregatedEvent::AggregatedEvent(
-    const EventPtr& event,
-    nx::vms::api::rules::PropertyMap aggregatedInfo)
-    :
-    m_aggregatedEvents{event},
-    m_aggregatedInfo(aggregatedInfo)
+AggregatedEvent::AggregatedEvent(Engine* engine, const EventLogRecord& record):
+    m_count(std::max(1, record.aggregatedInfo.total)) //< Event count can't be less than one.
 {
+    m_aggregatedEvents.push_back(engine->buildEvent(record.eventData));
+    for (const auto& record: record.aggregatedInfo.firstEventsData)
+        m_aggregatedEvents.push_back(engine->buildEvent(record));
+    // Probably we should add a spacer here.
+    for (const auto& record: record.aggregatedInfo.lastEventsData)
+        m_aggregatedEvents.push_back(engine->buildEvent(record));
+}
+
+std::pair<std::vector<EventPtr> /*firstEvents*/, std::vector<EventPtr> /*lastEvents*/>
+    AggregatedEvent::takeLimitedAmount(int limit) const
+{
+    // Unit tests environment.
+    if (m_eventLimitOverload > 0)
+    {
+        NX_ASSERT(limit == AggregatedEvent::kTotalEventsLimit,
+            "Passing limit directly does not work with an overload");
+        limit = m_eventLimitOverload;
+    }
+
+    // Check real events count here to ensure events would be correctly split if needed.
+    if (count() <= limit)
+        return {m_aggregatedEvents, {}};
+
+    // If the event is build from log record data, the real m_aggregatedEvents amount can be less
+    // than the limit.
+    limit = std::min(limit, (int) m_aggregatedEvents.size());
+
+    const int first = (limit + 1) / 2; //< Ensure odd values will be rounded up.
+    const int last = limit - first;
+
+    return {
+        std::vector<EventPtr>(m_aggregatedEvents.cbegin(), m_aggregatedEvents.cbegin() + first),
+        std::vector<EventPtr>(m_aggregatedEvents.cend() - last, m_aggregatedEvents.cend()),
+    };
+}
+
+void AggregatedEvent::overloadDefaultEventLimit(int value)
+{
+    m_eventLimitOverload = value;
 }
 
 QString AggregatedEvent::type() const
@@ -56,24 +98,27 @@ State AggregatedEvent::state() const
     return NX_ASSERT(!m_aggregatedEvents.empty()) ? initialEvent()->state() : State::none;
 }
 
-QVariantMap AggregatedEvent::details(
+const QVariantMap& AggregatedEvent::details(
     common::SystemContext* context,
     Qn::ResourceInfoLevel detailLevel) const
 {
+    static QVariantMap kEmptyValue;
     if (m_aggregatedEvents.empty())
-        return {};
+        return kEmptyValue;
 
     auto cachedValue = m_detailsCache.find(detailLevel);
     if (cachedValue != m_detailsCache.cend())
         return cachedValue->second;
 
-    auto result = initialEvent()->details(context, detailLevel);
-    m_detailsCache[detailLevel] = result;
-    return result;
+    m_detailsCache[detailLevel] = initialEvent()->details(context, detailLevel);
+    return m_detailsCache[detailLevel];
 }
 
 AggregatedEventPtr AggregatedEvent::filtered(const Filter& filter) const
 {
+    NX_ASSERT(m_aggregatedEvents.size() == m_count,
+        "This function is not allowed for deserialized events as they contain limited info.");
+
     if (m_aggregatedEvents.empty())
         return {};
 
@@ -90,8 +135,12 @@ AggregatedEventPtr AggregatedEvent::filtered(const Filter& filter) const
     return AggregatedEventPtr::create(std::move(filteredList));
 }
 
-std::vector<AggregatedEventPtr> AggregatedEvent::split(const SplitKeyFunction& splitKeyFunction) const
+std::vector<AggregatedEventPtr> AggregatedEvent::split(
+    const SplitKeyFunction& splitKeyFunction) const
 {
+    NX_ASSERT(m_aggregatedEvents.size() == m_count,
+        "This function is not allowed for deserialized events as they contain limited info.");
+
     if (m_aggregatedEvents.empty())
         return {};
 
@@ -117,17 +166,12 @@ std::vector<AggregatedEventPtr> AggregatedEvent::split(const SplitKeyFunction& s
 
 size_t AggregatedEvent::count() const
 {
-    return m_aggregatedEvents.size();
+    return m_count;
 }
 
 EventPtr AggregatedEvent::initialEvent() const
 {
     return m_aggregatedEvents.empty() ? EventPtr{} : m_aggregatedEvents.front();
-}
-
-const std::vector<EventPtr>& AggregatedEvent::aggregatedEvents() const
-{
-    return m_aggregatedEvents;
 }
 
 nx::Uuid AggregatedEvent::ruleId() const
@@ -138,6 +182,39 @@ nx::Uuid AggregatedEvent::ruleId() const
 void AggregatedEvent::setRuleId(nx::Uuid ruleId)
 {
     m_ruleId = ruleId;
+}
+
+void AggregatedEvent::storeToRecord(EventLogRecord* record, int limit) const
+{
+    if (!NX_ASSERT(record))
+        return;
+
+    AggregatedInfo& aggregatedInfo = record->aggregatedInfo;
+
+    auto serializeEvent =
+        [](const EventPtr& event)
+        {
+            return serializeProperties(
+                event.get(),
+                nx::utils::propertyNames(
+                    event.get(),
+                    nx::utils::PropertyAccess::anyAccess | nx::utils::PropertyAccess::stored));
+        };
+
+    auto [firstEvents, lastEvents] = takeLimitedAmount(limit);
+
+    if (NX_ASSERT(firstEvents.size() > 0))
+    {
+        record->eventData = serializeEvent(firstEvents.front());
+        firstEvents.erase(firstEvents.begin());
+    }
+
+    for (const auto& event: firstEvents)
+        aggregatedInfo.firstEventsData.push_back(serializeEvent(event));
+    for (const auto& event: lastEvents)
+        aggregatedInfo.lastEventsData.push_back(serializeEvent(event));
+
+    aggregatedInfo.total = m_aggregatedEvents.size();
 }
 
 } // namespace nx::vms::rules

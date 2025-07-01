@@ -582,14 +582,12 @@ EventParameterHelper::EventParametersNames EventParameterHelper::getVisibleEvent
 QString EventParameterHelper::evaluateEventParameter(
     common::SystemContext* context,
     const AggregatedEventPtr& event,
-    const QString& name,
-    const QVariantMap& extraParameters) const
+    const QString& name) const
 {
     auto substitution = SubstitutionContext{
         .name = name,
         .event = event,
         .manifest = context->vmsRulesEngine()->eventDescriptor(event->type()),
-        .extraParameters = extraParameters,
         .state = event->state(),
     };
 

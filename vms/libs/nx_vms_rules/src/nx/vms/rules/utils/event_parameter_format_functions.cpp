@@ -19,12 +19,13 @@
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/events/builtin_events.h>
 #include <nx/vms/rules/strings.h>
-#include <nx/vms/rules/utils/event.h>
-#include <nx/vms/rules/utils/event_details.h>
-#include <nx/vms/rules/utils/event_log.h>
-#include <nx/vms/rules/utils/field.h>
-#include <nx/vms/rules/utils/resource.h>
-#include <nx/vms/rules/utils/type.h>
+
+#include "event.h"
+#include "event_details.h"
+#include "event_log.h"
+#include "field.h"
+#include "resource.h"
+#include "type.h"
 
 namespace nx::vms::rules::utils {
 
@@ -125,51 +126,14 @@ QString eventTimeEnd(SubstitutionContext* substitution, common::SystemContext* c
 
 QString eventSourceName(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    return eventSourceText(substitution->event, context, Qn::RI_NameOnly);
+    return EventLog::sourceText(substitution->event, context, Qn::RI_NameOnly);
 }
 
 QString eventExtendedDescription(SubstitutionContext* substitution,
     common::SystemContext* context)
 {
     constexpr auto kDetailLevel = Qn::RI_NameOnly;
-
-    QStringList result;
-
-    auto details = substitution->event->details(context, kDetailLevel);
-    result.push_back(details[utils::kExtendedCaptionDetailName].toString());
-
-    auto addEvents =
-        [context, &result](const auto& events)
-        {
-            for (const auto& event: events)
-            {
-                result.push_back(Strings::timestampTime(event->timestamp()));
-                auto eventDetails = event->details(context, kDetailLevel);
-                auto detailing = eventDetails[utils::kDetailingDetailName]
-                    .template value<QStringList>();
-                for (const auto& line: detailing)
-                    result.push_back("  " + line);
-            }
-        };
-
-    const std::vector<EventPtr>& events = substitution->event->aggregatedEvents();
-
-    const int eventsLimit = substitution->extraParameters.value("eventsLimit").toInt();
-    if (eventsLimit <= 0 || events.size() <= (size_t) eventsLimit)
-    {
-        addEvents(events);
-    }
-    else
-    {
-        const size_t firstEvents = eventsLimit / 2;
-        const size_t lastEvents = eventsLimit - firstEvents;
-        addEvents(std::views::take(events, firstEvents));
-        result.push_back("...");
-        addEvents(events | std::views::drop(events.size() - lastEvents));
-        result.push_back({}); //< Add an empty line.
-        result.push_back(Strings::totalNumberOfEvents(QString::number(events.size())));
-    }
-    return result.join('\n');
+    return Strings::eventExtendedDescription(substitution->event, context, kDetailLevel);
 }
 
 QString deviceIp(SubstitutionContext* substitution, common::SystemContext* context)

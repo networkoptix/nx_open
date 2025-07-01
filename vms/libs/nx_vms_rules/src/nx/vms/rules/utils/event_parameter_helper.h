@@ -50,13 +50,11 @@ public:
      * @param context System context.
      * @param event Aggregated event.
      * @param name Name of the parameter to be substituted.
-     * @param extraParameters Custom parameters which will be passed to the substitution function.
      */
     QString evaluateEventParameter(
         common::SystemContext* context,
         const AggregatedEventPtr& event,
-        const QString& name,
-        const QVariantMap& extraParameters = {}) const;
+        const QString& name) const;
 
     /**
      * Generates html table with description of available event parameters.

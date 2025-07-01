@@ -33,8 +33,8 @@
 #include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/event.h>
-#include <nx/vms/rules/utils/event_log.h>
 #include <nx/vms/rules/utils/event_details.h>
+#include <nx/vms/rules/utils/event_log.h>
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/resource.h>
 #include <nx/vms/time/formatter.h>
@@ -72,13 +72,17 @@ using ResourceDataMap = std::map<ResourceType, ResourceData>;
 constexpr auto kResourceOrder =
     { ResourceType::device, ResourceType::user, ResourceType::layout, ResourceType::server };
 
+Qn::ResourceInfoLevel detailLevel()
+{
+    return appContext()->localSettings()->resourceInfoLevel();
+}
+
 ResourceData actionUserData(SystemContext* systemContext, const EventLogModelData& data)
 {
     const auto action = data.action(systemContext);
     ResourceData result;
 
-    for (auto email: action->property(kEmailsFieldName).toString().split(
-        ';', Qt::SkipEmptyParts))
+    for (auto email: action->property(kEmailsFieldName).toString().split(';', Qt::SkipEmptyParts))
     {
         result.names.push_back(email.trimmed());
     }
@@ -113,8 +117,7 @@ ResourceDataMap actionResourceMap(SystemContext* systemContext, const EventLogMo
 
     for (const auto& [name, desc]: manifest->resources)
     {
-        if (const auto field = vms::rules::utils::fieldByName(
-            QString::fromStdString(name), *manifest))
+        if (const auto field = fieldByName(QString::fromStdString(name), *manifest))
         {
             if (const auto visible = field->properties.value("visible");
                 visible.isValid() && !visible.toBool())
@@ -130,8 +133,7 @@ ResourceDataMap actionResourceMap(SystemContext* systemContext, const EventLogMo
         }
         else
         {
-            const auto ids =
-                fieldResourceIds(data.action(systemContext), name);
+            const auto ids = fieldResourceIds(data.action(systemContext), name);
 
             if (ids.empty())
                 continue;
@@ -161,8 +163,7 @@ int helpTopicIdData(EventLogModel::Column column, const EventLogModelData& data)
 
 QString resourceName(const QnResourcePtr& resource)
 {
-    const auto infoLevel = appContext()->localSettings()->resourceInfoLevel();
-    return vms::rules::Strings::resource(resource, infoLevel);
+    return vms::rules::Strings::resource(resource, detailLevel());
 }
 
 QIcon resourceIcon(QnResourceIconCache::Key key)
@@ -175,8 +176,7 @@ QIcon resourceIcon(QnResourceIconCache::Key key)
 
 QString actionTargetText(SystemContext* context, const EventLogModelData& data)
 {
-    if (auto destination =
-        data.actionDetails(context).value(vms::rules::utils::kDestinationDetailName).toString();
+    if (auto destination = data.actionDetails(context).value(kDestinationDetailName).toString();
         !destination.isEmpty())
     {
         return destination;
@@ -233,7 +233,6 @@ QString actionTargetTooltip(SystemContext* context, const EventLogModelData& dat
                     resourceData.groups,
                     resourceData.removed,
                     kMaxResource));
-
             }
             else
             {
@@ -280,16 +279,6 @@ QnResourceIconCache::Key actionTargetIcon(SystemContext* context, const EventLog
         || (resourceData.names.size() + resourceData.resources.size()) > 1;
 
     return resourceIconKey(resourceMap.begin()->first, multiple);
-}
-
-// TODO: #sivanov This logic should be moved to the event itself and covered by tests.
-QString eventSourceText(SystemContext* context, const EventLogModelData& data)
-{
-    const auto [resourceType, _] = eventSourceIcon(data.details(context));
-    const auto result = nx::vms::rules::utils::eventSourceText(data.details(context));
-    return result.isEmpty()
-        ? desktop::rules::Strings::removed(context, resourceType)
-        : result;
 }
 
 bool hasVideoLink(SystemContext* context, const EventLogModelData& data)
@@ -346,7 +335,7 @@ public:
     {
         m_events.clear();
         m_events.reserve(records.size());
-        for(auto&& record: records)
+        for (auto&& record: records)
             m_events.emplace_back(std::move(record));
 
         updateIndex();
@@ -525,8 +514,7 @@ QVariant EventLogModel::foregroundData(Column column, const EventLogModelData& d
     return QVariant();
 }
 
-QVariant EventLogModel::mouseCursorData(
-    Column column, const EventLogModelData& data) const
+QVariant EventLogModel::mouseCursorData(Column column, const EventLogModelData& data) const
 {
     if (column == DescriptionColumn && hasVideoLink(systemContext(), data))
         return QVariant::fromValue<int>(Qt::PointingHandCursor);
@@ -538,7 +526,7 @@ QnResourcePtr EventLogModel::resourceData(Column column, const EventLogModelData
     if (column == EventLogModel::EventSourceColumn)
     {
         const auto resources = resourcePool()->getResourcesByIds(
-            nx::vms::rules::utils::eventSourceResourceIds(data.details(systemContext())));
+            EventLog::sourceResourceIds(data.details(systemContext())));
 
         if (!resources.empty())
             return resources.first();
@@ -563,7 +551,7 @@ QVariant EventLogModel::iconData(Column column, const EventLogModelData& data) c
 
     if (column == EventSourceColumn)
     {
-        auto [resourceType, plural] = eventSourceIcon(data.details(systemContext()));
+        auto [resourceType, plural] = EventLog::sourceIcon(data.details(systemContext()));
         return resourceIcon(resourceIconKey(resourceType, plural));
     }
 
@@ -572,25 +560,26 @@ QVariant EventLogModel::iconData(Column column, const EventLogModelData& data) c
 
 QString EventLogModel::textData(Column column, const EventLogModelData& data) const
 {
+    const auto context = systemContext();
     switch (column)
     {
         case DateTimeColumn:
         {
-            const auto timeWatcher = systemContext()->serverTimeWatcher();
+            const auto timeWatcher = context->serverTimeWatcher();
             QDateTime dt = timeWatcher->displayTime(data.record().timestampMs.count());
             return nx::vms::time::toString(dt);
         }
         case EventColumn:
-            return data.eventTitle(systemContext());
+            return data.eventTitle(context);
 
         case EventSourceColumn:
-            return eventSourceText(systemContext(), data);
+            return EventLog::sourceText(context, data.details(context));
 
         case ActionColumn:
-            return vms::rules::Strings::actionName(systemContext(), data.actionType());
+            return vms::rules::Strings::actionName(context, data.actionType());
 
         case ActionCameraColumn:
-            return actionTargetText(systemContext(), data);
+            return actionTargetText(context, data);
 
         case DescriptionColumn:
             return description(data);
@@ -615,10 +604,11 @@ QString EventLogModel::tooltip(Column column, const EventLogModelData& data) con
     if (column == ActionCameraColumn)
         return actionTargetTooltip(systemContext(), data);
 
-    if (column != DescriptionColumn)
-        return QString();
+    if (column == DescriptionColumn)
+        return EventLog::descriptionTooltip(
+            data.event(systemContext()), systemContext(), detailLevel());
 
-    return textData(column, data);
+    return QString();
 }
 
 QString EventLogModel::description(const EventLogModelData& data) const
@@ -687,7 +677,7 @@ QString EventLogModel::motionUrl(Column column, const EventLogModelData& data) c
         connectionAddress);
 }
 
-QnResourceList EventLogModel::resourcesForPlayback(const QModelIndex &index) const
+QnResourceList EventLogModel::resourcesForPlayback(const QModelIndex& index) const
 {
     if (index.column() != DescriptionColumn || !m_index->isValidRow(index.row()))
         return {};
@@ -699,14 +689,14 @@ QnResourceList EventLogModel::resourcesForPlayback(const QModelIndex &index) con
     return resourcePool()->getResourcesByIds(getResourceIds(data.event(systemContext())));
 }
 
-int EventLogModel::columnCount(const QModelIndex &parent) const
+int EventLogModel::columnCount(const QModelIndex& parent) const
 {
     if (!parent.isValid())
         return m_columns.size();
     return 0;
 }
 
-int EventLogModel::rowCount(const QModelIndex &parent) const
+int EventLogModel::rowCount(const QModelIndex& parent) const
 {
     if (!parent.isValid())
         return m_index->size();

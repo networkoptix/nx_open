@@ -26,13 +26,10 @@ TextWithFields::~TextWithFields()
 
 QVariant TextWithFields::build(const AggregatedEventPtr& event) const
 {
-    const QVariantMap extraParameters{{"eventsLimit", m_substitutionEventsLimit}};
-
     return utils::composeTextFromTokenList(
         m_tokenizedText,
         systemContext(),
-        event,
-        extraParameters);
+        event);
 }
 
 QString TextWithFields::text() const
@@ -53,11 +50,6 @@ void TextWithFields::setText(const QString& text)
     m_rawText = text;
     parseText();
     emit textChanged();
-}
-
-void TextWithFields::setSubstitutionEventsLimit(int value)
-{
-    m_substitutionEventsLimit = value;
 }
 
 TextWithFieldsFieldProperties TextWithFields::properties() const

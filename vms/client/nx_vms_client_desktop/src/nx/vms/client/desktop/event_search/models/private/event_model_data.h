@@ -31,7 +31,6 @@ protected:
 
 private:
     mutable nx::vms::rules::AggregatedEventPtr m_event;
-    mutable QVariantMap m_details;
 };
 
 class EventLogModelData: public EventModelData

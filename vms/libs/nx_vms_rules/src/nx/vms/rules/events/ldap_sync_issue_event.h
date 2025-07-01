@@ -30,9 +30,6 @@ public:
         common::SystemContext* context,
         Qn::ResourceInfoLevel detailLevel) const override;
 
-    virtual nx::vms::api::rules::PropertyMap aggregatedInfo(
-        const AggregatedEvent& aggregatedEvent) const override;
-
     static const ItemDescriptor& manifest();
 
 protected:

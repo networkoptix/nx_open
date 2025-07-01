@@ -14,13 +14,15 @@
 #include <nx/utils/translatable_string.h>
 #include <nx/utils/uuid.h>
 
-namespace nx::vms::common { class SystemContext; }
+#include "rules_fwd.h"
 
+namespace nx::vms::common { class SystemContext; }
 namespace nx::vms::api::rules { struct UuidSelection; }
 
 namespace nx::vms::rules {
 
 class Engine;
+enum class ResourceType;
 
 class NX_VMS_RULES_API Strings
 {
@@ -45,7 +47,18 @@ public:
         const QnResourcePtr& resource,
         Qn::ResourceInfoLevel detailLevel = Qn::ResourceInfoLevel::RI_NameOnly);
 
+    /**
+     * Depending on the resource type, this function can return "Removed device" or "Removed
+     * server", etc.
+     */
+    static QString removedResource(common::SystemContext* context, ResourceType type);
+
     static QString resourceIp(const QnResourcePtr& resource);
+
+    static QString eventExtendedDescription(
+        AggregatedEventPtr event,
+        common::SystemContext* context,
+        Qn::ResourceInfoLevel detailLevel);
 
     enum Url { localIp, publicIp, cloud };
 

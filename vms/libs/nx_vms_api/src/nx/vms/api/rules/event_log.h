@@ -11,7 +11,7 @@
 #include <nx/vms/api/types/event_rule_types.h>
 
 #include "../data/server_time_period.h"
-#include "common.h"
+#include "aggregated_info.h"
 #include "event_log_fwd.h"
 #include "event_log_v3.h"
 
@@ -92,7 +92,7 @@ QN_FUSION_DECLARE_FUNCTIONS(EventLogFilter, (json), NX_VMS_API)
 
 struct NX_VMS_API EventLogRecord
 {
-    /**%apidoc Event timestamp. Used for sorting multiserver response.*/
+    /**%apidoc Event timestamp. Used for sorting responses from multiple servers.*/
     std::chrono::milliseconds timestampMs = std::chrono::milliseconds::zero();
 
     /**%apidoc Event data. Key is 'fieldName' from event manifest and value is serialized field
@@ -105,8 +105,11 @@ struct NX_VMS_API EventLogRecord
      */
     QMap<QString, QJsonValue> actionData;
 
-    /**%apidoc[opt] Event aggregated info during the rule period. */
-    QMap<QString, QJsonValue> aggregatedInfo;
+    /**%apidoc[opt] Set of events occurred during the rule aggregation period. Includes certain
+     * number of events which happened first (except the very first one which is stored in the
+     * `eventData` field), and some which happened last.
+     */
+    AggregatedInfo aggregatedInfo;
 
     /**%apidoc[opt] VMS rule id. */
     nx::Uuid ruleId;
@@ -118,7 +121,7 @@ struct NX_VMS_API EventLogRecord
 #define EventLogRecord_Fields \
     (timestampMs)(eventData)(actionData)(aggregatedInfo)(ruleId)(flags)
 NX_REFLECTION_INSTRUMENT(EventLogRecord, EventLogRecord_Fields)
-QN_FUSION_DECLARE_FUNCTIONS(EventLogRecord, (json)(ubjson)(sql_record), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(EventLogRecord, (json)(sql_record), NX_VMS_API)
 
 std::string NX_VMS_API toString(const EventLogRecord& record);
 
@@ -131,5 +134,8 @@ inline quint64 getLegacyTimestamp(const EventLogRecordV3& record)
 
 } // namespace nx::vms::rules
 
+// Enable fusion sql_record serialization.
 void NX_VMS_API serialize_field(const nx::vms::api::rules::PropertyMap& data, QVariant* value);
 void NX_VMS_API deserialize_field(const QVariant& value, nx::vms::api::rules::PropertyMap* data);
+void NX_VMS_API serialize_field(const nx::vms::api::rules::AggregatedInfo& data, QVariant* value);
+void NX_VMS_API deserialize_field(const QVariant& value, nx::vms::api::rules::AggregatedInfo* data);

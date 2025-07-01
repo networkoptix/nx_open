@@ -45,7 +45,6 @@ TextTokenList tokenizeText(QString text);
 QString composeTextFromTokenList(
     const TextTokenList& tokens,
     common::SystemContext* systemContext,
-    const AggregatedEventPtr& event,
-    const QVariantMap& extraParameters = {});
+    const AggregatedEventPtr& event);
 
 } // namespace nx::vms::rules::utils

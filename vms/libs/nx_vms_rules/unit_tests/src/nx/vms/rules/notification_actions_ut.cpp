@@ -58,36 +58,12 @@ protected:
         m_tooltipField->setText("{event.extendedDescription}");
     }
 
-    void whenEventsLimitSetTo(int value)
-    {
-        m_tooltipField->setSubstitutionEventsLimit(value);
-    }
-
-    void givenEvent(EventPtr event)
-    {
-        m_events.push_back(std::move(event));
-    }
-
-    void ensureAggregationIsValid()
-    {
-        NX_ASSERT(!m_events.empty());
-        const auto aggregationKey = m_events[0]->aggregationKey();
-        for (int i = 1; i < m_events.size(); ++i)
-            NX_ASSERT(m_events[i]->aggregationKey() == aggregationKey);
-    }
-
     void thenNotificationIs(
         const QString& expectedCaption,
         const QString& expectedDescription,
         const QString& expectedTooltip)
     {
-        NX_ASSERT(!m_events.empty());
-        ensureAggregationIsValid();
-
-        std::vector<EventPtr> eventList;
-        std::swap(m_events, eventList);
-
-        const auto event = AggregatedEventPtr::create(std::move(eventList));
+        auto event = buildEvent();
 
         const auto caption = m_captionField->build(event).value<QString>();
         const auto description = m_descriptionField->build(event).value<QString>();
@@ -102,7 +78,7 @@ protected:
     std::unique_ptr<TextWithFields> m_captionField;
     std::unique_ptr<TextWithFields> m_descriptionField;
     std::unique_ptr<TextWithFields> m_tooltipField;
-    std::vector<EventPtr> m_events;
+
 };
 
 // FIXME: #sivanov Short plan:
@@ -299,8 +275,6 @@ TEST_F(NotificationActionsTest, event_analyticsObject)
     static const nx::Uuid kEngine2Id = nx::Uuid::createUuid();
     static const QString kObjectTypeId1 = "nx.LicensePlate";
     static const QString kObjectTypeId2 = "nx.Face";
-    static const nx::Uuid kObjectTrackId1 = nx::Uuid::createUuid();
-    static const nx::Uuid kObjectTrackId2 = nx::Uuid::createUuid();
 
     static constexpr auto kExpectedCaption = "Object detected";
 
@@ -316,7 +290,7 @@ Object detected at Entrance
         kCamera1Id,
         kEngine1Id,
         kObjectTypeId1,
-        kObjectTrackId1,
+        /*objectTrackId*/ nx::Uuid::createUuid(),
         nx::common::metadata::Attributes()
     ));
 
@@ -326,7 +300,7 @@ Object detected at Entrance
         kCamera1Id,
         kEngine2Id,
         kObjectTypeId2, //< TODO: sivanov Probably fixed in UI.
-        kObjectTrackId2,
+        /*objectTrackId*/ nx::Uuid::createUuid(),
         nx::common::metadata::Attributes()
     ));
 

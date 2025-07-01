@@ -7,6 +7,8 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/resource/resource_pool_test_helper.h>
+#include <nx/vms/rules/aggregated_event.h>
+#include <nx/vms/rules/initializer.h>
 #include <nx/vms/time/formatter.h>
 
 #include "test_router.h"
@@ -54,6 +56,9 @@ void EventDetailsTestBase::SetUpTestSuite()
         common::SystemContext::Mode::unitTests,
         kServerId);
     sEngine = std::make_unique<Engine>(sContext.get(), std::make_unique<TestRouter>());
+
+    Initializer initializer(sContext.get());
+    initializer.initialize(sEngine.get());
 
     auto server = QnResourcePoolTestHelper::createServer(kServerId);
     server->setName(kServerName);
@@ -105,6 +110,40 @@ void EventDetailsTestBase::TearDownTestSuite()
 common::SystemContext* EventDetailsTestBase::systemContext()
 {
     return sContext.get();
+}
+
+void EventDetailsTestBase::givenEvent(EventPtr event)
+{
+    m_events.push_back(std::move(event));
+}
+
+void EventDetailsTestBase::whenEventsLimitSetTo(int value)
+{
+    m_eventLimitOverload = value;
+}
+
+AggregatedEventPtr EventDetailsTestBase::buildEvent()
+{
+    if (!m_aggregatedEvent)
+    {
+        ensureAggregationIsValid();
+
+        std::vector<EventPtr> eventList;
+        std::swap(m_events, eventList);
+        m_aggregatedEvent = AggregatedEventPtr::create(std::move(eventList));
+        if (m_eventLimitOverload)
+            m_aggregatedEvent->overloadDefaultEventLimit(*m_eventLimitOverload);
+    }
+
+    return m_aggregatedEvent;
+}
+
+void EventDetailsTestBase::ensureAggregationIsValid() const
+{
+    NX_ASSERT(!m_events.empty());
+    const auto aggregationKey = m_events[0]->aggregationKey();
+    for (size_t i = 1; i < m_events.size(); ++i)
+        NX_ASSERT(m_events[i]->aggregationKey() == aggregationKey);
 }
 
 } // namespace nx::vms::rules::test

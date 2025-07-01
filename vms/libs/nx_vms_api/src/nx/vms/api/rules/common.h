@@ -2,11 +2,11 @@
 
 #pragma once
 
+#include <QtCore/QJsonValue>
 #include <QtCore/QMap>
+#include <QtCore/QString>
 
 #include <nx/reflect/enum_instrument.h>
-
-class QJsonValue;
 
 namespace nx::vms::api::rules {
 

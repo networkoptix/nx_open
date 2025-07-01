@@ -69,8 +69,7 @@ TextTokenList tokenizeText(QString text)
 QString composeTextFromTokenList(
     const TextTokenList& tokens,
     common::SystemContext* systemContext,
-    const AggregatedEventPtr& event,
-    const QVariantMap& extraParameters)
+    const AggregatedEventPtr& event)
 {
     QString result;
     for (const auto& token: tokens)
@@ -78,7 +77,7 @@ QString composeTextFromTokenList(
         if (token.type == TextTokenType::substitution)
         {
             result += EventParameterHelper::instance()->evaluateEventParameter(
-                systemContext, event, token.value, extraParameters);
+                systemContext, event, token.value);
         }
         else
         {

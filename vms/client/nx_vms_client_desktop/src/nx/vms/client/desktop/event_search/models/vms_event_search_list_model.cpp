@@ -426,8 +426,8 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
 
     const auto infoLevel = appContext()->localSettings()->resourceInfoLevel();
     const auto event = nx::vms::rules::AggregatedEventPtr::create(
-        systemContext()->vmsRulesEngine()->buildEvent(d->data[index.row()].eventData),
-        d->data[index.row()].aggregatedInfo);
+        systemContext()->vmsRulesEngine(),
+        d->data[index.row()]);
     const auto details = event->details(systemContext(), infoLevel);
 
     switch (role)
@@ -476,7 +476,10 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
         // TODO: #sivanov Replace with a corresponding function when the event search unit
         // tests are ready.
         case core::DisplayedResourceListRole:
-            return nx::vms::rules::utils::eventSourceText(details);
+        {
+            return QVariant::fromValue<QStringList>({
+                nx::vms::rules::utils::EventLog::sourceText(systemContext(), details)});
+        }
 
         case core::ResourceListRole:
         {
