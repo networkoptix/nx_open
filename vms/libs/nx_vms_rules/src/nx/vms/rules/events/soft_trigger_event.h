@@ -41,9 +41,6 @@ protected:
     virtual QString extendedCaption(
         common::SystemContext* context,
         Qn::ResourceInfoLevel detailLevel) const override;
-
-private:
-    QStringList detailing(common::SystemContext* context, Qn::ResourceInfoLevel detailLevel) const;
 };
 
 } // namespace nx::vms::rules

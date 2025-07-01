@@ -347,8 +347,6 @@ TEST_F(NotificationActionsTest, event_deviceDisconnected)
 {
     static constexpr auto kExpectedCaption = "Camera disconnected";
 
-    static constexpr auto kExpectedDescription = "Entrance";
-
     static constexpr auto kExpectedTooltip = R"(
 Camera disconnected at Server1
 15:46:29
@@ -369,7 +367,8 @@ Camera disconnected at Server1
         kServerId
     ));
 
-    thenNotificationIs(kExpectedCaption, kExpectedDescription, kExpectedTooltip);
+    // Device name is already displayed in the source.
+    thenNotificationIs(kExpectedCaption, /*description*/{}, kExpectedTooltip);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -677,7 +676,6 @@ TEST_F(NotificationActionsTest, event_networkIssue)
     static constexpr auto kExpectedCaption = "Network Issue";
 
     static constexpr auto kExpectedDescription = R"(
-Entrance
 Multicast address conflict detected. Address 10.0.0.1:5555 is already in use by testcamera on secondary stream.
 )";
 
@@ -1087,7 +1085,6 @@ TEST_F(NotificationActionsTest, event_softTrigger)
     static constexpr auto kExpectedCaption = "Button 1";
 
     static constexpr auto kExpectedDescription = R"(
-Source: Entrance
 User: User1
 )";
 
