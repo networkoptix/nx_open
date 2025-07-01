@@ -64,6 +64,7 @@
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/audio_dispatcher.h>
@@ -140,6 +141,7 @@
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
+#include <utils/connection_diagnostics_helper.h>
 #include <utils/math/color_transformations.h>
 
 using namespace std::chrono;
@@ -803,6 +805,9 @@ void QnMediaResourceWidget::initStatusOverlayController()
                     break;
                 case Qn::ResourceOverlayButton::LogIn:
                     processCloudAuthorizationRequest();
+                    break;
+                case Qn::ResourceOverlayButton::SetUp2FA:
+                    processSetUp2FARequest();
                     break;
                 default:
                     NX_ASSERT("Unexpected button type");
@@ -3183,6 +3188,25 @@ void QnMediaResourceWidget::processCloudAuthorizationRequest()
     }
 
     appContext()->cloudCrossSystemManager()->systemContext(camera->systemId())->cloudAuthorize();
+}
+
+void QnMediaResourceWidget::processSetUp2FARequest()
+{
+    const auto camera = d->camera.dynamicCast<nx::vms::client::core::CrossSystemCameraResource>();
+    if (!NX_ASSERT(camera, "Set Up 2FA popup is actual for cross-site resources only"))
+        return;
+
+    const auto cloudContext =
+        appContext()->cloudCrossSystemManager()->systemContext(camera->systemId());
+    if (!NX_ASSERT(cloudContext, "For cross-site resources cloud context must be available"))
+        return;
+
+    nx::vms::api::ModuleInformation moduleInformation;
+    moduleInformation.systemName = cloudContext->systemDescription()->name();
+    QnConnectionDiagnosticsHelper::showConnectionErrorMessage(windowContext(),
+        nx::vms::client::core::RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled,
+        moduleInformation,
+        appContext()->version());
 }
 
 void QnMediaResourceWidget::at_item_imageEnhancementChanged()

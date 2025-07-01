@@ -483,7 +483,8 @@ namespace Qn
         MismatchedCertificateOverlay,
         InformationRequiredOverlay,
         SaasShutDown,
-        RestrictedOverlay,
+        ConnectionLostOverlay,
+        TwoFADisabledOverlay,
 
         OverlayCount
     };
@@ -499,6 +500,7 @@ namespace Qn
         UnlockEncryptedArchive,
         Authorize,
         LogIn,
+        SetUp2FA,
     };
 
     /**

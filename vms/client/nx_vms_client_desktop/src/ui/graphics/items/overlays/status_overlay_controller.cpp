@@ -77,10 +77,14 @@ const OverlayInfoMap& overlayInfo()
             {QnStatusOverlayWidget::ErrorStyle::red,
                 QnStatusOverlayWidget::tr("SITE SHUT DOWN"),
                 kErrorIconPath}},
-        {Qn::RestrictedOverlay,
+        {Qn::ConnectionLostOverlay,
             {QnStatusOverlayWidget::ErrorStyle::red,
                 QnStatusOverlayWidget::tr("CONNECTION LOST"),
-                kPaidIconPath}},
+                kErrorIconPath}},
+        {Qn::TwoFADisabledOverlay,
+            {QnStatusOverlayWidget::ErrorStyle::red,
+                QnStatusOverlayWidget::tr("2FA DISABLED"),
+                kRestrictIconPath}},
         {Qn::InformationRequiredOverlay,
             {QnStatusOverlayWidget::ErrorStyle::red,
                 QnStatusOverlayWidget::tr("INFORMATION REQUIRED"),
@@ -447,6 +451,7 @@ QnStatusOverlayController::getButtonCaptions(const QnResourcePtr& resource)
     result.insert(toInt(Qn::ResourceOverlayButton::UnlockEncryptedArchive), tr("Unlock"));
     result.insert(toInt(Qn::ResourceOverlayButton::LogIn), tr("Log In"));
     result.insert(toInt(Qn::ResourceOverlayButton::Authorize), tr("Authorize"));
+    result.insert(toInt(Qn::ResourceOverlayButton::SetUp2FA), tr("Set Up 2FA"));
 
     if (resource)
     {
