@@ -143,7 +143,7 @@ bool CameraBookmark::bookmarkMatchesFilter(api::BookmarkShareFilters filters) co
     }
     if (filters.testFlag(nx::vms::api::BookmarkShareFilter::expired))
     {
-        if (share.expirationTimeMs != 0ms && share.expirationTimeMs >= qnSyncTime->value())
+        if (share.expirationTimeMs == 0ms || share.expirationTimeMs >= qnSyncTime->value())
             return false;
     }
     if (filters.testFlag(nx::vms::api::BookmarkShareFilter::accessible))
@@ -244,6 +244,34 @@ CameraBookmarkList CameraBookmark::mergeCameraBookmarks(SystemContext* systemCon
         return result;
 
     return getSparseBookmarks(result, minVisibleLength, limit, pred);
+}
+
+CameraBookmarkDb::CameraBookmarkDb(const CameraBookmark& bookmark):
+    CameraBookmark(bookmark)
+{
+}
+
+std::optional<std::chrono::milliseconds> CameraBookmarkDb::shareExpirationTime() const
+{
+    return share.shareable ? std::make_optional(share.expirationTimeMs) : std::nullopt;
+}
+
+void CameraBookmarkDb::setShareExpirationTime(std::optional<std::chrono::milliseconds> value)
+{
+    share.shareable = value.has_value();
+    share.expirationTimeMs = value.value_or(0ms);
+}
+
+std::optional<QString> CameraBookmarkDb::shareDigest() const
+{
+    if (share.shareable && share.digest && !share.digest->isEmpty())
+        return share.digest;
+    return {};
+}
+
+void CameraBookmarkDb::setShareDigest(std::optional<QString> value)
+{
+    share.digest = std::move(value);
 }
 
 CameraBookmarkTagList CameraBookmarkTag::mergeCameraBookmarkTags(
@@ -407,26 +435,33 @@ void deserialize_field(const QVariant& /*value*/, CameraBookmarkTags* /*target*/
 {
 }
 
-void serialize_field(const BookmarkShareableParams& from, QVariant* to)
-{
-    *to = from.shareable ? QString(QJson::serialized(from)) : QString();
-}
-void deserialize_field(const QVariant& from, BookmarkShareableParams* to)
-{
-    QJson::deserialize(from.toString(), to);
-}
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkSortOrder, (json), BookmarkSortOrder_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     CameraBookmarkSearchFilter, (json), CameraBookmarkSearchFilter_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BookmarkShareableParams,
-    (sql_record) (json) (ubjson) (xml) (csv_record),
+    (json) (ubjson) (xml) (csv_record),
     BookmarkShareableParams_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    CameraBookmark, (sql_record) (json) (ubjson) (xml) (csv_record), CameraBookmark_Fields)
+
+// Explicitly use methods to map SQL columns to inner fields in the structure.
+#define VALUE(R, _, ITEM) \
+    ((getter, &CameraBookmarkDb::ITEM)(setter, &CameraBookmarkDb::ITEM)\
+        (name, BOOST_PP_STRINGIZE(ITEM)))
+QN_FUSION_ADAPT_CLASS(CameraBookmarkDb,
+    ((getter, &CameraBookmarkDb::shareExpirationTime)(setter, &CameraBookmarkDb::setShareExpirationTime)
+        (name, "shareExpirationTimeMs"))
+    ((getter, &CameraBookmarkDb::shareDigest)(setter, &CameraBookmarkDb::setShareDigest)
+        (name, "shareDigest"))
+    BOOST_PP_SEQ_FOR_EACH(VALUE, _, CameraBookmarkDb_Fields)
+    )
+#undef VALUE
+
+QN_FUSION_DEFINE_FUNCTIONS(CameraBookmarkDb, (sql_record))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    CameraBookmarkWithRecordId, (sql_record) (json) (ubjson) (xml) (csv_record),
+    CameraBookmark, (json) (ubjson) (xml) (csv_record), CameraBookmark_Fields)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    CameraBookmarkWithRecordId, (json) (ubjson) (xml) (csv_record),
     CameraBookmarkWithRowId_Fields)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

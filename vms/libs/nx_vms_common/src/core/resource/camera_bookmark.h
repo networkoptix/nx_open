@@ -140,8 +140,41 @@ struct NX_VMS_COMMON_API CameraBookmark
 
 NX_REFLECTION_INSTRUMENT(CameraBookmark, CameraBookmark_Fields)
 
+/**
+ * Special structure to map `share` field of base class with inner fields
+ * to separate SQL columns via setters and getters.
+ */
+struct NX_VMS_COMMON_API CameraBookmarkDb: CameraBookmark
+{
+    CameraBookmarkDb() = default;
+
+    CameraBookmarkDb(const CameraBookmark& bookmark);
+
+    /**
+     * Time Bookmark sharing expires in milliseconds from epoch.
+     * The zero time value means that sharing doesn't expire. It is std::nullopt if Bookmark
+     * is not shareable.
+     */
+    std::optional<std::chrono::milliseconds> shareExpirationTime() const;
+
+    /** Setting nullopt makes the Bookmark not shareable */
+    void setShareExpirationTime(std::optional<std::chrono::milliseconds> value);
+
+    std::optional<QString> shareDigest() const;
+
+    void setShareDigest(std::optional<QString> value);
+};
+#define CameraBookmarkDb_Fields \
+    (guid)(creatorId)(creationTimeStampMs)(name)(description)(timeout)(startTimeMs)(durationMs) \
+    (tags)(cameraId)
+
 struct NX_VMS_COMMON_API CameraBookmarkWithRecordId: CameraBookmark
 {
+    CameraBookmarkWithRecordId() = default;
+    CameraBookmarkWithRecordId(CameraBookmarkDb&& rhs):
+        CameraBookmark(std::move(rhs))
+    {
+    }
     qint64 recordId = 0;
 };
 
@@ -235,12 +268,16 @@ NX_VMS_COMMON_API QnCameraBookmarkList variantListToBookmarkList(const QVariantL
 
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkSortOrder, (json))
 QN_FUSION_DECLARE_FUNCTIONS(CameraBookmarkSearchFilter, (json), NX_VMS_COMMON_API)
+QN_FUSION_DECLARE_FUNCTIONS(BookmarkShareableParams, (json), NX_VMS_COMMON_API)
 
 QN_FUSION_DECLARE_FUNCTIONS(
-    CameraBookmark, (sql_record) (json) (ubjson) (xml) (csv_record), NX_VMS_COMMON_API)
+    CameraBookmark, (json) (ubjson) (xml) (csv_record), NX_VMS_COMMON_API)
 
 QN_FUSION_DECLARE_FUNCTIONS(
-    CameraBookmarkWithRecordId, (sql_record) (json) (ubjson) (xml) (csv_record), NX_VMS_COMMON_API)
+    CameraBookmarkDb, (sql_record), NX_VMS_COMMON_API)
+
+QN_FUSION_DECLARE_FUNCTIONS(
+    CameraBookmarkWithRecordId, (json) (ubjson) (xml) (csv_record), NX_VMS_COMMON_API)
 
 QN_FUSION_DECLARE_FUNCTIONS(
     CameraBookmarkTag, (sql_record) (json) (ubjson) (xml) (csv_record), NX_VMS_COMMON_API)
