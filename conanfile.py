@@ -147,7 +147,7 @@ class NxOpenConan(ConanFile):
 
     def build_requirements(self):
         self.build_requires("apidoctool/3.0" "#483c5073667ee722756e0ca31e18972a")
-        self.build_requires("qt-host/6.9.0" "#3995869eb604dd7c10d91e6869ca2a9f")
+        self.build_requires("qt-host/6.9.1" "#593e82a6bad53a827e568d713f62867a")
         self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
 
         if self.isLinux or self.isWindows:
@@ -189,7 +189,7 @@ class NxOpenConan(ConanFile):
         self.requires("libsrtp/2.6.0" "#248ee72d7d91db948f5651b7fe4905ea")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#cf9c0c761f39805e5a258dc39daff2bd")
-        self.requires("qt/6.9.0" "#bde40d4b323b30ce62c888d3f114dc40")
+        self.requires("qt/6.9.1" "#0d31ec3aed0c4551ce2c69606a0b035b")
         self.requires("roboto-fonts/1.0" "#1bff09c31c4d334f27795653e0f4b2bb")
         self.requires("boost/1.83.0" "#d150c9edc8081c98965b05ea9c2df318")
         self.requires("rapidjson/cci.20230929" "#751fc0dfc70af706c708706450fc2ab7")

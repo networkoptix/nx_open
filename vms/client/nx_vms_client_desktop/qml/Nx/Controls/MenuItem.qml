@@ -72,7 +72,7 @@ MenuItem
 
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: FontConfig.normal.pixelSize
-                color: menuItem.highlighted ? ColorTheme.colors.brand_Contrast : ColorTheme.colors.light4
+                color: menuItem.highlighted ? ColorTheme.colors.brand_contrast : ColorTheme.colors.light4
 
                 text: menuItem.text
             }

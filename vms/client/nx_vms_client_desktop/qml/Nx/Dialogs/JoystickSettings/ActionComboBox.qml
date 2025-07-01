@@ -73,7 +73,7 @@ ComboBox
                     verticalAlignment: Text.AlignVCenter
                     elide: Text.ElideRight
                     color: highlightedIndex === index
-                        ? ColorTheme.colors.brand_Contrast
+                        ? ColorTheme.colors.brand_contrast
                         : ColorTheme.colors.light4
                     opacity: isEnabled ? 1 : 0.3
 
