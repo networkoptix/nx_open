@@ -154,16 +154,16 @@ std::string to_string(ControlPacketType packetType)
             return "Handshake";
         case ControlPacketType::KeepAlive:
             return "KeepAlive";
-        case ControlPacketType::Acknowledgement:
-            return "Acknowledgement";
+        case ControlPacketType::Acknowledgment:
+            return "Acknowledgment";
         case ControlPacketType::LossReport:
             return "LossReport";
         case ControlPacketType::DelayWarning:
             return "DelayWarning";
         case ControlPacketType::Shutdown:
             return "Shutdown";
-        case ControlPacketType::AcknowledgementOfAcknowledgement:
-            return "AcknowledgementOfAcknowledgement";
+        case ControlPacketType::AcknowledgmentOfAcknowledgment:
+            return "AcknowledgmentOfAcknowledgment";
         case ControlPacketType::MsgDropRequest:
             return "MsgDropRequest";
         case ControlPacketType::RemotePeerFailure:
@@ -221,7 +221,7 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, int payloadSize)
     // Set additional information and control information field
     switch (pkttype)
     {
-        case ControlPacketType::Acknowledgement: //0010 - Acknowledgment (ACK)
+        case ControlPacketType::Acknowledgment: //0010 - Acknowledgment (ACK)
                                           // ACK packet seq. no.
             if (NULL != lparam)
                 m_nHeader[1] = *(int32_t *)lparam;
@@ -232,7 +232,7 @@ void CPacket::pack(ControlPacketType pkttype, void* lparam, int payloadSize)
 
             break;
 
-        case ControlPacketType::AcknowledgementOfAcknowledgement: //0110 - Acknowledgment of Acknowledgment (ACK-2)
+        case ControlPacketType::AcknowledgmentOfAcknowledgment: //0110 - Acknowledgment of Acknowledgment (ACK-2)
                                                            // ACK packet seq. no.
             m_nHeader[1] = *(int32_t *)lparam;
 

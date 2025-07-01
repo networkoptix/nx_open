@@ -1522,7 +1522,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
 {
     switch (pkttype)
     {
-        case ControlPacketType::Acknowledgement: //010 - Acknowledgment
+        case ControlPacketType::Acknowledgment: //010 - Acknowledgment
         {
             auto ctrlpkt = std::make_unique<CPacket>();
 
@@ -1622,7 +1622,7 @@ void CUDT::sendCtrl(ControlPacketType pkttype, void* lparam, void* rparam, int s
             break;
         }
 
-        case ControlPacketType::AcknowledgementOfAcknowledgement: //110 - Acknowledgment of Acknowledgment
+        case ControlPacketType::AcknowledgmentOfAcknowledgment: //110 - Acknowledgment of Acknowledgment
         {
             auto ctrlpkt = std::make_unique<CPacket>();
             ctrlpkt->pack(pkttype, lparam);
@@ -1776,7 +1776,7 @@ void CUDT::processCtrl(const CPacket* ctrlpkt)
 
     switch (ctrlpkt->getType())
     {
-        case ControlPacketType::Acknowledgement: //010 - Acknowledgment
+        case ControlPacketType::Acknowledgment: //010 - Acknowledgment
         {
             int32_t ack;
 
@@ -1801,7 +1801,7 @@ void CUDT::processCtrl(const CPacket* ctrlpkt)
             const auto now = CTimer::getTime();
             if ((currtime - m_ullSndLastAck2Time > m_iSYNInterval) || (ack == m_iSndLastAck2))
             {
-                sendCtrl(ControlPacketType::AcknowledgementOfAcknowledgement, &ack);
+                sendCtrl(ControlPacketType::AcknowledgmentOfAcknowledgment, &ack);
                 m_iSndLastAck2 = ack;
                 m_ullSndLastAck2Time = now;
             }
@@ -1892,7 +1892,7 @@ void CUDT::processCtrl(const CPacket* ctrlpkt)
             break;
         }
 
-        case ControlPacketType::AcknowledgementOfAcknowledgement: //110 - Acknowledgment of Acknowledgment
+        case ControlPacketType::AcknowledgmentOfAcknowledgment: //110 - Acknowledgment of Acknowledgment
         {
             int32_t ack;
             int rtt = -1;
@@ -2282,7 +2282,7 @@ void CUDT::checkTimers(bool forceAck)
     {
         // ACK timer expired or ACK interval is reached
 
-        sendCtrl(ControlPacketType::Acknowledgement);
+        sendCtrl(ControlPacketType::Acknowledgment);
         currtime = CTimer::getTime();
         if (m_congestionControl.m_iACKPeriod > std::chrono::microseconds::zero())
             m_ullNextACKTime = currtime + m_congestionControl.m_iACKPeriod * m_ullCPUFrequency;
@@ -2295,7 +2295,7 @@ void CUDT::checkTimers(bool forceAck)
     else if (m_iSelfClockInterval * m_iLightACKCount <= m_iPktCount)
     {
         //send a "light" ACK
-        sendCtrl(ControlPacketType::Acknowledgement, NULL, NULL, 4);
+        sendCtrl(ControlPacketType::Acknowledgment, NULL, NULL, 4);
         ++m_iLightACKCount;
     }
 
