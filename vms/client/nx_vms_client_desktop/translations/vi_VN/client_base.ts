@@ -4174,6 +4174,10 @@ Khóa giấy phép: %2</translation>
       <source>Log In</source>
       <translation>Đăng nhập</translation>
     </message>
+    <message>
+      <source>Set Up 2FA</source>
+      <translation type="unfinished">Set Up 2FA</translation>
+    </message>
   </context>
   <context>
     <name>QnStatusOverlayWidget</name>
@@ -4248,6 +4252,10 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>NOT ACTIVATED</source>
       <translation>KHÔNG KÍCH HOẠT</translation>
+    </message>
+    <message>
+      <source>2FA DISABLED</source>
+      <translation type="unfinished">2FA DISABLED</translation>
     </message>
   </context>
   <context>
@@ -5840,27 +5848,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>
         <numerusform>%n bố cục đã được thêm</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Removed subject</source>
-      <comment>The subject is user or group</comment>
-      <translation>Chủ đề đã bị xóa</translation>
-    </message>
-    <message>
-      <source>Removed device</source>
-      <translation>Thiết bị đã xóa</translation>
-    </message>
-    <message>
-      <source>Removed camera</source>
-      <translation>Camera bị xóa</translation>
-    </message>
-    <message>
-      <source>Removed server</source>
-      <translation>Máy chủ đã bị xóa</translation>
-    </message>
-    <message>
-      <source>Removed layout</source>
-      <translation>Bố cục đã xóa</translation>
     </message>
     <message numerus="yes">
       <source>%n removed subjects</source>

@@ -23,13 +23,6 @@
     </message>
   </context>
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLayoutsModelUnsorted</name>
     <message>
       <source>All Cameras</source>

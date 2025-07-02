@@ -4218,6 +4218,10 @@ Licensnyckel: %2</translation>
       <source>Log In</source>
       <translation>Logga in</translation>
     </message>
+    <message>
+      <source>Set Up 2FA</source>
+      <translation type="unfinished">Set Up 2FA</translation>
+    </message>
   </context>
   <context>
     <name>QnStatusOverlayWidget</name>
@@ -4292,6 +4296,10 @@ Licensnyckel: %2</translation>
     <message>
       <source>NOT ACTIVATED</source>
       <translation>INTE AKTIVERAD</translation>
+    </message>
+    <message>
+      <source>2FA DISABLED</source>
+      <translation type="unfinished">2FA DISABLED</translation>
     </message>
   </context>
   <context>
@@ -5934,27 +5942,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
         <numerusform>%n layouter mer</numerusform>
         <numerusform>%n layouter mer</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Removed subject</source>
-      <comment>The subject is user or group</comment>
-      <translation>Tog bort ämne</translation>
-    </message>
-    <message>
-      <source>Removed device</source>
-      <translation>Borttagen enhet</translation>
-    </message>
-    <message>
-      <source>Removed camera</source>
-      <translation>Borttagen kamera</translation>
-    </message>
-    <message>
-      <source>Removed server</source>
-      <translation>Borttagen server</translation>
-    </message>
-    <message>
-      <source>Removed layout</source>
-      <translation>Borttagen layout</translation>
     </message>
     <message numerus="yes">
       <source>%n removed subjects</source>

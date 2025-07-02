@@ -15,11 +15,6 @@
       <source>New Site</source>
       <translation>新規サイト</translation>
     </message>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user/company name</comment>
-      <translation>オーナー: %1</translation>
-    </message>
   </context>
   <context>
     <name>RemoteConnectionErrorStrings</name>

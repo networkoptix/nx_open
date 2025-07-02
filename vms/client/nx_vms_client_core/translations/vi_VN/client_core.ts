@@ -15,11 +15,6 @@
       <source>New Site</source>
       <translation>Chi nhánh mới</translation>
     </message>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user/company name</comment>
-      <translation>Chủ sở hữu: %1</translation>
-    </message>
   </context>
   <context>
     <name>RemoteConnectionErrorStrings</name>

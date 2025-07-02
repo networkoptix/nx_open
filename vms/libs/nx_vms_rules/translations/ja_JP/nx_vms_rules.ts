@@ -302,6 +302,27 @@
       <source>Total number of events</source>
       <translation>イベント総数</translation>
     </message>
+    <message>
+      <source>Removed subject</source>
+      <comment>The subject is user or group</comment>
+      <translation>削除されたサブジェクト</translation>
+    </message>
+    <message>
+      <source>Removed device</source>
+      <translation>削除されたデバイス</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation>削除されたカメラ</translation>
+    </message>
+    <message>
+      <source>Removed server</source>
+      <translation>削除されたサーバー</translation>
+    </message>
+    <message>
+      <source>Removed layout</source>
+      <translation>削除された  レイアウト</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>

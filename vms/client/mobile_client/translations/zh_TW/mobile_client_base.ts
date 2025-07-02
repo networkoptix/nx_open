@@ -19,13 +19,6 @@
     </message>
   </context>
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Your Site</source>
-      <translation>您的站點 (Site)</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLayoutsModelUnsorted</name>
     <message>
       <source>All Cameras</source>

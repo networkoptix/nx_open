@@ -15,11 +15,6 @@
       <source>New Site</source>
       <translation type="unfinished">New Site</translation>
     </message>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user/company name</comment>
-      <translation>المالك: %1</translation>
-    </message>
   </context>
   <context>
     <name>RemoteConnectionErrorStrings</name>

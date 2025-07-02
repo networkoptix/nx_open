@@ -308,6 +308,27 @@
       <source>Total number of events</source>
       <translation>Número total de eventos</translation>
     </message>
+    <message>
+      <source>Removed subject</source>
+      <comment>The subject is user or group</comment>
+      <translation>Asunto eliminado</translation>
+    </message>
+    <message>
+      <source>Removed device</source>
+      <translation>Dispositivo eliminado</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation>Cámara eliminada</translation>
+    </message>
+    <message>
+      <source>Removed server</source>
+      <translation>Servidor eliminado</translation>
+    </message>
+    <message>
+      <source>Removed layout</source>
+      <translation>Deseño eliminado</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>

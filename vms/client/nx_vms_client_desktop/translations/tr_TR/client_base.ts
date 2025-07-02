@@ -4217,6 +4217,10 @@ License Key: %2</source>
       <source>Log In</source>
       <translation>Oturum Aç</translation>
     </message>
+    <message>
+      <source>Set Up 2FA</source>
+      <translation type="unfinished">Set Up 2FA</translation>
+    </message>
   </context>
   <context>
     <name>QnStatusOverlayWidget</name>
@@ -4291,6 +4295,10 @@ License Key: %2</source>
     <message>
       <source>NOT ACTIVATED</source>
       <translation type="unfinished">NOT ACTIVATED</translation>
+    </message>
+    <message>
+      <source>2FA DISABLED</source>
+      <translation type="unfinished">2FA DISABLED</translation>
     </message>
   </context>
   <context>
@@ -5933,27 +5941,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
         <numerusform>%n layouts more</numerusform>
         <numerusform>%n layouts more</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Removed subject</source>
-      <comment>The subject is user or group</comment>
-      <translation type="unfinished">Removed subject</translation>
-    </message>
-    <message>
-      <source>Removed device</source>
-      <translation type="unfinished">Removed device</translation>
-    </message>
-    <message>
-      <source>Removed camera</source>
-      <translation>Kaldırılmış Kamera</translation>
-    </message>
-    <message>
-      <source>Removed server</source>
-      <translation type="unfinished">Removed server</translation>
-    </message>
-    <message>
-      <source>Removed layout</source>
-      <translation type="unfinished">Removed layout</translation>
     </message>
     <message numerus="yes">
       <source>%n removed subjects</source>

@@ -320,6 +320,27 @@
       <source>Total number of events</source>
       <translation type="unfinished">Total number of events</translation>
     </message>
+    <message>
+      <source>Removed subject</source>
+      <comment>The subject is user or group</comment>
+      <translation type="unfinished">Removed subject</translation>
+    </message>
+    <message>
+      <source>Removed device</source>
+      <translation type="unfinished">Removed device</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation>Віддалена камера</translation>
+    </message>
+    <message>
+      <source>Removed server</source>
+      <translation type="unfinished">Removed server</translation>
+    </message>
+    <message>
+      <source>Removed layout</source>
+      <translation type="unfinished">Removed layout</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>

@@ -4218,6 +4218,10 @@ Clave de licenza: %2</translation>
       <source>Log In</source>
       <translation>Iniciar sesión</translation>
     </message>
+    <message>
+      <source>Set Up 2FA</source>
+      <translation type="unfinished">Set Up 2FA</translation>
+    </message>
   </context>
   <context>
     <name>QnStatusOverlayWidget</name>
@@ -4292,6 +4296,10 @@ Clave de licenza: %2</translation>
     <message>
       <source>NOT ACTIVATED</source>
       <translation>NON ACTIVADO</translation>
+    </message>
+    <message>
+      <source>2FA DISABLED</source>
+      <translation type="unfinished">2FA DISABLED</translation>
     </message>
   </context>
   <context>
@@ -5934,27 +5942,6 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
         <numerusform>%n máis deseños</numerusform>
         <numerusform>%n máis deseños</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Removed subject</source>
-      <comment>The subject is user or group</comment>
-      <translation>Asunto eliminado</translation>
-    </message>
-    <message>
-      <source>Removed device</source>
-      <translation>Dispositivo eliminado</translation>
-    </message>
-    <message>
-      <source>Removed camera</source>
-      <translation>Cámara eliminada</translation>
-    </message>
-    <message>
-      <source>Removed server</source>
-      <translation>Servidor eliminado</translation>
-    </message>
-    <message>
-      <source>Removed layout</source>
-      <translation>Deseño eliminado</translation>
     </message>
     <message numerus="yes">
       <source>%n removed subjects</source>

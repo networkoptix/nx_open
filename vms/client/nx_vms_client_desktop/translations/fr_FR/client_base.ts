@@ -4218,6 +4218,10 @@ Clé de licence : %2</translation>
       <source>Log In</source>
       <translation>Connexion</translation>
     </message>
+    <message>
+      <source>Set Up 2FA</source>
+      <translation type="unfinished">Set Up 2FA</translation>
+    </message>
   </context>
   <context>
     <name>QnStatusOverlayWidget</name>
@@ -4292,6 +4296,10 @@ Clé de licence : %2</translation>
     <message>
       <source>NOT ACTIVATED</source>
       <translation>NON ACTIVÉ</translation>
+    </message>
+    <message>
+      <source>2FA DISABLED</source>
+      <translation type="unfinished">2FA DISABLED</translation>
     </message>
   </context>
   <context>
@@ -5934,27 +5942,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
         <numerusform>%n mises en page plus</numerusform>
         <numerusform>%n mises en page de plus</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Removed subject</source>
-      <comment>The subject is user or group</comment>
-      <translation>Sujet supprimé</translation>
-    </message>
-    <message>
-      <source>Removed device</source>
-      <translation>Appareil supprimé</translation>
-    </message>
-    <message>
-      <source>Removed camera</source>
-      <translation>Caméra retirée</translation>
-    </message>
-    <message>
-      <source>Removed server</source>
-      <translation>Serveur supprimé</translation>
-    </message>
-    <message>
-      <source>Removed layout</source>
-      <translation>Mise en page supprimée</translation>
     </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
