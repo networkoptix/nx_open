@@ -514,7 +514,7 @@ Page
                     return {
                         imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10",
                         text: kNoSites,
-                        description: qsTr("We didn't find any sites on your local network, try adding servers manually or log in to your cloud account"),
+                        description: d.kNoSitesFound,
                         buttonText: qsTr("Log In"),
                         buttonIconSource: "image://skin/24x24/Outline/cloud.svg?primary=dark1",
                         clickHandler: () => { Workflow.openCloudLoginScreen() }
@@ -524,7 +524,7 @@ Page
                 return {
                     imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10",
                     text: kNoSites,
-                    description: qsTr("We didn't find any sites on your local network, try adding servers manually"),
+                    description: d.kNoSitesFound,
                 }
             }
 
@@ -670,6 +670,8 @@ Page
         id: d
         property var listPosition: new Map()
         readonly property var kRootId: NxGlobals.uuid("")
+        readonly property string kNoSitesFound: qsTr("No accessible sites were found. " +
+            "Log in into the cloud account or connect to a local server")
     }
 
     Connections
