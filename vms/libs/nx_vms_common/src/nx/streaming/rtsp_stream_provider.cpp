@@ -472,6 +472,9 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextDataTCP()
 
             if (isInvalidTrack && isBufferAllocated)
                 m_demuxedData[rtpChannelNum]->clear();
+
+            NX_DEBUG(this, "Failed to read data, bytesRead: %1, rtpChannelNum: %2",
+                bytesRead, rtpChannelNum);
             break; // error
         }
         NX_VERBOSE(this, "Got %1 bytes, trackFound=%2", bytesRead, trackIndexIter != m_trackIndices.end());
@@ -506,7 +509,7 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextDataTCP()
             m_demuxedData[rtpChannelNum]->clear();
         }
     }
-    return  QnAbstractMediaDataPtr();
+    return QnAbstractMediaDataPtr();
 }
 
 QnAbstractMediaDataPtr RtspStreamProvider::getNextDataUDP()
