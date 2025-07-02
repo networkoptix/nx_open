@@ -5841,27 +5841,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n layouts more</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Removed subject</source>
-      <comment>The subject is user or group</comment>
-      <translation type="unfinished">Removed subject</translation>
-    </message>
-    <message>
-      <source>Removed device</source>
-      <translation type="unfinished">Removed device</translation>
-    </message>
-    <message>
-      <source>Removed camera</source>
-      <translation>ลบกล้องออก</translation>
-    </message>
-    <message>
-      <source>Removed server</source>
-      <translation type="unfinished">Removed server</translation>
-    </message>
-    <message>
-      <source>Removed layout</source>
-      <translation type="unfinished">Removed layout</translation>
-    </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>

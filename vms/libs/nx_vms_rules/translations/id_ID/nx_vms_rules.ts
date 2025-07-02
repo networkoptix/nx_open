@@ -302,6 +302,27 @@
       <source>Total number of events</source>
       <translation>Jumlah total event</translation>
     </message>
+    <message>
+      <source>Removed subject</source>
+      <comment>The subject is user or group</comment>
+      <translation>Subjek dihapus</translation>
+    </message>
+    <message>
+      <source>Removed device</source>
+      <translation>Perangkat dihapus</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation>Kamera yang dihapus</translation>
+    </message>
+    <message>
+      <source>Removed server</source>
+      <translation>Server dihapus</translation>
+    </message>
+    <message>
+      <source>Removed layout</source>
+      <translation>Layout dihapus</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>

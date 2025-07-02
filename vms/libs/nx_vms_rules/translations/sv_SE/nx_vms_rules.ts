@@ -308,6 +308,27 @@
       <source>Total number of events</source>
       <translation>Totalt antal händelser</translation>
     </message>
+    <message>
+      <source>Removed subject</source>
+      <comment>The subject is user or group</comment>
+      <translation>Tog bort ämne</translation>
+    </message>
+    <message>
+      <source>Removed device</source>
+      <translation>Borttagen enhet</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation>Borttagen kamera</translation>
+    </message>
+    <message>
+      <source>Removed server</source>
+      <translation>Borttagen server</translation>
+    </message>
+    <message>
+      <source>Removed layout</source>
+      <translation>Borttagen layout</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>

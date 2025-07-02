@@ -5935,27 +5935,6 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
         <numerusform>%n layouts more</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Removed subject</source>
-      <comment>The subject is user or group</comment>
-      <translation type="unfinished">Removed subject</translation>
-    </message>
-    <message>
-      <source>Removed device</source>
-      <translation type="unfinished">Removed device</translation>
-    </message>
-    <message>
-      <source>Removed camera</source>
-      <translation>Câmara removida</translation>
-    </message>
-    <message>
-      <source>Removed server</source>
-      <translation type="unfinished">Removed server</translation>
-    </message>
-    <message>
-      <source>Removed layout</source>
-      <translation type="unfinished">Removed layout</translation>
-    </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>

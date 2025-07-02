@@ -302,6 +302,27 @@
       <source>Total number of events</source>
       <translation>事件總數</translation>
     </message>
+    <message>
+      <source>Removed subject</source>
+      <comment>The subject is user or group</comment>
+      <translation>移除的主旨</translation>
+    </message>
+    <message>
+      <source>Removed device</source>
+      <translation>移除的裝置</translation>
+    </message>
+    <message>
+      <source>Removed camera</source>
+      <translation>移除攝影機</translation>
+    </message>
+    <message>
+      <source>Removed server</source>
+      <translation>移除的伺服器</translation>
+    </message>
+    <message>
+      <source>Removed layout</source>
+      <translation>移除的佈局</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>

@@ -5935,27 +5935,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
         <numerusform>%n layouter mer</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Removed subject</source>
-      <comment>The subject is user or group</comment>
-      <translation>Tog bort ämne</translation>
-    </message>
-    <message>
-      <source>Removed device</source>
-      <translation>Borttagen enhet</translation>
-    </message>
-    <message>
-      <source>Removed camera</source>
-      <translation>Borttagen kamera</translation>
-    </message>
-    <message>
-      <source>Removed server</source>
-      <translation>Borttagen server</translation>
-    </message>
-    <message>
-      <source>Removed layout</source>
-      <translation>Borttagen layout</translation>
-    </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>

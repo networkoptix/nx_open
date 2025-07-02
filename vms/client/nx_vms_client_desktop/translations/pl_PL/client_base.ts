@@ -6122,27 +6122,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n layouts more</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Removed subject</source>
-      <comment>The subject is user or group</comment>
-      <translation>Usunięto temat</translation>
-    </message>
-    <message>
-      <source>Removed device</source>
-      <translation>Usunięto urządzenie</translation>
-    </message>
-    <message>
-      <source>Removed camera</source>
-      <translation>Usunięta kamera</translation>
-    </message>
-    <message>
-      <source>Removed server</source>
-      <translation>Usunięto serwer</translation>
-    </message>
-    <message>
-      <source>Removed layout</source>
-      <translation>Usunięto układ</translation>
-    </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>

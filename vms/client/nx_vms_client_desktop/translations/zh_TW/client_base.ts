@@ -5841,27 +5841,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>再%n個佈局</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Removed subject</source>
-      <comment>The subject is user or group</comment>
-      <translation>移除的主旨</translation>
-    </message>
-    <message>
-      <source>Removed device</source>
-      <translation>移除的裝置</translation>
-    </message>
-    <message>
-      <source>Removed camera</source>
-      <translation>移除攝影機</translation>
-    </message>
-    <message>
-      <source>Removed server</source>
-      <translation>移除的伺服器</translation>
-    </message>
-    <message>
-      <source>Removed layout</source>
-      <translation>移除的佈局</translation>
-    </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>

@@ -5841,27 +5841,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>ほか %n レイアウト</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Removed subject</source>
-      <comment>The subject is user or group</comment>
-      <translation>削除されたサブジェクト</translation>
-    </message>
-    <message>
-      <source>Removed device</source>
-      <translation>削除されたデバイス</translation>
-    </message>
-    <message>
-      <source>Removed camera</source>
-      <translation>削除されたカメラ</translation>
-    </message>
-    <message>
-      <source>Removed server</source>
-      <translation>削除されたサーバー</translation>
-    </message>
-    <message>
-      <source>Removed layout</source>
-      <translation>削除された  レイアウト</translation>
-    </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>

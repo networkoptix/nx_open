@@ -5935,27 +5935,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
         <numerusform>%n mises en page de plus</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Removed subject</source>
-      <comment>The subject is user or group</comment>
-      <translation>Sujet supprimé</translation>
-    </message>
-    <message>
-      <source>Removed device</source>
-      <translation>Appareil supprimé</translation>
-    </message>
-    <message>
-      <source>Removed camera</source>
-      <translation>Caméra retirée</translation>
-    </message>
-    <message>
-      <source>Removed server</source>
-      <translation>Serveur supprimé</translation>
-    </message>
-    <message>
-      <source>Removed layout</source>
-      <translation>Mise en page supprimée</translation>
-    </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>

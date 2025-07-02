@@ -5841,27 +5841,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
         <numerusform>%n bố cục đã được thêm</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Removed subject</source>
-      <comment>The subject is user or group</comment>
-      <translation>Chủ đề đã bị xóa</translation>
-    </message>
-    <message>
-      <source>Removed device</source>
-      <translation>Thiết bị đã xóa</translation>
-    </message>
-    <message>
-      <source>Removed camera</source>
-      <translation>Camera bị xóa</translation>
-    </message>
-    <message>
-      <source>Removed server</source>
-      <translation>Máy chủ đã bị xóa</translation>
-    </message>
-    <message>
-      <source>Removed layout</source>
-      <translation>Bố cục đã xóa</translation>
-    </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
