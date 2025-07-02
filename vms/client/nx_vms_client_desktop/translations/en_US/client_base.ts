@@ -4217,6 +4217,10 @@ License Key: %2</source>
         <source>Log In</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Set Up 2FA</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStatusOverlayWidget</name>
@@ -4291,6 +4295,10 @@ License Key: %2</source>
     <message>
         <source>NOT ACTIVATED</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>2FA DISABLED</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5932,27 +5940,6 @@ If you intended to move analytics data to another storage location, please conta
             <numerusform>%n layout more</numerusform>
             <numerusform>%n layouts more</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Removed subject</source>
-        <comment>The subject is user or group</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Removed device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Removed camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Removed server</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Removed layout</source>
-        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n removed subjects</source>
