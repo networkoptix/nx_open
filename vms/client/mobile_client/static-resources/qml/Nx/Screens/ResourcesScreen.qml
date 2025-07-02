@@ -106,13 +106,20 @@ Page
 
     DummyMessage
     {
+        id: noCamerasPlaceholder
+
         anchors.fill: parent
-        title: qsTr("No cameras available on this layout")
-        buttonText: qsTr("Show all cameras")
-        onButtonClicked: windowContext.deprecatedUiController.layout = null
-        visible: camerasGrid.count == 0
-                 && windowContext.deprecatedUiController.layout
-                 && windowContext.sessionManager.hasActiveSession
+        title: qsTr("No Cameras")
+        titleColor: ColorTheme.colors.light4
+        description: windowContext.deprecatedUiController.layout
+            ? qsTr("We didn't find any cameras on this layout")
+            : qsTr("We didn't find any cameras on this site. " +
+                "You can add them in our desktop application")
+        descriptionColor: ColorTheme.colors.light10
+        descriptionFontPixelSize: 15
+        image: "image://skin/64x64/Outline/camera.svg?primary=light10"
+        visible: camerasGrid.count === 0
+            && windowContext.sessionManager.hasActiveSession
     }
 
     Loader

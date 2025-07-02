@@ -10,7 +10,10 @@ Pane
     id: dummy
 
     property alias title: title.text
+    property alias titleColor: title.color
     property alias description: description.text
+    property alias descriptionColor: description.color
+    property alias descriptionFontPixelSize: description.font.pixelSize
     property alias buttonText: button.text
     property alias image: image.source
     property bool compact: false
