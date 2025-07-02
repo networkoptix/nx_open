@@ -310,8 +310,10 @@ Object detected at Entrance
 //-------------------------------------------------------------------------------------------------
 // Camera Input
 
-TEST_F(NotificationActionsTest, event_cameraInput)
+TEST_F(NotificationActionsTest, event_cameraInput_C112754)
 {
+    RecordProperty("testrail", "C112754");
+
     static constexpr auto kExpectedCaption = "Input Signal on Camera";
     static constexpr auto kExpectedDescription = "Input Port: Port_1";
 
@@ -343,8 +345,10 @@ Input on Entrance
 //-------------------------------------------------------------------------------------------------
 // Device Disconnected
 
-TEST_F(NotificationActionsTest, event_deviceDisconnected)
+TEST_F(NotificationActionsTest, event_deviceDisconnected_C112752)
 {
+    RecordProperty("testrail", "C112752");
+
     static constexpr auto kExpectedCaption = "Camera disconnected";
 
     static constexpr auto kExpectedTooltip = R"(
@@ -374,8 +378,10 @@ Camera disconnected at Server1
 //-------------------------------------------------------------------------------------------------
 // Device IP Conflict
 
-TEST_F(NotificationActionsTest, event_deviceIpConflict)
+TEST_F(NotificationActionsTest, event_deviceIpConflict_C112756)
 {
+    RecordProperty("testrail", "C112756");
+
     static constexpr auto kExpectedCaption = "Camera IP Conflict";
 
     static constexpr auto kExpectedDescription = R"(
@@ -608,8 +614,10 @@ LDAP Sync Issue at Server1
 //-------------------------------------------------------------------------------------------------
 // License Issue
 
-TEST_F(NotificationActionsTest, event_licenseIssue)
+TEST_F(NotificationActionsTest, event_licenseIssue_C112760)
 {
+    RecordProperty("testrail", "C112760");
+
     static constexpr auto kExpectedCaption = "License Issue";
 
     static constexpr auto kExpectedDescription = R"(
@@ -644,8 +652,10 @@ Not enough licenses on Server1
 //-------------------------------------------------------------------------------------------------
 // Camera Motion
 
-TEST_F(NotificationActionsTest, event_motion)
+TEST_F(NotificationActionsTest, event_motion_C112753)
 {
+    RecordProperty("testrail", "C112753");
+
     static constexpr auto kExpectedCaption = "Motion on Camera";
 
     static constexpr auto kExpectedTooltip = R"(
@@ -969,8 +979,10 @@ Server1 certificate error
 //-------------------------------------------------------------------------------------------------
 // Server Conflict
 
-TEST_F(NotificationActionsTest, event_serverConflict)
+TEST_F(NotificationActionsTest, event_serverConflict_C112758)
 {
+    RecordProperty("testrail", "C112758");
+
     static constexpr auto kExpectedCaption = "Server Conflict";
 
     static constexpr auto kExpectedDescription = R"(
@@ -1020,8 +1032,10 @@ Server1 Conflict
 //-------------------------------------------------------------------------------------------------
 // Server Failure
 
-TEST_F(NotificationActionsTest, event_serverFailure)
+TEST_F(NotificationActionsTest, event_serverFailure_C112757)
 {
+    RecordProperty("testrail", "C112757");
+
     static constexpr auto kExpectedCaption = "Server Failure";
 
     static constexpr auto kExpectedDescription = R"(
@@ -1052,8 +1066,10 @@ Server1 Failure
 //-------------------------------------------------------------------------------------------------
 // Server Started
 
-TEST_F(NotificationActionsTest, event_serverStarted)
+TEST_F(NotificationActionsTest, event_serverStarted_C112759)
 {
+    RecordProperty("testrail", "C112759");
+
     static constexpr auto kExpectedCaption = "Server Started";
 
     static constexpr auto kExpectedTooltip = R"(
@@ -1123,8 +1139,10 @@ Soft Trigger Button 1
 //-------------------------------------------------------------------------------------------------
 // Storage Issue
 
-TEST_F(NotificationActionsTest, event_storageIssue)
+TEST_F(NotificationActionsTest, event_storageIssue_C112755)
 {
+    RecordProperty("testrail", "C112755");
+
     static constexpr auto kExpectedCaption = "Storage Issue";
 
     static constexpr auto kExpectedDescription = R"(

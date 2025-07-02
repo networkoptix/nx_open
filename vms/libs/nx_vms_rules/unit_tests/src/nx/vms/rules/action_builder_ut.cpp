@@ -844,8 +844,10 @@ TEST_F(ActionBuilderTest, builderWithIntervalAndFixedDurationAggregateEvents)
     builder->processEvent(prolongedEvent);
 }
 
-TEST_F(ActionBuilderTest, builderWithIntervalAggregatesAndEmitsThemWhenTimeElapsed)
+TEST_F(ActionBuilderTest, builderWithIntervalAggregatesAndEmitsThemWhenTimeElapsed_C112761)
 {
+    RecordProperty("testrail", "C112761");
+
     const std::chrono::milliseconds interval(100);
     const auto builder = makeTestActionBuilder([]{ return new TestAction; });
     addIntervalField(builder, interval);
