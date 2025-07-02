@@ -58,3 +58,53 @@ TEST(Sdp, SetupResponse2)
     ASSERT_EQ(5564, track.ioDevice->mediaAddressInfo().address.port);
     ASSERT_EQ(5565, track.ioDevice->rtcpAddressInfo().address.port);
 }
+
+TEST(Rtsp, ParseTextMessage)
+{
+    {
+        std::string_view data("RTSP/1.0 200 OK\r\nSession: 13816;timeout=50\r\n\r\n");
+        ASSERT_EQ(data.size(), nextRtspMessage((uint8_t*)data.data(), data.size(), /*maxChannelNumber*/ 256));
+    }
+    {
+        // No channel number in buffer -> no message.
+        std::string_view data("RTSP/1.0 200 OK$");
+        ASSERT_EQ(0, nextRtspMessage((uint8_t*)data.data(), data.size(), /*maxChannelNumber*/ 256));
+    }
+    {
+        // Channel number too big -> no message.
+        std::string_view data("RTSP/1.0 200 OK$q");
+        ASSERT_EQ(0, nextRtspMessage((uint8_t*)data.data(), data.size(), /*maxChannelNumber*/ 0));
+    }
+    {
+        // Normal message.
+        std::string_view data("RTSP/1.0 200 OK$0");
+        ASSERT_EQ(data.size() - 2, nextRtspMessage((uint8_t*)data.data(), data.size(), /*maxChannelNumber*/ 256));
+    }
+    {
+        // Normal message before $.
+        std::string_view data("RTSP/1.0 200 OK\r\n\r\nq$0");
+        ASSERT_EQ(data.size() - 3, nextRtspMessage((uint8_t*)data.data(), data.size(), /*maxChannelNumber*/ 256));
+    }
+    {
+        // Normal message.
+        std::string_view data("K$0");
+        ASSERT_EQ(1, nextRtspMessage((uint8_t*)data.data(), data.size(), /*maxChannelNumber*/ 256));
+    }
+    {
+        // No double delimiter -> no message.
+        std::string_view data("RTSP/1.0 200 OK\r\n");
+        ASSERT_EQ(0, nextRtspMessage((uint8_t*)data.data(), data.size(), /*maxChannelNumber*/ 256));
+    }
+    {
+        std::string_view data("");
+        ASSERT_EQ(0, nextRtspMessage((uint8_t*)data.data(), data.size(), /*maxChannelNumber*/ 256));
+    }
+    {
+        std::string_view data("$");
+        ASSERT_EQ(0, nextRtspMessage((uint8_t*)data.data(), data.size(), /*maxChannelNumber*/ 256));
+    }
+    {
+        std::string_view data("\r");
+        ASSERT_EQ(0, nextRtspMessage((uint8_t*)data.data(), data.size(), /*maxChannelNumber*/ 256));
+    }
+}

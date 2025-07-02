@@ -36,6 +36,9 @@ class QnRtspClient;
 static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
+// Return message size or 0 if no message found. Delimeters: '$' or '\r\n\r\n'.
+NX_VMS_COMMON_API int64_t nextRtspMessage(const uint8_t* data, int64_t size, int maxChannelNumber);
+
 class NX_VMS_COMMON_API QnRtspIoDevice
 {
 public:
