@@ -70,6 +70,25 @@ const QByteArray QnRtspClient::kGetParameterCommand("GET_PARAMETER");
 const QByteArray QnRtspClient::kPauseCommand("PAUSE");
 const QByteArray QnRtspClient::kTeardownCommand("TEARDOWN");
 
+
+int64_t nextRtspMessage(const uint8_t* data, int64_t size, int maxChannelNumber)
+{
+    int i = 0;
+    for(; i < size - 1 && (data[i] != '$' || data[i + 1] > maxChannelNumber); i++);
+
+    if (i == size - 1)
+        i = size;
+
+    const auto messageSize =
+        QnTCPConnectionProcessor::isFullMessage(QByteArray::fromRawData((const char *)data, i));
+
+    if (messageSize > 0)
+        return messageSize;
+
+    // return 0 if no message found, or size of message
+    return i == size ? 0 : i;
+}
+
 //-------------------------------------------------------------------------------------------------
 // QnRtspIoDevice
 
@@ -568,6 +587,7 @@ bool QnRtspClient::stop()
 {
     NX_MUTEX_LOCKER lock(&m_socketMutex);
     m_tcpSock.reset();
+    NX_VERBOSE(this, "Reset tcp socket");
     return true;
 }
 
@@ -575,7 +595,10 @@ void QnRtspClient::shutdown()
 {
     NX_MUTEX_LOCKER lock(&m_socketMutex);
     if (m_tcpSock)
+    {
+        NX_VERBOSE(this, "Shutdown tcp socket");
         m_tcpSock->shutdown();
+    }
 }
 
 bool QnRtspClient::isOpened() const
@@ -1164,7 +1187,12 @@ void QnRtspClient::processTextData(const QByteArray& textData)
 {
     const int requestLineLen = textData.indexOf("\r\n");
     if (requestLineLen == -1)
+    {
+        NX_VERBOSE(this, "Drop data, size: '%1'", textData.size());
         return;
+    }
+
+    NX_VERBOSE(this, "Process text message: '%1'", textData);
     nx::network::http::RequestLine requestLine;
     requestLine.parse(std::string_view(textData.data(), requestLineLen));
 
@@ -1204,30 +1232,35 @@ bool QnRtspClient::readAndProcessTextData()
     // have text response or part of text response.
     if (!m_tcpSock)
         return false;
+
+    if (m_responseBufferLen >= RTSP_BUFFER_LEN)
+    {
+        NX_DEBUG(this, "Failed to read text interleaved packet(buffer overflow), buffer size: %1",
+            m_responseBufferLen);
+        return false;
+    }
+
     int bytesRead = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
     if (bytesRead <= 0)
+    {
+        NX_DEBUG(this, "Failed to read text interleaved packet, length: %1", m_responseBufferLen);
         return false;
+    }
     m_responseBufferLen += bytesRead;
 
-    const quint8* textBlockEnd = m_responseBuffer;
-    const quint8* bEnd = m_responseBuffer + m_responseBufferLen;
-    for(; textBlockEnd < bEnd && *textBlockEnd != '$'; textBlockEnd++);
-
-    while (textBlockEnd > m_responseBuffer)
+    int maxChannelNumber = m_rtpToTrack.size() - 1;
+    while (true)
     {
-        const auto messageSize = QnTCPConnectionProcessor::isFullMessage(QByteArray::fromRawData(
-            (const char*) m_responseBuffer, textBlockEnd - m_responseBuffer));
+        const auto messageSize = nextRtspMessage(
+            m_responseBuffer, m_responseBufferLen, maxChannelNumber);
+
         if (messageSize <= 0)
-            break;
+            return true;
 
-        QByteArray textData = QByteArray::fromRawData((const char*) m_responseBuffer, messageSize);
-        processTextData(textData);
-        const quint8* messageEnd = m_responseBuffer + messageSize;
-        memmove(m_responseBuffer, messageEnd, bEnd - messageEnd);
+        processTextData(QByteArray::fromRawData((const char*) m_responseBuffer, messageSize));
+        memmove(m_responseBuffer, m_responseBuffer + messageSize, m_responseBufferLen - messageSize);
         m_responseBufferLen -= messageSize;
-        textBlockEnd -= messageSize;
     };
-
     return true;
 }
 
@@ -1286,6 +1319,7 @@ int QnRtspClient::readBinaryResponse(std::vector<nx::utils::ByteArray*>& demuxed
 {
     if (!m_tcpSock)
         return 0;
+
     while (m_tcpSock->isConnected())
     {
         while (m_responseBufferLen < 4) {
@@ -1296,8 +1330,12 @@ int QnRtspClient::readBinaryResponse(std::vector<nx::utils::ByteArray*>& demuxed
         }
         if (m_responseBuffer[0] == '$')
             break;
+
         if (!readAndProcessTextData())
+        {
+            NX_DEBUG(this, "Failed to process text message");
             return -1;
+        }
     }
 
     int dataLen = (m_responseBuffer[2]<<8) + m_responseBuffer[3] + 4;
@@ -1316,6 +1354,7 @@ int QnRtspClient::readBinaryResponse(std::vector<nx::utils::ByteArray*>& demuxed
         int bytesRead = readSocketWithBuffering(data, dataRestLen, true);
         if (bytesRead <= 0)
             return bytesRead;
+
         dataRestLen -= bytesRead;
         data += bytesRead;
     }
@@ -1673,6 +1712,9 @@ int QnRtspClient::readSocketWithBuffering(quint8* buf, size_t bufSize, bool read
     int bytesRead = m_tcpSock->recv(buf, (unsigned int) bufSize, readSome ? 0 : MSG_WAITALL);
     if (bytesRead > 0)
         m_lastReceivedDataTimer.restart();
+    else
+        NX_DEBUG(this, "Failed to read data from socket, bytesRead: %1", bytesRead);
+
     return bytesRead;
 }
 
