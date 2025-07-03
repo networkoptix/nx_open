@@ -323,10 +323,6 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
         qputenv("QSG_RENDER_LOOP", "basic");
     }
 
-    // Disables platform-specific text input handles since we have our custom ones.
-    if (nx::build_info::isAndroid())
-        qputenv("QT_QPA_NO_TEXT_HANDLES", "1");
-
     nx::kit::OutputRedirector::ensureOutputRedirection();
 
     // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
