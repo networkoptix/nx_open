@@ -2736,16 +2736,14 @@ void QnVirtualCameraResource::updateSourceUrl(const nx::Url& tempUrl,
 
     NX_DEBUG(this, nx::format("Save %1 stream %2 URL: %3").args(getPhysicalId(), role, url));
 
-    const auto roleStr = QString::number(role);
-    bool urlChanged = false;
-    {
-        NX_MUTEX_LOCKER lk(&m_mutex);
-        QJsonObject streamUrls = QJsonDocument::fromJson(
-            getProperty(nx::vms::api::device_properties::kStreamUrls).toUtf8()).object();
-        streamUrls[roleStr] = url;
-        urlChanged = setProperty(nx::vms::api::device_properties::kStreamUrls,
-            QString::fromUtf8(QJsonDocument(streamUrls).toJson()));
-    }
+    const bool urlChanged = updateProperty(
+        nx::vms::api::device_properties::kStreamUrls,
+        [roleStr = QString::number(role), &url](QString prevValue)
+        {
+            QJsonObject streamUrls = QJsonDocument::fromJson(prevValue.toUtf8()).object();
+            streamUrls[roleStr] = url;
+            return QJsonDocument(streamUrls).toJson();
+        });
 
     //TODO: #rvasilenko Setter and saving must be split.
     if (urlChanged && save)

@@ -77,7 +77,7 @@ void QnResource::setForceUsingLocalProperties(bool value)
 
 bool QnResource::useLocalProperties() const
 {
-    return m_forceUseLocalProperties || m_id.isNull();
+    return m_forceUseLocalProperties || getId().isNull();
 }
 
 void QnResource::updateInternal(const QnResourcePtr& source, NotifierList& notifiers)
@@ -339,13 +339,11 @@ QString QnResource::getProperty(const QString& key) const
     if (useLocalProperties())
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
-        auto itr = m_locallySavedProperties.find(key);
-        if (itr != m_locallySavedProperties.end())
-            return itr->second;
+        return getLocalPropertyUnsafe(key);
     }
     else if (auto* context = systemContext(); context && context->resourcePropertyDictionary())
     {
-        return context->resourcePropertyDictionary()->value(m_id, key);
+        return context->resourcePropertyDictionary()->value(getId(), key);
     }
 
     return {};
@@ -353,21 +351,10 @@ QString QnResource::getProperty(const QString& key) const
 
 bool QnResource::setProperty(const QString& key, const QString& value, bool markDirty)
 {
+    if (useLocalProperties())
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
-        if (useLocalProperties())
-        {
-            auto itr = m_locallySavedProperties.find(key);
-            if (itr == m_locallySavedProperties.end())
-            {
-                m_locallySavedProperties.emplace(key, value);
-                return true;
-            }
-            if (value == itr->second)
-                return false;
-            itr->second = value;
-            return true;
-        }
+        return setLocalPropertyUnsafe(key, value);
     }
 
     NX_ASSERT(!getId().isNull());
@@ -388,6 +375,38 @@ bool QnResource::setProperty(const QString& key, const QString& value, bool mark
     return false;
 }
 
+bool QnResource::updateProperty(
+    const QString& key,
+    std::function<QString(QString)> updater,
+    bool markDirty)
+{
+    if (!NX_ASSERT(updater))
+        return false;
+
+    if (useLocalProperties())
+    {
+        NX_MUTEX_LOCKER lk(&m_mutex);
+        return setLocalPropertyUnsafe(key, updater(getLocalPropertyUnsafe(key)));
+    }
+
+    if (auto* context = systemContext(); context && context->resourcePropertyDictionary())
+    {
+        const auto [prevValue, newValue] = context->resourcePropertyDictionary()->updateValue(
+            getId(),
+            key,
+            updater,
+            markDirty);
+
+        const bool valueChanged = prevValue != newValue;
+        if (valueChanged)
+            emitPropertyChanged(key, prevValue, newValue);
+
+        return valueChanged;
+    }
+
+    return false;
+}
+
 void QnResource::emitPropertyChanged(
     const QString& key, const QString& prevValue, const QString& newValue)
 {
@@ -397,7 +416,7 @@ void QnResource::emitPropertyChanged(
     NX_VERBOSE(this,
         "Changed property '%1' = '%2'",
         key,
-        hidePasswordIfCredentialsPropety(key, getProperty(key)));
+        hidePasswordIfCredentialsPropety(key, newValue));
     emit propertyChanged(toSharedPointer(this), key, prevValue, newValue);
 }
 
@@ -408,6 +427,25 @@ bool QnResource::setUrlUnsafe(const QString& value)
 
     m_url = value;
     return true;
+}
+
+bool QnResource::setLocalPropertyUnsafe(const QString& key, const QString& value)
+{
+    auto [it, added] = m_locallySavedProperties.emplace(key, value);
+    if (!added)
+    {
+        if (it->second == value)
+            return false;
+        it->second = value;
+    }
+    return true;
+}
+
+QString QnResource::getLocalPropertyUnsafe(const QString& key) const
+{
+    if (auto it = m_locallySavedProperties.find(key); it != m_locallySavedProperties.end())
+        return it->second;
+    return {};
 }
 
 nx::vms::api::ResourceParamDataList QnResource::getProperties() const

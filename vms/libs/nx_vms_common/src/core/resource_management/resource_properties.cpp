@@ -84,6 +84,50 @@ int QnResourcePropertyDictionary::saveData(const nx::vms::api::ResourceParamWith
     return requestId;
 }
 
+QString QnResourcePropertyDictionary::valueUnsafe(
+    const nx::Uuid& resourceId, const QString& key) const
+{
+    const auto resToPropsIt = m_items.find(resourceId);
+    if (resToPropsIt == m_items.end())
+        return QString();
+
+    const auto propIt = resToPropsIt->second.find(key);
+    return propIt == resToPropsIt->second.cend() ? QString() : propIt->second;
+}
+
+std::optional<QString> QnResourcePropertyDictionary::setValueUnsafe(
+    const nx::Uuid& resourceId,
+    const QString& key,
+    const QString& value,
+    bool markDirty)
+{
+    const auto itr = m_items.emplace(resourceId, QnResourcePropertyList{}).first;
+
+    QnResourcePropertyList& properties = itr->second;
+    QString prevValue;
+    auto [it, added] = properties.emplace(key, value);
+    if (!added)
+    {
+        if (it->second == value)
+            return std::nullopt; //< Nothing changed.
+        prevValue = std::exchange(it->second, value);
+    }
+
+    QnResourcePropertyList& modifiedProperties = m_modifiedItems[resourceId];
+    if (markDirty)
+    {
+        modifiedProperties[key] = value;
+    }
+    else
+    {
+        // If parameter marked as modified, removing mark,
+        // i.e. parameter value has been reset to already saved value.
+        modifiedProperties.erase(key);
+    }
+
+    return prevValue;
+}
+
 int QnResourcePropertyDictionary::saveParamsAsync(const nx::Uuid& resourceId)
 {
     nx::vms::api::ResourceParamWithRefDataList data;
@@ -115,12 +159,7 @@ void QnResourcePropertyDictionary::onRequestDone( int reqID, ec2::ErrorCode erro
 QString QnResourcePropertyDictionary::value(const nx::Uuid& resourceId, const QString& key) const
 {
     NX_READ_LOCKER lock(&m_readWriteLock);
-    auto resToPropsIt = m_items.find(resourceId);
-    if (resToPropsIt == m_items.end())
-        return QString();
-
-    auto propIt = resToPropsIt->second.find(key);
-    return propIt == resToPropsIt->second.cend() ? QString() : propIt->second;
+    return valueUnsafe(resourceId, key);
 }
 
 void QnResourcePropertyDictionary::clear()
@@ -162,41 +201,36 @@ void QnResourcePropertyDictionary::markAllParamsDirty(
 }
 
 std::optional<QString> QnResourcePropertyDictionary::setValue(
-    const nx::Uuid& resourceId, const QString& key,
+    const nx::Uuid& resourceId,
+    const QString& key,
     const QString& value, bool markDirty)
 {
-    NX_WRITE_LOCKER lock(&m_readWriteLock);
-    auto itr = m_items.find(resourceId);
-    if (itr == m_items.end())
-        itr = m_items.emplace(resourceId, QnResourcePropertyList{}).first;
-
-    QnResourcePropertyList& properties = itr->second;
-    auto itrValue = properties.find(key);
-    QString prevValue;
-    if (itrValue == properties.end())
-        properties.emplace(key, value);
-    else if (itrValue->second != value)
-        prevValue = std::exchange(itrValue->second, value);
-    else
-        return std::nullopt; // nothing to change
-
-    if (markDirty)
+    std::optional<QString> prevValue;
     {
-        m_modifiedItems[resourceId][key] = value;
+        NX_WRITE_LOCKER lock(&m_readWriteLock);
+        prevValue = setValueUnsafe(resourceId, key, value, markDirty);
     }
-    else
-    {
-        // If parameter marked as modified, removing mark,
-        // i.e. parameter value has been reset to already saved value.
-        QnResourcePropertyList& modifiedProperties = m_modifiedItems[resourceId];
-        auto propertyIter = modifiedProperties.find( key );
-        if( propertyIter != modifiedProperties.end() )
-            modifiedProperties.erase( propertyIter );
-    }
-
-    lock.unlock();
-    emit propertyChanged(resourceId, key);
+    if (prevValue)
+        emit propertyChanged(resourceId, key);
     return prevValue;
+}
+
+std::pair<QString, QString> QnResourcePropertyDictionary::updateValue(
+    const nx::Uuid& resourceId,
+    const QString& key,
+    std::function<QString(QString)> updater,
+    bool markDirty)
+{
+    QString prevValue;
+    QString newValue;
+    if (NX_ASSERT(updater))
+    {
+        NX_WRITE_LOCKER lock(&m_readWriteLock);
+        prevValue = valueUnsafe(resourceId, key);
+        newValue = updater(prevValue);
+        setValueUnsafe(resourceId, key, newValue, markDirty);
+    }
+    return {std::move(prevValue), std::move(newValue)};
 }
 
 bool QnResourcePropertyDictionary::hasProperty(const nx::Uuid& resourceId, const QString& key) const
