@@ -4308,7 +4308,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Set Up 2FA</source>
-      <translation type="unfinished">Set Up 2FA</translation>
+      <translation>Skonfiguruj 2FA</translation>
     </message>
   </context>
   <context>
@@ -4387,7 +4387,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>2FA DISABLED</source>
-      <translation type="unfinished">2FA DISABLED</translation>
+      <translation>2FA WYŁĄCZONE</translation>
     </message>
   </context>
   <context>

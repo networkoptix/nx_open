@@ -4220,7 +4220,7 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>Set Up 2FA</source>
-      <translation type="unfinished">Set Up 2FA</translation>
+      <translation>Konfigurera 2FA</translation>
     </message>
   </context>
   <context>
@@ -4299,7 +4299,7 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>2FA DISABLED</source>
-      <translation type="unfinished">2FA DISABLED</translation>
+      <translation>2FA INAKTIVERAD</translation>
     </message>
   </context>
   <context>

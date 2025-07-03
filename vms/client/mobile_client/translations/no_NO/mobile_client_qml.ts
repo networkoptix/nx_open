@@ -676,16 +676,20 @@
       <translation>Kobler til...</translation>
     </message>
     <message>
-      <source>No cameras available on this layout</source>
-      <translation>Ingen kameraer tilgjengelig i denne visningen</translation>
-    </message>
-    <message>
-      <source>Show all cameras</source>
-      <translation>Vis alle kameraer</translation>
-    </message>
-    <message>
       <source>Nothing found</source>
       <translation>Ingenting funnet</translation>
+    </message>
+    <message>
+      <source>No Cameras</source>
+      <translation type="unfinished">No Cameras</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any cameras on this layout</source>
+      <translation type="unfinished">We didn&apos;t find any cameras on this layout</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
+      <translation type="unfinished">We didn&apos;t find any cameras on this site. You can add them in our desktop application</translation>
     </message>
   </context>
   <context>

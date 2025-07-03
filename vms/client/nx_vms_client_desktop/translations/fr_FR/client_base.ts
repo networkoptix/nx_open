@@ -4299,7 +4299,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>2FA DISABLED</source>
-      <translation type="unfinished">2FA DISABLED</translation>
+      <translation>2FA DÉSACTIVÉ</translation>
     </message>
   </context>
   <context>

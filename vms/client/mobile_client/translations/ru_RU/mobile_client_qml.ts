@@ -678,16 +678,20 @@
       <translation>Соединение...</translation>
     </message>
     <message>
-      <source>No cameras available on this layout</source>
-      <translation>Нет камер на раскладке</translation>
-    </message>
-    <message>
-      <source>Show all cameras</source>
-      <translation>Показать все камеры</translation>
-    </message>
-    <message>
       <source>Nothing found</source>
       <translation>Ничего не найдено</translation>
+    </message>
+    <message>
+      <source>No Cameras</source>
+      <translation type="unfinished">No Cameras</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any cameras on this layout</source>
+      <translation type="unfinished">We didn&apos;t find any cameras on this layout</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
+      <translation type="unfinished">We didn&apos;t find any cameras on this site. You can add them in our desktop application</translation>
     </message>
   </context>
   <context>

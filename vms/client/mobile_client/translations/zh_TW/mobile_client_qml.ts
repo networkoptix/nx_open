@@ -675,16 +675,20 @@
       <translation>連線中...</translation>
     </message>
     <message>
-      <source>No cameras available on this layout</source>
-      <translation>佈局上無可用的攝影機</translation>
-    </message>
-    <message>
-      <source>Show all cameras</source>
-      <translation>顯示所有的攝影機</translation>
-    </message>
-    <message>
       <source>Nothing found</source>
       <translation>未找到任何內容</translation>
+    </message>
+    <message>
+      <source>No Cameras</source>
+      <translation type="unfinished">No Cameras</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any cameras on this layout</source>
+      <translation type="unfinished">We didn&apos;t find any cameras on this layout</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
+      <translation type="unfinished">We didn&apos;t find any cameras on this site. You can add them in our desktop application</translation>
     </message>
   </context>
   <context>

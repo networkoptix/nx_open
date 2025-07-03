@@ -676,16 +676,20 @@
       <translation>Connectant...</translation>
     </message>
     <message>
-      <source>No cameras available on this layout</source>
-      <translation>No hi ha càmeres disponibles en aquest disseny</translation>
-    </message>
-    <message>
-      <source>Show all cameras</source>
-      <translation>Mostra totes les càmeres</translation>
-    </message>
-    <message>
       <source>Nothing found</source>
       <translation>No s'ha trobat res</translation>
+    </message>
+    <message>
+      <source>No Cameras</source>
+      <translation type="unfinished">No Cameras</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any cameras on this layout</source>
+      <translation type="unfinished">We didn&apos;t find any cameras on this layout</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
+      <translation type="unfinished">We didn&apos;t find any cameras on this site. You can add them in our desktop application</translation>
     </message>
   </context>
   <context>

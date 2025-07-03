@@ -4255,7 +4255,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>2FA DISABLED</source>
-      <translation type="unfinished">2FA DISABLED</translation>
+      <translation>雙重認證(2FA) 已停用</translation>
     </message>
   </context>
   <context>

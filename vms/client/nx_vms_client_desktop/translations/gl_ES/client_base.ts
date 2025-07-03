@@ -4220,7 +4220,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Set Up 2FA</source>
-      <translation type="unfinished">Set Up 2FA</translation>
+      <translation>Configurar 2FA, autenticación en 2 pasos</translation>
     </message>
   </context>
   <context>
@@ -4299,7 +4299,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>2FA DISABLED</source>
-      <translation type="unfinished">2FA DISABLED</translation>
+      <translation>2FA Autenticador en 2 pasos deshabilitado</translation>
     </message>
   </context>
   <context>

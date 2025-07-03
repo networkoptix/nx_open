@@ -676,16 +676,20 @@
       <translation>Forbinder...</translation>
     </message>
     <message>
-      <source>No cameras available on this layout</source>
-      <translation>Ingen tilgængelige kameraer på dette layout</translation>
-    </message>
-    <message>
-      <source>Show all cameras</source>
-      <translation>Vis alle kameraer</translation>
-    </message>
-    <message>
       <source>Nothing found</source>
       <translation>Intet fundet</translation>
+    </message>
+    <message>
+      <source>No Cameras</source>
+      <translation type="unfinished">No Cameras</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any cameras on this layout</source>
+      <translation type="unfinished">We didn&apos;t find any cameras on this layout</translation>
+    </message>
+    <message>
+      <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
+      <translation type="unfinished">We didn&apos;t find any cameras on this site. You can add them in our desktop application</translation>
     </message>
   </context>
   <context>

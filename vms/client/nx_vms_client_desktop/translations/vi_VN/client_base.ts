@@ -4255,7 +4255,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>2FA DISABLED</source>
-      <translation type="unfinished">2FA DISABLED</translation>
+      <translation>2FA ĐÃ BỊ VÔ HIỆU HÓA</translation>
     </message>
   </context>
   <context>

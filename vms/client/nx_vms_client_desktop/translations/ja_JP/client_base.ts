@@ -4176,7 +4176,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Set Up 2FA</source>
-      <translation type="unfinished">Set Up 2FA</translation>
+      <translation>二要素認証のセットアップ</translation>
     </message>
   </context>
   <context>
@@ -4255,7 +4255,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>2FA DISABLED</source>
-      <translation type="unfinished">2FA DISABLED</translation>
+      <translation>二要素認証が無効です</translation>
     </message>
   </context>
   <context>
