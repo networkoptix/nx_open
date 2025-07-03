@@ -246,6 +246,9 @@ bool HwVideoDecoder::decode(
         avPacket->size = data->dataSize();
         avPacket->dts = data->timestamp;
         avPacket->pts = data->timestamp;
+
+        m_channel = data->channelNumber;
+        m_flags = data->flags;
     }
 
     int status = avcodec_send_packet(m_decoderContext, avPacket);
@@ -278,13 +281,11 @@ bool HwVideoDecoder::decode(
     if (frame->format == m_targetPixelFormat)
         frame->setMemoryType(MemoryType::VideoMemory);
 
-    frame->channel = data ? data->channelNumber : m_lastChannel;
+    frame->channel = m_channel;
+    frame->flags = m_flags;
     m_lastDecodeResult = 0;
     if (m_metrics)
         m_metrics->decodedPixels() += frame->width * frame->height;
-
-    if (data)
-        m_lastChannel = data->channelNumber;
 
     m_hardwareMode = (bool) frame->hw_frames_ctx;
     return true;
