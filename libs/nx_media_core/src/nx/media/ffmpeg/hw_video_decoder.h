@@ -63,7 +63,8 @@ private:
     std::string m_device;
     std::unique_ptr<AvOptions> m_options = nullptr;
     nx::metric::Storage* m_metrics = nullptr;
-    quint32 m_lastChannel = 0;
+    uint32_t m_channel = 0;
+    QnAbstractMediaData::MediaFlags m_flags {};
     MultiThreadDecodePolicy m_mtDecodingPolicy;
 };
 
