@@ -4218,6 +4218,10 @@ Lisensnøkkel: %2</translation>
       <source>Log In</source>
       <translation>Logg inn</translation>
     </message>
+    <message>
+      <source>Set Up 2FA</source>
+      <translation>Sett opp 2FA</translation>
+    </message>
   </context>
   <context>
     <name>QnStatusOverlayWidget</name>
@@ -4292,6 +4296,10 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>NOT ACTIVATED</source>
       <translation type="unfinished">NOT ACTIVATED</translation>
+    </message>
+    <message>
+      <source>2FA DISABLED</source>
+      <translation>2FA DEAKTIVERET</translation>
     </message>
   </context>
   <context>

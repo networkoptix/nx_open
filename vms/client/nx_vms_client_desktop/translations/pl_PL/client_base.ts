@@ -4306,6 +4306,10 @@ Klucz licencyjny: %2</translation>
       <source>Log In</source>
       <translation>Zaloguj się</translation>
     </message>
+    <message>
+      <source>Set Up 2FA</source>
+      <translation>Skonfiguruj 2FA</translation>
+    </message>
   </context>
   <context>
     <name>QnStatusOverlayWidget</name>
@@ -4380,6 +4384,10 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>NOT ACTIVATED</source>
       <translation>NIE AKTYWOWANE</translation>
+    </message>
+    <message>
+      <source>2FA DISABLED</source>
+      <translation>2FA WYŁĄCZONE</translation>
     </message>
   </context>
   <context>

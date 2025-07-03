@@ -4174,6 +4174,10 @@ Kunci Lisensi: %2</translation>
       <source>Log In</source>
       <translation>Masuk</translation>
     </message>
+    <message>
+      <source>Set Up 2FA</source>
+      <translation type="unfinished">Set Up 2FA</translation>
+    </message>
   </context>
   <context>
     <name>QnStatusOverlayWidget</name>
@@ -4248,6 +4252,10 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>NOT ACTIVATED</source>
       <translation>TIDAK DIAKTIFKAN</translation>
+    </message>
+    <message>
+      <source>2FA DISABLED</source>
+      <translation>2FA DINONAKTIFKAN</translation>
     </message>
   </context>
   <context>

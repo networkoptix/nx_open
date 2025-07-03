@@ -321,7 +321,7 @@
     </message>
     <message>
       <source>Removed layout</source>
-      <translation>削除された  レイアウト</translation>
+      <translation>削除されたレイアウト</translation>
     </message>
   </context>
   <context>

@@ -4217,6 +4217,10 @@ License Key: %2</source>
       <source>Log In</source>
       <translation>Oturum Aç</translation>
     </message>
+    <message>
+      <source>Set Up 2FA</source>
+      <translation type="unfinished">Set Up 2FA</translation>
+    </message>
   </context>
   <context>
     <name>QnStatusOverlayWidget</name>
@@ -4291,6 +4295,10 @@ License Key: %2</source>
     <message>
       <source>NOT ACTIVATED</source>
       <translation type="unfinished">NOT ACTIVATED</translation>
+    </message>
+    <message>
+      <source>2FA DISABLED</source>
+      <translation type="unfinished">2FA DISABLED</translation>
     </message>
   </context>
   <context>

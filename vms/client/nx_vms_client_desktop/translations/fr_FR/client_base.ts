@@ -4218,6 +4218,10 @@ Clé de licence : %2</translation>
       <source>Log In</source>
       <translation>Connexion</translation>
     </message>
+    <message>
+      <source>Set Up 2FA</source>
+      <translation type="unfinished">Set Up 2FA</translation>
+    </message>
   </context>
   <context>
     <name>QnStatusOverlayWidget</name>
@@ -4292,6 +4296,10 @@ Clé de licence : %2</translation>
     <message>
       <source>NOT ACTIVATED</source>
       <translation>NON ACTIVÉ</translation>
+    </message>
+    <message>
+      <source>2FA DISABLED</source>
+      <translation>2FA DÉSACTIVÉ</translation>
     </message>
   </context>
   <context>

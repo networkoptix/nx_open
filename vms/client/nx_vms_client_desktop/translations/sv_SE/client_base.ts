@@ -4218,6 +4218,10 @@ Licensnyckel: %2</translation>
       <source>Log In</source>
       <translation>Logga in</translation>
     </message>
+    <message>
+      <source>Set Up 2FA</source>
+      <translation>Konfigurera 2FA</translation>
+    </message>
   </context>
   <context>
     <name>QnStatusOverlayWidget</name>
@@ -4292,6 +4296,10 @@ Licensnyckel: %2</translation>
     <message>
       <source>NOT ACTIVATED</source>
       <translation>INTE AKTIVERAD</translation>
+    </message>
+    <message>
+      <source>2FA DISABLED</source>
+      <translation>2FA INAKTIVERAD</translation>
     </message>
   </context>
   <context>

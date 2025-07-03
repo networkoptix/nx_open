@@ -4218,6 +4218,10 @@ Clave de licenza: %2</translation>
       <source>Log In</source>
       <translation>Iniciar sesión</translation>
     </message>
+    <message>
+      <source>Set Up 2FA</source>
+      <translation>Configurar 2FA, autenticación en 2 pasos</translation>
+    </message>
   </context>
   <context>
     <name>QnStatusOverlayWidget</name>
@@ -4292,6 +4296,10 @@ Clave de licenza: %2</translation>
     <message>
       <source>NOT ACTIVATED</source>
       <translation>NON ACTIVADO</translation>
+    </message>
+    <message>
+      <source>2FA DISABLED</source>
+      <translation>2FA Autenticador en 2 pasos deshabilitado</translation>
     </message>
   </context>
   <context>
