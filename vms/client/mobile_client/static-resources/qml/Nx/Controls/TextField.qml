@@ -17,7 +17,7 @@ TextInput
 
     property bool showError: false
 
-    property bool enableCustomHandles: Qt.platform.os == "android"
+    property bool enableCustomHandles: false
 
     property color inactiveColor: showError ? ColorTheme.colors.red_d1 : ColorTheme.colors.dark7
     property color activeColor: showError ? ColorTheme.colors.red_core : ColorTheme.colors.brand_core
