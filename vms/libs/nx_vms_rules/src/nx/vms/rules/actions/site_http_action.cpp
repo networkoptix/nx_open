@@ -18,8 +18,8 @@ const ItemDescriptor& SiteHttpAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
         .id = utils::type<SiteHttpAction>(),
-        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Site HTTP(S) Request")),
-        .description = "Send HTTP(S) request to the site.",
+        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Internal HTTPS Request")),
+        .description = "Send HTTPS request to the site.",
         .executionTargets = ExecutionTarget::servers,
         .targetServers = TargetServers::currentServer,
         .fields = {
