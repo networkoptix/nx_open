@@ -34,6 +34,16 @@ public:
         const QString& value,
         bool markDirty = true);
 
+    /**
+    * Updates stored value using provided functor.
+    * @return Pair of old and new values.
+    */
+    std::pair<QString, QString> updateValue(
+        const nx::Uuid& resourceId,
+        const QString& key,
+        std::function<QString(QString)> updater,
+        bool markDirty = true);
+
     bool hasProperty(const nx::Uuid& resourceId, const QString& key) const;
     bool hasProperty(const QString& key, const QString& value) const;
     nx::vms::api::ResourceParamDataList allProperties(const nx::Uuid& resourceId) const;
@@ -66,6 +76,13 @@ private:
         const nx::Uuid& resourceId,
         nx::vms::api::ResourceParamWithRefDataList& outData);
     int saveData(const nx::vms::api::ResourceParamWithRefDataList&& data);
+
+    QString valueUnsafe(const nx::Uuid& resourceId, const QString& key) const;
+    std::optional<QString> setValueUnsafe(
+        const nx::Uuid& resourceId,
+        const QString& key,
+        const QString& value,
+        bool markDirty = true);
 
 private:
     using QnResourcePropertyList = std::unordered_map<QString, QString>;

@@ -327,6 +327,15 @@ public:
         bool markDirty = true);
 
     /**
+    * Updates the property value using provided functor.
+    * @return Whether the stored property value has been modified by this call. Return `true` if property is modified.
+    */
+    virtual bool updateProperty(
+        const QString& key,
+        std::function<QString(QString)> updater,
+        bool markDirty = true);
+
+    /**
      * Save modified properties to the database (using a network transaction).
      * @return Whether the request was finished successfully.
      */
@@ -400,6 +409,10 @@ protected:
      */
     bool setUrlUnsafe(const QString& value);
 
+    bool setLocalPropertyUnsafe(const QString& key, const QString& value);
+
+    QString getLocalPropertyUnsafe(const QString& key) const;
+
 private:
     bool useLocalProperties() const;
 
@@ -431,7 +444,7 @@ private:
     /** Identifier of the type of this Resource. */
     nx::Uuid m_typeId;
 
-    std::map<QString, QString> m_locallySavedProperties;
+    std::unordered_map<QString, QString> m_locallySavedProperties;
 
     /** System Context this Resource belongs to. */
     std::atomic<nx::vms::common::SystemContext*> m_systemContext{};
