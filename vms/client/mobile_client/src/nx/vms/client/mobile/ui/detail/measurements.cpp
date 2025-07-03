@@ -18,7 +18,20 @@ struct Measurements::Private
     Measurements* const q;
     std::unique_ptr<QnTextureSizeHelper> textureSizeHelper;
     int androidKeyboardHeight = 0;
+    int deviceStatusBarHeight = ::statusBarHeight();
+
+    void updateDeviceStatusBarHeight();
 };
+
+void Measurements::Private::updateDeviceStatusBarHeight()
+{
+    const auto value = ::statusBarHeight();
+    if (value == deviceStatusBarHeight)
+        return;
+
+    deviceStatusBarHeight = value;
+    emit q->deviceStatusBarHeightChanged();
+}
 
 //-------------------------------------------------------------------------------------------------
 
@@ -47,16 +60,15 @@ Measurements::Measurements(QQuickWindow* window, QObject* parent):
         timer->start();
     }
 
+    const auto updateStatusBarHeight = [this]() { d->updateDeviceStatusBarHeight(); };
+
     // Device status bar height stuff.
     const auto screen = qApp->primaryScreen();
     connect(screen, &QScreen::orientationChanged, this,
-        [this]()
+        [this, updateStatusBarHeight]()
         {
             const auto kAnimationDelayMs = std::chrono::milliseconds(300);
-            executeDelayedParented(
-                [this]() { emit deviceStatusBarHeightChanged(); },
-                kAnimationDelayMs,
-                this);
+            executeDelayedParented(updateStatusBarHeight, kAnimationDelayMs, this);
         });
 
 
@@ -68,7 +80,7 @@ Measurements::Measurements(QQuickWindow* window, QObject* parent):
          */
         const auto timer = new QTimer(this);
         timer->setInterval(std::chrono::milliseconds(500));
-        connect(timer, &QTimer::timeout, this, &Measurements::deviceStatusBarHeightChanged);
+        connect(timer, &QTimer::timeout, this, updateStatusBarHeight);
         timer->start();
     }
 }
