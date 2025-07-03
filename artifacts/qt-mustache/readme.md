@@ -5,5 +5,5 @@ The original sources were downloaded from https://github.com/robertknight/qt-mus
 by Network Optix, Inc.
 
 The original code is licensed under the
-[BSD License](https://www.xiph.org/licenses/bsd/speex/). The original license file is
-stored in this directory as `license.txt`.
+[BSD 2-Clause License](https://github.com/robertknight/qt-mustache/blob/master/LICENSE). 
+The original license file is stored in this directory as `license.txt`.
