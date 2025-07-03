@@ -7,6 +7,8 @@ import QtQuick.Templates as T
 import Nx.Core
 import Nx.Core.Controls
 
+import nx.vms.client.mobile
+
 import "private"
 
 // TODO #ynikitenkov Add "support text" functionality support.
@@ -140,6 +142,8 @@ T.ComboBox
             // gets it on mouse release or proper movement, not from pressed event (like TextInput).
             TextField
             {
+                id: textField
+
                 focus: true
                 clip: true
                 font: control.font
@@ -163,6 +167,8 @@ T.ComboBox
                 onAccepted: control.accepted()
 
                 background: null
+
+                Q.Component.onCompleted: TextInputWorkaround.setup(textField)
             }
         }
 
