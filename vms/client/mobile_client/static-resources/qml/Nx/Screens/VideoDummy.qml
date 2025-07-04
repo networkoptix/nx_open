@@ -186,7 +186,16 @@ DummyMessage
         },
         State
         {
-            name: "preloader"
+            name: "systemConnecting"
+            PropertyChanges
+            {
+                target: preloader
+                running: true
+            }
+        },
+        State
+        {
+            name: "mediaLoading"
             PropertyChanges
             {
                 target: preloader

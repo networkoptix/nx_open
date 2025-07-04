@@ -25,10 +25,6 @@ CameraResource::CameraResource(const nx::Uuid& resourceTypeId)
 {
     setTypeId(resourceTypeId);
     addFlags(Qn::server_live_cam);
-
-    // Handle situation when flags are added externally after resource is created.
-    connect(this, &QnResource::flagsChanged, this,
-        [this]() { m_cachedFlags.store(calculateFlags()); }, Qt::DirectConnection);
 }
 
 QString CameraResource::getName() const
@@ -47,7 +43,7 @@ void CameraResource::setName(const QString& name)
     emit nameChanged(toSharedPointer(this));
 }
 
-Qn::ResourceFlags CameraResource::calculateFlags() const
+Qn::ResourceFlags CameraResource::flags() const
 {
     Qn::ResourceFlags result = base_type::flags();
     if (isIOModule())
@@ -57,20 +53,6 @@ Qn::ResourceFlags CameraResource::calculateFlags() const
         result |= Qn::motion;
 
     return result;
-}
-
-Qn::ResourceFlags CameraResource::flags() const
-{
-    if (m_cachedFlags.load() == Qn::ResourceFlags())
-        m_cachedFlags.store(calculateFlags());
-
-    return m_cachedFlags;
-}
-
-void CameraResource::resetCachedValues()
-{
-    base_type::resetCachedValues();
-    m_cachedFlags.store(calculateFlags());
 }
 
 ResourceStatus CameraResource::getStatus() const
