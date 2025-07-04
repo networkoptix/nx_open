@@ -70,15 +70,6 @@ signals:
 
 protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
-
-protected slots:
-    virtual void resetCachedValues() override;
-
-private:
-    Qn::ResourceFlags calculateFlags() const;
-
-private:
-    mutable std::atomic<Qn::ResourceFlags> m_cachedFlags{};
 };
 
 } // namespace nx::vms::client::core

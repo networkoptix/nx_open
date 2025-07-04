@@ -30,7 +30,7 @@ NxObject
     readonly property bool noVideoStreams: mediaPlayer.noVideoStreams
     readonly property bool failed: mediaPlayer.failed
     readonly property bool offline: serverOffline || cameraOffline
-    readonly property bool noLicenses: resourceHelper.analogCameraWithoutLicense;
+    readonly property bool noLicenses: resourceHelper.analogCameraWithoutLicense
     readonly property bool hasDefaultCameraPassword: resourceHelper.hasDefaultCameraPassword
     readonly property bool hasOldFirmware: resourceHelper.hasOldCameraFirmware
     readonly property bool tooManyConnections:
@@ -44,6 +44,14 @@ NxObject
         noVideo && resourceHelper.isIoModule && resourceHelper.audioSupported
     readonly property bool liveVirtualCamera: resourceHelper.isVirtualCamera && mediaPlayer.liveMode
     readonly property bool audioOnlyMode: mediaPlayer.audioOnlyMode
+    readonly property bool systemConnecting:
+        (controller.needsCloudAuthorization && (appContext.cloudStatusWatcher.status
+            === CloudStatusWatcher.Offline))
+        || (!controller.needsCloudAuthorization
+            && (resource?.flags & ResourceFlag.cross_system)
+            && (resource?.flags & ResourceFlag.fake))
+    readonly property bool mediaLoading:
+        mediaPlayer.mediaStatus === MediaPlayer.MediaStatus.Loading
 
     readonly property string dummyState:
     {
@@ -53,14 +61,10 @@ NxObject
             return "defaultPasswordAlert"
         if (hasOldFirmware)
             return "oldFirmwareAlert"
-        if (needsCloudAuthorization)
-        {
-            return appContext.cloudStatusWatcher.status != CloudStatusWatcher.Offline
-                ? "needsCloudAuthorization"
-                : "preloader"
-        }
-        if ((resource?.flags & ResourceFlag.cross_system) && (resource?.flags & ResourceFlag.fake))
-            return "preloader"
+        if (needsCloudAuthorization && !systemConnecting)
+            return "needsCloudAuthorization"
+        if (systemConnecting)
+            return "systemConnecting"
         if (cameraOffline)
             return "cameraOffline"
         if (noVideoStreams)
@@ -78,9 +82,11 @@ NxObject
         if (failed)
             return "videoLoadingFailed"
         if (noLicenses)
-            return "noLicenses";
+            return "noLicenses"
         if (tooManyConnections)
             return "tooManyConnections"
+        if (mediaLoading)
+            return "mediaLoading"
         return ""
     }
 
@@ -105,7 +111,7 @@ NxObject
             d.tryFixVirtualCameraPosition = false
 
             if (controller.liveVirtualCamera)
-                jumpToFirstChunk();
+                jumpToFirstChunk()
         }
 
         ChunkPositionWatcher
@@ -182,7 +188,7 @@ NxObject
             if (mediaPlayer.liveMode)
                 return d.playing ? -1 : (new Date()).getTime()
 
-            return mediaPlayer.position;
+            return mediaPlayer.position
         }
     }
 
@@ -239,7 +245,10 @@ NxObject
                 && stackView.currentItem.audioController === audioController
         }
 
-        resource: resourceHelper.resource
+        resource: (controller.needsCloudAuthorization || controller.systemConnecting)
+            ? null
+            : resourceHelper.resource
+
         onPlayingChanged: windowContext.ui.windowHelpers.setKeepScreenOn(playing)
         maxTextureSize: windowContext.ui.measurements.getMaxTextureSize()
         allowHardwareAcceleration: appContext.settings.enableHardwareDecoding
@@ -257,6 +266,28 @@ NxObject
             {
                 timelineController.timelineJump(mediaPlayer.position)
                 d.waitForFirstPosition = false
+            }
+        }
+
+        onResourceChanged:
+        {
+            tryPlayTimer.restart()
+
+            timelineController.timelineJump(d.lastPosition)
+            mediaPlayer.position = d.lastPosition
+
+            if (mediaPlayer.position == -1)
+            {
+                d.waitForFirstPosition = false
+            }
+            else if (resourceHelper.resourceStatus !== API.ResourceStatus.online)
+            {
+                d.waitForFirstPosition = false
+                timelineController.timelineJump(mediaPlayer.position)
+            }
+            else
+            {
+                d.waitForFirstPosition = true
             }
         }
     }
@@ -286,28 +317,6 @@ NxObject
     }
 
     onCameraUnauthorizedChanged: tryPlayTimer.restart()
-
-    onResourceChanged:
-    {
-        tryPlayTimer.restart();
-
-        timelineController.timelineJump(d.lastPosition)
-        mediaPlayer.position = d.lastPosition
-
-        if (mediaPlayer.position == -1)
-        {
-            d.waitForFirstPosition = false
-        }
-        else if (resourceHelper.resourceStatus !== API.ResourceStatus.online)
-        {
-            d.waitForFirstPosition = false
-            timelineController.timelineJump(mediaPlayer.position)
-        }
-        else
-        {
-            d.waitForFirstPosition = true
-        }
-    }
 
     Component.onDestruction: windowContext.ui.windowHelpers.setKeepScreenOn(false)
 
@@ -354,7 +363,7 @@ NxObject
     {
         d.playing = false
         mediaPlayer.pause()
-        d.savePosition();
+        d.savePosition()
     }
 
     function preview()
@@ -378,7 +387,7 @@ NxObject
 
     function jumpForward()
     {
-        var nextChunkStartTime = chunkPositionWatcher.nextChunkStartTimeMs();
+        var nextChunkStartTime = chunkPositionWatcher.nextChunkStartTimeMs()
         forcePosition(nextChunkStartTime)
         if (nextChunkStartTime == -1)
             play()
@@ -403,7 +412,7 @@ NxObject
     onServerOfflineChanged:
     {
         if (serverOffline)
-            return;
+            return
 
         if (d.playing && !(mediaPlayer.playing || mediaPlayer.loading))
             mediaPlayer.play()
