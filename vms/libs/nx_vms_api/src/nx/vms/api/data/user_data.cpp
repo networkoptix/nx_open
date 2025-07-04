@@ -21,7 +21,7 @@ void UserData::fillId()
     if (type == UserType::cloud)
     {
         if (!email.isEmpty())
-            id = nx::Uuid::fromArbitraryData(email);
+            id = nx::Uuid::fromArbitraryData(email.toLower());
         else
             id = nx::Uuid();
     }

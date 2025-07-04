@@ -885,7 +885,8 @@ void QnUserResource::fillIdUnsafe()
 {
     // ATTENTION: This logic is similar to UserData::fillId().
     NX_ASSERT(!(isCloud() && getEmail().isEmpty()));
-    nx::Uuid id = isCloud() ? guidFromArbitraryData(getEmail()) : nx::Uuid::createUuid();
+    nx::Uuid id =
+        isCloud() ? guidFromArbitraryData(getEmail().toLower()) : nx::Uuid::createUuid();
     setIdUnsafe(id);
 }
 
