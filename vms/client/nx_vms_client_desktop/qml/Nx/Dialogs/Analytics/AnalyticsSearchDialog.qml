@@ -61,17 +61,10 @@ Window
         //  - switch tabs
         //  - enable new tab's controller
 
-        const oldController = tileView ? scrollView.controller : eventGridScrollable.contentItem.controller
-        const newController = tileView ? eventGridScrollable.contentItem.controller : scrollView.controller
-
-        if (oldController)
-            oldController.enabled = false
-
+        layout.children[tileView ? 1 : 0].controller.enabled = false
         if (!eventModel.placeholderRequired)
             layout.currentIndex = tileView ? 0 : 1
-
-        if (newController)
-            newController.enabled = true
+        layout.children[tileView ? 0 : 1].controller.enabled = true
     }
 
     signal accepted()
@@ -411,237 +404,226 @@ Window
 
                 Layout.fillHeight: true
 
-                Scrollable
+                EventGrid
                 {
-                    id: eventGridScrollable
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
+                    id: eventGrid
 
+                    objectName: "AnalyticsSearchDialog.EventGrid"
+                    standardTileInteraction: false
+                    keyNavigationEnabled: false //< We implement our own.
+                    focus: true
+                    controller.paused: !dialog.visible
+                    controller.allowToFetchNewer: counterBlock.availableNewTracks <= 0
+                    currentIndex: selection.index.row
 
-                    contentItem: EventGrid
+                    tileController
                     {
-                        id: eventGrid
+                        showInformation: d.objectTypeSelected
+                        showThumbnails: true
+                        selectedRow: dialog.showPreview ? selection.index.row : -1
+                        attributeManager: d.tileViewAttributeManager
 
-                        objectName: "AnalyticsSearchDialog.EventGrid"
-                        standardTileInteraction: false
-                        keyNavigationEnabled: false //< We implement our own.
-                        focus: true
-                        controller.paused: !dialog.visible
-                        controller.allowToFetchNewer: counterBlock.availableNewTracks <= 0
-                        currentIndex: selection.index.row
-                        scrollBarWidth: eventGridScrollable.verticalScrollBar ? eventGridScrollable.verticalScrollBar.width : 0
-                        scrollableWidth: eventGridScrollable ? eventGridScrollable.width : 0
-                        scrollableHeight: eventGridScrollable ? eventGridScrollable.height : 0
+                        videoPreviewMode: showPreview
+                            ? RightPanelGlobals.VideoPreviewMode.none
+                            : RightPanelGlobals.VideoPreviewMode.hover
 
-                        tileController
+                        onClicked: (row) =>
                         {
-                            showInformation: d.objectTypeSelected
-                            showThumbnails: true
-                            selectedRow: dialog.showPreview ? selection.index.row : -1
-                            attributeManager: d.tileViewAttributeManager
-
-                            videoPreviewMode: showPreview
-                                ? RightPanelGlobals.VideoPreviewMode.none
-                                : RightPanelGlobals.VideoPreviewMode.hover
-
-                            onClicked: (row) =>
+                            if (showOnLayoutButton.hovered)
                             {
-                                if (showOnLayoutButton.hovered)
-                                {
-                                    eventModel.showOnLayout(
-                                        eventGrid.tileController.hoveredTile.tileIndex)
-                                }
-                                else if (!showPreview)
-                                {
-                                    previewPanel.slideAnimationEnabled = true
-                                    showPreview = true
-                                }
-                                eventGrid.forceActiveFocus()
-                                if (row !== selection.index.row)
-                                    selection.index = eventModel.index(row, 0)
+                                eventModel.showOnLayout(
+                                    eventGrid.tileController.hoveredTile.tileIndex)
                             }
-
-                            onDoubleClicked:
-                                d.showSelectionOnLayout()
+                            else if (!showPreview)
+                            {
+                                previewPanel.slideAnimationEnabled = true
+                                showPreview = true
+                            }
+                            eventGrid.forceActiveFocus()
+                            if (row !== selection.index.row)
+                                selection.index = eventModel.index(row, 0)
                         }
 
-                        Item
+                        onDoubleClicked:
+                            d.showSelectionOnLayout()
+                    }
+
+                    Item
+                    {
+                        // Single item which is re-parented to the hovered tile overlay.
+                        id: tilePreviewOverlay
+
+                        parent: eventGrid.tileController.hoveredTile
+                            && eventGrid.tileController.hoveredTile.overlayContainer
+
+                        anchors.fill: parent || undefined
+                        visible: parent
+                            && eventGrid.tileController.hoveredTile
+                            && eventGrid.tileController.hoveredTile.hovered
+                            && !showPreview
+
+                        Column
                         {
-                            // Single item which is re-parented to the hovered tile overlay.
-                            id: tilePreviewOverlay
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
+                            anchors.margins: 4
+                            spacing: 4
 
-                            parent: eventGrid.tileController.hoveredTile
-                                && eventGrid.tileController.hoveredTile.overlayContainer
-
-                            anchors.fill: parent || undefined
-                            visible: parent
-                                && eventGrid.tileController.hoveredTile
-                                && eventGrid.tileController.hoveredTile.hovered
-                                && !showPreview
-
-                            Column
+                            TileOverlayButton
                             {
-                                anchors.right: parent.right
-                                anchors.bottom: parent.bottom
-                                anchors.margins: 4
-                                spacing: 4
+                                id: showOnLayoutButton
 
-                                TileOverlayButton
-                                {
-                                    id: showOnLayoutButton
-
-                                    icon.source: "image://skin/20x20/Solid/show_on_layout.svg"
-                                    accent: true
-                                }
+                                icon.source: "image://skin/20x20/Solid/show_on_layout.svg"
+                                accent: true
                             }
                         }
+                    }
 
-                        PersistentIndexWatcher
+                    PersistentIndexWatcher
+                    {
+                        id: selection
+                    }
+
+                    Connections
+                    {
+                        target: selection.index.model
+
+                        function onDataChanged(topLeft, bottomRight)
                         {
-                            id: selection
+                            const selectedRow = selection.index.row
+                            if (selectedRow < topLeft.row || selectedRow > bottomRight.row)
+                                return
+
+                            previewPanel.update()
                         }
+                    }
 
-                        Connections
+                    ModelDataAccessor
+                    {
+                        id: accessor
+                        model: eventGrid.model
+                    }
+
+                    readonly property real availableWidth: width - leftMargin - rightMargin
+
+                    readonly property int numColumns: Math.floor(
+                        availableWidth / (Metrics.kMinimumTileWidth + columnSpacing))
+
+                    readonly property int rowsPerPage:
+                        Math.floor((height - topMargin - bottomMargin) / cellHeight)
+
+                    columnWidth: (availableWidth / numColumns) - columnSpacing
+
+                    model: eventModel
+
+                    Shortcut
+                    {
+                        sequence: "Home"
+                        enabled: eventGrid.count > 0 && showPreview
+
+                        onActivated:
+                            selection.index = eventModel.index(0, 0)
+                    }
+
+                    Shortcut
+                    {
+                        sequence: "End"
+                        enabled: eventGrid.count > 0 && showPreview
+
+                        onActivated:
+                            selection.index = eventModel.index(eventModel.rowCount() - 1, 0)
+                    }
+
+                    Shortcut
+                    {
+                        sequence: "Left"
+                        enabled: eventGrid.count > 0 && selection.index.valid && showPreview
+
+                        onActivated:
                         {
-                            target: selection.index.model
-
-                            function onDataChanged(topLeft, bottomRight)
-                            {
-                                const selectedRow = selection.index.row
-                                if (selectedRow < topLeft.row || selectedRow > bottomRight.row)
-                                    return
-
-                                previewPanel.update()
-                            }
+                            const newRow = Math.max(selection.index.row - 1, 0)
+                            selection.index = eventModel.index(newRow, 0)
                         }
+                    }
 
-                        ModelDataAccessor
+                    Shortcut
+                    {
+                        sequence: "Right"
+                        enabled: eventGrid.count > 0 && selection.index.valid && showPreview
+
+                        onActivated:
                         {
-                            id: accessor
-                            model: eventGrid.model
+                            const newRow = Math.min(selection.index.row + 1, eventModel.rowCount() - 1)
+                            selection.index = eventModel.index(newRow, 0)
                         }
+                    }
 
-                        readonly property real availableWidth: width - leftMargin - rightMargin
+                    Shortcut
+                    {
+                        sequence: "Up"
+                        enabled: eventGrid.count > 0 && selection.index.valid && showPreview
 
-                        readonly property int numColumns: Math.floor(
-                            availableWidth / (Metrics.kMinimumTileWidth + columnSpacing))
-
-                        readonly property int rowsPerPage:
-                            Math.floor((height - topMargin - bottomMargin) / cellHeight)
-
-                        columnWidth: (availableWidth / numColumns) - columnSpacing
-
-                        model: eventModel
-
-                        Shortcut
+                        onActivated:
                         {
-                            sequence: "Home"
-                            enabled: eventGrid.count > 0 && showPreview
-
-                            onActivated:
-                                selection.index = eventModel.index(0, 0)
-                        }
-
-                        Shortcut
-                        {
-                            sequence: "End"
-                            enabled: eventGrid.count > 0 && showPreview
-
-                            onActivated:
-                                selection.index = eventModel.index(eventModel.rowCount() - 1, 0)
-                        }
-
-                        Shortcut
-                        {
-                            sequence: "Left"
-                            enabled: eventGrid.count > 0 && selection.index.valid && showPreview
-
-                            onActivated:
-                            {
-                                const newRow = Math.max(selection.index.row - 1, 0)
+                            const newRow = selection.index.row -
+                                (tileView ? eventGrid.numColumns : 1)
+                            if (newRow >= 0)
                                 selection.index = eventModel.index(newRow, 0)
-                            }
                         }
+                    }
 
-                        Shortcut
+                    Shortcut
+                    {
+                        sequence: "Down"
+                        enabled: eventGrid.count > 0 && selection.index.valid && showPreview
+
+                        onActivated:
                         {
-                            sequence: "Right"
-                            enabled: eventGrid.count > 0 && selection.index.valid && showPreview
-
-                            onActivated:
-                            {
-                                const newRow = Math.min(selection.index.row + 1, eventModel.rowCount() - 1)
+                            const newRow = selection.index.row +
+                                (tileView ? eventGrid.numColumns : 1)
+                            if (newRow < eventModel.rowCount())
                                 selection.index = eventModel.index(newRow, 0)
-                            }
                         }
+                    }
 
-                        Shortcut
+                    Shortcut
+                    {
+                        sequence: "PgUp"
+                        enabled: eventGrid.count > 0 && selection.index.valid && showPreview
+
+                        onActivated:
                         {
-                            sequence: "Up"
-                            enabled: eventGrid.count > 0 && selection.index.valid && showPreview
-
-                            onActivated:
-                            {
-                                const newRow = selection.index.row -
-                                    (tileView ? eventGrid.numColumns : 1)
-                                if (newRow >= 0)
-                                    selection.index = eventModel.index(newRow, 0)
-                            }
+                            const rowsToSkip = tileView
+                                ? eventGrid.rowsPerPage * eventGrid.numColumns
+                                : tableView.rowsPerPage
+                            const newRow = Math.max(0, selection.index.row - rowsToSkip)
+                            selection.index = eventModel.index(newRow, 0)
                         }
+                    }
 
-                        Shortcut
+                    Shortcut
+                    {
+                        sequence: "PgDown"
+                        enabled: eventGrid.count > 0 && selection.index.valid && showPreview
+
+                        onActivated:
                         {
-                            sequence: "Down"
-                            enabled: eventGrid.count > 0 && selection.index.valid && showPreview
-
-                            onActivated:
-                            {
-                                const newRow = selection.index.row +
-                                    (tileView ? eventGrid.numColumns : 1)
-                                if (newRow < eventModel.rowCount())
-                                    selection.index = eventModel.index(newRow, 0)
-                            }
+                            const rowsToSkip = tileView
+                                ? eventGrid.rowsPerPage * eventGrid.numColumns
+                                : tableView.rowsPerPage
+                            const newRow = Math.min(eventModel.rowCount() - 1,
+                                selection.index.row + rowsToSkip)
+                            selection.index = eventModel.index(newRow, 0)
                         }
+                    }
 
-                        Shortcut
-                        {
-                            sequence: "PgUp"
-                            enabled: eventGrid.count > 0 && selection.index.valid && showPreview
+                    Shortcut
+                    {
+                        sequences: ["Up", "Down", "Left", "Right", "PgUp", "PgDown"]
+                        enabled: eventGrid.count > 0 && !selection.index.valid
 
-                            onActivated:
-                            {
-                                const rowsToSkip = tileView
-                                    ? eventGrid.rowsPerPage * eventGrid.numColumns
-                                    : tableView.rowsPerPage
-                                const newRow = Math.max(0, selection.index.row - rowsToSkip)
-                                selection.index = eventModel.index(newRow, 0)
-                            }
-                        }
-
-                        Shortcut
-                        {
-                            sequence: "PgDown"
-                            enabled: eventGrid.count > 0 && selection.index.valid && showPreview
-
-                            onActivated:
-                            {
-                                const rowsToSkip = tileView
-                                    ? eventGrid.rowsPerPage * eventGrid.numColumns
-                                    : tableView.rowsPerPage
-                                const newRow = Math.min(eventModel.rowCount() - 1,
-                                    selection.index.row + rowsToSkip)
-                                selection.index = eventModel.index(newRow, 0)
-                            }
-                        }
-
-                        Shortcut
-                        {
-                            sequences: ["Up", "Down", "Left", "Right", "PgUp", "PgDown"]
-                            enabled: eventGrid.count > 0 && !selection.index.valid
-
-                            onActivated:
-                                selection.index = eventModel.index(0, 0)
-                        }
+                        onActivated:
+                            selection.index = eventModel.index(0, 0)
                     }
                 }
 
