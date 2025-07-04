@@ -346,9 +346,8 @@ bool SystemContext::hasViewBookmarksPermission()
 bool SystemContext::hasSearchObjectsPermission()
 {
     const auto server = currentServer();
-    return server
-        && server->getVersion() >= kObjectSearchMinimalSupportVersion
-        && accessController()->isDeviceAccessRelevant(nx::vms::api::AccessRight::viewArchive);
+    return accessController()->isDeviceAccessRelevant(nx::vms::api::AccessRight::viewArchive)
+        && (!server || server->getVersion() >= kObjectSearchMinimalSupportVersion);
 }
 
 nx::client::mobile::EventRulesWatcher* SystemContext::eventRulesWatcher() const

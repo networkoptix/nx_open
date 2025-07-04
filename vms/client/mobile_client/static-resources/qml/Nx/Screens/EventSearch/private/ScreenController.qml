@@ -35,8 +35,12 @@ NxObject
 
     function requestUpdate(direction)
     {
-        if (!view || controller.searchModel.fetchInProgress())
+        if (!view
+            || controller.searchModel.fetchInProgress()
+            || !windowContext.sessionManager.hasConnectedSession)
+        {
             return
+        }
 
         if (direction === EventSearch.FetchDirection.newer
             || direction === EventSearch.FetchDirection.older)
