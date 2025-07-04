@@ -681,15 +681,15 @@
     </message>
     <message>
       <source>No Cameras</source>
-      <translation type="unfinished">No Cameras</translation>
+      <translation>Inga kameror</translation>
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this layout</source>
-      <translation type="unfinished">We didn&apos;t find any cameras on this layout</translation>
+      <translation>Vi hittade inga kameror på den här layouten</translation>
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
-      <translation type="unfinished">We didn&apos;t find any cameras on this site. You can add them in our desktop application</translation>
+      <translation>Vi kunde inte hitta några kameror på denna plats. Du kan lägga till dem i vårt stationära program</translation>
     </message>
   </context>
   <context>

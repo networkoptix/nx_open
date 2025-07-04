@@ -681,7 +681,7 @@
     </message>
     <message>
       <source>No Cameras</source>
-      <translation type="unfinished">No Cameras</translation>
+      <translation>Ingen kameraer</translation>
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this layout</source>
@@ -689,7 +689,7 @@
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
-      <translation type="unfinished">We didn&apos;t find any cameras on this site. You can add them in our desktop application</translation>
+      <translation>Vi fant ingen kameraer på dette systemet. Du kan legge de til i skrivebordsprogrammet</translation>
     </message>
   </context>
   <context>

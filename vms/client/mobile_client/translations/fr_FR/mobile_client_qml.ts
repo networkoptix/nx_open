@@ -681,7 +681,7 @@
     </message>
     <message>
       <source>No Cameras</source>
-      <translation type="unfinished">No Cameras</translation>
+      <translation>Pas de caméras</translation>
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this layout</source>

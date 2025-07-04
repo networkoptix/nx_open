@@ -683,15 +683,15 @@
     </message>
     <message>
       <source>No Cameras</source>
-      <translation type="unfinished">No Cameras</translation>
+      <translation>Brak kamer</translation>
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this layout</source>
-      <translation type="unfinished">We didn&apos;t find any cameras on this layout</translation>
+      <translation>Nie znaleźliśmy żadnych kamer w tym układzie</translation>
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
-      <translation type="unfinished">We didn&apos;t find any cameras on this site. You can add them in our desktop application</translation>
+      <translation>Nie znaleźliśmy żadnych kamer na tej stronie. Możesz je dodać w naszej aplikacji desktopowej</translation>
     </message>
   </context>
   <context>

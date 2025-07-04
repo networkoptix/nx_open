@@ -680,7 +680,7 @@
     </message>
     <message>
       <source>No Cameras</source>
-      <translation type="unfinished">No Cameras</translation>
+      <translation>카메라가 없습니다.</translation>
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this layout</source>
