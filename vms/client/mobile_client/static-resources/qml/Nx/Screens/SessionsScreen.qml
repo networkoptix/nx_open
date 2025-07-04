@@ -335,12 +335,12 @@ Page
                 }
             }
 
-            function updateCheckedState()
+            function updateCheckedState(force)
             {
-                if (organizationsModel.topLevelLoading)
+                if (organizationsModel.topLevelLoading && !force)
                     return
 
-                if (!systemTabs.visible)
+                if (!systemTabs.visible && !force)
                 {
                     // If no tabs are going to be visible, select the Sites tab.
                     if (!organizationsModel.hasChannelPartners
@@ -352,7 +352,7 @@ Page
                 }
 
                 // Avoid switching tabs when selected tab is already visible.
-                if (tabGroup.checkedButton?.visible)
+                if (tabGroup.checkedButton?.visible && !force)
                     return
 
                 // Select appropriate tab based on the current state.
@@ -377,12 +377,20 @@ Page
             {
                 target: organizationsModel
                 function onTopLevelLoadingChanged() { systemTabs.updateCheckedState() }
+                function onHasChannelPartnersChanged()
+                {
+                    systemTabs.updateCheckedState(/*force*/ organizationsModel.hasChannelPartners)
+                }
+                function onHasOrganizationsChanged()
+                {
+                    systemTabs.updateCheckedState(/*force*/ organizationsModel.hasOrganizations)
+                }
             }
 
             Connections
             {
                 target: cloudUserProfileWatcher
-                function onIsOrgUserChanged() { systemTabs.updateCheckedState() }
+                function onIsOrgUserChanged() { systemTabs.updateCheckedState(/*force*/ true) }
             }
 
             Connections
