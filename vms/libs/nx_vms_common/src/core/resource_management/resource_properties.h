@@ -35,7 +35,7 @@ public:
     bool hasProperty(const QString& key, const QString& value) const;
     nx::vms::api::ResourceParamDataList allProperties(const nx::Uuid& resourceId) const;
     nx::vms::api::ResourceParamWithRefDataList allProperties() const;
-    QMap<QString, QString> modifiedProperties(const nx::Uuid& resourceId) const;
+    std::unordered_map<QString, QString> modifiedProperties(const nx::Uuid& resourceId) const;
 
     /**
      * Mark all params for resource as unsaved
@@ -44,25 +44,29 @@ public:
         const nx::Uuid& resourceId,
         nx::utils::MoveOnlyFunc<bool(const QString& paramName, const QString& paramValue)> filter = nullptr);
 
-    QHash<nx::Uuid, QSet<QString> > allPropertyNamesByResource() const;
+    QHash<nx::Uuid, QSet<QString>> allPropertyNamesByResource() const;
 
     void clear();
     void clear(const QVector<nx::Uuid>& idList);
+
 public slots:
     bool on_resourceParamRemoved(const nx::Uuid& resourceId, const QString& key);
+
 signals:
     void asyncSaveDone(int recId, ec2::ErrorCode);
     void propertyChanged(const nx::Uuid& resourceId, const QString& key);
     void propertyRemoved(const nx::Uuid& resourceId, const QString& key);
+
 private:
     void onRequestDone(int reqID, ec2::ErrorCode errorCode);
     void fromModifiedDataToSavedData(
         const nx::Uuid& resourceId,
         nx::vms::api::ResourceParamWithRefDataList& outData);
     int saveData(const nx::vms::api::ResourceParamWithRefDataList&& data);
+
 private:
-    using QnResourcePropertyList = QMap<QString, QString>;
-    QMap<nx::Uuid, QnResourcePropertyList> m_items;
-    QMap<nx::Uuid, QnResourcePropertyList> m_modifiedItems;
-    mutable nx::Mutex m_mutex;
+    using QnResourcePropertyList = std::unordered_map<QString, QString>;
+    std::unordered_map<nx::Uuid, QnResourcePropertyList> m_items;
+    std::unordered_map<nx::Uuid, QnResourcePropertyList> m_modifiedItems;
+    mutable nx::ReadWriteLock m_readWriteLock;
 };
