@@ -76,8 +76,11 @@ ListView
 
         onMouseWheel: (wheel) =>
         {
-            // TODO: implement pixel scrolling for high precision touchpads.
-            scrollBar.scrollBySteps(gearbox.transform(-wheel.angleDelta.y / 120.0))
+            if (!listView.contentHeight)
+                return;
+
+            scrollBar.scrollBy(-gearbox.pixelDelta(wheel, listView.scrollStepSize || 20)
+                / listView.contentHeight)
         }
     }
 }
