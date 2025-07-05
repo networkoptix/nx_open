@@ -1,8 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.0
+import QtQml
+import QtQuick
 
-import Nx.Controls 1.0
+import Nx.Controls
 
 import "private"
 
@@ -21,6 +22,7 @@ Item
     property Item contentItem
 
     property int pixelsPerLine: 20 // Default value in Qt, originally comes from QTextEdit.
+    property int scrollLines: Qt.styleHints.wheelScrollLines
 
     // Allow custom content resize when vertical ScrollBar appears.
     property int scrollBarWidth: scrollView.ScrollBar.vertical.visible
@@ -86,7 +88,6 @@ Item
                 const maxY = (flickable.originY + flickable.bottomMargin
                     + flickable.contentHeight) - flickable.height
 
-
                 const newContentY = Math.max(minY, Math.min(maxY, flickable.contentY - pixelDelta))
                 const accepted = flickable.contentY != newContentY
                 flickable.contentY = newContentY
@@ -107,18 +108,7 @@ Item
         onWheel: (wheel) =>
         {
             wheel.accepted = flickable.contentHeight > flickable.height
-                && flickable.scrollContentY(wheel.pixelDelta.y
-                    || gearbox.transform(getPixelDelta(wheel)))
-        }
-
-        function getPixelDelta(wheel)
-        {
-            // Standard mouse values.
-            const kUnitsPerDegree = 8
-            const kDegreesPerStep = 15.0
-
-            const degrees = wheel.angleDelta.y / kUnitsPerDegree
-            return Qt.styleHints.wheelScrollLines * pixelsPerLine * (degrees / kDegreesPerStep)
+                && flickable.scrollContentY(gearbox.pixelDelta(wheel, scrollLines * pixelsPerLine))
         }
     }
 }

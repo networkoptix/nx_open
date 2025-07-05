@@ -151,8 +151,11 @@ GridView
 
         onWheel: (wheel) =>
         {
-            // TODO: imlement pixel scrolling for high precision touchpads.
-            scrollBar.scrollBySteps(gearbox.transform(-wheel.angleDelta.y / 120.0))
+            if (!view.contentHeight)
+                return;
+
+            scrollBar.scrollBy(-gearbox.pixelDelta(wheel, /*pixelsPer15DegreeStep*/ 20)
+                / view.contentHeight)
         }
     }
 
