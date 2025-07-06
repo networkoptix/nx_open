@@ -352,6 +352,7 @@ Item
 
         parent: flick
         anchors.fill: parent
+        enabled: control.interactive
 
         MouseArea
         {
@@ -359,6 +360,7 @@ Item
 
             propagateComposedEvents: true
             anchors.fill: parent
+            enabled: control.interactive
         }
     }
 
