@@ -120,6 +120,7 @@ Item
                 doubleTapStartCheckFuncion: function() { return true }
 
                 onClicked: control.clicked()
+
                 CameraDisplay
                 {
                     id: cameraDisplay
