@@ -41,11 +41,10 @@ CameraTimeHelper::CameraTimeHelper(
 void CameraTimeHelper::setTimePolicy(TimePolicy policy)
 {
     m_timePolicy = policy;
-}
 
-void CameraTimeHelper::resetBadCameraTimeState()
-{
-    m_badCameraTimeState = false;
+    // Reset bad camera state if "Trust camera time" re-enabled.
+    if (m_timePolicy == TimePolicy::useCameraTimeIfCorrect)
+        m_badCameraTimeState = false;
 }
 
 void CameraTimeHelper::reset()
@@ -128,10 +127,9 @@ microseconds CameraTimeHelper::getTime(
                 getName(), cameraTime.count() / 1000, currentTime.count() / 1000,
                 (cameraTime - currentTime).count() / 1000);
             if (isPrimaryStream)
-            {
                 callback(EventType::BadCameraTime);
-                m_badCameraTimeState = true;
-            }
+
+            m_badCameraTimeState = true;
         }
     }
 
