@@ -9,7 +9,9 @@ import nx.vms.client.core.analytics
  */
 NameValueTable
 {
-    property list<DisplayedAttribute> attributes
+    // For some reason with a typed list property a `Binding` to it causes a crash in Qt 6.9.1,
+    // so it's just `var` as a workaround.
+    property /*list<DisplayedAttribute>*/ var attributes
 
     items: attributes
     nameRole: "displayedName"
