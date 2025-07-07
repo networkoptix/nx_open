@@ -7,8 +7,6 @@
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 
 #include <nx/utils/log/assert.h>
-#include <ui/common/weak_graphics_item_pointer.h>
-#include <ui/common/weak_pointer.h>
 
 namespace {
 

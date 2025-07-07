@@ -1422,9 +1422,13 @@ void QnWorkbenchController::at_motionRegionSelected(
     widget->addToMotionSelection(region);
 }
 
-void QnWorkbenchController::at_item_leftPressed(QGraphicsView *view, QGraphicsItem *item, ClickInfo info)
+void QnWorkbenchController::at_item_leftPressed(
+    QGraphicsView* /*view*/,
+    QGraphicsItem* item,
+    ClickInfo info)
 {
-    Q_UNUSED(view)
+    if (!item)
+        return;
 
     if (info.modifiers != 0)
         return;
@@ -1445,10 +1449,13 @@ void QnWorkbenchController::at_item_leftPressed(QGraphicsView *view, QGraphicsIt
 }
 
 void QnWorkbenchController::at_item_leftClicked(
-    QGraphicsView*,
+    QGraphicsView* /*view*/,
     QGraphicsItem* item,
     ClickInfo info)
 {
+    if (!item)
+        return;
+
     if (info.modifiers != Qt::NoModifier)
         return;
 
@@ -1468,6 +1475,9 @@ void QnWorkbenchController::at_item_rightClicked(
     QGraphicsItem* item,
     ClickInfo /*info*/)
 {
+    if (!item)
+        return;
+
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : nullptr;
     if(widget == nullptr)
         return;
@@ -1486,6 +1496,9 @@ void QnWorkbenchController::at_item_middleClicked(
     QGraphicsItem* item,
     ClickInfo /*info*/)
 {
+    if (!item)
+        return;
+
     if (tourIsRunning(windowContext()))
         return;
 
@@ -1501,10 +1514,13 @@ void QnWorkbenchController::at_item_middleClicked(
 }
 
 void QnWorkbenchController::at_item_doubleClicked(
-    QGraphicsView*,
+    QGraphicsView* /*view*/,
     QGraphicsItem* item,
     ClickInfo info)
 {
+    if (!item)
+        return;
+
     if (info.modifiers.testFlag(Qt::KeyboardModifier::ShiftModifier))
         return;
 
@@ -1519,8 +1535,11 @@ void QnWorkbenchController::at_item_doubleClicked(
     at_resourceWidget_doubleClicked(resourceWidget);
 }
 
-void QnWorkbenchController::at_resourceWidget_doubleClicked(QnResourceWidget *widget)
+void QnWorkbenchController::at_resourceWidget_doubleClicked(QnResourceWidget* widget)
 {
+    if (!widget)
+        return;
+
     mainWindow()->scene()->clearSelection();
     widget->setSelected(true);
 
@@ -1567,6 +1586,9 @@ void QnWorkbenchController::at_resourceWidget_doubleClicked(QnResourceWidget *wi
 
 void QnWorkbenchController::at_scene_clicked(QGraphicsView* view, ClickInfo info)
 {
+    if (!view)
+        return;
+
     if (!NX_ASSERT(workbench()))
         return;
 

@@ -8,53 +8,79 @@
 #include <QtCore/QVector>
 #include <QtCore/QWeakPointer>
 
+#include <nx/utils/log/assert.h>
+
 class QGraphicsItem;
 
 /**
  * This class presents functionality similar to that of a <tt>QWeakPointer</tt>,
  * but also works for non-<tt>QObject</tt> derived <tt>QGraphicsItem</tt>s.
  */
-class WeakGraphicsItemPointer {
+class WeakGraphicsItemPointer
+{
 public:
     WeakGraphicsItemPointer();
 
-    WeakGraphicsItemPointer(const WeakGraphicsItemPointer &other);
+    WeakGraphicsItemPointer(const WeakGraphicsItemPointer& other);
 
-    WeakGraphicsItemPointer(QGraphicsItem *item);
+    WeakGraphicsItemPointer(QGraphicsItem* item);
 
     ~WeakGraphicsItemPointer();
 
-    WeakGraphicsItemPointer &operator=(const WeakGraphicsItemPointer &other) {
+    WeakGraphicsItemPointer& operator=(const WeakGraphicsItemPointer& other)
+    {
         this->~WeakGraphicsItemPointer();
         new (this) WeakGraphicsItemPointer(other);
         return *this;
     }
 
-    WeakGraphicsItemPointer &operator=(QGraphicsItem *item) {
+    WeakGraphicsItemPointer& operator=(QGraphicsItem* item)
+    {
         this->~WeakGraphicsItemPointer();
         new (this) WeakGraphicsItemPointer(item);
         return *this;
     }
 
-    bool isNull() const {
+    bool isNull() const
+    {
         return m_guard.isNull();
     }
 
-    QGraphicsItem *data() const {
+    QGraphicsItem* data() const
+    {
         return isNull() ? nullptr : m_item;
     }
 
-    operator bool() const {
+    operator bool() const
+    {
         return !isNull();
     }
 
-    bool operator!() const {
+    bool operator!() const
+    {
         return isNull();
     }
 
-    void clear() {
+    void clear()
+    {
         m_guard.clear();
         m_item = nullptr;
+    }
+
+    operator QGraphicsItem*() const
+    {
+        return isNull() ? nullptr : m_item;
+    }
+
+    QGraphicsItem& operator*() const
+    {
+        NX_ASSERT(!isNull());
+        return *m_item;
+    }
+
+    QGraphicsItem* operator->() const
+    {
+        return isNull() ? nullptr : m_item;
     }
 
 private:
@@ -63,14 +89,15 @@ private:
 };
 
 
-class WeakGraphicsItemPointerList: public QVector<WeakGraphicsItemPointer> {
+class WeakGraphicsItemPointerList: public QVector<WeakGraphicsItemPointer>
+{
     typedef QVector<WeakGraphicsItemPointer> base_type;
 
 public:
     WeakGraphicsItemPointerList() {}
     WeakGraphicsItemPointerList(int size): base_type(size) {}
-    WeakGraphicsItemPointerList(int size, const WeakGraphicsItemPointer &value): base_type(size, value) {}
-    WeakGraphicsItemPointerList(const QList<QGraphicsItem *> &items);
+    WeakGraphicsItemPointerList(int size, const WeakGraphicsItemPointer& value): base_type(size, value) {}
+    WeakGraphicsItemPointerList(const QList<QGraphicsItem*>& items);
 
     /**
      * Compressed this list by removing all null items.
@@ -87,19 +114,19 @@ public:
      *                                  excluding null items and items that were already
      *                                  destroyed.
      */
-    QList<QGraphicsItem *> materialized() const;
+    QList<QGraphicsItem*> materialized() const;
 
     using base_type::indexOf;
     using base_type::lastIndexOf;
     using base_type::contains;
 
-    int indexOf(QGraphicsItem *value, int from = 0) const;
+    int indexOf(QGraphicsItem* value, int from = 0) const;
 
-    int lastIndexOf(QGraphicsItem *value, int from = -1) const;
+    int lastIndexOf(QGraphicsItem* value, int from = -1) const;
 
-    bool contains(QGraphicsItem *value) const;
+    bool contains(QGraphicsItem* value) const;
 
-    int removeAll(QGraphicsItem *value);
+    int removeAll(QGraphicsItem* value);
 
     bool removeOne(QGraphicsItem *value);
 };
