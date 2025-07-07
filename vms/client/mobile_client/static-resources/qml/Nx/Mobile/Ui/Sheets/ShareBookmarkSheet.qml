@@ -21,6 +21,55 @@ BottomSheet
         ? qsTr("New Bookmark")
         : qsTr("Sharing")
 
+    function showSheet()
+    {
+        d.updating = true
+        d.hasChanges = false
+
+        const animationDuration = enableSharingToggle.animationDuration
+        enableSharingToggle.animationDuration = 0
+
+        backend.resetBookmarkData()
+
+        enableSharingToggle.visible = backend.isShared || backend.isExpired
+
+        let expiresInModel = [
+            {text: qsTr("Expires in an hour"), expires: ShareBookmarkBackend.ExpiresIn.Hour},
+            {text: qsTr("Expires in a day"), expires: ShareBookmarkBackend.ExpiresIn.Day},
+            {text: qsTr("Expires in a month"), expires: ShareBookmarkBackend.ExpiresIn.Month},
+            {text: qsTr("Never expires"), expires: ShareBookmarkBackend.ExpiresIn.Never}]
+
+        let currentIndex = 1
+
+        if (backend.isShared)
+        {
+            if (backend.isNeverExpires())
+            {
+                currentIndex = 3
+            }
+            else
+            {
+                currentIndex = 0
+                expiresInModel.unshift(
+                    {text: backend.expiresInText(), expires: backend.expirationTimeMs})
+            }
+        }
+
+        lifetimeComboBox.model = expiresInModel
+        lifetimeComboBox.currentIndex = currentIndex
+
+        bookmarkDescriptionTextArea.text = backend.bookmarkDescription
+        shareLinkOptionsText.text = qsTr("Shared link options")
+
+        sharePasswordInput.resetState(/*hasSecretValue*/ !!backend.bookmarkDigest);
+
+        enableSharingToggle.animationDuration = animationDuration
+
+        d.updating = false
+
+        open()
+    }
+
     IconButton
     {
         id: infoButton
@@ -200,53 +249,6 @@ BottomSheet
 
                 sheet.close()
             }
-    }
-
-    onOpened:
-    {
-        d.updating = true
-        d.hasChanges = false
-
-        const animationDuration = enableSharingToggle.animationDuration
-        enableSharingToggle.animationDuration = 0
-
-        backend.resetBookmarkData()
-
-        enableSharingToggle.visible = backend.isShared || backend.isExpired
-
-        let expiresInModel = [
-            {text: qsTr("Expires in an hour"), expires: ShareBookmarkBackend.ExpiresIn.Hour},
-            {text: qsTr("Expires in a day"), expires: ShareBookmarkBackend.ExpiresIn.Day},
-            {text: qsTr("Expires in a month"), expires: ShareBookmarkBackend.ExpiresIn.Month},
-            {text: qsTr("Never expires"), expires: ShareBookmarkBackend.ExpiresIn.Never}]
-
-        let currentIndex = 1
-
-        if (backend.isShared)
-        {
-            if (backend.isNeverExpires())
-            {
-                currentIndex = 3
-            }
-            else
-            {
-                currentIndex = 0
-                expiresInModel.unshift(
-                    {text: backend.expiresInText(), expires: backend.expirationTimeMs})
-            }
-        }
-
-        lifetimeComboBox.model = expiresInModel
-        lifetimeComboBox.currentIndex = currentIndex
-
-        bookmarkDescriptionTextArea.text = backend.bookmarkDescription
-        shareLinkOptionsText.text = qsTr("Shared link options")
-
-        sharePasswordInput.resetState(/*hasSecretValue*/ !!backend.bookmarkDigest);
-
-        enableSharingToggle.animationDuration = animationDuration
-
-        d.updating = false
     }
 
     NxObject

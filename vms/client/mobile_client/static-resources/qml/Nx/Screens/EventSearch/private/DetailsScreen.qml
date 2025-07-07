@@ -83,7 +83,7 @@ Page
             onContinued:
             {
                 appContext.settings.showHowShareWorksNotification = !doNotShowAgain
-                shareBookmarkSheet.open()
+                shareBookmarkSheet.showSheet()
             }
         }
 
@@ -92,7 +92,7 @@ Page
             if (appContext.settings.showHowShareWorksNotification && isAnalyticsDetails)
                 howItWorksSheet.open()
             else
-                shareBookmarkSheet.open()
+                shareBookmarkSheet.showSheet()
         }
     }
 
