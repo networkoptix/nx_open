@@ -575,13 +575,22 @@ struct OrganizationsModel::Private
 
     void clearCloudData();
 
-    void notifyNodeUpdate(const TreeNode* node, const QList<int>& roles = {})
+    void notifyNodeUpdate(
+        const TreeNode* node,
+        const QList<int>& roles = {},
+        bool recursively = false)
     {
         if (!node)
             return;
 
         const auto index = q->createIndex(node->row(), 0, node);
         q->dataChanged(index, index, roles);
+
+        if (recursively)
+        {
+            for (const auto& child: node->allChildren())
+                notifyNodeUpdate(child.get(), roles, recursively);
+        }
     }
 
     void updateNodeAccess(TreeNode* node, bool accessible)
@@ -706,7 +715,7 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
             return {};
 
         if (role == SectionRole)
-            return kSites;
+            return (d->hasChannelPartners || d->hasOrganizations) ? kSites : "";
 
         if (index.parent() != d->sitesRoot())
             return {};
@@ -1315,6 +1324,12 @@ void OrganizationsModel::setSystemsModel(QAbstractProxyModel* systemsModel)
 
     if (d->proxyModelCount > 0)
         emit dataChanged(index(0, 0, sitesRoot), index(d->proxyModelCount - 1, 0, sitesRoot));
+
+    connect(this, &OrganizationsModel::hasChannelPartnersChanged, this,
+        [this]() { d->notifyNodeUpdate(d->root.get(), {SectionRole}, /*recursively*/ true); });
+
+    connect(this, &OrganizationsModel::hasOrganizationsChanged, this,
+        [this]() { d->notifyNodeUpdate(d->root.get(), {SectionRole}, /*recursively*/ true); });
 }
 
 OrganizationsFilterModel::OrganizationsFilterModel(QObject* parent): base_type(parent)
