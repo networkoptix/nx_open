@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <ui/common/weak_pointer.h>
+
 #include "click_info.h"
 #include "drag_processing_instrument.h"
 
@@ -41,13 +43,14 @@ signals:
      * @param item Item that was clicked.
      * @param info Additional click information.
      */
-    void itemPressed(QGraphicsView* view, QGraphicsItem *item, ClickInfo info);
-    void itemClicked(QGraphicsView* view, QGraphicsItem *item, ClickInfo info);
-    void itemDoubleClicked(QGraphicsView* view, QGraphicsItem *item, ClickInfo info);
+    void itemPressed(QPointer<QGraphicsView> view, WeakPointer<QGraphicsItem> item, ClickInfo info);
+    void itemClicked(QPointer<QGraphicsView> view, WeakPointer<QGraphicsItem> item, ClickInfo info);
+    void itemDoubleClicked(
+        QPointer<QGraphicsView> view, WeakPointer<QGraphicsItem> item, ClickInfo info);
 
-    void scenePressed(QGraphicsView* view, ClickInfo info);
-    void sceneClicked(QGraphicsView* view, ClickInfo info);
-    void sceneDoubleClicked(QGraphicsView* view, ClickInfo info);
+    void scenePressed(QPointer<QGraphicsView> view, ClickInfo info);
+    void sceneClicked(QPointer<QGraphicsView> view, ClickInfo info);
+    void sceneDoubleClicked(QPointer<QGraphicsView> view, ClickInfo info);
 
 protected:
     virtual void timerEvent(QTimerEvent *event) override;

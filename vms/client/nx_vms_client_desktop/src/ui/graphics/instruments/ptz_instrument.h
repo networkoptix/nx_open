@@ -68,7 +68,7 @@ signals:
     void ptzFinished(QnMediaResourceWidget* widget);
     void ptzProcessFinished(QnMediaResourceWidget* widget);
 
-    void doubleClicked(QnMediaResourceWidget* widget);
+    void doubleClicked(QPointer<QnMediaResourceWidget> widget);
 
 protected:
     virtual void installedNotify() override;
