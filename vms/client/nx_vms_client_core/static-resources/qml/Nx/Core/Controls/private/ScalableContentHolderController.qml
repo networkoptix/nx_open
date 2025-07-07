@@ -82,6 +82,17 @@ NxObject
             flickable.resizeContent(initialWidth * targetScale, initialHeight * targetScale, Qt.point(cx, cy))
         }
 
+        Binding
+        {
+            id: cancelTouchActionWorkaround
+
+            when: false
+            restoreMode: Binding.RestoreBindingOrValue
+
+            controller.pinchArea.enabled: false
+            controller.flickable.enabled: false
+        }
+
         Connections
         {
             target: pinchArea
@@ -94,7 +105,15 @@ NxObject
 
             function onPinchUpdated(pinch)
             {
-                pinchAreaHandler.updatePinch(pinch.center, pinch.previousCenter, pinch.scale)
+                if (pinch.pointCount > 1)
+                {
+                    pinchAreaHandler.updatePinch(pinch.center, pinch.previousCenter, pinch.scale)
+                    return
+                }
+
+                cancelTouchActionWorkaround.when = true
+                pinchAreaHandler.finishPinch()
+                cancelTouchActionWorkaround.when = false
             }
 
             function onPinchFinished()
