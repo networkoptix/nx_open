@@ -222,8 +222,8 @@ struct OrganizationsModel::Private
     OrganizationsModel* const q;
 
     QPointer<CloudStatusWatcher> statusWatcher;
-    QPointer<QAbstractProxyModel> proxyModel; //< Goes under special 'Sites' node.
-    int proxyModelCount = 0;
+    QPointer<QAbstractItemModel> sitesModel; //< Goes under special 'Sites' node.
+    int sitesModelRowCount = 0;
     nx::utils::ScopedConnections connections;
 
     bool hasChannelPartners = false;
@@ -300,6 +300,12 @@ struct OrganizationsModel::Private
 
     void setChannelPartners(const ChannelPartnerList& data)
     {
+        auto runAtScopeExit = nx::utils::ScopeGuard(
+            [this, empty = data.results.empty()]()
+            {
+                setHasChannelPartners(!empty);
+            });
+
         std::unordered_set<nx::Uuid> prevIds;
         for (const auto& node: root->allChildren())
         {
@@ -339,6 +345,13 @@ struct OrganizationsModel::Private
 
     void setOrganizations(const OrganizationList& data, nx::Uuid parentId)
     {
+        auto runAtScopeExit = nx::utils::ScopeGuard(
+            [this, parentId, empty = data.results.empty()]()
+            {
+                if (parentId == root->id)
+                    setHasOrganizations(!empty);
+            });
+
         // Either channel partner or root node.
         auto parent = nodes.find(parentId);
         if (!parent)
@@ -523,7 +536,7 @@ struct OrganizationsModel::Private
 
     QModelIndex mapFromProxyModel(const QModelIndex& index) const
     {
-        if (!proxyModel)
+        if (!sitesModel)
             return {};
 
         return q->index(index.row(), index.column(), sitesRoot());
@@ -531,7 +544,7 @@ struct OrganizationsModel::Private
 
     QModelIndex mapToProxyModel(const QModelIndex& index) const
     {
-        return proxyModel->index(index.row(), index.column());
+        return sitesModel->index(index.row(), index.column());
     }
 
     void setTopLevelLoading(bool loading)
@@ -545,23 +558,23 @@ struct OrganizationsModel::Private
 
     void beginSitesReset()
     {
-        const int prevRowCount = proxyModel->rowCount();
+        const int prevRowCount = sitesModel->rowCount();
         if (prevRowCount == 0)
             return;
 
         q->beginRemoveRows(sitesRoot(), 0, prevRowCount - 1);
-        proxyModelCount = 0;
+        sitesModelRowCount = 0;
         q->endRemoveRows();
     }
 
     void endSitesReset()
     {
-        const int newRowCount = proxyModel->rowCount();
+        const int newRowCount = sitesModel->rowCount();
         if (newRowCount == 0)
             return;
 
         q->beginInsertRows(sitesRoot(), 0, newRowCount - 1);
-        proxyModelCount = newRowCount;
+        sitesModelRowCount = newRowCount;
         q->endInsertRows();
     }
 
@@ -653,9 +666,9 @@ QModelIndex OrganizationsModel::indexFromNodeId(nx::Uuid id) const
 
 QModelIndex OrganizationsModel::indexFromSystemId(const QString& id) const
 {
-    if (d->proxyModel)
+    if (d->sitesModel)
     {
-        auto systemsModel = qobject_cast<QnSystemsModel*>(d->proxyModel->sourceModel());
+        auto systemsModel = qobject_cast<QnSystemsModel*>(d->sitesModel.get());
         if (!systemsModel)
             return {};
 
@@ -663,7 +676,7 @@ QModelIndex OrganizationsModel::indexFromSystemId(const QString& id) const
         if (row == -1)
             return {};
 
-        return d->mapFromProxyModel(d->proxyModel->mapFromSource(systemsModel->index(row, 0)));
+        return d->mapFromProxyModel(systemsModel->index(row, 0));
     }
 
     return {};
@@ -684,10 +697,10 @@ int OrganizationsModel::rowCount(const QModelIndex& parent) const
     if (!parentNode)
         return 0;
 
-    // Do not use d->proxyModel->rowCount() directly as it requires special handling during model
+    // Do not use d->sitesModel->rowCount() directly as it requires special handling during model
     // reset.
     if (parentNode->type == OrganizationsModel::SitesNode)
-        return d->proxyModelCount;
+        return d->sitesModelRowCount;
 
     return parentNode->allChildren().size();
 }
@@ -711,7 +724,7 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
 
     if (!node)
     {
-        if (!d->proxyModel)
+        if (!d->sitesModel)
             return {};
 
         if (role == SectionRole)
@@ -729,9 +742,13 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
                 return QVariant::fromValue(OrganizationsModel::System);
             case IsFromSitesRole:
                 return true;
+            case TabSectionRole:
+                return OrganizationsModel::SitesTab;
+            case PathFromRootRole:
+                return (d->hasChannelPartners || d->hasOrganizations) ? kSites : "";
             case QnSystemsModel::IsSaasUninitialized:
             {
-                auto id = d->proxyModel->data(
+                auto id = d->sitesModel->data(
                     d->mapToProxyModel(index),
                     QnSystemsModel::SystemIdRoleId).toString();
                 // If offline system belongs to another channel partner we cannot detect SaaS state.
@@ -743,13 +760,13 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
             }
             case OrganizationsModel::IsAccessibleThroughOrgRole:
             {
-                auto id = d->proxyModel->data(
+                auto id = d->sitesModel->data(
                     d->mapToProxyModel(index),
                     QnSystemsModel::SystemIdRoleId).toString();
                 return !!d->nodes.find(nx::Uuid::fromStringSafe(id));
             }
         }
-        return d->proxyModel->data(d->mapToProxyModel(index), role);
+        return d->sitesModel->data(d->mapToProxyModel(index), role);
     }
 
     switch (role)
@@ -780,10 +797,40 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
                     return "";
             }
             break;
+        case PathFromRootRole:
+        {
+            std::vector<QModelIndex> parents;
+
+            for (auto parent = index.parent(); parent.isValid(); parent = parent.parent())
+                parents.push_back(parent);
+
+            if (parents.empty())
+                return data(index, OrganizationsModel::SectionRole);
+
+            QStringList sectionNameParts;
+            for (const auto& parent: std::ranges::reverse_view(parents))
+                sectionNameParts << parent.data(Qt::DisplayRole).toString();
+
+            return sectionNameParts.join(" / ");
+        }
         case IsLoadingRole:
             return node->loading;
         case IsFromSitesRole:
             return false;
+        case TabSectionRole:
+        {
+            for (auto current = node; current; current = current->parentNode())
+            {
+                if (current->parentNode() == d->root.get())
+                {
+                    return current->type == OrganizationsModel::Organization
+                        ? OrganizationsModel::OrganizationsTab
+                        : OrganizationsModel::ChannelPartnersTab;
+                }
+            }
+            NX_ASSERT(false, "Node is not under root");
+            return OrganizationsModel::SitesTab;
+        }
         case IsAdministratorRole:
             return node->hasOrganizationRole(kOrganizationAdministratorId);
         case QnSystemsModel::IsSaasUninitialized:
@@ -797,9 +844,9 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
         case IsAccessDeniedRole:
             return !node->accessible;
         default:
-            if (node->type == OrganizationsModel::System && d->proxyModel)
+            if (node->type == OrganizationsModel::System && d->sitesModel)
             {
-                auto systemsModel = qobject_cast<QnSystemsModel*>(d->proxyModel->sourceModel());
+                auto systemsModel = qobject_cast<QnSystemsModel*>(d->sitesModel.get());
                 if (!systemsModel)
                     return {};
 
@@ -807,8 +854,7 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
                 if (rowInSystems == -1)
                     return {};
 
-                return d->proxyModel->mapFromSource(
-                    systemsModel->index(rowInSystems, 0)).data(role);
+                return systemsModel->index(rowInSystems, 0).data(role);
             }
             break;
     }
@@ -884,6 +930,7 @@ QHash<int, QByteArray> OrganizationsModel::roleNames() const
         {IsAccessibleThroughOrgRole, "isAccessibleThroughOrg"},
         {IsAccessDeniedRole, "isAccessDenied"},
         {IsAdministratorRole, "isAdministrator"},
+        {PathFromRootRole, "pathFromRoot"},
     };
 
     auto roles = QnSystemsModel::kRoleNames;
@@ -933,9 +980,9 @@ void OrganizationsModel::setStatusWatcher(CloudStatusWatcher* statusWatcher)
         d->startPolling();
 }
 
-QAbstractProxyModel* OrganizationsModel::systemsModel() const
+QAbstractItemModel* OrganizationsModel::systemsModel() const
 {
-    return d->proxyModel;
+    return d->sitesModel;
 }
 
 void OrganizationsModel::Private::clearCloudData()
@@ -1095,7 +1142,6 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
         // Hide inaccessible channel partners.
         removeInaccessibleItems(&channelPartnerList->results);
 
-        setHasChannelPartners(!channelPartnerList->results.empty());
         setChannelPartners(*channelPartnerList);
 
         if (!channelPartnerList->results.empty())
@@ -1115,7 +1161,6 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
         }
 
         setOrganizations(*orgList, root->id);
-        setHasOrganizations(!orgList->results.empty());
         setTopLevelLoading(false);
 
         // Show inaccessible organizations but don't load them.
@@ -1190,9 +1235,9 @@ void OrganizationsModel::setOrgSystems(
     d->setOrgSystems(orgId, data);
 }
 
-void OrganizationsModel::setSystemsModel(QAbstractProxyModel* systemsModel)
+void OrganizationsModel::setSystemsModel(QAbstractItemModel* systemsModel)
 {
-    if (d->proxyModel == systemsModel)
+    if (d->sitesModel == systemsModel)
         return;
 
     d->connections.reset();
@@ -1223,7 +1268,7 @@ void OrganizationsModel::setSystemsModel(QAbstractProxyModel* systemsModel)
         d->connections << connect(systemsModel, &QAbstractItemModel::rowsInserted, this,
             [this](const QModelIndex& /*parent*/, int /*start*/, int /*end*/)
             {
-                d->proxyModelCount = d->proxyModel->rowCount();
+                d->sitesModelRowCount = d->sitesModel->rowCount();
                 endInsertRows();
             });
 
@@ -1236,7 +1281,7 @@ void OrganizationsModel::setSystemsModel(QAbstractProxyModel* systemsModel)
         d->connections << connect(systemsModel, &QAbstractItemModel::rowsRemoved, this,
             [this](const QModelIndex& /*parent*/, int /*start*/, int /*end*/)
             {
-                d->proxyModelCount = d->proxyModel->rowCount();
+                d->sitesModelRowCount = d->sitesModel->rowCount();
                 endRemoveRows();
             });
 
@@ -1272,12 +1317,12 @@ void OrganizationsModel::setSystemsModel(QAbstractProxyModel* systemsModel)
                 {
                     d->endSitesReset();
                 }
-                else if (d->proxyModelCount > 0)
+                else if (d->sitesModelRowCount > 0)
                 {
                     const auto sitesRoot = d->sitesRoot();
                     emit dataChanged(
                         index(0, 0, sitesRoot),
-                        index(d->proxyModelCount - 1, 0, sitesRoot));
+                        index(d->sitesModelRowCount - 1, 0, sitesRoot));
                 }
             });
 
@@ -1300,30 +1345,30 @@ void OrganizationsModel::setSystemsModel(QAbstractProxyModel* systemsModel)
 
     const auto sitesRoot = d->sitesRoot();
     const int newRowCount = systemsModel ? systemsModel->rowCount() : 0;
-    const int diff = newRowCount - d->proxyModelCount;
+    const int diff = newRowCount - d->sitesModelRowCount;
 
     if (diff > 0)
     {
-        beginInsertRows(sitesRoot, d->proxyModelCount, d->proxyModelCount + diff - 1);
-        d->proxyModel = systemsModel;
-        d->proxyModelCount = newRowCount;
+        beginInsertRows(sitesRoot, d->sitesModelRowCount, d->sitesModelRowCount + diff - 1);
+        d->sitesModel = systemsModel;
+        d->sitesModelRowCount = newRowCount;
         endInsertRows();
     }
     else if (diff < 0)
     {
-        beginRemoveRows(sitesRoot, d->proxyModelCount + diff, d->proxyModelCount - 1);
-        d->proxyModel = systemsModel;
-        d->proxyModelCount = newRowCount;
+        beginRemoveRows(sitesRoot, d->sitesModelRowCount + diff, d->sitesModelRowCount - 1);
+        d->sitesModel = systemsModel;
+        d->sitesModelRowCount = newRowCount;
         endRemoveRows();
     }
     else
     {
-        d->proxyModel = systemsModel;
-        d->proxyModelCount = newRowCount; //< No change, but added for consistency.
+        d->sitesModel = systemsModel;
+        d->sitesModelRowCount = newRowCount; //< No change, but added for consistency.
     }
 
-    if (d->proxyModelCount > 0)
-        emit dataChanged(index(0, 0, sitesRoot), index(d->proxyModelCount - 1, 0, sitesRoot));
+    if (d->sitesModelRowCount > 0)
+        emit dataChanged(index(0, 0, sitesRoot), index(d->sitesModelRowCount - 1, 0, sitesRoot));
 
     connect(this, &OrganizationsModel::hasChannelPartnersChanged, this,
         [this]() { d->notifyNodeUpdate(d->root.get(), {SectionRole}, /*recursively*/ true); });
@@ -1373,20 +1418,43 @@ bool OrganizationsFilterModel::lessThan(const QModelIndex& left, const QModelInd
     if (leftInCurrentRoot != rightInCurrentRoot)
         return leftInCurrentRoot;
 
-    QVariant leftParentType = left.parent().data(OrganizationsModel::TypeRole);
-    QVariant rightParentType = right.parent().data(OrganizationsModel::TypeRole);
+    // Other results.
 
-    if (leftParentType != rightParentType && leftParentType == OrganizationsModel::SitesNode)
-        return false;
+    const bool leftFromSites = left.data(OrganizationsModel::IsFromSitesRole).toBool();
+    const bool rightFromSites = right.data(OrganizationsModel::IsFromSitesRole).toBool();
 
-    QVariant leftType = left.data(OrganizationsModel::TypeRole);
-    QVariant rightType = right.data(OrganizationsModel::TypeRole);
+    // 'Sites' section go last.
+    if (leftFromSites != rightFromSites)
+        return rightFromSites;
+
+    const auto leftType = left.data(OrganizationsModel::TypeRole)
+        .value<OrganizationsModel::NodeType>();
+    const auto rightType = right.data(OrganizationsModel::TypeRole)
+        .value<OrganizationsModel::NodeType>();
+
+    // 'Partners' section go first.
+    const bool leftIsPartner = leftType == OrganizationsModel::ChannelPartner;
+    const bool rightIsPartner = rightType == OrganizationsModel::ChannelPartner;
+    if (leftIsPartner != rightIsPartner)
+        return leftIsPartner;
+
+    if (!leftInCurrentRoot || !m_currentRoot.isValid())
+    {
+        // Other sections go in alphabetical order.
+        const QString leftSection = left.data(OrganizationsModel::PathFromRootRole).toString();
+        const QString rightSection = right.data(OrganizationsModel::PathFromRootRole).toString();
+
+        const int sectionsOrder = nx::utils::naturalStringCompare(
+            leftSection,
+            rightSection,
+            Qt::CaseInsensitive);
+
+        if (sectionsOrder != 0)
+            return sectionsOrder < 0;
+    }
 
     if (leftType != rightType)
-    {
-        return leftType.value<OrganizationsModel::NodeType>()
-            < rightType.value<OrganizationsModel::NodeType>();
-    }
+        return leftType < rightType;
 
     return QnSystemsModel::lessThan(left, right);
 }
@@ -1439,7 +1507,12 @@ QModelIndex OrganizationsFilterModel::currentRoot() const
 bool OrganizationsFilterModel::isInCurrentRoot(const QModelIndex& index) const
 {
     if (!m_currentRoot.isValid())
-        return true;
+    {
+        auto tab = index.data(OrganizationsModel::TabSectionRole)
+            .value<OrganizationsModel::TabSection>();
+
+        return m_currentTab == tab;
+    }
 
     if (!sourceModel())
         return true;
@@ -1462,6 +1535,64 @@ bool OrganizationsFilterModel::isInCurrentRoot(const QModelIndex& index) const
     return false;
 }
 
+void OrganizationsFilterModel::setCurrentTab(OrganizationsModel::TabSection value)
+{
+    if (m_currentTab == value)
+        return;
+    m_currentTab = value;
+    emit currentTabChanged();
+    invalidate();
+}
+
+OrganizationsModel::TabSection OrganizationsFilterModel::currentTab() const
+{
+    return m_currentTab;
+}
+
+void OrganizationsFilterModel::sectionInfo(
+    const QModelIndex& index, bool& otherResults, bool& addPlaceholder) const
+{
+    if (isInCurrentRoot(index))
+    {
+        otherResults = false;
+        addPlaceholder = false;
+        return;
+    }
+
+    if (index.row() == 0)
+    {
+        otherResults = true;
+        addPlaceholder = true;
+        return;
+    }
+
+    const auto sectionName = index.data(OrganizationsModel::PathFromRootRole).toString();
+
+    for (int row = index.row() - 1; row >= 0; --row)
+    {
+        auto sibling = index.siblingAtRow(row);
+
+        const bool inCurrentRoot = isInCurrentRoot(sibling);
+        const bool sameSection = sectionName
+            == sibling.data(OrganizationsModel::PathFromRootRole).toString();
+
+        if (sameSection && !inCurrentRoot)
+        {
+            if (row != 0)
+                continue;
+
+            otherResults = true;
+            addPlaceholder = true;
+            return;
+        }
+
+        // We either found an item in the current root or we switched to another section.
+        otherResults = inCurrentRoot; //< (sameSection && inCurrentRoot) || (!sameSection && inCurrentRoot)
+        addPlaceholder = !inCurrentRoot && row == 0 && sameSection;
+        return;
+    }
+}
+
 QVariant OrganizationsFilterModel::data(const QModelIndex& index, int role) const
 {
     if (!sourceModel())
@@ -1470,57 +1601,26 @@ QVariant OrganizationsFilterModel::data(const QModelIndex& index, int role) cons
     if (role != OrganizationsModel::SectionRole)
         return base_type::data(index, role);
 
-    auto listModel = qobject_cast<LinearizationListModel*>(sourceModel());
-    if (!NX_ASSERT(listModel))
-        return {};
+    if (isInCurrentRoot(index))
+    {
+        auto listModel = qobject_cast<LinearizationListModel*>(sourceModel());
+        if (!NX_ASSERT(listModel))
+            return {};
 
-    auto treeIndex = listModel->mapToSource(mapToSource(index));
+        auto treeIndex = listModel->mapToSource(mapToSource(index));
 
-    QList<QModelIndex> parents;
+        if (treeIndex.parent() == m_currentRoot)
+            return treeIndex.data(OrganizationsModel::SectionRole);
+        else
+            return index.data(OrganizationsModel::PathFromRootRole);
+    }
 
-    for (auto parent = treeIndex.parent(); parent.isValid(); parent = parent.parent())
-        parents.push_back(parent);
-
-    std::reverse(parents.begin(), parents.end());
-
-    if (!m_currentRoot.isValid() || parents.contains(m_currentRoot))
-        return base_type::data(index, role).toString();
-
-    // The first section which items are not under m_currentRoot should have additional title
-    // "Other results".
     bool otherResults = false;
-
-    const auto sectionName = mapToSource(index).data(OrganizationsModel::SectionRole).toString();
-
     bool addPlaceholder = false;
 
-    if (index.row() == 0)
-    {
-        otherResults = true;
-        addPlaceholder = true;
-    }
-
-    for (int row = index.row() - 1; row >= 0; --row)
-    {
-        auto sibling = index.siblingAtRow(row);
-
-        const bool inCurrentRoot = isInCurrentRoot(sibling);
-
-        const bool sameSection =
-            mapToSource(sibling).data(OrganizationsModel::SectionRole).toString() == sectionName;
-
-        if (sameSection && !inCurrentRoot)
-        {
-            if (row != 0)
-                continue;
-        }
-
-        // We either found an item in the current root or we are at the first item.
-        // Anyway if its the same section then it should be marked as "Other results".
-        otherResults = inCurrentRoot || (row == 0 && sameSection);
-        addPlaceholder = row == 0 && sameSection;
-        break;
-    }
+    // The first section which items are not under m_currentRoot should have additional title
+    // "Other results". Placeholder for emptry results in current root is also part of this section.
+    sectionInfo(index, otherResults, addPlaceholder);
 
     const QString prefix = otherResults
         ? (tr("Other results") + "\n") //< QML will split this on "\n".
@@ -1530,13 +1630,7 @@ QVariant OrganizationsFilterModel::data(const QModelIndex& index, int role) cons
         ? QString("\n" + tr("Try changing the search parameters"))
         : QString{};
 
-    if (parents.isEmpty())
-        return prefix + base_type::data(index, role).toString() + suffix;
-
-    QStringList sectionNameParts;
-    for (const auto& parent: parents)
-        sectionNameParts << parent.data(Qt::DisplayRole).toString();
-    return prefix + sectionNameParts.join(" / ") + suffix;
+    return prefix + index.data(OrganizationsModel::PathFromRootRole).toString() + suffix;
 }
 
 } // nx::vms::client::core
