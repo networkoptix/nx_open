@@ -207,8 +207,8 @@ TEST_P(CrudHandlerTest, ObjectTrackGet)
         "id": "00000000-0000-0000-0000-000000000000",
         "deviceId": "00000000-0000-0000-0000-000000000000",
         "objectTypeId": "",
-        "firstAppearanceTimeMs": 0,
-        "lastAppearanceTimeMs": 0,
+        "startTimeMs": 0,
+        "endTimeMs": 0,
         "objectRegion": {
             "boundingBoxGrid": ""
         },
