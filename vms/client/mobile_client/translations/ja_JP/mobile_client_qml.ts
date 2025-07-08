@@ -791,14 +791,6 @@
       <translation>組織が見つかりませんでした。サポートにお問い合わせください。</translation>
     </message>
     <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation>ローカルネットワーク上にサイトが見つかりませんでした。手動でのサーバー追加、またはクラウドアカウントへのログインをお試しください。</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation>ローカルネットワーク上にサイトが見つかりませんでした。手動でサーバーを追加してください。</translation>
-    </message>
-    <message>
       <source>Log In</source>
       <translation>ログイン</translation>
     </message>
@@ -825,6 +817,10 @@
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
       <translation>サスペンド状態およびシャットダウン状態のサイトは利用できません。</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
     </message>
   </context>
   <context>

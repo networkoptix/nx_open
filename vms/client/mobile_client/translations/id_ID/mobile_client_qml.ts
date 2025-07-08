@@ -791,14 +791,6 @@
       <translation>Kami tidak&apos; menemukan organisasi apa pun, coba hubungi support</translation>
     </message>
     <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation>Kami tidak&apos; menemukan site apa pun di jaringan lokal Anda, coba tambahkan server secara manual atau masuk ke akun cloud Anda</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation>Kami tidak&apos; menemukan site apa pun di jaringan lokal Anda, coba tambahkan server secara manual</translation>
-    </message>
-    <message>
       <source>Log In</source>
       <translation>Masuk</translation>
     </message>
@@ -825,6 +817,10 @@
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
       <translation>Site dalam status Disuspensi atau Dimatikan tidak tersedia di</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
     </message>
   </context>
   <context>

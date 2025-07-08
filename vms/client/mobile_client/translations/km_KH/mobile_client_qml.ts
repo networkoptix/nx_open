@@ -791,14 +791,6 @@
       <translation type="unfinished">We didn&apos;t find any organizations, try contacting support</translation>
     </message>
     <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation type="unfinished">We didn&apos;t find any sites on your local network, try adding servers manually</translation>
-    </message>
-    <message>
       <source>Log In</source>
       <translation type="unfinished">Log In</translation>
     </message>
@@ -825,6 +817,10 @@
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
       <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
     </message>
   </context>
   <context>

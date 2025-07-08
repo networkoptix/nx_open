@@ -792,14 +792,6 @@
       <translation>Nous avons trouvé aucune organisation, essayez de contacter le support</translation>
     </message>
     <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation>Nous n'avons trouvé aucun site sur votre réseau local, essayez d'ajouter des serveurs manuellement ou connectez-vous à votre compte cloud.</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation>Nous n'avons trouvé aucun site sur votre réseau local, essayez d'ajouter des serveurs manuellement.</translation>
-    </message>
-    <message>
       <source>Log In</source>
       <translation>Connexion</translation>
     </message>
@@ -826,6 +818,10 @@
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
       <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
     </message>
   </context>
   <context>
