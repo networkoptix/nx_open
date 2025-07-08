@@ -424,7 +424,7 @@ void Session::Private::connectToKnownServer(nx::vms::client::core::RemoteConnect
 
 void Session::Private::resetCurrentConnection()
 {
-    m_connectionProcess.reset();
+    core::RemoteConnectionFactory::destroyAsync(std::move(m_connectionProcess));
     q->systemContext()->setSession({});
     core::appContext()->networkModule()->setSession({});
 
