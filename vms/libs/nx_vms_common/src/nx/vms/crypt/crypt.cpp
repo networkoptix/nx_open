@@ -12,7 +12,6 @@
 
 namespace nx::vms::crypt {
 
-
 const EVP_CIPHER* toCipher(Algorithm algorithm)
 {
     switch(algorithm)
@@ -86,7 +85,7 @@ AesKey makeKey(const QString& password, Algorithm algorithm, const QByteArray& s
     hash.addData(result.salt);
     hash.addData(passwordBytes.data(), passwordBytes.size());
     auto ivVect = hash.result();
-    NX_ASSERT(ivVect.size() >= result.ivVect.size());
+    NX_ASSERT((size_t)ivVect.size() >= result.ivVect.size());
     memcpy(result.ivVect.data(), ivVect.data(), result.ivVect.size());
 
     return result;

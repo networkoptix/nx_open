@@ -174,7 +174,7 @@ QString serializeLayout(const QnAviArchiveMetadata& metadata)
 static int getVideoRotation(const AVFormatContext* context)
 {
     std::optional<int> result;
-    for (int i = 0; i < context->nb_streams; ++i)
+    for (unsigned int i = 0; i < context->nb_streams; ++i)
     {
         if (context->streams[i]->codecpar
             && context->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)

@@ -303,7 +303,7 @@ NodePtr AnalyticsEntitiesTreeBuilder::eventTypesForRulesPurposes(
      */
     using namespace nx::utils;
     std::set<nx::Uuid> allowed;
-    for (size_t i = 0; i < devices.size(); ++i)
+    for (qsizetype i = 0; i < devices.size(); ++i)
     {
         if (i == 0)
             allowed = devices[i]->compatibleAnalyticsEngines();
