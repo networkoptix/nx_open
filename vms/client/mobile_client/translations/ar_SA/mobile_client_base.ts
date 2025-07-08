@@ -27,6 +27,10 @@
         <numerusform>%n Object Attributes</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Shared Only</source>
+      <translation type="unfinished">Shared Only</translation>
+    </message>
   </context>
   <context>
     <name>QnLayoutsModelUnsorted</name>

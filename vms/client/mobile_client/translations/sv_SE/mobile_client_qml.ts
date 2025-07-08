@@ -372,6 +372,10 @@
       <source>Search Filters</source>
       <translation>Sökfilter</translation>
     </message>
+    <message>
+      <source>Shared Only</source>
+      <translation type="unfinished">Shared Only</translation>
+    </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>
@@ -796,14 +800,6 @@
       <translation>Vi hittade&apos;inga organisationer, försök kontakta supporten</translation>
     </message>
     <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation>Vi hittade inga webbplatser på ditt lokala nätverk, försök lägga till servrar manuellt eller logga in på ditt molnkonto</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation>Vi hittade inga webbplatser på ditt lokala nätverk, försök lägga till servrar manuellt eller logga in på ditt molnkonto</translation>
-    </message>
-    <message>
       <source>Log In</source>
       <translation>Logga in</translation>
     </message>
@@ -830,6 +826,10 @@
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
       <translation>Webbplatser i avstängt eller avstängt tillstånd är inte tillgängliga</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
     </message>
   </context>
   <context>

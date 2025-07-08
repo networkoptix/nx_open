@@ -372,6 +372,10 @@
       <source>Search Filters</source>
       <translation>Filtros de busca</translation>
     </message>
+    <message>
+      <source>Shared Only</source>
+      <translation type="unfinished">Shared Only</translation>
+    </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>
@@ -796,14 +800,6 @@
       <translation>Non atopamos ninguhna organización, por favor, proba a poñerte en contacto co servizo de asistencia</translation>
     </message>
     <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation>Non atopamos ningún sitio na túa rede local, por favor, proba a engadir servidores manualmente ou inicia sesión na túa conta na nube.</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation>Non atopamos ningún sitio na túa rede local, por favor, proba a engadir servidores manualmente</translation>
-    </message>
-    <message>
       <source>Log In</source>
       <translation>Iniciar sesión</translation>
     </message>
@@ -830,6 +826,10 @@
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
       <translation>Os sitios en estado Suspendido ou Pechado non están dispoñibles</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
     </message>
   </context>
   <context>

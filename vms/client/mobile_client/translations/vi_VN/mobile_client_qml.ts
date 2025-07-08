@@ -371,6 +371,10 @@
       <source>Search Filters</source>
       <translation>Bộ lọc Tìm kiếm</translation>
     </message>
+    <message>
+      <source>Shared Only</source>
+      <translation type="unfinished">Shared Only</translation>
+    </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>
@@ -795,14 +799,6 @@
       <translation>Chúng tôi không tìm thấy bất kỳ tổ chức nào, hãy thử liên hệ với bộ phận hỗ trợ</translation>
     </message>
     <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation>Chúng tôi không tìm thấy bất kỳ Chi nhánh nào trong mạng cục bộ, hãy thử thêm máy chủ theo cách thủ công hoặc đăng nhập vào tài khoản đám mây của bạn</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation>Chúng tôi không tìm thấy bất kỳ Chi nhánh nào trong mạng cục bộ, hãy thử thêm máy chủ theo cách thủ công</translation>
-    </message>
-    <message>
       <source>Log In</source>
       <translation>Đăng nhập</translation>
     </message>
@@ -829,6 +825,10 @@
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
       <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
     </message>
   </context>
   <context>

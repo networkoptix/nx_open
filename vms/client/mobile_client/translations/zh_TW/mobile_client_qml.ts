@@ -371,6 +371,10 @@
       <source>Search Filters</source>
       <translation>搜尋條件</translation>
     </message>
+    <message>
+      <source>Shared Only</source>
+      <translation type="unfinished">Shared Only</translation>
+    </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>
@@ -795,14 +799,6 @@
       <translation>我們沒有找到任何組織，請聯絡技術支援</translation>
     </message>
     <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-      <translation>我們在你的區域網路沒有找到任何站點，試著手動加入伺服器或登入你的cloud帳號</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-      <translation>我們在你的區域網路沒有找到任何站點，試著手動加入伺服器</translation>
-    </message>
-    <message>
       <source>Log In</source>
       <translation>登入</translation>
     </message>
@@ -829,6 +825,10 @@
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
       <translation>處於暫停或關閉狀態的站點不會出現</translation>
+    </message>
+    <message>
+      <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
+      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
     </message>
   </context>
   <context>
