@@ -993,9 +993,11 @@ int QnVirtualCameraResource::getMaxFps(nx::vms::api::StreamIndex streamIndex) co
 
 void QnVirtualCameraResource::setMaxFps(int fps, nx::vms::api::StreamIndex streamIndex)
 {
-    nx::vms::api::CameraMediaCapability capability = cameraMediaCapability();
-    capability.streamCapabilities[streamIndex].maxFps = fps;
-    setCameraMediaCapability(capability);
+    updateCameraMediaCapability(
+        [streamIndex, fps](nx::vms::api::CameraMediaCapability& capability)
+        {
+            capability.streamCapabilities[streamIndex].maxFps = fps;
+        });
 }
 
 int QnVirtualCameraResource::reservedSecondStreamFps() const
@@ -1164,6 +1166,23 @@ void QnVirtualCameraResource::setCameraMediaCapability(const nx::vms::api::Camer
 {
     setProperty(
         nx::vms::api::device_properties::kMediaCapabilities, QString::fromLatin1(QJson::serialized(value)));
+    m_cachedCameraMediaCapabilities.reset();
+}
+
+void QnVirtualCameraResource::updateCameraMediaCapability(
+    std::function<void(nx::vms::api::CameraMediaCapability& capability)> updater)
+{
+    if (!NX_ASSERT(updater))
+        return;
+
+    updateProperty(nx::vms::api::device_properties::kMediaCapabilities,
+        [updater](QString value)
+        {
+            auto capability =
+                QJson::deserialized<nx::vms::api::CameraMediaCapability>(value.toUtf8());
+            updater(capability);
+            return QString::fromLatin1(QJson::serialized(capability));
+        });
     m_cachedCameraMediaCapabilities.reset();
 }
 

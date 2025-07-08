@@ -352,6 +352,8 @@ public:
 
     nx::vms::api::CameraMediaCapability cameraMediaCapability() const;
     void setCameraMediaCapability(const nx::vms::api::CameraMediaCapability& value);
+    void updateCameraMediaCapability(
+        std::function<void(nx::vms::api::CameraMediaCapability& capability)> updater);
 
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() { return 0; }
 
