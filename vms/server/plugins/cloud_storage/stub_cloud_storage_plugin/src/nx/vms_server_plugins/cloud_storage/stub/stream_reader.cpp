@@ -87,7 +87,7 @@ nx::sdk::ErrorCode StreamReader::seek(
         m_file->seek(timestampUs, findKeyFrame, selectedPositionUs);
         return nx::sdk::ErrorCode::noError;
     }
-    catch (const std::exception& e)
+    catch (const std::exception&)
     {
         NX_OUTPUT << "Seek failed. timestamp: " << timestampUs << " file: " << m_file->name();
         return nx::sdk::ErrorCode::ioError;
