@@ -98,6 +98,7 @@ set(translations
     ru_RU
     es_ES
     ca_ES
+    gl_ES
     id_ID
     it_IT
     ja_JP
