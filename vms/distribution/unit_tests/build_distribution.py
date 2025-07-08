@@ -176,7 +176,9 @@ def main():
     isWindows = conf.CMAKE_SYSTEM_NAME == "Windows"
     isMac = conf.CMAKE_SYSTEM_NAME == "Darwin"
     isLinux = conf.CMAKE_SYSTEM_NAME == "Linux"
-    withClient = parse_boolean(conf.WITH_CLIENT)
+    withDesktopClient = parse_boolean(conf.WITH_DESKTOP_CLIENT)
+    withMobileClient = parse_boolean(conf.WITH_MOBILE_CLIENT)
+    withClient = withDesktopClient or withMobileClient
     withMediaServer = parse_boolean(conf.WITH_MEDIA_SERVER)
     withAnalyticsServer = parse_boolean(conf.WITH_ANALYTICS_SERVER)
 
@@ -245,7 +247,21 @@ def main():
                 a,
                 target_dir=bin_dir,
                 source_dir=src_bin_dir,
-                file_list=["client_external.dat", "client_core_external.dat", "bytedance_iconpark.dat"])
+                file_list=["client_core_external.dat", "bytedance_iconpark.dat"])
+
+        if withDesktopClient:
+            archiveFiles(
+                a,
+                target_dir=bin_dir,
+                source_dir=src_bin_dir,
+                file_list=["client_external.dat"])
+
+        if withMobileClient:
+            archiveFiles(
+                a,
+                target_dir=bin_dir,
+                source_dir=src_bin_dir,
+                file_list=["mobile_client_external.dat"])
 
         # Archive VMS external resources.
         if withMediaServer and not parse_boolean(conf.IS_OPEN_SOURCE):
