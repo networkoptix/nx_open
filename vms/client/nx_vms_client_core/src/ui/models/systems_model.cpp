@@ -373,23 +373,26 @@ bool QnSystemsModel::lessThan(const QModelIndex& sourceLeft, const QModelIndex& 
     if (leftIsConnectableMobile != rightIsConnectableMobile)
         return leftIsConnectableMobile;
 
+    if (leftIsOnline != rightIsOnline)
+        return leftIsOnline;
+
     const bool leftIsPending = sourceLeft.data(QnSystemsModel::IsPending).toBool();
     const bool rightIsPending = sourceRight.data(QnSystemsModel::IsPending).toBool();
 
     if (leftIsPending != rightIsPending)
-        return leftIsPending;
-
-    const bool leftIsCloud = sourceLeft.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
-    const bool rightIsCloud = sourceRight.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
-
-    if (leftIsCloud != rightIsCloud)
-        return leftIsCloud;
+        return rightIsPending;
 
     const bool leftIsLocalhost = isLocalHost(sourceLeft);
     const bool rightIsLocalhost = isLocalHost(sourceRight);
 
     if (leftIsLocalhost != rightIsLocalhost)
         return leftIsLocalhost;
+
+    const bool leftIsCloud = sourceLeft.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
+    const bool rightIsCloud = sourceRight.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
+
+    if (leftIsCloud != rightIsCloud)
+        return leftIsCloud;
 
     const int namesOrder = nx::utils::naturalStringCompare(
         sourceLeft.data(QnSystemsModel::SystemNameRoleId).toString(),

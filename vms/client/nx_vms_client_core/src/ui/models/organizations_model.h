@@ -49,6 +49,8 @@ public:
         IsAccessibleThroughOrgRole,
         IsAccessDeniedRole,
         IsAdministratorRole,
+        PathFromRootRole,
+        TabSectionRole,
 
         RolesCount
     };
@@ -64,12 +66,20 @@ public:
     };
     Q_ENUM(NodeType)
 
+    enum TabSection
+    {
+        ChannelPartnersTab = 0,
+        OrganizationsTab = 1,
+        SitesTab = 2,
+    };
+    Q_ENUM(TabSection)
+
     Q_PROPERTY(CloudStatusWatcher* statusWatcher
         READ statusWatcher
         WRITE setStatusWatcher
         NOTIFY statusWatcherChanged);
 
-    Q_PROPERTY(QAbstractProxyModel* systemsModel
+    Q_PROPERTY(QAbstractItemModel* systemsModel
         READ systemsModel
         WRITE setSystemsModel
         NOTIFY systemsModelChanged)
@@ -109,8 +119,8 @@ public:
     CloudStatusWatcher* statusWatcher() const;
     void setStatusWatcher(CloudStatusWatcher* statusWatcher);
 
-    QAbstractProxyModel* systemsModel() const;
-    void setSystemsModel(QAbstractProxyModel* systemsModel);
+    QAbstractItemModel* systemsModel() const;
+    void setSystemsModel(QAbstractItemModel* systemsModel);
 
     QModelIndex sitesRoot() const;
 
@@ -159,6 +169,11 @@ class NX_VMS_CLIENT_CORE_API OrganizationsFilterModel: public QSortFilterProxyMo
         WRITE setCurrentRoot
         NOTIFY currentRootChanged);
 
+    Q_PROPERTY(nx::vms::client::core::OrganizationsModel::TabSection currentTab
+        READ currentTab
+        WRITE setCurrentTab
+        NOTIFY currentTabChanged);
+
 public:
     OrganizationsFilterModel(QObject* parent = nullptr);
     bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
@@ -173,20 +188,26 @@ public:
     void setCurrentRoot(const QModelIndex& index);
     QModelIndex currentRoot() const;
 
+    void setCurrentTab(OrganizationsModel::TabSection value);
+    OrganizationsModel::TabSection currentTab() const;
+
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
 signals:
     void hideOrgSystemsFromSitesChanged();
     void showOnlyChanged();
     void currentRootChanged();
+    void currentTabChanged();
 
 private:
     bool isInCurrentRoot(const QModelIndex& index) const;
+    void sectionInfo(const QModelIndex& index, bool& otherResults, bool& addPlaceholder) const;
 
 private:
     bool m_hideOrgSystemsFromSites = false;
     QSet<OrganizationsModel::NodeType> m_showOnly;
     QPersistentModelIndex m_currentRoot;
+    OrganizationsModel::TabSection m_currentTab = OrganizationsModel::SitesTab;
     std::unique_ptr<PersistentIndexWatcher> m_currentRootWatcher;
 };
 

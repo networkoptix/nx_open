@@ -16,6 +16,7 @@ ListView
     property alias showOnly: filterModel.showOnly
 
     property alias currentRoot: filterModel.currentRoot
+    property alias currentTab: filterModel.currentTab
 
     property var organizationsModel: siteModel.sourceModel
 

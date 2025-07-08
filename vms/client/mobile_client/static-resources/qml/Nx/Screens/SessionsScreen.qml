@@ -154,6 +154,7 @@ Page
         {
             name: "inPartnerOrOrg"
             when: rootIndex !== NxGlobals.invalidModelIndex()
+                && rootIndex !== organizationsModel.sitesRoot
 
             PropertyChanges
             {
@@ -214,7 +215,7 @@ Page
 
     OrderedSystemsModel
     {
-        id: systemsModel
+        id: orderedSystemsModel
     }
 
     OrganizationsModel
@@ -222,7 +223,7 @@ Page
         id: organizationsModel
 
         statusWatcher: cloudUserProfileWatcher.statusWatcher
-        systemsModel: systemsModel
+        systemsModel: orderedSystemsModel.sourceModel
     }
 
     ModelDataAccessor
@@ -288,6 +289,18 @@ Page
                 && cloudUserProfileWatcher.isOrgUser
                 && (organizationsModel.hasChannelPartners
                     || organizationsModel.hasOrganizations)
+
+            readonly property var selectedTab:
+            {
+                if (tabGroup.checkedButton === partnersTabButton)
+                    return OrganizationsModel.ChannelPartnersTab
+                if (tabGroup.checkedButton === organizationsTabButton)
+                    return OrganizationsModel.OrganizationsTab
+                if (tabGroup.checkedButton === sitesTabButton)
+                    return OrganizationsModel.SitesTab
+
+                return OrganizationsModel.SitesTab
+            }
 
             ButtonGroup
             {
@@ -432,15 +445,16 @@ Page
             visible: !loadingIndicator.visible
             siteModel: linearizationListModel
             hideOrgSystemsFromSites: cloudUserProfileWatcher.isOrgUser
+            currentTab: systemTabs.selectedTab
             showOnly:
             {
                 if (!systemTabsRow.visible)
                     return []
 
-                if (partnersTabButton.checked)
+                if (currentTab === OrganizationsModel.ChannelPartnersTab)
                     return [OrganizationsModel.ChannelPartner]
 
-                if (organizationsTabButton.checked)
+                if (currentTab === OrganizationsModel.OrganizationsTab)
                     return [OrganizationsModel.Organization]
 
                 return []
@@ -681,7 +695,8 @@ Page
         function onFullTreeLoaded()
         {
             if (sessionsScreen.rootIndex === NxGlobals.invalidModelIndex()
-                && appGlobalState.lastOpenedNodeId !== NxGlobals.uuid(""))
+                && appGlobalState.lastOpenedNodeId !== NxGlobals.uuid("")
+                && appGlobalState.lastOpenedNodeId !== undefined)
             {
                 const nodeIndex =
                     organizationsModel.indexFromNodeId(appGlobalState.lastOpenedNodeId)
@@ -826,11 +841,12 @@ Page
         if (!searchField.visible)
             return
 
-        if (state !== "inPartnerOrOrg" && !searching)
-            return
+        if (state === "inPartnerOrOrg")
+        {
+            linearizationListModel.sourceRoot = siteList.currentRoot
+            searchField.visible = false
+        }
 
-        linearizationListModel.sourceRoot = siteList.currentRoot
-        searchField.visible = false
         searchField.clear()
         searchField.resetFocus()
         siteList.positionViewAtBeginning()
