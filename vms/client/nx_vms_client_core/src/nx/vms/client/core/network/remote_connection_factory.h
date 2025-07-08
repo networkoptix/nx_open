@@ -40,7 +40,7 @@ public:
     using ContextPtr = std::shared_ptr<Context>;
 
     using Process = RemoteConnectionProcess;
-    using ProcessPtr = std::shared_ptr<Process>;
+    using ProcessPtr = std::unique_ptr<Process>;
 
     struct CloudCredentialsProvider
     {

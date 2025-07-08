@@ -118,7 +118,7 @@ private:
     std::optional<RemoteConnectionError> m_error;
 };
 
-struct RemoteConnectionProcess
+struct NX_VMS_CLIENT_CORE_API RemoteConnectionProcess
 {
     std::shared_ptr<RemoteConnectionFactoryContext> context;
     std::future<void> future;

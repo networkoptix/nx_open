@@ -1253,7 +1253,7 @@ RemoteConnectionFactory::ProcessPtr RemoteConnectionFactory::connect(
     std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate> customUserInteractionDelegate,
     bool ignoreCachedData)
 {
-    auto process = std::make_shared<RemoteConnectionProcess>(systemContext);
+    auto process = std::make_unique<RemoteConnectionProcess>(systemContext);
 
     process->context->logonData = logonData;
     process->context->customUserInteractionDelegate = std::move(customUserInteractionDelegate);
@@ -1335,8 +1335,13 @@ RemoteConnectionFactory::ProcessPtr RemoteConnectionFactory::connect(
 
 void RemoteConnectionFactory::destroyAsync(ProcessPtr&& process)
 {
-    NX_ASSERT(process.use_count() == 1);
-    std::thread([process = std::move(process)]{ }).detach();
+    if (!process)
+        return;
+
+    auto future = std::move(process->future);
+    process.reset();
+
+    std::thread([future = std::move(future)] {}).detach();
 }
 
 } // namespace nx::vms::client::core
