@@ -372,6 +372,10 @@
         <source>Search Filters</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Shared Only</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>HorizontalCalendar</name>
@@ -796,14 +800,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>We didn&apos;t find any sites on your local network, try adding servers manually or log in to your cloud account</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>We didn&apos;t find any sites on your local network, try adding servers manually</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Log In</source>
         <translation></translation>
     </message>
@@ -829,6 +825,10 @@
     </message>
     <message>
         <source>Sites in the Suspended or Shutdown state are not available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
