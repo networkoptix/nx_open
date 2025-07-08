@@ -264,13 +264,12 @@ protected:
         const MessageBus* owner;
     } m_miscData;
     QMap<nx::Uuid, P2pConnectionPtr> m_connections; //< Actual connection list
+    QMap<nx::Uuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
     QElapsedTimer m_lastPeerInfoTimer;
     QMap<vms::api::PersistentIdData, vms::api::RuntimeData> m_lastRuntimeInfo;
 protected:
     void dropConnectionsThreadUnsafe();
 private:
-    QMap<nx::Uuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
-
     struct RemoteConnection
     {
         RemoteConnection() {}

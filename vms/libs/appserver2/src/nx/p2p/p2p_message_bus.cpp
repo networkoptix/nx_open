@@ -600,13 +600,25 @@ void MessageBus::at_stateChanged(
     if (!connection)
         return;
 
-    NX_VERBOSE(this, "Connection [%1] state changed to [%2]", connection->remotePeer().id, connection->state());
+    const auto& remoteId = connection->remotePeer().id;
+    if (!connection->isIncoming() && connection->state() >= Connection::State::Error)
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        auto it = m_connections.find(remoteId);
+        if (it != m_connections.end() && (*it)->state() == Connection::State::Connected)
+        {
+            NX_VERBOSE(this,
+                "Ignore connection [%1] state change to [%2]", remoteId, connection->state());
+            m_outgoingConnections.remove(remoteId);
+            return;
+        }
+    }
+
+    NX_VERBOSE(this, "Connection [%1] state changed to [%2]", remoteId, connection->state());
 
     emit stateChanged(connection->remotePeer().id, toString(connection->state()));
 
     NX_MUTEX_LOCKER lock(&m_mutex);
-
-    const auto& remoteId = connection->remotePeer().id;
     m_lastConnectionState[remoteId] = connection->state();
 
     switch (connection->state())
