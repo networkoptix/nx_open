@@ -393,9 +393,9 @@ struct NX_VMS_API ObjectTrackV4
     /**%apidoc Id of an Object Type of the last received Object Metadata in the Track. */
     QString objectTypeId;
 
-    std::chrono::milliseconds firstAppearanceTimeMs;
+    std::chrono::milliseconds startTimeMs;
 
-    std::chrono::milliseconds lastAppearanceTimeMs;
+    std::chrono::milliseconds endTimeMs;
 
     BaseObjectRegion objectRegion;
 
@@ -408,7 +408,7 @@ struct NX_VMS_API ObjectTrackV4
     nx::Uuid analyticsEngineId;
 };
 #define ObjectTrackV4_Fields \
-    (id)(deviceId)(objectTypeId)(firstAppearanceTimeMs)(lastAppearanceTimeMs) \
+    (id)(deviceId)(objectTypeId)(startTimeMs)(endTimeMs) \
     (objectRegion)(attributes)(bestShot)(title)(analyticsEngineId)
 NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackV4, (json));
 NX_REFLECTION_INSTRUMENT(ObjectTrackV4, ObjectTrackV4_Fields)
