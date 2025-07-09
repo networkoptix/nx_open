@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Só compartido</translation>
     </message>
   </context>
   <context>

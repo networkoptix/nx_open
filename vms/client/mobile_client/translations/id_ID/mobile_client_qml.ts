@@ -373,7 +373,7 @@
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Hanya Dibagikan</translation>
     </message>
   </context>
   <context>
@@ -688,11 +688,11 @@
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this layout</source>
-      <translation type="unfinished">We didn&apos;t find any cameras on this layout</translation>
+      <translation>Kami tidak&apos; menemukan kamera apa pun pada layout ini</translation>
     </message>
     <message>
       <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
-      <translation type="unfinished">We didn&apos;t find any cameras on this site. You can add them in our desktop application</translation>
+      <translation>Kami tidak&apos; menemukan kamera apa pun di site ini. Anda dapat menambahkannya di aplikasi desktop kami</translation>
     </message>
   </context>
   <context>
@@ -828,7 +828,7 @@
     </message>
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+      <translation>Tidak ditemukan site yang dapat diakses. Masuk ke akun cloud atau koneksikan ke server lokal</translation>
     </message>
   </context>
   <context>
