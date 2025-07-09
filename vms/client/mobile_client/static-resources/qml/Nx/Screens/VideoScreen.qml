@@ -217,7 +217,8 @@ Page
         {
             id: bookmarksMenuItem
             text: qsTr("Bookmarks")
-            visible: controller.systemContext?.hasViewBookmarksPermission ?? false
+            visible: (controller.systemContext?.hasViewBookmarksPermission
+                && !(controller.resource?.flags & ResourceFlag.cross_system)) ?? false
             height: visible ? implicitHeight : 0
             onTriggered: Workflow.openEventSearchScreen(controller.resource.id, camerasModel)
         }
@@ -226,7 +227,8 @@ Page
         {
             id: objectsMenuItem
             text: qsTr("Objects")
-            visible: controller.systemContext?.hasSearchObjectsPermission ?? false
+            visible: (controller.systemContext?.hasSearchObjectsPermission
+                && !(controller.resource?.flags & ResourceFlag.cross_system)) ?? false
             height: visible ? implicitHeight : 0
             onTriggered: Workflow.openEventSearchScreen(controller.resource.id, camerasModel, true)
         }
