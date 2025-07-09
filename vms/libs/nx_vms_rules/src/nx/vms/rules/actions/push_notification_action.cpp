@@ -47,13 +47,8 @@ const ItemDescriptor& PushNotificationAction::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("Body")),
                 "Notification body.",
                 {
-                    { "text", "{event.description}" }
+                    { "text", QString{"{event.description}\n%1"}.arg(kEventSourceTag) }
                 }),
-            makeFieldDescriptor<ActionFlagField>(
-                "addSource",
-                NX_DYNAMIC_TRANSLATABLE(tr("Add Source Device name to Body")),
-                "Specifies whether the source "
-                "device name must be added to the body or not."),
             utils::makeIntervalFieldDescriptor(
                 Strings::intervalOfAction()),
             makeFieldDescriptor<EventDevicesField>(

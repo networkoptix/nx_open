@@ -18,7 +18,6 @@ class NX_VMS_RULES_API PushNotificationAction: public nx::vms::rules::BasicActio
     FIELD(std::chrono::microseconds, interval, setInterval)
     FIELD(QString, caption, setCaption)
     FIELD(QString, description, setDescription)
-    FIELD(bool, addSource, setAddSource)
 
     FIELD(nx::Uuid, serverId, setServerId)
     FIELD(UuidList, deviceIds, setDeviceIds)
@@ -28,6 +27,8 @@ public:
     PushNotificationAction() = default;
 
     static const ItemDescriptor& manifest();
+
+    static constexpr auto kEventSourceTag = "[{site.name}: {event.source}]";
 };
 
 } // namespace nx::vms::rules
