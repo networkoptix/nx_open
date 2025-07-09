@@ -19,12 +19,9 @@
             <numerusform>%n Object Attributes</numerusform>
         </translation>
     </message>
-</context>
-<context>
-    <name>QnCloudSystemInformationWatcher</name>
     <message>
-        <source>Your Site</source>
-        <translation></translation>
+        <source>Shared Only</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
